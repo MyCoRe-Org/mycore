@@ -1,11 +1,23 @@
 %
 %
-\subsection{Das Klassifikationen-Datenmodel}
+\subsection{Das Klassifikationen-Datenmodell}
 %
 %
-Wie bereits erwähnt dienen Klassifikationen der einheitlichen Gliederung bestimmter Fakten. Sie sorgen dafür, dass z. B. eine einheitliche Schreibweise für bestimmte Begriffe verwendet wird. Diese Einzelbegriffe werden in als Kategorien bezeichnet. Innerhalb einer Kategorie kann der Begriff z. B. in verschiedenen Sprachen aufgezeichnet sein. Die eindeutige Zuordnung zu einer Kategorie erfolgt über einen Identifizierer. Dieser besteht aus der Klassifikations- und Kategorie-ID und muss eindeutig sein.\\[2ex]
-Klassifikationen werden im MyCore-Sample als extra XML-Files erstellt, in die Anwendung importiert und in Form einer Datenbank gespeichert. Dies ist für den Nutzer transparent und erfolgt mittels Schnittstellen. Der Zugriff auf die Daten erfolgt dann durch den oben genannten Identifizierer. Die Klassifikations-ID ist eine MCRObjectID mit dem Typ \mcridentifier{class}. Die Kategorie-ID ist dagegen frei wählbar. Sie darf mehrstufig ein, jede Stufe spiegelt eine Hierarchieebene wieder. Die Stufen in der ID werden mit einem Punkt voneinander getrennt, z. B. 'Uni.URZ'. Das wiederum gestattet eine Abfrage nach allen untergeordneten Stufen bzw. Sub-Kategorien wie z. B. 'Uni.*'. {\bf Achtung, sollten Sie Zahlen als Kategorie-ID's mit verwenden, so planen Sie entsprechende Vornullen ein, andernfalls wird das Suchergebnis fehlerhaft!}.\\[2ex]
-Im \mcridentifier{ID} Attribut einer \mcridentifier{category} ist der eindeutige Identifizierer anzugeben. Das darunter befindliche \mcridentifier{label} Tag bietet die Möglichkeit, eine Kurzbezeichnung anzugeben. Mehrsprachige Ausführungen sind erlaubt. Das selbe gilt für das Tag \mcridentifier{description}. Beide Werte werden als Strings aufgefasst. Eine \mcridentifier{category} kann wiederum \mcridentifier{category} Tags beinhalten.\\[2ex]
+Wie bereits erwähnt dienen Klassifikationen der einheitlichen Gliederung bestimmter Fakten. Sie sorgen
+dafür, dass \zB eine einheitliche Schreibweise für bestimmte Begriffe verwendet wird. Diese 
+Einzelbegriffe werden als Kategorien bezeichnet. Innerhalb einer Kategorie kann der Begriff \zB in 
+verschiedenen Sprachen aufgezeichnet sein. Die eindeutige Zuordnung zu einer Kategorie erfolgt über einen 
+Bezeichner. Dieser besteht aus der Klassifikations- und Kategorie-ID und muss eindeutig sein.\\[2ex]
+Klassifikationen werden im MyCore-Sample als extra XML-Datei erstellt, in die Anwendung importiert und in 
+Form einer Datenbank gespeichert. Dies ist für den Nutzer transparent und erfolgt mittels Schnittstellen. 
+Der Zugriff auf die Daten erfolgt dann durch den oben genannten Bezeichner. Die Klassifikations-ID ist 
+eine MCRObjectID mit dem Typ \mcridentifier{class}. Die Kategorie-ID ist dagegen frei wählbar. Sie darf 
+mehrstufig ein, jede Stufe spiegelt eine Hierarchieebene wieder. Die Stufen in der ID werden mit einem 
+Punkt voneinander getrennt, \zB 'Uni.URZ'. Das wiederum gestattet eine Abfrage nach allen 
+untergeordneten Stufen bzw. Sub-Kategorien wie \zB 'Uni.*'. {\bf Achtung, sollten Sie Zahlen als 
+Kategorie-ID's mit verwenden, so planen Sie entsprechende Vornullen ein, andernfalls wird das Suchergebnis 
+fehlerhaft!}.\\[2ex]
+Im \mcridentifier{ID} Attribut einer \mcridentifier{category} ist der eindeutige Bezeichner anzugeben. Das darunter befindliche \mcridentifier{label} Tag bietet die Möglichkeit, eine Kurzbezeichnung anzugeben. Mehrsprachige Ausführungen sind erlaubt. Dasselbe gilt für das Tag \mcridentifier{description}. Beide Werte werden als Strings aufgefasst. Eine \mcridentifier{category} kann wiederum \mcridentifier{category} Tags beinhalten.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}[caption=XML-Syntax eines Klassifikations-Objektes,label=lst:xml_syntax_metadatenclass]

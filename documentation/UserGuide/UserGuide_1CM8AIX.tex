@@ -240,8 +240,8 @@ Open \mcrcommand{https://<your hostname>/snoop} in the web browser.\\[2ex]
 \item Unpack the tar file to a \mcrfile{install\_root}
 \item READ the documentation!
 \item Set the JAVA\_HOME environment variable.
-\item Stop all WebSphere applications with \mrccommand{/usr/WebSphere/AppServer/bin/stopServer ...}\footnote{like icmrm or mycoresample}
-\item Start the install wizzard with \mrccommand{install\_root/updateWizard.sh} or as command line tool with \mrccommand{install\_root/updateSilent.sh}
+\item Stop all WebSphere applications with \mcrcommand{/usr/WebSphere/AppServer/bin/stopServer ...}\footnote{like icmrm or mycoresample}
+\item Start the install wizzard with \mcrcommand{install\_root/updateWizard.sh} or as command line tool with \mcrcommand{install\_root/updateSilent.sh}
 \begin{itemize}
 \item Select {\bf english}
 \item By default let the path of WebSphere on \mcrfile{/usr/WebSphere/AppServer}.  $\rightarrow$ {\bf 'Next'}
@@ -304,7 +304,7 @@ DB2AUTOSTART='YES'
 \item Dieser Punkt ist nur erforderlich, wenn ein TSM System eingesetzt werden soll.
 \begin{itemize}
 \item \mcrcommand{su - root}
-\ttem \mcrcommand{mkdir </home/rmadmin/staging>}
+\item \mcrcommand{mkdir </home/rmadmin/staging>}
 \item \mcrcommand{mklv -y <lvstaging> <vg..> 32}
 \item \mcrcommand{crfs -vjfs -d <lvstaging> -m </home/rmadmin/staging> -A yes}
 \item \mcrcommand{mount </home/rmadmin/staging>}
@@ -313,7 +313,7 @@ DB2AUTOSTART='YES'
 \item Now you must create a logical volume for the store of the Resource Manager.
 \begin{itemize}
 \item \mcrcommand{su - root}
-\ttem \mcrcommand{mkdir </home/rmadmin/storage>}
+\item \mcrcommand{mkdir </home/rmadmin/storage>}
 \item \mcrcommand{mklv -y <lvstorage> <vg..> 32}
 \item \mcrcommand{crfs -vjfs -d <lvstorage> -m </home/rmadmin/storage> -A yes}
 \item \mcrcommand{mount </home/rmadmin/storage>}

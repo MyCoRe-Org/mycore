@@ -3,15 +3,15 @@
 \subsection{Das Metadatenmodell}
 %
 %
-Die zu speichenden Daten des Beispiels wie auch anderer vom Anwender entwickelter Applikationen teilen sich in unserem Modell in Metadaten und digitale Objkete. Hinsichtlich letzterer sei auf den Anschnitt {\bf 'IFS und Content Store'} verwiesen. Unter Metadaten verstehen wir in MyCoRe  alle beschreibenden Daten des Objektes, die extern hinzugefügt, separat gespeichert und gesucht werden können. Dem gegenüber stehen Daten welche die digitalen Objekte selbst mitbringen. In diesem Abschnitt werden nur erstere behandelt. \\[2ex]
-Um die Metadaten besser auf unterschiedlichen Datenspiechern ablegen zu können, wurde eins System von XML-Strukturen entwickelt, welches es gestattet, neben den eigentlichen Daten wie Titel, Autor usw. auch Struktur- und Service-Informationen mit abzulegen. Die eigentlichen Nutzerdaten sind wiederum typisiert, was denen speicherunabhängige Aufzeichnung erheblich vereinfacht. Es steht dem Entwickler einer Anwendung jedoch frei, hier bei bedarf weitere hinzuzufügen. Im Folgenden soll nun der Aufbau der Metadaten-Objekte im Detail beschrieben werden. Zum verständnis des Samples sei hier auch auf den vorigen Abschnitt verwiesen.\\[2ex]
-Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstrukturen und Standard-Metadaten-Typen werden seitens MyCoRe bereits XMLSchema-Dateien mitgeliefert.
+Die zu speichernden Daten des Beispiels teilen sich in unserem Modell in Metadaten und digitale Objekte. Dies gilt auch für die vom Anwender entwickelten Applikationen. Digitale Objekte sind Gegenstand des Abschnitts {\bf 'IFS und Content Store'}. Unter Metadaten verstehen wir in MyCoRe alle beschreibenden Daten des Objektes, die extern hinzugefügt, separat gespeichert und gesucht werden können. Dem gegenüber stehen Daten welche die digitalen Objekte selbst mitbringen. In diesem Abschnitt werden nur erstere behandelt. \\[2ex]
+Um die Metadaten besser auf unterschiedlichen Datenspeichern ablegen zu können, wurde ein System von XML-Strukturen entwickelt, das es gestattet, neben den eigentlichen Daten wie Titel, Autor usw. auch Struktur- und Service-Informationen mit abzulegen. Die eigentlichen Nutzerdaten sind wiederum typisiert, was deren speicherunabhängige Aufzeichnung erheblich vereinfacht. Es steht dem Entwickler einer Anwendung jedoch frei, hier bei Bedarf weitere hinzuzufügen. Im Folgenden soll nun der Aufbau der Metadatenobjekte im Detail beschrieben werden. Zum Verständnis des Samples sei hier auch auf den vorigen Abschnitt verwiesen.\\[2ex]
+Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstrukturen und Standardmetadatentypen werden seitens MyCoRe bereits XMLSchema-Dateien mitgeliefert.
 %
 %
-\subsubsection{XML-Syntax eines Matadaten-Objektes}
+\subsubsection{XML-Syntax eines Metadatenobjektes}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax eines Metadaten-Objektes,label=lst:xml_syntax_metadatenobjekt]
+\begin{lstlisting}[caption=XML-Syntax eines Metadatenobjektes,label=lst:xml_syntax_metadatenobjekt]
  <?xml version="1.0" cncoding="iso-8859" ?>
  <mycoreobject
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -32,17 +32,17 @@ Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstruk
  </mycoreobject>
 \end{lstlisting}
 
-Für \mcridentifier{xsi:noNamespaceSchemaLocation} ist das entsprechende XMLSchema-File des Metadaten-Types anzugeben (z. B. \mcrfile{Document.xsd})\\[2ex]
+Für \mcridentifier{xsi:noNamespaceSchemaLocation} ist das entsprechende XMLSchema-File des Meta\-datentyps anzugeben (\zB \mcrfile{Document.xsd})\\[2ex]
 Die \mcridentifier{ID} ist die eindeutige MCRObjectID.\\[2ex]
 Der \mcridentifier{label} ist ein kurzer Text-String, der bei administrativen Arbeiten an der Datenbasis das Identifizieren einzelner Datensätze erleichtern soll. Er kann maximal 256 Zeichen lang sein.\\[2ex]
 Innerhalb der XML-Datenstruktur gibt es die Abschnitte \mcridentifier{structure}, \mcridentifier{metadata} und \mcridentifier{service} zur Trennung von Struktur-, Beschreibungs- und Wartungsdaten. Diese Tag-Namen sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!}\\[2ex]
 %
 %
-\subsubsection{XML-Synatx des structure XML-Knotens}
-Im XML-Knoten \mcridentifier{structure} sind alle Informationen über die Beziehung des Metadaten-Objektes zu anderen Objekten abgelegt. Es werden derzeit die folgenden XML-Daten unter diesem Knoten abgelegt. Die Tag-Namen \mcridentifier{parents/parent}, \mcridentifier{children/child} und \mcridentifier{derobjects/derobject} sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!} Alle Sub-Knoten haben einen Aufbau wie für MCRMetaLinkID beschieben.\\[2ex]
-In \mcridentifier{parents} wird ein Link zu einem Eltern-Objekt gespeichert, sofern das referentierende Objekt Eltern hat. Ob dies der Fall ist, bestimmt die Anwendung. Das Tag dient der getsaltung von Vererbungsbäumen und kann durch den Anweder festgelegt werden. Siehe auch 'Programmers Guide', Abschnitt Vererbung. Die Werte für \mcridentifier{xlink:title} und \mcridentifier{xlink:label} werden beim Laden der Daten automatisch ergänzt.\\[2ex]
-Die Informationen über die \mcridentifier{children} hingegen werden durch das MyCoRe-System beim Laden der Daten {\bf automatisch} erzeugt und {\bf dürfen nicht per Hand geändert werden}, das sonst das Gesamtsystem nicht mehr konsistent ist. Werden die Metadaten eines Kindes oder eines Baumes von Kindern gelöscht, so wird in diesem Teil des XML-Knotens der Eintrag durch die Software entfernt.\\[2ex]
-Das selbe gilt auch für den XML-Unterknoten \mcridentifier{derobjects}. In diesem Bereich werden alle Verweise auf die an das Metadaten-Objekt angehangenen digitalen Objekte gespeichert. Jeder Eintrag verweist mittels einer Referenz auf ein Datenobjekt vom Typ \mcridentifier{mycorederivate}, wie es im nachfolgenden Abschnitt \mcridentifier{'IFS und Content Store'} näher erläutert ist.
+\subsubsection{XML-Synatx des XML-Knotens structure}
+Im XML-Knoten \mcridentifier{structure} sind alle Informationen über die Beziehung des Meta\-datenobjektes zu anderen Objekten abgelegt. Es werden derzeit die folgenden XML-Daten unter diesem Knoten abgelegt. Die Tag-Namen \mcridentifier{parents/parent}, \mcridentifier{children/child} und \mcridentifier{derobjects/derobject} sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!} Alle Sub-Knoten haben einen Aufbau wie für MCRMetaLinkID beschieben.\\[2ex]
+In \mcridentifier{parents} wird ein Link zu einem Elternobjekt gespeichert, sofern das referenzierende Objekt Eltern hat. Ob dies der Fall ist, bestimmt die Anwendung. Das Tag dient der Gestaltung von Vererbungsbäumen und kann durch den Anweder festgelegt werden. Siehe auch 'Programmers Guide', Abschnitt Vererbung. Die Werte für \mcridentifier{xlink:title} und \mcridentifier{xlink:label} werden beim Laden der Daten automatisch ergänzt.\\[2ex]
+Die Informationen über die \mcridentifier{children} hingegen werden durch das MyCoRe-System beim Laden der Daten {\bf automatisch} erzeugt und {\bf dürfen nicht per Hand geändert werden}, da sonst das Gesamtsystem nicht mehr konsistent ist. Werden die Metadaten eines Kindes oder eines Baumes von Kindern gelöscht, so wird in diesem Teil des XML-Knotens der Eintrag durch die Software entfernt.\\[2ex]
+Dasselbe gilt auch für den XML-Unterknoten \mcridentifier{derobjects}. In diesem Bereich werden alle Verweise auf die an das Metadatenobjekt angehängten digitalen Objekte gespeichert. Jeder Eintrag verweist mittels einer Referenz auf ein Datenobjekt vom Typ \mcridentifier{mycorederivate}, wie es im nachfolgenden Abschnitt \mcridentifier{'IFS und Content Store'} näher erläutert ist.
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}[caption=XML-Syntax des structure XML-Knotens,label=lst:xml_syntax_structure_xml_knoten]
@@ -63,8 +63,8 @@ Das selbe gilt auch für den XML-Unterknoten \mcridentifier{derobjects}. In diese
 
 %
 %
-\subsubsection{XML-Synatx des metadata XML-Knotens}
-Der Abschnitt \mcridentifier{metadata} des MyCoRe-Metadaten-Objektes nimmt alle Beschreibungsdaten des eigentlichen Datenmodells auf. Diese werden ihrerseits in vordefinierten Datentyp-Strukturen mit festgelegtem Sysntax abgelegt. Die Liste der Einzelelemente und die Reihenfolge der Typen ist dabei quasi beliebig in Anordnung und Länge. Wichtig ist nur, dass alle Datentypen bestimmte gemeinsame eigenschaften haben. Es ist auch jeder Zeit möglich, weitere Typen den Projekten der Anwender hinzuzufügen (siehe dazu das Programmer Guide).
+\subsubsection{XML-Synatx des XML-Knotens metadata}
+Der Abschnitt \mcridentifier{metadata} des MyCoRe-Metadatenobjektes nimmt alle Beschreibungsdaten des eigentlichen Datenmodells auf. Diese werden ihrerseits in vordefinierten Datentyp-Strukturen mit festgelegter Syntax abgelegt. Die Liste der Einzelelemente und die Reihenfolge der Typen ist dabei quasi beliebig in Anordnung und Länge. Wichtig ist nur, dass alle Datentypen bestimmte gemeinsame Eigenschaften haben. Es ist auch jederzeit möglich, weitere Typen den Projekten der Anwender hinzuzufügen (siehe dazu das Dokument MyCoRe Programmer's Guide).
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}[caption=XML-Syntax des metadata XML-Knotens,label=lst:xml_syntax_metadata_xml_knoten]
  <metadata xml:lang="...">
@@ -75,17 +75,17 @@ Der Abschnitt \mcridentifier{metadata} des MyCoRe-Metadaten-Objektes nimmt alle 
  </metadata>
 \end{lstlisting}
 
-Die Metadaten bestehen aus einer Ansammlung von Informationen rund um das multimediale Objekt und sind hauptsächlicher der Teil, welcher in der Suche abgefragt wird. Jedes Metadatum (auch Metadaten-Tag) enthält im \mcridentifier{class} Attribut den Namen des MCRMeta-Types bzw. der gleichnamigen MCRMeta-Java Klasse. Daneben gibt es noch ein Attribut \mcridentifier{heritable}, in dem festgelegt wird, ob diese Metadaten vererbbar seinen sollen. Weiterhin können noch die Attribute \mcridentifier{papasearch} für die Einbindung in die parametrische Suche und \mcridentifier{textsearch} für die Volltext-Suche über das gesamte Metadaten-Objekt angegeben werden. Es sind jeweils die boolschen Werte \mcridentifier{true} oder \mcridentifier{false} möglich. Die mit der vererbung verbundenen Mechanismen sind in dieser Dokumentation weiter hinten beschrieben. \\[2ex]
-Für MyCoRe  wurden einige Basis-Metadaten-Typen festgelegt, mit denen die Mehrzahl der bisher in Betracht kommenden Anwendungen gelöst werden können. Die einzelnen Daten treten dabei als Liste auf, in denen mehrere Elemente des gleichen Types erscheinen können, beispielsweise ein Titel in verschiedenen Sprachen. Jedes Listenelement hat wiederum per Default ein \mcridentifier{type} Attribut und eine gemäß W3C spezifizierte Sprache im Attribut \mcridentifier{xml:lang}. Die Angabe der Sprache im Tag \mcridentifier{metadata} ist für alle eingschlossenen Metadaten-Typen der Default-Wert. Derzeit sind für MyCoRe folgende Sprachkürzel nach ISO-Norm nutzbar: \\
+Die Metadaten bestehen aus einer Ansammlung von Informationen rund um das multimediale Objekt. Vorrangig wird dieser Teil in der Suche abgefragt. Jedes Metadatum (auch Metadaten-Tag) enthält im \mcridentifier{class} Attribut den Namen des MCRMeta-Typs bzw. der gleichnamigen MCRMeta-Java Klasse. Daneben gibt es noch ein Attribut \mcridentifier{heritable}, in dem festgelegt wird, ob diese Metadaten vererbbar sein sollen. Weiterhin können noch die Attribute \mcridentifier{papasearch} für die Einbindung in die parametrische Suche und \mcridentifier{textsearch} für die Volltext-Suche über das gesamte Metadatenobjekt angegeben werden. Es sind jeweils die boolschen Werte \mcridentifier{true} oder \mcridentifier{false} möglich. Die mit der Vererbung verbundenen Mechanismen sind in dieser Dokumentation weiter hinten beschrieben. \\[2ex]
+Für MyCoRe  wurden einige Basismetadatentypen festgelegt, mit denen die Mehrzahl der bisher in Betracht kommenden Anwendungen gelöst werden können. Die einzelnen Daten treten dabei als Liste auf, in denen mehrere Elemente des gleichen Typs erscheinen können, beispielsweise ein Titel in verschiedenen Sprachen. Jedes Listenelement hat wiederum per Default ein \mcridentifier{type} Attribut und eine gemäß W3C spezifizierte Sprache im Attribut \mcridentifier{xml:lang}. Die Angabe der Sprache im Tag \mcridentifier{metadata} ist für alle eingschlossenen Metadatentypen der Default-Wert. Derzeit sind für MyCoRe folgende Sprachkürzel nach ISO-Norm nutzbar: \\
 
 \begin{center}
 \texttt{'de' 'en' 'en\_uk' 'en\_us' 'all'}
 \end{center}
 
 Für interne Zwecke wurde ein weiteres Attribut \mcridentifier{inherited} eingeführt. Dieses ist NICHT durch den Anwender zu verändern! Es wird gesetzt, wenn das betreffende Metadatum von einem Elternteil geerbt wurde (siehe Vererbung). Diese Information ist für die Datenpräsentation sehr hilfreich. \\[2ex]
-Für das MyCoRe-Beispiel mit einem Dublin Core Datenmodell werden bereits einige Metadaten-Typen verwendet, welche dem MyCoRe-Kern beigefügt sind. Die Syntax der einzelnen Typen wird in den nachfolgenden Absätzen genau beschrieben.\\[2ex]
+Für das MyCoRe-Beispiel mit einem Dublin Core Datenmodell werden bereits einige Metadatentypen verwendet, welche dem MyCoRe-Kern beigefügt sind. Die Syntax der einzelnen Typen wird in den nachfolgenden Absätzen genau beschrieben.\\[2ex]
 \small
-\bottomcaption{MyCoRe Metadaten-Basistypen}
+\bottomcaption{MyCoRe Metadatenbasistypen}
 \tablehead{\hline}
 \tabletail{\hline}
 \begin{supertabular}{|p{4cm}|p{11cm}|}
@@ -98,19 +98,19 @@ MCRMetaCorporation & Dieser XML-Part enthält alle zu einer Liste von Institution
 MCRMetaDate & Dieser XML-Part enthält eine Liste von typisierten Datumsangaben. \\ \hline
 MCRMetaLangText & Dies ist ein XML-Part, welcher ein Datenpaar aus einem Text-String und der dazugehörigen Sprache darstellt.\\ \hline
 MCRMetaLink & Dieser XML-Part enthält Links auf andere Objekte. Basis der Gestaltung dieses Parts ist die Spezifikation für XLink des W3C. \\ \hline
-MCRMetaLinkID & Der Part ist ananlog zu MCRMetaLink, es können aber nur MCRObjectID's als Referenz angegeben werden.\\ \hline
+MCRMetaLinkID & Der Part ist analog zu MCRMetaLink, es können jedoch nur MCRObjectID's als Referenz angegeben werden.\\ \hline
 MCRMetaNumber & Dieser XML-Part enthält alle zu einer Liste von Zahlenwerten gehörenden Daten wie Dimension und Maßeinheit.\\ \hline
-MCRMetaPerson & Dieser XML-Part enthält alle zu einer Liste von natürlichen personen und deren zugehörigen Daten. \\ \hline
+MCRMetaPerson & Dieser XML-Part enthält alle zu einer Liste von natürlichen Personen und deren zugehörigen Daten. \\ \hline
 \end{supertabular}
 \normalsize
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaAddress}
-Der Basistype \mcridentifier{MCRMetaAddress} beinhaltet eine Liste von postalischen Anschriften in der Ausprägung eines XML-Abschnittes. Dabei wird berücksichtigt, dass die Anschrift in verschiedenen Sprachen und in international gängigen Formen gespeichert werden soll. Die einzelnen Subtags sind dabei selbsterklärend. Die Angaben zu \mcridentifier{type} und \mcridentifier{xml:lang} sind optional, ebenso die unter \mcridentifier{subtag} liegenden Tags, jedoch muss mindestens eines ausgefüllt sein. Alle Werte wenden als Text betrachtet. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaAddress}
+Der Basistyp \mcridentifier{MCRMetaAddress} beinhaltet eine Liste von postalischen Anschriften in der Ausprägung eines XML-Abschnittes. Dabei wird berücksichtigt, dass die Anschrift in verschiedenen Sprachen und in international gängigen Formen gespeichert werden soll. Die einzelnen Subtags sind dabei selbsterklärend. Die Angaben zu \mcridentifier{type} und \mcridentifier{xml:lang} sind optional, ebenso die unter \mcridentifier{subtag} liegenden Tags, jedoch muss mindestens eines ausgefüllt sein. Alle Werte werden als Text betrachtet. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \bottomcaption{}
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaAddress,label=lst:xml_syntax_MCRMetaAddress]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaAddress,label=lst:xml_syntax_MCRMetaAddress]
  <tag class="MCRMetaAddress" heritable="..." parasearch="...">
   <subtag type="..." xml:lang="...">
    <country>...</country>
@@ -125,7 +125,7 @@ Der Basistype \mcridentifier{MCRMetaAddress} beinhaltet eine Liste von postalisc
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaAddress, label=lst:beispiel_basistyp_mcraddress]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaAddress, label=lst:beispiel_basistyp_mcraddress]
  <addresses class="MCRMetaAddress" heritable="false" parasearch="true">
   <address type="Work" xml:lang="de">
    <country>Deutschland</country>
@@ -140,7 +140,7 @@ Der Basistype \mcridentifier{MCRMetaAddress} beinhaltet eine Liste von postalisc
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaBoolean}
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaBoolean}
 Der Basistyp \mcridentifier{MCRMetaBoolean} beinhaltet eine Liste von Wahrheitswerten mit zugehörigen \mcridentifier{type} Attributen. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ. Folgende Werte sind zulässig:\\
 \begin{itemize}
 \item für {\bf true} - 'true', 'yes', 'wahr' und 'ja'
@@ -148,7 +148,7 @@ Der Basistyp \mcridentifier{MCRMetaBoolean} beinhaltet eine Liste von Wahrheitsw
 \end{itemize}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaBoolean,label=lst:xml_syntax_basistyp_mcrboolean]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaBoolean,label=lst:xml_syntax_basistyp_mcrboolean]
  <tag class="MCRMetaBoolean" heritable="..." parasearch="...">
   <subtag type="..." xml:lang="...">
    ...
@@ -158,7 +158,7 @@ Der Basistyp \mcridentifier{MCRMetaBoolean} beinhaltet eine Liste von Wahrheitsw
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaBoolean, label=lst:beispiel_basistyp_mcrboolean]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaBoolean, label=lst:beispiel_basistyp_mcrboolean]
  <publishes class="MCRMetaBoolean" heritable="true" parasearch="true">
   <publish type="Ausgabe_1" xml:lang="de">ja</publish>
   <publish type="Ausgabe_2" xml:lang="de">nein</publish>
@@ -167,11 +167,11 @@ Der Basistyp \mcridentifier{MCRMetaBoolean} beinhaltet eine Liste von Wahrheitsw
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaClass}
-Der Basistyp \mcridentifier{MCRMetaClass} dient der Einbindung von Klassifikationen\footnote{siehe voriges Kapitel} und deren Kategorien in die Metadaten. Beide Identifizierer zusammen beschreiben einen Kategorieeintrag vollständig. Dabei ist für die \mcridentifier{categid} eine, ggf mehrstufige, Kategorie-ID einzutragen. Die \mcridentifier{classid} muss vom Typ \mcridentifier{MCRObjectID} sein. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaClass}
+Der Basistyp \mcridentifier{MCRMetaClass} dient der Einbindung von Klassifikationen\footnote{siehe voriges Kapitel} und deren Kategorien in die Metadaten. Beide Identifizierer zusammen beschreiben einen Kategorieeintrag vollständig. Dabei ist für die \mcridentifier{categid} eine, ggf. mehrstufige, Kategorie-ID einzutragen. Die \mcridentifier{classid} muss vom Typ \mcridentifier{MCRObjectID} sein. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaClass,label=lst:xml_syntax_basistyp_mcrclass]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaClass,label=lst:xml_syntax_basistyp_mcrclass]
  <tag class="MCRMetaClass" heritable="..." parasearch="...">
   <subtag classid="..." categid="..."/>
   ...
@@ -179,7 +179,7 @@ Der Basistyp \mcridentifier{MCRMetaClass} dient der Einbindung von Klassifikatio
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaClass,label=lst:beispiel_basistyp_mcrclass]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaClass,label=lst:beispiel_basistyp_mcrclass]
  <origins class="MCRMetaClass" heritable="false" parasearch="true">
   <origin classid="MyCoReDemoDC_class_1" categid="Unis.Leipzig.URZ"/>
   ...
@@ -187,11 +187,11 @@ Der Basistyp \mcridentifier{MCRMetaClass} dient der Einbindung von Klassifikatio
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaCorporation}
-Der Basistyp \mcridentifier{MCRMetaCorporation} beinhaltet eine Liste von Namen einer Firma oder Einrichtung. Dabei soll berücksichtigt werden, dass die Name in verschiedenen Sprachen und in international gängigen Formen gespeichert werden sollen.  Über das Attribut \mcridentifier{type} ist eine Differenzierung der verschiedenen Namen, z. B. Abteilungen, Institute, Kurznamen usw.) möglich. \mcridentifier{name} beinhaltet den vollständigen Namen, \mcridentifier{nickname} das Pseudonym, \mcridentifier{parent} den Namen der übergeordneten Einrichtung und \mcridentifier{property} den rechtlichen Stand, z. B. GmbH. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaCorporation}
+Der Basistyp \mcridentifier{MCRMetaCorporation} beinhaltet eine Liste von Namen einer Firma oder Einrichtung. Dabei soll berücksichtigt werden, dass die Name in verschiedenen Sprachen und in international gängigen Formen gespeichert werden sollen. Über das Attribut \mcridentifier{type} ist eine Differenzierung der verschiedenen Namen (\zB Abteilungen, Institute, Kurznamen usw.) möglich. \mcridentifier{name} beinhaltet den vollständigen Namen, \mcridentifier{nickname} das Pseudonym, \mcridentifier{parent} den Namen der übergeordneten Einrichtung und \mcridentifier{property} den rechtlichen Stand, \zB GmbH. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaCorporation,label=lst:xml_syntax_basistyp_corporation]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaCorporation,label=lst:xml_syntax_basistyp_corporation]
  <tag class="MCRMetaCorporation" heritable="..." parasearch="...">
   <subtag type="..." xml:lang="...">
    <name>...</name>
@@ -204,7 +204,7 @@ Der Basistyp \mcridentifier{MCRMetaCorporation} beinhaltet eine Liste von Namen 
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaCorporation, label=lst:beispiel_basistyp_mcrcorporation]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaCorporation, label=lst:beispiel_basistyp_mcrcorporation]
  <firmas class="MCRMetaCorporation" heritable="true" parasearch="true">
   <firma type="Uni" xml:lang="de">
    <name>Universität Leipzig</name>
@@ -221,11 +221,11 @@ Der Basistyp \mcridentifier{MCRMetaCorporation} beinhaltet eine Liste von Namen 
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaDate}
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaDate}
 Der Basistyp \mcridentifier{MCRMetaDate} beschreibt eine Liste von Datumsangaben welche zusätzlich mit einem \mcridentifier{type} Attribut versehen werden können. Das Darstellungsformat muss der angegebenen Sprache oder der ISO 8601 Notation folgen. Innerhalb von MyCoRe weden dann alle Datumsangaben in das ISO 8601 Format umgewandelt. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaDate,label=lst:xml_syntax_basistyp_mcrdate]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaDate,label=lst:xml_syntax_basistyp_mcrdate]
  <tag class="MCRMetaDate" heritable="..." parasearch="...">
   <subtag type="..." xml:lang="...">
    ...
@@ -235,7 +235,7 @@ Der Basistyp \mcridentifier{MCRMetaDate} beschreibt eine Liste von Datumsangaben
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaDate,label=lst:beispiel_basistyp_mcrdate]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaDate,label=lst:beispiel_basistyp_mcrdate]
  <dates class="MCRMetaDate" heritable="false" parasearch="true">
   <date type="heute" xml:lang="de">15.10.2003</date>
   <date type="morgen" xml:lang="us">2003/16/10</date>
@@ -246,11 +246,11 @@ Der Basistyp \mcridentifier{MCRMetaDate} beschreibt eine Liste von Datumsangaben
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaLangText}
-Der Basistyp \mcridentifier{MCRMetaLangText} dient der Speicherung einer Liste von Textabschnitten mit zugehöriger Sprachangabe. Das Attribut \mcridentifier{textsearch} bewirkt, dass alle Text-Values in einen gemeinsamen Textindex des Metadaten-Objektes abgelegt werden.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaLangText}
+Der Basistyp \mcridentifier{MCRMetaLangText} dient der Speicherung einer Liste von Textabschnitten mit zugehöriger Sprachangabe. Das Attribut \mcridentifier{textsearch} bewirkt, dass alle Text-Values in einen gemeinsamen Textindex des Metadatenobjektes abgelegt werden.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaLangText,label=lst:xml_syntax_basistyp_mcrlangtext]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaLangText,label=lst:xml_syntax_basistyp_mcrlangtext]
  <tag class="MCRMetaLangText" heritable="..." parasearch="..." textsearch="...">
   <subtag type="..." xml:lang="...">
    ...
@@ -260,7 +260,7 @@ Der Basistyp \mcridentifier{MCRMetaLangText} dient der Speicherung einer Liste v
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaLangText,label=lst:beispiel_basistyp_mcrlangtext]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaLangText,label=lst:beispiel_basistyp_mcrlangtext]
  <titles class="MCRMetaLangText" heritable="true" parasearch="true" textsearch="true">
   <title type="maintitle" xml:lang="de">
    Mein Leben als MyCoRe-Entwickler
@@ -270,14 +270,14 @@ Der Basistyp \mcridentifier{MCRMetaLangText} dient der Speicherung einer Liste v
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaLink}
-Der Basistyp \mcridentifier{MCRMetaLink} wurde geschaffen, um eine Verküpfung verschiedener MyCoRe-Objekte untereinander zu realisieren. Ausserden können hier genauso Verweise auf beliebige externe Referenzen abgelegt werden. Der Typ \mcridentifier{MCRMetaLink} ist eine Implementation des W3C XLink Standards\footnote{siehe 'XLM Linking Language (XLink) Version 1.0'}. Auf dieser Basis enthält der MyCoRe-Metadaten-Typ zwei Arten von Links - eine Referenz und einen bidirektionalen Link. Bei beiden werden jedoch in \mcridentifier{MCRMetaLink} nicht alle Möglichkeiten der XLink Spezifikation ausgeschöpft, da dies für die in MyCoRe benötigten Funktionalitäten nicht erforderlich ist.\\[2ex]
-Im Referenztyp ist das Attribut \mcridentifier{xlink:type='locator'} immer anzugeben. Die eigentliche Referenz wird im \mcridentifier{xlink:href} Attribut notiert. Dabei kann die Referenz eine URL oder eine MCRObjectID sein. Daneben können noch weitere Informationen im \mcridentifier{xlink:label} angegeben werden, z. B. die Rolle einer verlinkten Person. Der Referenztyp kommt im MyCoRe-Sample bei der Verlinkung von Dokumenten und Personen zum Einsatz. Um den Update-Aufwand in Grenzen zu halten, wurde z. B. die genannte Verbindung als Referenz konzipiert. Somit weiss im Sample das referenzierte Objekt nichts über den Verweis.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaLink}
+Der Basistyp \mcridentifier{MCRMetaLink} wurde geschaffen, um eine Verküpfung verschiedener MyCoRe-Objekte untereinander zu realisieren. Ausserden können hier genauso Verweise auf beliebige externe Referenzen abgelegt werden. Der Typ \mcridentifier{MCRMetaLink} ist eine Implementation des W3C XLink Standards\footnote{siehe 'XLM Linking Language (XLink) Version 1.0'}. Auf dieser Basis enthält der MyCoRe-Metadatentyp zwei Arten von Links - eine Referenz und einen bidirektionalen Link. Bei beiden werden jedoch in \mcridentifier{MCRMetaLink} nicht alle Möglichkeiten der XLink Spezifikation ausgeschöpft, da dies für die in MyCoRe benötigten Funktionalitäten nicht erforderlich ist.\\[2ex]
+Im Referenztyp ist das Attribut \mcridentifier{xlink:type='locator'} immer anzugeben. Die eigentliche Referenz wird im \mcridentifier{xlink:href} Attribut notiert. Dabei kann die Referenz eine URL oder eine MCRObjectID sein. Daneben können noch weitere Informationen im \mcridentifier{xlink:label} angegeben werden, \zB die Rolle einer verlinkten Person. Der Referenztyp kommt im MyCoRe-Sample bei der Verlinkung von Dokumenten und Personen zum Einsatz. Um den Update-Aufwand in Grenzen zu halten, wurde \zB die genannte Verbindung als Referenz konzipiert. Somit weiß das referenzierte Objekt im Sample nichts über den Verweis.\\[2ex]
 Alternativ dazu besteht die Möglichkeit eines bidirektionalen Links. Dieser wird sowohl in der Link-Quelle wie auch im Link-Ziel eingetragen. Der Typ ist in diesem Fall \mcridentifier{xlink:type='arc'}. Weiterhin sind die Attribute \mcridentifier{xlink:from} und \mcridentifier{xlink:to} erforderlich. Optional kann noch ein Titel in \mcridentifier{xlink:title} mitgegeben werden.\\[2ex]
 Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaLink,label=lst:xml_syntax_basistyp_mcrlink]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaLink,label=lst:xml_syntax_basistyp_mcrlink]
  <tag class="MCRMetaLink" heritable="..." parasearch="...">
   <subtag xlink:type="locator" xlink:href="..." xlink:label="..." xlink:title="..."\>
   <subtag xlink:type="arc" xlink:from="..." xlink:to="..." xlink:title="..."\>
@@ -286,7 +286,7 @@ Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem T
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaLink,label=lst:beispiel_basistyp_mcrlink]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaLink,label=lst:beispiel_basistyp_mcrlink]
  <urls class="MCRMetaLink" heritable="false" parasearch="...">
   <url xlink:type="locator" xlink:href="http://www.zoje.de" xlink:label="ZOJE" xlink:title="Eine externe URL"\>
   <url xlink:type="arc" xlink:from="mcr_object_id_1" xlink:to="mcr_object_id_2" xlink:title="Link zwischen Objekten"\>
@@ -295,15 +295,15 @@ Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem T
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaLinkID}
-Der Basistyp \mcridentifier{MCRMetaLinkID} entspricht im Aufbau dem von \mcridentifier{MCRMetaLink}. Der einzige Unterschied ist, dass die Attribute \mcridentifier{xlink:href}, \mcridentifier{xlink:from} und \mcridentifier{xlink:to} nur mit \mcridentifier{MCRObjectID}'s belegt werden dürfen.
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaLinkID}
+Der Basistyp \mcridentifier{MCRMetaLinkID} entspricht im Aufbau dem \mcridentifier{MCRMetaLink}. Der einzige Unterschied ist, dass die Attribute \mcridentifier{xlink:href}, \mcridentifier{xlink:from} und \mcridentifier{xlink:to} nur mit \mcridentifier{MCRObjectID}'s belegt werden dürfen.
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaNumber}
-Der Basistyp \mcridentifier{MCRMetaNumber} ermöglicht das Speichern und Suchen von Zahlenwerten. Die Zahlendarstellung kann je nach Sprache, d. h. im deutschen mit Komma und im englischen mit Punkt, angegeben werden. Weiterhin sind die zusätzlichen Attribute \mcridentifier{dimension} und \mcridentifier{measurement} möglich. Beide Attribute sind optional, ebenso wie das Default-Attribut \mcridentifier{type}. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaNumber}
+Der Basistyp \mcridentifier{MCRMetaNumber} ermöglicht das Speichern und Suchen von Zahlenwerten. Die Zahlendarstellung kann je nach Sprache, d. h. im Deutschen mit Komma und im Englischen mit Punkt, angegeben werden. Weiterhin sind die zusätzlichen Attribute \mcridentifier{dimension} und \mcridentifier{measurement} möglich. Beide Attribute sind optional, ebenso wie das Default-Attribut \mcridentifier{type}. Das optionale Attribut \mcridentifier{textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaNumber,label=lst:xml_syntax_basistyp_mcrnumber]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaNumber,label=lst:xml_syntax_basistyp_mcrnumber]
  <tag class="MCRMetaNumber" heritable="..." parasearch="...">
   <subtag xml:lang="..." dimension="..." mesurement="...">
    ...
@@ -313,7 +313,7 @@ Der Basistyp \mcridentifier{MCRMetaNumber} ermöglicht das Speichern und Suchen v
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel des Metadaten-Basistypes MCRMetaNumber,label=lst:beispiel_basistyp_mcrnumber]
+\begin{lstlisting}[caption=Beispiel des Metadatenbasistyps MCRMetaNumber,label=lst:beispiel_basistyp_mcrnumber]
  <masse class="MCRMetaNumber" heritable="false" parasearch="true">
   <mass xml:lang="de" dimension="Breite" mesurement="cm">
    12,1
@@ -326,11 +326,11 @@ Der Basistyp \mcridentifier{MCRMetaNumber} ermöglicht das Speichern und Suchen v
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des Metadaten-Types MCRMetaPerson}
-Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für natürliche Personen. Dabei wird berücksichtigt, dass die namen in verschiedenen Sprachen und international gängigen Formen auftreten können. Das Attribut \mcridentifier{type} dient der Differenzierung der verschiedenen Namen einer Person, z. B. Geburtsname, Sysnonym, Kosename usw. \mcridentifier{firstname} repräsentiert den/die Vornamen, \mcridentifier{callname} den Rufnamen, \mcridentifier{surename} den Familiennamen, \mcridentifier{academic} den akademischen  und \mcridentifier{peerage} den Adelstitel. Das optionale Attribut \mcridentifier{textsearch} hat den Effekt, dass alle textlichen Werte des Namens in das allgemeine Textsuch-Feld des Metadaten-Objektes übernommen werden..\\[2ex]
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaPerson}
+Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für natürliche Personen. Dabei wird berücksichtigt, dass die Namen in verschiedenen Sprachen und international gängigen Formen auftreten können. Das Attribut \mcridentifier{type} dient der Differenzierung der verschiedenen Namen einer Person, \zB Geburtsname, Synonym, Kosename usw. \mcridentifier{firstname} repräsentiert den/die Vornamen, \mcridentifier{callname} den Rufnamen, \mcridentifier{surename} den Familiennamen, \mcridentifier{academic} den akademischen Titel und \mcridentifier{peerage} den Adelstitel. Das optionale Attribut \mcridentifier{textsearch} hat den Effekt, dass alle textlichen Werte des Namens in das allgemeine Feld zur Textsuche des Metadatenobjektes übernommen werden.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=XML-Syntax des Metadaten-Basistypes MCRMetaPerson,label=lst:xml_syntax_basistyp_mcrperson]
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaPerson,label=lst:xml_syntax_basistyp_mcrperson]
  <tag class="MCRMetaPerson" heritable="..." parasearch="...">
   <subtag type="..." xml:lang="..">
    <firstname>...</firstname>
@@ -344,7 +344,7 @@ Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für n
 \end{lstlisting}
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
-\begin{lstlisting}[caption=Beispiel-Syntax des Metadaten-Basistypes MCRMetaPerson,label=lst:beispiel_basistyp_mcrperson]
+\begin{lstlisting}[caption=Beispiel-Syntax des Metadatenbasistyps MCRMetaPerson,label=lst:beispiel_basistyp_mcrperson]
  <tag class="MCRMetaPerson" heritable="true" parasearch="false">
   <subtag type="geburtsname" xml:lang="de">
    <firstname>Lisa Marie</firstname>
@@ -363,13 +363,13 @@ Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für n
 \end{lstlisting}
 %
 %
-\subsubsection{XML-Syntax des service XML-Knotens}
-Für die Einrichtung eines Workflow und um die wartung großer Datenmengen zu vereinfachen, wurde noch der XML-Abschnitt \mcridentifier{service} in das Metadaten-Objekt integriert.  Hier sind Informationen wie Datumsangaben und Flags für die Verarbeitung im Batch-Betrieb enthalten. {\bf Achtung, die Tag-Namen sind fest vorgegeben und dürfen nicht anderweitig verwendet werden!} \\[2ex]
-Die Datumsangaben \mcridentifier{servdates} verhalten sich analog zu denen in \mcridentifier{MCRMetaDate}.Folgende Möglichkeiten für das Attribut \mcridentifier{type} sind vorgesehen. Weitere Typen sind jedoch integrierbar.
+\subsubsection{XML-Syntax des XML-Knotens service}
+Für die Einrichtung eines Workflow und um die Wartung großer Datenmengen zu vereinfachen, wurde der XML-Abschnitt \mcridentifier{service} in das Metadatenobjekt integriert.  Hier sind Informationen wie Datumsangaben und Flags für die Verarbeitung im Batch-Betrieb enthalten. {\bf Achtung, die Tag-Namen sind fest vorgegeben und dürfen nicht anderweitig verwendet werden!} \\[2ex]
+Die Datumsangaben \mcridentifier{servdates} verhalten sich analog zu denen in \mcridentifier{MCRMetaDate}. Folgende Möglichkeiten für das Attribut \mcridentifier{type} sind vorgesehen. Weitere Typen sind jedoch integrierbar.
 \begin{itemize}
 \item \mcridentifier{acceptdate} - Datum aus dem Dublin Core, kann frei verwendet werden.
 \item \mcridentifier{createdate} - Das Erzeugungsdatum des Objektes, dieser Wert wird {\bf automatisch} beim Anlegen des Objektes erzeugt und {\bf bleibt immer erhalten}!
-\item \mcridentifier{modifydate} - Das datum des letzten Update, dieser Wert wird {\bf automatisch} beim Update des Objektes erzeugt und {\bf bleibt immer erhalten}!
+\item \mcridentifier{modifydate} - Das Datum des letzten Update, dieser Wert wird {\bf automatisch} beim Update des Objektes erzeugt und {\bf bleibt immer erhalten}!
 \item \mcridentifier{submitdate} - Datum aus dem Dublin Core, kann frei verwendet werden.
 \item \mcridentifier{validfromdate} - Datum aus dem Dublin Core, kann frei verwendet werden.
 \item \mcridentifier{validtodate} - Datum aus dem Dublin Core, kann frei verwendet werden.
