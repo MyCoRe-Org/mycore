@@ -24,12 +24,12 @@
 
 package mycore.communication;
 
-import mycore.common.*;
-import mycore.datamodel.*;
-import javax.servlet.http.*;
-import javax.servlet.*;
 import java.io.*;
-
+import javax.servlet.*;
+import javax.servlet.http.*;
+import mycore.common.*;
+import mycore.xml.MCRQueryInterface;
+import mycore.xml.MCRQueryResultArray;
 
 /**
  * This class provides a Servlet for remote Querying for distributed

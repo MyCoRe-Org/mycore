@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import java.io.*;
 import java.util.*;
@@ -213,9 +213,9 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
+ * &lt;mycore...&gt;<br>
  * ...<br>
- * &lt;/mcrobject&gt;<br>
+ * &lt;/mycore...&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
@@ -245,9 +245,9 @@ public final org.jdom.Document exportAllToDocument()
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
+ * &lt;mycore...&gt;<br>
  * ...<br>
- * &lt;/mcrobject&gt;<br>
+ * &lt;/mycore...&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
@@ -270,9 +270,9 @@ public final byte [] exportAllToByteArray() throws IOException
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
+ * &lt;mycore...&gt;<br>
  * ...<br>
- * &lt;/mcrobject&gt;<br>
+ * &lt;/mycore...&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
@@ -303,9 +303,9 @@ public final org.jdom.Document exportElementToDocument(int index)
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
+ * &lt;mycore...&gt;<br>
  * ...<br>
- * &lt;/mcrobject&gt;<br>
+ * &lt;/mycore...&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
@@ -335,9 +335,9 @@ private static String ERRORTEXT =
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
+ * &lt;mycore...&gt;<br>
  * ...<br>
- * &lt;/mcrobject&gt;<br>
+ * &lt;/mycore...&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *

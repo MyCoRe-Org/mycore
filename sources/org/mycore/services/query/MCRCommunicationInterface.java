@@ -22,33 +22,43 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import java.util.*;
 import mycore.common.MCRException;
+import mycore.xml.MCRQueryResultArray;
 
 /**
- * This interface is designed to choose the tranformer from XQuery to
- * the used query system of the persistence layer. 
+ * This interface is designed to choose the communication methodes
+ * for the connection between MCRClient and MCRServer.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
-public interface MCRQueryInterface
+
+public interface MCRCommunicationInterface
 {
 
 /**
- * This method parse the XQuery string and return the result as
- * MCRQueryResultArray. If the type is null or empty or maxresults
- * is lower 1 an empty list was returned.
+ * This methode represide the query request methode for the communication.
+ * For the connection parameter would the MCRConfiguration used.
  *
- * @param query                 the XQuery string
- * @param maxresults            the maximum of results
- * @param type                  the MCRObject type
- * @return                      a result list as MCRQueryResultArray
+ * @param hostAlias the host alias as string that shall be requested.
+ * @param mcrtype  the type value of the MCRObjectId
+ * @param query    the query as a stream
+ * @exception MCRException general Exception of MyCoRe
  **/
-public MCRQueryResultArray getResultList(String query, String type,
-  int maxresults);
+public void requestQuery(String hostAlias, String mcrtype, String query)
+  throws MCRException;
+
+/**
+ * This methode represide the response methode for the communication.
+ * For the connection parameter would the MCRConfiguration used.
+ *
+ * @return an empty MCRQueryResultArray as the response.
+ * @exception MCRException general Exception of MyCoRe
+ **/
+public MCRQueryResultArray responseQuery() throws MCRException;
 
 }
-

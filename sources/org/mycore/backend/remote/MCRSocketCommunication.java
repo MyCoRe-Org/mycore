@@ -29,9 +29,8 @@ import java.io.*;
 import java.net.*;
 import mycore.common.MCRException;
 import mycore.common.MCRConfiguration;
-import mycore.datamodel.MCRQueryResultArray;
-import mycore.datamodel.MCRObject;
-import mycore.datamodel.MCRCommunicationInterface;
+import mycore.xml.MCRQueryResultArray;
+import mycore.xml.MCRCommunicationInterface;
 
 /**
  * This class implements the interface to choose the communication methodes

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import mycore.datamodel.*;
 import mycore.common.MCRConfiguration;

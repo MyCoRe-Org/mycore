@@ -26,6 +26,7 @@ package mycore.gui;
 import javax.swing.*;
 import javax.swing.event.*;
 import mycore.datamodel.*;
+import mycore.xml.*;
 
 /**
  * This class implements the ListModel interface for displaying MyCoRe

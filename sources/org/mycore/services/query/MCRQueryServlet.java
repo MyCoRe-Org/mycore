@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import java.io.*;
 import java.util.*;

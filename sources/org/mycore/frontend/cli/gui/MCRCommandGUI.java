@@ -38,6 +38,7 @@ import org.w3c.dom.*;
 import mycore.common.*;
 import mycore.commandline.*;
 import mycore.datamodel.*;
+import mycore.xml.*;
 
 /**
  * This class is a very simple GUI for handling MyCoRe objects. 

@@ -26,8 +26,8 @@ package mycore.communication;
 
 import java.util.*;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRQueryResultArray;
-import mycore.datamodel.MCRCommunicationInterface;
+import mycore.xml.MCRQueryResultArray;
+import mycore.xml.MCRCommunicationInterface;
 
 /**
  * This class implements the interface to choose the communication methodes

@@ -30,8 +30,8 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
-import mycore.datamodel.MCRQueryResult;
-import mycore.datamodel.MCRQueryResultArray;
+import mycore.xml.MCRQueryResult;
+import mycore.xml.MCRQueryResultArray;
 import mycore.classifications.MCRClassification;
 
 /**

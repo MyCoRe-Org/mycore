@@ -22,13 +22,13 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import java.util.*;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
 import mycore.common.MCRConfiguration;
-import mycore.datamodel.MCRQueryResultArray;
+import mycore.xml.MCRQueryResultArray;
 
 /**
  * This class is the result list of a XQuery question to the persistence

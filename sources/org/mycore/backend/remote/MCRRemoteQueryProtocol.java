@@ -27,8 +27,8 @@ package mycore.communication;
 import java.net.*;
 import java.io.*;
 import mycore.common.*;
-import mycore.datamodel.MCRQueryResultArray;
-import mycore.datamodel.MCRQueryInterface;
+import mycore.xml.MCRQueryResultArray;
+import mycore.xml.MCRQueryInterface;
 
 /**
  * This class realizes the RemoteQueryProtocol in the view
