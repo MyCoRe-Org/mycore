@@ -26,6 +26,9 @@ package mycore.commandline;
 
 import java.io.*;
 import java.util.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
 import mycore.datamodel.MCRQueryResult;
 import mycore.communication.MCRCommunicationInterface;
@@ -114,7 +117,7 @@ public static void main(String[] args)
     metadata.setFromXMLResultStream(comm.response());
     }
 
-  printResult(metadata);
+  printResult(metadata, config, type);
 
   System.out.println("Ready.");
   System.out.println();
@@ -138,11 +141,31 @@ private static final void usage()
  *
  * @param results the XML result collection
  **/
-private static final void printResult(MCRQueryResult results)
+private static final void printResult(MCRQueryResult results,
+  MCRConfiguration config, String type)
   {
-  for (int l=0;l<results.getSize();l++) {
-    System.out.println(results.getMCRObjectIdOfElement(l)); 
+  String xsltoneresult = config.getString("MCR.xslt_oneresult_"+type);
+  String outoneresult = config.getString("MCR.out_oneresult_"+type);
+  TransformerFactory transfakt = TransformerFactory.newInstance();
+  try {
+    Transformer trans = 
+      transfakt.newTransformer(new StreamSource(xsltoneresult));
+    for (int l=0;l<results.getSize();l++) {
+      String mcrid = results.getMCRObjectIdOfElement(l);
+      String mcrxml = results.getXMLOfElement(l);
+      System.out.println(mcrid); 
+      System.out.println();
+      StreamResult sr = null;
+      if (outoneresult.equals("SYSOUT")) {
+        sr = new StreamResult((OutputStream) System.out); }
+      else {
+        sr = new StreamResult(outoneresult); }
+      trans.transform(new StreamSource((Reader)new StringReader(mcrxml)),sr);
+      System.out.println();
+      }
     }
+  catch (Exception e) {
+    System.out.println(e.getMessage()); }
   System.out.println();
   }
 
