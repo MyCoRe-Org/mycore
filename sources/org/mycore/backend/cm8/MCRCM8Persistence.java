@@ -31,6 +31,7 @@ import com.ibm.mm.sdk.common.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRPersistenceException;
+import mycore.common.MCRUtils;
 import mycore.datamodel.MCRObject;
 import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectStructure;
@@ -68,13 +69,15 @@ public MCRCM8Persistence()
  * As example: Document --> MCR.persistence_cm8_document
  *
  * @param mcr_tc      the typed content array
- * @param xml         the XML stream from the object
+ * @param xml         the XML stream from the object as JDOM
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void create(MCRTypedContent mcr_tc, byte [] xml)
+public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  // convert the JDOM tree
+  byte [] xml = MCRUtils.getByteArray(jdom);
   // get root data
   MCRObjectID mcr_id = null;
   String mcr_label = null;
@@ -395,13 +398,15 @@ public final String receiveLabel(MCRObjectID mcr_id)
  * As example: Document --> MCR.persistence_cm8_document
  *
  * @param mcr_tc      the typed content array
- * @param xml         the XML stream from the object
+ * @param xml         the XML stream from the object as JDOM
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void update(MCRTypedContent mcr_tc, byte [] xml)
+public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  // convert the JDOM tree
+  byte [] xml = MCRUtils.getByteArray(jdom);
   // get root data
   MCRObjectID mcr_id = null;
   String mcr_label = null;
