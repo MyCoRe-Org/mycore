@@ -302,8 +302,10 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   if ((dimension = dimension.trim()).length() !=0) {
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"dimension",dimension); }
+/*
   if ((measurement = measurement.trim()).length() !=0) {
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"measurement",measurement); }
+*/
   return tc;
   }
 

@@ -25,6 +25,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.text.*;
+import java.net.*;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
@@ -246,6 +247,7 @@ public final boolean isValid()
  * <em>project_id</em>_<em>type_id</em>_<em>number</em> as
  * <em>String_String_Integer</em>.
  * <li> The ID is not longer as MAX_LENGTH.
+ * >li> The ID has only characters, they must not encoded.
  * </ul>
  *
  * @param id   the MCRObjectId
@@ -257,7 +259,8 @@ public final boolean isValid(String id)
   mcr_valid_id = false;
   if ((id == null) || ((id = id.trim()).length() ==0)) { return false; }
   if (id.length()>MAX_LENGTH) { return false; }
-  String mcr_id = id;
+  String mcr_id = URLEncoder.encode(id);
+  if (!mcr_id.equals(id)) { return false; }
   int len = mcr_id.length();
   int i = mcr_id.indexOf("_");
   if (i==-1) { return false; }
