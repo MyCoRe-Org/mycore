@@ -55,7 +55,9 @@ public class MCRParserXerces
   private static boolean flagvalidation        = false;
   private static boolean flagnamespaces        = true;
   private static boolean flagschemasupport     = true;
-  private static boolean flagschemafullsupport = false;
+  private static boolean flagnoschemasupport   = false;
+  private static boolean flagschemafullsupport = true;
+  private static boolean flagnoschemafullsupport = false;
   private static boolean flagdeferreddom       = true;
   private static MCREntityResolver entityResolver;
 
@@ -81,11 +83,11 @@ public class MCRParserXerces
 	entityResolver=new MCREntityResolver();
 
 	builder.setFeature( setnamespaces,        flagnamespaces        );
-	builder.setFeature( setschemasupport,     !flagschemasupport    );
-	builder.setFeature( setschemafullsupport, flagschemafullsupport );
+	builder.setFeature( setschemasupport,     flagnoschemasupport    );
+	builder.setFeature( setschemafullsupport, flagnoschemafullsupport );
 	builderValid.setFeature( setnamespaces,        flagnamespaces        );
 	builderValid.setFeature( setschemasupport,     flagschemasupport     );
-	builderValid.setFeature( setschemafullsupport, flagschemafullsupport );
+	builderValid.setFeature( setschemafullsupport, flagnoschemafullsupport );
 
 	builder.setReuseParser(true);
 	builderValid.setReuseParser(true);
