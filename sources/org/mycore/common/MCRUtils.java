@@ -394,6 +394,7 @@ public class MCRUtils {
 						, bytesRead /* bytes to write */
 						);
 				} else {
+					source.close(); //not needed anymore
 					break; // hit eof
 				}
 			} // end while
