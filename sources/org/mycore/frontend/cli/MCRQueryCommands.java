@@ -66,6 +66,7 @@ final public class MCRQueryCommands
   public static void query( String host, String type, String query )
     throws Exception
   {
+    if (query==null) query = "";
     host  = host .toLowerCase();
     type  = type .toLowerCase();
     query = query.toLowerCase();
@@ -132,18 +133,33 @@ private static final void printResult(MCRQueryResult results,
   MCRConfiguration config, String type)
   throws Exception
   {
+  // Configuration
+  String xsltallresult = config.getString("MCR.xslt_allresult_"+type);
   String xsltoneresult = config.getString("MCR.xslt_oneresult_"+type);
   String outtype = config.getString("MCR.out_type_"+type);
   String outpath = config.getString("MCR.out_path_"+type);
   TransformerFactory transfakt = TransformerFactory.newInstance();
+  // Indexlist
   Transformer trans = 
-    transfakt.newTransformer(new StreamSource(xsltoneresult));
+    transfakt.newTransformer(new StreamSource(xsltallresult));
+  String mcrxmlall = results.getXMLResultStream();
+//System.out.println(mcrxmlall);
+  StreamResult sr = null;
+  if (outpath.equals("SYSOUT")) {
+    sr = new StreamResult((OutputStream) System.out); }
+  else {
+    System.out.println(outpath+System.getProperty("file.separator")+
+      type+"_index."+outtype);
+    sr = new StreamResult(outpath+System.getProperty("file.separator")+
+      type+"_index."+outtype); }
+  trans.transform(new StreamSource((Reader)new StringReader(mcrxmlall)),sr);
+  System.out.println();
+  // All data
+  trans = transfakt.newTransformer(new StreamSource(xsltoneresult));
   for (int l=0;l<results.getSize();l++) {
     String mcrid = results.getMCRObjectIdOfElement(l);
     String mcrxml = results.getXMLOfElement(l);
-    System.out.println(mcrid); 
-    System.out.println();
-    StreamResult sr = null;
+    sr = null;
     if (outpath.equals("SYSOUT")) {
       sr = new StreamResult((OutputStream) System.out); }
     else {
