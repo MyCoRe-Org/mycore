@@ -221,7 +221,7 @@ public final String createTextSearch()
 public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
   setId(new MCRObjectID("Template_derivate_1"));
-  mcr_persist.createDataBase("derivate", confdoc);
+  mcr_persist.createDataBase(mcr_type, confdoc);
   }
 
 /**
@@ -244,7 +244,7 @@ public final void createInDatastore() throws MCRPersistenceException
     MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
     MCRMetaLinkID der = new MCRMetaLinkID();
     der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
+    der.setSubTag("derobject");
     try {
       obj = new MCRObject();
       obj.addDerivateInDatastore(meta.getXLinkHref(),der); }
@@ -272,7 +272,7 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
     MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
     MCRMetaLinkID der = new MCRMetaLinkID();
     der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
+    der.setSubTag("derobject");
     try {
       obj = new MCRObject();
       obj.removeDerivateInDatastore(meta.getXLinkHref(),der); }
@@ -359,7 +359,7 @@ public final void updateInDatastore() throws MCRPersistenceException
     MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
     MCRMetaLinkID der = new MCRMetaLinkID();
     der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
+    der.setSubTag("derobject");
     try {
       obj = new MCRObject();
       obj.addDerivateInDatastore(meta.getXLinkHref(),der); }

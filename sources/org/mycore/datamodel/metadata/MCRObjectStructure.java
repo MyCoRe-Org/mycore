@@ -395,7 +395,7 @@ public class MCRObjectStructure
         }
       }
     // Structure derivate part
-    struct_element = element.getChild("derivates");
+    struct_element = element.getChild("derobjects");
     if (struct_element != null) {
       List struct_links_list = struct_element.getChildren();
       for (int i=0;i<struct_links_list.size();i++) {  
@@ -432,7 +432,7 @@ public class MCRObjectStructure
       elmm.addContent(parent.createXML());
       elm.addContent(elmm); }
     if (derivates.size() > 0) {
-      org.jdom.Element elmm = new org.jdom.Element("derivates");
+      org.jdom.Element elmm = new org.jdom.Element("derobjects");
       for (i = 0; i < derivates.size(); ++i) {
         elmm.addContent(((MCRMetaLink) derivates.get(i))
           .createXML()); }
@@ -479,7 +479,7 @@ public class MCRObjectStructure
 */
     // add the derivates for the parametric searchable
     if (derivates.size() > 0) {
-      tc.addTagElement(tc.TYPE_TAG,"derivates");
+      tc.addTagElement(tc.TYPE_TAG,"derobjects");
       for (int i=0;i<derivates.size();i++)
         tc.addMCRTypedContent(((MCRMetaLink) derivates.get(i))
           .createTypedContent(true));
@@ -554,7 +554,7 @@ public class MCRObjectStructure
       }
     }
     n = derivates.size();
-    System.out.println("The structure contains "+n+" derivates :");
+    System.out.println("The structure contains "+n+" derobjects :");
     for (i = 0; i < n; ++i) {
       link = (MCRMetaLink) derivates.get(i);
       link.debug(); }
