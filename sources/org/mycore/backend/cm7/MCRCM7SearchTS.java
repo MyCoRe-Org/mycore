@@ -59,8 +59,10 @@ private MCRQueryResultArray mcr_result;
  * The defaults was set to:
  * <ul>
  * <li>MAX_RESULTS for the maximum of results.
- * <li>SEARCH_LANG for the language of the search.
- * <li>CCSID_LATIN_1 for the enconding type.
+ * <li>The configuration value of <em>MCR.persistence_cm7_textsearch_lang</em>
+ * for the language of the search.
+ * <li>The configuration value of <em>MCR.persistence_cm7_textsearch_ccsid</em>
+ * for the enconding type.
  * <li>The configuration value of <em>MCR.persistence_cm7_textsearch_server</em>
  * for the text search server.
  * <li>The configuration value of <em>MCR.persistence_cm7_field_id</em> for
@@ -71,17 +73,17 @@ private MCRQueryResultArray mcr_result;
  **/
 public MCRCM7SearchTS()
   {
-  mcr_maxresults = MAX_RESULTS;
-  mcr_searchlang = SEARCH_LANG;
-  mcr_ccsid = CCSID_LATIN_1;
+  MCRConfiguration conf = MCRConfiguration.instance();
+  mcr_maxresults = conf.getInt("MCR.persistence_cm7_textsearch_maxresult",
+    MAX_RESULTS);
+  setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang","DEU"));
+  mcr_ccsid = conf.getInt("MCR.persistence_cm7_textsearch_ccsid",
+    CCSID_LATIN_1);
   mcr_indexclass = "";
-  mcr_tsserver = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_textsearch_server");
+  mcr_tsserver = conf.getString("MCR.persistence_cm7_textsearch_server");
   mcr_tsindex = "";
-  mcr_fieldid =  MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_id");
-  mcr_partid =  MCRConfiguration.instance()
-    .getInt("MCR.persistence_cm7_part_xml",2);
+  mcr_fieldid = conf.getString("MCR.persistence_cm7_field_id");
+  mcr_partid = conf.getInt("MCR.persistence_cm7_part_xml",2);
   mcr_result = new MCRQueryResultArray();
   }
 
@@ -112,11 +114,13 @@ public final void setMaxResults(int maxresults)
  **/
 public final void setSearchLang(String lang) 
   {
-  if ((lang == null) || ((lang = lang.trim()).length() ==0)) { return; }
+  if ((lang == null) || ((lang = lang.trim()).length() ==0)) { 
+    mcr_searchlang = DK_LANG_DEU; return; }
   lang.toUpperCase();
   if (lang.equals("DEU")) { mcr_searchlang = DK_LANG_DEU; return; }
   if (lang.equals("ENG")) { mcr_searchlang = DK_LANG_ENG; return; }
   if (lang.equals("FRA")) { mcr_searchlang = DK_LANG_FRA; return; }
+  mcr_searchlang = DK_LANG_DEU;
   }
 
 /**
@@ -174,7 +178,7 @@ public final void search(String cond) throws Exception, DKException
     // prepare the vector
     DKDatastoreDL connection = MCRCM7ConnectionPool.getConnection();
     String id = "";
-    String xml = "";
+    byte[] xml = null;
     String itemId = "";
     while (iter.more()) {
       DKDDO mcr_item = (DKDDO)iter.next();
@@ -184,7 +188,7 @@ public final void search(String cond) throws Exception, DKException
         MCRCM7Item my_item = new MCRCM7Item(connection,mcr_indexclass,itemId);
         my_item.retrieve();
         id = my_item.getKeyfieldToString(mcr_fieldid);
-        xml = my_item.getPart(mcr_partid);
+        xml = my_item.getPartToBytes(mcr_partid);
         mcr_result.add("local",id,rank.intValue(),xml);
         }
       }

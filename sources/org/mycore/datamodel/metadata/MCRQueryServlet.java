@@ -85,10 +85,10 @@ public class MCRQueryServlet extends HttpServlet
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
 
-    //System.out.println( "mode  = " + mode  );
-    //System.out.println( "query = " + query );
-    //System.out.println( "type  = " + type  );
-    //System.out.println( "hosts = " + host  );
+    System.out.println( "mode  = " + mode  );
+    System.out.println( "query = " + query );
+    System.out.println( "type  = " + type  );
+    System.out.println( "hosts = " + host  );
 
     if( mode  == null ) mode  = "ResultList";
     if( host  == null ) host  = "local";
@@ -142,9 +142,9 @@ public class MCRQueryServlet extends HttpServlet
       }
 
     // print list for debug
-    //for (i=0;i<hostAliasList.size();i++) {
-    //  System.out.println("Host : "+hostAliasList.get(i)); }
-    //System.out.println();
+    for (i=0;i<hostAliasList.size();i++) {
+      System.out.println("Host : "+hostAliasList.get(i)); }
+    System.out.println();
 
     // prepare the stylesheet name
     String style = mode + "-" + type;

@@ -199,6 +199,19 @@ public final void add(String in_host, String in_id, int in_rank, String in_xml)
   }
 
 /**
+ * This methode add one element to the result list.
+ *
+ * @param in_host    the host input as a string
+ * @param in_id      the MCRObjectId input as a string
+ * @param in_rank    the rank input as an integer
+ * @param in_xml     the well formed XML stream as a byte array
+ **/
+public final void add(String in_host, String in_id, int in_rank, byte[] in_xml)
+  {
+  add(in_host,in_id,in_rank,new String(in_xml));
+  }
+
+/**
  * This methode return a well formed XML stream of the result collection
  * in form of<br>
  * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
@@ -221,8 +234,8 @@ public final String exportAll()
   sb.append('<').append(TAG_RESULTS).append('>').append(NL);
   for (int i=0;i<rank.size();i++) {
     sb.append('<').append(TAG_RESULT).append(' ').append(ATTR_HOST)
-      .append("=\"").append(host.get(i)).append("\" ").append(ATTR_ID)
-      .append("=\"").append(mcr_id.get(i)).append("\" ").append(ATTR_RANK)
+      .append("=\"").append(((String)host.get(i)).trim()).append("\" ").append(ATTR_ID)
+      .append("=\"").append(((String)mcr_id.get(i)).trim()).append("\" ").append(ATTR_RANK)
       .append("=\"").append(rank.get(i)).append("\" >").append(NL);
     sb.append(xml.get(i)).append(NL);
     sb.append("</").append(TAG_RESULT).append('>').append(NL);
@@ -254,8 +267,8 @@ public final String exportElement(int index)
   sb.append('<').append(TAG_RESULTS).append('>').append(NL);
   if ((index>=0)&&(index<=host.size())) {
     sb.append('<').append(TAG_RESULT).append(' ').append(ATTR_HOST)
-      .append("=\"").append(host.get(index)).append("\" ").append(ATTR_ID)
-      .append("=\"").append(mcr_id.get(index)).append("\" ").append(ATTR_RANK)
+      .append("=\"").append(((String)host.get(index)).trim()).append("\" ").append(ATTR_ID)
+      .append("=\"").append(((String)mcr_id.get(index)).trim()).append("\" ").append(ATTR_RANK)
       .append("=\"").append(rank.get(index)).append("\" >").append(NL);
     sb.append(xml.get(index)).append(NL);
     sb.append("</").append(TAG_RESULT).append('>').append(NL);
