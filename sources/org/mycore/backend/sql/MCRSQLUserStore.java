@@ -187,7 +187,7 @@ public class MCRSQLUserStore implements MCRUserStore
     try {
       c.doUpdate (new MCRSQLStatement(SQLGroupsTable)
        .addColumn("GID VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
-       .addColumn("CREATOR VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("CREATOR VARCHAR("+Integer.toString(MCRUser.description_len)+") NOT NULL")
        .addColumn("CREATIONDATE TIMESTAMP")
        .addColumn("MODIFIEDDATE TIMESTAMP")
        .addColumn("DESCRIPTION VARCHAR("+Integer.toString(MCRUser.id_len)+")")
