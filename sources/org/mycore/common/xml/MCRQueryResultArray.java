@@ -55,12 +55,6 @@ private String default_encoding;
 public static final String TAG_RESULTS = "mcr_results";
 /** The tag for one result **/
 public static final String TAG_RESULT = "mcr_result";
-/** The tag for one mycoreobject **/
-public static final String TAG_MYCORE_OBJECT = "mycoreobject";
-/** The tag for one mycoreclass **/
-public static final String TAG_MYCORE_CLASS = "mycoreclass";
-/** The tag for one mycorederivate **/
-public static final String TAG_MYCORE_DERIVATE = "mycorederivate";
 /** The attribute of the host name **/
 public static final String ATTR_HOST = "host";
 /** The attribute of the MCRObjectId **/
@@ -346,15 +340,18 @@ private static String ERRORTEXT =
  * &lt;/mcr_results&gt;<br>
  *
  * @param the XML input stream as byte array
- * @exception org.jdom.JDOMException if an error in the JDOM builder was occured
+ * @exception MCRException a MyCoRe error is occured
+ * @exception org.jdom.JDOMException cant read the byte array as XML
  **/
 public final synchronized void importElements(byte [] in) 
-  throws org.jdom.JDOMException
+  throws MCRException, org.jdom.JDOMException
   {
   ByteArrayInputStream bin = new ByteArrayInputStream(in);
   org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
   org.jdom.Document jdom = builder.build(bin);
   org.jdom.Element root = jdom.getRootElement();
+  if (!root.getName().equals(TAG_RESULTS)) {
+    throw new MCRException("The input is not an MCRQueryResultArray."); }
   List list = root.getChildren(TAG_RESULT);
   int irank = 0;
   for (int i=0;i<list.size();i++) {
@@ -365,9 +362,8 @@ public final synchronized void importElements(byte [] in)
     try { irank = Integer.parseInt(inrank); }
     catch (NumberFormatException e) {
       throw new MCRException(ERRORTEXT); }
-    org.jdom.Element inxml = res.getChild(TAG_MYCORE_OBJECT);
-    if (inxml==null) { inxml = res.getChild(TAG_MYCORE_CLASS); }
-    if (inxml==null) { inxml = res.getChild(TAG_MYCORE_DERIVATE); }
+    List childlist = res.getChildren();
+    org.jdom.Element inxml = (org.jdom.Element)childlist.get(0);
     host.add(inhost);
     mcr_id.add(inid);
     rank.add(new Integer(irank));
@@ -396,6 +392,7 @@ public final void debug() throws IOException
   { 
   System.out.println("Debug of MCRQueryResultArray");
   System.out.println("============================");
+  System.out.println("Size = "+size()); 
   System.out.println(new String(exportAllToByteArray())); 
   }
   

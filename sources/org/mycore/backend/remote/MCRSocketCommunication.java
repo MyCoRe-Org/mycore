@@ -51,9 +51,6 @@ private final static String XML_HEADER =
   "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 
 private String reqtype;
-private String hostAlias;
-private String mcrtype;
-private String query;
 private String reqstream = "";
 
 /**
@@ -70,48 +67,35 @@ public MCRSocketCommunication()
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
+ * @return the result of the query as MCRQueryResultArray
  **/
-public void requestQuery(String hostAlias, String mcrtype, String query)
-  throws MCRException
+public MCRQueryResultArray requestQuery(String hostAlias, String mcrtype, 
+  String query) throws MCRException
   {
-  System.out.println("Hostname : "+hostAlias);
-  System.out.println("MCR type : "+mcrtype);
-  System.out.println("Query    : "+query);
+  System.out.println("Hostname = "+hostAlias);
+  System.out.println("MCR type = "+mcrtype);
+  System.out.println("Query    = "+query);
   System.out.println();
 
-  this.hostAlias = hostAlias;
-  this.mcrtype = mcrtype;
-  this.query = query;
   reqstream = mcrtype+"***"+query;
-  }
+  String NL = System.getProperty("line.separator");
+  String host;            // in this format: server.domain.de
+  int port;               // the port: 12345
+  MCRQueryResultArray result = new MCRQueryResultArray();
+  MCRConfiguration config = MCRConfiguration.instance();
+  host = config.getString("MCR.communication_"+hostAlias+"_host");
+  port = config.getInt("MCR.communication_"+hostAlias+"_port");
 
-/**
- * This methode represide the response methode for the communication.
- * For the connection parameter would the MCRConfiguration used.
- *
- * @return an empty MCRQueryResultArray as the response.
- * @exception MCRException general Exception of MyCoRe
- **/
-public MCRQueryResultArray responseQuery() throws MCRException
-  {
-    String NL = System.getProperty("line.separator");
-    String host;            // in this format: server.domain.de
-    int port;               // the port: 12345
-    MCRQueryResultArray result = new MCRQueryResultArray();
-    MCRConfiguration config = MCRConfiguration.instance();
-    host = config.getString("MCR.communication_"+hostAlias+"_host");
-    port = config.getInt("MCR.communication_"+hostAlias+"_port");
-
-    MCRSocketCommunicator sc = null;
-    try {
-      sc = new MCRSocketCommunicator(new Socket(host, port)); }
-    catch (UnknownHostException e) {
-      throw new MCRException("Don't know about host: " + host +"."); }
-    catch (IOException e) {
-      throw new MCRException("Couldn't get I/O for the connection to: "
-        + host + "."); }
-    if (sc != null)
-    try {
+  MCRSocketCommunicator sc = null;
+  try {
+    sc = new MCRSocketCommunicator(new Socket(host, port)); }
+  catch (UnknownHostException e) {
+    throw new MCRException("Don't know about host: " + host +"."); }
+   catch (IOException e) {
+    throw new MCRException("Couldn't get I/O for the connection to: "
+      + host + "."); }
+  if (sc != null)
+  try {
       int state = 0;
       int resultSize = 0;
       String toServer ="";

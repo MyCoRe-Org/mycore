@@ -60,7 +60,8 @@ public class MCRQueryThread extends Thread {
     }
 
 // lets the thread run
-public void run() {
+public void run() 
+  {
   if (hostAlias.equalsIgnoreCase("local")) {
     try {
       if (mcr_type.equalsIgnoreCase("class")) {
@@ -87,12 +88,11 @@ public void run() {
        throw new MCRException(e.getMessage(),e); }
     }
   else {
-      MCRCommunicationInterface comm = null;
-      comm = (MCRCommunicationInterface)
-             config.getInstanceOf("MCR.communication_"+hostAlias+"_class");
-      comm.requestQuery(hostAlias,mcr_type,mcr_query);
-      mcr_result.importElements(comm.responseQuery());
+    MCRCommunicationInterface comm = null;
+    comm = (MCRCommunicationInterface)
+      config.getInstanceOf("MCR.communication_"+hostAlias+"_query_class");
+    mcr_result.importElements(comm.requestQuery(hostAlias,mcr_type,mcr_query));
+    }
   }
 
-}
 }

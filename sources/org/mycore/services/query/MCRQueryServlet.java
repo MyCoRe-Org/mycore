@@ -98,10 +98,13 @@ private String defaultLang = "";
     String att_lang  = (String) request.getAttribute( "lang" );
     if (att_lang!=null) { lang = att_lang; }
 
-    if( mode  == null ) mode  = "ResultList";
-    if( host  == null ) host  = "local";
-    if( query == null ) query = "";
-    if( type  == null ) return;
+    if( mode  == null ) { mode  = "ResultList"; }
+    if( mode.equals("") ) { mode  = "ResultList"; }
+    if( host  == null ) { host  = "local"; }
+    if( host.equals("") ) { host  = "local"; }
+    if( query == null ) { query = ""; }
+    if( type  == null ) { return; }
+    if( type.equals("") ) { return; }
     if (!conf.getBoolean("MCR.type_"+type.toLowerCase(),false)) { return; }
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }

@@ -56,26 +56,17 @@ public MCRCommunicationDummy()
  * @param hostlist the list of hostnames as string they should requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
- * @exception MCRException general Exception of MyCoRe
- **/
-public final void requestQuery(String hostAlias, String mcrtype, String query)
-  throws MCRException
-  {
-  System.out.println("Hostname : "+hostAlias);
-  System.out.println("MCR type : "+mcrtype);
-  System.out.println("Query    : "+query);
-  System.out.println();
-  }
-
-/**
- * This methode represide the query response methode for the communication.
- * For the connection parameter would the MCRConfiguration used.
- *
  * @return an empty MCRQueryResultArray as the response.
  * @exception MCRException general Exception of MyCoRe
  **/
-public final MCRQueryResultArray responseQuery() throws MCRException
+public final MCRQueryResultArray requestQuery(String hostAlias, String mcrtype,
+  String query) throws MCRException
   {
+  System.out.println("Hostname = "+hostAlias);
+  System.out.println("MCR type = "+mcrtype);
+  System.out.println("Query    = "+query);
+  System.out.println();
+
   return new MCRQueryResultArray() ;
   }
 

@@ -47,18 +47,10 @@ public interface MCRCommunicationInterface
  * @param hostAlias the host alias as string that shall be requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
+ * @return the result of the query as MCRQueryResultArray
  * @exception MCRException general Exception of MyCoRe
  **/
-public void requestQuery(String hostAlias, String mcrtype, String query)
-  throws MCRException;
-
-/**
- * This methode represide the response methode for the communication.
- * For the connection parameter would the MCRConfiguration used.
- *
- * @return an empty MCRQueryResultArray as the response.
- * @exception MCRException general Exception of MyCoRe
- **/
-public MCRQueryResultArray responseQuery() throws MCRException;
+public MCRQueryResultArray requestQuery(String hostAlias, String mcrtype, 
+  String query) throws MCRException;
 
 }

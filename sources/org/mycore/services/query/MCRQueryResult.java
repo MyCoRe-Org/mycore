@@ -44,8 +44,10 @@ import mycore.xml.MCRQueryResultArray;
  **/
 public class MCRQueryResult
 {
+
 // The list of hosts from the configuration
 private ArrayList remoteAliasList = null;
+
 // The instcnce of configuraion
 private MCRConfiguration conf = null;
 
@@ -55,10 +57,10 @@ private MCRConfiguration conf = null;
  **/
 public MCRQueryResult()
   {
+  // get an instance of configuration
+  conf = MCRConfiguration.instance();
   // read host list from configuration
-  MCRConfiguration config = MCRConfiguration.instance();
-  String hostconf = config.getString("MCR.communication_hostaliases",
-    "local");
+  String hostconf = conf.getString("MCR.communication_hostaliases","local");
   remoteAliasList = new ArrayList();
   int i = 0;
   int j = hostconf.length();
@@ -70,8 +72,6 @@ public MCRQueryResult()
     else {
       remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
     }
-  // get an instance of configuration
-  conf = MCRConfiguration.instance();
   }
 
 /**

@@ -43,10 +43,6 @@ import mycore.xml.MCRCommunicationInterface;
 public class MCRServletCommunication implements MCRCommunicationInterface
 {
 
-private String reqtype;
-private String hostAlias;
-private String query;
-
 /**
  * This is the constructor for the MCRSocketCommunication.
  **/
@@ -61,33 +57,25 @@ public MCRServletCommunication()
  * @param reqtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
+ * @return the result of the query as MCRQueryResultArray
  **/
-public void requestQuery(String hostAlias, String reqtype, String query)
-  throws MCRException
+public MCRQueryResultArray requestQuery(String hostAlias, String reqtype, 
+  String query) throws MCRException
   {
-  this.hostAlias = hostAlias;
-  this.reqtype = reqtype;
-  this.query = query;
-  }
+  System.out.println("Hostname = "+hostAlias);
+  System.out.println("MCR type = "+reqtype);
+  System.out.println("Query    = "+query);
+  System.out.println();
 
-/**
- * This method represides the response methode for the communication.
- * For connection parameters the MCRConfiguration is used.
- *
- * @return an empty MCRQueryResultArray as the response.
- * @exception MCRException general Exception of MyCoRe
- **/
-public MCRQueryResultArray responseQuery() throws MCRException
-{
-  String NL = System.getProperty("line.separator");
-  URL currentURL;
   MCRConfiguration config = MCRConfiguration.instance();
   String protocol = config.getString("MCR.communication_"+hostAlias
     +"_protocol");
   String host = config.getString("MCR.communication_"+hostAlias+"_host");
   int port = config.getInt("MCR.communication_"+hostAlias+"_port");
   String location = config.getString("MCR.communication_"+hostAlias
-    +"_servlet_location");
+    +"_query_servlet");
+
+  URL currentURL;
   MCRQueryResultArray result = new MCRQueryResultArray();
   try {
     currentURL = new URL(protocol,host,port,location);
@@ -115,17 +103,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
     e.printStackTrace(System.err);
   }
   return result;
-}
-
-/**
- * This methode debug this class.
- **/
-public final void debug()
-  {
-  System.out.println("Hostname : "+hostAlias);
-  System.out.println("MCR type : "+reqtype);
-  System.out.println("Query    : "+query);
-  System.out.println();
   }
+
 }
 
