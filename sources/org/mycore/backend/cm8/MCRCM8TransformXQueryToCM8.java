@@ -311,8 +311,8 @@ private final String traceOneCondition(String cond, String itemtypename,
       // replace * with %
       value[i] = "%"+value[i].replace('*','%')+"%"; } 
     // is value[0] a date
-    GregorianCalendar date = MCRUtils.covertDateToGregorianCalendar(value[i]);
-    if (date != null) {
+    try {
+      GregorianCalendar date = MCRUtils.covertDateToGregorianCalendar(value[i]); 
       long number = 0;
       if (date.get(Calendar.ERA) == GregorianCalendar.AD) {
         number = (4000+date.get(Calendar.YEAR))*10000 +
@@ -326,10 +326,19 @@ private final String traceOneCondition(String cond, String itemtypename,
       value[i] = Long.toString(number);
       sbout.append(' ').append(op[i]).append(' ').append(value[i])
         .append(bool[i]); 
+      continue;
       }
-    else {
-      sbout.append(' ').append(op[i]).append(" \"").append(value[i])
-        .append("\"").append(bool[i]); }
+    catch (Exception e) { }
+    // is value[0] a number
+    try {
+      double numb = Double.parseDouble(value[i]);
+      sbout.append(' ').append(op[i]).append(' ').append(value[i])
+        .append(' ').append(bool[i]); 
+      continue;
+      }
+    catch (Exception e) { }
+    sbout.append(' ').append(op[i]).append(" \"").append(value[i])
+      .append("\"").append(bool[i]); 
     }
   sbout.append(']');
   //return sbout.toString().replace('\'','\"');

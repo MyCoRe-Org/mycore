@@ -228,6 +228,11 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
           logger.debug("Attribute : "+sb+"  "+elname+"  "+
             (String)mcr_tc.getValueElement(i));
           break;
+        case MCRTypedContent.FORMAT_NUMBER :
+          valueobject = mcr_tc.getValueElement(i);
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            ((Double)mcr_tc.getValueElement(i)).toString());
+          break;
         }
       item.setAttribute(sb.toString(),elname,valueobject);
       }

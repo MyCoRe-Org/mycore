@@ -87,9 +87,9 @@ public static void main(String argv[]) throws DKException, Exception
     ifsfile = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.File");
     //query = "/"+itemtype+"[@ifsfile=\""+mcrid.getId()+"\"]";
     // show all items
-    // query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
+    query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
     // show all items
-    query = "/"+itemtype;
+    //query = "/"+itemtype;
     }
 
   System.out.println(query);
