@@ -13,7 +13,7 @@
  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
              schemaLocation="./xml-2001.xsd" />
 
- <xsd:include schemaLocation='/dlwww/cvs/mycore/schema/MCRMetaLink.xsd'/>
+ <xsd:include schemaLocation='./MCRMetaLink.xsd'/>
 
  <xsd:complexType name="MCRObjectStructure" >
   <xsd:sequence>

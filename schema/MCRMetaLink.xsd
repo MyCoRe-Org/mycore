@@ -14,7 +14,7 @@
              schemaLocation="./xml-2001.xsd" />
 
  <xsd:import namespace="http://www.w3.org/1999/xlink"
-             schemaLocation="/dlwww/mycore/schema/xlinks-2001.xsd" />
+             schemaLocation="./xlinks-2001.xsd" />
 
  <xsd:complexType name="MCRMetaLink">
   <xsd:simpleContent>
