@@ -45,6 +45,9 @@ public class MCRContentStoreFactory
   /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */  
   protected static Hashtable extenderClasses = new Hashtable();
   
+  /** The MCRContentStoreSelector implementation that will be used */
+  protected static MCRContentStoreSelector storeSelector;
+  
   /**
    * Returns the MCRContentStore instance that is configured for this
    * StoreID. The instance that is returned is configured by the property
@@ -74,6 +77,26 @@ public class MCRContentStoreFactory
       }
     }
     return (MCRContentStore)( stores.get( storeID ) );
+  }
+
+  /**
+   * Returns the MCRContentStore instance that should be used
+   * to store the content of the given file. The configured
+   * MCRContentStoreSelector is used to make this decision.
+   *
+   * @see MCRContentStoreSelector
+   * @see MCRContentStore
+   **/
+  public static MCRContentStore selectStore( MCRFile file )
+  {
+    if( storeSelector == null )
+    {
+      String property = "MCF.IFS.ContentStoreSelector.Class";
+      Object obj = MCRConfiguration.instance().getInstanceOf( property );
+      storeSelector = (MCRContentStoreSelector)obj;
+    }
+    String store = storeSelector.selectStore( file );
+    return getStore( store );
   }
   
   /**
