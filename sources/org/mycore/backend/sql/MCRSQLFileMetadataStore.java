@@ -25,7 +25,6 @@
 package org.mycore.backend.sql;
 
 import org.mycore.common.*;
-import org.mycore.backend.sql.*;
 import org.mycore.datamodel.ifs.*;
 import org.mycore.datamodel.metadata.*;
 

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.backend.sql.*;
 import org.mycore.user.*;
 
 /**

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
-import org.mycore.backend.db2.MCRDB2UserStore;
+import org.mycore.backend.sql.MCRSQLUserStore;
 
 /**
  * This class is the user (and group) manager of the MyCoRe system. It is 

@@ -38,7 +38,7 @@ public interface MCRLinkTableInterface
 {
 
 /**
- * The initializer for the class MCRDB2LinkTableStore. It reads
+ * The initializer for the class MCRSQLLinkTableStore. It reads
  * the classification configuration and checks the table names.
  *
  * @exception throws if the type is not correct

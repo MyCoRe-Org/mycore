@@ -41,10 +41,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.backend.sql.MCRSQLConnection;
-import org.mycore.backend.sql.MCRSQLConnectionPool;
-import org.mycore.backend.sql.MCRSQLRowReader;
-import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.services.nbn.MCRNBN;
 import org.mycore.services.nbn.MCRNBNManager;
 

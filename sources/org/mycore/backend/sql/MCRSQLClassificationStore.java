@@ -32,7 +32,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.classifications.*;
-import org.mycore.backend.sql.*;
 
 /** 
  * This class implements the MCRClassificationInterface as presistence
