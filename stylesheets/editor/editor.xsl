@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.15 $ $Date: 2004-09-29 13:46:56 $ -->
+<!-- $Revision: 1.16 $ $Date: 2004-10-04 12:04:09 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -13,7 +13,14 @@
 
 <!-- ========================================================================= -->
 
-<xsl:include href="editor-common.xsl" />
+<xsl:include href="editor-config.xsl" />
+
+<!-- ============ Parameter aus MyCoRe LayoutServlet ============ -->
+<xsl:param name="WebApplicationBaseURL"     />
+<xsl:param name="ServletsBaseURL"           />
+<xsl:param name="DefaultLang"               />
+<xsl:param name="Lang"                      />
+<xsl:param name="MCRSessionID"              />
 
 <!-- ======== http request parameters ======== -->
 <xsl:param name="editor.source.new" select="'false'" /> <!-- if true, empty source -->
@@ -625,7 +632,7 @@
 
 <!-- ======== helpPopup ======== -->
 <xsl:template match="helpPopup">
-  <xsl:variable name="url">
+  <xsl:variable name="url.helper">
     <xsl:choose>
       <xsl:when test="@url">
         <xsl:value-of select="@url" />
@@ -638,6 +645,12 @@
         <xsl:value-of select="@id" />
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="url">
+    <xsl:call-template name="build.url">
+      <xsl:with-param name="url" select="$url.helper" />                                                                                      
+    </xsl:call-template>
   </xsl:variable>
 
   <xsl:variable name="properties">
@@ -701,6 +714,61 @@
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
     </xsl:otherwise>
   </xsl:choose>
+</xsl:template>
+
+<!-- ========= multi-language label ======== -->
+<xsl:template name="output.label">
+  <xsl:param name="usefont" select="'no'" />
+
+  <xsl:if test="$usefont = 'yes'">
+    <xsl:text disable-output-escaping="yes">&lt;span style="</xsl:text>
+    <xsl:value-of select="$editor.font" />
+    <xsl:text disable-output-escaping="yes">" &gt;</xsl:text>
+  </xsl:if>
+
+  <xsl:choose>
+
+    <!-- If there is a label with xml:lang = selected lang, output it -->
+    <xsl:when test="label[lang($Lang)]">
+      <xsl:for-each select="label[lang($Lang)]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, if there is a label in the default language, output it -->
+    <xsl:when test="label[lang($DefaultLang)]">
+      <xsl:for-each select="label[lang($DefaultLang)]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, use the language-independent @label attribute, if it exists -->
+    <xsl:when test="@label">
+      <xsl:value-of select="@label" />
+    </xsl:when>
+
+    <!-- Otherwise, use the language-independent nested label elements, if existing -->
+    <xsl:when test="label[string-length(@xml:lang)=0]">
+      <xsl:for-each select="label[string-length(@xml:lang)=0]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, use the first label of any language that exists -->
+    <xsl:otherwise>
+      <xsl:for-each select="label[1]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:otherwise>
+
+    <!-- Otherwise give up, user is too stupid to configure the editor -->
+
+  </xsl:choose>
+
+  <xsl:if test="$usefont = 'yes'">
+    <xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>
+  </xsl:if>
+
 </xsl:template>
 
 <!-- ======== label ======== -->
@@ -830,7 +898,7 @@
   <xsl:variable name="attr.token" select="ancestor::editor/cancel/@token" />
 
   <!-- ======== build url for cancel button ======== -->
-  <xsl:variable name="url">
+  <xsl:variable name="url.helper">
     <xsl:choose>
       <xsl:when test="string-length($editor.cancel.url) &gt; 0">
         <xsl:value-of select="$editor.cancel.url"/>
@@ -849,6 +917,12 @@
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="url">
+    <xsl:call-template name="build.url">
+      <xsl:with-param name="url" select="$url.helper" />
+    </xsl:call-template>
   </xsl:variable>
 
   <!-- ======== pass cancel url to servlet ======== -->
