@@ -57,11 +57,11 @@ import org.mycore.common.MCRConfiguration;
  * easy to use. So here is an example:
  * <PRE>
  * // Get an instance of the class
- * MCRXSLTransformation transformation = MCRXSLTransformation getInstance();
+ * MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
  * 
  * // Get the template: myStylesheet could be a String (i.e. a filename),
  * // a File or a StreamSource
- * Templates templates = transformation(myStylesheet);
+ * Templates templates = getStylesheet(myStylesheet);
  *
  * // Next, you are in need of a TransformerHandler:
  * TransformerHandler th = getTransformerHandler(templates);
