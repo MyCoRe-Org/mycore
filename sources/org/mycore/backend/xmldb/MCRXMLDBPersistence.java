@@ -52,6 +52,7 @@ public final class MCRXMLDBPersistence
      * Creates a new MCRXMLDBPersistence.
      **/
     public MCRXMLDBPersistence() throws MCRPersistenceException {
+        System.out.println("XMLStart mit: " + conf_prefix);
 	driver = config.getString( conf_prefix + "driver" );
     	vendor = config.getString( conf_prefix + "vendor" );
 	hostname = config.getString( conf_prefix + "hostname", "" );
@@ -63,6 +64,8 @@ public final class MCRXMLDBPersistence
 								  hostname, 
 								  port, 
 								  dbpath + "/" + root );
+            System.out.println("MCRXMLDBPersistence connString:" + connString); 
+            System.out.println("MCRXMLDBPersistence driver    :" + driver); 
 	    rootCollection = MCRXMLDBTools.getRootCollection( driver, 
 							      connString );
 	    if( rootCollection == null ) {
@@ -79,6 +82,7 @@ public final class MCRXMLDBPersistence
 	    }
 	}
 	catch( Exception e ) {
+            System.out.println("XMLException: " + e.getMessage());
 	    throw new MCRPersistenceException( e.getMessage(), e );
 	}
     }
@@ -95,6 +99,9 @@ public final class MCRXMLDBPersistence
     public final void create( MCRTypedContent mcr_tc, Document doc, String mcr_ts ) 
 	throws MCRPersistenceException {
 	try {
+            System.out.println("MCRTypedContent: " + mcr_tc);
+            System.out.println("Document       : " + doc);
+            System.out.println("String         : " + mcr_ts);
 	    MCRObjectID mcr_id = null;
 	    String mcr_label = null;
 	    for( int i = 0; i < mcr_tc.getSize(); i++ ) {
@@ -102,6 +109,7 @@ public final class MCRXMLDBPersistence
 		    mcr_id = new MCRObjectID( (String)mcr_tc.getValueElement( i ) ); 
 		    mcr_label = (String)mcr_tc.getValueElement( i+1 ); }
 	    }
+            System.out.println("typeCollection: " + mcr_id.getTypeId().toLowerCase());
 	    Collection typeCollection = rootCollection.getChildCollection( mcr_id.getTypeId().toLowerCase() );
 	    MCRXMLDBItem item = new MCRXMLDBItem( typeCollection, mcr_id, doc );
 	    item.create();
@@ -144,6 +152,7 @@ public final class MCRXMLDBPersistence
      * @param doc
      **/    
     public void update( MCRTypedContent mcr_tc, Document doc, String mcr_ts ) {
+        System.out.println("update");
 	create( mcr_tc, doc, mcr_ts );
     }
 
@@ -183,6 +192,7 @@ public final class MCRXMLDBPersistence
     public final byte[] receive( MCRObjectID mcr_id )
 	throws MCRConfigurationException, 
 	MCRPersistenceException {
+        System.out.println("MCRXMLDBPersistence receive");    
 	return MCRUtils.getByteArray( getItem( mcr_id ).getContent() );
     }
 
@@ -197,6 +207,7 @@ public final class MCRXMLDBPersistence
 	throws MCRPersistenceException {
 	Collection typeCollection = null;
 	MCRXMLDBItem item = null;
+        System.out.println("MCRXMLDBPersistence getItem with: " + mcr_id.getTypeId().toLowerCase());    
 	try {
 	    typeCollection = 
 		rootCollection.getChildCollection( mcr_id.getTypeId().toLowerCase() );
@@ -232,6 +243,7 @@ public final class MCRXMLDBPersistence
 
     public synchronized String getNextFreeId( String project_ID, String type_ID )
 	throws MCRPersistenceException { 
+        System.out.println("MCRXMLDBPersistence getNextFreeId");    
 	return "";
 	
     }
@@ -276,6 +288,7 @@ public final class MCRXMLDBPersistence
 //  	    catch( Exception e ) {
 //  		throw new MCRPersistenceException( e.getMessage(), e );
 //  	    }
-	return true;
+        System.out.println("Check exist");    
+	return false;
     }
 }
