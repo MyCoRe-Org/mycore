@@ -211,4 +211,40 @@ public class MCRDirectory extends MCRFilesystemNode
     public int compare( Object a, Object b )
     { return ((MCRFilesystemNode)a).getLastModified().getTime().compareTo( ((MCRFilesystemNode)b).getLastModified().getTime() ); }
   };
+
+  protected void collectMD5Lines( List list )
+  {
+    MCRFilesystemNode[] nodes = getChildren();
+    for( int i = 0; i < nodes.length; i++ )
+    {
+      if( nodes[ i ] instanceof MCRDirectory )
+      {
+        MCRDirectory dir = (MCRDirectory)( nodes[ i ] );
+        dir.collectMD5Lines( list );
+      }
+      else
+      {
+        MCRFile file = (MCRFile)( nodes[ i ] ); 
+        String line = file.getMD5() + " " + file.getSize();
+        list.add( line );
+      }  
+    }
+  }
+  
+  public byte[] buildFingerprint()
+  {
+    ensureNotDeleted();
+    
+    List list = new Vector();
+    collectMD5Lines( list );
+    Collections.sort( list );
+    
+    StringBuffer sb = new StringBuffer();
+    for( int i = 0; i < list.size(); i++ )
+      sb.append( list.get( i ) ).append( '\n' );
+    String s = sb.toString();
+    
+    try{ return s.getBytes( "UTF-8" ); }
+    catch( UnsupportedEncodingException shouldNeverBeThrown ){ return null; }
+  }
 }
