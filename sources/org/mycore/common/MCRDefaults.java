@@ -24,6 +24,9 @@
 
 package org.mycore.common;
 
+import java.text.*;
+import java.util.*;
+
 /**
  * This class holds only static variables, they ar used in all classes as
  * default values. So we can change this in one source code. The values
@@ -46,6 +49,38 @@ public final static String ENCODING = "ISO_8859-1";
 
 /** The maximum of the metadata XML files **/
 public final static int MAX_XML_FILE_LENGTH = 100 * 1024;
+
+/** The supported language codes (like xml:lang definition) **/
+public static String[] SUPPORTED_LANG = { 
+  // ISO-639 with ISO-3166 extendions
+  "de", 
+  "de-DE", 
+  "en", 
+  "en-UK", 
+  "en-US", 
+  // extendion for historical languages
+  "x-egy",   // egypt
+  "x-ara",   // arabic
+  "x-grc",   // old greek
+  "x-lat",   // latin
+  "x-cop"    // coptic
+  };
+
+/** The date format for the supported languages **/
+public static DateFormat[] DATE_FORMAT = {
+  // ISO-639 with ISO-3166 extendions
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN),       // de
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY),      // de-DE
+  DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK),            // en
+  DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK),            // en-UK
+  DateFormat.getDateInstance(DateFormat.SHORT, Locale.US),            // en-US
+  // extendion for historical languages (all use the default)
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-egy
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-ara
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-grc
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-lat
+  DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())  // x-cop
+  };
 
 }
 

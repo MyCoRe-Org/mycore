@@ -44,39 +44,49 @@ import org.jdom.output.XMLOutputter;
  * @version $Revision$ $Date$
  **/
 public class MCRUtils {
+
 	public final static char COMMAND_OR='O';
 	public final static char COMMAND_AND='A';
 	public final static char COMMAND_XOR='X';
-	// public constant data
-	public static String[] SUPPORTED_LANG = { "de", "en", "en_uk", "en_us" };
-	private static final Logger logger = Logger.getLogger(MCRUtils.class);
 
-	// common data
-	private static DateFormat DE_DF =
-		DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY);
-	private static DateFormat UK_DF =
-		DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK);
-	private static DateFormat US_DF =
-		DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+	// public constant data
+	private static final Logger logger = Logger.getLogger(MCRUtils.class);
 
 	/**
 	 * This method check the language string base on RFC 1766 to the supported
 	 * languages in mycore.
 	 *
 	 * @param lang          the language string
-	 * @return trye if the language was supported, otherwise false
+	 * @return true if the language was supported, otherwise false
 	 **/
 	public static final boolean isSupportedLang(String lang) {
 		if ((lang == null) || ((lang = lang.trim()).length() == 0)) {
 			return false;
 		}
-		lang = lang.trim().toLowerCase();
-		for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-			if (lang.equals(SUPPORTED_LANG[i]))
+		for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
+			if (lang.equals(MCRDefaults.SUPPORTED_LANG[i]))
 				return true;
 		}
 		return false;
 	}
+
+	/**
+	 * The method return the index of a language string in the
+	 * statich field MCRDefault.SUPPORTED_LANG. If the lang is not
+	 * supported -1 was returned.
+	 *
+	 * @param lang          the language string
+	 * @return the index if the language was supported, otherwise -1
+	 **/
+	public static final int getPositionLang(String lang) {
+		if ((lang == null) || ((lang = lang.trim()).length() == 0)) {
+			return -1;
+		}
+		for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
+			if (lang.equals(MCRDefaults.SUPPORTED_LANG[i])) return i;
+		}
+		return -1;
+         }
 
 	/**
 	 * The method return the instance of DateFormat for the given language.
@@ -85,19 +95,11 @@ public class MCRUtils {
 	 * @return the instance of DateFormat or null
 	 **/
 	public static final DateFormat getDateFormat(String lang) {
-		lang = lang.trim().toLowerCase();
-		if (!isSupportedLang(lang)) {
-			return null;
+                int i = getPositionLang(lang);
+		if (i == -1) {
+			return DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
 		}
-		if (lang.equals(SUPPORTED_LANG[0]))
-			return DE_DF;
-		if (lang.equals(SUPPORTED_LANG[1]))
-			return US_DF;
-		if (lang.equals(SUPPORTED_LANG[2]))
-			return UK_DF;
-		if (lang.equals(SUPPORTED_LANG[3]))
-			return US_DF;
-		return null;
+		return MCRDefaults.DATE_FORMAT[i];
 	}
 
 	/**
@@ -115,8 +117,9 @@ public class MCRUtils {
 			return false;
 		}
 		try {
+			DateFormat df = getDateFormat("de");
 			GregorianCalendar newdate = new GregorianCalendar();
-			newdate.setTime(DE_DF.parse(date));
+			newdate.setTime(df.parse(date));
 		} catch (ParseException e) {
 			return false;
 		}
@@ -138,8 +141,9 @@ public class MCRUtils {
 			return false;
 		}
 		try {
+			DateFormat df = getDateFormat("en-UK");
 			GregorianCalendar newdate = new GregorianCalendar();
-			newdate.setTime(UK_DF.parse(date));
+			newdate.setTime(df.parse(date));
 		} catch (ParseException e) {
 			return false;
 		}
@@ -161,8 +165,9 @@ public class MCRUtils {
 			return false;
 		}
 		try {
+			DateFormat df = getDateFormat("en-US");
 			GregorianCalendar newdate = new GregorianCalendar();
-			newdate.setTime(US_DF.parse(date));
+			newdate.setTime(df.parse(date));
 		} catch (ParseException e) {
 			return false;
 		}
@@ -190,8 +195,8 @@ public class MCRUtils {
 		} catch (ParseException e) {
 		}
 		if (!test) {
-			for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-				DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
+			for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
+				DateFormat df = getDateFormat(MCRDefaults.SUPPORTED_LANG[i]);
 				df.setLenient(false);
 				try {
 					calendar.setTime(df.parse(indate));
@@ -244,8 +249,8 @@ public class MCRUtils {
 		} catch (ParseException e) {
 		}
 		if (!test) {
-			for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-				DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
+			for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
+				DateFormat df = getDateFormat(MCRDefaults.SUPPORTED_LANG[i]);
 				try {
 					calendar.setTime(
 						df.parse(indate.substring(start, indate.length())));
