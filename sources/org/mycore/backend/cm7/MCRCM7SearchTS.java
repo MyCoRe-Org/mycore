@@ -186,7 +186,8 @@ public final void search(String cond) throws Exception, DKException
       DKDDO mcr_item = (DKDDO)iter.next();
       if (mcr_item != null) {
         itemId = (String)mcr_item.getDataByName("DKDLItemId");
-        Integer rank = (Integer)mcr_item.getDataByName("DKRank") ;
+//      Integer rank = (Integer)mcr_item.getDataByName("DKRank") ;
+        Integer rank = new Integer(1);
         MCRCM7Item my_item = new MCRCM7Item(connection,mcr_indexclass,itemId);
         my_item.retrieve();
         id = my_item.getKeyfieldToString(mcr_fieldid);

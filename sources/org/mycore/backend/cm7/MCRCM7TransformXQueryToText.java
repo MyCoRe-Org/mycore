@@ -300,7 +300,7 @@ private final String traceOneCondition(String cond)
     try {
       MCRObjectID mid = new MCRObjectID(value[i]);
       if (mid.isValid()) {
-        value[i] = mid.getId().replace('_','X'); }
+        value[i] = mid.getId().toUpperCase().replace('_','X'); }
       }
     catch (MCRException e) { }
     }
@@ -308,14 +308,14 @@ private final String traceOneCondition(String cond)
   for (i=0;i<counter;i++) {
     if (tag[i].endsWith("@CATEGID")) { value[i] = value[i]+"*"; }
     }
-/*
+  
   for (i=0;i<counter;i++) {
     System.out.println("TAG="+tag[i]);
     System.out.println("OPER="+op[i]);
     System.out.println("VALUE="+value[i]);
     System.out.println();
     }
-*/
+  
 
   // search and prepare all attributes
   String attr[] = new String[10];
