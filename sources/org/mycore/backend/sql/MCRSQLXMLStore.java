@@ -171,7 +171,7 @@ public synchronized final void delete( MCRObjectID mcrid, int version )
     connection.getJDBCConnection().setAutoCommit(false);
     StringBuffer sb = new StringBuffer(1024);
     sb.append("DELETE FROM ").append(tableName)
-      .append("WHERE ( MCRID = ? AND MCRVERSION = ? )");
+      .append(" WHERE ( MCRID = ? AND MCRVERSION = ? )");
     PreparedStatement statement = connection.getJDBCConnection()
       .prepareStatement(sb.toString());
     statement.setString(1,mcrid.getId());
