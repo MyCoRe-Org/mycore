@@ -237,6 +237,25 @@ public class MCRConfiguration
       return properties;
   }
   
+  /**
+   * Returns all the properties required for logging purposes
+   *
+   * @return the list of properties starting with log4j
+   */
+  public Properties getLoggingProperties() {
+      Properties properties = new Properties();
+      
+      Enumeration names = this.properties.propertyNames();      
+      while (names.hasMoreElements()) {
+          String name = (String) (names.nextElement());
+          if (name.startsWith("mcr.log4j")) {
+              String value = this.properties.getProperty(name);
+              properties.setProperty(name.substring(4), value);
+          }
+      }
+      return properties;
+  }
+  
 /**
  * Returns a new instance of the class specified in the configuration property
  * with the given name.
