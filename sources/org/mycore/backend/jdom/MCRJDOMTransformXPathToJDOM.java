@@ -23,6 +23,7 @@
  **/
 package org.mycore.backend.jdom;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -78,6 +79,7 @@ public MCRJDOMTransformXPathToJDOM() {
  */
 public final HashSet getResultIDs(String root, String query, String type) {
   // prepare the query over the rest of the metadata
+  Date t1 = new Date();
   HashSet idmeta = new HashSet();
   logger.debug("Incomming condition : " + query);
   String xsltquery = "";
@@ -91,6 +93,10 @@ public final HashSet getResultIDs(String root, String query, String type) {
   MCRJDOMMemoryStore store = MCRJDOMMemoryStore.instance();
   org.jdom.Element rootelm = store.retrieveType(type);
   org.jdom.Document stylesheet = store.getStylesheet(xsltquery);
+  Date t2 = new Date();
+  float diff = (t2.getTime()-t1.getTime())/1000;
+  logger.debug("Prepare stylesheet in "+Float.toString(diff)+" s");
+
 
   // execute the query
   org.jdom.transform.JDOMResult jdomres = new org.jdom.transform.JDOMResult();
@@ -101,6 +107,9 @@ public final HashSet getResultIDs(String root, String query, String type) {
   catch (Exception e) {
     //e.printStackTrace(); }
     e.getMessage(); }
+  Date t3 = new Date();
+  diff = (t3.getTime()-t2.getTime())/1000;
+  logger.debug("Execute the XALAN transformation in "+Float.toString(diff)+" s");
 
   // select the results
   org.jdom.Document resdoc = jdomres.getDocument();
@@ -120,6 +129,9 @@ public final HashSet getResultIDs(String root, String query, String type) {
         }
       }
     }
+  Date t4 = new Date();
+  diff = (t4.getTime()-t3.getTime())/1000;
+  logger.debug("Create the result HashTable in "+Float.toString(diff)+" s");
 
   return idmeta;
   }
