@@ -43,6 +43,17 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \end{itemize}
 \item Test der Installation:\\
 {\tt su - db2inst1} $\rightarrow$ {\tt db2stop} $\rightarrow$ {\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.} $\rightarrow$ {\tt db2level} $\rightarrow$ {\tt exit}
+\item Installieren Sie nun den FixPack 2 gemäß der Anleitung. Bezugsquelle für den Fix ist:\\
+{\tt http://www-3.ibm.com/cgi-bin/db2www/data/db2/udb/winos2unix/support/download.d2w/report}\\[2ex]
+Die wichtigsten Schritte sind:
+\begin{itemize}
+\item Auspacken des FixPack's
+\item {\tt ./installFixPak -a}
+\item Aktualisieren von Exemplaren zur Verwendung der neuen Stufe von DB2
+\item Restart der Datenbank
+\item Neubinden der DB2 UDB Datenbanken
+\end{itemize}
+Eine vollständige Beschriebung befindet sich in der mitgelieferten Readme-Datei.
 \end{enumerate}
 %
 \subsubsection{NSE}
@@ -59,6 +70,13 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item {\tt ./db2iupdt -u db2fenc1 db2inst1}
 \item Test der Installation:\\
 {\tt su - db2inst1} $\rightarrow$ {\tt db2start} $\rightarrow$ {\tt db2text start} $\rightarrow$ {\tt db2licm -l}\footnote{Pr"uft Ihren Lizenzeintrag} $\rightarrow$ {\tt exit}
+\item Installieren Sie nun den FixPack 2 gemäß der Anleitung. Dieses Update ist sehr einfach zu bewerkstelligen.\\[2ex]
+Die wichtigsten Schritte sind:
+\begin{itemize}
+\item  Auspacken des FixPack's
+\item {\tt ./nsesetup.sh}
+\item {\tt cd /usr/opt/db2\_08\_01/instance ; ./db2iupdt db2inst1}
+\end{itemize}
 \end{enumerate}
 %
 \subsubsection{WebSphere 5}
