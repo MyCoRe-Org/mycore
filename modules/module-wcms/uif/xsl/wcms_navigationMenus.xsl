@@ -761,7 +761,7 @@
 					</xsl:when>
 					<xsl:otherwise>
                         <xsl:call-template name="UrlAddSession">
-                            <xsl:with-param name="url" select="$alternative"/>
+                            <xsl:with-param name="url" select="$newurl"/>
                         </xsl:call-template>
 					</xsl:otherwise>
 				</xsl:choose>
