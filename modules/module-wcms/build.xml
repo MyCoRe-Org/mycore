@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.5 $ $Date: 2004-12-06 12:45:46 $ -->
+<!-- $Revision: 1.6 $ $Date: 2004-12-16 13:19:26 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -83,6 +83,7 @@
            debug="${debug}"
            optimize="${optimize}"
            target="${javatarget}"
+           source="${sourcerelease}"
            encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
