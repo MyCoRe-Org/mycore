@@ -18,6 +18,12 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 %
 \subsubsection{DB2}
 \begin{enumerate}
+\item Legen Sie bitte die nachfolgenden Benutzer an. Zusammen sollten je nach geplanten Anwendungen 4-8 GB Plattenplatz eingeplant werden. Achten Sie darauf, dass man sich in die Accounts einloggen kann, z. B. via Telnet!
+\begin{itemize}
+\item User {\bf dasusr1} $\rightarrow$ Group {\bf dasadm1}
+\item User {\bf db2inst1} $\rightarrow$ Group {\bf db2grp1}
+\item User {\bf db2fenc1} $\rightarrow$ Group {\bf db2fgrp1}
+\end{itemize}
 \item Kopieren Sie das File {\it ese.sbcs.tar.Z} von der CD {\bf 'DB2 8.1 with FP1'} und entpacken Sie dieses.
 \item {\tt ./db2setup}
 \item W"ahlen Sie {\bf Install Products} $\rightarrow$ {\bf DB2 UDB Enterprise Server Edition}. Folgen Sie den Schritten:
@@ -227,6 +233,181 @@ In the web browser please do the following configurations.
 \end{enumerate}
 Restart the HTTP Server (and leave it open) by clicking on the black circle logo that is located next to the help button in the upper-right corner of the right panel. \\[2ex]
 Open \mcrcommand{https://<your hostname>/snoop} in the web browser.
+%
+{\bf Installation of the FixPack 2}
+\begin{enumerate}
+\item Download from \url{ftp://ftp.software.ibm.com/software/websphere/appserv/support/fixpacks/was50/fixpack2/AIX/}
+\end{enumerate}
+%
+\subsubsection{Content Manager}
+\begin{enumerate}
+\item Legen Sie bitte die nachfolgenden Benutzer an. {\bf icmadmin} und {\bf rmadmin} benötigen nicht viel Platz. Für den Benutzer {\bf mcradmin} sollte ausreichend Platz eingeplant werden, da hier später die MyCoRe-Anwendungen installiert werden.. Achten Sie darauf, dass man sich in die Accounts einloggen kann, z. B. via Telnet! Im IBM Handbuch wir ein Accout {\bf icmconct} angegeben, dies entspricht in der Funktionalität unserem {\bf mcradmin}. Sicherheitshalber können sie es mit anlegen.
+\begin{itemize}
+\item User {\bf icmadmin} $\rightarrow$ Group {\bf db2grp1}
+\item User {\bf rmadmin} $\rightarrow$ Group {\bf db2grp1}
+\item User {\bf icmconct} $\rightarrow$ Group {\bf staff}
+\item User {\bf mcradmin} $\rightarrow$ Group {\bf mcr}
+\end{itemize}
+\item Fügen sie den Nutzer {\bf root} der Gruppe {\bf db2grp1} hinzu.
+\item Ergänzen Sie das File \mcrfile{/etc/environment} um folgende Zeilen:
+\begin{verbatim}
+#
+# Appendix for Content Manager
+#
+ICMROOT=/usr/lpp/icm
+ICMDLL=/home/db2fenc1
+ICMCOMP=/usr/vacpp/bin
+CMCOMMON=/usr/lpp/cmb/cmgmt
+EXTSHM=ON
+DB2INSTANCE=db2inst1
+DB2LIBPATH=/usr/lpp/icm/lib
+\end{verbatim}
+\item Ergänzen Sie das File \mcrfile{.profile} für die User {\bf root}, {\bf icmadmin}, {\bf rmadmin} und {\bf mcradmin} mit den folgenden Zeilen:
+\begin{verbatim}
+# The following three lines have been added by UDB DB2.
+if [ -f /home/db2inst1/sqllib/db2profile ]; then
+    . /home/db2inst1/sqllib/db2profile
+fi
+\end{verbatim}
+\item Das File \mcrfile{/home/db2inst1/sqllib/profile.env} sollte folgende Einträge aufweisen:
+\begin{verbatim}
+DB2_FMP_COMM_HEAPSZ='12000'
+DB2ENVLIST='LIBPATH ICMROOT ICMDLL ICMCOMP EXTSHM CMCOMMON DB2LIBPATH'
+DB2_RR_TO_RS='YES'
+DB2COMM='tcpip'
+DB2AUTOSTART='YES'
+\end{verbatim}
+\item Nun sollte noch einmal die DB2 und NSE gestoppt und neu gestartet werden.\footnote{Es ist sinnvoll nach jedem Reboot des Systems vor dem Start des CM diese Schritte durchzuführen um einen sicheren Ausgangspunkt zu haben!}
+\begin{itemize}
+\item \mcrcommand{su - db2inst1}
+\item \mcrcommand{db2stop}
+\item \mcrcommand{db2text stop}
+\item \mcrcommand{db2start}
+\item {\bf Kurz warten!!!}
+\item \mcrcommand{db2db2text start}
+\end{itemize} 
+\item Dieser Punkt ist nur erforderlich, wenn ein TSM System eingesetzt werden soll.
+\begin{itemize}
+\item \mcrcommand{su - root}
+\ttem \mcrcommand{mkdir </home/rmadmin/staging>}
+\item \mcrcommand{mklv -y <lvstaging> <vg..> 32}
+\item \mcrcommand{crfs -vjfs -d <lvstaging> -m </home/rmadmin/staging> -A yes}
+\item \mcrcommand{mount </home/rmadmin/staging>}
+\item \mcrcommand{chown rmadmin.db2grp1 </home/rmadmin/staging>}
+\end{itemize}
+\item Now you must create a logical volume for the store of the Resource Manager.
+\begin{itemize}
+\item \mcrcommand{su - root}
+\ttem \mcrcommand{mkdir </home/rmadmin/storage>}
+\item \mcrcommand{mklv -y <lvstorage> <vg..> 32}
+\item \mcrcommand{crfs -vjfs -d <lvstorage> -m </home/rmadmin/storage> -A yes}
+\item \mcrcommand{mount </home/rmadmin/storage>}
+\item \mcrcommand{chown rmadmin.db2grp1 </home/rmadmin/storage>}
+\end{itemize}
+\item  Now you can start the Content Manager installation. Attention, this will open a X11 window connection!
+\begin{enumerate}
+\item \mcrcommand{su - root}
+\item \mcrcommand{cd .../English}
+\item \mcrcommand{./setup.exe}
+\item {\bf 'Next'}
+\item Select I accept ... {\bf 'Next'}
+\item Setup type $\rightarrow$ {\bf Select full} $\rightarrow$ {\bf 'Next'}
+\item Identification and authorization for LS
+\begin{itemize}
+\item Library Server database name $\rightarrow$ {\bf ICMNLSDB}
+\item Library Server scheme name $\rightarrow$ {\bf ICMADMIN}
+\item Library Server database administration ID $\rightarrow$ {\bf icmadmin}
+\item Password ... $\rightarrow$ Confirm password ...
+\item Database connection ID $\rightarrow$ {\bf mcradmin}
+\item Library Server ID $\rightarrow$ {\bf 1}
+\item Unselect {\bf Enable Unicode}
+\item Select {\bf Enable text search}
+\end{itemize}
+\item Configure Resource Manager
+\begin{itemize}
+\item Resource Manager database name $\rightarrow$ {\bf RMDB}
+\item Resource Manager database administration ID $\rightarrow$ {\bf rmadmin}
+\item Password ... $\rightarrow$ Confirm password ...
+\end{itemize}
+\item Installation options for resource manager database
+\begin{itemize}
+\item Mount point $\rightarrow$ /mcrfile{</home/rmadmin/storage>}
+\item Path $\rightarrow$ /mcrfile{</home/rmadmin/staging>}
+\end{itemize}
+\item Resource Manager with WebSphere Application Server
+\begin{itemize}
+\item WebSphere home $\rightarrow$ /mcrfile{/usrWebSphere/AppServer}
+\item Web application path $\rightarrow$ {\bf /icmrm}
+\item Web application name $\rightarrow$ {\bf icmrm}
+\item Service Port $\rightarrow$ {\bf 7500}
+\item Application server name $\rightarrow$ {\bf icmrm}
+\item Your WebSphere Application Server will be stopped$ \rightarrow$ {\bf 'Yes'}
+\end{itemize}
+\item WebSphere V5 auto deploy options
+\begin{itemize}
+\item WebSphere administration user ID $\rightarrow$ {\bf icmadmin}
+\item Password ... $\rightarrow$ Confirm password ...
+\item Node name $\rightarrow$ {\bf <your host name>}
+\end{itemize}
+\item Connect Library Server to Resource Manager
+\begin{itemize}
+\item Resource Manager server hostname $\rightarrow$ {\bf <your full qualified hostname>}
+\item Web application port $\rightarrow$ {\bf 80}
+\item Secure web application port $\rightarrow$ {\bf 443}
+\item Resource Manager server operating system $\rightarrow$ {\bf AIX}
+\item Token duration $\rightarrow$ {\bf 48}
+\end{itemize}
+\item Configure components for LDAP
+\begin{itemize}
+\item Do NOT select Library Server
+\item Do NOT select Resource Manager
+\end{itemize}
+\item Summary $\rightarrow$ {\bf 'Next'}
+\item {\bf 'Finish'}
+\end{enumerate}
+\item Verify the log file \mcrfile{/usr/lpp/icm/logs/icm82install.log}.
+\item Start the Resource Manager as root \mcrcommand{/usr/WebSphere/AppServer/bin/startServer.sh icmrm}.
+\item Test the Resource Manager in a web browser $\rightarrow$ \mcrcommand{https://<your full qualified hostname>/icmrm/ICMResourceManager}\footnote{The response is : No order found to prcess, that is okay.}
+\end{enumerate}
+%
+\subsubsection{Information Integrator for Content Manager}
+\begin{enumerate}
+\item \mcrcommand{su -}
+\item Change to the install directory.
+\item \mcrcommand{./frnxsetup.sh} Attention, this will open a X11 window connection!
+\item License Agreement $\rightarrow$ {\bf 'Accept'}
+\item {\bf 'Next'}
+\item Install the following options
+\begin{itemize}
+\item Remote Connectors $\rightarrow$ {\bf none}
+\item Local Connectors $\rightarrow$ {\bf only CM V8 connector}
+\item Connector Toolkitd and Samples $\rightarrow$ {\bf only CM V8 connector}
+\item Features $\rightarrow$ {\bf none}
+\item Infocenter $\rightarrow$ {\bf optional}
+\item System Admin Database $\rightarrow$ {\bf none}
+\item {\bf 'Next'}
+\end{itemize}
+\item System configuration
+\begin{itemize}
+\item Keep {\bf Local}
+\item Do not select LDAP
+\item {\bf 'Next'}
+\end{itemize}
+\item Content Manager V8 Server Connection
+\begin{itemize}
+\item Database name $\rightarrow$ {\bf icmnlsdb}
+\item Schema name $\rightarrow$ {\bf ICMADMIN}
+\item Authentication type $\rightarrow$ {\bf Server}
+\item Database connection ID $\rightarrow$ {\bf mcradmin}
+\item Password ... $\rightarrow$ Confirm password ...
+\item Enable single sign-on $\rightarrow$ {\bf false}
+\item {\bf 'Next'}
+\end{itemize}
+\item Content Manager V8 Connector $\rightarrow$ {\bf 'Next'}
+\item WAIT!
+\item {\bf 'Finish'}
+\item Check the log under \mcrfile{/tmp/frn/frnxinst.log}
+\end{enumerate}
 %
 %
 \subsection{Der IBM Content Manager unter Solaris}
