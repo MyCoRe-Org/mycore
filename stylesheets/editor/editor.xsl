@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.30 $ $Date: 2004-12-30 09:41:06 $ -->
+<!-- $Revision: 1.31 $ $Date: 2004-12-30 13:03:12 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -142,6 +142,9 @@
       <xsl:text>multipart/form-data</xsl:text>
     </xsl:attribute>
   </xsl:if>
+
+  <!-- ======== charset ======== -->
+  <xsl:attribute name="accept-charset">UTF-8</xsl:attribute>
 
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
