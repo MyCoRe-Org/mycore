@@ -1,9 +1,6 @@
 \documentclass[a4paper,12pt]{report}
 \usepackage{ngerman}
 
-%neue deutsche Rechtschreibung
-%\usepackage[english,ngerman]{babel}
-
 \usepackage[latin1]{inputenc} %für Linux
 %\usepackage[ansinew]{inputenc} %fuer Windows
 
@@ -11,13 +8,13 @@
 
 \begin{document}
 %-------   Vorspann
-\title{MyCoRe Internal Design Guilde}
+\title{MyCoRe Internal Design Guide}
 \author{
 Johannes Bühler
             }
 \maketitle
 
-\setcounter{secnumdepth}{10} 
+\setcounter{secnumdepth}{4} 
 
 
 \chapter*{Vorwort} 
@@ -25,6 +22,9 @@ Johannes Bühler
 \tableofcontents
 \listoffigures
 \listoftables
+
+\chapter{Softwareentwicklung}
+\input{ProgGuide_Softwareentwicklung.tex}
 
 \chapter{ Einf"uhrung und Grundprinzipien} 
 \section{XML/XSLT}
@@ -40,6 +40,7 @@ Johannes Bühler
 \subsection{MCRDerivate}
 \subsection{MCRLinkManager}
 \subsection{Erweiterungsm"oglichkeiten}
+\pagebreak
 Seitenumbruch erzwingen?
 \section{Das IFS Modell (ohne Stores)}
 \section{Das User- und ACL-Modell}

@@ -1,0 +1,57 @@
+\section{Hinweise zur Softwareentwicklung}
+\subsection{cvs-zugang}
+
+ Der Zugang zum cvs--Server des Mycore Projekts für Entwickler erfolgt nach
+ Freischaltung eines Accounts\footnote{Dieser kann über Frank Lützenkirchen
+   \url{luetzenkirchen@bibl.uni-essen.de} beantragt werden} über ssh. Dem
+ Freischalten sind folgende Umgebungsvariablen zu setzten:
+
+\begin{verbatim}
+CVS_RSH=ssh
+CVSROOT=:ext:mcr_username@server.mycore.de:/cvs
+export CVS_RSH CVSROOT
+\end{verbatim}
+
+Es empfielt sich zuerst die MyCoRe Quellen herunterzuladen. 
+\begin{verbatim}
+cvs -d :ext:mcr_username@server.mycore.de:/cvs checkout mycore
+
+\end{verbatim}
+
+Danach können sie mit 
+
+\begin{verbatim}
+cvs -d :ext:mcr_username@server.mycore.de:/cvs commit -m "Kommentar fürs
+CVS" 'file' 
+
+\end{verbatim}
+
+die entsprechende Datei commiten.
+
+Soll in ein bestehendes Projekt eine neue Datei integriert werden, so legt man
+sie zunächst lokal im vorgesehenen (und bereits ausgecheckten!) Verzeichnis
+an. Dann merkt man sie mittels \verb+cvs add <filename>+ vor. Um sie dann
+global zu registrieren, erfolgt ein (verkürzt): \verb+cvs commit <filename>+
+Neue Unterverzeichnisse werden auf die gleiche Weise angelegt.
+
+Weitere und sehr ausführliche Informationen gibt es zu Hauf im Internet.
+
+
+\url{http://www.cvshome.org/docs/}
+\url{http://cvsbook.red-bean.com/translations/german/}
+\url{http://panama.informatik.uni-freiburg.de/~oberdiek/documents/OpenSourceDevWithCVS.pdf}
+\url{http://sourceforge.net/docman/?group_id=1}
+\url{http://www.jspwiki.org/Wiki.jsp?page=CVSTips}
+\url{http://www.selflinux.org/selflinux/pdf/cvs_buch_kapitel_9.pdf}
+
+\section{Entwicklungsumgebung}
+
+\section{Tools}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ProgGuide"
+%%% TeX-master: "ProgGuide"
+%%% End: 
