@@ -345,11 +345,14 @@ public class MCRLayoutServlet extends MCRServlet {
 		String user =
 			MCRConfiguration.instance().getString(
 				"MCR.users_guestuser_username");
+		String lang = defaultLang;
 		if (session != null) {
 			MCRSession mcrSession =
 				(MCRSession) (session.getAttribute("mycore.session"));
-			if (mcrSession != null)
+			if (mcrSession != null){
 				user = mcrSession.getCurrentUserID();
+				lang = mcrSession.getCurrentLanguage();
+			}
 		}
 
 		logger.debug(
@@ -362,6 +365,7 @@ public class MCRLayoutServlet extends MCRServlet {
 		parameters.put("WebApplicationBaseURL", applicationBaseURL);
 		parameters.put("ServletsBaseURL", servletsBaseURL);
 		parameters.put("DefaultLang", defaultLang);
+		parameters.put("CurrentLang", lang);
 
 		return parameters;
 	}
