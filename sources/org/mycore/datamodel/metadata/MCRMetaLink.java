@@ -281,7 +281,7 @@ public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaLink is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
@@ -320,7 +320,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
   {
   if (!isValid()) {
     debug();
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaLink is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
   tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);

@@ -184,7 +184,7 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaBoolean is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("lang",lang,Namespace.XML_NAMESPACE);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
@@ -205,7 +205,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaBoolean is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
   tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag.toUpperCase());

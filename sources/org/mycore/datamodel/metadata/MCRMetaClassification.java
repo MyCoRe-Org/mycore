@@ -160,7 +160,7 @@ public void setFromDOM(org.jdom.Element element)
 public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaClassification is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   elm.setAttribute("classid",classid); 
@@ -179,7 +179,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaClassification is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; } 
   tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);

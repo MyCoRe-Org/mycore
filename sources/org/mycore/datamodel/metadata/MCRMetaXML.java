@@ -169,7 +169,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
   {
   if (!isValid()) {
     debug();
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("The content of MCRMetaXML is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   return tc;
   }
