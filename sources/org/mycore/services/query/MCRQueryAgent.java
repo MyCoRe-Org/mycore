@@ -96,10 +96,7 @@ public class MCRQueryAgent {
 			return this.result;
 		}
 		public void accomplished(){
-			synchronized(this.tc){
-				this.tc.decrease();
-				this.tc.notify();
-			}
+			this.tc.decrease();
 		}
 	}
 

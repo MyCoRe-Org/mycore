@@ -159,6 +159,7 @@ public class MCRQueryCollector {
 		}
 		public synchronized void decrease(){
 			this.threadNum--;
+			this.notify();
 		}
 			
 	}
