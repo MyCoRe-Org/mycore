@@ -157,7 +157,7 @@ public final void setFromURI(String uri) throws MCRException
     jdom_document = bulli.build(MCRXMLHelper.parseURI(uri));
     }
   catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException(e.getMessage(),e); }
   set();
   }
 
