@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.10 $ $Date: 2005-01-24 17:06:46 $ -->
+<!-- $Revision: 1.11 $ $Date: 2005-02-11 09:01:21 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" 
@@ -35,7 +35,7 @@
         To keep standard compliance it's default turned of, as it may annoy some
         people, too.
       -->
-      <xsl:variable name="wcms.useTargets" select="'no'" />
+      <xsl:variable name="wcms.useTargets" select="'yes'" />
 
       <xsl:include href="wcms_coreFunctions.xsl" />
       <xsl:include href="wcms_common-used.xsl" />
