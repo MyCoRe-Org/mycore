@@ -24,7 +24,9 @@
 
 package mycore.user;
 
+import java.util.Date;
 import java.util.Vector;
+import java.text.SimpleDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,11 +47,8 @@ import mycore.xml.MCRXMLHelper;
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
-public class MCRGroup
+public class MCRGroup extends MCRUserUnit
 {
-  /** The group ID of the MyCoRe group */
-  private String groupID = "";
-
   /** A list of privileges members of this group have */
   private Vector privileges = null;
 
@@ -59,11 +58,14 @@ public class MCRGroup
   /** A list of other groups which are members of the group */
   private Vector groups = null;
 
-  /** Specify whether the UserManager must be notified about the creation of this object */
-  private boolean bCreateInMgr = true;
+  /** A list of users which have the privilege to administer this group */
+  private Vector admins = null;
+
+  /** A list of groups which members have the privilege to administer this group */
+  private Vector adminGroups = null;
 
   /**
-   * Creates a group object from a XML string which must be passed as a parameter.
+   * Creates a group object from an XML string which must be passed as a parameter.
    *
    * @param groupXML     XML string containing all neccessary information to create a group object.
    * @param bCreateInMgr boolean value which specifies whether the MCRUserMgr must be notified
@@ -75,7 +77,7 @@ public class MCRGroup
   public MCRGroup(String groupXML, boolean bCreateInMgr) throws Exception
   {
     MCRArgumentChecker.ensureNotNull(groupXML, "groupXML");
-    this.bCreateInMgr = bCreateInMgr;
+    super.bCreateInMgr = bCreateInMgr;
 
     // Parse the XML-string of the group and get a DOM representation
 
@@ -98,9 +100,36 @@ public class MCRGroup
 
   private final void create(Element domGroup, boolean bCreateInMgr) throws Exception
   {
-    groupID = MCRXMLHelper.getElementText("groupID", domGroup);
+    NodeList accountList = domGroup.getElementsByTagName("account");
+    NodeList accountElements = accountList.item(0).getChildNodes();
 
-    // Now we extract the privileges-information from the DOM Element and fill the
+    ID          = trim(MCRXMLHelper.getElementText("groupID", accountElements));
+    creator     = trim(MCRXMLHelper.getElementText("creator", accountElements));
+    description = trim(MCRXMLHelper.getElementText("description", accountElements));
+
+    // extract date information
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+    String date = trim(MCRXMLHelper.getElementText("creationdate", accountElements));
+    if (date.equals(""))
+      creationDate = new Date();
+    else
+      creationDate = sdf.parse(date);
+
+    date = trim(MCRXMLHelper.getElementText("last_changes", accountElements));
+    if (date.equals(""))
+      lastChanges = creationDate;
+    else
+      lastChanges = sdf.parse(date);
+
+    // Now we extract the admins-information from the DOM element and fill the Vectors
+    // "admins" and "adminGroups".
+
+    NodeList adminList = domGroup.getElementsByTagName("admins");
+    NodeList adminElements = adminList.item(0).getChildNodes();
+    admins = new Vector(MCRXMLHelper.getAllElementTexts("userID", adminElements));
+    adminGroups = new Vector(MCRXMLHelper.getAllElementTexts("groupID", adminElements));
+
+    // Now we extract the privileges-information from the DOM element and fill the
     // Vector "privileges". This way the group knows which privileges it has, resp.
     // members of this group have.
 
@@ -123,51 +152,66 @@ public class MCRGroup
   }
 
   /**
-   * returns the group object as an xml representation
-   *
-   * @param NL separation sequence. Typically this will be an empty string (if the XML
-   *        representation is needed as one line) or a newline ("\n") sequence.
-   * @return returns the group object as an xml representation
+   * This method adds a group to the groups list of the group
+   * @param groupID  ID of the group added to the group
    */
-  public String getGroupAsXML(String NL)
+  public void addGroup(String groupID) throws Exception
   {
-    // At first we create XML representations of the privileges and members lists
-    StringBuffer privBuf = new StringBuffer();
-    privBuf.append("<privileges>").append(NL);
-    for (int i=0; i<privileges.size(); i++) {
-      privBuf.append("<privilege>").append(privileges.elementAt(i)).append("</privilege>").append(NL);
-    }
-    privBuf.append("</privileges>");
-
-    StringBuffer memberBuf = new StringBuffer();
-    memberBuf.append("<members>").append(NL);
-    for (int i=0; i<users.size(); i++) {
-      memberBuf.append("<userID>").append(users.elementAt(i)).append("</userID>").append(NL);
-    }
-    for (int i=0; i<groups.size(); i++) {
-      memberBuf.append("<groupID>").append(groups.elementAt(i)).append("</groupID>").append(NL);
-    }
-    memberBuf.append("</members>");
-
-    // Now we put together all information of the group
-    StringBuffer sb = new StringBuffer();
-    sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL)
-      .append("<mycore_user_and_group_info type=\"group\">").append(NL)
-      .append("<group>").append(NL)
-      .append("<groupID>").append(groupID).append("</groupID>" ).append(NL)
-      .append(privBuf).append(NL)
-      .append(memberBuf).append(NL)
-      .append("</group>").append(NL)
-      .append("</mycore_user_and_group_info>").append(NL);
-    return sb.toString();
+    groups.add(groupID);
+    super.lastChanges = new Date();
+    MCRUserMgr.instance().updateGroup(this);
   }
 
   /**
-   * returns the groupID of the group
-   * @return returns the groupID of the group
+   * This method adds a user to the users list of the group
+   * @param userID  ID of the user added to the group
    */
-  public String getGroupID()
-  { return groupID; }
+  public void addUser(String userID) throws Exception
+  {
+    users.add(userID);
+    super.lastChanges = new Date();
+    MCRUserMgr.instance().updateGroup(this);
+  }
+
+  /**
+   * This method returns the group information as a formatted string.
+   *
+   * @return group information, all in one string
+   */
+  public String getFormattedInfo() throws Exception
+  {
+    StringBuffer sb = new StringBuffer();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+
+    sb.append("group ID      : ").append(ID).append("\n");
+    sb.append("creator       : ").append(creator).append("\n");
+    sb.append("creation date : ").append(sdf.format(creationDate)).append("\n");
+    sb.append("last changes  : ").append(sdf.format(lastChanges)).append("\n");
+    sb.append("description   : ").append(description).append("\n");
+
+    sb.append("\n").append("admins [users]   : ");
+    for (int i=0; i<admins.size(); i++) {
+      sb.append(admins.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("admins [groups]  : ");
+    for (int i=0; i<adminGroups.size(); i++) {
+      sb.append(adminGroups.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("privileges       : ");
+    for (int i=0; i<privileges.size(); i++) {
+      sb.append(privileges.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("members [users]  : ");
+    for (int i=0; i<users.size(); i++) {
+      sb.append(users.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("members [groups] : ");
+    for (int i=0; i<groups.size(); i++) {
+      sb.append(groups.elementAt(i)).append(",");
+    }
+    sb.append("\n");
+    return sb.toString();
+  }
 
   /**
    * returns the group list (group members) as a Vector of strings
@@ -191,27 +235,98 @@ public class MCRGroup
   { return users; }
 
   /**
-   * This method returns the group information as a formatted string.
-   *
-   * @return group information, all in one string
+   * checks if members of this group have a given privilege
+   * @return returns true if the given privilege is in the list of privileges
+   *         of this group
    */
-  public String getFormattedInfo() throws Exception
+  public boolean hasPrivilege(String privilege) throws Exception
   {
-    StringBuffer sb = new StringBuffer();
-    sb.append("group ID         : ").append(groupID);
-    sb.append("\n").append("privileges       : ");
+    if (privileges.contains(privilege))
+      return true;
+    else
+      return false;
+  }
+
+  /**
+   * This method removes a group from the groups list of the group
+   * @param userID  ID of the group removed from the group
+   */
+  public void removeGroup(String groupID) throws Exception
+  {
+    groups.remove(groupID);
+    super.lastChanges = new Date();
+    MCRUserMgr.instance().updateGroup(this);
+  }
+
+  /**
+   * This method removes a user from the users list of the group
+   * @param userID  ID of the user removed from the group
+   */
+  public void removeUser(String userID) throws Exception
+  {
+    users.remove(userID);
+    super.lastChanges = new Date();
+    MCRUserMgr.instance().updateGroup(this);
+  }
+
+  /**
+   * returns the group object as an xml representation
+   *
+   * @param NL separation sequence. Typically this will be an empty string (if the XML
+   *        representation is needed as one line) or a newline ("\n") sequence.
+   * @return returns the group object as an xml representation
+   */
+  public String toXML(String NL) throws Exception
+  {
+    // At first we create XML representations of the admins, privileges and members lists
+    StringBuffer adminsBuf = new StringBuffer();
+    adminsBuf.append("<admins>").append(NL);
+    for (int i=0; i<admins.size(); i++) {
+      adminsBuf.append("<userID>").append(admins.elementAt(i)).append("</userID>").append(NL);
+    }
+    for (int i=0; i<adminGroups.size(); i++) {
+      adminsBuf.append("<groupID>").append(adminGroups.elementAt(i)).append("</groupID>").append(NL);
+    }
+    adminsBuf.append("</admins>");
+
+    // privileges
+    StringBuffer privBuf = new StringBuffer();
+    privBuf.append("<privileges>").append(NL);
     for (int i=0; i<privileges.size(); i++) {
-      sb.append(privileges.elementAt(i)).append(",");
+      privBuf.append("<privilege>").append(privileges.elementAt(i)).append("</privilege>").append(NL);
     }
-    sb.append("\n").append("members [groups] : ");
-    for (int i=0; i<groups.size(); i++) {
-      sb.append(groups.elementAt(i)).append(",");
-    }
-    sb.append("\n").append("members [users]  : ");
+    privBuf.append("</privileges>");
+
+    // members
+    StringBuffer memberBuf = new StringBuffer();
+    memberBuf.append("<members>").append(NL);
     for (int i=0; i<users.size(); i++) {
-      sb.append(users.elementAt(i)).append(",");
+      memberBuf.append("<userID>").append(users.elementAt(i)).append("</userID>").append(NL);
     }
-    sb.append("\n");
+    for (int i=0; i<groups.size(); i++) {
+      memberBuf.append("<groupID>").append(groups.elementAt(i)).append("</groupID>").append(NL);
+    }
+    memberBuf.append("</members>");
+
+    // Now we put together all information of the group
+    StringBuffer sb = new StringBuffer();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+
+    sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL)
+      .append("<mycore_user_and_group_info type=\"group\">").append(NL)
+      .append("<group>").append(NL)
+      .append("<account>").append(NL)
+      .append("<groupID>").append(ID).append("</groupID>" ).append(NL)
+      .append("<creator>").append(creator).append("</creator>").append(NL)
+      .append("<creationdate>").append(sdf.format(creationDate)).append("</creationdate>").append(NL)
+      .append("<last_changes>").append(sdf.format(lastChanges)).append("</last_changes>").append(NL)
+      .append("<description>").append(description).append("</description>").append(NL)
+      .append("</account>").append(NL)
+      .append(adminsBuf).append(NL)
+      .append(privBuf).append(NL)
+      .append(memberBuf).append(NL)
+      .append("</group>").append(NL)
+      .append("</mycore_user_and_group_info>").append(NL);
     return sb.toString();
   }
 }

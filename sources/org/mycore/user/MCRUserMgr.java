@@ -98,21 +98,15 @@ public class MCRUserMgr
    */
   public final synchronized void createGroup(MCRGroup group) throws Exception
   {
-    // At the moment the permission to create a group is not checked...
-    // perhaps it will be checked in the group object itself
-
-    // Check if the group already exists in the datastore. If yes, notify the
-    // administrator who read in the group file. In later stages of the software
-    // development we may examine if the new group differs from the persistent
-    // group object.
-
-    if (!mcrUserStore.existsGroup(group.getGroupID())) {
-      mcrUserStore.createGroup(group.getGroupID(), group.getGroupAsXML(""));
-      groupCache.put(group.getGroupID(), group);
+    // Check if the group already exists in the datastore. If yes, notify the creator
+    // and write a message to a log file.
+    if (!mcrUserStore.existsGroup(group.getID())) {
+      mcrUserStore.createGroup(group.getID(), group);
+      groupCache.put(group.getID(), group);
     }
     else { // Later this will go to some logging mechanism rather then to stdout
            // Or should we throw an exception?? (MCRPersistenceExeption)
-      System.out.println("\nGroup " + group.getGroupID() + " already exists!");
+      System.out.println("\nGroup " + group.getID() + " already exists!");
       System.out.println("If you want to overwrite the existent group object you must first delete it.");
     }
   }
@@ -123,22 +117,27 @@ public class MCRUserMgr
    */
   public final synchronized void createUser(MCRUser user) throws Exception
   {
-    // At the moment the permission to create a user is not checked...
-    // perhaps it will be checked in the user object itself
+    // Check if user already exists in the datastore. If yes, notify the creator
+    // and write a message to a log file.
+    if (!mcrUserStore.existsUser(user.getID()))
+    {
+      // All of the groups this newly created user is a member of have to be updated.
+      // However, in the case that we reload all user and groups from XML files
+      // the group objects already know their members. Therefore we must check it.
 
-    // Check if user already exists in the datastore. If yes, notify the
-    // administrator who read in the user file. In later stages of the software
-    // development we may examine if the new user differs from the persistent
-    // user object.
-
-    if (!mcrUserStore.existsUser(user.getUserID())) {
-      mcrUserStore.createUser(user.getUserID(), user.getUserAsXML(""));
-      userCache.put(user.getUserID(), user);
+      String userID = user.getID();
+      mcrUserStore.createUser(userID, user);
+      for (int i=0; i<user.getGroups().size(); i++) {
+        MCRGroup updGroup = retrieveGroup((String)user.getGroups().elementAt(i));
+        if (!updGroup.getUsers().contains(userID))
+          updGroup.addUser(user.getID());
+      }
+      userCache.put(user.getID(), user);
     }
     else { // Later this will go to some logging mechanism rather then to stdout
-           // Or should we throw an exception?? (MCRPersistenceExeption)
-      System.out.println("\nUser " + user.getUserID() + " already exists!");
+      System.out.println("\nUser " + user.getID() + " already exists!");
       System.out.println("If you want to overwrite the existent user object you must first delete it.");
+      throw new MCRException("User " + user.getID() + " already exists!");
     }
   }
 
@@ -164,9 +163,14 @@ public class MCRUserMgr
    */
   public final synchronized void deleteUser(String userID) throws Exception
   {
-    // At the moment the permission to delete a user is not checked...
     if (mcrUserStore.existsUser(userID))
     {
+      // All of the groups this deleted user was a member of have to be updated
+      MCRUser user = retrieveUser(userID);
+      for (int i=0; i<user.getGroups().size(); i++) {
+        MCRGroup updGroup = retrieveGroup((String)user.getGroups().elementAt(i));
+        updGroup.removeUser(user.getID());
+      }
       mcrUserStore.deleteUser(userID);
       userCache.remove(userID);
     }
@@ -180,7 +184,7 @@ public class MCRUserMgr
    *
    * @return   Vector of strings including the group IDs of the system
    */
-  public final Vector getAllGroupIDs() throws Exception
+  public final synchronized Vector getAllGroupIDs() throws Exception
   { return mcrUserStore.getAllGroupIDs(); }
 
   /**
@@ -189,8 +193,40 @@ public class MCRUserMgr
    *
    * @return   Vector of strings including the user IDs of the system
    */
-  public final Vector getAllUserIDs() throws Exception
+  public final synchronized Vector getAllUserIDs() throws Exception
   { return mcrUserStore.getAllUserIDs(); }
+
+  /**
+   * This method returns all users of the system as DOM document.
+   * @return  DOM representation of all user objects
+   */
+  public final synchronized Document getAllUsersAsDOM() throws IOException, Exception
+  {
+    // Actually this method is not very well designed since we transform the data
+    // from XML string representation to DOM representation back and forth. There
+    // is much to much parsing involved. This has to be updated... Additionally
+    // the method saveAllUsersToXMLFile() is very similar.
+
+    MCRUser currentUser;
+    Document userDoc;
+    StringBuffer allUsersBuffer = new StringBuffer();
+    allUsersBuffer.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n")
+                  .append("<mycore_user_and_group_info type=\"user\">");
+
+    Vector allUserIDs = mcrUserStore.getAllUserIDs();
+    for (int i=0; i<allUserIDs.size(); i++)
+    {
+      currentUser = mcrUserStore.retrieveUser((String)allUserIDs.elementAt(i));
+      userDoc = currentUser.toDOM();
+      NodeList domUserList = userDoc.getElementsByTagName("user");
+      StringBuffer sb = new StringBuffer();
+      MCRXMLHelper.getNodeAsString(domUserList.item(0), "  ", sb);
+      allUsersBuffer.append(sb.toString());
+    }
+
+    allUsersBuffer.append("\n</mycore_user_and_group_info>");
+    return MCRXMLHelper.parseXML(allUsersBuffer.toString());
+  }
 
   /**
    * Returns information about the group cache as a formatted string - ready for
@@ -209,6 +245,13 @@ public class MCRUserMgr
    */
   public final String getUserCacheInfo()
   { return userCache.toString(); }
+
+  /**
+   * This method returns the user store. This is used by the singleton MCRPrivilegeSet.
+   * @return   returns the user store
+   */
+  public final MCRUserStore getUserStore()
+  { return mcrUserStore; }
 
   /**
    * This method expects a string as a parameter which represents a normal file or a
@@ -272,7 +315,7 @@ public class MCRUserMgr
    * @param passwd password for the user
    * @return true if the password matches the password stored, false otherwise
    */
-  public boolean login(String userID, String passwd) throws Exception
+  public synchronized boolean login(String userID, String passwd) throws Exception
   {
     MCRUser loginUser = retrieveUser(userID);
 
@@ -290,24 +333,33 @@ public class MCRUserMgr
    * be retrieved from the database. Then the group object is put into the cache.
    *
    * @param groupID    string representing the requested group object
+   * @param bFromDataStore  group must be retrieved directly from the data store
    * @return MCRGroup  group object (if available)
    * @exception MCRException  if group object is not known
    */
-  public MCRGroup retrieveGroup (String groupID) throws Exception
+  public MCRGroup retrieveGroup(String groupID) throws Exception
+  { return this.retrieveGroup(groupID, false); }
+
+  public synchronized MCRGroup retrieveGroup (String groupID, boolean bFromDataStore) throws Exception
   {
-    MCRGroup reqGroup = (MCRGroup)groupCache.get(groupID);
+    // In order to compare a modified group object with the persistent one we must
+    // be able to force this method to get the group from the store
+    MCRGroup reqGroup;
+    if (bFromDataStore)
+      reqGroup = null;
+    else
+      reqGroup = (MCRGroup)groupCache.get(groupID);
+
     if (reqGroup == null)
     {
       // We do not have this group in the cache. Hence we retrieve it from
-      // the persistent datastore as an XML Stream. The group object will be
-      // created and put into the cache.
+      // the persistent datastore. The group object is put into the cache.
 
-      String reqGroupXML = mcrUserStore.retrieveGroup(groupID);
-      if (reqGroupXML == null)
+      reqGroup = mcrUserStore.retrieveGroup(groupID);
+      if (reqGroup == null)
         throw new MCRException("Unknown group!");
       else
       {
-        reqGroup = new MCRGroup(reqGroupXML, false); // needs not to be created in MCRUserMgr
         groupCache.put(groupID, reqGroup);
         return reqGroup;
       }
@@ -321,25 +373,34 @@ public class MCRUserMgr
    * user object. In case that the user object is not in the cache, the user will
    * be retrieved from the database. Then the user object is put into the cache.
    *
-   * @param userID    string representing the requested user object
-   * @return MCRUser  user object (if available)
-   * @exception MCRException  if user object is not known
+   * @param userID          string representing the requested user object
+   * @param bFromDataStore  user must be retrieved directly from the data store
+   * @return MCRUser        user object (if available), otherwise null
    */
-  public MCRUser retrieveUser (String userID) throws Exception
+  public MCRUser retrieveUser(String userID) throws Exception
+  { return this.retrieveUser(userID, false); }
+
+  public synchronized MCRUser retrieveUser(String userID, boolean bFromDataStore) throws Exception
   {
-    MCRUser reqUser = (MCRUser)userCache.get(userID);
+    // In order to compare a modified user object with the persistent one we must
+    // be able to force this method to get the user from the store
+    MCRUser reqUser;
+    if (bFromDataStore)
+      reqUser = null;
+    else
+      reqUser = (MCRUser)userCache.get(userID);
+
     if (reqUser == null)
     {
       // We do not have this user in the cache. Hence we retrieve him or her
-      // from the persistent datastore as an XML Stream. The user object will be
-      // created and put into the cache.
+      // from the persistent datastore. The user object is put into the cache.
 
-      String reqUserXML = mcrUserStore.retrieveUser(userID);
-      if (reqUserXML == null)
-        throw new MCRException("Unknown user!");
+      reqUser = mcrUserStore.retrieveUser(userID);
+      if (reqUser == null)
+        return null; // no such user available
+        //throw new MCRException("Unknown user!");
       else
       {
-        reqUser = new MCRUser(reqUserXML, false);  // needs not to be created in MCRUserMgr
         userCache.put(userID, reqUser);
         return reqUser;
       }
@@ -348,30 +409,123 @@ public class MCRUserMgr
       return reqUser;
   }
 
-    /**
+  /**
+   * This method saves all groups of the system to an XML file. This is usefull for
+   * exporting the groups to another system, e.g. by upgrading the DL.
+   *
+   * @param fileName  Name of the file the groups will be saved in
+   */
+  public final void saveAllGroupsToXMLFile(String fileName) throws IOException, Exception
+  {
+    MCRGroup currentGroup;
+    Document groupDoc;
+    FileWriter outFile = new FileWriter(new File(fileName));
+    outFile.write("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
+    outFile.write("<mycore_user_and_group_info type=\"group\">");
+
+    Vector allGroupIDs = mcrUserStore.getAllGroupIDs();
+    for (int i=0; i<allGroupIDs.size(); i++)
+    {
+      currentGroup = mcrUserStore.retrieveGroup((String)allGroupIDs.elementAt(i));
+      groupDoc = currentGroup.toDOM();
+      NodeList domGroupList = groupDoc.getElementsByTagName("group");
+      StringBuffer sb = new StringBuffer();
+      MCRXMLHelper.getNodeAsString(domGroupList.item(0), "  ", sb);
+      outFile.write(sb.toString());
+    }
+
+    outFile.write("\n</mycore_user_and_group_info>");
+    outFile.flush();
+    outFile.close();
+  }
+
+  /**
+   * This method saves all users of the system to an XML file. This is usefull for
+   * exporting the users to another system, e.g. by upgrading the DL.
+   *
+   * @param fileName  Name of the file the users will be saved in
+   */
+  public final void saveAllUsersToXMLFile(String fileName) throws IOException, Exception
+  {
+    MCRUser currentUser;
+    Document userDoc;
+    FileWriter outFile = new FileWriter(new File(fileName));
+    outFile.write("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
+    outFile.write("<mycore_user_and_group_info type=\"user\">");
+
+    Vector allUserIDs = mcrUserStore.getAllUserIDs();
+    for (int i=0; i<allUserIDs.size(); i++)
+    {
+      currentUser = mcrUserStore.retrieveUser((String)allUserIDs.elementAt(i));
+      userDoc = currentUser.toDOM();
+      NodeList domUserList = userDoc.getElementsByTagName("user");
+      StringBuffer sb = new StringBuffer();
+      MCRXMLHelper.getNodeAsString(domUserList.item(0), "  ", sb);
+      outFile.write(sb.toString());
+    }
+
+    outFile.write("\n</mycore_user_and_group_info>");
+    outFile.flush();
+    outFile.close();
+  }
+
+  /**
    * updates a group in the datastore (and the cache as well)
    * @param group    The group object which will be updated
    */
-  public final synchronized void updateGroup(MCRGroup group) throws Exception
+  public final synchronized void updateGroup(MCRGroup group) throws MCRException, Exception
   {
-    // At the moment the permission to update a group is not checked...
-    // perhaps it will be checked in the group object itself
-    mcrUserStore.updateGroup(group.getGroupID(), group.getGroupAsXML(""));
-    groupCache.remove(group.getGroupID());
-    groupCache.put(group.getGroupID(), group);
+    if (mcrUserStore.existsGroup(group.getID())) {
+      mcrUserStore.updateGroup(group.getID(), group);
+      groupCache.remove(group.getID());
+      groupCache.put(group.getID(), group);
+    }
+    else
+      throw new MCRException("Tried to update group "+group.getID()+
+                             " which is not yet stored in the database.");
   }
 
   /**
    * updates a user in the datastore (and the cache as well)
    * @param user     The user object which will be updated
    */
-  public final synchronized void updateUser(MCRUser user) throws Exception
+  public final synchronized void updateUser(MCRUser user) throws MCRException, Exception
   {
-    // At the moment the permission to update a user is not checked...
-    // perhaps it will be checked in the user object itself
-    mcrUserStore.updateUser(user.getUserID(), user.getUserAsXML(""));
-    userCache.remove(user.getUserID());
-    userCache.put(user.getUserID(), user);
+    if (mcrUserStore.existsUser(user.getID()))
+    {
+      // We have to check whether the membership to some of the groups of this user changed.
+      // For example, the user might be removed from one of the groups he or she was
+      // a member of. This group must be notified! To get information about which groups
+      // have been added or removed, we compare the current (updated) user object with
+      // the one from the datastore before the update process takes place.
+
+      String userID = user.getID();
+      MCRUser oldUser = retrieveUser(userID, true); // get the user directly from the datastore
+      for (int i=0; i<user.getGroups().size(); i++)
+      {
+        MCRGroup updGroup = retrieveGroup((String)user.getGroups().elementAt(i));
+        if (!oldUser.getGroups().contains(updGroup.getID())) {
+          // The user is a new member of this group
+          updGroup.addUser(userID);
+        }
+      }
+      for (int i=0; i<oldUser.getGroups().size(); i++)
+      {
+        MCRGroup updGroup = retrieveGroup((String)oldUser.getGroups().elementAt(i));
+        if (!user.getGroups().contains(updGroup.getID())) {
+          // The user is no longer member of this group
+          updGroup.removeUser(userID);
+        }
+      }
+
+      // Now we really update the current user
+      mcrUserStore.updateUser(user.getID(), user);
+      userCache.remove(user.getID());
+      userCache.put(user.getID(), user);
+    }
+    else
+      throw new MCRException("Tried to update user "+user.getID()+
+                             " which is not yet stored in the database.");
   }
 
   /**
@@ -426,6 +580,13 @@ public class MCRUserMgr
       for (int i=0; i<iNumGroups; i++) {
         newGroup = new MCRGroup((Element)domGroupList.item(i));
       }
+    }
+    else if (infoType.equals("privilege"))
+    {
+      NodeList domPrivList = mcrDocument.getElementsByTagName("privilege");
+      int iNumPrivs = domPrivList.getLength();
+      System.out.println("Number of privileges to load: " + iNumPrivs);
+      MCRPrivilegeSet.instance().loadPrivileges(domPrivList, true);
     }
     else
       throw new MCRException("MCRUserMgr.loadUsersOrGroupsFromXMLFile : The type attribute"+

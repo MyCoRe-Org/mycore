@@ -58,7 +58,7 @@ public class MCRXMLHelper
  /**
   * Parses an XML file from a URI and returns it as DOM.
   *
-  * @param uri           the URI of the XML file 
+  * @param uri           the URI of the XML file
   * @throws MCRException if XML could not be parsed
   * @return              the XML file as a DOM object
   **/
@@ -87,9 +87,23 @@ public class MCRXMLHelper
     // Parts of this method are taken from Brett McLaughlin's Book "Java and XML" (O'Reilly).
     switch (node.getNodeType())
     {
+      case Node.DOCUMENT_NODE:
+           System.out.println("<xml version=\"1.0\">\n");
+           Document doc = (Document)node;
+           printNode(doc.getDocumentElement(), "");
+           break;
+
       case Node.ELEMENT_NODE:
            String name = node.getNodeName();
-           System.out.print("\n" + indent + "<" + name + ">");
+           System.out.print("\n" + indent + "<" + name);
+           NamedNodeMap attributes = node.getAttributes();
+           for (int i=0; i<attributes.getLength(); i++)
+           {
+             Node current = attributes.item(i);
+             System.out.print(" " + current.getNodeName() + "=\""
+                                  + current.getNodeValue() + "\"");
+           }
+           System.out.print(">");
            NodeList children = node.getChildNodes();
            if (children != null)
            {
@@ -138,7 +152,7 @@ public class MCRXMLHelper
    */
   static public final String getElementText(String seekElementName, Element element)
   {
-    NodeList list = element.getElementsByTagName("groupID");
+    NodeList list = element.getElementsByTagName(seekElementName);
     return getElementText(seekElementName, list);
   }
 
@@ -170,6 +184,51 @@ public class MCRXMLHelper
           textVector.add(elementList.item(i).getFirstChild().getNodeValue().trim());
     }
     return textVector;
+  }
+
+  /**
+   * This method fills a StringBuffer with node information as XML string. It is
+   * used e.g. for saving users or groups as XML-file
+   *
+   * @param node        the DOM-node to be printed
+   * @param indent      indentation string for formatted output, e.g. " " (one space)
+   * @param sb          StringBuffer to be filled by recursive calls
+   */
+  static public void getNodeAsString (Node node, String indent, StringBuffer sb)
+  {
+    switch (node.getNodeType())
+    {
+      case Node.DOCUMENT_NODE:
+           sb.append("<xml version=\"1.0\">\n").append("\n");
+           Document doc = (Document)node;
+           getNodeAsString(doc.getDocumentElement(), "", sb);
+           break;
+
+      case Node.ELEMENT_NODE:
+           String name = node.getNodeName();
+           sb.append("\n" + indent + "<" + name);
+           NamedNodeMap attributes = node.getAttributes();
+           for (int i=0; i<attributes.getLength(); i++)
+           {
+             Node current = attributes.item(i);
+             sb.append(" " + current.getNodeName() + "=\""
+                           + current.getNodeValue() + "\"");
+           }
+           sb.append(">");
+           NodeList children = node.getChildNodes();
+           if (children != null)
+           {
+             for (int i=0; i<children.getLength(); i++)
+               getNodeAsString(children.item(i), indent + "  ", sb);
+           }
+           sb.append("\n" + indent + "</" + name + ">");
+           break;
+
+      case Node.TEXT_NODE:
+           if (node.getNodeValue().trim() != null)
+             sb.append(node.getNodeValue().trim());
+           break;
+    }
   }
 }
 

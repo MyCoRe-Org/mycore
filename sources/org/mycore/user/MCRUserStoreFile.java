@@ -48,39 +48,69 @@ public class MCRUserStoreFile implements MCRUserStore
   /** filename for the flat file database containing group information */
   private String dbGroupsFileName;
 
+  /** filename for the flat file database containing privilege information */
+  private String dbPrivsFileName;
+
   /** temporary file name */
   private String dbTmpFileName;
 
   /**
    * The constructor opens the database files. The paths and names of the files
    * must be provided by the values <code>MCR.userstore_users_file_name</code>,
-   * <code>MCR.userstore_groups_file_name</code> and <code>MCR.userstore_tmp_file_name</code>
-   * in <code>mycore.properties</code>.
+   * <code>MCR.userstore_groups_file_name</code>,
+   * <code>MCR.userstore_privileges_file_name</code>
+   * and <code>MCR.userstore_tmp_file_name</code> in <code>mycore.properties</code>.
    */
   public MCRUserStoreFile()
   {
     dbUsersFileName  = MCRConfiguration.instance().getString("MCR.userstore_users_file_name");
     dbGroupsFileName = MCRConfiguration.instance().getString("MCR.userstore_groups_file_name");
+    dbPrivsFileName  = MCRConfiguration.instance().getString("MCR.userstore_privileges_file_name");
     dbTmpFileName    = MCRConfiguration.instance().getString("MCR.userstore_tmp_file_name");
   }
 
   /**
    * This method creates a MyCoRe user object in the persistent datastore.
    * @param newUserID    a String representing the user ID of the new user
-   * @param newUserXML   a String representing the user as an XML Stream
+   * @param newUser      the new user object to be stored
    */
-  public synchronized void createUser(String newUserID, String newUserXML)
-         throws MCRException, IOException
-  { createUserOrGroup(newUserID, newUserXML, dbUsersFileName); }
+  public synchronized void createUser(String newUserID, MCRUser newUser)
+         throws MCRException, IOException, Exception
+  {
+    String newUserXML = newUser.toXML("");
+    createUserOrGroup(newUserID, newUserXML, dbUsersFileName);
+  }
 
   /**
    * This method creates a MyCoRe group object in the persistent datastore.
    * @param newGroupID   a String representing the group ID of the new group
-   * @param newGroupXML  a String representing the group as an XML Stream
+   * @param newGroup     the new group object to be stored
    */
-  public synchronized void createGroup(String newGroupID, String newGroupXML)
-         throws MCRException, IOException
-  { createUserOrGroup(newGroupID, newGroupXML, dbGroupsFileName); }
+  public synchronized void createGroup(String newGroupID, MCRGroup newGroup)
+         throws MCRException, IOException, Exception
+  {
+    String newGroupXML = newGroup.toXML("");
+    createUserOrGroup(newGroupID, newGroupXML, dbGroupsFileName);
+  }
+
+  /**
+   * This method creates a MyCoRe privilege set object in the persistent datastore.
+   * @param privilegeSet the privilege set object
+   */
+  public synchronized void createPrivilegeSet(MCRPrivilegeSet privilegeSet)
+                           throws MCRException, IOException
+  {
+    String newPrivSetXML = privilegeSet.toXML("");
+    PrintWriter pw  = new PrintWriter(new FileWriter(dbPrivsFileName, true));
+    StringBuffer sb = new StringBuffer();
+
+    sb.append(newPrivSetXML.replace('\n', ' '))
+      .toString();
+
+    pw.println(sb);
+    pw.flush();
+    pw.close();
+  }
 
   /**
    * This method deletes a MyCoRe user object from the persistent datastore.
@@ -102,6 +132,17 @@ public class MCRUserStoreFile implements MCRUserStore
    */
   public synchronized boolean existsUser(String userID) throws MCRException, IOException
   { return existsUserOrGroup(userID, dbUsersFileName); }
+
+  /**
+   * This method tests if a MyCoRe privilege set object is available in the persistent datastore.
+   */
+  public boolean existsPrivilegeSet() throws MCRException, IOException
+  {
+    String test = retrievePrivilegeSet();
+    if ((test != null) && (test != ""))
+      return true;
+    else return false;
+  }
 
   /**
    * This method tests if a MyCoRe group object is available in the persistent datastore.
@@ -127,41 +168,98 @@ public class MCRUserStoreFile implements MCRUserStore
   /**
    * This method retrieves a MyCoRe user object from the persistent datastore.
    * @param userID       a String representing the MyCoRe user object which is to be retrieved
-   * @return             an XML representation of the user object
+   * @return             the requested user object
    */
-  public synchronized String retrieveUser(String userID) throws MCRException, IOException
-  { return retrieveUserOrGroup(userID, dbUsersFileName); }
+  public synchronized MCRUser retrieveUser(String userID)
+                      throws MCRException, IOException, Exception
+  {
+    String userXML = retrieveUserOrGroup(userID, dbUsersFileName);
+    if (userXML != null) {
+      MCRUser user = new MCRUser(userXML, false);  // needs not to be created in MCRUserMgr
+      return user;
+    }
+    else return null;
+  }
 
   /**
    * This method retrieves a MyCoRe group object from the persistent datastore.
    * @param groupID      a String representing the MyCoRe group object which is to be retrieved
-   * @return             an XML representation of the group object
+   * @return             the requested group object
    */
-  public synchronized String retrieveGroup(String groupID) throws MCRException, IOException
-  { return retrieveUserOrGroup(groupID, dbGroupsFileName); }
+  public synchronized MCRGroup retrieveGroup(String groupID)
+                      throws MCRException, IOException, Exception
+  {
+    String groupXML = retrieveUserOrGroup(groupID, dbGroupsFileName);
+    if (groupXML != null) {
+      MCRGroup group = new MCRGroup(groupXML, false); // needs not to be created in MCRUserMgr
+      return group;
+    }
+    else return null;
+  }
+
+  /**
+   * This method retrieves a MyCoRe privilege set object from the persistent datastore.
+   * @return  the requested privilege set object as XML string representation
+   */
+  public String retrievePrivilegeSet() throws MCRException, IOException
+  {
+    BufferedReader br = new BufferedReader(new FileReader(dbPrivsFileName));
+    String line = br.readLine();
+    br.close();
+
+    if ((line != null) && (line != ""))
+      return line;
+    else return null;
+  }
 
   /**
    * This method updates a MyCoRe user object in the persistent datastore.
    * @param userID     a String representing the MyCoRe user object which is to be updated
-   * @param userXML    a String representing the user as an XML Stream
+   * @param user       the user to be updated
    */
-  public synchronized void updateUser(String userID, String userXML)
-                           throws MCRException, IOException
+  public synchronized void updateUser(String userID, MCRUser user)
+                           throws MCRException, IOException, Exception
   {
-    deleteUser(userID);            // this will be done a different way if we do not use
-    createUser(userID, userXML);   // a flat file as database
+    deleteUser(userID);           // this will be done a different way if we do not use
+    createUser(userID, user);     // a flat file as database
+  }
+
+  /**
+   * This method updates a MyCoRe privilege set object in the persistent datastore.
+   * @param privilegeSet the privilege set object to be updated
+   */
+  public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) throws MCRException, IOException
+  {
+    // Well, don't look at this! This is only a proof of concept!
+
+    try
+    {
+      File f = new File(dbPrivsFileName);
+      while (true)
+      {
+        f.delete();
+        if (!f.exists()) break;
+        Thread.sleep(100);  // workaround (I ran into a timeout problem here...)
+        System.out.println(dbPrivsFileName+" not yet deleted!");
+      }
+      createPrivilegeSet(privilegeSet);
+    }
+
+    catch  (Exception e) {
+      throw new MCRException("MCRUserStoreFile.updatePrivilegeSet(): "+e.getMessage());
+    }
   }
 
   /**
    * This method updates a MyCoRe group object in the persistent datastore.
    * @param groupID    a String representing the MyCoRe group object which is to be updated
-   * @param groupXML   a String representing the group as an XML Stream
+   * @param group      the group to be updated
    */
-  public synchronized void updateGroup(String groupID, String groupXML)
-                           throws MCRException, IOException
+  public synchronized void updateGroup(String groupID, MCRGroup group)
+                           throws MCRException, IOException, Exception
   {
-    deleteGroup(groupID);           // this will be done a different way if we do not use
-    createGroup(groupID, groupXML); // a flat file as database
+    deleteGroup(groupID);         // this will be done a different way if we do not use
+    createGroup(groupID, group);  // a flat file as database
   }
 
   /**
@@ -178,8 +276,8 @@ public class MCRUserStoreFile implements MCRUserStore
     PrintWriter pw  = new PrintWriter(new FileWriter(dbFileName, true));
     StringBuffer sb = new StringBuffer();
 
-    sb.append(newID).append(':')
-      .append(newXML).append(':')
+    sb.append(newID.trim()).append("::")
+      .append(newXML.replace('\n', ' '))
       .toString();
 
     pw.println(sb);
@@ -211,7 +309,7 @@ public class MCRUserStoreFile implements MCRUserStore
       while ((line = br.readLine()) != null)
       {
         if (line.startsWith("#")) continue;    // skip this line - it is a comment
-        StringTokenizer st = new StringTokenizer(line, ":");
+        StringTokenizer st = new StringTokenizer(line, "::");
         String persistentID = st.nextToken();  // the first token is the userID, the
                                                // second token is the XML representation
         if (!persistentID.equals(delID)) {
@@ -258,7 +356,7 @@ public class MCRUserStoreFile implements MCRUserStore
     while ((line = br.readLine()) != null)
     {
       if (line.startsWith("#")) continue;    // skip this line - it is a comment
-      StringTokenizer st = new StringTokenizer(line, ":");
+      StringTokenizer st = new StringTokenizer(line, "::");
       String persistentID = st.nextToken();  // the first token is the ID, the
                                              // second token is the XML representation
       if (persistentID.equals(ID)) {
@@ -285,7 +383,7 @@ public class MCRUserStoreFile implements MCRUserStore
     while ((line = br.readLine()) != null)
     {
       if (line.startsWith("#")) continue;    // skip this line - it is a comment
-      StringTokenizer st = new StringTokenizer(line, ":");
+      StringTokenizer st = new StringTokenizer(line, "::");
       vecIDs.add(st.nextToken());  // the first token is the ID
     }
     br.close();
@@ -307,7 +405,7 @@ public class MCRUserStoreFile implements MCRUserStore
     while ((line = br.readLine()) != null)
     {
       if (line.startsWith("#")) continue;    // skip this line - it is a comment
-      StringTokenizer st = new StringTokenizer(line, ":");
+      StringTokenizer st = new StringTokenizer(line, "::");
       String persistentID = st.nextToken();  // the first token is the ID, the
                                              // second token is the XML representation
       if (persistentID.equals(ID)) {
