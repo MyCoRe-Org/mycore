@@ -42,6 +42,8 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.frontend.fileupload.MCRUploadHandlerInterface;
 import org.mycore.frontend.fileupload.MCRUploadHandlerManager;
 import org.mycore.frontend.workflow.MCRWorkflowManager;
@@ -159,7 +161,7 @@ public class MCRStartEditorServlet extends MCRServlet
       !mytodo.equals("seditobj") && !mytodo.equals("seditder") &&
       !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && 
       !mytodo.equals("snewder") && !mytodo.equals("scommitder") &&
-      !mytodo.equals("saddfile") && !mytodo.equals("sdelfile")) {
+      !mytodo.equals("saddfile")&& !mytodo.equals("snewfile")) {
       mytodo = "wnewobj"; }
     LOGGER.info("TODO = "+mytodo);
     // get the MCRObjectID from the text filed (TF)
@@ -536,6 +538,21 @@ public class MCRStartEditorServlet extends MCRServlet
         }
       myremcrid = mysemcrid;
       mysemcrid =  WFM.createDerivate(myremcrid);
+      mystep="addder";
+      mytodo = "saddfile";
+      }
+
+    // action SNEWFILE - create a new derivate
+    if (mytodo.equals("snewfile")) {
+      String priv = "modify-"+mytype;
+      if (!privs.contains(priv)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      String workdir = CONFIG.getString("MCR.editor_"+mytype+"_directory");
+      File ndir = new File(workdir,mysemcrid);
+      ndir.mkdir();
+      mystep="addfile";
       mytodo = "saddfile";
       }
 
@@ -569,7 +586,7 @@ public class MCRStartEditorServlet extends MCRServlet
 
     // action SCOMMITDER in the database
     if (mytodo.equals("scommitder")) {
-      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+      if (!checkAccess(myremcrid,userid,privs,"modify-"+mytype,true)) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
@@ -578,19 +595,27 @@ public class MCRStartEditorServlet extends MCRServlet
         return;
         }
       // commit to the server
-      MCRObjectID ID = new MCRObjectID(mysemcrid);
-      boolean b = WFM.commitDerivateObject(ID.getTypeId(),myremcrid);
+      boolean b = false;
+      MCRObjectID ID = new MCRObjectID(myremcrid);
+      if (mystep.indexOf("addfile") != -1) {
+        String workdir = CONFIG.getString("MCR.editor_"+mytype+"_directory");
+        File ndir = new File(workdir,mysemcrid);
+        MCRFileImportExport.addFiles(ndir,mysemcrid);
+        b = true;
+        }
+      else {
+        b = WFM.commitDerivateObject(ID.getTypeId(),mysemcrid); }
       if (b) {
-        WFM.deleteDerivateObject(ID.getTypeId(),myremcrid);
+        WFM.deleteDerivateObject(ID.getTypeId(),mysemcrid);
         StringBuffer sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
         String searchtype = CONFIG.getString(sb.toString(),ID.getTypeId());
         sb = new StringBuffer(getBaseURL());
         sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-        sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(mysemcrid).append("\']");
+        sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
         return;
         }
-      WFM.deleteDerivateObject(ID.getTypeId(),myremcrid);
+      WFM.deleteDerivateObject(ID.getTypeId(),mysemcrid);
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+storeerrorpage));
       return;
       }
@@ -612,7 +637,9 @@ public class MCRStartEditorServlet extends MCRServlet
    **/
   private final boolean checkAccess(String mcrid, String user, ArrayList privs,
     String action, boolean source) {
+    // is the user the administrator
     if (user.equals("administrator")) { return true; }
+    // has the user the privilege
     if (!privs.contains(action)) { return false; }
     // get the user of the object
     org.jdom.Document jdom = null;
@@ -634,8 +661,11 @@ public class MCRStartEditorServlet extends MCRServlet
       }
     if (jdom == null) { return false; }
     org.jdom.Element root = jdom.getRootElement();
+    if (root == null) { return false; }
     org.jdom.Element service = root.getChild("service");
+    if (service == null) { return false; }
     org.jdom.Element servflags = service.getChild("servflags");
+    if (servflags == null) { return false; }
     ArrayList ar = new ArrayList();
     List list = servflags.getChildren("servflag");
     if (list != null) {

@@ -85,9 +85,10 @@ public final String getNextURL(MCRObjectID ID) throws Exception
  *
  * @param ID the MCRObjectID of the MCRObject
  * @param DD the MCRObjectID of the MCRDerivate
+ * @param step the step text as String
  * @return the next URL as String
  **/
-public final String getNextURL(MCRObjectID ID, MCRObjectID DD) throws Exception
+public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception
   {
   // return all is ready
   StringBuffer sb = new StringBuffer();

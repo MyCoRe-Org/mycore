@@ -60,9 +60,10 @@ abstract public class MCRCheckFileBase extends MCRCheckBase
  *
  * @param ID the MCRObjectID of the MCRObject
  * @param DD the MCRObjectID of the MCRDerivate
+ * @param step the step text as String
  * @return the next URL as String
  **/
-abstract public String getNextURL(MCRObjectID ID, MCRObjectID DD) throws Exception;
+abstract public String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception;
 
 /**
  * This method overrides doGetPost of MCRServlet.<br />
@@ -143,22 +144,26 @@ public void doGetPost(MCRServletJob job) throws Exception
   
   // add the mainfile entry
   MCRDerivate der = new MCRDerivate();
-  der.setFromURI(dirname+".xml");
-  if (der.getDerivate().getInternals().getMainDoc().equals("#####")) {
-    der.getDerivate().getInternals().setMainDoc(mainfile);
-    byte [] outxml = MCRUtils.getByteArray(der.createXML());
-    try {
-      FileOutputStream out = new FileOutputStream(dirname+".xml");
-      out.write(outxml);
-      out.flush();
-      }
-    catch (IOException ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store to file "+dirname+".xml");
+  try {
+    der.setFromURI(dirname+".xml");
+    if (der.getDerivate().getInternals().getMainDoc().equals("#####")) {
+      der.getDerivate().getInternals().setMainDoc(mainfile);
+      byte [] outxml = MCRUtils.getByteArray(der.createXML());
+      try {
+        FileOutputStream out = new FileOutputStream(dirname+".xml");
+        out.write(outxml);
+        out.flush();
+        }
+      catch (IOException ex) {
+        logger.error( ex.getMessage() );
+        logger.error( "Exception while store to file "+dirname+".xml");
+        }
       }
     }
+  catch (Exception e) {
+    logger.warn("Can't open file "+dirname+".xml"); }
 
-  job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+getNextURL(ID,DD)));
+  job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+getNextURL(ID,DD,step)));
   }
 
 }

@@ -83,16 +83,17 @@ public final String getNextURL(MCRObjectID ID) throws Exception
  *
  * @param ID the MCRObjectID of the MCRObject
  * @param DD the MCRObjectID of the MCRDerivate
+ * @param step the step text String
  * @return the next URL as String
  **/
-public final String getNextURL(MCRObjectID ID, MCRObjectID DD) throws Exception
+public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception
   {
   // return all is ready
   StringBuffer sb = new StringBuffer();
   sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=")
-    .append(ID.getTypeId()).append("&step=commit&se_mcrid=")
-    .append(ID.getId()).append("&re_mcrid=").append(DD.getId())
-    .append("&tf_mcrid=").append(ID.getId());
+    .append(ID.getTypeId()).append("&step=").append(step).append("&se_mcrid=")
+    .append(DD.getId()).append("&re_mcrid=").append(ID.getId())
+    .append("&tf_mcrid=").append(DD.getId());
   return sb.toString();
   }
 
