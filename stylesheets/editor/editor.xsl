@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.10 $ $Date: 2004-03-18 11:13:39 $ -->
+<!-- $Revision: 1.11 $ $Date: 2004-03-18 13:31:22 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1221,7 +1221,7 @@
   <xsl:param name="url" />
   
   <xsl:choose>
-    <xsl:when test="starts-with($url,'http://') or starts-with(@url,'https://')">
+    <xsl:when test="starts-with($url,'http://') or starts-with($url,'https://') or starts-with($url,'file://')">
       <xsl:value-of select="$url" />
     </xsl:when>
     <xsl:otherwise>
