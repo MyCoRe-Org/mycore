@@ -81,11 +81,12 @@ public class MCREditorSubmission
     }
 
     List children = element.getChildren();
-    suffix = "";
 
     for( int i = 0, nr = 1; i < children.size(); i++ )
     {
       Element child = (Element)( children.get( i ) );
+      String suffix = "";
+
       if( i > 0 )
       {
         Element before = (Element)( children.get( i - 1 ) ); 
