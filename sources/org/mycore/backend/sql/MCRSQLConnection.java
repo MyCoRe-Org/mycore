@@ -127,6 +127,25 @@ public class MCRSQLConnection
   }
   
   /**
+   * Executes an SQL update statement on this connection.
+   *
+   * @param statement the SQL create, insert or delete statement to be executed
+   **/  
+  public void doUpdate( String statement )
+    throws MCRPersistenceException
+  {
+    MCRArgumentChecker.ensureNotEmpty( statement, "statement" );
+    
+    try
+    { connection.createStatement().executeUpdate( statement ); }
+    catch( Exception ex )
+    { 
+      throw new MCRPersistenceException 
+      ( "Error while executing SQL update statement: " + statement, ex ); 
+    }
+  }
+  
+  /**
    * Executes an SQL select statement on this connection, where the expected result
    * is just a single value of a row.
    *
@@ -181,6 +200,19 @@ public class MCRSQLConnection
     finally{ c.release(); }
   }
   
+  /**
+   * Executes an SQL update statement, using any currently free connection from the pool. 
+   *
+   * @param statement the SQL create, insert or delete statement to be executed
+   **/  
+  public static void justDoUpdate( String statement )
+    throws MCRPersistenceException
+  {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try{ c.doUpdate( statement ); }
+    finally{ c.release(); }
+  }
+
   /**
    * Executes an SQL select statement where the expected result
    * is just a single value of a row, using any currently free connection from the pool. 
