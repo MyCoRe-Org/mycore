@@ -259,7 +259,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   {
     ensureNotDeleted();
     
-    if( storageID.length() != 0 ) getContentStore().deleteContent( storageID );
+    if( storageID.length() != 0 ) 
+    {  
+      getContentStore().deleteContent( storageID );
+      if( hasParent() ) getParent().sizeOfChildChanged( size, 0 );
+    }
+    
     super.delete();
     
     this.contentTypeID = null;
