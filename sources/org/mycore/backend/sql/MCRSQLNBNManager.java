@@ -377,7 +377,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
 		try {
 			PreparedStatement statement = connection.getJDBCConnection()
-				.prepareStatement("select NISS from " + table + " where DOCUMENTID = " + documentId);
+				.prepareStatement("select NISS from " + table + " where DOCUMENTID = '" + documentId + "'");
 			ResultSet set = statement.executeQuery();
 			if (set.next()) {
 				String NISS = set.getString(1); 
