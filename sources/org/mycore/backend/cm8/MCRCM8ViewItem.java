@@ -37,7 +37,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * <br />
  * Start the program with<br />
  *   java CRCM8ViewItem doc <em>MCRObjectID</em> or <br />
- *   java CRCM8ViewItem ifs <br />
+ *   java CRCM8ViewItem ifs <em>MCRObjectID</em><br />
  * 
  * @author Holger König
  * @version $Revision$ $Date$

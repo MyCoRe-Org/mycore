@@ -193,7 +193,7 @@ private void createStore(DKDatastoreICM connection) throws Exception
   DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
   DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr("ifsowner");
   attr.setNullable(false);
-  attr.setUnique(true);
+  attr.setUnique(false);
   item_type.addAttr(attr);
   attr = (DKAttrDefICM) dsDefICM.retrieveAttr("ifspath");
   attr.setNullable(false);
