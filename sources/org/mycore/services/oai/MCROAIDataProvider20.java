@@ -623,7 +623,7 @@ public class MCROAIDataProvider20 extends HttpServlet {
     
         for (int i = 0; i < children.length; i++) { 
             String categoryID = children[i].getID();
-            String categoryLabel = children[i].getLabel("en");
+            String categoryLabel = children[i].getText("en");
             String categoryDescription = children[i].getDescription("en");
 	    	logger.debug("Suche nach Kategorie: " + categoryID);    
             
