@@ -41,6 +41,7 @@ import mycore.datamodel.MCRQueryResultArray;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 final public class MCRQueryCommands
@@ -66,21 +67,83 @@ final public class MCRQueryCommands
     throws Exception
   {
     if (host==null) host = "local";
-    host  = host .toLowerCase();
     if (type==null) { return; }
     type  = type .toLowerCase();
     if (query==null) query = "";
-    query = query.toLowerCase();
 
-    System.out.println( "Host  : " + host  );
-    System.out.println( "Type  : " + type  );
-    System.out.println( "Query : " + query );
+    System.out.println( "Host(s)  : " + host  );
+    System.out.println( "Type     : " + type  );
+    System.out.println( "Query    : " + query );
     System.out.println();
 
+    // read host list from configuration
     MCRConfiguration config = MCRConfiguration.instance();
+    String hostconf = config.getString("MCR.communication_hostaliases");
+    ArrayList remoteAliasList = new ArrayList();
+    int i = 0;
+    int j = hostconf.length();
+    int k = 0;
+    while (k!=-1) {
+      k = hostconf.indexOf(",",i);
+      if (k==-1) {
+        remoteAliasList.add(hostconf.substring(i,j)); }
+      else {
+        remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
+      }
+
+    // build host list from host string
+    ArrayList hostAliasList = new ArrayList();
+    i = 0;
+    j = host.length();
+    k = 0;
+    int n = 0;
+    while (n!=-1) {
+      n = host.indexOf(",",i);
+      String hostname = "";
+      if (n==-1) { hostname = host.substring(i,j); }
+      else { hostname = host.substring(i,n); i = n+1; }
+      if (hostname.equals("local")) {
+        k = -1;
+        for (int l=0;l<hostAliasList.size();l++) {
+          if (((String)hostAliasList.get(l)).equals("local")) { 
+            k = 0; break; }
+          }
+        if (k==-1) { hostAliasList.add("local"); }
+        }
+      else {
+        if (hostname.equals("remote")) {
+          for (int m=0;m<remoteAliasList.size();m++) {
+            k = -1;
+            for (int l=0;l<hostAliasList.size();l++) {
+              if (((String)hostAliasList.get(l))
+                .equals(remoteAliasList.get(m))) { k = 0; break; }
+              }
+            if (k==-1) { hostAliasList.add(remoteAliasList.get(m)); }
+            }
+          }
+        else {
+          k = -1;
+          for (int m=0;m<remoteAliasList.size();m++) {
+            if (((String)remoteAliasList.get(m)).equals(hostname)) { 
+              k = 0; break; } }
+          if (k==-1) {
+            throw new MCRException( "The host name is not in the list."); }
+          k = -1;
+          for (int l=0;l<hostAliasList.size();l++) {
+            if (((String)hostAliasList.get(l)).equals(hostname)) { 
+              k = 0; break; } }
+          if (k==-1) { hostAliasList.add(hostname); }
+          }
+        }
+      }
+
+    // print list for debug
+    for (i=0;i<hostAliasList.size();i++) {
+      System.out.println("Host : "+hostAliasList.get(i)); }
+    System.out.println();
 
     MCRQueryResult result = new MCRQueryResult(type);
-    result.setFromQuery(host,query);
+    result.setFromQuery(hostAliasList,query);
 
     printResult(result.getResultArray(), config, type);
 
@@ -106,7 +169,7 @@ private static final void printResult(MCRQueryResultArray results,
   // Indexlist
   String mcrxmlall = results.exportAll();
   //System.out.println(mcrxmlall);
-  Transformer trans = 
+  Transformer trans =
     transfakt.newTransformer(new StreamSource(xsltallresult));
   StreamResult sr = null;
   if (outpath.equals("SYSOUT")) {
