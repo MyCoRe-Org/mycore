@@ -100,7 +100,9 @@ public class MCRUserMgr
     // For all users in the system get their groups and check if the groups really exist at
     // all. We do not need to check if the user is a member of the groups listed in his or
     // her groups vector since the user object is constructed from the data - so he or she
-    // *must* be a member by definition.
+    // *must* be a member by definition. However, since the primary group of the user is added
+    // automatically to the group list in MCRUser, we have to check if this group has the
+    // user as member.
 
     Vector allUserIDs = mcrUserStore.getAllUserIDs();
     for (int i=0; i<allUserIDs.size(); i++) {
@@ -111,6 +113,12 @@ public class MCRUserMgr
           System.out.println("user : '"+currentUser.getID()+"' error: unknown group '"
                              +(String)currentGroupIDs.elementAt(j)+"'!");
         }
+      }
+      MCRGroup primaryGroup = retrieveGroup(currentUser.getPrimaryGroupID(), true);
+      Vector mbrUserIDs = primaryGroup.getMemberUserIDs();
+      if (!mbrUserIDs.contains((String)currentUser.getID())) {
+        System.out.println("user : '"+currentUser.getID()+"' error: is not member of primary group '"
+                             +(String)currentUser.getPrimaryGroupID()+"'!");
       }
     }
 
