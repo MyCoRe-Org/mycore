@@ -734,7 +734,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
             } else {
-            	record = query.getRecord(id, getServletName());
+            	record = query.getRecord(id, null, getServletName());
             }
         }
         
@@ -1076,7 +1076,8 @@ public class MCROAIDataProvider extends HttpServlet {
 		    while (mappedSetIterator.hasNext()) {
 		    	String[] mappedSet = (String[]) mappedSetIterator.next();
 				do {
-			    	List result = query.listIdentifiers(mappedSet, from, until, getServletName());
+			    	List result = query.listIdentifiers(
+							mappedSet, from, until, prefix, getServletName());
 					if (result != null) {
 						Iterator iterator = result.iterator();
 				    	List tokenElements = new ArrayList();
@@ -1193,7 +1194,8 @@ public class MCROAIDataProvider extends HttpServlet {
 	    }
 
         if (query.exists(id)) {
-        	List record = new ArrayList(query.getRecord(id, getServletName()));
+        	List record = new ArrayList(query.getRecord(
+					id, metadataPrefix[0], getServletName()));
             Element eGetRecord = new Element("GetRecord", ns);
             
 		    if (record != null) {
@@ -1399,7 +1401,8 @@ public class MCROAIDataProvider extends HttpServlet {
 		    while (mappedSetIterator.hasNext()) {
 		    	String[] mappedSet = (String[]) mappedSetIterator.next();
 				do {
-					List result = query.listRecords(mappedSet, from, until, getServletName());
+					List result = query.listRecords(
+							mappedSet, from, until, prefix, getServletName());
 					if (result != null) {
 						Iterator iterator = result.iterator();
 				    	List tokenElements = new ArrayList();
