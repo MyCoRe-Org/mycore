@@ -184,7 +184,8 @@ public class MCRSQLConnection
   public int countRows( String condition )
     throws MCRPersistenceException
   {
-    String query = "SELECT count(*) AS number FROM " + condition;
+//    String query = "SELECT count(*) AS number FROM " + condition;
+    String query = "SELECT count(*) FROM " + condition;
     String count = getSingleValue( query );
     return( count == null ? 0 : Integer.parseInt( count ) );
   }
