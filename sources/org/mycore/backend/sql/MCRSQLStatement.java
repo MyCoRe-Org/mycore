@@ -28,7 +28,7 @@ import java.util.*;
 import org.mycore.common.*;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
@@ -41,6 +41,19 @@ public class MCRSQLStatement
   protected Properties conditions;
   protected Vector     columns;
   protected String     tableName;
+
+	private static char maskChar;
+  
+  static{
+    MCRConfiguration config = MCRConfiguration.instance();
+  	if (config.getString("MCR.persistence_sql_database_url").indexOf(":db2:")>0){
+  		maskChar='\'';
+  	}
+  	else {
+  		maskChar='\\';
+  	}
+  	
+  }
   
   public MCRSQLStatement( String tableName )
   { 
@@ -213,7 +226,7 @@ public class MCRSQLStatement
   		StringTokenizer tok=new StringTokenizer(value,String.valueOf(mask));
   		StringBuffer returning=new StringBuffer();
   		while (tok.hasMoreTokens()){
-  			returning.append(tok.nextToken()).append('\\').append(mask);
+  			returning.append(tok.nextToken()).append(maskChar).append(mask);
   		}
   		return returning.toString();
   	}
