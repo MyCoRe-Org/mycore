@@ -23,12 +23,17 @@
  **/
 package wcms;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -52,7 +57,7 @@ public abstract class WCMSServlet extends MCRServlet {
 		if (isValidUser()) {
 			processRequest(job.getRequest(), job.getResponse());
 		} else {
-			job.getResponse().sendRedirect(
+			job.getResponse() .sendRedirect(
 					super.CONFIG.getString("MCR.WCMS.sessionError"));
 		}
 	}
@@ -62,5 +67,40 @@ public abstract class WCMSServlet extends MCRServlet {
 		return (status != null && status.equals("loggedIn"));
 	}
 	
+	public Element getTemplates() {
+		Element templates = new Element("templates");
+		
+        // content
+        /*File [] contentTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar)).listFiles();        
+		Element content = new Element("content");
+		content.addContent(new Element("template").setText(conTemp.toString()));*/
+		
+		// master
+        File [] masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();		
+		Element master = new Element("master");
+        for (int i = 0; i < masterTemplates.length; i++ ) {
+           if ( masterTemplates[i].isDirectory() && masterTemplates[i].getName().compareToIgnoreCase("cvs") != 0) {
+               master.addContent(new Element("template").setText(masterTemplates[i].getName()));
+           }
+        }
+
+        //templates.addContent(content);        
+        templates.addContent(master);
+        
+        return templates;
+	}
+    
+	final Document XMLFile2JDOM(String pathOfFile) throws IOException, JDOMException { 		
+
+		File XMLFile  = new File(pathOfFile);
+		SAXBuilder builder = new SAXBuilder();
+        Document doc = builder.build(XMLFile);
+        return doc;
+	}
+
+/*	final void WriteJDOM2XMLFile(Document doc, String pathOfFile)  { 		
+		
+	}	
+*/	
 	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 }

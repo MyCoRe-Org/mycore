@@ -20,7 +20,7 @@
 				<xsl:when test="/cms/session = 'login' " >
 					<xsl:call-template name="wcmsLogin" />
 				</xsl:when>
-				<xsl:when test="/cms/session = 'welcome' or /cms/session = 'logs' " >
+				<xsl:when test="/cms/session = 'welcome' or /cms/session = 'logs' or /cms/session = 'managGlobal' " >
 					<xsl:call-template name="wcmsAdministration" />
 				</xsl:when>
 				<xsl:when test="/cms/session = 'choose' " >
