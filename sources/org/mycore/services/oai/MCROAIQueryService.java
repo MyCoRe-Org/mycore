@@ -187,6 +187,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * @param set the category (if known) is in the first element
 	 * @param from the date (if known) is in the first element
 	 * @param until the date (if known) is in the first element
+	 * @param metadataPrefix the requested metadata prefix
 	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
@@ -258,6 +259,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	/**
 	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
 	 * @param id The id of the object.
+	 * @param metadataPrefix the requested metadata prefix
 	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
@@ -294,6 +296,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * @param set the category (if known) is in the first element
 	 * @param from the date (if known) is in the first element
 	 * @param until the date (if known) is in the first element
+	 * @param metadataPrefix the requested metadata prefix
 	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
