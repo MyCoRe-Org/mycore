@@ -43,8 +43,7 @@ public final class MCRObjectID
 /**
  * constant value for the object id length
  **/
-public static final int MAX_LENGTH = 64;
-public static final String [] NO_NUMBER_TYPE = { "classification","category" };
+public static final int MAX_LENGTH = 32;
 
 // constant definitions
 private static final String NL =
@@ -158,17 +157,13 @@ public final String getNumber()
 
 /**
  * This methode get the integer with <em>number</em>. 
- * If the Id is not valid or in the NO_NUMBER_TYPE list, a -1 was returned.
+ * If the Id is not valid, a -1 was returned.
  *
  * @return the number as integer
  **/
 public final int getNumberAsInteger()
   {
   if (!mcr_valid_id) { return -1; }
-  int i = -1;
-  for (int j=0;j<NO_NUMBER_TYPE.length;j++) {
-    if (NO_NUMBER_TYPE[j].equals(mcr_type_id)) { i = j; break; } }
-  if (i==-1) { return i; }
   return (new Integer(mcr_number)).intValue();
   }
 
@@ -205,8 +200,6 @@ public final String getId()
  * <li> The syntax of the ID is 
  * <em>project_id</em>_<em>type_id</em>_<em>number</em> as
  * <em>String_String_Integer</em>.
- * (If the second string is in the NO_NUMBER_TYPE list, a string at the
- * third position is correct.)
  * <li> The ID is not longer as MAX_LENGTH.
  * </ul>
  *
@@ -224,8 +217,6 @@ public final boolean isValid()
  * <li> The syntax of the ID is 
  * <em>project_id</em>_<em>type_id</em>_<em>number</em> as
  * <em>String_String_Integer</em>.
- * (If the second string is in the NO_NUMBER_TYPE list, a string at the
- * third position is correct.)
  * <li> The ID is not longer as MAX_LENGTH.
  * </ul>
  *
@@ -249,13 +240,8 @@ public final boolean isValid(String id)
   if (!conf.getBoolean("MCR.type_"+mcr_type_id.toLowerCase(),false)) { 
     return false; }
   mcr_number = mcr_id.substring(j+1,len);
-  i = -1;
-  for (j=0;j<NO_NUMBER_TYPE.length;j++) {
-    if (NO_NUMBER_TYPE[j].equals(mcr_type_id)) { i = j; break; } }
-  if (i==-1) {
-    try { j = (new Integer(mcr_number)).intValue(); }
-    catch (NumberFormatException e) { return false; }
-    }
+  try { j = (new Integer(mcr_number)).intValue(); }
+  catch (NumberFormatException e) { return false; }
   mcr_valid_id = true;
   return mcr_valid_id; 
   }
