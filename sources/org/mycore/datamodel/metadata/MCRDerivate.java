@@ -239,15 +239,12 @@ public final void createInDatastore() throws MCRPersistenceException
   if ((!f.isDirectory()) && (!f.isFile())) {
     throw new MCRPersistenceException("The File or Directory on "+
     getDerivate().getInternals().getSourcePath()+" was not found."); }
-/*
   try {
     MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
       mcr_id.getId());
     //System.out.println(difs.getName());
     }
-  catch (Exception e) {
-    e.printStackTrace(); }
-*/
+  catch (Exception e) { e.printStackTrace(); }
   // create the derivate
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
@@ -296,6 +293,9 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
     catch (MCRException e) {
       System.out.println(e.getMessage()); }
     }
+  // delete data from IFS
+  MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+  difs.delete();
   // delete derivate
   mcr_persist.delete(mcr_id);
   }
@@ -364,6 +364,16 @@ public final void updateInDatastore() throws MCRPersistenceException
     catch (MCRException e) {
       System.out.println(e.getMessage()); }
     }
+  // update to IFS
+  File f = new File(getDerivate().getInternals().getSourcePath());
+  if ((!f.isDirectory()) && (!f.isFile())) {
+    throw new MCRPersistenceException("The File or Directory on "+
+    getDerivate().getInternals().getSourcePath()+" was not found."); }
+  try {
+    MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+    MCRFileImportExport.importFiles(f,difs);
+    }
+  catch (Exception e) { e.printStackTrace(); }
   // update the derivate
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");
