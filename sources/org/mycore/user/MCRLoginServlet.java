@@ -25,6 +25,7 @@
 package org.mycore.user;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -109,6 +110,17 @@ public class MCRLoginServlet extends MCRServlet
       if (loginOk) {
         mcrSession.setCurrentUserID(uid);
         logger.info("MCRLoginServlet: user " + uid + " logged in successfully.");
+
+        // We here put the list of groups separated by blanks as a string into the HTTP
+        // session. The LayoutServlet then forwards them to the XSL Stylesheets.
+
+        StringBuffer groups = new StringBuffer();
+        ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+
+        for (int i=0; i<groupList.size(); i++) {
+          groups.append((String)groupList.get(i)).append(" ");
+        }
+        job.getRequest().getSession().setAttribute("XSL.CurrentGroups", groups.toString());
 
         if (uid.equals(guestID)) {
           job.getResponse().sendRedirect(backto_url);
