@@ -153,6 +153,9 @@ public abstract class MCRFilesystemNode
     return ownerID; 
   }
 
+  public String getParentID()
+  { return parentID; }
+
   public MCRDirectory getParent()
   { 
     ensureNotDeleted();
