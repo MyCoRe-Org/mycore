@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!-- $Revision: 1.3 $ $Date: 2004-03-11 08:25:59 $ -->
+<!-- ============================================== --> 
 
 <xsl:stylesheet 
   version="1.0" 
@@ -170,6 +174,7 @@
         <xsl:value-of select="$editor.source.url"/>
       </xsl:when>
       <xsl:when test="source/@url">
+        <xsl:value-of select="$WebApplicationBaseURL" />
         <xsl:choose>
           <xsl:when test="contains(source/@url,source/@token)">
             <xsl:value-of select="substring-before(source/@url,source/@token)" />
@@ -934,13 +939,18 @@
   <xsl:param name="var"   />
   <xsl:param name="value" />
 
-  <xsl:variable name="last" select="count(item)-1" />
+  <xsl:variable name="helper">
+    <xsl:apply-templates select="*" mode="read.items" />
+  </xsl:variable>
+  <xsl:variable name="items" select="xalan:nodeset($helper)/*" />
+
+  <xsl:variable name="last" select="count($items)-1" />
 
   <xsl:variable name="cols">
     <xsl:choose>
        <xsl:when test="@cols"><xsl:value-of select="@cols"/></xsl:when>
        <xsl:when test="@rows"><xsl:value-of select="(($last - ($last mod @rows)) div @rows)+1"/></xsl:when>
-       <xsl:otherwise><xsl:value-of select="count(item)"/></xsl:otherwise>
+       <xsl:otherwise><xsl:value-of select="count($items)"/></xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
   <xsl:variable name="rows">
@@ -950,8 +960,10 @@
     </xsl:choose>
   </xsl:variable>
 
+  <xsl:variable name="type" select="@type" />
+
   <table border="0" cellpadding="0" cellspacing="0">
-    <xsl:for-each select="item">
+    <xsl:for-each select="$items">
 
       <xsl:variable name="pxy" select="position() - 1" />
 
@@ -966,14 +978,14 @@
       </xsl:if>
 
       <td>
-        <xsl:if test="../@type='radio'">
+        <xsl:if test="$type='radio'">
           <xsl:call-template name="editor.radio">
             <xsl:with-param name="var"   select="$var"   />
             <xsl:with-param name="value" select="$value" />
             <xsl:with-param name="item"  select="."      />
           </xsl:call-template>
         </xsl:if>
-        <xsl:if test="../@type='checkbox'">
+        <xsl:if test="$type='checkbox'">
           <xsl:call-template name="editor.checkbox">
             <xsl:with-param name="var"   select="$var"   />
             <xsl:with-param name="value" select="$value" />
@@ -1107,7 +1119,7 @@
 </xsl:template>
 
 <xsl:template match="loadfrom" mode="read.items">
-  <xsl:apply-templates select="document(@url)/items" mode="read.items" />
+  <xsl:apply-templates select="document(concat($WebApplicationBaseURL,@url))/items" mode="read.items" />
 </xsl:template>
 
 <!-- ======== html select list option ======== -->
