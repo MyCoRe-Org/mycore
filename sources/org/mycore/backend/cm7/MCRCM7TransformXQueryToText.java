@@ -81,12 +81,13 @@ public final MCRQueryResultArray getResultList(String query, String type,
   if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-//System.out.println("================================");
-//System.out.println("MCRCM7TransformXQueryToText : "+query);
-//System.out.println("================================");
+System.out.println("================================");
+System.out.println("MCRCM7TransformXQueryToText : "+query);
+System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
+System.out.println("Raw text :"+rawtext);
   int startpos = 0;
   int stoppos = rawtext.length();
   int operpos = -1;
@@ -95,24 +96,32 @@ public final MCRQueryResultArray getResultList(String query, String type,
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-//System.out.println("Next cond :"+onecond);
+System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
-    cond.append(traceOneCondition(onecond));
+    cond.append(traceOneCondition("("+onecond.trim()+")"));
     if (onecond.length()>1) { cond.append(')'); }
     if (startpos<stoppos) {
-      operpos = rawtext.indexOf("(",startpos);
+      operpos = rawtext.indexOf("AND",startpos);
       if (operpos != -1) {
-        oper = rawtext.substring(startpos,operpos-1).trim();
+        startpos = operpos+3;
+        oper = rawtext.substring(operpos,startpos);
         cond.append(' ').append(oper).append(' ');
-        startpos = operpos;
+        continue;
+        }
+      operpos = rawtext.indexOf("OR",startpos);
+      if (operpos != -1) {
+        startpos = operpos+2;
+        oper = rawtext.substring(operpos,startpos);
+        cond.append(' ').append(oper).append(' ');
+        continue;
         }
       }
     }
   if (cond.length()==1) { cond.append("( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
-//System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-//System.out.println("================================");
+System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
+System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
@@ -147,9 +156,9 @@ private final String getNextCondition(int startpos,int stoppos,String query)
   StringBuffer sb = new StringBuffer(128);
   for (int i=startpos;i<stoppos;i++) {
     sb.append(query.charAt(i));
-    if (query.charAt(i)=='(') { numopen++; }
-    if (query.charAt(i)==')') { numclose++; }
-    if (numopen==numclose) { break; }
+    if (query.charAt(i)=='[') { numopen++; }
+    if (query.charAt(i)==']') { numclose++; }
+    if ((numopen==1)&&(numclose==1)) { break; }
     }
   return sb.toString();
   }
