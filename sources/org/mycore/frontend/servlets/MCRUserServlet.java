@@ -29,8 +29,6 @@ import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
-import org.apache.log4j.Logger;
-import org.jdom.Content;
 import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -47,15 +45,22 @@ import org.mycore.user.MCRUserMgr;
 
 public class MCRUserServlet extends MCRServlet
 {
-  private static Logger LOGGER=Logger.getLogger(MCRUserServlet.class);
-
   // user ID and password of the guest user
-  private static String GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );
-  private static String GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
+  private static String GUEST_ID;
+  private static String GUEST_PWD;
 
   // The default mode for this class
   String mode = "Select";
+  
 
+    /* (non-Javadoc)
+     * @see javax.servlet.GenericServlet#init()
+     */
+    public void init() {
+        super.init();
+        GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );
+        GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
+    }
   /**
    * This method overrides doGetPost of MCRServlet and handles HTTP requests. Depending
    * on the request parameter "mode" this method delegates the request to different
@@ -123,7 +128,7 @@ public class MCRUserServlet extends MCRServlet
         return;
       }
       catch (MCRException e) {
-        root.addContent((Content)new org.jdom.Element("error").addContent(e.getMessage()));
+        root.addContent(new org.jdom.Element("error").addContent(e.getMessage()));
       }
     }
     doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet mcr_user-ChangePwd-*.xsl
@@ -202,17 +207,15 @@ public class MCRUserServlet extends MCRServlet
   protected org.jdom.Document createJdomDocBase(MCRServletJob job)
   {
     // Get the MCRSession object for the current thread from the session manager.
-    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-    String currentUser = mcrSession.getCurrentUserID();
     String backto_url = getProperty(job.getRequest(), "url").trim();
     if (backto_url.length() == 0) backto_url = null;
 
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent((Content)new org.jdom.Element("guest_id").addContent(GUEST_ID));
-    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
-    root.addContent((Content)new org.jdom.Element("backto_url").addContent(backto_url));
+    root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
+    root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
+    root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
     return jdomDoc;
   }
 

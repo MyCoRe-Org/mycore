@@ -87,7 +87,7 @@ public class MCRFileNodeServlet extends MCRServlet
   private static Logger LOGGER = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
   // Default language
-  private static String defaultLang = CONFIG.getString("MCR.metadata_default_lang", "en");
+  private static String defaultLang;
 
   // The list of hosts from the configuration
   private ArrayList remoteAliasList = null;
@@ -102,7 +102,7 @@ public class MCRFileNodeServlet extends MCRServlet
  
     // read host list from configuration
     String hostconf = CONFIG.getString( "MCR.remoteaccess_hostaliases", "local" );
-    
+    defaultLang = CONFIG.getString("MCR.metadata_default_lang", "en");
     remoteAliasList = new ArrayList();
     if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
     
