@@ -495,7 +495,7 @@ public final void createInDatastore() throws MCRPersistenceException
   if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  String xml = createXML();
+  byte [] xml = createXML().getBytes();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.create(mcr_tc,xml);
   }
@@ -525,8 +525,8 @@ public final void receiveFromDatastore(String id)
   {
   mcr_id = new MCRObjectID(id);
   if (mcr_persist==null) { setPersistence(); }
-  String xml = mcr_persist.receive(mcr_id);
-  setFromXML(xml);
+  byte [] xml = mcr_persist.receive(mcr_id);
+  setFromXML(new String(xml));
   }
 
 /**
@@ -537,7 +537,7 @@ public final void receiveFromDatastore(String id)
  * @return the XML stream of the object as string
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final String receiveXMLFromDatastore(String id) 
+public final byte [] receiveXMLFromDatastore(String id) 
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
@@ -555,7 +555,7 @@ public final void updateInDatastore() throws MCRPersistenceException
   if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
   mcr_service.setDate("modifydate");
-  String xml = createXML();
+  byte [] xml = createXML().getBytes();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.update(mcr_tc,xml);
   }

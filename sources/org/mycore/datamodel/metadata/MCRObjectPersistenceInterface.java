@@ -43,11 +43,11 @@ public interface MCRObjectPersistenceInterface
  * The methode create a object in the data store.
  *
  * @param mcr_tc      the typed content
- * @param xml         the XML stream from the object
+ * @param xml         the XML stream as byte array from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void create(MCRTypedContent mcr_tc, String xml)
+public void create(MCRTypedContent mcr_tc, byte [] xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
@@ -64,11 +64,11 @@ public void delete(MCRObjectID mcr_id)
  * The methode receive a object as XML stream from the data store.
  *
  * @param mcr_id   the MyCoRe object ID
- * @return the XML stream of the object as string
+ * @return the XML stream as byte array of the object as string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public String receive(MCRObjectID mcr_id)
+public byte [] receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
@@ -97,11 +97,11 @@ public String receiveLabel(MCRObjectID mcr_id)
  * The methode update a object in the data store.
  *
  * @param mcr_tc      the typed content
- * @param xml         the XML stream from the object
+ * @param xml         the XML stream as byte array from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void update(MCRTypedContent mcr_tc, String xml)
+public void update(MCRTypedContent mcr_tc, byte [] xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**

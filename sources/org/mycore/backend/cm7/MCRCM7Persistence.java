@@ -97,7 +97,7 @@ public MCRCM7Persistence()
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void create(MCRTypedContent mcr_tc, String xml)
+public final void create(MCRTypedContent mcr_tc, byte [] xml)
   throws MCRConfigurationException, MCRPersistenceException
   {
   // extract index data from typed content
@@ -137,33 +137,34 @@ public final void create(MCRTypedContent mcr_tc, String xml)
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
   // store the data
+  DKDatastoreDL connection = null;
   try {
-    DKDatastoreDL connection = null;
+    connection = MCRCM7ConnectionPool.instance().getConnection();
+    boolean test = false;
     try {
-      connection = MCRCM7ConnectionPool.instance().getConnection();
-      try {
-        MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
-          connection);
-        throw new MCRPersistenceException(
-          "A object with ID "+mcr_id.getId()+" exists."); }
-      catch (MCRPersistenceException e) { }
-      MCRCM7Item item = new MCRCM7Item(connection,mcr_index_class,
-        DKConstant.DK_DOCUMENT);
-      item.setKeyfield(mcr_id_name,mcr_id.getId());
-      item.setKeyfield(mcr_label_name,mcr_label);
-      item.setKeyfield(mcr_flag_name,mcr_flags);
-      item.setKeyfield(mcr_create_name,mcr_create);
-      item.setKeyfield(mcr_modify_name,mcr_modify);
-      item.setPart(mcr_xml_part,xml);
-      item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
-      item.create();
-      exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
-      }
-    finally {
-      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
+      MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
+        connection);
+      test = true; }
+    catch (MCRPersistenceException e) { }
+    if (test) {
+      throw new MCRPersistenceException(
+        "A object with ID "+mcr_id.getId()+" exists."); }
+    MCRCM7Item item = new MCRCM7Item(connection,mcr_index_class,
+      DKConstant.DK_DOCUMENT);
+    item.setKeyfield(mcr_id_name,mcr_id.getId());
+    item.setKeyfield(mcr_label_name,mcr_label);
+    item.setKeyfield(mcr_flag_name,mcr_flags);
+    item.setKeyfield(mcr_create_name,mcr_create);
+    item.setKeyfield(mcr_modify_name,mcr_modify);
+    item.setPart(mcr_xml_part,xml,xml.length);
+    item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
+    item.create();
+    exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
+  finally {
+    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   }
 
 /**
@@ -184,34 +185,18 @@ public final void delete(MCRObjectID mcr_id)
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
-  try {
-    deleteCM7(mcr_id); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode delete internal a object from the data store.
- *
- * @param mcr_id      the object id
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final void deleteCM7(MCRObjectID mcr_id)
-  throws DKException, Exception
-  {
   DKDatastoreDL connection = null;
   try {
     connection = MCRCM7ConnectionPool.instance().getConnection();
-    try {
-      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-      item.delete();
-      exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
-      }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+"does not exists."); }
+    MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
+    item.delete();
+    exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
     }
+  catch (MCRPersistenceException e) {
+    throw new MCRPersistenceException(
+      "A object with ID "+mcr_id.getId()+" does not exists."); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage(),e); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   }
@@ -228,40 +213,26 @@ private final void deleteCM7(MCRObjectID mcr_id)
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final String receive(MCRObjectID mcr_id)
+public final byte [] receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
   {
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  try {
-    return receiveCM7(mcr_id); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode receive internal a object from the data store.
- *
- * @param mcr_id      the object id
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final String receiveCM7(MCRObjectID mcr_id)
-  throws DKException, Exception
-  {
   DKDatastoreDL connection = null;
-  String xml = new String();
+  byte [] xml = null;
   try {
     connection = MCRCM7ConnectionPool.instance().getConnection();
     try {
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-      xml = item.getPart(mcr_xml_part);
+      xml = item.getPartToBytes(mcr_xml_part);
       }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage(),e); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   return xml;
@@ -369,7 +340,7 @@ public final String receiveLabel(MCRObjectID mcr_id)
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void update(MCRTypedContent mcr_tc, String xml)
+public final void update(MCRTypedContent mcr_tc, byte [] xml)
   throws MCRConfigurationException, MCRPersistenceException
   {
   // extract index data from typed content
@@ -425,7 +396,7 @@ public final void update(MCRTypedContent mcr_tc, String xml)
         item.setKeyfield(mcr_flag_name,mcr_flags);
         item.setKeyfield(mcr_create_name,mcr_create);
         item.setKeyfield(mcr_modify_name,mcr_modify);
-        item.setPart(mcr_xml_part,xml);
+        item.setPart(mcr_xml_part,xml,xml.length);
         item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
         item.update();
         exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
