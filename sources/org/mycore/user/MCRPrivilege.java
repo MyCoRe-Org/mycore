@@ -33,7 +33,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 
 /**
- * This class defines a privilege of the MyCoRe user management system.
+ * This class defines a privilege of the MyCoRe user management system. Privileges
+ * must not be confused with access control lists (ACL) which control if some
+ * principal (user, host, subnet etc) is allowed to access data in the system.
+ * Privileges are used to define roles in the user management component of the
+ * mycore system.
  *
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
@@ -50,25 +54,32 @@ public class MCRPrivilege
   /** The description of the privilege */
   private String privDescription;
 
-  /** constructor */
+  /**
+   * constructor
+   * @param name The name of the privilege
+   * @param description The description of the privilege
+   */
   public MCRPrivilege (String name, String description)
   {
     privName = name;
     privDescription = description;
   }
 
-  /** constructor */
+  /**
+   * constructor
+   * @param priv  the jdom.element representation of the privilege
+   */
   public MCRPrivilege (org.jdom.Element priv)
   {
-  privName = "";
-  privDescription = "";
-  if (!priv.getName().equals("privilege")) return;
-  privName = ((String)priv.getAttributeValue("name")).trim();
-  List listelm = priv.getChildren();
-  if (listelm.size()>0) {
-    org.jdom.Element elm = (org.jdom.Element)listelm.get(0);
-    if (!priv.getName().equals("privilege.descrition")) return; 
-    privDescription = ((String)elm.getText()).trim();
+    privName = "";
+    privDescription = "";
+    if (!priv.getName().equals("privilege")) return;
+    privName = ((String)priv.getAttributeValue("name")).trim();
+    List listelm = priv.getChildren();
+    if (listelm.size()>0) {
+      org.jdom.Element elm = (org.jdom.Element)listelm.get(0);
+      if (!priv.getName().equals("privilege.description")) return;
+      privDescription = ((String)elm.getText()).trim();
     }
   }
 
@@ -88,35 +99,35 @@ public class MCRPrivilege
   public org.jdom.Element toJDOMElement() throws MCRException
   {
     org.jdom.Element priv = new org.jdom.Element("privilege").setAttribute("name", privName);
-    org.jdom.Element Description = new org.jdom.Element("privilege.descrition").setText(privDescription);
+    org.jdom.Element Description = new org.jdom.Element("privilege.description").setText(privDescription);
 
     // Aggregate privilege element
     priv.addContent(Description);
     return priv;
   }
 
-/**
- * The method check the validation of this class.
- * @return true if name is not null or empty, else return false
- **/
-public boolean isValid()
-  { if (privName.length()==0) return false; else return true; }
+  /**
+   * The method check the validation of this class.
+   * @return true if name is not null or empty, else return false
+   **/
+  public boolean isValid()
+  { return (privName.length()==0) ? false : true; }
 
-/**
- * This helper method replaces null with an empty string and trims whitespace from
- * non-null strings.
- */
-protected final static String trim(String s)
+  /**
+   * This helper method replaces null with an empty string and trims whitespace from
+   * non-null strings.
+   */
+  protected final static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
 
-/**
- * This method put debug data to the logger (for the debug mode).
- **/
-public final void debug()
+  /**
+   * This method puts debug data to the logger (if it is set to debug mode).
+   */
+  public final void debug()
   {
-  MCRConfiguration config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
-  logger.debug("privName           = "+privName);
-  logger.debug("privDescription    = "+privDescription);
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    logger.debug("privName           = "+privName);
+    logger.debug("privDescription    = "+privDescription);
   }
 }
