@@ -26,15 +26,17 @@ package mycore.datamodel;
 
 import java.util.*;
 import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
 import mycore.common.MCRConfigurationException;
-import mycore.datamodel.MCRObject;
+import mycore.common.MCRException;
 import mycore.datamodel.MCRQueryInterface;
+import mycore.datamodel.MCRQueryResultArray;
+import mycore.datamodel.MCRCommunicationInterface;
 
 /**
  * This class is the result list of a XQuery question to the persistence
- * system. With the getElement methode you can get a MCRObjectID from
- * this list. The method use, depending of the persitence type property,
+ * system. the result ist transparent over all searched instances of
+ * a common instance collection or of a local instance.
+ * The method use, depending of the persitence type property,
  * a interface to a query transformer form XQuery to the target system
  * query language.
  *
@@ -44,224 +46,111 @@ import mycore.datamodel.MCRQueryInterface;
 public class MCRQueryResult
 {
 private int vec_max_length;
-private Vector mcr_result = null;
-private Vector mcr_xml = null;
-private MCRQueryInterface mcr_transform = null;
+private MCRQueryResultArray mcr_result = null;
+private MCRQueryInterface mcr_queryint = null;
 private MCRConfiguration config = null;
-
-/** The start tag for the result collection **/
-public static final String TAG_RESULTS_S = "<mcr_results>";
-/** The end tag for the result collection **/
-public static final String TAG_RESULTS_E = "</mcr_results>";
-/** The start tag for one result **/
-public static final String TAG_RESULT_S = "<mcr_result>";
-/** The end tag for one result **/
-public static final String TAG_RESULT_E = "</mcr_result>";
-/** The start tag for one MCRObjectId **/
-public static final String TAG_MCRID_S = "<mcr_objectid>";
-/** The end tag for one MCRObjectId **/
-public static final String TAG_MCRID_E = "</mcr_objectid>";
-/** The start tag for one XML document **/
-public static final String TAG_XML_S = "<mcr_xml>";
-/** The end tag for one XML document **/
-public static final String TAG_XML_E = "</mcr_xml>";
-/* The new line string */
-private String NL;
+private String mcr_type = null;
+private String mcr_host = null;
+private String mcr_query = null;
 
 /**
  * This constructor create the MCRQueryResult class with an empty
- * query result vector.
+ * MCRQueryResultArray.
  *
+ * @param type the type of the MCRObjectId
  * @exception MCRConfigurationException     
  *                              an Exception of MyCoRe Configuration
  **/
-public MCRQueryResult() throws MCRConfigurationException
+public MCRQueryResult(String type) throws MCRConfigurationException
   {
-  NL = System.getProperty("line.separator");
   config = MCRConfiguration.instance();
   vec_max_length = config.getInt("MCR.query_max_results",10);
-  mcr_result = new Vector(vec_max_length);
-  mcr_xml = new Vector(vec_max_length);
+  mcr_result = new MCRQueryResultArray();
+  if (type==null) { 
+    throw new MCRException("The MCR object type is empty."); }
+  mcr_type = type .toLowerCase();
+  mcr_host = "";
+  mcr_query = "";
   }
 
 /**
  * This methode read the properties for the MCRObject type and call
  * the coresponding class for a query to the persistence layer. If
- * it was succesful, the vector of MCRObject's is filled with answers.
- * Then the corresponding XML streams was loaded.
+ * it was succesful, the MCRQueryResultArray is filled with answers.
  *
+ * @param host                  the host as "local", "remote" or hostname
  * @param type 	                the MCRObject type
  * @param query	                the Query string
  * @exception MCRException      general Exception of MyCoRe
  * @exception MCRConfigurationException      
  *                              an Exception of MyCoRe Configuration
  **/
-public final void setFromQuery(String type, String query) 
+public final void setFromQuery(String host, String query) 
   throws MCRException, MCRConfigurationException
   {
-  String persist_type = "";
-  String proptype = "MCR.persistence_type_"+type.toLowerCase();
-  try {
-    persist_type = config.getString(proptype);
-    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-      "_query_name";
-    mcr_transform = (MCRQueryInterface)config.getInstanceOf(proppers);
-    mcr_result = mcr_transform.getResultList(query,type,vec_max_length);
+  // precheck
+  if (host==null) host = "local";
+  host  = host .toLowerCase();
+  if (query==null) query = "";
+  query = query.toLowerCase();
+  if ((host.equals(mcr_host))&&(query.equals(mcr_query))) { return; }
+  mcr_host = host;
+  mcr_query = query;
+  boolean todo = false;
+  // local
+  if (mcr_host.equals("local")) {
+    try {
+      String proptype = "MCR.persistence_type_"+mcr_type.toLowerCase();
+      String persist_type = config.getString(proptype);
+      String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
+        "_query_name";
+      mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);
+      mcr_result = mcr_queryint.getResultList(mcr_query,mcr_type,
+        vec_max_length);
+      todo = true; }
+    catch (Exception e) {
+       throw new MCRException(e.getMessage(),e); }
     }
-  catch (Exception e) {
-     throw new MCRException(e.getMessage(),e); }
-  for (int i=0;i< mcr_result.size();i++) {
-    MCRObject obj = new MCRObject();
-    mcr_xml.addElement(
-      obj.receiveXMLFromDatastore((String)mcr_result.elementAt(i))); 
+  // remote
+  if(mcr_host.equals("remote")) {
+    String hosts = config.getString("MCR.communication_hosts");
+    int veclen = config.getInt("MCR.communication_max_hosts",3);
+    Vector hostlist = new Vector(veclen);
+    int i = 0;
+    int j = hosts.length();
+    int k = 0;
+    while (k!=-1) {
+      k = hosts.indexOf(",",i);
+      if (k==-1) {
+        hostlist.addElement(hosts.substring(i,j)); }
+      else {
+        hostlist.addElement(hosts.substring(i,k)); i = k+1; }
+      }
+    MCRCommunicationInterface comm = null;
+    comm = (MCRCommunicationInterface)config
+      .getInstanceOf("MCR.communication_class");
+    comm.requestQuery(hostlist,mcr_type,mcr_query);
+    mcr_result = comm.responseQuery();
+    todo = true; }
+  if(!todo) {
+    Vector hostlist = new Vector(1);
+    hostlist.addElement(mcr_host);
+    MCRCommunicationInterface comm = null;
+    comm = (MCRCommunicationInterface)config
+      .getInstanceOf("MCR.communication_class");
+    comm.requestQuery(hostlist,mcr_type,mcr_query);
+    mcr_result = comm.responseQuery();
     }
+
   }
 
-// Error text
-private static String ERRORTEXT =
-  "The stream for the MCRQueryResult constructor is false.";
-
 /**
- * This methode fills the internal MCRObjectID- and XML-vector
- * fron a XML input stream with following form:<br>
- * &lt;mcr_results&gt;<br>
- * &lt;mcr_result&gt;<br>
- * &lt;mcr_objectid&gt;MCRObjectId&lt;/mcr_objectid&gt;<br>
- * &lt;mcr_xml&gt;XML&lt;/mcr_xml&gt;<br>
- * &lt;/mcr_result&gt;<br>
- * ...<br>
- * &lt;/mcr_results&gt;<br>
- * The XML header line was extracted and put in each XML-vector element.
+ * This methode return the MCRQueryResultArray.
  *
- * @param xmlstream the input straem of the result collection
- * @exception MCRException if the stream has not the correct format.
- * @exception MCRConfigurationException      
- *                              an Exception of MyCoRe Configuration
+ * @return the MCRQueryResultArray.
  **/
-public final void setFromXMLResultStream(String xmlstream) 
-  {
-  NL = System.getProperty("line.separator");
-  config = MCRConfiguration.instance();
-  vec_max_length = config.getInt("MCR.query_max_results",10);
-  mcr_result = new Vector(vec_max_length);
-  mcr_xml = new Vector(vec_max_length);
-  int itagresultss = xmlstream.indexOf(TAG_RESULTS_S);
-  if (itagresultss == -1) { throw new MCRException(ERRORTEXT); }
-  itagresultss += TAG_RESULTS_S.length();
-  int itagresultse = xmlstream.indexOf(TAG_RESULTS_E,itagresultss);
-  if (itagresultse == -1) { throw new MCRException(ERRORTEXT); }
-  int itagresults = xmlstream.indexOf(TAG_RESULT_S,itagresultss);
-  if (itagresults == -1) { return; }
-  int ltagresulte = TAG_RESULT_E.length();
-  int itagresulte = 0;
-  int itagmcrids = 0;
-  int ltagmcrids = TAG_MCRID_S.length();
-  int itagmcride = 0;
-  int itagxmls = 0;
-  int ltagxmls = TAG_XML_S.length();
-  int itagxmle = 0;
-  while (itagresults != -1) {
-    itagmcrids = xmlstream.indexOf(TAG_MCRID_S,itagresults);
-    if (itagmcrids == -1) { throw new MCRException(ERRORTEXT); }
-    itagmcride = xmlstream.indexOf(TAG_MCRID_E,itagmcrids);
-    if (itagmcride == -1) { throw new MCRException(ERRORTEXT); }
-    itagxmls = xmlstream.indexOf(TAG_XML_S,itagresults);
-    if (itagxmls == -1) { throw new MCRException(ERRORTEXT); }
-    itagxmle = xmlstream.indexOf(TAG_XML_E,itagxmls);
-    if (itagmcride == -1) { throw new MCRException(ERRORTEXT); }
-    mcr_result.addElement(xmlstream.substring(itagmcrids+ltagmcrids,itagmcride)
-      .trim());
-    mcr_xml.addElement(MCRObject.XML_HEADER+NL+
-      xmlstream.substring(itagxmls+ltagxmls,itagxmle).trim());
-    itagresulte = xmlstream.indexOf(TAG_RESULT_E,itagresults);
-    if (itagresulte == -1) { throw new MCRException(ERRORTEXT); }
-    itagresults = xmlstream.indexOf(TAG_RESULT_S,itagresulte+ltagresulte);
-    }
-  }
+public final MCRQueryResultArray getResultArray()
+  { return mcr_result; }
 
-/**
- * This methode return a XML stream of the result collection in form of<br>
- * &lt;mcr_results&gt;<br>
- * &lt;mcr_result&gt;<br>
- * &lt;mcr_objectid&gt;MCRObjectID&lt;/mcr_objectid&gt;<br>
- * &lt;mcr_xml&gt;XML&lt;/mcr_xml&gt;<br>
- * &lt;/mcr_result&gt;<br>
- * ...<br>
- * &lt;/mcr_results&gt;<br>
- *
- * @exception MCRException if the result list is empty.
- * @return the result collection as an XML stream.
- **/
-public final String getXMLResultStream()
-  {
-  StringBuffer sb = new StringBuffer(204800);
-  sb.append(MCRObject.XML_HEADER).append(NL);
-  sb.append(TAG_RESULTS_S).append(NL);
-  if (mcr_result.size()==0) { 
-    sb.append(TAG_RESULTS_E).append(NL);
-    return sb.toString(); }
-  String sub = null;
-  for (int i=0;i<mcr_result.size();i++) {
-    sb.append(TAG_RESULT_S).append(NL);
-    sb.append(TAG_MCRID_S).append(mcr_result.elementAt(i)).append(TAG_MCRID_E)
-      .append(NL);
-    sub = (String)mcr_xml.elementAt(i);
-    sb.append(TAG_XML_S).append(NL);
-    sb.append(sub.substring(MCRObject.XML_HEADER.length()+
-      NL.length(),sub.length()));
-    sb.append(TAG_XML_E).append(NL);
-    sb.append(TAG_RESULT_E).append(NL);
-    }
-  sb.append(TAG_RESULTS_E).append(NL);
-  return sb.toString();
-  }
-
-/**
- * This methode return the size of the result vector.
- *
- * @return the size of the result vector
- **/
-public final int getSize()
-  { return mcr_result.size(); }
-
-/**
- * This methode get one MCRObjectId as string from the result list
- * for a given element number.
- *
- * @param index              the index of the Element
- * return a MCRObjectId of the index or null if no object for this index
- * was found.
- **/
-public final String getMCRObjectIdOfElement(int index)
-  {
-  if ((index < 0) || (index > mcr_result.size())) { return null; }
-  return (String) mcr_result.elementAt(index);
-  }
-
-/**
- * This methode get one XML stream as string from the result list
- * for a given element number.
- *
- * @param index              the index of the Element
- * return a XML stream of the index or null if no object for this index
- * was found.
- **/
-public final String getXMLOfElement(int index)
-  {
-  if ((index < 0) || (index > mcr_xml.size())) { return null; }
-  return (String) mcr_xml.elementAt(index);
-  }
-
-/**
- * This methode print the MCRObjectId as string from the result list.
- **/
-public final void debug()
-  {
-  System.out.println("Result list:");
-  for (int i=0;i< mcr_result.size();i++) {
-    System.out.println("  "+(String)mcr_result.elementAt(i)+"\n"); 
-    System.out.println("  "+(String)mcr_xml.elementAt(i)+"\n"); }
-  System.out.println();
-  }
 }
 

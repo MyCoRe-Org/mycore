@@ -38,16 +38,17 @@ public interface MCRQueryInterface
 {
 
 /**
- * This method parse the XQuery string and return a vector of MCRObjectID's.
+ * This method parse the XQuery string and return the result as
+ * MCRQueryResultArray. If the type is null or empty or maxresults
+ * is lower 1 an empty list was returned.
  *
- * @param query	                the XQuery string
- * @param maxresult             the maximum of results
+ * @param query                 the XQuery string
+ * @param maxresults            the maximum of results
  * @param type                  the MCRObject type
- * @exception MCRException      general Exception of MyCoRe
- * @return			list of MCRObjectID's as a vector
+ * @return                      a result list as MCRQueryResultArray
  **/
-public Vector getResultList(String query, String type, int maxresult) 
-  throws MCRException; 
+public MCRQueryResultArray getResultList(String query, String type,
+  int maxresults);
 
 }
 

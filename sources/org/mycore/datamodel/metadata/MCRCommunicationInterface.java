@@ -22,10 +22,11 @@
  *
  **/
 
-package mycore.communication;
+package mycore.datamodel;
 
 import java.util.*;
 import mycore.common.MCRException;
+import mycore.datamodel.MCRQueryResultArray;
 
 /**
  * This interface is designed to choose the communication methodes
@@ -39,25 +40,24 @@ public interface MCRCommunicationInterface
 {
 
 /**
- * This methode represide the request methode for the communication.
+ * This methode represide the query request methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
  * @param hostlist the list of hostnames as string they should requested.
- * @param reqstream the stream of the request. The syntax of this XML
- *                  stream is extenal described.
+ * @param mcrtype  the type value of the MCRObjectId
+ * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void request(Vector hostlist, String reqstream)
+public void requestQuery(Vector hostlist, String mcrtype, String query)
   throws MCRException;
  
 /**
  * This methode represide the response methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
- * @return resstream the stream of the response. The syntax of this XML
- *                  stream is extenal described.
+ * @return an empty MCRQueryResultArray as the response.
  * @exception MCRException general Exception of MyCoRe
  **/
-public String response() throws MCRException;
+public MCRQueryResultArray responseQuery() throws MCRException;
  
 }

@@ -24,11 +24,11 @@
 
 package mycore.cm7;
 
-import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRPersistenceException;
+import mycore.datamodel.MCRQueryResultArray;
 
 /**
  * This is the search class for the IBM Content Manager 7 Text Search Engine.
@@ -51,7 +51,8 @@ private String mcr_indexclass;
 private String mcr_tsserver;
 private String mcr_tsindex;
 private String mcr_fieldid;
-private Vector mcr_result;
+private int mcr_partid;
+private MCRQueryResultArray mcr_result;
 
 /**
  * The constructor.<br>
@@ -79,15 +80,17 @@ public MCRCM7SearchTS()
   mcr_tsindex = "";
   mcr_fieldid =  MCRConfiguration.instance()
     .getString("MCR.persistence_cm7_field_id");
-  mcr_result = null;
+  mcr_partid =  MCRConfiguration.instance()
+    .getInt("MCR.persistence_cm7_part_xml",2);
+  mcr_result = new MCRQueryResultArray();
   }
 
 /**
- * This methode return the answer vector of a query.
+ * This methode return the answer list of a query.
  *
- * @return the vector of MCRObjectID's as strings or NULL
+ * @return the MCRQueryResultArray
  **/
-public final Vector getResultVector()
+public final MCRQueryResultArray getResult()
   { return mcr_result; }
 
 /**
@@ -143,11 +146,9 @@ public final void setIndexTS(String index)
   }
 
 /**
- * This methode starts the query and return a vector of MCRObjectId's
- * as strings.
+ * This methode starts the query and store the result in a MCRQueryResultArray.
  *
  * @param cond                 the query string for CM7 text search
- * @return the vector of XML strings.
  **/
 public final void search(String cond) throws Exception, DKException
   {
@@ -171,18 +172,20 @@ public final void search(String cond) throws Exception, DKException
     DKResults pResult = (DKResults)pQry.result();
     dkIterator iter = ((dkCollection)pResult).createIterator();
     // prepare the vector
-    mcr_result = new Vector(mcr_maxresults);
     DKDatastoreDL connection = MCRCM7ConnectionPool.getConnection();
     String id = "";
+    String xml = "";
     String itemId = "";
     while (iter.more()) {
       DKDDO mcr_item = (DKDDO)iter.next();
       if (mcr_item != null) {
         itemId = (String)mcr_item.getDataByName("DKDLItemId");
+        Integer rank = (Integer)mcr_item.getDataByName("DKRank") ;
         MCRCM7Item my_item = new MCRCM7Item(connection,mcr_indexclass,itemId);
         my_item.retrieve();
         id = my_item.getKeyfieldToString(mcr_fieldid);
-        mcr_result.addElement(id);
+        xml = my_item.getPart(mcr_partid);
+        mcr_result.add("local",id,rank.intValue(),xml);
         }
       }
     MCRCM7ConnectionPool.releaseConnection(connection);

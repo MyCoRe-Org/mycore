@@ -26,8 +26,9 @@ package mycore.communication;
 
 import java.net.*;
 import java.io.*;
-import mycore.datamodel.MCRQueryResult;
 import mycore.common.*;
+import mycore.datamodel.MCRQueryResultArray;
+import mycore.datamodel.MCRQueryInterface;
 
 /**
  * This class realizes the RemoteQueryProtocol in the view
@@ -99,11 +100,23 @@ public class MCRRemoteQueryProtocol {
         } else if (state == SENT_EXPECTING_QUERY) {
             if (theInput.length() == bytes) {
               try {
-                MCRQueryResult metadata = new MCRQueryResult();
                 if (queryInputSyntaxIsCorrect(theInput)) {
-                  metadata.setFromQuery(extractType(theInput),extractQuery(theInput));
-                  queryResult = metadata.getXMLResultStream();
-                }
+                  // start the local query
+                  MCRConfiguration config = MCRConfiguration.instance();
+                  int vec_length = config.getInt("MCR.query_max_results",10);
+
+                  String type = extractType(theInput);
+                  String query = extractQuery(theInput);
+                  String proptype = "MCR.persistence_type_"+type;
+                  String persist_type = config.getString(proptype);
+                  String proppers = "MCR.persistence_"+persist_type
+                    .toLowerCase()+"_query_name";
+                  MCRQueryInterface mcr_query = (MCRQueryInterface)config
+                    .getInstanceOf(proppers);
+                  MCRQueryResultArray result = mcr_query
+                    .getResultList(query,type,vec_length);
+                  queryResult = result.exportAll();
+                  }
                 else queryResult="";
               }
               catch (MCRException mcre) {

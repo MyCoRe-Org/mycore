@@ -26,7 +26,8 @@ package mycore.communication;
 
 import java.util.*;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRQueryResult;
+import mycore.datamodel.MCRQueryResultArray;
+import mycore.datamodel.MCRCommunicationInterface;
 
 /**
  * This class implements the interface to choose the communication methodes
@@ -48,35 +49,35 @@ public MCRCommunicationDummy()
   }
 
 /**
- * This methode represide the request methode for the communication.
+ * This methode represide the query request methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
  * @param hostlist the list of hostnames as string they should requested.
- * @param reqstream the stream of the request. The syntax of this XML
- *                  stream is extenal described.
+ * @param mcrtype  the type value of the MCRObjectId
+ * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void request(Vector hostlist, String reqstream)
+public final void requestQuery(Vector hostlist, String mcrtype, String query)
   throws MCRException
   {
   for (int i=0;i<hostlist.size();i++) {
     System.out.println("Hostname : "+hostlist.elementAt(i));
     }
-  System.out.println("Request  : "+reqstream);
+  System.out.println("MCR type : "+mcrtype);
+  System.out.println("Query    : "+query);
   System.out.println();
   }
  
 /**
- * This methode represide the response methode for the communication.
+ * This methode represide the query response methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
- * @return resstream the stream of the response. The syntax of this XML
- *                  stream is extenal described.
+ * @return an empty MCRQueryResultArray as the response. 
  * @exception MCRException general Exception of MyCoRe
  **/
-public String response() throws MCRException
+public final MCRQueryResultArray responseQuery() throws MCRException
   {
-  return MCRQueryResult.TAG_RESULTS_S+MCRQueryResult.TAG_RESULTS_E;
+  return new MCRQueryResultArray() ;
   }
  
 }

@@ -31,8 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
 import mycore.datamodel.MCRQueryResult;
-import mycore.communication.MCRCommunicationInterface;
-import mycore.communication.MCRSocketCommunication;
+import mycore.datamodel.MCRQueryResultArray;
 
 /**
  * This class implements the query command to start a query to a local
@@ -66,9 +65,11 @@ final public class MCRQueryCommands
   public static void query( String host, String type, String query )
     throws Exception
   {
-    if (query==null) query = "";
+    if (host==null) host = "local";
     host  = host .toLowerCase();
+    if (type==null) { return; }
     type  = type .toLowerCase();
+    if (query==null) query = "";
     query = query.toLowerCase();
 
     System.out.println( "Host  : " + host  );
@@ -76,52 +77,15 @@ final public class MCRQueryCommands
     System.out.println( "Query : " + query );
     System.out.println();
 
-  MCRConfiguration config = MCRConfiguration.instance();
+    MCRConfiguration config = MCRConfiguration.instance();
 
-  boolean todo = false;
+    MCRQueryResult result = new MCRQueryResult(type);
+    result.setFromQuery(host,query);
 
-  MCRQueryResult metadata = new MCRQueryResult();
-  if(host.equals("local")) {
-    metadata.setFromQuery(type,query);
-    todo = true; }
+    printResult(result.getResultArray(), config, type);
 
-  if(host.equals("remote")) {
-    String hosts = config.getString("MCR.communication_hosts");
-    int veclen = config.getInt("MCR.communication_max_hosts",3);
-    Vector hostlist = new Vector(veclen);
-    int i = 0;
-    int j = hosts.length();
-    int k = 0;
-    while (k!=-1) {
-      k = hosts.indexOf(",",i);
-      if (k==-1) { 
-        hostlist.addElement(hosts.substring(i,j)); }
-      else {
-        hostlist.addElement(hosts.substring(i,k)); i = k+1; }
-      }
-    MCRCommunicationInterface comm = null;
-    comm = (MCRCommunicationInterface)config
-      .getInstanceOf("MCR.communication_class");   
-    // the request string must convert in a 'good' syntax
-    comm.request(hostlist,type+"***"+query);
-    metadata.setFromXMLResultStream(comm.response());
-    todo = true; }
-
-  if(!todo) {
-    Vector hostlist = new Vector(1);
-    hostlist.addElement(host);
-    MCRCommunicationInterface comm = null;
-    comm = (MCRCommunicationInterface)config
-      .getInstanceOf("MCR.communication_class");   
-    // the request string must convert in a 'good' syntax
-    comm.request(hostlist,type+"***"+query);
-    metadata.setFromXMLResultStream(comm.response());
-    }
-
-  printResult(metadata, config, type);
-
-  System.out.println("Ready.");
-  System.out.println();
+    System.out.println("Ready.");
+    System.out.println();
   }
 
 /**
@@ -129,7 +93,7 @@ final public class MCRQueryCommands
  *
  * @param results the XML result collection
  **/
-private static final void printResult(MCRQueryResult results,
+private static final void printResult(MCRQueryResultArray results,
   MCRConfiguration config, String type)
   throws Exception
   {
@@ -140,10 +104,10 @@ private static final void printResult(MCRQueryResult results,
   String outpath = config.getString("MCR.out_path_"+type);
   TransformerFactory transfakt = TransformerFactory.newInstance();
   // Indexlist
+  String mcrxmlall = results.exportAll();
+  //System.out.println(mcrxmlall);
   Transformer trans = 
     transfakt.newTransformer(new StreamSource(xsltallresult));
-  String mcrxmlall = results.getXMLResultStream();
-//System.out.println(mcrxmlall);
   StreamResult sr = null;
   if (outpath.equals("SYSOUT")) {
     sr = new StreamResult((OutputStream) System.out); }
@@ -156,9 +120,9 @@ private static final void printResult(MCRQueryResult results,
   System.out.println();
   // All data
   trans = transfakt.newTransformer(new StreamSource(xsltoneresult));
-  for (int l=0;l<results.getSize();l++) {
-    String mcrid = results.getMCRObjectIdOfElement(l);
-    String mcrxml = results.getXMLOfElement(l);
+  for (int l=0;l<results.size();l++) {
+    String mcrid = results.getId(l);
+    String mcrxml = results.getXML(l);
     sr = null;
     if (outpath.equals("SYSOUT")) {
       sr = new StreamResult((OutputStream) System.out); }

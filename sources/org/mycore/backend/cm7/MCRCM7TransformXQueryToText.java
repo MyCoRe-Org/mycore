@@ -32,6 +32,7 @@ import mycore.common.MCRPersistenceException;
 import mycore.common.MCRUtils;
 import mycore.datamodel.MCRQueryInterface;
 import mycore.datamodel.MCRObjectID;
+import mycore.datamodel.MCRQueryResultArray;
 
 /**
  * This is the tranformer implementation for CM 7 from XQuery language
@@ -57,25 +58,24 @@ public MCRCM7TransformXQueryToText()
   {}
 
 /**
- * This method parse the XQuery string and return a vector of 
- * MCRObjectId's as strings. If the type is null or empty or maxresults
- * is lower 1 a MCRException was throwed.
+ * This method parse the XQuery string and return the result as
+ * MCRQueryResultArray. If the type is null or empty or maxresults
+ * is lower 1 an empty list was returned.
  *
  * @param query	                the XQuery string
  * @param maxresults            the maximum of results
  * @param type                  the MCRObject type
- * @exception MCRException      general Exception of MyCoRe
- * @return			list of MCRObject's as a vector of XML strings
+ * @return			a result list as MCRQueryResultArray
  **/
-public final Vector getResultList(String query, String type, int maxresults) 
-  throws MCRPersistenceException
+public final MCRQueryResultArray getResultList(String query, String type, 
+  int maxresults) 
   {
   // check the parameter
+  MCRQueryResultArray result = new MCRQueryResultArray();
   if ((type == null) || ((type = type.trim()).length() ==0)) {
-    throw new MCRPersistenceException("The type is empty."); }
+    return result; }
   if (maxresults < 1) {
-    throw new MCRPersistenceException("The maxresults is lower then one."); }
-  Vector result = new Vector(maxresults);
+    return result; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
   //System.out.println("================================");
@@ -92,7 +92,7 @@ public final Vector getResultList(String query, String type, int maxresults)
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-//    System.out.println("Next cond :"+onecond);
+    //System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
     cond.append(traceOneCondition(onecond));
@@ -120,13 +120,13 @@ public final Vector getResultList(String query, String type, int maxresults)
   ts.setIndexTS(MCRConfiguration.instance().getString(conf));
   ts.setMaxResults(maxresults);
   try {
-    ts.search(cond.toString()); result = ts.getResultVector(); }
+    ts.search(cond.toString()); result = ts.getResult(); }
   catch (Exception e) {
     System.out.println(e.getMessage());
     e.printStackTrace();
     throw new MCRPersistenceException("The text search error.");
     }
-  System.out.println("================================");
+  //System.out.println("================================");
   return result;
   }
 
