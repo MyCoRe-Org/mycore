@@ -1,82 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-
 <web-app id="WebApp">
+	<display-name> MyCoRe-WCMS </display-name>
+	<servlet id="LayoutServlet">
+		<servlet-name> MCRLayoutServlet </servlet-name>
+		<servlet-class> org.mycore.common.xml.MCRLayoutServlet </servlet-class>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+	<servlet id="StaticXMLFileServlet">
+		<servlet-name> MCRStaticXMLFileServlet </servlet-name>
+		<servlet-class> org.mycore.frontend.servlets.MCRStaticXMLFileServlet </servlet-class>
+		<load-on-startup>4</load-on-startup>
+	</servlet>
+	<servlet id="ErrorServlet">
+		<servlet-name> ErrorServlet </servlet-name>
+		<servlet-class> miless.servlets.ErrorServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSLoginServlet">
+		<servlet-name> WCMSLoginServlet </servlet-name>
+		<servlet-class> wcms.WCMSLoginServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSChooseServlet">
+		<servlet-name> WCMSChooseServlet </servlet-name>
+		<servlet-class> wcms.WCMSChooseServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSActionServlet">
+		<servlet-name> WCMSActionServlet </servlet-name>
+		<servlet-class> wcms.WCMSActionServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSAdminServlet">
+		<servlet-name> WCMSAdminServlet </servlet-name>
+		<servlet-class> wcms.WCMSAdminServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSFileUploadServlet">
+		<servlet-name> WCMSFileUploadServlet </servlet-name>
+		<servlet-class> wcms.WCMSFileUploadServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSGetStaticHTMLServlet">
+		<servlet-name> WCMSGetStaticHTMLServlet	 </servlet-name>
+		<servlet-class> wcms.WCMSGetStaticHTMLServlet </servlet-class>
+	</servlet>	
+	
 
-  <display-name> MyCoRe-WCMS </display-name>
-
-  <servlet id="LayoutServlet">
-    <servlet-name> MCRLayoutServlet </servlet-name>
-    <servlet-class> org.mycore.common.xml.MCRLayoutServlet </servlet-class>
-    <load-on-startup>3</load-on-startup>
-  </servlet>
-  <servlet id="StaticXMLFileServlet">
-    <servlet-name> MCRStaticXMLFileServlet </servlet-name>
-    <servlet-class> org.mycore.frontend.servlets.MCRStaticXMLFileServlet </servlet-class>
-    <load-on-startup>4</load-on-startup>
-  </servlet>
-  <servlet id="ErrorServlet">
-    <servlet-name> ErrorServlet </servlet-name>
-    <servlet-class> miless.servlets.ErrorServlet </servlet-class>
-  </servlet>
- 	<servlet id="WCMSLoginServlet">
-	      <servlet-name> WCMSLoginServlet </servlet-name>
-	      <servlet-class> wcms.WCMSLoginServlet </servlet-class>
-	  </servlet>
-	  <servlet id="WCMSChooseServlet">
-	      <servlet-name> WCMSChooseServlet </servlet-name>
-	      <servlet-class> wcms.WCMSChooseServlet </servlet-class>
-	  </servlet> 
-	  <servlet id="WCMSActionServlet">
-	      <servlet-name> WCMSActionServlet </servlet-name>
-	      <servlet-class> wcms.WCMSActionServlet </servlet-class>
-	  </servlet>  
-	  <servlet id="WCMSAdminServlet">
-	      <servlet-name> WCMSAdminServlet </servlet-name>
-	      <servlet-class> wcms.WCMSAdminServlet </servlet-class>
-	  </servlet>   
-	  <servlet id="WCMSFileUploadServlet">
-	      <servlet-name> WCMSFileUploadServlet </servlet-name>
-	      <servlet-class> wcms.WCMSFileUploadServlet </servlet-class>
-	  </servlet>  	
-
-  <servlet-mapping>
-    <servlet-name> MCRStaticXMLFileServlet </servlet-name>
-    <url-pattern> *.xml </url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name> ErrorServlet </servlet-name>
-    <url-pattern> /servlet/* </url-pattern>
-  </servlet-mapping>
 	<servlet-mapping>
-	      <servlet-name> WCMSLoginServlet </servlet-name>
-	      <url-pattern> /servlets/WCMSLoginServlet </url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	      <servlet-name> WCMSChooseServlet </servlet-name>
-	      <url-pattern> /servlets/WCMSChooseServlet </url-pattern>
-	  </servlet-mapping>
-	  <servlet-mapping>
-	      <servlet-name> WCMSActionServlet </servlet-name>
-	      <url-pattern> /servlets/WCMSActionServlet </url-pattern>
-	  </servlet-mapping>  
-	  <servlet-mapping>
-	      <servlet-name> WCMSAdminServlet </servlet-name>
-	      <url-pattern> /servlets/WCMSAdminServlet </url-pattern>
-	  </servlet-mapping>    
-	  <servlet-mapping>
-	      <servlet-name> WCMSFileUploadServlet </servlet-name>
-	      <url-pattern> /servlets/WCMSFileUploadServlet </url-pattern>
-	  </servlet-mapping>
-	  
-  <session-config>
-    <session-timeout> 30 </session-timeout>
-  </session-config>
-
-  <welcome-file-list>
-    <welcome-file> index.xml </welcome-file>
-    <welcome-file> index.html </welcome-file>
-    <welcome-file> index.htm  </welcome-file>
-  </welcome-file-list>
-  
+		<servlet-name> MCRStaticXMLFileServlet </servlet-name>
+		<url-pattern> *.xml </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> ErrorServlet </servlet-name>
+		<url-pattern> /servlet/* </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSLoginServlet </servlet-name>
+		<url-pattern> /servlets/WCMSLoginServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSChooseServlet </servlet-name>
+		<url-pattern> /servlets/WCMSChooseServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSActionServlet </servlet-name>
+		<url-pattern> /servlets/WCMSActionServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSAdminServlet </servlet-name>
+		<url-pattern> /servlets/WCMSAdminServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSFileUploadServlet </servlet-name>
+		<url-pattern> /servlets/WCMSFileUploadServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSGetStaticHTMLServlet </servlet-name>
+		<url-pattern> /servlets/WCMSGetStaticHTMLServlet </url-pattern>
+	</servlet-mapping>
+		
+	<session-config>
+		<session-timeout> 30 </session-timeout>
+	</session-config>
+	<welcome-file-list>
+		<welcome-file> index.xml </welcome-file>
+		<welcome-file> index.html </welcome-file>
+		<welcome-file> index.htm </welcome-file>
+	</welcome-file-list>
 </web-app>

@@ -19,6 +19,11 @@
 		<servlet-name> WCMSFileUploadServlet </servlet-name>
 		<servlet-class> wcms.WCMSFileUploadServlet </servlet-class>
 	</servlet>
+
+	<servlet id="WCMSGetStaticHTMLServlet">
+		<servlet-name> WCMSGetStaticHTMLServlet	 </servlet-name>
+		<servlet-class> wcms.WCMSGetStaticHTMLServlet </servlet-class>
+	</servlet>		
 <!-- end of: wcms -->
 <!-- wcms -->
 	<servlet-mapping>
@@ -41,4 +46,8 @@
 		<servlet-name> WCMSFileUploadServlet </servlet-name>
 		<url-pattern> /servlets/WCMSFileUploadServlet </url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSGetStaticHTMLServlet </servlet-name>
+		<url-pattern> /servlets/WCMSGetStaticHTMLServlet </url-pattern>
+	</servlet-mapping>	
 <!-- end of: wcms -->
