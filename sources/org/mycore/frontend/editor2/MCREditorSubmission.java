@@ -142,6 +142,7 @@ public class MCREditorSubmission
     for( int i = 0; i < variables.size(); i++ )
     {
       MCREditorVariable var = (MCREditorVariable)( variables.get( i ) ); 
+      MCREditorServlet.logger.debug( var.getName() + "=" + var.getValue() );
 
       Element  parent   = root;
       String[] elements = var.pathElements;
