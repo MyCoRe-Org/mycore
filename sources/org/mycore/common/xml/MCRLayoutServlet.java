@@ -56,6 +56,7 @@ import org.apache.log4j.PropertyConfigurator;
  * input to various output formats, using XSL stylesheets.
  *
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler
  * @version $Revision$ $Date$
  */
 public class MCRLayoutServlet extends HttpServlet 
@@ -228,64 +229,65 @@ public class MCRLayoutServlet extends HttpServlet
   
   public static final Properties buildXSLParameters(HttpServletRequest request)
   {
-    Properties parameters = new Properties();
+  	long time=System.currentTimeMillis();
+	Properties parameters = new Properties();
+	String name=null;
+	String user=null;
     
-    // Read all *.xsl attributes that are stored in the browser session
-    HttpSession session = request.getSession();
-    for( Enumeration e = session.getAttributeNames(); e.hasMoreElements(); )
-    {
-      String name = (String)( e.nextElement() );
-      if( name.startsWith( "XSL." ) )
-      {
-        String value = (String)( session.getAttribute( name ) );
-        parameters.put( name.substring( 4 ), value );
-      }
-    }
+	// Read all *.xsl attributes that are stored in the browser session
+	HttpSession session = request.getSession(false);
+	if (session != null){
+		for( Enumeration e = session.getAttributeNames(); e.hasMoreElements(); )		{
+	  		name = (String)( e.nextElement() );
+	  		if( name.startsWith( "XSL." ) ){
+	  			parameters.put( name.substring( 4 ), session.getAttribute( name ) );
+	  		}
+		}
+		user = (String)( session.getAttribute( "XSL.CurrentUser" ) );
+	}
     
-    // Read all *.xsl attributes provided by the invoking servlet
-    for( Enumeration e = request.getAttributeNames(); e.hasMoreElements(); )
-    {
-      String name = (String)( e.nextElement() );
-      if( name.startsWith( "XSL." ) )
-      {
-        String value = (String)( request.getAttribute( name ) );
-        parameters.put( name.substring( 4 ), value );
-      }
-    }
+	// Read all *.xsl attributes provided by the invoking servlet
+	for( Enumeration e = request.getAttributeNames(); e.hasMoreElements(); )
+	{
+	  name = (String)( e.nextElement() );
+	  if( name.startsWith( "XSL." ) )
+	  {
+		parameters.put( name.substring( 4 ), request.getAttribute( name ) );
+	  }
+	}
       
-    // Read all *.xsl attributes from the client HTTP request parameters
-    for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); )
-    {
-      String name = (String)( e.nextElement() );
-      if( name.startsWith( "XSL." ) )
-      {
-        String value = request.getParameter( name );
-        parameters.put( name.substring( 4 ), value );
-      }
-    }
+	// Read all *.xsl attributes from the client HTTP request parameters
+	for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); )
+	{
+	  name = (String)( e.nextElement() );
+	  if( name.startsWith( "XSL." ) )
+	  {
+		parameters.put( name.substring( 4 ), request.getParameter( name ) );
+	  }
+	}
 
-    // Set some predefined XSL parameters:
+	// Set some predefined XSL parameters:
 
-    String user = (String)( session.getAttribute( "XSL.CurrentUser" ) );
-    if( user == null ) user = "gast";
+	if( user == null ) user = "gast";
     
-    String contextPath = request.getContextPath() + "/";
-    String requestURL  = getCompleteURL( request );
+	String contextPath = request.getContextPath() + "/";
+	String requestURL  = getCompleteURL( request );
     
-    int pos = requestURL.indexOf( contextPath, 9 );
-    String applicationBaseURL = requestURL.substring( 0, pos ) + contextPath;
+	int pos = requestURL.indexOf( contextPath, 9 );
+	String applicationBaseURL = requestURL.substring( 0, pos ) + contextPath;
 
-    String servletsBaseURL = applicationBaseURL + "servlets/";
+	String servletsBaseURL = applicationBaseURL + "servlets/";
 
-    String defaultLang = MCRConfiguration.instance()
-      .getString( "MCR.metadata_default_lang", "en" );
+	String defaultLang = MCRConfiguration.instance()
+	  .getString( "MCR.metadata_default_lang", "en" );
 
-    parameters.put( "CurrentUser",           user               );
-    parameters.put( "RequestURL",            requestURL         );
-    parameters.put( "WebApplicationBaseURL", applicationBaseURL );
-    parameters.put( "ServletsBaseURL",       servletsBaseURL    );
-    parameters.put( "DefaultLang",           defaultLang        );
+	parameters.put( "CurrentUser",           user               );
+	parameters.put( "RequestURL",            requestURL         );
+	parameters.put( "WebApplicationBaseURL", applicationBaseURL );
+	parameters.put( "ServletsBaseURL",       servletsBaseURL    );
+	parameters.put( "DefaultLang",           defaultLang        );
     
+    logger.info("buildXSLTParameters runned: "+(System.currentTimeMillis()-time)+" msec!");
     return parameters;
   }
 
