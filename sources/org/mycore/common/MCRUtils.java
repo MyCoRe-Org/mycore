@@ -41,9 +41,9 @@ public class MCRUtils
 private static DateFormat DE_DF =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
 private static DateFormat UK_DF =
-  DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
+  DateFormat.getDateInstance(DateFormat.SHORT,Locale.UK);
 private static DateFormat US_DF =
-  DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.US);
+  DateFormat.getDateInstance(DateFormat.SHORT,Locale.US);
 
 /**
  * This method check the language string base on RFC 1766 to the supported
