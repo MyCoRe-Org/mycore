@@ -1,4 +1,5 @@
 /**
+/**
  * $RCSfile: MCROAIQuery.java,v $
  * $Revision: 1.7 $ $Date: 2003/01/31 11:56:25 $
  *
