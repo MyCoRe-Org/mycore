@@ -437,7 +437,7 @@ public final synchronized void importElements(byte [] in)
    * @exception MCRException a MyCoRe error is occured
    * @exception org.jdom.JDOMException cant read the byte array as XML
    **/
-  protected final synchronized void importElements(org.jdom.Document jdom) 
+  public final synchronized void importElements(org.jdom.Document jdom) 
 	throws MCRException, org.jdom.JDOMException
 	{
 	org.jdom.Element root = jdom.getRootElement();
@@ -510,24 +510,43 @@ private final void resetStatus()
   	}
   }
 
+/**
+ * sorts the entries in the XMLContainer with ascending order.
+ * @see org.mycore.common.MCRSortable#sort(MCRXMLSortInterface)
+ * @throws MCRException if sorting fails
+ */
   public synchronized void sort(MCRXMLSortInterface sorter) throws MCRException{
 	/* do some sorting here */
 	sort(sorter,false);
   }
+  /**
+   * sorts the entries in the XMLContainer with given order.
+   * @param reversed true if descending order, fals otherwise
+   * @see org.mycore.common.MCRSortable#sort(MCRXMLSortInterface, boolean)
+   * @throws MCRException if sorting fails
+   */
   public synchronized void sort(MCRXMLSortInterface sorter, boolean reversed) throws MCRException{
 	/* do some sorting here */
 	
+	//pack myself into the sorter
 	sorter.add(this);
+	//make myself clear
 	this.host.clear();
 	this.mcr_id.clear();
 	this.rank.clear();
 	this.status.clear();
 	this.xml.clear();
+	//get the sorted results
 	Object[] result=sorter.sort(reversed);
+	//import every single MCRXMLContainer in the new order
 	for (int i=0;i<result.length;i++){
 		importElements((MCRXMLContainer)result[i]);
 	}
   }
+  /**
+   * makes a copy of MCRXMLContainer
+   * @see java.lang.Object#clone()
+   */
   public synchronized Object clone(){
   	MCRXMLContainer clone=new MCRXMLContainer();
   	clone.default_encoding=this.default_encoding.intern();

@@ -1,6 +1,8 @@
 package org.mycore.common.xml;
 
 import org.mycore.common.MCRException;
+import javax.servlet.ServletContext;
+import java.util.Hashtable;
 // JDOM imports
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -10,8 +12,11 @@ import org.jdom.transform.JDOMResult;
 // Xalan-J 2 imports
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
@@ -38,19 +43,31 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	private MCRXMLContainer finalCont;
 	private Object[] fContCont;
 	private static Logger logger=Logger.getLogger(MCRXMLSorter.class);
-	
+	private static ServletContext CONTEXT;
+	private static Hashtable StylePool;
+	private static TransformerFactory factory;
+	private static String StylePoolStr=MCRXMLSorter.class+".StylePool";
+	/**
+	 * initialize the Sorter with some Objects to sort
+	 * @param XMLCont XMLContainer to be sort
+	 */
 	public MCRXMLSorter (MCRXMLContainer XMLCont){
-		this.ObjectPool=new ArrayList();
-		this.orderList=new ArrayList();
-		this.sortKeys=new ArrayList();
-		prepareStylesheets();
+		init();
+		for (int i=0; i<XMLCont.size(); i++){
+			add(XMLCont.exportElementToContainer(i));
+		}
 	}
 	
 	public MCRXMLSorter (){
+		init();
+	}
+	
+	private void init(){
 		this.ObjectPool=new ArrayList();
 		this.orderList=new ArrayList();
 		this.sortKeys=new ArrayList();
 		prepareStylesheets();
+		if (factory==null) factory=TransformerFactory.newInstance();
 	}
 
 	/**
@@ -188,6 +205,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 				throw new MCRException("JDOMException while transforming document!",je);
 			}
 			finally{
+				//now we split the resulting XMLContainer into single ones
 				if (finalCont.size()==0) fContCont=null;
 				else{
 					fContCont=new Object[finalCont.size()];
@@ -204,12 +222,36 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	 * @see org.mycore.common.xml.MCRXMLSortInterface#clearObjects()
 	 */
 	public void clearObjects() {
+		ObjectPool.clear();
+		sorted=false;
 	}
 
 	/**
 	 * @see org.mycore.common.xml.MCRXMLSortInterface#clearSortKeys()
 	 */
 	public void clearSortKeys() {
+		sortKeys.clear();
+		orderList.clear();
+		sorted=false;
+	}
+	/**
+	 * @see org.mycore.common.xml.MCRXMLSortInterface#setServletContext(ServletContext)
+	 */
+	public void setServletContext(ServletContext context){
+		CONTEXT=context;
+		if (CONTEXT.getAttribute(StylePoolStr)!=null)
+		  StylePool=(Hashtable) CONTEXT.getAttribute(StylePoolStr);
+		else {
+			if (StylePool==null)
+				StylePool=new Hashtable();
+			CONTEXT.setAttribute(StylePoolStr,StylePool);
+		}
+	}
+	/**
+	 * @see org.mycore.common.xml.MCRXMLSortInterface#getServletContext()
+	 */
+	public ServletContext getServletContext(){
+		return CONTEXT;
 	}
 	
 	private void prepareStylesheets(){
@@ -221,7 +263,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 			  .append("<xsl:output\n method=\"xml\"/>\n\n")
 			  .append("<xsl:template match=\"/mcr_results\">\n\n")
 			  .append("<xsl:element name=\"mcr_results\">\n\n")
-			  .append("<xsl:for-each select=\"//*/mcr_result\">\n");
+			  .append("<xsl:for-each select=\"mcr_result\">\n");
 		  
 		stylesheetEnd=
 		  new StringBuffer("  <xsl:copy-of select=\".\"/>\n")
@@ -263,24 +305,54 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 		sorted=false;
 		reverse_sorted=false;
 	}
+	/**
+	 * 
+	 * @param sourceDoc XMLDocument to be sorted with a stylesheet
+	 * @return Document transformed XMLDocument
+	 * @throws IOException for an i/o eception
+	 * @throws TransformerException if stylesheet fails
+	 * @throws JDOMException if Document is somehow not well formed
+	 */
 	public Document transform(Document sourceDoc)
 	 throws IOException, TransformerException, JDOMException {
-		// Set up the XSLT stylesheet for use with Xalan-J 2
-		JDOMSource fromXML=new JDOMSource(sourceDoc);
 		JDOMResult toXML=new JDOMResult();
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		InputStream in = new ByteArrayInputStream(stylesheet.toString().getBytes());
-		Templates xslt = transformerFactory.newTemplates(
-			new StreamSource(in));
-		Transformer processor = xslt.newTransformer();
-		// Use I/O streams for source files
-		in.close();
- 		processor.transform(fromXML, toXML);
-		Document result=toXML.getDocument();
-		XMLOutputter xmlOutputter = new XMLOutputter();
-		//System.out.println(stylesheet.toString());
-		// xmlOutputter.output(result, System.out);
-		// Convert the resultant transformed document back to JDOM
-		return result;
+		Templates stylesheet=getCompiledStylesheet();
+		TransformerHandler handler = ((SAXTransformerFactory)factory).newTransformerHandler( stylesheet );
+		handler.setResult(toXML);
+		new org.jdom.output.SAXOutputter( handler ).output( sourceDoc );
+		return toXML.getDocument();
+	}
+	private Templates getCompiledStylesheet(){
+		if (StylePool!=null){
+			Templates stylesheet;
+			Hashtable orderList=(Hashtable)StylePool.get(this.orderList);
+			if (orderList==null){
+				orderList=new Hashtable();
+				StylePool.put(this.orderList, orderList);
+			}
+			stylesheet=(Templates)orderList.get(this.sortKeys);
+			if (stylesheet==null){
+				stylesheet=compileStylesheet();
+				orderList.put(this.sortKeys, stylesheet);
+				StylePool.put(this.orderList, orderList);
+			}
+			return stylesheet;
+		}
+		else return compileStylesheet();
+	}
+	private Templates compileStylesheet(){
+		buildSortingStylesheet();
+        Templates stylesheet;
+		try {
+			stylesheet =
+				factory.newTemplates(
+					new StreamSource(
+						new ByteArrayInputStream(
+							this.stylesheet.toString().getBytes())));
+		} catch (TransformerConfigurationException e) {
+        	String msg = "Error while compiling XSL stylesheet ";
+        	throw new MCRException( msg, e );
+		}
+        return stylesheet;
 	}
 }

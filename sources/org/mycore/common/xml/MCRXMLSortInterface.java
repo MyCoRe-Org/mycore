@@ -1,5 +1,9 @@
 package org.mycore.common.xml;
 
+import java.net.ServerSocket;
+
+import javax.servlet.ServletContext;
+
 import org.mycore.common.MCRException;
 	
 /**
@@ -100,5 +104,15 @@ public interface MCRXMLSortInterface {
 	 * @author Thomas Scheffler
 	 */
 	public void clearSortKeys();
+	/**
+	 * sets Servlet-Context
+	 * @param context ServletContext
+	 */
+	public void setServletContext(ServletContext context);
+	/**
+	 * gets Servlet-Context
+	 * @return ServletContext implementing ServletContext
+	 */
+	public ServletContext getServletContext();
 	
 }

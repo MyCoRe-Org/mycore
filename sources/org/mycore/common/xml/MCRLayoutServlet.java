@@ -35,6 +35,21 @@ import javax.xml.transform.stream.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 import org.mycore.common.*;
+// JDOM imports
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
+import org.jdom.transform.JDOMResult;
+// XSLT imports
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML 
@@ -45,15 +60,21 @@ import org.mycore.common.*;
  */
 public class MCRLayoutServlet extends HttpServlet 
 {
+  // The configuration
+  private MCRConfiguration conf = null;
+
   protected SAXTransformerFactory factory;  
   protected MCRCache stylesheetCache;
   protected MCRCache staticFileCache;
+  private static Logger logger=Logger.getLogger(MCRLayoutServlet.class);
 
   public void init()
   {
     // Get SAX transformer factory
     TransformerFactory tf = TransformerFactory.newInstance();
-      
+    conf = MCRConfiguration.instance();
+   	PropertyConfigurator.configure(conf.getLoggingProperties());
+  
     if( ! tf.getFeature( SAXTransformerFactory.FEATURE ) )
       throw new MCRConfigurationException
       ( "Could not load a SAXTransformerFactory for use with XSLT" );
@@ -84,6 +105,7 @@ public class MCRLayoutServlet extends HttpServlet
                      HttpServletResponse response ) 
     throws IOException, ServletException
   {
+  	logger.info("MCRLayoutServlet started...");
     Properties parameters = buildXSLParameters( request );
     
     org.jdom.Document xml;  
@@ -106,6 +128,7 @@ public class MCRLayoutServlet extends HttpServlet
       String styleDir     = "/WEB-INF/stylesheets/";
       
       File styleFile = getStylesheetFile( styleDir, styleName );
+      logger.info("MCRLayoutServlet: Stylesheet read!");
 
       if( styleFile == null ) 
         renderAsXML( xml, response );
@@ -114,9 +137,14 @@ public class MCRLayoutServlet extends HttpServlet
         Templates stylesheet = getCompiledStylesheet( factory, styleFile );
         TransformerHandler handler = getHandler( stylesheet );
         setXSLParameters( handler, parameters );
-        transform( xml, stylesheet, handler, response );
+        try {
+			transform( xml, stylesheet, handler, response );
+		} catch (IOException e) {
+			logger.error("IO Error while transforming Document",e);
+		}
       }
     }
+  	logger.info("MCRLayoutServlet finished!");
   }
 
  /**
@@ -309,6 +337,7 @@ public class MCRLayoutServlet extends HttpServlet
   {
     String path = getServletContext().getRealPath( dir + name );
     File file = new File( path );
+    logger.info("Stylesheet: "+file.getPath());
     
     if( ! file.exists() ) return null;
 
@@ -388,7 +417,9 @@ public class MCRLayoutServlet extends HttpServlet
     handler.setResult( new StreamResult( out ) );
     
     try
-    { new org.jdom.output.SAXOutputter( handler ).output( xml ); }
+    {  
+    	new org.jdom.output.SAXOutputter( handler ).output( xml );
+    }
     catch( org.jdom.JDOMException ex )
     {
       String msg = "Error while transforming XML using XSL stylesheet";

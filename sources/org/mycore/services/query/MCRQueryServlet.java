@@ -62,6 +62,11 @@ private String sortType = "";
 private static final String MCRSorterConfPrefix="MCR.XMLSorter";
 private static final String MCRSorterConfDelim="\"+lang+\"";
 private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
+private static final String SortParam="SortKey";
+private static final String InOrderParam="inOrder";
+private boolean customSort=false;
+private String SortKey;
+private boolean inOrder=true;
 private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
  /**
@@ -116,6 +121,15 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     String lang  = request.getParameter( "lang" );
     String view  = request.getParameter( "view");
     String ref   = request.getParameter( "ref");
+    SortKey = request.getParameter(SortParam);
+    if (request.getParameter(InOrderParam)!=null &&
+        request.getParameter(InOrderParam).toLowerCase().equals("false"))
+    	inOrder = false;
+    else inOrder = true;
+    	
+    if (SortKey != null) customSort = true;
+    else customSort = false;
+    logger.info(SortKey+":"+inOrder+"("+request.getParameter(InOrderParam)+")"+":"+customSort);
     int status=0;
 
     String att_mode  = (String) request.getAttribute( "mode"  );
@@ -279,6 +293,34 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
       	jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
     }
     
+    if (customSort && cachedFlag && type.equals(sortType)){
+    	// when I'm in here a ResultList exists and I have to resort it.
+    	MCRXMLContainer resarray = new MCRXMLContainer();
+    	try {
+			resarray.importElements(jdom);
+		} catch (JDOMException e) {
+			throw new MCRException("Error while RE-sorting JDOM.", e);
+		}
+		if (resarray.size()>0){
+			if (session == null)
+			  session = request.getSession(true);
+			if (session != null)
+			{
+				//let's do resorting.
+				jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
+				session.setAttribute( "CachedList", jdom );
+				session.setAttribute( "CachedType", type );
+			}
+			else {
+				logger.warn("session for setAttribute is null");
+			}
+		}
+		else {
+			logger.fatal("MCRQueryServlet: Error while RE-sorting JDOM:" +
+				"After import Containersize was ZERO!");
+		}
+    }
+    
     if ((view.equals("prev") || view.equals("next")) && (ref != null)){
     	/* change generate new query */
     	if (cachedFlag){
@@ -319,6 +361,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 				request.setAttribute( "XSL.Style", style );
 				RequestDispatcher rd = getServletContext()
 				                       .getNamedDispatcher( "MCRLayoutServlet" );
+				logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
         		rd.forward( request, response );
         	}
       	}
@@ -410,18 +453,26 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	} catch (ClassNotFoundException e) {
 		throw new MCRException(e.getMessage(),e);
 	}
+	if (sorter.getServletContext()==null)
+		sorter.setServletContext(getServletContext());
   	//MCRXMLSorter sorter=new MCRXMLSorter();
   	/*maybe here should be a propertie used
   	 * XPath Expression can be relative to mcr_result
   	 */
   	// sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
-  	int keynum=Integer.parseInt(conf.getString(MCRSorterConfPrefix+".keys.count","0"));
-  	boolean inorder=true;
-  	for (int key=1; key<=keynum; key++){
-  		// get XPATH Expression and hope it's good, if not exist sort for title
-  		inorder=conf.getBoolean(MCRSorterConfPrefix+".keys."+key+".inorder",true);
-		sorter.addSortKey(replString(conf.getString(MCRSorterConfPrefix+".keys."+key,"./*/*/*/title[lang('"+lang+"')]"),MCRSorterConfDelim,lang),inorder);
+  	if (customSort){
+  		logger.info("MCRQueryServlet: CustomSort enalbed. Sorting inorder: " +inOrder);
+  		sorter.addSortKey(replString(SortKey,MCRSorterConfDelim,lang), inOrder);
   	}
+  	else {
+  		int keynum=Integer.parseInt(conf.getString(MCRSorterConfPrefix+".keys.count","0"));
+  		boolean inorder=true;
+  		for (int key=1; key<=keynum; key++){
+  			// get XPATH Expression and hope it's good, if not exist sort for title
+  			inorder=conf.getBoolean(MCRSorterConfPrefix+".keys."+key+".inorder",true);
+			sorter.addSortKey(replString(conf.getString(MCRSorterConfPrefix+".keys."+key,"./*/*/*/title[lang('"+lang+"')]"),MCRSorterConfDelim,lang),inorder);
+  		}
+	}
   	xmlcont.sort(sorter);
   	return xmlcont;
   }
