@@ -279,6 +279,10 @@ public final String createSearchStringHref(String part, String tag,
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return ""; }
+  if (svalue[0]==null) { return ""; }
+  if ((!svalue[0].equals("locator"))&&(!svalue[0].equals("arc"))) {
+    return ""; }
+  if (svalue[1]==null) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
   String href = svalue[1];
   if (svalue[0].equals("locator")) {
@@ -289,9 +293,12 @@ public final String createSearchStringHref(String part, String tag,
         .append(tag.toUpperCase()).append("XXX")
         .append(subtag.toUpperCase()).append("XXX")
         .append(svalue[0].toUpperCase()).append("XXX ") 
-        .append(label.toUpperCase()).append(' ')
-        .append(svalue[2].toUpperCase()).append(' ')
-        .append(svalue[3].toUpperCase()).append(NL);
+        .append(label.toUpperCase()).append(' ');
+      if (!(svalue[2]==null)) {
+        sb.append(svalue[2].toUpperCase()).append(' '); }
+      if (!(svalue[3]==null)) {
+        sb.append(svalue[3].toUpperCase()); }
+      sb.append(NL);
       href = svalue[1].replace('_','X');
       }
     catch (Exception e) { }
@@ -301,15 +308,22 @@ public final String createSearchStringHref(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX");
   sb.append(svalue[0].toUpperCase()).append("XXX ");
   if (svalue[0].equals("locator")) {
-    sb.append("XXXHREFXXX").append(href.toUpperCase()).append("XXX ")
-      .append(svalue[2].toUpperCase()).append(' ')
-      .append(svalue[3].toUpperCase()).append(NL);
+    sb.append("XXXHREFXXX").append(href.toUpperCase()).append("XXX ");
+    if (!(svalue[2]==null)) {
+      sb.append(svalue[2].toUpperCase()).append(' '); }
+    if (!(svalue[3]==null)) {
+      sb.append(svalue[3].toUpperCase()); }
+    sb.append(NL);
     }
   else {
+    if (svalue[2]==null) { return ""; }
     sb.append("XXXFROMXXX").append(svalue[1].replace('_','X').toUpperCase())
       .append("XXX ");
     sb.append("XXXTOXXX").append(svalue[2].replace('_','X').toUpperCase())
-      .append("XXX ").append(NL);
+      .append("XXX ");
+    if (!(svalue[3]==null)) {
+      sb.append(svalue[3].toUpperCase()); }
+    sb.append(NL);
     }
   return sb.toString();
   }

@@ -121,6 +121,7 @@ public MCRMetaLink(String set_datapart, String set_subtag,
       from = new MCRObjectID(set_data1); to = new MCRObjectID(set_data2); }
     catch (Exception e) { 
       throw new MCRException("The from/to value is not a MCRObjectID."); }
+    if (set_data3==null) { title = ""; } else { title = set_data3.trim(); }
     linktype = set_linktype;
     return;
     }
@@ -129,7 +130,7 @@ public MCRMetaLink(String set_datapart, String set_subtag,
   }
 
 /**
- * This method set a reference with xlink:href and xlink:label. 
+ * This method set a reference with xlink:href, xlink:label and xlink:title. 
  *
  * @param set_href        the reference 
  * @param set_label       the new label string
@@ -148,13 +149,15 @@ public final void setReference(String set_href, String set_label,
   }
 
 /**
- * This method set a bidirectional link with xlink:from and xlink:to. 
+ * This method set a bidirectional link with xlink:from, xlink:to and 
+ * xlink:title. 
  *
  * @param set_from        the source MCRObjectID
  * @param set_to          the target MCRObjectID
+ * @param set_title       the new title string
  * @exception MCRException if the from or to element is not a MCRObjectId
  **/
-public final void setBiLink(String set_from, String set_to)
+public final void setBiLink(String set_from, String set_to, String set_title)
   throws MCRException
   {
   linktype = "arc";
@@ -163,6 +166,7 @@ public final void setBiLink(String set_from, String set_to)
   catch (Exception e) { 
     linktype = null;
     throw new MCRException("The from/to value is not a MCRObjectID."); }
+  if (set_title==null) { title = ""; } else { title = set_title.trim(); }
   }
 
 /**
@@ -304,6 +308,9 @@ public final void setFromDOM(Node dom_metadata_node)
       catch (Exception e) { 
         throw new MCRException("The from/to value is not a MCRObjectID."); }
       }
+    temp = ((Element)dom_metadata_node).getAttribute("xlink:title");
+    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
+      title = temp; }
     }
   }
 
@@ -331,7 +338,10 @@ public final String createXML() throws MCRException
     }
   else {
     sb.append(" xlink:from=\"").append(from.getId()).append("\" xlink:to=\"")
-      .append(to.getId()).append("\" "); }
+      .append(to.getId()).append("\" "); 
+    if ((title != null) && ((title = title.trim()).length() !=0)) {
+      sb.append("xlink:title=\"").append(title).append("\" "); }
+    }
   sb.append("/>").append(NL);
   return sb.toString();
   }
@@ -370,6 +380,8 @@ public final String createTS(Object mcr_query, String tag) throws MCRException
     svalue[1] = from.getId();
     sattrib[2] = "xlink:to";
     svalue[2] = to.getId();
+    sattrib[3] = "xlink:title";
+    svalue[3] = title;
     }
   StringBuffer sb = new StringBuffer(1024);
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringHref(datapart,
@@ -418,6 +430,7 @@ public final void debug()
   if (linktype.equals("arc")) {
     System.out.println("<xlink:from>"+from.getId()+"</xlink:from>");
     System.out.println("<xlink:to>"+to.getId()+"</xlink:to>");
+    System.out.println("<xlink:title>"+title+"</xlink:title>");
     }
   System.out.println("MCRMetaLink debug end"+NL);
   }
