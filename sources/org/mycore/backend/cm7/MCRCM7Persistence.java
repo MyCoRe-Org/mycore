@@ -538,7 +538,7 @@ private final String createTS(MCRTypedContent mcr_tc)
         sb.append("XXX")
           .append(ttt.createSearchStringText((String)mcr_tc
             .getValueElement(i+1)))
-          .append("XXX ");
+          .append("XXX");
         if (((String)mcr_tc.getValueElement(i+1)).toLowerCase()
           .equals("locator")) {
           sb.append("XXXHREFXXX")
@@ -555,7 +555,7 @@ private final String createTS(MCRTypedContent mcr_tc)
           sb.append("XXXFROMXXX")
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+2)))
-            .append("XXX ")
+            .append("XXX")
             .append("XXXTOXXX")
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+3)))
