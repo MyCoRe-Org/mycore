@@ -258,6 +258,7 @@ public class MCRNBN {
 	public static boolean exists(String urn) {
 		MCRArgumentChecker.ensureNotEmpty(urn, "urn");
 		if (urn.startsWith(prefix)) {
+			logger.info("Looking for NBN: " + urn.substring(urn.lastIndexOf("-") + 1));
 			HashMap map = (HashMap) manager.listURNs(urn.substring(urn.lastIndexOf("-") + 1));
 			if (!map.isEmpty()) {
 				return true;
