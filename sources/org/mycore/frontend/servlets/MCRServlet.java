@@ -41,10 +41,10 @@ import org.mycore.common.xml.MCRLayoutServlet;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been taken
- * from MilessServlet.java written by Frank Lützenkirchen.
+ * from MilessServlet.java written by Frank Lï¿½tzenkirchen.
  *
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -61,7 +61,9 @@ public class MCRServlet extends HttpServlet
   private final static boolean GET  = true;
   private final static boolean POST = false;
 
-  /** Initialisation of the servlet */
+  protected String ReqCharEncoding;
+
+	/** Initialisation of the servlet */
   public void init()
   {
     MCRConfiguration.instance().reload(true);
@@ -180,7 +182,12 @@ public class MCRServlet extends HttpServlet
       String lang = getStringParameter(job, "lang");
       if (lang.trim().length() != 0)
         session.setCurrentLanguage(lang.trim().toUpperCase());
-
+			// Try to set encoding of form values
+			ReqCharEncoding = req.getCharacterEncoding();
+			if (ReqCharEncoding == null) {
+				// Set default to UTF-8
+				ReqCharEncoding = "UTF-8";
+			}
       if( GETorPOST == GET ) doGet( job ); else doPost( job );
     }
 
@@ -288,10 +295,21 @@ protected void generateErrorPage(HttpServletRequest request, HttpServletResponse
   }
 
 protected String getProperty(HttpServletRequest request, String name) {
-	String value  = (String) request.getAttribute(name);
+	String value = (String) request.getAttribute(name);
 	//if Attribute not given try Parameter
-  	if (value == null || value.length()==0)
+	if (value == null || value.length() == 0)
 		value = request.getParameter(name);
-  	return value;
-  }
+	//fix encoding bug using solution of
+	//http://www.jguru.com/faq/view.jsp?EID=137281
+	try {
+		logger.debug("Char encoding: "+value);
+		value = new String(value.getBytes(), ReqCharEncoding);
+		logger.debug(" - to: "+value);
+	} catch (UnsupportedEncodingException e) {
+		//OK, we tried it!!
+		logger.warn("Failed to convert bytes to String using ChracterEncoding: "+ReqCharEncoding,e);
+	}
+	return value;
+}
+  
 }
