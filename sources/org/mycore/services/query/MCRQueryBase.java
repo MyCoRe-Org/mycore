@@ -93,16 +93,18 @@ public MCRXMLContainer getResultList( String query, String type,
     return result;
   this.maxresults = maxresults;
   // separate the query
+  logger.debug("QIn: The incomming query is "+query);
   flags = new ArrayList();
   subqueries = new ArrayList();
   andor = new ArrayList();
+  root = null;
   int i=0, j = query.length(), l, m, n, kon;
   while (i < j) {
     l = query.indexOf("/mycore",i);
     if (l == -1) { break; }
     m = query.indexOf("[",l);
     if (m == -1) { throwQueryEx(); }
-    root = query.substring(l,m);
+    if (root == null) { root = query.substring(l,m); }
     n = query.indexOf("]",m);
     if (n == -1) { throwQueryEx(); }
     kon = 1;
