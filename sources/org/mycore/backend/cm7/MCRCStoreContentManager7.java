@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.ifs;
+package mycore.cm7;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
