@@ -38,10 +38,8 @@ public interface MCRMetaSearchInterface {
  * @param root                  the query root
  * @param query                 the metadata queries
  * @param type                  the MCRObject type
- * @param maxresults            the maximum of results
  * @return the HashSet of MCRObjectID's
  */
-public HashSet getResultIDs(String root, String query, String type,
-  int maxresults);
+public HashSet getResultIDs(String root, String query, String type);
 
 }

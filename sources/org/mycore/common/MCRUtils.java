@@ -355,7 +355,7 @@ public class MCRUtils {
 	}
 	
 	/**
-	 * converts an Array of Objects to an Array of Strings
+	 * Converts an Array of Objects to an Array of Strings
 	 * using the toString() method.
 	 * @param objects Array of Objects to be converted
 	 * @return Array of Strings representing Objects
@@ -363,6 +363,20 @@ public class MCRUtils {
 	public static final String[] getStringArray(Object[] objects){
 		String[] returns=new String[objects.length];
 		for (int i=0;i<objects.length;i++)
+			returns[i]=objects[i].toString();
+		return returns;
+	}
+
+	/**
+	 * Converts an Array of Objects to an Array of Strings
+	 * using the toString() method.
+	 * @param objects Array of Objects to be converted
+	 * @param maxitem The maximum of items to convert
+	 * @return Array of Strings representing Objects
+	 */
+	public static final String[] getStringArray(Object[] objects, int maxitems){
+		String[] returns=new String[maxitems];
+		for (int i=0;i<maxitems;i++)
 			returns[i]=objects[i].toString();
 		return returns;
 	}
@@ -510,6 +524,26 @@ public class MCRUtils {
 		}
 		return merged;
 	}
+
+	/**
+	 * The method cut a HashSet for a maximum of items.
+	 *
+	 * @hashin The incoming HashSet
+	 * @maxitem The maximum number of items
+	 * @return the cutted HashSet
+	 **/
+	public static final HashSet cutHashSet(HashSet hashin, int maxitems)
+	{
+	MCRArgumentChecker.ensureNotNull(hashin,"Input HashSet");
+	if (maxitems < 1) { logger.warn("The maximum items are lower then 1."); }
+	HashSet hashout = new HashSet();
+	Object id;
+	int i = 0;
+	for (Iterator it = hashin.iterator(); it.hasNext() && (i < maxitems); i++) {
+		hashout.add((Object)it.next()); }
+	return hashout;
+	}
+
 	/**
 	 * Reads exactly <code>len</code> bytes from the input stream
 	 * into the byte array. This method reads repeatedly from the

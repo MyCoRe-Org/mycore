@@ -589,7 +589,9 @@ public final void add(
 		return clone;
 	}
 	/**
-	 * removes everything after the n-th Element if existing
+	 * Removes everything after the n-th Element if existing
+	 *
+	 * @param newsize the new size of the MCRXMLContainer
 	 */
 	public synchronized void cutDownTo(int newsize) {
 		if (newsize < size()) {

@@ -243,6 +243,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			}
 			searchfulltext = false;
 		}
+		result.cutDownTo(maxresults);
 		return result;
 	}
 

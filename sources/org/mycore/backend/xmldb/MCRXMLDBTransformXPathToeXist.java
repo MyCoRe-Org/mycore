@@ -81,12 +81,9 @@ public MCRXMLDBTransformXPathToeXist() {
 	 *            the metadata queries
 	 * @param type
 	 *            the MCRObject type
-	 * @param maxresults
-	 *            the maximum of results
 	 * @return a result list as MCRXMLContainer
 	 */
-	public final HashSet getResultIDs(String root, String query, String type,
-			int maxresults) {
+	public final HashSet getResultIDs(String root, String query, String type) {
 		// prepare the query over the rest of the metadata
 		HashSet idmeta = new HashSet();
 		SAXHandler handler = new SAXHandler();
@@ -117,8 +114,7 @@ public MCRXMLDBTransformXPathToeXist() {
 				org.jdom.Document doc;
 				ResourceIterator ri = resultset.getIterator();
 				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-				long start = System.currentTimeMillis();
-				for (int i = 0; (ri.hasMoreResources()) && (i < maxresults); i++) {
+				while (ri.hasMoreResources()) {
 					//doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
 					//OK we simply asume that all docs are well in exist
 					//and their ID is our ObjectID :o)
@@ -130,8 +126,6 @@ public MCRXMLDBTransformXPathToeXist() {
 									.append(tok.nextToken()).append('_')
 									.append(tok.nextToken()).toString()));
 				}
-				long end = System.currentTimeMillis();
-				logger.debug("converting Res2Doc took: " + (end - start));
 			} catch (Exception e) {
 				throw new MCRPersistenceException(e.getMessage(), e);
 			}

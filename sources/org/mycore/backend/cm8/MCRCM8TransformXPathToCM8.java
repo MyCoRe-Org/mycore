@@ -78,8 +78,7 @@ public MCRCM8TransformXPathToCM8()
  * @param maxresults            the maximum of results
  * @return                      a result list as MCRXMLContainer
  **/
-public final HashSet getResultIDs(String root, String query, String type, 
-  int maxresults)
+public final HashSet getResultIDs(String root, String query, String type) 
   {
   // prepare the query over the rest of the metadata
   HashSet idmeta = new HashSet();
@@ -88,6 +87,7 @@ public final HashSet getResultIDs(String root, String query, String type,
   // set the default
   String newquery = "";
   if ((root==null) && (query.length()==0)) { newquery = DEFAULT_QUERY; }
+  int maxresults = config.getInt("MCR.query_max_results",100);
 
   // read prefix from configuration
   String sb = new String("MCR.persistence_cm8_" + type.toLowerCase());

@@ -116,7 +116,7 @@ protected final MCRXMLContainer startQuery(String type) {
     logger.debug("Metadate query : " + metaquery);
     }
   if (hasmeta) {
-    idmeta = msif.getResultIDs(root,metaquery,type,maxresults); }
+    idmeta = msif.getResultIDs(root,metaquery,type); }
 
   // merge the results
   HashSet myresult = null;
@@ -124,6 +124,9 @@ protected final MCRXMLContainer startQuery(String type) {
   if (!hasmeta) { myresult = idts; }
   if ((hasts) && (hasmeta)) {
     myresult = MCRUtils.mergeHashSets(idts, idmeta, MCRUtils.COMMAND_AND); }
+  logger.debug("Number of items in HashSet befor cutting "+Integer.toString(myresult.size()));
+  myresult = MCRUtils.cutHashSet(myresult,maxresults);
+  logger.debug("Number of items in HashSet after cutting "+Integer.toString(myresult.size()));
 
   // put the XML files in the result container
   result = createResultContainer(myresult);
