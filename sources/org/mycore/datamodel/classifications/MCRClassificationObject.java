@@ -25,6 +25,8 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
+
+import org.jdom.Namespace;
 import org.mycore.common.*;
 
 /**
@@ -283,7 +285,7 @@ public abstract class MCRClassificationObject
     {
     if ((index<0) || (index>getSize())) return null;
     org.jdom.Element elm = new org.jdom.Element("label");
-    elm.setAttribute("xml:lang",getLang(index));
+    elm.setAttribute("lang",getLang(index),Namespace.XML_NAMESPACE);
     elm.setAttribute("text",getText(index));
     elm.setAttribute("description",getDescription(index));
     return elm;

@@ -25,6 +25,8 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.*;
+
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -269,7 +271,7 @@ public final org.jdom.Element createXML() throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRObjectMetadata : The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("metadata");
-  elm.setAttribute("xml:lang",default_lang);
+  elm.setAttribute("lang",default_lang,Namespace.XML_NAMESPACE);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
     elm.addContent(((MCRMetaElement)meta_list.get(i)).createXML(herited_xml)); }

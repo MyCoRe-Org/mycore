@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
 /**
@@ -185,7 +186,7 @@ public final org.jdom.Element createXML() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
-  elm.setAttribute("xml:lang",lang);
+  elm.setAttribute("lang",lang,Namespace.XML_NAMESPACE);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
