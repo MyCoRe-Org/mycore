@@ -262,35 +262,46 @@ public final void deleteMetadataObject(String type, String ID)
     String dername = (String)derifiles.get(i);
     logger.debug("Check the derivate file "+dername);
     if (isDerivateOfObject(type,dername,ID)) {
-      logger.debug("Delete the derivate "+dername);
-      fn = getDirectoryPath(type)+SLASH+dername;
-      try {
-        File fi = new File(fn);
-        if (fi.isFile() && fi.canWrite()) {
-          fi.delete(); logger.debug("File "+fn+" removed."); }
-        else {
-          logger.error("Can't remove file "+fn); }
-        }
-      catch (Exception ex) {
-        logger.error("Can't remove file "+fn); }
-      try {
-        File fi = new File(fn.substring(0,fn.length()-4));
-        if (fi.isDirectory() && fi.canWrite()) {
-          File [] fl = fi.listFiles();
-          for (int j=0;j<fl.length;j++) {
-            String na = fl[j].getName();
-            fl[j].delete(); logger.debug("File "+na+" removed.");
-            }
-          fi.delete();
-          logger.debug("Directory "+fn.substring(0,fn.length()-4)+" removed.");
-          }
-        else {
-          logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
-        }
-      catch (Exception ex) {
-        logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
+      deleteDerivateObject(type,ID,dername);
       }
     }
+  }
+
+/**
+ * The method removes a derivate object from the workflow.
+ *
+ * @param type the MCRObjectID type of the metadata object
+ * @param ID the ID of the metadata object
+ **/
+public final void deleteDerivateObject(String type, String ID, String dername)
+  {
+  logger.debug("Delete the derivate "+dername);
+  String fn = getDirectoryPath(type)+SLASH+dername;
+  try {
+    File fi = new File(fn);
+    if (fi.isFile() && fi.canWrite()) {
+      fi.delete(); logger.debug("File "+fn+" removed."); }
+    else {
+      logger.error("Can't remove file "+fn); }
+    }
+  catch (Exception ex) {
+    logger.error("Can't remove file "+fn); }
+  try {
+    File fi = new File(fn.substring(0,fn.length()-4));
+    if (fi.isDirectory() && fi.canWrite()) {
+      File [] fl = fi.listFiles();
+      for (int j=0;j<fl.length;j++) {
+        String na = fl[j].getName();
+        fl[j].delete(); logger.debug("File "+na+" removed.");
+        }
+      fi.delete();
+      logger.debug("Directory "+fn.substring(0,fn.length()-4)+" removed.");
+      }
+    else {
+      logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
+    }
+  catch (Exception ex) {
+    logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
   }
 
 /**
