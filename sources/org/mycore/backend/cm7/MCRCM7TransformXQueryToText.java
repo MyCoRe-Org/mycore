@@ -387,8 +387,14 @@ private final String traceOneCondition(String cond)
   date = MCRUtils.covertDateToGregorianCalendar(value[0]);
   if (date != null) {
     isdate = true;
-    number = (long)(date.get(Calendar.YEAR)*10000 +
-      date.get(Calendar.MONTH)*100 + date.get(Calendar.DAY_OF_MONTH));
+    if (date.get(Calendar.ERA) == GregorianCalendar.AD) {
+      number = (4000+date.get(Calendar.YEAR))*10000 +
+                     date.get(Calendar.MONTH)*100 +
+                     date.get(Calendar.DAY_OF_MONTH); }
+    else {
+      number = (4000-date.get(Calendar.YEAR))*10000 +
+                     date.get(Calendar.MONTH)*100 +
+                     date.get(Calendar.DAY_OF_MONTH); }
     }
   else { isdate = false; }
   // is value[0] a number
