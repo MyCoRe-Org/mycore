@@ -61,10 +61,10 @@ import org.mycore.common.MCRConfiguration;
  * 
  * // Get the template: myStylesheet could be a String (i.e. a filename),
  * // a File or a StreamSource
- * Templates templates = getStylesheet(myStylesheet);
+ * Templates templates = transformation.getStylesheet(myStylesheet);
  *
  * // Next, you are in need of a TransformerHandler:
- * TransformerHandler th = getTransformerHandler(templates);
+ * TransformerHandler th = transformation.getTransformerHandler(templates);
  * 
  * // Now you are able to set some properties (if you want!):
  * Properties parameters = new Properties();
@@ -73,7 +73,7 @@ import org.mycore.common.MCRConfiguration;
  * 
  * // Finally, you need an OutputStream and might get at work:
  * OutputStream out = response.getOutputStream();
- * transform(jdom, th, out);
+ * transformation.transform(jdom, th, out);
  * 
  * // You might also want to transform into something different,
  * // perhaps a ZIP-File:
