@@ -1,0 +1,41 @@
+%
+%
+\subsection{Das Speichermodell für die Multimediadaten (IFS)}
+%
+%
+Im bisherigen Verlauf dieses Kapitels wurden nur die beschreibenden Daten des multimedialen Objektes erläutert. Dieser Abschnitt beschäftigt sich damit, wie die eigentlichen Objekte dem Gesamtsystem hinzugefügt werden können. \\[2ex]
+Im MyCoRe Projekt wurde zur Ablage der digitalen Objekte das Konzept des {\bf IFS} entwickelt. Hier ist es möglich, über spezielle Konfigurationen festzulegen, in welchen Store die einzelnen Files gespeichert werden sollen. Eine genaue Beschreibung der Möglichkeiten finden Sie im Kapitel 4. \\[2ex]
+Das Laden von Objekten erfolgt mittels eines Metadaten-Files, welches alle Informationen über das/die zu speichernden Files und Ihre Beziehung zu den Metadaten enthält. Die zu speichernden multimedialen Objekte werden im weiteren als \mcridentifier{Derivate}, also Abkömmlinge, bezeichnet, da ein Objekt in mehreren Formen, z. B. Grafikformaten, auftreten kann. Die Struktur der XML-Datei für Derivate ist fest vorgegeben, alle Felder, die nutzerseitig geändert werden könne, sind unten beschrieben.\\[2ex]
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}[caption=XML-Syntax eines Derivate-Objektes,label=lst:xml_syntax_derivateobjekt]
+ <?xml version="1.0" cncoding="iso-8859" ?>
+ <mycorederivate
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="....xsd"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  ID="..."
+  label="..."
+  >
+  <derivate>
+   <linkmetas class="MCRMetaLinkID">
+    <linkmeta xlink:type="locator" xlink:href="..." />
+   </linkmetas>
+   <internals class="MCRMetaIFS">
+    <internal
+     sourcepath="..."
+     maindoc="..." 
+     />
+   </internals>
+  </derivate>
+  <service>
+   ...
+  </service>
+ </mycoreobject>
+\end{lstlisting}
+
+Für \mcridentifier{xsi:noNamespaceSchemaLocation} ist das entsprechende XMLSchema-File anzugeben (z. B. \mcrfile{Derivate.xsd})\\[2ex]
+Die \mcridentifier{ID} ist die eindeutige MCRObjectID.\\[2ex]
+Der \mcridentifier{label} ist ein kurzer Text-String, der bei administrativen Arbeiten an der Datenbasis das Identifizieren einzelner Datensätze erleichtern soll. Er kann maximal 256 Zeichen lang sein.\\[2ex]
+Die Referenz in \mcridentifier{linkmeta} ist die MCRObjectID des Metadatensatzes, an den das/die Objekte angehängt werden sollen.\\[2ex]
+Das Attribut \mcridentifier{sourcepath} enthält die Pfadangabe zu einer Datei oder zu einem Verzeichnis, welches als Quelle dienen soll. Aus diesen Files kann nun ein File ausgewählt werden, welches den Einstiegspunkt z. B bei HTML-Seiten darstellen soll. Bei einzelnen Bildern ist hier noch einmal der Filename anzugeben. Ist nichts angegeben, so wird versucht, Dateien wie index.html usw. zu finden.\\[2ex]
+
