@@ -66,6 +66,7 @@ public class MCROAIQueryService implements MCROAIQuery {
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
 	private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme"; // the classification id which serves as scheme for the OAI set structure
     private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier of the repository
+    private static final String STR_OAI_QUERYTYPE = "MCR.oai.querytype" ; // search query type
 
 	private MCRConfiguration config;
 	
@@ -314,14 +315,14 @@ public class MCROAIQueryService implements MCROAIQuery {
 	    return classification;
 	}
 
-	private Collection doQuery(String query) {
+	private Collection doQuery(String query, String querytype) {
 		List results = new ArrayList();
 		
 	    try {
 	    	MCRXMLContainer qra=new MCRXMLContainer();
 	    	synchronized(qra){
 	    		collector.collectQueryResults("local", 
-	    				"document", query, qra);
+	    				querytype, query, qra);
 	    		qra.wait();
 	    	}
 	    	
@@ -345,6 +346,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 		List queries = new ArrayList();
 		List restrictionQueries = new ArrayList();
         String repositoryId = null;
+        String querytype = null;
         
 		try {
 			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
@@ -366,6 +368,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 		try {
 			classification = getClassifications(instance);
         	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
+        	querytype = config.getString(STR_OAI_QUERYTYPE + "." + instance) ;
 	    } catch (MCRConfigurationException mcrx) {
 	    	return list;
 	    }
@@ -418,12 +421,12 @@ public class MCROAIQueryService implements MCROAIQuery {
 		Set results = new HashSet();
 		for (int i = 0; i < queries.size(); i++) {
 			String query = (String) queries.get(i);
-			results.addAll(doQuery(query));
+			results.addAll(doQuery(query,querytype));
     	}
 
 		for (int i = 0; i < restrictionQueries.size(); i++) {
 			String query = (String) restrictionQueries.get(i);
-			results.retainAll(doQuery(query));
+			results.retainAll(doQuery(query,querytype));
 		}
 		
 		Iterator iterator = results.iterator();
