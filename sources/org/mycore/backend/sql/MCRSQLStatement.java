@@ -24,7 +24,6 @@
 
 package org.mycore.backend.sql;
 
-import java.sql.*;
 import java.util.*;
 import org.mycore.common.*;
 
@@ -193,6 +192,6 @@ public class MCRSQLStatement
   { return "DELETE FROM " + toRowSelector(); }
 
   public final String toCountStatement()
-  { return "SELECT COUNT( DISTINCT FROM ) AS NUMBER FROM " + toRowSelector(); }
+  { return "SELECT COUNT( DISTINCT MCRFROM ) AS NUMBER FROM " + toRowSelector(); }
   
 }
