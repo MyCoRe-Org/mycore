@@ -238,6 +238,7 @@ public final void createInDatastore() throws MCRPersistenceException
   if (getDerivate().getInternals() != null) {
     File f = new File(getDerivate().getInternals().getSourcePath());
     if ((!f.isDirectory()) && (!f.isFile())) {
+      mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
       throw new MCRPersistenceException("The File or Directory on "+
         getDerivate().getInternals().getSourcePath()+" was not found."); }
     try {
