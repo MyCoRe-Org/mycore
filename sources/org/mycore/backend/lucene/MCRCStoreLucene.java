@@ -252,7 +252,6 @@ public class MCRCStoreLucene
 		Document doc = null;
 		MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
 		source = new MCRContentInputStream(isc.getNewInputStream());
-		InputStream sourceStream = isc.getNewInputStream();
 		String returns = super.doStoreContent(file, source);
 		if (returns == null || returns.length() == 0)
 			throw new MCRPersistenceException(
@@ -318,8 +317,8 @@ public class MCRCStoreLucene
 			//in.close();fin.close();tmp.delete();
 			logger.debug("returning document");
 			return returns;
-		} else
-			return null;
+		}
+		return null;
 	}
 
 	private final boolean containsExclusiveClause(BooleanQuery query) {
