@@ -525,7 +525,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         TimeZone tz = timeFormat.getTimeZone();
         // compute milliseconds to hours...
-        int offset = Math.abs(tz.getRawOffset() / 3600000);
+        int offset = Math.abs(tz.getRawOffset() / 3600000) * -1;
 		calendar.add(Calendar.HOUR, offset);
 		calendar.add(Calendar.HOUR, timeout);
         Date timeoutDate = calendar.getTime();
