@@ -71,6 +71,9 @@ private MCRUserStore mcrUserStore;
 /** The one and only instance of this class */
 private static MCRUserMgr theInstance = null;
 
+/** The superuser from the property */
+private static String root = null;
+
 /**
  * private constructor to create the singleton instance.
  */
@@ -80,6 +83,7 @@ private MCRUserMgr() throws MCRException
   config = MCRConfiguration.instance();
   String userStoreName =  config.getString("MCR.userstore_class_name");
   PropertyConfigurator.configure(config.getLoggingProperties());
+  root = config.getString("MCR.users_superuser_username","mcradmin");
   try {
     mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance(); }
   catch (Exception e) {
@@ -125,6 +129,7 @@ public final void checkConsistency(MCRSession session) throws MCRException
   // However, since the primary group of the user is added automatically to the
   // group list in MCRUser, we have to check if this group has the
   // user as member.
+  logger.info("Consistency check is started.");
   ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
   for (int i=0; i<allUserIDs.size(); i++) {
     MCRUser currentUser = retrieveUser((String)allUserIDs.get(i), true);
@@ -223,28 +228,41 @@ public final synchronized void initializeGroup(MCRGroup group,String creator)
   throws MCRException
   {
   if (locked) {
-    throw new MCRException("The user component is locked. At the moment write access is denied."); }
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
+  setLock(true);
+  if (group == null) {
+    setLock(false);
+    throw new MCRException("The group is null."); }
+  if ((creator==null) || ((creator = creator.trim()).length() ==0)) {
+    setLock(false);
+    throw new MCRException("The creator is null or empty."); }
+  // Check if the user validation
+  if (!group.isValid()) {
+    setLock(false);
+    throw new MCRException("The group data are not valid."); }
   // Check if the group already exists. If so, throw an exception
-  if (!mcrUserStore.existsGroup(group.getID())) {
-    try {
-      // Set the values from Manager side 
-      group.setCreationDate();
-      group.setModifiedDate();
-      group.setCreator(creator);
-      // At first create the group. The group must be created before updating the groups
-      // this group is a member of because the existence of the group will be checked 
-      // while updating the groups.
-      mcrUserStore.createGroup(group);
-      }
-    catch (Exception ex) {
-      // Since something went wrong we delete the previously created group. We do this
-      // using this.deleteGroup() in order to ensure that already updated groups will
-      // be resetted to the original state as well.
-      throw new MCRException("Can't initalize MCRGroup.",ex);
-      }
+  if (mcrUserStore.existsGroup(group.getID())) {
+    setLock(false);
+    throw new MCRException("The group '"+group.getID()+"' already exists!"); }
+  try {
+    // Set the values from Manager side 
+    group.setCreationDate();
+    group.setModifiedDate();
+    group.setCreator(creator);
+    // At first create the group. The group must be created before updating the groups
+    // this group is a member of because the existence of the group will be checked 
+    // while updating the groups.
+    mcrUserStore.createGroup(group);
+    setLock(false);
     }
-  else
-    throw new MCRException("The group '"+group.getID()+"' already exists!");
+  catch (Exception ex) {
+    // Since something went wrong we delete the previously created group. We do this
+    // using this.deleteGroup() in order to ensure that already updated groups will
+    // be resetted to the original state as well.
+    setLock(false);
+    throw new MCRException("Can't initalize MCRGroup.",ex);
+    }
   }
 
 /**
@@ -258,11 +276,20 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
   throws MCRException
   {
   if (locked) {
-    throw new MCRException("The user component is locked. At the moment write access is denied."); }
+    throw new MCRException(
+     "The user component is locked. At the moment write access is denied."); }
   // For this action you must have list rights.
   MCRUser admin = retrieveUser(session.getCurrentUserID());
   if (!admin.hasPrivilege("create group")) {
     throw new MCRException("The session has no privilig to create group!"); }
+  // check the group to null.
+  if (group == null) {
+    setLock(false);
+    throw new MCRException("The group is null."); }
+  // Check if the user validation
+  if (!group.isValid()) {
+    setLock(false);
+    throw new MCRException("The group data are not valid."); }
   // Check if the group already exists. If so, throw an exception
   if (mcrUserStore.existsGroup(group.getID())) {
     throw new MCRException("The group '"+group.getID()+"' already exists!"); }
@@ -289,27 +316,15 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
         +(String)admGroupIDs.get(j)); 
       }
     }
-  // now we check the member groups and users if they exists, else we get an
-  // MCRException. Also this group can not be a member of himself.
-  ArrayList mbrUserIDs = group.getMemberUserIDs();
-  for (int j=0; j<mbrUserIDs.size(); j++) {
-    if (!mcrUserStore.existsUser((String)mbrUserIDs.get(j))) {
-      throw new MCRException("MCRUserMgr.createGroup(): unknown member userID: "
-        +(String)mbrUserIDs.get(j)); 
-      }
-    }
-  ArrayList mbrGroupIDs = group.getMemberGroupIDs();
-  for (int j=0; j<mbrGroupIDs.size(); j++) {
-    if (group.getID().equals((String)mbrGroupIDs.get(j))) {
-      throw new MCRException("MCRUserMgr.createGroup(): the group '"+
-        group.getID()+ "' cannot contain itself."); }
-    if (!mcrUserStore.existsGroup((String)mbrGroupIDs.get(j))) {
-      throw new MCRException("MCRUserMgr.createGroup(): unknown member groupID: "
-        +(String)admGroupIDs.get(j)); 
-      }
-    }
+  // Clear the member user and group array list.
+  group.cleanMemberUserID();
+  group.cleanMemberGroupID();
   ArrayList groupIDs = group.getGroupIDs();
   for (int j=0; j<groupIDs.size(); j++) {
+    if (!mcrUserStore.existsGroup((String)groupIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): unknown groupID: "
+        +(String)groupIDs.get(j)); 
+      }
     MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
     if (!linkedGroup.getAdminUserIDs().contains(session.getCurrentUserID())) {
       throw new MCRException("MCRUserMgr.createGroup(): cant set member to "+
@@ -319,40 +334,11 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
     }
   // We now check if the privileges set for the group really exist at all.
   checkPrivsForGroup(group);
-  // We now check if the group implicitly would be a member of itself. 
-  // Attention: it is important to do this *before* the following update of 
-  // the groups this group will be a member of!
-  if (MCRGroup.isImplicitMemberOf(group, group.getID())) {
-    throw new MCRException("Create failed: the group '"+group.getID()
-      +"' implicitly is a member of itself. Check the affiliations!");
-    }
   try {
     // Just create the group. The group must be created before updating the 
     // groups this group is a member of because the existence of the group will
     // be checked  while updating the groups.
     mcrUserStore.createGroup(group);
-    // We now check whether this group already has members (users or groups) 
-    // and if so, remove them from the cache such that they will have to be 
-    // retrieved from the datastore again. In addition we test if the members 
-    // exist at all...
-    for (int i=0; i<mbrUserIDs.size(); i++) {
-      userCache.remove((String)mbrUserIDs.get(i)); }
-    for (int i=0; i<mbrGroupIDs.size(); i++) {
-      groupCache.remove((String)mbrGroupIDs.get(i)); }
-    // now we set the groupIDs of the users they are connected with mbrUserIDs
-    for (int j=0; j<mbrUserIDs.size(); j++) {
-      MCRUser otheruser = retrieveUser((String)mbrUserIDs.get(j));
-      otheruser.addGroupID((String)mbrUserIDs.get(j));
-      otheruser.setModifiedDate();
-      mcrUserStore.updateUser(otheruser);
-      }
-    // now we set the groupIDs of the groups they are connected with mbrGroupIDs
-    for (int j=0; j<mbrGroupIDs.size(); j++) {
-      MCRGroup othergroup = retrieveGroup((String)mbrGroupIDs.get(j));
-      othergroup.addGroupID((String)mbrGroupIDs.get(j));
-      othergroup.setModifiedDate();
-      mcrUserStore.updateGroup(othergroup);
-      }
     // We finally update the groups this group will be a member of
     for (int i=0; i<groupIDs.size(); i++) {
       MCRGroup membergroup = retrieveGroup((String)groupIDs.get(i), true);
@@ -365,7 +351,7 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
     // Since something went wrong we delete the previously created group. We do this
     // using this.deleteGroup() in order to ensure that already updated groups will
     // be resetted to the original state as well.
-    try { mcrUserStore.deleteGroup(group.getID()); }
+    try { deleteGroup(session,group.getID()); }
     catch (MCRException e) { }
     throw new MCRException("Can't create MCRGroup.",ex);
     }
@@ -380,39 +366,43 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
 public final synchronized void initializeUser(MCRUser user,String creator) 
   throws MCRException
   { 
-  if (locked)
-    throw new MCRException("The user component is locked. At the moment write access is denied.");
+  if (locked) {
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
+  setLock(true);
+  if (user == null) {
+    setLock(false);
+    throw new MCRException("The user is null."); }
+  if ((creator==null) || ((creator = creator.trim()).length() ==0)) {
+    setLock(false);
+    throw new MCRException("The crator is null or empty."); }
+  // Check if the user validation
+  if (!user.isValid()) {
+    setLock(false);
+    throw new MCRException("The user data are not valid."); }
   // Check if the user already exists. If so, throw an exception
-  if (!mcrUserStore.existsUser(user.getNumID(), user.getID())) {
-    try {
-      // Set the values from Manager side 
-      user.setCreationDate();
-      user.setModifiedDate();
-      user.setCreator(creator);
-      // At first create the user. The user must be created before updating the groups
-      // because the existence of the user will be checked while updating the groups.
-      mcrUserStore.createUser(user);
-      // now update the groups
-      ArrayList groupIDs = user.getGroupIDs();
-      if (groupIDs != null) { 
-        // well, actually this cannot be since there is always the primary group...
-        for (int i=0; i<groupIDs.size(); i++) {
-          MCRGroup currentGroup = this.retrieveGroup((String)groupIDs.get(i), true);
-          currentGroup.addMemberUserID(user.getID());
-          }
-        }
-      }
-    catch (MCRException ex)
-      {
-      // Since something went wrong we delete the previously created user. We do this
-      // using this.deleteUser() in order to ensure that already updated groups will
-      // be resetted to the original state as well.
-      deleteUser(new MCRSession(),user.getID());
-      throw new MCRException("Can't create user.",ex);
-      }
+  if (mcrUserStore.existsUser(user.getNumID(), user.getID())) {
+    setLock(false);
+    throw new MCRException("The user '"+user.getID()+"' or numerical ID '" +
+      user.getNumID()+ "' already exists!"); }
+  try {
+    // Set the values from Manager side 
+    user.setCreationDate();
+    user.setModifiedDate();
+    user.setCreator(creator);
+    // At first create the user. The user must be created before updating the groups
+    // because the existence of the user will be checked while updating the groups.
+    mcrUserStore.createUser(user);
+    setLock(false);
     }
-  else
-    throw new MCRException("The user '"+user.getID()+"' or numerical ID '" +user.getNumID()+ "' already exists!");
+  catch (MCRException ex)
+    {
+    // Since something went wrong we delete the previously created user. We do this
+    // using this.deleteUser() in order to ensure that already updated groups will
+    // be resetted to the original state as well.
+    setLock(false);
+    throw new MCRException("Can't initialize user.",ex);
+    }
   }
 
 /**
@@ -420,45 +410,69 @@ public final synchronized void initializeUser(MCRUser user,String creator)
  * @param session the MCRSession object
  * @param user   The user object which will be created
  */
-public final synchronized void createUser(MCRSession session,MCRUser user) throws MCRException
+public final synchronized void createUser(MCRSession session,MCRUser user) 
+  throws MCRException
   {
-  if (locked)
-    throw new MCRException("The user component is locked. At the moment write access is denied.");
+  if (locked) {
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
   // For this action you must have list rights.
   MCRUser admin = retrieveUser(session.getCurrentUserID());
   if (!admin.hasPrivilege("create user")) {
     throw new MCRException("The session has no privilig to create user!"); }
+  // Check if the user is not null
+  if (user == null) {
+    throw new MCRException("The user is null."); }
+  // Check if the user validation
+  if (!user.isValid()) {
+    throw new MCRException("The user data are not valid."); }
   // Check if the user already exists. If so, throw an exception
-  if (!mcrUserStore.existsUser(user.getNumID(), user.getID())) {
-    try {
-      // Set the values from Manager side 
-      user.setCreationDate();
-      user.setModifiedDate();
-      user.setCreator(session.getCurrentUserID());
-      // At first create the user. The user must be created before updating the groups
-      // because the existence of the user will be checked while updating the groups.
-      mcrUserStore.createUser(user);
-      // now update the groups
-      ArrayList groupIDs = user.getGroupIDs();
-      if (groupIDs != null) { 
-        // well, actually this cannot be since there is always the primary group...
-        for (int i=0; i<groupIDs.size(); i++) {
-          MCRGroup currentGroup = this.retrieveGroup((String)groupIDs.get(i), true);
-          currentGroup.addMemberUserID(user.getID());
-          }
-        }
-      }
-    catch (MCRException ex)
-      {
-      // Since something went wrong we delete the previously created user. We do this
-      // using this.deleteUser() in order to ensure that already updated groups will
-      // be resetted to the original state as well.
-      try { deleteUser(new MCRSession(),user.getID()); } catch (Exception e) { }
-      throw new MCRException("Can't create user.",ex);
+  if (mcrUserStore.existsUser(user.getNumID(), user.getID())) {
+    throw new MCRException("The user '"+user.getID()+"' or numerical ID '" +
+      user.getNumID()+ "' already exists!"); }
+  // check the groupIDs values
+  ArrayList groupIDs = user.getGroupIDs();
+  for (int j=0; j<groupIDs.size(); j++) {
+    if (!mcrUserStore.existsGroup((String)groupIDs.get(j))) {
+      throw new MCRException("The user '"+user.getID()+"' has a false GroupID."); }
+    MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
+    if (!linkedGroup.getAdminUserIDs().contains(session.getCurrentUserID())) {
+      throw new MCRException("MCRUserMgr.createGroup(): cant set member to "+
+        " groupIDs: "+(String)groupIDs.get(j)+" because this session is not an"+
+        "adminMember."); 
       }
     }
-  else
-    throw new MCRException("The user '"+user.getID()+"' or numerical ID '" +user.getNumID()+ "' already exists!");
+  try {
+    // Set the values from Manager side 
+    user.setCreationDate();
+    user.setModifiedDate();
+    user.setCreator(session.getCurrentUserID());
+    // At first create the user. The user must be created before updating the groups
+    // because the existence of the user will be checked while updating the groups.
+    mcrUserStore.createUser(user);
+    // now we update the primary group
+    if (!mcrUserStore.existsGroup(user.getPrimaryGroupID())) {
+      throw new MCRException("The user '"+user.getID()+"' has a false primaryGroup."); }
+    MCRGroup primGroup = retrieveGroup(user.getPrimaryGroupID());
+    primGroup.addMemberUserID(user.getID());
+    groupCache.remove(primGroup.getID());
+    mcrUserStore.updateGroup(primGroup);
+    // now update the other groups
+    for (int i=0; i<groupIDs.size(); i++) {
+      MCRGroup otherGroup = retrieveGroup((String)groupIDs.get(i), true);
+      otherGroup.addMemberUserID(user.getID());
+      groupCache.remove(otherGroup.getID());
+      mcrUserStore.updateGroup(otherGroup);
+      }
+    }
+  catch (MCRException ex)
+    {
+    // Since something went wrong we delete the previously created user. We do this
+    // using this.deleteUser() in order to ensure that already updated groups will
+    // be resetted to the original state as well.
+    try { deleteUser(session,user.getID()); } catch (Exception e) { }
+    throw new MCRException("Can't create user.",ex);
+    }
   }
 
 /**
@@ -488,48 +502,46 @@ public final synchronized void deleteGroup(MCRSession session, String groupID)
       " are users with '"+ groupID+"' as their primary group. First update or"+
       " delete the users!");
     }
-  // It is sufficient to remove the members (users and groups, respectively) 
-  // from  the caches. The next time they will be used they will be rebuild 
-  // from the datastore and hence no  longer have this group in their group 
-  // lists.
-  MCRGroup delGroup = retrieveGroup(groupID);
-  for (int i=0; i<delGroup.getMemberGroupIDs().size(); i++) {
-    groupCache.remove((String)delGroup.getMemberGroupIDs().get(i));
-    MCRGroup ugroup = retrieveGroup((String)delGroup.getMemberGroupIDs().get(i));
-    ugroup.removeGroupID(groupID);
-    mcrUserStore.updateGroup(ugroup);
-    }
-  for (int i=0; i<delGroup.getMemberUserIDs().size(); i++) {
-    userCache.remove((String)delGroup.getMemberUserIDs().get(i));
-    MCRUser uuser = retrieveUser((String)delGroup.getMemberUserIDs().get(i));
-    uuser.removeGroupID(groupID);
-    mcrUserStore.updateUser(uuser);
-    }
-  // We have to notify the groups where this group is an administrative group
-  for (int i=0; i<delGroup.getAdminGroupIDs().size(); i++) {
-    String gid = (String)delGroup.getAdminGroupIDs().get(i);
-    if (mcrUserStore.existsGroup(gid)) { // this test must be!
-      MCRGroup currentGroup = retrieveGroup(gid);
-      currentGroup.removeAdminGroupID(groupID);
+  try {
+    // It is sufficient to remove the members (users and groups, respectively) 
+    // from  the caches. The next time they will be used they will be rebuild 
+    // from the datastore and hence no  longer have this group in their group 
+    // lists.
+    MCRGroup delGroup = retrieveGroup(groupID);
+    for (int i=0; i<delGroup.getMemberGroupIDs().size(); i++) {
+      groupCache.remove((String)delGroup.getMemberGroupIDs().get(i));
+      MCRGroup ugroup = retrieveGroup((String)delGroup.getMemberGroupIDs().get(i));
+      ugroup.removeGroupID(groupID);
+      mcrUserStore.updateGroup(ugroup);
+      }
+    for (int i=0; i<delGroup.getMemberUserIDs().size(); i++) {
+      userCache.remove((String)delGroup.getMemberUserIDs().get(i));
+      MCRUser uuser = retrieveUser((String)delGroup.getMemberUserIDs().get(i));
+      uuser.removeGroupID(groupID);
+      mcrUserStore.updateUser(uuser);
+      }
+    // Remove this groug from the memberIDs of othe groups
+    for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
+      groupCache.remove((String)delGroup.getGroupIDs().get(i));
+      MCRGroup ggroup = retrieveGroup((String)delGroup.getGroupIDs().get(i));
+      ggroup.removeMemberGroupID(groupID);
+      mcrUserStore.updateGroup(ggroup);
+      }
+    // remove all admin items from other groups
+    ArrayList ogroups = mcrUserStore.getGroupIDsWithAdminUser(groupID);
+    for (int i=0; i<ogroups.size(); i++) {
+      groupCache.remove((String)ogroups.get(i));
+      MCRGroup agroup = retrieveGroup((String)ogroups.get(i));
+      agroup.removeAdminGroupID(groupID);
+      mcrUserStore.updateGroup(agroup);
       }
     }
-  // We have to notify the groups this group is a member of
-  for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
-    String gid = (String)delGroup.getGroupIDs().get(i);
-    if (mcrUserStore.existsGroup(gid)) { // this test must be!
-      MCRGroup currentGroup = retrieveGroup(gid);
-      currentGroup.removeMemberGroupID(groupID);
-      }
+  catch (Exception ex)
+    { throw new MCRException("Can't delete user "+groupID,ex); }
+  finally {
+    groupCache.remove(groupID);
+    mcrUserStore.deleteGroup(groupID);
     }
-  // Remove this grou from the memberIDs of othe groups
-  for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
-    groupCache.remove((String)delGroup.getGroupIDs().get(i));
-    MCRGroup ggroup = retrieveGroup((String)delGroup.getGroupIDs().get(i));
-    ggroup.removeMemberGroupID(groupID);
-    mcrUserStore.updateGroup(ggroup);
-    }
-  groupCache.remove(groupID);
-  mcrUserStore.deleteGroup(groupID);
   }
 
 /**
@@ -559,19 +571,22 @@ public final synchronized void deleteUser(MCRSession session, String userID)
     for (int i=0; i<adminGroups.size(); i++) {
       MCRGroup adminGroup = retrieveGroup((String)adminGroups.get(i));
       adminGroup.removeAdminUserID(userID);
+      groupCache.remove(adminGroup.getID());
+      mcrUserStore.updateGroup(adminGroup);
       }
     // We have to notify the groups this user is a member of
     for (int i=0; i<user.getGroupIDs().size(); i++) {
       MCRGroup currentGroup = retrieveGroup((String)user.getGroupIDs().get(i));
-      // while updating the group it will be removed from the group cache
       currentGroup.removeMemberUserID(userID); 
+      groupCache.remove(currentGroup.getID());
+      mcrUserStore.updateGroup(currentGroup);
       }
     }
   catch (Exception ex)
     { throw new MCRException("Can't delete user "+userID,ex); }
   finally {
-    mcrUserStore.deleteUser(userID);
     userCache.remove(userID);
+    mcrUserStore.deleteUser(userID);
     }
   }
 
@@ -588,7 +603,7 @@ public final synchronized ArrayList getAllGroupIDs(MCRSession session)
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
   if (!admin.hasPrivilege("list all users")) {
-    throw new MCRException("The session has no privilig to list all users!"); }
+    throw new MCRException("The session has no privilege to list all users!"); }
   return mcrUserStore.getAllGroupIDs(); 
   }
 
@@ -707,7 +722,7 @@ public synchronized boolean login(String userID, String passwd)
  * @return                  MCRGroup group object (if available)
  * @exception MCRException  if group object is not known
  */
-public MCRGroup retrieveGroup(String groupID) throws MCRException
+MCRGroup retrieveGroup(String groupID) throws MCRException
   { return this.retrieveGroup(groupID, false); }
 
 public MCRGroup retrieveGroup(MCRSession session, String groupID)
@@ -730,7 +745,7 @@ public MCRGroup retrieveGroup(MCRSession session, String groupID, boolean bFromD
   return this.retrieveGroup(groupID, bFromDataStore); 
   }
 
-public synchronized MCRGroup retrieveGroup (String groupID, boolean bFromDataStore) 
+synchronized MCRGroup retrieveGroup (String groupID, boolean bFromDataStore) 
   throws MCRException
   {
   // In order to compare a modified group object with the persistent one we must
@@ -761,7 +776,7 @@ public synchronized MCRGroup retrieveGroup (String groupID, boolean bFromDataSto
  *                          from the data store
  * @return MCRUser          user object (if available), otherwise null
  */
-public MCRUser retrieveUser(String userID) throws MCRException
+MCRUser retrieveUser(String userID) throws MCRException
   { return this.retrieveUser(userID, false); }
 
 public MCRUser retrieveUser(MCRSession session ,String userID) throws MCRException
@@ -783,7 +798,7 @@ public MCRUser retrieveUser(MCRSession session ,String userID,boolean bFromDataS
   return this.retrieveUser(userID, bFromDataStore); 
   }
 
-public synchronized MCRUser retrieveUser(String userID, boolean bFromDataStore)
+synchronized MCRUser retrieveUser(String userID, boolean bFromDataStore)
   throws MCRException
   {
   // In order to compare a modified user object with the persistent one we must
@@ -802,6 +817,14 @@ public synchronized MCRUser retrieveUser(String userID, boolean bFromDataStore)
   else
     return reqUser;
   }
+
+/**
+ * This internal method sets the lock-status of the user manager.
+ *
+ * @param locked   flag that determines whether write access to the data is denied (true) or allowed
+ */
+private final synchronized void setLock(boolean locked)
+  { this.locked = locked; }
 
 /**
  * This method sets the lock-status of the user manager.
@@ -825,6 +848,40 @@ public final synchronized void setLock(MCRSession session, boolean locked)
 public final boolean isLocked()
   { return locked; }
 
+/**
+ * This method set a new password for the given user.
+ *
+ * @param session the MCRSession object
+ * @param userID  the userID
+ * @param password the user password
+ **/
+public final void setPassword(MCRSession session, String userID, String password)
+  throws MCRException
+  {
+  // check for empty strings
+  if ((userID==null) || ((userID = userID.trim()).length() ==0)) {
+    throw new MCRException("The userID is null or empty!"); }
+  if ((password==null) || ((password = password.trim()).length() ==0)) {
+    throw new MCRException("The password is null or empty!"); }
+  // check privileges
+  MCRUser user = retrieveUser(userID);
+  if (!user.isUpdateAllowed()) {
+    throw new MCRException("The update for the user "+userID+" is not allowed!"); }
+  boolean test = false;
+  if (session.getCurrentUserID().equals(userID)) { 
+    test = true; }
+  else {
+    MCRUser admin = retrieveUser(session.getCurrentUserID());
+    if (admin.hasPrivilege("user administrator")) {
+      test = true; }
+    }
+  if (!test) {
+    throw new MCRException("You have no rights to change th users password!"); }
+  user.setPassword(password);
+  userCache.remove(userID);
+  mcrUserStore.updateUser(user);
+  }
+  
 /**
  * This method updates a group in the datastore (and the cache as well).
  * @param session the MCRSession object
@@ -925,32 +982,64 @@ public final synchronized void updateGroup(MCRSession session,MCRGroup group) th
 public final synchronized void updateUser(MCRSession session,MCRUser updUser) 
   throws MCRException
   {
-  if (locked)
-    throw new MCRException("The user component is locked. At the moment write access is denied.");
+  if (locked) {
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
   if (!admin.hasPrivilege("modify user")) {
     throw new MCRException("The session has no privilig to modify user!"); }
-  String userID = updUser.getID();
-  if (mcrUserStore.existsUser(userID)) {
-    // We have to check whether the membership to some of the groups of this user changed.
-    // For example, the user might be removed from one of the groups he or she was
-    // a member of. This group must be notified! To get information about which groups
-    // have been added or removed, we compare the current (updated) user object with
-    // the one from the datastore before the update process takes place.
-    // get the user directly from the datastore
-    MCRUser oldUser = retrieveUser(userID, true); 
-    // Set the values from Manager side 
-    oldUser.setModifiedDate();
-    // Now check and update changes in the membership to groups
-    oldUser.update(updUser); 
+  if (mcrUserStore.existsUser(updUser.getID())) {
+    throw new MCRException(
+      "You tried to update the unknown user '"+updUser.getID()+"'."); 
+    }
+  // check that the udtUser is valid
+  if (!updUser.isValid()) {
+    throw new MCRException("The update user is not valid."); }
+  try {
+    MCRUser olduser = mcrUserStore.retrieveUser(updUser.getID());
+    // remove this user from primary group member
+    MCRGroup primGroup = retrieveGroup(olduser.getPrimaryGroupID());
+    primGroup.removeMemberUserID(olduser.getID()); 
+    groupCache.remove(primGroup.getID());
+    primGroup.setModifiedDate();
+    mcrUserStore.updateGroup(primGroup);
+    // We have to notify the groups this user is a member of
+    for (int i=0; i<olduser.getGroupIDs().size(); i++) {
+      MCRGroup currentGroup = retrieveGroup((String)olduser.getGroupIDs().get(i));
+      currentGroup.removeMemberUserID(olduser.getID()); 
+      currentGroup.setModifiedDate();
+      groupCache.remove(currentGroup.getID());
+      mcrUserStore.updateGroup(currentGroup);
+      }
+    // update the data
+    olduser.update(updUser);
+    olduser.setModifiedDate();
     // Now we really update the current user
     mcrUserStore.updateUser(updUser);
-    userCache.remove(userID);
-    userCache.put(userID, updUser);
+    userCache.remove(olduser.getID());
+    userCache.put(olduser.getID(), updUser);
+    // now write the user to the new primary group
+    primGroup = retrieveGroup(olduser.getPrimaryGroupID());
+    primGroup.addMemberUserID(olduser.getID()); 
+    groupCache.remove(primGroup.getID());
+    primGroup.setModifiedDate();
+    mcrUserStore.updateGroup(primGroup);
+    // We have to notify the groups this user is a member of
+    for (int i=0; i<olduser.getGroupIDs().size(); i++) {
+      MCRGroup currentGroup = retrieveGroup((String)olduser.getGroupIDs().get(i));
+      currentGroup.addMemberUserID(olduser.getID()); 
+      currentGroup.setModifiedDate();
+      groupCache.remove(currentGroup.getID());
+      mcrUserStore.updateGroup(currentGroup);
+      }
     }
-  else
-    throw new MCRException("You tried to update the unknown user '"+userID+"'.");
+  catch (MCRException ex) {
+    try { deleteUser(session,updUser.getID()); }
+    catch (MCRException e) { }
+    throw new MCRException("Error while update user "+updUser.getID()+
+      ", the user was delete."); 
+    }
   }
 
 /**

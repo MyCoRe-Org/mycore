@@ -270,7 +270,7 @@ public int getNumID()
    * @return
    *   returns true if all required fields have been provided
    */
-  public boolean isValid() throws Exception
+  public boolean isValid() 
   {
     ArrayList requiredUserAttributes = 
       MCRUserPolicy.instance().getRequiredUserAttributes();
@@ -282,8 +282,6 @@ public int getNumID()
       test = test && this.numID >= 0;
     if (requiredUserAttributes.contains("password"))
       test = test && this.passwd.length() > 0;
-    if (requiredUserAttributes.contains("creator"))
-      test = test && super.creator.length() > 0;
     if (requiredUserAttributes.contains("primary_group"))
       test = test && this.primaryGroupID.length() >0;
 

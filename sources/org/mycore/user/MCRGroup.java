@@ -400,12 +400,24 @@ public void removeMemberGroupID(String groupID) throws MCRException
   { removeAndUpdate(groupID, mbrGroupIDs); }
 
 /**
+ * This method clean the member group ArrayList.
+ */
+protected final void cleanMemberGroupID()
+  { mbrGroupIDs.clear(); }
+
+/**
  * This method removes a user from the users list (members) of the group.
  *
  * @param userID   ID of the user removed from the group
  */
 public void removeMemberUserID(String userID) throws MCRException
   { removeAndUpdate(userID, mbrUserIDs); }
+
+/**
+ * This method clean the member user ArrayList.
+ */
+protected final void cleanMemberUserID()
+  { mbrUserIDs.clear(); }
 
 /**
  * This method removes a privilege from the privileges list of the group.
