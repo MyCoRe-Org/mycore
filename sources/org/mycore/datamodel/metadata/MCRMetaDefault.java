@@ -111,7 +111,6 @@ public MCRMetaDefault(String default_lang)
  * the value of <em>set_type<em>, if it is null, an empty string was set 
  * to the type element. The datapart element was set. If the value of
  * <em>set_datapart,/em> is null or empty the default was set.
- * The inherited value is set to false!
  *
  * @param set_datapart     the data part name
  * @param set_subtag       the name of the subtag
@@ -129,7 +128,7 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
-  inherited = DEFAULT_INHERITED;
+  inherited = set_inherited;
   if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() ==0)) {
     throw new MCRException("The set_subtag is null or empty."); }
   subtag = set_subtag;
@@ -141,7 +140,6 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
   if ((set_datapart != null) &&
     ((set_datapart = set_datapart.trim()).length() !=0)) {
     datapart = set_datapart; }
-  inherited = set_inherited;
   }
 
 /**
@@ -290,7 +288,10 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
     type = temp_type; }
   String temp_herit = (String)element.getAttributeValue("inherited");
   if ((temp_herit!=null) && ((temp_herit = temp_herit.trim()).length() !=0)) {
-    inherited = Boolean.getBoolean(temp_herit); }
+    boolean mist = false;
+    if (temp_herit.equals("true")) { mist = true; } 
+    inherited = mist; 
+    }
   }
 
 /**

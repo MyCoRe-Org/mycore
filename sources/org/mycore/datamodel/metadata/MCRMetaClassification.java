@@ -163,8 +163,7 @@ public final org.jdom.Element createXML() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
-  if (inherited) {
-    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
+  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
   elm.setAttribute("classid",classid); 
   elm.setAttribute("categid",categid); 
   return elm;

@@ -179,10 +179,9 @@ public final org.jdom.Element createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
+  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
-  if (inherited) {
-    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((name      = name    .trim()).length()   !=0) {
     elm.addContent(new org.jdom.Element("name").addContent(name)); }
   if ((nickname  = nickname.trim()).length()   !=0) {

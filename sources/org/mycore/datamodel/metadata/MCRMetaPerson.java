@@ -193,13 +193,13 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
+  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
-  if (inherited) { 
-    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((firstname = firstname.trim()).length() !=0) {
     elm.addContent(new org.jdom.Element("firstname").addContent(firstname)); }
   if ((callname  = callname .trim()).length() !=0) {
@@ -224,6 +224,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -304,7 +305,25 @@ public final boolean isValid()
  **/
 public final Object clone()
   {
-  return null;
+  MCRMetaPerson out = new MCRMetaPerson(datapart,subtag,lang,type,inherited,
+    firstname,callname,surename,academic,peerage);
+  return (Object)out;
+  }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  logger.debug("Start Class : MCRMetaPerson");
+  super.debugDefault();
+  logger.debug("Firstname          = "+firstname);
+  logger.debug("Callname           = "+callname);
+  logger.debug("Surename           = "+surename);
+  logger.debug("Academic           = "+academic);
+  logger.debug("Peerage            = "+peerage);
+  logger.debug("Stop");
+  logger.debug("");
   }
 
 }

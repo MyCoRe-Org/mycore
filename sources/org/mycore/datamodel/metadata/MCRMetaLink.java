@@ -276,10 +276,9 @@ public org.jdom.Element createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
   elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
     MCRObject.XLINK_URL));
-  if (inherited) {
-    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if (linktype.equals("locator")) {
     elm.setAttribute("href",href,org.jdom.Namespace.getNamespace("xlink",
       MCRObject.XLINK_URL));

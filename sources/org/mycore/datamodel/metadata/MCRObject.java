@@ -273,12 +273,11 @@ public final void createInDatastore() throws MCRPersistenceException
   mcr_service.setDate("modifydate");
   // prepare this object with parent metadata
   MCRObjectID parent_id = mcr_struct.getParentID();
-  MCRObject parent = new MCRObject();
   if (parent_id != null) {
     logger.debug("Parent ID = "+parent_id.getId());
     try {
-      byte [] xmlarray = mcr_persist.receive(parent_id);
-      parent.setFromXML(xmlarray,false);
+      MCRObject parent = new MCRObject();
+      parent.receiveFromDatastore(parent_id);
       mcr_metadata.appendMetadata(parent.getMetadata()
         .getHeritableMetadata());
       }
@@ -296,13 +295,11 @@ public final void createInDatastore() throws MCRPersistenceException
   // add the MCRObjectID to the child list in the parent object
   if (parent_id != null) {
     try {
-      parent.mcr_service.setDate("modifydate");
-      parent.mcr_struct.addChild(mcr_id,mcr_struct.getParent().getXLinkLabel(),
-        mcr_label);
-      org.jdom.Document parent_xml = parent.createXML();
-      MCRTypedContent parent_mcr_tc = parent.createTypedContent();
-      String parent_mcr_ts = parent.createTextSearch();
-      mcr_persist.update(parent_mcr_tc,parent_xml,parent_mcr_ts);
+      MCRObject parent = new MCRObject();
+      parent.receiveFromDatastore(parent_id);
+      parent.getStructure().addChild(mcr_id,mcr_struct.getParent()
+        .getXLinkLabel(),mcr_label);
+      parent.updateThisInDatastore();
       }
     catch (Exception e) {
       logger.debug(MCRException.getStackTraceAsString(e));
@@ -421,12 +418,8 @@ private final void deleteFromDatastore() throws MCRPersistenceException
       byte [] xmlarray = mcr_persist.receive(parent_id);
       MCRObject parent = new MCRObject();
       parent.setFromXML(xmlarray,false);
-      parent.mcr_service.setDate("modifydate");
       parent.mcr_struct.removeChild(mcr_id);
-      org.jdom.Document parent_xml = parent.createXML();
-      MCRTypedContent parent_mcr_tc = parent.createTypedContent();
-      String parent_mcr_ts = parent.createTextSearch();
-      mcr_persist.update(parent_mcr_tc,parent_xml,parent_mcr_ts);
+      parent.updateThisInDatastore();
       }
     catch (Exception e) {
       logger.debug(MCRException.getStackTraceAsString(e));
@@ -537,17 +530,26 @@ public final void updateInDatastore() throws MCRPersistenceException
     }
   // set the date
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
-  mcr_service.setDate("modifydate");
   // update this dataset
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
+  updateThisInDatastore();
   // update all children
   for (int i=0;i<mcr_struct.getChildSize();i++) {
     MCRObject child = new MCRObject();
     child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
     }
+  }
+
+/**
+ * The method updates this object in the persistence layer.
+ **/
+private final void updateThisInDatastore()
+  throws MCRPersistenceException
+  {
+  mcr_service.setDate("modifydate");
+  org.jdom.Document xml = createXML();
+  MCRTypedContent mcr_tc = createTypedContent();
+  String mcr_ts = createTextSearch();
+  mcr_persist.update(mcr_tc,xml,mcr_ts);
   }
 
 /**
@@ -585,11 +587,7 @@ private final void updateMetadataInDatastore(MCRObjectID child_id)
       }
     }
   // update this dataset
-  mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
+  updateThisInDatastore();
   // update all children
   for (int i=0;i<mcr_struct.getChildSize();i++) {
     MCRObject child = new MCRObject();
