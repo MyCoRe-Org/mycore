@@ -290,7 +290,8 @@ public class WCMSActionServlet extends HttpServlet {
         if ( action.equals("add") && mode.equals("extern") ) {
             fileName = link;
             if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
-                fileName = "http://" + link;
+                //fileName = "http://" + link;
+            	fileName = link;            	
             }
 
             if( addAtPosition.equals("child") ) {
@@ -311,7 +312,8 @@ public class WCMSActionServlet extends HttpServlet {
             //implement here (edit, extern)6
             fileName = link;
             if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
-                fileName = "http://" + link;
+                //fileName = "http://" + link;
+            	fileName = link;
             }
         }
 

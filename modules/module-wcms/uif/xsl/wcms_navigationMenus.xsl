@@ -605,12 +605,38 @@
 					</xsl:choose>
 				</a>
 			</xsl:when>
-			<!-- item @type is something else -> just use href -->
+			<!-- item @type is extern-->
 			<xsl:otherwise>
 				<a target="{@target}">
-					<xsl:attribute name="href">
-						<xsl:value-of select="@href" />
-					</xsl:attribute>
+					<!-- set attribute @href -->
+					<xsl:variable name="href_temp">
+                     <xsl:choose>
+                        <!-- build $webapplicationbaseurl before link in case @href doesn't start with 'http' & co. -->
+                        <xsl:when test=" starts-with(@href,'http:') or starts-with(@href,'mailto:') or starts-with(@href,'ftp:')">
+                           <xsl:value-of select="@href" />
+                        </xsl:when>
+                        <!-- link is relative and not starting with http ... -->
+                        <xsl:otherwise>
+                           <xsl:value-of select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
+                        </xsl:otherwise>
+                     </xsl:choose>
+               </xsl:variable>               
+               <xsl:attribute name="href">
+                     <xsl:choose>
+                        <!-- in case of $href_temp contains 'servlet' append 'lang=$currentlang' -->
+                        <xsl:when test=" contains($href_temp,'/servlets/') ">
+										<xsl:call-template name="UrlSetParam">
+										  <xsl:with-param name="url" select="$href_temp"/>
+										  <xsl:with-param name="par" select="'lang'"/>
+										  <xsl:with-param name="value" select="$CurrentLang"/>
+                              </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise>
+                           <xsl:value-of select="$href_temp" />
+                        </xsl:otherwise>
+                     </xsl:choose>                  	
+               </xsl:attribute>
+					<!-- end: set attribute @href -->
 					<xsl:choose>
 						<xsl:when test="@style = 'bold'">
 							<b>
