@@ -367,7 +367,7 @@ public class MCRCStoreContentManager8
 			return "";
 		StringBuffer tmp=new StringBuffer(query.substring(i, j));
 		for (int x=0;x<tmp.length();x++){
-			switch (tmp.charAt(i)){
+			switch (tmp.charAt(x)){
 				case '\"':
 					//replace double quotes by quotes
 					tmp.setCharAt(x,'\'');
