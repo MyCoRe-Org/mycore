@@ -34,6 +34,8 @@ import mycore.common.*;
  * a connection from the pool when they need one and release 
  * the connection after their work has finished.
  *
+ * @see MCRSQLConnection
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  *
@@ -102,58 +104,35 @@ public class MCRSQLConnectionPool
     
     // Build the initial number of JDBC connections
     for( int i = 0; i < initNumberOfConnections; i++ )
-      freeConnections.addElement( buildConnection() );
+      freeConnections.addElement( new MCRSQLConnection() );
   }
 
   /**
-   * Builds a new JDBC database connection before it is put
-   * into the pool of free connections.
-   *
-   * @return a new JDBC connection to the underlying database.
-   * @throws MCRPersistenceException if there was a problem while building the connection
-   **/
-  protected Connection buildConnection()
-    throws MCRPersistenceException
-  {
-    String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
-    
-    System.out.println( "Building a connection to JDBC datastore." );
-    
-    Connection connection = null;
-    try{ connection = DriverManager.getConnection( url ); }
-    catch( Exception exc )
-    {
-      throw new MCRPersistenceException
-      ( "Could not build a JDBC connection using url " + url, exc );
-    }
-    return connection;
-  }
-
-  
-  /**
-   * Gets a free JDBC connection from the pool. When this
+   * Gets a free connection from the pool. When this
    * connection is not used any more by the invoker, he is
    * responsible for returning it into the pool by invoking
-   * <code>releaseConnection()</code>.
+   * the <code>release()</code> method of the connection.
    *
-   * @return a free JDBC connection for your personal use
+   * @see MCRSQLConnection#release()
+   *
+   * @return a free connection for your personal use
    * @throws MCRPersistenceException if there was a problem while building the connection
    **/
-  public synchronized Connection getConnection()
+  public synchronized MCRSQLConnection getConnection()
     throws MCRPersistenceException
   {
   	// Wait for a free connection
     while( usedConnections.size() == maxNumberOfConnections )
       try{ wait(); } catch( InterruptedException ignored ){}
 
-    Connection connection;
+    MCRSQLConnection connection;
     
     // Do we have to build a connection or is there already one?
     if( freeConnections.isEmpty() ) 
-      connection = buildConnection();
+      connection = new MCRSQLConnection();
     else
     {
-      connection = (Connection)( freeConnections.firstElement() );
+      connection = (MCRSQLConnection)( freeConnections.firstElement() );
       freeConnections.removeElement( connection );
     }
     
@@ -163,11 +142,15 @@ public class MCRSQLConnectionPool
   
   /**
    * Releases a connection, indicating that it is not used any more 
-   * and should be returned to to pool of free connections.
+   * and should be returned to to pool of free connections. This
+   * method is invoked when you call the method <code>release()</code> 
+   * of the <code>MCRSQLConnection</code> object.
    *
-   * @param connection the JDBC connection that has been used
+   * @see MCRSQLConnection#release()
+   *
+   * @param connection the connection that has been used
    **/
-  public synchronized void releaseConnection( Connection connection )
+  synchronized void releaseConnection( MCRSQLConnection connection )
   {
     if( connection == null ) return;
     
