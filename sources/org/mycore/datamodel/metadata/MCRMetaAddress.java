@@ -247,7 +247,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag.toUpperCase());
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
   if ((country = country.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"country");
     tc.addStringElement(tc.TYPE_VALUE,null,country,parametric,textsearch);
