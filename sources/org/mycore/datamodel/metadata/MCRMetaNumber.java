@@ -100,8 +100,8 @@ public MCRMetaNumber(String set_datapart, String set_subtag,
   try {
     if (set_number == null) {
       throw new MCRException( "The format of a number is false."); }
-    set_number.replace(',','.');
-    number = (new Double(set_number)).doubleValue(); }
+    String new_number = set_number.replace(',','.');
+    number = (new Double(new_number)).doubleValue(); }
   catch (NumberFormatException e) {
     throw new MCRException( "The format of a number is false."); }
   dimension = "";
