@@ -44,7 +44,7 @@ import java.io.File;
  */
 public class MCRClassificationBrowser extends MCRServlet
 {
-  private static Logger logger=Logger.getLogger(MCRClassificationBrowser.class);
+  private static Logger LOGGER=Logger.getLogger(MCRClassificationBrowser.class);
   private static String lang  = null;
 
 
@@ -54,7 +54,7 @@ public class MCRClassificationBrowser extends MCRServlet
 	/*
 	 * default classification
 	 */
-	logger.info( this.getClass() + " Start" );
+	LOGGER.debug( this.getClass() + " Start" );
 	MCRSession mcrSession 	= MCRSessionMgr.getCurrentSession();
     lang = mcrSession.getCurrentLanguage();
 
@@ -62,13 +62,13 @@ public class MCRClassificationBrowser extends MCRServlet
 	 * the urn with information abaut classification-propertie and category
 	 */
 	String uri = new String(job.getRequest().getPathInfo());
-	logger.info( this.getClass() + " Path = " + uri );
+	LOGGER.debug( this.getClass() + " Path = " + uri );
 
 	try {
 		mcrSession.BData = new MCRClassificationBrowserData(uri );
 	}catch  (  MCRConfigurationException cErr ) {
-		job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
+	    generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_INTERNAL_SERVER_ERROR,cErr.getMessage(),cErr,false);
+  }
 
 	Document  jdomFile = getEmbeddingPage(mcrSession.BData.getPageName());
 	Document  jdom = mcrSession.BData.createXmlTree(lang);
@@ -84,11 +84,11 @@ public class MCRClassificationBrowser extends MCRServlet
 	String path = getServletContext().getRealPath(coverPage);
 	File file = new File(path);
 	if (!file.exists()) {
-		logger.debug(this.getClass() + " did not find the CoverPage " + path);
+		LOGGER.debug(this.getClass() + " did not find the CoverPage " + path);
 		return null;
 	}
 	SAXBuilder sxbuild = new SAXBuilder();
-	logger.debug(this.getClass() + " found CoverPage " + path);
+	LOGGER.debug(this.getClass() + " found CoverPage " + path);
 	return sxbuild.build(file);
 
   }
@@ -110,7 +110,8 @@ public class MCRClassificationBrowser extends MCRServlet
 
 	  job.getRequest().getSession().setAttribute("mycore.language", lang);
 	  job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-	  job.getRequest().setAttribute("XSL.Style", styleSheet);
+	  if (getProperty(job.getRequest(),"XSL.Style")==null)
+	      job.getRequest().setAttribute("XSL.Style", styleSheet);
 
 	  RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
 	  rd.forward(job.getRequest(), job.getResponse());
