@@ -189,6 +189,37 @@ public class MCRObjectCommands
   }
 
  /**
+  * Create a new data base based of the MCRObject template.
+  **/
+  public static boolean createDataBase ( String mcr_type )
+    {
+    String conf_item = "MCR.persistence_template_"+mcr_type;
+    String file = "";
+    try {
+      file = MCRConfiguration.instance().getString(conf_item); }
+    catch ( Exception e ) {
+      throw new MCRException(e.getMessage(),e); }
+    if(!file.endsWith(".xml")) {
+      System.out.println( file + " ignored, does not end with *.xml" );
+      return false; }
+    if(! new File(file).isFile()) {
+      System.out.println( file + " ignored, is not a file." );
+      return false; }
+    System.out.println( "Reading file " + file + " ...\n" );
+    try {
+      MCRObject mycore_obj = new MCRObject();
+      mycore_obj.setFromURI( file );
+      System.out.println( "Label --> " + mycore_obj.getLabel() );
+      mycore_obj.createDataBase();
+      System.out.println( "Database for "+mcr_type+" created.\n" );
+      }
+    catch (Exception e) {
+      System.out.println( "Database for "+mcr_type+" was not created.\n" );
+      return false; }
+    return true;
+    }
+
+ /**
   * Shows a list of next MCRObjectIDs.
   */
   public static void getid( String base )

@@ -360,6 +360,18 @@ public final MCRTypedContent createTypedContent() throws MCRException
   }
 
 /**
+ * The methode create a new datastore based of given data. It create
+ * a new data table for storing MCRObjects with the same MCRObjectID type.
+ **/
+public void createDataBase()
+  {
+  if (mcr_persist==null) { setPersistence(); }
+  MCRTypedContent mcr_tc = createTypedContent();
+  System.out.println("This feature comes in the future.");
+  //mcr_persist.createDataBase(mcr_tc);
+  }
+
+/**
  * The methode create the object in the data store.
  *
  * @exception MCRPersistenceException if a persistence problem is occured
