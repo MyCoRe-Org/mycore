@@ -34,8 +34,12 @@ import javax.servlet.http.*;
 import org.jdom.*;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
+import org.mycore.backend.remote.*;
 
 /**
+ * This class implements the connection to the IFS database via HTTP/HTTPS
+ * protocol as servlet.
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt 
  * @version $Revision$ $Date$
@@ -53,7 +57,7 @@ private ArrayList remoteAliasList = null;
 
  /**
   * The initialization method for this servlet. This read the default
-  * language from the configuration.
+  * language and the remote host list from the configuration.
   **/
   public void init() throws MCRConfigurationException
   {
@@ -64,6 +68,7 @@ private ArrayList remoteAliasList = null;
     // read host list from configuration
     String hostconf = conf.getString("MCR.remoteaccess_hostaliases","local");
     remoteAliasList = new ArrayList();
+    remoteAliasList.add("local");
     int i = 0;
     int j = hostconf.length();
     int k = 0;
@@ -109,13 +114,12 @@ System.out.println("requestPath = "+requestPath);
     }
     
     StringTokenizer st = new StringTokenizer( requestPath, "/" );
-    if( ! st.hasMoreTokens() )
-    {
+    if(!st.hasMoreTokens()) {
       String msg = "Error: HTTP request path is empty";
       System.out.println( msg );
       res.sendError( res.SC_NOT_FOUND, msg );
       return;
-    }
+      }
     
     // get the language
     String lang  = req.getParameter( "lang" );
@@ -127,16 +131,27 @@ System.out.println("requestPath = "+requestPath);
 System.out.println("MCRFileNodeServlet : lang = "+lang);
 
     // get the host alias
-    String host  = req.getParameter( "hosts" );
+    String hostAlias  = req.getParameter( "hosts" );
     String att_host  = (String) req.getAttribute( "hosts" );
-    if (att_host!=null) { host = att_host; }
-    if( host  == null ) host  = "local";
-    if( host.equals("") ) host  = "local";
-System.out.println("MCRFileNodeServlet : hosts = "+host);
+    if (att_host!=null) { hostAlias = att_host; }
+    if( hostAlias  == null ) hostAlias  = "local";
+    if( hostAlias.equals("") ) hostAlias  = "local";
+    boolean test = false;
+    for (int i=0;i<remoteAliasList.size();i++) {
+      if (((String)remoteAliasList.get(i)).equals(hostAlias)) {
+        test = true; break; }
+      }
+    if (!test) {
+      String msg = "Error: HTTP request host is not in the alias list";
+      System.out.println( msg );
+      res.sendError( res.SC_NOT_FOUND, msg );
+      return;
+      }
+System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
 
     String ownerID = st.nextToken();
     
-    if (host.equals("local"))
+    if (hostAlias.equals("local"))
     {
       MCRFilesystemNode[] roots = MCRFilesystemNode.getRootNodes( ownerID );
       if( roots.length == 0 )
@@ -193,44 +208,13 @@ System.out.println("MCRFileNodeServlet : hosts = "+host);
     }
     else
     {
-      // read the configuration
-      String protocol = conf.getString("MCR.remoteaccess_"+host+"_protocol");
-      String realhost = conf.getString("MCR.remoteaccess_"+host+"_host");
-      int port = conf.getInt("MCR.remoteaccess_"+host+"_port");
-      String location = conf.getString("MCR.remoteaccess_"+host+
-        "_ifs_servlet")+requestPath;
-System.out.println("Protokoll = "+protocol);
-System.out.println("Realhost = "+realhost);
-System.out.println("Port = "+port);
-System.out.println("Location = "+location);
-      // get data from the URL
-      BufferedInputStream in = null;
-      String headercontext = "";
-      try {
-        URL currentURL = new URL(protocol,realhost,port,location);
-        HttpURLConnection urlCon = 
-          (HttpURLConnection) currentURL.openConnection();
-        urlCon.setDoOutput(true);
-        urlCon.setRequestMethod("POST");
-        PrintWriter pout = new PrintWriter(urlCon.getOutputStream());
-        pout.print("hosts=local");
-        pout.close();
-        in = new BufferedInputStream(urlCon.getInputStream());
-        headercontext = urlCon.getContentType();
-        }
-      catch(MCRException mcre) {
-        System.err.println("Can't use the response from host:"+realhost+".");
-        return; }
-      catch(UnknownHostException uhe) {
-        System.err.println("Don't know about host: "+realhost+"."); 
-        return; }
-      catch(IOException ioe) {
-        System.err.println("Couldn't get I/O for the connection to: "
-          +realhost+"."); 
-        return; }
-      catch(Exception e) {
-        e.printStackTrace(System.err); 
-        return; }
+      // call the remote access backend
+      MCRRemoteAccessInterface comm = (MCRRemoteAccessInterface)
+        conf.getInstanceOf("MCR.remoteaccess_"+hostAlias+"_query_class");
+
+      BufferedInputStream in = comm.requestIFS(hostAlias,requestPath);
+      String headercontext = comm.getHeaderContent();
+      if (in == null) { return; }
 
       if(!headercontext.equals("text/xml")) {
         res.setContentType(headercontext);
@@ -270,7 +254,7 @@ System.out.println("Location = "+location);
         style = parameters.getProperty("Style");
         }
       else {
-        resarray.setHost(0,host);
+        resarray.setHost(0,hostAlias);
         jdom = resarray.exportAllToDocument();
         style = parameters.getProperty("Style","IFSMetadata-"+lang);
         }

@@ -30,6 +30,7 @@ import java.net.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.BasicConfigurator;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
@@ -50,6 +51,10 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface
 static Logger logger=Logger.getLogger(MCRServletCommunication.class.getName());
 
 // internal data
+private String realhost;
+private String protocol;
+private int port;
+private String location;
 private String headercontext;
 private boolean hasifsdata;
 private MCRConfiguration config = MCRConfiguration.instance();
@@ -59,8 +64,44 @@ private MCRConfiguration config = MCRConfiguration.instance();
  **/
 public MCRServletCommunication()
   { 
-  headercontext = ""; hasifsdata = false; 
+  // get the instance of MCRConfiguration
   config = MCRConfiguration.instance();
+  // set the logger property
+  //BasicConfigurator.configure();
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  // set the defaults
+  headercontext = ""; hasifsdata = false; 
+  }
+
+/**
+ * This method read the connection configuration from the property file.
+ *
+ * @param hostAlias the alias name of the called host
+ * @return true if no error was occure, else return false
+ **/
+private final boolean readConnectionData(String hostAlias)
+  {
+  realhost = config.getString("MCR.remoteaccess_"+hostAlias+"_host","");
+  if (realhost.length()==0) {
+    logger.error("Connection data for host "+hostAlias+" not found.");
+    return false;
+    }
+  protocol = config.getString("MCR.remoteaccess_"+hostAlias+"_protocol","");
+  if (protocol.length()==0) {
+    logger.error("Connection data for host "+hostAlias+" not found.");
+    return false;
+    }
+  protocol = protocol.toLowerCase();
+  if (!protocol.equals("http")) {
+    logger.error("Connection protocol for host "+hostAlias+" is not HTTP.");
+    return false;
+    }
+  port = config.getInt("MCR.remoteaccess_"+hostAlias+"_port",0);
+  if (port==0) {
+    logger.error("Connection port for host "+hostAlias+" is false.");
+    return false;
+    }
+  return true;
   }
 
 /**
@@ -77,46 +118,29 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
   String query) throws MCRException
   {
   MCRXMLContainer result = new MCRXMLContainer();
-  PropertyConfigurator.configure(config.getLoggingProperties());
+  hasifsdata = false;
 
   logger.debug("HostAlias        = "+hostAlias);
   logger.debug("MCRObjectID Type = "+reqtype);
   logger.debug("Query            = "+query);
 
-  String host = config.getString("MCR.remoteaccess_"+hostAlias+"_host","");
-  if (host.length()==0) {
-    System.out.println("Connection data for host "+hostAlias+" not found.");
-    return result;
-    }
-  String protocol = config.getString("MCR.remoteaccess_"+hostAlias
-    +"_protocol","");
-  if (protocol.length()==0) {
-    System.out.println("Connection data for host "+hostAlias+" not found.");
-    return result;
-    }
-  protocol = protocol.toLowerCase();
-  if ((!protocol.equals("http"))&&(!protocol.equals("https"))) {
-    System.out.println("Connection protocol for host "+hostAlias+" is not"+
-      " http or https.");
-    return result;
-    }
-  int port = config.getInt("MCR.remoteaccess_"+hostAlias+"_port",0);
-  if (port==0) {
-    System.out.println("Connection port for host "+hostAlias+" is false.");
-    return result;
-    }
-  String location = config.getString("MCR.remoteaccess_"+hostAlias
+  if (!readConnectionData(hostAlias)) { return result; }
+  location = config.getString("MCR.remoteaccess_"+hostAlias
     +"_query_servlet");
   if (location.length()==0) {
-    System.out.println("Connection location for host "+hostAlias+" not found.");
+    logger.error("Connection location for host "+hostAlias+" not found.");
     return result;
     }
-  System.out.println("Connecting to "+protocol+"://"+host+":"+port+
-    location);
+  StringBuffer sb = new StringBuffer(256);
+  sb.append("Connecting to ").append(protocol).append("://")
+    .append(realhost).append(':').append(port).append(location).append('?')
+    .append("type=").append(URLEncoder.encode(reqtype))
+    .append("&hosts=local").append("&query=").append(URLEncoder.encode(query));
+  logger.debug(sb.toString());
 
   URL currentURL;
   try {
-    currentURL = new URL(protocol,host,port,location);
+    currentURL = new URL(protocol,realhost,port,location);
     HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();
     urlCon.setDoOutput(true);
     urlCon.setRequestMethod("POST");
@@ -133,11 +157,12 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
     for (int i=0;i<result.size();i++) { result.setHost(i,hostAlias); }
     }
   catch(MCRException mcre) {
-    System.err.println("Can't use the response from host:"+host+"."); }
+    logger.error("Can't use the response from host:"+realhost+"."); }
   catch(UnknownHostException uhe) {
-    System.err.println("Don't know about host: "+host+"."); }
+    logger.error("Don't know about host: "+realhost+"."); }
   catch(IOException ioe) {
-    System.err.println("Couldn't get I/O for the connection to: "+host+"."); }
+    logger.error("Couldn't get I/O for the connection to: "+realhost+".");
+    }
   catch(Exception e) {
     e.printStackTrace(System.err); }
   return result;
@@ -152,16 +177,64 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
  * @exception MCRException general Exception of MyCoRe
  * @return the result of the query as MCRXMLContainer
  **/
-public BufferedInputStream requestIFS(String hostAlias, String path) 
+public final BufferedInputStream requestIFS(String hostAlias, String path) 
   throws MCRException
   {
   BufferedInputStream in = null;
   hasifsdata = false;
-  System.out.println("HostAlias = "+hostAlias);
-  System.out.println("Path      = "+path);
+  logger.debug("HostAlias        = "+hostAlias);
+  logger.debug("Path             = "+path);
 
-  return in;
+  if (!readConnectionData(hostAlias)) { return in; }
+  location = config.getString("MCR.remoteaccess_"+hostAlias
+    +"_ifs_servlet");
+  if (location.length()==0) {
+    logger.error("Connection location for host "+hostAlias+" not found.");
+    return in;
+    }
+  if (path.length()==0) {
+    logger.error("Connection path for host "+hostAlias+" is empty.");
+    return in;
+    }
+  StringBuffer sb = new StringBuffer(256);
+  sb.append("Connecting to ").append(protocol).append("://")
+    .append(realhost).append(':').append(port).append(location).append(path)
+    .append('?').append("hosts=local");
+  logger.debug(sb.toString());
+
+  URL currentURL;
+  try {
+    currentURL = new URL(protocol,realhost,port,location+path);
+    HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();
+    urlCon.setDoOutput(true);
+    urlCon.setRequestMethod("POST");
+    PrintWriter out = new PrintWriter(urlCon.getOutputStream());
+    out.print("hosts=local");
+    out.close();
+    headercontext = urlCon.getContentType();
+    hasifsdata = true;
+    return new BufferedInputStream(urlCon.getInputStream());
+    }
+  catch(MCRException mcre) {
+    logger.error("Can't use the response from host:"+realhost+"."); }
+  catch(UnknownHostException uhe) {
+    logger.error("Don't know about host: "+realhost+"."); }
+  catch(IOException ioe) {
+    logger.error("Couldn't get I/O for the connection to: "+realhost+".");
+    }
+  catch(Exception e) {
+    logger.error(System.err); }
+  return null;
   }
+
+/**
+ * This method returns the HPPT header content string, if a requestIFS was 
+ * successful running.
+ *
+ * @return HPPT header content string
+ **/
+public final String getHeaderContent()
+  { if (hasifsdata) { return headercontext; } else { return ""; } }
 
 }
 

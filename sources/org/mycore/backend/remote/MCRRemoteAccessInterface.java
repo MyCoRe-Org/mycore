@@ -24,6 +24,7 @@
 
 package org.mycore.backend.remote;
 
+import java.io.*;
 import java.util.*;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
@@ -53,5 +54,24 @@ public interface MCRRemoteAccessInterface
 public MCRXMLContainer requestQuery(String hostAlias, String mcrtype, 
   String query) throws MCRException;
 
+/**
+ * This methode represide the IFS request methode for the communication.
+ * For the connection parameter would the MCRConfiguration used.
+ *
+ * @param hostAlias the list of hostnames as string they should requested.
+ * @param path      the path to the IFS data
+ * @exception MCRException general Exception of MyCoRe
+ * @return the result of the query as MCRXMLContainer
+ **/
+public BufferedInputStream requestIFS(String hostAlias, String path)
+  throws MCRException;
+
+/**
+ * This method returns the HPPT header content string, if a requestIFS was
+ * successful running.
+ *
+ * @return HPPT header content string
+ **/
+public String getHeaderContent();
 
 }
