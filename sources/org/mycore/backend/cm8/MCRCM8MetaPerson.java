@@ -100,6 +100,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     it.addAttr(attr);
     lt.addSubEntity(it);
 
@@ -114,6 +115,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     it.addAttr(attr);
     lt.addSubEntity(it);
 
@@ -128,6 +130,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     it.addAttr(attr);
     lt.addSubEntity(it);
 
@@ -142,6 +145,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     it.addAttr(attr);
     lt.addSubEntity(it);
 
@@ -156,6 +160,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     it.addAttr(attr);
     lt.addSubEntity(it);
     }

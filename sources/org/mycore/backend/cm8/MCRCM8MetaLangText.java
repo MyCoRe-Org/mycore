@@ -98,6 +98,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
     attr.setNullable(true);
     attr.setUnique(false);
+    if (ts) { attr.setTextSearchable(true); }
     lt.addAttr(attr);
     }
   catch (Exception e) {
