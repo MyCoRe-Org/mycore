@@ -56,8 +56,8 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
     
     if( ! baseDir.exists() )
     {
-      boolean success = baseDir.mkdirs();
-      if( ! success )
+      baseDir.mkdirs();
+      if( ! baseDir.exists() )
       {
         String msg = "Could not create content store base directory: " + baseDir.getPath();
         throw new MCRConfigurationException( msg );
@@ -96,13 +96,16 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
       storageID.append( slots[ i ] ).append( File.separator );
       
     File dir = new File( baseDir, storageID.toString() );
-    if( ! dir.exists() )
+    synchronized( this )
     {
-      boolean success = dir.mkdirs();
-      if( ! success )
+      if( ! dir.exists() )
       {
-        String msg = "Could not create content store slot directory: " + dir.getPath();
-        throw new MCRPersistenceException( msg );
+        dir.mkdirs();
+        if( ! dir.exists() )
+        {
+          String msg = "Could not create content store slot directory: " + dir.getPath();
+          throw new MCRPersistenceException( msg );
+        }
       }
     }
       
