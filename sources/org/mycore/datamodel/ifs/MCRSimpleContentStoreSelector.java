@@ -24,18 +24,24 @@
 
 package org.mycore.datamodel.ifs;
 
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.jdom.*;
-import org.jdom.input.*;
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Hashtable;
+import java.util.List;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCREntityResolver;
 
 /**
  * Decides which MCRContentStore implementation should be used to store the
  * content of a given file, based on the content type of the file.
  *
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
@@ -102,5 +108,9 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
       return (String)( table.get( typeID ) );
     else
       return defaultID;
+  }
+  
+  public String[] getAvailableStoreIDs(){
+  	return (String[]) table.values().toArray(new String[table.size()]);
   }
 }
