@@ -281,13 +281,14 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("  class name                   = "+classname);
-  System.out.println("  default language             = "+lang);
-  System.out.println("  tag                          = "+tag);
-  System.out.println("  heritable                    = "+heritable);
+  System.out.println("MCRMetaElement debug start:");
+  System.out.println("<classname>"+classname+"</classname>");
+  System.out.println("<lang>"+lang+"</lang>");
+  System.out.println("<tag>"+tag+"</tag>");
+  System.out.println("<heritable>"+heritable+"</heritable>");
   for (int i=0;i<list.size();i++) {
     ((MCRMetaInterface)list.get(i)).debug(); }
-  System.out.println();
+  System.out.println("MCRMetaElement debug end"+NL);
   }
 
 }

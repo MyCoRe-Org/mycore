@@ -1,8 +1,6 @@
 /**
  * $RCSfile$
  * $Revision$ $Date$
- * RCSfile: MCRMetaPerson.java,v $
- * Revision: 1.5 $ $Date$
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -302,18 +300,14 @@ public final boolean isValid()
  **/
 public final void debug()
   {
+  System.out.println("MCRMetaPerson debug start:");
   super.debug();
-  if (firstname.length()!=0) {
-    System.out.println("firstname : "+firstname); }
-  if (callname.length()!=0) {
-    System.out.println("callname  : "+callname); }
-  if (surename.length()!=0) {
-    System.out.println("surename  : "+surename); }
-  if (academic.length()!=0) {
-    System.out.println("academic  : "+academic); }
-  if (peerage.length()!=0) {
-    System.out.println("peerage   : "+peerage); }
-  System.out.println("--- ---");
+  System.out.println("<firstname>"+firstname+"</firstname>");
+  System.out.println("<callname>"+callname+"</callname>");
+  System.out.println("<surename>"+surename+"</surename>");
+  System.out.println("<academic>"+academic+"</academic>");
+  System.out.println("<peerage>"+peerage+"</peerage>");
+  System.out.println("MCRMetaPerson debug end"+NL);
   }
 
 }

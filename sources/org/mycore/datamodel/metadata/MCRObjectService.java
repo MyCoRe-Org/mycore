@@ -394,12 +394,12 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("The document service data content :");
+  System.out.println("MCRMetaService debug start:");
   for (int i=0;i<dates.size();i++) {
     ((MCRMetaDate)dates.get(i)).debug(); }
   for (int i=0;i<flags.size();i++) {
     ((MCRMetaLangText)flags.get(i)).debug(); }
-  System.out.println();
+  System.out.println("MCRMetaService debug end"+NL);
   }
 
 }

@@ -154,7 +154,7 @@ public final GregorianCalendar getDate()
  **/
 public final String getDateToString()
   {
-  if (date == null) { return null; }
+  if (date == null) { return ""; }
   return df.format(date.getTime());
   }
 
@@ -249,9 +249,10 @@ public final boolean isValid()
  **/
 public final void debug()
   {
+  System.out.println("MCRMetaDate debug start:");
   super.debug();
-  if (date != null) { System.out.println(getDateToString()); }
-  System.out.println("--- ---");
+  System.out.println("<date>"+getDateToString()+"</date>");
+  System.out.println("MCRMetaDate debug end"+NL);
   }
 
 }

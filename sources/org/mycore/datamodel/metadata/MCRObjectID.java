@@ -41,6 +41,8 @@ public final class MCRObjectID
  * constant value for the object id length
  **/
 public final int MAX_LENGTH = 64;
+protected static String NL =
+  new String((System.getProperties()).getProperty("line.separator"));
 
 private String mcr_id = null;
 private String mcr_project_id = null;
@@ -175,6 +177,16 @@ public final String getId()
  **/
 public final boolean isValid()
   { return mcr_valid_id; }
+
+/**
+ * This method print all data content from the MCRObjectId class.
+ **/
+public final void debug()
+  {
+  System.out.println("MCRObjectId debug start:");
+  System.out.println("<ID>"+mcr_id+"</ID>");
+  System.out.println("MCRObjectId debug end"+NL);
+  }
 
 } 
 

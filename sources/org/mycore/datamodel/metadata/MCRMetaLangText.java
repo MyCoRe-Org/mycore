@@ -203,9 +203,10 @@ public final boolean isValid()
  **/
 public final void debug()
   {
+  System.out.println("MCRMetaLangText debug start:");
   super.debug();
   if (text.trim().length()!=0) { System.out.println(text); }
-  System.out.println("--- ---");
+  System.out.println("MCRMetaLangText debug end"+NL);
   }
 
 }

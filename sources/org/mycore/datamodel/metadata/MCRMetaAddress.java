@@ -1,0 +1,359 @@
+/**
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, normally in the file license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
+ **/
+
+package mycore.datamodel;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+import mycore.common.MCRException;
+
+/**
+ * This class implements all methods for handling with the MCRMetaAddress part
+ * of a metadata object. The MCRMetaAddress class represents a natural address
+ * specified by a list of names. 
+ *
+ * @author J. Vogler
+ * @version $Revision$ $Date$
+ **/
+final public class MCRMetaAddress extends MCRMetaDefault 
+  implements MCRMetaInterface 
+{
+
+// MetaAddress data
+private String country;
+private String state;
+private String zipcode;
+private String city;
+private String street;
+private String number;
+
+/**
+ * This is the constructor. <br>
+ * The language element was set to <b>en</b>.
+ * All other elemnts are set to an empty string.
+ */
+public MCRMetaAddress()
+  {
+  super();
+  country   = "";
+  state     = "";
+  zipcode   = "";
+  city      = "";
+  street    = "";
+  number    = "";
+  }
+
+/**
+ * This is the constructor. <br>
+ * The language element was set. If the value of <em>default_lang</em>
+ * is null, empty or false <b>en</b> was set. The subtag element was set
+ * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+ * is null or empty an exception was throwed. The type element was set to
+ * the value of <em>set_type<em>, if it is null, an empty string was set
+ * to the type element. The country, state, zipcode, city, street and
+ * number element was set to the value of <em>set_...<em>, if they are null,
+ * an empty string was set to this element.
+ *
+ * @param set_datapart    the global part of the elements like 'metadata'
+ *                        or 'service'
+ * @param set_subtag      the name of the subtag
+ * @param default_lang    the default language
+ * @param set_type        the optional type string
+ * @param set_country     the country name
+ * @param set_state       the state name
+ * @param set_zipcode     the zipcode string
+ * @param set_city        the city name
+ * @param set_street      the street name
+ * @param set_number      the number string
+ * @exception MCRException if the parameter values are invalid
+ **/
+public MCRMetaAddress(String set_datapart, String set_subtag, 
+  String default_lang, String set_type, String set_country, String set_state, 
+  String set_zipcode, String set_city, String set_street, String set_number) 
+  throws MCRException
+  {
+  super(set_datapart,set_subtag,default_lang,set_type);
+  country   = "";
+  state     = "";
+  zipcode   = "";
+  city      = "";
+  street    = "";
+  number    = "";
+  if (set_country != null) { country  = set_country; }
+  if (set_state   != null) { state    = set_state;   }
+  if (set_zipcode != null) { zipcode  = set_zipcode; }
+  if (set_city    != null) { city     = set_city;    }
+  if (set_street  != null) { street   = set_street;  }
+  if (set_number  != null) { number   = set_number;  }
+  }
+
+/**
+ * This methode set all address componets. 
+ *
+ * @param set_country   the country name
+ * @param set_state     the state name
+ * @param set_zipcode   the zipcode string
+ * @param set_city      the city name
+ * @param set_street    the street name
+ * @param set_number    the number string
+ **/
+public final void set(String set_country, String set_state, String 
+  set_zipcode, String set_city, String set_street, String set_number)
+  {
+  if ((set_country  == null) || (set_state  == null) ||
+      (set_zipcode  == null) || (set_city   == null) || 
+      (set_street   == null) || (set_number == null)) {
+    throw new MCRException("One parameter is null."); }
+  country  = set_country;
+  state    = set_state;
+  zipcode  = set_zipcode;
+  city     = set_city;
+  street   = set_street;
+  number   = set_number;
+  }
+
+/**
+ * This method get the country text element.
+ *
+ * @return the country
+ **/
+public final String getCountry()
+  { return country; }
+
+/**
+ * This method get the state text element.
+ *
+ * @return the state
+ **/
+public final String getState()
+  { return state; }
+
+/**
+ * This method get the zipcode text element.
+ *
+ * @return the zipcode
+ **/
+public final String getZipcode()
+  { return zipcode; }
+
+/**
+ * This method get the city text element.
+ *
+ * @return the city
+ **/
+public final String getCity()
+  { return city; }
+
+/**
+ * This method get the street text element.
+ *
+ * @return the street
+ **/
+public final String getStreet()
+  { return street; }
+
+/**
+ * This method get the number text element.
+ *
+ * @return the number
+ **/
+public final String getNumber()
+  { return number; }
+
+
+/**
+ * This method reads the XML input stream part from a DOM part for the
+ * metadata of the document.
+ *
+ * @param metadata_address_node       a relevant DOM element for the metadata
+ **/
+public final void setFromDOM(Node metadata_address_node)
+  {
+  super.setFromDOM(metadata_address_node);
+  NodeList childs_name_nodelist = metadata_address_node.getChildNodes();
+
+  country  = seekElementText("country", childs_name_nodelist);
+  state    = seekElementText("state",   childs_name_nodelist);
+  zipcode  = seekElementText("zipcode", childs_name_nodelist);
+  city     = seekElementText("city",    childs_name_nodelist);
+  street   = seekElementText("street",  childs_name_nodelist);
+  number   = seekElementText("number",  childs_name_nodelist);
+  }
+
+public String seekElementText(String seek_element, NodeList childs_nodelist)
+  {
+  String temp_child_node_name;
+  String seek_element_text = "";
+  int length_childs_nodelist = childs_nodelist.getLength();
+  for (int i = 0; i < length_childs_nodelist; i++)
+    {
+      temp_child_node_name = childs_nodelist.item(i).getNodeName();
+      if ( temp_child_node_name.equals(seek_element) )
+        {
+           Node seek_node  = childs_nodelist.item(i);
+           NodeList seek_childs_nodelist
+                           = seek_node.getChildNodes();
+           Node text_node  = seek_childs_nodelist.item(0);
+           int text_node_type   = text_node.getNodeType();
+           if ( text_node_type  == Node.TEXT_NODE )
+             { seek_element_text = text_node.getNodeValue().trim();
+               return seek_element_text;
+             }
+        }
+    }
+  return seek_element_text;
+  } 
+
+
+/**
+ * This method creates a XML stream for all data in this class, defined
+ * by the MyCoRe XML MCRMetaAddress definition for the given subtag.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a XML string with the XML MCRMetaAddress part
+ **/
+public final String createXML() throws MCRException
+  {
+
+  if (!isValid()) {
+    throw new MCRException("The content is not valid."); }
+  StringBuffer sb = new StringBuffer(1024);
+  sb.append("<").append(subtag).append(" type=\"").append(type)
+    .append("\" xml:lang=\"").append(lang) .append("\" >").append(NL);
+  if ((country = country  .trim()).length() !=0) {
+    sb.append("<country>").append(country) .append("</country>").append(NL); }
+  if ((state   = state    .trim()).length() !=0) {
+    sb.append("<state>")  .append(state)   .append("</state>")  .append(NL); }
+  if ((zipcode = zipcode  .trim()).length() !=0) {
+    sb.append("<zipcode>").append(zipcode) .append("</zipcode>").append(NL); }
+  if ((city    = city     .trim()).length() !=0) {
+    sb.append("<city>")   .append(city)    .append("</city>")   .append(NL); }
+  if ((street  = street   .trim()).length() !=0) {
+    sb.append("<street>") .append(street)  .append("</street>") .append(NL); }
+  if ((number  = number   .trim()).length() !=0) {
+    sb.append("<number>") .append(number)  .append("</number>") .append(NL); }
+  sb.append("</").append(subtag).append(">").append(NL); 
+  return sb.toString();
+  }
+
+/**
+ * This method creates a Text Search stream for all data in this class, defined
+ * by the MyCoRe TS MCRMetaAddress definition for the given tag and subtag.
+ * The content of this stream is depending on the implementation for
+ * the persistence database chosen by the <em>MCR.persistence_type</em> 
+ * configuration.
+ *
+ * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
+ * @exception MCRException if the content of this class is not valid
+ * @return a TS string with the TS MCRMetaAddress part
+ **/
+public final String createTS(Object mcr_query) throws MCRException
+  {
+
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
+  String [] sattrib = null;
+  String [] svalue  = null;
+  StringBuffer sb   = new StringBuffer(1024);
+
+  if (type.trim().length()!=0) {
+    sattrib = new String[1]; sattrib[0] = "type";
+    svalue = new String[1]; svalue[0] = type;
+    }
+
+  if (country.trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"country",null,null,country )); }
+
+  if (state  .trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"state"  ,null,null,state   )); }
+
+  if (zipcode.trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"zipcode",null,null,zipcode )); }
+
+  if (city   .trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"city"   ,null,null,city    )); }
+
+  if (street .trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"street" ,null,null,street  )); }
+
+  if (number .trim().length()!=0) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"number ",null,null,number  )); }
+
+  return sb.toString();
+  }
+
+/**
+ * This method checks the validation of the content of this class.
+ * The method returns <em>false</em> if
+ * <ul>
+ * <li> the country  is empty and
+ * <li> the state    is empty and
+ * <li> the zipcode  is empty and
+ * <li> the city     is empty and
+ * <li> the street   is empty and
+ * <li> the number   is empty
+ * </ul>
+ * otherwise the method returns <em>true</em>.
+ *
+ * @return a boolean value
+ **/
+public final boolean isValid()
+  {
+  if (((country = country  .trim()).length() ==0) && 
+      ((state   = state    .trim()).length() ==0) &&
+      ((zipcode = zipcode  .trim()).length() ==0) &&
+      ((city    = city     .trim()).length() ==0) &&
+      ((street  = street   .trim()).length() ==0) &&
+      ((number  = number   .trim()).length() ==0)) {
+    return false; }
+  return true;
+  }
+
+/**
+ * This metod prints all data content from the MCRMetaAddress class.
+ **/
+public final void debug()
+  {
+  System.out.println("MCRMetaAddress debug start:");
+  super.debug();
+  System.out.println("<country>" +country+ "</country>" );
+  System.out.println("<state>"   +state  + "</state>"   );
+  System.out.println("<zipcode>" +zipcode+ "</zipcode>" );
+  System.out.println("<city>"    +city   + "</city>"    );
+  System.out.println("<street>"  +street + "</street>"  );
+  System.out.println("<number>"  +number + "</number>"  );
+  System.out.println("MCRMetaAddress debug end"+NL);
+  }
+
+}
+

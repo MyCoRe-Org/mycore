@@ -274,12 +274,10 @@ public boolean isValid()
  **/
 public void debug()
   {
-  if (type.trim().length()!=0) {
-    System.out.println("--- "+datapart+" --- "+subtag+" with lang "+lang+
-      " and type "+type+" ---"); }
-  else {
-    System.out.println("--- "+datapart+" --- "+subtag+" with lang "+lang+
-      " ---"); }
+  System.out.println("<datapart>"+datapart+"</datapart>");
+  System.out.println("<subtag>"+subtag+"</subtag>");
+  System.out.println("<lang>"+lang+"</lang>");
+  System.out.println("<type>"+type+"</type>");
   }
 
 }
