@@ -1,0 +1,90 @@
+%
+%
+\subsection{Grundlegendes}
+%
+%
+Um einen Dokument-Server oder andere MyCore-Anwendungen problemlos als
+eigenständige Anwendung zu betreiben, ist es notwendig hierfür auch
+separate Speicherbereiche für die Daten und Objekte bereitzustellen.
+Hierzu muss die Konfiguration an verschiedenen Stellen geändert werden.
+Oft reicht schon die Änderung der Tabellennamen aus. Für diese Beispiel
+wird der Prefix {\bf DOC} verwendet.\\[ex2]
+Im nachfolgenden Abschnitt wird davon ausgegangen, dass Sie den
+MyCoRe-Sample Baum in ein gesondertes Anwendungsverzeichnis kopiert haben,
+z. B. \mcrfile{~/docserv} welches durch die Environment Variable
+z. B. \mcrcommand{export DOCSERV\_HOME=/docserv} beschrieben wird.\\[ex2]
+An dieser Stelle sollen Sie auch nocheinmal darauf hingewiesen werden,
+dass es auch unveränderliche Einstellungen gibt, welche Sie beim 
+compilieren des MyCoRe-Kernes einmal festgelegt haben. Die betrifft vor
+allem die benutzte SQL-Datenbank (DB2, MySQL, ...) und den verwendeten 
+Metadaten-Store (CM8, XML:DB,...). Diesen benutzen alle Ihre Applikationen
+gemeinsam!\\[ex2]
+Bearbeiten Sie folgende Konfigurationsstellen:
+
+\begin{itemize}
+\item {\bf Klassifikationen} - {\tt mycore.properties.classification}
+\begin{verbatim}
+# Configuration for SQL store
+MCR.classifications_store_sql_table_class=DOCCLASS
+MCR.classifications_store_sql_table_classlabel=DOCCLASSLABEL
+MCR.classifications_store_sql_table_categ=DOCCATEG
+MCR.classifications_store_sql_table_categlabel=DOCCATEGLABEL
+
+# for classifications
+MCR.linktable_store_sql_table_class=DOCLINKCLASS
+
+# for links
+MCR.linktable_store_sql_table_href=DOCLINKHREF
+\end{verbatim}
+
+\item {\bf Internal Filesystem} - {\tt mycore.properties.ifs}
+\begin{verbatim}
+# File metadata persistence implementation and table name to store nodes
+MCR.IFS.FileMetadataStore.SQL.TableName=DOCFSNODES
+\end{verbatim}
+
+\item {\bf Usersystem} - {\tt mycore.properties.users}
+\begin{verbatim}
+# SQL tables for the user management
+MCR.users_store_sql_table_users=DOCUSERS
+MCR.users_store_sql_table_groups=DOCGROUPS
+MCR.users_store_sql_table_group_members=DOCGROUPMEMBERS
+MCR.users_store_sql_table_group_admins=DOCGROUPADMINS
+MCR.users_store_sql_table_privileges=DOCPRIVS
+MCR.users_store_sql_table_privs_lookup=DOCPRIVSLOOKUP
+\end{verbatim}
+
+\item {\bf Metdaten Store mit CM8} - {\tt mycore.properties.private}
+Hier sind vor allem die richtigen Parameter für die Content Manager TextSearch
+Anbindung einzutragen.
+
+\begin{verbatim}
+# Special values for the text search engine
+MCR.persistence_cm8_textsearch_indexdir=/home/db2inst1/sqllib/db2ext/docindexes
+MCR.persistence_cm8_textsearch_workingdir=/home/db2inst1/sqllib/db2ext/docindexes
+\end{verbatim}
+
+\item {\bf Metdaten Store mit CM8} - {\tt mycore.properties.cm8}
+Weiterhin müssen noch die ItemType-Namen und die Prefixes für die
+neue Anwendung festgelegt werden.
+\begin{verbatim}
+# Special values for the objects for CM8
+MCR.persistence_cm8_document=DOC_Demo_Doc
+MCR.persistence_cm8_document_prefix=ia
+MCR.persistence_cm8_legalentity=DOC_Demo_Legal
+MCR.persistence_cm8_legalentity_prefix=ib
+MCR.persistence_cm8_derivate=DOC_Demo_Der
+MCR.persistence_cm8_derivate_prefix=ic
+\end{verbatim}
+
+\item {\bf Metdaten Store mit eXist} - {\tt mycore.properties.private}
+Nach dem Eintrag dieser Kondigurationszeile ist die eXist-Collection {\bf doc}
+anzulegen. Unter dieser müssen dann die weiteren Collections analog zum
+MyCoRe-Sample angelegt werden.
+
+\begin{verbatim}
+MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/doc
+\end{verbatim}
+
+\end{itemize}
+
