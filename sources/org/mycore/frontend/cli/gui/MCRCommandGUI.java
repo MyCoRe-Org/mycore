@@ -78,8 +78,6 @@ public class MCRCommandGUI extends JFrame {
     String querySearchString = "";
     String[] queryHosts;
     String queryHostString = "local";
-    //    Document resultDoc;
-    String selDocId;
     MCRObjectIdentifier selObject;
 
     public MCRCommandGUI() {
@@ -228,7 +226,7 @@ public class MCRCommandGUI extends JFrame {
   			try {
   			    FileOutputStream fos = new FileOutputStream( fileChooser.getSelectedFile() );
 			    MCRObject obj = new MCRObject();
-			    obj.receiveFromDatastore( selDocId );
+			    obj.receiveFromDatastore( selObject.getId() );
   			    fos.write( obj.createXML() );
 			    fos.close();
   			}
@@ -245,7 +243,7 @@ public class MCRCommandGUI extends JFrame {
   		    try {
   			int answer = JOptionPane.showConfirmDialog( null, "Do you really want to delete the selected item from the content store?", "Confirm delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
   			if( answer == JOptionPane.YES_OPTION ) { 
-			    MCRObjectCommands.delete( selDocId );
+			    MCRObjectCommands.delete( selObject.getId() );
   			}
   		    }
   		    catch( Exception e ) {
