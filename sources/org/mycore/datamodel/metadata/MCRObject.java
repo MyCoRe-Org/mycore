@@ -82,8 +82,6 @@ private String NL;
  * The constructor reads the following informations from the property file:
  * <ul>
  * <li>MCR.parser_class_name</li>
- * <li>MCR.persistence_class_name</li>
- * <li>MCR.persistence_type</li>
  * </ul>
  *
  * @exception MCRException      general Exception of MyCoRe
@@ -95,6 +93,8 @@ public MCRObject() throws MCRException, MCRConfigurationException
   NL = new String((System.getProperties()).getProperty("line.separator"));
   mcr_id = new MCRObjectID();
   mcr_label = new String("");
+  persist_type = new String("");
+  mcr_persist = null;
   try {
   // Parser class
     parser_name = MCRConfiguration.instance()
@@ -108,17 +108,6 @@ public MCRObject() throws MCRException, MCRConfigurationException
     mcr_struct = new MCRObjectStructure();
   // Service class
     mcr_service = new MCRObjectService();
-  // Persistence class and type
-    persist_name = MCRConfiguration.instance()
-      .getString("MCR.persistence_class_name");
-    if (persist_name == null) {
-      throw new MCRConfigurationException("MCR.persistence_class_name"); }
-    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
-      .newInstance(); 
-    persist_type = MCRConfiguration.instance()
-      .getString("MCR.persistence_type");
-    if (persist_type == null) {
-      throw new MCRConfigurationException("MCR.persistence_type"); }
     }
   catch (Exception e) {
      throw new MCRException(e.getMessage()); }
@@ -194,6 +183,35 @@ private final void set() throws MCRException
   // get the service data of the object
   dom_element_list = mcr_document.getElementsByTagName("service");
   mcr_service.setFromDOM(dom_element_list);
+  }
+
+/**
+ * This methode set the persistence depended of the ObjectId type part.
+ * It search the <em>MCR.persistence_type_...</em> information of
+ * the property file. The it will load the coresponding persistence class.
+ *
+ * @exception MCRException was throw if the ObjectId is null or empty or 
+ * the class was not found
+ **/
+private final void setPersistence() throws MCRException
+  {
+  if (!mcr_id.isValid()) { 
+    throw new MCRException("The ObjectId is not valid."); }
+  String proptype = "MCR.persistence_type_"+mcr_id.getTypeId().toLowerCase();
+  try {
+    persist_type = MCRConfiguration.instance().getString(proptype);
+    if (persist_type == null) {
+      throw new MCRConfigurationException(proptype+" not found."); }
+    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
+      "_class_name";
+    persist_name = MCRConfiguration.instance().getString(proppers);
+    if (persist_name == null) {
+      throw new MCRConfigurationException(proppers+" not found."); }
+    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
+      .newInstance(); 
+    }
+  catch (Exception e) {
+     throw new MCRException(e.getMessage()); }
   }
 
 /**
@@ -335,6 +353,7 @@ public final String createTS()
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
+  if (mcr_persist==null) { setPersistence(); }
   mcr_service.setCreateDate();
   mcr_service.setSubmitDate("");
   mcr_service.setAcceptDate("");
@@ -353,6 +372,7 @@ public final void createInDatastore() throws MCRPersistenceException
 public final void deleteFromDatastore(String id) throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
+  if (mcr_persist==null) { setPersistence(); }
   mcr_persist.delete(mcr_id);
   }
 
@@ -365,6 +385,7 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
 public final void receiveFromDatastore(String id) throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
+  if (mcr_persist==null) { setPersistence(); }
   String xml = mcr_persist.receive(mcr_id);
   setFromXML(xml);
   }
@@ -376,6 +397,7 @@ public final void receiveFromDatastore(String id) throws MCRPersistenceException
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
+  if (mcr_persist==null) { setPersistence(); }
   mcr_service.setModifyDate();
   String xml = createXML();
   String ts = createTS();
