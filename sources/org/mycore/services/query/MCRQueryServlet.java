@@ -390,13 +390,12 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 			}
 		} catch (InterruptedException ignored) {
 		}
-    	if (type.equals(sortType)){
-    		// Status setzen f�r Dokumente
-    		if (resarray.size()==1)
-    			resarray.setStatus(0,status);
-    		else if (maxresults>0)
+		// set naighbour status for documents
+    	if (type.equals(sortType) && (resarray.size()==1))
+				resarray.setStatus(0,status);
+		// cut results if more than "maxresults"
+  		else if (maxresults>0)
     			resarray.cutDownTo(maxresults);
-    	}
     	// create a new session if not already alive and encache result list
     	if (mode.equals("ResultList")){
     		session = request.getSession(true);
