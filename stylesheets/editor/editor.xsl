@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2004-03-11 14:37:46 $ -->
+<!-- $Revision: 1.5 $ $Date: 2004-03-11 14:57:20 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -729,11 +729,20 @@
     </xsl:when>
 
     <!-- Otherwise, use the language-independent nested label elements, if existing -->
-    <xsl:otherwise>
+    <xsl:when test="label[string-length(@xml:lang)=0]">
       <xsl:for-each select="label[string-length(@xml:lang)=0]">
         <xsl:copy-of select="*|text()" />
       </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, use the first label of any language that exists -->
+    <xsl:otherwise>
+      <xsl:for-each select="label[1]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
     </xsl:otherwise>
+
+    <!-- Otherwise give up, user is too stupid to configure the editor -->
 
   </xsl:choose>
 
