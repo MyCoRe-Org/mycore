@@ -78,11 +78,14 @@ public class MCRFileContentType
   { return this.label; }
 
   /**
-   * Returns the MIME type used to deliver this file type to a client browser
+   * Returns the MIME type used to deliver this file type to a client browser.
+   * If no MIME type is set, the default type "application/octet-stream" for
+   * binary content is returned.
+   *
    * @return the MIME type used to deliver this file type to a client browser
    */  
   public String getMimeType() 
-  { return this.mimeType; }
+  { return ( mimeType != null ? mimeType : "application/octet-stream" ); }
 
   /**
    * Returns the URL where additional information like a plug-in download page can be found
@@ -90,4 +93,14 @@ public class MCRFileContentType
    */  
   public String getURL() 
   { return this.url; }
+
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append( "ID    = " ).append( this.getID()       ).append( "\n" );
+    sb.append( "label = " ).append( this.getLabel()    ).append( "\n" );
+    sb.append( "mime  = " ).append( this.getMimeType() ).append( "\n" );
+    sb.append( "url   = " ).append( this.getURL()      );
+    return sb.toString();
+  }
 }
