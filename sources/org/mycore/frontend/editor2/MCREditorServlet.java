@@ -135,6 +135,8 @@ public class MCREditorServlet extends MCRServlet
     while( keys.hasNext() )
     {
       key = (String)( keys.next() );
+      if( key.startsWith( "XSL." ) ) continue;
+
       String[] values = (String[])( parameters.get( key ) );
       for( int i = 0; ( values != null ) && ( i < values.length ); i++ )
       {
