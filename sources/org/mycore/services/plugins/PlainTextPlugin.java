@@ -23,13 +23,11 @@
  **/
 package org.mycore.services.plugins;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Writer;
+import java.io.Reader;
 import java.util.HashSet;
 
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 
@@ -42,7 +40,7 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 public class PlainTextPlugin implements TextFilterPlugin {
 
 	private static final int MAJOR=0;
-	private static final int MINOR=3;
+	private static final int MINOR=4;
 	
 	private static HashSet contentTypes;
 	private static String info = null;
@@ -93,15 +91,12 @@ public class PlainTextPlugin implements TextFilterPlugin {
 	/* (non-Javadoc)
 	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
 	 */
-	public boolean transform(
+	public Reader transform(
 		MCRFileContentType ct,
-		InputStream input,
-		Writer output)
+		InputStream input)
 		throws FilterPluginTransformException {
 		if (getSupportedContentTypes().contains(ct)) {
-			BufferedReader in
-			  = new BufferedReader(new InputStreamReader(input));
-			return MCRUtils.copyReader(in, output);
+			return new InputStreamReader(input);
 		} else
 			throw new FilterPluginTransformException(
 				"ContentType "

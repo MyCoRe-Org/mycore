@@ -25,7 +25,7 @@ package org.mycore.services.plugins;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Writer;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -160,16 +160,22 @@ public class TextFilterPluginManager {
 	public boolean isSupported(MCRFileContentType ct) {
 		return (ct == null) ? false : ContentTypePluginBag.containsKey(ct);
 	}
-
-	public boolean transform(
+	
+	/**
+	 * returns a Reader for the characters of the InputStream
+	 * @param ct ContentType of the InputStream
+	 * @param input InputStream to be parsed
+	 * @return null if ContentType is unsupported, else a Reader for the parsed characters
+	 * @throws FilterPluginTransformException
+	 */
+	public Reader transform(
 		MCRFileContentType ct,
-		InputStream input,
-		Writer output)
+		InputStream input)
 		throws FilterPluginTransformException {
 		if (isSupported(ct)) {
-			return getPlugin(ct).transform(ct, input, output);
+			return getPlugin(ct).transform(ct, input);
 		} else
-			return false;
+			return null;
 	}
 
 	/**

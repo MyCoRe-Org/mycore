@@ -23,6 +23,7 @@
  **/
 package org.mycore.services.plugins;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Writer;
+import java.io.Reader;
 import java.util.HashSet;
 
 import org.mycore.common.MCRConfigurationException;
@@ -48,7 +49,7 @@ public class PdfPlugin implements TextFilterPlugin {
 	private static HashSet contentTypes = null;
 	private static String name = "Yagee's amazing PDF Filter";
 	private static final int MAJOR = 0;
-	private static final int MINOR = 5;
+	private static final int MINOR = 6;
 	private static String info = null;
 	private static String p2t_info = null;
 	private static final String textencoding = "UTF-8";
@@ -132,14 +133,11 @@ public class PdfPlugin implements TextFilterPlugin {
 				txtfile.getAbsolutePath()};
 		String s;
 		try {
-			System.err.println(
-				testcommand[0]
-					+ " "
-					+ testcommand[1]
-					+ " "
-					+ testcommand[2]
-					+ " "
-					+ testcommand[3]);
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < testcommand.length; i++) {
+				sb.append(testcommand[i]).append(' ');
+			}
+			System.err.println(sb);
 			Process p = Runtime.getRuntime().exec(testcommand);
 			BufferedReader stdError =
 				new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -171,38 +169,7 @@ public class PdfPlugin implements TextFilterPlugin {
 		return contentTypes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType, org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
-	 */
-	//	public boolean transform(
-	//		MCRFileContentType ct,
-	//		InputStream input,
-	//		OutputStream output)
-	//		throws FilterPluginTransformException {
-	//		if (!getSupportedContentTypes().contains(ct))
-	//			throw new FilterPluginTransformException(
-	//				"ContentType "
-	//					+ ct
-	//					+ " is not supported by "
-	//					+ getName()
-	//					+ "!");
-	//		boolean success = true;
-	//		try {
-	//			stripText(input, output);
-	//		} catch (IOException e) {
-	//			success = false;
-	//			StringBuffer msg =
-	//				new StringBuffer("Error while transforming Inputstream: I/O Error");
-	//			throw new FilterPluginTransformException(msg.toString(), e);
-	//		} finally {
-	//			return success;
-	//		}
-	//	}
-
-	public boolean transform(
-		MCRFileContentType ct,
-		InputStream input,
-		Writer output)
+	public Reader transform(MCRFileContentType ct, InputStream input)
 		throws FilterPluginTransformException {
 		if (!getSupportedContentTypes().contains(ct))
 			throw new FilterPluginTransformException(
@@ -211,28 +178,22 @@ public class PdfPlugin implements TextFilterPlugin {
 					+ " is not supported by "
 					+ getName()
 					+ "!");
-		boolean success = false;
 		try {
 			System.err.println("===== PDF decoding starts ====");
 			File pdffile = File.createTempFile("inp", ".pdf");
-			FileOutputStream fout = new FileOutputStream(pdffile);
+			BufferedOutputStream out =
+				new BufferedOutputStream(new FileOutputStream(pdffile));
 			pdffile.deleteOnExit();
-			MCRUtils.copyStream(input, fout);
-			fout.flush();
-			fout.close();
+			MCRUtils.copyStream(input, out);
+			out.close();
 			File txtfile = File.createTempFile("out", ".txt");
 			txtfile.deleteOnExit();
-			success = pdftotext(pdffile, txtfile);
+			if (!pdftotext(pdffile, txtfile)) {
+				throw new FilterPluginTransformException("pdftotext reported an error while exporting text of PDF file!");
+			}
 			pdffile.delete();
 			FileInputStream fin = new FileInputStream(txtfile);
-			BufferedReader in =
-				new BufferedReader(new InputStreamReader(fin, textencoding));
-			System.err.println("[0]");
-			if (MCRUtils.copyReader(in, output)) {
-				System.err.println("[1]");
-				txtfile.delete();
-				System.err.println("[2]");
-			}
+			return new InputStreamReader(fin, textencoding);
 		} catch (FileNotFoundException e) {
 			throw new FilterPluginTransformException("File was not found!", e);
 		} catch (IOException e) {
@@ -240,7 +201,6 @@ public class PdfPlugin implements TextFilterPlugin {
 				"General I/O Exception occured",
 				e);
 		}
-		return success;
 	}
 
 	/**

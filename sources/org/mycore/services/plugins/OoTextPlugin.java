@@ -23,16 +23,13 @@
  **/
 package org.mycore.services.plugins;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -57,13 +54,13 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class OoTextPlugin implements TextFilterPlugin {
 
 	private static final int MAJOR = 0;
-	private static final int MINOR = 2;
+	private static final int MINOR = 3;
 	private static final EntityResolver OooResolver = new ResolveOfficeDTD();
 
 	private static HashSet contentTypes;
 	private static String info = null;
 
-	private static int DEF_BYTE_SZ = 1024 * 16;
+	private static int DEF_BYTE_SZ = 1024 * 63;
 
 	private ByteArrayInputStream bis;
 
@@ -108,20 +105,12 @@ public class OoTextPlugin implements TextFilterPlugin {
 	/* (non-Javadoc)
 	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
 	 */
-	public boolean transform(
-		MCRFileContentType ct,
-		InputStream input,
-		Writer output)
+	public Reader transform(MCRFileContentType ct, InputStream input)
 		throws FilterPluginTransformException {
 		if (getSupportedContentTypes().contains(ct)) {
 			try {
 				System.out.println("Reading Oo-Document");
-//				CharArrayWriter cw=new CharArrayWriter();
-//				MCRUtils.copyReader(new BufferedReader(getTextReader(getXMLStream(input))),cw);
-//				System.out.print(cw.toCharArray());
-//				return MCRUtils.copyReader(new BufferedReader(new CharArrayReader(cw.toCharArray())), output);
-				
-				return MCRUtils.copyReader(new BufferedReader(getTextReader(getXMLStream(input))), output);
+				return getTextReader(getXMLStream(input));
 			} catch (SAXException e) {
 				throw new FilterPluginTransformException(
 					"Error while parsing OpenOffice document.",
@@ -164,37 +153,77 @@ public class OoTextPlugin implements TextFilterPlugin {
 		}
 		if (ze == null || !ze.getName().equals("content.xml"))
 			throw new FilterPluginTransformException("No content.xml was found in OpenOffice.org document!");
-		ByteArrayOutputStream bos =
-			new ByteArrayOutputStream(
-				(ze.getSize() < 0) ? DEF_BYTE_SZ : (int) ze.getSize());
-		int x;
-		while ((x = zip.read()) != -1)
-			bos.write(x);
+		int chunkSize = (ze.getSize() < 0) ? DEF_BYTE_SZ : (int) ze.getSize();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(chunkSize);
+		BufferedOutputStream out = new BufferedOutputStream(bos);
+		byte[] ba = new byte[chunkSize];
+		while (true) {
+			int bytesRead = MCRUtils.readBlocking(zip, ba, 0, chunkSize);
+			if (bytesRead > 0) {
+				out.write(ba, 0 /* offset in ba */
+				, bytesRead /* bytes to write */
+				);
+			} else {
+				break; // hit eof
+			}
+		}
+		out.close();
 		return new ByteArrayInputStream(bos.toByteArray());
 	}
 
-	private CharArrayReader getTextReader(InputStream xml)
+	private Reader getTextReader(InputStream xml)
 		throws IOException, SAXException {
 		XMLReader reader =
 			XMLReaderFactory.createXMLReader(
 				"org.apache.xerces.parsers.SAXParser");
-		CharArrayWriter cos=new CharArrayWriter();
-		BufferedWriter out=new BufferedWriter(cos);
-		reader.setContentHandler(new TextHandler(out));
+		StringBuffer buf = new StringBuffer();
+		reader.setContentHandler(new TextHandler(buf));
 		InputSource inp = new InputSource(xml);
 		reader.setEntityResolver(OooResolver);
 		reader.parse(inp);
-		return new CharArrayReader(cos.toCharArray());
+		return new StringBufferReader(buf);
+	}
+
+	private static class StringBufferReader extends Reader {
+		private final StringBuffer buf;
+		private int pos;
+		public StringBufferReader(StringBuffer buf) {
+			this.buf = buf;
+			pos = 0;
+		}
+		/* (non-Javadoc)
+		* @see java.io.Reader#close()
+		*/
+		public void close() throws IOException {
+		}
+
+		/* (non-Javadoc)
+		 * @see java.io.Reader#read(char[], int, int)
+		 */
+		public int read(char[] cbuf, int off, int len) throws IOException {
+			int charsRead =
+				(buf.length() < (off + len)) ? (buf.length() - off) : len;
+			if (pos == buf.length() - 1)
+				return -1;
+			else {
+				int start = pos + off;
+				int end = start + charsRead;
+				buf.getChars(start, end, cbuf, 0);
+				pos = end - 1;
+			}
+			return charsRead;
+		}
+
 	}
 
 	private static class TextHandler extends DefaultHandler {
 		private static final String textNS = "http://openoffice.org/2000/text";
-		private final Writer out;
+		private final StringBuffer buf;
 		private boolean textElement = false;
-		private static final char[] space= new char[]{' '};
+		private static final char[] space = new char[] { ' ' };
 
-		private TextHandler(Writer out) {
-			this.out = out;
+		private TextHandler(StringBuffer buf) {
+			this.buf = buf;
 		}
 
 		/* (non-Javadoc)
@@ -203,15 +232,8 @@ public class OoTextPlugin implements TextFilterPlugin {
 		public void characters(char[] ch, int start, int length)
 			throws SAXException {
 			if (textElement) {
-				try {
-					//write text to the stream
-					out.write(ch, start, length);
-					out.write(space,0,1);
-				} catch (IOException e) {
-					throw new FilterPluginTransformException(
-						"Error while getting text Elements.",
-						e);
-				}
+				//write text to the stream
+				buf.append(ch, start, length).append(' ');
 			}
 		}
 

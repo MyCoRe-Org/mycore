@@ -529,7 +529,7 @@ public class MCRUtils {
 	 * @exception  IOException   if an I/O error occurs.
 	 *
 	 */
-	private static final int readBlocking(
+	public static final int readBlocking(
 		InputStream in,
 		byte b[],
 		int off,
@@ -553,7 +553,7 @@ public class MCRUtils {
 	 * Reads exactly <code>len</code> bytes from the input stream
 	 * into the byte array. This method reads repeatedly from the
 	 * underlying stream until all the bytes are read.
-	 * InputStream.read is often documented to block like this, but in actuality it
+	 * Reader.read is often documented to block like this, but in actuality it
 	 * does not always do so, and returns early with just a few bytes.
 	 * readBlockiyng blocks until all the bytes are read,
 	 * the end of the stream is detected,
@@ -568,7 +568,7 @@ public class MCRUtils {
 	 * @exception  IOException   if an I/O error occurs.
 	 *
 	 */
-	private static final int readBlocking(
+	public static final int readBlocking(
 		Reader in,
 		char c[],
 		int off,

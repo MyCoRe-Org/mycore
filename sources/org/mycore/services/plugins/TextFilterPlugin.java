@@ -24,6 +24,7 @@
 package org.mycore.services.plugins;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.HashSet;
 
@@ -76,9 +77,8 @@ public interface TextFilterPlugin {
 	 * @param input  File in foreign format
 	 * @return Inputstream textual representation of input
 	 */
-	public boolean transform(
+	public Reader transform(
 		MCRFileContentType ct,
-		InputStream input,
-		Writer output)
+		InputStream input)
 		throws FilterPluginTransformException;
 }
