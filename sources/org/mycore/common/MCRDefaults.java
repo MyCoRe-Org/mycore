@@ -44,5 +44,8 @@ public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance"
 /** The default encoding */
 public final static String ENCODING = "ISO_8859-1";
 
+/** The maximum of the metadata XML files **/
+public final static int MAX_XML_FILE_LENGTH = 100 * 1024;
+
 }
 

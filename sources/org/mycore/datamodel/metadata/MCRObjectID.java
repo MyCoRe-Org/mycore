@@ -108,7 +108,7 @@ public MCRObjectID (String id) throws MCRException
  * @param base_id         the basic ID 
  * @exception MCRUsageException if the given string is not valid.
  **/
-public void setNextId(String base_id) throws MCRUsageException
+public void setNextFreeId(String base_id) throws MCRUsageException
   {
   mcr_valid_id = false;
   StringBuffer sb = new StringBuffer(MAX_LENGTH);
@@ -117,14 +117,9 @@ public void setNextId(String base_id) throws MCRUsageException
   if (!is) { throw new MCRException("The ID is not valid"); }
   MCRObjectPersistenceInterface mcr_persist;
   try {
-    String persist_type = conf.getString( "MCR.XMLStore.Type" );
-    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-      "_class_name";
-    String persist_name = conf.getString(proppers);
-    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
-      .newInstance(); 
-    mcr_number = Integer.parseInt(mcr_persist.getNextFreeId(mcr_project_id,
-      mcr_type_id));
+    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+    mcr_number = xmltable.getNextFreeIdInt(mcr_type_id,mcr_project_id,
+      mcr_type_id);
     }
   catch (Exception e) {
      throw new MCRUsageException(e.getMessage(),e); }
