@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.22 $ $Date: 2004-12-22 22:25:35 $ -->
+<!-- $Revision: 1.23 $ $Date: 2004-12-23 10:00:16 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -33,6 +33,18 @@
 <xsl:param name="target.param.7" />
 <xsl:param name="target.param.8" />
 <xsl:param name="target.param.9" />
+
+<!-- ======== constants, do not change ======== -->
+<xsl:variable name="editor.delimiter.internal"  select="'_'" />
+<xsl:variable name="editor.delimiter.root"      select="'/'" />
+<xsl:variable name="editor.delimiter.element"   select="'/'" />
+<xsl:variable name="editor.delimiter.attribute" select="'@'" />
+<xsl:variable name="editor.delimiter.pos.start" select="'['" />
+<xsl:variable name="editor.delimiter.pos.end"   select="']'" />
+
+<xsl:variable name="editor.list.indent">
+  <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
+</xsl:variable>
 
 <!-- ========================================================================= -->
 
