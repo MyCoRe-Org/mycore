@@ -28,13 +28,23 @@
 				<xsl:for-each 
 					select="document($navigationBase)/navigation//item[@href]">
 					<xsl:if test="@href = $browserAddress ">
-						<a href="{ concat($WebApplicationBaseURL,substring-after($hrefStartingPage,'/') )}" >
+						<a>
+                            <xsl:attribute name="href">
+                                <xsl:call-template name="UrlAddSession">
+                                    <xsl:with-param name="url" select="concat($WebApplicationBaseURL,substring-after($hrefStartingPage,'/'))" />
+                                </xsl:call-template>
+                            </xsl:attribute>
 							<xsl:value-of select="$MainTitle" />
 						</a>
 						<xsl:for-each select="ancestor-or-self::item">
 							<xsl:if test="$browserAddress != $hrefStartingPage " > > <xsl:choose> <xsl:when 
-								test="position() != last()"> <a 
-								href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}" > <xsl:choose> <xsl:when 
+								test="position() != last()"> <a> 
+                                    <xsl:attribute name="href">
+                                        <xsl:call-template name="UrlAddSession">
+                                            <xsl:with-param name="url" select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
+                                        </xsl:call-template>
+                                    </xsl:attribute>
+                                    <xsl:choose> <xsl:when 
 								test="./label[lang($CurrentLang)] != ''"> <xsl:value-of select="./label[lang($CurrentLang)]" 
 								/> </xsl:when> <xsl:otherwise> <xsl:value-of select="./label[lang($DefaultLang)]" /> 
 								</xsl:otherwise> </xsl:choose> </a> </xsl:when> <xsl:otherwise> <xsl:choose> <xsl:when 
@@ -599,7 +609,9 @@
                        <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
                     </xsl:if>
 					<xsl:attribute name="href">
-						<xsl:value-of select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
+                        <xsl:call-template name="UrlAddSession">
+                            <xsl:with-param name="url" select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
+                        </xsl:call-template>
 					</xsl:attribute>
 					<xsl:choose>
 						<xsl:when test="@style = 'bold'">
@@ -645,19 +657,24 @@
                            <xsl:value-of select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
                         </xsl:otherwise>
                      </xsl:choose>
-               </xsl:variable>               
+               </xsl:variable>
+                    <xsl:variable name="href_temp2">
+                        <xsl:call-template name="UrlAddSession">
+                            <xsl:with-param name="url" select="$href_temp" />
+                        </xsl:call-template>
+                    </xsl:variable>
                <xsl:attribute name="href">
                      <xsl:choose>
                         <!-- in case of $href_temp contains 'servlet' append 'lang=$currentlang' -->
                         <xsl:when test=" contains($href_temp,'/servlets/') ">
                                         <xsl:call-template name="UrlSetParam">
-                                          <xsl:with-param name="url" select="$href_temp"/>
+                                          <xsl:with-param name="url" select="$href_temp2"/>
                                           <xsl:with-param name="par" select="'lang'"/>
                                           <xsl:with-param name="value" select="$CurrentLang"/>
                               </xsl:call-template>
                         </xsl:when>
                         <xsl:otherwise>
-                           <xsl:value-of select="$href_temp" />
+                           <xsl:value-of select="$href_temp2" />
                         </xsl:otherwise>
                      </xsl:choose>                  	
                </xsl:attribute>
@@ -749,5 +766,5 @@
 		</a>
 	</xsl:template>            
 	
-	<!-- ================================================================================= -->	
+	<!-- ================================================================================= --> 
 </xsl:stylesheet>
