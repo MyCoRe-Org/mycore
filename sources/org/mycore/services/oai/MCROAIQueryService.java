@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -284,7 +285,8 @@ public class MCROAIQueryService implements MCROAIQuery {
    		list.add(identifier);
    		logger.debug("Identifier hinzugefügt");
    		
-        Element eMetadata = object.getMetadata().createXML();
+        Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
+             
         list.add(eMetadata);
    		logger.debug("Metadaten hinzugefügt");
         
@@ -384,7 +386,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 				list.add(identifier);
 				
 				if (listRecords) {
-					Element eMetadata = object.getMetadata().createXML();
+					Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
 					list.add(eMetadata);
 				}
 		    }
@@ -399,11 +401,11 @@ public class MCROAIQueryService implements MCROAIQuery {
 	        StringBuffer query = new StringBuffer("");
 			
 			query.
-				append("/mycoreobject/metadata/*/*[@classid=\"").
+				append("/mycoreobject[metadata/*/*[@classid=\"").
 				append(restrictionClassification).
                 append("\" and @categid=\"").
 				append(restrictionCategory).
-				append("\"]");
+				append("\"] ]");
 			
 			restrictionQueries.add(query.toString());
 	    } catch (MCRConfigurationException mcrx) {
@@ -423,17 +425,17 @@ public class MCROAIQueryService implements MCROAIQuery {
 
 	        if (set == null) {
             	query.
-					append("/mycoreobject/metadata/*/*[@classid=\"").
+					append("/mycoreobject[metadata/*/*[@classid=\"").
 					append(classification[i]).
-					append("\"]");
+					append("\"] ]");
     	    } else {
 	            String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
             	query.
-					append("/mycoreobject/metadata/*/*[@classid=\"").
+					append("/mycoreobject[metadata/*/*[@classid=\"").
 					append(classification[i]).
         	        append("\" and @categid=\"").
 					append(categoryId).
-					append("\"]");
+					append("\"] ]");
     	    }
 	        
 	        queries.add(query.toString());
@@ -489,7 +491,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 			list.add(identifier);
 			
 			if (listRecords) {
-				Element eMetadata = object.getMetadata().createXML();
+				Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
 				list.add(eMetadata);
 			}
 		}
@@ -497,6 +499,36 @@ public class MCROAIQueryService implements MCROAIQuery {
 		return list;
 	}
 	
+	/**
+	 * Method collectMetadataWithLinks
+	 * @param documentMetadata the metadata of the given document
+	 * @return an Element with the metadata in collections like author and institution, 
+	 *                that were linked in the documentMetadata via MCRMetaLinkID and xlink:href
+	 */
+	public Element collectMetadataWithLinks(Element documentMetadata) {
+		// Element result = (Element) documentMetadata.clone();
+        Iterator it = documentMetadata.getChildren().iterator() ;
+        while (it.hasNext()) {
+        	Element elm = (Element) it.next() ;
+        	if (elm.getAttribute("class").getValue().equals("MCRMetaLinkID")) {
+        		Iterator metalinkIterator = elm.getChildren().iterator();
+        		while(metalinkIterator.hasNext()) {
+        			Element linkElm = (Element) metalinkIterator.next() ;
+        			MCRObject linkObj = new MCRObject();
+        			linkObj.receiveFromDatastore(linkElm.getAttribute("href",
+        			    org.jdom.Namespace.getNamespace("xlink", 
+        			        org.mycore.common.MCRDefaults.XLINK_URL)).getValue());
+        			linkElm.addContent(linkObj.getMetadata().createXML()) ;
+        		}
+        	}
+        }
+          
+        //org.jdom.Document myDoc = object.createXML() ;
+        //org.jdom.output.XMLOutputter myOut = new org.jdom.output.XMLOutputter();
+        //logger.debug("tempHH:" + myOut.outputString(eMetadata));
+        //end new  		
+		return documentMetadata;
+	}
 	/**
 	 * Method hasMore.
 	 * @return true, if more results for the last query exists, else false
