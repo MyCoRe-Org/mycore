@@ -409,7 +409,7 @@ public class MCRCommandLineInterface
       logger.error( "Command not understood. Enter 'help' to get a list of commands." );
     }
     catch( Throwable t1 ) 
-    {
+    { t1.printStackTrace();
       if( t1 instanceof MCRException )
         logMCRException( (MCRException)t1 );
       else if( ( t1 instanceof InvocationTargetException ) || ( t1 instanceof ExceptionInInitializerError ) ) 
