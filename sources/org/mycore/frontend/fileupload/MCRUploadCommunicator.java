@@ -47,9 +47,6 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.mycore.common.MCRConfiguration;
-
-
 /**
  * This class is used by applets to communicate with the
  * corresponding MCRUploadServlet servlet to execute tasks
@@ -317,9 +314,7 @@ public final class MCRUploadCommunicator
   protected InputStream doPost( Hashtable parameters )
     throws IOException
   {
-  	MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    String data = encodeParameters( parameters, CONFIG.getString("MCR.request_charencoding", "UTF-8"));
+    String data = encodeParameters( parameters, "UTF-8");
     String mime = "application/x-www-form-urlencoded";
 
     URLConnection connection = null;
