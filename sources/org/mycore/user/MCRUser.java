@@ -126,9 +126,9 @@ public MCRUser(int numID, String ID, String creator, Timestamp creationDate,
   throws MCRException, Exception
   {
   // The following data will never be changed by update
-  super.ID      = trim(ID);
+  super.ID      = trim(ID,id_len);
   this.numID    = numID;
-  super.creator = trim(creator);
+  super.creator = trim(creator,id_len);
   // check if the creation timestamp is provided. If not, use current timestamp
   if (creationDate == null) {
     super.creationDate = new Timestamp(new GregorianCalendar().getTime()
@@ -142,9 +142,9 @@ public MCRUser(int numID, String ID, String creator, Timestamp creationDate,
     super.modifiedDate = modifiedDate; }
   this.idEnabled = idEnabled;
   this.updateAllowed = updateAllowed;
-  super.description = trim(description);
-  this.passwd = trim(passwd);
-  this.primaryGroupID = trim(primaryGroupID);
+  super.description = trim(description,description_len);
+  this.passwd = trim(passwd,password_len);
+  this.primaryGroupID = trim(primaryGroupID,id_len);
   super.groupIDs = groupIDs;
   userContact = new MCRUserContact(salutation,firstname,lastname,
     street, city,postalcode,country,state,institution,faculty,department,
@@ -160,8 +160,8 @@ public MCRUser(org.jdom.Element elm)
   {
   this();
   if (!elm.getName().equals("user")) { return; }
-  super.ID = ((String)elm.getAttributeValue("ID")).trim();
-  String numIDtmp = ((String)elm.getAttributeValue("numID")).trim();
+  super.ID = trim((String)elm.getAttributeValue("ID"),id_len);
+  String numIDtmp = trim((String)elm.getAttributeValue("numID"));
   try {
     this.numID = Integer.parseInt(numIDtmp); }
   catch (Exception e) {
@@ -170,11 +170,9 @@ public MCRUser(org.jdom.Element elm)
     (elm.getAttributeValue("id_enabled").equals("true")) ? true : false;
   this.updateAllowed = 
     (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
-  String tmp = elm.getChildTextTrim("user.creator");
-  if (tmp != null) { this.creator = tmp; }
-  tmp = elm.getChildTextTrim("user.password");
-  if (tmp != null) { this.passwd = tmp; }
-  tmp = elm.getChildTextTrim("user.creation_date");
+  this.creator = trim(elm.getChildTextTrim("user.creator"),id_len);
+  this.passwd = trim(elm.getChildTextTrim("user.password"),password_len);
+  String tmp = elm.getChildTextTrim("user.creation_date");
   if (tmp != null) {
     try {
       super.creationDate = Timestamp.valueOf(tmp); }
@@ -186,10 +184,10 @@ public MCRUser(org.jdom.Element elm)
       super.modifiedDate = Timestamp.valueOf(tmp); }
     catch (Exception e) { }
     }
-  tmp = elm.getChildTextTrim("user.description");
-  if (tmp != null) { this.description = tmp; }
-  tmp = elm.getChildTextTrim("user.primary_group");
-  if (tmp != null) { this.primaryGroupID = tmp; }
+  this.description = trim(elm.getChildTextTrim("user.description"),
+    description_len);
+  this.primaryGroupID = trim(elm.getChildTextTrim("user.primary_group"),
+    id_len);
   org.jdom.Element userContactElement = elm.getChild("user.contact");
   org.jdom.Element userGroupElement = elm.getChild("user.groups");
   if (userGroupElement != null) {
@@ -280,6 +278,8 @@ public int getNumID()
       test = test && super.ID.length() > 0;
     if (requiredUserAttributes.contains("numID"))
       test = test && this.numID >= 0;
+    if (requiredUserAttributes.contains("creator"))
+      test = test && super.ID.length() > 0;
     if (requiredUserAttributes.contains("password"))
       test = test && this.passwd.length() > 0;
     if (requiredUserAttributes.contains("primary_group"))
@@ -299,7 +299,7 @@ public boolean setPassword(String newPassword)
   // conform with a password policy.
   if (newPassword == null) { return false; }
   if (newPassword.length() != 0) {
-    passwd = newPassword;
+    passwd = trim(newPassword,password_len);
     super.modifiedDate = new Timestamp(new GregorianCalendar().getTime()
       .getTime());
     return true;

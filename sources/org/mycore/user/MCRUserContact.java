@@ -49,6 +49,54 @@ public class MCRUserContact
     Logger.getLogger(MCRUserContact.class.getName());
   private static MCRConfiguration config = null;
 
+  /** The length of the salutation */
+  public final static int salutation_len = 24;
+
+  /** The length of the firstname */
+  public final static int firstname_len = 64;
+
+  /** The length of the lastname */
+  public final static int lastname_len = 32;
+
+  /** The length of the street */
+  public final static int street_len = 64;
+
+  /** The length of the city */
+  public final static int city_len = 32;
+
+  /** The length of the postalcode */
+  public final static int postalcode_len = 32;
+
+  /** The length of the country */
+  public final static int country_len = 32;
+
+  /** The length of the state */
+  public final static int state_len = 32;
+
+  /** The length of the institution */
+  public final static int institution_len = 64;
+
+  /** The length of the faculty */
+  public final static int faculty_len = 64;
+
+  /** The length of the department */
+  public final static int department_len = 64;
+
+  /** The length of the institute */
+  public final static int institute_len = 64;
+
+  /** The length of the telephone */
+  public final static int telephone_len = 32;
+
+  /** The length of the fax */
+  public final static int fax_len = 32;
+
+  /** The length of the email */
+  public final static int email_len = 64;
+
+  /** The length of the cellphone */
+  public final static int cellphone_len = 32;
+
   private String salutation = "";
   private String firstname = "";
   private String lastname = "";
@@ -82,22 +130,23 @@ public class MCRUserContact
                         String telephone, String fax, String email, 
                         String cellphone)
   {
-    this.salutation  = trim(salutation);
-    this.firstname   = trim(firstname);
-    this.lastname    = trim(lastname);
-    this.street      = trim(street);
-    this.city        = trim(city);
-    this.postalcode  = trim(postalcode);
-    this.country     = trim(country);
-    this.state       = trim(state);
-    this.institution = trim(institution);
-    this.faculty     = trim(faculty);
-    this.department  = trim(department);
-    this.institute   = trim(institute);
-    this.telephone   = trim(telephone);
-    this.fax         = trim(fax);
-    this.email       = trim(email);
-    this.cellphone   = trim(cellphone);
+    init();
+    this.salutation  = MCRUserObject.trim(salutation,salutation_len);
+    this.firstname   = MCRUserObject.trim(firstname,firstname_len);
+    this.lastname    = MCRUserObject.trim(lastname,lastname_len);
+    this.street      = MCRUserObject.trim(street,street_len);
+    this.city        = MCRUserObject.trim(city,city_len);
+    this.postalcode  = MCRUserObject.trim(postalcode,postalcode_len);
+    this.country     = MCRUserObject.trim(country,country_len);
+    this.state       = MCRUserObject.trim(state,state_len);
+    this.institution = MCRUserObject.trim(institution,institution_len);
+    this.faculty     = MCRUserObject.trim(faculty,faculty_len);
+    this.department  = MCRUserObject.trim(department,department_len);
+    this.institute   = MCRUserObject.trim(institute,institute_len);
+    this.telephone   = MCRUserObject.trim(telephone,telephone_len);
+    this.fax         = MCRUserObject.trim(fax,fax_len);
+    this.email       = MCRUserObject.trim(email,email_len);
+    this.cellphone   = MCRUserObject.trim(cellphone,cellphone_len);
   }
 
   /**
@@ -115,25 +164,41 @@ public class MCRUserContact
    * All address and contact attributes are passed in a JDOM Element.
    * @param elm the JDOM Element
    */
-  public void setFromJDOMElement(org.jdom.Element elm)
+  public final void setFromJDOMElement(org.jdom.Element elm)
     {
     if (elm == null) { return; }
-    this.salutation  = trim(elm.getChildTextTrim("contact.salutation"));
-    this.firstname   = trim(elm.getChildTextTrim("contact.firstname"));
-    this.lastname    = trim(elm.getChildTextTrim("contact.lastname"));
-    this.street      = trim(elm.getChildTextTrim("contact.street"));
-    this.city        = trim(elm.getChildTextTrim("contact.city"));
-    this.postalcode  = trim(elm.getChildTextTrim("contact.postalcode"));
-    this.country     = trim(elm.getChildTextTrim("contact.country"));
-    this.state       = trim(elm.getChildTextTrim("contact.state"));
-    this.institution = trim(elm.getChildTextTrim("contact.institution"));
-    this.faculty     = trim(elm.getChildTextTrim("contact.faculty"));
-    this.department  = trim(elm.getChildTextTrim("contact.faculty"));
-    this.institute   = trim(elm.getChildTextTrim("contact.department"));
-    this.telephone   = trim(elm.getChildTextTrim("contact.institute"));
-    this.fax         = trim(elm.getChildTextTrim("contact.fax"));
-    this.email       = trim(elm.getChildTextTrim("contact.email"));
-    this.cellphone   = trim(elm.getChildTextTrim("contact.cellphone"));
+    this.salutation  = MCRUserObject.trim(elm.getChildTextTrim("contact.salutation"),
+      salutation_len);
+    this.firstname   = MCRUserObject.trim(elm.getChildTextTrim("contact.firstname"),
+      firstname_len);
+    this.lastname    = MCRUserObject.trim(elm.getChildTextTrim("contact.lastname"),
+      lastname_len);
+    this.street      = MCRUserObject.trim(elm.getChildTextTrim("contact.street"),
+      street_len);
+    this.city        = MCRUserObject.trim(elm.getChildTextTrim("contact.city"),
+      city_len);
+    this.postalcode  = MCRUserObject.trim(elm.getChildTextTrim("contact.postalcode"),
+      postalcode_len);
+    this.country     = MCRUserObject.trim(elm.getChildTextTrim("contact.country"),
+      country_len);
+    this.state       = MCRUserObject.trim(elm.getChildTextTrim("contact.state"),
+      state_len);
+    this.institution = MCRUserObject.trim(elm.getChildTextTrim("contact.institution"),
+      institution_len);
+    this.faculty     = MCRUserObject.trim(elm.getChildTextTrim("contact.faculty"),
+      faculty_len);
+    this.department  = MCRUserObject.trim(elm.getChildTextTrim("contact.department"),
+      department_len);
+    this.institute   = MCRUserObject.trim(elm.getChildTextTrim("contact.institute"),
+      institute_len);
+    this.telephone   = MCRUserObject.trim(elm.getChildTextTrim("contact.telephone"),
+      telephone_len);
+    this.fax         = MCRUserObject.trim(elm.getChildTextTrim("contact.fax"),
+      fax_len);
+    this.email       = MCRUserObject.trim(elm.getChildTextTrim("contact.email"),
+      email_len);
+    this.cellphone   = MCRUserObject.trim(elm.getChildTextTrim("contact.cellphone"),
+      cellphone_len);
     }
 
   /**
@@ -141,6 +206,8 @@ public class MCRUserContact
    **/
   private final void init()
     {
+    config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
     salutation = "";
     firstname = "";
     lastname = "";
@@ -162,52 +229,52 @@ public class MCRUserContact
   /**
    * The following methods simply return the attributes...
    */
-  public String getSalutation()
+  public final String getSalutation()
   { return salutation; }
 
-  public String getFirstName()
+  public final String getFirstName()
   { return firstname; }
 
-  public String getLastName()
+  public final String getLastName()
   { return lastname; }
 
-  public String getStreet()
+  public final String getStreet()
   { return street; }
 
-  public String getCity()
+  public final String getCity()
   { return city; }
 
-  public String getPostalCode()
+  public final String getPostalCode()
   { return postalcode; }
 
-  public String getCountry()
+  public final String getCountry()
   { return country; }
 
-  public String getState()
+  public final String getState()
   { return state; }
 
-  public String getInstitution()
+  public final String getInstitution()
   { return institution; }
 
-  public String getFaculty()
+  public final String getFaculty()
   { return faculty; }
 
-  public String getDepartment()
+  public final String getDepartment()
   { return department; }
 
-  public String getInstitute()
+  public final String getInstitute()
   { return institute; }
 
-  public String getTelephone()
+  public final String getTelephone()
   { return telephone; }
 
-  public String getFax()
+  public final String getFax()
   { return fax; }
 
-  public String getEmail()
+  public final String getEmail()
   { return email; }
 
-  public String getCellphone()
+  public final String getCellphone()
   { return cellphone; }
 
 /**
@@ -218,7 +285,7 @@ public class MCRUserContact
  * @returns
  *   JDOM Element including data fields of this class
  **/
-  public org.jdom.Element toJDOMElement()
+  public final org.jdom.Element toJDOMElement()
   {
   org.jdom.Element address     = new org.jdom.Element("user.contact");
   org.jdom.Element Salutation  = 
@@ -276,10 +343,8 @@ public class MCRUserContact
 /**
  * The method print a debug over thi data.
  **/
-public void debug()
+public final void debug()
   {
-  config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
   logger.debug("Salutation      : "+salutation);
   logger.debug("Firstname       : "+firstname);
   logger.debug("Lastname        : "+lastname);
@@ -298,10 +363,4 @@ public void debug()
   logger.debug("Cellphone       : "+cellphone);
   }
 
-/**
- * This helper method replaces null with an empty string and trims whitespace 
- * from non-null strings.
- **/
-private static String trim(String s)
-  { return (s != null) ? s.trim() : ""; }
 }

@@ -48,6 +48,12 @@ public class MCRPrivilege
   /** The logger */
   private static Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
 
+  /** The length of the decription */
+  public static final int description_len = MCRUserObject.description_len;
+
+  /** The length of the privilege */
+  public static final int privilege_len = MCRUserObject.privilege_len;
+
   /** The name of the privilege */
   private String privName;
 
@@ -61,8 +67,8 @@ public class MCRPrivilege
    */
   public MCRPrivilege (String name, String description)
   {
-    privName = name;
-    privDescription = description;
+    privName = MCRUserObject.trim(name,privilege_len);
+    privDescription = MCRUserObject.trim(description,description_len);
   }
 
   /**
@@ -74,12 +80,14 @@ public class MCRPrivilege
     privName = "";
     privDescription = "";
     if (!priv.getName().equals("privilege")) return;
-    privName = ((String)priv.getAttributeValue("name")).trim();
+    privName = MCRUserObject.trim((String)priv.getAttributeValue("name"),
+      privilege_len);
     List listelm = priv.getChildren();
     for (int i=0;i<listelm.size();i++) {
       org.jdom.Element elm = (org.jdom.Element)listelm.get(i);
       if (!elm.getName().equals("privilege.description")) return;
-      privDescription = ((String)elm.getText()).trim();
+      privDescription = MCRUserObject.trim((String)elm.getText(),
+        description_len);
     }
   }
 
@@ -112,13 +120,6 @@ public class MCRPrivilege
    **/
   public boolean isValid()
   { return (privName.length()==0) ? false : true; }
-
-  /**
-   * This helper method replaces null with an empty string and trims whitespace from
-   * non-null strings.
-   */
-  protected final static String trim(String s)
-  { return (s != null) ? s.trim() : ""; }
 
   /**
    * This method puts debug data to the logger (if it is set to debug mode).

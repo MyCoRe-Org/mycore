@@ -103,8 +103,8 @@ public MCRGroup(String ID, String creator, Timestamp creationDate,
   ArrayList groupIDs, ArrayList privileges)
   throws MCRException, Exception
   {
-  super.ID = trim(ID);
-  super.creator = trim(creator);
+  super.ID = trim(ID,id_len);
+  super.creator = trim(creator,id_len);
   // check if the creation timestamp is provided. If not, use current timestamp
   if (creationDate == null) {
     super.creationDate = new Timestamp(new GregorianCalendar().getTime()
@@ -116,6 +116,7 @@ public MCRGroup(String ID, String creator, Timestamp creationDate,
       .getTime()); }
   else {
     super.modifiedDate = modifiedDate; }
+  this.description = trim(description,description_len);
   this.admUserIDs = new ArrayList();
   if (admUserIDs != null) { this.admUserIDs = admUserIDs; }
   this.admGroupIDs = new ArrayList();
@@ -139,10 +140,9 @@ public MCRGroup(org.jdom.Element elm)
   {
   this();
   if (!elm.getName().equals("group")) { return; }
-  super.ID = ((String)elm.getAttributeValue("ID")).trim();
-  String tmp = elm.getChildTextTrim("user.creator");
-  if (tmp != null) { this.creator = tmp; }
-  tmp = elm.getChildTextTrim("user.creation_date");
+  super.ID = trim((String)elm.getAttributeValue("ID"),id_len);
+  this.creator = trim(elm.getChildTextTrim("user.creator"),id_len);
+  String tmp = elm.getChildTextTrim("user.creation_date");
   if (tmp != null) {
     try {
       super.creationDate = Timestamp.valueOf(tmp); }
@@ -154,21 +154,20 @@ public MCRGroup(org.jdom.Element elm)
       super.modifiedDate = Timestamp.valueOf(tmp); }
     catch (Exception e) { }
     }
-  tmp = elm.getChildTextTrim("user.description");
-  if (tmp != null) { this.description = tmp; }
+  this.description = trim(elm.getChildTextTrim("user.description"),
+    description_len);
   org.jdom.Element adminElement = elm.getChild("group.admins");
   if (adminElement != null) {
     List adminIDList = adminElement.getChildren();
     for (int j=0; j<adminIDList.size(); j++) {
       org.jdom.Element newID = (org.jdom.Element)adminIDList.get(j);
+      String id = trim((String)newID.getTextTrim(),id_len);
       if(newID.getName().equals("admins.userID")) {
-        if (!((String)newID.getTextTrim()).equals("")) {
-          addAdminUserID((String)newID.getTextTrim()); }
+        if (!id.equals("")) { addAdminUserID(id); }
         continue;
         }
       if(newID.getName().equals("admins.groupID")) {
-        if (!((String)newID.getTextTrim()).equals("")) {
-          addAdminGroupID((String)newID.getTextTrim()); }
+        if (!id.equals("")) { addAdminGroupID(id); }
         }
       }
     }
@@ -177,14 +176,13 @@ public MCRGroup(org.jdom.Element elm)
     List memberIDList = memberElement.getChildren();
     for (int j=0; j<memberIDList.size(); j++) {
       org.jdom.Element newID = (org.jdom.Element)memberIDList.get(j);
+      String id = trim((String)newID.getTextTrim(),id_len);
       if(newID.getName().equals("members.userID")) {
-        if (!((String)newID.getTextTrim()).equals("")) {
-          addMemberUserID((String)newID.getTextTrim()); }
+        if (!id.equals("")) { addMemberUserID(id); }
         continue;
         }
       if(newID.getName().equals("members.groupID")) {
-        if (!((String)newID.getTextTrim()).equals("")) {
-          addMemberGroupID((String)newID.getTextTrim()); }
+        if (!id.equals("")) { addMemberGroupID(id); }
         }
       }
     }
@@ -193,8 +191,8 @@ public MCRGroup(org.jdom.Element elm)
     List groupIDList = userGroupElement.getChildren();
     for (int j=0; j<groupIDList.size(); j++) {
       org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
-      if (!((String)groupID.getTextTrim()).equals("")) {
-        this.groupIDs.add((String)groupID.getTextTrim()); }
+      String id = trim((String)groupID.getTextTrim(),id_len);
+      if (!id.equals("")) { this.groupIDs.add(id); }
       }
     }
   org.jdom.Element privilegeElement = elm.getChild("group.privileges");
@@ -202,8 +200,8 @@ public MCRGroup(org.jdom.Element elm)
     List privilegeIDList = privilegeElement.getChildren();
     for (int j=0; j<privilegeIDList.size(); j++) {
       org.jdom.Element privilegeID = (org.jdom.Element)privilegeIDList.get(j);
-      if (!((String)privilegeID.getTextTrim()).equals("")) {
-        this.privileges.add((String)privilegeID.getTextTrim()); }
+      String priv = trim((String)privilegeID.getTextTrim(),privilege_len);
+      if (!priv.equals("")) { this.privileges.add(priv); }
       }
     }
   }

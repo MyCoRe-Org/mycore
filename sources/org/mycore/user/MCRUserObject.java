@@ -51,6 +51,18 @@ abstract class MCRUserObject
     Logger.getLogger(MCRUserObject.class.getName());
   protected static MCRConfiguration config = null;
 
+  /** The length of user and group names */
+  public static final int id_len = 20;
+
+  /** The length of the password */
+  public static final int password_len = 20;
+
+  /** The length of the decription */
+  public static final int description_len = 200;
+
+  /** The length of the privilege */
+  public static final int privilege_len = 100;
+
   /** The ID of the MyCoRe user unit (either user ID or group ID) */
   protected String ID = "";
 
@@ -194,6 +206,21 @@ abstract public org.jdom.Element toJDOMElement() throws MCRException;
  */
 protected final static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
+
+/**
+ * This helper method replaces null with an empty string and trims whitespace
+ * from non-null strings.
+ **/
+protected final static String trim(String s, int len)
+  {
+  String sn = (s != null) ? s.trim() : "";
+  if (sn.length()>len) {
+    logger.warn("The string \'"+sn+"\' is too long (max. "+Integer.toString(len)+").");
+    return sn.substring(0,len);
+    }
+  else {
+    return sn; }
+  }
 
 /**
  * This method put debug data to the logger (for the debug mode).
