@@ -105,8 +105,14 @@ public class MCRCM8TransformXPathToCM8
 			cond
 				.append(' ')
 				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix))
-				.append(' ')
-				.append((String) andor.get(i));
+                        boolean fl = false;
+                        for (int j=i+1;j<subqueries.size();j++) {
+                                if (!((Boolean) flags.get(j)).booleanValue())
+                                        fl = true;
+                                }
+                        if (fl) {
+                                cond.append(' ').append((String) andor.get(i)); }
+
 			flags.set(i, Boolean.TRUE);
 		}
 		logger.debug("Codition transformation " + cond.toString());
