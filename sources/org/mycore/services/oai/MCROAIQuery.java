@@ -26,6 +26,8 @@ package org.mycore.services.oai;
 
 import java.util.List;
 
+import org.jdom.Element;
+
 /**
  * @author Werner Gresshoff
  *
@@ -64,5 +66,15 @@ public interface MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 */
 	public List listIdentifiers(String[] set, String[] from, String[] until, String instance);
-	
+
+	/**
+	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
+	 * @param id The id of the object.
+	 * @return List A list that contains an array of three Strings: the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 * 				and a JDOM element with the metadata of the record
+	 */
+	public List getRecord(String id);
+		
 }

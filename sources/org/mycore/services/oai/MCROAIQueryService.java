@@ -204,42 +204,8 @@ public class MCROAIQueryService implements MCROAIQuery {
    	    	
 	    	    MCRObject object = new MCRObject();
     	        object.receiveFromDatastore(objectId);
-    	    
-	 		    Calendar calendar = object.getService().getDate("modifydate");
-    		    // Format the date.
-		        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
-        		formatter.setCalendar(calendar);
-		        String datestamp = formatter.format(calendar.getTime());
-            
-		        StringBuffer setSpec = new StringBuffer("");
-            	String[] identifier = new String[3];
-            	identifier[0] = "oai:" + repositoryId + ":" + objectId;
-            	identifier[1] = datestamp;
-           		identifier[2] = new String("");
-        
-		        for (int j = 0; j < object.getMetadata().size(); j++) {
-        		    if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
-                		MCRMetaElement element = object.getMetadata().getMetadataElement(j);
-                		
-		                if (element.getTag().equals("subjects")) {
-        		            for (int k = 0; k < element.size(); k++) {
-                		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
-		                        String categoryId = classification.getCategId();
-		                        MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
-		                        MCRCategoryItem parent;
-        		                while ((parent = category.getParent()) != null) {
-		                            categoryId = parent.getID() + ":" + categoryId;
-                        		    category = parent;
-                		        }
-                		        
-                		        setSpec.append(" ").append(categoryId);
-                    		}
-                    		
-                    		identifier[2] = setSpec.toString().trim();
-                		}
-            		}
-        		}
-        
+	 	
+        		String[] identifier = getHeader(object, objectId, repositoryId);
         		list.add(identifier);
 	   	    }
    	    } catch (MCRException mcrx) {
@@ -249,4 +215,70 @@ public class MCROAIQueryService implements MCROAIQuery {
 		return list;
 	}
 	
+	private String[] getHeader(MCRObject object, String objectId, String repositoryId) {
+	    Calendar calendar = object.getService().getDate("modifydate");
+	    // Format the date.
+        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
+   		formatter.setCalendar(calendar);
+        String datestamp = formatter.format(calendar.getTime());
+            
+        StringBuffer setSpec = new StringBuffer("");
+       	String[] identifier = new String[3];
+       	identifier[0] = "oai:" + repositoryId + ":" + objectId;
+       	identifier[1] = datestamp;
+   		identifier[2] = new String("");
+        
+        for (int j = 0; j < object.getMetadata().size(); j++) {
+   		    if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
+           		MCRMetaElement element = object.getMetadata().getMetadataElement(j);
+                		
+                if (element.getTag().equals("subjects")) {
+   		            for (int k = 0; k < element.size(); k++) {
+           		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
+                        String categoryId = classification.getCategId();
+                        MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
+                        MCRCategoryItem parent;
+   		                while ((parent = category.getParent()) != null) {
+                            categoryId = parent.getID() + ":" + categoryId;
+                   		    category = parent;
+           		        }
+                		        
+           		        setSpec.append(" ").append(categoryId);
+               		}
+                    		
+               		identifier[2] = setSpec.toString().trim();
+           		}
+       		}
+   		}
+   		
+   		return identifier;
+	}
+	
+	/**
+	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
+	 * @param id The id of the object.
+	 * @return List A list that contains an array of three Strings: the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 * 				and a JDOM element with the metadata of the record
+	 */
+	public List getRecord(String id) {
+		List list = new ArrayList();
+
+        MCRObject object = new MCRObject();
+        try {
+            object.receiveFromDatastore(id);
+        } catch(MCRException e) {
+            return null;
+        }
+	 	
+   		String[] identifier = getHeader(object, objectId, repositoryId);
+   		list.add(identifier);
+
+        Element eMetadata = object.getMetadata().createXML();
+        list.add(eMetadata);
+        
+        return list;
+	}
+		
 }

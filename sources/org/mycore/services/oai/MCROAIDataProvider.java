@@ -55,6 +55,7 @@ import javax.servlet.http.HttpUtils;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXSLTransformation;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -90,6 +91,7 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
     private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.oai.metadata.transformer"; 
+    private static final String STR_STANDARD_TRANSFORMER = "oai_dc";
     
     // If there are other metadata formats available, all need a namespace and schema entry
     // of it's own, e.g. 
@@ -338,9 +340,8 @@ public class MCROAIDataProvider extends HttpServlet {
 				return false;
 	    	}
 		    MCRConfiguration config = MCRConfiguration.instance();
-		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
 		    try {
-			    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+			    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 			    return query.exists(identifier.substring(lastColon + 1));
 		    } catch (MCRConfigurationException mcrx) {
 		    	logger.fatal("Die OAIQuery-Klasse ist nicht konfiguriert.");
@@ -926,6 +927,105 @@ public class MCROAIDataProvider extends HttpServlet {
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	    }
 	    
+        return document;
+    }
+    
+	/**
+	 * Method getRecord. Implementation of the OAI Verb GetRecord.
+	 * @param request The servlet request.
+	 * @param header The document so far
+	 * @return Document The document with all new elements added.
+	 */
+    private org.jdom.Document getRecord(HttpServletRequest request, org.jdom.Document header) {
+        org.jdom.Document document = header;
+        Element eRoot = document.getRootElement();
+        Namespace ns = eRoot.getNamespace();
+
+        // First: check if there was an identifier in the request (required)
+        String identifier[] = getParameter("identifier", request); 
+        // Then: check if there was an metadataPrefix in the request (required)
+        String metadataPrefix[] = getParameter("metadataPrefix", request); 
+        if ((identifier == null) || (metadataPrefix == null) || 
+                (identifier.length != 1) || (metadataPrefix.length != 1) || 
+                badArguments(request, 3)) {
+            logger.info("Anfrage 'getRecord' wurde wegen fehlendem Parameter abgebrochen.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        
+        Element eRoot = document.getRootElement();
+        Element eRequest = eRoot.getChild("request", ns);
+        eRequest.setAttribute("verb", "GetRecord");
+        eRequest.setAttribute("identifier", identifier[0]);
+        eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
+        
+        //Search for the last delimiter (a colon)...
+		int lastDelimiter = identifier[0].lastIndexOf(":");
+		//...and use the characters behind as id
+        String id = identifier[0].substring(lastDelimiter + 1);
+        //We don't look at the begginning of the identifier!!
+        
+        MCRConfiguration config = MCRConfiguration.instance();
+        //Check, if the requested metadata format is supported
+        String format = null;
+        //Check, if the requested metadata format is supported
+	    try {
+	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	    } catch (MCRConfigurationException mcrx) {
+        	logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+            return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
+	    }
+        
+        //Then look, if the id exists
+        MCROAIQuery query = null;
+	    try {
+		    query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
+	    } catch (MCRConfigurationException mcrx) {
+	    	logger.fatal(mcrx.getMessage());
+            return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
+	    }
+
+        if (query.exists(id)) {
+        	List record = new ArrayList(query.getRecord(id));
+            Element eGetRecord = new Element("GetRecord", ns);
+            
+		    if (record != null) {
+		    	ListIterator iterator = sets.listIterator();
+	    	
+	    		String[] array = (String[]) iterator.next();
+	    		
+		        Element eHeader = new Element("header", ns);
+    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
+            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+	            if ((array[2] != null) && (array[2].length() > 0)) {
+		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
+    	    	
+	    	    	while (tokenizer.hasMoreTokens()) {
+                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
+    		    	}
+    	    	
+    	        }
+            
+	            eGetRecord.addContent(eHeader);
+	            
+	            Element eMetadata = (Element) iterator.next();
+	            eGetRecord.addContent(eMetadata);
+	            
+		    	eRoot.addContent(eGetRecord);
+		    	
+            	org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
+            		getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+        	    if (newDocument != null) {
+    	            document = newDocument;
+	            } else {
+	            	logger.error("Die Transformation in 'getRecord' hat nicht funktioniert.");
+        	    }
+	    	}
+	    	
+		} else {
+			logger.info("Anfrage 'getRecord wurde fegen fehlender ID " + id + "abgebrochen.");
+            return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
+        }
+        
         return document;
     }
     
