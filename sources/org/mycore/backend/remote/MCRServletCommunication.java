@@ -199,7 +199,9 @@ public final BufferedInputStream requestIFS(String hostAlias, String path)
   StringBuffer sb = new StringBuffer(256);
   sb.append("Connecting to ").append(protocol).append("://")
     .append(realhost).append(':').append(port).append(location).append(path)
-    .append('?').append("hosts=local");
+    .append('?');
+  if(path.endsWith("/")) { sb.append("XSL.Style=xml&"); }
+  sb.append("hosts=local");
   logger.debug(sb.toString());
 
   URL currentURL;
@@ -209,6 +211,7 @@ public final BufferedInputStream requestIFS(String hostAlias, String path)
     urlCon.setDoOutput(true);
     urlCon.setRequestMethod("POST");
     PrintWriter out = new PrintWriter(urlCon.getOutputStream());
+    if(path.endsWith("/")) { out.print("XSL.Style=xml&"); }
     out.print("hosts=local");
     out.close();
     headercontext = urlCon.getContentType();
