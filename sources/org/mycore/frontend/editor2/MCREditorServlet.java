@@ -153,7 +153,6 @@ public class MCREditorServlet extends MCRServlet
   { 
     MCRCache cache = MCRSessionMgr.getCurrentSession().requestParamCache;
     Map parameters = (Map)( cache.get( key ) );
-    cache.clear();
     return parameters;
   }
 
