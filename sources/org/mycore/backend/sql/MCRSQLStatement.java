@@ -35,6 +35,8 @@ import mycore.common.*;
  */
 public class MCRSQLStatement
 {
+  protected final static String NULL = "NULL";
+
   protected Properties values;
   protected Properties conditions;
   protected Vector     columns;
@@ -51,14 +53,24 @@ public class MCRSQLStatement
   public MCRSQLStatement setValue( String columnName, String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
-    if( columnValue != null ) values.put( columnName, columnValue ); 
+
+    if( columnValue == null )
+      values.put( columnName, NULL );
+    else
+      values.put( columnName, columnValue ); 
+
     return this;
   }
   
   public MCRSQLStatement setCondition( String columnName, String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
-    if( columnValue != null ) conditions.put( columnName, columnValue ); 
+
+    if( columnValue == null ) 
+      conditions.put( columnName, NULL );
+    else
+      conditions.put( columnName, columnValue ); 
+
     return this;
   }
   
@@ -72,7 +84,7 @@ public class MCRSQLStatement
   protected String getSQLValue( String key )
   {
     String value = values.getProperty( key );
-    return ( value == null ? "NULL" : "\"" + value + "\"" );
+    return ( value == NULL ? "NULL" : "'" + value + "'" );
   }
   
   protected String condition()
@@ -89,10 +101,10 @@ public class MCRSQLStatement
       
       sql.append( key ).append( " " );
       
-      if( value == null )
+      if( value == NULL )
         sql.append( "IS NULL" );
       else
-        sql.append( "= \"" ).append( value ).append( "\"" );
+        sql.append( "= '" ).append( value ).append( "'" );
       
       if( keys.hasMoreElements() ) sql.append( " AND " );
     }

@@ -94,7 +94,8 @@ public abstract class MCRClassificationObject
     MCRCategory[] children;
     if( childrenIDs == null )
     {
-      children = manager().retrieveChildren( getClassificationID(), ID );
+      String parentID = ( this instanceof MCRCategory ? ID : null );
+      children = manager().retrieveChildren( getClassificationID(), parentID );
       childrenIDs = new String[ children.length ];
       for( int i = 0; i < children.length; i++ )
         childrenIDs[ i ] = children[ i ].getID();

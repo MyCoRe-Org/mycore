@@ -96,7 +96,7 @@ class MCRClassificationManager
     if( c == null )
     {
       c = store.retrieveClassification( ID );
-      classificationCache.put( ID, c );
+      if( c != null ) classificationCache.put( ID, c );
     }
     return c;
   }
@@ -109,7 +109,7 @@ class MCRClassificationManager
     if( c == null )
     {
       c = store.retrieveCategory( classifID, categID );
-      categoryCache.put( cachingID, c );
+      if( c != null ) categoryCache.put( cachingID, c );
     }
     return c;
   }
