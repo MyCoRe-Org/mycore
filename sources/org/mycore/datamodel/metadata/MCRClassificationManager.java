@@ -84,7 +84,8 @@ class MCRClassificationManager
     {
     if( store.categoryItemExists( category.getClassificationID(), 
       category.getID() ) )
-      throw new MCRPersistenceException( "Category already exists" );
+      throw new MCRPersistenceException( "Category "+category.getID()
+        +" already exists" );
     store.createCategoryItem( category );
     categoryCache.put( getCachingID( category ), category );
     }
