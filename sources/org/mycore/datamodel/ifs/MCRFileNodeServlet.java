@@ -227,21 +227,16 @@ public class MCRFileNodeServlet extends HttpServlet
       String style = "";
       Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
       
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      MCRUtils.copyStream( in, baos );
-      baos.close();
-      byte[] bytes = baos.toByteArray();
-      
       boolean ismcrxml = true;
       MCRXMLContainer resarray = new MCRXMLContainer();
       
       try
-      { resarray.importElements( bytes ); }
+      { resarray.importElements( in ); }
       catch( org.jdom.JDOMException e ) 
       {
         res.setContentType( headercontext );
         OutputStream out = res.getOutputStream();
-        out.write( bytes );
+        MCRUtils.copyStream( in, out );
         out.close();
         return;
       }
@@ -250,10 +245,9 @@ public class MCRFileNodeServlet extends HttpServlet
       
       if( ! ismcrxml ) 
       {
-        ByteArrayInputStream bin = new ByteArrayInputStream( bytes );
         org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
         try 
-        { jdom = builder.build( bin ); }
+        { jdom = builder.build( in ); }
         catch( org.jdom.JDOMException f ) { }
         
         style = parameters.getProperty( "Style" );
