@@ -146,7 +146,7 @@ public class MCRXSLTransformation {
 	    File styleFile = new File(stylesheet);
 	    
 		if (!styleFile.exists()) {
-			logger.fatal("The Stylesheet doesn't exist.");
+			logger.fatal("The Stylesheet doesn't exist: " + stylesheet);
 			return null;
 		}
 		return getStylesheet(styleFile);
