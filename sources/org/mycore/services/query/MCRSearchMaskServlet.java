@@ -175,7 +175,7 @@ org.jdom.Document jdom = null;
     if (!element.getName().equals("element")) { continue; }
     if (!element.getAttributeValue("type").equals("query")) { continue; }
     String name = element.getAttributeValue("name");
-    String tempquery = element.getAttributeValue("query");
+    String tempquery = (element.getAttributeValue("query")).replace('\'','\"');
     int tempfields = 1;
     try {
       tempfields = (new Integer((String)element.getAttributeValue("fields")))
