@@ -55,7 +55,8 @@ private  String langid = null;
 // 32 Bit
 protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
 protected static int MAX_NUMBER_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
-protected static String ROOT_TAG = "/MYCOREOBJECT";
+protected static String ROOT_TAG_OBJECT = "/MYCOREOBJECT";
+protected static String ROOT_TAG_DERIVATE = "/MYCOREDERIVATE";
 
 /**
  * The constructor.
@@ -188,8 +189,10 @@ private final String traceOneCondition(String cond)
   int klammerzu = cond.indexOf("]",klammerauf+1);
   if ((klammerauf==-1)||(klammerzu==-1)) { return ""; }
   // create pretag as value of the path to the data
-  if (klammerauf!=ROOT_TAG.length()) { return ""; }
-  if (!cond.startsWith(ROOT_TAG)) { return ""; } 
+  if ((klammerauf!=ROOT_TAG_OBJECT.length()) &&
+      (klammerauf!=ROOT_TAG_DERIVATE.length())) { return ""; }
+  if ((!cond.startsWith(ROOT_TAG_OBJECT)) && 
+      (!cond.startsWith(ROOT_TAG_DERIVATE))) { return ""; } 
   String pretag = "XXXMYCOREOBJECT";
 //System.out.println("PRETAG="+pretag);
   // search operations

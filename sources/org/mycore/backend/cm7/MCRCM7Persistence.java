@@ -166,7 +166,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     item.setPart(mcr_xml_part,xml,xml.length);
     item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
     item.create();
-    exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+    updateTextIndexQueue(connection,mcr_ts_index);
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
@@ -212,7 +212,7 @@ public final void delete(MCRObjectID mcr_id)
     connection = MCRCM7ConnectionPool.instance().getConnection();
     MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
     item.delete();
-    exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+    updateTextIndexQueue(connection,mcr_ts_index);
     }
   catch (MCRPersistenceException e) {
     throw new MCRPersistenceException(
@@ -295,87 +295,6 @@ public final byte [] receive(MCRObjectID mcr_id)
   }
 
 /**
- * The methode receive an object from the data store and return the 
- * service date for the given type. The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case 
- * configuration name.<br>
- *
- * @param mcr_id      the object id
- * @param type     the type of the service date
- * @return the date for the type or null
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final GregorianCalendar receiveServiceDate(MCRObjectID mcr_id,
-  String type) throws MCRConfigurationException, MCRPersistenceException
-  {
-  // search the index class
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = conf.getString(sb.toString()); 
-  // make a connection
-  DKDatastoreDL connection = null;
-  GregorianCalendar cal = new GregorianCalendar();
-  try {
-    connection = MCRCM7ConnectionPool.instance().getConnection();
-    try {
-      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-      if (type.equals("createdate")) {
-        cal = item.getKeyfieldToDate(mcr_create_name); return cal; }
-      if (type.equals("modifydate")) {
-        cal = item.getKeyfieldToDate(mcr_modify_name); return cal; }
-      }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+"does not exists."); }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  finally {
-    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
-  return null;
-  }
-
-/**
- * The methode receive an object from the data store and return the 
- * label of the object. The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case 
- * configuration name.<br>
- * As example: Document --> MCR.persistence_cm7_document
- *
- * @param mcr_id      the object id
- * @return the label of the object
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final String receiveLabel(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
-  {
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = conf.getString(sb.toString()); 
-  String label = new String("");
-  try {
-    DKDatastoreDL connection = null;
-    try {
-      connection = MCRCM7ConnectionPool.instance().getConnection();
-      try {
-        MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-        label = item.getKeyfieldToString(mcr_label_name);
-        }
-      catch (MCRPersistenceException e) {
-        throw new MCRPersistenceException(
-          "A object with ID "+mcr_id.getId()+"does not exists."); }
-      }
-    finally {
-      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  return label;
-  }
-
-/**
  * The methode update an object in the data store. The index class
  * is determinated by the type of the object ID. This <b>must</b>
  * correspond with the lower case configuration name.<br>
@@ -448,7 +367,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         item.setPart(mcr_xml_part,xml,xml.length);
         item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
         item.update();
-        exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+        updateTextIndexQueue(connection,mcr_ts_index);
         }
       catch (MCRPersistenceException e) { 
         throw new MCRPersistenceException(
@@ -471,6 +390,43 @@ private final MCRCM7Item getItem(String id, String indexclass,
   sb.append('\'').append(mcr_id_name).append("' == \"")
     .append(id.trim().toUpperCase()).append('\"');
   return new MCRCM7Item(sb.toString(),mcr_index_class,connection );
+  }
+
+/**
+ * Update the Text Search Queue
+ **/
+private final void updateTextIndexQueue(DKDatastoreDL connection, 
+  String mcr_ts_index)
+  {
+  try {
+    connection.invokeSearchEngine("SM",mcr_ts_server+"-"+mcr_ts_index); }
+  catch( Exception ex ) {
+    System.out.println( "WARNING: Problem while calling TSE user exit:" );
+    System.out.println( "         " + ex.getMessage()                   );
+    }
+  finally { 
+    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
+
+  DKDatastoreTS connectionTSE = null;
+  try {
+    connectionTSE = new DKDatastoreTS();
+    connectionTSE.connect( mcr_ts_server, "", "", "" );
+    DKDatastoreDefTS definition = 
+      (DKDatastoreDefTS)( connectionTSE.datastoreDef() );
+    DKDatastoreAdminTS administration = 
+      (DKDatastoreAdminTS)( definition.datastoreAdmin() );
+      administration.startUpdateIndex(mcr_ts_index);
+    }
+  catch( Exception ex ) { 
+    System.out.println( 
+      "WARNING: Problem while starting text search index update:" ); 
+    System.out.println( "         " + ex.getMessage()); 
+    }
+  finally {
+    if( connectionTSE != null ) 
+    try{ connectionTSE.disconnect(); }
+    catch( Exception ignored ){}
+    }
   }
 
 /**
