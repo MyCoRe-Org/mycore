@@ -25,6 +25,8 @@
 package org.mycore.common.xml;
 
 import org.mycore.common.*;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 import java.io.*;
 import java.net.*;
@@ -49,11 +51,11 @@ import org.apache.log4j.PropertyConfigurator;
  * input to various output formats, using XSL stylesheets.
  *
  * @author Frank Lützenkirchen
- * @author Thomas Scheffler
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  */
-public class MCRLayoutServlet extends HttpServlet 
+public class MCRLayoutServlet extends MCRServlet 
 {
   private static MCRCache cache;
   
@@ -161,15 +163,12 @@ public class MCRLayoutServlet extends HttpServlet
     out.close();
   }
 
-  protected void doPost( HttpServletRequest  request, 
-                         HttpServletResponse response )
-    throws IOException, ServletException
-  { doGet( request, response ); }
 
-  protected void doGet( HttpServletRequest  request, 
-                        HttpServletResponse response ) 
+  public void doGetPost(MCRServletJob job) 
     throws IOException, ServletException
   {
+  	HttpServletRequest request = job.getRequest();
+  	HttpServletResponse response = job.getResponse();
     Source sourceXML = null;   
     String docType   = null;
     
@@ -245,6 +244,14 @@ public class MCRLayoutServlet extends HttpServlet
         { transform( sourceXML, stylesheet, transformer, response ); } 
         catch( IOException ex ) 
         {	logger.error("IO Error while XSL transforming XML Document", ex ); }
+        catch( MCRException ex){
+        	generateErrorPage(request,
+        	                           response,
+        	                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+        	                           ex.getMessage(),
+        	                           ex,
+        	                           false);
+        }
       }
     }
   }
@@ -473,7 +480,7 @@ public class MCRLayoutServlet extends HttpServlet
                             Templates    xsl,
                             Transformer  transformer,
                             HttpServletResponse response )
-    throws IOException
+    throws IOException, MCRException
   {
     // Set content type  from "<xsl:output media-type = "...">
     // Set char encoding from "<xsl:output encoding   = "...">
