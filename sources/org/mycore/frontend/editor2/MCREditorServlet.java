@@ -31,7 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Map;
 import java.util.Iterator;
-
+import java.util.Enumeration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -78,6 +78,8 @@ public class MCREditorServlet extends MCRServlet
     String action = parms.getParameter( "_action" );
     if( "start.session".equals( action ) )
       processStartSession( req, res );
+    else if( "load.session".equals( action ) )
+      processLoadSession( req, res );
     else if( "show.popup".equals( action ) )
       processShowPopup( req, res );
     else if( "submit".equals( action ) )
@@ -101,10 +103,23 @@ public class MCREditorServlet extends MCRServlet
 	
     sendToDisplay( req, res, new Document( clone ) );
   }
+
+  private void processLoadSession( HttpServletRequest  req,
+                                   HttpServletResponse res )
+    throws ServletException, java.io.IOException
+  {
+    String sessionID = req.getParameter( "_session" );
+    logger.info( "Editor session " + sessionID + " reload form data" );
+
+    Element editor = (Element)( sessions.get( sessionID ) );
+
+    req.setAttribute( "XSL.Style", "xml" );
+    sendToDisplay( req, res, editor.getDocument() );
+  }
   
   private void processStartSession( HttpServletRequest  req, 
                                     HttpServletResponse res )
-  throws ServletException, java.io.IOException
+    throws ServletException, java.io.IOException
   {
     String uri = req.getParameter( "_uri" );
     String ref = req.getParameter( "_ref" );
@@ -181,8 +196,57 @@ public class MCREditorServlet extends MCRServlet
     String sessionID = parms.getParameter( "_session" );
     Element editor = (Element)( sessions.get( sessionID ) );
 
-    logger.info( "Editor session " + sessionID + " submitting form data" );
+    String button = null;
+      
+    for( Enumeration e = parms.getParameterNames(); e.hasMoreElements(); )
+    {
+      String name = (String)( e.nextElement() );
+      if( name.startsWith( "_p-" ) || name.startsWith( "_m-" ) ||
+          name.startsWith( "_u-" ) || name.startsWith( "_d-" ) )
+      {
+        button = name;
+        break;
+      }
+    } 
 
+    if( button == null )
+    { 
+      logger.info( "Editor session " + sessionID + " submitting form data" );
+      processTargetSubmission( req, res, parms, editor );
+    }
+    else
+    {
+      int pos = button.lastIndexOf( "-" );
+  
+      String action = button.substring( 1, 2 );
+      String path   = button.substring( 3, pos );
+      int    nr     = Integer.parseInt( button.substring( pos + 1, button.length() - 2 ) );
+
+      logger.debug( "Editor action " + action + " " + nr + " " + path );
+
+      editor.removeChild( "input" );
+      editor.removeChild( "repeats" );
+
+      MCREditorSubmission sub = new MCREditorSubmission( parms, editor );
+      editor.addContent( sub.buildInputElements()  );
+      editor.addContent( sub.buildRepeatElements() );
+
+      // Redirect to webpage to reload editor form
+      StringBuffer sb = new StringBuffer(  getBaseURL() );
+      sb.append( parms.getParameter( "_webpage" ) );
+      sb.append( "?XSL.editor.session.id=" );
+      sb.append( sessionID );
+
+      logger.debug( "Editor redirect to " + sb.toString() );
+      res.sendRedirect( sb.toString() );
+    }
+  }
+
+  private void processTargetSubmission( 
+    HttpServletRequest req, HttpServletResponse res,
+    MCRRequestParameters parms, Element editor )
+    throws ServletException, java.io.IOException
+  {    
     MCREditorSubmission sub = new MCREditorSubmission( parms, editor );
 
     // If there is no input, handle as if "cancel" button was pressed

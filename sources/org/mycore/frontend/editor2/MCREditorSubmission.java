@@ -65,6 +65,7 @@ public class MCREditorSubmission
     this.parms = parms;
     setVariablesFromSubmission( parms, editor );
     Collections.sort( variables );
+    setRepeatsFromSubmission();
   }
 
   private void setVariablesFromElement( Element element, String prefix, String suffix )
@@ -331,6 +332,20 @@ public class MCREditorSubmission
       
       repeats.add( new MCREditorVariable( path, value ) );
       MCREditorServlet.logger.debug( "Editor repeats " + path + " = " + value );
+    }
+  }
+
+  private void setRepeatsFromSubmission()
+  {
+    for( Enumeration e = parms.getParameterNames(); e.hasMoreElements(); )
+    {
+      String parameter = (String)( e.nextElement() );
+      if( parameter.startsWith( "_n-" ) )
+      {
+        String value = parms.getParameter( parameter );
+        repeats.add( new MCREditorVariable( parameter.substring( 3 ), value ) );
+        MCREditorServlet.logger.debug( "Editor repeats " + parameter.substring( 3 ) + " = " + value );
+      }	
     }
   }
 }
