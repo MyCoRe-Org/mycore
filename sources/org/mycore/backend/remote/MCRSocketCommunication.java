@@ -110,7 +110,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
       }
     MCRSocketCommunicator sc = null;
     try {
-      sc = new MCRSocketCommunicator(new Socket(host, port)); } 
+      sc = new MCRSocketCommunicator(new Socket(host, port)); }
     catch (UnknownHostException e) {
       throw new MCRException("Don't know about host: " + host +"."); }
     catch (IOException e) {
@@ -128,26 +128,19 @@ public MCRQueryResultArray responseQuery() throws MCRException
             toServer = "query in bytes:" + reqstream.length(); state = 1; }
           }
         else if (state == 1) {
-          if (fromServer.equals("ok expecting query")) {
-            toServer = reqstream; state = 2; }
+          if (fromServer.equals("ok expecting host")) {
+            toServer = host; state = 2; }
           }
         else if (state == 2) {
-          try {
-            if ( (fromServer.substring(0,15).equals("received bytes:")) &&
-                 (reqstream.length() == 
-                    Integer.parseInt(fromServer.substring(15))) ) {
-              toServer = "ok expecting result size";
-              state = 3;
-              }
-            }
-          catch (NumberFormatException nfe) { }
-          catch (IndexOutOfBoundsException ioobe) { }
+          if (fromServer.equals("ok expecting query")) {
+            toServer = reqstream; state = 3; }
           }
         else if (state == 3) {
           try {
-            if ((fromServer.substring(0,16).equals("result in bytes:"))) {
-              resultSize = Integer.parseInt(fromServer.substring(16));
-              toServer = "ok expecting result";
+            if ( (fromServer.substring(0,15).equals("received bytes:")) &&
+                 (reqstream.length() ==
+                    Integer.parseInt(fromServer.substring(15))) ) {
+              toServer = "ok expecting result size";
               state = 4;
               }
             }
@@ -155,16 +148,27 @@ public MCRQueryResultArray responseQuery() throws MCRException
           catch (IndexOutOfBoundsException ioobe) { }
           }
         else if (state == 4) {
+          try {
+            if ((fromServer.substring(0,16).equals("result in bytes:"))) {
+              resultSize = Integer.parseInt(fromServer.substring(16));
+              toServer = "ok expecting result";
+              state = 5;
+              }
+            }
+          catch (NumberFormatException nfe) { }
+          catch (IndexOutOfBoundsException ioobe) { }
+          }
+        else if (state == 5) {
           if (fromServer.length() == resultSize) {
             if (fromServer.startsWith(MCRObject.XML_HEADER))
               fromServer = fromServer.substring(MCRObject.XML_HEADER.length());
             result.importElements(fromServer);
             toServer = "received bytes:"+resultSize;
-            state = 5;
+            state = 6;
           }
         }
         sc.write(toServer);
-        if (state == 4) fromServer = sc.read(resultSize);
+        if (state == 5) fromServer = sc.read(resultSize);
         else fromServer = sc.read();
       }
       sc.close();
@@ -175,3 +179,4 @@ public MCRQueryResultArray responseQuery() throws MCRException
   }
 
 }
+

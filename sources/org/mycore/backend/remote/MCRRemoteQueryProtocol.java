@@ -44,15 +44,17 @@ public class MCRRemoteQueryProtocol {
 // the states of the server
     private static final int WAITING = 0;
     private static final int SENT_CONNECTED = 1;
-    private static final int SENT_EXPECTING_QUERY = 2;
-    private static final int SENT_RECEIVED_QUERY = 3;
-    private static final int SENT_RESULT_SIZE = 4;
-    private static final int SENT_RESULT = 5;
+    private static final int SENT_EXPECTING_HOST = 2;
+    private static final int SENT_EXPECTING_QUERY = 3;
+    private static final int SENT_RECEIVED_QUERY = 4;
+    private static final int SENT_RESULT_SIZE = 5;
+    private static final int SENT_RESULT = 6;
 
 // first it is waiting
     private int state = WAITING;
     private int bytes = 0;
     private String queryResult;
+    private String host;
 
     private boolean queryInputSyntaxIsCorrect(String input) {
     return input.indexOf("***") > 0;
@@ -85,10 +87,8 @@ public class MCRRemoteQueryProtocol {
               else if (theInput.substring(0,15).equals("query in bytes:")) {
                 bytes = Integer.parseInt(theInput.substring(15));
 
-                System.out.println("bytes = " + bytes); //
-
-                theOutput = "ok expecting query";
-                state = SENT_EXPECTING_QUERY;
+                theOutput = "ok expecting host";
+                state = SENT_EXPECTING_HOST;
               } else throw new ProtocolException("Communication Error! Error Code 1");
             }
             catch (NumberFormatException nfe) {
@@ -97,6 +97,10 @@ public class MCRRemoteQueryProtocol {
             catch (IndexOutOfBoundsException ioobe) {
               throw new ProtocolException("Communication Error! Error Code 3");
             }
+        } else if (state == SENT_EXPECTING_HOST) {
+            host = theInput;
+            theOutput = "ok expecting query";
+            state = SENT_EXPECTING_QUERY;
         } else if (state == SENT_EXPECTING_QUERY) {
             if (theInput.length() == bytes) {
               try {
@@ -115,6 +119,8 @@ public class MCRRemoteQueryProtocol {
                     .getInstanceOf(proppers);
                   MCRQueryResultArray result = mcr_query
                     .getResultList(query,type,vec_length);
+                  for (int i=0; i<result.size();i++)
+                    result.setHost(i,host);
                   queryResult = result.exportAll();
                   }
                 else queryResult="";
@@ -158,3 +164,4 @@ public class MCRRemoteQueryProtocol {
         return theOutput;
     }
 }
+
