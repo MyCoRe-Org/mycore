@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import org.jdom.transform.JDOMSource;
 import org.mycore.common.*;
 import org.mycore.services.query.MCRQueryCollector;
 import org.mycore.common.xml.MCRXMLContainer;
@@ -53,9 +54,9 @@ final class MCRQueryCommands
 {
 
 // logger
-static Logger logger=Logger.getLogger(MCRQueryCommands.class.getName());
+private static final Logger logger=Logger.getLogger(MCRQueryCommands.class.getName());
 
-static MCRQueryCollector collector;
+private static MCRQueryCollector collector;
 
 /** Executes a local query */
 public static void queryLocal( String type, String query )
@@ -151,9 +152,7 @@ public static void queryRemote( String type, String query )
       TransformerFactory transfakt = TransformerFactory.newInstance();
       Transformer trans = transfakt.newTransformer( source );
       StreamResult sr = new StreamResult( (OutputStream)System.out );
-      trans.transform( new javax.xml.transform.dom.DOMSource( 
-        (new org.jdom.output.DOMOutputter())
-        .output(resarray.exportAllToDocument())),sr);
+      trans.transform(new JDOMSource(resarray.exportAllToDocument()),sr);
     }
     catch( Exception ex )
     {
