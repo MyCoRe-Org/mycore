@@ -116,14 +116,16 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			}
 			m = query.indexOf("[", l);
 			if (m == -1) {
-				throw new MCRPersistenceException("Error while analyze the query string.");
+				logger.error("Error 1 while analyze the query string : "+query);
+				break;
 			}
 			if (root == null) {
 				root = query.substring(l, m);
 			}
 			n = query.indexOf("]", m);
 			if (n == -1) {
-				throw new MCRPersistenceException("Error while analyze the query string.");
+				logger.error("Error 2 while analyze the query string : "+query);
+				break;
 			}
 			kon = 1;
 			for (int o = m + 1; o < n; o++) {
@@ -134,7 +136,8 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			for (int o = kon; o > 1; o--) {
 				n = query.indexOf("]", n + 1);
 				if (n == -1) {
-					throw new MCRPersistenceException("Error while analyze the query string.");
+					logger.error("Error 3 while analyze the query string : "+query);
+					break;
 				}
 			}
 			flags.add(Boolean.FALSE);
