@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.12 $ $Date: 2004-07-22 13:51:57 $ -->
+<!-- $Revision: 1.13 $ $Date: 2004-07-23 14:23:44 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -452,12 +452,6 @@
   <xsl:variable name="num.next" select="count($cells[@col &gt; (number($col.nr) + number($col.span) - 1)])"/>
 
   <td colspan="{$col.span}">
-
-    <!-- ======== last column gets width 100% ======== -->
-    <xsl:if test="$num.next = '0'">
-      <xsl:attribute name="width">100%</xsl:attribute>
-    </xsl:if>
-
     <xsl:variable name="the.cell" select="$cells[(@row=$row.nr) and (@col=$col.nr)]" />
 
     <!-- ======== if there is no cell here, add space ======== -->
@@ -532,6 +526,17 @@
 
   <!-- ======== set align / valign ======== -->
   <xsl:call-template name="editor.set.anchor" />
+
+  <!-- ======== set width / height ======== -->
+  <xsl:copy-of select="@height" />
+  <xsl:choose>
+    <xsl:when test="@width">
+      <xsl:copy-of select="@width"/>
+    </xsl:when>
+    <xsl:when test="$num.next = '0'">
+      <xsl:attribute name="width">100%</xsl:attribute>
+    </xsl:when>
+  </xsl:choose>
 
   <xsl:variable name="outer.border" select="../@lines" />
 
