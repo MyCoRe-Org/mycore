@@ -52,7 +52,7 @@ public static String DEFAULT_LANGUAGE = "de";
 public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
 public static boolean DEFAULT_TEXT_SEARCH = false;
 public static boolean DEFAULT_HERITABLE = false;
-private String META_PACKAGE_NAME = "mycore.datamodel.";
+private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 private static String LINK_CLASS_NAME = "MCRMetaLink";
 
 // MetaElement data
@@ -401,11 +401,11 @@ public final void setFromDOM(org.jdom.Element element) throws MCRException
       ((MCRMetaInterface)obj).setFromDOM(subtag);
       }
     catch (ClassNotFoundException e) {
-      throw new MCRException(classname+" ClassNotFoundException"); }
+      throw new MCRException(fullname+" ClassNotFoundException"); }
     catch (IllegalAccessException e) {
-      throw new MCRException(classname+" IllegalAccessException"); }
+      throw new MCRException(fullname+" IllegalAccessException"); }
     catch (InstantiationException e) {
-      throw new MCRException(classname+" InstantiationException"); }
+      throw new MCRException(fullname+" InstantiationException"); }
     list.add(obj);
     }
   }
