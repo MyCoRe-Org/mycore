@@ -25,6 +25,9 @@
 package org.mycore.services.query;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 
 import javax.servlet.http.*;
@@ -49,6 +52,7 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
+ * @author Thomas Scheffler
  * @version $Revision$ $Date$
 */
 public class MCRQueryServlet extends HttpServlet 
@@ -187,12 +191,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     logger.info("MCRQueryServlet : type = "+type);
     logger.info("MCRQueryServlet : hosts = "+ host);
     logger.info("MCRQueryServlet : lang = "+lang);
-    logger.info("MCRQueryServlet : query = "+query);
-	// prepare the stylesheet name
-	// TODO: Speed this up - it's tooo slow
-	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
-	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
-	logger.info("Style = "+style);
+    logger.info("MCRQueryServlet : query = \""+query+"\"");
 
 	// check for valid session
 	if (mode.equals("CachedResultList"))
@@ -211,6 +210,11 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	  cachedFlag = true;
 	  mode = "ResultList";
 	}
+	// prepare the stylesheet name
+	// TODO: Speed this up - it's tooo slow
+	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
+	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
+	logger.info("Style = "+style);
 
 	if (type.equals(sortType)){
 		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
@@ -461,6 +465,36 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	logger.info("MCRQueryServlet: getBrowseElementID() returns: "+result);
   	return result;
   }
+  private Document getObjectMetaDataByID(HttpSession session,String ID, String host){
+  	Document MetaData=null;
+  	if(session!=null && ID!=null && host!=null){
+		Document jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
+		if (jdom == null)
+			return null;
+		List elements = jdom.getRootElement()
+							  .getChildren(MCRXMLContainer.TAG_RESULT);
+		org.jdom.Element search=null;
+		boolean found=false;
+		while(!elements.isEmpty()){
+			search=(Element)elements.get(0);
+			if ((search).getAttributeValue("id").equals(ID) &&
+				(search).getAttributeValue("host").equals(host)){
+					elements.clear();
+					found=true;
+			}
+			else {
+				elements.remove(0);
+			}
+		}
+	
+		if (search==null || !found)
+			return null;
+		MetaData = new Document(new Element(MCRXMLContainer.TAG_RESULTS));
+		MetaData.getRootElement().addContent((Element)search.clone());
+		logger.info("MCRQueryServlet: found Element with ID "+ID+" in cache!");
+  	}
+  	return MetaData;
+  }
   private MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang){
   	MCRXMLSortInterface sorter=null;
   	try {
@@ -546,7 +580,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   private String getProperty(HttpServletRequest request, String name){
 	String value  = (String) request.getAttribute(name);
 	//if Attribute not given try Parameter
-  	if (value == null)
+  	if (value == null || value.length()==0)
 		value = request.getParameter(name);
   	return value;
   }
