@@ -89,128 +89,104 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common,compile_datamodel,compile_classifications,compile_nbn,compile_editor,compile_xml,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_webservice,compile_user,compile_persistency,compile_database,compile_gui"/>
+  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_webservice, compile_query, compile_persistency, compile_database"/>
 
   <target name="compile_common">
     <antcall target="javac">
-      <param name="packages" value="mycore/common/**"/>
+      <param name="packages" value="org/mycore/common/**"/>
     </antcall>
   </target>
 
   <target name="compile_persistency">
     <echo>Compiling for persistence layer ${persistency}</echo>
-    <antcall target="compile_${persistency}">
-      <param name="packages" value="mycore/${persistency}/**"/>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/backend/${persistency}/**"/>
     </antcall>
   </target>
 
   <target name="compile_database">
     <echo>Compiling for for database layer ${database}</echo>
-    <antcall target="compile_${database}">
-      <param name="packages" value="mycore/${database}/**"/>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/backend/${database}/**"/>
     </antcall>
   </target>
 
   <target name="compile_sql">
     <antcall target="javac">
-      <param name="packages" value="mycore/sql/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_db2">
-    <antcall target="javac">
-      <param name="packages" value="mycore/db2/**"/>
+      <param name="packages" value="org/mycore/backend/sql/**"/>
     </antcall>
   </target>
 
   <target name="compile_webservice">
     <antcall target="javac">
-      <param name="packages" value="mycore/webservice/**"/>
+      <param name="packages" value="org/mycore/webservice/**"/>
+    </antcall>
+  </target>
+
+  <target name="compile_oai">
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/services/oai/**"/>
     </antcall>
   </target>
 
   <target name="compile_ifs">
     <antcall target="javac">
-      <param name="packages" value="mycore/ifs/**"/>
+      <param name="packages" value="org/mycore/datamodel/ifs/**, org/mycore/backend/filesystem/**, org/mycore/backend/realhelix/**, org/mycore/backend/videocharger/**"/>
     </antcall>
   </target>
 
-  <target name="compile_communication">
+  <target name="compile_remote">
     <antcall target="javac">
-      <param name="packages" value="mycore/communication/**"/>
+      <param name="packages" value="org/mycore/backend/remote/**"/>
     </antcall>
   </target>
 
-  <target name="compile_xml">
+  <target name="compile_metadata">
     <antcall target="javac">
-      <param name="packages" value="mycore/xml/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_datamodel">
-    <antcall target="javac">
-      <param name="packages" value="mycore/datamodel/**"/>
+      <param name="packages" value="org/mycore/datamodel/metadata/**"/>
     </antcall>
   </target>
 
   <target name="compile_classifications">
     <antcall target="javac">
-      <param name="packages" value="mycore/classifications/**"/>
+      <param name="packages" value="org/mycore/datamodel/classifications/**"/>
     </antcall>
   </target>
 
   <target name="compile_editor">
     <antcall target="javac">
-      <param name="packages" value="mycore/editor/**"/>
+      <param name="packages" value="org/mycore/frontend/editor/**"/>
     </antcall>
   </target>
 
   <target name="compile_user">
     <antcall target="javac">
-      <param name="packages" value="mycore/user/**"/>
+      <param name="packages" value="org/mycore/user/**"/>
     </antcall>
   </target>
 
-  <target name="compile_commandline">
+  <target name="compile_cli">
     <antcall target="javac">
-      <param name="packages" value="mycore/commandline/**"/>
+      <param name="packages" value="org/mycore/frontend/cli/**"/>
     </antcall>
   </target>
 
   <target name="compile_nbn">
     <antcall target="javac">
-      <param name="packages" value="mycore/nbn/**"/>
+      <param name="packages" value="org/mycore/services/nbn/**"/>
     </antcall>
   </target>
 
-  <target name="compile_cm7">
-   <antcall target="javac">
-     <param name="packages" value="mycore/cm7/**"/>
-   </antcall>
-  </target>
-
-  <target name="compile_cm8">
-   <antcall target="javac">
-     <param name="packages" value="mycore/cm8/**"/>
-   </antcall>
-  </target>
-
-  <target name="compile_xmldb">
-   <antcall target="javac">
-     <param name="packages" value="mycore/xmldb/**"/>
-     <param name="classpath" value="${lib}/xmldb.jar"/>
-   </antcall>
-  </target>
-
-  <target name="compile_gui">
+  <target name="compile_query">
     <antcall target="javac">
-      <param name="packages" value="mycore/gui/**"/>
+      <param name="packages" value="org/mycore/services/query/**"/>
     </antcall>
   </target>
 
   <!-- =================================================================== -->
   <!-- Create the JavaDocs from sources                                    -->
   <!-- =================================================================== -->
+
   <target name="javadocs" depends="init">
     <echo>
 
