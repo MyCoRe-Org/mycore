@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.user.*;
 
 /**
  * Instances of this class collect information kept during a session like the currently
@@ -72,6 +73,14 @@ public class MCRSession implements Cloneable
   /** returns the current user ID */
   public final String getCurrentUserID()
   { return userID.trim(); }
+
+  /** returns the current user object */
+  public final MCRUser getCurrentUser()
+  {
+    if (userID != null)
+      return MCRUserMgr.instance().retrieveUser(userID.trim());
+    else return null;
+  }
 
   /** sets the current user ID */
   public final void setCurrentUserID(String userID)
