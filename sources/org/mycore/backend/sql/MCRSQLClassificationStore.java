@@ -425,6 +425,11 @@ public final ArrayList retrieveChildren( String CLID, String PID )
     .setCondition( "PID",  PID  )
     .setCondition( "CLID", CLID )
     .toSelectStatement() );
+  logger.debug("Generiertes Statement: " + 
+  		new MCRSQLStatement( tableCateg )
+  	    .setCondition( "PID",  PID  )
+	    .setCondition( "CLID", CLID )
+	    .toSelectStatement());
   while( reader.next() ) {
     String ID    = reader.getString( "ID"    );
     String URL   = "";
