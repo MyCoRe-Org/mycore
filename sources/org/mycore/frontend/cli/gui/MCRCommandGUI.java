@@ -227,7 +227,7 @@ public class MCRCommandGUI extends JFrame {
   			    FileOutputStream fos = new FileOutputStream( fileChooser.getSelectedFile() );
 			    MCRObject obj = new MCRObject();
 			    obj.receiveFromDatastore( selObject.getId() );
-  			    fos.write( obj.createXML() );
+  			    fos.write( MCRUtils.getByteArray(obj.createXML()) );
 			    fos.close();
   			}
   			catch( Exception e ) {
