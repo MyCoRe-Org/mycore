@@ -285,7 +285,8 @@ public class MCRDerivateCommands
       return;
       }
     logger.info( "Derivate "+ID+" stored under "+dirname+" and "+
-      filename+".\n" );
+      filename+"." );
+    logger.info( "" );
     }
 
  /**

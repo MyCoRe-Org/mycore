@@ -266,7 +266,8 @@ public class MCRObjectCommands
       logger.error("");
       return;
       }
-    logger.info( "Object "+ID+" stored under "+filename+".\n" );
+    logger.info( "Object "+ID+" stored under "+filename+"." );
+    logger.info( "" );
     }
 
   }
