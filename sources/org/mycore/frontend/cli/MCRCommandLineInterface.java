@@ -101,11 +101,11 @@ public class MCRCommandLineInterface
     // *************************************************
 
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete object from {0} to {1}",
+      "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "delete object {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "delete object from {0} to {1}",
-      "org.mycore.frontend.cli.MCRObjectCommands.delete String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "load object from file {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String" );

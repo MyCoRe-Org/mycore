@@ -90,7 +90,7 @@ public class MCRObjectCommands
   * @param IDfrom the start ID for deleting the MCRObjects
   * @param IDto   the stop ID for deleting the MCRObjects
   **/
-  public static void delete( String IDfrom, String IDto )
+  public static void deleteFromTo( String IDfrom, String IDto )
     throws Exception
     {
     init();
