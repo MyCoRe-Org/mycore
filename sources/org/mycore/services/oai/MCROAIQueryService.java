@@ -135,12 +135,14 @@ public class MCROAIQueryService implements MCROAIQuery {
 		    } catch (MCRConfigurationException mcrx) {
 		    }
 			    
+   	    	logger.debug("Die erzeugte Query ist: " + query.toString());
+   	    	
 			MCRQueryResult qr = new MCRQueryResult();
 			MCRXMLContainer qra = null;
     	    try {
 		        qra = qr.setFromQuery("local", "document", query.toString());
     	    } catch (MCRException mcrx) {
-    	    	logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
+    	    	logger.error("Die Query ist fehlgeschlagen.");
     	    	return newList;
     	    }
 
@@ -208,6 +210,8 @@ public class MCROAIQueryService implements MCROAIQuery {
 	    } catch (MCRConfigurationException mcrx) {
 	    }
 			    
+    	logger.debug("Die erzeugte Query ist: " + query.toString());
+    	
         MCRQueryResult qr = new MCRQueryResult();
    	    try {
 	        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
@@ -226,6 +230,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         		list.add(identifier);
 	   	    }
    	    } catch (MCRException mcrx) {
+   	    	logger.error("Die Query ist fehlgeschlagen.");
    	    	return null;
    	    }
    	    
