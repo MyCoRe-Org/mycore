@@ -23,8 +23,6 @@
  **/
 package org.mycore.services.query;
 
-import java.util.IdentityHashMap;
-
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
