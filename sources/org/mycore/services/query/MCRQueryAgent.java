@@ -49,6 +49,7 @@ public class MCRQueryAgent {
 		vec_max_length = conf.getInt("MCR.query_max_results",10);
 		for (int i=0; i<nThreads; i++) {
 			threads[i] = new PoolWorker();
+			threads[i].setName("MCRQueryAgent #"+(i+1));
 			threads[i].start();
 		}
 	}

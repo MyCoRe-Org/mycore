@@ -61,6 +61,7 @@ public class MCRQueryCollector {
 
 		for (int i=0; i<nThreads; i++) {
 			threads[i] = new PoolWorker();
+			threads[i].setName("MCRQueryCollector #"+(i+1));
 			threads[i].start();
 		}
 		// get an instance of configuration
