@@ -135,7 +135,7 @@ public static void queryRemote( String type, String query )
     else // other types
     {
     	synchronized(resarray){
-			collector.collectQueryResults( "local", type, query, resarray );
+			collector.collectQueryResults( host, type, query, resarray );
 			try{
 				resarray.wait();
 			} catch (InterruptedException ignored) {}

@@ -128,6 +128,11 @@ public class MCRQueryCollector {
 					returns.addLast(host);
 				else if (host.equals("local"))
 					returns.addFirst(host);
+				else if (host.equals("remote")) {
+					Object [] ob = remoteAliasList.toArray();
+					for (int j=0;j<ob.length;j++) {
+						returns.addLast((String)ob[j]); }
+					}
 				else
 					throw new MCRException ("Host '"+host+"' is not in the list");
 			}
