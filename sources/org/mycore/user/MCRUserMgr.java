@@ -591,6 +591,29 @@ public class MCRUserMgr
   }
 
   /**
+   * This method gets all group IDs of a given group where the group under consideraton
+   * is a member of, including the implicit membership.
+   *
+   * @param    groupID   The group under consideration
+   * @return   ArrayList of strings containing the group IDs the group is a member of
+   *           (including the implicit ones).
+   */
+  public final synchronized ArrayList getAllImplicitGroupIDsOfGroup(String groupID)
+  throws MCRException
+  {
+    // Checking the privileges is done in the subsequent methods
+    ArrayList allGroupIDs = getAllGroupIDs();
+    ArrayList allImplicitGroupIDs = new ArrayList();
+    MCRGroup currentGroup = retrieveGroup(groupID);
+
+    for (int i=0; i<allGroupIDs.size(); i++) {
+      if (MCRGroup.isImplicitMemberOf(currentGroup, (String)allGroupIDs.get(i)))
+        allImplicitGroupIDs.add(allGroupIDs.get(i));
+    }
+    return allImplicitGroupIDs;
+  }
+
+  /**
    * This method returns a JDOM presentation of all groups of the system
    *
    * @return   JDOM document presentation of all groups of the system
@@ -755,6 +778,22 @@ public class MCRUserMgr
       if (currentGroup.hasPrivilege("change owner of object"))
         return currentGroup;
     }
+    return null;
+  }
+
+  /**
+   * This method returns the ID of the primary group for a given userID.
+   *
+   * @param  userID  the userID for which the primary group ID is requested
+   * @return groupID the ID of the primary group of the user
+   */
+  public final String getPrimaryGroupIDOfUser(String userID)
+  {
+    try {
+      MCRUser u = retrieveUser(userID);
+      return u.getPrimaryGroupID();
+    }
+    catch (MCRException e) { }
     return null;
   }
 

@@ -244,6 +244,33 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   { return ID; }
 
   /**
+   * This method determines the list of all groups the user is a member of, including
+   * the implicit ones. That means: if user u is a member of group G1 and G1 is
+   * member of group G2 and G2 itself is member of G3, then user u is considered
+   * to be an implicit member of groups G2 and G3.
+   *
+   * @return list of all groups the user is a member of
+   */
+  public final ArrayList getAllGroupIDs()
+  {
+    ArrayList allGroupIDs = new ArrayList();
+    allGroupIDs.addAll(groupIDs);
+    try {
+      for (int i = 0; i < groupIDs.size(); i++) {
+        ArrayList implicitGroupIDs = MCRUserMgr.instance().
+            getAllImplicitGroupIDsOfGroup( (String) groupIDs.get(i));
+        for (int k = 0; k < implicitGroupIDs.size(); k++) {
+          if (!allGroupIDs.contains(implicitGroupIDs.get(k))) {
+            allGroupIDs.add(implicitGroupIDs.get(k));
+          }
+        }
+      }
+    }
+    catch(MCRException ex) {}
+    return allGroupIDs;
+  }
+
+  /**
    * @return  This method returns the numerical ID of the user object.
    */
   public int getNumID()
