@@ -142,10 +142,6 @@ private final void createCateg()
      .addColumn( "PID VARCHAR("+Integer.toString(lengthCategID)+
        ")" )
      .addColumn( "PRIMARY KEY ( CLID, ID )" )
-     .addColumn( "CONSTRAINT CATEG2CLASSIF FOREIGN KEY ( CLID ) REFERENCES " +
-       tableClass + " ON DELETE CASCADE" )
-     .addColumn( "CONSTRAINT CATEG2PARENT FOREIGN KEY ( CLID, PID ) REFERENCES "
-       + tableCateg + " ON DELETE CASCADE" )
      .toCreateTableStatement() );
     }
   finally{ c.release(); }
@@ -169,8 +165,6 @@ private final void createClassLabel()
      .addColumn( "MCRDESC VARCHAR("+Integer.toString(lengthDescription)+
        ")" )
      .addColumn( "PRIMARY KEY ( ID, LANG )" )
-     .addColumn( "CONSTRAINT CLASS2LABEL FOREIGN KEY ( ID ) REFERENCES "
-       + tableClass + " ON DELETE CASCADE" )
      .toCreateTableStatement() );
     }
   finally{ c.release(); }
@@ -196,8 +190,6 @@ private final void createCategLabel()
      .addColumn( "MCRDESC VARCHAR("+Integer.toString(lengthDescription)+
        ")" )
      .addColumn( "PRIMARY KEY ( CLID, ID, LANG )" )
-     .addColumn( "CONSTRAINT CATEG2LABEL FOREIGN KEY ( CLID, ID ) REFERENCES "
-       + tableCateg + " ON DELETE CASCADE" )
      .toCreateTableStatement() );
     }
   finally{ c.release(); }
@@ -233,6 +225,15 @@ public void deleteClassificationItem( String ID )
   {
   MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableClass )
     .setCondition( "ID", ID )
+    .toDeleteStatement() );
+  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableClassLabel )
+    .setCondition( "ID", ID )
+    .toDeleteStatement() );
+  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
+    .setCondition( "CLID", ID )
+    .toDeleteStatement() );
+  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCategLabel )
+    .setCondition( "CLID", ID )
     .toDeleteStatement() );
   }
   
@@ -307,6 +308,10 @@ public final void createCategoryItem( MCRCategoryItem category )
 public final void deleteCategoryItem( String CLID, String ID )
   {
   MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
+    .setCondition( "CLID", CLID )
+    .setCondition( "ID",   ID   )
+    .toDeleteStatement() );
+  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCategLabel )
     .setCondition( "CLID", CLID )
     .setCondition( "ID",   ID   )
     .toDeleteStatement() );
