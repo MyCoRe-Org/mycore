@@ -177,7 +177,8 @@ private String handleQueryStringExist(String root, String query, String type) {
             }
           else { break; }
           }
-
+    // back-convert @categid=610 to @categid="610"
+    query = query.replaceAll("@categid[ ]*=[ ]*([0-9]+)","@categid=\"$1\"")   ;
 	// combine the separated queries
 	query = root + "[" + query + "]";
 	return query;
