@@ -171,6 +171,10 @@ public MCRTypedContent createTypedContent(boolean parasearch)
     debug();
     throw new MCRException("The content of MCRMetaXML is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
+  if(!parasearch) { return tc; }
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   return tc;
   }
 
