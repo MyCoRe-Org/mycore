@@ -110,8 +110,9 @@ public class MCREditorServlet extends MCRServlet
     String ref = req.getParameter( "_ref" );
 
     logger.info( "Editor load editor definition from " + ref + "@" + uri );
+    Element param = getTargetParameters();
     Element editor = MCREditorDefReader.readDef( uri, ref );
-    addTargetParameters( editor );
+    if( param != null ) editor.addContent( param );
 
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );
@@ -123,15 +124,13 @@ public class MCREditorServlet extends MCRServlet
     sendToDisplay( req, res, new Document( editor ) );
   }
 
-  private void addTargetParameters( Element editor )
+  private Element getTargetParameters()
   { 
     String key = "StoredRequestParameters";
     Map parameters = (Map)( MCRSessionMgr.getCurrentSession().get( key ) );
-    if( parameters == null ) return;
+    if( parameters == null ) return null;
 
     Element tps = new Element( "target-parameters" );
-    editor.addContent( tps );
-    
     Iterator keys = parameters.keySet().iterator();
     while( keys.hasNext() )
     {
@@ -145,6 +144,7 @@ public class MCREditorServlet extends MCRServlet
         tps.addContent( tp );
       }
     }
+    return tps;
   }
 
   private static Random random = new Random();
