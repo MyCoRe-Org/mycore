@@ -24,6 +24,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.net.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.mycore.common.*;
@@ -64,4 +65,22 @@ public class MCRServletJob
   /** returns the HttpServletResponse object */
   public HttpServletResponse getResponse()
   { return theResponse; }
+
+  /** returns true if the current http request was issued from the local host **/
+  public boolean isLocal()
+  {
+    try
+    {
+      String serverName = theRequest.getServerName(); 
+      String serverIP   = InetAddress.getByName( serverName ).getHostAddress();  
+      String remoteIP   = MCRServlet.getRemoteAddr( theRequest );
+      return ( remoteIP.equals( serverIP ) || remoteIP.equals( "127.0.0.1" ) );
+    }
+    catch( Exception ex )
+    {
+      String msg = "Exception while testing if http request was from local host";
+      throw new MCRConfigurationException( msg, ex );
+    }
+  }
 }
+
