@@ -26,6 +26,7 @@ package org.mycore.common.xml;
 
 import java.io.*;
 import java.util.*;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -226,9 +227,9 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
   xml.add(in_xml);
   int in_status=0;
   if (status.size()>0){
-	  System.out.print("MCRXMLContainer: set status at "+(status.size()-1)+" from "+((Integer)status.get(status.size()-1)).intValue());
+	  // System.out.print("MCRXMLContainer: set status at "+(status.size()-1)+" from "+((Integer)status.get(status.size()-1)).intValue());
 	  status.set((status.size()-1), new Integer(((Integer)status.get(status.size()-1)).intValue()+1));
-	  System.out.println(" to "+((Integer)status.get(status.size()-1)).intValue() + " Element: "+((org.jdom.Element)getXML(status.size()-1)).getAttributeValue("ID"));
+	  // System.out.println(" to "+((Integer)status.get(status.size()-1)).intValue() + " Element: "+((org.jdom.Element)getXML(status.size()-1)).getAttributeValue("ID"));
 	  in_status=2;
   }
   status.add(new Integer(in_status));
@@ -402,33 +403,56 @@ public final synchronized void importElements(byte [] in)
   ByteArrayInputStream bin = new ByteArrayInputStream(in);
   org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
   org.jdom.Document jdom = builder.build(bin);
-  org.jdom.Element root = jdom.getRootElement();
-  if (!root.getName().equals(TAG_RESULTS)) {
-    throw new MCRException("The input is not an MCRXMLContainer."); }
-  List list = root.getChildren(TAG_RESULT);
-  int irank = 0;
-  int istatus = 0;
-  for (int i=0;i<list.size();i++) {
-    org.jdom.Element res = (org.jdom.Element) list.get(i);
-    String inhost = res.getAttributeValue(ATTR_HOST);
-    String inid = res.getAttributeValue(ATTR_ID);
-    String inrank = res.getAttributeValue(ATTR_RANK);
-    try { irank = Integer.parseInt(inrank); }
-    catch (NumberFormatException e) {
-      throw new MCRException(ERRORTEXT); }
-    istatus = ((res.getAttributeValue(ATTR_SUCC).equals("true"))?1:0)
-             +((res.getAttributeValue(ATTR_PRED).equals("true"))?2:0);
-    List childlist = res.getChildren();
-    org.jdom.Element inxml = (org.jdom.Element)childlist.get(0);
-    host.add(inhost);
-    mcr_id.add(inid);
-    rank.add(new Integer(irank));
-    status.add(new Integer(istatus));
-    System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
-    xml.add(inxml);
-    }
-   if (list.size()>1) resetStatus();
+  importElements(jdom);
   }
+  /**
+   * This methode import a well formed XML stream of results as byte array and add it to an
+   * existing list.
+   * in form of<br>
+   * &lt;?xml version="1.0" encoding="..."?&gt;<br>
+   * &lt;mcr_results&gt;<br>
+   * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
+   *  rank="<em>rank</em>" &gt;<br>
+   * &lt;mycore...&gt;<br>
+   * ...<br>
+   * &lt;/mycore...&gt;<br>
+   * &lt;/mcr_result&gt;<br>
+   * &lt;/mcr_results&gt;<br>
+   *
+   * @param jdom the XML input as a JDom Object
+   * @exception MCRException a MyCoRe error is occured
+   * @exception org.jdom.JDOMException cant read the byte array as XML
+   **/
+  protected final synchronized void importElements(org.jdom.Document jdom) 
+	throws MCRException, org.jdom.JDOMException
+	{
+	org.jdom.Element root = jdom.getRootElement();
+	if (!root.getName().equals(TAG_RESULTS)) {
+	  throw new MCRException("The input is not an MCRXMLContainer."); }
+	List list = root.getChildren(TAG_RESULT);
+	int irank = 0;
+	int istatus = 0;
+	for (int i=0;i<list.size();i++) {
+	  org.jdom.Element res = (org.jdom.Element) list.get(i);
+	  String inhost = res.getAttributeValue(ATTR_HOST);
+	  String inid = res.getAttributeValue(ATTR_ID);
+	  String inrank = res.getAttributeValue(ATTR_RANK);
+	  try { irank = Integer.parseInt(inrank); }
+	  catch (NumberFormatException e) {
+		throw new MCRException(ERRORTEXT); }
+	  istatus = ((res.getAttributeValue(ATTR_SUCC).equals("true"))?1:0)
+			   +((res.getAttributeValue(ATTR_PRED).equals("true"))?2:0);
+	  List childlist = res.getChildren();
+	  org.jdom.Element inxml = (org.jdom.Element)childlist.get(0);
+	  host.add(inhost);
+	  mcr_id.add(inid);
+	  rank.add(new Integer(irank));
+	  status.add(new Integer(istatus));
+	  // System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
+	  xml.add(inxml);
+	  }
+	 if (list.size()>1) resetStatus();
+	}
 
 /**
  * This method imports another MCRXMLContainer and add it to the existing list.
@@ -474,13 +498,33 @@ private final void resetStatus()
   	}
   }
 
-  public void sort(MCRXMLSortInterface sorter) throws MCRException{
+  public synchronized void sort(MCRXMLSortInterface sorter) throws MCRException{
 	/* do some sorting here */
-	throw new MCRException("method not implemented yet");
+	sort(sorter,false);
   }
-  public void sort(MCRXMLSortInterface sorter, boolean reversed) throws MCRException{
+  public synchronized void sort(MCRXMLSortInterface sorter, boolean reversed) throws MCRException{
 	/* do some sorting here */
-	throw new MCRException("method not implemented yet");
+	
+	sorter.add(this);
+	this.host.clear();
+	this.mcr_id.clear();
+	this.rank.clear();
+	this.status.clear();
+	this.xml.clear();
+	Object[] result=sorter.sort(reversed);
+	for (int i=0;i<result.length;i++){
+		importElements((MCRXMLContainer)result[i]);
+	}
+  }
+  public synchronized Object clone(){
+  	MCRXMLContainer clone=new MCRXMLContainer();
+  	clone.default_encoding=this.default_encoding.intern();
+  	clone.host=(ArrayList) this.host.clone();
+  	clone.mcr_id=(ArrayList) this.mcr_id.clone();
+  	clone.rank=(ArrayList) this.rank.clone();
+  	clone.status=(ArrayList) this.status.clone();
+  	clone.xml=(ArrayList) this.xml.clone();
+  	return clone;
   }
 }
 

@@ -37,6 +37,8 @@ import org.mycore.common.*;
 import org.mycore.datamodel.classifications.*;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.common.xml.MCRXMLSorter;
+import org.mycore.common.xml.MCRXMLSortInterface;
 
 /**
  * This servlet provides a web interface to query
@@ -155,7 +157,6 @@ private String defaultLang = "";
     if (type.equals("class")) {
       Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
       String style = parameters.getProperty("Style",mode+"-class-"+lang);
-//System.out.println("Style = "+style);
       MCRQueryResult result = new MCRQueryResult();
       String squence = conf.getString("MCR.classifications_search_sequence",
         "remote-local");
@@ -245,9 +246,7 @@ private String defaultLang = "";
     	if (resarray.size()==1)
     	  resarray.setStatus(0,status);  
 	  }
-      jdom = resarray.exportAllToDocument();
-if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
-
+	  
       // create a new session if not already alive and encache result list
       if (mode.equals("ResultList"))
       {
@@ -255,12 +254,18 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
           session = request.getSession(true);
         if (session != null)
         {
+		  if (type.equals("document"))
+		  	jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
+		  else
+		    jdom = resarray.exportAllToDocument(); // no Resultlist for documents: why sort?
           session.setAttribute( "CachedList", jdom );
           session.setAttribute( "CachedType", type );
         }
         else
           System.out.println("session for setAttribute is null");
       }
+      else
+      	jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
     }
     
     if ((view.equals("prev") || view.equals("next")) && (ref != null)){
@@ -288,11 +293,6 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
     		   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
     		   "&lang="+lang+"&query="+query );
     		doGet(request,response);
-			/*
-			RequestDispatcher rd = getServletContext()
-			  .getNamedDispatcher( "MCRQueryServlet" );
-			rd.forward( request, response );
-			*/
     	}
     }
 	else {
@@ -317,93 +317,7 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
     	}
 	}
   }
-
-  /**
-   * <em>transform</em> transforms a JDOM via XSLT giving a result JDOM.
-   *
-   * @param inp                              the input list as JDOM
-   * @param stylesheet                       the transforming stylesheet
-   * @return org.jdom.Document               the result
-   * @exception MCRException                 thrown if XSLT transformation fails
-   */
-  private static org.jdom.Document transform (org.jdom.Document inp, String stylesheet)
-    throws MCRException
-  {
-    try
-    {
-      Transformer transformer = TransformerFactory.newInstance().
-        newTransformer(new StreamSource(stylesheet));
-      JDOMResult out = new JDOMResult();
-      transformer.transform(new JDOMSource(inp), out);
-      return out.getDocument();
-    }
-    catch (TransformerException exc)
-    {
-      throw new MCRException("Could not transform JDOM via XSLT", exc);
-    }
-  }
-
-  /**
-   * <em>buildSortingStylesheet</em> creates an XSL stylesheet which can sort a list
-   * of documents according to a given attribute in ascending order.
-   *
-   * @param attr                          the name of the attribute for which the list
-   *                                      should be sorted
-   * @return String                       the resulting stylesheet
-   */
-  private static String buildSortingStylesheet (String attr)
-  {
-    String stylesheet = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n";
-
-    stylesheet += "<!-- This file is machine generated and can be safely removed -->\n\n";
-
-    stylesheet += "<xsl:stylesheet version=\"1.0\"\n" +
-      "  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n\n";
-
-    stylesheet += "<xsl:output\n" +
-      "  method=\"xml\"\n" +
-  //    "  encoding=\"ISO-8859-1\"\n" +
-  //    "  media-type=\"text/xml\"\n" +
-  //    "  doctype-public=\"\"\n" +
-      "/>\n\n";
-
-    stylesheet += "<xsl:template match=\"/mcr_results\">\n\n";
-
-    stylesheet += "<xsl:element name=\"mcr_results\">\n\n";
-
-    stylesheet += "<xsl:for-each select=\"//mcr_result\">\n" +
-      "  <xsl:sort order=\"ascending\" select=\"mycoreobject/metadata/" +
-      attr + "s/" + attr + "/text()\"/>\n" +
-      "  <xsl:copy-of select=\".\"/>\n" +
-      "</xsl:for-each>\n\n";
-
-    stylesheet += "</xsl:element>\n\n";
-
-    stylesheet += "</xsl:template>\n\n";
-
-    stylesheet += "</xsl:stylesheet>\n";
-
-    return stylesheet;
-  }
-
-  /**
-   * <em>sortList</em> takes a list of documents and sorts them according to a given attribute.
-   *
-   * @param inp                           the input list as a JDOM
-   * @param attr                          the sorting attribute
-   * @return org.jdom.Document            the sorted list as a JDOM
-   * @exception MCRException              thrown if JDOM could not be transformed via XSLT
-   */
-  private static synchronized org.jdom.Document sortList (org.jdom.Document inp, String attr)
-    throws Exception
-  {
-    String stylesheet = buildSortingStylesheet(attr);
-    BufferedWriter wr = new BufferedWriter(new FileWriter("machine-generated-sort.xsl"));
-    wr.write(stylesheet);
-    wr.close();
-    return transform(inp, "machine-generated-sort.xsl");
-  }
-
+  
   /**
    * <em>getStructure</em> retrieves all links outgoing from a single input document
    * and gives the result as a vector of link lists (link folders).
@@ -472,5 +386,13 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
 	System.out.println("MCRQueryServlet: getBrowseElementID() returns: "+result);
   	return result;
   }
+  private MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang){
+  	MCRXMLSorter sorter=new MCRXMLSorter();
+  	/*maybe here should be a propertie used
+  	 * XPath Expression can be relative to mcr_result
+  	 */
+  	sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
+  	xmlcont.sort(sorter);
+  	return xmlcont;
+  }
 }
-
