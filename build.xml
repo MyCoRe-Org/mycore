@@ -29,6 +29,7 @@
   <property name="mycore.source.sql" value="./sources/mycore/sql"/>
   <property name="mycore.source.user" value="./sources/mycore/user"/>
   <property name="mycore.source.command" value="./sources/mycore/commandline"/>
+  <property name="mycore.source.nbn" value="./sources/mycore/nbn"/>
   <property name="mycore.class" value="./classes"/>
   <property name="mycore.javadoc" value="./javadocs"/>
     
@@ -80,7 +81,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_ifs,compile_communication,compile_user,compile_commandline">
+  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_ifs,compile_communication,compile_user,compile_commandline,compile_nbn">
   </target>
   
   <target name="compile_common">
@@ -167,6 +168,15 @@
   <target name="compile_commandline">
     <!-- compiles the commandline tool source classes -->
     <javac srcdir="${mycore.source.command}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_nbn">
+    <!-- compiles the National Bibliographic Names source classes -->
+    <javac srcdir="${mycore.source.nbn}"
            destdir="${mycore.class}"
            debug="${debug}"
            optimize="${optimize}">
