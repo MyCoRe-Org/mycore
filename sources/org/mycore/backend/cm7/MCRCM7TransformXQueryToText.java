@@ -87,7 +87,6 @@ public final MCRQueryResultArray getResultList(String query, String type,
     return result; }
   if (maxresults < 1) {
     return result; }
-  if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
 System.out.println("================================");
@@ -96,7 +95,7 @@ System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
-System.out.println("Raw text :"+rawtext);
+//System.out.println("Raw text :"+rawtext);
   int startpos = 0;
   int stoppos = rawtext.length();
   int operpos = -1;
@@ -105,22 +104,22 @@ System.out.println("Raw text :"+rawtext);
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-System.out.println("Next cond :"+onecond);
+//System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
     cond.append(traceOneCondition(onecond.trim()));
     if (onecond.length()>1) { cond.append(')'); }
     if (startpos<stoppos) {
-      operpos = rawtext.indexOf("AND",startpos);
+      operpos = rawtext.indexOf(" AND ",startpos);
       if (operpos != -1) {
-        startpos = operpos+3;
+        startpos = operpos+5;
         oper = rawtext.substring(operpos,startpos);
         cond.append(' ').append(oper).append(' ');
         continue;
         }
-      operpos = rawtext.indexOf("OR",startpos);
+      operpos = rawtext.indexOf(" OR ",startpos);
       if (operpos != -1) {
-        startpos = operpos+2;
+        startpos = operpos+4;
         oper = rawtext.substring(operpos,startpos);
         cond.append(' ').append(oper).append(' ');
         continue;
@@ -190,7 +189,7 @@ private final String traceOneCondition(String cond)
   if (klammerauf!=ROOT_TAG.length()) { return ""; }
   if (!cond.startsWith(ROOT_TAG)) { return ""; } 
   String pretag = "XXXMYCOREOBJECT";
-System.out.println("PRETAG="+pretag);
+//System.out.println("PRETAG="+pretag);
   // search operations
   String tag[] = new String[10];
   String op[] = new String[10];
@@ -294,12 +293,14 @@ System.out.println("PRETAG="+pretag);
     catch (MCRException e) { }
     }
 
+/*
   for (i=0;i<counter;i++) {
     System.out.println("TAG="+tag[i]);
     System.out.println("OPER="+op[i]);
     System.out.println("VALUE="+value[i]);
     System.out.println();
     }
+*/
 
   // search and prepare all attributes
   String attr[] = new String[10];
@@ -351,11 +352,13 @@ System.out.println("PRETAG="+pretag);
       attr[i] = sbtag.toString();
       }
     }
+/*
   for (i=0;i<counter;i++) {
     System.out.println("ATTR="+attr[i]);
     System.out.println("ISATTR="+isattr[i]);
     System.out.println();
     }
+*/
 
   StringBuffer sbout = new StringBuffer(1024);
   if (isattr[0]) {
@@ -396,17 +399,23 @@ System.out.println("PRETAG="+pretag);
     }
   catch (NumberFormatException e) { isnumber = false; }
     
-  String stag = "( ";
-  String etag = " )";
-  if (counter > 1) {
-    stag = "( $PARA$ { ";
-    StringBuffer sbetag = new StringBuffer(128);
-    for (i=1;i < counter;i++) { sbetag.append(attr[i]); }
-    sbetag.append(" } )");
-    etag = sbetag.toString();
-    }
   // number search
   if ((isnumber)||(isdate)) {
+    String stag = "( ";
+    String atag = "";
+    String etag = " )";
+    // prepare attributes
+    if (counter > 1) {
+      StringBuffer sbatag = new StringBuffer(128);
+      for (i=1;i<counter;i++) {
+        j = tag[i].indexOf("@");
+        if (j == -1) { continue; }
+        sbatag.append("XXX").append(tag[i].substring(j+1,tag[i].length()))
+          .append("XXX").append(value[i]).append("XXX*");
+        }
+      atag = sbatag.toString();
+      }
+    // select operator
     int ioper = 0;
     if (op[0].indexOf("<=")>=0) { ioper = 6; }
     else if (op[0].indexOf(">=")>=0) { ioper = 5; }
@@ -419,15 +428,19 @@ System.out.println("PRETAG="+pretag);
     String binstrmax = Integer.toBinaryString(MAX_NUMBER_STRING_LENGTH);
     int lenstr = binstr.length();
     int lenstrmax = binstrmax.length();
+    // do for equal
     if ((ioper==1)||(ioper==5)||(ioper==6)) {
-      sbout.append(stag).append("$MC=*$ ").append(attr[0]);
+      sbout.append(stag).append("$MC=*$ ").append(attr[0]).append(atag)
+        .append("YYY");
       for (i=0;i<(lenstrmax-lenstr);i++) { sbout.append('0'); }
         sbout.append(binstr);
       sbout.append(etag); }
     if ((ioper==5)||(ioper==6)) { sbout.append(" OR "); }
+    // do for not equal
     if (ioper==2) {
       for (j=0;j<(lenstrmax-lenstr);j++) {
-        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0]);
+        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
+          .append(atag).append("YYY");
         for (k=0;k<j;k++) { sbout.append('?'); }
         sbout.append('1');
         for (k=j+1;k<lenstrmax;k++) { sbout.append('?'); }
@@ -435,8 +448,9 @@ System.out.println("PRETAG="+pretag);
         sbout.append(" OR ");
         }
       for (j=0;j<lenstr;j++) {
-        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0]);
-        for (i=0;i<(lenstrmax-lenstr);i++) { sbout.append('0'); }
+        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
+          .append(atag).append("YYY");
+        for (i=0;i<(lenstrmax-lenstr);i++) { sbout.append('?'); }
         for (k=0;k<lenstr;k++) {
           if (k==j) {
             if (binstr.charAt(k)=='0') {
@@ -451,11 +465,13 @@ System.out.println("PRETAG="+pretag);
         if (j!=lenstr-1) { sbout.append(" OR "); }
         }
       }
+    // do for lower
     if ((ioper==4)||(ioper==5)) {
       StringBuffer sbetag = new StringBuffer(32);
       for (k=0;k<lenstr;k++) { sbetag.append('?'); }
       for (i=0;i<(lenstrmax-lenstr);i++) {
-        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0]);
+        sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
+          .append(atag).append("YYY");
         for (j=0;j<(lenstrmax-lenstr);j++) {
           if (i==j) { sbout.append('1'); }
           else { sbout.append('?'); }
@@ -469,7 +485,7 @@ System.out.println("PRETAG="+pretag);
       for (j=0;j<lenstr;j++) {
         if (binstr.charAt(j)=='0') {
           sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
-            .append(sbetag.toString());
+            .append(atag).append("YYY").append(sbetag.toString());
           for (k=0;k<lenstr;k++) {
             if (k<j) {
               sbout.append(binstr.charAt(k)); }
@@ -483,11 +499,12 @@ System.out.println("PRETAG="+pretag);
           }
         }
       }
+    // do for greater
     if (((ioper==3)||(ioper==6))&&(number!=0.)) {
       StringBuffer sbetag = new StringBuffer(32);
       for (k=0;k<(lenstrmax-lenstr);k++) { sbetag.append('0'); }
       sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
-        .append(sbetag.toString()).append('0');
+        .append(atag).append("YYY").append(sbetag.toString()).append('0');
       for (k=0;k<lenstr-1;k++) { sbout.append('?'); }
       sbout.append(etag);
       if (number > 1) {
@@ -495,7 +512,7 @@ System.out.println("PRETAG="+pretag);
         for (j=1;j<lenstr;j++) {
           if (binstr.charAt(j)=='0') { continue; }
           sbout.append(stag).append("$SC=?,MC=*$ ").append(attr[0])
-            .append(sbetag.toString()).append('1');
+            .append(atag).append("YYY").append(sbetag.toString()).append('1');
           for (k=1;k<lenstr;k++) {
             if (k<j) {
               sbout.append(binstr.charAt(k)); }

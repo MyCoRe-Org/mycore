@@ -121,6 +121,7 @@ public final String createSearchStringDate(GregorianCalendar date)
   {
   if (date == null) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
+  sb.append("YYY");
   int idate = date.get(Calendar.YEAR)*10000 +
               date.get(Calendar.MONTH)*100 +
               date.get(Calendar.DAY_OF_MONTH);
@@ -163,6 +164,7 @@ public final String createSearchStringDouble(double number)
   {
   if ((number < 0.) || (number > 10.e6)) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
+  sb.append("YYY");
   // 3 numbers after decimal point
   long a = (Math.round(number*10000.))/10; 
   String binstr = Long.toBinaryString(a);
