@@ -337,14 +337,12 @@ private final String traceOneCondition(String cond, String itemtypename,
       while (st.hasMoreTokens()) {
         if (tag[i].equals("*")) {
           sbout.append(" contains-text(@").append(itemtypeprefix)
-            .append("ts, \"THESAURUS \'deu\' EXPAND \'SYNONYM_OF\' TERM OF \'")
-            .append(st.nextToken()).append("\'\")=1");
+            .append("ts,\"\'").append(st.nextToken()).append("\'\")=1");
           }
         else {
           sbout.append(" contains-text(")
             .append(convPath(tag[i],itemtypeprefix))
-            .append(", \"THESAURUS \'deu\' EXPAND \'SYNONYM_OF\' TERM OF \'")
-            .append(st.nextToken()).append("\'\")=1");
+            .append(",\"\'").append(st.nextToken()).append("\'\")=1");
           }
         if ((stcount > 1) && (st.countTokens()>0)) { sbout.append(" and "); }
         }
