@@ -115,9 +115,11 @@ public class MCREditorServlet extends MCRServlet
     Map requestParameters = getRequestParameters( key );
     Element param  = getTargetParameters( requestParameters );
     Element editor = MCREditorDefReader.readDef( uri, ref );
-    Element input  = MCREditorSourceReader.readSource( editor, requestParameters );
     if( param != null ) editor.addContent( param );
-    editor.addContent( input );
+
+    MCREditorSubmission sub = MCREditorSourceReader.readSource( editor, requestParameters ); 
+    editor.addContent( sub.buildInputElements()  );
+    editor.addContent( sub.buildRepeatElements() );
 
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );

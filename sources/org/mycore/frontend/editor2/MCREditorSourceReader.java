@@ -38,10 +38,10 @@ import org.jdom.Element;
 public class MCREditorSourceReader
 {
   /**
-   * Reads XML input from an url and returns a list of source variable elements
+   * Reads XML input from an url and builds a list of source variable elements
    * that can be processed by editor.xsl
    **/
-  static Element readSource( Element editor, Map parameters )
+  static MCREditorSubmission readSource( Element editor, Map parameters )
   {
     Element source = editor.getChild( "source" );
     String[] urlFromRequest   = (String[])( parameters.get( "XSL.editor.source.url" ) );
@@ -98,7 +98,7 @@ public class MCREditorSourceReader
 
       MCREditorServlet.logger.info( "Editor reading XML input from " + url );
       Element input = MCREditorResolver.readXML( url );
-      return new MCREditorSubmission( input ).buildInputElements();
+      return new MCREditorSubmission( input );
     }
   }
 }

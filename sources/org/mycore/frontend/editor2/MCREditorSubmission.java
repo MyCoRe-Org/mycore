@@ -39,6 +39,7 @@ import java.util.*;
 public class MCREditorSubmission
 {
   private List variables = new ArrayList();
+  private List repeats   = new ArrayList();
   private List files     = new ArrayList();
   
   private Hashtable node2file = new Hashtable();
@@ -85,7 +86,7 @@ public class MCREditorSubmission
     for( int i = 0, nr = 1; i < children.size(); i++ )
     {
       Element child = (Element)( children.get( i ) );
-      String suffix = "";
+      suffix = "";
 
       if( i > 0 )
       {
@@ -204,6 +205,17 @@ public class MCREditorSubmission
     return input;
   }
   
+  Element buildRepeatElements()
+  {
+    Element eRepeats = new Element( "repeats" );
+    for( int i = 0; i < repeats.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( repeats.get( i ) );
+      eRepeats.addContent( var.asRepeatElement() );
+    }
+    return eRepeats;
+  }
+  
   public MCRRequestParameters getParameters()
   { return parms; }
 
@@ -283,7 +295,7 @@ public class MCREditorSubmission
     {
       MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
       String[] path = var.getPathElements();
-      String prefix = path[ 0 ];
+      String prefix = "/" + path[ 0 ];
         
       for( int j = 1; j < path.length; j++ )
       {
@@ -317,8 +329,8 @@ public class MCREditorSubmission
       String path  = (String)( e.nextElement() );
       String value = (String)( maxtable.get( path ) );
       
-      // repeats.addElement( new MCREditorVariable( path, value ) );
-      MCREditorServlet.logger.debug( "Editor get num " + path + " = " + value );
+      repeats.add( new MCREditorVariable( path, value ) );
+      MCREditorServlet.logger.debug( "Editor repeats " + path + " = " + value );
     }
   }
 }

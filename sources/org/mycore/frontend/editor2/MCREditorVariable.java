@@ -72,6 +72,14 @@ public class MCREditorVariable implements Comparable
     return var;
   }
   
+  Element asRepeatElement()
+  {
+    Element var = new Element( "repeat" );
+    var.setAttribute( "path",  path  );
+    var.setAttribute( "value", value );
+    return var;
+  }
+  
   void setFile( FileItem file )
   { this.file = file; }
 
