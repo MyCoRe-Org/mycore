@@ -235,7 +235,7 @@
 			<div class="kupu-editorframe">
 				<form>
 					<iframe id="kupu-editor" frameborder="0" 
-						src=" {concat($WebApplicationBaseURL,'servlets/WCMSGetStaticHTMLServlet',$HttpSession,'?href=',/cms/href,'&amp;lang=',$CurrentLang) }" 
+						src=" {concat($WebApplicationBaseURL,'servlets/WCMSGetStaticHTMLServlet?href=',/cms/href,'&amp;lang=',$CurrentLang) }" 
 						scrolling="auto">
 					</iframe>
 					<xsl:choose>
