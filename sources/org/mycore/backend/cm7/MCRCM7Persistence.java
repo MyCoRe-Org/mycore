@@ -59,6 +59,9 @@ private static MCRConfiguration conf = null;
 private String mcr_index_class = null;
 private String mcr_ts_index = null;
 
+private static String NL =
+  new String((System.getProperties()).getProperty("line.separator"));
+
 /**
  * The static part that read the configuration
  **/
@@ -94,10 +97,12 @@ public MCRCM7Persistence()
  *
  * @param mcr_tc      the typed content array
  * @param xml         the XML stream from the object as JDOM
+ * @param mcr_ts_in   the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom)
+public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
+  String mcr_ts_in)
   throws MCRConfigurationException, MCRPersistenceException
   {
   // convert the JDOM tree
@@ -131,7 +136,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom)
       break;
       }
     }
-  mcr_ts = createTS(mcr_tc);
+  mcr_ts = createTS(mcr_tc)+NL+mcr_ts_in.toUpperCase();
   // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
@@ -375,11 +380,12 @@ public final String receiveLabel(MCRObjectID mcr_id)
  *
  * @param mcr_tc      the typed content array
  * @param xml         the XML stream from the object as JDOM
+ * @param mcr_ts_in   the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom)
-  throws MCRConfigurationException, MCRPersistenceException
+public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
+  String mcr_ts_in) throws MCRConfigurationException, MCRPersistenceException
   {
   // convert the JDOM tree
   byte [] xml = MCRUtils.getByteArray(jdom);
@@ -412,7 +418,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom)
       break;
       }
     }
-  mcr_ts = createTS(mcr_tc);
+  mcr_ts = createTS(mcr_tc)+NL+mcr_ts_in.toUpperCase();
   // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());

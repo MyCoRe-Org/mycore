@@ -56,10 +56,11 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
  *
  * @param mcr_tc      the typed content
  * @param xml         the XML stream as JDOM object
+ * @param mcr_ts      the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void create(MCRTypedContent mcr_tc, org.jdom.Document xml)
+public void create(MCRTypedContent mcr_tc, org.jdom.Document xml, String mcr_ts)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
@@ -122,10 +123,11 @@ public String receiveLabel(MCRObjectID mcr_id)
  *
  * @param mcr_tc      the typed content
  * @param xml         the XML stream as JDOM object
+ * @param mcr_ts      the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void update(MCRTypedContent mcr_tc, org.jdom.Document xml)
+public void update(MCRTypedContent mcr_tc, org.jdom.Document xml, String mcr_ts)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**

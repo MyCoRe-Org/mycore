@@ -80,8 +80,6 @@ private ArrayList type;
 private ArrayList name;
 private ArrayList format;
 private ArrayList value;
-private ArrayList paraflag;
-private ArrayList tsflag;
 
 /**
  * The static part that read the configuration
@@ -101,8 +99,6 @@ public MCRTypedContent()
   name = new ArrayList();
   format = new ArrayList();
   value = new ArrayList();
-  paraflag = new ArrayList();
-  tsflag = new ArrayList();
   }
 
 /**
@@ -117,8 +113,6 @@ public final void addMCRTypedContent(MCRTypedContent in)
     name.add(in.getNameElement(i));
     format.add((Object) new Integer(in.getFormatElement(i)));
     value.add(in.getValueElement(i));
-    paraflag.add((Object) new Boolean(in.getParaFlagElement(i)));
-    tsflag.add((Object) new Boolean(in.getTSFlagElement(i)));
     }
   }
 
@@ -129,12 +123,10 @@ public final void addMCRTypedContent(MCRTypedContent in)
  * @param inname     a name as a String
  * @param informat   one of the format constante of this class
  * @param invalue    the value as an Object
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
 public final boolean addElement(int intype, String inname, int informat,
-  Object invalue, boolean inparaflag, boolean intsflag)
+  Object invalue)
   {
   if ((intype<1)||(intype>TYPE_LASTTAG)) { return false; }
   if ((informat<1)||(intype>FORMAT_LAST)) { return false; }
@@ -142,8 +134,6 @@ public final boolean addElement(int intype, String inname, int informat,
   name.add(inname);
   format.add((Object) new Integer(informat));
   if (invalue==null) { value.add(""); } else value.add(invalue);
-  paraflag.add((Object) new Boolean(inparaflag));
-  tsflag.add((Object) new Boolean(intsflag));
   return true;
   }
 
@@ -163,8 +153,6 @@ public final boolean addTagElement(int intype, String inname)
   name.add(inname);
   format.add(new Integer(FORMAT_UNDEFINED));
   value.add(new String(" "));
-  paraflag.add(new Boolean(false));
-  tsflag.add(new Boolean(false));
   return true;
   }
 
@@ -174,19 +162,14 @@ public final boolean addTagElement(int intype, String inname)
  * @param intype     TYPE_VALUE 
  * @param inname     a name as a String
  * @param invalue    the value as a GregorianCalendar date
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addBooleanElement(boolean invalue, boolean inparaflag,
-  boolean intsflag)
+public final boolean addBooleanElement(boolean invalue)
   {
   type.add(new Integer(TYPE_VALUE));
   name.add("");
   format.add(new Integer(FORMAT_BOOLEAN));
   value.add(new Boolean(invalue));
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -194,20 +177,15 @@ public final boolean addBooleanElement(boolean invalue, boolean inparaflag,
  * This method add a ClassificationID value to this list.
  *
  * @param invalue    the value as an String
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addClassElement( String invalue, boolean inparaflag,
-  boolean intsflag)
+public final boolean addClassElement( String invalue)
   {
   if (invalue==null) { return false; }
   type.add(new Integer(TYPE_VALUE));
   name.add("classid");
   format.add(new Integer(FORMAT_CLASSID));
   value.add(invalue);
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -215,20 +193,15 @@ public final boolean addClassElement( String invalue, boolean inparaflag,
  * This method add a CategoryID value to this list.
  *
  * @param invalue    the value as an String
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addCategElement( String invalue, boolean inparaflag,
-  boolean intsflag)
+public final boolean addCategElement( String invalue)
   {
   if (invalue==null) { return false; }
   type.add(new Integer(TYPE_VALUE));
   name.add("categid");
   format.add(new Integer(FORMAT_CATEGID));
   value.add(invalue);
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -236,20 +209,15 @@ public final boolean addCategElement( String invalue, boolean inparaflag,
  * This method add a Date value to this list.
  *
  * @param invalue    the value as a GregorianCalendar date
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addDateElement(GregorianCalendar invalue, 
-  boolean inparaflag, boolean intsflag)
+public final boolean addDateElement(GregorianCalendar invalue) 
   {
   if (invalue==null) { return false; }
   type.add(new Integer(TYPE_VALUE));
   name.add("");
   format.add(new Integer(FORMAT_DATE));
   value.add(invalue);
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -257,37 +225,28 @@ public final boolean addDateElement(GregorianCalendar invalue,
  * This method add a Double value to this list.
  *
  * @param invalue    the value as a double
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addDoubleElement(double invalue, boolean inparaflag, 
-  boolean intsflag)
+public final boolean addDoubleElement(double invalue)
   {
   type.add(new Integer(TYPE_VALUE));
   name.add("");
   format.add(new Integer(FORMAT_NUMBER));
   value.add(new Double(invalue));
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
 /**
  * This method add a Link value to this list.
  *
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
-public final boolean addLinkElement(boolean inparaflag, boolean intsflag)
+public final boolean addLinkElement()
   {
   type.add(new Integer(TYPE_VALUE));
   name.add("");
   format.add(new Integer(FORMAT_LINK));
   value.add("");
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -297,12 +256,10 @@ public final boolean addLinkElement(boolean inparaflag, boolean intsflag)
  * @param intype     TYPE_VALUE or TYPE_ATTRIBUTE
  * @param inname     a name as a String
  * @param invalue    the value as an String
- * @param inparaflag is true if the value should use for parametric search
- * @param intsflag   is true if the value should use for text search
  * @return false if an error was occured, else return true
  **/
 public final boolean addStringElement(int intype, String inname,
-  String invalue, boolean inparaflag, boolean intsflag)
+  String invalue)
   {
   if ((intype!=TYPE_VALUE)&&(intype!=TYPE_ATTRIBUTE)) { return false; }
   if (intype==TYPE_VALUE) { inname = ""; }
@@ -312,8 +269,6 @@ public final boolean addStringElement(int intype, String inname,
   name.add(inname);
   format.add(new Integer(FORMAT_STRING));
   value.add(invalue);
-  paraflag.add(new Boolean(inparaflag));
-  tsflag.add(new Boolean(intsflag));
   return true;
   }
 
@@ -444,30 +399,6 @@ public final Object getValueElement(int index)
   }
 
 /**
- * The method return the parametric flag of the element with a index.
- *
- * @param index  the index of the element
- * @return the parametric flag of the element
- **/
-public final boolean getParaFlagElement(int index)
-  {
-  if ((index<0) || (index>type.size())) { return false; }
-  return ((Boolean)paraflag.get(index)).booleanValue();
-  }
- 
-/**
- * The method return the text search flag of the element with a index.
- *
- * @param index  the index of the element
- * @return the text search flag of the element
- **/
-public final boolean getTSFlagElement(int index)
-  {
-  if ((index<0) || (index>type.size())) { return false; }
-  return ((Boolean)tsflag.get(index)).booleanValue();
-  }
- 
-/**
  * The method return the size of the MCRTypedContent array.
  *
  * @return the size of the array
@@ -491,32 +422,9 @@ public final MCRTypedContent getElements(int from, int to)
   MCRTypedContent out = new MCRTypedContent();
   for (int i=from; i < to+1; i++) {
     out.addElement(getTypeElement(i),getNameElement(i),getFormatElement(i),
-      getValueElement(i),getParaFlagElement(i),getTSFlagElement(i));
+      getValueElement(i));
     }
   return out;
-  }
-
-/**
- * The method create a text search string for this MCRTypedContent.
- *
- * @return a text search string
- **/
-public final String getTextString()
-  {
-  StringBuffer sb = new StringBuffer(4096);
-  for (int i=0;i<type.size();i++) {
-    if (getTSFlagElement(i)) { 
-      if (getFormatElement(i) == FORMAT_STRING) {
-        sb.append((String)getValueElement(i)).append(' '); continue; }
-      if (getFormatElement(i) == FORMAT_DATE) {
-        DateFormat df = MCRUtils.getDateFormat(default_lang);
-        if (df==null) { continue; }
-        sb.append(df.format(((GregorianCalendar)getValueElement(i)).getTime()))
-          .append(' '); continue; 
-        }
-      }
-    }
-  return sb.toString().trim();
   }
 
 /**
@@ -527,7 +435,7 @@ public final void debug()
   System.out.println("\nMCRTypedContent table");
   for (int i=0; i<type.size(); i++) {
     System.out.println(i+"  "+type.get(i)+"   "+name.get(i)+"   "+format.get(i)
-      +"   "+paraflag.get(i)+"   "+tsflag.get(i)+"   "+value.get(i)); }
+      +"   "+value.get(i)); }
   System.out.println();
   }
 

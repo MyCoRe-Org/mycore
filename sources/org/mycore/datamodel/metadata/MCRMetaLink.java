@@ -354,38 +354,45 @@ public final org.jdom.Element createXML() throws MCRException
 /**
  * This methode create a typed content list for all data in this instance.
  *
- * @param parametric true if the data should parametric searchable
- * @param textsearch true if the data should text searchable
+ * @param parasearch true if the data should parametric searchable
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent(boolean parametric,
-  boolean textsearch) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parasearch)
+  throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
+  if(!parasearch) { return tc; }
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addLinkElement(parametric,textsearch);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",linktype,parametric,textsearch);
+  tc.addLinkElement();
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",linktype);
   if (linktype.equals("locator")) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"href",href,parametric,
-      textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",label,parametric,
-      textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title,parametric,
-      textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"href",href);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",label);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title);
     }
   else {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"from",from.getId(),parametric,
-      textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"to",to.getId(),parametric,
-      textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title,parametric,
-      textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"from",from.getId());
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"to",to.getId());
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title);
     }
   return tc;
+  }
+
+/**
+ * This methode create a String for all text searchable data in this instance.
+ *
+ * @param textsearch true if the data should text searchable
+ * @exception MCRException if the content of this class is not valid
+ * @return an empty String, because the content is not text searchable.
+ **/
+public final String createTextSearch(boolean textsearch)
+  throws MCRException
+  {
+  return "";
   }
 
 /**

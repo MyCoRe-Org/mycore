@@ -271,30 +271,41 @@ public final org.jdom.Element createXML() throws MCRException
 /**
  * This methode create a typed content list for all data in this instance.
  *
- * @param parametric true if the data should parametric searchable
- * @param textsearch true if the data should text searchable
+ * @param parasearch true if the data should parametric searchable
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent(boolean parametric,
-  boolean textsearch) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parasearch)
+  throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
+  if(!parasearch) { return tc; }
   tc.addTagElement(tc.TYPE_SUBTAG,subtag.toUpperCase());
-  tc.addDoubleElement(number,parametric,textsearch);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,false);
+  tc.addDoubleElement(number);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,false); }
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type); }
   if ((dimension = dimension.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"dimension",dimension,parametric,
-      false); }
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"dimension",dimension); }
   if ((measurement = measurement.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"measurement",measurement,
-      parametric,false); }
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"measurement",measurement); }
   return tc;
+  }
+
+/**
+ * This methode create a String for all text searchable data in this instance.
+ *
+ * @param textsearch true if the data should text searchable
+ * @exception MCRException if the content of this class is not valid
+ * @return an empty String, because the content is not text searchable.
+ **/
+public final String createTextSearch(boolean textsearch)
+  throws MCRException
+  {
+  return "";
   }
 
 /**

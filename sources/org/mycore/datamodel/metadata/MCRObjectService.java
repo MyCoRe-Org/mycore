@@ -370,14 +370,14 @@ public final MCRTypedContent createTypedContent() throws MCRException
     tc.addTagElement(tc.TYPE_TAG,"servdates");
     for (int i=0;i<dates.size();i++) {
       tc.addMCRTypedContent(((MCRMetaDate)dates.get(i))
-        .createTypedContent(true,false));
+        .createTypedContent(true));
       }
     }
   if (flags.size()!=0) {
     tc.addTagElement(tc.TYPE_TAG,"servflags");
     for (int i=0;i<flags.size();i++) {
       tc.addMCRTypedContent(((MCRMetaLangText)flags.get(i))
-        .createTypedContent(true,false)); }
+        .createTypedContent(true)); }
     }
   return tc;
   }

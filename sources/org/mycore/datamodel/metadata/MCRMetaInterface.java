@@ -62,13 +62,21 @@ public org.jdom.Element createXML() throws MCRException;
 /**
  * This methode create a typed content list for all data in this instance.
  *
- * @param parametric true if the data should parametric searchable
- * @param textsearch true if the data should text searchable
+ * @param parasearch true if the data should parametric searchable
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public MCRTypedContent createTypedContent(boolean parametric,
-  boolean textsearch) throws MCRException;
+public MCRTypedContent createTypedContent(boolean parasearch)
+  throws MCRException;
+
+/**
+ * This abstract method create a String for the text searchable data.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a String with the text search data
+ **/
+public String createTextSearch(boolean textsearch)
+  throws MCRException;
 
 /**
  * This methode check the validation of the content of this class.

@@ -50,7 +50,7 @@ private static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 public static String DEFAULT_LANGUAGE = "de";
 public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
-public static boolean DEFAULT_TEXT_SEARCH = true;
+public static boolean DEFAULT_TEXT_SEARCH = false;
 public static boolean DEFAULT_HERITABLE = false;
 private String META_PACKAGE_NAME = "mycore.datamodel.";
 private static String LINK_CLASS_NAME = "MCRMetaLink";
@@ -170,7 +170,7 @@ public void setParametricSearch(String parasearch)
   this.parasearch = DEFAULT_PARAMETRIC_SEARCH;
   if ((parasearch == null) || ((parasearch = parasearch.trim()).length() ==0))
     { return; }
-  if (parasearch.equals("true")) { this.parasearch = true; }
+  if (parasearch.equals("true")) { this.parasearch = true; return; }
   this.parasearch = false;
   }
 
@@ -192,7 +192,7 @@ public void setTextSearch(String textsearch)
   this.textsearch = DEFAULT_TEXT_SEARCH;
   if ((textsearch == null) || ((textsearch = textsearch.trim()).length() ==0))
     { return; }
-  if (textsearch.equals("true")) { this.textsearch = true; }
+  if (textsearch.equals("true")) { this.textsearch = true; return; }
   this.textsearch = false;
   }
 
@@ -444,13 +444,28 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  if (parasearch) { 
-    tc.addTagElement(tc.TYPE_TAG,tag);
-    for (int i=0;i<list.size();i++) {
-      tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
-        .createTypedContent(parasearch,textsearch)); }
-    }
+  if (!parasearch) { return tc; }
+  tc.addTagElement(tc.TYPE_TAG,tag);
+  for (int i=0;i<list.size();i++) {
+    tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
+      .createTypedContent(parasearch)); }
   return tc;
+  }
+
+/**
+ * This methode create a String for all text searchable data in this instance.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a String with the searchable text
+ **/
+public final String createTextSearch()
+  throws MCRException
+  {
+  if (!textsearch) { return ""; }
+  StringBuffer sb = new StringBuffer(1024);
+  for (int i=0;i<list.size();i++) {
+    sb.append(((MCRMetaInterface)list.get(i)).createTextSearch(textsearch)); }
+  return sb.toString();
   }
 
 /**

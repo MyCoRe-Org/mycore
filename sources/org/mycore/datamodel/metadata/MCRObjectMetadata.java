@@ -211,8 +211,6 @@ public final org.jdom.Element createXML() throws MCRException
 /**
  * This methode create a typed content list for all data in this instance.
  *
- * @param parametric true if the data should parametric searchable
- * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
@@ -222,12 +220,27 @@ public final MCRTypedContent createTypedContent() throws MCRException
     throw new MCRException("MCRObjectMetadata : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"metadata");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",default_lang,true,false);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",default_lang);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
     tc.addMCRTypedContent(((MCRMetaElement)meta_list.get(i))
       .createTypedContent()); }
   return tc;
+  }
+
+/**
+ * This methode create a String for all text searchable data in this instance.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a String with the text values from the metadata object
+ **/
+public final String createTextSearch() throws MCRException
+  { 
+  StringBuffer sb = new StringBuffer(4096);
+  int len = meta_list.size();
+  for (int i = 0; i < len; i++) {
+    sb.append(((MCRMetaElement)meta_list.get(i)).createTextSearch()); }
+  return sb.toString();
   }
 
 /**

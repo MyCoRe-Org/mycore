@@ -418,12 +418,12 @@ public class MCRObjectStructure
       tc.addTagElement(tc.TYPE_TAG,"children");
       for (int i=0;i<children.size();i++)
         tc.addMCRTypedContent(((MCRMetaLink) children.elementAt(i))
-          .createTypedContent(true,true));
+          .createTypedContent(true));
       }
     if (parent != null) {
       tc.addTagElement(tc.TYPE_TAG,"parents");
       tc.addMCRTypedContent(parent
-        .createTypedContent(true,true));
+        .createTypedContent(true));
       if (inherited_metadata == null)
         collectInheritedMetadata();
       tc.addTagElement(tc.TYPE_TAG, "parents_metadata");
@@ -439,7 +439,7 @@ public class MCRObjectStructure
       tc.addTagElement(tc.TYPE_TAG,"derivates");
       for (int i=0;i<the_derivates.size();i++)
         tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
-          .createTypedContent(true,true));
+          .createTypedContent(true));
       }
     return tc;
     }

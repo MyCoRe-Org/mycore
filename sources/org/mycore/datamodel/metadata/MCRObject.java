@@ -393,13 +393,23 @@ public final MCRTypedContent createTypedContent() throws MCRException
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId(),true,false);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label,true,false);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId());
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label);
   tc.addMCRTypedContent(mcr_struct.createTypedContent());
   tc.addMCRTypedContent(mcr_metadata.createTypedContent());
   tc.addMCRTypedContent(mcr_service.createTypedContent());
   return tc;
   }
+
+/**
+ * This methode create a String for all text searchable data in this instance.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a String with the text values from the metadata object
+ **/
+public final String createTextSearch()
+  throws MCRException
+  { return mcr_metadata.createTextSearch(); }
 
 /**
  * The methode create a new datastore based of given data. It create
@@ -422,7 +432,8 @@ public final void createInDatastore() throws MCRPersistenceException
   mcr_service.setDate("modifydate");
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
-  mcr_persist.create(mcr_tc,xml);
+  String mcr_ts = createTextSearch();
+  mcr_persist.create(mcr_tc,xml,mcr_ts);
   }
 
 /**
@@ -489,7 +500,8 @@ public final void updateInDatastore() throws MCRPersistenceException
   mcr_service.setDate("modifydate");
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
-  mcr_persist.update(mcr_tc,xml);
+  String mcr_ts = createTextSearch();
+  mcr_persist.update(mcr_tc,xml,mcr_ts);
   }
 
 /**

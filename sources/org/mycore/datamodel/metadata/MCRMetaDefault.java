@@ -31,7 +31,7 @@ import mycore.datamodel.MCRTypedContent;
 /**
  * This class implements any methods for handling the basic data for all 
  * metadata classes of the metadata objects. The methods createXML() and
- * createTypedContent() are abstract methods.
+ * createTypedContent() and createTextSearch() are abstract methods.
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -250,8 +250,17 @@ public abstract org.jdom.Element createXML() throws MCRException;
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the data part
  **/
-public abstract MCRTypedContent createTypedContent(boolean parametric,
-  boolean textsearch) throws MCRException;
+public abstract MCRTypedContent createTypedContent(boolean parametric)
+  throws MCRException;
+
+/**
+ * This abstract method create a String for the text searchable data.
+ *
+ * @exception MCRException if the content of this class is not valid
+ * @return a String with the text search data 
+ **/
+public abstract String createTextSearch(boolean textsearch) 
+  throws MCRException;
 
 /**
  * This method check the validation of the content of this class.
