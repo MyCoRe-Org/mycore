@@ -342,6 +342,8 @@ public class MCRLayoutServlet extends MCRServlet {
         String user = MCRConfiguration.instance().getString(
                 "MCR.users_guestuser_username");
         String lang = defaultLang;
+        String referer = request.getHeader("Referer");
+        if (referer==null) referer="";
         
         // handle HttpSession
         if (session !=null && !request.isRequestedSessionIdFromCookie()){
@@ -362,6 +364,7 @@ public class MCRLayoutServlet extends MCRServlet {
         LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
         LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
         LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
+        LOGGER.debug("LayoutServlet RefererURL =" + referer);
 
         parameters.put("CurrentUser", user);
         parameters.put("RequestURL", requestURL);
@@ -369,6 +372,7 @@ public class MCRLayoutServlet extends MCRServlet {
         parameters.put("ServletsBaseURL", servletsBaseURL);
         parameters.put("DefaultLang", defaultLang);
         parameters.put("CurrentLang", lang);
+        parameters.put("Referer", referer);
 
         return parameters;
     }

@@ -49,6 +49,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.backend.remote.MCRRemoteAccessInterface;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
@@ -76,16 +77,17 @@ public class MCRFileNodeServlet extends MCRServlet
   /*
    * Die folgenden Dinge will ich hier unbedingt raus haben:
    * - language und damit verbundene Stylesheet Auswahl
-   *   -> gehï¿½rt ins MCRLayoutServlet und/oder MCRServlet
+   *   -> gehöhrt ins MCRLayoutServlet und/oder MCRServlet
    * - remote handling
    *   -> muss das so kompliziert sein?
+   * Vielleicht nicht, aber ich behebe hier nur Fehler ;o)
    */
   
   // The Log4J logger
   private static Logger LOGGER = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
   // Default language
-  private String defaultLang = "";
+  private static String defaultLang = CONFIG.getString("MCR.metadata_default_lang", "en");
 
   // The list of hosts from the configuration
   private ArrayList remoteAliasList = null;
@@ -111,221 +113,184 @@ public class MCRFileNodeServlet extends MCRServlet
   /**
    * Handles the HTTP request
    **/
-  public void doGetPost( MCRServletJob job )
-    throws IOException, ServletException
-  {
-    HttpServletRequest  req = job.getRequest();
-    HttpServletResponse res = job.getResponse();
+  public void doGetPost(MCRServletJob job) throws IOException,
+            ServletException {
+        HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
 
-    // get the language
-    String lang = req.getParameter( "lang" );
-    String att_lang = (String)( req.getAttribute( "lang" ) );
-    
-    if( att_lang != null ) 
-      lang = att_lang;
-    if( ( lang  == null ) || ( lang.trim().length() == 0 ) ) 
-      lang  = defaultLang;
-    
-    LOGGER.debug( "MCRFileNodeServlet: lang = " + lang );
+        // get the language
+        String lang = getProperty(req, "lang");
+        if ((lang == null) || (lang.trim().length() == 0))
+            lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        if ((lang == null) || (lang.trim().length() == 0))
+            lang = defaultLang;
 
-    // get the host alias
-    String hostAlias = req.getParameter( "hosts" );
-    String att_host = (String)( req.getAttribute( "hosts" ) );
-    
-    if( att_host != null ) 
-      hostAlias = att_host;
-    if( ( hostAlias == null ) || ( hostAlias.trim().length() == 0 ) )
-      hostAlias = "local";
+        LOGGER.debug("MCRFileNodeServlet: lang = " + lang);
 
-    LOGGER.debug( "MCRFileNodeServlet : host = " + hostAlias );
-    
-    if( ! remoteAliasList.contains( hostAlias ) )
-    {
-      String msg = "Error: HTTP request host is not in the alias list";
-      LOGGER.error( msg );
-      generateErrorPage(req,
-                                 res,
-                                 HttpServletResponse.SC_BAD_REQUEST,msg,
-                                 new MCRException(hostAlias+" is not in the host alias list!"),
-                                 false);
-      return;
-    }
+        // get the host alias
+        String hostAlias = getProperty(req, "hosts");
+        if ((hostAlias == null) || (hostAlias.trim().length() == 0))
+            hostAlias = "local";
 
-    String requestPath = req.getPathInfo();
-    LOGGER.info( "MCRFileNodeServlet: request path = " + requestPath );
+        LOGGER.debug("MCRFileNodeServlet : host = " + hostAlias);
 
-    if( requestPath == null ) 
-    {
-      String msg = "Error: HTTP request path is null";
-      LOGGER.error( msg );
-	  generateErrorPage(req,
-								 res,
-								 HttpServletResponse.SC_BAD_REQUEST,msg,
-								 new MCRException("No path was given in the request"),
-								 false);
-      return;
-    }
-    
-    StringTokenizer st = new StringTokenizer( requestPath, "/" );
-    if( ! st.hasMoreTokens() ) 
-    {
-      String msg = "Error: HTTP request path is empty";
-      LOGGER.error( msg );
-	  generateErrorPage(req,
-								 res,
-								 HttpServletResponse.SC_BAD_REQUEST,msg,
-								 new MCRException("Empty path was given in the request"),
-								 false);
-      return;
-    }
-    
-    String ownerID = st.nextToken();
-    
-    if( hostAlias.equals( "local" ) ) // local node to be retrieved
-    {
-	MCRFilesystemNode root;
-	try {
-		  root = MCRFilesystemNode.getRootNode(ownerID);
-	} catch (org.mycore.common.MCRPersistenceException e) {
-		// Could not get value from JDBC result set
-		LOGGER.error("MCRFileNodeServlet: Error while getting root node!",e);
-		root = null;
-	} 
-	
-      if( root == null )
-      {
-        String msg = "Error: No root node found for owner ID " + ownerID;
-        LOGGER.error( msg );
-		generateErrorPage(req,
-								   res,
-								   HttpServletResponse.SC_NOT_FOUND,msg,
-								   new MCRException(msg),
-								   false);
-        return;
-      }
-    
-      if( root instanceof MCRFile )
-      {
-        if( st.hasMoreTokens() ) // request path is too long
-        {
-          String msg = "Error: No such file or directory " + st.nextToken();
-          LOGGER.error( msg );
-		  generateErrorPage(req,
-									 res,
-									 HttpServletResponse.SC_NOT_FOUND,msg,
-									 new MCRException(msg),
-									 false);
-          return;
+        if (!remoteAliasList.contains(hostAlias)) {
+            String msg = "Error: HTTP request host is not in the alias list";
+            LOGGER.error(msg);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+                    msg, new MCRException(hostAlias
+                            + " is not in the host alias list!"), false);
+            return;
         }
-        else
-        {
-          sendFile( req, res, (MCRFile)root );
-          return;
+
+        String requestPath = req.getPathInfo();
+        LOGGER.info("MCRFileNodeServlet: request path = " + requestPath);
+
+        if (requestPath == null) {
+            String msg = "Error: HTTP request path is null";
+            LOGGER.error(msg);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+                    msg, new MCRException("No path was given in the request"),
+                    false);
+            return;
         }
-      }
-      else // root node is a directory
-      {
-        int pos = ownerID.length() + 1;
-        String path = requestPath.substring( pos );
-      
-        MCRDirectory dir = (MCRDirectory)root;
-        MCRFilesystemNode node = dir.getChildByPath( path );
-      
-        if( node == null )
-        {
-          String msg = "Error: No such file or directory " + path;
-          LOGGER.error( msg );
-		  generateErrorPage(req,
-									 res,
-									 HttpServletResponse.SC_NOT_FOUND,msg,
-									 new MCRException(msg),
-									 false);
-          return;
+
+        StringTokenizer st = new StringTokenizer(requestPath, "/");
+        if (!st.hasMoreTokens()) {
+            String msg = "Error: HTTP request path is empty";
+            LOGGER.error(msg);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+                    msg,
+                    new MCRException("Empty path was given in the request"),
+                    false);
+            return;
         }
-        else if( node instanceof MCRFile )
-        {
-          sendFile( req, res, (MCRFile)node );
-          return;
+
+        String ownerID = st.nextToken();
+
+        if (hostAlias.equals("local")) {
+            // local node to be retrieved
+            MCRFilesystemNode root;
+            try {
+                root = MCRFilesystemNode.getRootNode(ownerID);
+            } catch (org.mycore.common.MCRPersistenceException e) {
+                // Could not get value from JDBC result set
+                LOGGER
+                        .error(
+                                "MCRFileNodeServlet: Error while getting root node!",
+                                e);
+                root = null;
+            }
+
+            if (root == null) {
+                String msg = "Error: No root node found for owner ID "
+                        + ownerID;
+                LOGGER.error(msg);
+                generateErrorPage(req, res, HttpServletResponse.SC_NOT_FOUND,
+                        msg, new MCRException(msg), false);
+                return;
+            }
+
+            if (root instanceof MCRFile) {
+                if (st.hasMoreTokens()) {
+                    //request path is too long
+                    String msg = "Error: No such file or directory "
+                            + st.nextToken();
+                    LOGGER.error(msg);
+                    generateErrorPage(req, res,
+                            HttpServletResponse.SC_NOT_FOUND, msg,
+                            new MCRException(msg), false);
+                    return;
+                }
+                sendFile(req, res, (MCRFile) root);
+                return;
+            }
+            // root node is a directory
+            int pos = ownerID.length() + 1;
+            String path = requestPath.substring(pos);
+
+            MCRDirectory dir = (MCRDirectory) root;
+            MCRFilesystemNode node = dir.getChildByPath(path);
+
+            if (node == null) {
+                String msg = "Error: No such file or directory " + path;
+                LOGGER.error(msg);
+                generateErrorPage(req, res, HttpServletResponse.SC_NOT_FOUND,
+                        msg, new MCRException(msg), false);
+                return;
+            } else if (node instanceof MCRFile) {
+                sendFile(req, res, (MCRFile) node);
+                return;
+            } else {
+                sendDirectory(req, res, (MCRDirectory) node, lang);
+                return;
+            }
         }
-        else
-        {
-          sendDirectory( req, res, (MCRDirectory)node, lang );
-          return;
+        // remote node to be retrieved
+        String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
+        MCRRemoteAccessInterface comm = (MCRRemoteAccessInterface) (CONFIG
+                .getInstanceOf(prop));
+
+        BufferedInputStream in = comm.requestIFS(hostAlias, requestPath);
+        if (in == null)
+            return;
+
+        String headercontext = comm.getHeaderContent();
+        if (!headercontext.equals("text/xml")) {
+            res.setContentType(headercontext);
+            OutputStream out = new BufferedOutputStream(res.getOutputStream());
+            MCRUtils.copyStream(in, out);
+            out.close();
+            return;
         }
-      }
+
+        org.jdom.Document jdom = null;
+        String style = "";
+        Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
+
+        boolean ismcrxml = true;
+        MCRXMLContainer resarray = new MCRXMLContainer();
+
+        try {
+            resarray.importElements(in);
+        } catch (org.jdom.JDOMException e) {
+            res.setContentType(headercontext);
+            OutputStream out = res.getOutputStream();
+            MCRUtils.copyStream(in, out);
+            out.close();
+            return;
+        } catch (MCRException e) {
+            ismcrxml = false;
+        }
+
+        if (!ismcrxml) {
+            org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+            try {
+                jdom = builder.build(in);
+            } catch (org.jdom.JDOMException ignores) {
+            }
+
+            style = parameters.getProperty("Style");
+        } else {
+            resarray.setHost(0, hostAlias);
+            jdom = resarray.exportAllToDocument();
+            style = parameters.getProperty("Style", "IFSMetadata-" + lang);
+        }
+        LOGGER.debug("Style = " + style);
+
+        if (style.equals("xml")) {
+            res.setContentType("text/xml");
+            OutputStream out = res.getOutputStream();
+            new XMLOutputter(Format.getPrettyFormat()).output(jdom, out);
+            out.close();
+        } else {
+            req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+            req.setAttribute("XSL.Style", style);
+            RequestDispatcher rd = getServletContext().getNamedDispatcher(
+                    "MCRLayoutServlet");
+            rd.forward(req, res);
+        }
     }
-    else // remote node to be retrieved
-    {
-      String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
-      MCRRemoteAccessInterface comm = 
-        (MCRRemoteAccessInterface)( CONFIG.getInstanceOf( prop ) );
-
-      BufferedInputStream in = comm.requestIFS( hostAlias, requestPath );
-      if( in == null ) return;
-
-      String headercontext = comm.getHeaderContent();
-      if( ! headercontext.equals( "text/xml" ) ) 
-      {
-        res.setContentType( headercontext );
-        OutputStream out = new BufferedOutputStream( res.getOutputStream() );
-        MCRUtils.copyStream( in, out );
-        out.close();
-        return;
-      }
-
-      org.jdom.Document jdom = null;
-      String style = "";
-      Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
-      
-      boolean ismcrxml = true;
-      MCRXMLContainer resarray = new MCRXMLContainer();
-      
-      try
-      { resarray.importElements( in ); }
-      catch( org.jdom.JDOMException e ) 
-      {
-        res.setContentType( headercontext );
-        OutputStream out = res.getOutputStream();
-        MCRUtils.copyStream( in, out );
-        out.close();
-        return;
-      }
-      catch( MCRException e ) 
-      {ismcrxml = false; }
-      
-      if( ! ismcrxml ) 
-      {
-        org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-        try 
-        { jdom = builder.build( in ); }
-        catch( org.jdom.JDOMException f ) { }
-        
-        style = parameters.getProperty( "Style" );
-      }
-      else 
-      {
-        resarray.setHost( 0, hostAlias );
-        jdom = resarray.exportAllToDocument();
-        style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
-      }
-      LOGGER.debug( "Style = " + style );
-
-      if( style.equals( "xml" ) ) 
-      {
-        res.setContentType( "text/xml" );
-        OutputStream out = res.getOutputStream();
-        new XMLOutputter(Format.getPrettyFormat()).output( jdom, out );
-        out.close();
-      }
-      else 
-      {
-        req.setAttribute( "MCRLayoutServlet.Input.JDOM", jdom );
-        req.setAttribute( "XSL.Style", style );
-        RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
-        rd.forward( req, res );
-      }
-    }
-  }
 
   /**
    * Sends the contents of an MCRFile to the client. If the
