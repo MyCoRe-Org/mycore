@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.services.query;
 
 import java.util.*;
-import mycore.common.MCRException;
+import org.mycore.common.MCRException;
 
 /**
  * This interface is designed to choose the tranformer from XQuery to

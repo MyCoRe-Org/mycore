@@ -22,13 +22,13 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.services.query;
 
 import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This servlet provides a web interface to create a search mask and

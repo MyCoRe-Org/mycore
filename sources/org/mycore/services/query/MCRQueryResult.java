@@ -22,13 +22,12 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.services.query;
 
 import java.util.*;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
-import mycore.common.MCRConfiguration;
-import mycore.xml.MCRQueryResultArray;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * This class is the result list of a XQuery question to the persistence

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.services.query;
 
 import java.io.*;
 import java.util.*;
@@ -32,9 +32,9 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 import org.jdom.transform.*;
 import org.jdom.*;
-import mycore.common.*;
-import mycore.classifications.*;
-import mycore.xml.MCRLayoutServlet;
+import org.mycore.common.*;
+import org.mycore.datamodel.classifications.*;
+import org.org.mycore.common.xml.MCRLayoutServlet;
 
 /**
  * This servlet provides a web interface to query

@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.services.query;
 
-import mycore.datamodel.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
-import mycore.classifications.MCRClassification;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications.MCRClassification;
 import java.net.*;
 import java.io.*;
 
