@@ -30,14 +30,14 @@ import java.util.*;
 import java.lang.reflect.*;
 import mycore.common.*;
 
-/** 
+/**
  * The main class implementing the MyCoRe command line interface. With
  * the command line interface, you can import, export, update and delete
  * documents and other data from/to the filesystem. Metadata is imported
  * from and exported to XML files. The command line interface is for
  * administrative purposes and to be used on the server side. It
  * implements an interactive command prompt and understands a set of commands.
- * Each command is an instance of the class <code>MCRCommand</code>. 
+ * Each command is an instance of the class <code>MCRCommand</code>.
  *
  * @see MCRCommand
  *
@@ -58,9 +58,9 @@ public class MCRCommandLineInterface
   /** The standard input console where the user enters commands */
   protected static BufferedReader console = new BufferedReader( new InputStreamReader( System.in ) );
 
- /** 
-  * Reads command definitions from a configuration file 
-  * and builds the MCRCommand instances 
+ /**
+  * Reads command definitions from a configuration file
+  * and builds the MCRCommand instances
   **/
   protected static void initCommands()
     throws NoSuchMethodException, ClassNotFoundException
@@ -68,17 +68,17 @@ public class MCRCommandLineInterface
     MCRConfiguration config = MCRConfiguration.instance();
 
     // **************************************
-    // Built-in commands 
+    // Built-in commands
     // **************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand( 
-      "process {0}", 
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "process {0}",
       "mycore.commandline.MCRCommandLineInterface.readCommandsFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand( 
-      "help", 
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "help",
       "mycore.commandline.MCRCommandLineInterface.listKnownCommands" );
-    knownCommands[ numCommands++ ] = new MCRCommand( 
-      "exit", 
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "exit",
       "mycore.commandline.MCRCommandLineInterface.exit" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "quit",
@@ -112,7 +112,7 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
- 
+
     // ******************************
     // Commands for executing queries
     // ******************************
@@ -135,9 +135,6 @@ public class MCRCommandLineInterface
       "load users or groups from file {0}",
       "mycore.commandline.MCRUserCommands.loadFromFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "check users to groups consistency",
-      "mycore.commandline.MCRUserCommands.checkConsistency" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
       "delete user {0}",
       "mycore.commandline.MCRUserCommands.deleteUser String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -149,9 +146,6 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "list all groups",
       "mycore.commandline.MCRUserCommands.listAllGroups" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "login as user {0} with password {1}",
-      "mycore.commandline.MCRUserCommands.login String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "print group {0} as xml",
       "mycore.commandline.MCRUserCommands.printGroupAsXML String" );
@@ -173,9 +167,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "set password for user {0} to {1}",
       "mycore.commandline.MCRUserCommands.setPassword String String" );
-  }   
+  }
 
- /** 
+ /**
   * The main method that either shows up an interactive command prompt or
   * reads a file containing a list of commands to be processed
   */
@@ -186,9 +180,9 @@ public class MCRCommandLineInterface
 
     try{ initCommands(); }
     catch( Exception ex )
-    { 
+    {
       System.out.println();
-      System.out.println( ex ); 
+      System.out.println( ex );
       System.exit( 1 );
     }
     System.out.println( "done." );
@@ -220,8 +214,8 @@ public class MCRCommandLineInterface
       processCommand( command );
     }
   }
- 
- /** 
+
+ /**
   * Shows up a command prompt.
   *
   * @return The command entered by the user at stdin
@@ -240,7 +234,7 @@ public class MCRCommandLineInterface
     return line;
   }
 
- /** 
+ /**
   * Processes a command entered by searching a matching command
   * in the list of known commands and executing its method.
   *
@@ -253,11 +247,11 @@ public class MCRCommandLineInterface
       for( int i = 0; i < numCommands; i++ )
         if( knownCommands[ i ].invoke( command ) )
           return;
-      
+
       System.out.println( "Command not understood. Enter 'help' to get a list of commands." );
     }
     catch( Exception ex )
-    { 
+    {
       if( ex instanceof InvocationTargetException )
       {
         Throwable t = ( (InvocationTargetException)ex ).getTargetException();
@@ -265,14 +259,14 @@ public class MCRCommandLineInterface
       }
       else
       {
-        System.out.println( ex ); 
+        System.out.println( ex );
         System.out.println( ex.getMessage() );
       }
     }
   }
 
- /** 
-  * Reads a file containing a list of commands to be executed and adds 
+ /**
+  * Reads a file containing a list of commands to be executed and adds
   * them to the commands queue for processing.  This method implements
   * the "process ..." command.
   *
@@ -286,7 +280,7 @@ public class MCRCommandLineInterface
     BufferedReader reader = new BufferedReader( new FileReader( file ) );
     System.out.println( "Reading commands from file " + file );
 
-    String line; 
+    String line;
     int pos = 0;
     while( ( line = reader.readLine() ) != null )
     {
@@ -299,7 +293,7 @@ public class MCRCommandLineInterface
     reader.close();
   }
 
- /** 
+ /**
   * Shows a list of commands understood by the command line interface and
   * shows their input syntax. This method implements the "help" command
   */
@@ -311,7 +305,7 @@ public class MCRCommandLineInterface
       knownCommands[ i ].showSyntax();
   }
 
- /** 
+ /**
   * Executes simple shell commands from inside the command line
   * interface and shows their output. This method implements commands
   * entered beginning with exclamation mark, like "! ls -l /temp"
@@ -329,8 +323,8 @@ public class MCRCommandLineInterface
     showOutput( p.getInputStream() );
     showOutput( p.getErrorStream() );
   }
-  
- /** 
+
+ /**
   * Catches the output read from an input stream and prints it line by line
   * on standard out. This is used to catch the stdout and stderr stream output
   * when executing an external shell command.
@@ -343,7 +337,7 @@ public class MCRCommandLineInterface
       System.out.print( (char)c );
   }
 
- /** 
+ /**
   * Exits the command line interface. This method implements the "exit" and
   * "quit" commands.
   */

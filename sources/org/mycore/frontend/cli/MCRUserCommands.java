@@ -38,12 +38,6 @@ import org.w3c.dom.DOMException;
  */
 public class MCRUserCommands
 {
-  /** This method invokes MCRUserMgr.checkUserGroupConsistency() */
-  public static void checkConsistency() throws Exception
-  {
-    MCRUserMgr.instance().checkUserGroupConsistency();
-  }
-
   /**
    * This method invokes MCRUserMgr.deleteGroup()
    * @param groupID the ID of the group which will be deleted
@@ -93,58 +87,72 @@ public class MCRUserCommands
     MCRUserMgr.instance().loadUsersOrGroupsFromFile(filename);
   }
 
-  /** This method asks for a user ID and a password and then invokes MCRUserMgr.login() */
-  public static void login( String userID, String password ) throws Exception
-  {
-    if (MCRUserMgr.instance().login(userID, password))
-      System.out.println("User successfully logged in!");
-    else
-      System.out.println("Access denied! Wrong password?");
-  }
-
   /**
-   * This method calls MCRUserMgr.getGroupAsXML()
+   * This method invokes MCRUserMgr.retrieveGroup() and then works with the
+   * retrieved group object to get an XML-Representation.
+   *
    * @param groupID the ID of the group for which the XML-representation is needed
    */
   public static void printGroupAsXML(String groupID) throws Exception
-  { System.out.println("\n"+MCRUserMgr.instance().getGroupAsXML(groupID, "\n")); }
+  {
+    MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+    System.out.println("\n"+group.getGroupAsXML("\n"));
+  }
 
   /**
-   * This method calls MCRUserMgr.getGroupInfo()
+   * This method invokes MCRUserMgr.retrieveGroup() and then works with the
+   * retrieved group object to get the formatted group information data.
+   *
    * @param groupID the ID of the group for which the group information is needed
    */
   public static void printGroupInfo(String groupID) throws Exception
-  { System.out.println("\n"+MCRUserMgr.instance().getGroupInfo(groupID)); }
+  {
+    MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+    System.out.println("\n"+group.getFormattedInfo());
+  }
 
   /** This method invokes MCRUserMgr.getGroupCacheInfo() */
   public static void printGroupCacheInfo() throws Exception
   { System.out.println("\n"+MCRUserMgr.instance().getGroupCacheInfo()); }
 
   /**
-   * This method calls MCRUserMgr.getUserAsXML()
+   * This method invokes MCRUserMgr.retrieveUser() and then works with the
+   * retrieved user object to get an XML-Representation.
+   *
    * @param userID the ID of the user for which the XML-representation is needed
    */
   public static void printUserAsXML(String userID) throws Exception
-  { System.out.println("\n"+MCRUserMgr.instance().getUserAsXML(userID, "\n")); }
+  {
+    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
+    System.out.println("\n"+user.getUserAsXML("\n"));
+  }
 
   /**
-   * This method calls MCRUserMgr.getUserInfo()
+   * This method invokes MCRUserMgr.retrieveUser() and then works with the
+   * retrieved user object to get the formatted user information data.
+   *
    * @param userID the ID of the user for which the user information is needed
    */
   public static void printUserInfo(String userID) throws Exception
-  { System.out.println("\n"+MCRUserMgr.instance().getUserInfo(userID)); }
+  {
+    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
+    System.out.println("\n"+user.getFormattedInfo());
+  }
 
   /** This method invokes MCRUserMgr.getUserCacheInfo() */
   public static void printUserCacheInfo() throws Exception
   { System.out.println("\n"+MCRUserMgr.instance().getUserCacheInfo()); }
 
   /**
-   * This method invokes MCRUserMgr.setPassword()
+   * This method invokes MCRUserMgr.retrieveUser() and then works with the
+   * retrieved user object to change the password.
+   *
    * @param userID the ID of the user for which the password will be set
    */
-  public static void setPassword(String userID,String password) throws Exception
+  public static void setPassword(String userID, String password) throws Exception
   {
-    MCRUserMgr.instance().setPassword(userID, password);
+    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
+    user.setPassword(password);
   }
 }
 
