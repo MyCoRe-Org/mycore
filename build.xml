@@ -8,7 +8,6 @@
 
   <!-- compiler -->
   <property name="build.compiler" value="classic"/>
-  <property name="build.sysclasspath" value="last"/>
   <property name="debug" value="on"/>
   <property name="optimize" value="on"/>
   <property name="deprecation" value="on"/>
@@ -21,6 +20,14 @@
   <property name="persistency"  value="cm7"/>
   <property name="database"     value="db2"/>
     
+  <!-- classpath -->
+  <property name="build.sysclasspath" value="last"/>
+  <path id="mycore.classpath">
+    <fileset dir="${lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
   <!-- =================================================================== -->
@@ -74,7 +81,7 @@
     <javac srcdir="${sources}"
            destdir="${classes}"
            includes="${packages}"
-           classpath="${lib}/ftp.jar;${lib}/activation.jar;${lib}/mail.jar"
+           classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
            deprecation="on">
@@ -215,7 +222,7 @@
       packagenames        = "mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.classifications.*,mycore.ifs.*,mycore.nbn.*,mycore.editor.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.${database}.*,mycore.gui.*,mycore.webservice.*"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
-      classpath           = "${lib}/ftp.jar"
+      classpathref        = "mycore.classpath"
       author              = "true"
       version             = "true"
       use                 = "true"
@@ -231,6 +238,7 @@
       <link href="http://www.mycore.de/library/jaxp/docs/api"/>
       <link href="http://www.jdom.org/docs/apidocs"/>
       <link href="http://www.xmldb.org/xapi/api"/>
+      <link href="http://www.mycore.de/library/log4j/api"/>
     </javadoc>
   </target>
 
