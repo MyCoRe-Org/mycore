@@ -47,6 +47,8 @@ implements MCRQueryInterface
 // common data
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
+private MCRConfiguration conf =  MCRConfiguration.instance();
+
 // 32 Bit
 protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
 protected static int MAX_NUMBER_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
@@ -76,6 +78,7 @@ public final MCRQueryResultArray getResultList(String query, String type,
     return result; }
   if (maxresults < 1) {
     return result; }
+  if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
   //System.out.println("================================");
@@ -112,12 +115,11 @@ public final MCRQueryResultArray getResultList(String query, String type,
   //System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
-  ts.setSearchLang(MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_textsearch_lang"));
-  String conf = "MCR.persistence_cm7_"+type.toLowerCase();
-  ts.setIndexClass(MCRConfiguration.instance().getString(conf));
-  conf = conf + "_ts";
-  ts.setIndexTS(MCRConfiguration.instance().getString(conf));
+  ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
+  String confp = "MCR.persistence_cm7_"+type.toLowerCase();
+  ts.setIndexClass(conf.getString(confp));
+  confp = confp + "_ts";
+  ts.setIndexTS(conf.getString(confp));
   ts.setMaxResults(maxresults);
   try {
     ts.search(cond.toString()); result = ts.getResult(); }
@@ -162,7 +164,7 @@ private final String traceOneCondition(String cond)
   {
   int i, j, k;
   StringBuffer sb = new StringBuffer(128);
-  // System.out.println("ONECOND="+cond);
+  //System.out.println("ONECOND="+cond);
   // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
@@ -172,11 +174,13 @@ private final String traceOneCondition(String cond)
   boolean ispath = false;
   String inpath = cond.substring(0,klammerauf);
   if ((inpath.equals("(")) || (inpath.equals("(.")) ||
-      (inpath.equals("(*")) || (inpath.equals("(//*"))) { 
+      (inpath.equals("(*")) || (inpath.equals("(//*")) ||
+      (inpath.equals("(/"))) { 
     pt.append(""); ispath = true; }
   if (!ispath) {
     i = 1;
-    if (inpath.substring(0,3).equals("(//")) { i = 3; }
+    if (inpath.substring(0,2).equals("(/")) { i = 2; }
+    if (inpath.substring(0,3).equals("(//")) { i++; }
     if (!inpath.substring(0,2).equals("(/")) { pt.append('*'); }
     if (inpath.substring(0,3).equals("(./")) { i = 3; }
     j = 0;
@@ -276,7 +280,11 @@ private final String traceOneCondition(String cond)
   boolean isdate = false;
   boolean isnumber = false;
   boolean ismcrid = false;
+  boolean isat = false;
   long number = 0;
+  // is value 0 a attribute
+  if (tag[0].substring(0,1).equals("@")) { isat = true; }
+  // is value 0 a date
   try {
     DateFormat df = MCRUtils.getDateFormat("de");
     date.setTime(df.parse(value[0]));
@@ -285,6 +293,7 @@ private final String traceOneCondition(String cond)
       date.get(Calendar.MONTH)*100 + date.get(Calendar.DAY_OF_MONTH));
     }
   catch (ParseException e) { isdate = false; }
+  // is value 0 a number
   try {
     String test = value[0].replace(',','.');
     double dnumber = (new Double(test)).doubleValue();
@@ -296,6 +305,7 @@ private final String traceOneCondition(String cond)
     isnumber = true;
     }
   catch (NumberFormatException e) { isnumber = false; }
+  // is value 0 a MCRObjectId
   try {
     MCRObjectID mid = new MCRObjectID(value[0]);
     if (mid.isValid()) {
@@ -306,7 +316,22 @@ private final String traceOneCondition(String cond)
   // set the path and attribute tags
   StringBuffer sbatag = new StringBuffer(128);
   if ((!tag[0].equals(".")) && (!tag[0].equals("*"))) {
-    sbatag.append(pretag).append("XXX").append(tag[0]).append("XXX*"); }
+    if (!isat) {
+      sbatag.append(pretag).append("XXX").append(tag[0]).append("XXX*"); }
+    else {
+      sbatag.append(pretag).append("XXX*XXX")
+        .append(tag[0].substring(1,tag[0].length())).append("XXX");
+      for (int ii=0;ii<value[0].length();ii++) {
+        if ((value[0].charAt(ii)>='A')&&(value[0].charAt(ii)<='Z')) {
+          sbatag.append(value[0].charAt(ii)); continue; }
+        if ((value[0].charAt(ii)>='0')&&(value[0].charAt(ii)<='9')) {
+          sbatag.append(value[0].charAt(ii)); continue; }
+        if (value[0].charAt(ii)=='*') {
+          sbatag.append(value[0].charAt(ii)); continue; }
+        sbatag.append('X');    
+        }
+      sbatag.append("XXX"); }
+    }
   else { sbatag.append(""); }
   for (i=1;i<counter;i++) {
     sbatag.append("XXX").append(tag[i].substring(1,tag[i].length()))
@@ -419,6 +444,11 @@ private final String traceOneCondition(String cond)
           }
         }
       }
+    return sb.toString();
+    }
+  // attribute query
+  if (isat) {
+    sb.append("( $MC=*$ ").append(atttag).append(" )"); 
     return sb.toString();
     }
   // freetext

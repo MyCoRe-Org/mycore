@@ -77,6 +77,38 @@ public final String createSearchStringText(String text)
   }
 
 /**
+ * The method returns the search string for a XML attribute field for
+ * the IBM Content Manager 7 persistence system.<p>
+ *
+ * @param attr               the text value of this element
+ * @return the search string for the CM7 text search engine
+ **/
+public final String createSearchStringAttr(String attr)
+  {
+  if ((attr == null) || ((attr = attr.trim()).length() ==0)) {
+    return ""; }
+  StringBuffer sb = new StringBuffer(1024);
+  try {
+    MCRObjectID mid = new MCRObjectID(attr);
+    if (mid.isValid()) {
+      attr = mid.getId().replace('_','X');
+      sb.append(attr.toUpperCase());
+      return sb.toString();
+      }
+    }
+  catch (MCRException e) { }
+  String attru = attr.replace('\n',' ').replace('\r',' ').toUpperCase(); 
+  for (int i=0;i<attr.length();i++) {
+    if ((attru.charAt(i)>='A')&&(attru.charAt(i)<='Z')) { 
+      sb.append(attru.charAt(i)); continue; }
+    if ((attru.charAt(i)>='0')&&(attru.charAt(i)<='9')) { 
+      sb.append(attru.charAt(i)); continue; }
+    sb.append('X');  
+    }
+  return sb.toString();
+  }
+
+/**
  * The method returns the search string for a XML date field for
  * the IBM Content Manager 7 persistence system.<p>
  * The date was transformed to a bit string with 

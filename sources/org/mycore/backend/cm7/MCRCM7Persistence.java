@@ -444,14 +444,14 @@ private final String createTS(MCRTypedContent mcr_tc)
   int tagdiff = MCRTypedContent.TYPE_LASTTAG-MCRTypedContent.TYPE_MASTERTAG+1;
   String  [] tag = new String [tagdiff];
   // MCRObject data
-  sb.append("XXX").append(mcr_tc.getNameElement(0))
-    .append("XXX").append(mcr_tc.getNameElement(1)).append("XXX ")
-    .append(ttt.createSearchStringText((String)mcr_tc.getValueElement(1)))
-    .append(NL);
-  sb.append("XXX").append(mcr_tc.getNameElement(0))
-    .append("XXX").append(mcr_tc.getNameElement(2)).append("XXX ")
-    .append(ttt.createSearchStringText((String)mcr_tc.getValueElement(2)))
-    .append(NL);
+  sb.append("XXX").append(mcr_tc.getNameElement(0).toUpperCase()).append("XXX")
+    .append("XXX").append(mcr_tc.getNameElement(1).toUpperCase()).append("XXX")
+    .append(ttt.createSearchStringAttr((String)mcr_tc.getValueElement(1)))
+    .append("XXX").append(NL);
+  sb.append("XXX").append(mcr_tc.getNameElement(0).toUpperCase()).append("XXX")
+    .append("XXX").append(mcr_tc.getNameElement(2).toUpperCase()).append("XXX")
+    .append(ttt.createSearchStringAttr((String)mcr_tc.getValueElement(2)))
+    .append("XXX").append(NL);
   int i = 3; 
   while (i<mcr_tc.getSize()) {
     if (mcr_tc.getTypeElement(i)>=MCRTypedContent.TYPE_MASTERTAG) {   
