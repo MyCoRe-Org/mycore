@@ -156,7 +156,7 @@ Die wichtigsten Schritte sind:
 \begin{enumerate}
 \item \mcrcommand{/usr/IBMHttpServer/bin/ikeyman}
 \begin{itemize}
-\item Select the key database {\bf 'New'} 
+\item Select the key database {\bf 'New'}
 \item Select {\bf CMS key database file} $\rightarrow$ File Name = \mcrfile{key.kdb} $\rightarrow$ Location = \mcrfile{/usr/IBMHttpServer/ssl}
 \item Select {\bf 'OK'}
 \item \mcrcommand{<password>} $\rightarrow$ \mcrcommand{<password>}
@@ -194,15 +194,15 @@ In the web browser please do the following configurations.
 \item Set up the security module
 \begin{itemize}
 \item In the left navigation panel select {\bf Basic Select} $\rightarrow$ {\bf Module Sequence}
-\item In the Module Sequence panel $\rightarrow$ Scope = {\bf GLOBAL} $\rightarrow$ 
+\item In the Module Sequence panel $\rightarrow$ Scope = {\bf GLOBAL} $\rightarrow$
 \item {\bf Add} $\rightarrow$ select a module to add $\rightarrow$ in the drop-down list select {\bf ibm\_ssl} $\rightarrow$ \mcrfile{modules/IBMModuleSSL128.dll} wird ersetzt $\rightarrow$ {\bf 'Apply'} $\rightarrow$ {\bf 'Close'} $\rightarrow$ {\bf 'Submit'}
 \end{itemize}
 \item Set up the secure host IP and aditional prot for the secure server
 \begin{itemize}
 \item In the left navigation panel select {\bf Basic Select} $\rightarrow$ {\bf Advanced Properties}
-\item In the Module Sequence window panel $\rightarrow$ Scope = {\bf GLOBAL} $\rightarrow$ 
-\item {\bf Add} (for the Specify aditional ports and IP address filed) $\rightarrow$ IP addresse = {\bf empty} $\rightarrow$ Port = {\bf 80 $\rightarrow$ {\bf 'Apply'}
-\item {\bf Add} (for the Specify additional prots and IP adress field) $\rightarrow$ IP addresse = {\bf empty} $\rightarrow$ Port = {\bf 443 $\rightarrow$ {\bf 'Apply'} $\rightarrow$ {\bf 'Close'} $\rightarrow$ {\bf 'Submit'}
+\item In the Module Sequence window panel $\rightarrow$ Scope = {\bf GLOBAL} $\rightarrow$
+\item {\bf Add} (for the Specify aditional ports and IP address filed) $\rightarrow$ IP addresse = {\bf empty} $\rightarrow$ Port = {\bf 80 $\rightarrow$} {\bf 'Apply'}
+\item {\bf Add} (for the Specify additional prots and IP adress field) $\rightarrow$ IP addresse = {\bf empty} $\rightarrow$ Port = {\bf 443 $\rightarrow$} {\bf 'Apply'} $\rightarrow$ {\bf 'Close'} $\rightarrow$ {\bf 'Submit'}
 \end{itemize}
 \item Set up the virtual host sructure for the secure server
 \begin{itemize}
