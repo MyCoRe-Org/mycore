@@ -67,10 +67,6 @@ public class MCRCommandLineInterface
   {
     MCRConfiguration config = MCRConfiguration.instance();
 
-    //MCRParserInterface parser = (MCRParserInterface)
-    //  ( config.getInstanceOf( "MCR.parser_class_name" ) );
-    // ToDo: dom = parser.parseURI( filename ); usw.
-
     // **************************************
     // Built-in commands 
     // **************************************
@@ -178,12 +174,6 @@ public class MCRCommandLineInterface
       "set password for user {0} to {1}",
       "mycore.commandline.MCRUserCommands.setPassword String String" );
   }   
-
-  public static void test( String a, String b )
-  {
-    System.out.println( "[" + a + "]" );
-    System.out.println( "[" + b + "]" );
-  }
 
  /** 
   * The main method that either shows up an interactive command prompt or
