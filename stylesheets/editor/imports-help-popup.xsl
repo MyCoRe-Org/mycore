@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2004-12-30 10:00:16 $ -->
+<!-- $Revision: 1.2 $ $Date: 2004-12-30 10:03:18 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -26,7 +26,7 @@
 
 <!-- ======== handles editor help ======== -->
 
-<xsl:template match="/imports/components">
+<xsl:template match="/imports">
   <html>
     <head>
       <title>Hilfe zum Formular</title>
