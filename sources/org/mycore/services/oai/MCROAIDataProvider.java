@@ -1346,7 +1346,7 @@ public class MCROAIDataProvider extends HttpServlet {
         List mappedSets = new ArrayList();
 	    if (set != null) {
 	    	buildMappings();
-	    	if (mappings.containsValue(set[0])) {
+	    	if (mappings != null && mappings.containsValue(set[0])) {
 	    		Set keys = mappings.keySet();
 	    		Iterator keyIterator = keys.iterator();
 	    		while (keyIterator.hasNext()) {
