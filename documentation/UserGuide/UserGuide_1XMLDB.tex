@@ -44,36 +44,23 @@ MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicher
 \item {\bf mysql-devel-3.23.52-83} oder höher
 \item {\bf mysql-bench-3.23.52-83} oder höher
 \end{itemize}
-\item Die Dokumentation steht nun unter {\it /usr/share/doc/package/mysql}.
-\item Führe Sie das Kommando {\tt rcmysql start} als root aus. 
-\item Führe Sie das Kommando {\tt /usr/bin/mysqladmin -u root password 'new-password'} als root aus.
-\item die folgende Sequenz sorgt dafür, dass der MyCoRe-User {\bf mcradmin} alle Rechte auf der Datenbank hat. Dabei werden bei der Ausführung von Kommandos von {\bf localhost} aus keine Pssworte abgefragt. Von anderen Hosts aus muss 'ein\_password' eingegeben werden.
+\item Die Dokumentation steht nun unter {\it /usr/share/doc/packages/mysql}.
+\item Führen Sie das Kommando {\tt rcmysql start} als root aus. 
+\item Führen Sie das Kommando {\tt /usr/bin/mysqladmin -u root password {\it new-password}} als root aus.
+\item Die folgende Sequenz sorgt dafür, dass der MyCoRe-User {\bf mcradmin} alle Rechte auf der Datenbank hat. 
+      Dabei werden bei der Ausführung von Kommandos von {\bf localhost} aus keine Passw"orter abgefragt. 
+      Von anderen Hosts aus muss {\it ein-password} eingegeben werden.
+
 {\tt
-\begin{verbatim}
-mysql --user=root -pPASSWORD mysql
-GRANT ALL PRIVILEGES ON *.* TO mcradmin@localhost WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO mcradmin@"%" IDENTIFIED BY 'ein\_passwort' 
-WITH GRANT OPTION;
-quit
-\end{verbatim}
-}
-\item Ist das Password einmal gesetzt, müssen Sie zusätzlich die Option -p verwenden.
-\item Zum verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
-\item jetzt können Sie die Datenbasis für MyCoRe mit nachstehendem Kommando anlegen.
-{\tt
-\begin{verbatim}
-mysqladmin -u mcradmin create mycore 
-\end{verbatim}
-}
-\item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommandos
-{\tt
-\begin{verbatim}
-mysql --user=mcradmin -pPASSWORD mycore
-GRANT SELECT ON mycore.* TO mycorenutzer@'%';
-quit
-\end{verbatim}
+mysql --user=root -p{\it PASSWORD} mysql \newline
+GRANT ALL PRIVILEGES ON *.* TO mcradmin@localhost WITH GRANT OPTION; \newline
+GRANT ALL PRIVILEGES ON *.* TO mcradmin@'\%' IDENTIFIED BY '{\it ein-passwort}' \newline
+WITH GRANT OPTION; \newline
+quit \newline
 }
 
+\item Ist das Password einmal gesetzt, müssen Sie zusätzlich die Option -p verwenden.
+\item Zum Verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
 \item jetzt können Sie die Datenbasis für MyCoRe mit nachstehendem Kommando anlegen.
 {\tt
 \begin{verbatim}
@@ -81,22 +68,30 @@ mysqladmin -u mcradmin create mycore
 \end{verbatim}
 }
 \item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommandos
+
 {\tt
-\begin{verbatim}
-mysql --user=mcradmin -pPASSWORD mycore
-GRANT SELECT ON mycore.* TO mycorenutzer@'%';
+mysql --user=mcradmin -p{\it PASSWORD} mycore \newline
+GRANT SELECT ON mycore.* TO mycorenutzer@'\%'; \newline
 quit
-\end{verbatim}
 }
+
 \end{enumerate}
 
 Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei {\it /etc/hosts.allow} geschrieben werden.
 
 \subsubsection{Die Installation der freien XML:DB eXist}
 
-eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So ist die Nutzung von eXist direkt möglich.
+eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. 
+Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. 
+So ist die Nutzung von eXist direkt möglich.
 \paragraph*{Vorbedingungen} 
-Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, da es ansonsten zu einem Konflikt mit der hier vorgestellten Installtion kommt, weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. Den Port für Tomact ändern sie in der {\it tomcatinstalldir/conf/server.xml}. Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene MySQL-Installation vorausgesetzt. Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner in \$MYCORE\_HOME bzw. \$MYCORE\_SAMPLE\_HOME liegen. 
+Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, 
+da es ansonsten zu einem Konflikt mit der hier vorgestellten Installation kommt, 
+weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. 
+Den Port für Tomact ändern sie in der {\it tomcatinstalldir/conf/server.xml}. 
+Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene MySQL-Installation vorausgesetzt. 
+Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner 
+in \$MYCORE\_HOME bzw. \$MYCORE\_SAMPLE\_HOME liegen. 
 
 \begin{enumerate}
 \item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden (cvs). Zum Test kam Version eXist-0.9.2.
@@ -124,12 +119,16 @@ Mit \mcrcommand{rcapache2 [start; stop; restart]} als root kann der Server gesta
 
 \subsubsection{Die Installation von Tomcat 4}
 
-Wie Apache, dessen Installation im vorigen Abschnitt \ref{sec:apchache2_installation} beschrieben wurde,  ist auch Tomcat als Servlet-Engine im Linux-Umfeld ein Quasi-Standard. Für die Arbeit der Web-Anwendung des MyCoRe-Projektes wird dieses Tool zwingend benötigt. Installiern Sie folgende Komponenten:
+Wie Apache, dessen Installation im vorigen Abschnitt \ref{sec:apchache2_installation} beschrieben wurde,  
+ist auch Tomcat als Servlet-Engine im Linux-Umfeld ein Quasi-Standard. 
+Für die Arbeit der Web-Anwendung des MyCoRe-Projektes wird dieses Tool zwingend benötigt. 
+Installiern Sie folgende Komponenten:
 \begin{itemize}
 \item {\bf jakarta-tomcat-4.1.18-31} oder höher
 \item {\bf apache2-jakarta-tomcat-connectors-4.1.18-31} oder höher
 \end{itemize}
-Im File \mcrfile{/etc/profile.local} ist folgender Eintrag vorzunehmen, damit Tomcat auch von {\bf mcradmin} genutzt werden kann.
+Im File \mcrfile{/etc/profile.local} ist folgender Eintrag vorzunehmen, 
+damit Tomcat auch von {\bf mcradmin} genutzt werden kann.
 \begin{verbatim}
 export CATALINA_HOME=/opt/jakarta/tomcat
 \end{verbatim}
@@ -137,7 +136,14 @@ Weiterhin ist noch die richtige Gruppenzugehörigkeit für die Tomcat-Installation
 \begin{verbatim}
 chown wwwrun:nogroup -R /opt/jakarta/tomcat
 \end{verbatim}
-Mit \mcrcommand{rctomcat [start; stop; restart]} als root kann der Server gestartet gestoppt bzw neugestartet werden und über \mcrcommand{rctomcat [status]} wird der aktuelle Staus abgefragt. Nach erfolgreichem starten des Tomcat Servers sollte er unter der Standardadresse \url{http://localhost:8080/examples} erreichbar sein. Die Dokumentation steht unter \url{http://localhost:8080/tomcat-docs}.
+Mit \mcrcommand{rctomcat [start; stop; restart]} als root kann der Server gestartet gestoppt bzw 
+neugestartet werden und über \mcrcommand{rctomcat [status]} wird der aktuelle Staus abgefragt. 
+Nach erfolgreichem starten des Tomcat Servers sollte er unter der Standardadresse \url{http://localhost:8080/examples} 
+erreichbar sein. 
+Bitte beachten Sie aber, dass der standardm"assige Port 8080 auch von eXist (falls Sie dies verwenden)
+verwendet wird.
+In diesem Fall m"ussen Sie in der Konfigurationsdatei {\it server.xml} einen anderen Port ausw"ahlen.
+Die Dokumentation steht unter \url{http://localhost:8080/tomcat-docs}.
 %
 %
 \subsection{Installation der Komponenten unter MS Windows}
