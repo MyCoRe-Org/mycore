@@ -23,14 +23,11 @@
  **/
 package org.mycore.services.plugins;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.datamodel.ifs.MCRFileReader;
 
 /**
  * The Plugin spec for filtering several documents for the fulltext search.
@@ -44,6 +41,18 @@ public interface TextFilterPlugin {
 	 * @return Plugin name
 	 */
 	public String getName();
+	
+	/**
+	 * should return the major version number
+	 * @return major version number
+	 */
+	public int getMajorNumber();
+	
+	/**
+	 * should return the minor version number
+	 * @return minor version number
+	 */
+	public int getMinorNumber();
 
 	/**
 	 * may contain some additional Information on the plugin

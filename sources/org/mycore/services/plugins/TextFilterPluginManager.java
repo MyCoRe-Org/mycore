@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -72,6 +73,7 @@ public class TextFilterPluginManager {
 	}
 	private void init() {
 		ContentTypePluginBag = new Hashtable();
+		PropertyConfigurator.configure(conf.getLoggingProperties());
 		Plugins = new Hashtable();
 		loadPlugins();
 	}
@@ -96,8 +98,13 @@ public class TextFilterPluginManager {
 			iter.hasNext();
 			) {
 			filter = (TextFilterPlugin) iter.next();
-			//logger.debug("Loading TextFilterPlugin: "+filter.getName());
-			System.err.println("Loading TextFilterPlugin: " + filter.getName());
+			logger.info(
+				new StringBuffer("Loading TextFilterPlugin: ")
+					.append(filter.getName())
+					.append(" v:")
+					.append(filter.getMajorNumber())
+					.append('.')
+					.append(filter.getMinorNumber()).toString());
 			for (Iterator CtIterator =
 				filter.getSupportedContentTypes().iterator();
 				CtIterator.hasNext();
