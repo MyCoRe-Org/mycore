@@ -69,7 +69,6 @@ public void requestQuery(String hostAlias, String reqtype, String query)
   this.hostAlias = hostAlias;
   this.reqtype = reqtype;
   this.query = query;
-  debug();
   }
 
 /**
@@ -104,15 +103,15 @@ public MCRQueryResultArray responseQuery() throws MCRException
     BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
     String fromServer="";
     int inread;
-    while ( (inread = in.read()) != -1 ) fromServer = fromServer + (char) inread;
+    while ((inread = in.read()) != -1) fromServer = fromServer + (char) inread;
     result.importElements(fromServer);
   }
+  catch(MCRException mcre) {
+    System.err.println("Can't use the response from host:"+host+"."); }
   catch(UnknownHostException uhe) {
-    System.err.println("Don't know about host: " + host +". ");
-  }
+    System.err.println("Don't know about host: "+host+"."); }
   catch(IOException ioe) {
-    System.err.println("Couldn't get I/O for the connection to: " + host + ". ");
-  }
+    System.err.println("Couldn't get I/O for the connection to: "+host+"."); }
   catch(Exception e) {
     e.printStackTrace(System.err);
   }
