@@ -224,12 +224,10 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	 * @return ObjectID if found, else null
 	 */
 	public MCRObjectID getObjectID(String DerivateID) {
-		StringBuffer query =
-			new StringBuffer("/mycorederivate[@ID=\"").append(
-				DerivateID).append(
-				"\"]");
+		ArrayList in = new ArrayList();
+		in.add(new MCRObjectID(DerivateID));
 		MCRXMLContainer derivate =
-			getResultList(query.toString(), "derivate", 1);
+			createResultContainer(in);
 		//<mycorederivate
 		if (derivate.size() > 0) {
 			Element derivateE = derivate.getXML(0);
