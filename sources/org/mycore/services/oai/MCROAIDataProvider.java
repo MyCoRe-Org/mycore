@@ -107,6 +107,7 @@ public class MCROAIDataProvider extends HttpServlet {
     // MCR.oai.metadata.namespace.olac=http://www.language-archives.org/OLAC/0.2/
     // MCR.oai.metadata.schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
     private static final String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace"; 
+    private static final String STR_OAI_METADATA_ELEMENT = "MCR.oai.metadata.element"; 
     private static final String STR_OAI_METADATA_SCHEMA = "MCR.oai.metadata.schema"; 
     
     // Following the DINI recommendation for OAI repositories
@@ -694,7 +695,10 @@ public class MCROAIDataProvider extends HttpServlet {
 		}
         
         // First; check if there was an identifier in the request
-        String identifier[] = getParameter("identifier", request); 
+        String identifier[] = getParameter("identifier", request);
+        // If an identifier was given, this will be the record to
+        // check, if the metadata is supported
+        List record = null;
         if (identifier == null) {
             if (badArguments(request, 1)) {
             	logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlendem Parameter abgebrochen.");
@@ -711,7 +715,7 @@ public class MCROAIDataProvider extends HttpServlet {
     	    try {
         		id = legalOAIIdentifier(identifier[0]);
 	        } catch (MCRException mcrx) {
-    	        logger.info("Anfrage 'getRecord' wurde wegen fehlerhaftem Identifier abgebrochen.");
+    	        logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlerhaftem Identifier abgebrochen.");
         	    return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
 	        }
 	        
@@ -721,6 +725,8 @@ public class MCROAIDataProvider extends HttpServlet {
             if (!query.exists(id)) {
             	logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
+            } else {
+            	record = query.getRecord(id, getServletName());
             }
         }
         
@@ -738,12 +744,26 @@ public class MCROAIDataProvider extends HttpServlet {
         while (propertiesNames.hasMoreElements()) {
             String name = (String) propertiesNames.nextElement();
             String metadataPrefix = name.substring(name.lastIndexOf(".") + 1);
+            if (record != null) {
+            	// Identifier submitted
+            	Element metadata = (Element) record.get(1);
+            	try {
+        			String namespace = config.getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix);
+        			String elementName = config.getString(STR_OAI_METADATA_ELEMENT + "." + metadataPrefix);
+        			Namespace mns = Namespace.getNamespace(metadataPrefix, namespace);
+        			if (metadata.getChild(elementName, mns) == null) {
+        				continue;
+        			}
+            	} catch(MCRConfigurationException e) {
+            		continue;
+            	}
+            }
             Element eMetadataFormat = new Element("metadataFormat", ns);
             eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
             eMetadataFormat.addContent(newElementWithContent("schema", ns, config
-                .getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
+            		.getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
             eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, config
-                .getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
+            		.getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
             eListMetadataFormats.addContent(eMetadataFormat);
         }
         
