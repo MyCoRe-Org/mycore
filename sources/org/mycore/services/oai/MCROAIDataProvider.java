@@ -1055,7 +1055,6 @@ public class MCROAIDataProvider extends HttpServlet {
 		    Iterator mappedSetIterator = mappedSets.iterator();
 		    while (mappedSetIterator.hasNext()) {
 		    	String[] mappedSet = (String[]) mappedSetIterator.next();
-		    	logger.info("Query set: " + mappedSet[0]);
 		    	List result = query.listIdentifiers(mappedSet, from, until, getServletName());
 		    	if (result != null) {
 		    		sets.addAll(result);
