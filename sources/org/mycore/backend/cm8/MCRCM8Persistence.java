@@ -112,15 +112,11 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
     item.setAttribute("/",itemtypeprefix+"xml",xml);
+System.out.println(mcr_ts_in);
     item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
 
 //mcr_tc.debug();
 
-    // set to offset metadata
-    for (int i=mcr_tc_counter;i<mcr_tc.getSize();i++) {
-      if (mcr_tc.getNameElement(i).equals("metadata")) {
-        mcr_tc_counter = i; }
-      }
     String [] xmlpath = new String[mcr_tc.TYPE_LASTTAG+1];
     int lastpath = 0;
 
@@ -138,10 +134,28 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         i++;
         continue; 
         }
+      // tag is 'structure'
+      if ((mcr_tc.getNameElement(i).equals("structure")) &&
+          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
+        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"structure";
+        lastpath = mcr_tc.TYPE_MASTERTAG;
+        item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
+          "/"+xmlpath[lastpath]+"/");
+        continue; 
+        }
       // tag is 'service'
       if ((mcr_tc.getNameElement(i).equals("service")) &&
           (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
         xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"service";
+        lastpath = mcr_tc.TYPE_MASTERTAG;
+        item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
+          "/"+xmlpath[lastpath]+"/");
+        continue; 
+        }
+      // tag is 'derivate'
+      if ((mcr_tc.getNameElement(i).equals("derivate")) &&
+          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
+        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"derivate";
         lastpath = mcr_tc.TYPE_MASTERTAG;
         item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
@@ -354,99 +368,6 @@ public final byte[] receive(MCRObjectID mcr_id)
   finally {
     MCRCM8ConnectionPool.releaseConnection(connection); }
   return xml;
-  }
-
-/**
- * The methode receive an object from the data store and return the
- * service date for the given type. The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case
- * configuration name.<br>
- *
- * @param mcr_id      the object id
- * @param type     the type of the service date
- * @return the date for the type or null
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final GregorianCalendar receiveServiceDate(MCRObjectID mcr_id,
-  String type) throws MCRConfigurationException, MCRPersistenceException
-  {
-  GregorianCalendar cal = new GregorianCalendar();
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
-  // retrieve the createdate value
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.getConnection();
-    MCRCM8Item item = null;
-    try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
-        itemtypeprefix);
-      item.retrieve();
-      sb = new StringBuffer(128);
-      sb.append("/").append(itemtypeprefix).append("service")
-        .append("/").append(itemtypeprefix).append("servdates")
-        .append("/").append(itemtypeprefix).append("servdate");
-      java.sql.Date date = item.getTypedDate(sb.toString(),
-        itemtypeprefix+"servdate",itemtypeprefix+"type",type);
-      if (date == null) { return null; }
-      cal.setTime(date);
-      }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
-        " does not exist."); }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
-  return cal;
-  }
-
-/**
- * The methode receive an object from the data store and return the 
- * label of the object. The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case 
- * configuration name.<br>
- * As example: Document --> MCR.persistence_cm8_document
- *
- * @param mcr_id      the object id
- * @return the label of the object
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final String receiveLabel(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
-  {
-  String label = new String("");
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
-  // receive the label
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.getConnection();
-    MCRCM8Item item = null;
-    try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
-        itemtypeprefix);
-      item.retrieve();
-      label = item.getString("/",itemtypeprefix+"label");
-      }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
-        " does not exist."); }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
-  return label;
   }
 
 /**
