@@ -90,11 +90,14 @@ public class MCREditorSourceReader
         url = MCRServlet.getBaseURL() + url;
       }
 
-      StringBuffer sb = new StringBuffer( url );
-      sb.append( url.indexOf( "?" ) == -1 ? "?" : "&" );
-      sb.append( "MCRSessionID=" );
-      sb.append( MCRSessionMgr.getCurrentSession().getID() );
-      url = sb.toString();
+      if( ! url.startsWith( "file:" ) )
+      {
+        StringBuffer sb = new StringBuffer( url );
+        sb.append( url.indexOf( "?" ) == -1 ? "?" : "&" );
+        sb.append( "MCRSessionID=" );
+        sb.append( MCRSessionMgr.getCurrentSession().getID() );
+        url = sb.toString();
+      }
 
       MCREditorServlet.logger.info( "Editor reading XML input from " + url );
       Element input = MCREditorResolver.readXML( url );
