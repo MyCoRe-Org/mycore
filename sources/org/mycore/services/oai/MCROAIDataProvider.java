@@ -1516,7 +1516,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			throw new MCRException("Error in legalOAIIdentifier");
 		}
 		
-		String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*???()");
+		String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*?()");
 		StringBuffer buffer = new StringBuffer(tokenizer.nextToken());
 		while (tokenizer.hasMoreTokens()) {
 			buffer.append(":")
