@@ -334,6 +334,7 @@ class MCREditorRequest
   }
   
   Document loadEditorXML( String editorFile )
+    throws Exception
   {
     String name = "/WEB-INF/editor/" + editorFile;
     String path = context.getRealPath( name );
