@@ -128,25 +128,31 @@ public class MCRCStoreContentManager8
 		storeTempType = "none";
 		if (TIEREF_TABLE == null) {
 			//TIEREF_TABLE=MCRSQLConnection.justGetSingleValue(new MCRSQLStatement(TIEINDEX_TABLE).setCondition("COLNAME","TIEREF").toSelectStatement("TABSCHEMA"));
-			logger.debug("Getting TIEREF Table name...");
-			MCRSQLRowReader row =
-				MCRSQLConnection.justDoQuery(
-					new MCRSQLStatement(TIEINDEX_TABLE)
-						.setCondition("COLNAME", "TIEREF")
-						.toSelectStatement("TABSCHEMA,TABNAME"));
-			if (row.next()) {
-				TIEREF_TABLE =
-					new StringBuffer(row.getString(1))
-						.append('.')
-						.append(row.getString(2))
-						.toString();
-				logger.debug("TIEREF Table: "+TIEREF_TABLE);
-			} else {
-				logger.warn(
-					"Failure getting TIEREF Index from "
-						+ TIEINDEX_TABLE
-						+ "!");
-			}
+			storeTieRefTable();
+		}
+	}
+
+	private boolean storeTieRefTable() {
+		logger.debug("Getting TIEREF Table name...");
+		MCRSQLRowReader row =
+			MCRSQLConnection.justDoQuery(
+				new MCRSQLStatement(TIEINDEX_TABLE)
+					.setCondition("COLNAME", "TIEREF")
+					.toSelectStatement("TABSCHEMA,TABNAME"));
+		if (row.next()) {
+			TIEREF_TABLE =
+				new StringBuffer(row.getString(1))
+					.append('.')
+					.append(row.getString(2))
+					.toString();
+			logger.debug("TIEREF Table: "+TIEREF_TABLE);
+			return true;
+		} else {
+			logger.warn(
+				"Failure getting TIEREF Index from "
+					+ TIEINDEX_TABLE
+					+ "!");
+			return false;
 		}
 	}
 
@@ -500,8 +506,8 @@ public class MCRCStoreContentManager8
 	 */
 	protected int countDerivateContents(String derivateID) {
 		logger.debug("DerivateID = " + derivateID);
-		if (TIEREF_TABLE == null)
-			throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
+		if (TIEREF_TABLE == null && !storeTieRefTable())
+				throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
 		return MCRSQLConnection.justCountRows(
 			new MCRSQLStatement(TIEREF_TABLE)
 				.setCondition(DerivateAttribute, derivateID)
@@ -541,8 +547,7 @@ public class MCRCStoreContentManager8
 			dkIterator iter = results.createIterator();
 			logger.debug("Number of Results:  " + results.cardinality());
 			outgo = new String[results.cardinality()];
-			int i = 0;
-			while (iter.more()) {
+			for (int i=0;iter.more();i++) {
 				DKDDO resitem = (DKDDO) iter.next();
 				resitem.retrieve();
 				short dataId =
@@ -769,7 +774,7 @@ public class MCRCStoreContentManager8
 			if (b == 0)
 				return 1;
 			else
-				while (b > 1)
+				for (;b > 1;b--)
 					c *= a;
 			return c;
 		}
