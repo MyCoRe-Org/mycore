@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.51 $ $Date: 2003-08-06 07:53:03 $                      -->
+  <!-- $Revision: 1.52 $ $Date: 2003-08-06 09:16:16 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -62,7 +62,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.51 $ $Date: 2003-08-06 07:53:03 $</echo>
+    <echo>Ant build file   : $Revision: 1.52 $ $Date: 2003-08-06 09:16:16 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>Persistency type : ${env.MCR_PERSISTENCE}</echo>
@@ -355,9 +355,15 @@
 
   <target name="pdflatex">
     <echo>Processing ${TeXFile} to PDF...</echo>
-    <exec dir="documentation" executable="pdflatex" output="output.log"> <arg line="${TeXFile}" /> </exec>
-    <exec dir="documentation" executable="pdflatex" output="output.log"> <arg line="${TeXFile}" /> </exec>
-    <exec dir="documentation" executable="pdflatex"> <arg line="${TeXFile}" /> </exec>
+    <exec dir="documentation" executable="pdflatex" output="documentation/output.log"> 
+      <arg line="--interaction nonstopmode ${TeXFile}" /> 
+    </exec>
+    <exec dir="documentation" executable="pdflatex" output="documentation/output.log"> 
+      <arg line="--interaction nonstopmode ${TeXFile}" /> 
+    </exec>
+    <exec dir="documentation" executable="pdflatex"> 
+      <arg line="--interaction nonstopmode ${TeXFile}" /> 
+    </exec>
     <delete>
       <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
     </delete>
@@ -394,7 +400,7 @@
   <!-- Build CVS ChangeLog                                                 -->
   <!-- =================================================================== -->
 
-  <target name="changelog" depends="init">
+  <target name="changelog">
     <echo>
 
       Building CVS ChangeLog, please be patient...
@@ -405,7 +411,7 @@
     <antcall target="do-log"><param name="changelog-year" value="2001" /></antcall>
   </target>
 
-  <target name="do-log">
+  <target name="do-log" depends="init">
     <echo>Logging changes of the year ${changelog-year}...</echo>
 
     <cvschangelog 
