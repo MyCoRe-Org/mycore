@@ -90,8 +90,8 @@ Jeder Metadaten-Typ hat mindestens folgend Eigenschaften:
 \item Er hat einen Schalter, ob er Volltext suchbar sein soll.
 \item Er hat einen Schalter, ob er vererbt werden darf.
 \item Er hat einen Schalter, ob er selbst erben darf.
-\item Bei jedem Typ kann die zugehörige Sprache spezifiziert werden.
-\item Er hat einen Attribut {\bf 'type'}.
+\item Bei jedem Element kann die zugehörige Sprache spezifiziert werden.
+\item Jedes Element hat einen Attribut {\bf 'type'}.
 \end{itemize}
 \item[service] - der letzte Abschnitt enthält Informationen zur Verwaltung des Metadaten-Satzes wie Erstellungsdatum oder Verwaltungs-Flags.
 \end{description}
@@ -118,7 +118,7 @@ der verwendbaren Produkte (IBM Content Manager 8 oder die XML:DB eXist).
 Die Resultate einer Anfrage sind die gespeicherten XML-Metadaten-Objekte,
 welche in einem sie umgebenden XML-Container dem fragenden Prozess
 zurückgeliefert werden. Diese Resultatsliste kann nun zur Datenpräsentation
-aufbereitet werden.
+mit XSLT aufbereitet werden.
 
 \subsection{Vererbung}
 
@@ -165,7 +165,7 @@ Verzeichnisstruktur aufzufinden oder Verzeichnisinhalte zu sortieren.
 
 Über die MyCoRe-Kommandozeile (Command Line Interface) können \mcridentifier{Derivate}, d. h.
 Dateibündel, die zu einem Dokument gehören, importiert oder aktualisiert werden. Über ein Servlet
-werden Dateien und Verzeichnisse im Browser angezeigt und ausgeliefert. In Vorbereitung ist auch
+werden Dateien und Verzeichnisse im Browser angezeigt und ausgeliefert. Es gibt auch
 die Möglichkeit, Dateien interaktiv über den Browser in das System hochzuladen.
 
 Die beschreibenden und technischen Daten zu Dateien und Verzeichnissen werden in einem \mcridentifier{FileMetadataStore}
@@ -186,6 +186,8 @@ Dies wird u. a. bei unserem MyCoRe-Sample demonstriert. Hier erfolgt eine
 Verbindung er einzelnen Installationen über eine HTTP-Servlet-Schnittstelle.
 
 \subsection{Schnittstellen zu OAI, Z39.50, Webservices}
+
+Dieser Teil von MyCoRe ist vorgesehen, aber leider noch in Arbeit.
 
 \section{Benutzer- und Zugriffsrechteverwaltung}
 \subsection{Benutzerverwaltung}
@@ -221,11 +223,42 @@ Dabei ist "uber ein MyCoRe-internes Session-Management gew"ahrleistet, dass die
 Anmeldung "uber mehrere Transaktionen bzw. mehrere Anfragen an das System erhalten bleibt.
 (Detaillierte Informationen hierzu finden Sie im 'MyCoRe Internal Design Guide'.)
 
-\subsection{Verwaltung von Zugriffsrechten}
-Macht Benno S"uselbeck...
+\subsection{Zugrifftrechte auf MyCoRe-Objekte}
 
-\section{Benutzer- und Autoreninterface}
+Dieser Teil von MyCoRe ist vorgesehen, aber leider noch in Arbeit.
 
+\section{Datenpräsentation}
 
+Ziel einer MyCoRe-Anwendung ist es natürlich, die Daten des Systems dem Anwender
+in verschiedenster Art zu präsentieren. Da MyCoRe konsequent XML-basiert ist,
+bietet sich hier natürlich vor allem die Möglichkeit mittels XSLT
+eine Datenaufbereitung und -Darstellung zu betreiben. Eine sehr zentrale
+Komponente ist hierbei das MCRLayoutServlet. Es bietet in eleganter Art und
+Weise die Möglichkeit einer Transformation der XML-Daten via Anwendungs-Stylesheets. So kann beispielsweise bei einem Verbund mehrerer Partner-Applikationen
+jede ihr eignens Layout zeigen. Der Funktionsbereich der Datenpräsentation
+erstreckt sich in MyCoRe von einfachen WEB-Seiten über Trefferlisten und
+Resultats- bzw. Dokumentanzeigen bis hin zu Komponenten der Nutzerverwaltung
+und dem Editor.
 
- 
+\section{Autoreninterface}
+
+Das MyCoRe-System bringt natürlich auch eine Schnittstelle für die Dateneingabe
+durch berechtigte Anwender mit. Diese ist eine Mischung aus Konfigurationsdateien und anwendungsbezogenen Servlets. Dem Ideenreichtum bei der Gestaltung
+des Editors und der Prüfung der Daten entsprechend des Datenmodells sind
+kaum Grenzen gesetzt. So lassen sich für die MyCoRe Datenmodelle ansprechende
+Eingabewerkzeuge gestalten, welche harmonisch in die Anwendung integriert
+werden können. Auch das Abladen von Dokumenten und multimedialen Objekten
+ist mit vorgesehen.
+
+\section{Zusätzliche Komponenten}
+
+MyCoRe ist kein statisches Produkt. Mit dem entstehen einer jeden Anwendung
+besteht die Möglichkeit allgemein interessierende neue Komponenten in den
+Kern mit aufzunehmen. Darüber hinaus werden eine Reihe von Applikationen zur
+Nachnutzung und Modifikation angeboten, so dass hier oft wenig Eigenentwicklung
+betrieben werden muss.\\[2ex]
+MyCoRe bietet aber ganz bewuss aus der Erfahrung der Entwickler heraus keine 
+Lösung von der Stange an, da jedes Projekt seine eigenen Spezifika hat.
+Vielmehr soll der Projektdesigner aus einer Vielzahl von Möglichkeiten der
+Kombination vorhandener Teile seine ganz spezielle Anwendung gestalten.
+

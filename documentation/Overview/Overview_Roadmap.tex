@@ -1,69 +1,149 @@
-\section{Klassifikationen}
-\label{sec:PlanungenKlassifikationen}
-\mcridentifier{Editor}\\[0.1cm]
-In der aktuellen Version fehlt noch ein Editor für die Erstellung und 
-Bearbeitung von Klassifikationen. Dieser soll sich die Bausteine des Matadaten-Editors verwenden. Planung: Release 1.0.
+Die folgende Aufstellung soll interessierte Nachnutzer des MyCore-Projektes
+darüber informieren, welcher Funktionsumfang für die einzelnen Releases
+von den Entwicklern vorgesehen ist. Da die Entwicklung des Projektes durch
+das Developer-Team bedingt durch anderweitige Aufgaben  nicht immer i
+kontinuierlich betrieben werden kann, ist eine Mitwirkung neuer Anwender
+in höchstem Maße erwünscht.
 
-\section{Metadaten}
-\label{sec:PlanungenMetadaten}
-\mcridentifier{Datenmodellierung}\\[0.1cm]
-Im Bereich der Datenmodellierung sind die Integration weiterer Metadaten-Typen geplant. Weiterhin soll es einen Connector zu Fremddaten (z. B: einer SQL DB) geben. Planung: Release $>=$ 1.0.
+\section{Funktionsumfang des Releases 0.8 - Juni 2004}
+\label{sec:Planungen07}
 
-\mcridentifier{Volltextsuche}\\[0.1cm]
-Die Integration einer Volltextindizierung und -suche ist bereits in Arbeit und hat eine hohe Priorität. Planung: Release 1.0.
+{\bf Klassifikationen}
+\begin{itemize}
+\item Das Klassifikationsdatenmodell ist implementiert und funktioniert.
+\item Klassifikationen werden in XML-Form gespeichert.
+\item Kategorien können hierarchisch angeordenet werden, die Kategorien bekommen dann mehrstufige ID's.
+\item Die Label der Kategorien können mehrsprachig sein.
+\item Klassifikationen können per Commandline-Tools verwaltet werden.
+\item Die für das MyCoRe-Beispiel benötigten Klassifikationen sind vorhanden.
+\end{itemize}
 
-\section{Benutzerverwaltung}
-\label{sec:PlanungenUsermanagement}
-\mcridentifier{Passwortverschl"usselung}\\[0.1cm]
-Derzeit werden die Passw"orter nur im Klartext in der jeweiligen SQL-Datenbank abgelegt.
-Ein Verschl"usselungsmechanismus wird eingearbeitet und ist f"ur das Release 1.0 geplant.
+{\bf Metadaten-Modell}
+\begin{itemize}
+\item Das allgemeine Datenmodell für die Metadaten ist implementiert.
+\item Es sind 12 komplexe Grunddatentypen zur Gestaltung von Anwendungen implementiert.
+\item Das Modell für die Datentypen gestattet eine mehrsprachige Speicherung.
+\item Die Metadaten können per Commandline-Tools verwaltet werden.
+\item Es gibt einen Migrationspfad von MILESS zu MyCoRe.
+\item Unter Verwendung des IBM Content Managers 8.2 ist auch eine textindizierte Suche in den Metadaten möglich. 
+\item Es wurde ein Suchkonzept auf Basis eines vereinfachten und erweiterten XPath-Synatx implementiert.
+\item Die Suche in den Daten kombiniert die Suche in den Metadaten mit einer Volltextsuche in den Dokumenten.
+\item Das Design der Metadaten und der Suche gestattet eine einfache Erweiterung durch eigene Projekte der Anwender.
+\end{itemize}
 
-\mcridentifier{Grafisches Verwaltungsinterface}\\[0.1cm]
-Mit Einf"uhrung der globalen grafischen Benutzerschnittstelle f"ur MyCoRe werden auch
-Editoren zur Durchf"uhrung der Gesch"aftsprozesse der Benutzerverwaltung zur
-Verf"ugung stehen. Planung: Release 1.0.
+{\bf Internes File System}
+\begin{itemize}
+\item Es sind Funktionalitäten zur Anbindung der eigentlichen Dokumente und multimedialen Objekte an die Metadaten implementiert.
+\item Es ist eine zentrale Verwaltungseinheit zur Klassifizierung und Verteilung der einzelnen Objekte auf die Stores vorhanden.
+\item Es sind folgende Stores implementiert: 
+\begin{itemize}
+\item FileSystem Store als Standardspeicher
+\item Lucene Store zur Speicherung der Daten im FileSystem und Textindizierung von *.txt und *.pdf Dokumenten unter Lucene
+\item IBM Content Manager 8.2 Store inklusive Volltextindizierung der Dokumente
+\item Helix Server Store für multimediale Objekte
+\item IBM VideoCharger Store für multimediale Objekte
+\end{itemize}
+\end{itemize}
 
-\mcridentifier{Einbindung externer Benutzerverwaltungen}\\[0.1cm]
-"Ublicherweise gibt es in den Institutionen in denen eine Digitale Bibliothek zum Einsatz kommt 
-bereits bestehende Benutzerverwaltungen wie zum Beispiel zentrale LDAP-Server. 
-Die MyCoRe-Benutzerverwaltung soll zuk"unftig eine einfache Schnittstelle bieten, um diese 
-bereits bestehenden Verwaltungen zumindest f"ur die reine Authentifizierung mit einzubeziehen.
-Planung: Release $>$ 1.0.
+{\bf Benutzer- und Rechtesystem}
+\begin{itemize}
+\item Die Benutzerdaten bestehen aus Nutzern welche in Gruppen angeordnet sind. Diese Gruppen können festgelegte Rechte haben.
+\item Die Benutzerdaten können per Commandline-Tools verwaltet werden.
+\item Das Benutzersystem hat eine API Schnittstelle (MCRUserManager) zu den
+anderen Komponeneten von MyCoRe.
+\item Via Servlet können die Privilegien einzelner Nutzer abgefragt werden.
+\end{itemize}
 
-\mcridentifier{Benutzerprofile}\\[0.1cm]
-Das Benutzermanagement soll "uber die reinen administrativen Aufgaben hinaus auch die Verwaltung 
-von Benutzerprofilen erm"oglichen. 
-Damit soll es Anwendern der digitalen Bibliothek erm"oglicht werden, regelm"aßig wiederkehrende 
-Aufgaben direkt abzurufen, Zwischenergebnisse abzulegen usw.
-Planung: Release $>$ 1.0.
+{\bf Datenpräsentation}
+\begin{itemize}
+\item Die Datenpräsentation basiert auf XSLT 1.0.
+\item In der Beispielanwendung wedern folgende Möglichkeiten der Darstellung gezeigt:
+\begin{itemize}
+\item einfache WEB-Dokumente und Seiten
+\item Suche in der Datenbasis
+\item Anzeige der Resultatsliste
+\item Anzeige der Objekt-Metadaten
+\item Anzeige der Attribute des Objektes und des Objektes selbst
+\item Wechsel des Benutzers
+\item Umschalten der Präsentation auf eine andere Sprache
+\end{itemize}
+\item Die Arbeit der implementierten Servlets läuft Session-orientiert, d. h. alees Servlets kennen den konkerten Stand der einzelnen Sessions.
+\end{itemize}
 
-\section{Verwaltung von Zugriffsrechten}
-\label{sec:PlanungenACL}
-Der Zugriffsschutz f"ur Objekte soll f"ur Benutzer, Gruppen und/oder IP/Host-Masken realisierbar 
-sein. 
-Objekte einer Digitalen Bibliothek bestehen aus Metadaten und einzelnen multimedialen Komponenten. 
-Die Zugriffskontrolle soll auf die kleinsten Granulen eines Objekts anwendbar sein. 
-So sollen also zum Beispiel die Metadaten frei zug"anglich sein, f"ur einzelne Teile aber 
-besondere Rechte erforderlich sein. 
-Zur Vereinfachung der Arbeit der Autoren soll es m"oglich sein, das Setzen von Zugriffsrechten 
-f"ur eine gr"oßere Anzahl von Objekten zu automatisieren bzw. sie projektspezifisch automatisch 
-zu setzen. 
-Dar"uber hinaus m"ussen Objekte zeitlich begrenzt mit besonderen Zugriffsrechten versehen werden 
-k"onnen. 
-Insbesondere muss es m"oglich sein, Dokumente wie zum Beispiel Dissertationen erst ab einem 
-bestimmten Zeitpunkt freizugeben.
-An der Implementierung dieser Komponente von MyCoRe wird gearbeitet.
-Planung: Release 1.0.
+{\bf Remotezugriff und Services}
+\begin{itemize}
+\item Es wurde via HTTP eine Möglichkeit der Remote-Abfrage von Systemen geschaffen.
+\item Es wurde ein OAI Client gemäß Standard 2.0 implementiert.
+\end{itemize}
 
-\section{Digital Rights Management}
-\label{sec:PlanungenDRM}
-\mcridentifier{Wasserzeichen}\\[0.1cm]
-Durch die Verwaltung von Zugriffsrechten kann man das Retrieval von Objekten aus der Digitalen 
-Bibliothek kontrollieren, nicht aber die unberechtigte Weiterverwertung nach etwaigem 
-Herunterladen eines Objekts. 
-Um das Copyright der Autoren f"ur diesen Fall zu gew"ahrleisten, sollen Autoren w"ahlen k"onnen, 
-ob ihre Objekte zusammen mit einem digitalen Wasserzeichen ausgeliefert werden sollen. 
-Der Signiervorgang soll dabei funktional in den Auslieferungsmechanismus des Repositories 
-eingebunden sein, also ohne zus"atzlichen Arbeitsaufwand f"ur die Autoren geschehen.
-An der Implementierung dieser Komponente von MyCoRe wird gearbeitet.
-Planung: Release $>$ 1.0.
+{\bf zusätzliche Funktionalitäten}
+\begin{itemize}
+\item Es wurde ein Tool zur Generierung von NBN's implementiert.
+\end{itemize}
+
+{\bf Dokumentation}
+\begin{itemize}
+\item Die Dokumentation gestattet die Installation des MyCoRe-Beispiels.
+\item Mit ihrer Hilfe kann ein eigener Dokument-Server aufgebaut werden.
+\item Sie zeigt erste Details der Gestaltung des Projektes.
+\end{itemize}
+
+\section{Funktionsumfang des Releases 0.9}
+\label{sec:Planungen09}
+
+{\bf Klassifikationen}
+\begin{itemize}
+\item Klassifikationen können mittels eines Editors erstellt werden.
+\item Im MyCoRe-Beispiel sind weitere allgemeingültige Klassifikationen aus dem Bibliotheksumfeld abgelegt (z.B. PACS). Diese können für eigene Entwicklungen genutzt werden.
+\end{itemize}
+
+
+{\bf Metadaten-Modell}
+\begin{itemize}
+\item Die Struktur der bisherigen LegalEntities wird an die Personennormdatei angepasst.
+\item Die Dokument-Metadaten werden werden um die Klassifikation Language (Dublin Core Feld 12) erweitert.
+\end{itemize}
+
+{\bf Internes File System}
+\begin{itemize}
+\item Optionale Komprimierung der Daten vor der Auslieferung.
+\end{itemize}
+
+{\bf Benutzer- und Rechtesystem}
+\begin{itemize}
+\item Die Benutzerdatenverwaltung wird über einen Editor gesteuert. 
+\item Eine einfache Anbindung an LDAP-Server wird realisiert.
+\item Es wird eine vereinfachte Form eines Access-Controll-Modells geben, welches den Zugriff auf die metadaten und Objekte regelt.
+\end{itemize}
+
+{\bf Datenpräsentation}
+\begin{itemize}
+\item Es ist die Suche mittels Klassifikations-Browser im Ordner-Stil möglich.
+\item Implementation von Warenkorbfunktionen in das Beispiel.
+\end{itemize}
+
+{\bf Remotezugriff und Services}
+\begin{itemize}
+\item Weitere WebServices werden implementiert.
+\end{itemize}
+
+{\bf zusätzliche Funktionalitäten}
+\begin{itemize}
+\item Einbindung eines Digital Rights Management wie Wasserzeichen usw. in die Ausleiferungder Objekte
+\end{itemize}
+
+{\bf Dokumentation}
+\begin{itemize}
+\item Die Dokumentation ist vollständig ausgearbeitet.
+\end{itemize}
+
+\section{Funktionsumfang des Releases 1.0}
+\label{sec:Planungen10}
+
+\begin{itemize}
+\item Alle Kernfunktionalitäten sind vollständig vorhanden und getestet.
+\item Die Beispielanwendung zeigt den Funktionsumfang voll auf.
+\item Es liegen eine Reihe von Anwendungsprojekten zur Nachnutzung vor.
+\item Die ausführliche Dokumentation ist redaktionell überarbeitet.
+\end{itemize}
+
