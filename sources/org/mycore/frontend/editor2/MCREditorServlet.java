@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
+import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -76,8 +77,8 @@ public class MCREditorServlet extends MCRServlet
     MCRRequestParameters parms = new MCRRequestParameters( req );
     
     String action = parms.getParameter( "_action" );
-    if( "load.definition".equals( action ) )
-      processLoadDefinition( req, res );
+    if( "start.session".equals( action ) )
+      processStartSession( req, res );
     else if( "show.popup".equals( action ) )
       processShowPopup( req, res );
     else if( "submit".equals( action ) )
@@ -102,17 +103,22 @@ public class MCREditorServlet extends MCRServlet
     sendToDisplay( req, res, new Document( clone ) );
   }
   
-  private void processLoadDefinition( HttpServletRequest  req, 
-                                      HttpServletResponse res )
+  private void processStartSession( HttpServletRequest  req, 
+                                    HttpServletResponse res )
   throws ServletException, java.io.IOException
   {
     String uri = req.getParameter( "_uri" );
     String ref = req.getParameter( "_ref" );
+    String key = req.getParameter( "_requestParamKey" );
 
-    logger.info( "Editor load editor definition from " + ref + "@" + uri );
-    Element param = getTargetParameters();
+    logger.info( "Editor start editor session from " + ref + "@" + uri );
+
+    Map requestParameters = getRequestParameters( key );
+    Element param = getTargetParameters( requestParameters );
     Element editor = MCREditorDefReader.readDef( uri, ref );
     if( param != null ) editor.addContent( param );
+    List variables = MCREditorSourceReader.readSource( editor, requestParameters );
+    editor.addContent( variables );
 
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );
@@ -124,22 +130,29 @@ public class MCREditorServlet extends MCRServlet
     sendToDisplay( req, res, new Document( editor ) );
   }
 
-  private Element getTargetParameters()
+  private Map getRequestParameters( String key )
   { 
-    String key = "StoredRequestParameters";
-    Map parameters = (Map)( MCRSessionMgr.getCurrentSession().get( key ) );
+    MCRCache cache = MCRSessionMgr.getCurrentSession().requestParamCache;
+    Map parameters = (Map)( cache.get( key ) );
+    cache.clear();
+    return parameters;
+  }
+
+  private Element getTargetParameters( Map parameters )
+  {
     if( parameters == null ) return null;
 
     Element tps = new Element( "target-parameters" );
     Iterator keys = parameters.keySet().iterator();
     while( keys.hasNext() )
     {
-      key = (String)( keys.next() );
+      String key = (String)( keys.next() );
       if( key.startsWith( "XSL." ) ) continue;
 
       String[] values = (String[])( parameters.get( key ) );
       for( int i = 0; ( values != null ) && ( i < values.length ); i++ )
       {
+        logger.debug( "Editor target parameter " + key + "=" + values[ i ] );
         Element tp = new Element( "target-parameter" );
         tp.setAttribute( "name", key );
         tp.addContent( values[ i ] );
