@@ -58,6 +58,7 @@ private MCRConfiguration conf = null;
 private String defaultLang = "";
 private static final String MCRSorterConfPrefix="MCR.XMLSorter";
 private static final String MCRSorterConfDelim="\"+lang+\"";
+private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
 
  /**
   * The initialization method for this servlet. This read the default
@@ -389,17 +390,29 @@ private static final String MCRSorterConfDelim="\"+lang+\"";
   	return result;
   }
   private MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang){
-  	MCRXMLSorter sorter=new MCRXMLSorter();
+  	MCRXMLSortInterface sorter=null;
+  	try {
+		sorter = (MCRXMLSortInterface)(Class.forName(
+		               conf.getString("MCR.XMLSortInterfaceImpl", MCRStdSorter)))
+		               .newInstance();
+	} catch (InstantiationException e) {
+		throw new MCRException(e.getMessage(),e);
+	} catch (IllegalAccessException e) {
+		throw new MCRException(e.getMessage(),e);
+	} catch (ClassNotFoundException e) {
+		throw new MCRException(e.getMessage(),e);
+	}
+  	//MCRXMLSorter sorter=new MCRXMLSorter();
   	/*maybe here should be a propertie used
   	 * XPath Expression can be relative to mcr_result
   	 */
   	// sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
-  	int keynum=Integer.parseInt(conf.getString(this.MCRSorterConfPrefix+".keys.count","0"));
+  	int keynum=Integer.parseInt(conf.getString(MCRSorterConfPrefix+".keys.count","0"));
   	boolean inorder=true;
   	for (int key=1; key<=keynum; key++){
   		// get XPATH Expression and hope it's good, if not exist sort for title
-  		inorder=conf.getBoolean(this.MCRSorterConfPrefix+".keys."+key+".inorder",true);
-		sorter.addSortKey(replString(conf.getString(this.MCRSorterConfPrefix+".keys."+key,"./*/*/*/title[lang('"+lang+"')]"),this.MCRSorterConfDelim,lang),inorder);
+  		inorder=conf.getBoolean(MCRSorterConfPrefix+".keys."+key+".inorder",true);
+		sorter.addSortKey(replString(conf.getString(MCRSorterConfPrefix+".keys."+key,"./*/*/*/title[lang('"+lang+"')]"),MCRSorterConfDelim,lang),inorder);
   	}
   	xmlcont.sort(sorter);
   	return xmlcont;
