@@ -24,10 +24,16 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.*;
-import java.util.*;
-import java.security.*;
-import org.mycore.common.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * This input stream is used by the MyCoRe filesystem classes to
@@ -153,7 +159,7 @@ public class MCRContentInputStream extends FilterInputStream
     StringBuffer sb = new StringBuffer();
     for( int i = 0; i < bytes.length; i++ )
     {
-      String sValue = "0" + Integer.toHexString( (int) bytes[ i ] );
+      String sValue = "0" + Integer.toHexString(bytes[i]);
       sb.append( sValue.substring( sValue.length() - 2 ) );
     }
     return sb.toString();
