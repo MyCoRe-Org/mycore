@@ -145,7 +145,15 @@ public class MCRFileNodeServlet extends HttpServlet
     
     if( hostAlias.equals( "local" ) ) // local node to be retrieved
     {
-      MCRFilesystemNode root = MCRFilesystemNode.getRootNode( ownerID );
+	MCRFilesystemNode root;
+	try {
+		  root = MCRFilesystemNode.getRootNode(ownerID);
+	} catch (org.mycore.common.MCRPersistenceException e) {
+		// Could not get value from JDBC result set
+		logger.error("MCRFileNodeServlet: Error while getting root node!",e);
+		root = null;
+	} 
+	
       if( root == null )
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
