@@ -91,7 +91,7 @@ public class MCRLayoutServlet extends HttpServlet
                                 Attributes attributes )
         throws SAXException
       {
-        detected.setProperty( "rootElementName", qName + " / " + localName );
+        detected.setProperty( "rootElementName", qName );
         throw new MCRException( "we force an interrupt with this exception" );
       }
     };
@@ -148,8 +148,13 @@ public class MCRLayoutServlet extends HttpServlet
     out.close();
   }
 
-  protected void processRequest( HttpServletRequest  request, 
-                                 HttpServletResponse response ) 
+  protected void doPost( HttpServletRequest  request, 
+                         HttpServletResponse response )
+    throws IOException, ServletException
+  { doGet( request, response ); }
+
+  protected void doGet( HttpServletRequest  request, 
+                        HttpServletResponse response ) 
     throws IOException, ServletException
   {
     Source sourceXML = null;   
