@@ -238,6 +238,7 @@ org.jdom.Document jdom = null;
     request.setAttribute( "mode", "ResultList" );
     request.removeAttribute( "type" );
     request.setAttribute( "type", type );
+    layout = type;
     request.removeAttribute( "layout" );
     request.setAttribute( "layout", layout );
     request.removeAttribute( "hosts" );
