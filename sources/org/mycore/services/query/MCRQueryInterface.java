@@ -24,8 +24,6 @@
 
 package org.mycore.services.query;
 
-import java.util.*;
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
 
 /**
@@ -33,6 +31,7 @@ import org.mycore.common.xml.MCRXMLContainer;
  * the used query system of the persistence layer. 
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 public interface MCRQueryInterface
