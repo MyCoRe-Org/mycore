@@ -499,11 +499,15 @@ public final byte [] receiveXMLFromDatastore(String id)
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
-  // clean the structure
-  mcr_struct.clear();
   // get the old Item
   MCRObject old = new MCRObject();
-  old.receiveFromDatastore(mcr_id);
+  try {
+    old.receiveFromDatastore(mcr_id);
+    }
+  catch (MCRPersistenceException pe) {
+    createInDatastore(); return; }
+  // clean the structure
+  mcr_struct.clear();
   // set the derivate data in structure
   for (int i=0;i<old.mcr_struct.getDerivateSize();i++) {
     mcr_struct.addDerivate(old.mcr_struct.getDerivate(i));
