@@ -257,30 +257,17 @@ public final byte [] receive(MCRObjectID mcr_id)
  * @return the GregorianCalendar data of the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
+ * @exception DKException if an error in the CM7 is occured
+ * @exception Exception if an general error is occured
  **/
 public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  // search the index class
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  try {
-    return receiveCreateDateCM7(mcr_id); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode receive internal a GregorianCalendar object from the data store.
- *
- * @param mcr_id      the object id
- * @return the GregorianCalendar data of the object
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
-  throws DKException, Exception
-  {
+  // make a connection
   DKDatastoreDL connection = null;
   GregorianCalendar create = new GregorianCalendar();
   try {
@@ -293,6 +280,8 @@ private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage(),e); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   return create;

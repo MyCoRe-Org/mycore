@@ -64,8 +64,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
     // start the local query
     MCRConfiguration config = MCRConfiguration.instance();
     int vec_length = config.getInt("MCR.query_max_results",10);
-    String proptype = "MCR.persistence_type_"+type;
-    String persist_type = config.getString(proptype);
+    String persist_type = config.getString("MCR.persistence_type","cm7");
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+"_query_name";
     MCRQueryInterface mcr_query = (MCRQueryInterface)config.getInstanceOf(proppers);
     MCRQueryResultArray result = mcr_query.getResultList(query,type,vec_length);
