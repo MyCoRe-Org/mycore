@@ -24,7 +24,6 @@
 
 package org.mycore.backend.cm8;
 
-import java.util.*;
 import java.io.*;
 import java.net.*;
 
@@ -323,13 +322,10 @@ public class MCRCStoreContentManager8
     if (doctext==null) { return (new String[0]); }
 
     // transform query
-    int i = doctext.indexOf("\"");
-    if (i==-1) { return (new String[0]); }
-    int j = doctext.indexOf("\"",i+1);
-    if (j==-1) { return (new String[0]); }
+    String query=parseQuery(doctext);
     StringBuffer sb = new StringBuffer(1024);
-    sb.append('/').append(itemTypeName).append("[contains-text (@TIEREF,\"\'")
-      .append(doctext.substring(i+1,j)).append("\'\")=1]");
+    sb.append('/').append(itemTypeName).append("[contains-text-basic (@TIEREF,\"")
+      .append(query).append("\")=1]");
     logger.debug("TS outgoing query "+sb.toString());
     
     // start the query
@@ -345,7 +341,7 @@ public class MCRCStoreContentManager8
       dkIterator iter = results.createIterator();
       logger.debug("Number of Results:  "+results.cardinality());
       outgo = new String[results.cardinality()];
-      i = 0;
+      int i = 0;
       while (iter.more()) {
         DKDDO resitem = (DKDDO)iter.next();
         resitem.retrieve();
@@ -360,6 +356,28 @@ public class MCRCStoreContentManager8
 
     return outgo;
     }
+    
+	protected static String parseQuery(String query) {
+		int i = query.indexOf('\"');
+		i++;
+		if (i == 0)
+			return "";
+		int j = query.lastIndexOf('\"');
+		if (j == -1)
+			return "";
+		StringBuffer tmp=new StringBuffer(query.substring(i, j));
+		for (int x=0;x<tmp.length();x++){
+			switch (tmp.charAt(i)){
+				case '\"':
+					//replace double quotes by quotes
+					tmp.setCharAt(x,'\'');
+					break;
+				default:
+					break;
+			}
+		}
+		return tmp.toString();
+	}
 
 }
 
