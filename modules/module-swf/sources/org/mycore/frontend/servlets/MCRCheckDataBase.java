@@ -51,42 +51,8 @@ import org.mycore.user.*;
  * @version $Revision$ $Date$
  */
 
-abstract public class MCRCheckEditorServlet extends MCRServlet
+abstract public class MCRCheckDataBase extends MCRCheckBase
 {
-// The configuration
-protected static MCRConfiguration CONFIG;
-protected static Logger logger=Logger.getLogger(MCRCheckEditorServlet.class);
-
-/** Initialisation of the servlet */
-public void init()
-  {
-  MCRConfiguration.instance().reload(true);
-  CONFIG = MCRConfiguration.instance();
-  PropertyConfigurator.configure(CONFIG.getLoggingProperties());
-  }
-
-/**
- * The method check the privileg of this action.
- *
- * @param privs the ArrayList  of privilegs
- * @return true if the privileg exist, else return false
- **/
-abstract public boolean hasPrivileg(ArrayList privs, String type);
-
-/**
- * The method is a dummy and return an URL with the next working step.
- *
- * @param ID the MCRObjectID of the MCRObject
- * @return the next URL as String
- **/
-abstract public String loadMetadata(MCRObjectID ID) throws Exception;
-
-/**
- * The method send a message to the mail address for the MCRObjectType.
- *
- * @param ID the MCRObjectID of the MCRObject
- **/
-abstract public void sendMail(MCRObjectID ID);
 
 /**
  * This method overrides doGetPost of MCRServlet.<br />
@@ -158,8 +124,8 @@ public void doGetPost(MCRServletJob job) throws Exception
   // Save the prepared metadata object 
   storeMetadata(outxml,job,ID,fullname,lang);
 
-  // call the loadMetadata and sendMail methods
-  String url = loadMetadata(ID);
+  // call the getNextURL and sendMail methods
+  String url = getNextURL(ID);
   sendMail(ID);
   job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+url));
   }
@@ -652,17 +618,4 @@ System.out.println(jdom);
   rd.forward(job.getRequest(), job.getResponse());
   }
  
-/**
- * A method to handle IO errors.
- *
- * @param jab the MCRServletJob
- * @param lang the current language
- **/
-protected void errorHandlerIO(MCRServletJob job, String lang) 
-  throws Exception
-  { 
-  String pagedir = CONFIG.getString( "MCR.editor_page_dir","" );
-  job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+pagedir+"editor_error_store.xml")); 
-  }
-
 }

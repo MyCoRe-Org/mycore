@@ -51,7 +51,7 @@ import org.mycore.user.*;
  * @version $Revision$ $Date$
  */
 
-public class MCRCheckNewFileServlet extends MCRCheckFileBase
+public class MCRCheckCommitFileServlet extends MCRCheckFileBase
 {
 
 /**
@@ -62,7 +62,7 @@ public class MCRCheckNewFileServlet extends MCRCheckFileBase
  **/
 public final boolean hasPrivileg(ArrayList privs, String type)
   {
-  if (!privs.contains("create-"+type)) return false;
+  if (!privs.contains("modify-"+type)) return false;
   return true;
   }
 
@@ -75,9 +75,7 @@ public final boolean hasPrivileg(ArrayList privs, String type)
 public final String getNextURL(MCRObjectID ID) throws Exception
   {
   // return all is ready
-  StringBuffer sb = new StringBuffer();
-  sb.append(CONFIG.getString( "MCR.editor_page_dir","" )).append("editor_").append(ID.getTypeId()).append("_editor.xml");
-  return sb.toString();
+  return "";
   }
 
 /**
@@ -91,7 +89,10 @@ public final String getNextURL(MCRObjectID ID, MCRObjectID DD) throws Exception
   {
   // return all is ready
   StringBuffer sb = new StringBuffer();
-  sb.append(CONFIG.getString( "MCR.editor_page_dir","" )).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+  sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=")
+    .append(ID.getTypeId()).append("&step=commit&se_mcrid=")
+    .append(ID.getId()).append("&re_mcrid=").append(DD.getId())
+    .append("&tf_mcrid=").append(ID.getId());
   return sb.toString();
   }
 

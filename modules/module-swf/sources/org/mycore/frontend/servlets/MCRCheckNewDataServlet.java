@@ -51,7 +51,7 @@ import org.mycore.user.*;
  * @version $Revision$ $Date$
  */
 
-public class MCRCheckNewDataServlet extends MCRCheckEditorServlet
+public class MCRCheckNewDataServlet extends MCRCheckDataBase
 {
 /**
  * The method check the privileg of this action.
@@ -71,7 +71,7 @@ public final boolean hasPrivileg(ArrayList privs, String type)
  * @param ID the MCRObjectID of the MCRObject
  * @return the next URL as String
  **/
-public final String loadMetadata(MCRObjectID ID) throws Exception
+public final String getNextURL(MCRObjectID ID) throws Exception
   {
   // return all is ready
   StringBuffer sb = new StringBuffer();

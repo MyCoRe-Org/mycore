@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-SimpleWorkflow build file for use with ANT                   -->
-<!-- $Revision: 1.1 $ $Date: 2005-02-18 19:13:04 $                      -->
+<!-- $Revision: 1.2 $ $Date: 2005-03-01 12:13:58 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - SimpleWorkflow" default="usage" basedir=".">
@@ -65,12 +65,19 @@
     <echo>---------------------------------------------------------</echo>
   </target>
 
-  <target name="compile" depends="compile_frontend_servlets" />
+  <target name="compile" depends="compile_frontend_servlets, compile_frontend_workflow" />
 
   <target name="compile_frontend_servlets">
     <echo>Compiling the MyCoRe SWF frontent servlets</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/frontend/servlets/**"/>
+    </antcall>
+  </target>
+
+  <target name="compile_frontend_workflow">
+    <echo>Compiling the MyCoRe SWF frontent workflow</echo>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/frontend/workflow/**"/>
     </antcall>
   </target>
 

@@ -95,6 +95,11 @@ public class MCRStartEditorServlet extends MCRServlet
    * <tr><th>TODO</th><th>MCRObjectID from</th><th>used privileg</th><th>description</th></tr>
    * <tr><td>seditobj</td><td>tf_mcrid</td><td>modify-type</td><td>edit an object in the server</td></tr>
    * <tr><td>sdelobj</td><td>tf_mcrid</td><td>delete-type</td><td>delete an object from the server</tr>
+   * <tr><td>snewder</td><td>tf_mcrid</td><td>create-type</td><td>create a new derivate in the server</tr>
+   * <tr><td>sdelder</td><td>tf_mcrid</td><td>delete-type</td><td>delete a derivate from the server</tr>
+   * <tr><td>seditder</td><td>tf_mcrid</td><td>modify-type</td><td>change a derivate in the server</tr>
+   * <tr><td>saddfile</td><td>tf_mcrid<br />re_mcrid</td><td>modify-type</td><td>add a new file to a derivate in the server</td></tr>
+   * <tr><td>sdelfile</td><td>tf_mcrid<br />re_mcrid</td><td>modify-type</td><td>remove a file from a derivate in the server</td></tr>
    * </table><br />
    *
    * The table shows the possible todo's in the workflow:<br />
@@ -104,7 +109,7 @@ public class MCRStartEditorServlet extends MCRServlet
    * <tr><td>wnewder</td><td>se_mcrid</td><td>create-type</td><td>add a new derivate to the workflow</td></tr>
    * <tr><td>waddfile</td><td>se_mcrid<br />re_mcrid</td><td>create-type</td><td>add a new file to a derivate in the workflow</td></tr>
    * <tr><td>weditobj</td><td>se_mcrid</td><td>modify-type</td><td>edit an object in the workflow</td></tr>
-   * <tr><td>weditder</td><td>se_mcrid</td><td>modify-type</td><td>edit an derivate in the workflow</td></tr>
+   * <tr><td>weditder</td><td>se_mcrid (Der)<br />re_mcrid (Obj)</td><td>modify-type</td><td>edit an derivate in the workflow</td></tr>
    * <tr><td>wcommit</td><td>se_mcrid</td><td>commit-type</td><td>commit a document to the server</td></tr>
    * <tr><td>wdelobj</td><td>se_mcrid</td><td>delete-type</td><td>delete an object from the workflow</td></tr>
    * <tr><td>wdelder</td><td>se_mcrid<br />re_mcrid</td><td>delete-type</td><td>delete a derivate from the workflow</td></tr>
@@ -146,10 +151,14 @@ public class MCRStartEditorServlet extends MCRServlet
     if ((mytodo==null) || ((mytodo=mytodo.trim()).length()==0)) {
       mytodo = "wnewobj"; }
     if (!mytodo.equals("wnewobj") && !mytodo.equals("wnewder") &&
-      !mytodo.equals("waddfile") && !mytodo.equals("weditobj") &&
-      !mytodo.equals("weditder") && !mytodo.equals("wcommit") &&
+      !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") &&
+      !mytodo.equals("weditobj") && !mytodo.equals("weditder") && 
       !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") &&
-      !mytodo.equals("seditobj") && !mytodo.equals("sdelobj")) {
+      !mytodo.equals("wcommit") &&
+      !mytodo.equals("seditobj") && !mytodo.equals("weditder") &&
+      !mytodo.equals("sdelobj") && !mytodo.equals("wdelder") && 
+      !mytodo.equals("snewder") && !mytodo.equals("scommitder") &&
+      !mytodo.equals("saddfile") && !mytodo.equals("sdelfile")) {
       mytodo = "wnewobj"; }
     LOGGER.info("TODO = "+mytodo);
     // get the MCRObjectID from the text filed (TF)
@@ -274,7 +283,7 @@ public class MCRStartEditorServlet extends MCRServlet
       fuh.set(myremcrid,mysemcrid,"new",getBaseURL()+sb.toString());
       String fuhid = fum.register(fuh);
       mymcrid = mysemcrid;
-      myfile = pagedir+"fileupload.xml";
+      myfile = pagedir+"fileupload_new.xml";
       String base = getBaseURL() + myfile;
       Properties params = new Properties();
       params.put( "XSL.UploadID", fuhid);
@@ -475,6 +484,74 @@ public class MCRStartEditorServlet extends MCRServlet
      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+myfile));
      return;
      }
+
+    // action SNEWDER - create a new derivate
+    if (mytodo.equals("snewder")) {
+      String priv = "modify-"+mytype;
+      if (!privs.contains(priv)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      myremcrid = mysemcrid;
+      mysemcrid =  WFM.createDerivate(myremcrid);
+      mytodo = "saddfile";
+      }
+
+    // action SADDFILE - create a new file in the derivate
+    if (mytodo.equals("saddfile")) {
+      if (!checkAccess(myremcrid,userid,privs,"modify-"+mytype,true)) {
+        job.getResponse().sendRedirect(getBaseURL()+usererrorpage);
+        return;
+        }
+      mymcrid = mysemcrid;
+      MCRUploadHandlerManager fum = MCRUploadHandlerManager.instance();
+      MCRUploadHandlerInterface fuh = fum.getNewHandle();
+      StringBuffer sb = new StringBuffer("/servlets/MCRStartEditorServlet?");
+      sb.append("tf_mcrid=").append(mytfmcrid).append("&amp;type=").append(mytype).append("&amp;step=").append(mystep).append("&amp;todo=scommitder");
+      fuh.set(myremcrid,mysemcrid,"new",getBaseURL()+sb.toString());
+      String fuhid = fum.register(fuh);
+      mymcrid = mysemcrid;
+      myfile = pagedir+"fileupload_commit.xml";
+      String base = getBaseURL() + myfile;
+      Properties params = new Properties();
+      params.put( "XSL.UploadID", fuhid);
+      params.put( "XSL.editor.source.new", "true" );
+      params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
+      params.put( "XSL.target.param.0", "mcrid=" + mysemcrid );
+      params.put( "XSL.target.param.1", "type="  + mytype );
+      params.put( "XSL.target.param.2", "step="  + mystep );
+      params.put( "XSL.target.param.3", "remcrid="  + myremcrid );
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
+      return;
+      }
+
+    // action SCOMMITDER in the database
+    if (mytodo.equals("scommitder")) {
+      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      if (mytfmcrid.length()==0) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+        return;
+        }
+      // commit to the server
+      MCRObjectID ID = new MCRObjectID(mysemcrid);
+      boolean b = WFM.commitDerivateObject(ID.getTypeId(),myremcrid);
+      if (b) {
+        WFM.deleteDerivateObject(ID.getTypeId(),myremcrid);
+        StringBuffer sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
+        String searchtype = CONFIG.getString(sb.toString(),ID.getTypeId());
+        sb = new StringBuffer(getBaseURL());
+        sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
+        sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(mysemcrid).append("\']");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+        return;
+        }
+      WFM.deleteDerivateObject(ID.getTypeId(),myremcrid);
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+storeerrorpage));
+      return;
+      }
    }
 
   /**

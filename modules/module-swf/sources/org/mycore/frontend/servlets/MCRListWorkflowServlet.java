@@ -53,7 +53,7 @@ import org.mycore.user.MCRUserMgr;
  * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt;<br />
  * &gt;data&lt;2004-06-08&gt;/data&lt;<br />
  * &gt;derivate ID="..."&lt;<br />
- * &gt;file&lt;...&gt;/file&lt;<br />
+ * &gt;file size="..." main="true|false" &lt;...&gt;/file&lt;<br />
  * &gt;/derivate&lt;<br />
  * &gt;/item&lt;<br />
  * &gt;/mcr_workflow&lt;<br />
@@ -168,9 +168,33 @@ public void doGetPost(MCRServletJob job) throws Exception
         String dername = (String)derifiles.get(j);
         LOGGER.debug("Check the derivate file "+dername);
         if (WFM.isDerivateOfObject(type,dername,ID)) {
+          org.jdom.Document der_in = null;
+          String dname = dirname+SLASH+dername;
+          org.jdom.Element der = null;
+          String mainfile = "";
+          String label = "Derivate of "+ID;
+          try {
+            der_in = MCRXMLHelper.parseURI(dname,false);
+            LOGGER.debug("Derivate file "+dername+" was readed.");
+            der = der_in.getRootElement();
+            label = der.getAttributeValue("label");
+            org.jdom.Element s1 = der.getChild("derivate");
+            if (s1 != null) {
+              org.jdom.Element s2 = s1.getChild("internals");
+              if (s2 != null) {
+                org.jdom.Element s3 = s2.getChild("internal");
+                if (s3 != null) {
+                  mainfile = s3.getAttributeValue("maindoc"); }
+                }
+              }
+            LOGGER.debug("The maindoc name is "+mainfile);
+            }
+          catch( Exception ex ) {
+            LOGGER.warn( "Can't parse workflow file "+dername); }
           String derpath = dername.substring(0,dername.length()-4);
           org.jdom.Element deriv = new org.jdom.Element("derivate");
           deriv.setAttribute("ID",derpath);
+          deriv.setAttribute("label",label);
           File dir = new File(dirname,derpath);
           LOGGER.debug("Derivate under "+dir.getName());
           if (dir.isDirectory()) {
@@ -180,6 +204,10 @@ public void doGetPost(MCRServletJob job) throws Exception
               file.setText(derpath+SLASH+(String)dirlist.get(k));
               File thisfile = new File(dir,(String)dirlist.get(k));
               file.setAttribute("size",String.valueOf(thisfile.length()));
+              if (mainfile.equals((String)dirlist.get(k))) {
+                file.setAttribute("main","true"); }
+              else {
+                file.setAttribute("main","false"); }
               deriv.addContent(file);
               }
             derifiles.remove(j); j--;

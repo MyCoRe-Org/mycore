@@ -52,7 +52,7 @@ import org.mycore.user.*;
  * @version $Revision$ $Date$
  */
 
-public class MCRCheckCommitDataServlet extends MCRCheckEditorServlet
+public class MCRCheckCommitDataServlet extends MCRCheckDataBase
 {
 /**
  * The method check the privileg of this action.
@@ -72,7 +72,7 @@ public final boolean hasPrivileg(ArrayList privs, String type)
  * @param ID the MCRObjectID of the MCRObject
  * @return the next URL as String
  **/
-public final String loadMetadata(MCRObjectID ID) throws Exception
+public final String getNextURL(MCRObjectID ID) throws Exception
   {
   // commit to the server 
   MCRWorkflowManager wfm = MCRWorkflowManager.instance();

@@ -32,27 +32,32 @@ import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.commons.fileupload.*;
-import org.jdom.*;
 
 import org.mycore.common.*;
-import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
-import org.mycore.frontend.servlets.*;
-import org.mycore.frontend.editor2.*;
-import org.mycore.user.*;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
- * output XML and store the XML in a file or if an error was occured start the
- * editor again.
+ * output XML for metadata object and derivate objects.
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 
-public class MCRCheckNewFileServlet extends MCRCheckFileBase
+abstract public class MCRCheckBase extends MCRServlet
 {
+// The configuration
+protected static MCRConfiguration CONFIG;
+protected static Logger logger=Logger.getLogger(MCRCheckBase.class);
+String NL = System.getProperty("file.separator");
+
+/** Initialisation of the servlet */
+public void init()
+  {
+  MCRConfiguration.instance().reload(true);
+  CONFIG = MCRConfiguration.instance();
+  PropertyConfigurator.configure(CONFIG.getLoggingProperties());
+  }
 
 /**
  * The method check the privileg of this action.
@@ -60,48 +65,39 @@ public class MCRCheckNewFileServlet extends MCRCheckFileBase
  * @param privs the ArrayList  of privilegs
  * @return true if the privileg exist, else return false
  **/
-public final boolean hasPrivileg(ArrayList privs, String type)
-  {
-  if (!privs.contains("create-"+type)) return false;
-  return true;
-  }
+abstract public boolean hasPrivileg(ArrayList privs, String type);
 
 /**
- * The method is a dummy and return an URL with the next working step.
+ * The method is a dummy or works with the data and return an URL with the 
+ * next working step.
  *
  * @param ID the MCRObjectID of the MCRObject
  * @return the next URL as String
  **/
-public final String getNextURL(MCRObjectID ID) throws Exception
-  {
-  // return all is ready
-  StringBuffer sb = new StringBuffer();
-  sb.append(CONFIG.getString( "MCR.editor_page_dir","" )).append("editor_").append(ID.getTypeId()).append("_editor.xml");
-  return sb.toString();
-  }
-
-/**
- * The method is a dummy and return an URL with the next working step.
- *
- * @param ID the MCRObjectID of the MCRObject
- * @param DD the MCRObjectID of the MCRDerivate
- * @return the next URL as String
- **/
-public final String getNextURL(MCRObjectID ID, MCRObjectID DD) throws Exception
-  {
-  // return all is ready
-  StringBuffer sb = new StringBuffer();
-  sb.append(CONFIG.getString( "MCR.editor_page_dir","" )).append("editor_").append(ID.getTypeId()).append("_editor.xml");
-  return sb.toString();
-  }
+abstract public String getNextURL(MCRObjectID ID) throws Exception;
 
 /**
  * The method send a message to the mail address for the MCRObjectType.
  *
  * @param ID the MCRObjectID of the MCRObject
  **/
- public final void sendMail(MCRObjectID ID)
-   {
-   }
+abstract public void sendMail(MCRObjectID ID);
+
+/**
+ * A method to handle IO errors.
+ *
+ * @param jab the MCRServletJob
+ * @param lang the current language
+ **/
+protected void errorHandlerIO(MCRServletJob job, String lang)
+  throws Exception
+  {
+  String pagedir = CONFIG.getString( "MCR.editor_page_dir","" );
+  job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL(
+)+pagedir+"editor_error_store.xml"));
+  }
 
 }
+
+
+

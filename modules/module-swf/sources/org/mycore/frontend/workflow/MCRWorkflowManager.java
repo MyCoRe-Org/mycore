@@ -365,6 +365,22 @@ public final boolean commitMetadataObject(String type, String ID)
   }
 
 /**
+ * The method commit a derivate object with update method
+ * from the workflow to the data store.
+ *
+ * @param type the MCRObjectID type of the metadata object
+ * @param DD the ID as String of the derivate object
+ **/
+public final boolean commitDerivateObject(String type, String ID)
+  {
+  String fn = getDirectoryPath(type)+SLASH+ID+".xml";
+  MCRDerivateCommands.updateFromFile(fn);
+  if (!MCRDerivate.existInDatastore(ID)) { return false; }
+  logger.debug("Commit the derivate "+fn);
+  return true;
+  }
+
+/**
  * The method create a new MCRDerivate and store them to the directory
  * of the workflow that correspons with the type of the given object
  * MCRObjectID with the name of itseslf. Also ti create a ne directory 
@@ -425,7 +441,14 @@ public String createDerivate(String objmcrid)
     der.setService(serv);
     }
   catch (Exception e) {
-    logger.error("Read error of "+workdir+NL+ID.getId()+".xml"); }
+    try {
+      obj.receiveFromDatastore(ID);
+      MCRObjectService serv = obj.getService();
+      der.setService(serv);
+      }
+    catch (Exception e2) {
+      logger.warn("Read error of "+workdir+NL+ID.getId()+".xml"); }
+    }
   byte [] outxml = MCRUtils.getByteArray(der.createXML());
 
   // Save the prepared MCRDerivate to a file
