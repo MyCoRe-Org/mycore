@@ -46,11 +46,11 @@ class MCRClassificationManager
   {
     MCRConfiguration config = MCRConfiguration.instance();
     
-    Object object = config.getInstanceOf( "mcr.classifications.store_class" );  
+    Object object = config.getInstanceOf( "MCR.classifications_store_class" );  
     store = (MCRClassificationStore)object;
     
-    int classifSize = config.getInt( "mcr.classifications.classification_cache_size", 30 );
-    int categSize   = config.getInt( "mcr.classifications.category_cache_size", 500 );
+    int classifSize = config.getInt( "MCR.classifications_classification_cache_size", 30 );
+    int categSize   = config.getInt( "MCR.classifications_category_cache_size", 500 );
     
     classificationCache = new MCRCache( classifSize );
     categoryCache       = new MCRCache( categSize   );
