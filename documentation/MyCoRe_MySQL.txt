@@ -17,6 +17,8 @@ Use MySQL with MyCoRe-Sample under Windows XP Professional       16.06.2003
    The icon of this programm is a traffic light. If it shows green all is ok.
    You can use this tool, to view the databases and the table- and columnnames.
    Note: if you create a new table restart WinMySQLAdmin
+   Attention: if you start WinMySQLAdmin, it will be minimized immediately. To resize
+              click the traffic light icon    
 
 5. Now create the database for MyCoRe. I started MySQL by typing mysql on the
    commandline. 
