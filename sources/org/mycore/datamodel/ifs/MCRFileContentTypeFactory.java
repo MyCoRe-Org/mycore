@@ -128,6 +128,12 @@ public class MCRFileContentTypeFactory
       throw new MCRConfigurationException( msg );
     }
   }
+  
+  /** 
+   * Returns the default file content type to be used if content type is unknown 
+   **/
+  public static MCRFileContentType getDefaultType()
+  { return defaultType; }
 
   /** 
    * Detects the file content type from filename and file content header.
