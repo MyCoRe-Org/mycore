@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQueryService.java,v $
- * $Revision: 1.9 $ $Date: 2003/01/31 11:08:25 $
+ * $Revision: 1.10 $ $Date: 2003/01/31 11:56:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -44,7 +44,7 @@ import org.mycore.services.query.MCRQueryResult;
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.9 $ $Date: 2003/01/31 11:08:25 $
+ * @version $Revision: 1.10 $ $Date: 2003/01/31 11:56:25 $
  *
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
  */
@@ -96,7 +96,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         
         for (int i = 0; i < categories.length; i++) { 
            	String[] set = new String[3];
-   	        set[0] = new String(categories[i].getID());
+   	        set[0] = new String(parentSpec + categories[i].getID());
        	    set[1] = new String(categories[i].getLabel("en"));
           	set[2] = new String(categories[i].getDescription("en"));
           	
@@ -129,8 +129,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 */		    	newList.add(set);
 		    
     	        if (categories[i].hasChildren()) {
-        	        newList = getSets(newList, categories[i].getChildren(), 
-            	        parentSpec + categoryID + ":");
+        	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":");
 	            }
 /*			}
 */		}
@@ -143,19 +142,20 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * @param set the category (if known) is in the first element
 	 * @param from the date (if known) is in the first element
 	 * @param until the date (if known) is in the first element
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	public List listIdentifiers(String[] set, String[] from, String[] until) {
+	public List listIdentifiers(String[] set, String[] from, String[] until, String instance) {
 		List list = new ArrayList();
         StringBuffer query = new StringBuffer("");
         String classificationId = null;
         String repositoryId = null;
 		MCRConfiguration config = MCRConfiguration.instance();
 		try {
-	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + getServletName());
-        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
+        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
 
         	if (set == null) {
             	query.append("/mycoreobject[metadata/*/*/@classid=\"").append(classificationId).append("\"]");
@@ -205,13 +205,13 @@ public class MCROAIQueryService implements MCROAIQuery {
             	identifier[1] = datestamp;
            		identifier[2] = new String("");
         
-		        for (int i = 0; i < object.getMetadata().size(); i++) {
-        		    if (object.getMetadata().getMetadataElement(i).getClassName().equals("MCRMetaClassification")) {
-                		MCRMetaElement element = object.getMetadata().getMetadataElement(i);
+		        for (int j = 0; j < object.getMetadata().size(); j++) {
+        		    if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
+                		MCRMetaElement element = object.getMetadata().getMetadataElement(j);
                 		
 		                if (element.getTag().equals("subjects")) {
-        		            for (int j = 0; i < element.size(); j++) {
-                		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(j);
+        		            for (int k = 0; k < element.size(); k++) {
+                		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
 		                        String categoryId = classification.getCategId();
 		                        MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
 		                        MCRCategoryItem parent;
