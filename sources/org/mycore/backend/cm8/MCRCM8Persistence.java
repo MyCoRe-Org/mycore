@@ -234,7 +234,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     }
   catch (Exception e) {
     throw new MCRPersistenceException(
-      "Error while creating data in CM8 store,e"); }
+      "Error while creating data in CM8 store.",e); }
   finally {
     MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   }
