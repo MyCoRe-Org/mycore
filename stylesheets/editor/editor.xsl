@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.24 $ $Date: 2004-12-23 10:15:43 $ -->
+<!-- $Revision: 1.25 $ $Date: 2004-12-27 10:41:08 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -227,6 +227,107 @@
   </tr>
 </xsl:template>
 
+<!-- ======== handle repeater ======== -->
+<xsl:template match="repeater">
+  <xsl:param name="var"      />
+  <xsl:param name="pos"      />
+  <xsl:param name="num.next" />
+
+  <!-- find number of repeats of related xml input element -->
+  <xsl:variable name="num">
+    <xsl:choose>
+      <xsl:when test="ancestor::editor/repeats/repeat[@path=$var]/@value">
+        <xsl:value-of select="ancestor::editor/repeats/repeat[@path=$var]/@value"/>
+      </xsl:when>
+      <xsl:otherwise>1</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <table border="0" cellspacing="0" cellpadding="0">
+  
+    <!-- If repeater is last component in parent panel, this table must be width 100% -->
+    <xsl:if test="$num.next = '0'">
+      <xsl:attribute name="width">100%</xsl:attribute>
+    </xsl:if>
+
+    <!-- ======== iterate rows in repeater ======== -->
+    <xsl:call-template name="repeater.row">
+      <xsl:with-param name="var" select="$var" />
+      <xsl:with-param name="pos" select="$pos" />
+      <xsl:with-param name="num" select="$num" />
+    </xsl:call-template>
+  </table>
+</xsl:template>
+
+<!-- ======== handle repeater row ======== -->
+<xsl:template name="repeater.row">
+  <xsl:param name="row.nr" select="'1'" />
+  <xsl:param name="num" />
+  <xsl:param name="var" />
+  <xsl:param name="pos" />
+
+  <tr>
+    <xsl:call-template name="repeated.component">
+      <xsl:with-param name="var"    select="$var" />
+      <xsl:with-param name="pos"    select="$pos" />
+      <xsl:with-param name="row.nr" select="$row.nr" />
+    </xsl:call-template>
+  </tr>
+
+  <xsl:variable name="min">
+    <xsl:choose>
+      <xsl:when test="@min">
+        <xsl:value-of select="@min" />
+      </xsl:when>
+      <xsl:otherwise>1</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ======== output another repeated row ======== -->
+  <xsl:if test="($row.nr &lt; $min) or ($row.nr &lt; $num)">
+    <xsl:call-template name="repeater.row">
+      <xsl:with-param name="row.nr" select="1 + $row.nr" />
+      <xsl:with-param name="num" select="$num" />
+      <xsl:with-param name="var" select="$var" />
+      <xsl:with-param name="pos" select="$pos" />
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<!-- ======== handle repeated component ======== -->
+<xsl:template name="repeated.component">
+  <xsl:param name="var" />
+  <xsl:param name="pos" />
+  <xsl:param name="row.nr" />
+
+  <!-- ======== build the "position number" of this repeated component ======== -->
+  <xsl:variable name="pos.new">
+    <xsl:value-of select="$pos" />
+    <xsl:if test="$pos">
+      <xsl:text>.</xsl:text>
+    </xsl:if>
+    <xsl:value-of select="$row.nr" />
+  </xsl:variable>
+
+  <!-- ======== build variable path for repeated component ======== -->
+  <xsl:variable name="var.new">
+    <xsl:value-of select="$var" />
+    <xsl:if test="$row.nr &gt; 1">
+      <xsl:value-of select="$editor.delimiter.pos.start" />
+      <xsl:value-of select="$row.nr" />
+      <xsl:value-of select="$editor.delimiter.pos.end" />
+    </xsl:if>
+  </xsl:variable>
+ 
+  <td>
+    <xsl:call-template name="cell">
+      <xsl:with-param name="var" select="$var.new" />
+      <xsl:with-param name="pos" select="$pos.new" />
+      <xsl:with-param name="outer.border" select="@lines" />
+    </xsl:call-template>
+  </td>
+</xsl:template>
+
 <!-- ======== handle panel ======== -->
 <xsl:template match="panel">
   <xsl:param name="var"      />
@@ -349,12 +450,17 @@
         <xsl:value-of select="$pos.new" />
       </xsl:attribute>
 
+      <xsl:variable name="outer.border" select="@lines" />
+
       <!-- ======== if there is a cell here, handle it ======== -->
-      <xsl:apply-templates select="$the.cell">
-        <xsl:with-param name="var"      select="$var"      />
-        <xsl:with-param name="pos"      select="$pos.new"  />
-        <xsl:with-param name="num.next" select="$num.next" />
-      </xsl:apply-templates>
+      <xsl:for-each select="$the.cell">
+        <xsl:call-template name="cell">
+          <xsl:with-param name="var"      select="$var"      />
+          <xsl:with-param name="pos"      select="$pos.new"  />
+          <xsl:with-param name="num.next" select="$num.next" />
+          <xsl:with-param name="outer.border" select="$outer.border" />
+        </xsl:call-template>
+      </xsl:for-each>
 
     </xsl:if>
   </td>
@@ -371,11 +477,12 @@
   </xsl:if>
 </xsl:template>
 
-<!-- ======== handle cell ======== -->
-<xsl:template match="cell">
-  <xsl:param name="var"      />
-  <xsl:param name="pos"      />
-  <xsl:param name="num.next" />
+<!-- ======== handle cell or repeater content ======== -->
+<xsl:template name="cell">
+  <xsl:param name="var" />
+  <xsl:param name="pos" />
+  <xsl:param name="num.next" select="'0'" />
+  <xsl:param name="outer.border" />
 
   <!-- ======== build new variable path ======== -->
   <xsl:variable name="var.new">
@@ -397,8 +504,6 @@
       <xsl:attribute name="width">100%</xsl:attribute>
     </xsl:when>
   </xsl:choose>
-
-  <xsl:variable name="outer.border" select="../@lines" />
 
   <!-- ======== handle referenced or embedded component ======== -->
   <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
