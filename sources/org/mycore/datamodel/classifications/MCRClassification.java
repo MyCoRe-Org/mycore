@@ -83,7 +83,8 @@ private ArrayList cat;
       if (tag.getName().equals("label")) {
         String text = tag.getAttributeValue("text");
         String desc = tag.getAttributeValue("description");
-        String lang = tag.getAttributeValue("lang");
+        String lang = tag.getAttributeValue("lang",
+          org.jdom.Namespace.XML_NAMESPACE);
         cl.addData(lang,text,desc);
         }
       else {
@@ -118,7 +119,8 @@ private ArrayList cat;
         if (tag.getName().equals("label")) {
           String text = tag.getAttributeValue("text");
           String desc = tag.getAttributeValue("description");
-          String lang = tag.getAttributeValue("lang");
+          String lang = tag.getAttributeValue("lang",
+            org.jdom.Namespace.XML_NAMESPACE);
           ci.addData(lang,text,desc);
           }
         else {
