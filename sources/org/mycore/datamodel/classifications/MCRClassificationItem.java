@@ -46,6 +46,7 @@ public class MCRClassificationItem extends MCRClassificationObject
   public MCRClassificationItem( String classID ) 
     { 
     	super ( classID );
+    	MCRObjectID.isValidOrDie(classID);
     }
   
   /**
