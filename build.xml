@@ -14,10 +14,11 @@
   <property name="deprecation" value="on"/>
     
   <!-- file system -->
-  <property name="sources"  value="./sources"/>
-  <property name="classes"  value="./classes"/>
-  <property name="javadocs" value="./javadocs"/>
-  <property name="lib"      value="./lib"/>
+  <property name="sources"      value="./sources"/>
+  <property name="classes"      value="./classes"/>
+  <property name="javadocs"     value="./javadocs"/>
+  <property name="lib"          value="./lib"/>
+  <property name="persistency"  value="cm7"/>
     
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -78,35 +79,18 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_all_cm7" />
+  <target name="compile" depends="compile_common,compile_datamodel,compile_nbn,compile_xml,compile_classifications,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_user,compile_persistency"/>
 
-  <target name="compile_all_cm7">
-    <antcall target="javac">
-      <param name="packages" value="mycore/common/**,mycore/cm7/**,mycore/datamodel/**,mycore/nbn/**,mycore/xml/**,mycore/classifications/**,mycore/commandline/**,mycore/communication/**,mycore/ifs/**,mycore/sql/**,mycore/user/**" />
-    </antcall>
-  </target>
-  
-  <target name="compile_all_cm8">
-    <antcall target="javac">
-      <param name="packages" value="mycore/common/**,mycore/cm8/**,mycore/datamodel/**,mycore/nbn/**,mycore/xml/**,mycore/classifications/**,mycore/commandline/**,mycore/communication/**,mycore/ifs/**,mycore/sql/**,mycore/user/**" />
-    </antcall>
-  </target>
-  
   <target name="compile_common">
     <antcall target="javac">
       <param name="packages" value="mycore/common/**"/>
     </antcall>
   </target>
 
-  <target name="compile_cm7">
-    <antcall target="javac">
-      <param name="packages" value="mycore/cm7/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_cm8">
-    <antcall target="javac">
-      <param name="packages" value="mycore/cm8/**"/>
+  <target name="compile_persistency">
+    <echo>Compiling for for persitence layer ${persistency}</echo>
+    <antcall target="compile_${persistency}">
+      <param name="packages" value="mycore/${persistency}/**"/>
     </antcall>
   </target>
 
@@ -164,6 +148,26 @@
     </antcall>
   </target>
 
+  <target name="compile_cm7">
+   <antcall target="javac">
+     <param name="packages" value="mycore/cm7/**"/>
+   </antcall>
+  </target>
+
+  <target name="compile_cm8">
+   <antcall target="javac">
+     <param name="packages" value="mycore/cm8/**"/>
+   </antcall>
+  </target>
+
+  <target name="compile_xmldb">
+   <antcall target="javac">
+     <param name="packages" value="mycore/xmldb/**"/>
+     <param name="classpath" value="${lib}/xmldb.jar"/>
+   </antcall>
+  </target>
+
+
   <!-- =================================================================== -->
   <!-- Create the JavaDocs from sources                                    -->
   <!-- =================================================================== -->
@@ -194,6 +198,7 @@
       <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
       <link href="http://www.mycore.de/library/jaxp/docs/api"/>
       <link href="http://www.jdom.org/docs/apidocs"/>
+      <link href="http://www.xmldb.org/xapi/api"/>
     </javadoc>
   </target>
 
