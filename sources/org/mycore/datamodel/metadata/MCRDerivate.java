@@ -27,13 +27,16 @@ package mycore.datamodel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
-import java.util.Vector;
+import java.io.File;
+//import java.util.Vector;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
 import mycore.xml.MCRXMLHelper;
+import mycore.ifs.MCRDirectory;
+import mycore.ifs.MCRFileImportExport;
 
 /**
  * This class implements all methode for handling one derivate object.
@@ -231,6 +234,20 @@ public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
+  // create data in IFS
+  File f = new File(getDerivate().getInternals().getSourcePath());
+  if ((!f.isDirectory()) && (!f.isFile())) {
+    throw new MCRPersistenceException("The File or Directory on "+
+    getDerivate().getInternals().getSourcePath()+" was not found."); }
+/*
+  try {
+    MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
+      mcr_id.getId());
+    //System.out.println(difs.getName());
+    }
+  catch (Exception e) {
+    e.printStackTrace(); }
+*/
   // create the derivate
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");

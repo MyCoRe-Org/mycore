@@ -25,43 +25,38 @@
 package mycore.datamodel;
 
 import mycore.common.MCRException;
-import mycore.classifications.MCRCategoryItem;
-import mycore.classifications.MCRClassificationItem;
+import mycore.ifs.*;
 
 /**
- * This class implements all method for handling with the MCRMetaClassification
- *  part of a metadata object. The MCRMetaClassification class present a 
- * link to a category of a classification.
+ * This class implements all method for handling the IFS metadata.
+ * The MCRMetaIFS class present all informations to store and retrieve
+ * derivates to the IFS. 
  * <p>
- * &lt;tag class="MCRMetaClassification" heritable="..."&gt;<br>
- * &lt;subtag classid="..." categid="..." /&gt;<br>
+ * &lt;tag class="MCRMetaIFS" &gt;<br>
+ * &lt;subtag sourcepath="..." maindoc="..." /&gt;<br>
  * &lt;/tag&gt;<br>
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaClassification extends MCRMetaDefault 
+final public class MCRMetaIFS extends MCRMetaDefault 
   implements MCRMetaInterface 
 {
 
-/** The length of the classification ID **/
-public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
-public static final int MAX_CATEGID_LENGTH = 32;
-
-// MCRMetaClassification data
-private String classid;
-private String categid;
+// MCRMetaIFS data
+private String sourcepath;
+private String maindoc;
 
 /**
  * This is the constructor. <br>
  * The language element was set to <b>en</b>.
- * The classid and categid value was set to an empty string.
+ * All other data was set to empty.
  */
-public MCRMetaClassification()
+public MCRMetaIFS()
   {
   super();
-  classid = "";
-  categid = "";
+  sourcepath = "";
+  maindoc = "";
   }
 
 /**
@@ -69,67 +64,64 @@ public MCRMetaClassification()
  * The language element was set to <b>en</b>.
  * The subtag element was set to the value of <em>set_subtag<em>. If the 
  * value of <em>set_subtag</em> is null or empty an exception was throwed. 
- * The type element was set to an empty string.
- * the <em>set_classid</em> and the <em>categid</em> must be not null
- * or empty!
+ * The type element was set empty.
+ * The sourcepath must be NOT null or empty.
  *
  * @param set_datapart     the global part of the elements like 'metadata'
  *                         or 'service'
  * @param set_subtag       the name of the subtag
- * @param set_classid      the classification ID
- * @param set_categid      the category ID
+ * @param set_sourcepath   the sourcepath attribute
  * @exception MCRException if the set_subtag value, the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  */
-public MCRMetaClassification(String set_datapart, String set_subtag, 
-  String default_lang, String set_classid, String set_categid) 
+public MCRMetaIFS(String set_datapart, String set_subtag, 
+  String default_lang, String set_sourcepath) 
   throws MCRException
   {
   super(set_datapart,set_subtag,"en","");
-  setValue(set_classid,set_categid);
+  setSourcePath(set_sourcepath);
+  maindoc = "";
   }
 
 /**
- * The method return the classification ID.
+ * The method return the derivate source path.
  *
- * @return the classId
+ * @return the sourcepath
  **/
-public final String getClassId()
-  { return classid; }
+public final String getSourcePath()
+  { return sourcepath; }
  
 /**
- * The method return the category ID.
+ * The method return the derivate main document name.
  *
- * @return the categId
+ * @return the main document name.
  **/
-public final String getCategId()
-  { return categid; }
+public final String getMainDoc()
+  { return maindoc; }
  
 /**
- * This method set values of classid and categid.
+ * This method set the value of derivate source path.
  *
- * @param set_classid      the classification ID
- * @param set_categid      the category ID
- * @exception MCRException if the set_classid value or
- * the set_categid are null, empty, too long or not a MCRObjectID
+ * @param set_sourcepath   the derivate source path
+ * @exception MCRException if the set_sourcepath value is null or empty
  **/
-public final void setValue(String set_classid, String set_categid)
+public final void setSourcePath(String set_sourcepath)
   throws MCRException
   {
-  if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
-    throw new MCRException("The classid is empty."); }
-  if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
-    throw new MCRException("The categid is empty."); }
-  if (set_classid.length() > MAX_CLASSID_LENGTH) {
-    throw new MCRException("The classid is too long."); }
-  try {
-    MCRObjectID mid = new MCRObjectID(set_classid); }
-  catch (Exception e) {
-    throw new MCRException("The classid is not MCRObjectID."); }
-  classid = set_classid;
-  if (set_categid.length() > MAX_CATEGID_LENGTH) {
-    throw new MCRException("The categid is too long."); }
-  categid = set_categid;
+  if ((set_sourcepath==null) || 
+      ((set_sourcepath=set_sourcepath.trim()).length()==0)) {
+    throw new MCRException("The sourcepath is empty."); }
+  sourcepath = set_sourcepath;
+  }
+
+/**
+ * This method set the value of derivate main document.
+ *
+ * @param set_maindoc the derivate main document name
+ **/
+public final void setMainDoc(String set_maindoc)
+  {
+  if (set_maindoc==null) { maindoc=""; } else { maindoc=set_maindoc; }
   }
 
 /**
@@ -137,21 +129,19 @@ public final void setValue(String set_classid, String set_categid)
  * metadata of the document.
  *
  * @param element a relevant JDOM element for the metadata
- * @exception MCRException if the set_classid value or
- * the set_categid are null, empty, too long or not a MCRObjectID
+ * @exception MCRException if the set_sourcepath value is null or empty
  **/
 public final void setFromDOM(org.jdom.Element element)
   throws MCRException
   {
   super.setFromDOM(element);
-  String set_classid = element.getAttributeValue("classid");
-  String set_categid = element.getAttributeValue("categid");
-  setValue(set_classid,set_categid);
+  setSourcePath(element.getAttributeValue("sourcepath"));
+  setMainDoc(element.getAttributeValue("maindoc"));
   }
 
 /**
  * This method create a XML stream for all data in this class, defined
- * by the MyCoRe XML MCRMetaClassification definition for the given subtag.
+ * by the MyCoRe XML MCRMetaIFS definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Element with the XML MCRClassification part
@@ -162,8 +152,8 @@ public final org.jdom.Element createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
-  elm.setAttribute("classid",classid); 
-  elm.setAttribute("categid",categid); 
+  elm.setAttribute("sourcepath",sourcepath); 
+  elm.setAttribute("maindoc",maindoc); 
   return elm;
   }
 
@@ -177,14 +167,8 @@ public final org.jdom.Element createXML() throws MCRException
 public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
-  if (!isValid()) {
-    debug();
-    throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; } 
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addClassElement(classid);
-  tc.addCategElement(categid);
   return tc;
   }
 
@@ -197,9 +181,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
  **/
 public final String createTextSearch(boolean textsearch)
   throws MCRException
-  {
-  return "";
-  }
+  { return ""; }
 
 /**
  * This method check the validation of the content of this class.
@@ -214,14 +196,8 @@ public final String createTextSearch(boolean textsearch)
 public final boolean isValid()
   {
   if (!super.isValid()) { return false; }
-  try {
-    MCRClassificationItem cl = 
-      MCRClassificationItem.getClassificationItem(classid);
-    if (cl==null) { return false; }
-    MCRCategoryItem ci = cl.getCategoryItem(categid);
-    if (ci==null) { return false; }
-    }
-  catch (Exception e) { return false; }
+  if ((sourcepath==null) || ((sourcepath=sourcepath.trim()).length()==0)) { 
+    return false; }
   return true;
   }
 
@@ -230,10 +206,10 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("MCRMetaClassification debug start:");
+  System.out.println("MCRMetaIFS debug start:");
   super.debug();
-  System.out.println("ClassificationID = "+classid);
-  System.out.println("CategoryID = "+categid);
+  System.out.println("IFS Source Path   = "+sourcepath);
+  System.out.println("IFS Main Document = "+maindoc);
   System.out.println("MCRMetaClassification debug end"+NL);
   }
 

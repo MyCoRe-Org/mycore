@@ -45,6 +45,7 @@ private String NL;
 // derivate data
 private ArrayList linkmetas = null;
 private ArrayList externals = null;
+private MCRMetaIFS internals = null;
 
 /**
  * This is the constructor of the MCRObjectDerivate class. All data
@@ -55,6 +56,7 @@ public MCRObjectDerivate()
   NL = new String((System.getProperties()).getProperty("line.separator"));
   linkmetas = new ArrayList();
   externals = new ArrayList();
+  internals = null;
   }
 
 /**
@@ -93,6 +95,16 @@ public final void setFromDOM(org.jdom.Element derivate_element)
       link.setFromDOM(external_element);
       externals.add(link); 
       }
+    }
+  // Internal part
+  org.jdom.Element internals_element = derivate_element.getChild("internals");
+  if (internals_element!=null) {
+    List internal_element_list = internals_element.getChildren();
+    org.jdom.Element internal_element = (org.jdom.Element)
+      internal_element_list.get(0);
+    internals = new MCRMetaIFS();
+    internals.setDataPart("internal");
+    internals.setFromDOM(internal_element);
     }
   }
 
@@ -139,6 +151,14 @@ public final MCRMetaLink getExternal(int index)
   }
 
 /**
+ * This method get a single data from the internal list as a MCRMetaIFS.
+ *
+ * @return a internal data as MCRMetaIFS
+ **/
+public final MCRMetaIFS getInternals() 
+  { return internals; }
+
+/**
  * This methode create a XML stream for all derivate data.
  *
  * @exception MCRException if the content of this class is not valid
@@ -160,14 +180,13 @@ public final org.jdom.Element createXML() throws MCRException
       elmm.addContent(((MCRMetaLinkID)linkmetas.get(i)).createXML()); }
     elm.addContent(elmm); 
     }
-  if (externals.size()!=0) {
-    org.jdom.Element elmm = new org.jdom.Element("externals");
-    elmm.setAttribute("class","MCRMetaLink");
+  if (internals!=null) {
+    org.jdom.Element elmm = new org.jdom.Element("internals");
+    elmm.setAttribute("class","MCRMetaIFS");
     elmm.setAttribute("heritable","false");
     elmm.setAttribute("parasearch","false");
     elmm.setAttribute("textsearch","false");
-    for (int i=0;i<externals.size();i++) {
-      elmm.addContent(((MCRMetaLink)externals.get(i)).createXML()); }
+    elmm.addContent(internals.createXML()); 
     elm.addContent(elmm); 
     }
   return elm;
@@ -224,6 +243,7 @@ public final void debug()
     ((MCRMetaLinkID)linkmetas.get(i)).debug(); }
   for (int i=0;i<externals.size();i++) {
     ((MCRMetaLink)externals.get(i)).debug(); }
+  if (internals!=null) { internals.debug(); }
   System.out.println("MCRObjectDerivate debug end"+NL);
   }
 
