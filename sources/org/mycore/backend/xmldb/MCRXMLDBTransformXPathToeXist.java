@@ -162,7 +162,17 @@ private String handleQueryStringExist(String root, String query, String type) {
                 query = sb.toString();
                 l = sb.length();
                 }
-              catch (Exception e) { }
+              catch (Exception e) {
+                String s = MCRUtils.covertDateToISO(query.substring(i+1,j));
+                StringBuffer sb = new StringBuffer(1024);
+                if (s != null) {
+                  sb.append(query.substring(0,i+1));
+                  sb.append(s);
+                  sb.append(query.substring(j,l));
+                  query = sb.toString();
+                  l = sb.length();
+                  }
+                }
               i = j+1;
               }
             i = i+1;
