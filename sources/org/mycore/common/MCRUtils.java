@@ -25,12 +25,12 @@
 package org.mycore.common;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.text.*;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.jdom.output.SAXOutputter;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -474,5 +474,131 @@ public class MCRUtils {
 
 		return sb.toString();
 
+	}
+
+	/**
+	 * replacement for sun.misc.Service.provider(Class,ClassLoader) which is only available on sun jdk
+	 * 
+	 * @param service	Interface of instance needs to implement
+	 * @param loader	URLClassLoader of Plugin
+	 * @return Iterator over instances of service
+	 */
+	public static final Iterator getProviders(
+		Class service,
+		ClassLoader loader) {
+		//we use a hashtable for this to keep controll of duplicates
+		Hashtable classMap = new Hashtable();
+		String name = "META-INF/services/" + service.getName();
+		Enumeration services;
+		try {
+			services =
+				(loader == null)
+					? ClassLoader.getSystemResources(name)
+					: loader.getResources(name);
+		} catch (IOException ioe) {
+			logger.error("Service: cannot load " + name);
+			return classMap.values().iterator();
+		}
+		//Put all class names matching Service in nameSet
+		while (services.hasMoreElements()) {
+			URL url = (URL) services.nextElement();
+			System.out.println(url);
+			InputStream input = null;
+			BufferedReader reader = null;
+			try {
+				input = url.openStream();
+				reader =
+					new BufferedReader(new InputStreamReader(input, "utf-8"));
+				Object classInstance = null;
+				for (StringBuffer className =
+					new StringBuffer().append(reader.readLine());
+					(className.length() != 4
+						&& className.toString().indexOf("null") == -1);
+					className.delete(0, className.length()).append(
+						reader.readLine())) {
+					//System.out.println("processing String: "+className.toString());					               	
+					//remove any comments
+					int comPos = className.toString().indexOf("#");
+					if (comPos != -1)
+						className.delete(comPos, className.length());
+					//trim String
+					int st = 0;
+					int sblen = className.length();
+					int len = sblen - 1;
+					while ((st < sblen) && className.charAt(st) <= ' ')
+						st++;
+					while ((st < len) && className.charAt(len) <= ' ')
+						len--;
+					className.delete(len + 1, sblen).delete(0, st);
+					//end trim String	 
+					//if space letter is included asume first word as class name
+					int spacePos = className.toString().indexOf(" ");
+					if (spacePos != -1)
+						className =
+							className.delete(spacePos, className.length());
+					//trim String
+					st = 0;
+					sblen = className.length();
+					len = sblen - 1;
+					while ((st < sblen) && className.charAt(st) <= ' ')
+						st++;
+					while ((st < len) && className.charAt(len) <= ' ')
+						len--;
+					className.delete(len + 1, sblen).delete(0, st);
+					//end trim String	 
+					if (className.length() > 0) {
+						//we should have a proper class name now
+						try {
+							classInstance =
+								Class
+									.forName(className.toString(), true, loader)
+									.newInstance();
+							if (service.isInstance(classInstance))
+								classMap.put(
+									className.toString(),
+									classInstance);
+							else {
+								classInstance = null;
+								logger.error(
+									className.toString()
+										+ " does not implement "
+										+ service.getName()
+										+ "! Class instance will not be used.");
+							}
+						} catch (ClassNotFoundException e) {
+							logger.error(
+								"Service: cannot find class: " + className);
+						} catch (InstantiationException e) {
+							logger.error(
+								"Service: cannot instantiate: " + className);
+						} catch (IllegalAccessException e) {
+							logger.error(
+								"Service: illegal access to: " + className);
+						} catch (NoClassDefFoundError e) {
+							logger.error(
+								"Service: " + e + " for " + className);
+						} catch (Exception e) {
+							logger.error(
+								"Service: exception for: "
+									+ className
+									+ " "
+									+ e);
+						}
+					}
+				}
+			} catch (IOException ioe) {
+				logger.error("Service: problem with: " + url);
+			} finally {
+				try {
+					if (input != null)
+						input.close();
+					if (reader != null)
+						reader.close();
+				} catch (IOException ioe2) {
+					logger.error("Service: problem with: " + url);
+				}
+			}
+		}
+		return classMap.values().iterator();
 	}
 }

@@ -23,31 +23,21 @@
  **/
 package org.mycore.services.plugins;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 
 /**
@@ -102,7 +92,7 @@ public class TextFilterPluginManager {
 		}
 		TextFilterPlugin filter = null;
 		MCRFileContentType ct;
-		for (Iterator iter = getProviders(TextFilterPlugin.class, classLoader);
+		for (Iterator iter = MCRUtils.getProviders(TextFilterPlugin.class, classLoader);
 			iter.hasNext();
 			) {
 			filter = (TextFilterPlugin) iter.next();
@@ -201,130 +191,5 @@ public class TextFilterPluginManager {
 			i++;
 		}
 		return returnU;
-	}
-	/**
-	 * replacement for sun.misc.Service.provider(Class,ClassLoader) which is only available on sun jdk
-	 * 
-	 * @param service	Interface of instance needs to implement
-	 * @param loader	URLClassLoader of Plugin
-	 * @return Iterator over instances of service
-	 */
-	protected static final Iterator getProviders(
-		Class service,
-		URLClassLoader loader) {
-		//we use a hashtable for this to keep controll of duplicates
-		Hashtable classMap = new Hashtable();
-		String name = "META-INF/services/" + service.getName();
-		Enumeration services;
-		try {
-			services =
-				(loader == null)
-					? ClassLoader.getSystemResources(name)
-					: loader.getResources(name);
-		} catch (IOException ioe) {
-			System.err.println("Service: cannot load " + name);
-			return classMap.values().iterator();
-		}
-		//Put all class names matching Service in nameSet
-		while (services.hasMoreElements()) {
-			URL url = (URL) services.nextElement();
-			System.out.println(url);
-			InputStream input = null;
-			BufferedReader reader = null;
-			try {
-				input = url.openStream();
-				reader =
-					new BufferedReader(new InputStreamReader(input, "utf-8"));
-				Object classInstance = null;
-				for (StringBuffer className =
-					new StringBuffer().append(reader.readLine());
-					(className.length() != 4
-						&& className.toString().indexOf("null") == -1);
-					className.delete(0, className.length()).append(
-						reader.readLine())) {
-					//System.out.println("processing String: "+className.toString());					               	
-					//remove any comments
-					int comPos = className.toString().indexOf("#");
-					if (comPos != -1)
-						className.delete(comPos, className.length());
-					//trim String
-					int st = 0;
-					int sblen = className.length();
-					int len = sblen - 1;
-					while ((st < sblen) && className.charAt(st) <= ' ')
-						st++;
-					while ((st < len) && className.charAt(len) <= ' ')
-						len--;
-					className.delete(len + 1, sblen).delete(0, st);
-					//end trim String	 
-					//if space letter is included asume first word as class name
-					int spacePos = className.toString().indexOf(" ");
-					if (spacePos != -1)
-						className =
-							className.delete(spacePos, className.length());
-					//trim String
-					st = 0;
-					sblen = className.length();
-					len = sblen - 1;
-					while ((st < sblen) && className.charAt(st) <= ' ')
-						st++;
-					while ((st < len) && className.charAt(len) <= ' ')
-						len--;
-					className.delete(len + 1, sblen).delete(0, st);
-					//end trim String	 
-					if (className.length() > 0) {
-						//we should have a proper class name now
-						try {
-							classInstance =
-								Class
-									.forName(className.toString(), true, loader)
-									.newInstance();
-							if (service.isInstance(classInstance))
-								classMap.put(
-									className.toString(),
-									classInstance);
-							else {
-								classInstance = null;
-								logger.error(
-									className.toString()
-										+ " does not implement "
-										+ service.getName()
-										+ "! Class instance will not be used.");
-							}
-						} catch (ClassNotFoundException e) {
-							System.err.println(
-								"Service: cannot find class: " + className);
-						} catch (InstantiationException e) {
-							System.err.println(
-								"Service: cannot instantiate: " + className);
-						} catch (IllegalAccessException e) {
-							System.err.println(
-								"Service: illegal access to: " + className);
-						} catch (NoClassDefFoundError e) {
-							System.err.println(
-								"Service: " + e + " for " + className);
-						} catch (Exception e) {
-							System.err.println(
-								"Service: exception for: "
-									+ className
-									+ " "
-									+ e);
-						}
-					}
-				}
-			} catch (IOException ioe) {
-				System.err.println("Service: problem with: " + url);
-			} finally {
-				try {
-					if (input != null)
-						input.close();
-					if (reader != null)
-						reader.close();
-				} catch (IOException ioe2) {
-					System.err.println("Service: problem with: " + url);
-				}
-			}
-		}
-		return classMap.values().iterator();
 	}
 }
