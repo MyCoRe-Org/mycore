@@ -120,12 +120,13 @@ public static void queryRemote( String type, String query )
       resarray = result.setFromQuery( host, type, query );
     }
 
-    String applpath = config.getString( "MCR.appl_path" );
-    String xslpath = applpath + "/stylesheets/mcr_results-PlainText-" + type + ".xsl";
+    String xslfile = "mcr_results-PlainText-" + type + ".xsl";
+    InputStream in = MCRQueryCommands.class.getResourceAsStream( "/" + xslfile ); 
+    if( in == null ) throw new MCRConfigurationException( "Can't read stylesheet file " + xslfile ); 
 
     try
     {
-      StreamSource source = new StreamSource( xslpath );
+      StreamSource source = new StreamSource( in );
       TransformerFactory transfakt = TransformerFactory.newInstance();
       Transformer trans = transfakt.newTransformer( source );
       StreamResult sr = new StreamResult( (OutputStream)System.out );
