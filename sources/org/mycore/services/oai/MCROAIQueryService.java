@@ -43,11 +43,11 @@ import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.services.oai.MCROAIQuery;
-import org.mycore.services.query.MCRQueryResult;
+import org.mycore.services.query.MCRQueryCollector;
 
 /**
  * @author Werner Gresshoff
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision: 1.10 $ $Date: 2003/01/31 11:56:25 $
  *
@@ -55,6 +55,7 @@ import org.mycore.services.query.MCRQueryResult;
  */
 public class MCROAIQueryService implements MCROAIQuery {
     static Logger logger = Logger.getLogger(MCROAIQueryService.class);
+    static MCRQueryCollector collector;
 
     private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
@@ -70,6 +71,11 @@ public class MCROAIQueryService implements MCROAIQuery {
 		config = MCRConfiguration.instance();
     	config.reload(true);
     	PropertyConfigurator.configure(config.getLoggingProperties());
+    	if (collector==null){
+			int cThreads=config.getInt("MCR.Collector_Thread_num",2);
+			int aThreads=config.getInt("MCR.Agent_Thread_num",6);
+			collector=new MCRQueryCollector(cThreads,aThreads);
+    	}
 	}
 	
 	/**
@@ -137,18 +143,20 @@ public class MCROAIQueryService implements MCROAIQuery {
 			    
    	    	logger.debug("Die erzeugte Query ist: " + query.toString());
    	    	
-			MCRQueryResult qr = new MCRQueryResult();
-			MCRXMLContainer qra = null;
+			MCRXMLContainer qra = new MCRXMLContainer();
     	    try {
-		        qra = qr.setFromQuery("local", "document", query.toString());
+    	    	synchronized(qra){
+    	    		collector.collectQueryResults("local", "document", query.toString(),qra);
+    	    		qra.wait();
+    	    	}
     	    } catch (MCRException mcrx) {
     	    	logger.error("Die Query ist fehlgeschlagen.");
     	    	return newList;
-    	    }
+    	    } catch (InterruptedException ignored){}
 
 			if (qra.size() > 0) {
 		    	newList.add(set);
-		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugefügt.");
+		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugefï¿½gt.");
 		    	
     	        if (categories[i].hasChildren()) {
         	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
@@ -214,9 +222,12 @@ public class MCROAIQueryService implements MCROAIQuery {
 			    
     	logger.debug("Die erzeugte Query ist: " + query.toString());
     	
-        MCRQueryResult qr = new MCRQueryResult();
    	    try {
-	        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
+   	    	MCRXMLContainer qra=new MCRXMLContainer();
+   	    	synchronized(qra){
+				collector.collectQueryResults("local", "document", query.toString(),qra);
+				qra.wait();
+   	    	}
    	    
    	    	if (qra.size() == 0) {
    	    		return list;
@@ -374,9 +385,12 @@ public class MCROAIQueryService implements MCROAIQuery {
 			    
     	logger.debug("Die erzeugte Query ist: " + query.toString());
     	
-        MCRQueryResult qr = new MCRQueryResult();
    	    try {
-	        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
+	        MCRXMLContainer qra = new MCRXMLContainer();
+	        synchronized(qra){
+				collector.collectQueryResults("local", "document", query.toString(),qra);
+				qra.wait();
+	        }
    	    
    	    	if (qra.size() == 0) {
    	    		return list;

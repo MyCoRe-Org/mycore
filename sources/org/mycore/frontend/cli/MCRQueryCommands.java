@@ -25,7 +25,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
-import java.util.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
@@ -35,9 +34,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
+import org.mycore.services.query.MCRQueryCollector;
 import org.mycore.services.query.MCRQueryResult;
 import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
  * This class implements the query command to start a query to a local
@@ -46,8 +45,9 @@ import org.mycore.datamodel.classifications.MCRClassification;
  * The result was presided as a text output.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Mathias Zarick
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 final class MCRQueryCommands
@@ -55,6 +55,8 @@ final class MCRQueryCommands
 
 // logger
 static Logger logger=Logger.getLogger(MCRQueryCommands.class.getName());
+
+static MCRQueryCollector collector;
 
 /** Executes a local query */
 public static void queryLocal( String type, String query )
@@ -75,6 +77,11 @@ public static void queryRemote( String type, String query )
   {
     MCRConfiguration config = MCRConfiguration.instance();
     PropertyConfigurator.configure( config.getLoggingProperties() );
+	if (collector==null){
+		int cThreads=config.getInt("MCR.Collector_Thread_num",2);
+		int aThreads=config.getInt("MCR.Agent_Thread_num",6);
+		collector=new MCRQueryCollector(cThreads,aThreads);
+	}
 
     // input parameters
     if( host  == null ) host = "local";
@@ -94,22 +101,35 @@ public static void queryRemote( String type, String query )
 
       String squence = config.getString(
         "MCR.classifications_search_sequence", "remote-local" );
-    
-      if( squence.equalsIgnoreCase( "local-remote" ) ) 
-      {
-        resarray = result.setFromQuery( "local", type, query );
-        if( resarray.size() == 0 ) 
-        {
-          resarray = result.setFromQuery( host, type, query ); 
-        }
-      }
-      else 
-      {
-        resarray = result.setFromQuery( host, type, query );
-        if( resarray.size() == 0 ) 
-        {
-          resarray = result.setFromQuery( "local", type, query ); 
-        }
+      synchronized(resarray){
+		if( squence.equalsIgnoreCase( "local-remote" ) ) 
+		{
+		  collector.collectQueryResults( "local", type, query, resarray );
+		  	try {
+				resarray.wait();
+		  	} catch (InterruptedException ignored) {}
+		  if( resarray.size() == 0 ) 
+		  {
+			collector.collectQueryResults( host, type, query, resarray );
+		  	try {
+				resarray.wait();
+		  	} catch (InterruptedException ignored) {}
+		  }
+		}
+		else 
+		{
+			collector.collectQueryResults( host, type, query, resarray );
+			try{
+				resarray.wait();
+			} catch (InterruptedException ignored) {}
+		  if( resarray.size() == 0 ) 
+		  {
+			collector.collectQueryResults( "local", type, query, resarray );
+			try{
+				resarray.wait();
+			} catch (InterruptedException ignored) {}
+		  }
+		}
       }
 
       if( resarray.size() == 0 )
@@ -117,7 +137,12 @@ public static void queryRemote( String type, String query )
     }
     else // other types
     {
-      resarray = result.setFromQuery( host, type, query );
+    	synchronized(resarray){
+			collector.collectQueryResults( "local", type, query, resarray );
+			try{
+				resarray.wait();
+			} catch (InterruptedException ignored) {}
+    	}
     }
 
     String xslfile = "mcr_results-PlainText-" + type + ".xsl";

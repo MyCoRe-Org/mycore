@@ -49,16 +49,17 @@ import org.apache.log4j.PropertyConfigurator;
  * This servlet provides a web interface to query
  * the datastore using XQueries and deliver the result list
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
- * @author Thomas Scheffler
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
 */
 public class MCRQueryServlet extends HttpServlet 
 {
 // The configuration
 private MCRConfiguration conf = null;
+private MCRQueryCollector collector;
 
 // Default Language (as UpperCase)
 private String defaultLang = "";
@@ -80,6 +81,10 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   public void init() throws MCRConfigurationException
     {
     conf = MCRConfiguration.instance();
+    collector = (MCRQueryCollector)this.getServletContext().getAttribute("QueryCollector");
+    if (collector == null)
+    	collector = new MCRQueryCollector(2,6);
+    this.getServletContext().setAttribute("QueryCollector",collector);
 	PropertyConfigurator.configure(conf.getLoggingProperties());
     defaultLang = conf
       .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
@@ -233,20 +238,45 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     // query for classifications
     if (type.equals("class")) {
-      MCRQueryResult result = new MCRQueryResult();
       String squence = conf.getString("MCR.classifications_search_sequence",
         "remote-local");
       MCRXMLContainer resarray = new MCRXMLContainer();
       if (squence.equalsIgnoreCase("local-remote")) { 
-        resarray = result.setFromQuery("local",type, query );
+        try {
+        	synchronized(resarray){
+				collector.collectQueryResults("local",type,query,resarray);
+				resarray.wait();
+			}
+		} catch (InterruptedException ignored) {
+		}
         if (resarray.size()==0) {
-          resarray = result.setFromQuery(host,type, query ); }
-        }
+			try {
+				synchronized(resarray){
+					collector.collectQueryResults(host,type,query,resarray);
+					resarray.wait();
+				}
+			} catch (InterruptedException ignored) {
+			}
+		}
+      }
       else {
-        resarray = result.setFromQuery(host,type, query ); 
+		try {
+			synchronized(resarray){
+				collector.collectQueryResults(host,type,query,resarray);
+				resarray.wait();
+			}
+		} catch (InterruptedException ignored) {
+		}
         if (resarray.size()==0) {
-          resarray = result.setFromQuery("local",type, query ); }
-        } 
+			try {
+				synchronized(resarray){
+					collector.collectQueryResults("local",type,query,resarray);
+					resarray.wait();
+				}
+			} catch (InterruptedException ignored) {
+			}
+        }
+      } 
       if (resarray.size()==0) {
 		generateErrorPage(request,response,
 		HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -360,10 +390,16 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     }
     else {
     	//cachedFlag==false
-    	MCRQueryResult result = new MCRQueryResult();
-    	MCRXMLContainer resarray = result.setFromQuery(host, type, query );
+    	MCRXMLContainer resarray = new MCRXMLContainer();
+		try {
+			synchronized(resarray){
+				collector.collectQueryResults(host,type,query,resarray);
+				resarray.wait();
+			}
+		} catch (InterruptedException ignored) {
+		}
     	if (type.equals(sortType)){
-    		// Status setzen für Dokumente
+    		// Status setzen fï¿½r Dokumente
     		if (resarray.size()==1)
     			resarray.setStatus(0,status);
     		else if (maxresults>0)

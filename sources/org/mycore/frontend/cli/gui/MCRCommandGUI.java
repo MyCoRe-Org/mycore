@@ -27,19 +27,17 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.filechooser.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 import org.mycore.common.*;
 import org.mycore.frontend.cli.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.common.xml.*;
-import org.mycore.services.query.*;
+import org.mycore.services.query.MCRQueryCollector;
 
 /**
  * This class is a very simple GUI for handling MyCoRe objects. 
@@ -51,10 +49,12 @@ import org.mycore.services.query.*;
  * To be done: - showing results with stylesheets
  *
  * @author marc schluepmann
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRCommandGUI extends JFrame {
     MCRConfiguration config;
+    static MCRQueryCollector collector;
     JPanel queryPanel = new JPanel( new FlowLayout() );
     JPanel resultPanel = new JPanel();
     JPanel detailPanel = new JPanel();
@@ -91,7 +91,11 @@ public class MCRCommandGUI extends JFrame {
 	    Vector queryHosts = new Vector(2);
 	    queryHosts.add( "local" );
 	    queryHosts.add( "remote" );
-
+		if (collector==null){
+			int cThreads=config.getInt("MCR.Collector_Thread_num",2);
+			int aThreads=config.getInt("MCR.Agent_Thread_num",6);
+			collector=new MCRQueryCollector(cThreads,aThreads);
+		}
 	    StringTokenizer stok = new StringTokenizer( hosts, "," );
 	    while( stok.hasMoreTokens() )
 		queryHosts.addElement( stok.nextToken() );
@@ -185,11 +189,14 @@ public class MCRCommandGUI extends JFrame {
 	queryButton.addActionListener( new ActionListener() {
 		public void actionPerformed( ActionEvent evt ) {
 		    try {
-			MCRQueryResult result = new MCRQueryResult();
-			MCRXMLContainer resarray = result.setFromQuery( queryHostString, 
-									    queryItemString, 
-									    queryField.getText() 
-									    );
+			MCRXMLContainer resarray = new MCRXMLContainer();
+			synchronized(resarray){
+				collector.collectQueryResults(queryHostString, 
+			                                                   queryItemString, 
+			                                                   queryField.getText(),
+			                                                   resarray);
+				resarray.wait();
+			}
 			setResults( resarray );
 			//System.out.println( domToString( resultDoc, null ) );
 		    }
@@ -369,11 +376,14 @@ public class MCRCommandGUI extends JFrame {
 
     public void showResult( MCRObjectIdentifier objID ) {
 	try {
-	    MCRQueryResult result = new MCRQueryResult();
-	    MCRXMLContainer resarray = result.setFromQuery( objID.getHost(), 
-								objID.getType(), 
-								"/mycoreobject[@ID='" + objID.getId() + "']" 
-								);
+	    MCRXMLContainer resarray = new MCRXMLContainer();
+	    synchronized(resarray){
+			collector.collectQueryResults( objID.getHost(), 
+								  objID.getType(), 
+								  "/mycoreobject[@ID='" + objID.getId() + "']",
+								  resarray);
+			resarray.wait();
+	    }
 	    String id = resarray.getId( 0 );
 	    detailView.setText( transformResult( resarray.exportElementToByteArray( 0 ) ) );
 	    detailView.updateUI();
