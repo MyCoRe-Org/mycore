@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.79 $ $Date: 2004-05-19 12:37:50 $                      -->
+  <!-- $Revision: 1.80 $ $Date: 2004-05-21 10:30:53 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -12,9 +12,11 @@
   <!-- =================================================================== -->
 
   <!-- Javac properties -->
-  <property name="debug"       value="on"  />
-  <property name="optimize"    value="on"  />
-  <property name="deprecation" value="on" />
+  <property name="debug"          value="on" />
+  <property name="optimize"       value="on" />
+  <property name="deprecation"    value="on" />
+  <property name="javatarget"     value="1.3" />
+  <property name="sourceencoding" value="ISO-8859-15" />
 
   <!-- Read in all environment variables -->
   <property environment="env" />
@@ -62,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.79 $ $Date: 2004-05-19 12:37:50 $</echo>
+    <echo>Ant build file   : $Revision: 1.80 $ $Date: 2004-05-21 10:30:53 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -133,6 +135,11 @@
       <param name="provider" value="org.mycore.services.plugins.PdfPlugin"/>
       <param name="append" value="true"/>
     </antcall>
+    <antcall target="create_service">
+      <param name="service" value="org.mycore.services.plugins.TextFilterPlugin"/>
+      <param name="provider" value="org.mycore.services.plugins.OoTextPlugin"/>
+      <param name="append" value="true"/>
+    </antcall>
   
     <jar 
       destfile="${basedir}/lib/mycore-for-${MCR.XMLStore.Type}.jar"
@@ -157,6 +164,8 @@
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
+	   target="${javatarget}"
+	   encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
     <echo>---------------------------------------------------------</echo>
@@ -562,6 +571,7 @@
     <chmod dir="${Distrib.TargetDir}" includes="${Distrib.Module}*.*" perm="a+r" />
 
   </target>
+
 
 </project>
 
