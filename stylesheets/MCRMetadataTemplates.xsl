@@ -59,5 +59,74 @@
   </xsd:element>
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaPerson -->
+
+<xsl:template match="mcrmetaperson">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element name="firstname" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="callname" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="surename" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="academic" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="peerage" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute ref="xml:lang" />
+  </xsd:complexType>
+ </xsd:element>
+</xsl:template>
+
+<!-- Template for the metadata MCRMetaAddress -->
+
+<xsl:template match="mcrmetaaddress">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element name="country" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="state" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="zipcode" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="city" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="street" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="number" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute ref="xml:lang" />
+  </xsd:complexType>
+ </xsd:element>
+</xsl:template>
+
+<!-- Template for the metadata MCRMetaCorporation -->
+
+<xsl:template match="mcrmetacorporation">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element name="name" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="nickname" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="parent" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+    <xsd:element name="property" type="xsd:string" minOccurs='0' 
+     maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute ref="xml:lang" />
+  </xsd:complexType>
+ </xsd:element>
+</xsl:template>
+
 </xsl:stylesheet>
 
