@@ -56,7 +56,7 @@ public class WCMSAdminServlet extends HttpServlet {
             processRequest(request, response);
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -72,7 +72,7 @@ public class WCMSAdminServlet extends HttpServlet {
             processRequest(request, response);
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
 
     }
@@ -99,7 +99,7 @@ public class WCMSAdminServlet extends HttpServlet {
         if (request.getSession().getAttribute("status").equals("loggedIn")){
             String action = request.getParameter("action");
             List rootNodes = (List)request.getSession().getAttribute("rootNodes");
-            File [] contentTemplates = new File((mcrConf.getString("templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
+            File [] contentTemplates = new File((mcrConf.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
             Element rootOut = new Element("cms");
             Document jdom = new Document(rootOut);
             rootOut.addContent(new Element("session").setText(action));
@@ -131,7 +131,7 @@ public class WCMSAdminServlet extends HttpServlet {
                 char fs = File.separatorChar;
                 String error;
                 try {
-                    File logFile = new File(mcrConf.getString("logFile").replace('/', File.separatorChar));
+                    File logFile = new File(mcrConf.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
                     if (!logFile.exists()) error = "Logfile nicht gefunden!";
                     Element root = new SAXBuilder().build(logFile).getRootElement();
                     Element test = (Element)root.clone();
@@ -161,6 +161,6 @@ public class WCMSAdminServlet extends HttpServlet {
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             rd.forward(request, response);
         }
-        else response.sendRedirect(mcrConf.getString("sessionError"));
+        else response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
     }
 }

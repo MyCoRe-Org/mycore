@@ -3,41 +3,41 @@
 ### content and configuratin stuff
 #########################################################################
 #Path and File containing the WCMS user Database. Normally WCMSUserDB.xml
-wcmsUserDBFile=$MYCORESAMPLE_HOME/modules/module-wcms/aif/config/WCMSUserDB.xml
+MCR.WCMS.wcmsUserDBFile=$MYCORESAMPLE_HOME/modules/module-wcms/aif/config/WCMSUserDB.xml
 
 #Path to the content section
-contentRoot=$MYCORESAMPLE_HOME/webapps/content/
+MCR.WCMS.contentRoot=$MYCORESAMPLE_HOME/webapps/content/
 
 #Path and File containing the navigation menu
-navigationFile=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/navigation.xml
+MCR.WCMS.navigationFile=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/navigation.xml
 
 #Path an File containing the invalid Session information
-sessionError=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/aif/admin/error/noSession.xml
+MCR.WCMS.sessionError=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/aif/admin/error/noSession.xml
 
 #Path containing the templates
-templatePath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/templates/
+MCR.WCMS.templatePath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/templates/
 
 #########################################################################
 ### backups, logs, etc.
 #########################################################################
 #Path to the location where content and navigation backups will be stored 
-backupPath=$MYCORESAMPLE_HOME/modules/module-wcms/aif/archive/contentBackup/
+MCR.WCMS.backupPath=$MYCORESAMPLE_HOME/modules/module-wcms/aif/archive/contentBackup/
 
 #Path and File logging the activities done with the WCMS
-logFile=$MYCORESAMPLE_HOME/modules/module-wcms/aif/archive/logs/WCMSLogFile.xml
+MCR.WCMS.logFile=$MYCORESAMPLE_HOME/modules/module-wcms/aif/archive/logs/WCMSLogFile.xml
 
 #Path a file containing the general last done action information
-footer=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/lastModified.xml
+MCR.WCMS.footer=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/lastModified.xml
 
 #########################################################################
 ### file upload properties
 #########################################################################
 #Path for documents uploaded with WCMSFileUploadServlet
-documentPath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/documents/
+MCR.WCMS.documentPath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/documents/
 
 #Path for images uploaded with WCMSFileUploadServlet
-imagePath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/images/uploads/
+MCR.WCMS.imagePath=$MYCORESAMPLE_HOME/webapps/modules/module-wcms/uif/common/images/uploads/
 
 #Maximum Size of uploadabel Files in Bytes
-maxUploadFileSize=5000000
+MCR.WCMS.maxUploadFileSize=5000000
 

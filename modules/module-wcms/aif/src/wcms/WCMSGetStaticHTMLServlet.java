@@ -79,7 +79,7 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
             processRequest(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 

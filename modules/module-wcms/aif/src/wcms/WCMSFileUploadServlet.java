@@ -40,8 +40,8 @@ public class WCMSFileUploadServlet extends HttpServlet {
     char fs = File.separatorChar;
     private static Set props=null;
     private String fileName, filePath, contentType, fileContentType, error, status, action = null;
-    private String documentPath = mcrConf.getString("documentPath").replace('/', File.separatorChar);
-    private String imagePath = mcrConf.getString("imagePath").replace('/', File.separatorChar);
+    private String documentPath = mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
+    private String imagePath = mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
     private String savePath = null;
     private Dictionary fields;
     private int fileSize, fileMaxSize;
@@ -86,7 +86,7 @@ public class WCMSFileUploadServlet extends HttpServlet {
             doGetPost(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -101,7 +101,7 @@ public class WCMSFileUploadServlet extends HttpServlet {
             doGetPost(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -112,7 +112,7 @@ public class WCMSFileUploadServlet extends HttpServlet {
     throws ServletException, IOException {
         action = request.getParameter("action");
         if (action.equals("upload")) {
-            fileMaxSize = mcrConf.getInt("maxUploadFileSize");
+            fileMaxSize = mcrConf.getInt("MCR.WCMS.maxUploadFileSize");
             fileSize = request.getContentLength();
             fileContentType = request.getContentType();
 

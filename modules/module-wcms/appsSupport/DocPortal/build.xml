@@ -11,6 +11,9 @@
 
 	<property name="build.sysclasspath" value="last" />
 
+	<!-- read mycore.properties.wcms -->
+	<property file="${env.MYCORESAMPLE_HOME}/module/module-wcms/aif/config/mycore.properties.wcms" />	
+
 	<!-- ============================================== -->
 
 	<target name="usage">
@@ -195,6 +198,18 @@
 		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/thirdParty/kupu" preservelastmodified="yes">			
 			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/thirdParty/kupu" />
 		</copy>						
+		
+		<!-- set file permissions -->
+		<!--
+	    <chmod file="${MCR.WCMS.wcmsUserDBFile}" perm="ug+r"/>
+	    <chmod dir="${MCR.WCMS.contentRoot}" type="dir" includes="**/*" perm="ug+rwx"/>
+	    <chmod file="${MCR.WCMS.navigationFile}" perm="ug+rwx"/>
+	    <chmod dir="${MCR.WCMS.backupPath}" type="dir" includes="**/*" perm="ug+rwx"/>
+	    <chmod file="${MCR.WCMS.logFile}" perm="ug+rwx"/>
+	    <chmod file="${MCR.WCMS.footer}" perm="ug+rwx"/>
+	    <chmod dir="${MCR.WCMS.documentPath}" perm="ug+rwx"/>
+	    <chmod dir="${MCR.WCMS.imagePath}" perm="ug+rwx"/>	
+		-->
 		
 	</target>	
 

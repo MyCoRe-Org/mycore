@@ -113,7 +113,7 @@ public class WCMSLoginServlet extends HttpServlet {
             }
         }
         if (session.getAttribute("status") == null && userPassword == null && userID == null) {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
 
         /**
@@ -121,7 +121,7 @@ public class WCMSLoginServlet extends HttpServlet {
          * If the check was successful, loginOk is set to true.
          */
         try {
-            File dbfile = new File(mcrConf.getString("wcmsUserDBFile").replace('/', File.separatorChar));
+            File dbfile = new File(mcrConf.getString("MCR.WCMS.wcmsUserDBFile").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(dbfile);
             Element root = doc.getRootElement();

@@ -94,7 +94,7 @@ public class WCMSChooseServlet extends HttpServlet {
             doGetPost(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
 
     }
@@ -110,7 +110,7 @@ public class WCMSChooseServlet extends HttpServlet {
             doGetPost(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
 
     }
@@ -129,10 +129,10 @@ public class WCMSChooseServlet extends HttpServlet {
             action = request.getParameter("action");
         }
         else action = "false";
-        File [] contentTemplates = new File(mcrConf.getString("templatePath")+"content/".replace('/', File.separatorChar)).listFiles();
-        File [] masterTemplates = new File(mcrConf.getString("templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
+        File [] contentTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar)).listFiles();
+        File [] masterTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
-        File conTemp = new File(mcrConf.getString("templatePath")+"content/".replace('/', File.separatorChar));
+        File conTemp = new File(mcrConf.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -201,7 +201,7 @@ public class WCMSChooseServlet extends HttpServlet {
          */
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(mcrConf.getString("navigationFile").replace('/', File.separatorChar));
+            Document doc = builder.build(mcrConf.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
             Element root = doc.getRootElement();
             validate(root);
         }
@@ -228,7 +228,7 @@ public class WCMSChooseServlet extends HttpServlet {
                     if (!action.equals("add") && mode.equals("intern")) ed = sax.build(getServletContext().getRealPath("")+fs+href);
                     else {
                         //if (mode.equals("intern")) {
-                            ed = sax.build((mcrConf.getString("templatePath")+"content/").replace('/', File.separatorChar)+template);
+                            ed = sax.build((mcrConf.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)+template);
                         //}
                         //else return;
                     }
@@ -443,7 +443,7 @@ public class WCMSChooseServlet extends HttpServlet {
 
         Element images = new Element("images");
         rootOut.addContent(images);
-        File imagePath = new File((mcrConf.getString("imagePath").replace('/', File.separatorChar)));
+        File imagePath = new File((mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
         if (!imagePath.exists()) imagePath.mkdirs();
         imageList = new File(imagePath.toString()).listFiles();
         for (int i=0; i < imageList.length; i++) {
@@ -452,12 +452,11 @@ public class WCMSChooseServlet extends HttpServlet {
             }
         }
 
-        rootOut.addContent(new Element("imagePath").setText( mcrConf.getString("imagePath").substring( mcrConf.getString("imagePath").lastIndexOf("webapps")  )  ));
-        // rootOut.addContent(new Element("imagePath").setText(mcrConf.getString("imagePath")));
+        rootOut.addContent(new Element("imagePath").setText( mcrConf.getString("MCR.WCMS.imagePath").substring( mcrConf.getString("MCR.WCMS.imagePath").lastIndexOf("webapps")  )  ));
 
         Element documents = new Element("documents");
         rootOut.addContent(documents);
-        File documentPath = new File((mcrConf.getString("documentPath").replace('/', File.separatorChar)));
+        File documentPath = new File((mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
         if (!documentPath.exists()) documentPath.mkdirs();
         documentList = new File(documentPath.toString()).listFiles();
         for (int i=0; i < documentList.length; i++) {
@@ -465,8 +464,7 @@ public class WCMSChooseServlet extends HttpServlet {
                 documents.addContent(new Element("document").setText(documentList[i].getName()));
             }
         }
-        rootOut.addContent(new Element("documentPath").setText(  mcrConf.getString("documentPath").substring(mcrConf.getString("documentPath").lastIndexOf("webapps"))  ));
-		//rootOut.addContent(new Element("documentPath").setText(mcrConf.getString("documentPath"))	);
+        rootOut.addContent(new Element("documentPath").setText(  mcrConf.getString("MCR.WCMS.documentPath").substring(mcrConf.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))  ));
 
         Element master = new Element("master");
         for (int i = 0; i < masterTemplates.length; i++ ) {

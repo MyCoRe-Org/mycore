@@ -121,7 +121,7 @@ public class WCMSActionServlet extends HttpServlet {
             processRequest(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -137,7 +137,7 @@ public class WCMSActionServlet extends HttpServlet {
             processRequest(request, response, request.getSession(false));
         }
         else {
-            response.sendRedirect(mcrConf.getString("sessionError"));
+            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -160,7 +160,7 @@ public class WCMSActionServlet extends HttpServlet {
         hrefFile = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(mcrConf.getString("templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
+        masterTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
 
         userID = (String)session.getAttribute("userID");
         userClass = (String)session.getAttribute("userClass");
@@ -258,7 +258,7 @@ public class WCMSActionServlet extends HttpServlet {
         replaceMenu = request.getParameter("replaceMenu");
         if ( replaceMenu == null ) replaceMenu = "false";
         masterTemplate = request.getParameter("masterTemplate");
-        File naviFile = new File(mcrConf.getString("navigationFile").replace('/', File.separatorChar));
+        File naviFile = new File(mcrConf.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 
         fileName = href;
  /* -------------------------------------------------------------------- */
@@ -400,7 +400,7 @@ public class WCMSActionServlet extends HttpServlet {
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
             if ( action.equals("delete") ) {
-                File [] contentTemplates = new File((mcrConf.getString("templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
+                File [] contentTemplates = new File((mcrConf.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
                 for (int i=0; i < contentTemplates.length; i++) {
@@ -417,16 +417,16 @@ public class WCMSActionServlet extends HttpServlet {
 
                 Element images = new Element("images");
                 rootOut.addContent(images);
-                imageList = (new File(mcrConf.getString("imagePath").replace('/', File.separatorChar))).list();
+                imageList = (new File(mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
                 for (int i=0; i < imageList.length; i++) {
-                    images.addContent(new Element("image").setText(mcrConf.getString("imagePath")+imageList[i]));
+                    images.addContent(new Element("image").setText(mcrConf.getString("MCR.WCMS.imagePath")+imageList[i]));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
-                documentList = (new File(mcrConf.getString("documentPath").replace('/', File.separatorChar))).list();
+                documentList = (new File(mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
                 for (int i=0; i < documentList.length; i++) {
-                    documents.addContent(new Element("document").setText(mcrConf.getString("imagePath")+documentList[i]));
+                    documents.addContent(new Element("document").setText(mcrConf.getString("MCR.WCMS.imagePath")+documentList[i]));
                 }
                 Element templates = new Element("templates");
                 Element master = new Element("master");
@@ -500,7 +500,7 @@ public class WCMSActionServlet extends HttpServlet {
 
     public void updateFooter() {
         try {
-            File footer = new File(mcrConf.getString("footer").replace('/', File.separatorChar));
+            File footer = new File(mcrConf.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
             Document doc;
             if (!footer.exists()) {
@@ -560,7 +560,7 @@ public class WCMSActionServlet extends HttpServlet {
 
     public void writeToLogFile(String action, String contentFileBackup) {
         try {
-            File logFile = new File(mcrConf.getString("logFile").replace('/', File.separatorChar));
+            File logFile = new File(mcrConf.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
             Document doc;
             if (!logFile.exists()) {
@@ -683,9 +683,9 @@ public class WCMSActionServlet extends HttpServlet {
     public String makeBackup (File inputFile) {
         File backupFile = null;
         if (inputFile.toString().endsWith(fs+"navigation.xml")) {
-            backupFile = new File(mcrConf.getString("backupPath").replace('/', File.separatorChar)+fs+"navi"+fs+"navigation.xml");
+            backupFile = new File(mcrConf.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fs+"navi"+fs+"navigation.xml");
         }
-        else backupFile = new File(mcrConf.getString("backupPath").replace('/', File.separatorChar)+href.replace('/', File.separatorChar));
+        else backupFile = new File(mcrConf.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+href.replace('/', File.separatorChar));
         if (inputFile.exists()) {
             try {
                 BufferedInputStream bi = new BufferedInputStream(new FileInputStream(inputFile));
