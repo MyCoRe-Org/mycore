@@ -228,7 +228,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((firstname = firstname.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"firstname");
     tc.addStringElement(tc.TYPE_VALUE,null,firstname,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -237,7 +237,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((callname = callname.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"callname");
     tc.addStringElement(tc.TYPE_VALUE,null,callname,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -246,7 +246,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((surename = surename.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"surename");
     tc.addStringElement(tc.TYPE_VALUE,null,surename,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -255,7 +255,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((academic = academic.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"academic");
     tc.addStringElement(tc.TYPE_VALUE,null,academic,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -264,7 +264,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((peerage = peerage.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"peerage");
     tc.addStringElement(tc.TYPE_VALUE,null,peerage,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,

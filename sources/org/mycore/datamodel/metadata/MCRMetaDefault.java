@@ -38,6 +38,10 @@ import mycore.datamodel.MCRTypedContent;
  **/
 public abstract class MCRMetaDefault
 {
+// public data
+public static final int DEFAULT_LANG_LENGTH = 12;
+public static final int DEFAULT_TYPE_LENGTH = 256;
+public static final int DEFAULT_STRING_LENGTH = 4096;
 
 // common data
 protected static String NL =

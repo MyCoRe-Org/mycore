@@ -210,7 +210,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
   tc.addDateElement(date,parametric,textsearch);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,textsearch);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,textsearch);
   if ((type = type.trim()).length() !=0) {
     tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
   return tc;

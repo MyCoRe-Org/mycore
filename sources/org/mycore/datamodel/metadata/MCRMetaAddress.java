@@ -251,7 +251,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((country = country.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"country");
     tc.addStringElement(tc.TYPE_VALUE,null,country,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -260,7 +260,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((state = state.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"state");
     tc.addStringElement(tc.TYPE_VALUE,null,state,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -269,7 +269,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((zipcode = zipcode.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"zipcode");
     tc.addStringElement(tc.TYPE_VALUE,null,zipcode,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -278,7 +278,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((city = city.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"city");
     tc.addStringElement(tc.TYPE_VALUE,null,city,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -287,7 +287,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((street = street.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"street");
     tc.addStringElement(tc.TYPE_VALUE,null,street,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -296,7 +296,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((number = number.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"number");
     tc.addStringElement(tc.TYPE_VALUE,null,number,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,

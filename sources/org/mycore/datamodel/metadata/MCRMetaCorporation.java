@@ -208,7 +208,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((name = name.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"name");
     tc.addStringElement(tc.TYPE_VALUE,null,name,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -217,7 +217,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((nickname = nickname.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"nickname");
     tc.addStringElement(tc.TYPE_VALUE,null,nickname,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -226,7 +226,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((parent = parent.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"parent");
     tc.addStringElement(tc.TYPE_VALUE,null,parent,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
@@ -235,7 +235,7 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   if ((property = property.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"property");
     tc.addStringElement(tc.TYPE_VALUE,null,property,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
       textsearch);
     if ((type = type.trim()).length() !=0) {
       tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,

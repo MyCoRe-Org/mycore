@@ -374,7 +374,6 @@ public final MCRTypedContent createTypedContent() throws MCRException
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_TAG,tag);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"class",classname,true,false);
   for (int i=0;i<list.size();i++) {
     tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
       .createTypedContent(true,true)); }
