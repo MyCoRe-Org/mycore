@@ -22,10 +22,25 @@
  *
  **/
 
-package mycore.oai;
+package mycore.services.oai;
 
-import mycore.oai.MCROAIQuery;
+import mycore.services.oai.MCROAIQuery;
 
+/**
+ * @author Werner Gresshoff
+ *
+ * @version $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ *
+ * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
+ */
 public class MCROAIQueryService implements MCROAIQuery {
 
+	/**
+	 * Method exists. Checks if the given ID exists in the data repository
+	 * @param id The ID to be checked
+	 * @return boolean
+	 */
+	public boolean exists(String id) {
+		return MCRObject.existInDatastore(id);
+	}
 }

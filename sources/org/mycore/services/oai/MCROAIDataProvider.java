@@ -67,6 +67,18 @@ public class MCROAIDataProvider extends HttpServlet {
     private static String STR_OAI_REPOSITORY_NAME = "MCR.oai.repositoryname"; //Name of the repository
     private static String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; //Identifier of the repository
 	private static String STR_OAI_FRIENDS = "MCR.oai.friends"; // a colon (:) separated list of other OAI repsoitories (friends)
+	private static String STR_OAI_QUERYSERVICE = "MCR.oai.queryservice"; // implementing class of MCROAIQuery
+	
+    // If there are other metadata formats available, all need a namespace and schema entry
+    // of it's own, e.g. 
+    // MCR.oai.metadata.namespace.olac=http://www.language-archives.org/OLAC/0.2/
+    // MCR.oai.metadata.schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
+    private static String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace"; 
+    private static String STR_OAI_METADATA_SCHEMA = "MCR.oai.metadata.schema"; 
+    
+    // Some constants referring to metadata formats (must be known for dc)
+    private static String STR_DC_NAMESPACE = "http://www.openarchives.org/OAI/2.0/oai_dc/";
+    private static String STR_DC_SCHEMA = "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
 
     private static String STR_OAI_NAMESPACE = "http://www.openarchives.org/OAI/";
     private static String STR_OAI_VERSION = "2.0";
@@ -75,6 +87,7 @@ public class MCROAIDataProvider extends HttpServlet {
     private static String ERR_FAULTY_VERB = "No verb or too much verbs";
     private static String ERR_ILLEGAL_VERB = "Illegal verb";
     private static String ERR_ILLEGAL_ARGUMENT = "Illegal argument";
+    private static String ERR_UNKNOWN_ID = "Unknown identifier";
 
     private static String[] STR_VERBS = {"GetRecord", "Identify",
         "ListIdentifiers", "ListMetadataFormats", "ListRecords",
@@ -283,6 +296,36 @@ public class MCROAIDataProvider extends HttpServlet {
     }
 
 	/**
+	 * Method checkIdentifier. Check for conformance with the rules and the existence of the given <i>identifier</i>.
+	 * @param identifier Identifier to be checked.
+	 * @param repositoryIdentifier The repository identifier (from .properties file)
+	 * @return boolean
+	 */
+    private boolean checkIdentifier(String identifier, String repositoryIdentifier) {
+		// First, check if the identifier starts with "oai"
+		if (!identifier.toUpperCase().startsWith("OAI:")) {
+		    return false;
+		} else {
+	    	int lastColon = identifier.lastIndexOf(":");
+	    
+	    	if ((lastColon == 3) || !identifier.substring(4, lastColon).equals(repositoryIdentifier)) {
+				return false;
+	    	}
+		    MCRConfiguration config = MCRConfiguration.instance();
+		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
+		    try {
+			    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+		    } catch (MCRConfigurationException mcrx) {
+		    	logger.fatal("Die OAIQuery-Klasse ist nicht konfiguriert.");
+		    	return false;
+		    }
+/*    	                !MCRObject.existInDatastore(identifier.substring(lastColon + 1))) { */
+		} 
+        
+		return true;
+    }
+
+	/**
 	 * Method identify. Implementation of the OAI Verb Identify.
 	 * @param request
 	 * @param header
@@ -368,4 +411,78 @@ public class MCROAIDataProvider extends HttpServlet {
         return document;
     }
 
+	/**
+	 * Method listMetadataFormats. Implementation of the OAI Verb ListMetadataFormats.
+	 * @param request
+	 * @param header
+	 * @return Document
+	 */
+    private org.jdom.Document listMetadataFormats(HttpServletRequest request, org.jdom.Document header) {
+    	logger.info("Harvester hat 'listMetadatFormats' angefordert");
+        org.jdom.Document document = header;
+        
+        Element eRoot = document.getRootElement();
+        Namespace ns = eRoot.getNamespace();
+        
+		try {
+	        String repositoryIdentifier = MCRConfiguration.instance()
+    	        .getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+		} catch (MCRConfigurationException mcrx) {
+			logger.fatal("Missing configuration item: " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
+				+ " is missing.");
+			return null;
+		}
+        
+        // First; check if there was an identifier in the request
+        String identifier[] = getParameter("identifier", request); 
+        if (identifier == null) {
+            if (badArguments(request, 1)) {
+            	logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlendem Parameter abgebrochen.");
+                return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+            }
+            Element eRequest = eRoot.getChild("request", ns);
+            eRequest.setAttribute("verb", "ListMetadataFormats");
+        } else if (identifier.length > 1) {
+            //Es ist nur ein Identifier erlaubt!
+          	logger.info("Anfrage 'listMetadataFormats' wurde wegen zu vieler Parameter abgebrochen.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        } else {
+            Element eRequest = eRoot.getChild("request", ns);
+            eRequest.setAttribute("verb", "ListMetadataFormats");
+            eRequest.setAttribute("identifier", identifier[0]);
+            if (!checkIdentifier(identifier[0], repositoryIdentifier)) {
+            	logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
+                return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
+            }
+        }
+        
+        // The supported metadata formats are only returned if no identifier was given, or
+        // the identifier was found in the repository
+        Element eListMetadataFormats = new Element("ListMetadataFormats", ns);
+        Element dcMetadataFormat = new Element("metadataFormat", ns);
+        dcMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, "oai_dc"));
+        dcMetadataFormat.addContent(newElementWithContent("schema", ns, STR_DC_SCHEMA));
+        dcMetadataFormat.addContent(newJDOMElementWithContent("metadataNamespace", ns, STR_DC_NAMESPACE));
+        eListMetadataFormats.addContent(dcMetadataFormat);
+        
+        Properties properties = MCRConfiguration.instance().
+            getProperties(STR_OAI_METADATA_NAMESPACE);
+        Enumeration propertiesNames = properties.propertyNames();
+        while (propertiesNames.hasMoreElements()) {
+            String name = (String) propertiesNames.nextElement();
+            String metadataPrefix = name.substring(name.lastIndexOf(".") + 1);
+            Element eMetadataFormat = new Element("metadataFormat", ns);
+            eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
+            eMetadataFormat.addContent(newElementWithContent("schema", ns, MCRConfiguration.instance()
+                .getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
+            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, MCRConfiguration.instance()
+                .getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
+            eListMetadataFormats.addContent(eMetadataFormat);
+        }
+        
+        eRoot.addContent(eListMetadataFormats);
+
+        return document;
+    }
+    
 }

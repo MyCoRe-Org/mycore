@@ -22,8 +22,24 @@
  *
  **/
 
-package mycore.oai;
+package mycore.services.oai;
 
+/**
+ * @author Werner Gresshoff
+ *
+ * @version $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * 
+ * This is an interface which encapsulates the functions needed for
+ * the communication with the datastore. All functions which are
+ * MyCoRe or Miless specific should be implemented here.
+ */
 public interface MCROAIQuery {
+	
+	/**
+	 * Method exists. Checks if the given ID exists in the data repository
+	 * @param id The ID to be checked
+	 * @return boolean
+	 */
+	public boolean exists(String id);
 
 }
