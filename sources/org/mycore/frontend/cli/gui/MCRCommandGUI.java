@@ -294,7 +294,7 @@ public class MCRCommandGUI extends JFrame {
 	funcPanel.add( addButton );
 	funcPanel.add( saveButton );
 	funcPanel.add( removeButton );
-	fileChooser.setFileFilter( new XMLFileFilter() );
+	fileChooser.setFileFilter( new MCRXMLFileFilter() );
 	fileChooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
 	detailView.setMaximumSize( new Dimension( 300, 400 ) );
 	detailView.setMinimumSize( new Dimension( 300, 57 ) );
