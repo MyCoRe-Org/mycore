@@ -67,12 +67,7 @@ public class MCRContentInputStream extends FilterInputStream
 
     MCRArgumentChecker.ensureNotNull( in, "InputStream" );
 
-    try{ digest = MessageDigest.getInstance( "MD5" ); }
-    catch( NoSuchAlgorithmException exc )
-    {
-      String msg = "Could not find java classes that support MD5 checksum algorithm";
-      throw new MCRConfigurationException( msg, exc ); 
-    }
+    digest = buildMD5Digest();
 
     DigestInputStream      dis = new DigestInputStream( in, digest );
     MCRBlockingInputStream bis = new MCRBlockingInputStream( dis, headerSize );
@@ -137,6 +132,14 @@ public class MCRContentInputStream extends FilterInputStream
    * @return the MD5 checksum as a String of hex digits
    */
   public String getMD5String()
+  { return getMD5String( digest ); }
+  
+  /**
+   * Given an MD5 message digest, returns the MD5 checksum as a String
+   *
+   * @return the MD5 checksum as a String of hex digits
+   */
+  public static String getMD5String( MessageDigest digest )
   {
     byte[] bytes = digest.digest();
     StringBuffer sb = new StringBuffer();
@@ -146,5 +149,20 @@ public class MCRContentInputStream extends FilterInputStream
       sb.append( sValue.substring( sValue.length() - 2 ) );
     }
     return sb.toString();
+  }
+  
+  /**
+   * Builds a MessageDigest instance for MD5 checksum computation.
+   *
+   * @throws MCRConfigurationException if no java classes that support MD5 algorithm could be found
+   */
+  public static MessageDigest buildMD5Digest()
+  {
+    try{ return MessageDigest.getInstance( "MD5" ); }
+    catch( NoSuchAlgorithmException exc )
+    {
+      String msg = "Could not find java classes that support MD5 checksum algorithm";
+      throw new MCRConfigurationException( msg, exc ); 
+    }
   }
 }

@@ -27,6 +27,7 @@ package mycore.ifs;
 import mycore.common.*;
 import java.util.*;
 import java.io.*;
+import java.security.*;
 import javax.servlet.http.*;
 
 /**
@@ -255,7 +256,19 @@ public class MCRFile extends MCRFilesystemNode
     ensureNotDeleted();
     
     if( storageID.length() != 0 ) 
+    {
+      MessageDigest digest = MCRContentInputStream.buildMD5Digest();
+
+      DigestOutputStream dos = new DigestOutputStream( target, digest );
       getContentStore().retrieveContent( this, target ); 
+      
+      String md5_new = MCRContentInputStream.getMD5String( digest );
+      if( ! this.md5.equals( md5_new ) )
+      {
+        String msg = "MD5 Checksum failure while retrieving file content";
+        throw new MCRPersistenceException( msg );
+      }
+    }
   }
   
   /**
