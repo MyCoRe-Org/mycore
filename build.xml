@@ -8,6 +8,7 @@
 
   <!-- compiler -->
   <property name="build.compiler" value="classic"/>
+  <property name="build.sysclasspath" value="last"/>
   <property name="debug" value="on"/>
   <property name="optimize" value="on"/>
   <property name="deprecation" value="on"/>
@@ -171,6 +172,7 @@
       packagenames = "mycore.*"
       sourcepath   = "${sources}"
       destdir      = "${javadocs}"
+      classpath    = "${lib}/ftp.jar"
       author       = "true"
       version      = "true"
       use          = "true"
