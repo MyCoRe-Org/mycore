@@ -45,7 +45,7 @@ public interface MCRFileContentTypeDetector
    * @param type the file content type the rule is for
    * @param rules the rules XML element containing the rules for detecting that type
    */
-  void addRule( MCRFileContentType type, Element rules );
+  public void addRule( MCRFileContentType type, Element rules );
   
   /**
    * Detects the file content type from filename and/or file header.
@@ -54,5 +54,5 @@ public interface MCRFileContentTypeDetector
    * @param header the first bytes of the file content
    * @return the file content type detected, or null if detection was not possible
    */
-  MCRFileContentType detectType( String filename, byte[] header );
+  public MCRFileContentType detectType( String filename, byte[] header );
 }
