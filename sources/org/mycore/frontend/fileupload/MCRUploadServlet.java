@@ -23,13 +23,26 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.zip.*;
-import javax.servlet.http.*;
-import org.mycore.frontend.servlets.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipInputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet implements the server side of communication with the upload applet
@@ -38,6 +51,7 @@ import org.apache.log4j.Logger;
  *
  * @author Frank Lützenkirchen
  * @author Harald Richter
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  * @see org.mycore.frontend.fileupload.MCRMCRUploadHandlerInterface
  */
@@ -45,7 +59,7 @@ public final class MCRUploadServlet
   extends MCRServlet
 {
   
-  static Logger logger = Logger.getLogger( MCRUploadServlet.class );
+  static Logger LOGGER = Logger.getLogger( MCRUploadServlet.class );
 
   public void doGetPost( MCRServletJob job )
     throws Exception
@@ -53,7 +67,7 @@ public final class MCRUploadServlet
     try{ invokeMethod( job ); }
     catch( Exception ex )
     {
-      logger.debug( ex.getClass().getName() + " " + ex.getMessage() );
+      LOGGER.error( "Error while handling FileUpload", ex);
       sendException( job.getResponse(), ex );
       throw ex;
     }
@@ -65,51 +79,51 @@ public final class MCRUploadServlet
     HttpServletRequest  req = job.getRequest();
     HttpServletResponse res = job.getResponse();
 
-    String method = getStringParameter( req, "method" );
+    String method = req.getParameter("method");
     
     if( method.equals( "redirecturl" ) )
     {
-      String uploadId = this.getStringParameter( req, "uploadId" );
+      String uploadId = req.getParameter("uploadId");
       String url = MCRUploadHandlerManager.instance().getHandle( uploadId ).getRedirectURL( );
-      logger.info("REDIRECT " + url);
+      LOGGER.info("REDIRECT " + url);
       res.sendRedirect( url );
       return;
     }
     else if( method.equals( "startDerivateSession String" ) )
     {
-      String uploadId = this.getStringParameter( req, "uploadId" );
+      String uploadId = req.getParameter("uploadId");
       uploadId = MCRUploadHandlerManager.instance().getHandle( uploadId ).startUpload();
-      logger.info( "MCRUploadServlet start session " + uploadId );
+      LOGGER.info( "MCRUploadServlet start session " + uploadId );
       sendResponse( res, uploadId );
     }
     else if( method.equals( "createFile String" ) )
     {
-      final String           path  = getStringParameter( req, "path" );
+      final String           path  = req.getParameter("path");
       
-      logger.info("PATH: " + path);
-      final String   uploadId = getStringParameter( req, "uploadId" );
-      final String   md5      = getStringParameter( req, "md5" );
+      LOGGER.info("PATH: " + path);
+      final String   uploadId = req.getParameter("uploadId");
+      final String   md5      = req.getParameter("md5");
 
-      logger.debug( "MCRUploadServlet receives file " + path + " with md5 " + md5 );
+      LOGGER.debug( "MCRUploadServlet receives file " + path + " with md5 " + md5 );
       if ( ! MCRUploadHandlerManager.instance().getHandle( uploadId ).acceptFile( path, md5 ) )
       {
-        logger.debug( "Skip file " + path );
+        LOGGER.debug( "Skip file " + path );
         sendResponse( res, "skip file" );
         return;
       }
 
       String servername = req.getServerName();
 
-      logger.debug( "Applet wants to send content of file " + path );
-      logger.debug( "Next trying to create a server socket for file transfer..." );
+      LOGGER.debug( "Applet wants to send content of file " + path );
+      LOGGER.debug( "Next trying to create a server socket for file transfer..." );
 
       final ServerSocket server = new ServerSocket( 0, 1, InetAddress.getByName( servername ) );
-      logger.debug( "Server socket successfully created." );
+      LOGGER.debug( "Server socket successfully created." );
 
       final int    port = server.getLocalPort();
       final String host = server.getInetAddress().getHostAddress();
 
-      logger.debug( "Informing applet that server socket is ready." );
+      LOGGER.debug( "Informing applet that server socket is ready." );
 
       sendResponse( res, host + ":" + port );
 
@@ -123,31 +137,30 @@ public final class MCRUploadServlet
 
           try
           {
-            logger.debug( "Listening on " + host + ":" + port + " for incoming data..." );
+            LOGGER.debug( "Listening on " + host + ":" + port + " for incoming data..." );
             socket = server.accept();
 
-            logger.debug( "Client applet connected to socket now." );
+            LOGGER.debug( "Client applet connected to socket now." );
         
             DataOutputStream dos = new DataOutputStream( socket.getOutputStream() );
             ZipInputStream   zis = new ZipInputStream  ( socket.getInputStream()  );
 
-            logger.debug( "Constructed ZipInputStream and DataOutputStream, receiving data soon." );
+            LOGGER.debug( "Constructed ZipInputStream and DataOutputStream, receiving data soon." );
 
             zis.getNextEntry();
        
             String erg = MCRUploadHandlerManager.instance().getHandle( uploadId ).receiveFile( path, zis );
-            logger.debug( "Stored incoming file content under " + erg );
-            logger.debug( "Informing applet about location where content was stored..." );
+            LOGGER.debug( "Stored incoming file content under " + erg );
+            LOGGER.debug( "Informing applet about location where content was stored..." );
 
             dos.writeUTF( erg );
  
-            logger.debug( "Sended acknowledgement to applet." );
-            logger.debug( "File transfer completed successfully." );
+            LOGGER.debug( "Sended acknowledgement to applet." );
+            LOGGER.debug( "File transfer completed successfully." );
           }
           catch( Exception ex )
           { 
-            logger.error( "Exception while receiving and storing file content from applet:" );
-            logger.error( ex.getClass().getName() + " " + ex.getMessage() ); 
+            LOGGER.error( "Exception while receiving and storing file content from applet:", ex );
           }
           finally
           { 
@@ -158,7 +171,7 @@ public final class MCRUploadServlet
             }
             catch( Exception ignored ){}
 
-            logger.debug( "Socket closed." );
+            LOGGER.debug( "Socket closed." );
           }
         } 
       } );
@@ -167,26 +180,17 @@ public final class MCRUploadServlet
     }
     else if( method.equals( "endDerivateSession String" ) )
     {
-      String   uploadId = this.getStringParameter( req, "uploadId" );
+      String   uploadId = req.getParameter("uploadId");
       MCRUploadHandlerInterface uploadHandler = MCRUploadHandlerManager.instance().getHandle( uploadId );
       uploadHandler.finishUpload( ); 
       sendResponse( res, "upload finished." );
     }
   }
 
-  protected String getStringParameter( HttpServletRequest req, String label )
-  {
-    String[] values = req.getParameterValues( label );
-    if( values == null )
-      return null;
-    else
-      return values[ 0 ];
-  }
-
   protected void sendException( HttpServletResponse res, Exception ex )
     throws Exception
   {
-    Hashtable response = new Hashtable();
+    HashMap response = new HashMap();
     response.put( "clname",  ex.getClass().getName()  );
     response.put( "strace",  getStackTrace( ex )      );
     if( ex.getLocalizedMessage() != null )
@@ -198,44 +202,32 @@ public final class MCRUploadServlet
                                Object              value )
     throws Exception
   {
-    Hashtable parameters = new Hashtable();
+    HashMap parameters = new HashMap();
     if( value != null ) parameters.put( "return", value );
     sendResponse( res, "upload/response", parameters );
   }
 
-  protected void sendResponse( HttpServletResponse res,
-                               int                 value )
-    throws Exception
-  {
-    Hashtable parameters = new Hashtable();
-    parameters.put( "return", new Integer( value ) );
-    sendResponse( res, "upload/response", parameters );
-  }
-
-  protected void sendResponse( HttpServletResponse res,
-                               String              mime,
-                               Hashtable           parameters )
+  protected void sendResponse( HttpServletResponse res, String mime,  Map parameters )
     throws Exception
   {
     ByteArrayOutputStream baos = new ByteArrayOutputStream( 1024 );
     DataOutputStream      dos  = new DataOutputStream( baos );
-    Enumeration           keys = parameters.keys();
+    Set entries = parameters.entrySet();
 
     dos.writeUTF( mime );
-    while( keys.hasMoreElements() )
+    Iterator it=entries.iterator();
+    while( it.hasNext() )
     {
-      String key   = (String)( keys.nextElement() );
-      Object value = parameters.get( key );
-      Class  cl    = value.getClass();
-      dos.writeUTF( key          );
-      dos.writeUTF( cl.getName() );
+    	Map.Entry entry=(Map.Entry)it.next();
+      //write out key
+      dos.writeUTF( entry.getKey().toString() );
+      //write out class
+      dos.writeUTF( entry.getValue().getClass().getName() );
 
-      if( cl == String.class )
-        dos.writeUTF( ( (String )(value) ) );
-      else if( cl == Integer.class )
-        dos.writeInt( ( (Integer)(value) ).intValue() );
+      if( entry.getValue().getClass() == Integer.class )
+        dos.writeInt( ( (Integer)(entry.getValue()) ).intValue() );
       else
-        dos.writeUTF( value.toString() );
+        dos.writeUTF( entry.getValue().toString() );
     }
     dos.close();
 
@@ -252,17 +244,11 @@ public final class MCRUploadServlet
   {
     try
     {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream( 1024 );
-      PrintWriter           pw   = new PrintWriter( baos );
-
+    	StringWriter sw=new StringWriter();
+    	PrintWriter pw=new PrintWriter(sw);
       ex.printStackTrace( pw );
       pw.close();
-
-      byte[]               bytes = baos.toByteArray();
-      ByteArrayInputStream bais  = new ByteArrayInputStream( bytes );
-      InputStreamReader    isr   = new InputStreamReader   ( bais  );
-      BufferedReader       br    = new BufferedReader      ( isr   );
-      return br.readLine();
+      return sw.toString();
     }
     catch( Exception ex2 ) {}
     return null;

@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.fileupload;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -38,8 +39,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -60,6 +63,7 @@ import java.util.zip.ZipOutputStream;
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  * @see org.mycore.frontend.fileupload.MCRUploadServlet
  */
@@ -127,12 +131,11 @@ public final class MCRUploadCommunicator
     {
       System.out.println( "---------------------------- Starting filetransfer ---------------------------" );
 
-      Hashtable request = new Hashtable();
+      HashMap request = new HashMap();
       request.put( "method", "createFile String" );
       request.put( "path",  path );
       request.put( "uploadId",  uploadId );
  
-      InputStream source = new FileInputStream( file );
       String md5 = getMD5String( file );
       request.put( "md5", md5 );
       
@@ -169,13 +172,16 @@ public final class MCRUploadCommunicator
       byte[] buffer = new byte[ 65536 ];
 
       System.out.println( "Starting to send file content..." );
-      while( ( num = source.read( buffer ) ) != -1 )
+      InputStream fi = new FileInputStream( file );
+      BufferedInputStream bi = new BufferedInputStream(fi);
+      while( ( num = bi.read( buffer ) ) != -1 )
       {
         zos.write( buffer, 0, num );
         System.out.println( "Sended " + num + " bytes of file content." );
         MCRUploadProgressMonitor.getDialog().updateProgressBar( num );
       }
       zos.closeEntry();
+      bi.close();
       System.out.println( "Finished sending file content." );
 
       String storageID = dis.readUTF();
@@ -288,7 +294,7 @@ public final class MCRUploadCommunicator
   protected void startDerivateSession( String uploadId )
     throws IOException, MCRUploadException
   {
-    Hashtable request = new Hashtable();
+    HashMap request = new HashMap();
     request.put( "method", "startDerivateSession String" );
     request.put( "uploadId",    uploadId                 );
     send( request );
@@ -297,21 +303,20 @@ public final class MCRUploadCommunicator
   protected void endDerivateSession( String uploadId )
     throws IOException, MCRUploadException
   {
-    Hashtable request = new Hashtable();
+    HashMap request = new HashMap();
     request.put( "method", "endDerivateSession String" );
     request.put( "uploadId",    uploadId                 );
     String xml = (String)( send( request ) );
     return;
   }
 
-  protected Object send( Hashtable parameters )
+  protected Object send( Map parameters )
     throws IOException, MCRUploadException
   {
-    Hashtable response = getResponse( doPost( parameters ) );
-    return response.get( "return" );
+    return getResponse(doPost(parameters)).get("return");
   }
 
-  protected InputStream doPost( Hashtable parameters )
+  protected InputStream doPost( Map parameters )
     throws IOException
   {
     String data = encodeParameters( parameters, "UTF-8");
@@ -336,42 +341,39 @@ public final class MCRUploadCommunicator
     return connection.getInputStream();
   }
   
-  protected String encodeParameters( Hashtable parameters, String encoding ) throws UnsupportedEncodingException
+  protected String encodeParameters( Map parameters, String encoding ) throws UnsupportedEncodingException
   {
     StringBuffer data = new StringBuffer();
-    Enumeration  e    = parameters.keys();
+    Set entries = parameters.entrySet();
 
-    while( e.hasMoreElements() )
+    Iterator it=entries.iterator();
+    while( it.hasNext() )
     {
-      String name  = (String) e.nextElement();
-      String value = (String) parameters.get( name );
-
-      data.append( URLEncoder.encode( name, encoding) )
-          .append( "=" )
-          .append( URLEncoder.encode( value, encoding ) )
-          .append( "&amp;" );
+    	Map.Entry entry=(Map.Entry)it.next();
+      //write out key
+    	data.append( URLEncoder.encode( entry.getKey().toString(), encoding))
+				.append("=")
+				.append(URLEncoder.encode(entry.getValue().toString(),encoding))
+				.append("&");
     }
-    data.setLength( data.length() - 5 );
-
+    data.setLength(data.length() - 1);
     return data.toString();
   }
 
-  protected Hashtable getResponse( InputStream is )
+  protected Map getResponse( InputStream is )
     throws IOException, MCRUploadException
   {
     DataInputStream dis   = new DataInputStream( is );
     String          mime  = dis.readUTF();
     byte[]          dummy = new byte[ 0 ];
 
-    Hashtable response = new Hashtable();
+    HashMap response = new HashMap();
     while( dis.read( dummy, 0, 0 ) != -1 )
     {
       String key    = dis.readUTF();
       String clname = dis.readUTF();
       Object value  = null;
-      if( clname.equals( String.class.getName() ) )
-        value = dis.readUTF();
-      else if( clname.equals( Integer.class.getName() ) )
+      if( clname.equals( Integer.class.getName() ) )
         value = new Integer( dis.readInt() );
       else
         value = dis.readUTF();
@@ -380,9 +382,9 @@ public final class MCRUploadCommunicator
 
     if( mime.equals( "upload/exception" ) )
     {
-      String clname  = (String)( response.get( "clname"  ) );
-      String message = (String)( response.get( "message" ) );
-      String strace  = (String)( response.get( "strace"  ) );
+      String clname  = response.get("clname").toString();
+      String message = response.get("message").toString();
+      String strace  = response.get("strace").toString();
       throw new MCRUploadException( clname, message, strace );
     }
 
@@ -395,12 +397,13 @@ public final class MCRUploadCommunicator
     MessageDigest digest = MessageDigest.getInstance("MD5");
 
     InputStream source = new FileInputStream( file );
+    BufferedInputStream bi = new BufferedInputStream(source);
     // Calculate the digest for the given file.
-    DigestInputStream in = new DigestInputStream( source, digest );
+    DigestInputStream in = new DigestInputStream( bi, digest );
     byte[] buffer = new byte[8192];
     while (in.read(buffer) != -1)
       ;
-    source.close();
+    bi.close();
     
     byte[] bytes = digest.digest();
     StringBuffer sb = new StringBuffer();
