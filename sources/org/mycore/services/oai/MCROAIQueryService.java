@@ -94,7 +94,9 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-	public List listSets(String classificationId, String instance) {
+	public List listSets(String instance) {
+    	String classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
+	    logger.debug("Suche in Klassifikation: " + classificationId);
 		List list = new ArrayList();
         MCRClassificationItem repository = MCRClassificationItem.
             getClassificationItem(classificationId);
@@ -240,9 +242,10 @@ public class MCROAIQueryService implements MCROAIQuery {
         		String[] identifier = getHeader(object, objectId, repositoryId);
         		list.add(identifier);
 	   	    }
+	   	    
+   	    	return list;
    	    } catch (Exception mcrx) {
    	    	logger.error("Die Query ist fehlgeschlagen.");
-   	    } finally {
    	    	return list;
    	    }
 	}
@@ -406,9 +409,10 @@ public class MCROAIQueryService implements MCROAIQuery {
     		    Element eMetadata = object.getMetadata().createXML();
 	        	list.add(eMetadata);
 	   	    }
+	   	    
+   	    	return list;
    	    } catch (Exception mcrx) {
    	    	logger.error("Die Query ist fehlgeschlagen.");
-   	    } finally {
    	    	return list;
    	    }
 	}
