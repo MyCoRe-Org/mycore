@@ -58,7 +58,7 @@ public class MCRPrivilegeSet
     conf = MCRConfiguration.instance();
     // Get the user store name
     try {
-      String userStoreName = conf.instance().getString("MCR.userstore_class_name");
+      String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
       mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
       privs = mcrUserStore.retrievePrivilegeSet();
       }
