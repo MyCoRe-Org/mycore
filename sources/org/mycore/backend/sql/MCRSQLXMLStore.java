@@ -291,7 +291,9 @@ public final int getNextFreeIdInt( String project, String type )
   {
   String query = new StringBuffer()
         .append( "SELECT MAX(MCRID) FROM " )
-        .append( tableName ).toString();
+        .append( tableName ).append(" WHERE ( MCRID LIKE \'")
+        .append(project).append('_').append(type).append("%\' )")
+        .toString();
   try {
     return (new MCRObjectID(MCRSQLConnection.justGetSingleValue(query)))
       .getNumberAsInteger() + 1;
