@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.9 $ $Date: 2003/01/28 13:31:25 $
+ * $Revision: 1.10 $ $Date: 2003/01/28 13:43:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -64,7 +64,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.9 $ $Date: 2003/01/28 13:31:25 $
+ * @version $Revision: 1.10 $ $Date: 2003/01/28 13:43:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -104,6 +104,8 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String ERR_ILLEGAL_VERB = "Illegal verb";
     private static final String ERR_ILLEGAL_ARGUMENT = "Illegal argument";
     private static final String ERR_UNKNOWN_ID = "Unknown identifier";
+    private static final String ERR_BAD_RESUMPTION_TOKEN = "Bad resumption token";
+    private static final String ERR_NO_RECORDS_MATCH = "No results where found with your search criteria";
 
     private static final String[] STR_VERBS = {"GetRecord", "Identify",
         "ListIdentifiers", "ListMetadataFormats", "ListRecords",
@@ -345,14 +347,14 @@ public class MCROAIDataProvider extends HttpServlet {
 	 */
     private void deleteOutdatedTokenFiles() {
 	    MCRConfiguration config = MCRConfiguration.instance();
-	    String dir;
+	    String dir = new String();
 	    int timeout;
 	    
 	    try {
-		    dir = config.getString(STR_RESUMPTIONTOKEN_DIR);
-		    timeout = config.getInt(STR_RESUMPTIONTOKEN_TIMEOUT, 72);
+		    dir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
+		    timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
 	    } catch (MCRConfigurationException mcrx) {
-	    	logger.error("Die Property '" + STR_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstützt.");
+	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstützt.");
 	    	return;
 	    } catch (NumberFormatException nfx) {
 	    	timeout = 72;
@@ -360,7 +362,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    
 		File directory = new File(dir);
 		File[] tokenList = directory.listFiles(new TokenFileFilter(directory, 
-            STR_RESUMPTIONTOKEN_SUFFIX));
+            STR_OAI_RESUMPTIONTOKEN_SUFFIX));
 		if (tokenList == null) {
             return;
 		}
@@ -434,7 +436,7 @@ public class MCROAIDataProvider extends HttpServlet {
 					
 				Calendar calendar = new GregorianCalendar();
 				Date now = new Date();
-			    int timeout = config.getInt(STR_RESUMPTIONTOKEN_TIMEOUT, 72);
+			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
 				calendar.setTime(now);
 				calendar.add(Calendar.HOUR, timeout);
 	            Date timeoutDate = calendar.getTime();
@@ -457,7 +459,9 @@ public class MCROAIDataProvider extends HttpServlet {
 			return list;
 	    } catch (IOException e) { 	
 	    	throw new IOException(e);
-        }
+        } finally {
+        	return list;
+		}
     }
     
 	/**
