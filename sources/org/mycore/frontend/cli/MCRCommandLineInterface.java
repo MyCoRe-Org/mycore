@@ -248,108 +248,35 @@ public class MCRCommandLineInterface
       "query remote {0} {1}",
       "org.mycore.frontend.cli.MCRQueryCommands.queryRemote String String" );
 
-    // **************************************
-    // Commands for user and group management
-    // **************************************
-
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "init superuser",
-      "org.mycore.frontend.cli.MCRUserCommands.initSuperuser MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "check user data consistency",
-      "org.mycore.frontend.cli.MCRUserCommands.checkConsistency MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "create user data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "create group data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "import user data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.importUserFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "import group data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update user data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update group data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.updateGroupFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update privileges data from file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.updatePrivilegesFromFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "delete user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.deleteUser MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "delete group {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.deleteGroup MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "list all users",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllUsers MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "list all groups",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllGroups MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "list all privileges",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllPrivileges MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save all users to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save all groups to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save all privileges to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllPrivilegesToFile MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save user {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save group {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "set password for user {0} to {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.setPassword MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "set user management to read only mode",
-      "org.mycore.frontend.cli.MCRUserCommands.setLock MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "set user management to read/write mode",
-      "org.mycore.frontend.cli.MCRUserCommands.unLock MCRSession" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "show user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.showUser MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "show group {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.showGroup MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "enable user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.enableUser MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "disable user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.disableUser MCRSession String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "add group {0} as member to group {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.addMemberGroupToGroup MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "remove group {0} as member from group {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.removeMemberGroupFromGroup MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "add user {0} as member to group {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "remove user {0} as member from group {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup MCRSession String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "encrypt passwords in user xml file {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile MCRSession String String" );
+    // Read internal commands
+    String internals = config.getString("MCR.internal_command_classes","");
+    if (internals.length()==0) return;
+    StringTokenizer st = new StringTokenizer(internals,",");
+    while (st.hasMoreTokens()) {
+      String classname = st.nextToken();
+      logger.debug("Will load commands from the internal class "+classname);
+      Object obj = new Object();
+      try {
+        obj = Class.forName(classname).newInstance();
+        ArrayList ar = ((MCRExternalCommandInterface)obj).getPossibleCommands();
+        for (int i=0;i<ar.size();i+=2) {
+          knownCommands[ numCommands++ ] = new MCRCommand(session,
+            (String)ar.get(i),(String)ar.get(i+1));
+          logger.debug("Add command '"+(String)ar.get(i)+"'");
+          }
+        }
+      catch (ClassNotFoundException e) {
+        logger.error(classname+" ClassNotFoundException"); }
+      catch (IllegalAccessException e) {
+        logger.error(classname+" IllegalAccessException"); }
+      catch (InstantiationException e) {
+        logger.error(classname+" InstantiationException"); }
+      }
 
     // Read external commands
     String externals = config.getString("MCR.external_command_classes","");
     if (externals.length()==0) return;
-    StringTokenizer st = new StringTokenizer(externals,",");
+    st = new StringTokenizer(externals,",");
     while (st.hasMoreTokens()) {
       String classname = st.nextToken();
       logger.debug("Will load commands from the external class "+classname);

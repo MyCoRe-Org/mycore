@@ -52,17 +52,137 @@ import org.mycore.user.MCRUserMgr;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRUserCommands
+public class MCRUserCommands implements MCRExternalCommandInterface
 {
-  /** The logger and the configuration */
-  private static Logger logger = Logger.getLogger(MCRUserCommands.class.getName());
-  private static MCRConfiguration config = null;
+  /** the file separator */
+  private static String SLASH = System.getProperty( "file.separator" );
+
+  /** The logger and the CONFIGuration */
+  private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
+  private static MCRConfiguration CONFIG = null;
+
+  /** The array holding all known commands */
+  private static ArrayList command  = null;
+
+  /**
+   * The empty constructor.
+   */
+  public MCRUserCommands()
+  {
+    command  = new ArrayList();
+
+    // init the user system
+    command.add("init superuser");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.initSuperuser MCRSession");
+    // check the consistence of the user system
+    command.add("check user data consistency");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.checkConsistency MCRSession");
+    // encrypt a the passwords of data from the first UserSystem version
+    command.add("encrypt passwords in user xml file {0} to file {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile MCRSession String String");
+    // set a new password for the user
+    command.add("set password for user {0} to {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.setPassword MCRSession String String");
+    // set user management to read only mode
+    command.add("set user management to ro mode");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.setLock MCRSession");
+    // set user management to read/write mode
+    command.add("set user management to rw mode");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.unLock MCRSession");
+    // enable a user
+    command.add("enable user {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.enableUser MCRSession String");
+    // disable a user
+    command.add("disable user {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.disableUser MCRSession String");
+
+    //update privileges for a file
+    command.add("update privileges data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.updatePrivilegesFromFile MCRSession String");
+    // create new group from data of a file
+    command.add("create group data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile MCRSession String");
+    // import new group from data of a file (repair process)
+    command.add("import group data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile MCRSession String");
+    // update group data from a file
+    command.add("update group data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.updateGroupFromFile MCRSession String");
+    // delete a group
+    command.add("delete group {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.deleteGroup MCRSession String");
+    // add a group as a member of an other group
+    command.add("add group {0} as member to group {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.addMemberGroupToGroup MCRSession String String");
+    // remove a group as member of an other group
+    command.add("remove group {0} as member from group {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.removeMemberGroupFromGroup MCRSession String String");
+    // create new user from data of a file
+    command.add("create user data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.createUserFromFile MCRSession String");
+    // import new user from data of a file (repair process)
+    command.add("import user data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.importUserFromFile MCRSession String");
+    // update user data from a file
+    command.add("update user data from file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile MCRSession String");
+    // delete a user
+    command.add("delete user {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.deleteUser MCRSession String");
+    // add user as a member of a group
+    command.add("add user {0} as member to group {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup MCRSession String String");
+    // remove the user as a member of a group
+    command.add("remove user {0} as member from group {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup MCRSession String String");
+
+    // list all privileges
+    command.add("list all privileges");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.listAllPrivileges MCRSession");
+    // list all groups with their privileges and subgroups
+    command.add("list all groups");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.listAllGroups MCRSession");
+    // list data of one group
+    command.add("list group {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.listGroup MCRSession String");
+    // list all users with their groups
+    command.add("list all users");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.listAllUsers MCRSession");
+    // list data of one user
+    command.add("list user {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.listUser MCRSession String");
+
+    // save all privilege data to a file
+    command.add("save all privileges to file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.saveAllPrivilegesToFile MCRSession String");
+    // save all group data to a file
+    command.add("save all groups to file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile MCRSession String");
+    // save one group to a file
+    command.add("save group {0} to file {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile MCRSession String String");
+    // save all user data to a file
+    command.add("save all users to file {0}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile MCRSession String");
+    // save one user to a file
+    command.add("save user {0} to file {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile MCRSession String String");
+  }
+
+  /**
+   * The method return the list of possible commands of this class.
+   * Each command has TWO Strings, a String of the user command syntax and
+   * a String of the called method.
+   * @return a command pair RArrayList
+   **/
+  public final ArrayList getPossibleCommands()
+    { return command; }
 
   /**
    * Initialize common data.
    */
   private static void init() {
-    config = MCRConfiguration.instance();
+    CONFIG = MCRConfiguration.instance();
   }
 
   /**
@@ -76,15 +196,15 @@ public class MCRUserCommands
   public static void initSuperuser(MCRSession session) throws MCRException
   {
     init();
-    String suser = config.getString("MCR.users_superuser_username", "mcradmin");
-    String spasswd = config.getString("MCR.users_superuser_userpasswd", "mycore");
-    String sgroup = config.getString("MCR.users_superuser_groupname", "mcrgroup");
-    String guser = config.getString("MCR.users_guestuser_username", "gast");
-    String gpasswd = config.getString("MCR.users_guestuser_userpasswd", "gast");
-    String ggroup = config.getString("MCR.users_guestuser_groupname", "mcrgast");
+    String suser = CONFIG.getString("MCR.users_superuser_username", "mcradmin");
+    String spasswd = CONFIG.getString("MCR.users_superuser_userpasswd", "mycore");
+    String sgroup = CONFIG.getString("MCR.users_superuser_groupname", "mcrgroup");
+    String guser = CONFIG.getString("MCR.users_guestuser_username", "gast");
+    String gpasswd = CONFIG.getString("MCR.users_guestuser_userpasswd", "gast");
+    String ggroup = CONFIG.getString("MCR.users_guestuser_groupname", "mcrgast");
 
-    // If configuration parameter defines that we use password encryption: encrypt!
-    String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
+    // If CONFIGuration parameter defines that we use password encryption: encrypt!
+    String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
     boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
     if (useEncryption) {
       String cryptPwd = MCRCrypt.crypt(spasswd);
@@ -97,7 +217,7 @@ public class MCRUserCommands
     try {
       if (MCRUserMgr.instance().retrieveUser(suser) != null)
       if (MCRUserMgr.instance().retrieveGroup(sgroup) != null)
-	logger.info("The superuser already exists!");
+	LOGGER.info("The superuser already exists!");
       return;
     } catch (Exception e) {}
 
@@ -151,7 +271,7 @@ public class MCRUserCommands
     } catch (Exception e) {
       throw new MCRException("Can't create the privileges.", e);
     }
-    logger.info("The privilege set is installed.");
+    LOGGER.info("The privilege set is installed.");
 
     // the superuser group
     try {
@@ -175,7 +295,7 @@ public class MCRUserCommands
     } catch (Exception e) {
       throw new MCRException("Can't create the superuser group.", e);
     }
-    logger.info("The group " + sgroup + " is installed.");
+    LOGGER.info("The group " + sgroup + " is installed.");
 
     // the guest group
     try {
@@ -200,7 +320,7 @@ public class MCRUserCommands
     } catch (Exception e) {
       throw new MCRException("Can't create the guest group.", e);
     }
-    logger.info("The group " + ggroup + " is installed.");
+    LOGGER.info("The group " + ggroup + " is installed.");
 
     // the superuser
     try {
@@ -217,9 +337,9 @@ public class MCRUserCommands
     } catch (Exception e) {
       throw new MCRException("Can't create the superuser.", e);
     }
-      logger.info("The user "   + suser
+      LOGGER.info("The user "   + suser
 				+ " with password "
-				+ config.getString("MCR.users_superuser_userpasswd", "mycore")
+				+ CONFIG.getString("MCR.users_superuser_userpasswd", "mycore")
 				+ " is installed.");
 
     // the guest
@@ -236,15 +356,15 @@ public class MCRUserCommands
     } catch (Exception e) {
       throw new MCRException("Can't create the guest user.", e);
     }
-      logger.info("The user "	+ guser
+      LOGGER.info("The user "	+ guser
 				+ " with password "
-				+ config.getString("MCR.users_guestuser_userpasswd", "gast")
+				+ CONFIG.getString("MCR.users_guestuser_userpasswd", "gast")
 				+ " is installed.");
 
       // check all
       session.setCurrentUserID(suser);
       MCRUserMgr.instance().checkConsistency();
-      logger.info("");
+      LOGGER.info("");
   }
 
   /**
@@ -267,7 +387,7 @@ public class MCRUserCommands
   public static void deleteGroup(MCRSession session, String groupID) throws Exception {
     init();
     MCRUserMgr.instance().deleteGroup(groupID);
-    logger.info("Group ID " + groupID + " deleted!");
+    LOGGER.info("Group ID " + groupID + " deleted!");
   }
 
   /**
@@ -280,7 +400,7 @@ public class MCRUserCommands
   public static void deleteUser(MCRSession session, String userID) throws Exception {
     init();
     MCRUserMgr.instance().deleteUser(userID);
-    logger.info("User ID " + userID + " deleted!");
+    LOGGER.info("User ID " + userID + " deleted!");
   }
 
   /**
@@ -292,7 +412,7 @@ public class MCRUserCommands
   public static void enableUser(MCRSession session, String userID) throws Exception {
     init();
     MCRUserMgr.instance().enableUser(userID);
-    logger.info("User ID " + userID + " enabled!");
+    LOGGER.info("User ID " + userID + " enabled!");
   }
 
   /**
@@ -310,7 +430,7 @@ public class MCRUserCommands
   {
     init();
     if (!checkFilename(oldFile)) return;
-    logger.info( "Reading file " + oldFile + " ..." );
+    LOGGER.info( "Reading file " + oldFile + " ..." );
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(oldFile, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -341,7 +461,7 @@ public class MCRUserCommands
   public static void disableUser(MCRSession session, String userID) throws Exception {
     init();
     MCRUserMgr.instance().disableUser(userID);
-    logger.info("User ID " + userID + " disabled!");
+    LOGGER.info("User ID " + userID + " disabled!");
   }
 
   /**
@@ -353,9 +473,9 @@ public class MCRUserCommands
   public static void listAllUsers(MCRSession session) throws Exception {
     init();
     ArrayList users = MCRUserMgr.instance().getAllUserIDs();
-    logger.info("");
+    LOGGER.info("");
     for (int i = 0; i < users.size(); i++) {
-      logger.info((String) users.get(i));
+      listUser(session,(String)users.get(i));
     }
   }
 
@@ -368,9 +488,9 @@ public class MCRUserCommands
   public static void listAllGroups(MCRSession session) throws Exception {
     init();
     ArrayList groups = MCRUserMgr.instance().getAllGroupIDs();
-    logger.info("");
+    LOGGER.info("");
     for (int i = 0; i < groups.size(); i++) {
-      logger.info((String) groups.get(i));
+      listGroup(session,(String)groups.get(i));
     }
   }
 
@@ -384,11 +504,11 @@ public class MCRUserCommands
     try {
       init();
       ArrayList privs = MCRUserMgr.instance().getAllPrivileges();
-      logger.info("");
+      LOGGER.info("");
       for (int i = 0; i < privs.size(); i++) {
 	MCRPrivilege currentPriv = (MCRPrivilege) privs.get(i);
-	logger.info(currentPriv.getName());
-	logger.info("    " + currentPriv.getDescription());
+	LOGGER.info(currentPriv.getName());
+	LOGGER.info("    " + currentPriv.getDescription());
       }
     } catch (Exception e) {
       throw new MCRException("Error while command saveAllGroupsToFile()", e);
@@ -506,7 +626,7 @@ public class MCRUserCommands
       return;
     init();
     MCRUserMgr.instance().setPassword(userID, password);
-    logger.info("The new password was set.");
+    LOGGER.info("The new password was set.");
   }
 
   /**
@@ -517,7 +637,7 @@ public class MCRUserCommands
   public static void setLock(MCRSession session) throws MCRException {
     init();
     MCRUserMgr.instance().setLock(true);
-    logger.info("Write access to the user component persistent database now is denied.");
+    LOGGER.info("Write access to the user component persistent database now is denied.");
   }
 
   /**
@@ -528,7 +648,7 @@ public class MCRUserCommands
   public static void unLock(MCRSession session) throws MCRException {
     init();
     MCRUserMgr.instance().setLock(false);
-    logger.info("Write access to the user component persistent database now is allowed.");
+    LOGGER.info("Write access to the user component persistent database now is allowed.");
   }
 
   /**
@@ -538,12 +658,33 @@ public class MCRUserCommands
    * @param session the MCRSession object
    * @param groupID the ID of the group for which the XML-representation is needed
    */
-  public static final void showGroup(MCRSession session, String groupID)
+  public static final void listGroup(MCRSession session, String groupID)
   throws MCRException {
-    MCRGroup group =
-    MCRUserMgr.instance().retrieveGroup(groupID);
-    org.jdom.Document jdomDoc = group.toJDOMDocument();
-    showAsXML(jdomDoc);
+    MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+    StringBuffer sb = new StringBuffer();
+    LOGGER.info(" ");
+    sb.append("group=").append(group.getID());
+    LOGGER.info(sb.toString());
+    ArrayList ar = group.getMemberGroupIDs();
+    for (int i=0;i<ar.size();i++) {
+      sb = new StringBuffer();
+      sb.append("   groups in this group=").append((String)ar.get(i));
+      LOGGER.info(sb.toString());
+      }
+    ar = group.getMemberUserIDs();
+    for (int i=0;i<ar.size();i++) {
+      sb = new StringBuffer();
+      sb.append("   user in this group=").append((String)ar.get(i));
+      LOGGER.info(sb.toString());
+      }
+    ar = group.getAllPrivileges();
+    for (int i=0;i<ar.size();i++) {
+      sb = new StringBuffer();
+      sb.append("   has privileg=").append((String)ar.get(i));
+      LOGGER.info(sb.toString());
+      }
+    //org.jdom.Document jdomDoc = group.toJDOMDocument();
+    //showAsXML(jdomDoc);
   }
 
   /**
@@ -553,11 +694,30 @@ public class MCRUserCommands
    * @param session the MCRSession object
    * @param userID the ID of the user for which the XML-representation is needed
    */
-  public static final void showUser(MCRSession session, String userID)
+  public static final void listUser(MCRSession session, String userID)
   throws MCRException {
     MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-    org.jdom.Document jdomDoc = user.toJDOMDocument();
-    showAsXML(jdomDoc);
+    StringBuffer sb = new StringBuffer();
+    LOGGER.info(" ");
+    sb.append("user=").append(user.getID()).append("   number=").append(user.getNumID()).append("   update=").append(user.isUpdateAllowed()).append("   enabled=").append(user.isEnabled());
+    LOGGER.info(sb.toString());
+    sb = new StringBuffer();
+    sb.append("   primary group=").append(user.getPrimaryGroupID());
+    LOGGER.info(sb.toString());
+    ArrayList ar = user.getAllGroupIDs();
+    for (int i=0;i<ar.size();i++) {
+      sb = new StringBuffer();
+      sb.append("   member in group=").append((String)ar.get(i));
+      LOGGER.info(sb.toString());
+      }
+    ar = user.getPrivileges();
+    for (int i=0;i<ar.size();i++) {
+      sb = new StringBuffer();
+      sb.append("   has privileg=").append((String)ar.get(i));
+      LOGGER.info(sb.toString());
+      }
+    //org.jdom.Document jdomDoc = user.toJDOMDocument();
+    //showAsXML(jdomDoc);
   }
 
   /**
@@ -569,11 +729,11 @@ public class MCRUserCommands
   {
     init();
     if (!filename.endsWith(".xml")) {
-      logger.warn(filename + " ignored, does not end with *.xml");
+      LOGGER.warn(filename + " ignored, does not end with *.xml");
       return false;
     }
     if (!new File(filename).isFile()) {
-      logger.warn(filename + " ignored, is not a file.");
+      LOGGER.warn(filename + " ignored, is not a file.");
       return false;
     }
       return true;
@@ -586,7 +746,7 @@ public class MCRUserCommands
    **/
   public static final void createUserFromFile(MCRSession session, String filename) {
     init();
-    String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
+    String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
     boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
     createUserFromFile(session, filename, useEncryption);
   }
@@ -603,7 +763,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -635,7 +795,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -663,7 +823,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -692,7 +852,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -716,7 +876,7 @@ public class MCRUserCommands
     **/
    public static final void updateUserFromFile(MCRSession session, String filename) {
      init();
-     String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
+     String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
      boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
      updateUserFromFile(session, filename, useEncryption);
    }
@@ -733,7 +893,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -761,7 +921,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -885,7 +1045,7 @@ public class MCRUserCommands
     init();
     if (!checkFilename(filename))
       return;
-    logger.info("Reading file " + filename + " ...");
+    LOGGER.info("Reading file " + filename + " ...");
     try {
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
@@ -929,8 +1089,8 @@ public class MCRUserCommands
   throws MCRException
   {
     // get encoding
-    config = MCRConfiguration.instance();
-    String mcr_encoding = config.getString("MCR.metadata_default_encoding",
+    CONFIG = MCRConfiguration.instance();
+    String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding",
     				           MCRDefaults.ENCODING);
 
     // Create the output
