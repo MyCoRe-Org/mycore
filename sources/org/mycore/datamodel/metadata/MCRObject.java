@@ -310,8 +310,10 @@ public final String createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(4096);
   sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL);
-  sb.append("<mycoreobject ")
-    .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
+  sb.append("<mycoreobject ").append(NL);
+  sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
+    .append(NL);
+  sb.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\"")
     .append(NL);
   sb.append("xsi:noNamespaceSchemaLocation=\"../schema/")
     .append(mcr_id.getSchema()).append(".xsd\"").append(NL);

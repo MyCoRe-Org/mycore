@@ -188,9 +188,10 @@ public final String createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag);
+  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang)
+    .append("\"");
   if ((type != null) && ((type = type.trim()).length() !=0)) {
-    sb.append("\" type=\"").append(type).append("\""); }
+    sb.append(" type=\"").append(type).append("\""); }
   sb.append('>').append(NL);
   sb.append(getDateToString());
   sb.append("</").append(subtag).append('>').append(NL);

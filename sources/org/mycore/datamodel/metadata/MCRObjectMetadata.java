@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 
 /**
  * This class implements all methode for handling one object metadata part.
@@ -63,8 +64,6 @@ public MCRObjectMetadata() throws MCRConfigurationException
   {
   default_lang = MCRConfiguration.instance()
     .getString("MCR.metadata_default_lang");
-  if (default_lang == null) {
-    throw new MCRConfigurationException("MCR.metadata_default_lang"); }
   meta_list = new ArrayList();
   tag_names = new ArrayList();
   }
@@ -141,7 +140,8 @@ public final void setFromDOM(NodeList dom_element_list) throws MCRException
   {
   Element metadata_root = (Element)dom_element_list.item(0);
   String temp_lang = metadata_root.getAttribute("xml:lang");
-  if (temp_lang != null) { default_lang = temp_lang; }
+  if ((temp_lang != null) && ((temp_lang = temp_lang.trim()).length() !=0)) {
+    default_lang = temp_lang; }
   NodeList metadata_elements = metadata_root.getChildNodes();
   int len = metadata_elements.getLength();
   String temp_tag = "";
@@ -205,6 +205,7 @@ public final String createTS(Object mcr_query) throws MCRException
  * The methode returns <em>true</em> if
  * <ul>
  * <li> the array is empty
+ * <li> the default lang value was supported
  * </ul>
  * otherwise the methode return <em>false</em>
  *
@@ -213,6 +214,7 @@ public final String createTS(Object mcr_query) throws MCRException
 public final boolean isValid()
   {
   if (meta_list.size()==0) { return false; }
+  if (!MCRUtils.isSupportedLang(default_lang)) { return false; }
   return true;
   }
 
