@@ -59,6 +59,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -234,6 +235,14 @@ public class MCRLayoutServlet extends MCRServlet {
         String styleName = buildStylesheetName(style, docType, type);
         String styleDir = "/WEB-INF/stylesheets/";
         File styleFile = getStylesheetFile(styleDir, styleName);
+        if ((styleFile == null)
+                && ((style.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage())))){
+            /* We are here because we tried StaticFileServlet tried
+             * to get a stylesheet for a specific language */
+            style="default";
+            styleName = buildStylesheetName(style, docType, type);
+            styleFile = getStylesheetFile(styleDir, styleName);
+        }
         /*
          * if there is no stylesheet present forward as xml instead you can
          * transform xml-code using "doctype"-xml.xsl now

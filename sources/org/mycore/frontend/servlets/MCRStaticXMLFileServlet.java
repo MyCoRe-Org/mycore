@@ -24,16 +24,19 @@
 
 package org.mycore.frontend.servlets;
 
-import org.mycore.common.*;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
-import org.apache.log4j.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * This servlet displays static *.xml files stored in the web application
@@ -44,13 +47,13 @@ import javax.servlet.http.*;
  */
 public class MCRStaticXMLFileServlet extends MCRServlet
 {
-  protected final static Logger logger = Logger.getLogger(  MCRStaticXMLFileServlet.class );
+  protected final static Logger LOGGER = Logger.getLogger(  MCRStaticXMLFileServlet.class );
 
   public void doGetPost( MCRServletJob job )
     throws ServletException, java.io.IOException
   {
     String requestedPath = job.getRequest().getServletPath();
-    logger.info( "MCRStaticXMLFileServlet " + requestedPath );
+    LOGGER.info( "MCRStaticXMLFileServlet " + requestedPath );
     URL url = null;
     
     try{ url = getServletContext().getResource( requestedPath ); }
@@ -78,6 +81,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
     job.getRequest().setAttribute( "XSL.FileName", file.getName() );
     job.getRequest().setAttribute( "XSL.FilePath", file.getPath() );
+    job.getRequest().setAttribute( "XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage() );
     job.getRequest().setAttribute( "MCRLayoutServlet.Input.FILE", file );
     
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );

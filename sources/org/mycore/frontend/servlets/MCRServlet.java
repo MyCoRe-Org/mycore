@@ -53,8 +53,8 @@ public class MCRServlet extends HttpServlet {
 	// Some configuration details
 	protected static MCRConfiguration config;
 
-	private static Logger logger = Logger.getLogger(MCRServlet.class);
-	private static String baseURL, servletURL;
+	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
+	private static String BASE_URL, SERVLET_URL;
 
 	// These values serve to remember if we have a GET or POST request
 	private final static boolean GET = true;
@@ -72,12 +72,12 @@ public class MCRServlet extends HttpServlet {
 
 	/** returns the base URL of the mycore system */
 	public static String getBaseURL() {
-		return baseURL;
+		return BASE_URL;
 	}
 
 	/** returns the servlet base URL of the mycore system */
 	public static String getServletBaseURL() {
-		return servletURL;
+		return SERVLET_URL;
 	}
 
 	/**
@@ -93,9 +93,9 @@ public class MCRServlet extends HttpServlet {
 
 		String requestURL = req.getRequestURL().toString();
 		int pos = requestURL.indexOf(contextPath, 9);
-		baseURL = requestURL.substring(0, pos) + contextPath;
+		BASE_URL = requestURL.substring(0, pos) + contextPath;
 
-		servletURL = baseURL + "servlets/";
+		SERVLET_URL = BASE_URL + "servlets/";
 	}
 
 	// The methods doGet() and doPost() simply call the private method doGetPost(),
@@ -146,12 +146,12 @@ public class MCRServlet extends HttpServlet {
 			ReqCharEncoding =
 				config.getString("MCR.request_charencoding", "UTF-8");
 			req.setCharacterEncoding(ReqCharEncoding);
-			logger.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
+			LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
 		}
 		String c = getClass().getName();
 		c = c.substring(c.lastIndexOf(".") + 1);
 
-		if (baseURL == null)
+		if (BASE_URL == null)
 			prepareURLs(req);
 
 		try {
@@ -200,7 +200,7 @@ public class MCRServlet extends HttpServlet {
 				h = InetAddress.getByName(h).getHostName();
 			}
 			h = h.toLowerCase();
-			logger.info(c + " request from " + h + " : " + s + " user " + u);
+			LOGGER.info(c + " request from " + h + " : " + s + " user " + u);
 
 			MCRServletJob job = new MCRServletJob(req, res);
 
@@ -273,10 +273,10 @@ public class MCRServlet extends HttpServlet {
 		String servlet = cname.substring(cname.lastIndexOf(".") + 1);
 		String trace = MCRException.getStackTraceAsString(ex);
 
-		logger.info("Exception caught in : " + servlet);
-		logger.info("Exception type      : " + type);
-		logger.info("Exception message   : " + msg);
-		logger.debug(trace);
+		LOGGER.info("Exception caught in : " + servlet);
+		LOGGER.info("Exception type      : " + type);
+		LOGGER.info("Exception message   : " + msg);
+		LOGGER.debug(trace);
 	}
 
 	protected void generateErrorPage(
@@ -287,7 +287,7 @@ public class MCRServlet extends HttpServlet {
 		Exception ex,
 		boolean xmlstyle)
 		throws IOException, ServletException {
-		logger.error(
+		LOGGER.error(
 			getClass().getName()
 				+ ": Error "
 				+ error
@@ -318,7 +318,7 @@ public class MCRServlet extends HttpServlet {
 		request.setAttribute("XSL.Style", style);
 		RequestDispatcher rd =
 			getServletContext().getNamedDispatcher("MCRLayoutServlet");
-		logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
+		LOGGER.info("MCRQueryServlet: forward to MCRLayoutServlet!");
 		rd.forward(request, response);
 	}
 
