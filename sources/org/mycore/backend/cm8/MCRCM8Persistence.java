@@ -103,7 +103,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     }
     catch (MCRPersistenceException e) { }
     if (test) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
+      throw new MCRPersistenceException("The CM8 item with ID "+mcr_id.getId()+
         " exists."); }
     MCRCM8Item item = new MCRCM8Item(connection,itemtypename);
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
@@ -300,7 +300,7 @@ public final void delete(MCRObjectID mcr_id)
       logger.info("Item "+mcr_id.getId()+" was deleted.");
       }
     catch (MCRPersistenceException e) {
-      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
+      logger.warn("The CM8 item with ID "+mcr_id.getId()+" does not exist."); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
