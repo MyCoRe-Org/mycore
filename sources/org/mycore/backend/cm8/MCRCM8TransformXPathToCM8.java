@@ -520,8 +520,10 @@ public class MCRCM8TransformXPathToCM8
 			}
 			sbout.append(tag[i]);
 			if (op[i].equals("like")) {
-				// replace * with %
-				value[i] = "%" + value[i].replace('*', '%') + "%";
+				// replace * with % and add one % if it is not in the string
+                                if (value[i].indexOf("*") == -1) { 
+					value[i] = value[i] + "*"; }
+				value[i] = value[i].replace('*', '%');
 			}
 			// is value[0] a date
 			try {
