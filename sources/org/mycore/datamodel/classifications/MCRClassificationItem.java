@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -28,7 +28,7 @@ import org.mycore.common.*;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * This class represents a classification item of the MyCoRe classification 
+ * This class represents a classification item of the MyCoRe classification
  * model and implements the abstract MCRClassificationObject class.
  *
  * @author Frank Lützenkirchen
@@ -43,28 +43,28 @@ public class MCRClassificationItem extends MCRClassificationObject
    *
    * @param classID the ID of this classification
    **/
-  public MCRClassificationItem( String classID ) 
-    { 
+  public MCRClassificationItem( String classID )
+    {
     	super ( classID );
     	MCRObjectID.isValidOrDie(classID);
     }
-  
+
   /**
    * The constructor create a new MCRClassificationItem for the given
    * classID. This must be a valid MCRObjectID.
    *
    * @param classID the ID of this classification as MCRObjectID
    **/
-  public MCRClassificationItem( MCRObjectID classID ) 
+  public MCRClassificationItem( MCRObjectID classID )
     { super( classID.getId() ); }
-  
+
   /**
    * The method call the MCRClassificationManager to create this
    * instance.
    **/
   public final void create()
     { manager().createClassificationItem( this ); }
-  
+
   /**
    * The method call the MCRClassificationManager to delete this
    * instance.
@@ -83,7 +83,7 @@ public class MCRClassificationItem extends MCRClassificationObject
    **/
   public final void update()
     { manager().updateClassificationItem( this ); }
-  
+
   /**
    * The methode return the classification ID.
    *
@@ -91,7 +91,7 @@ public class MCRClassificationItem extends MCRClassificationObject
    **/
   public final String getClassificationID()
     { return ID; }
-  
+
   /**
    * The method return a MCRCategoryItem for the given category ID.
    *
@@ -99,11 +99,11 @@ public class MCRClassificationItem extends MCRClassificationObject
    * @return the MCRCategoryItem
    **/
   public MCRCategoryItem getCategoryItem( String categID )
-    { 
+    {
     ensureNotDeleted();
-    MCRArgumentChecker.ensureNotEmpty( categID, "categID" );  
+    MCRArgumentChecker.ensureNotEmpty( categID, "categID" );
     return MCRCategoryItem.getCategoryItem( this.ID, categID );
-    }  
+    }
 
   /**
    * The method return a MCRCategoryItem for the given category labeltext.
@@ -112,12 +112,12 @@ public class MCRClassificationItem extends MCRClassificationObject
    * @return the MCRCategoryItem
    **/
   public MCRCategoryItem getCategoryItemForLabelText( String labeltext )
-    { 
+    {
     ensureNotDeleted();
-    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext" );  
+    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext" );
     return MCRCategoryItem.getCategoryItemForLabelText( this.ID, labeltext );
-    }  
-  
+    }
+
   /**
    * The method return a MCRClassificationItem for the given classification ID.
    *
@@ -126,8 +126,21 @@ public class MCRClassificationItem extends MCRClassificationObject
    **/
   public static MCRClassificationItem getClassificationItem( String ID )
     {
-    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );  
+    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
     return manager().retrieveClassificationItem( ID );
     }
+
+	/**
+	  * The method return the number of Documents
+	  * for the ClassifID
+	  * @return int
+	  **/
+
+   public int countDocLinks()
+   {
+	   return manager().retrieveNumberOfDocs(ID );
+   }
+
+
 
   }
