@@ -150,6 +150,7 @@ public class MCRDerivateCommands
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
       if ( ! list[ i ].endsWith(".xml") ) continue;
+      if ( list [ i ].indexOf("derivate") == -1) continue;
       if( processFromFile( directory + SLASH + list[ i ], update ) )
         numProcessed++;
       }
