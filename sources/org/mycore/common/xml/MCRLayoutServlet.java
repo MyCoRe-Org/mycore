@@ -92,7 +92,17 @@ public class MCRLayoutServlet extends HttpServlet
                                 Attributes attributes )
         throws SAXException
       {
-        detected.setProperty( "rootElementName", qName );
+        logger.debug( "MCRLayoutServlet detected root element = " + qName );
+        detected.setProperty( "docType", qName );
+        throw new MCRException( forcedInterrupt );
+      }
+     
+      // We would need SAX 2.0 to be able to do this, for later use:
+      public void startDTD( String name, String publicId, String systemId )
+        throws SAXException
+      {
+        logger.debug( "MCRLayoutServlet detected DOCTYPE declaration = " + name );
+        detected.setProperty( "docType", name );
         throw new MCRException( forcedInterrupt );
       }
     };
@@ -112,7 +122,7 @@ public class MCRLayoutServlet extends HttpServlet
       }
     }
     
-    return detected.getProperty( "rootElementName" );
+    return detected.getProperty( "docType" );
   }
   
   protected void forwardXML( HttpServletRequest  request,
@@ -369,6 +379,8 @@ public class MCRLayoutServlet extends HttpServlet
       ( "Could not load a SAXTransformerFactory for use with XSLT" );
       
     factory = (SAXTransformerFactory)( tf );
+
+    factory.setURIResolver( new MCRURIResolver() ); // Useful for debugging
   }
   
   /**
@@ -478,5 +490,17 @@ public class MCRLayoutServlet extends HttpServlet
       throw new MCRException( msg, ex );
     }
     finally{ out.close(); }
+  }
+
+  class MCRURIResolver implements URIResolver
+  {
+    public Source resolve( String href, String base ) 
+      throws TransformerException 
+    {
+      logger.debug( "MCRURIResolver href = " + href );
+      logger.debug( "MCRURIResolver base = " + base );
+
+      return null;
+    }
   }
 }
