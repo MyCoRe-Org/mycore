@@ -408,23 +408,26 @@ public class MCRCommandLineInterface
       }
       logger.error( "Command not understood. Enter 'help' to get a list of commands." );
     }
-    catch( Exception ex ) 
+    catch( Throwable t1 ) 
     {
-      if( ex instanceof InvocationTargetException ) 
+      if( t1 instanceof MCRException )
+        logMCRException( (MCRException)t1 );
+      else if( ( t1 instanceof InvocationTargetException ) || ( t1 instanceof ExceptionInInitializerError ) ) 
       {
-        Throwable t = ( (InvocationTargetException)ex ).getTargetException();
+        Throwable t2 = null;
+        if( t1 instanceof InvocationTargetException )
+          t2 = ( (InvocationTargetException)t1 ).getTargetException();
+        else
+          t2 = ( (ExceptionInInitializerError)t1 ).getException();
 
-        if( t instanceof MCRException )
-          logMCRException( (MCRException)t );
-        else if( t instanceof Exception )
-          logException( (Exception)t );
+        if( t2 instanceof MCRException )
+          logMCRException( (MCRException)t2 );
+        else if( t2 instanceof Exception )
+          logException( (Exception)t2 );
         else // it is any other Throwable
-          logThrowable( t );
+          logThrowable( t2 );
       }
-      else if( ex instanceof MCRException )
-        logMCRException( (MCRException)ex );
-      else 
-        logException( ex );
+      else logThrowable( t1 );
     }
   }
 
