@@ -26,7 +26,10 @@ package org.mycore.services.plugins;
 import org.mycore.common.MCRException;
 
 /**
- * Exception to be thrown if transformation to text stream failed
+ * Thrown when an application tries to create an instance of a 
+ * class implementing the TextFilterPlugin interface, but the 
+ * specified class object cannot be instantiated because it has 
+ * requisites that are no met.
  * 
  * @author Thomas Scheffler (yagee)
  */
