@@ -41,6 +41,7 @@ import java.io.*;
  *   MCR.IFS.ContentStore.<StoreID>.IndexClass      Index Class to use
  *   MCR.IFS.ContentStore.<StoreID>.Keyfield.File   Keyfield storing file ID
  *   MCR.IFS.ContentStore.<StoreID>.Keyfield.Time   Keyfield storing timestamp
+ *   MCR.IFS.ContentStore.<StoreID>.Keyfield.Owner  Keyfield storing owner ID
  * </code>
  *
  * @author Frank Lützenkirchen
@@ -60,6 +61,9 @@ public class MCRCStoreContentManager7 extends MCRContentStore
   /** The name of the keyfield that stores the creation timestamp */
   protected String keyfieldTime;
   
+  /** The name of the keyfield that stores the creation MCRFile.getOwnerID */
+  protected String keyfieldOwner;
+  
   public void init( String storeID )
   {
     super.init( storeID );
@@ -70,6 +74,7 @@ public class MCRCStoreContentManager7 extends MCRContentStore
     indexClass   = config.getString( prefix + "IndexClass"    ); 
     keyfieldFile = config.getString( prefix + "Keyfield.File" );
     keyfieldTime = config.getString( prefix + "Keyfield.Time" );
+    keyfieldOwner = config.getString( prefix + "Keyfield.Owner" );
   }
   
   protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
@@ -81,6 +86,7 @@ public class MCRCStoreContentManager7 extends MCRContentStore
       MCRCM7Item item = new MCRCM7Item( connection, indexClass, DKConstant.DK_DOCUMENT );
       item.setKeyfield( keyfieldFile, file.getID()         );
       item.setKeyfield( keyfieldTime, buildNextTimestamp() );
+      item.setKeyfield( keyfieldOwner, ((MCRFile)file).getOwnerID() );
       item.create();
       String itemID = item.getItemId();
       

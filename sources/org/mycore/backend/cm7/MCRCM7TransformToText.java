@@ -122,9 +122,15 @@ public final String createSearchStringDate(GregorianCalendar date)
   if (date == null) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
   sb.append("YYY");
-  int idate = date.get(Calendar.YEAR)*10000 +
-              date.get(Calendar.MONTH)*100 +
-              date.get(Calendar.DAY_OF_MONTH);
+  int idate = 0;
+  if (date.get(Calendar.ERA) == GregorianCalendar.AD) {
+    idate = (4000+date.get(Calendar.YEAR))*10000 +
+                  date.get(Calendar.MONTH)*100 +
+                  date.get(Calendar.DAY_OF_MONTH); }
+  else {
+    idate = (4000-date.get(Calendar.YEAR))*10000 +
+                  date.get(Calendar.MONTH)*100 +
+                  date.get(Calendar.DAY_OF_MONTH); }
   String binstr = Integer.toBinaryString(idate);
   String binstrmax = Integer.toBinaryString(MAX_BIN_STRING_LENGTH);
   int lenstr = binstr.length();

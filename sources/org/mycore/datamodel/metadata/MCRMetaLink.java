@@ -51,9 +51,9 @@ public static final int MAX_XLINK_TYPE_LENGTH = 8;
 /** The length of XLink:href **/
 public static final int MAX_XLINK_HREF_LENGTH = 128;
 /** The length of XLink:label **/
-public static final int MAX_XLINK_LABEL_LENGTH = 64;
+public static final int MAX_XLINK_LABEL_LENGTH = 128;
 /** The length of XLink:title **/
-public static final int MAX_XLINK_TITLE_LENGTH = 64;
+public static final int MAX_XLINK_TITLE_LENGTH = 128;
 /** The length of XLink:from **/
 public static final int MAX_XLINK_FROM_LENGTH = MCRObjectID.MAX_LENGTH;
 /** The length of XLink:to **/

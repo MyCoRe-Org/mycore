@@ -24,6 +24,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.text.*;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUsageException;
@@ -42,7 +44,7 @@ public final class MCRObjectID
 /**
  * constant value for the object id length
  **/
-public static final int MAX_LENGTH = 32;
+public static final int MAX_LENGTH = 64;
 
 // constant definitions
 private static final String NL =
@@ -51,8 +53,11 @@ private static MCRConfiguration conf = null;
 
 private String mcr_project_id = null;
 private String mcr_type_id = null;
-private String mcr_number = null;
+private int mcr_number = -1;
 private boolean mcr_valid_id;
+
+private String number_pattern = null;
+private DecimalFormat number_format = null;
 
 /**
  * Static mthode to load the configuration.
@@ -69,8 +74,11 @@ public MCRObjectID ()
   {
   mcr_project_id = null;
   mcr_type_id = null;
-  mcr_number = null;
+  mcr_number = -1;
   mcr_valid_id = false;
+  number_pattern = conf.getString("MCR.metadata_objectid_number_pattern",
+    "0000000000");
+  number_format = new DecimalFormat(number_pattern);
   }
 
 /**
@@ -84,6 +92,9 @@ public MCRObjectID (String id) throws MCRException
   boolean is = isValid(id);
   if (!is) { throw new MCRException("The ID is not valid"); }
   mcr_valid_id = true;
+  number_pattern = conf.getString("MCR.metadata_objectid_number_pattern",
+    "0000000000");
+  number_format = new DecimalFormat(number_pattern);
   }
 
 /**
@@ -111,7 +122,8 @@ public void setNextId(String base_id) throws MCRUsageException
     String persist_name = conf.getString(proppers);
     mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
       .newInstance(); 
-    mcr_number = mcr_persist.getNextFreeId(mcr_project_id,mcr_type_id);
+    mcr_number = Integer.parseInt(mcr_persist.getNextFreeId(mcr_project_id,
+      mcr_type_id));
     }
   catch (Exception e) {
      throw new MCRUsageException(e.getMessage(),e); }
@@ -127,7 +139,7 @@ public final boolean setNumber(int num)
   {
   if (!mcr_valid_id) { return false; }
   if (num < 0) { return false; }
-  mcr_number = Integer.toString(num);
+  mcr_number = num;
   return true;
   }
 
@@ -161,10 +173,10 @@ public final String getTypeId()
  *
  * @return the string of the number
  **/
-public final String getNumber()
+public final String getNumberAsString()
   {
   if (!mcr_valid_id) { return ""; }
-  return mcr_number;
+  return number_format.format((long)mcr_number);
   }
 
 /**
@@ -176,7 +188,7 @@ public final String getNumber()
 public final int getNumberAsInteger()
   {
   if (!mcr_valid_id) { return -1; }
-  return (new Integer(mcr_number)).intValue();
+  return mcr_number;
   }
 
 /**
@@ -202,7 +214,10 @@ public final String getBase()
 public final String getId()
   {
   if (!mcr_valid_id) { return ""; }
-  return mcr_project_id+"_"+mcr_type_id+"_"+mcr_number;
+  StringBuffer sb = new StringBuffer(MAX_LENGTH);
+  sb.append(mcr_project_id).append('_').append(mcr_type_id)
+    .append('_').append(number_format.format((long)mcr_number));
+  return sb.toString();
   }
 
 /**
@@ -252,10 +267,10 @@ public final boolean isValid(String id)
   mcr_type_id = mcr_id.substring(i+1,j).toLowerCase();
   if (!conf.getBoolean("MCR.type_"+mcr_type_id.toLowerCase(),false)) { 
     return false; }
-  mcr_number = mcr_id.substring(j+1,len);
-  try { j = (new Integer(mcr_number)).intValue(); }
+  mcr_number = -1;
+  try { mcr_number = Integer.parseInt(mcr_id.substring(j+1,len)); }
   catch (NumberFormatException e) { return false; }
-  if ((new Integer(mcr_number)).intValue() < 0) { return false; }
+  if (mcr_number < 0) { return false; }
   mcr_valid_id = true;
   return mcr_valid_id; 
   }
@@ -270,7 +285,7 @@ public final boolean equals(MCRObjectID in)
   {
   if (!mcr_project_id.equals(in.getProjectId())) { return false; }
   if (!mcr_type_id.equals(in.getTypeId())) { return false; }
-  if (!mcr_number.equals(in.getNumber())) { return false; }
+  if (mcr_number != in.getNumberAsInteger()) { return false; }
   return true;
   }
 
