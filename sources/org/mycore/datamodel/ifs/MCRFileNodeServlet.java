@@ -45,6 +45,7 @@ import org.mycore.frontend.servlets.*;
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt 
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
@@ -110,7 +111,11 @@ public class MCRFileNodeServlet extends MCRServlet
     {
       String msg = "Error: HTTP request host is not in the alias list";
       logger.error( msg );
-      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+      generateErrorPage(req,
+                                 res,
+                                 HttpServletResponse.SC_BAD_REQUEST,msg,
+                                 new MCRException(hostAlias+" is not in the host alias list!"),
+                                 false);
       return;
     }
 
@@ -121,7 +126,11 @@ public class MCRFileNodeServlet extends MCRServlet
     {
       String msg = "Error: HTTP request path is null";
       logger.error( msg );
-      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+	  generateErrorPage(req,
+								 res,
+								 HttpServletResponse.SC_BAD_REQUEST,msg,
+								 new MCRException("No path was given in the request"),
+								 false);
       return;
     }
     
@@ -130,7 +139,11 @@ public class MCRFileNodeServlet extends MCRServlet
     {
       String msg = "Error: HTTP request path is empty";
       logger.error( msg );
-      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+	  generateErrorPage(req,
+								 res,
+								 HttpServletResponse.SC_BAD_REQUEST,msg,
+								 new MCRException("Empty path was given in the request"),
+								 false);
       return;
     }
     
@@ -151,7 +164,11 @@ public class MCRFileNodeServlet extends MCRServlet
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
         logger.error( msg );
-        res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+		generateErrorPage(req,
+								   res,
+								   HttpServletResponse.SC_NOT_FOUND,msg,
+								   new MCRException(msg),
+								   false);
         return;
       }
     
@@ -161,7 +178,11 @@ public class MCRFileNodeServlet extends MCRServlet
         {
           String msg = "Error: No such file or directory " + st.nextToken();
           logger.error( msg );
-          res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+		  generateErrorPage(req,
+									 res,
+									 HttpServletResponse.SC_NOT_FOUND,msg,
+									 new MCRException(msg),
+									 false);
           return;
         }
         else
@@ -182,7 +203,11 @@ public class MCRFileNodeServlet extends MCRServlet
         {
           String msg = "Error: No such file or directory " + path;
           logger.error( msg );
-          res.sendError( HttpServletResponse.SC_NOT_FOUND );
+		  generateErrorPage(req,
+									 res,
+									 HttpServletResponse.SC_NOT_FOUND,msg,
+									 new MCRException(msg),
+									 false);
           return;
         }
         else if( node instanceof MCRFile )
