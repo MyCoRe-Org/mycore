@@ -436,7 +436,7 @@ public class MCRCStoreContentManager8
 		item_type.setXDOClassID(DK_ICM_XDO_TEXT_CLASS_ID);
 		item_type.setTextIndexDef(mcr_item_text_index);
 		item_type.setTextSearchable(true);
-		DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
+		DKDatastoreDefICM dsDefICM = (DKDatastoreDefICM)connection.datastoreDef();
 		DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeFile);
 		attr.setNullable(false);
 		attr.setUnique(false);
