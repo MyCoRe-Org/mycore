@@ -6,6 +6,8 @@
 # $Revision$ $Date$
 #
 #######################################################################
+
+#######################################################################
 #
 # Environment for Relational Database System to use via JDBC and SQL
 #
@@ -27,13 +29,13 @@
 
 # IBM DB2 Version 7.* or 8.* under IBM AIX
 # MCR.JDBCStore.Type=db2
-# MCR.JDBCStore.BaseDir=/db2/db2inst1/sqllib
+# MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib
 # MCR.JDBCStore.Jars=java/sqlj.zip java12/db2java.zip java/runtime.zip
 # MCR.JDBCStore.ClassesDirs=function
 # MCR.JDBCStore.LibPath=java12 lib
 
 # MySQL under Linux or Windows: JDBC driver is included in MyCoRe!
-  MCR.JDBCStore.Type=mysql
+MCR.JDBCStore.Type=mysql
 
 ####################################################################### 
 #
@@ -68,31 +70,16 @@
 # MCR.XMLStore.ClassesDirs=lib cmgmt
 # MCR.XMLStore.LibPath=lib
 
-# eXist under Linux
+# XML:DB eXist under Linux
   MCR.XMLStore.Type=xmldb
   MCR.XMLStore.BaseDir=/home/mcradmin/eXist-1.0b1
   MCR.XMLStore.Jars=exist.jar lib/core/xmlrpc-1.2.jar
   MCR.XMLStore.LibPath=lib/core
 
-# eXist under Windows
+# XML:DB eXist under Windows
 # MCR.XMLStore.Type=xmldb
-# MCR.XMLStore.BaseDir=C:\\Java\\eXist-0.9.2
+# MCR.XMLStore.BaseDir=C:\\Java\\eXist-1.0b1
 # MCR.XMLStore.Jars=exist.jar lib/core/xmlrpc-1.2.jar
-
-# Lucene under Linux
-# MCR.XMLStore.Type=lucene
-# MCR.XMLStore.BaseDir=d:/usr/local/src/lucene-1.3-rc2
-# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
-
-# Lucene under Windows
-# MCR.XMLStore.Type=lucene
-# MCR.XMLStore.BaseDir=d:\\_Kannweg\\lucene-1.3-rc2
-# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
-
-# Tamino with xml:db
-# MCR.XMLStore.Type=tamino
-# MCR.XMLStore.BaseDir=d:\\_Kannweg\\taminomcr\\libs
-# MCR.XMLStore.Jars=tamino_xmldb.jar TaminoAPI4J.jar
 
 #######################################################################
 # 
@@ -109,6 +96,25 @@
 #######################################################################
 
 # MCR.WebAppServer.SharedJarsDir=
+
+#######################################################################
+# Experimental state DO NOT USE THIS !!!
+#######################################################################
+
+# XML:DB Tamino
+# MCR.XMLStore.Type=tamino
+# MCR.XMLStore.BaseDir=d:\\_Kannweg\\taminomcr\\libs
+# MCR.XMLStore.Jars=tamino_xmldb.jar TaminoAPI4J.jar
+
+# Lucene under Linux
+# MCR.XMLStore.Type=lucene
+# MCR.XMLStore.BaseDir=d:/usr/local/src/lucene-1.3-rc2
+# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
+
+# Lucene under Windows
+# MCR.XMLStore.Type=lucene
+# MCR.XMLStore.BaseDir=d:\\_Kannweg\\lucene-1.3-rc2
+# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
 
 #######################################################################
 
