@@ -139,7 +139,7 @@ public final String getLabel()
  *
  * @return the metadata tag part as a object that extend MCRMetaElement
  **/
-public final Object getMetadataElement(String tag)
+public final MCRMetaElement getMetadataElement(String tag)
   { return mcr_metadata.getMetadataElement(tag); }
 
 /**
@@ -281,7 +281,7 @@ public final void setLabel(String label)
  * @param tag      the tag of a metadata part
  * @return true if set was succesful, otherwise false
  **/
-public final boolean setMetadataElement(Object obj, String tag)
+public final boolean setMetadataElement(MCRMetaElement obj, String tag)
   { 
   if (obj == null) { return false; }
   if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }

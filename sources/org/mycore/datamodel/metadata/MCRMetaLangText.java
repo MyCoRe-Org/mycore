@@ -24,151 +24,103 @@
 
 package mycore.datamodel;
 
-import java.util.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRMetaElement;
 
 /**
- * This class implements all methode for handling with the LangText part
- * of a metadata object. The LangText class present a vector of items,
- * which has peers of a text and his corresponding language. The maximum
- * length of the vector is set in the property configuration.
+ * This class implements all methode for handling with the MCRMetaLangText part
+ * of a metadata object. The MCRMetaLangText class present a single item,
+ * which has peers of a text and his corresponding language. 
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaLangText extends MCRMetaElement 
-  implements MCRMetaInterface
+final public class MCRMetaLangText extends MCRMetaDefault 
+  implements MCRMetaInterface 
 {
 
 // MetaLangText data
 private String subtag;
-private int vec_max_length = 1;
-private Vector text;
-private Vector lang;
+private String text;
+private String lang;
 
 /**
- * This is the constructor of the MCRMetaLangText class. <br>
- * The methode set the default vector length to the value from the
- * configuration property <em>MCR.metadata_langtext_vec_max_length</em>.
+ * This is the constructor. <br>
+ * The default language for the element was set to <b>en</b>.
  */
 public MCRMetaLangText()
   {
+  lang = DEFAULT_LANGUAGE;
   subtag = "";
-  vec_max_length = MCRConfiguration.instance()
-    .getInt("MCR.metadata_langtext_vec_max_length",1);
-  text = new Vector(vec_max_length);
-  lang = new Vector(vec_max_length);
+  text = "";
   }
 
 /**
- * This is the constructor of the MCRMetaLangText class. <br>
- * The methode set the default vector length to the value from the
- * configuration property <em>MCR.metadata_langtext_vec_max_length</em>.
+ * This is the constructor. <br>
+ * The default language for the element was set. If the default languge
+ * is empty or false <b>en</b> was set.
  *
- * @param default_lang          the default language
+ * @param default_lang     the default language
  */
 public MCRMetaLangText(String default_lang)
   {
+  if ((default_lang == null) || 
+    ((default_lang = default_lang.trim()).length() ==0)) {
+    lang = DEFAULT_LANGUAGE; }
+  else {
+    lang = default_lang; }
   subtag = "";
-  setDefaultLang(default_lang);
-  vec_max_length = MCRConfiguration.instance()
-    .getInt("MCR.metadata_langtext_vec_max_length",1);
-  text = new Vector(vec_max_length);
-  lang = new Vector(vec_max_length);
+  text = "";
   }
 
 /**
- * This methode add a languge/text pair to the list. 
+ * This is the constructor. <br>
+ * The default language for the element was set. If the default languge
+ * is empty or false <b>en</b> was set.
+ * The subtag was set to the value of set_subtag.
  *
- * @param replang                the new language string, if this is null or
- *                               empty, the default language was set
- * @param reptex                 the new text string
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the vector is full
- **/
-public final void addElement(String replang, String reptext)
-  throws IndexOutOfBoundsException
+ * @param set_subtag       the name of the subtag
+ * @param default_lang     the default language
+ * @exception MCRException if the set_subtag value is null or empty
+ */
+public MCRMetaLangText(String set_subtag, String default_lang)
+  throws MCRException
   {
-  if (lang.size()>=vec_max_length) {
-    throw new IndexOutOfBoundsException("Index error in addElement."); }
-  if ((replang == null) || ((replang = replang.trim()).length() ==0)) {
-    lang.addElement(default_lang); }
+  if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() ==0)) {
+    throw new MCRException("MCRMetaLangText : The set_subtag is"+
+      " null or empty."); }
+  if ((default_lang == null) ||
+    ((default_lang = default_lang.trim()).length() ==0)) {
+    lang = DEFAULT_LANGUAGE; }
   else {
-    lang.addElement(replang); }
-  text.addElement(reptext);
+    lang = default_lang; }
+  subtag = set_subtag;
+  text = "";
   }
 
 /**
- * This methode get a language element from the vector for the given index.
+ * This methode set a languge/text pair. 
  *
- * @param index                 the index id of the element
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the index is false
+ * @param set_lang        the new language string, if this is null or
+ *                        empty, nothing is to do
+ * @param set_text        the new text string
  **/
-public final String getLangElement(int index) throws IndexOutOfBoundsException
+public final void set(String set_lang, String set_text)
   {
-  if ((index<0)||(index>lang.size())) {
-    throw new IndexOutOfBoundsException("Index error in getLangElement."); }
-  return (String)lang.elementAt(index);  
+  if ((set_lang != null) && ((set_lang = set_lang.trim()).length() !=0)) {
+    lang = set_lang; }
+  text = set_text;
   }
 
 /**
- * This methode get a text element from the vector for the given index.
+ * This methode get the text element.
  *
- * @param index                 the index id of the element
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the index is false
+ * @return the text
  **/
-public final String getTextElement(int index) throws IndexOutOfBoundsException
-  {
-  if ((index<0)||(index>lang.size())) {
-    throw new IndexOutOfBoundsException("Index error in getTextElement."); }
-  return (String)text.elementAt(index);  
-  }
-
-/**
- * This methode remove a languge/text pair from a given index of the list. 
- *
- * @param index                  a index of the list
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the index is false
- **/
-public final void removeElement(int index) throws IndexOutOfBoundsException
-  {
-  if ((index<0)||(index>lang.size())) {
-    throw new IndexOutOfBoundsException("Index error in removeElement."); }
-  lang.removeElementAt(index);
-  text.removeElementAt(index);
-  }
-
-/**
- * This methode replace a languge/text pair for a given index of the list. 
- *
- * @param index                  a index of the list
- * @param replang                the new language string, if this is null or
- *                               empty, the default language was set
- * @param reptex                 the new text string
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the index is false
- **/
-public final void replaceElement(int index, String replang, String reptext)
-  throws IndexOutOfBoundsException
-  {
-  if ((index<0)||(index>lang.size())) {
-    throw new IndexOutOfBoundsException("Index error in replaceElement."); }
-  if ((replang == null) || ((replang = replang.trim()).length() ==0)) {
-    lang.setElementAt(default_lang,index); }
-  else {
-    lang.setElementAt(replang,index); }
-  text.setElementAt(reptext,index);
-  }
+public final String getText()
+  { return text; }
 
 /**
  * This methode read the XML input stream part from a DOM part for the
@@ -178,86 +130,83 @@ public final void replaceElement(int index, String replang, String reptext)
  **/
 public final void setFromDOM(Node metadata_langtext_node)
   {
-  String temp_lang = null, temp_text = null;
-  setTag(metadata_langtext_node.getNodeName());
-  Element langtext_element = (Element)metadata_langtext_node;
-  class_name =  langtext_element.getAttribute("type");
-  String here_string = langtext_element.getAttribute("hereditary");
-  if (here_string == null) { here_string = ""; }
-  setHereditary(here_string);
-  NodeList langtext_subelement_list = langtext_element.getChildNodes();
-  int langtext_subelement_counter = langtext_subelement_list.getLength();
-  for (int i = 0; i < langtext_subelement_counter; i++) {
-    Node langtext_item = langtext_subelement_list.item(i);
-    if (i==1) { subtag = langtext_item.getNodeName(); }
-    if (langtext_item.getNodeType() != Node.ELEMENT_NODE) { continue; }
-    temp_lang = ((Element)langtext_item).getAttribute("xml:lang");
-    if (temp_lang==null) { temp_lang = default_lang; }
-    lang.addElement(temp_lang);
-    Node langtext_textelement = langtext_item.getFirstChild();
-    temp_text = ((Text)langtext_textelement).getData().trim();
-    if (temp_text==null) {
-      temp_text = ""; }
-    text.addElement(temp_text);
-    }
+  subtag = metadata_langtext_node.getNodeName(); 
+  String temp_lang = ((Element)metadata_langtext_node).getAttribute("xml:lang");
+  if (temp_lang!=null) { lang = temp_lang; }
+  Node langtext_textelement = metadata_langtext_node.getFirstChild();
+  String temp_text = ((Text)langtext_textelement).getData().trim();
+  if (temp_text==null) { temp_text = ""; }
+  text = temp_text;
   }
 
 /**
  * This methode create a XML stream for all data in this class, defined
- * by the MyCoRe XML LangText definition for the given tag and subtag.
+ * by the MyCoRe XML MCRMetaLangText definition for the given subtag.
  *
- * @return a XML string with the XML LangText part
+ * @exception MCRException if the content of this class is not valid
+ * @return a XML string with the XML MCRMetaLangText part
  **/
-public final String createXML()
+public final String createXML() throws MCRException
   {
+  if (!isValid()) {
+    throw new MCRException("MCRMetaLangText : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(tag).append(" type=\"MCRMetaLangText\" hereditary=\"")
-    .append(hereditary).append("\">").append(NL);
-  for (int i=0;i<text.size();i++) {
-    sb.append('<').append(subtag).append(" xml:lang=\"")
-      .append(lang.elementAt(i)).append("\">").append(NL);
-    sb.append(text.elementAt(i));
-    sb.append("</").append(subtag).append('>').append(NL);
-    }
-  sb.append("</").append(tag).append('>').append(NL);
+  sb.append('<').append(subtag).append(" xml:lang=\"")
+    .append(lang).append("\">").append(NL);
+  sb.append(text);
+  sb.append("</").append(subtag).append('>').append(NL);
   return sb.toString();
   }
 
 /**
  * This methode create a Text Search stream for all data in this class, defined
- * by the MyCoRe XML LangText definition for the given tag and subtag.
+ * by the MyCoRe TS MCRMetaLangText definition for the given tag and subtag.
  * The content of this stream is depended by the implementation for
  * the persistence database. It was choose over the
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
- * @return a XML string with the XML LangText part
+ * @exception MCRException if the content of this class is not valid
+ * @return a TS string with the TS MCRMetaLangText part
  **/
-public final String createTS(Object mcr_query)
+public final String createTS(Object mcr_query) throws MCRException
   {
+  if (!isValid()) {
+    throw new MCRException("MCRMetaLangText : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
-  for (int i=0;i<text.size();i++) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-        (String)text.elementAt(i)));
-    }
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
+    text));
   return sb.toString();
   }
 
 /**
- * This metode print all data content from the MetaLangText vector.
+ * This methode check the validation of the content of this class.
+ * The methode returns <em>true</em> if
+ * <ul>
+ * <li> the subtag is not null or empty
+ * <li> the text is not null or empty
+ * </ul>
+ * otherwise the methode return <em>false</em>
+ *
+ * @return a boolean value
+ **/
+public final boolean isValid()
+  {
+  if ((text == null) || ((text = text.trim()).length() ==0)) {
+    return false; }
+  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
+    return false; }
+  return true;
+  }
+
+/**
+ * This metode print all data content from the MCRMetaLangText class.
  **/
 public final void debug()
   {
-  System.out.println("metadata class name            = "+class_name);
-  System.out.println("metadata tag                   = "+tag);
-  System.out.println("metadata subtag                = "+subtag);
-  System.out.println("metadata hereditary            = "+hereditary);
-  for (int i=0;i<text.size();i++) {
-    System.out.println("--- text with lang "+lang.elementAt(i)+" --->");
-    System.out.println(text.elementAt(i));
-    System.out.println("-------->");
-    }
-  System.out.println();
+  System.out.println("--- text for "+subtag+" with lang "+lang+" ---");
+  System.out.println(text);
+  System.out.println("--- ---");
   }
 
 }

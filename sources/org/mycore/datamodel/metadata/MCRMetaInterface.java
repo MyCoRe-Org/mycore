@@ -38,18 +38,11 @@ public interface MCRMetaInterface
 {
 
 /**
- * This methode return the tag of this metadata class as string.
+ * This methode set the default language to the class.
  *
- * @return the tag of this metadata class as string
+ * @param default_lang           the default language
  **/
-public String getTag();
-
-/**
- * This methode set the default language for the metadata class.
- *
- * @param default_lang          the default language
- */
-public void setDefaultLang(String lang);
+public void setLang(String default_lang);
 
 /**
  * This methode read the XML input stream part from a DOM part for the
@@ -62,9 +55,10 @@ public void setFromDOM(Node metadata_langtext_node);
 /**
  * This methode create a XML stream for a metadata part.
  *
+ * @exception MCRException if the content of this class is not valid
  * @return a XML string with the XML data of the metadata part
  **/
-public String createXML();
+public String createXML() throws MCRException;
 
 /**
  * This methode create a Text Search stream for a metadata part.
@@ -73,9 +67,17 @@ public String createXML();
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param type   the type of the persistece system
+ * @exception MCRException if the content of this class is not valid
  * @return a Text Search string with the data of the metadata part
  **/
-public String createTS(Object mcr_query);
+public String createTS(Object mcr_query) throws MCRException;
+
+/**
+ * This methode check the validation of the content of this class.
+ *
+ * @return a boolean value
+ **/
+public boolean isValid();
 
 /**
  * This methode print all elements of the metadata class.

@@ -31,7 +31,6 @@ import org.w3c.dom.NodeList;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRMetaInterface;
 
 /**
  * This class implements all methode for handling one object metadata part.
@@ -43,72 +42,91 @@ import mycore.datamodel.MCRMetaInterface;
  **/
 public class MCRObjectMetadata
 {
-private String NL;
+// common data
+private static String NL = 
+  new String((System.getProperties()).getProperty("line.separator"));;
 private String default_lang = null;
-private String meta_package_name = "mycore.datamodel.";
+
+// metadata list
 private ArrayList meta_list = null;
+private ArrayList tag_names = null;
 
 /**
  * This is the constructor of the MCRObjectMetadata class. It set the default
- * language for all metadata to the value from the configuration properties.
+ * language for all metadata to the value from the configuration propertie
+ * <em>MCR.metadata_default_lang</em>.
  *
  * @exception MCRConfigurationException
  *                              a special exception for configuartion data
  */
 public MCRObjectMetadata() throws MCRConfigurationException
   {
-  NL = new String((System.getProperties()).getProperty("line.separator"));
   default_lang = MCRConfiguration.instance()
     .getString("MCR.metadata_default_lang");
   if (default_lang == null) {
     throw new MCRConfigurationException("MCR.metadata_default_lang"); }
   meta_list = new ArrayList();
+  tag_names = new ArrayList();
   }
 
 /**
- * This methode return the object metadata element selected by tag.
+ * This methode return the MCRMetaElement selected by tag.
  * If this was not found, null was returned.
  *
- * @return the metadata tag part as a object that extend MCRMetaElement
+ * @return the MCRMetaElement for the tag
  **/
-public final Object getMetadataElement(String tag)
+public final MCRMetaElement getMetadataElement(String tag)
   {
   if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return null; }
-  Object meta_obj = new Object();
-  int len = meta_list.size();
+  int len = tag_names.size();
   for (int i = 0; i < len; i++) {
-    meta_obj = meta_list.get(i);
-    if (((MCRMetaInterface)meta_obj).getTag().equals(tag)) { 
-      return meta_obj; }
+    if (((String)tag_names.get(i)).equals(tag)) {
+      return (MCRMetaElement)meta_list.get(i); }
     }
   return  null;
   }
 
 /**
- * This methode set the given object metadata element.
+ * This methode set the given MCRMetaElement to the list. If the
+ * tag exists the MCRMetaElement was replaced.
  *
- * @param obj       the metadata part object
- * @param tag       the metadata part tag
+ * @param obj       the MCRMetaElement object
+ * @param tag       the MCRMetaElement tag
  * @return true if set was succesful, otherwise false
  **/
-public final boolean setMetadataElement(Object obj, String tag)
+public final boolean setMetadataElement(MCRMetaElement obj, String tag)
   { 
   if (obj == null) { return false; }
   if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }
-  Object meta_obj = new Object();
-  int len = meta_list.size();
+  int len = tag_names.size();
   int fl = -1;
   for (int i = 0; i < len; i++) {
-    meta_obj = meta_list.get(i);
-    if (((MCRMetaInterface)meta_obj).getTag().equals(tag)) { fl = i; }
+    if (((String)tag_names.get(i)).equals(tag)) { fl = i; }
     }
   if (fl == -1) {
     meta_list.add(obj);
+    tag_names.add(tag);
     return true;
     }
   meta_list.remove(fl);
   meta_list.add(obj);
-  return true;
+  return false;
+  }
+
+/**
+ * This methode remove the MCRMetaElement selected by tag from the list.
+ *
+ * @return true if set was succesful, otherwise false
+ **/
+public final boolean removeMetadataElement(String tag)
+  {
+  if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }
+  int len = tag_names.size();
+  for (int i = 0; i < len; i++) {
+    if (((String)tag_names.get(i)).equals(tag)) {
+      meta_list.remove(i); return true; }
+    }
+  return false;
   }
 
 /**
@@ -117,54 +135,45 @@ public final boolean setMetadataElement(Object obj, String tag)
  *
  * @param dom_element_list       a list of relevant DOM elements for
  *                               the metadata
+ * @exception MCRException       if a problem is occured
  **/
-public final void setFromDOM(NodeList dom_element_list)
+public final void setFromDOM(NodeList dom_element_list) throws MCRException
   {
-  String meta_class_name;
   Element metadata_root = (Element)dom_element_list.item(0);
-  default_lang = metadata_root.getAttribute("xml:lang");
+  String temp_lang = metadata_root.getAttribute("xml:lang");
+  if (temp_lang != null) { default_lang = temp_lang; }
   NodeList metadata_elements = metadata_root.getChildNodes();
   int len = metadata_elements.getLength();
+  String temp_tag = "";
   for (int i=0;i<len;i++) {
     Node metadata_item = metadata_elements.item(i);
     if (metadata_item.getNodeType() != Node.ELEMENT_NODE) { continue; }
-    System.out.println("Nodename = "+metadata_item.getNodeName()+" "+
-      metadata_item.getNodeType());
-    meta_class_name = meta_package_name +
-      ((Element)metadata_item).getAttribute("type");
-    System.out.println("Classname = "+meta_class_name);
-    Object meta_obj = new Object();
-    try {
-      meta_obj = Class.forName(meta_class_name).newInstance();
-      ((MCRMetaInterface)meta_obj).setDefaultLang(default_lang);
-      ((MCRMetaInterface)meta_obj).setFromDOM(metadata_item);
-      }
-    catch (ClassNotFoundException e) {
-       System.out.println("ClassNotFoundException : "+e.getMessage()); }
-    catch (IllegalAccessException e) {
-       System.out.println("IllegalAccessException : "+e.getMessage()); }
-    catch (InstantiationException e) {
-       System.out.println("InstantiationException : "+e.getMessage()); }
-    meta_list.add(meta_obj);
+    temp_tag = metadata_item.getNodeName();
+    if ((temp_tag == null) || ((temp_tag = temp_tag.trim()).length() ==0)) {
+      throw new MCRException("MCRObjectMetadata : The tag is null or empty."); }
+    tag_names.add(temp_tag);
+    MCRMetaElement obj = new MCRMetaElement(default_lang);
+    obj.setFromDOM(metadata_item);
+    meta_list.add(obj);
     }
   }
-
+    
 /**
  * This methode create a XML stream for all metadata.
  *
+ * @exception MCRException if the content of this class is not valid
  * @return a XML string with the XML data of the metadata part
  **/
-public final String createXML()
+public final String createXML() throws MCRException
   {
+  if (!isValid()) {
+    throw new MCRException("MCRObjectMetadata : The content is not valid."); }
   StringBuffer sb = new StringBuffer(2048);
   sb.append("<metadata xml:lang=\"").append(default_lang).append("\">")
     .append(NL);
-  Object meta_obj;
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    meta_obj = meta_list.get(i);
-    sb.append(((MCRMetaInterface)meta_obj).createXML());
-    }
+    sb.append(((MCRMetaElement)meta_list.get(i)).createXML()); }
   sb.append("</metadata>").append(NL);
   return sb.toString();
   }
@@ -176,18 +185,35 @@ public final String createXML()
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @exception MCRException if the content of this class is not valid
  * @return a Text Search string with the data of the metadata part
  **/
-public final String createTS(Object mcr_query)
+public final String createTS(Object mcr_query) throws MCRException
   {
+  if (!isValid()) {
+    throw new MCRException("MCRObjectMetadata : The content is not valid."); }
   StringBuffer sb = new StringBuffer(2048);
-  Object meta_obj;
+  sb.append("");
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    meta_obj = meta_list.get(i);
-    sb.append(((MCRMetaInterface)meta_obj).createTS(mcr_query));
-    }
+    sb.append(((MCRMetaElement)meta_list.get(i)).createTS(mcr_query)); }
   return sb.toString();
+  }
+
+/**
+ * This methode check the validation of the content of this class.
+ * The methode returns <em>true</em> if
+ * <ul>
+ * <li> the array is empty
+ * </ul>
+ * otherwise the methode return <em>false</em>
+ *
+ * @return a boolean value
+ **/
+public final boolean isValid()
+  {
+  if (meta_list.size()==0) { return false; }
+  return true;
   }
 
 /**
@@ -199,11 +225,8 @@ public final void debug()
   System.out.println("The document matadata content :");
   System.out.println("default language               = "+default_lang);
   System.out.println();
-  Object meta_obj;
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    meta_obj = meta_list.get(i);
-    ((MCRMetaInterface)meta_obj).debug();
-    }
+    ((MCRMetaElement)meta_list.get(i)).debug(); }
   }
 }
