@@ -81,9 +81,9 @@ public final MCRQueryResultArray getResultList(String query, String type,
   if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-  //System.out.println("================================");
-  //System.out.println("MCRCM7TransformXQueryToText : "+query);
-  //System.out.println("================================");
+//System.out.println("================================");
+//System.out.println("MCRCM7TransformXQueryToText : "+query);
+//System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
@@ -95,7 +95,7 @@ public final MCRQueryResultArray getResultList(String query, String type,
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-    //System.out.println("Next cond :"+onecond);
+//System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
     cond.append(traceOneCondition(onecond));
@@ -109,10 +109,10 @@ public final MCRQueryResultArray getResultList(String query, String type,
         }
       }
     }
-  if (cond.length()==1) { cond.append("(XXXMYCOREOBJECTXXXIDXXX)"); }
+  if (cond.length()==1) { cond.append("( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
-  //System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-  //System.out.println("================================");
+//System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
+//System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
