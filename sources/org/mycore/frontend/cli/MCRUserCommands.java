@@ -62,7 +62,7 @@ private static void init()
 /**
  * The method initialized the user and group system an creat a
  * superunser with the values of the mycore.properties. As 'super'
- * default, if no properties was find, mcradmin with password mycore was 
+ * default, if no properties was find, mcradmin with password mycore was
  * used.
  *
  * @param session the MCRSession object
@@ -108,11 +108,13 @@ public static void initSuperuser(MCRSession session) throws MCRException
       "Users with this privilege may list the users of the system."));
     privList.add(new MCRPrivilege("list all privileges",
       "Users with this privilege may list the privileges of the system."));
+    privList.add(new MCRPrivilege("change owner of object",
+      "Users with this privilege may change the owner of an object in the repository."));
     MCRUserMgr.instance().initializePrivileges(privList);
     }
   catch (Exception e) {
     throw new MCRException("Can't create the privileges.",e); }
-  logger.info("The privillege set is installed.");
+  logger.info("The privilege set is installed.");
 
   // the superuser group
   try {
@@ -125,6 +127,7 @@ public static void initSuperuser(MCRSession session) throws MCRException
     ArrayList groupIDs = new ArrayList();
     ArrayList privileges= new ArrayList();
     privileges.add("user administrator");
+    privileges.add("change owner of object");
     MCRGroup g = new MCRGroup(sgroup,suser,null,null,"The superuser group",
       admUserIDs,admGroupIDs,mbrUserIDs,mbrGroupIDs,groupIDs,privileges);
     MCRUserMgr.instance().initializeGroup(g,suser);
@@ -151,7 +154,7 @@ public static void initSuperuser(MCRSession session) throws MCRException
     MCRUserMgr.instance().initializeGroup(g,suser);
     }
   catch (Exception e) {
-    throw new MCRException("Can't create the superuser group.",e); }
+    throw new MCRException("Can't create the guest group.",e); }
   logger.info("The group "+ggroup+" is installed.");
 
   // the superuser
@@ -178,7 +181,7 @@ public static void initSuperuser(MCRSession session) throws MCRException
     MCRUserMgr.instance().initializeUser(u,suser);
     }
   catch (Exception e) {
-    throw new MCRException("Can't create the guest.",e); }
+    throw new MCRException("Can't create the guest user.",e); }
   logger.info("The user "+guser+" with password "+gpasswd+" is installed.");
 
   // check all
@@ -230,7 +233,7 @@ public static void deleteUser(MCRSession session, String userID) throws Exceptio
  * @param session the MCRSession object
  * @param userID the ID of the user which will be enabled
  **/
-public static void enableUser(MCRSession session, String userID) 
+public static void enableUser(MCRSession session, String userID)
   throws Exception
   {
   init();
@@ -244,7 +247,7 @@ public static void enableUser(MCRSession session, String userID)
  * @param session the MCRSession object
  * @param userID the ID of the user which will be enabled
  **/
-public static void disableUser(MCRSession session, String userID) 
+public static void disableUser(MCRSession session, String userID)
   throws Exception
   {
   init();
@@ -302,13 +305,13 @@ public static void listAllPrivileges(MCRSession session) throws MCRException
   }
 
 /**
- * This command takes a file name as a parameter, retrieves all groups from 
+ * This command takes a file name as a parameter, retrieves all groups from
  * MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param session the MCRSession object
  * @param filename Name of the file the groups will be saved to
  */
-public static void saveAllGroupsToFile(MCRSession session, String filename) 
+public static void saveAllGroupsToFile(MCRSession session, String filename)
   throws MCRException
   {
   try {
@@ -321,7 +324,7 @@ public static void saveAllGroupsToFile(MCRSession session, String filename)
   }
 
 /**
- * This command takes a file name as a parameter, retrieves all privileges 
+ * This command takes a file name as a parameter, retrieves all privileges
  * from MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param filename Name of the file the privileges will be saved to
@@ -340,13 +343,13 @@ public static void saveAllPrivilegesToFile(MCRSession session, String filename)
   }
 
 /**
- * This command takes a file name as a parameter, retrieves all users from 
+ * This command takes a file name as a parameter, retrieves all users from
  * MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param session the MCRSession object
  * @param filename Name of the file the users will be saved to
  */
-public static void saveAllUsersToFile(MCRSession session, String filename) 
+public static void saveAllUsersToFile(MCRSession session, String filename)
   throws MCRException
   {
   try {
@@ -359,14 +362,14 @@ public static void saveAllUsersToFile(MCRSession session, String filename)
   }
 
 /**
- * This command takes a groupID and file name as a parameter, retrieves the 
+ * This command takes a groupID and file name as a parameter, retrieves the
  * group from MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param session the MCRSession object
  * @param groupID  ID of the group to be saved
  * @param filename Name of the file the groups will be saved to
  */
-public static void saveGroupToFile(MCRSession session, String groupID, 
+public static void saveGroupToFile(MCRSession session, String groupID,
   String filename) throws Exception
   {
   try {
@@ -380,14 +383,14 @@ public static void saveGroupToFile(MCRSession session, String groupID,
   }
 
 /**
- * This command takes a userID and file name as a parameter, retrieves the 
+ * This command takes a userID and file name as a parameter, retrieves the
  * user from MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param session the MCRSession object
  * @param userID   ID of the user to be saved
  * @param filename Name of the file the user will be saved to
  */
-public static void saveUserToFile(MCRSession session, String userID, 
+public static void saveUserToFile(MCRSession session, String userID,
   String filename) throws MCRException
   {
   try {
@@ -407,7 +410,7 @@ public static void saveUserToFile(MCRSession session, String userID,
  * @param session the MCRSession object
  * @param userID the ID of the user for which the password will be set
  */
-public static void setPassword(MCRSession session,String userID, 
+public static void setPassword(MCRSession session,String userID,
   String password) throws MCRException
   {
   if (password == null) return;
@@ -416,7 +419,7 @@ public static void setPassword(MCRSession session,String userID,
   logger.info("The new password was set.");
   }
 
-/** 
+/**
  *This method sets the user management component to read only mode
  *
  * @param session the MCRSession object
@@ -429,7 +432,7 @@ public static void setLock(MCRSession session) throws MCRException
     " denied.");
   }
 
-/** 
+/**
  * This method sets the user management component to read/write access mode
  *
  * @param session the MCRSession object
@@ -449,7 +452,7 @@ public static void unLock(MCRSession session) throws MCRException
  * @param session the MCRSession object
  * @param groupID the ID of the group for which the XML-representation is needed
  */
-public static final void showGroup(MCRSession session,String groupID) 
+public static final void showGroup(MCRSession session,String groupID)
   throws MCRException
   {
   MCRGroup group = MCRUserMgr.instance().retrieveGroup(session,groupID, true);
@@ -464,7 +467,7 @@ public static final void showGroup(MCRSession session,String groupID)
  * @param session the MCRSession object
  * @param userID the ID of the user for which the XML-representation is needed
  */
-public static final void showUser(MCRSession session, String userID) 
+public static final void showUser(MCRSession session, String userID)
   throws MCRException
   {
   MCRUser user = MCRUserMgr.instance().retrieveUser(session,userID, true);
@@ -481,10 +484,10 @@ private static final boolean checkFilename(String filename)
   {
   init();
   if( ! filename.endsWith( ".xml" ) ) {
-    logger.warn( filename + " ignored, does not end with *.xml" ); 
+    logger.warn( filename + " ignored, does not end with *.xml" );
     return false; }
   if( ! new File( filename ).isFile() ) {
-    logger.warn( filename + " ignored, is not a file." ); 
+    logger.warn( filename + " ignored, is not a file." );
     return false;}
   return true;
   }
@@ -639,7 +642,7 @@ private static final void showAsXML(org.jdom.Document jdomDoc)
  * @param jdomDoc  the JDOM XML document to be printed
  * @param outFile  a FileWriter object for the output
  */
-private static final void saveToXMLFile(org.jdom.Document jdomDoc, 
+private static final void saveToXMLFile(org.jdom.Document jdomDoc,
   FileWriter outFile)
   {
   // get encoding
@@ -650,7 +653,7 @@ private static final void saveToXMLFile(org.jdom.Document jdomDoc,
   org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(
     "  ", true,mcr_encoding);
   try { outputter.output(jdomDoc, outFile); }
-  catch (Exception e) { 
+  catch (Exception e) {
     throw new MCRException("Error while save XML to file."); }
   }
 }

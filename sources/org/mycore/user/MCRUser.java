@@ -283,6 +283,17 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   { return getPrivileges().contains(privilege); }
 
   /**
+   * This method checks if the user is authenticated. It does so by querying the user
+   * manager. This information is needed to assign categories in the access control
+   * subsystem.
+   *
+   * @return
+   *   returns true if the user is authenticated
+   */
+  public final boolean isAuthenticated()
+  { return MCRUserMgr.instance().isAuthenticated(this); }
+
+  /**
    * @return
    *   This method returns true if the user is enabled and may login.
    */
