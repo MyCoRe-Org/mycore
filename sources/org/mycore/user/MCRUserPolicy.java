@@ -39,6 +39,9 @@ public class MCRUserPolicy
   /** Vector with Strings indicating required user fields */
   private Vector reqUserAttributes = null;
 
+  /** Vector with Strings indicating required group fields */
+  private Vector reqGroupAttributes = null;
+
   /** The one and only instance of this class */
   private static MCRUserPolicy theInstance = null;
 
@@ -59,13 +62,18 @@ public class MCRUserPolicy
     reqUserAttributes.add("telephone");
     reqUserAttributes.add("email");
     reqUserAttributes.add("primary_group");
+
+    reqGroupAttributes = new Vector();
+    reqGroupAttributes.add("groupID");
+    reqGroupAttributes.add("creator");
   }
 
   /**
    * This method is the only way to get an instance of this class. It calls the
    * private constructor to create the singleton.
    *
-   * @return returns the one and only instance of <CODE>MCRUserPolicy</CODE>
+   * @return
+   *   returns the one and only instance of <CODE>MCRUserPolicy</CODE>
    */
   public final static synchronized MCRUserPolicy instance() throws Exception
   {
@@ -75,20 +83,34 @@ public class MCRUserPolicy
   }
 
   /**
-   * This method returns true if the given field is a required attribute.
-   * @param required  string value representing a user attribute to check
-   *                  whether it is required
+   * This method returns true if the given field is a required user attribute.
+   * @param required
+   *   string value representing a user attribute to check whether it is required
    */
   public boolean isRequiredForUser(String required)
-  {
-    if (reqUserAttributes.contains(required))
-      return true;
-    else return false;
-  }
+  { return (reqUserAttributes.contains(required)) ? true : false; }
 
   /**
-   * This method simply returns the vector with required fields.
+   * This method returns true if the given field is a required group attribute.
+   * @param required
+   *   string value representing a group attribute to check whether it is required
+   */
+  public boolean isRequiredForGroup(String required)
+  { return (reqGroupAttributes.contains(required)) ? true : false; }
+
+  /**
+   * @return
+   *   This method returns a vector of strings with the names of required
+   *   user attributes.
    */
   public Vector getRequiredUserAttributes()
   { return reqUserAttributes; }
+
+  /**
+   * @return
+   *   This method returns a vector of strings with the names of required
+   *   group attributes.
+   */
+  public Vector getRequiredGroupAttributes()
+  { return reqGroupAttributes; }
 }

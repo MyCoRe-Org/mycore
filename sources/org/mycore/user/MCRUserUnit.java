@@ -25,8 +25,7 @@
 package mycore.user;
 
 import java.io.*;
-import java.util.Date;
-import java.text.DateFormat;
+import java.sql.Timestamp;
 import org.w3c.dom.Document;
 import mycore.xml.MCRXMLHelper;
 
@@ -48,53 +47,72 @@ abstract class MCRUserUnit
   protected String creator = "";
 
   /** The date of creation of the user unit object in the MyCoRe system */
-  protected Date creationDate = null;
+  protected Timestamp creationDate = null;
 
   /** The date of the last changes of this user unit */
-  protected Date lastChanges = null;
+  protected Timestamp lastChanges = null;
 
   /** Description of the user unit */
   protected String description = "";
 
-  /** Specify whether the UserManager must be notified about the creation of this object */
-  protected boolean bCreateInMgr = true;
+  /**
+   * @return  This method returns the creation date (timestamp) of the user
+   *          unit object.
+   */
+  public Timestamp getCreationDate()
+  { return creationDate; }
 
   /**
-   * returns the creator user ID of the user unit object
-   * @return         returns the creator user ID of the user unit object
+   * @return  This method returns the date of the last modifications
+   *          (timestamp)of the user unit object.
+   */
+  public Timestamp getLastChangesDate()
+  { return lastChanges; }
+
+  /**
+   * @return  This method returns the user ID of the creator of this
+   *          user unit object.
    */
   public String getCreator()
   { return creator; }
 
   /**
-   * This helper method returns a given date (creationDate, lastChanges) as a string
-   * @param date     date to be transformed into a string
-   * @return         returns a given date as a string
+   * @return  This method returns the description of the user unit object.
    */
-  protected String getDateAsString(Date date)
-  { return DateFormat.getDateInstance().format(date); }
+  public String getDescription()
+  { return description; }
 
   /**
-   * returns the ID of the user unit (user ID or group ID)
-   * @return         returns the ID of the user unit
+   * @return  This method returns the ID (user ID or group ID) of the user unit.
    */
   public String getID()
   { return ID; }
 
-  /** This method returns the user unit information as a formatted string. */
+  /**
+   * This method returns the user unit information as a formatted string. Being
+   * an abstract class it must be implemented by a subclass, i.e. MCRuser or
+   * MCRGroup.
+   */
   abstract public String getFormattedInfo() throws Exception;
 
-  /** Checks if the user unit has a specific privilege */
+  /**
+   * This method checks if the user unit has a specific privilege. Being an
+   * abstract class it must be implemented by a subclass, i.e. MCRuser or
+   * MCRGroup.
+   */
   abstract public boolean hasPrivilege(String privilege) throws Exception;
 
   /**
-   * returns the user or group object as a DOM document
-   * @return returns the user or group object as a DOM document
+   * @return This method returns the user or group object as a DOM document.
    */
   public Document toDOM() throws Exception
   { return MCRXMLHelper.parseXML(this.toXML("")); }
 
-  /** This method returns the user unit object as an xml representation. */
+  /**
+   * This method returns the user unit object as an xml representation. Being
+   * an abstract class it must be implemented by a subclass, i.e. MCRuser or
+   * MCRGroup.
+   */
   abstract public String toXML(String NL) throws Exception;
 
   /**
@@ -103,5 +121,4 @@ abstract class MCRUserUnit
    */
   protected static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
-
 }

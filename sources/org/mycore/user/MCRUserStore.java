@@ -30,9 +30,9 @@ import mycore.common.MCRException;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
- * configurable. Any concrete database-class which stores MyCoRe user and group
- * information must implement this interface. Which database actually will be
- * used can then be configured by reading the value
+ * configurable. Any concrete database-class which stores MyCoRe user, group and
+ * privilege information must implement this interface. Which database actually
+ * will be used can then be configured by reading the value
  * <code>MCR.userstore_class_name</code> from mycore.properties.
  *
  * @author Detlev Degenhardt
@@ -42,106 +42,100 @@ public interface MCRUserStore
 {
   /**
    * This method creates a MyCoRe user object in the persistent datastore.
-   * @param newUserID    a String representing the user ID of the new user
-   * @param newUser      the new user object to be stored
+   * @param newUser  the new user object to be stored
    */
-  public void createUser(String newUserID, MCRUser newUser) throws MCRException, IOException, Exception;
+  public void createUser(MCRUser newUser) throws Exception;
 
   /**
    * This method creates a MyCoRe group object in the persistent datastore.
-   * @param newGroupID   a String representing the group ID of the new group
-   * @param newGroup     the new group object to be stored
+   * @param newGroup  the new group object to be stored
    */
-  public void createGroup(String newGroupID, MCRGroup newGroup) throws MCRException, IOException, Exception;
+  public void createGroup(MCRGroup newGroup) throws Exception;
 
   /**
    * This method creates a MyCoRe privilege set object in the persistent datastore.
-   * @param privilegeSet the privilege set object
+   * @param privilegeSet  the privilege set object
    */
-  public void createPrivilegeSet(MCRPrivilegeSet privilegeSet) throws MCRException, IOException;
+  public void createPrivilegeSet(MCRPrivilegeSet privilegeSet) throws Exception;
 
   /**
    * This method deletes a MyCoRe user object in the persistent datastore.
-   * @param delUserID    a String representing the MyCoRe user object which is to be deleted
+   * @param delUserID  a String representing the MyCoRe user object which is to be deleted
    */
-  public void deleteUser(String delUserID) throws MCRException, IOException;
+  public void deleteUser(String delUserID) throws Exception;
 
   /**
    * This method deletes a MyCoRe group object in the persistent datastore.
-   * @param delGroupID   a String representing the MyCoRe group object which is to be deleted
+   * @param delGroupID  a String representing the MyCoRe group object which is to be deleted
    */
-  public void deleteGroup(String delGroupID) throws MCRException, IOException;
+  public void deleteGroup(String delGroupID) throws Exception;
 
   /**
    * This method tests if a MyCoRe user object is available in the persistent datastore.
-   * @param userID       a String representing the MyCoRe user object which is to be looked for
+   * @param userID  a String representing the MyCoRe user object which is to be looked for
    */
-  public boolean existsUser(String userID) throws MCRException, IOException;
+  public boolean existsUser(String userID) throws Exception;
 
   /**
    * This method tests if a MyCoRe group object is available in the persistent datastore.
-   * @param groupID      a String representing the MyCoRe group object which is to be looked for
+   * @param groupID  a String representing the MyCoRe group object which is to be looked for
    */
-  public boolean existsGroup(String groupID) throws MCRException, IOException;
+  public boolean existsGroup(String groupID) throws Exception;
 
   /**
    * This method tests if a MyCoRe privilege set object is available in the persistent datastore.
    */
-  public boolean existsPrivilegeSet() throws MCRException, IOException;
+  public boolean existsPrivilegeSet() throws Exception;
 
   /**
    * This method gets all user IDs and returns them as a Vector of strings.
-   * @return   Vector of strings including the user IDs of the system
+   * @return  Vector of strings including the user IDs of the system
    */
-  public Vector getAllUserIDs() throws MCRException, IOException;
+  public Vector getAllUserIDs() throws Exception;
 
   /**
    * This method gets all group IDs and returns them as a Vector of strings.
-   * @return   Vector of strings including the group IDs of the system
+   * @return  Vector of strings including the group IDs of the system
    */
-  public Vector getAllGroupIDs() throws MCRException, IOException;
+  public Vector getAllGroupIDs() throws Exception;
 
   /**
    * This method retrieves a MyCoRe user object from the persistent datastore.
    * @param userID     a String representing the MyCoRe user object which is to be retrieved
    * @return           the requested user object
    */
-  public MCRUser retrieveUser(String userID)
-                 throws MCRException, IOException, Exception;
+  public MCRUser retrieveUser(String userID) throws Exception;
 
   /**
-   * This method retrieves a MyCoRe privilege set object from the persistent datastore.
-   * @return  the requested privilege set object as XML string representation
+   * This method retrieves a MyCoRe privilege set from the persistent datastore.
+   * @return  the Vector of known privileges of the system
    */
-  public String retrievePrivilegeSet() throws MCRException, IOException;
+  public Vector retrievePrivilegeSet() throws Exception;
 
   /**
    * This method retrieves a MyCoRe group object from the persistent datastore.
    * @param groupID    a String representing the MyCoRe group object which is to be retrieved
    * @return           the requested group object
    */
-  public MCRGroup retrieveGroup(String groupID)
-                  throws MCRException, IOException, Exception;
+  public MCRGroup retrieveGroup(String groupID) throws Exception;
 
   /**
    * This method updates a MyCoRe group object in the persistent datastore.
-   * @param groupID    a String representing the MyCoRe group object which is to be updated
    * @param group      the group to be updated
    */
-  public void updateGroup(String groupID, MCRGroup group) throws MCRException, IOException, Exception;
+  public void updateGroup(MCRGroup group) throws Exception;
 
   /**
    * This method updates a MyCoRe privilege set object in the persistent datastore.
    * @param privilegeSet the privilege set object to be updated
    */
-  public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) throws MCRException, IOException;
+  public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) throws Exception;
 
   /**
    * This method updates a MyCoRe user object in the persistent datastore.
-   * @param userID     a String representing the MyCoRe user object which is to be updated
    * @param user       the user to be updated
    */
-  public void updateUser(String userID, MCRUser user) throws MCRException, IOException, Exception;
+  public void updateUser(MCRUser user) throws Exception;
 }
 
 

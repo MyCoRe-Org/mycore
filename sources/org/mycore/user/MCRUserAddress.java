@@ -66,7 +66,8 @@ public class MCRUserAddress
    * Constructor. All address attributes of a user are taken from a DOM NodeList
    * which must be passed as a parameter.
    *
-   * @param addressElements a DOM NodeList containing the address attributes of a user
+   * @param addressElements
+   *   a DOM NodeList containing the address attributes of a user
    */
   public MCRUserAddress(NodeList addressElements)
   {
@@ -166,105 +167,29 @@ public class MCRUserAddress
    * is used by the corresponding user object to create a full XML representation
    * of the user.
    *
-   * @param NL   newline character, should be "\n" if you want newlines behind
-   *             every tag or "" if you want the XML-stream as one line
+   * @param NL
+   *   newline character, should be "\n" if you want newlines behind every tag
+   *   or "" if you want the XML-stream as one line
    */
   public String getAddressAsXmlElement(String NL) throws Exception
   {
-    Vector requiredUserAttributes = MCRUserPolicy.instance().getRequiredUserAttributes();
     StringBuffer sb = new StringBuffer();
     sb.append("<address>").append(NL);
-
-    if (requiredUserAttributes.contains("salutation"))
-      sb.append("<salutation required=\"true\">");
-    else
-      sb.append("<salutation>");
-    sb.append(salutation).append("</salutation>").append(NL);
-
-    if (requiredUserAttributes.contains("firstname"))
-      sb.append("<firstname required=\"true\">");
-    else
-      sb.append("<firstname>");
-    sb.append(firstname).append("</firstname>").append(NL);
-
-    if (requiredUserAttributes.contains("lastname"))
-      sb.append("<lastname required=\"true\">");
-    else
-      sb.append("<lastname>");
-    sb.append(lastname).append("</lastname>").append(NL);
-
-    if (requiredUserAttributes.contains("street"))
-      sb.append("<street required=\"true\">");
-    else
-      sb.append("<street>");
-    sb.append(street).append("</street>").append(NL);
-
-    if (requiredUserAttributes.contains("city"))
-      sb.append("<city required=\"true\">");
-    else
-       sb.append("<city>");
-    sb.append(city).append("</city>").append(NL);
-
-    if (requiredUserAttributes.contains("postalcode"))
-      sb.append("<postalcode required=\"true\">");
-    else
-      sb.append("<postalcode>");
-    sb.append(postalcode).append("</postalcode>").append(NL);
-
-    if (requiredUserAttributes.contains("country"))
-      sb.append("<country required=\"true\">");
-    else
-      sb.append("<country>");
-    sb.append(country).append("</country>").append(NL);
-
-    if (requiredUserAttributes.contains("institution"))
-      sb.append("<institution required=\"true\">");
-    else
-      sb.append("<institution>");
-    sb.append(institution).append("</institution>").append(NL);
-
-    if (requiredUserAttributes.contains("faculty"))
-      sb.append("<faculty required=\"true\">");
-    else
-      sb.append("<faculty>");
-    sb.append(faculty).append("</faculty>").append(NL);
-
-    if (requiredUserAttributes.contains("department"))
-      sb.append("<department required=\"true\">");
-    else
-      sb.append("<department>");
-    sb.append(department).append("</department>").append(NL);
-
-    if (requiredUserAttributes.contains("institute"))
-      sb.append("<institute required=\"true\">");
-    else
-      sb.append("<institute>");
-    sb.append(institute).append("</institute>").append(NL);
-
-    if (requiredUserAttributes.contains("telephone"))
-      sb.append("<telephone required=\"true\">");
-    else
-      sb.append("<telephone>");
-    sb.append(telephone).append("</telephone>").append(NL);
-
-    if (requiredUserAttributes.contains("fax"))
-      sb.append("<fax required=\"true\">");
-    else
-      sb.append("<fax>");
-    sb.append(fax).append("</fax>").append(NL);
-
-    if (requiredUserAttributes.contains("email"))
-      sb.append("<email required=\"true\">");
-    else
-      sb.append("<email>");
-    sb.append(email).append("</email>").append(NL);
-
-    if (requiredUserAttributes.contains("cellphone"))
-      sb.append("<cellphone required=\"true\">");
-    else
-      sb.append("<cellphone>");
-    sb.append(cellphone).append("</cellphone>").append(NL);
-
+    sb.append("<salutation>").append(salutation).append("</salutation>").append(NL);
+    sb.append("<firstname>").append(firstname).append("</firstname>").append(NL);
+    sb.append("<lastname>").append(lastname).append("</lastname>").append(NL);
+    sb.append("<street>").append(street).append("</street>").append(NL);
+    sb.append("<city>").append(city).append("</city>").append(NL);
+    sb.append("<postalcode>").append(postalcode).append("</postalcode>").append(NL);
+    sb.append("<country>").append(country).append("</country>").append(NL);
+    sb.append("<institution>").append(institution).append("</institution>").append(NL);
+    sb.append("<faculty>").append(faculty).append("</faculty>").append(NL);
+    sb.append("<department>").append(department).append("</department>").append(NL);
+    sb.append("<institute>").append(institute).append("</institute>").append(NL);
+    sb.append("<telephone>").append(telephone).append("</telephone>").append(NL);
+    sb.append("<fax>").append(fax).append("</fax>").append(NL);
+    sb.append("<email>").append(email).append("</email>").append(NL);
+    sb.append("<cellphone>").append(cellphone).append("</cellphone>").append(NL);
     sb.append("</address>");
     return sb.toString();
   }
@@ -274,8 +199,9 @@ public class MCRUserAddress
    * <code>java.lang.Object</code>. All address attributes of a user are returned
    * as a string (in table formatted output for "nice" listings).
    *
-   * @return returns the address information of the user in a table formatted
-   *         output, all in one string
+   * @return
+   *   returns the address information of the user in a table formatted output,
+   *   all in one string
    */
   public String toString()
   {
@@ -303,7 +229,8 @@ public class MCRUserAddress
    * one string. The various attributes are separated by a separator string, which
    * must be provided as a parameter.
    *
-   * @param separator String sequence for separating the various address attributes
+   * @param separator
+   *   String sequence for separating the various address attributes
    */
   public String toString(String separator)
   {

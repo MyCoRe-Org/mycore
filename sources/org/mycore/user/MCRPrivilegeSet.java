@@ -40,11 +40,8 @@ import mycore.xml.MCRXMLHelper;
  */
 public class MCRPrivilegeSet
 {
-  /** This vector holds the names of the privileges */
-  private Vector privNames = null;
-
-  /** This vector holds the descriptions of the privileges */
-  private Vector privDescriptions = null;
+  /** This vector holds all privileges of the mycore user management system */
+  private Vector privileges = null;
 
   /** The one and only instance of this class */
   private static MCRPrivilegeSet theInstance = null;
@@ -52,24 +49,20 @@ public class MCRPrivilegeSet
   /** private constructor to create the singleton instance. */
   private MCRPrivilegeSet() throws Exception
   {
-    privNames = new Vector();
-    privDescriptions = new Vector();
-
+    Vector privs = new Vector();
     MCRUserStore mcrUserStore = MCRUserMgr.instance().getUserStore();
-    String privsXML = mcrUserStore.retrievePrivilegeSet();
+    privs = mcrUserStore.retrievePrivilegeSet();
 
-    if (privsXML != null) { // There already exists a privilege set
-      Document mcrDocument = MCRXMLHelper.parseXML(privsXML);
-      NodeList domPrivList = mcrDocument.getElementsByTagName("privilege");
-      this.loadPrivileges(domPrivList, false); // need not to create in data store
-    }
+    if (!(privs == null)) // There already exists a privilege set
+      this.privileges = privs;
   }
 
   /**
    * This method is the only way to get an instance of this class. It calls the
    * private constructor to create the singleton.
    *
-   * @return returns the one and only instance of <CODE>MCRPrivilegeSet</CODE>
+   * @return
+   *   returns the one and only instance of <CODE>MCRPrivilegeSet</CODE>
    */
   public final static synchronized MCRPrivilegeSet instance() throws Exception
   {
@@ -82,24 +75,30 @@ public class MCRPrivilegeSet
    * This method takes a NodeList as parameter and fills the vector of known
    * privileges of the system.
    *
-   * @param privList       DOM NodeList with information about the privileges
-   * @param createInStore  boolean value to determine whether the privileges have
-   *                       to be stored in the persistent data store
+   * @param privList
+   *   DOM NodeList with information about the privileges
+   * @param createInStore
+   *   boolean value to determine whether the privileges have to be stored in
+   *   the persistent data store
    */
   public void loadPrivileges(NodeList privList, boolean createInStore)
               throws Exception
   {
     NodeList privElements = null;
-    privNames.clear();
-    privDescriptions.clear();
+    MCRPrivilege thePrivilege;
+    privileges.clear();
 
     for (int i=0; i<privList.getLength(); i++) {
       privElements = privList.item(i).getChildNodes();
-      privNames.add(trim(MCRXMLHelper.getElementText("name", privElements)));
-      privDescriptions.add(trim(MCRXMLHelper.getElementText("description", privElements)));
+      thePrivilege = new MCRPrivilege(
+         trim(MCRXMLHelper.getElementText("name", privElements)),
+         trim(MCRXMLHelper.getElementText("description", privElements))
+         );
+      privileges.add(thePrivilege);
     }
 
-    if (createInStore) {
+    if (createInStore)
+    {
       MCRUserStore mcrUserStore = MCRUserMgr.instance().getUserStore();
       if (mcrUserStore.existsPrivilegeSet())
         mcrUserStore.updatePrivilegeSet(this);
@@ -109,39 +108,44 @@ public class MCRPrivilegeSet
   }
 
   /**
-   * This method returns the list of privileges.
-   * @returns privNames  Vector with the names of the privileges
+   * @returns
+   *   This method returns a Vector of strings containing all names of the
+   *   privileges of the system.
    */
   public Vector getPrivileges()
-  { return privNames; }
+  { return privileges; }
 
   /**
-   * returns the privilege set object as a DOM document
-   * @return returns the privilege set object as a DOM document
+   * @return
+   *   This method returns the privilege set object as a DOM document.
    */
   public Document toDOM()
   { return MCRXMLHelper.parseXML(this.toXML("")); }
 
   /**
-   * returns the privilege set object as an xml representation
+   * This method returns the privilege set object as an xml representation.
    *
-   * @param NL separation sequence. Typically this will be an empty string (if the XML
-   *        representation is needed as one line) or a newline ("\n") sequence.
-   * @return returns the privilege object as an xml representation
+   * @param NL
+   *   separation sequence. Typically this will be an empty string (if the XML
+   *   representation is needed as one line) or a newline ("\n") sequence.
+   * @return
+   *   returns the privilege object as an xml representation
    */
   public String toXML(String NL)
   {
+    MCRPrivilege thePrivilege;
     StringBuffer sb = new StringBuffer();
     sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL)
-      .append("<mycore_user_and_group_info type=\"privilege\">").append(NL);
+      .append("<userinfo type=\"privilege\">").append(NL);
 
-    for (int i=0; i<privNames.size(); i++) {
+    for (int i=0; i<privileges.size(); i++) {
+      thePrivilege = (MCRPrivilege)privileges.elementAt(i);
       sb.append("<privilege>").append(NL)
-        .append("<name>").append((String)privNames.elementAt(i)).append("</name>").append(NL)
-        .append("<description>").append((String)privDescriptions.elementAt(i)).append("</description>").append(NL)
+        .append("<name>").append((String)thePrivilege.getName()).append("</name>").append(NL)
+        .append("<description>").append((String)thePrivilege.getDescription()).append("</description>").append(NL)
         .append("</privilege>").append(NL);
     }
-    sb.append("</mycore_user_and_group_info>").append(NL);
+    sb.append("</userinfo>").append(NL);
     return sb.toString();
   }
 
