@@ -145,15 +145,19 @@ public class MCRCStoreVideoCharger7 implements MCRContentStore
 
   public void retrieveContent( MCRFile file, OutputStream target )
     throws MCRPersistenceException
+  { retrieveContent( file.getStorageID(), target ); }
+  
+  protected void retrieveContent( String assetID, OutputStream target )
+    throws MCRPersistenceException
   {
     FTPClient connection = connect();
     try
-    { connection.get( target, file.getStorageID() );  }
+    { connection.get( target, assetID );  }
     catch( Exception exc )
     {
       if( ! ( exc instanceof MCRPersistenceException ) )
       {
-        String msg = "Could not get stored content to output stream: " + file.getStorageID();
+        String msg = "Could not get stored content to output stream: " + assetID;
         throw new MCRPersistenceException( msg, exc );
       }
       else throw (MCRPersistenceException)exc;
@@ -183,12 +187,9 @@ public class MCRCStoreVideoCharger7 implements MCRContentStore
       File local = new File( directory, list[ i ] );
       if( local.exists() ) continue;
       
-      MCRFile remote = new MCRFile();
-      remote.setPath     ( list[ i ] );
-      remote.setStoreID  ( storeID   );
-      remote.setStorageID( list[ i ] );
-      
-      remote.getContentTo( local );
+      FileOutputStream target = new FileOutputStream( local );
+      new MCRCStoreVideoCharger7().retrieveContent( list[ i ], target );
+      target.close();
     }
   }
 
