@@ -26,7 +26,6 @@ package mycore.datamodel;
 
 import java.util.*;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRObjectID;
 
 /**
  * This interface is designed to choose the tranformer from XQuery to
@@ -49,113 +48,6 @@ public interface MCRQueryInterface
  **/
 public Vector getResultList(String query, String type, int maxresult) 
   throws MCRException; 
-
-/**
- * The methode returns the search string for a XML text field for
- * the IBM Content Manager 7 persistence system.a<p>
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue"&gt;<br>
- * &lt;innertag iattrib="ivalue"&gt;<br>
- * text<br>
- * &lt;/innertag&gt;<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param innertag           the optional inner tag of a subtag element
- * @param iattrib            the optional attribute vector of a innertag
- * @param ivalue             the optional value vector of iattrib
- * @param text               the text value of this element
- * @return the search string for the CM7 text search engine
- **/
-public String createSearchStringText(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue, String innertag, String [] iattrib, 
-  String [] ivalue, String text);
-
-/**
- * The method returns the search string for a XML date field for
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * date<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param date               the date value of this element
- * @return the search string for the CM7 text search engine
- **/
-public String createSearchStringDate(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue, GregorianCalendar date);
-
-/**
- * The method returns the search string for a XML boolean field for
- * the IBM Content Manager 7 persistence system.<p>
- * The boolean value was transformed to a string.
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * bvalue<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param bvalue             the boolean value of this element
- * @return the search string for the CM7 text search engine
- **/
-public String createSearchStringBoolean(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue, boolean bvalue);
-
-/**
- * The method returns the search string for a XML field with numbers for
- * the IBM Content Manager 7 persistence system.<p>
- * The number was transformed to a string to cut the number of the third decimal
- * position and tronspose it then in a integer number by multiply with 1000.
- * the number must be in range of 10^10 to -10^10.
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * number<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param number             the number value of this element as a double value
- * @return the search string for the CM7 text search engine
- **/
-public String createSearchStringDouble(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue, double number);
-
-/**
- * The method returns the search string for a XML link field for
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the attribute vector of a subtag
- * @param svalue             the value vector of sattrib
- * @return the search string for the CM7 text search engine
- **/
-public String createSearchStringHref(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue);
 
 }
 

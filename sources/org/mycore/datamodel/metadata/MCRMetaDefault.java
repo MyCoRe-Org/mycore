@@ -28,11 +28,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
+import mycore.datamodel.MCRTypedContent;
 
 /**
  * This class implements any methods for handling the basic data for all 
  * metadata classes of the metadata objects. The methods createXML() and
- * createTS() are abstract methods.
+ * createTypedContent() are abstract methods.
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -241,18 +242,13 @@ public void setFromDOM(Node dom_metadata_node) throws MCRException
 public abstract String createXML() throws MCRException;
 
 /**
- * This abstract method create a Text Search stream for all data in this class,
- * defined by the MyCoRe TS MCRMeta... definition for the given tag and subtag.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This abstract method create a typed content list for the data.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
- * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMeta... part
+ * @return a MCRTypedContent with the data of the data part
  **/
-public abstract String createTS(Object mcr_query,String tag) throws MCRException;
+public abstract MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException;
 
 /**
  * This method check the validation of the content of this class.

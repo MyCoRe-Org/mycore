@@ -57,61 +57,22 @@ public MCRCM7TransformToText()
 /**
  * The method returns the search string for a XML text field for
  * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue"&gt;<br>
- * &lt;innertag iattrib="ivalue"&gt;<br>
- * text<br>
- * &lt;/innertag&gt;<br>
- * &lt;/subtag&gt;
  *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param innertag           the optional inner tag of a subtag element
- * @param iattrib            the optional attribute vector of a innertag
- * @param ivalue             the optional value vector of iattrib
  * @param text               the text value of this element
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringText(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue, String innertag, 
-  String [] iattrib, String [] ivalue, String text)
+public final String createSearchStringText(String text)
   {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
+  if ((text == null) || ((text = text.trim()).length() ==0)) {
     return ""; }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX");
-  if (tag!=null) { sb.append(tag.toUpperCase()).append("XXX"); }
-  sb.append(subtag.toUpperCase()).append("XXX");
-  if ((innertag != null) && ((innertag = innertag.trim()).length() !=0)) {
-    sb.append(innertag.toUpperCase()).append("XXX"); }
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
+  try {
+    MCRObjectID mid = new MCRObjectID(text);
+    if (mid.isValid()) {
+      text = mid.getId().replace('_','X'); }
     }
-  if (iattrib != null) {
-    for (int i=0;i<iattrib.length;i++) {
-      if (iattrib[i]==null) { continue; }
-      sb.append("XXX").append(iattrib[i].toUpperCase()).append("XXX")
-        .append(ivalue[i].toUpperCase()).append("XXX");
-      }
-    }
-  sb.append(' ');
-  if ((text != null) && ((text = text.trim()).length() !=0)) {
-    try {
-      MCRObjectID mid = new MCRObjectID(text);
-      if (mid.isValid()) {
-        text = mid.getId().replace('_','X'); }
-      }
-    catch (MCRException e) { }
-    sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); }
-  sb.append(NL);
+  catch (MCRException e) { }
+  sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); 
   return sb.toString();
   }
 
@@ -120,38 +81,14 @@ public final String createSearchStringText(String part, String tag,
  * the IBM Content Manager 7 persistence system.<p>
  * The date was transformed to a bit string with 
  * <em>10000*year+100*month+day</em>.
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * date<br>
- * &lt;/subtag&gt;
  *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
  * @param date               the date value of this element
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringDate(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue, GregorianCalendar date)
+public final String createSearchStringDate(GregorianCalendar date)
   {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
   if (date == null) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX")
-    .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
-    }
   int idate = date.get(Calendar.YEAR)*10000 +
               date.get(Calendar.MONTH)*100 +
               date.get(Calendar.DAY_OF_MONTH);
@@ -161,7 +98,6 @@ public final String createSearchStringDate(String part, String tag,
   int lenstrmax = binstrmax.length();
   for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
   sb.append(binstr);
-  sb.append(NL);
   return sb.toString();
   }
 
@@ -169,43 +105,16 @@ public final String createSearchStringDate(String part, String tag,
  * The method returns the search string for a XML boolean field for
  * the IBM Content Manager 7 persistence system.<p>
  * The boolean value was transformed to a string.
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * bvalue<br>
- * &lt;/subtag&gt;
  *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
  * @param bvalue             the boolean value of this element
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringBoolean(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue, boolean bvalue)
+public final String createSearchStringBoolean(boolean bvalue)
   {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX")
-    .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
-    }
   if (bvalue) {
-    sb.append(" TRUE"); }
+    return "TRUE"; }
   else {
-    sb.append(" FALSE"); }
-  sb.append(NL);
-  return sb.toString();
+    return "FALSE"; }
   }
 
 /**
@@ -214,40 +123,14 @@ public final String createSearchStringBoolean(String part, String tag,
  * The number was transformed to a string to cut the number of the third decimal
  * position and transpose it then in a integer number by multiply with 1000.
  * The number must be in range of 10^6 to 0.
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * number<br>
- * &lt;/subtag&gt;
  *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
  * @param number             the number value of this element as a double value
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringDouble(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue, double number)
+public final String createSearchStringDouble(double number)
   {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
   if ((number < 0.) || (number > 10.e6)) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX")
-    .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
-    }
-  // non numbers after decimal point
-  //long a = (Math.round(number*10.))/10; 
   // 3 numbers after decimal point
   long a = (Math.round(number*10000.))/10; 
   String binstr = Long.toBinaryString(a);
@@ -256,75 +139,6 @@ public final String createSearchStringDouble(String part, String tag,
   int lenstrmax = binstrmax.length();
   for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
   sb.append(binstr);
-  sb.append(NL);
-  return sb.toString();
-  }
-
-/**
- * The method returns the search string for a XML link field for
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service' or 'structure'
- * @param tag                the tagname of an element list
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the attribute vector of a subtag
- * @param svalue             the value vector of sattrib
- * @return the search string for the CM7 text search engine
- **/
-public final String createSearchStringHref(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue)
-  {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  if (svalue[0]==null) { return ""; }
-  if ((!svalue[0].equals("locator"))&&(!svalue[0].equals("arc"))) {
-    return ""; }
-  if (svalue[1]==null) { return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  String href = svalue[1];
-  if (svalue[0].equals("locator")) {
-    try {
-      MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
-      String label = mcr_pers.receiveLabel(new MCRObjectID(svalue[1]));
-      sb.append("XXX").append(part.toUpperCase()).append("XXX")
-        .append(tag.toUpperCase()).append("XXX")
-        .append(subtag.toUpperCase()).append("XXX")
-        .append(svalue[0].toUpperCase()).append("XXX ") 
-        .append(label.toUpperCase()).append(' ');
-      if (!(svalue[2]==null)) {
-        sb.append(svalue[2].toUpperCase()).append(' '); }
-      if (!(svalue[3]==null)) {
-        sb.append(svalue[3].toUpperCase()); }
-      sb.append(NL);
-      href = svalue[1].replace('_','X');
-      }
-    catch (Exception e) { }
-    }
-  sb.append("XXX").append(part.toUpperCase()).append("XXX")
-    .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX");
-  sb.append(svalue[0].toUpperCase()).append("XXX ");
-  if (svalue[0].equals("locator")) {
-    sb.append("XXXHREFXXX").append(href.toUpperCase()).append("XXX ");
-    if (!(svalue[2]==null)) {
-      sb.append(svalue[2].toUpperCase()).append(' '); }
-    if (!(svalue[3]==null)) {
-      sb.append(svalue[3].toUpperCase()); }
-    sb.append(NL);
-    }
-  else {
-    if (svalue[2]==null) { return ""; }
-    sb.append("XXXFROMXXX").append(svalue[1].replace('_','X').toUpperCase())
-      .append("XXX ");
-    sb.append("XXXTOXXX").append(svalue[2].replace('_','X').toUpperCase())
-      .append("XXX ");
-    if (!(svalue[3]==null)) {
-      sb.append(svalue[3].toUpperCase()); }
-    sb.append(NL);
-    }
   return sb.toString();
   }
 

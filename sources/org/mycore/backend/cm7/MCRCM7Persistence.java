@@ -33,6 +33,7 @@ import mycore.common.MCRConfigurationException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectService;
+import mycore.datamodel.MCRTypedContent;
 import mycore.datamodel.MCRObjectPersistenceInterface;
 import mycore.cm7.MCRCM7ConnectionPool;
 import mycore.cm7.MCRCM7Item;
@@ -86,6 +87,10 @@ public MCRCM7Persistence()
     .getString("MCR.persistence_cm7_textsearch_server");
   mcr_ts_lang = MCRConfiguration.instance()
     .getString("MCR.persistence_cm7_textsearch_lang");
+  if ((mcr_id_name == null) || (mcr_label_name == null) || 
+      (mcr_flag_name == null) ||
+      (mcr_create_name == null) || (mcr_modify_name == null)) {
+    throw new MCRConfigurationException("A indexclass field name is false."); }
   }
 
 /**
@@ -94,72 +99,78 @@ public MCRCM7Persistence()
  * correspond with the lower case configuration name.<br>
  * As example: Document --> MCR.persistence_cm7_document
  *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
+ * @param mcr_tc      the typed content array
  * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void create(MCRObjectID mcr_id, String mcr_label, 
-  MCRObjectService mcr_service, String xml, String ts) 
+public final void create(MCRTypedContent mcr_tc, String xml)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  // extract index data from typed content
+  MCRObjectID mcr_id = null;
+  String mcr_label = null;
+  String mcr_flags = "";
+  GregorianCalendar mcr_create = null;
+  GregorianCalendar mcr_modify = null;
+  String mcr_ts = null;
+  for (int i=0;i<mcr_tc.getSize();i++) {
+    if (mcr_tc.getNameElement(i).equals("ID")) {
+      mcr_id = new MCRObjectID((String)mcr_tc.getValueElement(i)); 
+      mcr_label = (String)mcr_tc.getValueElement(i+1); }
+    }
+  for (int i=0;i<mcr_tc.getSize();i++) {
+    if (mcr_tc.getNameElement(i).toLowerCase().equals("service")) {
+      for (int j=i;j<mcr_tc.getSize();j++) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("date")) {
+          if (mcr_tc.getValueElement(j+3).equals("createdate")) {
+            mcr_create = (GregorianCalendar) mcr_tc.getValueElement(j+1);
+            continue; }
+          if (mcr_tc.getValueElement(j+3).equals("modifydate")) {
+            mcr_modify = (GregorianCalendar) mcr_tc.getValueElement(j+1);
+            continue; }
+          }
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("flag")) {
+          mcr_flags = mcr_flags + " " + (String)mcr_tc.getValueElement(j+1); }
+        }
+      break;
+      }
+    }
+  mcr_ts = createTS(mcr_tc);
+  // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
+  // store the data
   try {
-    createCM7(mcr_id,mcr_label,mcr_service,xml,ts); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode create internal a object in the data store.
- *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
- * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final void createCM7(MCRObjectID mcr_id, String mcr_label,
-  MCRObjectService mcr_service, String xml, String ts) 
-  throws MCRConfigurationException, DKException, Exception
-  {
-  if ((mcr_id_name == null) || (mcr_label_name == null) || 
-      (mcr_flag_name == null) ||
-      (mcr_create_name == null) || (mcr_modify_name == null)) {
-    throw new MCRConfigurationException("A indexclass field name is false."); }
-  DKDatastoreDL connection = null;
-  try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    DKDatastoreDL connection = null;
     try {
-      MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
-        connection);
-      throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+" exists."); }
-    catch (MCRPersistenceException e) { }
-    MCRCM7Item item = new MCRCM7Item(connection,mcr_index_class,
-      DKConstant.DK_DOCUMENT);
-    item.setKeyfield(mcr_id_name,mcr_id.getId());
-    item.setKeyfield(mcr_label_name,mcr_label);
-    item.setKeyfield(mcr_flag_name,mcr_service.getFlags());
-    item.setKeyfield(mcr_create_name,mcr_service.getDate("createdate"));
-    item.setKeyfield(mcr_modify_name,mcr_service.getDate("modifydate"));
-    item.setPart(mcr_xml_part,xml);
-    item.setPart(mcr_ts_part,ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
-    item.create();
-    exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+      connection = MCRCM7ConnectionPool.getConnection();
+      try {
+        MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
+          connection);
+        throw new MCRPersistenceException(
+          "A object with ID "+mcr_id.getId()+" exists."); }
+      catch (MCRPersistenceException e) { }
+      MCRCM7Item item = new MCRCM7Item(connection,mcr_index_class,
+        DKConstant.DK_DOCUMENT);
+      item.setKeyfield(mcr_id_name,mcr_id.getId());
+      item.setKeyfield(mcr_label_name,mcr_label);
+      item.setKeyfield(mcr_flag_name,mcr_flags);
+      item.setKeyfield(mcr_create_name,mcr_create);
+      item.setKeyfield(mcr_modify_name,mcr_modify);
+      item.setPart(mcr_xml_part,xml);
+      item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
+      item.create();
+      exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+      }
+    finally {
+      MCRCM7ConnectionPool.releaseConnection(connection); }
     }
-  finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
   }
 
 /**
@@ -333,37 +344,24 @@ public final String receiveLabel(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  String label = new String("");
   try {
-    return receiveLabelCM7(mcr_id); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode receive internal a Label of an object from the data store.
- *
- * @param mcr_id      the object id
- * @return the label of the object
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final String receiveLabelCM7(MCRObjectID mcr_id)
-  throws DKException, Exception
-  {
-  DKDatastoreDL connection = null;
-  String label = new String();
-  try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    DKDatastoreDL connection = null;
     try {
-      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-      label = item.getKeyfieldToString(mcr_label_name);
+      connection = MCRCM7ConnectionPool.getConnection();
+      try {
+        MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
+        label = item.getKeyfieldToString(mcr_label_name);
+        }
+      catch (MCRPersistenceException e) {
+        throw new MCRPersistenceException(
+          "A object with ID "+mcr_id.getId()+"does not exists."); }
       }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+"does not exists."); }
+    finally {
+      MCRCM7ConnectionPool.releaseConnection(connection); }
     }
-  finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
   return label;
   }
 
@@ -373,71 +371,81 @@ private final String receiveLabelCM7(MCRObjectID mcr_id)
  * correspond with the lower case configuration name.<br>
  * As example: Document --> MCR.persistence_cm7_document
  *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
+ * @param mcr_tc      the typed content array
  * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void update(MCRObjectID mcr_id, String mcr_label, 
-  MCRObjectService mcr_service, String xml, String ts) 
+public final void update(MCRTypedContent mcr_tc, String xml)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  // extract index data from typed content
+  MCRObjectID mcr_id = null;
+  String mcr_label = null;
+  String mcr_flags = "";
+  GregorianCalendar mcr_create = null;
+  GregorianCalendar mcr_modify = null;
+  String mcr_ts = null;
+  for (int i=0;i<mcr_tc.getSize();i++) {
+    if (mcr_tc.getNameElement(i).equals("ID")) {
+      mcr_id = new MCRObjectID((String)mcr_tc.getValueElement(i)); 
+      mcr_label = (String)mcr_tc.getValueElement(i+1); }
+    }
+  for (int i=0;i<mcr_tc.getSize();i++) {
+    if (mcr_tc.getNameElement(i).toLowerCase().equals("service")) {
+      for (int j=i;j<mcr_tc.getSize();j++) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("date")) {
+          if (mcr_tc.getValueElement(j+3).equals("createdate")) {
+            mcr_create = (GregorianCalendar) mcr_tc.getValueElement(j+1);
+            continue; }
+          if (mcr_tc.getValueElement(j+3).equals("modifydate")) {
+            mcr_modify = (GregorianCalendar) mcr_tc.getValueElement(j+1);
+            continue; }
+          }
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("flag")) {
+          mcr_flags = mcr_flags + " " + (String)mcr_tc.getValueElement(j+1); }
+        }
+      break;
+      }
+    }
+  mcr_ts = createTS(mcr_tc);
+  // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
+  // store the data
   try {
-    updateCM7(mcr_id,mcr_label,mcr_service,xml,ts); }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  }
-
-/**
- * The methode update internal a object in the data store.
- *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
- * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
- **/
-private final void updateCM7(MCRObjectID mcr_id, String mcr_label,
-  MCRObjectService mcr_service, String xml, String ts) 
-  throws  MCRConfigurationException, DKException, Exception
-  {
-  DKDatastoreDL connection = null;
-  if ((mcr_id_name == null) || (mcr_label_name == null) || 
-      (mcr_flag_name == null) ||
-      (mcr_create_name == null) || (mcr_modify_name == null)) {
-    throw new MCRConfigurationException("A indexclass field name is false."); }
-  try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    DKDatastoreDL connection = null;
+    if ((mcr_id_name == null) || (mcr_label_name == null) || 
+        (mcr_flag_name == null) ||
+        (mcr_create_name == null) || (mcr_modify_name == null)) {
+      throw new MCRConfigurationException("Indexclass field name is false."); }
     try {
-      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,
-        connection);
-      item.setKeyfield(mcr_id_name,mcr_id.getId());
-      item.setKeyfield(mcr_label_name,mcr_label);
-      item.setKeyfield(mcr_flag_name,mcr_service.getFlags());
-      item.setKeyfield(mcr_create_name,mcr_service.getDate("createdate"));
-      item.setKeyfield(mcr_modify_name,mcr_service.getDate("modifydate"));
-      item.setPart(mcr_xml_part,xml);
-      item.setPart(mcr_ts_part,ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
-      item.update();
-      exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+      connection = MCRCM7ConnectionPool.getConnection();
+      try {
+        MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,
+          connection);
+        item.setKeyfield(mcr_id_name,mcr_id.getId());
+        item.setKeyfield(mcr_label_name,mcr_label);
+        item.setKeyfield(mcr_flag_name,mcr_flags);
+        item.setKeyfield(mcr_create_name,mcr_create);
+        item.setKeyfield(mcr_modify_name,mcr_modify);
+        item.setPart(mcr_xml_part,xml);
+        item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
+        item.update();
+        exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
+        }
+      catch (MCRPersistenceException e) { 
+        throw new MCRPersistenceException(
+          "A object with ID "+mcr_id.getId()+"does not exists."); }
       }
-    catch (MCRPersistenceException e) { 
-      throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+"does not exists."); }
+    finally {
+      MCRCM7ConnectionPool.releaseConnection(connection); }
     }
-  finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
   }
 
 /**
@@ -450,6 +458,151 @@ private final MCRCM7Item getItem(String id, String indexclass,
   sb.append('\'').append(mcr_id_name).append("' == \"")
     .append(id.trim().toUpperCase()).append('\"');
   return new MCRCM7Item(sb.toString(),mcr_index_class,connection );
+  }
+
+/**
+ * Create the TextSearch from MCRTypedContent.
+ **/
+private final String createTS(MCRTypedContent mcr_tc)
+  {
+  String NL = System.getProperty("line.separator");
+  StringBuffer sb = new StringBuffer(2048);
+  MCRCM7TransformToText ttt = new MCRCM7TransformToText();
+  int maxtag = 0;
+  int tagdiff = MCRTypedContent.TYPE_LASTTAG-MCRTypedContent.TYPE_MASTERTAG+1;
+  String  [] tag = new String [tagdiff];
+  // MCRObject data
+  sb.append("XXX").append(mcr_tc.getNameElement(0))
+    .append("XXX").append(mcr_tc.getNameElement(1)).append("XXX ")
+    .append(ttt.createSearchStringText((String)mcr_tc.getValueElement(1)))
+    .append(NL);
+  sb.append("XXX").append(mcr_tc.getNameElement(0))
+    .append("XXX").append(mcr_tc.getNameElement(2)).append("XXX ")
+    .append(ttt.createSearchStringText((String)mcr_tc.getValueElement(2)))
+    .append(NL);
+  int i = 3; 
+  while (i<mcr_tc.getSize()) {
+    if (mcr_tc.getTypeElement(i)>=MCRTypedContent.TYPE_MASTERTAG) {   
+      tagdiff = mcr_tc.getTypeElement(i) - MCRTypedContent.TYPE_MASTERTAG;
+      tag[tagdiff] = ((String)mcr_tc.getNameElement(i)).toUpperCase();
+      maxtag = tagdiff + 1;
+      i++; continue; 
+      }
+    if (mcr_tc.getTypeElement(i)==MCRTypedContent.TYPE_VALUE) {   
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_BOOLEAN) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        int j = i+1;
+        int k = 1;
+        while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
+          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+            sb.append("XXX")
+              .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
+              .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
+              .append("XXX"); }
+          j++; 
+          if (j>=mcr_tc.getSize()) { break; } else { k++; }
+          }
+        sb.append(ttt.createSearchStringBoolean(((Boolean)mcr_tc
+            .getValueElement(i)).booleanValue()));
+        sb.append(NL);
+        i += k; continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_DATE) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        int j = i+1;
+        int k = 1;
+        while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
+          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+            sb.append("XXX")
+              .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
+              .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
+              .append("XXX"); }
+          j++; 
+          if (j>=mcr_tc.getSize()) { break; } else { k++; }
+          }
+        sb.append(ttt.createSearchStringDate((GregorianCalendar)mcr_tc
+            .getValueElement(i)));
+        sb.append(NL);
+        i += k; continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_LINK) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        sb.append("XXX")
+          .append(ttt.createSearchStringText((String)mcr_tc
+            .getValueElement(i+1)))
+          .append("XXX ");
+        if (((String)mcr_tc.getValueElement(i+1)).toLowerCase()
+          .equals("locator")) {
+          sb.append("XXXHREFXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+2)))
+            .append("XXX ")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+3)))
+            .append(' ')
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+4)));
+          }
+        else {
+          sb.append("XXXFROMXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+2)))
+            .append("XXX ")
+            .append("XXXTOXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+3)))
+            .append("XXX ")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+4)));
+          }
+        sb.append(NL);
+        i += 5; continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_NUMBER) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        int j = i+1;
+        int k = 1;
+        while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
+          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+            sb.append("XXX")
+              .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
+              .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
+              .append("XXX"); }
+          j++; 
+          if (j>=mcr_tc.getSize()) { break; } else { k++; }
+          }
+        sb.append(ttt.createSearchStringDouble(((Double)mcr_tc
+            .getValueElement(i)).doubleValue()));
+        sb.append(NL);
+        i += k; continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_STRING) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        int j = i+1;
+        int k = 1;
+        while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
+          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+            sb.append("XXX")
+              .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
+              .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
+              .append("XXX"); }
+          j++;
+          if (j>=mcr_tc.getSize()) { break; } else { k++; }
+          }
+        sb.append(' ').append(ttt.createSearchStringText((String)mcr_tc
+            .getValueElement(i)));
+        sb.append(NL);
+        i += k; continue;
+        }
+      }
+    i++;
+    }
+  return sb.toString();
   }
 
  /**

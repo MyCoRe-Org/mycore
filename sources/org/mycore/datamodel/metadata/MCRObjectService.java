@@ -34,6 +34,7 @@ import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.datamodel.MCRMetaDate;
 import mycore.datamodel.MCRMetaLangText;
+import mycore.datamodel.MCRTypedContent;
 
 /**
  * This class implements all methode for handling one document service data.
@@ -352,34 +353,32 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This methode create a Text Search stream for all structure data.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all structure data.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
  * @exception MCRException if the content of this class is not valid
- * @return a Text Search string with the data of the metadata part
+ * @return a MCRTypedContent with the data of the metadata part
  **/
-public final String createTS(Object mcr_query)  throws MCRException
+public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(2048);
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_MASTERTAG,"service");
   if (dates.size()!=0) {
+    tc.addTagElement(tc.TYPE_TAG,"dates");
     for (int i=0;i<dates.size();i++) {
-      sb.append(((MCRMetaDate)dates.get(i)).createTS(mcr_query,"dates")); }
+      tc.addMCRTypedContent(((MCRMetaDate)dates.get(i))
+        .createTypedContent(true,true));
+      }
     }
-  else {
-    sb.append(""); }
   if (flags.size()!=0) {
+    tc.addTagElement(tc.TYPE_TAG,"flags");
     for (int i=0;i<flags.size();i++) {
-      sb.append(((MCRMetaLangText)flags.get(i)).createTS(mcr_query,"flags")); }
+      tc.addMCRTypedContent(((MCRMetaLangText)flags.get(i))
+        .createTypedContent(true,true)); }
     }
-  else {
-    sb.append(""); }
-  return sb.toString();
+  return tc;
   }
 
 /**

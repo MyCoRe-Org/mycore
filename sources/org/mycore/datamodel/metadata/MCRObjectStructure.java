@@ -204,37 +204,32 @@ public class MCRObjectStructure
     return sb.toString();
   }
 
-  /**
-   * <em>createTS</em> creates a text search string from structure data.
-   * In cases of parent links, it looks for the parent's inheritable
-   * metadata and appends these to the text search string. The output
-   * string depends on the persistency database implementation.
-   *
-   * @param mcr_query            implementor of MCRQueryInterface
-   * @exception MCRException if the content of this class is not valid
-   * @return String              text search output string
-   */
-  public final String createTS (Object mcr_query) throws MCRException
+/**
+ * This methode create a typed content list for all data in this instance.
+ *
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
+ * @exception MCRException if the content of this class is not valid
+ * @return a MCRTypedContent with the data of the MCRObject data
+ **/
+public final MCRTypedContent createTypedContent() throws MCRException
   {
-    if (!isValid()) {
-      debug();
-      throw new MCRException("The content is not valid."); }
-    int i, n = the_links.size(), m = the_derivates.size();
-    if ((n==0)&&(m==0)) { return ""; }
-    StringBuffer sb = new StringBuffer(2048);
-    if (n!=0) {
-    for (i=0;i<n;i++) {
-      sb.append(((MCRMetaLink) the_links.elementAt(i))
-        .createTS(mcr_query,"links")); }
-      }
-    else { sb.append(""); }
-    if (m!=0) {
-      for (i=0;i<m;i++) {
-        sb.append(((MCRMetaLink) the_derivates.elementAt(i))
-          .createTS(mcr_query,"derivates")); }
-      }
-    else { sb.append(""); }
-    return sb.toString();
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_MASTERTAG,"structure");
+  tc.addTagElement(tc.TYPE_TAG,"links");
+  for (int i=0;i<the_links.size();i++) {
+    tc.addMCRTypedContent(((MCRMetaLink) the_links.elementAt(i))
+      .createTypedContent(true,true));
+    }
+  tc.addTagElement(tc.TYPE_TAG,"derivates");
+  for (int i=0;i<the_derivates.size();i++) {
+    tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
+      .createTypedContent(true,true));
+    }
+  return tc;
   }
 
   /**

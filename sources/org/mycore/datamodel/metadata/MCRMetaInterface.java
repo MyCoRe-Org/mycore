@@ -61,17 +61,15 @@ public void setFromDOM(Node metadata_langtext_node);
 public String createXML() throws MCRException;
 
 /**
- * This methode create a Text Search stream for a metadata part.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param type   the type of the persistece system
- * @param tag                the tagname of an element list
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a Text Search string with the data of the metadata part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public String createTS(Object mcr_query,String tag) throws MCRException;
+public MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException;
 
 /**
  * This methode check the validation of the content of this class.

@@ -36,7 +36,6 @@ import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectStructure;
 import mycore.datamodel.MCRObjectService;
-import mycore.datamodel.MCRQueryInterface;
 import mycore.xml.MCRXMLHelper;
 
 /**
@@ -65,11 +64,9 @@ public final static String XML_HEADER =
 private String parser_name;
 private String persist_name;
 private String persist_type;
-private String query_name;
 
 // interface classes
 private MCRObjectPersistenceInterface mcr_persist;
-private MCRQueryInterface mcr_query;
 
 // the DOM document
 private Document mcr_document = null;
@@ -109,7 +106,6 @@ public MCRObject() throws MCRException, MCRConfigurationException
   mcr_schema_path = new String("");
   persist_type = new String("");
   mcr_persist = null;
-  mcr_query = null;
   try {
   // Path of XML schema
     mcr_schema_path = MCRConfiguration.instance()
@@ -343,42 +339,24 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This methode create a Text Search stream for all object data.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the 
- * <em>MCR.persistence_type</em> and <em>MCR.persistence_..._query_name</em>
- * configuration.
+ * This methode create a typed content list for all MCRObject data.
  *
  * @exception MCRException if the content of this class is not valid
- * @exception MCRConfigurationException if the configuration faild
- * @return a Text Search string with the Text Search data of the object
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS() throws MCRException, MCRConfigurationException
+public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  if (mcr_query == null) {
-    try {
-      String propquery = "MCR.persistence_"+persist_type.toLowerCase()+
-        "_query_name";
-      query_name = MCRConfiguration.instance().getString(propquery);
-      if (query_name == null) {
-        throw new MCRConfigurationException(propquery+" not found."); }
-      mcr_query = (MCRQueryInterface)Class.forName(query_name).newInstance();
-      }
-    catch (Exception e) {
-      throw new MCRException(e.getMessage()); }
-    }
-  StringBuffer sb = new StringBuffer(4096);
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(
-    "MyCoReObject",null,"ID",null,null,null,null,null,mcr_id.getId()));
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(
-    "MyCoReObject",null,"Label",null,null,null,null,null,mcr_label));
-  sb.append(mcr_struct.createTS(mcr_query));
-  sb.append(mcr_metadata.createTS(mcr_query));
-  sb.append(mcr_service.createTS(mcr_query));
-  return sb.toString();
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId(),true,true);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label,true,true);
+  tc.addMCRTypedContent(mcr_struct.createTypedContent());
+  tc.addMCRTypedContent(mcr_metadata.createTypedContent());
+  tc.addMCRTypedContent(mcr_service.createTypedContent());
+  return tc;
   }
 
 /**
@@ -392,8 +370,8 @@ public final void createInDatastore() throws MCRPersistenceException
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
   String xml = createXML();
-  String ts = createTS();
-  mcr_persist.create(mcr_id,mcr_label,mcr_service,xml,ts);
+  MCRTypedContent mcr_tc = createTypedContent();
+  mcr_persist.create(mcr_tc,xml);
   }
 
 /**
@@ -452,8 +430,8 @@ public final void updateInDatastore() throws MCRPersistenceException
   mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
   mcr_service.setDate("modifydate");
   String xml = createXML();
-  String ts = createTS();
-  mcr_persist.update(mcr_id,mcr_label,mcr_service,xml,ts); 
+  MCRTypedContent mcr_tc = createTypedContent();
+  mcr_persist.update(mcr_tc,xml);
   }
 
 /**

@@ -179,25 +179,24 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This methode create a Text Search stream for all metadata.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a Text Search string with the data of the metadata part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRObjectMetadata : The content is not valid."); }
-  StringBuffer sb = new StringBuffer(2048);
-  sb.append("");
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_MASTERTAG,"metadata");
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    sb.append(((MCRMetaElement)meta_list.get(i)).createTS(mcr_query)); }
-  return sb.toString();
+    tc.addMCRTypedContent(((MCRMetaElement)meta_list.get(i))
+      .createTypedContent()); }
+  return tc;
   }
 
 /**

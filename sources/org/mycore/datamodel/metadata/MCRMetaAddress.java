@@ -260,57 +260,76 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This method creates a Text Search stream for all data in this class, defined
- * by the MyCoRe TS MCRMetaAddress definition for the given tag and subtag.
- * The content of this stream is depending on the implementation for
- * the persistence database chosen by the <em>MCR.persistence_type</em> 
- * configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
- * @param tag                the tagname of an element list
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMetaAddress part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query,String tag) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException
   {
-
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  String [] sattrib = null;
-  String [] svalue  = null;
-  StringBuffer sb   = new StringBuffer(1024);
-
-  if (type.trim().length()!=0) {
-    sattrib = new String[1]; sattrib[0] = "type";
-    svalue = new String[1]; svalue[0] = type;
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag.toUpperCase());
+  if ((country = country.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"country");
+    tc.addStringElement(tc.TYPE_VALUE,null,country,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
     }
-
-  if (country.trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"country",null,null,country )); }
-
-  if (state  .trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"state"  ,null,null,state   )); }
-
-  if (zipcode.trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"zipcode",null,null,zipcode )); }
-
-  if (city   .trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"city"   ,null,null,city    )); }
-
-  if (street .trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"street" ,null,null,street  )); }
-
-  if (number .trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"number ",null,null,number  )); }
-
-  return sb.toString();
+  if ((state = state.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"state");
+    tc.addStringElement(tc.TYPE_VALUE,null,state,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((zipcode = zipcode.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"zipcode");
+    tc.addStringElement(tc.TYPE_VALUE,null,zipcode,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((city = city.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"city");
+    tc.addStringElement(tc.TYPE_VALUE,null,city,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((street = street.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"street");
+    tc.addStringElement(tc.TYPE_VALUE,null,street,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((number = number.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"number");
+    tc.addStringElement(tc.TYPE_VALUE,null,number,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  return tc;
   }
 
 /**

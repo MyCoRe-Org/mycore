@@ -154,32 +154,26 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This method create a Text Search stream for all data in this class, defined
- * by the MyCoRe TS MCRMetaLangText definition for the given tag and subtag.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
- * @param tag                the tagname of an element list
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMetaLangText part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query, String tag) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  String [] sattrib = null;
-  String [] svalue = null;
-  if ((type != null) && ((type = type.trim()).length() !=0)) {
-    sattrib = new String[1]; sattrib[0] = "type";
-    svalue = new String[1]; svalue[0] = type; 
-    }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-    tag,subtag,sattrib,svalue,null,null,null,text));
-  return sb.toString();
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addStringElement(tc.TYPE_VALUE,null,text,parametric,textsearch);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,textsearch);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
+  return tc;
   }
 
 /**

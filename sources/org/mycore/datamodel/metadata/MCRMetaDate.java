@@ -199,36 +199,26 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This method create a Text Search stream for all data in this class, defined
- * by the MyCoRe TS MCRMetaDate definition for the given tag and subtag.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
- * @param tag                the tagname of an element list
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMetaDate part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query, String tag) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  String [] sattrib = null;
-  String [] svalue = null;
-  int count = 1;
-  if ((type != null) && ((type = type.trim()).length() !=0)) { count++; }
-    sattrib = new String[count]; sattrib[0] = "lang";
-    svalue = new String[count]; svalue[0] = lang; 
-  if ((type != null) && ((type = type.trim()).length() !=0)) { 
-    sattrib[1] = "type"; svalue[1] = type;
-    }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringDate(datapart,
-    tag,subtag,sattrib,svalue,date));
-  sb.append("");
-  return sb.toString();
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addDateElement(date,parametric,textsearch);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,textsearch);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
+  return tc;
   }
 
 /**

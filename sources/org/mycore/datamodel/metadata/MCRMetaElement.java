@@ -223,7 +223,7 @@ public final void setFromDOM(Node metadata_element_node) throws MCRException
 public final String createXML() throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("The content is not valid."); }
+    throw new MCRException("MCRMetaElement : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
   sb.append('<').append(tag).append(" class=\"").append(classname)
     .append("\" heritable=\"").append(heritable).append("\">").append(NL);
@@ -234,25 +234,24 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This methode create a Text Search stream for all data in this class, defined
- * by the MyCoRe XML LangText definition for the given tag and subtag.
- * The content of this stream is depended by the implementation for
- * the persistence database. It was choose over the
- * <em>MCR.persistence_type</em> configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML Element part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_TAG,tag);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"class",classname,true,false);
   for (int i=0;i<list.size();i++) {
-    sb.append(((MCRMetaInterface)list.get(i)).createTS(mcr_query,tag)); }
-  sb.append("");
-  return sb.toString();
+    tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
+      .createTypedContent(true,true)); }
+  return tc;
   }
 
 /**

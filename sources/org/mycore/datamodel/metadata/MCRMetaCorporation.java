@@ -213,42 +213,58 @@ public final String createXML() throws MCRException
   }
 
 /**
- * This method creates a Text Search stream for all data in this class, defined
- * by the MyCoRe TS MCRMetaCorporation definition for the given tag and subtag.
- * The content of this stream is depending on the implementation for
- * the persistence database chosen by the <em>MCR.persistence_type</em> 
- * configuration.
+ * This methode create a typed content list for all data in this instance.
  *
- * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
- * @param tag                the tagname of an element list
+ * @param parametric true if the data should parametric searchable
+ * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMetaCorporation part
+ * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final String createTS(Object mcr_query, String tag) throws MCRException
+public final MCRTypedContent createTypedContent(boolean parametric,
+  boolean textsearch) throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  String [] sattrib = null;
-  String [] svalue  = null;
-  StringBuffer sb = new StringBuffer(1024);
-  if (type.trim().length()!=0) {
-    sattrib = new String[1]; sattrib[0] = "type";
-    svalue  = new String[1]; svalue[0]  = type;
+  MCRTypedContent tc = new MCRTypedContent();
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  if ((name = name.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"name");
+    tc.addStringElement(tc.TYPE_VALUE,null,name,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
     }
-  if (name     .trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"name",    null,null,name    )); }
-  if (parent   .trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"parent",  null,null,parent  )); }
-  if (nickname .trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"nickname",null,null,nickname)); }
-  if (property    .trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      tag,subtag,sattrib,svalue,"property",   null,null,property   )); }
-  return sb.toString();
+  if ((nickname = nickname.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"nickname");
+    tc.addStringElement(tc.TYPE_VALUE,null,nickname,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((parent = parent.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"parent");
+    tc.addStringElement(tc.TYPE_VALUE,null,parent,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  if ((property = property.trim()).length() !=0) {
+    tc.addTagElement(tc.TYPE_SUB2TAG,"property");
+    tc.addStringElement(tc.TYPE_VALUE,null,property,parametric,textsearch);
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"xml:lang",lang,parametric,
+      textsearch);
+    if ((type = type.trim()).length() !=0) {
+      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
+        textsearch); }
+    }
+  return tc;
   }
 
 /**

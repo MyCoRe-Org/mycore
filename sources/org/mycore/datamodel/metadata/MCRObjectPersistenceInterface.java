@@ -28,6 +28,7 @@ import java.util.*;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
+import mycore.datamodel.MCRTypedContent;
 
 /**
  * This interface is designed to choose the Persistence for the project.
@@ -41,16 +42,12 @@ public interface MCRObjectPersistenceInterface
 /**
  * The methode create a object in the data store.
  *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
+ * @param mcr_tc      the typed content
  * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void create(MCRObjectID mcr_id, String mcr_label, 
-  MCRObjectService mcr_service, String xml, String ts) 
+public void create(MCRTypedContent mcr_tc, String xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
@@ -99,16 +96,12 @@ public String receiveLabel(MCRObjectID mcr_id)
 /**
  * The methode update a object in the data store.
  *
- * @param mcr_id      the object id
- * @param mcr_label   the object label
- * @param mcr_service the service class for the object
+ * @param mcr_tc      the typed content
  * @param xml         the XML stream from the object
- * @param ts          the text search stream from the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void update(MCRObjectID mcr_id, String mcr_label, 
-  MCRObjectService mcr_service, String xml, String ts) 
+public void update(MCRTypedContent mcr_tc, String xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
