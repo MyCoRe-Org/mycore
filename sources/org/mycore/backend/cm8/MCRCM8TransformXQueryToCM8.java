@@ -327,6 +327,11 @@ private final String traceOneCondition(String cond, String itemtypename,
   for (i=0;i<counter;i++) {
     if (tag[i].endsWith("@href")) { 
       tag[i] = tag[i].substring(0,tag[i].length()-5)+"@xlinkhref"; }
+    if (op[i].equals("contains")) {
+      sbout.append(" contains-text(@").append(itemtypeprefix)
+        .append("ts, \"").append(value[i]).append("\")=1");
+      continue;
+      }
     j = 0;
     k = tag[i].length();
     m = 0;
@@ -349,15 +354,11 @@ private final String traceOneCondition(String cond, String itemtypename,
       m = j; n = l;
       j = l+1; 
       }
-    if (op[i].equals("contains")) {
-      return ""; }
-    else {
-      if (op[i].equals("like")) { 
-        // replace * with %
-        value[i] = value[i].replace('*','%'); 
-        } 
-      sbout.append(' ').append(op[i]).append(" \"").append(value[i])
-        .append("\"").append(bool[i]); }
+    if (op[i].equals("like")) { 
+      // replace * with %
+      value[i] = value[i].replace('*','%'); } 
+    sbout.append(' ').append(op[i]).append(" \"").append(value[i])
+      .append("\"").append(bool[i]); 
     }
   sbout.append(']');
   //return sbout.toString().replace('\'','\"');

@@ -112,6 +112,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
     item.setAttribute("/",itemtypeprefix+"xml",xml);
+    item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
 
 //mcr_tc.debug();
 

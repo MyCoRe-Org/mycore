@@ -84,12 +84,12 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     System.out.println("Info CM8 Datastore Creation: connected.");
-    // create the Attribut for MCRObjectID
+    // create the Attribute for MCRObjectID
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"ID",
       MCRObjectID.MAX_LENGTH,false)) {
       System.out.println("Warning CM8 Datastore Creation: attribute "+
         mcr_item_type_prefix+"ID already exists."); }
-    // create the Attribut for MCR_Label
+    // create the Attribute for MCR_Label
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"label",
       MCRObject.MAX_LABEL_LENGTH,false)) {
       System.out.println("Warning CM8 Datastore Creation: attribute "+
@@ -97,8 +97,13 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     // create the Attribut for the XML byte array
     if (!createAttributeBlob(connection,mcr_item_type_prefix+"xml",
       100*1024,false)) {
-      System.out.println(
-        "Warning CM8 Datastore Creation: attribute xml already exists."); }
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"xml already exists."); }
+    // create the Attribut for the XML byte array
+    if (!createAttributeClob(connection,mcr_item_type_prefix+"ts",
+      100*1024,true)) {
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"ts already exists."); }
     // create the default attribute type
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"type",
       MCRMetaDefault.DEFAULT_TYPE_LENGTH,false)) {
@@ -144,6 +149,11 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix+"xml");
     attr.setNullable(false);
     attr.setUnique(false);
+    item_type.addAttr(attr);
+    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix+"ts");
+    attr.setNullable(false);
+    attr.setUnique(false);
+//    attr.setTextSearchable(true);
     item_type.addAttr(attr);
 
     // get the configuration JDOM root element
@@ -345,6 +355,31 @@ private static final boolean createAttributeBlob(DKDatastoreICM connection,
   try {
     attr.setName(name);
     attr.setType(DK_CM_BLOB);
+    attr.setSize(len);
+    attr.setTextSearchable(search);
+    attr.setNullable(true);
+    attr.setUnique(false);
+    attr.add(); }
+  catch (DKException e) { return false; }
+  return true;
+  }
+
+/**
+ * This methode is internal and create a DK_CM_CLOB attribute.
+ *
+ * @param connection the connection to the database
+ * @param name the name of the attribute
+ * @param len the len of the character field
+ * @param search ist true, if the attribute should text searchable
+ * @return If the attribute exists, false was returned, else true.
+ **/
+private static final boolean createAttributeClob(DKDatastoreICM connection,
+  String name, int len, boolean search) throws Exception
+  {
+  DKAttrDefICM attr = new DKAttrDefICM(connection);
+  try {
+    attr.setName(name);
+    attr.setType(DK_CM_CLOB);
     attr.setSize(len);
     attr.setTextSearchable(search);
     attr.setNullable(true);
