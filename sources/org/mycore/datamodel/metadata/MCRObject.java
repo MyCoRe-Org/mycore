@@ -693,7 +693,7 @@ public final void repairPersitenceDatastore(MCRObjectID id)
     throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
       " was not retrieved.");
     }
-  if (!persist_type.equals("jdom")) { mcr_persist.update(this); }
+  mcr_persist.update(this); 
   deleteLinksFromTable();
   addLinksToTable();
   }
