@@ -20,6 +20,7 @@ Konfiguration in {\tt build.properties}. Beachten Sie dazu bitte die
 Hinweise in der Ausgabe beim Erzeugen der Web Application.
 
 \subsection{Konfiguration des Web Application Server}
+
 \subsubsection{ Tomcat}
 Die grundlegende Installation von Tomcat wurde bereits beschrieben. Nun soll auf dieser Basis das die WEB-Anwendung des MyCoRe-Samples installiert werden. Dabei ist an dieser Stelle nur ein einfaches Szenario auf der Basis der Tomcat-Grundinstallation beschrieben. Für die Konfiguration komplexerer Modelle, z. B. mehrere Applikationen nebeneinander, gibt es weiter hinten in diesem Dokument eine ausführliche Anleitung.\\[2ex]
 Folgende Schritte sind auszuführen:
@@ -33,6 +34,52 @@ Folgende Schritte sind auszuführen:
 \item \mcrcommand{rctomcat restart}
 \end{enumerate}
 Nun sollten Sie auf die Beispielanwendung mit der URL \url{http://localhost:8080/mycoresample} zugreifen können. Testen Sie nun die Anwendung!
+
 \subsubsection{ Websphere}
+Im Kapitel 1 wurde ja bereits beschrieben, wie die Anwendung IBM WebSphere zu installieren ist. Diese soll als Servlet-Engine zur Anwendung kommen, wenn der IBM Content Manager 8 als Persitence-Layer verwendet wird. Die Konfiguration von WebSphere erfolgt via Web-Anwendung. Starten Sie dazu den Adminserver mittels
+\begin{center}
+\mcrcommand{/usr/WebSphere/AppServer/bin/startServer.sh server1}
+\end{center}
+Öffnen Sie nun eine Web-Browser mit der URL \url{http://<hostname>:9090/admin} und melden Sie sich an.\\[2ex]
+Nun sind folgende Schritte durchzuführen:
+\begin{enumerate}
+\item (linke Seite) {\bf Server} $\rightarrow$ {\bf Application Server}
+\item (rechte Seite) {\bf NEW}
+\item (rechte Seite) Server Name $\rightarrow$ {\bf mycoresample} $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) {\bf FINISH}
+\item (linke Seite) {\bf Applications} $\rightarrow$ {\bf Install New Applications}
+\item (rechte Seite) {\bf Server Path} $\rightarrow$ Pfad zum File \mcrfile{mycoresample.war} eintagen $\rightarrow$ {\bf /mycoresample} im Feld Context Root eintragen $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) Preparing for application installation $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) Step 1 $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) Step 2 $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) Step 3 $\rightarrow$ Auswählen {\bf mycoresample} in der Checkbox $\rightarrow$ dann auswählen der Zeile mit {\bf server=mycoresample} $\rightarrow$ {\bf APPLY}
+\item (rechte Seite) Step 3 $\rightarrow$ {\bf NEXT}
+\item (rechte Seite) Step 4 $\rightarrow$ {\bf FINISH}
+\item (linke Seite) {\bf Server} $\rightarrow$ {\bf Application Server}
+\item (rechte Seite) {\bf mycoresample} $\rightarrow$ {\bf Process Definition} $\rightarrow$ {\bf Process Execution} 
+\item (rechte Seite) User auf {\bf mcradmin} setzen
+\item (rechte Seite) Group auf {\bf mcr} setzen
+\item (rechte Seite) {\bf APPLY} $\rightarrow$ {\bf OK}
+\item (rechte Seite) oben auf den Text {\bf save} klicken
+\item (rechte Seite) {\bf SAVE}
+\item (linke Seite) {\bf Environment} $\rightarrow$ {\bf Update Web Server Plugin} $\rightarrow$ {\bf OK}
+\item {\bf Logout}
+\end{enumerate}
+Nun muss der Application Server gestartet werden:
+\begin{center}
+\mcrcommand{/usr/WebSphere/AppServer/bin/startServer.sh mycoresample}
+\end{center}
+Da die Anwendung als {\bf mcradmin} ausgeführt wird, kommt es zu einem Schreibfehler in den Log-Files. Hier ist nun folgendes zu tun:
+\begin{enumerate}
+\item \mcrcommand{chown -R mcradmin:mcr /usr/WebSphere/AppServer/logs/mycoresample}
+\item \mcrcommand{chmod 666 /usr/WebSphere/AppServer/logs/activity.log}
+\end{enumerate}
+Danach ist der Server nocheinmal zu stoppen und neu zu starten:
+\begin{center}
+\mcrcommand{/usr/WebSphere/AppServer/bin/stopServer.sh mycoresample}
+\mcrcommand{/usr/WebSphere/AppServer/bin/startServer.sh mycoresample}
+\end{center}
+Jetzt sollten Sie auf das MyCoRe-Sample unter der URL \url{http://<hostname>/mycoresample} zugreifen können.
+
 \subsection{Die Nutzung des Editor-Servlets}
 
