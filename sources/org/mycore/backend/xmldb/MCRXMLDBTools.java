@@ -4,7 +4,25 @@ import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.mycore.common.*;
+
+/**
+ * This is the implementation of Tools for the XML:DB API
+ *
+ * @author marc schluepmann
+ * @author harald richter
+ * @version $Revision$ $Date$
+ **/
 public final class MCRXMLDBTools {
+     static Logger logger      = Logger.getLogger( MCRXMLDBTools.class.getName() );
+     static String conf_prefix = "MCR.persistence_xmldb_";
+     static String driver      = "";
+     static String connString  = "";
+     static String database    = "";
+     
     /**
      * This method returns an XML:DB conform connection string of the
      * form:
@@ -98,4 +116,116 @@ public final class MCRXMLDBTools {
 	}
 	return new_coll;
     }
+    
+    /**
+     * Get driver name for XML:DB database
+     **/
+    public static String getDriverName( ) {
+        if (0 == driver.length())
+        {    
+	 MCRConfiguration config = MCRConfiguration.instance();  
+         driver = config.getString( conf_prefix + "driver" );
+         logger.info("MCRXMLDBTools MCR.persistence_xmldb_driver      : " + driver); 
+        } 
+	return driver;
+    }
+    
+    /**
+     * Get connection string for XML:DB database
+     **/
+    public static String getConnectString( ) {
+        if (0 == connString.length())
+        {    
+	 MCRConfiguration config = MCRConfiguration.instance();  
+         connString = config.getString( conf_prefix + "database_url" , "");
+         logger.info("MCRXMLDBTools MCR.persistence_xmldb_database_url: " + connString); 
+        } 
+	return connString;
+    }
+    
+    /**
+     * Handle query string for XML:DB database
+     **/
+    public static String handleQueryString( String query, String type ) {
+        logger.debug("MCRXMLDBTools handlequerstring   (old)  : " + query + " type : " + type); 
+        
+        if (0 == database.length())
+        {    
+	 MCRConfiguration config = MCRConfiguration.instance();  
+         database = config.getString( conf_prefix + "database" , "");
+         logger.info("MCRXMLDBTools MCR.persistence_xmldb_database    : " + database); 
+        } 
+        
+        if ( database.equals( "xindice" ) )
+          query = handleQueryStringXindice( query, type );
+        else if ( database.equals( "exist" ) )
+          query = handleQueryStringExist( query, type );
+        
+        logger.debug("MCRXMLDBTools handlequerstring   (new)  : " + query); 
+	return query;
+    }
+    
+    /**
+     * Handle query string for Xindice
+     **/
+    static String handleQueryStringXindice( String query, String type ) {
+	return query;
+    }
+    
+    /**
+     * Handle query string for exist
+     **/
+    static String handleQueryStringExist( String query, String type ) {
+// with exist dev version from 03/07/03 no longer needed        
+//        if ( query.equals( "/*" ))
+//          query = "xcollection('/db/mycore/" + type + "')/mycoreobject";
+//        query = subst(query, "like", "=");
+// a lot of queries of mycore sample (document and legal entity) work!!
+        query = subst(query, "like", "&=");
+        query = subst(query, "contains(", "contains(.,");
+        if ( -1 != query.indexOf("] and") )
+        {
+          query = subst(query, "[", "/");
+          query = subst(query, "] and", " and");
+          query = "//*[" + query; 
+        }
+	return query;
+    }
+    
+/**
+ * <p>
+ * Returns String in with newStr substituted for find String.
+ * @param in String to edit
+ * @param find string to match
+ * @param newStr string to substitude for find
+*/
+
+public static String subst(String in, String find, String newStr){
+
+    char[] working = in.toCharArray();
+    StringBuffer sb = new StringBuffer();
+
+	int startindex = in.indexOf(find);
+	if (startindex<0) return in;
+
+
+	int currindex=0;
+
+	while (startindex > -1) {
+		for(int i = currindex; i < startindex; i++){
+			sb.append(working[i]);
+		}//for
+	 	currindex = startindex;
+		sb.append(newStr);
+		currindex += find.length();
+		startindex = in.indexOf(find,currindex);
+	}//while
+
+	for (int i = currindex; i < working.length; i++){
+		sb.append(working[i]);
+	}//for
+
+	return sb.toString();
+
+  } //subst
 }

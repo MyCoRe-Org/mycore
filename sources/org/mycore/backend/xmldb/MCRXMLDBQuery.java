@@ -37,6 +37,7 @@ import org.apache.log4j.PropertyConfigurator;
  * This is the implementation of the MCRQueryInterface for the XML:DB API
  *
  * @author marc schluepmann
+ * @author harald richter
  * @version $Revision$ $Date$
  **/
 public class MCRXMLDBQuery implements MCRQueryInterface {
@@ -50,13 +51,7 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
     // defaults
     private final int MAX_RESULTS = 1000;
     // private data
-    private static String conf_prefix = "MCR.persistence_xmldb_";
     private int maxres = 0;
-    private String vendor;
-    private String hostname;
-    private int port;
-    private String dbpath;
-    private String root;
     private MCRConfiguration config = null;
     private Collection rootCollection = null;
     private Collection typeCollection = null;
@@ -69,11 +64,6 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	config = MCRConfiguration.instance();
 	PropertyConfigurator.configure( config.getLoggingProperties() );
 	maxres = config.getInt( "MCR.query_max_results", MAX_RESULTS );
-    	vendor = config.getString( conf_prefix + "vendor" );
-	hostname = config.getString( conf_prefix + "hostname", "" );
-	port = config.getInt( conf_prefix + "port", 0 );
-	dbpath = config.getString( conf_prefix + "dbpath" );
-	root = config.getString( conf_prefix + "root" );
     }
 
     /**
@@ -99,12 +89,13 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	    return result;
 	if( query.trim().equals( "" ) )
 	    query = "/*";
+        query = MCRXMLDBTools.handleQueryString( query, type);
 	try {
-	    Class driverclass = Class.forName( config.getString( conf_prefix + "driver" ) );
+	    Class driverclass = Class.forName( MCRXMLDBTools.getDriverName() );
 	    database = (Database)driverclass.newInstance();
 	    DatabaseManager.registerDatabase( database );
 
-	    String connString = MCRXMLDBTools.buildConnectString( vendor, hostname, port, dbpath + "/" + root );
+	    String connString = MCRXMLDBTools.getConnectString();
 
 	    rootCollection = DatabaseManager.getCollection( connString );
 	    typeCollection = rootCollection.getChildCollection( type.toLowerCase() );
