@@ -67,8 +67,6 @@ public class MCRParserXerces
     "http://apache.org/xml/features/validation/schema";
   private static String setschemafullsupport   =
     "http://apache.org/xml/features/validation/schema-full-checking";
-  private static String setdeferreddom         =
-    "http://apache.org/xml/features/dom/defer-node-expansion";
 
   /**
    * Constructor for the xerces parser. Sets default validation flag as
@@ -85,11 +83,9 @@ public class MCRParserXerces
 	builder.setFeature( setnamespaces,        flagnamespaces        );
 	builder.setFeature( setschemasupport,     flagschemasupport     );
 	builder.setFeature( setschemafullsupport, flagschemafullsupport );
-	builder.setFeature( setdeferreddom,       flagdeferreddom       );
 	builderValid.setFeature( setnamespaces,        flagnamespaces        );
 	builderValid.setFeature( setschemasupport,     flagschemasupport     );
 	builderValid.setFeature( setschemafullsupport, flagschemafullsupport );
-	builderValid.setFeature( setdeferreddom,       flagdeferreddom       );
 
 	builder.setReuseParser(true);
 	builder.setReuseParser(false);
