@@ -322,8 +322,8 @@ private Document buildLuceneDocument( String key, List types )
       logger.info("Number of documents found : " + hits.length());
       for (int i=0; i<anz; i++)
       {    
-        result[i] = hits.doc(0).get("key");
-//        logger.info(" id: " + hits.id(0) + " score: " + hits.score(0) + " key: " +  hits.doc(0).get("key") );
+        result[i] = hits.doc(i).get("key");
+//        logger.info(" id: " + hits.id(i) + " score: " + hits.score(i) + " key: " +  hits.doc(i).get("key") );
       }  
       return result;
 
