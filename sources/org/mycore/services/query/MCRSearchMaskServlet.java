@@ -104,14 +104,16 @@ org.jdom.Document jdom = null;
     throws IOException, ServletException
   {  
   String type  = request.getParameter( "type"  );
+  String layout = request.getParameter( "layout"  );
   String lang  = request.getParameter( "lang" );
   if( type  == null ) return;
+  if( layout  == null ) layout = type;
   if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
   type = type.toLowerCase();
 
   StringBuffer sb = new StringBuffer(128);
   sb.append(applicationPath).append(slash).append("config").append(slash)
-    .append(conf.getString( "MCR.searchmask_config_"+type));
+    .append(conf.getString( "MCR.searchmask_config_"+layout.toLowerCase()));
   try {
     File file = new File(sb.toString());
     jdom = new org.jdom.input.SAXBuilder().build(file);
@@ -121,7 +123,7 @@ org.jdom.Document jdom = null;
       sb.toString()+" or it has a parse error."); }
 
   // prepare the stylesheet name
-  String style = mode + "-" + type+ "-" + lang;
+  String style = mode + "-" + layout+ "-" + lang;
 
   // start Layout servlet
   try {
@@ -151,16 +153,18 @@ org.jdom.Document jdom = null;
     throws IOException, ServletException
   {  
   String type  = request.getParameter( "type"  );
+  String layout = request.getParameter( "layout"  );
   String lang  = request.getParameter( "lang" );
   String host  = request.getParameter( "hosts" );
   if( host  == null ) host  = "local";
   if( type  == null ) return;
+  if( layout  == null ) layout = type;
   if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
   StringBuffer query = new StringBuffer("");
 
   StringBuffer sb = new StringBuffer(128);
   sb.append(applicationPath).append(slash).append("config").append(slash)
-    .append(conf.getString( "MCR.searchmask_config_"+type.toLowerCase()));
+    .append(conf.getString( "MCR.searchmask_config_"+layout.toLowerCase()));
   try {
     File file = new File(sb.toString());
     jdom = new org.jdom.input.SAXBuilder().build(file);
@@ -233,6 +237,8 @@ System.out.println(tempquery);
     request.setAttribute( "mode", "ResultList" );
     request.removeAttribute( "type" );
     request.setAttribute( "type", type );
+    request.removeAttribute( "layout" );
+    request.setAttribute( "layout", layout );
     request.removeAttribute( "hosts" );
     request.setAttribute( "hosts", host );
     request.removeAttribute( "lang" );

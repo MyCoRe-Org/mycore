@@ -121,6 +121,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     String mode  = getProperty(request, "mode"  );
     String query = getProperty(request, "query" );
     String type  = getProperty(request, "type"  );
+    String layout = getProperty(request, "layout"  );
     String lang  = getProperty(request, "lang" );
 
 	//multiple host are allowed
@@ -178,6 +179,8 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     if( query == null ) { query = ""; }
     if( type  == null ) { return; }
     if( type.equals("") ) { return; }
+    if( layout == null ) { layout = type; }
+    if( layout.equals("") ) { layout = type; }
     if (!conf.getBoolean("MCR.type_"+type.toLowerCase(),false)) { return; }
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }
@@ -189,6 +192,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     logger.info("MCRQueryServlet : mode = "+mode);
     logger.info("MCRQueryServlet : type = "+type);
+    logger.info("MCRQueryServlet : layout = "+layout);
     logger.info("MCRQueryServlet : hosts = "+ host);
     logger.info("MCRQueryServlet : lang = "+lang);
     logger.info("MCRQueryServlet : query = \""+query+"\"");
@@ -213,7 +217,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	// prepare the stylesheet name
 	// TODO: Speed this up - it's tooo slow
 	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
-	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
+	String style = parameters.getProperty("Style",mode+"-"+layout+"-"+lang);
 	logger.info("Style = "+style);
 
 	if (type.equals(sortType)){
@@ -342,6 +346,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 			request.removeAttribute("status");
 			request.setAttribute("status",StrStatus);
 			request.setAttribute("type",type);
+			request.setAttribute("layout",layout);
 			request.setAttribute("hosts",host);
 			request.setAttribute("lang",lang);
 			request.setAttribute("query",query);
