@@ -473,12 +473,14 @@ public final int retrieveNumberOfChildren( String CLID, String PID )
 public final String [] getAllClassificationID()
   {
   int len = MCRSQLConnection.justCountRows( new MCRSQLStatement( tableClass )
-    .setCondition( "ID",  "*"  )
+	.addColumn("ID")
+//    .setCondition( "ID",  "*"  )
     .toRowSelector() );
   logger.debug("Number of classifications = "+Integer.toString(len));
   MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
     new MCRSQLStatement( tableClass )
-    .setCondition( "ID",  "*"  )
+	.addColumn("ID")
+//  .setCondition( "ID",  "*"  )
     .toSelectStatement() );
   String ID [] = new String[len];
   int i = 0;
