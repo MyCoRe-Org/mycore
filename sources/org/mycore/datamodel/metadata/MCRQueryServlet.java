@@ -57,14 +57,16 @@ public class MCRQueryServlet extends HttpServlet
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
+    String lang  = request.getParameter( "lang" );
 
     if( mode  == null ) mode  = "ResultList";
     if( host  == null ) host  = "local";
     if( query == null ) query = "";
     if( type  == null ) return; 
+    if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
 
     // prepare the stylesheet name
-    String style = mode + "-" + type;
+    String style = mode + "-" + type+ "-" + lang;
 
     try
     {
