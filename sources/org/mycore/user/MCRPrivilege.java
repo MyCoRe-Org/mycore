@@ -76,9 +76,9 @@ public class MCRPrivilege
     if (!priv.getName().equals("privilege")) return;
     privName = ((String)priv.getAttributeValue("name")).trim();
     List listelm = priv.getChildren();
-    if (listelm.size()>0) {
-      org.jdom.Element elm = (org.jdom.Element)listelm.get(0);
-      if (!priv.getName().equals("privilege.description")) return;
+    for (int i=0;i<listelm.size();i++) {
+      org.jdom.Element elm = (org.jdom.Element)listelm.get(i);
+      if (!elm.getName().equals("privilege.description")) return;
       privDescription = ((String)elm.getText()).trim();
     }
   }
