@@ -25,6 +25,11 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -52,13 +57,18 @@ public static String DEFAULT_LANGUAGE = "de";
 public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
 public static boolean DEFAULT_TEXT_SEARCH = false;
 public static boolean DEFAULT_HERITABLE = false;
+public static boolean DEFAULT_NOT_INHERIT = false;
 private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
+
+// logger
+static Logger logger=Logger.getLogger(MCRMetaElement.class.getName());
 
 // MetaElement data
 private String lang = null;
 private String classname = null;
 private String tag = null;
 private boolean heritable;
+private boolean notinherit;
 private boolean parasearch;
 private boolean textsearch;
 private ArrayList list = null;
@@ -75,6 +85,7 @@ public MCRMetaElement()
   parasearch = DEFAULT_PARAMETRIC_SEARCH;
   textsearch = DEFAULT_TEXT_SEARCH;
   heritable = DEFAULT_HERITABLE;
+  notinherit = DEFAULT_NOT_INHERIT;
   list = new ArrayList();
   }
 
@@ -97,26 +108,39 @@ public MCRMetaElement(String default_lang)
   parasearch = DEFAULT_PARAMETRIC_SEARCH;
   textsearch = DEFAULT_TEXT_SEARCH;
   heritable = DEFAULT_HERITABLE;
+  notinherit = DEFAULT_NOT_INHERIT;
   list = new ArrayList();
   }
 
 /**
  * This is the constructor of the MCRMetaElement class. 
  *
- * @param lang             the default language
- * @param parasearch       the  parametric search as string
+ * @param set_lang         the default language
+ * @param set_classname    the name of the MCRMeta... class
+ * @param set_tag          the name of this tag
+ * @param set_parasearch   set this flag to true if you want to have this
+ *                         element in a parametric search
+ * @param set_textsearch   set this flag to true if you want to have this
+ *                         element in a text search
+ * @param set_hreitable    set this flag to true if all child objects of this 
+ *                         element can inherit this data
+ * @param set_notinherit   set this flag to true if this element should not
+ *                         inherit from his parent object
+ * @param set_list         a list of MCRMeta... data lines to add in this 
+ *                         element
  **/
 public MCRMetaElement(String set_lang, String set_classname, String set_tag,
   boolean set_parasearch, boolean set_textsearch, boolean set_hreitable,
-  ArrayList set_list)
+  boolean set_notinherit, ArrayList set_list)
   {
   if ((set_lang != null) && ((set_lang = set_lang.trim()).length() !=0)) {
     lang = set_lang; }
   classname = ""; setClassName(set_classname);
   tag = ""; setTag(set_tag);
-  parasearch = DEFAULT_PARAMETRIC_SEARCH; setParametricSearch(set_parasearch);
-  textsearch = DEFAULT_TEXT_SEARCH; setTextSearch(set_textsearch);
-  heritable = DEFAULT_HERITABLE; setHeritable(set_hreitable);
+  parasearch = set_parasearch;
+  textsearch = set_textsearch;
+  heritable = set_hreitable;
+  notinherit = set_notinherit;
   list = new ArrayList();
   if (set_list != null) {
     for (int i=0; i<set_list.size();i++) { list.add(set_list.get(i)); }
@@ -143,28 +167,37 @@ public final MCRMetaInterface getElement(int index)
   }
 
 /**
- * This methode return the parametric search of this metadata as boolean value.
+ * This methode return the parametric search flag of this metadata as boolean 
+ * value.
  *
- * @return the parametric search of this metadata class
+ * @return the parametric search flag of this metadata class
  **/
 public final boolean getParametricSearch()
   { return parasearch; }
 
 /**
- * This methode return the text search of this metadata as boolean value.
+ * This methode return the text search flag of this metadata as boolean value.
  *
- * @return the text search of this metadata class
+ * @return the text search flag of this metadata class
  **/
 public final boolean getTextSearch()
   { return textsearch; }
 
 /**
- * This methode return the heritable of this metadata as boolean value.
+ * This methode return the heritable flag of this metadata as boolean value.
  *
- * @return the heritable of this metadata class
+ * @return the heritable flag of this metadata class
  **/
 public final boolean getHeritable()
   { return heritable; }
+
+/**
+ * This methode return the nonherit flag of this metadata as boolean value.
+ *
+ * @return the notherit flag of this metadata class
+ **/
+public final boolean getNotInherit()
+  { return notinherit; }
 
 /**
  * This methode return the default language of this metadata class as string.
@@ -183,9 +216,9 @@ public final String getTag()
   { return tag; }
 
 /**
- * This methode set the  parametric search for the metadata class.
+ * This methode set the parametric search flag for the metadata class.
  *
- * @param parasearch           the  parametric search as string
+ * @param parasearch           the parametric search flag as string
  */
 public void setParametricSearch(String parasearch)
   {
@@ -199,17 +232,17 @@ public void setParametricSearch(String parasearch)
   }
 
 /**
- * This methode set the parametric search for the metadata class.
+ * This methode set the parametric search flag for the metadata class.
  *
- * @param parasearch           the parametric search as boolean value
+ * @param parasearch           the parametric search flag as boolean value
  */
 public void setParametricSearch(boolean parasearch)
   { this.parasearch = parasearch; }
 
 /**
- * This methode set the  text search for the metadata class.
+ * This methode set the  text search flag for the metadata class.
  *
- * @param textsearch           the  text search as string
+ * @param textsearch           the text search flag as string
  */
 public void setTextSearch(String textsearch)
   {
@@ -223,25 +256,17 @@ public void setTextSearch(String textsearch)
   }
 
 /**
- * This methode set the text search for the metadata class.
+ * This methode set the text search flag for the metadata class.
  *
- * @param textsearch           the text search as boolean value
+ * @param textsearch           the text search flag as boolean value
  */
 public void setTextSearch(boolean textsearch)
   { this.textsearch = textsearch; }
 
 /**
- * This methode set the heritable for the metadata class.
+ * This methode set the heritable flag for the metadata class.
  *
- * @param heritable            the heritable as boolean value
- */
-public void setHeritable(boolean heritable)
-  { this.heritable = heritable; }
-
-/**
- * This methode set the heritable for the metadata class.
- *
- * @param heritable            the heritable as string
+ * @param heritable            the heritable flag as string
  */
 public void setHeritable(String heritable)
   {
@@ -253,6 +278,38 @@ public void setHeritable(String heritable)
   if (heritable.toLowerCase().equals("false")) { 
     this.heritable = false; return; }
   }
+
+/**
+ * This methode set the heritable flag for the metadata class.
+ *
+ * @param heritable            the heritable flag as boolean value
+ */
+public void setHeritable(boolean heritable)
+  { this.heritable = heritable; }
+
+/**
+ * This methode set the notinherit flag for the metadata class.
+ *
+ * @param notinherit           the notinherit flag as string
+ */
+public void setNotInherit(String notinherit)
+  {
+  this.notinherit = DEFAULT_NOT_INHERIT;
+  if ((notinherit == null) || ((notinherit = notinherit.trim()).length() ==0))
+    { return; }
+  if (notinherit.toLowerCase().equals("true")) { 
+    this.notinherit = true; return; }
+  if (notinherit.toLowerCase().equals("false")) { 
+    this.notinherit = false; return; }
+  }
+
+/**
+ * This methode set the notinherit flag for the metadata class.
+ *
+ * @param notinherit           the notinherit flag as boolean value
+ */
+public void setNotInherit(boolean notinherit)
+  { this.notinherit = notinherit; }
 
 /**
  * This methode set the tag for the metadata class.
@@ -304,7 +361,7 @@ public final void addMetaObject(MCRMetaInterface obj)
 public final void removeInheritedObject()
   {
   for (int i=0;i<size();i++) {
-    if (((MCRMetaInterface)list.get(i)).getInherited()) { list.remove(i); }
+    if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { list.remove(i); }
     }
   }
 
@@ -321,6 +378,7 @@ public final void setFromDOM(org.jdom.Element element) throws MCRException
   classname = element.getAttributeValue("class");
   String fullname = META_PACKAGE_NAME+classname;
   setHeritable(element.getAttributeValue("heritable"));
+  setNotInherit(element.getAttributeValue("notinherit"));
   setParametricSearch(element.getAttributeValue("parasearch"));
   setTextSearch(element.getAttributeValue("textsearch"));
   List element_list = element.getChildren();
@@ -354,20 +412,22 @@ public final void setFromDOM(org.jdom.Element element) throws MCRException
 public final org.jdom.Element createXML(boolean flag) throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(tag);
   int j = 0;
   for (int i=0;i<list.size();i++) {
-    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    if(((MCRMetaInterface)list.get(i)).getInherited() > 0); { j++; }
     }
   if ((j == 0) && (!flag)) { return elm; }
   elm.setAttribute("class",classname);
   elm.setAttribute("heritable",new Boolean(heritable).toString());
+  elm.setAttribute("notinherit",new Boolean(notinherit).toString());
   elm.setAttribute("parasearch",new Boolean(parasearch).toString());
   elm.setAttribute("textsearch",new Boolean(textsearch).toString());
   for (int i=0;i<list.size();i++) {
     if (!flag) {
-      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
+      if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { continue; } }
     elm.addContent(((MCRMetaInterface)list.get(i)).createXML()); }
   return elm;
   }
@@ -383,18 +443,19 @@ public final MCRTypedContent createTypedContent(boolean flag)
   throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if (!parasearch) { return tc; }
   int j = 0;
   for (int i=0;i<list.size();i++) {
-    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    if(((MCRMetaInterface)list.get(i)).getInherited() > 0); { j++; }
     }
   if ((j == 0) && (!flag)) { return tc; }
   tc.addTagElement(MCRTypedContent.TYPE_TAG,tag);
   for (int i=0;i<list.size();i++) {
     if (!flag) {
-      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
+      if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { continue; } }
     tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
       .createTypedContent(parasearch)); }
   return tc;
@@ -414,12 +475,12 @@ public final String createTextSearch(boolean flag)
   StringBuffer sb = new StringBuffer(1024);
   int j = 0;
   for (int i=0;i<list.size();i++) {
-    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    if(((MCRMetaInterface)list.get(i)).getInherited() > 0); { j++; }
     }
   if ((j == 0) && (!flag)) { return sb.toString(); }
   for (int i=0;i<list.size();i++) {
     if (!flag) {
-      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
+      if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { continue; } }
     sb.append(((MCRMetaInterface)list.get(i)).createTextSearch(textsearch))
       .append(' '); }
   return sb.toString();
@@ -460,11 +521,33 @@ public final Object clone()
   out.setParametricSearch(parasearch);
   out.setTextSearch(textsearch);
   out.setHeritable(heritable);
+  out.setNotInherit(notinherit);
   for (int i=0;i<size();i++) {
-    MCRMetaInterface mif = (MCRMetaInterface)(((MCRMetaInterface)list.get(i)).clone());
+    MCRMetaInterface mif = (MCRMetaInterface)
+      (((MCRMetaInterface)list.get(i)).clone());
     out.addMetaObject(mif);
     }
   return (Object)out;
   }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  // get the instance of MCRConfiguration
+  MCRConfiguration config = MCRConfiguration.instance();
+  // set the logger property
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  // the output
+  logger.debug("ClassName          = "+classname);
+  logger.debug("Tag                = "+tag);
+  logger.debug("Language           = "+lang);
+  logger.debug("Heritable          = "+String.valueOf(heritable));
+  logger.debug("NotInherit         = "+String.valueOf(notinherit));
+  logger.debug("ParametricSearch   = "+String.valueOf(parasearch));
+  logger.debug("TextSearch         = "+String.valueOf(textsearch));
+  }
+
 }
 

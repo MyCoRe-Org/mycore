@@ -104,7 +104,7 @@ public final MCRObjectMetadata getHeritableMetadata ()
     if (me.getHeritable()) {
       MCRMetaElement nme = (MCRMetaElement)me.clone();
       for (int j=0;j<nme.size();j++) {
-        nme.getElement(j).setInherited(true); }
+        nme.getElement(j).incrementInherited(); }
       heritMeta.setMetadataElement(nme, getMetadataTagName(i)); 
       }
     }
@@ -129,10 +129,12 @@ public final void appendMetadata(MCRObjectMetadata input)
       if (((String)tag_names.get(j)).equals(newtag)) { pos = j; }
       }
     if (pos != -1) {
-      ((MCRMetaElement)meta_list.get(pos)).setHeritable(true);
-      for (int j=0;j < newelm.size();j++) {
-        MCRMetaInterface obj  = newelm.getElement(j);
-        ((MCRMetaElement)meta_list.get(pos)).addMetaObject(obj); 
+      if (!((MCRMetaElement)meta_list.get(pos)).getNotInherit()) {
+        ((MCRMetaElement)meta_list.get(pos)).setHeritable(true);
+        for (int j=0;j < newelm.size();j++) {
+          MCRMetaInterface obj  = newelm.getElement(j);
+          ((MCRMetaElement)meta_list.get(pos)).addMetaObject(obj); 
+          }
         }
       }
     else {

@@ -29,6 +29,7 @@
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
      </xsd:simpleContent>
@@ -45,6 +46,7 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
+     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
      <xsd:attribute ref="xlink:type" />
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
@@ -64,6 +66,7 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
+     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
      <xsd:attribute ref="xlink:type" />
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
@@ -86,6 +89,7 @@
      <xsd:attribute name="classid" />
      <xsd:attribute name="categid" />
      <xsd:attribute name="type" use="optional" type="xsd:string" />
+     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
      <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
@@ -103,6 +107,7 @@
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
      </xsd:simpleContent>
@@ -124,6 +129,7 @@
      <xsd:attribute name="ifsid" use="optional" type="xsd:string"/>
      <xsd:attribute name="type" use="optional" type="xsd:string" />
      <xsd:attribute ref="xml:lang" use="optional" />
+     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    </xsd:complexType>
   </xsd:element>
 </xsd:sequence>
@@ -151,6 +157,7 @@
    </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute ref="xml:lang" />
+   <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
   </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
@@ -179,6 +186,7 @@
      maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
@@ -204,6 +212,7 @@
      maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>

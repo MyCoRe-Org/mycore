@@ -80,7 +80,7 @@ public MCRMetaIFS(String set_datapart, String set_subtag,
   String default_lang, String set_sourcepath) 
   throws MCRException
   {
-  super(set_datapart,set_subtag,"en","",false);
+  super(set_datapart,set_subtag,"en","",0);
   setSourcePath(set_sourcepath);
   maindoc = "";
   ifsid = "";

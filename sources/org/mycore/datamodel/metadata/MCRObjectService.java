@@ -77,10 +77,10 @@ public MCRObjectService()
   lang = DEFAULT_LANGUAGE;
   dates = new ArrayList();
   MCRMetaDate d = new MCRMetaDate("service","servdate",lang,"createdate",
-    false,new GregorianCalendar());
+    0,new GregorianCalendar());
   dates.add(d);
   d = new MCRMetaDate("service","servdate",lang,"modifydate",
-    false,new GregorianCalendar());
+    0,new GregorianCalendar());
   dates.add(d);
   flags = new ArrayList();
   }
@@ -187,7 +187,7 @@ public final void setDate(String type)
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
     MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,
-      false,new GregorianCalendar());
+      0,new GregorianCalendar());
     dates.add(d);
     }
   else {
@@ -213,7 +213,7 @@ public final void setDate(String type, GregorianCalendar date)
   for (int j=0;j<dates.size();j++) {
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
-    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,false,date);
+    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,0,date);
     dates.add(d);
     }
   else {
@@ -233,7 +233,7 @@ public final void addFlag(String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    false,value);
+    0,value);
   flags.add(flag);
   }
  
@@ -311,7 +311,7 @@ public final void replaceFlag(int index, String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    false,value);
+    0,value);
   flags.set(index,flag);
   }
 

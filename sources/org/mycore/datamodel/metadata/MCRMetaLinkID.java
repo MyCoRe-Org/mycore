@@ -64,13 +64,12 @@ public MCRMetaLinkID()
  *                         or 'service' or so
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @exception MCRException if the set_datapart or set_subtag value is null or 
  * empty
  */
 public MCRMetaLinkID(String set_datapart, String set_subtag, 
-  String default_lang, boolean set_inherted) throws MCRException
+  String default_lang, int set_inherted) throws MCRException
   { super(set_datapart,set_subtag,default_lang, set_inherted); }
 
 /**

@@ -72,13 +72,12 @@ public MCRMetaBoolean()
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param set_type         the optional type string
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @param set_value        the boolean value (true or false) as string
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaBoolean(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, boolean set_inherted, String set_value)
+  String default_lang, String set_type, int set_inherted, String set_value)
   throws MCRException
   {
   super(set_datapart,set_subtag,"en",set_type,set_inherted);
@@ -106,13 +105,12 @@ public MCRMetaBoolean(String set_datapart, String set_subtag,
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param set_type         the optional type string
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @param set_value        the boolean value (true or false)
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaBoolean(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, boolean set_inherted, boolean set_value)
+  String default_lang, String set_type, int set_inherted, boolean set_value)
   throws MCRException
   {
   super(set_datapart,set_subtag,"en",set_type,set_inherted);
@@ -188,7 +186,7 @@ public final org.jdom.Element createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
-  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
+  elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   elm.addContent(getValueToString());

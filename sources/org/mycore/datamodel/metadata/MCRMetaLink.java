@@ -93,12 +93,11 @@ public MCRMetaLink()
  *                         or 'service' or so
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @exception MCRException if the set_datapart or set_subtag value is null or empty
  */
 public MCRMetaLink(String set_datapart, String set_subtag, String default_lang,
-  boolean set_inherted)
+  int set_inherted)
   throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,"",set_inherted);
@@ -276,7 +275,7 @@ public org.jdom.Element createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
-  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
+  elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
     MCRObject.XLINK_URL));
   if (linktype.equals("locator")) {

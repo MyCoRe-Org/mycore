@@ -85,6 +85,7 @@
     <xsd:complexType>
      <xsl:apply-templates select="*"/>
      <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+     <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
      <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
      <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
     </xsd:complexType>
@@ -106,6 +107,7 @@
    <xsd:complexType>
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
     <xsl:choose>
      <xsl:when test="contains(@parasearch,'false')">
       <xsd:attribute name="parasearch" type="xsd:boolean" use="required"
@@ -147,6 +149,7 @@
    <xsd:complexType>
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
@@ -172,6 +175,7 @@
    <xsd:complexType>
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>

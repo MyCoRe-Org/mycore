@@ -83,8 +83,7 @@ public MCRMetaNumber()
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @param set_dimension    the optional dimension string
  * @param set_measurement  the optional measurement string
  * @param set_number       the number string
@@ -92,7 +91,7 @@ public MCRMetaNumber()
  *   the number string is not in a number format
  */
 public MCRMetaNumber(String set_datapart, String set_subtag, 
-  String default_lang, boolean set_inherted, String set_dimension, 
+  String default_lang, int set_inherted, String set_dimension, 
   String set_measurement, String set_number) throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,"",set_inherted);
@@ -127,14 +126,13 @@ public MCRMetaNumber(String set_datapart, String set_subtag,
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a value >= 0
  * @param set_dimension    the optional dimension string
  * @param set_number       the number value
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaNumber(String set_datapart, String set_subtag, 
-  String default_lang, boolean set_inherted, String set_dimension,
+  String default_lang, int set_inherted, String set_dimension,
   String set_measurement, double set_number) throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,"",set_inherted);
@@ -262,7 +260,7 @@ public final org.jdom.Element createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
-  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
+  elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   if ((dimension != null) && ((dimension = dimension.trim()).length() !=0)) {

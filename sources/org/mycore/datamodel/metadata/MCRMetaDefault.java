@@ -51,7 +51,7 @@ protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 protected static String DEFAULT_LANGUAGE = "en";
 protected static String DEFAULT_DATAPART = "metadata";
-protected static boolean DEFAULT_INHERITED = false;
+protected static int DEFAULT_INHERITED = 0;
 
 // logger
 static Logger logger=Logger.getLogger(MCRMetaDefault.class.getName());
@@ -60,7 +60,7 @@ static Logger logger=Logger.getLogger(MCRMetaDefault.class.getName());
 protected String subtag;
 protected String lang;
 protected String type;
-protected boolean inherited;
+protected int inherited;
 protected String datapart;
 
 /**
@@ -68,7 +68,7 @@ protected String datapart;
  * The language element was set to <b>en</b>.
  * The datapart element was set to <b>metadata<b>
  * All other elemnts was set to an empty string.
- * The inherited value is set to false!
+ * The inherited value is set to 0!
  */
 public MCRMetaDefault()
   {
@@ -85,7 +85,7 @@ public MCRMetaDefault()
  * The language element was set. If the value of <em>default_lang</em>
  * is empty or false <b>en</b> was set. The datapart was set to default.
  * All other elemnts was set to an empty string.
- * The inherited value is set to false!
+ * The inherited value is set to 0!
  *
  * @param default_lang     the default language
  */
@@ -116,19 +116,19 @@ public MCRMetaDefault(String default_lang)
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
- * @param set_inherted     a boolean value, true if the data are inherited,
- *                         else false.
+ * @param set_inherted     a int value , > 0 if the data are inherited,
+ *                         else = 0.
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaDefault(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, boolean set_inherited)
+  String default_lang, String set_type, int set_inherited)
   throws MCRException
   {
   initLogger();
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
-  inherited = set_inherited;
+  setInherited(set_inherited);
   if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() ==0)) {
     throw new MCRException("The set_subtag is null or empty."); }
   subtag = set_subtag;
@@ -154,12 +154,25 @@ private void initLogger()
   }
 
 /**
- * This method set the inherited flag of true or false.
+ * This method set the inherited level. This can be 0 or an integer higher 0.
  * 
- * @param flag a boolean value, true if the data are inherited, else false.
+ * @param value                  the inherited level value, if it is < 0,
+ *                               0 was set
  **/
-public final void setInherited(boolean flag)
-  { inherited = flag; }
+public final void setInherited(int value)
+  { if (value < 0) { inherited = 0; } else { inherited = value; } }
+
+/**
+ * This method increments the inherited value with 1.
+ **/
+public final void incrementInherited()
+  { inherited++; }
+
+/**
+ * This method decrements the inherited value with 1.
+ **/
+public final void decrementInherited()
+  { if (inherited > 0) inherited--; }
 
 /**
  * This method set the language element. If the value of <em>default_lang</em>
@@ -220,9 +233,9 @@ public final void setDataPart(String set_datapart)
 /**
  * This method get the inherited element.
  *
- * @return the inherited flag as boolean
+ * @return the inherited flag as int
  **/
-public final boolean getInherited()
+public final int getInherited()
   { return inherited; }
 
 /**
@@ -231,7 +244,7 @@ public final boolean getInherited()
  * @return the inherited flag as string
  **/
 public final String getInheritedToString()
-  { return (new Boolean(inherited)).toString(); }
+  { return (new Integer(inherited)).toString(); }
 
 /**
  * This method get the language element.
@@ -288,9 +301,10 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
     type = temp_type; }
   String temp_herit = (String)element.getAttributeValue("inherited");
   if ((temp_herit!=null) && ((temp_herit = temp_herit.trim()).length() !=0)) {
-    boolean mist = false;
-    if (temp_herit.equals("true")) { mist = true; } 
-    inherited = mist; 
+    try {
+      inherited = Integer.parseInt(temp_herit); }
+    catch (NumberFormatException e) {
+      inherited = 0; }
     }
   }
 

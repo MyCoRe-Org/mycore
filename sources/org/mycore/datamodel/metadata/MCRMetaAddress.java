@@ -78,8 +78,7 @@ public MCRMetaAddress()
  * @param set_subtag      the name of the subtag
  * @param default_lang    the default language
  * @param set_type        the optional type string
- * @param set_inherted    a boolean value, true if the data are inherited, 
- *                        else false.
+ * @param set_inherted    a value >= 0
  * @param set_country     the country name
  * @param set_state       the state name
  * @param set_zipcode     the zipcode string
@@ -89,7 +88,7 @@ public MCRMetaAddress()
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaAddress(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, boolean set_inherted,
+  String default_lang, String set_type, int set_inherted,
   String set_country, String set_state, 
   String set_zipcode, String set_city, String set_street, String set_number) 
   throws MCRException
@@ -218,7 +217,7 @@ public final org.jdom.Element createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
     org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
-  elm.setAttribute("inherited",(new Boolean(inherited)).toString()); 
+  elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   if ((country = country  .trim()).length() !=0) {

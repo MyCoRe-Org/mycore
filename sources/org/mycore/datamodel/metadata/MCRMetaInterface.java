@@ -39,14 +39,14 @@ public interface MCRMetaInterface
 /**
  * This method get the inherited element.
  *
- * @return the inherited flag as boolean
+ * @return the inherited flag as int
  **/
-public boolean getInherited();
+public int getInherited();
 
 /**
  * This method get the inherited element.
  *
- * @return the inherited flag as string
+ * @return the inherited value as string
  **/
 public String getInheritedToString();
 
@@ -72,11 +72,23 @@ public String getSubTag();
 public String getType();
 
 /**
- * This method set the inherited flag of true or false.
+ * This method set the inherited level. This can be 0 or an integer higher 0.
  *
- * @param flag a boolean value, true if the data are inherited, else false.
+ * @param value                  the inherited level value, if it is < 0,
+ *                               0 was set
  **/
-public void setInherited(boolean flag);
+public void setInherited(int value);
+
+/**
+ * This method increments the inherited value with 1.
+ **/
+public void incrementInherited();
+
+/**
+ * This method decrements the inherited value with 1.
+ **/
+public void decrementInherited();
+
 
 /**
  * This methode set the default language to the class.
