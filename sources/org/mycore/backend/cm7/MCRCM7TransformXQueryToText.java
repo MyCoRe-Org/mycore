@@ -299,7 +299,10 @@ private final String traceOneCondition(String cond)
       }
     catch (MCRException e) { }
     }
-
+  // prepare categid
+  for (i=0;i<counter;i++) {
+    if (tag[i].endsWith("@CATEGID")) { value[i] = "0"+value[i]+"*"; }
+    }
 /*
   for (i=0;i<counter;i++) {
     System.out.println("TAG="+tag[i]);
@@ -335,7 +338,7 @@ private final String traceOneCondition(String cond)
         if ((value[i].charAt(ii)>='0')&&(value[i].charAt(ii)<='9')) {
           sbtag.append(value[i].charAt(ii)); continue; }
         if (value[i].charAt(ii)=='*') {
-          sbtag.append(value[0].charAt(ii)); continue; }
+          sbtag.append(value[i].charAt(ii)); continue; }
         sbtag.append('X');
         }
       if (op[i].equals("contains")) { sbtag.append('*'); }
