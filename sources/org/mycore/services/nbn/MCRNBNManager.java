@@ -85,7 +85,7 @@ public interface MCRNBNManager
   * containing '*' or '?' wildcard characters.
   *
   * @param pattern the pattern the URNs should match, or null
-  * @return a hashtable containing the matched URNs as keys, and their URLs as values
+  * @return a Map containing the matched URNs as keys, and their URLs as values
   **/
   public Map listURNs( String pattern );
 }
