@@ -1,3 +1,4 @@
+
 ReadMe for ftp.jar and ftp.zip
 ------------------------------
 
@@ -57,6 +58,10 @@ Enterprise Distributed Technologies Ltd.
  *  Change Log:  
  *
  *	  $Log$
+ *	  Revision 1.1  2002/06/04 07:50:36  mcrfluet
+ *	  Added a readme file that describes the contents and license of ftp.jar and
+ *	  ftp.zip
+ *	
  *	
  */
  
