@@ -243,6 +243,12 @@ private List trans( MCRFile file )
   ByteArrayOutputStream out = new ByteArrayOutputStream();
   MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
   java.net.URL url      = MCRContentIndexerXML.class.getResource( "/mcr_make_types.xsl" );
+  if ( null == url )
+  {
+    String msg = "File not found in CLASSPATH: " + "mcr_make_types.xsl";
+    logger.error( msg );
+    throw new MCRConfigurationException( msg );
+  }
   Templates xsl = transformer.getStylesheet( url.getFile() );
   TransformerHandler handler = transformer.getTransformerHandler( xsl );
   transformer.transform( file.getContentAsJDOM(), handler, out );
@@ -254,7 +260,8 @@ private List trans( MCRFile file )
   }   
   catch (Exception e)
   {
-    logger.info(e);
+//    throw new MCRException( "Error transforming MCRFile." );
+    e.printStackTrace();
     return null;
   }
 }
