@@ -35,10 +35,9 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 /**
- * @author Thomas Scheffler (yagee)
+ * This class provides methods to search derivates on a lucene index
  * 
- * Need to insert some things here
- *
+ * @author Thomas Scheffler (yagee)
  */
 public class LuceneCStoreQueryParser extends QueryParser {
 	private static final Logger logger =
@@ -69,7 +68,9 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	}
 
 	/**
-	 * @param string
+	 * Must be set prior parsing a query to the DerivateID to be searched on
+	 * 
+	 * @param string DerivateID
 	 */
 	public void setGroupingValue(String string) {
 		if (string.indexOf(" ") != -1)
@@ -106,6 +107,10 @@ public class LuceneCStoreQueryParser extends QueryParser {
 		}
 		return query;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.lucene.queryParser.QueryParser#parse(java.lang.String)
+	 */
 	public Query parse(String query) throws ParseException {
 		Query queryTemp = super.parse(query);
 		if (queryTemp.toString(field).equals(query)) {
@@ -116,6 +121,20 @@ public class LuceneCStoreQueryParser extends QueryParser {
 		}
 		return queryTemp;
 	}
+	/**
+	 * Parses a query String, returning an array of {@link org.apache.lucene.search.BooleanQuery}
+	 * 
+	 * Syntax:
+	 * <pre>
+	 * foo bar   : search for foo AND bar anywhere across the files of the derivate
+	 * foo -bar  : search for foo and no file of the derivate may contain bar
+	 * "foo bar" : any file of the derivate must contain the phrase foo bar.
+	 * </pre>
+	 * 
+	 * @param query Query matching the given syntax
+	 * @return Array of BooleanQuery queries against a single derivate
+	 * @throws ParseException if syntax mismatches
+	 */
 	public BooleanQuery[] getBooleanQueries(String query) throws ParseException {
 		BooleanQuery bQuery = (BooleanQuery) parse(query);
 		BooleanClause[] clauses = bQuery.getClauses();
@@ -123,7 +142,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
 		for (int i = 0; i < clauses.length; i++) {
 			if (clauses[i].prohibited == true
 				|| (clauses.length > 1 && clauses[i].required == true))
-				logger.error(
+				throw new ParseException(
 					"Queries should be OR linked: "
 						+ clauses[i].prohibited
 						+ ":"
