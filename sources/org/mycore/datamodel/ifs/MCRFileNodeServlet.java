@@ -313,11 +313,22 @@ private ArrayList remoteAliasList = null;
     addString( root, "path",         dir.getPath() );
     addString( root, "ownerID",      dir.getOwnerID() );
     addDate  ( root, "lastModified", dir.getLastModified() );
-    addString( root, "numChildDirectoriesHere",  String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.HERE  ) ) );
-    addString( root, "numChildDirectoriesTotal", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.TOTAL ) ) );
-    addString( root, "numChildFilesHere",        String.valueOf( dir.getNumChildren( dir.FILES, dir.HERE ) ) );
-    addString( root, "numChildFilesTotal",       String.valueOf( dir.getNumChildren( dir.FILES, dir.TOTAL ) ) );
     addString( root, "size",         String.valueOf( dir.getSize() ) );
+    
+    Element numChildren = new Element( "numChildren" );
+    root.addContent( numChildren );
+    
+    Element ncHere = new Element( "here" );
+    numChildren.addContent( ncHere );
+    
+    addString( ncHere, "directories", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.HERE ) ) );
+    addString( ncHere, "files",       String.valueOf( dir.getNumChildren( dir.FILES,       dir.HERE ) ) );
+    
+    Element ncTotal = new Element( "total" );
+    numChildren.addContent( ncTotal );
+    
+    addString( ncTotal, "directories", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.TOTAL ) ) );
+    addString( ncTotal, "files",       String.valueOf( dir.getNumChildren( dir.FILES,       dir.TOTAL ) ) );
 
     Element nodes = new Element( "children" );
     root.addContent( nodes );
