@@ -35,7 +35,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
 import org.mycore.services.query.MCRQueryCollector;
-import org.mycore.services.query.MCRQueryResult;
 import org.mycore.common.xml.MCRXMLContainer;
 
 /**
@@ -92,7 +91,6 @@ public static void queryRemote( String type, String query )
     logger.info("Query Type = " + type  );
     logger.info("Query      = " + query );
 
-    MCRQueryResult result = new MCRQueryResult();
     MCRXMLContainer resarray = new MCRXMLContainer();
 
     if( type.equals( "class" ) ) // classifications
