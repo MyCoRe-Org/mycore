@@ -209,7 +209,13 @@
       windowtitle         = "MyCoRe JavaDoc Documentation"
       doctitle            = "MyCoRe Source Code JavaDoc Documentation"
     >
-      <group title="MyCoRe Packages" packages="mycore.*"/>
+      <group title="MyCoRe Datamodel"                           packages="org.mycore.datamodel*" />
+      <group title="MyCoRe Persistence Backend Implementations" packages="org.mycore.backend*"   />
+      <group title="MyCoRe User Interface Frontend"             packages="org.mycore.frontend*"  />
+      <group title="MyCoRe Common Functionality"                packages="org.mycore.common*"    />
+      <group title="MyCoRe Services"                            packages="org.mycore.services*"  />
+      <group title="MyCoRe Other Packages"                      packages="org.mycore.user:org.mycore.webservice" />
+
       <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
       <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
       <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
