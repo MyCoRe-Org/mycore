@@ -10,13 +10,19 @@ Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde 
 \subsubsection{Vorbereitung}
 %
 %
-Als erster Schritt sind der Java-Compiler J2SE 1.3.1 oder höher und ANT zu installieren. Beide Befinden sich unter SuSE in der Distribution.
+Als erster Schritt sind der Java-Compiler J2SE 1.3.1 oder höher und ANT zu installieren. Beide befinden sich unter in der SuSE in der Distribution. 
 \begin{itemize}
 \item {\bf java2-jre-1.3.1-521} oder höher
 \item {\bf java2-1.3.1-521} oder höher
 \item {\bf jakarta-ant-1.5-76} oder höher
 \end{itemize}
+
+Wenn allerdings SuSE von einem ftp Server installiert wird, so ist Java nicht standardmäßig enthalten. Dann bitte die Java Linux Version von der \url{www.blackdown.org}\footnote{\url{ftp://ftp.informatik.hu-berlin.de/pub/Java/Linux/JDK-1.4.1/i386/01/j2sdk-1.4.1-01-linux-i586-gcc3.2.bin}} Homepage runterladen und wie folgt installieren. Download nach beispielsweise nach {\it /usr/local} anschließend mit {\tt chmod +x j2sdk-1.4.1-01-linux-<ARCH>.bin} ausführbar machen und ausführen {\tt ./j2sdk-1.4.1-01-linux-<ARCH>.bin}.  Damit die Pfad Variablen alle richtig gesetzt werden eine Vorlage unter {\it/etc/java} entsprechend editieren und mit {\tt setDefaultJava} als root die Links richtig setzten.
+Zudem sollte man in der Datei {\it /etc/profile.local}\footnote{Falls diese noch nicht existiert einfach anlegen} noch die Variable {\it ANT\_HOME}\footnote{export ANT\_HOME=/opt/jakarta/ant} gesetzt werden. 
+
 Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin} anlegen, unter welchem Sie dann Ihre Applikationen laufen lassen.
+
+
 %
 %
 \subsubsection{Die Installation von MySQL}
@@ -30,10 +36,8 @@ Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin} anlegen, u
 \item {\bf mysql-bench-3.23.52-83} oder höher
 \end{itemize}
 \item Die Dokumentation steht nun unter {\it /usr/share/doc/package/mysql}.
-\item Führe Sie das Kommando {\tt mysql\_install\_db } als mysql aus.
-\item Führe Sie das Kommando {\tt safe\_mysqld \& } als mysql aus.
-\item Zum verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
-\item Setzen Sie nun das {\bf root} Password mit dem Kommando {\tt /usr/bin/mysqladmin -u root  password PASSWORD} und {\tt mysqladmin -u root -h HOST password PASSWORD} . Ist das Password einmal gesetzt, müssen Sie zusätzlich die Option -p verwenden.
+\item Führe Sie das Kommando {\tt rcmysql } als root aus. 
+\item Führe Sie das Kommando {\tt /usr/bin/mysqladmin -u root password 'new-password'} als root aus.
 \item die folgende Sequenz sorgt dafür, dass der MyCoRe-User {\bf mcradmin} alle Rechte auf der Datenbank hat. Dabei werden bei der Ausführung von Kommandos von {\bf localhost} aus keine Pssworte abgefragt. Von anderen Hosts aus muss 'ein\_password' eingegeben werden.
 {\tt
 \begin{verbatim}
@@ -43,13 +47,15 @@ GRANT ALL PRIVILEGES ON *.* TO mcradmin@"%" IDENTIFIED BY 'ein\_passwort' WITH G
 quit
 \end{verbatim}
 }
+\item Ist das Password einmal gesetzt, müssen Sie zusätzlich die Option -p verwenden.
+\item Zum verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
 \item jetzt können Sie die Datenbasis für MyCoRe mit nachstehendem Kommando anlegen.
 {\tt
 \begin{verbatim}
 mysqladmin -u mcradmin create mycore 
 \end{verbatim}
 }
-\item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommanos
+\item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommandos
 {\tt
 \begin{verbatim}
 mysql --user=mcradmin -pPASSWORD mycore
@@ -58,6 +64,8 @@ quit
 \end{verbatim}
 }
 \end{enumerate}
+
+Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei ???? geschrieben werden.
 %
 %
 \subsection{Installation der Komponenten unter MS Windows}
