@@ -92,7 +92,7 @@ private boolean cachedFlag;
     conf = super.config;
     collector = (MCRQueryCollector)this.getServletContext().getAttribute("QueryCollector");
     if (collector == null)
-    	collector = new MCRQueryCollector(2,6);
+    	collector = new MCRQueryCollector(conf.getInt("MCR.Collector_Thread_num",2),conf.getInt("MCR.Agent_Thread_num",6));
     this.getServletContext().setAttribute("QueryCollector",collector);
 	PropertyConfigurator.configure(conf.getLoggingProperties());
     defaultLang = conf
