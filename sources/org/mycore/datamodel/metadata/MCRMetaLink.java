@@ -366,7 +366,6 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-/*
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
   tc.addLinkElement(parametric,textsearch);
   tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",linktype,parametric,textsearch);
@@ -386,7 +385,6 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title,parametric,
       textsearch);
     }
-*/
   return tc;
   }
 
