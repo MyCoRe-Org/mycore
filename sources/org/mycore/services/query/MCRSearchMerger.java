@@ -51,6 +51,7 @@ public MCRSearchMerger() {
   super();
   String temp = config.getString("MCR.XMLStore.Type","");
   metaclassname = config.getString("MCR.persistence_"+temp+"_query_name");
+  logger.debug("MCR.persistence_"+temp+"_query_name");
   logger.debug("Load the metadata search class "+metaclassname);
   try {
     msif = (MCRMetaSearchInterface)Class.forName(metaclassname).newInstance(); }

@@ -32,16 +32,11 @@ import org.mycore.common.xml.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
 
-import org.xmldb.api.base.*;
-import org.xmldb.api.modules.*;
-
 import org.apache.log4j.Logger;
 import org.jdom.output.*;
 
 import java.util.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -215,17 +210,19 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
     {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
-      java.net.URL url = MCRLUCENESearchStore.class.getResource("/mcr_" + typeId + "2fields.xsl");
-      if (null == url)
+
+      String stylesheet = "/mcr_4lucene_" + typeId + "2fields.xsl";
+      
+      java.net.URL url      = MCRContentIndexerXML.class.getResource( stylesheet );
+      if ( null == url )
       {
-        String msg = "File not found in CLASSPATH: " + "mcr_" + typeId + "2fields.xsl";
-        logger.error(msg);
-        throw new MCRConfigurationException(msg);
+        String msg = "File not found in CLASSPATH: " +  stylesheet;
+        logger.error( msg );
+        throw new MCRConfigurationException( msg );
       }
-      //TODO: get from classpath!!!! 
-      //      Templates xsl = transformer.getStylesheet( url.getFile() );
-      String xx = "D:\\mcr\\mycore\\stylesheets\\mcr_" + typeId + "2fields.xsl";
-      Templates xsl = transformer.getStylesheet(xx);
+      Templates xsl = transformer.getStylesheet( url.getFile() );
+      
+      
       TransformerHandler handler = transformer.getTransformerHandler(xsl);
       transformer.transform(new org.jdom.Document(root), handler, out);
       out.close();

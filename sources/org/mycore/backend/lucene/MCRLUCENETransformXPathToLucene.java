@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e ** 
+ * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -23,14 +23,17 @@
  **/
 package org.mycore.backend.lucene;
 
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexReader;
+import java.util.HashSet;
+
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.query.MCRMetaSearchInterface;
+
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -39,157 +42,118 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.queryParser.QueryParser;
 
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.services.query.*;
-
-import org.jdom.*;
-import org.jdom.input.*;
-import org.jdom.output.*;
+import org.apache.lucene.search.BooleanQuery;
 
 /**
- * This is the implementation of the MCRQueryInterface for Lucne
- * based omn MCRXMLDBTransformXPathToeXist.java
+ * This is the implementation of the MCRMetaSearchInterface with Lucene
+ *
  * @author Harald Richter
  * @version $Revision$ $Date$
  **/
-public class MCRLUCENETransformXPathToLucene extends MCRQueryBase {
+public class MCRLUCENETransformXPathToLucene implements MCRMetaSearchInterface {
 
-  static String indexDir = "";
-  
-  /** Reads properties from configuration file when class first used */
-  static
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    
-    indexDir       = config.getString( "MCR.persistence_lucene_searchindexdir" );
-    System.out.println( "TextIndexDir: " + indexDir);
-  }
-  
+/** The default query **/
 public static final String DEFAULT_QUERY = "/*";
+
+// the logger
+protected static Logger logger =
+  Logger.getLogger(MCRLUCENETransformXPathToLucene.class.getName());
+private MCRConfiguration config = null;
+
+static String indexDir = "";
 
 /**
  * The constructor.
  **/
-public MCRLUCENETransformXPathToLucene() {
-  super();
-  //MCRXMLDBConnectionPool.instance();
+  public MCRLUCENETransformXPathToLucene()
+  {
+    config = MCRConfiguration.instance();
+    indexDir = config.getString("MCR.persistence_lucene_searchindexdir");
+    logger.debug("TextIndexDir: " + indexDir);
   }
 
-/**
- * This method start the Query over one object type and return the 
- * result as MCRXMLContainer.
- *
- * @param type                  the MCRObject type
- * @return                      a result list as MCRXMLContainer
- **/
-protected final MCRXMLContainer startQuery( String type ) {
-  MCRXMLContainer result = new MCRXMLContainer();
-  // Mark all document searches
-  for (int i=0;i<subqueries.size();i++) {
-    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1)
-      flags.set(i,Boolean.TRUE);
+  /**
+   * This method starts the Query over the Lucene persistence layer for one
+   * object type and and returns the query result as a HashSet of MCRObjectIDs.
+   * 
+   * @param root
+   *          the query root
+   * @param query
+   *          the metadata queries
+   * @param type
+   *          the MCRObject type
+   * @return a result list as MCRXMLContainer
+   */
+	public final HashSet getResultIDs(String root, String query, String type)
+  {
+    // prepare the query over the rest of the metadata
+    HashSet idmeta = new HashSet();
+    logger.debug("Incomming condition : " + query);
+    String newquery = "";
+    if ((root == null) && (query.length() == 0))
+    {
+      newquery = DEFAULT_QUERY;
     }
-  
-  // prepare the query over the metadata
-  String query = handleQueryString(type);
-  logger.debug("Transformed query : "+query);
-  // do it over the metadata
-  try {
-      MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-      String objid;
-      byte[] xml;
-      
-      if ( query.startsWith( "+" + type + "/ID:" ) )
+    newquery = handleQueryStringExist(root, query, type);
+    logger.debug("Transformed query for Lucene: " + newquery);
+
+    // do it over the metadata
+    if (newquery.length() != 0)
+    {
+      try
       {
-        int i = query.indexOf(":");
-        objid = query.substring( i+1 );  
-        objid = MCRUtils.replaceString(objid, "x", "_");
-        System.out.println("xmltable.retrieve: " + objid );
-        xml = xmltable.retrieve(type,new MCRObjectID(objid));
-        result.add( "local", objid, 0, xml); 
-        return result;
-      }
-      
-      long start = System.currentTimeMillis();
-      IndexSearcher searcher = new IndexSearcher(indexDir);
-      Analyzer analyzer = new GermanAnalyzer();
+        long start = System.currentTimeMillis();
+        IndexSearcher searcher = new IndexSearcher(indexDir);
+        Analyzer analyzer = new GermanAnalyzer();
 
-      Query qu = QueryParser.parse(query, "", analyzer);
-      logger.debug("Searching for: " + qu.toString(""));
+        BooleanQuery bq = new BooleanQuery();
+        Query qu = QueryParser.parse(newquery, "", analyzer);
+        bq.add(qu, true, false);
+        
+        Term  te = new Term("typeId", type);
+        
+        TermQuery tq = new TermQuery(te);
+        bq.add(tq, true, false);
+        
+        logger.debug("Searching for: " + bq.toString(""));
 
-      Hits hits = searcher.search( qu );
-      long qtime = System.currentTimeMillis() - start;
-      start = System.currentTimeMillis();
+        Hits hits = searcher.search(bq);
+        long qtime = System.currentTimeMillis() - start;
+        start = System.currentTimeMillis();
 
-      logger.debug("+++++Number of documents found : " + hits.length());
-      for (int i = 0; i < hits.length(); i++)
+        logger.debug("+++++Number of objects found : " + hits.length());
+        for (int i = 0; i < hits.length(); i++)
+        {
+          String objid = hits.doc(i).get("key");
+          logger.debug("+++++Objid: " + objid + " Type: " + type);
+          idmeta.add(new MCRObjectID(objid));
+        }
+
+        logger.debug("query time:    " + qtime);
+      } catch (Exception e)
       {
-        objid =  hits.doc(i).get("ID");
-        logger.debug("+++++Objid: " + objid + " Type: " + type);
-        xml = xmltable.retrieve(type,new MCRObjectID(objid));
-        result.add( "local", objid, 0, xml); 
+        throw new MCRPersistenceException(e.getMessage(), e);
       }
-      
-      long rtime = System.currentTimeMillis() - start;
-      logger.debug("query time:    " + qtime);
-      logger.debug("retrieve time: " + rtime);
     }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
-    try {
-      }
-    catch( Exception e ) {
-      throw new MCRPersistenceException( e.getMessage(), e ); }
-    }
-  // Here you can add other searches and merge the result container with
-  // them from the first query.
-  return result;
+    return idmeta;
   }
 
 /**
  * Handle query string for Lucene
  **/
-private String handleQueryString(String type) {
-  if (subqueries.size() == 0) { return DEFAULT_QUERY; }
-  StringBuffer qsb = new StringBuffer(1024);
-  for (int i=0;i<subqueries.size();i++) {
-    if (((Boolean)flags.get(i)).booleanValue()) continue;
-    String help = (String)subqueries.get(i);
-    help = MCRUtils.replaceString(help, " and ", " and +" + type + "/"); // classifications?
-    qsb.append(' ').append('+').append(type).append('/').append(help).append(' ')
-      .append((String)andor.get(i));
-    flags.set(i,Boolean.TRUE);
-    }
-  logger.debug("Incomming condition : "+qsb.toString());
-  return handleQueryStringExist(qsb.toString().trim(),type);
-  }
-    
-/**
- * Handle query string for Lucene
- **/
-private String handleQueryStringExist( String query, String type ) {
-  query = MCRUtils.replaceString(query, ":", "");
-  query = MCRUtils.replaceString(query, "@", "");
-  query = MCRUtils.replaceString(query, "\"", "");
-  
-  query = MCRUtils.replaceString(query, " like ", ":");
-  query = MCRUtils.replaceString(query, "text()", ".");
-  query = MCRUtils.replaceString(query, "ts()", ".");
-  query = MCRUtils.replaceString(query, " contains(", ":\"");
-  query = MCRUtils.replaceString(query, ")", "\"");
-  
-  query = MCRUtils.replaceString(query, "='", ":");
-  query = MCRUtils.replaceString(query, "'", "");
-  query = MCRUtils.replaceString(query, "=", ":");
-  
-  query = MCRUtils.replaceString(query, "_", "x");
-//  query = MCRUtils.replaceString(query, "metadata/titles/", "");
-  // combine the separated queries
-//  query = root+ "[" + query +"]";
-  return query;
-  }
+private String handleQueryStringExist(String root, String query, String type) {
+	query = MCRUtils.replaceString(query, "#####metadata/titles/title contains(\"", "+(title:");
+	query = MCRUtils.replaceString(query, "\")#####", ")");
+	
+	/*
+	query = MCRUtils.replaceString(query, "like", "&=");
+	query = MCRUtils.replaceString(query, "text()", ".");
+	query = MCRUtils.replaceString(query, "ts()", ".");
+	query = MCRUtils.replaceString(query, "contains(", "&=");
+	query = MCRUtils.replaceString(query, "contains (", "&=");
+	query = MCRUtils.replaceString(query, ")", "");
+	*/
+	return query;
 }
-
+  
+}
