@@ -557,5 +557,37 @@ private final void resetStatus()
   	clone.xml=(ArrayList) this.xml.clone();
   	return clone;
   }
+  /**
+   * removes everything after the n-th Element if existing
+   */
+  public synchronized void cutDownTo(int newsize){
+  	if (newsize < size()){
+  		host    =new ArrayList(host.subList(0,newsize));
+  		mcr_id=new ArrayList(mcr_id.subList(0,newsize));
+  		rank    =new ArrayList(rank.subList(0,newsize));
+  		status  =new ArrayList(status.subList(0,newsize));
+  		xml      =new ArrayList(xml.subList(0,newsize));
+//  		if (host.size()>newsize)	//if some Objects in List are equal List still too big
+//  			for (int i=newsize+1;i<host.size();i++)
+//  				host.remove(i);
+//  		mcr_id.retainAll(host.subList(0,newsize));
+//  		if (mcr_id.size()>newsize)
+//  			for (int i=newsize+1;i<mcr_id.size();i++)
+//  				mcr_id.remove(i);
+//  		rank.retainAll(host.subList(0,newsize));
+//  		if (rank.size()>newsize)
+//  			for (int i=newsize+1;i<rank.size();i++)
+//  				rank.remove(i);
+//  		status.retainAll(host.subList(0,newsize));
+//  		if (status.size()>newsize)
+//  			for (int i=newsize+1;i<status.size();i++)
+//  				status.remove(i);
+//  		xml.retainAll(host.subList(0,newsize));
+//  		if (xml.size()>newsize)
+//  			for (int i=newsize+1;i<xml.size();i++)
+//  				xml.remove(i);
+  		resetStatus();
+  	}
+  }
 }
 
