@@ -139,6 +139,7 @@ public class MCRCStoreContentManager8
 						.append('.')
 						.append(row.getString(2))
 						.toString();
+				logger.debug("TIEREF Table: "+TIEREF_TABLE);
 			} else {
 				logger.warn(
 					"Failure getting TIEREF Index from "
