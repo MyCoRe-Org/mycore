@@ -97,7 +97,10 @@ public class MCRContentStoreFactory {
 		if (storeSelector == null)
 			initStoreSelector();
 		String[] s = storeSelector.getAvailableStoreIDs();
-		for (int i = 0; i < s.length; i++)
+		if (s.length==0 && indexStores==null){
+			indexStores=new Hashtable();
+		}
+		else for (int i = 0; i < s.length; i++)
 			getStore(s[i]);
 		if (indexStores.size()==0)
 			return new MCRTextSearchInterface[0];
