@@ -232,11 +232,26 @@ In the web browser please do the following configurations.
 \end{itemize}
 \end{enumerate}
 Restart the HTTP Server (and leave it open) by clicking on the black circle logo that is located next to the help button in the upper-right corner of the right panel. \\[2ex]
-Open \mcrcommand{https://<your hostname>/snoop} in the web browser.
+Open \mcrcommand{https://<your hostname>/snoop} in the web browser.\\[2ex]
 %
 {\bf Installation of the FixPack 2}
 \begin{enumerate}
 \item Download from \url{ftp://ftp.software.ibm.com/software/websphere/appserv/support/fixpacks/was50/fixpack2/AIX/}
+\item Unpack the tar file to a \mcrfile{install\_root}
+\item READ the documentation!
+\item Set the JAVA\_HOME environment variable.
+\item Stop all WebSphere applications with \mrccommand{/usr/WebSphere/AppServer/bin/stopServer ...}\footnote{like icmrm or mycoresample}
+\item Start the install wizzard with \mrccommand{install\_root/updateWizard.sh} or as command line tool with \mrccommand{install\_root/updateSilent.sh}
+\begin{itemize}
+\item Select {\bf english}
+\item By default let the path of WebSphere on \mcrfile{/usr/WebSphere/AppServer}.  $\rightarrow$ {\bf 'Next'}
+\item Select {\bf fixpacks} $\rightarrow$ {\bf 'Next'}
+\item Let the path of install source by \mcrfile{install\_root}. $\rightarrow$ {\bf 'Next'}
+\item Confirm that you will install the fixpack 2. $\rightarrow$ {\bf 'Next'}
+\item By default let the path of HTTPD on \mcrfile{/usr/IBMHttpServer}. $\rightarrow$ {\bf 'Next'}
+\item {\bf 'Next'}
+\item {\bf 'Finish'}
+\end{itemize}
 \end{enumerate}
 %
 \subsubsection{Content Manager}
@@ -370,6 +385,13 @@ DB2AUTOSTART='YES'
 \item Test the Resource Manager in a web browser $\rightarrow$ \mcrcommand{https://<your full qualified hostname>/icmrm/ICMResourceManager}\footnote{The response is : No order found to prcess, that is okay.}
 \end{enumerate}
 %
+{\bf Installation of the FixPack 2}
+\begin{enumerate}
+\item Download from \url{ftp://ftp.software.ibm.com/ps/products/content_manager/fixes/v8.2/aix/820.20/}
+\item READ the documentation!
+\item Do the steps under 2.2.1 of the documentation.
+\end{enumerate}
+%
 \subsubsection{Information Integrator for Content Manager}
 \begin{enumerate}
 \item \mcrcommand{su -}
@@ -409,13 +431,12 @@ DB2AUTOSTART='YES'
 \item Check the log under \mcrfile{/tmp/frn/frnxinst.log}
 \end{enumerate}
 %
-%
-\subsection{Der IBM Content Manager unter Solaris}
-
-%
-%
-\subsection{Der IBM Content Manager unter Windows}
-
+{\bf Installation of the FixPack 2}
+\begin{enumerate}
+\item Download from \url{ftp://ftp.software.ibm.com/ps/products/enterprise_information_portal/fixes/v8.2/aix/820.20}
+\item READ the documentation!
+\item Do the steps under 2.2.1 of the documentation.
+\end{enumerate}
 %
 %
 
