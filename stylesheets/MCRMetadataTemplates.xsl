@@ -2,6 +2,7 @@
 
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xsd='http://www.w3.org/2001/XMLSchema'
   version="1.0">
 
 <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
@@ -22,6 +23,7 @@
 <!-- Template for the metadata MCRMetaLangText -->
 
 <xsl:template match="mcrmetalangtext">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:simpleContent>
@@ -32,11 +34,15 @@
      </xsd:simpleContent>
    </xsd:complexType>
  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaLangText" />
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaLink -->
 
 <xsl:template match="mcrmetalink">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute ref="xlink:type" />
@@ -47,11 +53,15 @@
      <xsd:attribute ref="xlink:to" use="optional"/>
    </xsd:complexType>
   </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaLink"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaLinkID -->
 
 <xsl:template match="mcrmetalinkid">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute ref="xlink:type" />
@@ -62,11 +72,15 @@
      <xsd:attribute ref="xlink:to" use="optional"/>
    </xsd:complexType>
   </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaLinkID"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaClassification -->
 
 <xsl:template match="mcrmetaclassification">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute name="classid" />
@@ -75,11 +89,15 @@
      <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaClassification" />
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaDate -->
 
 <xsl:template match="mcrmetadate">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:simpleContent>
@@ -90,24 +108,33 @@
      </xsd:simpleContent>
    </xsd:complexType>
   </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaDate" />
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaIFS -->
 
 <xsl:template match="mcrmetaifs">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute name="sourcepath" use="required" type="xsd:string" />
      <xsd:attribute name="maindoc" use="required" type="xsd:string"/>
+     <xsd:attribute name="ifsid" use="optional" type="xsd:string"/>
      <xsd:attribute name="type" use="optional" type="xsd:string" />
      <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaIFS"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaPerson -->
 
 <xsl:template match="mcrmetaperson">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:sequence>
@@ -126,11 +153,15 @@
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaPerson"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaAddress -->
 
 <xsl:template match="mcrmetaaddress">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:sequence>
@@ -151,11 +182,15 @@
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaAddress"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaCorporation -->
 
 <xsl:template match="mcrmetacorporation">
+<xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:sequence>
@@ -172,6 +207,9 @@
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaCorporation"/>
 </xsl:template>
 
 </xsl:stylesheet>

@@ -2,6 +2,7 @@
 
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xsd='http://www.w3.org/2001/XMLSchema'
   version="1.0">
 
 <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
@@ -76,45 +77,34 @@
 <!-- Template for the structure part -->
 
 <xsl:template match="/configuration/structure">
-
  <xsd:complexType name="MCRObjectStructure">
   <xsd:sequence>
-
- <xsl:for-each select="element">
-  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
-   <xsd:complexType>
-    <xsd:sequence>
+   <xsl:for-each select="element">
+    <xsd:element name="{@name}" minOccurs="{@minOccurs}" 
+     maxOccurs="{@maxOccurs}">
+    <xsd:complexType>
      <xsl:apply-templates select="*"/>
-    </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required" />
-    <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
-   </xsd:complexType>
-  </xsd:element>
- </xsl:for-each>
-
-   <xsl:value-of select="$newline"/>
+     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
+    </xsd:complexType>
+   </xsd:element>
+  </xsl:for-each>
+  <xsl:value-of select="$newline"/>
   </xsd:sequence>
   <xsd:attribute ref="xml:lang" />
  </xsd:complexType>
-
 </xsl:template>
 
 <!-- Template for the metadata part -->
 
 <xsl:template match="/configuration/metadata">
-
  <xsd:complexType name="MCRObjectMetadata">
   <xsd:sequence>
-
  <xsl:for-each select="element">
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-    <xsd:sequence>
-     <xsl:apply-templates select="*"/>
-    </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsl:choose>
      <xsl:when test="contains(@parasearch,'false')">
@@ -155,10 +145,7 @@
  <xsl:for-each select="element">
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-    <xsd:sequence>
-     <xsl:apply-templates select="*"/>
-    </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
@@ -183,10 +170,7 @@
  <xsl:for-each select="element">
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-    <xsd:sequence>
-     <xsl:apply-templates select="*"/>
-    </xsd:sequence>
-    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
