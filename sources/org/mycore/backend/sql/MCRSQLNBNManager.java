@@ -110,7 +110,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		try {
 			PreparedStatement statement;
 			statement = connection.getJDBCConnection()
-				.prepareStatement("insert into " + table + " values (?, ?, ?, ?, ?)");
+				.prepareStatement("insert into " + table + " values (?, ?, ?, ?, ?, ?)");
 			
 			statement.setString(1, urn.getNISSandChecksum());
 			statement.setNull(2, Types.VARCHAR);
@@ -121,6 +121,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 				statement.setString(4, urn.getComment());
 			}
 			statement.setTimestamp(5, new Timestamp(now.getTime()));
+			statement.setNull(6, Types.VARCHAR);
 			
 			statement.execute();
 			statement.close();
