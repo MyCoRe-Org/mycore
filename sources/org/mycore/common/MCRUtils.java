@@ -58,7 +58,7 @@ import org.jdom.output.XMLOutputter;
  * the programming API.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$

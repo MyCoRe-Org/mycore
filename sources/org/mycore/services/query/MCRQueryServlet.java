@@ -44,7 +44,7 @@ import org.apache.log4j.PropertyConfigurator;
  * This servlet provides a web interface to query the datastore using XQueries
  * and deliver the result list
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)

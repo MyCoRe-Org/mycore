@@ -40,23 +40,23 @@ import org.mycore.services.query.MCRTextSearchInterface;
  * remembering the implementations of MCRContentStore and MCRAudioVideoExtender 
  * that are used in the system.
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRContentStoreFactory {
 	/** Hashtable StoreID to MCRContentStore instance */
-	protected static Hashtable stores;
+	protected static Hashtable STORES;
 
 	/** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
-	protected static Hashtable extenderClasses;
+	protected static Hashtable EXTENDER_CLASSES;
 
 	/** Hashtable StoreID to MCRContentStore implementing {@link org.mycore.services.query.MCRTextSearchInterface} */
-	protected static Hashtable indexStores;
+	protected static Hashtable INDEX_STORES;
 
 	/** The MCRContentStoreSelector implementation that will be used */
-	protected static MCRContentStoreSelector storeSelector;
-	private static final Logger logger =
+	protected static MCRContentStoreSelector STORE_SELECTOR;
+	private static final Logger LOGGER =
 			Logger.getLogger(MCRContentStoreFactory.class);
 
 	/**
@@ -69,23 +69,23 @@ public class MCRContentStoreFactory {
 	 * @throws MCRConfigurationException if no MCRContentStore implementation is configured for this storeID
 	 */
 	public static MCRContentStore getStore(String storeID) {
-		if (stores == null)
-			stores = new Hashtable();
-		if (indexStores == null)
-			indexStores = new Hashtable();
+		if (STORES == null)
+			STORES = new Hashtable();
+		if (INDEX_STORES == null)
+			INDEX_STORES = new Hashtable();
 		MCRArgumentChecker.ensureNotEmpty(storeID, "Store ID");
-		if (!stores.containsKey(storeID)) {
+		if (!STORES.containsKey(storeID)) {
 			try {
 				String storeClass =
 					"MCR.IFS.ContentStore." + storeID + ".Class";
-				logger.debug("getting StoreClass: "+storeClass);
+				LOGGER.debug("getting StoreClass: "+storeClass);
 				Object obj =
 					MCRConfiguration.instance().getInstanceOf(storeClass);
 				MCRContentStore s = (MCRContentStore) (obj);
 				s.init(storeID);
-				stores.put(storeID, s);
+				STORES.put(storeID, s);
 				if (s instanceof MCRTextSearchInterface) {
-					indexStores.put(storeID, s);
+					INDEX_STORES.put(storeID, s);
 				}
 			} catch (Exception ex) {
 				String msg =
@@ -93,7 +93,7 @@ public class MCRContentStoreFactory {
 				throw new MCRConfigurationException(msg, ex);
 			}
 		}
-		return (MCRContentStore) (stores.get(storeID));
+		return (MCRContentStore) (STORES.get(storeID));
 	}
 
 	/**
@@ -101,18 +101,18 @@ public class MCRContentStoreFactory {
 	 * @return Array of {@link org.mycore.services.query.MCRTextSearchInterface} ContentStores
 	 */
 	public static MCRTextSearchInterface[] getAllIndexables() {
-		if (storeSelector == null)
+		if (STORE_SELECTOR == null)
 			initStoreSelector();
-		String[] s = storeSelector.getAvailableStoreIDs();
-		if (s.length==0 && indexStores==null){
-			indexStores=new Hashtable();
+		String[] s = STORE_SELECTOR.getAvailableStoreIDs();
+		if (s.length==0 && INDEX_STORES==null){
+			INDEX_STORES=new Hashtable();
 		}
 		else for (int i = 0; i < s.length; i++)
 			getStore(s[i]);
-		if (indexStores.size()==0)
+		if (INDEX_STORES.size()==0)
 			return new MCRTextSearchInterface[0];
-		return (MCRTextSearchInterface[]) indexStores.values().toArray(
-				new MCRTextSearchInterface[indexStores.size()]);
+		return (MCRTextSearchInterface[]) INDEX_STORES.values().toArray(
+				new MCRTextSearchInterface[INDEX_STORES.size()]);
 	}
 
 	/**
@@ -124,16 +124,16 @@ public class MCRContentStoreFactory {
 	 * @see MCRContentStore
 	 **/
 	public static MCRContentStore selectStore(MCRFile file) {
-		if (storeSelector == null)
+		if (STORE_SELECTOR == null)
 			initStoreSelector();
-		String store = storeSelector.selectStore(file);
+		String store = STORE_SELECTOR.selectStore(file);
 		return getStore(store);
 	}
 
 	private static void initStoreSelector() {
 		String property = "MCR.IFS.ContentStoreSelector.Class";
 		Object obj = MCRConfiguration.instance().getInstanceOf(property);
-		storeSelector = (MCRContentStoreSelector) obj;
+		STORE_SELECTOR = (MCRContentStoreSelector) obj;
 	}
 
 	/**
@@ -147,8 +147,8 @@ public class MCRContentStoreFactory {
 	 * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
 	*/
 	protected static Class getExtenderClass(String storeID) {
-		if (extenderClasses == null)
-			extenderClasses = new Hashtable();
+		if (EXTENDER_CLASSES == null)
+			EXTENDER_CLASSES = new Hashtable();
 		MCRArgumentChecker.ensureNotNull(storeID, "store ID");
 
 		String storeClass = "MCR.IFS.AVExtender." + storeID + ".Class";
@@ -157,17 +157,17 @@ public class MCRContentStoreFactory {
 		if (value.equals(""))
 			return null;
 
-		if (!extenderClasses.containsKey(storeID)) {
+		if (!EXTENDER_CLASSES.containsKey(storeID)) {
 			try {
 				Class cl = Class.forName(value);
-				extenderClasses.put(storeID, cl);
+				EXTENDER_CLASSES.put(storeID, cl);
 			} catch (Exception ex) {
 				String msg = "Could not load AudioVideoExtender class " + value;
 				throw new MCRConfigurationException(msg, ex);
 			}
 		}
 
-		return (Class) (extenderClasses.get(storeID));
+		return (Class) (EXTENDER_CLASSES.get(storeID));
 	}
 
 	/**

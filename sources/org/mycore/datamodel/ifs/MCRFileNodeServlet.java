@@ -65,7 +65,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * will be forwareded to MCRLayoutServlet as XML data to display
  * a detailed directory listing.
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt 
  * @author Thomas Scheffler (yagee)
  *

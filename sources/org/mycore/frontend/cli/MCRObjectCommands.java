@@ -43,24 +43,25 @@ import org.mycore.datamodel.metadata.*;
  * MyCoRe command line interface.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
 
 public class MCRObjectCommands
 {
   private static String SLASH = System.getProperty( "file.separator" );
-  private static Logger logger =
+  private static Logger LOGGER =
     Logger.getLogger(MCRClassificationCommands.class.getName());
-  private static MCRConfiguration config = null;
+  private static MCRConfiguration CONFIG;
 
  /**
   * Initialize common data.
   **/
   private static void init()
     {
-    config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
+  	if (CONFIG==null)
+  		CONFIG = MCRConfiguration.instance();
+    PropertyConfigurator.configure(CONFIG.getLoggingProperties());
     }
 
  /**
@@ -75,13 +76,13 @@ public class MCRObjectCommands
     MCRObject mycore_obj = new MCRObject();
     try {
       mycore_obj.deleteFromDatastore( ID );
-      logger.info( mycore_obj.getId().getId() + " deleted." );
+      LOGGER.info( mycore_obj.getId().getId() + " deleted." );
       }
     catch ( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "Can't deltete " + mycore_obj.getId().getId() + "." );
-      logger.error( "" );
+      LOGGER.debug( ex.getStackTraceAsString() );
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Can't deltete " + mycore_obj.getId().getId() + "." );
+      LOGGER.error( "" );
       }
     }
 
@@ -109,9 +110,9 @@ public class MCRObjectCommands
         now.setNumber(i); delete(now.getId()); }
       }
     catch ( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "" );
+      LOGGER.debug( ex.getStackTraceAsString() );
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "" );
       }
     }
 
@@ -142,12 +143,12 @@ public class MCRObjectCommands
     init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
-      logger.warn( directory + " ignored, is not a directory." );
+      LOGGER.warn( directory + " ignored, is not a directory." );
       return;
       }
     String[] list = dir.list();
     if( list.length == 0) {
-      logger.warn( "No files found in directory " + directory );
+      LOGGER.warn( "No files found in directory " + directory );
       return;
       }
     int numProcessed = 0;
@@ -156,7 +157,7 @@ public class MCRObjectCommands
 	if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
       }
-    logger.info( "Processed " + numProcessed + " files." );
+    LOGGER.info( "Processed " + numProcessed + " files." );
     }
 
  /**
@@ -185,32 +186,32 @@ public class MCRObjectCommands
     {
     init();
     if( ! file.endsWith( ".xml" ) ) {
-      logger.warn( file + " ignored, does not end with *.xml" );
+      LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
       }
     if( ! new File( file ).isFile() ) {
-      logger.warn( file + " ignored, is not a file." );
+      LOGGER.warn( file + " ignored, is not a file." );
       return false;
       }
-    logger.info( "Reading file " + file + " ..." );
+    LOGGER.info( "Reading file " + file + " ..." );
     try {
       MCRObject mycore_obj = new MCRObject();
       mycore_obj.setFromURI( file );
-      logger.info( "Label --> " + mycore_obj.getLabel() );
+      LOGGER.info( "Label --> " + mycore_obj.getLabel() );
       if( update ) {
         mycore_obj.updateInDatastore();
-        logger.info( mycore_obj.getId().getId() + " updated." );
-        logger.info("");
+        LOGGER.info( mycore_obj.getId().getId() + " updated." );
+        LOGGER.info("");
         }
       else {
         mycore_obj.createInDatastore();
-        logger.info( mycore_obj.getId().getId() + " loaded." );
-        logger.info("");
+        LOGGER.info( mycore_obj.getId().getId() + " loaded." );
+        LOGGER.info("");
         }
       return true;
       }
     catch( MCRException ex ) {
-      logger.error( "Exception while loading from file " + file,ex );
+      LOGGER.error( "Exception while loading from file " + file,ex );
       return false;
     }
   }
@@ -223,11 +224,11 @@ public class MCRObjectCommands
     MCRObjectID mcr_id = new MCRObjectID();
     try {
       mcr_id.setNextFreeId( base );
-      logger.info("The next free ID  is "+mcr_id.getId());
+      LOGGER.info("The next free ID  is "+mcr_id.getId());
       }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       }
     }
 
@@ -240,11 +241,11 @@ public class MCRObjectCommands
     try {
       mcr_id.setNextFreeId( base );
       mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
-      logger.info("The last used ID  is "+mcr_id.getId());
+      LOGGER.info("The last used ID  is "+mcr_id.getId());
       }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       }
     }
 
@@ -261,23 +262,23 @@ public class MCRObjectCommands
     MCRObjectID id = null;
     try { id = new MCRObjectID(ID); }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // check dirname
     File dir = new File(dirname);
     if (dir.isFile()) {
-      logger.error(dirname+" is not a dirctory."); 
-      logger.error("");
+      LOGGER.error(dirname+" is not a dirctory."); 
+      LOGGER.error("");
       return;
       }
     // get XML
     byte[] xml = null;
     try { xml = obj.receiveXMLFromDatastore(ID); }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // store the XML file
@@ -299,13 +300,13 @@ public class MCRObjectCommands
         }
       }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store to file " + filename );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store to file " + filename );
+      LOGGER.error("");
       return;
       }
-    logger.info( "Object "+id.toString()+" stored under "+filename+"." );
-    logger.info( "" );
+    LOGGER.info( "Object "+id.toString()+" stored under "+filename+"." );
+    LOGGER.info( "" );
     }
 
  /**
@@ -325,21 +326,21 @@ public class MCRObjectCommands
     MCRObjectID tid = null;
     try { fid = new MCRObjectID(fromID); }
     catch (Exception ex) {
-      logger.error( "FromID : "+ex.getMessage() );
-      logger.error("");
+      LOGGER.error( "FromID : "+ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     try { tid = new MCRObjectID(toID); }
     catch (Exception ex) {
-      logger.error( "ToID : "+ex.getMessage() );
-      logger.error("");
+      LOGGER.error( "ToID : "+ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // check dirname
     File dir = new File(dirname);
     if (dir.isFile()) {
-      logger.error(dirname+" is not a dirctory."); 
-      logger.error("");
+      LOGGER.error(dirname+" is not a dirctory."); 
+      LOGGER.error("");
       return;
       }
     String xslfile = "mcr_save-object.xsl";
@@ -372,16 +373,16 @@ public class MCRObjectCommands
           out.flush();
           }
         k++;
-        logger.info( "Object "+nid.toString()+" stored under "+filename+"." );
+        LOGGER.info( "Object "+nid.toString()+" stored under "+filename+"." );
         }
       }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store file to " + dirname );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store file to " + dirname );
+      LOGGER.error("");
       return;
       }
-    logger.info( k + " Object's stored under "+dirname+"." );
+    LOGGER.info( k + " Object's stored under "+dirname+"." );
     }
 
  /**
@@ -394,11 +395,11 @@ public class MCRObjectCommands
     MCRObjectID id = new MCRObjectID();
     try {
       id.setNextFreeId(base);
-      logger.info(id.getId());
+      LOGGER.info(id.getId());
       }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       }
     }
 
@@ -413,11 +414,11 @@ public class MCRObjectCommands
     try {
       mcr_id.setNextFreeId(base);
       mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
-      logger.info(mcr_id.getId());
+      LOGGER.info(mcr_id.getId());
       }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       }
     }
 
@@ -430,16 +431,16 @@ public class MCRObjectCommands
     {
     init();
     if( ! file.endsWith( ".xml" ) ) {
-      logger.warn( file + " ignored, does not end with *.xml" );
+      LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
       }
     if( ! new File( file ).isFile() ) {
-      logger.warn( file + " ignored, is not a file." );
+      LOGGER.warn( file + " ignored, is not a file." );
       return false;
       }
-    logger.info( "Reading file " + file + " ..." );
+    LOGGER.info( "Reading file " + file + " ..." );
     if (MCRXMLHelper.parseURI(file)!=null)
-    	logger.info( "The file has no XML errors." );
+    	LOGGER.info( "The file has no XML errors." );
     return true;
     }
 
@@ -452,11 +453,11 @@ public class MCRObjectCommands
   public static void repairMetadataSearch(String type)
     {
     init();
-    logger.info("Start the repair for type "+type);
-    String typetest = config.getString("MCR.type_"+type,"");
+    LOGGER.info("Start the repair for type "+type);
+    String typetest = CONFIG.getString("MCR.type_"+type,"");
     if (typetest.length()==0) {
-      logger.error("The type "+type+" was not found.");
-      logger.info(" ");
+      LOGGER.error("The type "+type+" was not found.");
+      LOGGER.info(" ");
       return;
       }
     // XML table manager
@@ -467,9 +468,9 @@ public class MCRObjectCommands
       stid = (String)ar.get(i);
       MCRObject obj = new MCRObject();
       obj.repairPersitenceDatastore(stid);
-      logger.info("Repaired "+(String)ar.get(i)); 
+      LOGGER.info("Repaired "+(String)ar.get(i)); 
       }
-    logger.info(" ");
+    LOGGER.info(" ");
     }
 
  /**
@@ -481,19 +482,19 @@ public class MCRObjectCommands
   public static void repairMetadataSearchForID(String id)
     {
     init();
-    logger.info("Start the repair for the ID "+id);
+    LOGGER.info("Start the repair for the ID "+id);
     MCRObjectID mid = null;
     try {
       mid = new MCRObjectID(id); }
     catch (Exception e) {
-      logger.error("The String "+id+" is not a MCRObjectID.");
-      logger.info(" ");
+      LOGGER.error("The String "+id+" is not a MCRObjectID.");
+      LOGGER.info(" ");
       return;
       }
     MCRObject obj = new MCRObject();
     obj.repairPersitenceDatastore(mid);
-    logger.info("Repaired "+mid.getId()); 
-    logger.info(" ");
+    LOGGER.info("Repaired "+mid.getId()); 
+    LOGGER.info(" ");
     }
 
   }

@@ -45,7 +45,7 @@ import org.mycore.common.xml.MCRXMLContainer;
  * The result was presided as a text output.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Mathias Zarick
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -54,9 +54,9 @@ final class MCRQueryCommands
 {
 
 // logger
-private static final Logger logger=Logger.getLogger(MCRQueryCommands.class.getName());
+private static final Logger LOGGER=Logger.getLogger(MCRQueryCommands.class);
 
-private static MCRQueryCollector collector;
+private static MCRQueryCollector COLLECTOR;
 
 /** Executes a local query */
 public static void queryLocal( String type, String query )
@@ -77,10 +77,10 @@ public static void queryRemote( String type, String query )
   {
     MCRConfiguration config = MCRConfiguration.instance();
     PropertyConfigurator.configure( config.getLoggingProperties() );
-	if (collector==null){
+	if (COLLECTOR==null){
 		int cThreads=config.getInt("MCR.Collector_Thread_num",2);
 		int aThreads=config.getInt("MCR.Agent_Thread_num",6);
-		collector=new MCRQueryCollector(cThreads,aThreads);
+		COLLECTOR=new MCRQueryCollector(cThreads,aThreads);
 	}
 
     // input parameters
@@ -88,9 +88,9 @@ public static void queryRemote( String type, String query )
     if( type  == null ) return; else type = type.toLowerCase();
     if( query == null ) query = "";
 
-    logger.info("Query Host = " + host  );
-    logger.info("Query Type = " + type  );
-    logger.info("Query      = " + query );
+    LOGGER.info("Query Host = " + host  );
+    LOGGER.info("Query Type = " + type  );
+    LOGGER.info("Query      = " + query );
 
     MCRXMLContainer resarray = new MCRXMLContainer();
 
@@ -101,13 +101,13 @@ public static void queryRemote( String type, String query )
       synchronized(resarray){
 		if( squence.equalsIgnoreCase( "local-remote" ) ) 
 		{
-		  collector.collectQueryResults( "local", type, query, resarray );
+		  COLLECTOR.collectQueryResults( "local", type, query, resarray );
 		  	try {
 				resarray.wait();
 		  	} catch (InterruptedException ignored) {}
 		  if( resarray.size() == 0 ) 
 		  {
-			collector.collectQueryResults( host, type, query, resarray );
+			COLLECTOR.collectQueryResults( host, type, query, resarray );
 		  	try {
 				resarray.wait();
 		  	} catch (InterruptedException ignored) {}
@@ -115,13 +115,13 @@ public static void queryRemote( String type, String query )
 		}
 		else 
 		{
-			collector.collectQueryResults( host, type, query, resarray );
+			COLLECTOR.collectQueryResults( host, type, query, resarray );
 			try{
 				resarray.wait();
 			} catch (InterruptedException ignored) {}
 		  if( resarray.size() == 0 ) 
 		  {
-			collector.collectQueryResults( "local", type, query, resarray );
+			COLLECTOR.collectQueryResults( "local", type, query, resarray );
 			try{
 				resarray.wait();
 			} catch (InterruptedException ignored) {}
@@ -130,12 +130,12 @@ public static void queryRemote( String type, String query )
       }
 
       if( resarray.size() == 0 )
-        logger.error( "No classification or category exists" ); 
+        LOGGER.error( "No classification or category exists" ); 
     }
     else // other types
     {
     	synchronized(resarray){
-			collector.collectQueryResults( host, type, query, resarray );
+			COLLECTOR.collectQueryResults( host, type, query, resarray );
 			try{
 				resarray.wait();
 			} catch (InterruptedException ignored) {}
@@ -156,16 +156,16 @@ public static void queryRemote( String type, String query )
     }
     catch( Exception ex )
     {
-      logger.error( "Error while tranforming query result XML using XSLT" );
-      logger.debug( ex.getMessage() );
-      logger.info( "Stop." );
-      logger.info( "" );
+      LOGGER.error( "Error while tranforming query result XML using XSLT" );
+      LOGGER.debug( ex.getMessage() );
+      LOGGER.info( "Stop." );
+      LOGGER.info( "" );
       return;
     }
 
-    logger.info( "" );
-    logger.info( "Ready." );
-    logger.info( "" );
+    LOGGER.info( "" );
+    LOGGER.info( "Ready." );
+    LOGGER.info( "" );
   }
 }
 

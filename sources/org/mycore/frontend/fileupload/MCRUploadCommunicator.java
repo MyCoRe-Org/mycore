@@ -60,7 +60,7 @@ import org.mycore.common.MCRConfiguration;
  * some marshalling etc. and sends the request to the
  * MCRUploadServlet servlet that does the job.
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -69,10 +69,10 @@ import org.mycore.common.MCRConfiguration;
 
 public final class MCRUploadCommunicator
 {
-  protected static String url;
+  protected static String URL;
 
   public static void setPeerURL( String peer )
-  { url = peer; }
+  { URL = peer; }
 
   public void sendDerivate( String uploadId, File selectedFiles[] )
     throws Exception
@@ -323,7 +323,7 @@ public final class MCRUploadCommunicator
     String mime = "application/x-www-form-urlencoded";
 
     URLConnection connection = null;
-    try{ connection = new URL( url ).openConnection(); }
+    try{ connection = new URL( URL ).openConnection(); }
     catch( MalformedURLException ignored ) {} // will never happen if base URL is ok
 
     connection.setDoInput         ( true  );

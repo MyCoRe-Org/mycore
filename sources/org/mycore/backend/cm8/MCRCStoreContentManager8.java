@@ -53,7 +53,7 @@ import org.mycore.services.query.*;
  *   MCR.IFS.ContentStore.<StoreID>.Attribute.Time  Name of timestamp attribute
  * </code>
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -82,19 +82,19 @@ public class MCRCStoreContentManager8
 	protected int storeTempSize = 4;
 	protected String storeTempDir = "";
 
-	private static final Logger logger = MCRCM8ConnectionPool.getLogger();
-	private static final MCRConfiguration config = MCRConfiguration.instance();
+	private static final Logger LOGGER = MCRCM8ConnectionPool.getLogger();
+	private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
 	/** Table which holds infos about where files are stored **/
 	protected static final String METAIFSTABLE =
-		config.getString("MCR.IFS.FileMetadataStore.SQL.TableName");
+		CONFIG.getString("MCR.IFS.FileMetadataStore.SQL.TableName");
 
 	/** Table which holds infos about how many documents are indexed **/
 	protected static final String TIEINDEX_TABLE = "DB2EXT.TEXTINDEXES";
-	protected static final String ICMDB=config.getString("MCR.persistence_cm8_library_server");
+	protected static final String ICMDB=CONFIG.getString("MCR.persistence_cm8_library_server");
 	protected static String TIEREF_TABLE;
 	//TODO: Get this CollumnName from the Database somehow
-	protected static final String DerivateAttribute = "ATTR0000001088";
+	protected static final String DERIVATE_ATTRIBUTE = "ATTR0000001088";
 
 	/**
 	* The method initialized the CM8 content store with data of the
@@ -115,13 +115,13 @@ public class MCRCStoreContentManager8
 	**/
 	public void init(String storeID) {
 		super.init(storeID);
-		itemTypeName = config.getString(prefix + "ItemType");
-		attributeTime = config.getString(prefix + "Attribute.File");
-		attributeOwner = config.getString(prefix + "Attribute.Owner");
-		attributeFile = config.getString(prefix + "Attribute.Time");
-		storeTempType = config.getString(prefix + "StoreTemp.Type", "none");
-		storeTempSize = config.getInt(prefix + "StoreTemp.MemSize", 4);
-		storeTempDir = config.getString(prefix + "StoreTemp.Dir", "/tmp");
+		itemTypeName = CONFIG.getString(prefix + "ItemType");
+		attributeTime = CONFIG.getString(prefix + "Attribute.File");
+		attributeOwner = CONFIG.getString(prefix + "Attribute.Owner");
+		attributeFile = CONFIG.getString(prefix + "Attribute.Time");
+		storeTempType = CONFIG.getString(prefix + "StoreTemp.Type", "none");
+		storeTempSize = CONFIG.getInt(prefix + "StoreTemp.MemSize", 4);
+		storeTempDir = CONFIG.getString(prefix + "StoreTemp.Dir", "/tmp");
 		for (int i = 0; i < STORE_TYPE_LIST.length; i++) {
 			if (storeTempType.equals(STORE_TYPE_LIST[i])) {
 				return;
@@ -140,11 +140,11 @@ public class MCRCStoreContentManager8
 		try {
 			connection=(Connection)ds.connection().handle();
 		} catch (Exception e) {
-			logger.warn("Cannot get DKHandle from MCRCM8ConnectionPool!",e);
+			LOGGER.warn("Cannot get DKHandle from MCRCM8ConnectionPool!",e);
 			MCRCM8ConnectionPool.instance().releaseConnection(ds);
 			return false;
 		}
-		logger.debug("Getting TIEREF Table name...");
+		LOGGER.debug("Getting TIEREF Table name...");
 		ResultSet rs;
 		try {
 			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEINDEX_TABLE).setCondition("COLNAME","TIEREF").toSelectStatement("TABSCHEMA,TABNAME"));
@@ -160,14 +160,14 @@ public class MCRCStoreContentManager8
 					return false;
 				}
 				TIEREF_TABLE=tieref.toString();				
-				logger.debug("TIEREF Table: "+TIEREF_TABLE);
+				LOGGER.debug("TIEREF Table: "+TIEREF_TABLE);
 			} else {
-			logger.warn("Failure getting TIEREF Index from " + TIEINDEX_TABLE + "!");
+			LOGGER.warn("Failure getting TIEREF Index from " + TIEINDEX_TABLE + "!");
 			MCRCM8ConnectionPool.instance().releaseConnection(ds);
 			return false;
 		}
 		} catch (SQLException e1) {
-			logger.warn("Cannot get TIEREF Table out of Library Server",e1);
+			LOGGER.warn("Cannot get TIEREF Table out of Library Server",e1);
 			MCRCM8ConnectionPool.instance().releaseConnection(ds);
 			return false;
 		}
@@ -441,7 +441,7 @@ public class MCRCStoreContentManager8
 	 * @see org.mycore.services.query.MCRTextSearchInterface#getDerivateIDs(java.lang.String)
 	 */
 	public String[] getDerivateIDs(String doctext) {
-		logger.debug("TS incoming query " + doctext);
+		LOGGER.debug("TS incoming query " + doctext);
 		//toggles contains-text-basic:contains-text
 		boolean basicquery = true;
 		if (doctext == null) {
@@ -503,8 +503,8 @@ public class MCRCStoreContentManager8
 								.append(" of exact ")
 								.append(derCount)
 								.append("  needed results!");
-						logger.debug(msg.toString());
-						logger.debug("Removing from results:" + derivateID);
+						LOGGER.debug(msg.toString());
+						LOGGER.debug("Removing from results:" + derivateID);
 						results.remove(derivateID);
 						break;
 					}
@@ -531,7 +531,7 @@ public class MCRCStoreContentManager8
 	 * @return number of index documents
 	 */
 	protected int countDerivateContents(String derivateID) {
-		logger.debug("DerivateID = " + derivateID);
+		LOGGER.debug("DerivateID = " + derivateID);
 		int count;
 		if (TIEREF_TABLE == null && !storeTieRefTable())
 				throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
@@ -545,7 +545,7 @@ public class MCRCStoreContentManager8
 		}
 		ResultSet rs;
 		try {
-			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEREF_TABLE).setCondition(DerivateAttribute,derivateID).toSelectStatement("COUNT(*)"));
+			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEREF_TABLE).setCondition(DERIVATE_ATTRIBUTE,derivateID).toSelectStatement("COUNT(*)"));
 			if (rs.next()){
 				count=rs.getInt(1);
 			} else {
@@ -557,7 +557,7 @@ public class MCRCStoreContentManager8
 			throw new MCRPersistenceException("Cannot query TIEREF Table out of Library Server",e1);
 		}
 		MCRCM8ConnectionPool.instance().releaseConnection(ds);
-		logger.debug("Derivate: "+derivateID+" has "+count+" indexed files!");
+		LOGGER.debug("Derivate: "+derivateID+" has "+count+" indexed files!");
 		return count;
 	}
 
@@ -571,7 +571,7 @@ public class MCRCStoreContentManager8
 			.append(" (@TIEREF,\"")
 			.append(basic ? query.containstextbasic() : query.containstext())
 			.append("\")=1]");
-		logger.debug("TS outgoing query " + sb.toString());
+		LOGGER.debug("TS outgoing query " + sb.toString());
 
 		// start the query
 		String[] outgo = new String[0];
@@ -592,7 +592,7 @@ public class MCRCStoreContentManager8
 					DKConstantICM.DK_CM_XQPE_QL_TYPE,
 					options);
 			dkIterator iter = results.createIterator();
-			logger.debug("Number of Results:  " + results.cardinality());
+			LOGGER.debug("Number of Results:  " + results.cardinality());
 			outgo = new String[results.cardinality()];
 			for (int i=0;iter.more();i++) {
 				DKDDO resitem = (DKDDO) iter.next();
@@ -600,7 +600,7 @@ public class MCRCStoreContentManager8
 				short dataId =
 					resitem.dataId(DK_CM_NAMESPACE_ATTR, attributeOwner);
 				outgo[i] = (String) resitem.getData(dataId);
-				logger.debug("MCRDerivateID :" + outgo[i]);
+				LOGGER.debug("MCRDerivateID :" + outgo[i]);
 			}
 		} catch (Exception e) {
 		} finally {

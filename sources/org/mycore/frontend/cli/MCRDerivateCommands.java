@@ -44,14 +44,14 @@ import org.mycore.datamodel.ifs.*;
  * MyCoRe command line interface.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
 
 public class MCRDerivateCommands
   {
   private static String SLASH = System.getProperty( "file.separator" );
-  private static Logger logger =
+  private static Logger LOGGER =
     Logger.getLogger(MCRDerivateCommands.class.getName());
 
  /**
@@ -74,13 +74,13 @@ public class MCRDerivateCommands
     MCRDerivate mycore_obj = new MCRDerivate();
     try {
       mycore_obj.deleteFromDatastore( ID );
-      logger.info( mycore_obj.getId().getId() + " deleted." );
+      LOGGER.info( mycore_obj.getId().getId() + " deleted." );
       }
     catch ( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "Can't deltete " + mycore_obj.getId().getId() + "." );
-      logger.error( "" );
+      LOGGER.debug( ex.getStackTraceAsString() );
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Can't deltete " + mycore_obj.getId().getId() + "." );
+      LOGGER.error( "" );
       }
     }
 
@@ -107,9 +107,9 @@ public class MCRDerivateCommands
         now.setNumber(i); delete(now.getId()); }
       }
     catch ( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "" );
+      LOGGER.debug( ex.getStackTraceAsString() );
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "" );
       }
     }
 
@@ -140,12 +140,12 @@ public class MCRDerivateCommands
     init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
-      logger.warn( directory + " ignored, is not a directory." );
+      LOGGER.warn( directory + " ignored, is not a directory." );
       return;
       }
     String[] list = dir.list();
     if( list.length == 0) {
-      logger.warn( "No files found in directory " + directory );
+      LOGGER.warn( "No files found in directory " + directory );
       return;
       }
     int numProcessed = 0;
@@ -154,7 +154,7 @@ public class MCRDerivateCommands
       if( processFromFile( directory + SLASH + list[ i ], update ) )
         numProcessed++;
       }
-    logger.info( "Processed " + numProcessed + " files." );
+    LOGGER.info( "Processed " + numProcessed + " files." );
     }
 
  /**
@@ -183,14 +183,14 @@ public class MCRDerivateCommands
     {
     init();
     if( ! file.endsWith( ".xml" ) ) {
-      logger.warn( file + " ignored, does not end with *.xml" );
+      LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
       }
     if( ! new File( file ).isFile() ) {
-      logger.warn( file + " ignored, is not a file." );
+      LOGGER.warn( file + " ignored, is not a file." );
       return false;
       }
-    logger.info( "Reading file " + file + " ..." );
+    LOGGER.info( "Reading file " + file + " ..." );
     try {
       MCRDerivate mycore_obj = new MCRDerivate();
       mycore_obj.setFromURI( file );
@@ -203,25 +203,25 @@ public class MCRDerivateCommands
         String prefix = new File( file ).getParent();
         path = prefix + File.separator + path;
         mycore_obj.getDerivate().getInternals().setSourcePath( path );
-        logger.info( "Source path --> " + path );
+        LOGGER.info( "Source path --> " + path );
         }
 
-      logger.info( "Label --> " + mycore_obj.getLabel() );
+      LOGGER.info( "Label --> " + mycore_obj.getLabel() );
 
       if( update ) {
         mycore_obj.updateInDatastore();
-        logger.info( mycore_obj.getId().getId() + " updated." );
-        logger.info("");
+        LOGGER.info( mycore_obj.getId().getId() + " updated." );
+        LOGGER.info("");
         }
       else {
         mycore_obj.createInDatastore();
-        logger.info( mycore_obj.getId().getId() + " loaded." );
-        logger.info("");
+        LOGGER.info( mycore_obj.getId().getId() + " loaded." );
+        LOGGER.info("");
         }
       return true;
       }
     catch( MCRException ex ) {
-      logger.error( "Exception while loading from file " + file,ex );
+      LOGGER.error( "Exception while loading from file " + file,ex );
       return false;
       }
     }
@@ -234,11 +234,11 @@ public class MCRDerivateCommands
     MCRObjectID mcr_id = new MCRObjectID();
     try {
       mcr_id.setNextFreeId( base );
-      logger.info(mcr_id.getId());
+      LOGGER.info(mcr_id.getId());
       }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       }
     }
 
@@ -257,23 +257,23 @@ public class MCRDerivateCommands
     MCRObjectID id = null;
     try { id = new MCRObjectID(ID); }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // check dirname
     File dir = new File(dirname);
     if (dir.isFile()) {
-      logger.error(dirname+" is not a dirctory.");
-      logger.error("");
+      LOGGER.error(dirname+" is not a dirctory.");
+      LOGGER.error("");
       return;
       }
     // get XML
     byte[] xml = null;
     try { xml = obj.receiveXMLFromDatastore(ID); }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // store the XML file
@@ -296,9 +296,9 @@ xml,false)),sr);
         }
       }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store to file " + filename );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store to file " + filename );
+      LOGGER.error("");
       return;
       }
     // store the derivate file under dirname
@@ -308,15 +308,15 @@ xml,false)),sr);
       MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(id.toString())
         ,dir); }
     catch (MCRException ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store to object in "+dirname+
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store to object in "+dirname+
         SLASH+id.toString());
-      logger.error( "" );
+      LOGGER.error( "" );
       return;
       }
-    logger.info( "Derivate "+id.toString()+" stored under "+dirname+SLASH+
+    LOGGER.info( "Derivate "+id.toString()+" stored under "+dirname+SLASH+
       id.toString()+" and "+filename+"." );
-    logger.info( "" );
+    LOGGER.info( "" );
     }
 
  /**
@@ -337,21 +337,21 @@ xml,false)),sr);
     MCRObjectID tid = null;
     try { fid = new MCRObjectID(fromID); }
     catch (Exception ex) {
-      logger.error( "FromID : "+ex.getMessage() );
-      logger.error("");
+      LOGGER.error( "FromID : "+ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     try { tid = new MCRObjectID(toID); }
     catch (Exception ex) {
-      logger.error( "ToID : "+ex.getMessage() );
-      logger.error("");
+      LOGGER.error( "ToID : "+ex.getMessage() );
+      LOGGER.error("");
       return;
       }
     // check dirname
     File dir = new File(dirname);
     if (dir.isFile()) {
-      logger.error(dirname+" is not a dirctory.");
-      logger.error("");
+      LOGGER.error(dirname+" is not a dirctory.");
+      LOGGER.error("");
       return;
       }
     String xslfile = "mcr_save-derivate.xsl";
@@ -384,7 +384,7 @@ xml,false)),sr);
           out.write(xml);
           out.flush();
           }
-        logger.info( "Object "+nid.toString()+" stored under "+filename+"." );
+        LOGGER.info( "Object "+nid.toString()+" stored under "+filename+"." );
         // store the derivate file under dirname
         try {
           dir = new File(dirname+SLASH+nid.toString());
@@ -393,24 +393,24 @@ xml,false)),sr);
             nid.toString()),dir);
           }
         catch (MCRException ex) {
-          logger.error( ex.getMessage() );
-          logger.error( "Exception while store to object in "+dirname+
+          LOGGER.error( ex.getMessage() );
+          LOGGER.error( "Exception while store to object in "+dirname+
             SLASH+nid.toString());
-          logger.error( "" );
+          LOGGER.error( "" );
           return;
           }
-        logger.info( "Derivate "+nid.toString()+" stored under "+dirname+SLASH+
+        LOGGER.info( "Derivate "+nid.toString()+" stored under "+dirname+SLASH+
           nid.toString()+" and "+filename+"." );
         k++;
         }
       }
     catch (Exception ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store file or objects to " + dirname );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store file or objects to " + dirname );
+      LOGGER.error("");
       return;
       }
-    logger.info( k + " Object's stored under "+dirname+"." );
+    LOGGER.info( k + " Object's stored under "+dirname+"." );
     }
 
  /**
@@ -419,7 +419,7 @@ xml,false)),sr);
   public static void repairDerivateSearch()
     {
     init();
-    logger.info("Start the repair for type derivate");
+    LOGGER.info("Start the repair for type derivate");
     // XML table manager
     MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
     ArrayList ar = mcr_xml.retrieveAllIDs("derivate");
@@ -428,9 +428,9 @@ xml,false)),sr);
     for (int i=0;i<ar.size();i++) {
       stid = (String)ar.get(i);
       der.repairPersitenceDatastore(stid);
-      logger.info("Repaired "+(String)ar.get(i));
+      LOGGER.info("Repaired "+(String)ar.get(i));
       }
-    logger.info(" ");
+    LOGGER.info(" ");
     }
 
   }

@@ -24,11 +24,16 @@
 
 package org.mycore.backend.sql;
 
-import java.util.*;
-import org.mycore.common.*;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRConfiguration;
 
 /**
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
@@ -42,15 +47,15 @@ public class MCRSQLStatement
   protected Vector     columns;
   protected String     tableName;
 
-	private static char maskChar;
+	private static char MASK_CHAR;
   
   static{
     MCRConfiguration config = MCRConfiguration.instance();
   	if (config.getString("MCR.persistence_sql_database_url").indexOf(":db2:")>0){
-  		maskChar='\'';
+  		MASK_CHAR='\'';
   	}
   	else {
-  		maskChar='\\';
+  		MASK_CHAR='\\';
   	}
   	
   }
@@ -226,7 +231,7 @@ public class MCRSQLStatement
   		StringTokenizer tok=new StringTokenizer(value,String.valueOf(mask));
   		StringBuffer returning=new StringBuffer();
   		while (tok.hasMoreTokens()){
-  			returning.append(tok.nextToken()).append(maskChar).append(mask);
+  			returning.append(tok.nextToken()).append(MASK_CHAR).append(mask);
   		}
   		return returning.toString();
   	}

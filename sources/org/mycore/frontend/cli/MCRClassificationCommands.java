@@ -44,13 +44,13 @@ import org.mycore.datamodel.classifications.MCRClassification;
  * MyCoRe command line interface for classifications.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
 
 public class MCRClassificationCommands
   {
-  private static Logger logger = 
+  private static Logger LOGGER = 
     Logger.getLogger(MCRClassificationCommands.class.getName());
   private static String SLASH = System.getProperty( "file.separator" );
   
@@ -77,13 +77,13 @@ public class MCRClassificationCommands
     MCRClassification cl = new MCRClassification();
     try {
       cl.delete( mcr_id.getId() );
-      logger.info( mcr_id.getId() + " deleted." );
+      LOGGER.info( mcr_id.getId() + " deleted." );
       }
     catch ( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "Can't deltete " + mcr_id.getId() + "." );
-      logger.error( "" );
+      LOGGER.debug( ex.getStackTraceAsString() );
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Can't deltete " + mcr_id.getId() + "." );
+      LOGGER.error( "" );
       }
     }
 
@@ -115,12 +115,12 @@ public class MCRClassificationCommands
     init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
-      logger.warn( directory + " ignored, is not a directory." );
+      LOGGER.warn( directory + " ignored, is not a directory." );
       return;
       }
     String[] list = dir.list();
     if( list.length == 0) {
-      logger.warn( "No files found in directory " + directory );
+      LOGGER.warn( "No files found in directory " + directory );
       return;
       }
     int numProcessed = 0;
@@ -129,7 +129,7 @@ public class MCRClassificationCommands
       if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
       }
-    logger.info( "Processed " + numProcessed + " files." );
+    LOGGER.info( "Processed " + numProcessed + " files." );
     }
 
  /**
@@ -159,29 +159,29 @@ public class MCRClassificationCommands
     {
     init();
     if( ! file.endsWith( ".xml" ) ) {
-      logger.warn( file + " ignored, does not end with *.xml" );
+      LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
       }
 
     if( ! new File( file ).isFile() ) {
-      logger.warn( file + " ignored, is not a file." );
+      LOGGER.warn( file + " ignored, is not a file." );
       return false;
       }
-    logger.info( "Reading file " + file + " ...\n" );
+    LOGGER.info( "Reading file " + file + " ...\n" );
     try {
       MCRClassification cl = new MCRClassification();
       if( update ) {
         String id = cl.updateFromURI(file);
-        logger.info( id + " updated.\n" );
+        LOGGER.info( id + " updated.\n" );
         }
       else {
         String id = cl.createFromURI(file);
-        logger.info( id + " loaded.\n" );
+        LOGGER.info( id + " loaded.\n" );
         }
       return true;
       }
     catch( MCRException ex ) {
-      logger.error( "Exception while loading from file " + file, ex);
+      LOGGER.error( "Exception while loading from file " + file, ex);
       return false;
     }
   }
@@ -204,14 +204,14 @@ public class MCRClassificationCommands
       out.flush();
       }
     catch (IOException ex) {
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while store to file " + filename );
-      logger.error("");
+      LOGGER.error( ex.getMessage() );
+      LOGGER.error( "Exception while store to file " + filename );
+      LOGGER.error("");
       return;
       }
-    logger.info( "Classification "+mcr_id.getId()+" stored under "
+    LOGGER.info( "Classification "+mcr_id.getId()+" stored under "
       +filename+"." );
-    logger.info("");
+    LOGGER.info("");
   }
 
 }

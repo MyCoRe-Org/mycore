@@ -39,7 +39,7 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * This class implements all methods for a classification and extended
  * the MCRClassificationObject class.
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
@@ -47,7 +47,7 @@ public class MCRClassification
   {
 
 // logger
-static Logger logger=Logger.getLogger(MCRClassification.class.getName());
+static Logger LOGGER=Logger.getLogger(MCRClassification.class);
 
 // internal data
 private static int MAX_CATEGORY_DEEP = 15;
@@ -90,8 +90,8 @@ private ArrayList cat;
       else {
         categories = (org.jdom.Element)tag.clone(); }
       }
-    logger.debug(cl.toString());
-    logger.debug("Element name = "+categories.getName());
+    LOGGER.debug(cl.toString());
+    LOGGER.debug("Element name = "+categories.getName());
     cat = new ArrayList();
     MCRClassificationObject [] pid = new 
       MCRClassificationObject[MAX_CATEGORY_DEEP];

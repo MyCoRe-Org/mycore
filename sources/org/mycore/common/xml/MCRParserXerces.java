@@ -39,7 +39,7 @@ import org.mycore.common.MCRException;
  * to a DOM document.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
@@ -52,42 +52,38 @@ public class MCRParserXerces
   SAXBuilder builder;
 
   // parser configuration flags 
-  private static boolean flagvalidation        = false;
-  private static boolean flagnamespaces        = true;
-  private static boolean flagschemasupport     = true;
-  private static boolean flagnoschemasupport   = false;
-  private static boolean flagschemafullsupport = true;
-  private static boolean flagnoschemafullsupport = false;
-  private static boolean flagdeferreddom       = true;
-  private static MCREntityResolver entityResolver;
+  private static boolean FLAG_VALIDATION  = false;
+  private static boolean FLAG_NAMESPACES = true;
+  private static boolean FLAG_SCHEMA_SUPPORT = true;
+  private static boolean FLAG_NO_SCHEMA_SUPPORT = false;
+  private static boolean FLAG_SCHEMA_FULL_SUPPORT = true;
+  private static boolean FLAG_NO_SCHEMA_FULL_SUPPORT = false;
+  private static boolean FLAG_DEFERRED_DOM = true;
+  private static MCREntityResolver ENTITY_RESOLVER;
 
-  private static String setvalidation          =
-    "http://xml.org/sax/features/validation";
-  private static String setnamespaces          =
-    "http://xml.org/sax/features/namespaces";
-  private static String setschemasupport       =
-    "http://apache.org/xml/features/validation/schema";
-  private static String setschemafullsupport   =
-    "http://apache.org/xml/features/validation/schema-full-checking";
+  private static String SET_VALIDATION = "http://xml.org/sax/features/validation";
+	private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
+	private static String SET_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
+	private static String SET_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
 
   /**
    * Constructor for the xerces parser. Sets default validation flag as
    * specified by the property MCR.parser_schema_validation in mycore.properties
-   **/
+   */
   public MCRParserXerces()
   {
-    flagvalidation = MCRConfiguration.instance()
-      .getBoolean( "MCR.parser_schema_validation", flagvalidation );
+    FLAG_VALIDATION = MCRConfiguration.instance()
+      .getBoolean( "MCR.parser_schema_validation", FLAG_VALIDATION );
 	builderValid=new SAXBuilder("org.apache.xerces.parsers.SAXParser",true);
 	builder=new SAXBuilder("org.apache.xerces.parsers.SAXParser",false);
-	entityResolver=new MCREntityResolver();
+	ENTITY_RESOLVER=new MCREntityResolver();
 
-	builder.setFeature( setnamespaces,        flagnamespaces        );
-	builder.setFeature( setschemasupport,     flagnoschemasupport    );
-	builder.setFeature( setschemafullsupport, flagnoschemafullsupport );
-	builderValid.setFeature( setnamespaces,        flagnamespaces        );
-	builderValid.setFeature( setschemasupport,     flagschemasupport     );
-	builderValid.setFeature( setschemafullsupport, flagnoschemafullsupport );
+	builder.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
+	builder.setFeature(SET_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_SUPPORT);
+	builder.setFeature(SET_FULL_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_FULL_SUPPORT);
+	builderValid.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
+	builderValid.setFeature(SET_SCHEMA_SUPPORT, FLAG_SCHEMA_SUPPORT);
+	builderValid.setFeature(SET_FULL_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_FULL_SUPPORT);
 
 	builder.setReuseParser(true);
 	builderValid.setReuseParser(true);
@@ -95,8 +91,8 @@ public class MCRParserXerces
 	builder.setErrorHandler  ( this );
 	builderValid.setErrorHandler  ( this );
 
-	builder.setEntityResolver( entityResolver );
-	builderValid.setEntityResolver( entityResolver );
+	builder.setEntityResolver( ENTITY_RESOLVER );
+	builderValid.setEntityResolver( ENTITY_RESOLVER );
   }
 
   /**
@@ -109,7 +105,7 @@ public class MCRParserXerces
    * @return the parsed XML stream as a DOM document
    **/
   public Document parseURI( String uri )
-  { return parseURI( uri, flagvalidation ); }
+  { return parseURI( uri, FLAG_VALIDATION ); }
 
   /**
    * Parses the XML byte stream with xerces parser and 
@@ -133,7 +129,7 @@ public class MCRParserXerces
    * @return the parsed XML stream as a DOM document
    **/
   public Document parseXML( String xml )
-  { return parseXML( xml, flagvalidation ); }
+  { return parseXML( xml, FLAG_VALIDATION ); }
 
   /**
    * Parses the XML byte stream with xerces parser and 
@@ -160,7 +156,7 @@ public class MCRParserXerces
    * @return the parsed XML stream as a DOM document
    **/
   public Document parseXML( byte[] xml )
-  { return parseXML( xml, flagvalidation ); }
+  { return parseXML( xml, FLAG_VALIDATION ); }
 
   /**
    * Parses the XML byte stream with xerces parser and 

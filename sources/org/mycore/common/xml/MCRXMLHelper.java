@@ -33,24 +33,24 @@ import org.mycore.common.*;
  * There is plenty left to do.
  *
  * @author Detlev Degenhardt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRXMLHelper
 {
-  private static MCRParserInterface parser;
+  private static MCRParserInterface PARSER;
 
   /** Returns the XML Parser as configured in mycore.properties */
   private static MCRParserInterface getParser()
     throws MCRException
   {
-    if( parser == null )
+    if( PARSER == null )
     {
       Object o = MCRConfiguration.instance().getInstanceOf( "MCR.parser_class_name" );
-      parser = (MCRParserInterface)o;
+      PARSER = (MCRParserInterface)o;
     }
-    return parser;
+    return PARSER;
   }
 
  /**

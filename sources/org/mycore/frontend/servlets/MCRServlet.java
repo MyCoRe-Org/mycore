@@ -41,10 +41,10 @@ import org.mycore.common.xml.MCRLayoutServlet;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been taken
- * from MilessServlet.java written by Frank Lï¿½tzenkirchen.
+ * from MilessServlet.java written by Frank Lützenkirchen.
  *
  * @author Detlev Degenhardt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$

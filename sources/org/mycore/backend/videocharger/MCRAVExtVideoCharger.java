@@ -48,7 +48,7 @@ import java.text.*;
  *
  * This class also provides a method to list all assets in a VideoCharger store.
  *
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
