@@ -13,11 +13,11 @@ public class HashCipher {
     
     public static final void main(String args[]) throws IOException, NoSuchAlgorithmException, ArrayIndexOutOfBoundsException{
         try {
-            System.out.println(crypt(args[0]));
+            //System.out.println(crypt(args[0]));
         }
         catch (ArrayIndexOutOfBoundsException aioobe){
-            System.out.println("Usage: java wcms.util.HashCipher <\"PasswordString\">");
-            System.out.println("Example: java wcms.util.HashCipher \"tESt &58y\"");
+            //System.out.println("Usage: java wcms.util.HashCipher <\"PasswordString\">");
+            //System.out.println("Example: java wcms.util.HashCipher \"tESt &58y\"");
         }
     }
 

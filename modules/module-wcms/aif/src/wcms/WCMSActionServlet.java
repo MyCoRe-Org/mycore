@@ -179,13 +179,13 @@ public class WCMSActionServlet extends HttpServlet {
         style = request.getParameter("style");
         label = request.getParameter("label");
         content = request.getParameter("content");
-        System.out.println("first in content value:"+content+"-----------------------------------------------------------------------------------------------");
+        //System.out.println("first in content value:"+content+"-----------------------------------------------------------------------------------------------");
         contentCurrentLang = request.getParameter("content_currentLang");
 
-        System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
+        //System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
         /* code validation by JTidy */
         if ( request.getParameter("codeValidationDisable") == null ) {
-        	System.out.println("JTIDY bei der Arbeit..................................................................................................");
+        	//System.out.println("JTIDY bei der Arbeit..................................................................................................");
             Tidy tidy = new Tidy();
             
             tidy.setXHTML(true);
@@ -336,35 +336,35 @@ public class WCMSActionServlet extends HttpServlet {
         hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
 
         /*---------------------- Variable Test Output -------------------------*/
-        System.out.println("----- Variable Test Output ------");
-        System.out.println("hrefFile: "+hrefFile);
+        //System.out.println("----- Variable Test Output ------");
+        //System.out.println("hrefFile: "+hrefFile);
 
-        System.out.println("---------Session--------");
-        System.out.println("userID: "+userID);
-        System.out.println("userClass: "+userClass);
-        System.out.println("rootNodes: "+rootNodes);
-        System.out.println("action: "+action);
-        System.out.println("mode: "+mode);
-        System.out.println("href: "+href);
-        System.out.println("defaultLang: "+defaultLang);
-        System.out.println("currentLang: "+currentLang);
-        System.out.println("currentLangLabel: "+currentLangLabel);
-        System.out.println("---------Request--------");
-        System.out.println("label: "+label);
-        System.out.println("target: "+target);
-        System.out.println("style: "+style);
-        System.out.println("content: "+content);
-        System.out.println("contentCurrentLang: "+contentCurrentLang);
-        System.out.println("link: "+link);
-        System.out.println("realy_delete: "+realyDel);
-        System.out.println("fileName: "+fileName);
-        System.out.println("labelPath: "+labelPath);
-        System.out.println("---------Error--------");
-        System.out.println("error: "+error);
-        System.out.println("avalue: "+avalue);
+        //System.out.println("---------Session--------");
+        //System.out.println("userID: "+userID);
+        //System.out.println("userClass: "+userClass);
+        //System.out.println("rootNodes: "+rootNodes);
+        //System.out.println("action: "+action);
+        //System.out.println("mode: "+mode);
+        //System.out.println("href: "+href);
+        //System.out.println("defaultLang: "+defaultLang);
+        //System.out.println("currentLang: "+currentLang);
+        //System.out.println("currentLangLabel: "+currentLangLabel);
+        //System.out.println("---------Request--------");
+        //System.out.println("label: "+label);
+        //System.out.println("target: "+target);
+        //System.out.println("style: "+style);
+        //System.out.println("content: "+content);
+        //System.out.println("contentCurrentLang: "+contentCurrentLang);
+        //System.out.println("link: "+link);
+        //System.out.println("realy_delete: "+realyDel);
+        //System.out.println("fileName: "+fileName);
+        //System.out.println("labelPath: "+labelPath);
+        //System.out.println("---------Error--------");
+        //System.out.println("error: "+error);
+        //System.out.println("avalue: "+avalue);
 
-        System.out.println("replaceMenu: "+replaceMenu);
-		System.out.println("masterTemplate: "+masterTemplate);
+        //System.out.println("replaceMenu: "+replaceMenu);
+		//System.out.println("masterTemplate: "+masterTemplate);
         /*---------------------------------------------------------------------*/
 
         if ( !realyDel.equals("false") ) {
@@ -507,7 +507,7 @@ public class WCMSActionServlet extends HttpServlet {
                 footer.getParentFile().mkdirs();
                 doc = builder.build(footer);
                 Element root = doc.getRootElement();
-                System.out.println("Footer gibts noch nicht.");
+                //System.out.println("Footer gibts noch nicht.");
             }
             else doc = builder.build(footer);
             Element root = doc.getRootElement();
@@ -520,7 +520,7 @@ public class WCMSActionServlet extends HttpServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
     }
 
@@ -554,7 +554,7 @@ public class WCMSActionServlet extends HttpServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
     }
 
@@ -567,7 +567,7 @@ public class WCMSActionServlet extends HttpServlet {
                 logFile.getParentFile().mkdirs();
                 logFile.createNewFile();
                 doc = new Document(new Element("loggings"));
-                System.out.println("Logfile wurde unter"+logFile.toString()+"angelegt.");
+                //System.out.println("Logfile wurde unter"+logFile.toString()+"angelegt.");
             }
             else doc = builder.build(logFile);
             Element root = doc.getRootElement();
@@ -599,7 +599,7 @@ public class WCMSActionServlet extends HttpServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
     }
 

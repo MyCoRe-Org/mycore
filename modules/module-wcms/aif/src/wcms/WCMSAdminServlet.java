@@ -140,7 +140,7 @@ public class WCMSAdminServlet extends HttpServlet {
 
                 catch (Exception e) {
                     error = e.getMessage();
-                    System.out.println(error);
+                    //System.out.println(error);
                 }
 
                 rootOut.addContent(new Element("sort").setAttribute("order", sortOrder).setText(sort));

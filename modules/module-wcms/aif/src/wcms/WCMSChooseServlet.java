@@ -211,8 +211,8 @@ public class WCMSChooseServlet extends HttpServlet {
             errorOut.close();
         }
         /*
-        System.out.println("label:"+label+".............................................");
-		System.out.println("label_currentLang:"+label_currentLang+".............................................");
+        //System.out.println("label:"+label+".............................................");
+		//System.out.println("label_currentLang:"+label_currentLang+".............................................");
         */
         /**
          * Try to build a jdom Object from the content (this has to be valid XHTML content)
@@ -249,9 +249,9 @@ public class WCMSChooseServlet extends HttpServlet {
                                 	if (o instanceof Comment) ((Comment)o).detach();
                                    	defaultLangContentOutput.add(o);
 								}
-								System.out.println("deflistbefore: "+defaultLangContentOutput.toString());
+								//System.out.println("deflistbefore: "+defaultLangContentOutput.toString());
 								reverse(defaultLangContentOutput);
-                                System.out.println("deflistafter: "+defaultLangContentOutput.toString());
+                                //System.out.println("deflistafter: "+defaultLangContentOutput.toString());
                                 //break;
 							}
 							if (content.getAttributeValue("lang", ns).equals(currentLang) && action.equals("translate")) {
@@ -263,9 +263,9 @@ public class WCMSChooseServlet extends HttpServlet {
                                 	if (o instanceof Comment) ((Comment)o).detach();
                                 	currentLangContentOutput.add(o);
 								}
-								System.out.println("curlistbefore: "+currentLangContentOutput.toString());
+								//System.out.println("curlistbefore: "+currentLangContentOutput.toString());
 								reverse(currentLangContentOutput);
-                                System.out.println("curlistafter: "+currentLangContentOutput.toString());
+                                //System.out.println("curlistafter: "+currentLangContentOutput.toString());
 								//break;
                             }
                         }
@@ -297,7 +297,7 @@ public class WCMSChooseServlet extends HttpServlet {
                         }
                     }
                     catch (FileNotFoundException fne){
-                        System.out.println(fne);
+                        //System.out.println(fne);
                     }
                 }
             }

@@ -108,11 +108,11 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
             while (contentElementsIterator.hasNext()) {
                 Element content = (Element)contentElementsIterator.next();
                 if (content.getAttributeValue("lang", ns) != null) {
-                    System.out.println("Übergebene Sprache: "+ lang + "    gefundene Sprache " + content.getAttributeValue("lang", ns));
+                    //System.out.println("Übergebene Sprache: "+ lang + "    gefundene Sprache " + content.getAttributeValue("lang", ns));
                     contentList = content.getContent();
                     validXHTML = true;
                     if (content.getAttributeValue("lang", ns).equals(lang)) {
-                        System.out.println("drinn");
+                        //System.out.println("drinn");
                         for( int i = (contentList.size() - 1); i >= 0; i-- ) {
                             Object o = contentList.get(i);
                             //String u = null;
@@ -149,7 +149,7 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
                 response.setContentType( "text/html" );  
                 sos.println(completeOutput);
 
-                System.out.println("WCMSGetStaticHTMLServlet-Output: "+completeOutput);
+                //System.out.println("WCMSGetStaticHTMLServlet-Output: "+completeOutput);
                 
                 sos.flush();
                 sos.close();

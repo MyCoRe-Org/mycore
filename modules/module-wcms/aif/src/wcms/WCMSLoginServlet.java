@@ -145,7 +145,7 @@ public class WCMSLoginServlet extends HttpServlet {
             errorOut.close();
         }
 
-        System.out.println("loginValue = "+loginOk);
+        //System.out.println("loginValue = "+loginOk);
 
         /**
          * Build jdom object dependence on the given login data.
@@ -169,7 +169,7 @@ public class WCMSLoginServlet extends HttpServlet {
          */
 
         if (loginOk) {
-            System.out.println(session+" - "+userID+" - "+userRealName+" - "+userClass);
+            //System.out.println(session+" - "+userID+" - "+userRealName+" - "+userClass);
             session.setAttribute("status", "loggedIn");
             if (!userID.equals(session.getAttribute("userID"))) session.setAttribute("userID", userID);
             if (!userRealName.equals(session.getAttribute("userRealName"))) session.setAttribute("userRealName", userRealName);

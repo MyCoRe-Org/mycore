@@ -151,7 +151,7 @@ public class WCMSFileUploadServlet extends HttpServlet {
                             newLine = new String(line, 0, i);
                             if (contentType.startsWith("image/")) savePath = imagePath;
                             else savePath = documentPath;
-                            System.out.println(savePath+fileName);
+                            //System.out.println(savePath+fileName);
                             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(savePath+fileName)));
                             while (i != -1 && !newLine.startsWith(boundary)) {
                                 // the problem is the last line of the file content
@@ -201,7 +201,7 @@ public class WCMSFileUploadServlet extends HttpServlet {
 
              catch (IOException e){
 				 e.printStackTrace();
-                 System.out.println(e.getMessage());
+                 //System.out.println(e.getMessage());
              }
             /*Logfile
             WCMSActionServlet wcms = new WCMSActionServlet();
