@@ -35,7 +35,6 @@ import org.mycore.common.*;
  * Instances of this class represent MyCoRe users.
  *
  * @see org.mycore.user.MCRUserMgr
- *
  * @see org.mycore.user.MCRUserObject
  * @see org.mycore.user.MCRUserContact
  * @see org.mycore.user.MCRUserMgr
@@ -67,10 +66,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   /**
    * Default constructor. It is used to create a user object with empty fields.
    * This is useful for constructing an XML representation of a user without
-   * specialized data which is used e.g. by MCRCreateUserServlet just to get an
-   * XML-representation. The XML representation is the used by the
-   * XSLT-Stylesheet to create HTML output for the servlet. This empty user
-   * object will not be created in the persistent data store.
+   * specialized data which is used e.g. by MCRUserServlet just to get an
+   * XML-representation. The XML representation is used by the XSLT-Stylesheet
+   * to create HTML output for the presentation. This empty user object will not
+   * be created in the persistent data store.
    */
   public MCRUser()
   {
@@ -85,13 +84,13 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
 
   /**
    * This minimal constructor only takes the user ID as a parameter. For all
-   * other attributes the default constructor is invoked.
+   * other attributes the default constructor is invoked. This constructor is
+   * used by the access control system.
+   *
+   * @param ID the named user ID
    */
   public MCRUser (String id)
-  {
-    // This constructor is used by the access control system
-    super.ID = id.trim();
-  }
+  { super.ID = id.trim(); }
 
   /**
    * This constructor takes all attributes of this class as single variables.
@@ -137,49 +136,50 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     super.ID      = trim(ID,id_len);
     this.numID    = numID;
     super.creator = trim(creator,id_len);
-    // check if the creation timestamp is provided. If not, use current timestamp
+
+    // check if the creation and modified timestamp is provided. If not, use current timestamp
     if (creationDate == null) {
-      super.creationDate = new Timestamp(new GregorianCalendar().getTime()
-        .getTime()); }
-    else {
-      super.creationDate = creationDate; }
+      super.creationDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+    else { super.creationDate = creationDate; }
+
     if (modifiedDate == null) {
-      super.modifiedDate = new Timestamp(new GregorianCalendar().getTime()
-        .getTime()); }
-    else {
-      super.modifiedDate = modifiedDate; }
+      super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+    else { super.modifiedDate = modifiedDate; }
+
     this.idEnabled = idEnabled;
     this.updateAllowed = updateAllowed;
     super.description = trim(description,description_len);
     this.passwd = trim(passwd,password_len);
     this.primaryGroupID = trim(primaryGroupID,id_len);
     super.groupIDs = groupIDs;
+
     userContact = new MCRUserContact(salutation,firstname,lastname,
       street, city,postalcode,country,state,institution,faculty,department,
       institute,telephone,fax,email,cellphone);
   }
 
   /**
-   * This constructor create the data of this class from an JDOM Element.
+   * This constructor creates the data of this object from a given JDOM element.
    *
    * @param the JDOM Element
    **/
   public MCRUser(org.jdom.Element elm)
   {
     this();
-    if (!elm.getName().equals("user")) { return; }
-    super.ID = trim((String)elm.getAttributeValue("ID"),id_len);
+    if (!elm.getName().equals("user")) { return; } // Detlev asks: Jens, what is this good for??
+    super.ID = trim((String)elm.getAttributeValue("ID"), id_len);
     String numIDtmp = trim((String)elm.getAttributeValue("numID"));
+
     try {
       this.numID = Integer.parseInt(numIDtmp); }
     catch (Exception e) {
-      this.numID = -1; }
-    this.idEnabled =
-      (elm.getAttributeValue("id_enabled").equals("true")) ? true : false;
-    this.updateAllowed =
-      (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
-    this.creator = trim(elm.getChildTextTrim("user.creator"),id_len);
-    this.passwd = trim(elm.getChildTextTrim("user.password"),password_len);
+      this.numID = -1;
+    }
+
+    this.idEnabled = (elm.getAttributeValue("id_enabled").equals("true")) ? true : false;
+    this.updateAllowed = (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
+    this.creator = trim(elm.getChildTextTrim("user.creator"), id_len);
+    this.passwd = trim(elm.getChildTextTrim("user.password"), password_len);
     String tmp = elm.getChildTextTrim("user.creation_date");
     if (tmp != null) {
       try {
@@ -194,6 +194,11 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     }
     this.description = trim(elm.getChildTextTrim("user.description"), description_len);
     this.primaryGroupID = trim(elm.getChildTextTrim("user.primary_group"), id_len);
+
+    org.jdom.Element contactElement = elm.getChild("user.contact");
+    if (contactElement != null) {
+      userContact = new MCRUserContact(contactElement); }
+
     org.jdom.Element userGroupElement = elm.getChild("user.groups");
     if (userGroupElement != null) {
       List groupIDList = userGroupElement.getChildren();
@@ -208,10 +213,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
 
   /**
    * @return
-   *   This method returns the address object of the user
+   *   This method returns the contact object of the user
    */
   public MCRUserContact getUserContact()
-    { return userContact; }
+  { return userContact; }
 
   /**
    * @return
@@ -224,7 +229,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    * @return  This method returns the numerical ID of the user object.
    */
   public int getNumID()
-    { return numID; }
+  { return numID; }
 
   /**
    * @return
@@ -244,7 +249,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    * This method returns a normalized ArrayList of all privileges of this user.
    *
    * @return a privilege list of this user
-   **/
+   */
   public final ArrayList getPrivileges()
   {
     ArrayList ar = new ArrayList();
@@ -255,18 +260,19 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
       for (int i=0;i<groupIDs.size();i++) {
         g = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i));
         ar.addAll(g.getAllPrivileges());
-        }
       }
+    }
     catch(MCRException ex) {}
+
     ArrayList n = new ArrayList();
     for (int i=0;i<ar.size();i++) {
       boolean test = false;
       String name = ((String)ar.get(i));
       for (int j=0;j<n.size();j++) {
         if (name.equals((String)n.get(j))) { test = true; }
-        }
-      if (!test) { n.add(ar.get(i)); }
       }
+      if (!test) { n.add(ar.get(i)); }
+    }
     for (int i=0;i<n.size();i++) { logger.debug("Privileg = "+(String)ar.get(i)); }
     return n;
   }
@@ -308,9 +314,9 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    */
   public boolean isMemberOf (MCRGroup group)
   {
-    if (groupIDs.contains(group.getID()))
+    if (groupIDs.contains(group.getID())) {
       return true;
-
+    }
     return false;
   }
 
@@ -368,18 +374,18 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   }
 
   /**
-   * This method set the enabled value with a boolean data.
+   * This method sets the "enabled" attribute to a boolean value.
    *
    * @param flag the boolean data
-   **/
+   */
   public final void setEnabled(boolean flag)
   { idEnabled = flag; }
 
   /**
-   * This method update this instance with the data of the given MCRUser.
+   * This method updates this instance with the data of the given MCRUser.
    *
    * @param newuser the data for the update.
-   **/
+   */
   public final void update(MCRUser newuser)
   {
     if (!updateAllowed) return;
@@ -454,8 +460,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   }
 
   /**
-   * This method put debug data to the logger (for the debug mode).
-   **/
+   * This method writes debug data to the logger (for the debug mode).
+   */
   public final void debug()
   {
     debugDefault();

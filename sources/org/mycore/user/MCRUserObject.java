@@ -47,20 +47,19 @@ import org.mycore.common.MCRException;
  */
 abstract class MCRUserObject
 {
-  protected static Logger logger =
-    Logger.getLogger(MCRUserObject.class.getName());
+  protected static Logger logger = Logger.getLogger(MCRUserObject.class.getName());
   protected static MCRConfiguration config = null;
 
-  /** The length of user and group names */
+  /** The maximum length of user and group names */
   public static final int id_len = 20;
 
-  /** The length of the password */
+  /** The maximum length of the password */
   public static final int password_len = 20;
 
-  /** The length of the decription */
+  /** The maximum length of the decription */
   public static final int description_len = 200;
 
-  /** The length of the privilege */
+  /** The maximum length of the privilege */
   public static final int privilege_len = 100;
 
   /** The ID of the MyCoRe user unit (either user ID or group ID) */
@@ -97,28 +96,24 @@ abstract class MCRUserObject
   }
 
   /**
-   * The method set the creationDate at call time.
+   * This method sets the creationDate to the time the method is called.
    **/
   public final void setCreationDate()
-    {
-    creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-    }
+  { creationDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
 
   /**
-   * The method set the modifiedDate at call time.
+   * This method sets the modifiedDate to the time the method is called.
    **/
   public final void setModifiedDate()
-    {
-    modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-    }
+  { modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
 
   /**
-   * The method set the creator value.
+   * This method sets the creator value.
    *
-   * @param creator the creator  of a user or group
+   * @param creator the creator of a user or group
    **/
   public final void setCreator(String creator)
-    { this.creator = trim(creator); }
+  { this.creator = trim(creator); }
 
   /**
    * @return
@@ -167,7 +162,7 @@ abstract class MCRUserObject
   { if (!groupIDs.contains(groupID)) { groupIDs.add(groupID); } }
 
   /**
-   * This method clean the administrative groups ArrayList.
+   * This method clears the ArrayList containing the administrative groups.
    */
   protected final void cleanGroupID()
   { groupIDs.clear(); }
@@ -238,4 +233,3 @@ abstract class MCRUserObject
   { return ID; }
 
 }
-
