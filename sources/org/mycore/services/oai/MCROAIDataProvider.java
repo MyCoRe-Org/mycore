@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * $Revision: 1.3 $ $Date: 2003/01/23 10:07:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -54,7 +54,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/23 10:07:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -315,11 +315,11 @@ public class MCROAIDataProvider extends HttpServlet {
 		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
 		    try {
 			    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+			    return query.exists(identifier.substring(lastColon + 1));
 		    } catch (MCRConfigurationException mcrx) {
 		    	logger.fatal("Die OAIQuery-Klasse ist nicht konfiguriert.");
 		    	return false;
 		    }
-/*    	                !MCRObject.existInDatastore(identifier.substring(lastColon + 1))) { */
 		} 
         
 		return true;
