@@ -207,27 +207,27 @@ private final String seekElementText(String seek_element,
  * by the MyCoRe XML MCRMetaPerson definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaPerson part
+ * @return a JDOM Element with the XML MCRMetaPerson part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("<").append(subtag).append(" type=\"").append(type)
-    .append("\" xml:lang=\"").append(lang).append("\" >").append(NL);
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    elm.setAttribute("type",type); }
   if ((firstname = firstname.trim()).length() !=0) {
-    sb.append("<firstname>").append(firstname).append("</firstname>").append(NL); }
+    elm.addContent(new org.jdom.Element("firstname").addContent(firstname)); }
   if ((callname  = callname .trim()).length() !=0) {
-    sb.append("<callname>") .append(callname) .append("</callname>") .append(NL); }
+    elm.addContent(new org.jdom.Element("callname").addContent(callname)); }
   if ((surename  = surename .trim()).length() !=0) {
-    sb.append("<surename>") .append(surename) .append("</surename>") .append(NL); }
+    elm.addContent(new org.jdom.Element("surename").addContent(surename)); }
   if ((academic  = academic .trim()).length() !=0) {
-    sb.append("<academic>") .append(academic) .append("</academic>") .append(NL); }
+    elm.addContent(new org.jdom.Element("academic").addContent(academic)); }
   if ((peerage   = peerage  .trim()).length() !=0) {
-    sb.append("<peerage>")  .append(peerage)  .append("</peerage>")  .append(NL); }
-  sb.append("</").append(subtag).append(">").append(NL); 
-  return sb.toString();
+    elm.addContent(new org.jdom.Element("peerage").addContent(peerage)); }
+  return elm;
   }
 
 /**

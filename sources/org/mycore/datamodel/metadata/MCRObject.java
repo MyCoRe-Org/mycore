@@ -24,6 +24,7 @@
 
 package mycore.datamodel;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,14 +59,10 @@ final public class MCRObject
  * constant value for the object id length
  **/
 public final static int MAX_LABEL_LENGTH = 256;
-/**
- * the header of all XML Files
- **/
-public final static String XML_HEADER = 
-  "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 
 // from configuration
-MCRConfiguration mcr_conf = null;
+private MCRConfiguration mcr_conf = null;
+private String mcr_encoding = null;
 private String parser_name;
 private String persist_name;
 private String persist_type;
@@ -88,6 +85,8 @@ private MCRObjectMetadata mcr_metadata = null;
 // other
 private String NL;
 private String SLASH;
+public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
+public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
 /**
  * This is the constructor of the MCRObject class. It make an
@@ -113,8 +112,10 @@ public MCRObject() throws MCRException, MCRConfigurationException
   mcr_persist = null;
   try {
     mcr_conf = MCRConfiguration.instance();
+  // Default Encoding
+    mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding");
   // Path of XML schema
-    mcr_schema_path = mcr_conf.getString("MCR.parser_schema_path");
+    mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
   // Metadata class
     mcr_metadata = new MCRObjectMetadata();
   // Structure class
@@ -296,7 +297,7 @@ private final void set() throws MCRException
   mcr_id = new MCRObjectID(dom_element.getAttribute("ID"));
   mcr_label = dom_element.getAttribute("label").trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
-   mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
+    mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
   mcr_schema = dom_element.getAttribute("xsi:noNamespaceSchemaLocation").trim();
   int i=0;
   int j=0;
@@ -428,29 +429,34 @@ public final void setStructure(MCRObjectStructure structure)
  * This methode create a XML stream for all object data.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML data of the object
+ * @return a JDOM Document with the XML data of the object as byte array
  **/
-public final String createXML() throws MCRException
+public final byte [] createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(4096);
-  sb.append(XML_HEADER).append(NL);
-  sb.append("<mycoreobject ").append(NL);
-  sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
-    .append(NL);
-  sb.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\"")
-    .append(NL);
-  sb.append("xsi:noNamespaceSchemaLocation=\"").append(mcr_schema_path)
-    .append(SLASH).append(mcr_schema).append("\"").append(NL);
-  sb.append("ID=\"").append(mcr_id.getId()).append("\" ").append(NL);
-  sb.append("label=\"").append(mcr_label).append("\">").append(NL);
-  sb.append(mcr_struct.createXML());
-  sb.append(mcr_metadata.createXML());
-  sb.append(mcr_service.createXML());
-  sb.append("</mycoreobject>").append(NL);
-  return sb.toString();
+  org.jdom.Element elm = new org.jdom.Element("mycoreobject");
+  org.jdom.Document doc = new org.jdom.Document(elm);
+  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    XLINK_URL));
+  elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+SLASH+mcr_schema,
+    org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+  elm.setAttribute("ID",mcr_id.getId());
+  elm.setAttribute("label",mcr_label);
+  elm.addContent(mcr_struct.createXML());
+  elm.addContent(mcr_metadata.createXML());
+  elm.addContent(mcr_service.createXML());
+  ByteArrayOutputStream outb = new ByteArrayOutputStream();
+  try {
+    org.jdom.output.XMLOutputter outp = new org.jdom.output.XMLOutputter();
+    outp.setEncoding(mcr_encoding);
+    outp.setNewlines(true);
+    outp.output(doc,outb); }
+  catch (Exception e) {
+    throw new MCRException("Can't produce byte array."); }
+  return outb.toByteArray();
   }
 
 /**
@@ -495,7 +501,7 @@ public final void createInDatastore() throws MCRPersistenceException
   if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  byte [] xml = createXML().getBytes();
+  byte [] xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.create(mcr_tc,xml);
   }
@@ -555,7 +561,7 @@ public final void updateInDatastore() throws MCRPersistenceException
   if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
   mcr_service.setDate("modifydate");
-  byte [] xml = createXML().getBytes();
+  byte [] xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.update(mcr_tc,xml);
   }

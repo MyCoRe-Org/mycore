@@ -56,9 +56,9 @@ public void setFromDOM(Node metadata_langtext_node);
  * This methode create a XML stream for a metadata part.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML data of the metadata part
+ * @return a JDOM Element with the XML data of the metadata part
  **/
-public String createXML() throws MCRException;
+public org.jdom.Element createXML() throws MCRException;
 
 /**
  * This methode create a typed content list for all data in this instance.

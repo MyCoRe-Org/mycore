@@ -233,30 +233,29 @@ public String seekElementText(String seek_element, NodeList childs_nodelist)
  * by the MyCoRe XML MCRMetaAddress definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaAddress part
+ * @return a JDOM Element with the XML MCRMetaAddress part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
-
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("<").append(subtag).append(" type=\"").append(type)
-    .append("\" xml:lang=\"").append(lang) .append("\" >").append(NL);
+    org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    elm.setAttribute("type",type); }
   if ((country = country  .trim()).length() !=0) {
-    sb.append("<country>").append(country) .append("</country>").append(NL); }
+    elm.addContent(new org.jdom.Element("country").addContent(country)); }
   if ((state   = state    .trim()).length() !=0) {
-    sb.append("<state>")  .append(state)   .append("</state>")  .append(NL); }
+    elm.addContent(new org.jdom.Element("state").addContent(state)); }
   if ((zipcode = zipcode  .trim()).length() !=0) {
-    sb.append("<zipcode>").append(zipcode) .append("</zipcode>").append(NL); }
+    elm.addContent(new org.jdom.Element("zipcode").addContent(zipcode)); }
   if ((city    = city     .trim()).length() !=0) {
-    sb.append("<city>")   .append(city)    .append("</city>")   .append(NL); }
+    elm.addContent(new org.jdom.Element("city").addContent(city)); }
   if ((street  = street   .trim()).length() !=0) {
-    sb.append("<street>") .append(street)  .append("</street>") .append(NL); }
+    elm.addContent(new org.jdom.Element("street").addContent(street)); }
   if ((number  = number   .trim()).length() !=0) {
-    sb.append("<number>") .append(number)  .append("</number>") .append(NL); }
-  sb.append("</").append(subtag).append(">").append(NL); 
-  return sb.toString();
+    elm.addContent(new org.jdom.Element("number").addContent(number)); }
+  return elm;
   }
 
 /**

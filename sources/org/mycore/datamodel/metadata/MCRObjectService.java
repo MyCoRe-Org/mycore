@@ -327,29 +327,27 @@ public final void replaceFlag(int index, String value)
  * This methode create a XML stream for all structure data.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML data of the structure data part
+ * @return a JDOM Element with the XML data of the structure data part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(2048);
-  sb.append("<service>").append(NL);
+  org.jdom.Element elm = new org.jdom.Element("service");
   if (dates.size()!=0) {
-    sb.append("<dates>").append(NL);
+    org.jdom.Element elmm = new org.jdom.Element("dates");
     for (int i=0;i<dates.size();i++) {
-      sb.append(((MCRMetaDate)dates.get(i)).createXML()); }
-    sb.append("</dates>").append(NL);
+      elmm.addContent(((MCRMetaDate)dates.get(i)).createXML()); }
+    elm.addContent(elmm); 
     }
   if (flags.size()!=0) {
-    sb.append("<flags>").append(NL);
+    org.jdom.Element elmm = new org.jdom.Element("flags");
     for (int i=0;i<flags.size();i++) {
-      sb.append(((MCRMetaLangText)flags.get(i)).createXML()); }
-    sb.append("</flags>").append(NL);
+      elmm.addContent(((MCRMetaLangText)flags.get(i)).createXML()); }
+    elm.addContent(elmm); 
     }
-  sb.append("</service>").append(NL);
-  return sb.toString();
+  return elm;
   }
 
 /**

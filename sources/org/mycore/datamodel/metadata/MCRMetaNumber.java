@@ -256,25 +256,22 @@ public final void setFromDOM(Node metadata_number_node)
  * by the MyCoRe XML MCRNumber definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRNumber part
+ * @return a JDOM Element with the XML MCRNumber part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang)
-    .append("\"");
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
   if ((dimension != null) && ((dimension = dimension.trim()).length() !=0)) {
-    sb.append(" dimension=\"").append(dimension).append("\""); }
+    elm.setAttribute("dimension",dimension); }
   if ((measurement != null) && 
       ((measurement = measurement.trim()).length() !=0)) {
-    sb.append(" measurement=\"").append(measurement).append("\""); }
-  sb.append(">").append(NL);
-  sb.append(getNumberToString());
-  sb.append("</").append(subtag).append('>').append(NL);
-  return sb.toString();
+    elm.setAttribute("measurement",measurement); }
+  elm.addContent(getNumberToString());
+  return elm;
   }
 
 /**

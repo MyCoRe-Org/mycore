@@ -45,6 +45,12 @@ import mycore.datamodel.MCRCommunicationInterface;
 public class MCRSocketCommunication implements MCRCommunicationInterface
 {
 
+/**
+ * the header of all XML Files
+ **/
+private final static String XML_HEADER = 
+  "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
+
 private String reqtype;
 private String hostAlias;
 private String mcrtype;
@@ -149,8 +155,8 @@ public MCRQueryResultArray responseQuery() throws MCRException
           }
         else if (state == 5) {
           if (fromServer.length() == resultSize) {
-            if (fromServer.startsWith(MCRObject.XML_HEADER))
-              fromServer = fromServer.substring(MCRObject.XML_HEADER.length());
+            if (fromServer.startsWith(XML_HEADER))
+              fromServer = fromServer.substring(XML_HEADER.length());
             result.importElements(fromServer.getBytes());
             toServer = "received bytes:"+resultSize;
             state = 6;

@@ -645,47 +645,40 @@ public class MCRObjectStructure
    * structure's memory copy into an XML string.
    *
    * @exception MCRException if the content of this class is not valid
-   * @return String              the structure XML string
+   * @return org.jdom.Element    the structure XML string
    */
-  public final String createXML () throws MCRException
+  public final org.jdom.Element createXML () throws MCRException
   {
     if (!isValid()) {
       debug();
       throw new MCRException("The content is not valid."); }
-    int i, n;
-    StringBuffer sb = new StringBuffer(2048);
-    sb.append("<structure>").append(NL);
-	n = uniLinksTo.size();
-    sb.append("<uniLinksTo>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) uniLinksTo.elementAt(i)).createXML()); }
-    sb.append("</uniLinksTo>").append(NL);
-	n = linksTo.size();
-    sb.append("<linksTo>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) linksTo.elementAt(i)).createXML()); }
-    sb.append("</linksTo>").append(NL);
-	n = linksFrom.size();
-    sb.append("<linksFrom>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) linksFrom.elementAt(i)).createXML()); }
-    sb.append("</linksFrom>").append(NL);
-	n = children.size();
-    sb.append("<children>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) children.elementAt(i)).createXML()); }
-    sb.append("</children>").append(NL);
-    sb.append("<parents>").append(NL);
+    int i;
+    org.jdom.Element elm = new org.jdom.Element("structure");
+    org.jdom.Element elmm = new org.jdom.Element("uniLinksTo");
+    for (i = 0; i < uniLinksTo.size(); ++i) {
+      elmm.addContent(((MCRMetaLink) uniLinksTo.elementAt(i)).createXML()); }
+    elm.addContent(elmm);
+    elmm = new org.jdom.Element("linksTo");
+    for (i = 0; i < linksTo.size(); ++i) {
+      elmm.addContent(((MCRMetaLink) linksTo.elementAt(i)).createXML()); }
+    elm.addContent(elmm);
+    elmm = new org.jdom.Element("linksFrom");
+    for (i = 0; i < linksFrom.size(); ++i) {
+      elmm.addContent(((MCRMetaLink) linksFrom.elementAt(i)).createXML()); }
+    elm.addContent(elmm);
+    elmm = new org.jdom.Element("children");
+    for (i = 0; i < children.size(); ++i) {
+      elmm.addContent(((MCRMetaLink) children.elementAt(i)).createXML()); }
+    elm.addContent(elmm);
+    elmm = new org.jdom.Element("parents");
     if (parent != null)
-      sb.append(parent.createXML());
-    sb.append("</parents>").append(NL);
-    sb.append("<derivates>").append(NL);
-    n = the_derivates.size();
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) the_derivates.elementAt(i)).createXML()); }
-    sb.append("</derivates>").append(NL);
-    sb.append("</structure>").append(NL);
-    return sb.toString();
+      elmm.addContent(parent.createXML());
+    elm.addContent(elmm);
+    elmm = new org.jdom.Element("derivates");
+    for (i = 0; i < the_derivates.size(); ++i) {
+      elmm.addContent(((MCRMetaLink) the_derivates.elementAt(i)).createXML()); }
+    elm.addContent(elmm);
+    return elm;
   }
 
   /**

@@ -191,25 +191,25 @@ private final String seekElementText(String seek_element,
  * by the MyCoRe XML MCRMetaCorporation definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaCorporation part
+ * @return a JDOM Element with the XML MCRMetaCorporation part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("<").append(subtag).append(" type=\"").append(type)
-    .append("\" xml:lang=\"").append(lang).append("\" >").append(NL);
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    elm.setAttribute("type",type); }
   if ((name      = name    .trim()).length()   !=0) {
-    sb.append("<name>")    .append(name)    .append("</name>").append(NL);     }
+    elm.addContent(new org.jdom.Element("name").addContent(name)); }
   if ((nickname  = nickname.trim()).length()   !=0) {
-    sb.append("<nickname>").append(nickname).append("</nickname>").append(NL); }
+    elm.addContent(new org.jdom.Element("nickname").addContent(nickname)); }
   if ((parent    = parent  .trim()).length()   !=0) {
-    sb.append("<parent>")  .append(parent)  .append("</parent>").append(NL);   }
+    elm.addContent(new org.jdom.Element("parent").addContent(parent)); }
   if ((property     = property   .trim()).length()   !=0) {
-    sb.append("<property>").append(property).append("</property>").append(NL);    }
-  sb.append("</").append(subtag).append(">").append(NL); 
-  return sb.toString();
+    elm.addContent(new org.jdom.Element("property").addContent(property)); }
+  return elm;
   }
 
 /**

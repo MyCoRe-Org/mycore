@@ -180,22 +180,21 @@ public final void setFromDOM(Node metadata_date_node)
  * by the MyCoRe XML MCRMetaDate definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaDate part
+ * @return a JDOM Element with the XML MCRMetaDate part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang)
-    .append("\"");
+  if (!isValid()) {
+    throw new MCRException("The content is not valid."); }
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
-    sb.append(" type=\"").append(type).append("\""); }
-  sb.append('>').append(NL);
-  sb.append(getDateToString());
-  sb.append("</").append(subtag).append('>').append(NL);
-  return sb.toString();
+    elm.setAttribute("type",type); }
+  elm.addContent(getDateToString());
+  return elm;
   }
 
 /**

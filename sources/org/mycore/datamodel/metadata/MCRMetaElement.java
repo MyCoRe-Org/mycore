@@ -218,19 +218,18 @@ public final void setFromDOM(Node metadata_element_node) throws MCRException
  * by the MyCoRe XML MCRLangText definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML Element part
+ * @return a JDOM Element with the XML Element part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(tag).append(" class=\"").append(classname)
-    .append("\" heritable=\"").append(heritable).append("\">").append(NL);
+  org.jdom.Element elm = new org.jdom.Element(tag);
+  elm.setAttribute("class",classname);
+  elm.setAttribute("heritable",new Boolean(heritable).toString());
   for (int i=0;i<list.size();i++) {
-    sb.append(((MCRMetaInterface)list.get(i)).createXML()); }
-  sb.append("</").append(tag).append('>').append(NL);
-  return sb.toString();
+    elm.addContent(((MCRMetaInterface)list.get(i)).createXML()); }
+  return elm;
   }
 
 /**

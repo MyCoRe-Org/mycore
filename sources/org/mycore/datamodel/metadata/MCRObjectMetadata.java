@@ -200,20 +200,18 @@ public final void setFromDOM(NodeList dom_element_list) throws MCRException
  * This methode create a XML stream for all metadata.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML data of the metadata part
+ * @return a JDOM Element with the XML data of the metadata part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRObjectMetadata : The content is not valid."); }
-  StringBuffer sb = new StringBuffer(2048);
-  sb.append("<metadata xml:lang=\"").append(default_lang).append("\">")
-    .append(NL);
+  org.jdom.Element elm = new org.jdom.Element("metadata");
+  elm.setAttribute("xml:lang",default_lang);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    sb.append(((MCRMetaElement)meta_list.get(i)).createXML()); }
-  sb.append("</metadata>").append(NL);
-  return sb.toString();
+    elm.addContent(((MCRMetaElement)meta_list.get(i)).createXML()); }
+  return elm;
   }
 
 /**

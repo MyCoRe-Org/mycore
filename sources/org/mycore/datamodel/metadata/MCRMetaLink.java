@@ -320,32 +320,36 @@ public final void setFromDOM(Node dom_metadata_node)
  * by the MyCoRe XML MCRMetaLink definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaLink part
+ * @return a JDOM Element with the XML MCRMetaLink part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xlink:type=\"").append(linktype)
-    .append("\" ");
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
+    MCRObject.XLINK_URL));
   if (linktype.equals("locator")) {
-    sb.append(" xlink:href=\"").append(MCRUtils.stringToXML(href))
-      .append("\" ");
+    elm.setAttribute("href",href,org.jdom.Namespace.getNamespace("xlink",
+      MCRObject.XLINK_URL));
     if ((label != null) && ((label = label.trim()).length() !=0)) {
-      sb.append("xlink:label=\"").append(label).append("\" "); }
+      elm.setAttribute("label",label,org.jdom.Namespace.getNamespace("xlink",
+        MCRObject.XLINK_URL)); }
     if ((title != null) && ((title = title.trim()).length() !=0)) {
-      sb.append("xlink:title=\"").append(title).append("\" "); }
+      elm.setAttribute("title",title,org.jdom.Namespace.getNamespace("xlink",
+        MCRObject.XLINK_URL)); }
     }
   else {
-    sb.append(" xlink:from=\"").append(from.getId()).append("\" xlink:to=\"")
-      .append(to.getId()).append("\" "); 
+    elm.setAttribute("from",from.getId(),org.jdom.Namespace.getNamespace(
+      "xlink",MCRObject.XLINK_URL));
+    elm.setAttribute("to",to.getId(),org.jdom.Namespace.getNamespace("xlink",
+      MCRObject.XLINK_URL));
     if ((title != null) && ((title = title.trim()).length() !=0)) {
-      sb.append("xlink:title=\"").append(title).append("\" "); }
+      elm.setAttribute("title",title,org.jdom.Namespace.getNamespace("xlink",
+        MCRObject.XLINK_URL)); }
     }
-  sb.append("/>").append(NL);
-  return sb.toString();
+  return elm;
   }
 
 /**

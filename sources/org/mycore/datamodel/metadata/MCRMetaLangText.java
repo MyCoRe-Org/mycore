@@ -135,22 +135,19 @@ public final void setFromDOM(Node metadata_langtext_node)
  * by the MyCoRe XML MCRMetaLangText definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaLangText part
+ * @return a JDOM Element with the XML MCRMetaLangText part
  **/
-public final String createXML() throws MCRException
+public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
     throw new MCRException("The content is not valid."); }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang)
-    .append("\"");
+  org.jdom.Element elm = new org.jdom.Element(subtag);
+  elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
-    sb.append(" type=\"").append(type).append("\""); }
-  sb.append(">").append(NL);
-  sb.append(MCRUtils.stringToXML(text));
-  sb.append("</").append(subtag).append('>').append(NL);
-  return sb.toString();
+    elm.setAttribute("type",type); }
+  elm.addContent(text);
+  return elm;
   }
 
 /**

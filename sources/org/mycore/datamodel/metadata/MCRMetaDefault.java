@@ -237,9 +237,9 @@ public void setFromDOM(Node dom_metadata_node) throws MCRException
  * defined by the MyCoRe XML MCRMeta... definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMeta... part
+ * @return a JDOM Element with the XML MCRMeta... part
  **/
-public abstract String createXML() throws MCRException;
+public abstract org.jdom.Element createXML() throws MCRException;
 
 /**
  * This abstract method create a typed content list for the data.
