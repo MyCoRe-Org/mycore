@@ -216,7 +216,7 @@ public class MCROAIDataProvider extends HttpServlet {
             } else {
                 //Check if a correct verb was given
                 if (verb[0].equalsIgnoreCase(STR_VERBS[0])) {
-                    // document = getRecord(request, header, ns);
+                    document = getRecord(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[1])) {
                     document = identify(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[2])) {
