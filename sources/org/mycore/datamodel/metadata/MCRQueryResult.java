@@ -122,7 +122,7 @@ private static String ERRORTEXT =
   "The stream for the MCRQueryResult constructor is false.";
 
 /**
- * This methode fills the internal MCRObjectId- and XML-vector
+ * This methode fills the internal MCRObjectID- and XML-vector
  * fron a XML input stream with following form:<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result&gt;<br>
@@ -131,6 +131,7 @@ private static String ERRORTEXT =
  * &lt;/mcr_result&gt;<br>
  * ...<br>
  * &lt;/mcr_results&gt;<br>
+ * The XML header line was extracted and put in each XML-vector element.
  *
  * @param xmlstream the input straem of the result collection
  * @exception MCRException if the stream has not the correct format.
@@ -170,8 +171,8 @@ public final void setFromXMLResultStream(String xmlstream)
     if (itagmcride == -1) { throw new MCRException(ERRORTEXT); }
     mcr_result.addElement(xmlstream.substring(itagmcrids+ltagmcrids,itagmcride)
       .trim());
-    mcr_xml.addElement(xmlstream.substring(itagxmls+ltagxmls,itagxmle)
-      .trim());
+    mcr_xml.addElement(MCRObject.XML_HEADER+NL+
+      xmlstream.substring(itagxmls+ltagxmls,itagxmle).trim());
     itagresulte = xmlstream.indexOf(TAG_RESULT_E,itagresults);
     if (itagresulte == -1) { throw new MCRException(ERRORTEXT); }
     itagresults = xmlstream.indexOf(TAG_RESULT_S,itagresulte+ltagresulte);
@@ -182,7 +183,7 @@ public final void setFromXMLResultStream(String xmlstream)
  * This methode return a XML stream of the result collection in form of<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result&gt;<br>
- * &lt;mcr_objectid&gt;MCRObjectId&lt;/mcr_objectid&gt;<br>
+ * &lt;mcr_objectid&gt;MCRObjectID&lt;/mcr_objectid&gt;<br>
  * &lt;mcr_xml&gt;XML&lt;/mcr_xml&gt;<br>
  * &lt;/mcr_result&gt;<br>
  * ...<br>
@@ -193,16 +194,22 @@ public final void setFromXMLResultStream(String xmlstream)
  **/
 public final String getXMLResultStream()
   {
-  if (mcr_result.size()==0) { 
-    throw new MCRException("The MCRQueryResult vector is empty."); }
   StringBuffer sb = new StringBuffer(204800);
+  sb.append(MCRObject.XML_HEADER).append(NL);
   sb.append(TAG_RESULTS_S).append(NL);
+  if (mcr_result.size()==0) { 
+    sb.append(TAG_RESULTS_E).append(NL);
+    return sb.toString(); }
+  String sub = null;
   for (int i=0;i<mcr_result.size();i++) {
     sb.append(TAG_RESULT_S).append(NL);
     sb.append(TAG_MCRID_S).append(mcr_result.elementAt(i)).append(TAG_MCRID_E)
       .append(NL);
-    sb.append(TAG_XML_S).append(mcr_xml.elementAt(i)).append(TAG_XML_E)
-      .append(NL);
+    sub = (String)mcr_xml.elementAt(i);
+    sb.append(TAG_XML_S).append(NL);
+    sb.append(sub.substring(MCRObject.XML_HEADER.length()+
+      NL.length(),sub.length()));
+    sb.append(TAG_XML_E).append(NL);
     sb.append(TAG_RESULT_E).append(NL);
     }
   sb.append(TAG_RESULTS_E).append(NL);
