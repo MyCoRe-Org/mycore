@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.11 $ $Date: 2003/01/28 14:02:25 $
+ * $Revision: 1.13 $ $Date: 2003/01/30 10:41:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Properties;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
@@ -68,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.11 $ $Date: 2003/01/28 14:02:25 $
+ * @version $Revision: 1.13 $ $Date: 2003/01/30 10:41:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -86,6 +87,8 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.oai.resumptiontoken.dir"; // temporary Directory
     private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT="MCR.oai.resumptiontoken.timeout"; // timeout, after which a resumption token will be deleted	
     private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; //maximum number of returned list sets
+    private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
+    private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
     
     // If there are other metadata formats available, all need a namespace and schema entry
     // of it's own, e.g. 
@@ -567,10 +570,10 @@ public class MCROAIDataProvider extends HttpServlet {
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
         String repositoryIdentifier = new String();
+	    MCRConfiguration config = MCRConfiguration.instance();
         
 		try {
-	        repositoryIdentifier = MCRConfiguration.instance()
-    	        .getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
 		} catch (MCRConfigurationException mcrx) {
 			logger.fatal("Missing configuration item: " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
 				+ " is missing.");
@@ -609,17 +612,16 @@ public class MCROAIDataProvider extends HttpServlet {
         dcMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, STR_DC_NAMESPACE));
         eListMetadataFormats.addContent(dcMetadataFormat);
         
-        Properties properties = MCRConfiguration.instance().
-            getProperties(STR_OAI_METADATA_NAMESPACE);
+        Properties properties = config.getProperties(STR_OAI_METADATA_NAMESPACE);
         Enumeration propertiesNames = properties.propertyNames();
         while (propertiesNames.hasMoreElements()) {
             String name = (String) propertiesNames.nextElement();
             String metadataPrefix = name.substring(name.lastIndexOf(".") + 1);
             Element eMetadataFormat = new Element("metadataFormat", ns);
             eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
-            eMetadataFormat.addContent(newElementWithContent("schema", ns, MCRConfiguration.instance()
+            eMetadataFormat.addContent(newElementWithContent("schema", ns, config
                 .getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
-            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, MCRConfiguration.instance()
+            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, config
                 .getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
             eListMetadataFormats.addContent(eMetadataFormat);
         }
@@ -674,7 +676,7 @@ public class MCROAIDataProvider extends HttpServlet {
             return document;
         }
         
-	    List sets;
+	    List sets = null;
 	    
 	    try {
         	String classificationIdentifier = config.getString(STR_OAI_SETSCHEME + "." + getServletName());
@@ -688,7 +690,20 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	return document;
 	    }
 	    
-	    //Hier erfolgt noch die Verarbeitung der Datensätze!
+	    if (sets != null) {
+	    	int maxreturns = 0;
+	    	ListIterator iterator = sets.listIterator();
+	    	
+			try {
+		        maxreturns = config.getString(STR_OAI_MAXRETURNS);
+			} catch (NumberFormatException nfx) {
+				//do nothing, just let maxreturns be 0
+			}
+	    	
+	    	while (iterator.hasNext()) {
+	    		String[] set = (String[3]) (iterator.next());
+	    	}
+	    }
         
         return document;
     }
