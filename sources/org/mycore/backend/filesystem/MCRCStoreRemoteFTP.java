@@ -105,9 +105,7 @@ public class MCRCStoreRemoteFTP extends MCRContentStore
         storageID.append( slots[ i ] ).append( "/" );
       }
       
-      String fileID = buildNextID();
-      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
-      
+      String fileID = buildNextID( file );
       connection.put( source, fileID );
       storageID.append( fileID );
       

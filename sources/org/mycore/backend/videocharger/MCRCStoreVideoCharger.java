@@ -93,8 +93,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore
   public String storeContent( MCRFileReader file, MCRContentInputStream source )
     throws MCRPersistenceException
   {
-    String storageID = buildNextID();
-    if( file.getExtension().length() > 0 ) storageID += "." + file.getExtension();
+    String storageID = buildNextID( file );
 
     FTPClient connection = connect();
     try

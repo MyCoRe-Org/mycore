@@ -102,9 +102,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
         }
       }
       
-      String fileID = buildNextID();
-      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
-      
+      String fileID = buildNextID( file );
       storageID.append( fileID );
       
       File local = new File( dir, fileID );
