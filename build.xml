@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.71 $ $Date: 2004-02-19 08:05:16 $                      -->
+  <!-- $Revision: 1.72 $ $Date: 2004-03-04 01:11:36 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -63,7 +63,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.71 $ $Date: 2004-02-19 08:05:16 $</echo>
+    <echo>Ant build file   : $Revision: 1.72 $ $Date: 2004-03-04 01:11:36 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -394,56 +394,6 @@
       </doclet>             
  
     </javadoc>
-  </target>
-
-  <!-- =================================================================== --> 
-  <!-- Create the PDF documentation from LaTeX sources                     --> 
-  <!-- =================================================================== --> 
-    
-  <target name="tex2pdf" depends="init"> 
-    <echo>Building the MyCoRe documentation as PDF from LaTeX sources... </echo> 
-
-    <property name="tmpdir" value="${basedir}/documentation/tmp" />
-
-    <delete dir="${tmpdir}" />
-    <mkdir  dir="${tmpdir}" />
-    <copy toDir="${tmpdir}"> <fileset dir="${basedir}/documentation/include" /> </copy>
-
-    <antcall target="pdflatex"> <param name="TeXFile" value="Overview" /></antcall>
-    <antcall target="pdflatex"> <param name="TeXFile" value="UserGuide" /></antcall>
-    <antcall target="pdflatex"> <param name="TeXFile" value="ProgGuide" /></antcall>
-    <antcall target="pdflatex"> <param name="TeXFile" value="HowToWriteTheManual" /></antcall>
-    <move toDir="${basedir}/documentation/pdf"><fileset dir="${tmpdir}" includes="*.pdf" /></move>
-    
-<delete dir="${tmpdir}" />   
-
-  </target> 
-
-  <target name="pdflatex">
-    <echo>Processing ${TeXFile} to PDF...</echo>
-
-    <copy toDir="${tmpdir}"> <fileset dir="${basedir}/documentation/${TeXFile}" /> </copy>
-
-    <echo>First run...</echo>
-    <exec dir="${tmpdir}" executable="pdflatex" output="${tmpdir}/output.log"> 
-      <arg line="--interaction nonstopmode ${TeXFile}" /> 
-    </exec>
-    <echo>Second run...</echo>
-    <exec dir="${tmpdir}" executable="pdflatex" output="${tmpdir}/output.log"> 
-      <arg line="--interaction nonstopmode ${TeXFile}" /> 
-    </exec>
-    <echo>Third run...</echo>
-    <exec dir="${tmpdir}" executable="pdflatex" output="${tmpdir}/output.log"> 
-      <arg line="--interaction nonstopmode ${TeXFile}" /> 
-    </exec>
-    <echo>Index, Glossary ...</echo>
-    <exec dir="${tmpdir}" executable="makeindex"> 
-      <arg line="'${TeXFile}.glo' -s nomencl.ist -o '${TeXFile}.gls'"/> 
-    </exec>
-    <echo>Fourth run...</echo>
-    <exec dir="${tmpdir}" executable="pdflatex"> 
-      <arg line="--interaction nonstopmode ${TeXFile}" /> 
-    </exec>
   </target>
 
   <!-- =================================================================== -->
