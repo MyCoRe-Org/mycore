@@ -1,0 +1,66 @@
+\chapter{Sourcecode Formatierungen}
+Das einfügen von Sourcecode kann entweder über die Umgebung verbatim erfolgen oder was sich speziell bei Programmiersprachen anbietet ist das Paket listings.
+
+\section{Die \textit{verbatim} Umgebung}
+
+\begin{verbatim}
+hier steht der Sourcecode und alle Zeichen werden
+nicht von Latex interpretiert und so wie sie darstehen
+auch dargestellt
+\end{verbatim}
+
+\section{Die \textit{lstlisting} Umgebung}
+Eine umfassende Dokumentation ist zu finden im listings.pdf, dass der Distribution bei liegt oder unter \url{http://www.ctan.org/tex-archive/macros/latex/contrib/listings/listings.pdf} heruntergeladen werden kann. Falls das Paket nicht in ihrer Distribution enthalten ist kann es einfach installiert werden. Siehe dazu \ref{sec:installation_pakete}
+Für die MyCoRe Dokumentation sind die folgenden Beispiele im Prinzip genügend.
+Danach können Sie Ihr Code-Listing wie folgt einbinden:
+
+\begin{verbatim}
+\lstset{language=XML,fancyvrb=true,frame=btlr}
+\lstset{breaklines,prebreak={\space\McrHookSign}}
+\begin{lstlisting}[caption={Eintrag_Listingsverz]XML Beispiel},%
+		label=lst:XmlBeispiel]{frame=single}
+<structure>
+ <parents class="MCRMetaLinkID">
+  <parent xlink:type="locator" xlink:href="...mcr_id..." />
+ </parents>
+...
+</structure>
+\end{lstlisting}
+\end{verbatim}
+
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\McrHookSign}}
+\begin{lstlisting}[caption={[Eintrag_Listingsverz]XML Beispiel},label=lst:XmlBeispiel]{frame=single}
+<structure>
+ <parents class="MCRMetaLinkID">
+  <parent xlink:type="locator" xlink:href="...mcr_id..." />
+ </parents>
+ <children class="MCRMetaLinkID">
+  <child xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+  ...
+ </children>
+ <derobjects class="MCRMetaLinkID">
+  <derobject xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+  ...
+ </derobjects>
+</structure>
+\end{lstlisting}
+
+Möchten Sie den Code aus einer externen Datei einfügen, so verfahren Sie wie folgt:
+
+\begin{verbatim}
+\lstset{language=Java, basicstyle=\small, commentstyle=\color{grey}}
+\lstset{linewidth=\textwidth, showstringspaces=false}
+\lstset{numbers=left, stepnumber=5, numbersep=10pt}
+\lstset{fancyvrb=true,frame=btlr,breaklines,prebreak={\space\McrHookSign}}
+\lstinputlisting[caption=Multi-Page Java Code,label=lst:java]{example.java}
+\end{verbatim}
+
+\lstset{language=Java, basicstyle=\small, commentstyle=\color{grey}}
+\lstset{linewidth=\textwidth, showstringspaces=false}
+\lstset{numbers=left, stepnumber=5, numbersep=10pt}
+\lstset{fancyvrb=true,frame=btlr,breaklines,prebreak={\space\McrHookSign}}
+\lstset{rulesepcolor=\color{black}}
+\lstinputlisting[caption=Multi-Page Java Code,label=lst:java]{example.java}
+
+
+

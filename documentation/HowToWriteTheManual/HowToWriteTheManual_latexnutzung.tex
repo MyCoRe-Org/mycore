@@ -16,6 +16,22 @@ Das Kommando {\tt dvips {\it filename.dvi}} generiert aus dem {\bf .dvi} - File 
 Um mit einem Rutsch direkt PDF-Dokumente zu erzeugen genügt das Kommando {\tt pdflatex {\it filename.tex}}.\\[2ex] 
 Zusätzlich haben wir ein Shell Script {\tt convert\_jpeg.sh } unter {\it \$MYCORE\_HOME/bin } gestellt, welches auf Basis von {\bf ImageMagick} von allen jpeg-Files Bounding Boxes zur Verarbeitung unter \LaTeX erzeugt.
 
+\subsubsection{Installieren fehlender Pkete}
+\label{sec:installation_pakete}
+Die Installation wirde hier am Beispiel des listing Pakets verdeutlicht, ist aber prinzipiell auch auf andere Pakete anwendbar, ggf aber immer die README Datei des Pakets lesen. Wer genaueres wissen möchte findet Information dazu unter \url{http://www.dante.de/faq/de-tex-faq/html/makros1.html#7}.
+
+\begin{enumerate}
+\item Alle Dateien aus \mcrfile{listings.tar.gz} in \mcrpath{temp} Verzeichnis
+downloaden und entpacken
+\item Führe \mcrcommand{latex listings.ins} im erstellten
+Verzeichnis aus.
+\item Erstelle das Verzeichnis listings unter
+\mcrpath{/usr/local/share/texmf/tex/latex/} und verschiebe alle \mcrfile{sty} und \mcrfile{cfg}
+Dateien vom temp ins Verzeichnis \mcrpath{/usr/local/share/texmf/tex/latex/}
+\item \mcrcommand{texhash} als root ausführen
+
+\end{enumerate}
+
 \subsection{Die Installation unter Windows}
 Prinzipiell läßt sich jede (aktuelle) Distribution verwenden. Sehr gute Erfahrungen habe ich mit Miktex (\url{http://www.miktex.org/index.html}) gemacht, da diese eine umfassende Paketsammlung enthält, die Pakete leicht übers Netz aktualisieren lassen und die Installation sehr einfach ist. \LaTeX Texte können in jedem beliebigen Texteditor verfasst werden, einige Editoren bieten jedoch hilfreiche Funktionen für die Erstellung von \LaTeX -- Dokumenten. (X)emacs wird doch den meisten Windows nutzern fremd sein und daher empfehle ich folgende Editoren WinEdt\footnote{leider nur share-- und keine freeware} (\url{http://www.winedt.com}\footnote{Extensions zu winedt sind zu finden unter \url{www.winedt.org}}) oder texniccenter (\url{http://www.toolscenter.de})
 eine weitere Liste ist unter \url{http://www.dante.de/faq/de-tex-faq/html/woher.html#25} einsehbar. Wer sich für Winedt entscheidet findet unter \url{http://www.dante.de/help/documentation/miktex} eine gute Installationsanleitung für seine komplette \LaTeX Umgebung. Mit entsprechenden Änderungen kann diese Vorlage natürlich auch für andere Distributionen verwendet werden. 
