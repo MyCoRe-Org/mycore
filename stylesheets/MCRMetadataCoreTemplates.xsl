@@ -137,6 +137,28 @@
   fixed="MCRMetaIFS"/>
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaNumber -->
+
+<xsl:template match="mcrmetanumber">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:simpleContent>
+       <xsd:extension base="xsd:string">
+         <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+         <xsd:attribute ref="xml:lang" />
+         <xsd:attribute name="dimension" use="optional" type="xsd:string" />
+         <xsd:attribute name="measurement" use="optional" type="xsd:string" />
+       </xsd:extension>
+     </xsd:simpleContent>
+   </xsd:complexType>
+  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaNumber" />
+</xsl:template>
+
 <!-- Template for the metadata MCRMetaPerson -->
 
 <xsl:template match="mcrmetaperson">
