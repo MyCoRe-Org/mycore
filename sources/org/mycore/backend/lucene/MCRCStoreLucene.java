@@ -64,7 +64,7 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.services.plugins.TextFilterPluginManager;
-import org.mycore.services.query.IndexableStore;
+import org.mycore.services.query.MCRTextSearchInterface;
 
 /**
  * This class provides a content store based on lucene and the local filesystem.
@@ -73,11 +73,12 @@ import org.mycore.services.query.IndexableStore;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements IndexableStore {
+public class MCRCStoreLucene
+	extends MCRCStoreLocalFilesystem
+	implements MCRTextSearchInterface {
 	private static final TextFilterPluginManager pMan =
 		TextFilterPluginManager.getInstance();
-	private static final Logger logger =
-		Logger.getLogger(MCRCStoreLucene.class);
+	private static final Logger logger = Logger.getLogger(MCRCStoreLucene.class);
 	private static final MCRConfiguration conf = MCRConfiguration.instance();
 	private static File indexDir = null;
 	private static IndexWriter indexWriter = null;
@@ -86,10 +87,10 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 
 	private static IndexReader indexReader;
 	private static Searcher indexSearcher;
-	
-	private static final String STORAGE_FIELD="StorageID";
-	private static final String DERIVATE_FIELD="DerivateID";
-	
+
+	private static final String STORAGE_FIELD = "StorageID";
+	private static final String DERIVATE_FIELD = "DerivateID";
+
 	/* (non-Javadoc)
 	 * @see org.mycore.datamodel.ifs.MCRContentStore#doDeleteContent(java.lang.String)
 	 */
@@ -121,9 +122,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 		String returns = super.doStoreContent(file, source);
 		if (returns == null || returns.length() == 0)
 			throw new MCRPersistenceException(
-				"Failed to store file "
-					+ file.getID()
-					+ " to local file system!");
+				"Failed to store file " + file.getID() + " to local file system!");
 		doc = getDocument(file, isc.getNewInputStream());
 		Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
 		doc.add(storageID);
@@ -263,6 +262,9 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 		String[] returns = null;
 		//maybe transform query here
 		String queryText = parseQuery(docTextQuery);
+		logger.debug("TS transformed query:" + queryText);
+		if (queryText.length() == 0)
+			return new String[0];
 		try {
 			HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD);
 			Iterator it = derivateIDs.iterator();
@@ -275,10 +277,10 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 				hits = getHitsForDerivate((String) it.next(), queryText);
 				//we have an array of hits each should contain only
 				//documents belonging to a single derivateID
-				boolean ok=true;
-				for (int j=0;j<hits.length;j++)
-					if(hits[j]==null || hits[j].length()==0)
-						ok=false;
+				boolean ok = true;
+				for (int j = 0; j < hits.length; j++)
+					if (hits[j] == null || hits[j].length() == 0)
+						ok = false;
 				if (ok) {
 					doc = hits[0].doc(0);
 					derivateID = doc.get(DERIVATE_FIELD);
@@ -287,13 +289,12 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 						collector.add(derivateID);
 					} else {
 						logger.warn(
-							"Found Document containes no Field \"DerivateID\":"
-								+ doc);
+							"Found Document containes no Field \"DerivateID\":" + doc);
 					}
 				}
-//				else{
-//					logger.error("At least one hit returned was empty!");
-//				}
+				//				else{
+				//					logger.error("At least one hit returned was empty!");
+				//				}
 			}
 			returns = MCRUtils.getStringArray(collector.toArray());
 		} catch (IOException e) {
@@ -354,25 +355,31 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 		Hits[] hits = null;
 		Analyzer analyzer = getAnalyzer();
 
-		logger.debug("Query: "+derivateID+"-->"+queryText);
-		LuceneCStoreQueryParser parser = new LuceneCStoreQueryParser("content", analyzer);
+		logger.debug("Query: " + derivateID + "-->" + queryText);
+		LuceneCStoreQueryParser parser =
+			new LuceneCStoreQueryParser("content", analyzer);
 		parser.setGroupingValue(derivateID);
 		//combine to a query over a specific DerivateID
-//		StringBuffer queryStr =
-//			new StringBuffer("DerivateID:\"").append(derivateID).append(
-//				"\" AND ").append(
-//				queryText);
+		//		StringBuffer queryStr =
+		//			new StringBuffer("DerivateID:\"").append(derivateID).append(
+		//				"\" AND ").append(
+		//				queryText);
 		try {
 			BooleanQuery[] queries = parser.getBooleanQueries(queryText);
-			hits=new Hits[queries.length];
-			for (int i=0;i<queries.length;i++){
+			hits = new Hits[queries.length];
+			for (int i = 0; i < queries.length; i++) {
 				logger.debug("  -Searching for: " + queries[i].toString("content"));
 				hits[i] = indexSearcher.search(queries[i]);
-				if(containsExclusiveClause(queries[i])){
+				if (containsExclusiveClause(queries[i])) {
 					//check that all documents meets negative clause
-					Hits test=indexSearcher.search(QueryParser.parse(derivateID,DERIVATE_FIELD,new WhitespaceAnalyzer()));
-					if (test.length()!=hits[i].length())
-						hits[i]=null;
+					Hits test =
+						indexSearcher.search(
+							QueryParser.parse(
+								derivateID,
+								DERIVATE_FIELD,
+								new WhitespaceAnalyzer()));
+					if (test.length() != hits[i].length())
+						hits[i] = null;
 				}
 				//logger.debug(hits[i].length() + " total matching documents");
 			}
@@ -395,20 +402,26 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements Indexab
 		}
 		return hits;
 	}
-	
-	private final boolean containsExclusiveClause(BooleanQuery query){
-		BooleanClause[] clauses=query.getClauses();
-		if (clauses.length==1){
-			clauses=((BooleanQuery)clauses[0].query).getClauses();
-			if (clauses.length==2)
+
+	private final boolean containsExclusiveClause(BooleanQuery query) {
+		BooleanClause[] clauses = query.getClauses();
+		if (clauses.length == 1) {
+			clauses = ((BooleanQuery) clauses[0].query).getClauses();
+			if (clauses.length == 2)
 				return clauses[1].prohibited;
 		}
 		return false;
 	}
-	
-	
-	protected static String parseQuery(String query){
-		return query;
+
+	protected static String parseQuery(String query) {
+		logger.debug("TS incoming query: " + query);
+		int i = query.indexOf("\"");
+		if (i == -1)
+			return "";
+		int j = query.indexOf("\"", i + 1);
+		if (j == -1)
+			return "";
+		return query.substring(i, j);
 	}
 
 	protected void finalize() throws Throwable {
