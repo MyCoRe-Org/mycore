@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5 $ $Date: 2004-03-11 14:57:20 $ -->
+<!-- $Revision: 1.6 $ $Date: 2004-03-11 15:20:54 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -60,9 +60,7 @@
 
       <!-- ======== read input xml from source url ======== -->
       <xsl:for-each select="$imported.editor">
-        <xsl:call-template name="editor.read.source">
-          <xsl:with-param name="base" select="/*" />
-        </xsl:call-template>
+        <xsl:call-template name="editor.read.source" />
       </xsl:for-each>
 
       <!-- ======== copy editor definition ======== -->
@@ -167,16 +165,14 @@
 
 <!-- ======== read source xml and transform to name=value pairs ======== -->
 <xsl:template name="editor.read.source">
-  <xsl:param name="base" />
 
   <!-- ======== build url where to get the xml source from ======== -->
-  <xsl:variable name="url">
+  <xsl:variable name="url.relative">
     <xsl:choose>
       <xsl:when test="string-length($editor.source.url) &gt; 0">
         <xsl:value-of select="$editor.source.url"/>
       </xsl:when>
       <xsl:when test="source/@url">
-        <xsl:value-of select="$WebApplicationBaseURL" />
         <xsl:choose>
           <xsl:when test="contains(source/@url,source/@token)">
             <xsl:value-of select="substring-before(source/@url,source/@token)" />
@@ -191,9 +187,21 @@
     </xsl:choose>
   </xsl:variable>
 
+  <!-- ======== If necessary, make relative url absolute ======== -->
+  <xsl:variable name="url">
+    <xsl:choose>
+      <xsl:when test="starts-with($url.relative,'http://') or starts-with($url.relative,'https://')">
+        <xsl:value-of select="$url.relative" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat($WebApplicationBaseURL,$url.relative)" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <!-- ======== if not empty new document, transform source to name=value ======== -->
-  <xsl:if test="$editor.source.new != 'true'">
-    <xsl:apply-templates select="document($url,$base)/*" mode="editor.source.to.list" />
+  <xsl:if test="($editor.source.new != 'true') and ($url != $WebApplicationBaseURL)">
+    <xsl:apply-templates select="document($url)/*" mode="editor.source.to.list" />
   </xsl:if>
 </xsl:template>
 
