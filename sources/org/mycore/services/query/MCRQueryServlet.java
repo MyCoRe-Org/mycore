@@ -77,6 +77,8 @@ public class MCRQueryServlet extends MCRServlet {
 	private String sortKey;
 
 	private boolean inOrder = true;
+	
+	private boolean saveResults;
 
 	private static Logger LOGGER = Logger.getLogger(MCRQueryServlet.class);
 
@@ -279,10 +281,14 @@ public class MCRQueryServlet extends MCRServlet {
 			// cut results if more than "maxresults"
 			else if (maxresults > 0)
 				resarray.cutDownTo(maxresults);
-			StringTokenizer st = new StringTokenizer(CONFIG.getString(MCR_SORTER_CONFIG_PREFIX+".types"),",");
 			HashSet sortTypes=new HashSet();
-			while (st.hasMoreTokens()){
-			    sortTypes.add(st.nextToken().trim());
+			//initialSort is set to true by the SearchMaskServlet
+			if (mode.equals("ResultList") && saveResults){
+			    //Only in mode ResultList sorting makes sense
+			    StringTokenizer st = new StringTokenizer(CONFIG.getString(MCR_SORTER_CONFIG_PREFIX+".types"),",");
+			    while (st.hasMoreTokens()){
+			        sortTypes.add(st.nextToken().trim());
+			    }
 			}
 			if (customSort) {
 				// when I'm in here a ResultList exists and I have to resort it.
@@ -306,7 +312,7 @@ public class MCRQueryServlet extends MCRServlet {
 			    jdom = resarray.exportAllToDocument();
 			}
 		}
-		if (mode.equals("ResultList")) {
+		if (mode.equals("ResultList") && saveResults) {
 			jdom.getRootElement().setAttribute("offset", "" + offset)
 					.setAttribute("size", "" + size);
 			session.setAttribute("CachedList", jdom);
@@ -497,6 +503,11 @@ public class MCRQueryServlet extends MCRServlet {
 		type = getProperty(request, "type");
 		layout = getProperty(request, "layout");
 		lang = getProperty(request, "lang");
+		String saveResults_str = getProperty(request, "saveResults");
+		if (saveResults_str!=null && saveResults_str.equals("true"))
+		    saveResults=true;
+		else
+		    saveResults=false;
 
 		//multiple host are allowed
 		hosts = request.getParameterValues("hosts");
@@ -543,6 +554,8 @@ public class MCRQueryServlet extends MCRServlet {
 			else
 				inOrder = true;
 			customSort = true;
+			//if customSort enabled we must saveResults too
+			saveResults = true;
 		} else
 			customSort = false;
 

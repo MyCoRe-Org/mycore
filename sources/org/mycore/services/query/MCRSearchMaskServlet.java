@@ -45,7 +45,7 @@ public class MCRSearchMaskServlet extends MCRServlet
 {
 
 // logger
-protected static Logger logger=Logger.getLogger(MCRSearchMaskServlet.class.getName());
+protected static Logger LOGGER=Logger.getLogger(MCRSearchMaskServlet.class.getName());
 
 // The default mode for this class
 String mode = "CreateSearchMask";
@@ -180,7 +180,7 @@ org.jdom.Document jdom = null;
     String tempquery = (element.getAttributeValue("query")).replace('\'','\"');
     int tempfields = 1;
     try {
-      tempfields = (new Integer((String)element.getAttributeValue("fields")))
+      tempfields = (new Integer(element.getAttributeValue("fields")))
         .intValue();
       }
     catch (NumberFormatException e) {
@@ -198,7 +198,7 @@ org.jdom.Document jdom = null;
     // check to all attributes for a line are filled
     int k = 0;
     for (int j=0;j<param.size();j++) {
-      logger.debug(name+"   "+param.get(j)+"   "+varia.get(j));
+      LOGGER.debug(name+"   "+param.get(j)+"   "+varia.get(j));
       if (param.get(j) == null) { k=1; break; }
       if (((String)param.get(j)).trim().length() ==0 ) { k=1; break; }
       }
@@ -233,6 +233,7 @@ org.jdom.Document jdom = null;
     }
 
   // start Query servlet
+  	request.setAttribute( "saveResults", "true" );
     request.removeAttribute( "mode" );
     request.setAttribute( "mode", "ResultList" );
     request.removeAttribute( "type" );
