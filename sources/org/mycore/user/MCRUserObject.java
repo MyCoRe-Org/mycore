@@ -85,7 +85,7 @@ abstract class MCRUserObject
    * The constructor for an empty object. Only the logger was set.
    **/
   public MCRUserObject()
-    {
+  {
     ID = "";
     creator = "";
     setCreationDate();
@@ -94,13 +94,13 @@ abstract class MCRUserObject
     groupIDs = new ArrayList();
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
-    }
+  }
 
   /**
    * The method set the creationDate at call time.
    **/
   public final void setCreationDate()
-    { 
+    {
     creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
     }
 
@@ -108,7 +108,7 @@ abstract class MCRUserObject
    * The method set the modifiedDate at call time.
    **/
   public final void setModifiedDate()
-    { 
+    {
     modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
     }
 
@@ -119,13 +119,6 @@ abstract class MCRUserObject
    **/
   public final void setCreator(String creator)
     { this.creator = trim(creator); }
-
-  /**
-   * @return
-   *   This method returns the ID (user ID or group ID) of the user object.
-   */
-  public final String getID()
-  { return ID; }
 
   /**
    * @return
@@ -163,79 +156,86 @@ abstract class MCRUserObject
   public final ArrayList getGroupIDs()
   { return groupIDs; }
 
-/**
- * This method adds a group to the groups list of the group. This is the list of
- * group IDs where this group is a member of, not the list of groups this group
- * has as members!
- *
- * @param groupID   ID of the group added to the group
- */
-public void addGroupID(String groupID) throws MCRException
+  /**
+   * This method adds a group to the groups list of the group. This is the list of
+   * group IDs where this group is a member of, not the list of groups this group
+   * has as members!
+   *
+   * @param groupID   ID of the group added to the group
+   */
+  public void addGroupID(String groupID) throws MCRException
   { if (!groupIDs.contains(groupID)) { groupIDs.add(groupID); } }
 
-/**
- * This method clean the administrative groups ArrayList.
- */
-protected final void cleanGroupID()
+  /**
+   * This method clean the administrative groups ArrayList.
+   */
+  protected final void cleanGroupID()
   { groupIDs.clear(); }
 
-/**
- * This method removes a group from the groups list of the group. These are the
- * groups where the group itself is a member of.
- *
- * @param groupID   ID of the group removed from the group
- */
-public void removeGroupID(String groupID) throws MCRException
+  /**
+   * This method removes a group from the groups list of the group. These are the
+   * groups where the group itself is a member of.
+   *
+   * @param groupID   ID of the group removed from the group
+   */
+  public void removeGroupID(String groupID) throws MCRException
   { if (groupIDs.contains(groupID))  { groupIDs.remove(groupID); } }
 
-/**
- * This method must be implemented by a subclass and then returns the user or group
- * object as a JDOM document.
- */
-abstract public org.jdom.Document toJDOMDocument() throws MCRException;
+  /**
+   * This method must be implemented by a subclass and then returns the user or group
+   * object as a JDOM document.
+   */
+  abstract public org.jdom.Document toJDOMDocument() throws MCRException;
 
-/**
- * This method must be implemented by a subclass and then returns the user or group
- * object as a JDOM element.
- */
-abstract public org.jdom.Element toJDOMElement() throws MCRException;
+  /**
+   * This method must be implemented by a subclass and then returns the user or group
+   * object as a JDOM element.
+   */
+  abstract public org.jdom.Element toJDOMElement() throws MCRException;
 
-/**
- * This helper method replaces null with an empty string and trims whitespace from
- * non-null strings.
- */
-protected final static String trim(String s)
+  /**
+   * This helper method replaces null with an empty string and trims whitespace from
+   * non-null strings.
+   */
+  protected final static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
 
-/**
- * This helper method replaces null with an empty string and trims whitespace
- * from non-null strings.
- **/
-protected final static String trim(String s, int len)
+  /**
+   * This helper method replaces null with an empty string and trims whitespace
+   * from non-null strings.
+   **/
+  protected final static String trim(String s, int len)
   {
-  String sn = (s != null) ? s.trim() : "";
-  if (sn.length()>len) {
-    logger.warn("The string \'"+sn+"\' is too long (max. "+Integer.toString(len)+").");
-    return sn.substring(0,len);
+    String sn = (s != null) ? s.trim() : "";
+    if (sn.length()>len) {
+      logger.warn("The string \'"+sn+"\' is too long (max. "+Integer.toString(len)+").");
+      return sn.substring(0,len);
     }
-  else {
-    return sn; }
+    else {
+      return sn; }
   }
 
-/**
- * This method put debug data to the logger (for the debug mode).
- **/
-public final void debugDefault()
+  /**
+   * This method sends debug data to the logger (for the debug mode).
+   **/
+  public final void debugDefault()
   {
-  logger.debug("ID                 = "+ID);
-  logger.debug("creator            = "+creator);
-  logger.debug("creationDate       = "+String.valueOf(creationDate));
-  logger.debug("modifiedDate       = "+String.valueOf(modifiedDate));
-  logger.debug("description        = "+description);
-  logger.debug("groupIDs #         = "+groupIDs.size());
-  for (int i = 0; i<groupIDs.size(); i++) {
-    logger.debug("groupIDs           = "+((String)groupIDs.get(i))); }
+    logger.debug("ID                 = "+ID);
+    logger.debug("creator            = "+creator);
+    logger.debug("creationDate       = "+String.valueOf(creationDate));
+    logger.debug("modifiedDate       = "+String.valueOf(modifiedDate));
+    logger.debug("description        = "+description);
+    logger.debug("groupIDs #         = "+groupIDs.size());
+    for (int i = 0; i<groupIDs.size(); i++) {
+      logger.debug("groupIDs           = "+((String)groupIDs.get(i))); }
   }
+
+  /**
+   * This method is only used for providing error messages in the
+   * access control component and should be removed later.
+   */
+  public String toString()
+  { return ID; }
 
 }
 
