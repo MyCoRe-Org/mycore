@@ -95,7 +95,7 @@ public final MCRXMLContainer getResultList(String query, String type,
   String itemtypename = conf.getString(sb); 
   String itemtypeprefix = conf.getString(sb+"_prefix");
   // prepare query
-  logger.debug("Incomming query "+query);
+  logger.debug("Incomming query = "+query);
   int startpos = 0;
   int stoppos = query.length();
   int operpos = -1;
@@ -104,6 +104,7 @@ public final MCRXMLContainer getResultList(String query, String type,
   StringBuffer cond = new StringBuffer("/mycoreobject[");
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,query);
+    logger.debug("Next cond = "+onecond);
     startpos += onecond.length();
     int klammerauf = onecond.indexOf('[');
     int klammerzu = onecond.indexOf(']');

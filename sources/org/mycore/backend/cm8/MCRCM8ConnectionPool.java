@@ -57,7 +57,7 @@ class MCRCM8ConnectionPool
   /** The maximum number of connections that will be built */
   protected int maxNumConnections;
 
-  /** The symbolic name of the CM 7.1 library server */
+  /** The symbolic name of the CM 8.1 library server */
   protected String serverName;
 
   /** The user ID to be used for connecting to the library server */
