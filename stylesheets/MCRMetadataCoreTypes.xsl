@@ -17,6 +17,12 @@
  </xsd:restriction>
 </xsd:simpleType>
 
+<xsd:simpleType name="mcrdefaultform">
+ <xsd:restriction base="xsd:string">
+  <xsd:maxLength value="256"/>
+ </xsd:restriction>
+</xsd:simpleType>
+
 <xsd:simpleType name="mcrobjectid">
  <xsd:restriction base="xsd:string">
   <xsd:maxLength value="64"/>
