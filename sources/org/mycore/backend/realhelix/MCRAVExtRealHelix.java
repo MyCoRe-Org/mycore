@@ -32,24 +32,24 @@ import java.net.*;
 import java.text.*;
 
 /**
- * This class implements the AudioVideoExtender functions for Real Server 8
- * instances. It reads technical metadata about stored assets by parsing
- * the Real Server's "View Source" responses and gets a player starter file
- * using the "/ramgen/"  mount point. The parameters can be configured 
- * in mycore.properties:
+ * This class implements the AudioVideoExtender functions for Real Server 8 and
+ * Helix Universal Streaming Server 9 instances. It reads technical metadata about 
+ * stored assets by parsing the Real Server's "View Source" responses and gets a 
+ * player starter file using the "/ramgen/"  mount point. The parameters can be 
+ * configured in mycore.properties:
  *
  * <code>
-     MCR.IFS.AVExtender.<StoreID>.RamGenBaseURL      URL of ramgen mount point
-     MCR.IFS.AVExtender.<StoreID>.ViewSourceBaseURL  URL of view source function
-     MCR.IFS.AVExtender.<StoreID>.PlayerURL          Download URL for RealPlayer
+ *   MCR.IFS.AVExtender.<StoreID>.RamGenBaseURL      URL of ramgen mount point
+ *   MCR.IFS.AVExtender.<StoreID>.ViewSourceBaseURL  URL of view source function
+ *   MCR.IFS.AVExtender.<StoreID>.PlayerURL          Download URL for RealOne Player
  * </code>
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */ 
-public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
+public class MCRAVExtRealHelix extends MCRAudioVideoExtender
 { 
-  public MCRAVExtRealServer8()
+  public MCRAVExtRealHelix()
   {}
 
   public void init( MCRFileReader file )
@@ -120,7 +120,7 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
     }
     catch( Exception exc )
     { 
-      String msg = "Error parsing metadata from RealServer ViewSource: " + file.getStorageID();  
+      String msg = "Error parsing metadata from Real Server ViewSource: " + file.getStorageID();  
       throw new MCRPersistenceException( msg, exc );
     }
   }
@@ -139,7 +139,7 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
     }
     catch( IOException exc )
     {
-      String msg = "Could not send RealPlayer starter .ram file";
+      String msg = "Could not send Real Player starter .ram file";
       throw new MCRPersistenceException( msg, exc ); 
     }
   }
