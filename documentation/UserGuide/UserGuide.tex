@@ -9,6 +9,9 @@
 
 \usepackage{mycore}
 
+\makeindex
+\makeglossary
+
 \begin{document}
 %-------   Vorspann
 \title{MyCoRe User Guide}
@@ -98,5 +101,10 @@ In diesem Dokument sind alle Arbeiten zum Start der Beispielanwendung und zur Ge
 % Hints \& Tips / Troubleshooting
 \input{UserGuide_5Hints.tex}
 % Glossar
-%\input{Glossar.tex}
+\input{Glossar.tex}
+
+\printglossary[2cm]
+\printindex
+
+
 \end{document}

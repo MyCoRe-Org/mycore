@@ -1,3 +1,10 @@
-%\nomenclature[Option]{$Variable$}{Definition}
+\chapter{Einträge ins Glossar}
+Die Glossareinträge können entweder direkt im Text oder in der Datei \mcrfile{glossary.tex} vorgenommen werden. \verb+\refpage+ verweist auf die Seite auf der der Eintrag steht.
 
-\nomenclature{$MyCoRe$}{My Content Repository}
+\begin{verbatim}
+\nomenclature[Option]{$Variable$}{Definition \refpage}
+\end{verbatim}
+
+\nomenclature{$MyCoRe$}{My Content Repository\refpage}
+
+
