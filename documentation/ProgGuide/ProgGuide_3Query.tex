@@ -3,16 +3,46 @@
 \section{Das Query-Modell von MyCoRe}
 %
 %
-MyCoRe bemüht sich, das Synatx-Modell der Suchabfragen an die existierenden Standards des W3C für {\bf XML Path Language (XPath) Version 1.0} (W3C Recommendation 16 November 1999) und {\bf XQuery 1.0: An XML Query Language} (W3C Working Draft 22 August 2003) anzugleichen. Dabei muss aber auch Rücksicht auf die Spezifik des MyCoRe-Systems zur Suche von Objekten und Metadaten genommen werden. Daher ist MyCoRe nicht  100\% XPath/XQuery konform, es wird sich jedoch bemüht, wo irgend möglich die Spezifikationen einzuhalten. Grund für diese Abweichungen sind die Praxisorientierung des MyCoRe-Systems, vor allem im Bereich digitaler Bibliotheken. So sollen verschiedene Persistence-Systeme zum Einsatz kommen, welche sehr unterschiedliche Abfrage-Syntax, auch außerhalb der XML-Welt, implementieren. Daher stellen der in diesem Abschnitt beschriebene Abfrage-Syntax nur einen recht keinen Teil der Möglichkeiten der W3C Spezifikationen dar. Er genügt aber in der Praxis, um recht komplexe Projekte zu realisieren.\\[2ex]
-MyCoRe muss neben der eigentlichen Query noch erfahren, welche Datenmodell-Typen abzufragen sind. Auch dafür ist die Ursache in der Persistence-Unabhängigkeit von MyCoRe zu suchen. Es ist notwendig, die Typen auf die entsprechenden Stores zu mappen, damit die Suche erfolgreich ist. Als Beispiel soll hier der Content Manager 8 ItemType oder die Umsetzung unter eXist stehen. Möglich ist sowohl einzelne Typen, wie auch eine Liste davon anzugeben. Die Liste ist ein String mit folgendem Syntax:
+MyCoRe bemüht sich, das Synatx-Modell der Suchabfragen an die existierenden 
+Standards des W3C für {\bf XML Path Language (XPath) Version 1.0} (W3C Recommendation 16 November 1999) anzugleichen, da die die derzeit häufigste Abfragesynatx
+im XML-Bereich ist. Dabei muss aber auch Rücksicht auf die Spezifik des 
+MyCoRe-Systems zur Suche von Objekten und Metadaten genommen werden. Daher ist 
+MyCoRe nicht  100\% XPath/XQuery konform, es wird sich jedoch bemüht, wo irgend
+möglich die Spezifikationen einzuhalten. Grund für diese Abweichungen sind die 
+Praxisorientierung des MyCoRe-Systems, vor allem im Bereich digitaler 
+Bibliotheken. So sollen verschiedene Persistence-Systeme zum Einsatz kommen, 
+welche sehr unterschiedliche Abfrage-Syntax, auch außerhalb der XML-Welt, 
+implementieren. Daher stellen der in diesem Abschnitt beschriebene Syntax nur 
+einen recht keinen Teil der Möglichkeiten der W3C Spezifikationen dar. Er 
+genügt aber in der Praxis, um recht komplexe Projekte zu realisieren. Eine 
+Annäherung an XPath 2.0 und XQuery 1.0 wird erst erfolgen, wenn die 
+Standardisierungsphase im wesentlichen abgeschlossen ist.
+
+MyCoRe muss neben der eigentlichen Query noch erfahren, welche Datenmodell-Typen
+abzufragen sind. Auch dafür ist die Ursache in der Persistence-Unabhängigkeit 
+von MyCoRe zu suchen. Es ist notwendig, die Typen auf die entsprechenden Stores 
+zu mappen, damit die Suche erfolgreich ist. Als Beispiel soll hier der Content 
+Manager 8 ItemType oder die Umsetzung unter eXist stehen. Möglich ist sowohl 
+einzelne Typen, wie auch eine Liste davon anzugeben. Die Liste ist ein String 
+mit folgendem Syntax:
 \begin{verbatim}
 String type_list = "type1[,...]"
 \end{verbatim}
-Wichtig ist nur, dass die Elemente, nach denen gefragt wird, in allen Datenmodellen der Typen vorkommen (sonst könnte das Ergebnis der Suche falsch sein). Normalerweise wird die Typ-Liste in der Applikation festgelegt und an die entsprechenden Query-Schnittstellen im API übergeben, z. B. durch das SearchMaskServlet.\\[2ex]
-%
+
+Wichtig ist nur, dass die Elemente, nach denen gefragt wird, in allen 
+Datenmodellen der Typen vorkommen (sonst könnte das Ergebnis der Suche eine 
+leere Resultatsliste sein). Normalerweise wird die Typ-Liste in der Applikation 
+festgelegt und an die entsprechenden Query-Schnittstellen im API übergeben, 
+z. B. durch das SearchMaskServlet.
+
 \subsection{Operatoren}
-MyCoRe verwendet nur die folgenden Operatoren innerhalb eines Test. Dies begründet sich mit der Kompatibilität und Umsetzung gegenüber den einzelnen Persitence-Layern. Wenn weitere Operatoren benötigt werden, so müssen diese in ALLEN Persitence-Implementierungen eingebaut werden. \\[2ex]
-Die einzelnen {\cc Test} können wiederum mit {\cc AND} bzw. {\cc OR} verknüpft werden. Funktionen für Test werden unter MyCoRe NICHT unterstützt. 
+
+MyCoRe verwendet nur die folgenden Operatoren innerhalb eines Test. Dies 
+begründet sich mit der Kompatibilität und Umsetzung gegenüber den einzelnen 
+Persitence-Layern. Wenn weitere Operatoren benötigt werden, so müssen diese in 
+ALLEN Persitence-Implementierungen eingebaut werden.
+
+Die einzelnen {\cc Tests} können wiederum mit {\cc AND} bzw. {\cc OR} verknüpft werden. Funktionen für Test werden unter MyCoRe NICHT unterstützt. 
 \begin{verbatim}
 SingleQuery :: OutPath [ Tests ]
                Tests
@@ -22,17 +52,27 @@ Test        :: InPath Operator Value
 \begin{itemize}
 \item Operator = - ist für alle Values zulässig
 \item Operator != - ist für alle Values zulässig
-\item Operator < - ist nur für Datums- und Zahlenangaben zulässig
-\item Operator <= - ist nur für Datums- und Zahlenangaben zulässig
-\item Operator > - ist nur für Datums- und Zahlenangaben zulässig
-\item Operator >= - ist nur für Datums- und Zahlenangaben zulässig
+\item Operator $<$ - ist nur für Datums- und Zahlenangaben zulässig
+\item Operator $<=$ - ist nur für Datums- und Zahlenangaben zulässig
+\item Operator $>$ - ist nur für Datums- und Zahlenangaben zulässig
+\item Operator $>=$ - ist nur für Datums- und Zahlenangaben zulässig
 \item Operator like - versucht im Value den angegebenen String zu finden, als Wildcard ist * zulässig
 \item Operator contains - arbeitet wie like, ist eine TextSearch-Engine verfügbar, so erfolgt die linguistische Suche darin.
 \end{itemize}
-Die Operatoren {\bf like} und {\bf contains} sind eine Ergänzung von MyCoRe um mit Textsuch-Mechanismen arbeiten zu können. Sie sind so nicht Bestandteil der W3C Spezifikationen, habe sich aber in der Praxis bewehrt.\\[2ex]
-%
+Die Operatoren {\bf like} und {\bf contains} sind eine Ergänzung von MyCoRe um 
+mit Textsuch-Mechanismen arbeiten zu können. Sie sind in der von MyCoRe 
+benötigten Synatx-Form so nicht Bestandteil der W3C Spezifikationen, habe sich 
+aber in der Praxis bewehrt.
+
 \subsection{Pfadangaben}
-Die Pfadangaben für eine SingleQuery können einfach oder einmal geschachtelt sein, je nach dem, wie die einzelnen Text- bzw. Attributknoten des XML-Datenmodells logisch zusammengehören. Alle hier aufgeführten Möglichkeiten sind relativ zu XML-Dokument-Wurzel.\\
+
+Die Pfadangaben für eine SingleQuery können einfach oder einmal geschachtelt 
+sein, je nach dem, wie die einzelnen Text- bzw. Attributknoten des 
+XML-Datenmodells logisch zusammengehören. Alle hier aufgeführten Möglichkeiten 
+sind relativ zu XML-Dokument-Wurzel. Andere Pfadangaben wie beispielsweise
+attribute:: für @ sind aus Gründen der Kompatibilität zu den einzelnen 
+Persitence-Layern nicht erlaubt (und in der praxis auch nicht erforderlich).
+
 \begin{verbatim}
 OutPath :: a
            a/b
@@ -44,14 +84,14 @@ InPath  :: SpecialNodeFuncition
            c/@d
            c/d/@e
            c/d/text()
-SpecialNodeFuncition :: *
+SpecialNodeFuncition :: ts()
                         text()
                         doctext()
 \end{verbatim}
 Hier noch einige Hinweise:
 \begin{itemize}
 \item '*' als {\cc SpecialNodeFuncition} darf allein nur in einer {\cc SingleQuery} ohne {\cc OutPath} angegeben werden. Es erfolgt dann eine Suche über alle für TextSearch markierten Metadaten.
-\item 'text()'  als {\cc SpecialNodeFuncition} darf allein nur in einer {\cc SingleQuery} ohne {\cc OutPath} angegeben werden. Es wird nach '*' überführt.
+\item 'text()'  als {\cc SpecialNodeFuncition} darf allein nur in einer {\cc SingleQuery} ohne {\cc OutPath} angegeben werden. Es wird nach 'ts()' überführt.
 \item 'doctext()'  als {\cc SpecialNodeFuncition} ist für die Abfrage des TextSearch des Dokumentes vorgesehen.\footnote{Wird derzeit implementiert und ist bald verfügbar!}
 \item MyCoRe kann bei Bedarf der Applikation um weitere {\cc SpecialNodeFuncition}'s ergänzt werden.
 \end{itemize}
