@@ -75,7 +75,8 @@ public class MCRCStoreLucene
 	private static final MCRConfiguration conf = MCRConfiguration.instance();
 	private static final String DERIVATE_FIELD = "DerivateID";
 	private static final String STORAGE_FIELD = "StorageID";
-	private static final Logger logger = Logger.getLogger(MCRCStoreLucene.class);
+	private static final Logger logger =
+		Logger.getLogger(MCRCStoreLucene.class);
 	private static final int optimizeIntervall = 10;
 	private static final TextFilterPluginManager pMan =
 		TextFilterPluginManager.getInstance();
@@ -106,9 +107,9 @@ public class MCRCStoreLucene
 		if (queryText.length() == 0)
 			return new String[0];
 		//Start a filtering query for the largest word in the query
-		HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD,queryText);
+		HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD, queryText);
 		//if it's a simple query we have the results already
-		if (queryText.indexOf(" ")==-1){
+		if (queryText.indexOf(" ") == -1) {
 			//only one word in the query!
 			//results are in derivateIDs
 			return MCRUtils.getStringArray(derivateIDs.toArray());
@@ -138,7 +139,8 @@ public class MCRCStoreLucene
 						collector.add(derivateID);
 					} else {
 						logger.warn(
-							"Found Document containes no Field \"DerivateID\":" + doc);
+							"Found Document containes no Field \"DerivateID\":"
+								+ doc);
 					}
 				}
 				//				else{
@@ -231,6 +233,22 @@ public class MCRCStoreLucene
 		MCRFileReader file,
 		MCRContentInputStream source)
 		throws Exception {
+		if (!pMan.isSupported(file.getContentType())) {
+			throw new MCRPersistenceException(
+				new StringBuffer(file.getContentTypeID())
+					.append(" is not supported by any TextFilterPlugin detected")
+					.append(" by the TextFilterPluginManager.\n")
+					.append("Make sure you have a Plugin installed in the proper directory:")
+					.append(
+						conf.getString(
+							"MCR.PluginDirectory",
+							"(not configured yet)"))
+					.append("\nIf you don't have the right Plugin ready, reasign \"")
+					.append(file.getContentTypeID())
+					.append("\" to another ContentStore.\n")
+					.append("Read the manual on how to do this!")
+					.toString());
+		}
 		Document doc = null;
 		MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
 		source = new MCRContentInputStream(isc.getNewInputStream());
@@ -238,7 +256,9 @@ public class MCRCStoreLucene
 		String returns = super.doStoreContent(file, source);
 		if (returns == null || returns.length() == 0)
 			throw new MCRPersistenceException(
-				"Failed to store file " + file.getID() + " to local file system!");
+				"Failed to store file "
+					+ file.getID()
+					+ " to local file system!");
 		doc = getDocument(file, isc.getNewInputStream());
 		Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
 		doc.add(storageID);
@@ -278,7 +298,8 @@ public class MCRCStoreLucene
 		throws IOException {
 		Document returns = new Document();
 		//filter here
-		BufferedReader in = new BufferedReader(pMan.transform(reader.getContentType(), stream));
+		BufferedReader in =
+			new BufferedReader(pMan.transform(reader.getContentType(), stream));
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
 		if (reader instanceof MCRFile) {
@@ -333,7 +354,8 @@ public class MCRCStoreLucene
 			BooleanQuery[] queries = parser.getBooleanQueries(queryText);
 			hits = new Hits[queries.length];
 			for (int i = 0; i < queries.length; i++) {
-				logger.debug("  -Searching for: " + queries[i].toString("content"));
+				logger.debug(
+					"  -Searching for: " + queries[i].toString("content"));
 				hits[i] = indexSearcher.search(queries[i]);
 				if (containsExclusiveClause(queries[i])) {
 					//check that all documents meets negative clause
@@ -412,7 +434,9 @@ public class MCRCStoreLucene
 				values = hits.doc(i).getValues(fieldName);
 				if (values == null) {
 					logger.warn(
-						"Found a document but " + fieldName + " was not stored in!");
+						"Found a document but "
+							+ fieldName
+							+ " was not stored in!");
 				} else {
 					for (int j = 0; j < values.length; j++) {
 						//Store field value in collector
@@ -480,8 +504,7 @@ public class MCRCStoreLucene
 			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
 		} catch (IOException e) {
 			throw new MCRPersistenceException(
-				"Cannot create index in "
-					+ indexDir.getAbsolutePath(),
+				"Cannot create index in " + indexDir.getAbsolutePath(),
 				e);
 		}
 		indexWriter.mergeFactor = optimizeIntervall;
