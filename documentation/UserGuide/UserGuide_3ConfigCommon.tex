@@ -38,7 +38,7 @@ Um die Arbeit mit verschiedenen Anbietern möglichst einfach zu gestalten, wurde 
 In der Konfigurationsdatei {\it mycore.properties.private} legen Sie im Parameter \\
 {\bf MCR.persistence\_sql\_driver} fest, welcher JDBC-Treiber verwendet werden soll. 
 Weiterhin müssen Sie die Variable {\bf MCR.persistence\_sql\_database\_url} anpassen, die die JDBC URL für Verbindungen
-zu Ihrer Datenbank festlegt. Beachten Sie dabei insbesondere, dass meist Gross/Kleinschreibung relevant ist!
+zu Ihrer Datenbank festlegt. Der DB2 Library-Name {\bf LIB} muss durch den aktuellen (z. B. {\bf ICMNLSDB}) ersetzt werden. Analog dazu muss der User {\bf ODBC} bei MySQL durch den entsprechenden Nutzer (z. B. {\bf mcradmin}) erstzt werden. Beachten Sie dabei insbesondere, dass meist Gross/Kleinschreibung relevant ist!
 Weiterhin können Sie die minimale und maximale Anzahl der gleichzeitigen Verbindungen zur Datenbank festlegen.
 
 \begin{verbatim}
@@ -84,7 +84,7 @@ MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/mycore
 MCR.persistence_xmldb_database=exist
 \end{verbatim}
 
-Starten Sie nun den eXist-Client und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
+Starten Sie nun den eXist-Client ({\it <eXist-installdir>/bin/client.sh} bzw. {\it cliend.cmd}) und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
 
 \begin{verbatim}
 mkcol mycore
@@ -101,8 +101,7 @@ quit
 
 \subsubsection{Speicherung von Datei-Inhalten konfigurieren}
 
-In der Grundkonfiguration verwendet die Beispiel-Applikation zur Speicherung der Datei-Inhalte
-der Derivate das lokale Dateisystem. Passen Sie in der Datei \\
+In der Grundkonfiguration verwendet die Beispiel-Applikation zur Speicherung der Datei-Inhalte der Derivate das lokale Dateisystem. Passen Sie in der Datei \\
 {\tt mycore.properties.private} die Variable {\tt MCR.IFS.ContentStore.FS.BaseDirectory} 
 an und erzeugen Sie ein neues, leeres Verzeichnis am angegebenen Ort.
 
