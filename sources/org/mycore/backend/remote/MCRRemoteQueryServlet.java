@@ -36,67 +36,61 @@ import java.io.*;
  * queries in MyCoRe,
  *
  * @author Mathias Zarick
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
-*/
+ */
 public class MCRRemoteQueryServlet extends HttpServlet {
 
-    private boolean queryInputSyntaxIsCorrect(String input) {
-    boolean result = false;
-    if (input != null) result = (input.indexOf("***") > 0);
-    return result;
-    }
-
-    private String extractType(String input) {
-    return input.substring(0,input.indexOf('*'));
-    }
-
-    private String extractQuery(String input) {
-    return input.substring(input.indexOf('*')+3);
-    }
-
-
+/**
+ * This methode get a distributed query with the GET methode and response
+ * with the answer of this query from the local host. 
+ *
+ * @param request the HTTP request instance
+ * @param response the HTTP response instance
+ * @exception IOException for an I/O error
+ * @exception ServletException for a servlet error
+ **/
 public void doGet(HttpServletRequest request, HttpServletResponse response)
   throws IOException, ServletException
-{  response.setContentType("text/xml");
-   PrintWriter out = response.getWriter();
-   String queryResult="";
-   String theInput = request.getParameter("request");
-   System.out.println("request="+theInput);
-   String host = request.getParameter("host");
-   if (host == null) host = request.getServerName();
-   try {
-     if (queryInputSyntaxIsCorrect(theInput)) {
-        // start the local query
-        MCRConfiguration config = MCRConfiguration.instance();
-        int vec_length = config.getInt("MCR.query_max_results",10);
-        String type = extractType(theInput);
-        String query = extractQuery(theInput);
-        String proptype = "MCR.persistence_type_"+type;
-        String persist_type = config.getString(proptype);
-        String proppers = "MCR.persistence_"+persist_type.toLowerCase()+"_query_name";
-        MCRQueryInterface mcr_query = (MCRQueryInterface)config.getInstanceOf(proppers);
-        MCRQueryResultArray result = mcr_query.getResultList(query,type,vec_length);
-        for (int i=0; i<result.size();i++)
-          result.setHost(i,host);
-        queryResult = result.exportAll();
-     }
-     else queryResult="";
-   }
-   catch (MCRException mcre) {
-        mcre.printStackTrace(System.err);
-        queryResult="<ERROR/>";
-   }
-   out.println(queryResult);
+  {  
+  response.setContentType("text/xml");
+  PrintWriter out = response.getWriter();
+  String queryResult="";
+  String type = request.getParameter("type");
+  String hosts = request.getParameter("hosts");
+  if (hosts == null) hosts = request.getServerName();
+  String query = request.getParameter("query");
+  try {
+    // start the local query
+    MCRConfiguration config = MCRConfiguration.instance();
+    int vec_length = config.getInt("MCR.query_max_results",10);
+    String proptype = "MCR.persistence_type_"+type;
+    String persist_type = config.getString(proptype);
+    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+"_query_name";
+    MCRQueryInterface mcr_query = (MCRQueryInterface)config.getInstanceOf(proppers);
+    MCRQueryResultArray result = mcr_query.getResultList(query,type,vec_length);
+    for (int i=0; i<result.size();i++) { result.setHost(i,hosts); }
+    queryResult = result.exportAll();
+    }
+  catch (MCRException mcre) {
+       mcre.printStackTrace(System.err);
+       queryResult="<mcr_results></mcr_results>"; }
+  out.print(queryResult);
+  out.close();
+  }
 
-}
-
+/**
+ * This methode get a distributed query with the POST methode and response
+ * with the answer of this query from the local host. 
+ *
+ * @param request the HTTP request instance
+ * @param response the HTTP response instance
+ * @exception IOException for an I/O error
+ * @exception ServletException for a servlet error
+ **/
 public void doPost(HttpServletRequest request, HttpServletResponse response)
   throws IOException, ServletException
-{ doGet(request, response);
-}
-
-public void init() throws ServletException {
-}
+  { doGet(request, response); }
 
 }
 

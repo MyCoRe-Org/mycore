@@ -46,37 +46,30 @@ public class MCRServletCommunication implements MCRCommunicationInterface
 
 private String reqtype;
 private String hostAlias;
-private String mcrtype;
 private String query;
-private String reqstream = "";
 
 /**
  * This is the constructor for the MCRSocketCommunication.
  **/
 public MCRServletCommunication()
-  { reqstream = ""; }
+  { }
 
 /**
  * This methode represide the query request methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
  * @param hostlist the list of hostnames as string they should requested.
- * @param mcrtype  the type value of the MCRObjectId
+ * @param reqtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void requestQuery(String hostAlias, String mcrtype, String query)
+public void requestQuery(String hostAlias, String reqtype, String query)
   throws MCRException
   {
-  System.out.println("Hostname : "+hostAlias);
-  System.out.println("MCR type : "+mcrtype);
-  System.out.println("Query    : "+query);
-  System.out.println();
-
   this.hostAlias = hostAlias;
-  this.mcrtype = mcrtype;
+  this.reqtype = reqtype;
   this.query = query;
-  reqstream = mcrtype+"***"+query;
+  debug();
   }
 
 /**
@@ -91,10 +84,12 @@ public MCRQueryResultArray responseQuery() throws MCRException
   String NL = System.getProperty("line.separator");
   URL currentURL;
   MCRConfiguration config = MCRConfiguration.instance();
-  String protocol = config.getString("MCR.communication_"+hostAlias+"_protocol");
+  String protocol = config.getString("MCR.communication_"+hostAlias
+    +"_protocol");
   String host = config.getString("MCR.communication_"+hostAlias+"_host");
   int port = config.getInt("MCR.communication_"+hostAlias+"_port");
-  String location = config.getString("MCR.communication_"+hostAlias+"_servlet_location");
+  String location = config.getString("MCR.communication_"+hostAlias
+    +"_servlet_location");
   MCRQueryResultArray result = new MCRQueryResultArray();
   try {
     currentURL = new URL(protocol,host,port,location);
@@ -102,8 +97,9 @@ public MCRQueryResultArray responseQuery() throws MCRException
     urlCon.setDoOutput(true);
     urlCon.setRequestMethod("POST");
     PrintWriter out = new PrintWriter(urlCon.getOutputStream());
-    out.println("request=" + URLEncoder.encode(reqstream)
-                + "&host=" + URLEncoder.encode(hostAlias));
+    out.print("type=" + URLEncoder.encode(reqtype)
+              + "&hosts=" + URLEncoder.encode(hostAlias)
+              + "&query=" + URLEncoder.encode(query));
     out.close();
     BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
     String fromServer="";
@@ -123,5 +119,15 @@ public MCRQueryResultArray responseQuery() throws MCRException
   return result;
 }
 
+/**
+ * This methode debug this class.
+ **/
+public final void debug()
+  {
+  System.out.println("Hostname : "+hostAlias);
+  System.out.println("MCR type : "+reqtype);
+  System.out.println("Query    : "+query);
+  System.out.println();
+  }
 }
 
