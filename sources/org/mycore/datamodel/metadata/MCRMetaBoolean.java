@@ -36,7 +36,7 @@ import mycore.common.MCRException;
  * <p>
  * &lt;tag class="MCRMetaBoolean" heritable="..."&gt;<br>
  * &lt;subtag type="..."&gt;<br>
- * true|false or yes|no or ja|nein or wahr|falsch
+ * true|false or yes|no or ja|nein or wahr|falsch<br>
  * &lt;/subtag&gt;<br>
  * &lt;/tag&gt;<br>
  *

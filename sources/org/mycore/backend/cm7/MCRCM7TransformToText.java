@@ -65,7 +65,7 @@ public MCRCM7TransformToText()
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -126,7 +126,7 @@ public final String createSearchStringText(String part, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -175,7 +175,7 @@ public final String createSearchStringDate(String part, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -220,7 +220,7 @@ public final String createSearchStringBoolean(String part, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -267,45 +267,50 @@ public final String createSearchStringDouble(String part, String tag,
  * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param href               the reference value of this element
+ * @param sattrib            the attribute vector of a subtag
+ * @param svalue             the value vector of sattrib
  * @return the search string for the CM7 text search engine
  **/
 public final String createSearchStringHref(String part, String tag,
-  String subtag, String [] sattrib, String [] svalue, MCRObjectID href)
+  String subtag, String [] sattrib, String [] svalue)
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return ""; }
-  if (href == null) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
+  String href = svalue[1];
+  if (svalue[0].equals("locator")) {
+    try {
+      MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
+      String label = mcr_pers.receiveLabel(new MCRObjectID(svalue[1]));
+      sb.append("XXX").append(part.toUpperCase()).append("XXX")
+        .append(tag.toUpperCase()).append("XXX")
+        .append(subtag.toUpperCase()).append("XXX")
+        .append(svalue[0].toUpperCase()).append("XXX ") 
+        .append(label.toUpperCase()).append(' ')
+        .append(svalue[2].toUpperCase()).append(' ')
+        .append(svalue[3].toUpperCase()).append(NL);
+      href = svalue[1].replace('_','X');
+      }
+    catch (Exception e) { }
+    }
   sb.append("XXX").append(part.toUpperCase()).append("XXX")
     .append(tag.toUpperCase()).append("XXX")
     .append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
+  sb.append(svalue[0].toUpperCase()).append("XXX ");
+  if (svalue[0].equals("locator")) {
+    sb.append("XXXHREFXXX").append(href.toUpperCase()).append("XXX ")
+      .append(svalue[2].toUpperCase()).append(' ')
+      .append(svalue[3].toUpperCase()).append(NL);
     }
-  MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
-  String label = mcr_pers.receiveLabel(href);
-  sb.append(' ').append(label.toUpperCase()).append(NL);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX")
-    .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i]==null) { continue; }
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
+  else {
+    sb.append("XXXFROMXXX").append(svalue[1].replace('_','X').toUpperCase())
+      .append("XXX ");
+    sb.append("XXXTOXXX").append(svalue[2].replace('_','X').toUpperCase())
+      .append("XXX ").append(NL);
     }
-  sb.append(' ').append(href.getId().replace('_','X').toUpperCase()).append(NL);
   return sb.toString();
   }
 

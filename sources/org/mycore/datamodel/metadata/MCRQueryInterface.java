@@ -61,7 +61,7 @@ public Vector getResultList(String query, String type, int maxresult)
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -85,7 +85,7 @@ public String createSearchStringText(String part, String subtag, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -106,7 +106,7 @@ public String createSearchStringDate(String part, String subtag, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -129,7 +129,7 @@ public String createSearchStringBoolean(String part, String subtag, String tag,
  * &lt;/subtag&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
@@ -147,16 +147,15 @@ public String createSearchStringDouble(String part, String subtag, String tag,
  * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
  *
  * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
+ *                           or 'service' or 'structure'
  * @param tag                the tagname of an element list
  * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param href               the reference value of this element
+ * @param sattrib            the attribute vector of a subtag
+ * @param svalue             the value vector of sattrib
  * @return the search string for the CM7 text search engine
  **/
 public String createSearchStringHref(String part, String subtag, String tag,
-  String [] sattrib, String [] svalue, MCRObjectID href);
+  String [] sattrib, String [] svalue);
 
 }
 

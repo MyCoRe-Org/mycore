@@ -94,7 +94,9 @@ public final Vector getResultList(String query, String type, int maxresults)
     onecond = getNextCondition(startpos,stoppos,rawtext);
 //    System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
-    cond.append('(').append(traceOneCondition(onecond)).append(')');
+    if (onecond.length()>1) { cond.append('('); }
+    cond.append(traceOneCondition(onecond));
+    if (onecond.length()>1) { cond.append(')'); }
     if (startpos<stoppos) {
       operpos = rawtext.indexOf("(",startpos);
       if (operpos != -1) {

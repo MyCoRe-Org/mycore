@@ -75,6 +75,7 @@ public class MCRObjectStructure
    */
   public final boolean addLink (MCRMetaLink add_link)
   {
+/*
     String role = add_link.getRole();
     String role_link= null;
     if (role == null) role = "";
@@ -90,6 +91,7 @@ public class MCRObjectStructure
       if (href.equals(link.getHrefToString()) && role.equals(role_link))
         return false;
     }
+*/
     the_links.addElement(add_link);
     return true;
   }
@@ -105,6 +107,7 @@ public class MCRObjectStructure
    */
   public final boolean removeLink (MCRMetaLink rem_link)
   {
+/*
     String role = rem_link.getRole();
     String role_link = null;
     if (role == null) role = "";
@@ -123,6 +126,7 @@ public class MCRObjectStructure
         return true;
       }
     }
+*/
     return false;
   }
 
@@ -197,18 +201,17 @@ public class MCRObjectStructure
     String ts_str = "" + NL;
     int i, n = the_links.size();
     MCRMetaLink link = null;
-    String role = null;
     for (i = 0; i < n; ++i)
     {
       link = (MCRMetaLink) the_links.elementAt(i);
       ts_str += link.createTS(mcr_query, "child");
+/*
       role = link.getRole();
       if (role == null) continue;
       if (! role.trim().equals("parent")) continue;
       // treat the parent case here:
-/*
-##### metadata inheritance not yet supported in this version,
-##### to be done next time !!
+      // ##### metadata inheritance not yet supported in this version,
+      // ##### to be done next time !!
 */
     }
     return ts_str;
@@ -241,8 +244,8 @@ public class MCRObjectStructure
     for (i = 0; i < n; ++i)
     {
       link = (MCRMetaLink) the_links.elementAt(i);
-      System.out.println("" + i + " : " + link.getRole() + " : " +
-        link.getHrefToString());
+      System.out.println("-->"+i+"<--");
+      link.debug();
     }
     System.out.println("The end of the document's structure data is reached.");
   }

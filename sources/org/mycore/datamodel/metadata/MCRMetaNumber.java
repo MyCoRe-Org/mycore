@@ -39,7 +39,7 @@ import mycore.common.MCRException;
  * <p>
  * &lt;tag class="MCRMetaNumber" heritable="..."&gt;<br>
  * &lt;subtag type="..." xml:lang="..." measurement="..."&gt;<br>
- * xxxx.xxx or xxx
+ * xxxx.xxx or xxx<br>
  * &lt;/subtag&gt;<br>
  * &lt;/tag&gt;<br>
  *
