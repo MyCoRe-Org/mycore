@@ -38,6 +38,7 @@ import org.mycore.common.*;
  * <code>urn:nbn:de:hbz:465-123456788</code>
  *
  * @author Frank Lützenkirchen
+ * @author Werner Greßhoff
  * @version $Revision$ $Date$
  */
 public class MCRNBN
@@ -165,6 +166,10 @@ public class MCRNBN
     return quotient.substring( quotient.length() - 1 );
   } 
 
+  public static String getLocalPrefix() {
+  	return prefix;
+  }
+  
   protected String  urn;
   protected Boolean valid;
   
