@@ -192,8 +192,10 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	public List listIdentifiers(String[] set, String[] from, String[] until, String instance) {
-		return listRecordsOrIdentifiers(set, from, until, instance, false);
+	public List listIdentifiers(String[] set, String[] from, String[] until, 
+			String metadataPrefix, String instance) {
+		return listRecordsOrIdentifiers(set, from, until, 
+				metadataPrefix, instance, false);
 	}
 	
 	/**
@@ -297,8 +299,10 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	public List listRecords(String[] set, String[] from, String[] until, String instance) {
-		return listRecordsOrIdentifiers(set, from, until, instance, true);
+	public List listRecords(String[] set, String[] from, String[] until, 
+			String metadataPrefix, String instance) {
+		return listRecordsOrIdentifiers(set, from, until, 
+				metadataPrefix, instance, true);
 	}
 	
 	/**
@@ -353,6 +357,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 			String[] set, 
 			String[] from, 
 			String[] until, 
+			String metadataPrefix, 
 			String instance,
 			boolean listRecords) {
 		List list = new ArrayList();

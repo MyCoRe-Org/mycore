@@ -26,8 +26,6 @@ package org.mycore.services.oai;
 
 import java.util.List;
 
-import org.jdom.Element;
-
 /**
  * @author Werner Gresshoff
  *
@@ -66,7 +64,8 @@ public interface MCROAIQuery {
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	public List listIdentifiers(String[] set, String[] from, String[] until, String instance);
+	public List listIdentifiers(String[] set, String[] from, String[] until, 
+			String metadataPrefix, String instance);
 
 	/**
 	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
@@ -77,7 +76,7 @@ public interface MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 * 				and a JDOM element with the metadata of the record
 	 */
-	public List getRecord(String id, String instance);
+	public List getRecord(String id, String metadataPrefix, String instance);
 	
 	/**
 	 * Method listRecords. Gets a list of metadata records with max. STR_OAI_MAXRETURNS
@@ -90,7 +89,8 @@ public interface MCROAIQuery {
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	public List listRecords(String[] set, String[] from, String[] until, String instance);
+	public List listRecords(String[] set, String[] from, String[] until, 
+			String metadataPrefix, String instance);
 	
 	/**
 	 * Method hasMore.
