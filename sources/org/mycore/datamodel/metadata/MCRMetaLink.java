@@ -340,6 +340,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
 
 /**
  * This methode create a String for all text searchable data in this instance.
+ * Only the title string was returned.
  *
  * @param textsearch true if the data should text searchable
  * @exception MCRException if the content of this class is not valid
@@ -348,7 +349,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
 public final String createTextSearch(boolean textsearch)
   throws MCRException
   {
-  return "";
+  return title;
   }
 
 /**
