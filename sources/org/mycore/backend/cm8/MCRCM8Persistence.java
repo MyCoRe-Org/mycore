@@ -194,7 +194,16 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
           break;
         case MCRTypedContent.FORMAT_DATE :
           GregorianCalendar cal = (GregorianCalendar)mcr_tc.getValueElement(i);
-          valueobject = new java.sql.Date(((Date)cal.getTime()).getTime());
+          int number = 0;
+          if (cal.get(Calendar.ERA) == GregorianCalendar.AD) {
+            number = (4000+cal.get(Calendar.YEAR))*10000 +
+                     cal.get(Calendar.MONTH)*100 +
+                     cal.get(Calendar.DAY_OF_MONTH); }
+          else {
+            number = (4000-cal.get(Calendar.YEAR))*10000 +
+                     cal.get(Calendar.MONTH)*100 +
+                     cal.get(Calendar.DAY_OF_MONTH); }
+          valueobject = new Integer(number);
           // begin for debug
           Calendar calendar = (GregorianCalendar)mcr_tc.getValueElement(i);
           SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");

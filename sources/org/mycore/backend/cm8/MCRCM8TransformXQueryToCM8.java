@@ -35,6 +35,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.common.MCRUtils;
 
 /**
  * This is the tranformer implementation for CM 8 from XQuery language
@@ -345,8 +346,26 @@ private final String traceOneCondition(String cond, String itemtypename,
     if (op[i].equals("like")) { 
       // replace * with %
       value[i] = "%"+value[i].replace('*','%')+"%"; } 
-    sbout.append(' ').append(op[i]).append(" \"").append(value[i])
-      .append("\"").append(bool[i]); 
+    // is value[0] a date
+    GregorianCalendar date = MCRUtils.covertDateToGregorianCalendar(value[i]);
+    if (date != null) {
+      long number = 0;
+      if (date.get(Calendar.ERA) == GregorianCalendar.AD) {
+        number = (4000+date.get(Calendar.YEAR))*10000 +
+                     date.get(Calendar.MONTH)*100 +
+                     date.get(Calendar.DAY_OF_MONTH); }
+      else {
+        number = (4000-date.get(Calendar.YEAR))*10000 +
+                     date.get(Calendar.MONTH)*100 +
+                     date.get(Calendar.DAY_OF_MONTH); }
+      logger.debug("Date "+value[i]+" as number = "+Long.toString(number));
+      value[i] = Long.toString(number);
+      sbout.append(' ').append(op[i]).append(' ').append(value[i])
+        .append(bool[i]); 
+      }
+    else {
+      sbout.append(' ').append(op[i]).append(" \"").append(value[i])
+        .append("\"").append(bool[i]); }
     }
   sbout.append(']');
   //return sbout.toString().replace('\'','\"');

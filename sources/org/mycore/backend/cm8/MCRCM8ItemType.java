@@ -507,7 +507,7 @@ public static final boolean createAttributeDate(DKDatastoreICM connection,
   }
 
 /**
- * This methode is internal and create a DK_CM_DATE attribute.
+ * This methode is internal and create a DK_CM_DOUBLE attribute.
  *
  * @param connection the connection to the database
  * @param name the name of the attribute
@@ -520,6 +520,27 @@ public static final boolean createAttributeDouble(DKDatastoreICM connection,
   try {
     attr.setName(name);
     attr.setType(DK_CM_DOUBLE);
+    attr.setNullable(true);
+    attr.setUnique(false);
+    attr.add(); }
+  catch (DKException e) { return false; }
+  return true;
+  }
+
+/**
+ * This methode is internal and create a DK_CM_INTEGER attribute.
+ *
+ * @param connection the connection to the database
+ * @param name the name of the attribute
+ * @return If the attribute exists, false was returned, else true.
+ **/
+public static final boolean createAttributeInteger(DKDatastoreICM connection,
+  String name) throws Exception
+  {
+  DKAttrDefICM attr = new DKAttrDefICM(connection);
+  try {
+    attr.setName(name);
+    attr.setType(DK_CM_INTEGER);
     attr.setNullable(true);
     attr.setUnique(false);
     attr.add(); }
