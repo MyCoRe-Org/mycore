@@ -255,6 +255,18 @@ public class MCRNBN {
 		}
 	}
   
+	public static boolean exists(String urn) {
+		MCRArgumentChecker.ensureNotEmpty(urn, "urn");
+		if (urn.startsWith(prefix)) {
+			HashMap map = (HashMap) manager.listURNs(urn.substring(urn.lastIndexOf("-") + 1));
+			if (!map.isEmpty()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	  
 	/**
 	 * Method getAuthor. Returns the author data from the reservation.
 	 * @return String
