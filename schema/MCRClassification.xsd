@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xlink="http://www.w3.org/1999/xlink" 
+<xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  elementFormDefault="unqualified">
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  elementFormDefault="qualified">
 
-<xsd:import schemaLocation="xml-2001.xsd"
-  namespace="http://www.w3.org/XML/1998/namespace"/>
+<xsd:import schemaLocation="xml-2001.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
+<xsd:import schemaLocation="xlinks-2001.xsd" namespace="http://www.w3.org/1999/xlink"/>
  
 <xsd:element type="MCRClass" name="mycoreclass"/>
 
@@ -28,6 +29,13 @@
  </xsd:simpleContent>
 </xsd:complexType>
 
+<xsd:complexType name="MCRClassURL">
+<xsd:attribute use="optional" ref="xlink:type"/>
+<xsd:attribute ref="xlink:href"/>
+<xsd:attribute use="optional" ref="xlink:title"/>
+<xsd:attribute use="optional" ref="xlink:label"/>
+</xsd:complexType>
+
 <xsd:complexType name="MCRClassCatgories">
  <xsd:sequence>
   <xsd:element maxOccurs="unbounded" minOccurs="1" type="MCRClassCategory"
@@ -39,6 +47,8 @@
  <xsd:sequence>
   <xsd:element maxOccurs="unbounded" minOccurs="1" type="MCRClassLabel"
      name="label"/>
+  <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassURL"
+     name="url"/>
   <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassCategory"
      name="category"/>
  </xsd:sequence>
