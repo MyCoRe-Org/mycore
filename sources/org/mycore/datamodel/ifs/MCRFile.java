@@ -67,9 +67,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     storeNew();
   }
   
-  MCRFile( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
+  MCRFile( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
   {
-    super( ID, parentID, ownerID, name, size, date );
+    super( ID, parentID, ownerID, name, label, size, date );
     
     this.storageID     = storageID;
     this.storeID       = storeID;

@@ -97,16 +97,16 @@ public class MCRFileMetadataManager
     throws MCRPersistenceException
   { return store.retrieveChild( parentID, name ); }
   
-  public MCRFilesystemNode buildNode( String type, String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
+  public MCRFilesystemNode buildNode( String type, String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
     throws MCRPersistenceException
   {
     MCRFilesystemNode n = (MCRFilesystemNode)( cache.get( ID ) );
     if( n != null ) return n;
     
     if( type.equals( "D" ) )
-      n = new MCRDirectory( ID, parentID, ownerID, name, size, date );
+      n = new MCRDirectory( ID, parentID, ownerID, name, label, size, date );
     else
-      n = new MCRFile( ID, parentID, ownerID, name, size, date, storeID, storageID, fctID, md5 );
+      n = new MCRFile( ID, parentID, ownerID, name, label, size, date, storeID, storageID, fctID, md5 );
     
     cache.put( ID, n ); 
     return n;

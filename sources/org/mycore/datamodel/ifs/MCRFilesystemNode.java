@@ -62,6 +62,9 @@ public abstract class MCRFilesystemNode
   /** The name of this node */
   protected String name;
   
+  /** The optional label of this node */
+  protected String label;
+  
   /** The size in number of bytes */
   protected long size;  
   
@@ -86,17 +89,19 @@ public abstract class MCRFilesystemNode
     this.ownerID      = ownerID;
     this.size         = 0;
     this.lastModified = new GregorianCalendar();
+    this.label        = null;
     
     checkName( name );
     this.name = name;
   }
   
-  protected MCRFilesystemNode( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date )
+  protected MCRFilesystemNode( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date )
   {
     this.ID           = ID;
     this.parentID     = parentID;
     this.ownerID      = ownerID;
     this.name         = name;
+    this.label        = label;
     this.size         = size;
     this.lastModified = date;
     this.deleted      = false;
@@ -117,6 +122,7 @@ public abstract class MCRFilesystemNode
     this.ID           = null;
     this.ownerID      = null;
     this.name         = null;
+    this.label        = null;
     this.size         = 0;
     this.lastModified = null;
     this.parentID     = null;
@@ -215,6 +221,37 @@ public abstract class MCRFilesystemNode
     ensureNotDeleted();
     return name; 
   }
+  
+  /**
+   * Sets the label of this node
+   *
+   * @param label the label (may be null)
+   **/
+  public void setLabel( String label )
+  {
+    ensureNotDeleted();
+    
+    if( ( label != null ) && ( label.trim().length() == 0 ) ) label = null;
+    if( this.label.equals( label ) ) return;
+    
+    this.label = label;
+    this.lastModified = new GregorianCalendar();
+    
+    manager.storeNode( this );
+    
+    if( parentID != null ) getParent().touch();
+  }
+  
+  /**
+   * Returns the label of this node
+   *
+   * @return the label of this node, or null
+   **/
+  public String getLabel()
+  { 
+    ensureNotDeleted();
+    return label; 
+  }
 
   public String getPath()
   {
@@ -310,6 +347,7 @@ public abstract class MCRFilesystemNode
     StringBuffer sb = new StringBuffer();
     sb.append( "ID          = " ).append( this.ID                   ).append( "\n" );
     sb.append( "Name        = " ).append( this.name                 ).append( "\n" );
+    sb.append( "Label       = " ).append( this.label                ).append( "\n" );
     sb.append( "Type        = " ).append( this.getClass().getName() ).append( "\n" );
     sb.append( "ParentID    = " ).append( this.parentID             ).append( "\n" );
     sb.append( "OwnerID     = " ).append( this.ownerID              ).append( "\n" );

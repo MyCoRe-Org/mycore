@@ -54,8 +54,8 @@ public class MCRDirectory extends MCRFilesystemNode
     storeNew();
   }
   
-  MCRDirectory( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date )
-  { super( ID, parentID, ownerID, name, size, date ); }
+  MCRDirectory( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date )
+  { super( ID, parentID, ownerID, name, label, size, date ); }
   
   public static MCRDirectory getRootDirectory( String ownerID )
   {
