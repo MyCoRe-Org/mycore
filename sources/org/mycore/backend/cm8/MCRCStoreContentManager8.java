@@ -26,6 +26,9 @@ package org.mycore.backend.cm8;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -34,8 +37,6 @@ import com.ibm.mm.sdk.common.*;
 
 import org.apache.log4j.Logger;
 
-import org.mycore.backend.sql.MCRSQLConnection;
-import org.mycore.backend.sql.MCRSQLRowReader;
 import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
@@ -52,7 +53,7 @@ import org.mycore.services.query.*;
  *   MCR.IFS.ContentStore.<StoreID>.Attribute.Time  Name of timestamp attribute
  * </code>
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -134,31 +135,44 @@ public class MCRCStoreContentManager8
 	}
 
 	private boolean storeTieRefTable() {
-		String driver=config.getString("MCR.persistence_cm8_library_server_driver");
-		String url=config.getString("MCR.persistence_cm8_library_server_url");
-		String user=config.getString("MCR.persistence_cm8_user_id");
-		String passwd=config.getString("MCR.persistence_cm8_password");
-		logger.debug("Getting TIEREF Table name...");
-		MCRSQLRowReader row =
-			new MCRSQLConnection(driver,url,user,passwd).doQuery(
-				new MCRSQLStatement(TIEINDEX_TABLE)
-					.setCondition("COLNAME", "TIEREF")
-					.toSelectStatement("TABSCHEMA,TABNAME"));
-		if (row.next()) {
-			TIEREF_TABLE =
-				new StringBuffer(row.getString(1))
-					.append('.')
-					.append(row.getString(2))
-					.toString();
-			logger.debug("TIEREF Table: "+TIEREF_TABLE);
-			return true;
-		} else {
-			logger.warn(
-				"Failure getting TIEREF Index from "
-					+ TIEINDEX_TABLE
-					+ "!");
+		DKDatastoreICM ds=MCRCM8ConnectionPool.instance().getConnection();
+		Connection connection;
+		try {
+			connection=(Connection)ds.connection().handle();
+		} catch (Exception e) {
+			logger.warn("Cannot get DKHandle from MCRCM8ConnectionPool!",e);
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
 			return false;
 		}
+		logger.debug("Getting TIEREF Table name...");
+		ResultSet rs;
+		try {
+			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEINDEX_TABLE).setCondition("COLNAME","TIEREF").toSelectStatement("TABSCHEMA,TABNAME"));
+			if (rs.next()){
+				StringBuffer tieref=new StringBuffer(rs.getString(1));
+				if (rs.wasNull()){
+					MCRCM8ConnectionPool.instance().releaseConnection(ds);
+					return false;
+				}
+				tieref.append('.').append(rs.getString(2));
+				if (rs.wasNull()){
+					MCRCM8ConnectionPool.instance().releaseConnection(ds);
+					return false;
+				}
+				TIEREF_TABLE=tieref.toString();				
+				logger.debug("TIEREF Table: "+TIEREF_TABLE);
+			} else {
+			logger.warn("Failure getting TIEREF Index from " + TIEINDEX_TABLE + "!");
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
+			return false;
+		}
+		} catch (SQLException e1) {
+			logger.warn("Cannot get TIEREF Table out of Library Server",e1);
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
+			return false;
+		}
+		MCRCM8ConnectionPool.instance().releaseConnection(ds);
+		return true;
 	}
 
 	protected String doStoreContent(
@@ -518,16 +532,33 @@ public class MCRCStoreContentManager8
 	 */
 	protected int countDerivateContents(String derivateID) {
 		logger.debug("DerivateID = " + derivateID);
-		String driver=config.getString("MCR.persistence_cm8_library_server_driver");
-		String url=config.getString("MCR.persistence_cm8_library_server_url");
-		String user=config.getString("MCR.persistence_cm8_user_id");
-		String passwd=config.getString("MCR.persistence_cm8_password");
+		int count;
 		if (TIEREF_TABLE == null && !storeTieRefTable())
 				throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
-		return new MCRSQLConnection(driver,url,user,passwd).countRows(
-			new MCRSQLStatement(TIEREF_TABLE)
-				.setCondition(DerivateAttribute, derivateID)
-				.toRowSelector());
+		DKDatastoreICM ds=MCRCM8ConnectionPool.instance().getConnection();
+		Connection connection;
+		try {
+			connection=(Connection)ds.connection().handle();
+		} catch (Exception e) {
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
+			throw new MCRPersistenceException("Cannot get DKHandle from MCRCM8ConnectionPool!",e);
+		}
+		logger.debug("Counting indexed derivates...");
+		ResultSet rs;
+		try {
+			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEREF_TABLE).setCondition(DerivateAttribute,derivateID).toSelectStatement("COUNT(*)"));
+			if (rs.next()){
+				count=rs.getInt(1);
+			} else {
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
+			throw new MCRPersistenceException("Failure counting Derivates in Index from " + TIEREF_TABLE + "!");
+		}
+		} catch (SQLException e1) {
+			MCRCM8ConnectionPool.instance().releaseConnection(ds);
+			throw new MCRPersistenceException("Cannot query TIEREF Table out of Library Server",e1);
+		}
+		MCRCM8ConnectionPool.instance().releaseConnection(ds);
+		return count;
 	}
 
 	private String[] queryIndex(CM8Query query, boolean basic) {
