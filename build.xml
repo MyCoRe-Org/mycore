@@ -46,6 +46,7 @@
     <echo message="   package  --> generates the classes and docs (default)"/>
     <echo message="   compile  --> compiles the source code"/>
     <echo message="   javadoc  --> generates the API documentation"/>
+    <echo message="   jar      --> creates a jar file containing all MyCoRe classes"/>
     <echo message="   clean    --> cleans up the directory"/>
     <echo message=""/>
     <echo message=" See the comments inside the build.xml file for more details."/>
@@ -66,6 +67,13 @@
   <!-- Creates the class package                                           -->
   <!-- =================================================================== -->
   <target name="package" depends="compile,javadoc">
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates a mycore.jar file containing all compiled MyCoRe classes    -->
+  <!-- =================================================================== -->
+  <target name="jar" depends="compile">
+    <jar jarfile="mycore.jar" basedir="${mycore.class}"/>
   </target>
   
   <!-- =================================================================== -->
