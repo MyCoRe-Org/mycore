@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
 	
 	<!-- ================================================================================= -->
-	<xsl:template match="toc">
+	<xsl:template match="TOC | toc">
 		<xsl:param name="browserAddress" />
 		<xsl:for-each 
 			select="document($navigationBase)/navigation//item[@href=$browserAddress]">

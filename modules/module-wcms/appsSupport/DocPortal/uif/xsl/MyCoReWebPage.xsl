@@ -110,7 +110,7 @@
 					</center>
 				</xsl:when>
 				<!-- added by wcms -->
-				<xsl:when test="name() = 'toc'">
+				<xsl:when test="name() = 'toc' or 'TOC'">
 					<xsl:apply-templates select="." >
 						<xsl:with-param name="browserAddress" select="$browserAddress" />
 					</xsl:apply-templates>
