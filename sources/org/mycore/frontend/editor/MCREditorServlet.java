@@ -32,6 +32,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.mycore.common.*;
+import org.mycore.frontend.servlets.*;
 
 /**
  * This servlet provides funtions to edit XML documents using
@@ -40,27 +41,19 @@ import org.mycore.common.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-public class MCREditorServlet extends HttpServlet
+public class MCREditorServlet extends MCRServlet
 {
-  public void doGet( HttpServletRequest req, HttpServletResponse res )
-    throws IOException, ServletException
-  { doGetPost( req, res ); }
-
-  public void doPost( HttpServletRequest req, HttpServletResponse res )
-    throws IOException, ServletException
-  { doGetPost( req, res ); }
-
-  protected void doGetPost( HttpServletRequest req, HttpServletResponse res )
+  protected void doGetPost( MCRServletJob job )
   {
     try
     {
       ServletContext context = getServletContext();
-      MCREditorRequest er = new MCREditorRequest( req, res, context );  
+      MCREditorRequest er = new MCREditorRequest( job.getRequest(), job.getResponse(), context );  
       er.processRequest();
     }
     catch( Exception ex )
     { 
-      try{ res.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR ); }
+      try{ job.getResponse().sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR ); }
       catch( Exception ignored ){}
       String msg = "Error while processing EditorServlet request";
       throw new MCRException( msg, ex ); 
