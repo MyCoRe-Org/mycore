@@ -30,6 +30,7 @@ import javax.servlet.http.*;
 import javax.servlet.*;
 import org.jdom.*;
 import mycore.common.*;
+import mycore.xml.MCRLayoutServlet;
 
 /**
  * This servlet provides a web interface to query
@@ -136,42 +137,48 @@ private String defaultLang = "";
     if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
 
     // prepare the stylesheet name
-    String style = mode + "-" + type+ "-" + lang;
+    Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
+    String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
+    System.out.println("Style = "+style);
 
-    try
+    if (! cachedFlag)
     {
-      if (! cachedFlag)
+      MCRQueryResult result = new MCRQueryResult();
+      MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
+
+      jdom = resarray.exportAllToDocument();
+
+      // create a new session if not already alive and encache result list
+      if (mode.equals("ResultList"))
       {
-        MCRQueryResult result = new MCRQueryResult();
-        MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
-
-        jdom = resarray.exportAllToDocument();
-
-        // create a new session if not already alive and encache result list
-        if (mode.equals("ResultList"))
+        if (session == null)
+          session = request.getSession(true);
+        if (session != null)
         {
-          if (session == null)
-            session = request.getSession(true);
-          if (session != null)
-          {
-            session.putValue("CachedList", jdom);
-            session.putValue("CachedType", type);
-          }
-          else
-            System.out.println("session for putValue is null");
+          session.putValue("CachedList", jdom);
+          session.putValue("CachedType", type);
+        }
+        else
+          System.out.println("session for putValue is null");
+      }
+    }
+
+    try {
+      if (style.equals("xml")) {
+        response.setContentType( "text/xml" );
+        OutputStream out = response.getOutputStream();
+        new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+        out.close();
+        }
+      else {
+        request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+        request.setAttribute( "XSL.Style", style );
+        RequestDispatcher rd = getServletContext()
+          .getNamedDispatcher( "MCRLayoutServlet" );
+        rd.forward( request, response );
         }
       }
-
-      request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
-      request.setAttribute( "XSL.Style", style );
-
-      RequestDispatcher rd = getServletContext()
-        .getNamedDispatcher( "MCRLayoutServlet" );
-
-      rd.forward( request, response );
-    }
-    catch( Exception ex )
-    {
+    catch( Exception ex ) {
       System.out.println( ex.getClass().getName() );
       System.out.println( ex );
     }
