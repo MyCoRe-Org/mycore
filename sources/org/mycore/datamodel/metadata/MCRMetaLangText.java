@@ -42,9 +42,7 @@ final public class MCRMetaLangText extends MCRMetaDefault
 {
 
 // MetaLangText data
-private String subtag;
 private String text;
-private String lang;
 
 /**
  * This is the constructor. <br>
