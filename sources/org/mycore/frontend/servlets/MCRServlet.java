@@ -45,7 +45,8 @@ import org.mycore.common.*;
 public class MCRServlet extends HttpServlet
 {
   // Some configuration details
-  private static MCRConfiguration config = null;
+  protected static MCRConfiguration config = null;
+
   private static Logger logger=Logger.getLogger(MCRServlet.class);
   private static String baseURL, servletURL;
 
@@ -217,34 +218,33 @@ public class MCRServlet extends HttpServlet
   }
 
   /** Handles an exception by reporting it and its embedded exception */
-  protected void handleException(Exception ex)
+  protected void handleException( Exception ex )
   {
-    try {
-      reportException(ex);
-      if(ex instanceof MCRException)
+    try 
+    {
+      reportException( ex );
+      if( ex instanceof MCRException )
       {
-        ex = ((MCRException)ex).getException();
-        if(ex != null) reportException(ex);
+        ex = ( (MCRException)ex ).getException();
+        if( ex != null ) handleException( ex );
       }
     }
-
-    catch(Exception ex2) {
-      try{ reportException(ex2); }
-      catch(Exception ignored){}
-    }
+    catch( Exception ignored ){}
   }
 
-  /** Reports an exception to the log (stdout) and to the browser */
-  protected void reportException(Exception ex) throws Exception
+  /** Reports an exception to the log */
+  protected void reportException( Exception ex ) 
+    throws Exception
   {
-    String msg     = (ex.getMessage() == null ? "" : ex.getMessage());
+    String msg     = ( ex.getMessage() == null ? "" : ex.getMessage() );
     String type    = ex.getClass().getName();
     String cname   = this.getClass().getName();
-    String servlet = cname.substring(cname.lastIndexOf( "." ) + 1);
+    String servlet = cname.substring( cname.lastIndexOf( "." ) + 1 );
+    String trace   = MCRException.getStackTraceAsString( ex );
 
-    logger.info("Exception caught in " + servlet);
-    logger.info("Exception type:     " + type   );
-    logger.info("Exception message:  " + msg    );
-    ex.printStackTrace();
+    logger.info( "Exception caught in : " + servlet );
+    logger.info( "Exception type      : " + type    );
+    logger.info( "Exception message   : " + msg     );
+    logger.debug( trace ); 
   }
 }
