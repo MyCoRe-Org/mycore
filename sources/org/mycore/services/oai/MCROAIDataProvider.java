@@ -41,8 +41,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
-import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -500,7 +500,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		calendar.setTime(now);
    	    SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
 	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-        SimpleTimeZone tz = (SimpleTimeZone) timeFormat.getTimeZone();
+        TimeZone tz = timeFormat.getTimeZone();
         // compute milliseconds to hours...
         int offset = Math.abs(tz.getRawOffset() / 3600000);
 		calendar.add(Calendar.HOUR, offset);
