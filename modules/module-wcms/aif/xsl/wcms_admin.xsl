@@ -32,11 +32,11 @@
   <tr>
 	<td colspan="2"> <br/> Die folgenden Optionen stehen für sie zur Verfügung: <br/><br/> <img 
 		src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
-		height="8" border="0" alt="" title=""/> <a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">Verwaltung der 
+		height="8" border="0" alt="" title=""/> <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=choose">Verwaltung der 
 		Webpräsenz</a> <br/> <img 
 		src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
 		height="8" border="0" alt="" title=""/> <!-- 	 <a href="/common/wcms/logs.xml">Nutzungsstatistik einsehen</a> -->
-		 <a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">Nutzungsstatistik einsehen</a> 
+		 <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=date&amp;sortOrder=descending">Nutzungsstatistik einsehen</a> 
 		<br/><br/> <img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
 		width="16" height="8" border="0" alt="" title="" /> <a href="javascript: window.close()">Abmelden</a> </td>
   </tr>
@@ -172,21 +172,21 @@ WCMS-Nutzer:
 			<xsl:choose>
 			  <xsl:when test=" $sortBy = 'date' " >
 		         <td align="center" class="green">
-		           <a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">Datum, Zeit</a>
+		           <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">Datum, Zeit</a>
 		         </td>			
 			  </xsl:when>
 			  <xsl:otherwise>
-		        <th><a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">Datum, Zeit</a></th>						
+		        <th><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">Datum, Zeit</a></th>						
 			  </xsl:otherwise>
 			</xsl:choose>
 			
 			<!-- user name column -->
 			<xsl:choose>
 			  <xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
-			    <td align="center" class="green"><a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">Nutzer</a></td>
+			    <td align="center" class="green"><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">Nutzer</a></td>
 			  </xsl:when>
 			  <xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
-			    <th><a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">Nutzer</a></th>
+			    <th><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">Nutzer</a></th>
 			  </xsl:when>
 			</xsl:choose>			
 			
@@ -194,11 +194,11 @@ WCMS-Nutzer:
 			<xsl:choose>
 			  <xsl:when test=" $sortBy = 'labelPath' " >
 			      <td align="center" class="green">
-			         <a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">Seite</a>
+			         <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">Seite</a>
 			      </td>
 			  </xsl:when>
 			  <xsl:otherwise>
-			      <th><a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">Seite</a></th>
+			      <th><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">Seite</a></th>
 
 			  </xsl:otherwise>
 			</xsl:choose>			
@@ -206,10 +206,10 @@ WCMS-Nutzer:
 			<!-- done action column -->
 			<xsl:choose>
 			  <xsl:when test=" $sortBy = 'doneAction' " >
-				  <td align="center" class="green"><a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">Aktion</a></td>
+				  <td align="center" class="green"><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">Aktion</a></td>
 			  </xsl:when>
 			  <xsl:otherwise>
-				  <th><a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">Aktion</a></th>
+				  <th><a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">Aktion</a></th>
 			  </xsl:otherwise>
 			</xsl:choose>					  
 			
@@ -218,15 +218,15 @@ WCMS-Nutzer:
 			  <xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
 		        <td align="center" class="green">
 				 <b>
-			      Backup<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}"> (Inhalt</a>
-				  <a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
+			      Backup<a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}"> (Inhalt</a>
+				  <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
 				 </b>
 			    </td>		  		  		  		  		  
 			  </xsl:when>
 			  <xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
 		        <th>
-			      Backup<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
-				  <a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
+			      Backup<a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
+				  <a href="{$ServletsBaseURL}WCMSAdminServlet{$HttpSession}?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
 			    </th>		  		  		  		  		  
 			  </xsl:when>
 			</xsl:choose>			  

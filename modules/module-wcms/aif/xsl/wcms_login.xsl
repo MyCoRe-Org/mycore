@@ -10,7 +10,7 @@
 				<td height="15" colspan="2"></td>
 			</tr>
 			<tr>
-				<td colspan="2" align="left"> <br/> Sie können hier die Webpräsenz ihres Miless/MyCoRe-Servers verwalten. 
+				<td colspan="2" align="left"> <br/> Sie kï¿½nen hier die Webprï¿½enz ihres Miless/MyCoRe-Servers verwalten. 
 					<br/><br/><br/> <b>Authentifizierung:</b> </td>
 			</tr>
 			<!-- invalid user or password entered - - - - - - - -->
@@ -26,7 +26,7 @@
 				</tr>
 			</xsl:if>
 			<!-- END OF: invalid user or password entered - - - - - - - -->
-			<form action="{$ServletsBaseURL}WCMSLoginServlet" method="post">
+			<form action="{$ServletsBaseURL}WCMSLoginServlet{$HttpSession}" method="post">
 				<tr>
 					<td colspan="2">
 						<br></br>

@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" >
 	<!-- cmsChooseAction  ============================================================================== -->
 	<xsl:template name="wcmsChooseAction" >
-		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet" method="post">
+		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet{$HttpSession}" method="post">
 			<table class="wcms" width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
 				<xsl:call-template name="wcms.headline" >
 					<xsl:with-param name="infoText" select="'Aktion und Inhalt festlegen (Schritt 1/3)'" />
@@ -31,7 +31,7 @@
 							</colgroup>
 							<tr>
 								<td class="green_noBorder" align="center" colspan="2">
-									<b> Bitte legen sie zunächst fest, was sie machen wollen und auf welche Seite sich 
+									<b> Bitte legen sie zunï¿½hst fest, was sie machen wollen und auf welche Seite sich 
 										diese Aktion beziehen soll </b>
 								</td>
 							</tr>
@@ -39,9 +39,9 @@
 								<!-- left column -->
 								<th align="left" valign="top"> <xsl:call-template name="chooseAction" /> <xsl:call-template 
 									name="addAtPosition" /> <xsl:call-template name="template" /> <br/><br/> &lt;m&gt; 
-									... neues Menü<br/> &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
+									... neues Men<br/> &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
 									Inhalt zugewiesen<br/> <xsl:if test="$CurrentLang != $DefaultLang"> <br/><br/> 
-									&lt;!&gt; ... Seite bisher nicht übersetzt<br/> </xsl:if> </th>
+									&lt;!&gt; ... Seite bisher nicht bersetzt<br/> </xsl:if> </th>
 								<!-- right column -->
 								<th align="left" valign="top"> Inhalt:<br/> <xsl:call-template name="chooseContent" /> </th>
 							</tr>
@@ -76,17 +76,17 @@
 			<th colspan="2" class="red" align="left">
 				<b>
 					<xsl:choose>
-						<xsl:when test=" /cms/error = '0' or /cms/error = '9' " > Fehler aufgetreten: Keine Seite ausgewählt. 
-							<br/><br/> Bitte wählen sie in der 2. Box die Seite aus, die sie bearbeiten wollen. </xsl:when>
-						<xsl:when test=" /cms/error = '5' " > Fehler aufgetreten: Anlegen nicht möglich. <br/><br/> Auf dieser 
-							Ebene können keine weiteren Menüpunkte angelegt werden. Wählen sie beim Erstellen die Position 
+						<xsl:when test=" /cms/error = '0' or /cms/error = '9' " > Fehler aufgetreten: Keine Seite ausgewï¿½lt. 
+							<br/><br/> Bitte wï¿½len sie in der 2. Box die Seite aus, die sie bearbeiten wollen. </xsl:when>
+						<xsl:when test=" /cms/error = '5' " > Fehler aufgetreten: Anlegen nicht mï¿½lich. <br/><br/> Auf dieser 
+							Ebene kï¿½nen keine weiteren Menpunkte angelegt werden. Wï¿½len sie beim Erstellen die Position 
 							"darunter" aus. </xsl:when>
-						<xsl:when test=" /cms/error = '6' " > Fehler aufgetreten: Anlegen nicht möglich. <br/><br/> Unterhalb 
-							eines externen Linkes können keine weiteren Menüpunkte angelegt werden. </xsl:when>
-						<xsl:when test=" /cms/error = '7' " > Fehler aufgetreten: Löschen nicht möglich. <br/><br/> Ein 
-							Menüpunkt kann nur gelöscht werden, wenn er keine Untermenüpunkte mehr enthält. </xsl:when>
-						<xsl:when test=" /cms/error = '8' " > Fehler aufgetreten: Keine Berechtigung. <br/><br/> Sie können in 
-							der gewählten Menüebene keinen Inhalt pflegen. </xsl:when>
+						<xsl:when test=" /cms/error = '6' " > Fehler aufgetreten: Anlegen nicht mï¿½lich. <br/><br/> Unterhalb 
+							eines externen Linkes kï¿½nen keine weiteren Menpunkte angelegt werden. </xsl:when>
+						<xsl:when test=" /cms/error = '7' " > Fehler aufgetreten: Lï¿½chen nicht mï¿½lich. <br/><br/> Ein 
+							Menpunkt kann nur gelï¿½cht werden, wenn er keine Untermenpunkte mehr enthï¿½t. </xsl:when>
+						<xsl:when test=" /cms/error = '8' " > Fehler aufgetreten: Keine Berechtigung. <br/><br/> Sie kï¿½nen in 
+							der gewï¿½lten Menebene keinen Inhalt pflegen. </xsl:when>
 					</xsl:choose>
 				</b>
 			</th>
@@ -106,7 +106,7 @@
 		test="(/cms/userClass = 'autor' or /cms/userClass = 'editor' or /cms/userClass = 'admin') and $CurrentLang=$DefaultLang" > 
 		<option value="add_extern">- neuen Link einpflegen</option> </xsl:if> <xsl:if 
 		test="/cms/userClass = 'admin' and $CurrentLang=$DefaultLang" > <option value="delete">- Inhalt in Archiv verschieben</option> 
-		</xsl:if> <xsl:if test="$DefaultLang != $CurrentLang" > <option value="translate">- Inhalt übersetzen</option> </xsl:if> 
+		</xsl:if> <xsl:if test="$DefaultLang != $CurrentLang" > <option value="translate">- Inhalt bersetzen</option> </xsl:if> 
 		</select> </xsl:template>
 	<!-- ================================================================================= -->
 	<xsl:template name="chooseContent">
@@ -235,7 +235,7 @@
 								width="11" height="22" border="0" alt="" title="" />
 						</td>
 						<td align="right" class="button">
-							<a href="javascript:document.choose.submit()">weiter zum nächsten Schritt</a>
+							<a href="javascript:document.choose.submit()">weiter zum nï¿½hsten Schritt</a>
 						</td>
 						<td align="right">
 							<img 
