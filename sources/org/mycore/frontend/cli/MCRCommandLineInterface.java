@@ -114,6 +114,30 @@ public class MCRCommandLineInterface
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
 
+    // **************************************
+    // Commands for classification management
+    // **************************************
+
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete classification {0}",
+      "mycore.commandline.MCRClassificationCommands.delete String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load classification from file {0}",
+      "mycore.commandline.MCRClassificationCommands.loadFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update classification from file {0}",
+      "mycore.commandline.MCRClassificationCommands.updateFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load all classifications from directory {0}",
+      "mycore.commandline.MCRClassificationCommands.loadFromDirectory String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update all classifications from directory {0}",
+      "mycore.commandline.MCRClassificationCommands.updateFromDirectory String"
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "save classification {0} to {1}",
+      "mycore.commandline.MCRClassificationCommands.save String String" );
+
     // *************************************
     // Commands for executing configurations
     // *************************************
