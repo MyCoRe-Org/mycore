@@ -71,6 +71,26 @@ Falls Sie {\tt MCR.XMLStore.Type=cm7} verwenden, passen Sie in der Datei \\
 
 Falls Sie {\tt MCR.XMLStore.Type=cm8} verwenden, passen Sie in der Datei \\
 {\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_cm8\_*} an.
+Die Einträge sind eigentlich selbsterklärend, so dass an dieser Stelle auf weitere Erläuterungen verzichtet werden kann.
+
+\begin{verbatim}
+# Special values for the persistence layer
+MCR.persistence_cm8_max_connections=2
+MCR.persistence_cm8_library_server=ICMNLSDB
+MCR.persistence_cm8_user_id=icmadmin
+MCR.persistence_cm8_password=????????
+
+# Special values for the text search engine
+MCR.persistence_cm8_textsearch_ccsid=819
+MCR.persistence_cm8_textsearch_lang=DE_DE
+MCR.persistence_cm8_textsearch_indexdir=/home/db2inst1/sqllib/db2ext/indexes
+MCR.persistence_cm8_textsearch_workingdir=/home/db2inst1/sqllib/db2ext/indexes
+\end{verbatim}
+
+Da der Persitence Layer CM8 auf einem Mapping der XML-Daten nach DB2 besteht, müssen die CM8 ItemTypes vor dem Laden der Daten separat angelegt werden. Dies geschiet mittels
+\begin{center} 
+{\tt build.sh create.metastore } \qquad bzw. \qquad {\tt build.cmd create.metastore } 
+\end{center} 
 
 \subsubsection{Die Nutzung von eXist als XML:DB Backend}
 
