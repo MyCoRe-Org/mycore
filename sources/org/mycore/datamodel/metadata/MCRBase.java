@@ -148,6 +148,14 @@ public final String getLabel()
   { return mcr_label; }
 
 /**
+ * This methode return the object schema. If this is not set, null was returned.
+ *
+ * @return the schema as a string
+ **/
+public final String getSchema()
+  { return mcr_schema; }
+
+/**
  * This methode return the instance of the MCRObjectService class.
  * If this was not found, null was returned.
  *
@@ -193,6 +201,17 @@ public final void setLabel(String label)
   mcr_label = label.trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
    mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
+  }
+
+/**
+ * This methode set the object schema.
+ *
+ * @param schema  the object schema
+ **/
+public final void setSchema(String schema)
+  { 
+  if (schema == null) { mcr_schema = ""; return; }
+  mcr_schema = schema.trim();
   }
 
 /**

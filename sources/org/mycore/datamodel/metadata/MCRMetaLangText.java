@@ -36,12 +36,12 @@ import org.mycore.common.MCRUtils;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaLangText extends MCRMetaDefault 
+public class MCRMetaLangText extends MCRMetaDefault 
   implements MCRMetaInterface 
 {
 
 // MetaLangText data
-private String text;
+protected String text;
 
 /**
  * This is the constructor. <br>
@@ -120,7 +120,7 @@ public final String getText()
  *
  * @param element a relevant JDOM element for the metadata
  **/
-public final void setFromDOM(org.jdom.Element element)
+public void setFromDOM(org.jdom.Element element)
   {
   super.setFromDOM(element);
   String temp_text = (element.getText()).trim();
@@ -135,7 +135,7 @@ public final void setFromDOM(org.jdom.Element element)
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Element with the XML MCRMetaLangText part
  **/
-public final org.jdom.Element createXML() throws MCRException
+public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
@@ -155,7 +155,7 @@ public final org.jdom.Element createXML() throws MCRException
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent(boolean parasearch)
+public MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
@@ -177,7 +177,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
  * @exception MCRException if the content of this class is not valid
  * @return a String with the text value
  **/
-public final String createTextSearch(boolean textsearch)
+public String createTextSearch(boolean textsearch)
   throws MCRException
   {
   if (textsearch) return text;
@@ -195,7 +195,7 @@ public final String createTextSearch(boolean textsearch)
  *
  * @return a boolean value
  **/
-public final boolean isValid()
+public boolean isValid()
   {
   if (!super.isValid()) { return false; }
   if ((text == null) || ((text = text.trim()).length() ==0)) {
@@ -206,7 +206,7 @@ public final boolean isValid()
 /**
  * This method make a clone of this class.
  **/
-public final Object clone()
+public Object clone()
   {
   MCRMetaLangText out = new MCRMetaLangText(datapart,subtag,lang,type,inherited,
     text);

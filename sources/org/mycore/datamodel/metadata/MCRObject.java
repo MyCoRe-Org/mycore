@@ -650,4 +650,14 @@ private void deleteLinksFromTable()
   mcr_linktable.deleteClassificationLink(mcr_id);
   }
 
+/**
+ * The method print all informations about this MCRObject.
+ **/
+public final void debug()
+  {
+  logger.debug("MCRObject ID : "+mcr_id.getId());
+  logger.debug("MCRObject Label : "+mcr_label);
+  logger.debug("MCRObject Schema : "+mcr_schema);
+  logger.debug("");
+  }
 }

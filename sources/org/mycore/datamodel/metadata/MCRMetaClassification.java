@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications.MCRClassificationItem;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaClassification extends MCRMetaDefault 
+public class MCRMetaClassification extends MCRMetaDefault 
   implements MCRMetaInterface 
 {
 
@@ -49,8 +49,8 @@ public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
 public static final int MAX_CATEGID_LENGTH = 128;
 
 // MCRMetaClassification data
-private String classid;
-private String categid;
+protected String classid;
+protected String categid;
 
 /**
  * This is the constructor. <br>
@@ -141,7 +141,7 @@ public final void setValue(String set_classid, String set_categid)
  * @exception MCRException if the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  **/
-public final void setFromDOM(org.jdom.Element element)
+public void setFromDOM(org.jdom.Element element)
   throws MCRException
   {
   super.setFromDOM(element);
@@ -157,7 +157,7 @@ public final void setFromDOM(org.jdom.Element element)
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Element with the XML MCRClassification part
  **/
-public final org.jdom.Element createXML() throws MCRException
+public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
@@ -175,7 +175,7 @@ public final org.jdom.Element createXML() throws MCRException
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent(boolean parasearch)
+public MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
@@ -195,7 +195,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
  * @exception MCRException if the content of this class is not valid
  * @return an empty String, because the content is not text searchable.
  **/
-public final String createTextSearch(boolean textsearch)
+public String createTextSearch(boolean textsearch)
   throws MCRException
   {
   return "";
@@ -211,7 +211,7 @@ public final String createTextSearch(boolean textsearch)
  *
  * @return a boolean value
  **/
-public final boolean isValid()
+public boolean isValid()
   {
   if (!super.isValid()) { return false; }
   try {
@@ -228,7 +228,7 @@ public final boolean isValid()
 /**
  * This method make a clone of this class.
  **/
-public final Object clone()
+public Object clone()
   {
   MCRMetaClassification out = new MCRMetaClassification(datapart,subtag,
     inherited,classid,categid);
