@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.common.xml;
 
 import org.w3c.dom.Document;
-import mycore.common.MCRException;
+import org.mycore.common.MCRException;
 
 /**
  * This interface is designed to choose the XML parser. To construct a

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.common.xml;
 
 import java.io.*;
 import java.net.*;
@@ -34,7 +34,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML 

@@ -22,18 +22,17 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.common.xml;
 
 import java.io.*;
 import java.util.Vector;
 import org.w3c.dom.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
  * elements, nodes etc. The class *must* be considered as "work in progress"!
- * There is plenty left to do - and finally it may make its way from the
- * package mycore.user to the package mycore.common.
+ * There is plenty left to do.
  *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen

@@ -22,14 +22,14 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.common.xml;
 
 import java.io.*;
 import java.util.*;
-import mycore.common.MCRException;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.datamodel.MCRObject;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * This class is the cache of one result list included all XML files

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.xml;
+package org.mycore.common.xml;
 
 import java.io.*;
 import org.apache.xerces.parsers.DOMParser;
@@ -33,9 +33,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * This class implements the MCRParserInterface to use the Xerces 1.4.x XML
