@@ -124,7 +124,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
           }
         else if (state == 1) {
           if (fromServer.equals("ok expecting host")) {
-            toServer = host; state = 2; }
+            toServer = hostAlias; state = 2; }
           }
         else if (state == 2) {
           if (fromServer.equals("ok expecting query")) {
