@@ -35,11 +35,14 @@ import java.text.SimpleDateFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
@@ -73,8 +76,11 @@ import org.jdom.output.XMLOutputter;
  * @version $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
-	
-    private static final long serialVersionUID = 1L;
+    /**
+	 * <code>serialVersionUID</code> introduced for compatibility
+	 * with JDK 1.4 (a should have)
+	 */
+	private static final long serialVersionUID = 4121136939476267829L;
 
 	static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
 
@@ -298,16 +304,22 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @return boolean True, if too much parameters were found
 	 */
     private boolean badArguments(HttpServletRequest request, int maxargs) {
-        Enumeration parameters = request.getParameterNames();
-        int nop = 0;
-        while (parameters.hasMoreElements()) {
-            parameters.nextElement();
-            nop++;
-            if (nop > maxargs) {
-                return true;
-            }
-        }
-        return false;
+    	Map parameterMap = request.getParameterMap();
+    	if (parameterMap.size() > maxargs) {
+    		return true;
+    	}
+    	
+    	//If there are no wrong parameters, it it possible some 
+    	//parameters are doubled
+    	Collection values = parameterMap.values();
+    	Iterator iterator = values.iterator();
+    	while (iterator.hasNext()) {
+    		String[] value = (String[]) iterator.next();
+    		if (value.length > 1) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
     
     /**
