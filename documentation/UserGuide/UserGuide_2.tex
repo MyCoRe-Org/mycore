@@ -19,18 +19,13 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \hline
 {\bf mycore} &  Das Root-Verzeichnis des MyCoRe-Kerns \\
 \quad {\bf bin} & Das Verzeichnis der Shellscripte \\
-\qquad build.sh & Shellscript zum Compilieren unter einem UNIX-System \\
-\qquad build.cmd & Shellscript zum Compilieren unter einem UNIX-System \\
-\qquad mycore.sh & Shellscript zur Arbeit mit dem Commandline-Interface unter UNIX \\
-\qquad mycore.cmd & Shellscript zur Arbeit mit dem Commandline-Interface unter Windows \\
-\qquad setup\_cm7.sh & Shellscript f"ur eine UNIX-Umgebung mit IBM Content Manager 7 \\
-\qquad setup\_cm7.cmd & Kommandoscript f"ur eine Windows-Umgebung mit IBM Content Manager 7 \\
-\qquad setup\_cm8.sh & Shellscript f"ur eine UNIX-Umgebung mit IBM Content Manager 8.1/8.2 \\
-\qquad setup\_cm8.cmd & Kommandoscript f"ur eine Windows-Umgebung mit IBM Content Manager 8.1/8.2 \\
-\qquad setup\_linux.sh & Shellscript f"ur eine UNIX-Umgebung mit MySQL und eXist \\
+\qquad build.sh & Startet den Build-Prozess unter einem UNIX-System \\
+\qquad build.cmd & Startet den Build-Prozess unter einem Windows-System \\
+\qquad build.properties & Konfiguration Pfade und Libraries der verwendeten Datenbanken \\ 
 \quad {\bf documentation} & Dokumentationen zu MyCoRe \\
-\quad {\bf lib} & Noterndige zus"atzliche Java-Bibliotheken \\
+\quad {\bf lib} & Notwendige zus"atzliche Java-Bibliotheken \\
 \quad {\bf schema} & XMLSchema Dateien, die anwendungsunabh"angig sind \\
+\quad {\bf stylesheets} & Intern verwendete, anwendungsunabh"angige XSL Stylesheets \\
 \quad {\bf sources/org/mycore} & Die Wurzel des MyCoRe-Source-Baumes \\
 \qquad {\bf datamodel} & Klassen zum Datenmodell \\
 \quad \qquad {\bf classifications} & Klassen zur Arbeit mit den Klassifikationen \\
@@ -55,7 +50,7 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \quad \qquad {\bf oai} & Klassen zur Arbeit mit OAI Komponenten \\
 \quad \qquad {\bf query} & Klassen zur Arbeit mit dem MyCoRe internen Query-System \\
 \qquad {\bf user} & Klassen des User- und Rechteverwaltungssystems \\
-\quad build.xml & Konfigurations-File für die Arbeit mit ANT \\
+\quad build.xml & Ant Build-Datei, steuert den MyCoRe Build-Prozess \\
 \quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen. \\
 \hline
 \end{supertabular}
@@ -63,25 +58,60 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 %
 \section{Konfiguration und "Ubersetzten des Kerns}
 %
-%
-Nach dem checkout der Files muss als erstes dieses Paket "ubersetzt werden. Die Arbeit erfolgt in den unten angegebenen Schritten.\\
-\begin{enumerate} 
-\item Zur Anpassung der erforderlichen Umgebung gibt es zwei Wege. Entweder alle notwendigen Variablen wie CLASSPATH usw. werden in den entsprechenden Nutzer-Profile gesetzt oder ({\bf empfohlen}) sie setzen an dieser Stelle nur die Environment-Variable {\bf MYCORE\_HOME} in Ihrer Systemumgebung und kopieren das entsprechende Template {\it setup\_....sh} (bzw. {\it setup\_....cmd}) im Verzeichnis {\it bin} dort nach {\it setup.sh} (bzw. {\it setup.cmd} f"ur die Windows Plattform) F"ur die unterst"utzten Systeme stehen jeweils entsprechende Files bereit. Passen Sie nun das Setup-Script an die eigene Konfiguration hinsichtlich der ben"otigten Software (Pfade zu ANT, Java usw.) an. 
-\item Als n"achstes ist im File {\it \$MYCORE\_HOME/build.xml} die Zeile \\
+\begin{enumerate}
+\item
+MyCoRe verwendet das Apache Ant Build-Tool, um den Quellcode zu übersetzen und eine vollständige 
+Beispiel-Applikation zu erzeugen. Entsprechend der Installationsanleitung des Ant-Paketes sollten Sie zunächst die
+Umgebungsvariable {\tt JAVA\_HOME} und {\tt ANT\_HOME} gesetzt haben. Sollten diese Variablen auf Ihrem System noch nicht
+gesetzt sein, können Sie dies in der Datei {\tt build.sh} (Unix) bzw. {\tt build.cmd} (Windows) nachholen und korrigieren.
+
+\item
+Es ist nicht nötig, weitere Umgebungsvariablen wie etwa den Java CLASSPATH zu setzen. Das MyCoRe Ant Build-Skript 
+ignoriert den lokal gesetzten {\tt CLASSPATH} völlig und generiert stattdessen einen eigenen {\tt CLASSPATH} entsprechend Ihrer Konfiguration. 
+Somit können wir sicherstellen, dass nur die erforderlichen Pakete und Klassen in der richtigen Version verwendet werden. Die Konfiguration der 
+Systemumgebung der verwendeten Datenbanken für die XML-Speicherung (IBM CM7, IBM CM8, Apache Xindice, eXist) und die Speicherung von Tabellen
+über JDBC in einer relationalen Datenbank (IBM DB2, MySQL, optional auch andere) wird in der Datei {\tt bin/build.properties}
+festgelegt. 
+
+\item
+In der Regel werden Sie nur die beiden entsprechenden Blöcke für die verwendete XML-Datenbank ({\tt MCR.XMLStore.*}) und die
+verwendete relationale Datenbank ({\tt MCR.JDBCStore.*}) durch kommentieren bzw. auskommentieren der vorgegebenen Zeilen und 
+Anpassen der beiden Variablen {\tt MCR.XMLStore.BaseDir} und \\
+{\tt MCR.JDBCStore.BaseDir} an die lokalen Installationsverzeichnisse
+Ihrer Datenbanksysteme anpassen müssen. Die weiteren Variablen steuern die für den Betrieb notwendigen JAR-Dateien 
+({\tt MCR.*Store.Jars}), eventuell zusätzlich in den CLASSPATH einzubindende class-Dateien oder Ressourcen ({\tt MCR.*Store.ClassesDirs})
+und zur Laufzeit erforderliche native Libraries bzw. DLLs ({\tt MCR.*Store.LibPath}). Passen Sie die Werte entsprechend der
+Dokumentation Ihres Datenbankproduktes und der Kommentare in der Datei selbst an.
+
+\item
+Sie sollten zunächst prüfen, ob ihre Systemumgebung korrekt eingerichtet ist, indem Sie 
 \begin{center}
-{\tt \begin{verbatim}<property name="persistency" value="cm7" />\end{verbatim}}
+{\tt build.sh info } \qquad bzw. \qquad {\tt build.cmd info }
 \end{center}
-entsprechend des gew"ahlten Persistence-Layers anzupassen. M"ogliche Werte sind {\it cm7}, {\it cm8} und {\it xmldb}.
-\item Starten Sie nun die "Ubersetzung mit einem Aufruf von {\it ant} oder ({\bf empfohlen}) der Ausf"uhrung des Shell-Scripts {\it bin/build.sh} (bzw. {\it bin/build.cmd}). Bei der Abarbeitung des Kommandos ohne Parameter wird Ihnen eine Auswahl an m"oglichen Parametern angeboten. So k"onnen Sie hier zum Beispiel alle Klassen kompilieren oder nur die Javadoc-Dokumentation bzw. diese Dokumentation erstellen. 
-\item Um die f"ur die MyCoRe-Anwendung ben"otigten Java-Klassen zu erzeugen starten Sie einfach \\
+ausführen. Das Ant Build Tool zeigt Ihnen daraufhin die verwendeten JDK- und Ant-Software-Versionen und den
+generierten CLASSPATH und LIBPATH (für Unix Systeme) an.
+
+\item 
+Eine Übersicht über alle wesentlichen Build-Ziele erhalten Sie mit
 \begin{center}
-{\it \$MYCORE\_HOME/bin/build.sh jar }
-\end{center} 
+{\tt build.sh usage } \qquad bzw. \qquad {\tt build.cmd usage } 
+\end{center}
+
+\item
+Übersetzen Sie alle MyCoRe Quellcode-Dateien mit dem Befehl
+\begin{center}
+{\tt build.sh jar } \qquad bzw. \qquad {\tt build.cmd jar }
+\end{center}
+Dabei entsteht, abhängig von dem von Ihnen gewählten Datenbank-System zur Speicherung der XML-Daten eine Jar-Datei 
+{\tt lib/mycore-for-[cm7|cm8|xmldb].jar}.
+
+\item
+Optional können Sie auch JavaDoc Quellcode-Dokumentation im HTML-Format generieren lassen, indem Sie
+\begin{center}
+{\tt build.sh jar } \qquad bzw. \qquad {\tt build.cmd jar }
+\end{center}
+aufrufen. Dabei entstehen HTML-Dateien im Verzeichnis {\tt documentation/html}.
+
 \end{enumerate} 
-Abh"angig von Ihrer Wahl beim build werden weitere Unterverzeichnisse im Verzeichnisbaum unter {\it \$MYCORE\_HOME} erstellt: 
-\begin{itemize} 
-\item mycore/classes $\longrightarrow$ enth"alt die Java Klassen 
-\item mycore/javsadocs $\longrightarrow$  enth"alt die Java Dokumentation 
-\end{itemize} 
 %
 %
