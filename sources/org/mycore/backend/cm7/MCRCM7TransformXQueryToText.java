@@ -315,6 +315,10 @@ private final String traceOneCondition(String cond)
   String attr[] = new String[10];
   boolean isattr[] = new boolean[10];
   for (i=0;i<counter;i++) {
+    int x = tag[i].indexOf("@XLINK:");
+    if (x != -1) {
+      tag[i] = tag[i].substring(0,x+1)+tag[i].substring(x+7,tag[i].length());
+      }
     if (tag[i].indexOf("@") != -1) { 
       isattr[i] = true;
       StringBuffer sbtag = new StringBuffer(128);
