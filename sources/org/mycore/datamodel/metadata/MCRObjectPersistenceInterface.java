@@ -97,29 +97,6 @@ public byte [] receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
- * The methode receive the service date of a object from the data store.
- *
- * @param mcr_id   the MyCoRe object ID
- * @param type     the type of the service date
- * @return the date for the type or null
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public GregorianCalendar receiveServiceDate(MCRObjectID mcr_id, String type)
-  throws MCRConfigurationException, MCRPersistenceException;
-
-/**
- * The methode receive the label of object from the data store.
- *
- * @param mcr_id   the MyCoRe object ID
- * @return the label
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public String receiveLabel(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException;
-
-/**
  * The methode update a object in the data store.
  *
  * @param mcr_tc      the typed content
