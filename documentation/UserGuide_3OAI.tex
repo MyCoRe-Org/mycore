@@ -1,0 +1,111 @@
+\subsection{Nutzung der OAI Schnittstelle}
+
+\subsubsection*{Grundlagen}
+
+Die Open Archives Initiative (\textsl{http://www.openarchives.org/}) hat 2001 ein offenes Protokoll f"ur das Sammeln (Harvesting) von Metadaten vorgestellt. Dies geschah vor dem Hintergrund, dass g"angige Suchmaschinen im WWW f"ur
+die wissenschaftliche Nutzung wegen der i.d.R. un"uberschaubaren Treffermenge und der fehlenden Qualit"at der angebotenen Treffer kaum nutzbar sind. Das \textbf{Open Archives Initiative Protocol for Metadata Harvesting 
+(OAI-PMH)} liegt mittlerweile in der Version 2.0 vor.\linebreak 
+Das OAI-PMH dient zur Kommunikation zwischen \textbf{Data Providern} und \textbf{Service Providern}. Unter einem Data Provider versteht man hierbei ein Archivierungssystem, dessen Metadaten von einem (oder mehreren) Service Provider(n) abgerufen werden, der diese als Basis zur Bildung von Mehrwertdiensten benutzt (z.B. der Suche "uber viele Archive gleichzeitig).\linebreak
+Zum besseren Verst"andnis der weiteren Dokumentation f"uhre ich hier die wichtigsten Definitionen kurz an:
+\begin{itemize}
+\item Ein \textbf{Harvester} ist ein Client, der OAI-PMH Anfragen stellt. Ein Harvester wird von einem Service Provider betrieben, um Metadaten aus Repositories zu sammeln.
+\item Ein \textbf{Repository} ist ein "uber das Netzwerk zug"anglicher Server, der OAI-PMH Anfragen verarbeiten kann, wie sie im Open Archives Initiative Protocol for Metadata Harvesting 2.0 vom 2002-06-14 beschrieben werden (http://www.openarchives.org/OAI/openarchivesprotocol.html). Ein Repository wird von einem Data Provider betrieben, um Harvestern den Zugriff auf Metadaten zu erm"oglichen.
+\end{itemize} 
+
+Der f"ur MyCoRe und Miless implementierte OAI Data Provider ist zertifiziert und erf"ullt den OAI-PMH 2.0 Standard.
+
+\subsubsection*{Der OAI Data Provider}
+
+MyCoRe bietet ein extrem flexibles Klassifikations-/Kategoriensystem. Ein OAI-Repository kann hiervon nur eine Klassifikation zur Strukturierung der Metadaten abbilden, d.h. einer MyCoRe-Klassifikation wird zu einem OAI-Repository. Es werden nur
+Metadaten zu Archivaten an den Harvester ausgeliefert, die in genau dieser MyCoRe-Klassifikation erfasst sind.
+Zur weiteren Einschr"ankung kann eine weitere Klassifikation angegeben werden, die f"ur den OAI Data Provider aber nicht
+strukturbildend ist.\linebreak
+Sollen weitere Daten "uber OAI zug"anglich gemacht werden, so bietet der OAI Data Provider die M"oglichkeit, unter verschiedenen Namen mehrere Servlet-Instanzen zu betreiben, wobei eine Instanz jeweils ein OAI-Repository darstellt.
+
+\subsubsection*{Installation}
+
+Zur Einbindung des OAI Data Providers m"ussen Eintragungen in den Deployment Descriptor des Servletcontainers und 
+in die mycore.properties erfolgen.
+
+\paragraph*{Der Deployment Descriptor}
+
+F"ur jedes OAI-Repository muss eine Servlet-Instanz in den Deployment Descriptor nach folgendem Muster eingetragen werden:
+
+\begin{verbatim}
+  <servlet id="OAIDataProvider">
+    <servlet-name>
+      OAIDataProvider
+    </servlet-name>
+    <servlet-class>
+      org.mycore.services.oai.MCROAIDataProvider
+    </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>
+      OAIDataProvider
+    </servlet-name>
+    <url-pattern>
+      /servlets/OAIDataProvider
+    </url-pattern>
+  </servlet-mapping>
+\end{verbatim}
+
+\paragraph*{Die mycore.properties}
+
+Bei den einzurichtenden Properties ist zwischen \textsl{instanzunabh"angigen} und \textsl{instanzabh"angigen} Properties
+zu unterscheiden. Instanzunabh"angige Properties sind hierbei f"ur jedes angebotene OAI-Repository g"ultig, instanzabh"angige
+Properties beziehen sich auf das jeweilige OAI-Repository.
+
+\subparagraph*{Instanzunabh"angige Properties}
+
+\begin{itemize}
+\item \verb MCR.oai.adminemail=admin@uni-irgendwo.de \textbf{ (notwendig)} Der Administrator der OAI-Repositories.
+\item \verb MCR.oai.resumptiontoken.dir=/mycore/temp \textbf{ (notwendig)} Ein Verzeichnis, in welches der OAI Data
+  Provider Informationen "uber Resumption Token ablegt.
+\item \verb MCR.oai.resumptiontoken.timeout=48 \textbf{ (notwendig)} Die Zeit (in Stunden), f"ur die die Informationen
+  "uber die Resumption Token nicht gel"oscht werden. Da das L"oschen nur erfolgt, wenn auf ein OAI-Repository
+  zugegriffen wird, k"onnen die Dateien evtl. auch l"anger aufgehoben werden.
+\item \verb MCR.oai.maxreturns=50 \textbf{ (notwendig)} Die maximale L"ange von Ergebnislisten, die an einen Harvester
+  zur"uckgegeben werden. "Uberschreitet eine Ergebnisliste diesen Wert, so wird ein Resumption Token angelegt.
+\item \verb MCR.oai.queryservice=org.mycore.services.oai.MCROAIQueryService \textbf{ (notwendig)} Die Klasse, die f"ur
+  das Archiv das Query-Interface implementiert. F"ur Miless ist dies \verb miless.oai.OAIService .
+\item \verb MCR.oai.metadata.transformer.oai_dc=MyCoReOAI-mycore2dc.xsl \textbf{ (notwendig)} Das Stylesheet, das die
+  Transformation aus dem im Archiv benutzten Metadatenschema in das f"ur OAI benutzte OAI Dublin Core Metadatenschema
+  durchf"uhrt. Wenn sich das im Archiv benutzte Metadatenschema "andert, muss dieses Stylesheet angepasst werden.
+  Optional k"onnen weitere Stylesheets angegeben werden, die einen Harvester mit anderen Metadatenformaten versorgen,
+  z.B. \linebreak \verb MCR.oai.metadata.transformer.rfc1806=MyCoReOAI-mycore2rfc.xsl. \linebreak Diese Stylesheets 
+  benutzen als Eingabe das Ergebnis des ersten Stylesheets.
+\end{itemize} 
+
+\subparagraph*{Instanzabh"angige Properties}
+
+Bei instanzabh"angigen Properties wird der im Deployment Descriptor verwendete Servletname zur Unterscheidung f"ur
+die einzelnen Repositories verwendet.
+
+\begin{itemize}
+\item \verb MCR.oai.repositoryname.OAIDataProvider=Test-Repository \textbf{ (notwendig)} Der Name
+  des OAI-Repositories.
+\item \verb MCR.oai.repositoryidentifier.OAIDataProvider=mycore.de \textbf{ (notwendig)} Der Identifier des OAI-Repositories 
+  (wird vom Harvester abgefragt).
+\item \verb MCR.oai.setscheme.OAIDataProvider=MyCoReDemoDC_class_1 \textbf{ (notwendig)} Die MyCoRe-Klassifikation, die
+  zur Bildung der Struktur des OAI-Repositories verwendet wird.
+\item \verb MCR.oai.restriction.classification.OAIDataProvider=MyCoReDemoDC_class_2 \textbf{ (optional)} Die
+  MyCoRe-Klassifikation, die zur Beschr"ankung der Suche verwendet wird.
+\item \verb MCR.oai.restriction.category.OAIDataProvider=dk01 \textbf{ (optional)} Die
+  MyCoRe-Kategorie, die zur Beschr"ankung der Suche verwendet wird.
+\item \verb MCR.oai.friends.OAIDataProvider=miami.uni-muenster.de/servlets/OAIDataProvider \textbf{ (optional)} Unter
+  dieser Property k"onnen weitere (bekannte und zertifizierte) OAI-Repositories angegeben werden, um den Harvestern
+  die Suche nach weiteren Datenquellen zu vereinfachen.
+\end{itemize} 
+
+\subsubsection*{Test}
+
+Um zu testen, ob das eigene OAI-Repository funktioniert, kann man sich des Tools bedienen, das von der \textsl{Open Archives
+Initiative} unter \textbf{http://www.openarchives.org} zur Verf"ugung gestellt wird. Unter dem Men"upunkt \textbf{Tools}
+wird der \textbf{OAI Repository Explorer} angeboten.
+
+\subsubsection*{Zertifizierung und Registrierung}
+
+Ebenfalls auf der oben angegebenen Website findet sich unter dem Men"upunkt \textbf{Community} der Eintrag
+\textbf{Register as a data provider}. Dort kann man anfordern, das eigene Repository zu zertifizieren und
+zu registrieren. Die Antwort wird an die in den Properties eingetragene EMail-Adresse geschickt.
