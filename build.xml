@@ -187,6 +187,7 @@
            author="true"
            doctitle="MyCoRe"
            >
+      <link href="http://www.mycore.de/library/jdk1.2.2/docs/api/"/>
       <group title="MyCoRe Common" packages="mycore.common.*"/>
       <group title="MyCoRe XML" packages="mycore.xml.*"/>
       <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
