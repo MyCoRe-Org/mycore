@@ -25,7 +25,6 @@
 package mycore.cm7;
 
 import java.util.*;
-import java.sql.*;
 import mycore.common.*;
 import mycore.sql.*;
 
@@ -63,32 +62,13 @@ public class MCRCM7Bypass
 
     if( ! tables.containsKey( indexClassName ) )
     {
-      int code = getKeywordCode( indexClassName, "3" );
+      String code = getKeywordCode( indexClassName, "3" );
 
       String query = "SELECT CLASSTABLENAME FROM " + owner +
                      ".SBTCLASSDEFS WHERE CLASSID = " + code;
 
-      String name = null;
-      Connection conn = MCRSQLConnectionPool.instance().getConnection();
-
-      try
-      {
-        Statement stmt = conn.createStatement();
-        ResultSet rs   = stmt.executeQuery( query );
-
-        if( rs.next() ) name = rs.getString( "CLASSTABLENAME" );
-
-        rs.close();
-        stmt.close();
-      }
-      catch( Exception ex )
-      { 
-        throw new MCRPersistenceException 
-        ( "Error while retrieving DB2 table name for index class " + indexClassName, ex ); 
-      }
-      finally
-      { MCRSQLConnectionPool.instance().releaseConnection( conn ); }
-
+      String name = MCRSQLConnection.justGetSingleValue( query );
+      
       if( name == null )
       {
         throw new MCRConfigurationException
@@ -110,9 +90,8 @@ public class MCRCM7Bypass
   {
     if( ! columns.containsKey( keyFieldName ) )
     {
-      int code = getKeywordCode( keyFieldName, "1" );
-      String sCode  = String.valueOf( code );
-      String column = "ATTRIBUTE00000".substring( 0, 14 - sCode.length() ) + sCode;
+      String code = getKeywordCode( keyFieldName, "1" );
+      String column = "ATTRIBUTE00000".substring( 0, 14 - code.length() ) + code;
       columns.put( keyFieldName, column );
     }
     return columns.getProperty( keyFieldName );
@@ -126,38 +105,19 @@ public class MCRCM7Bypass
    * @param fieldName the name of the Content Manager index class or keyfield
    * @return the keyword code used by Content Manager
    **/
-  protected static int getKeywordCode( String fieldName, String keywordClass )
+  protected static String getKeywordCode( String fieldName, String keywordClass )
   {
     String query = "SELECT KEYWORDCODE FROM " + owner + ".SBTNLSKEYWORDS WHERE " +
                    "KEYWORDSTRING LIKE '" + fieldName + "' AND " +
                    "KEYWORDCLASSFI = " + keywordClass;
  
-    int keywordCode = -1;
-    Connection conn = MCRSQLConnectionPool.instance().getConnection();
-
-    try
-    {
-      Statement stmt = conn.createStatement();
-      ResultSet rs   = stmt.executeQuery( query );
-
-      if( rs.next() ) keywordCode = rs.getInt( "KEYWORDCODE" );
-
-      rs.close();
-      stmt.close();
-    }
-    catch( Exception ex )
-    {
-      throw new MCRPersistenceException
-      ( "Error while retrieving keyword code from SBTNLSKEYWORDS table for field " + fieldName, ex );
-    }
-    finally
-    { MCRSQLConnectionPool.instance().releaseConnection( conn ); }
-
-    if( keywordCode == -1 )
+    String code = MCRSQLConnection.justGetSingleValue( query );
+    
+    if( code == null )
     {
       throw new MCRConfigurationException
       ( "Could not find keyword code in SBTNLSKEYWORDS for field " + fieldName );
     }
-    else return keywordCode;
+    else return code;
   }
 }
