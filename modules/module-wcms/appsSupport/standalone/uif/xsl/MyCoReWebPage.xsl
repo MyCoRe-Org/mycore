@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2004-11-18 15:10:48 $ -->
+<!-- $Revision: 1.2 $ $Date: 2004-12-06 16:10:15 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	exclude-result-prefixes="xlink" >
@@ -109,7 +109,7 @@
 					</center>
 				</xsl:when>
 				<!-- added by wcms -->
-				<xsl:when test="name() = 'toc'">
+				<xsl:when test="name() = 'toc' or 'TOC'">
 					<xsl:apply-templates select="." >
 						<xsl:with-param name="browserAddress" select="$browserAddress" />
 					</xsl:apply-templates>
