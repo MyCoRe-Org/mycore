@@ -230,7 +230,7 @@
   <!-- =================================================================== -->
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
-  <target name="clean">
+  <target name="clean" depends="init">
     <delete includeEmptyDirs="true" >
       <fileset dir="${mycore.javadoc}" />
       <fileset dir="${mycore.class}" />
