@@ -296,8 +296,20 @@ public class MCRConfiguration
       }
       else if( t instanceof Exception )
         throw new MCRConfigurationException( msg, (Exception)t ); 
-      else
-        throw new MCRConfigurationException( msg );
+      else{
+      	msg+=" because of: "+t.getMessage();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try
+		{
+		  PrintStream buffer = new PrintStream( baos );
+		  t.printStackTrace( buffer );
+		  buffer.close();
+		}
+		catch( Exception willNeverBeThrown ){}
+      	msg+="\n"+baos.toString();
+      	baos=null;
+		throw new MCRConfigurationException( msg );
+      }
     }    
     return o;
   }
