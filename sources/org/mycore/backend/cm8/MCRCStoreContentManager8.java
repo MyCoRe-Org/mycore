@@ -230,9 +230,10 @@ public class MCRCStoreContentManager8
       DKTextICM ddo = (DKTextICM)connection.createDDO( file.getStorageID() );
       ddo.retrieve(DK_CM_CONTENT_NO);
       
-      String url = ddo.getContentURL(-1,-1,-1);
-      logger.debug("URL = "+url);
-      InputStream is = new URL( url ).openStream();
+      String url[] = ddo.getContentURLs(DK_CM_CHECKOUT,-1,-1,
+        DK_ICM_GETINITIALRMURL);
+      logger.debug("URL = "+url[0]);
+      InputStream is = new URL( url[0] ).openStream();
       MCRUtils.copyStream( is, target );
       
       logger.debug("The file was retrieved from CM8 Ressource Manager.");
