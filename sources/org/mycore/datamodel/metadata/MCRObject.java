@@ -287,8 +287,8 @@ public final void createInDatastore() throws MCRPersistenceException
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
-  mcr_persist.create(mcr_tc,xml,mcr_ts);
   mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,xml);
+  mcr_persist.create(mcr_tc,xml,mcr_ts);
   deleteLinksFromTable();
   addLinksToTable(mcr_tc);
   // add the MCRObjectID to the child list in the parent object
@@ -478,7 +478,8 @@ public final void receiveFromDatastore(MCRObjectID id)
   if (xml != null) {
     setFromXML(xml,false); }
   else {
-    logger.warn("The XML file for ID "+mcr_id.getId()+" was not retrieved.");
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
     }
   }
 
@@ -496,7 +497,8 @@ public final byte [] receiveXMLFromDatastore(String id)
   mcr_id = new MCRObjectID(id);
   byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
   if (xml == null) {
-    logger.warn("The XML file for ID "+mcr_id.getId()+" was not retrieved.");
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
     }
   return xml;
   }
