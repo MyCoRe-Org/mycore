@@ -167,7 +167,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
       if( ( startPos != null ) || ( stopPos != null ) ) cgi.append( "?" );
       if( startPos != null ) cgi.append( "start=" ).append( startPos );
       if( ( startPos != null ) && ( stopPos != null ) ) cgi.append( "&" );
-      if( stopPos != null ) cgi.append( "stop=" ).append( stopPos );
+      if( stopPos != null ) cgi.append( "end=" ).append( stopPos );
     
       URLConnection connection = getConnection( cgi.toString() );
       forwardData( connection, out );
