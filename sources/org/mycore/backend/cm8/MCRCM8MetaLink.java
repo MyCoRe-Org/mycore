@@ -49,12 +49,13 @@ public class MCRCM8MetaLink implements DKConstantICM, MCRCM8MetaInterface
  * @param connection the connection to the CM8 datastore
  * @param dsDefICM the datastore definition
  * @param prefix the prefix name for the item type
+ * @param textindex the definition of the text search index
  * @return a DKComponentTypeDefICM for the MCR datamodel element
  * @exception MCRPersistenceException general Exception of MyCoRe CM8
  **/
 public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix)
-  throws MCRPersistenceException
+  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
+  DKTextIndexDefICM textindex) throws MCRPersistenceException
   {
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
   String typename = prefix+"xlinktype";

@@ -135,9 +135,9 @@ System.out.println("================================");
     connection = MCRCM8ConnectionPool.getConnection();
     DKNVPair parms [] = new DKNVPair[3];
     parms[0] = new DKNVPair(DK_CM_PARM_MAX_RESULTS,
-      "0");
-      //new Integer(maxresults).toString());
+      new Integer(maxresults).toString());
     parms[1] = new DKNVPair(DK_CM_PARM_RETRIEVE,
+      //new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
       new Integer(DK_CM_CONTENT_YES));
     parms[2] = new DKNVPair(DK_CM_PARM_END,null);
     DKResults rsc = (DKResults)connection.evaluate(query,

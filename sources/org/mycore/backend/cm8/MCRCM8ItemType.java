@@ -75,10 +75,10 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
   {
   try {
   // read the configuration
+  MCRConfiguration conf = MCRConfiguration.instance();
   String sb = new String("MCR.persistence_cm8_"+mcr_type);
-  String mcr_item_type_name = MCRConfiguration.instance().getString(sb); 
-  String mcr_item_type_prefix = MCRConfiguration.instance()
-    .getString(sb+"_prefix"); 
+  String mcr_item_type_name = conf.getString(sb); 
+  String mcr_item_type_prefix = conf.getString(sb+"_prefix"); 
   // connect to server
   DKDatastoreICM connection = null;
   try {
@@ -129,6 +129,48 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
         +mcr_item_type_name+" exist.");
       return; }
 
+    // create the TIE definition
+    DKTextIndexDefICM mcr_item_text_index = new DKTextIndexDefICM();
+    int text_commitcount = conf
+      .getInt("MCR.persistence_cm8_textsearch_commitcount",1);
+    mcr_item_text_index.setCommitCount(text_commitcount);
+    mcr_item_text_index.setFormat(DKTextIndexDefICM.TEXT_INDEX_DOC_FORMAT_TEXT);
+    int text_ccsid = conf.getInt("MCR.persistence_cm8_textsearch_ccsid",850);
+    mcr_item_text_index.setIndexCCSID(text_ccsid);
+    String text_indexdir = conf
+       .getString("MCR.persistence_cm8_textsearch_indexdir",
+       "/home/icmadmin/index");
+    mcr_item_text_index.setIndexDir(text_indexdir);
+    String text_lang = conf.getString("MCR.persistence_cm8_textsearch_lang",
+       "DE");
+    mcr_item_text_index.setIndexLangCode(text_lang);
+    int text_minchanges = conf
+       .getInt("MCR.persistence_cm8_textsearch_minchanges",1);
+    mcr_item_text_index.setMinChanges(text_minchanges);
+    String text_updatefreq = conf
+       .getString("MCR.persistence_cm8_textsearch_updatefreq","");
+    mcr_item_text_index.setUpdateFrequency(text_updatefreq);
+    String text_workingdir = conf
+       .getString("MCR.persistence_cm8_textsearch_workingdir",
+       "/home/icmadmin/work");
+    mcr_item_text_index.setWorkingDir(text_workingdir);
+    System.out.println(mcr_item_type_name+" - TextSearch - CommitCount = "+
+      mcr_item_text_index.getCommitCount());
+    System.out.println(mcr_item_type_name+" - TextSearch - Format = "+
+      mcr_item_text_index.getFormat());
+    System.out.println(mcr_item_type_name+" - TextSearch - CCSID = "+
+      mcr_item_text_index.getIndexCCSID());
+    System.out.println(mcr_item_type_name+" - TextSearch - IndexDir = "+
+      mcr_item_text_index.getIndexDir());
+    System.out.println(mcr_item_type_name+" - TextSearch - Lang = "+
+      mcr_item_text_index.getIndexLangCode());
+    System.out.println(mcr_item_type_name+" - TextSearch - MinChanges = "+
+      mcr_item_text_index.getMinChanges());
+    System.out.println(mcr_item_type_name+" - TextSearch - UpdateFreq = "+
+      mcr_item_text_index.getUpdateFrequency());
+    System.out.println(mcr_item_type_name+" - TextSearch - WorkingDir = "+
+      mcr_item_text_index.getWorkingDir());
+
     // create the root itemtype
     DKItemTypeDefICM item_type = new DKItemTypeDefICM(connection);
     System.out.println("Info CM8 Datastore Creation: "+mcr_item_type_name);
@@ -154,6 +196,7 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     attr.setNullable(false);
     attr.setUnique(false);
     attr.setTextSearchable(true);
+    attr.setTextIndexDef(mcr_item_text_index);
     item_type.addAttr(attr);
 
     // get the configuration JDOM root element
@@ -201,7 +244,7 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix);
+              mcr_item_type_prefix,mcr_item_text_index);
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -268,7 +311,7 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix);
+              mcr_item_type_prefix,mcr_item_text_index);
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -331,7 +374,7 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix);
+              mcr_item_type_prefix,mcr_item_text_index);
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -389,7 +432,8 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
         try {
           obj = Class.forName(stb.toString()).newInstance();
           DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
-            createItemType(mcr_subtag,connection,dsDefICM,mcr_item_type_prefix);
+            createItemType(mcr_subtag,connection,dsDefICM,mcr_item_type_prefix,
+            mcr_item_text_index);
           item_tag.addSubEntity(item_subtag);
           }
         catch (ClassNotFoundException e) {
