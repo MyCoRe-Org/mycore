@@ -30,12 +30,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -62,20 +62,33 @@ public class MCROAIQueryService implements MCROAIQuery {
     static Logger logger = Logger.getLogger(MCROAIQueryService.class.getName());
     static MCRQueryCollector collector;
 
+    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; //maximum number of returned list sets
     private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
 	private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme"; // the classification id which serves as scheme for the OAI set structure
     private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier of the repository
     private static final String STR_OAI_QUERYTYPE = "MCR.oai.querytype" ; // search query type
 
-	private MCRConfiguration config;
+	private static MCRConfiguration config;
+	private static int maxReturns;
+	
+	private int deliveredResults = 0;
+	private int numResults = 0;
+	private String lastQuery = "";
+	private Object[] resultArray;
+	
+	static {
+		MCRConfiguration.instance().reload(true);
+		config = MCRConfiguration.instance();
+		PropertyConfigurator.configure(config.getLoggingProperties());
+		maxReturns = config.getInt(STR_OAI_MAXRETURNS);
+	}
 	
 	/**
 	 * Method MCROAIQueryService.
 	 */
 	public MCROAIQueryService() {
-		config = MCRConfiguration.instance();
-   	if (collector==null){
+		if (collector==null){
 			int cThreads=config.getInt("MCR.Collector_Thread_num",2);
 			int aThreads=config.getInt("MCR.Agent_Thread_num",6);
 			collector=new MCRQueryCollector(cThreads,aThreads);
@@ -348,6 +361,30 @@ public class MCROAIQueryService implements MCROAIQuery {
         String repositoryId = null;
         String querytype = null;
         
+		if (hasMore() && 
+				((listRecords == lastQuery.equals("listRecords")) ||
+						(!listRecords == lastQuery.equals("listIdentifiers")))) {
+			for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
+				String objectId = (String) resultArray[i];
+				MCRObject object = new MCRObject();
+				object.receiveFromDatastore(objectId);
+				
+				String[] identifier = getHeader(object, 
+						objectId, 
+						repositoryId,
+						instance);
+				list.add(identifier);
+				
+				if (listRecords) {
+					Element eMetadata = object.getMetadata().createXML();
+					list.add(eMetadata);
+				}
+		    }
+			deliveredResults = Math.min(maxReturns + deliveredResults, numResults);
+			return list;
+		}
+		
+		resetResults(listRecords ? "listRecords" : "listIdentifiers");
 		try {
 			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
 			String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
@@ -429,9 +466,11 @@ public class MCROAIQueryService implements MCROAIQuery {
 			results.retainAll(doQuery(query,querytype));
 		}
 		
-		Iterator iterator = results.iterator();
-		while (iterator.hasNext()) {
-			String objectId = (String) iterator.next();
+	    numResults = results.size();   
+		deliveredResults = Math.min(maxReturns, numResults);
+		resultArray = results.toArray();
+		for (int i = 0; i < deliveredResults; i++) {
+			String objectId = (String) resultArray[i];
 			MCRObject object = new MCRObject();
 			object.receiveFromDatastore(objectId);
 			
@@ -450,4 +489,18 @@ public class MCROAIQueryService implements MCROAIQuery {
 		return list;
 	}
 	
+	/**
+	 * Method hasMore.
+	 * @return true, if more results for the last query exists, else false
+	 */
+	public boolean hasMore() {
+		return deliveredResults < numResults;
+	}
+
+	private void resetResults(String query) {
+		deliveredResults = 0;
+		numResults = 0;
+		resultArray = null;
+		lastQuery = query;
+	}
 }

@@ -56,7 +56,8 @@ public interface MCROAIQuery {
 	public List listSets(String instance);
 	
 	/**
-	 * Method listIdentifiers.Gets a list of identifiers
+	 * Method listIdentifiers. Gets a list of identifiers with max. STR_OAI_MAXRETURNS
+	 *                         elements.
 	 * @param set the category (if known) is in the first element
 	 * @param from the date (if known) is in the first element
 	 * @param until the date (if known) is in the first element
@@ -79,7 +80,8 @@ public interface MCROAIQuery {
 	public List getRecord(String id, String instance);
 	
 	/**
-	 * Method listRecords.Gets a list of metadata records
+	 * Method listRecords. Gets a list of metadata records with max. STR_OAI_MAXRETURNS
+	 *                     elements.
 	 * @param set the category (if known) is in the first element
 	 * @param from the date (if known) is in the first element
 	 * @param until the date (if known) is in the first element
@@ -89,5 +91,10 @@ public interface MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 */
 	public List listRecords(String[] set, String[] from, String[] until, String instance);
-		
+	
+	/**
+	 * Method hasMore.
+	 * @return true, if more results for the last query exists, else false
+	 */
+	public boolean hasMore();
 }
