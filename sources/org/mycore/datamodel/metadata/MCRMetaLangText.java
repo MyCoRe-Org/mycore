@@ -131,6 +131,7 @@ public final void setFromDOM(Node metadata_langtext_node)
   subtag = metadata_langtext_node.getNodeName(); 
   String temp_lang = ((Element)metadata_langtext_node).getAttribute("xml:lang");
   if (temp_lang!=null) { lang = temp_lang; }
+  type = ((Element)metadata_langtext_node).getAttribute("type");
   Node langtext_textelement = metadata_langtext_node.getFirstChild();
   String temp_text = ((Text)langtext_textelement).getData().trim();
   if (temp_text==null) { temp_text = ""; }
@@ -149,8 +150,10 @@ public final String createXML() throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRMetaLangText : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xml:lang=\"")
-    .append(lang).append("\">").append(NL);
+  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    sb.append("\" type=\"").append(type); }
+  sb.append("\">").append(NL);
   sb.append(text);
   sb.append("</").append(subtag).append('>').append(NL);
   return sb.toString();
@@ -172,6 +175,9 @@ public final String createTS(Object mcr_query) throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRMetaLangText : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringAttrib(subtag,
+      "type",type)); }
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
     text));
   return sb.toString();
@@ -202,7 +208,8 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("--- text for "+subtag+" with lang "+lang+" ---");
+  System.out.println("--- text for "+subtag+" with lang "+lang+" and type "+
+    type+" ---");
   System.out.println(text);
   System.out.println("--- ---");
   }

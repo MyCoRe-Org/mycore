@@ -45,6 +45,7 @@ protected static String DEFAULT_LANGUAGE = "en";
 // MetaLangText data
 protected String subtag;
 protected String lang;
+protected String type;
 
 /**
  * This is the constructor. <br>
@@ -54,6 +55,7 @@ public MCRMetaDefault()
   {
   lang = DEFAULT_LANGUAGE;
   subtag = "";
+  type = "";
   }
 
 /**
@@ -83,6 +85,18 @@ public void setSubTag(String subtag)
   }
 
 /**
+ * This methode set the type string to the class.
+ *
+ * @param type                   the type
+ **/
+public void setType(String type)
+  {
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    return; }
+  this.type = type;
+  }
+
+/**
  * This methode get the language element.
  *
  * @return the language
@@ -97,6 +111,14 @@ public final String getLang()
  **/
 public final String getSubTag()
   { return subtag; }
+
+/**
+ * This methode get the type element.
+ *
+ * @return the type
+ **/
+public final String getType()
+  { return type; }
 
 /**
  * This methode read the XML input stream part from a DOM part for the
