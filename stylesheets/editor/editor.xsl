@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2004-03-11 08:25:59 $ -->
+<!-- $Revision: 1.4 $ $Date: 2004-03-11 14:37:46 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -16,8 +16,10 @@
 <xsl:include href="editor-config.xsl" />
 
 <!-- ============ Parameter aus MyCoRe LayoutServlet ============ -->
-<xsl:param name="WebApplicationBaseURL" />
-<xsl:param name="ServletsBaseURL"       />
+<xsl:param name="WebApplicationBaseURL"     />
+<xsl:param name="ServletsBaseURL"           />
+<xsl:param name="DefaultLang"               />
+<xsl:param name="Lang"                      />
 
 <!-- ======== http request parameters ======== -->
 <xsl:param name="editor.source.new" select="'false'" /> <!-- if true, empty source -->
@@ -353,7 +355,7 @@
       </xsl:attribute>
 
       <xsl:call-template name="editor.set.anchor" />
-      <xsl:apply-templates select="label | output">
+      <xsl:apply-templates select="text | output">
         <xsl:with-param name="var" select="../@var" />
       </xsl:apply-templates>
 
@@ -560,7 +562,7 @@
 
     <!-- ======== hidden field for sorting the entry ======== -->
     <!-- ======== hidden field for identifying entry ======== -->
-    <xsl:if test="contains('textfield textarea password file list checkbox', name())">
+    <xsl:if test="contains('textfield textarea password file list checkbox ', concat(name(),' '))">
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos}" />
       <input type="hidden" name="{$editor.delimiter.internal}id@{$var.new}" value="{@id}" />
     </xsl:if>
@@ -695,11 +697,57 @@
   </xsl:choose>
 </xsl:template>
 
+<!-- ========= multi-language label ======== -->
+<xsl:template name="output.label">
+  <xsl:param name="usefont" select="'no'" />
+
+  <xsl:if test="$usefont = 'yes'">
+    <xsl:text disable-output-escaping="yes">&lt;span style="</xsl:text>
+    <xsl:value-of select="$editor.font" />
+    <xsl:text disable-output-escaping="yes">" &gt;</xsl:text>
+  </xsl:if>
+
+  <xsl:choose>
+
+    <!-- If there is a label with xml:lang = selected lang, output it -->
+    <xsl:when test="label[lang($Lang)]">
+      <xsl:for-each select="label[lang($Lang)]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, if there is a label in the default language, output it -->
+    <xsl:when test="label[lang($DefaultLang)]">
+      <xsl:for-each select="label[lang($DefaultLang)]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:when>
+
+    <!-- Otherwise, use the language-independent @label attribute, if it exists -->
+    <xsl:when test="@label">
+      <xsl:value-of select="@label" />
+    </xsl:when>
+
+    <!-- Otherwise, use the language-independent nested label elements, if existing -->
+    <xsl:otherwise>
+      <xsl:for-each select="label[string-length(@xml:lang)=0]">
+        <xsl:copy-of select="*|text()" />
+      </xsl:for-each>
+    </xsl:otherwise>
+
+  </xsl:choose>
+
+  <xsl:if test="$usefont = 'yes'">
+    <xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>
+  </xsl:if>
+
+</xsl:template>
+
 <!-- ======== label ======== -->
-<xsl:template match="label">
-  <span style="{$editor.font}">
-    <xsl:copy-of select="*|text()" />
-  </span>
+<xsl:template match="text">
+  <xsl:call-template name="output.label">
+    <xsl:with-param name="usefont" select="'yes'" />
+  </xsl:call-template>
 </xsl:template>
 
 <!-- ======== output ======== -->
@@ -845,7 +893,6 @@
 
   <!-- ======== output cancel button ======== -->
   <xsl:call-template name="editor.button">
-    <xsl:with-param name="label" select="@label" />
     <xsl:with-param name="url"   select="$url"   />
     <xsl:with-param name="width" select="@width" />
   </xsl:call-template>
@@ -854,7 +901,6 @@
 <!-- ======== button ======== -->
 <xsl:template match="button">
   <xsl:call-template name="editor.button">
-    <xsl:with-param name="label" select="@label" />
     <xsl:with-param name="url"   select="@url"   />
     <xsl:with-param name="width" select="@width" />
   </xsl:call-template>
@@ -862,9 +908,12 @@
 
 <!-- ======== output any button ======== -->
 <xsl:template name="editor.button">
-  <xsl:param name="label" />
   <xsl:param name="url"   />
   <xsl:param name="width" />
+
+  <xsl:variable name="label">
+    <xsl:call-template name="output.label" />
+  </xsl:variable>
 
   <input type="button" value="{$label}" onClick="self.location.href='{$url}'">
     <xsl:attribute name="style">
@@ -878,7 +927,11 @@
 
 <!-- ======== submitButton ======== -->
 <xsl:template match="submitButton">
-  <input type="submit" value="{@label}">
+  <xsl:variable name="label">
+    <xsl:call-template name="output.label" />
+  </xsl:variable>
+
+  <input type="submit" value="{$label}">
     <xsl:attribute name="style">
       <xsl:value-of select="concat($editor.font,' ',$editor.button.style)"/>
       <xsl:if test="@width">
@@ -1014,9 +1067,11 @@
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
   </input>
-  <span style="{$editor.font}">
-    <xsl:value-of select="$item/@label"/>
-  </span>
+  <xsl:for-each select="$item">
+    <xsl:call-template name="output.label">
+      <xsl:with-param name="usefont" select="'yes'" />
+    </xsl:call-template>
+  </xsl:for-each>
   <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
 </xsl:template>
 
@@ -1031,9 +1086,11 @@
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
   </input>
-  <span style="{$editor.font}">
-    <xsl:value-of select="$item/@label"/>
-  </span>
+  <xsl:for-each select="$item">                                                                                                                                                  
+    <xsl:call-template name="output.label">
+      <xsl:with-param name="usefont" select="'yes'" />
+    </xsl:call-template>
+  </xsl:for-each>
   <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
 </xsl:template>
 
@@ -1056,9 +1113,10 @@
       </xsl:when>
     </xsl:choose>
   </input>
-  <span style="{$editor.font}">
-    <xsl:value-of select="@label"/>
-  </span>
+
+  <xsl:call-template name="output.label">
+    <xsl:with-param name="usefont" select="'yes'" />
+  </xsl:call-template>
 </xsl:template>
 
 <!-- ======== space ======== -->
@@ -1113,9 +1171,14 @@
 </xsl:template>
 
 <xsl:template match="item" mode="read.items">
-  <item value="{@value}" label="{@label}">
-    <xsl:apply-templates select="*" />
+  <item value="{@value}">
+    <xsl:copy-of select="@label" />
+    <xsl:apply-templates select="*" mode="read.items" />
   </item>
+</xsl:template>
+
+<xsl:template match="label" mode="read.items">
+  <xsl:copy-of select="." />
 </xsl:template>
 
 <xsl:template match="loadfrom" mode="read.items">
@@ -1132,7 +1195,7 @@
       <xsl:attribute name="selected">selected</xsl:attribute>
     </xsl:if>
     <xsl:value-of select="$indent" disable-output-escaping="yes"/>
-    <xsl:value-of select="@label"/>
+    <xsl:call-template name="output.label" />
   </option>
 
   <!-- ======== handle nested items ======== -->
