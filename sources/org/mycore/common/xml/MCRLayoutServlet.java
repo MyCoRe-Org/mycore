@@ -287,8 +287,10 @@ public class MCRLayoutServlet extends MCRServlet {
     }
 
     public static Properties buildXSLParameters(HttpServletRequest request) {
-        Properties parameters = new Properties();
+        Properties parameters = (Properties)( MCRConfiguration.instance().getProperties().clone() );
 
+	// Read all properties from mycore.properties
+        
         // Read all *.xsl attributes that are stored in the browser session
         HttpSession session = request.getSession(false);
         if (session != null) {
