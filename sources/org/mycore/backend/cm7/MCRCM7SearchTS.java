@@ -159,6 +159,7 @@ public final void search(String cond) throws Exception, DKException
   // if parameters not set 
   if (mcr_tsindex == null) { return ; }
   if (mcr_indexclass == null) { return ; }
+  DKDatastoreDL connection = null;
   DKDatastoreTS dsTS = null;
   try {
     // search
@@ -176,7 +177,7 @@ public final void search(String cond) throws Exception, DKException
     DKResults pResult = (DKResults)pQry.result();
     dkIterator iter = ((dkCollection)pResult).createIterator();
     // prepare the vector
-    DKDatastoreDL connection = MCRCM7ConnectionPool.getConnection();
+    connection = MCRCM7ConnectionPool.instance().getConnection();
     String id = "";
     byte[] xml = null;
     String itemId = "";
@@ -192,9 +193,9 @@ public final void search(String cond) throws Exception, DKException
         mcr_result.add("local",id,rank.intValue(),xml);
         }
       }
-    MCRCM7ConnectionPool.releaseConnection(connection);
     }
   finally { 
+    MCRCM7ConnectionPool.instance().releaseConnection( connection );
     if (dsTS != null) { dsTS.disconnect(); } }
   }
 

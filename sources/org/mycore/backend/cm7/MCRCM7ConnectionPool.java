@@ -27,82 +27,164 @@ package mycore.cm7;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
+import mycore.common.*;
 
 /**
- * This class handle the connection pool to the IBM Content Manager 7.
+ * This class implements a pool of database connections to 
+ * IBM Content Manager 7.1 Library Server. Other classes get
+ * a connection from the pool when they need one and release 
+ * the connection after their work has finished.
  *
  * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
+ *
  * @version $Revision$ $Date$
  **/
 public class MCRCM7ConnectionPool implements DKConstant
-  {
-  protected static Vector freeConnections;
-  protected static Vector usedConnections;
-  protected static int    maxConnections;
+{
+  /** The connection pool singleton */
+  protected static MCRCM7ConnectionPool singleton;
 
-  static
-    {
-    try {
-      maxConnections  = MCRConfiguration.instance()
-        .getInt("MCR.persistence_cm7_max_connections",1);
-      freeConnections = new Vector(maxConnections);
-      usedConnections = new Vector(maxConnections);
-      System.out.print( "Connecting to ContentManager7: " );
-      String servername = MCRConfiguration.instance()
-        .getString("MCR.persistence_cm7_library_server");
-      String serveruid = MCRConfiguration.instance()
-        .getString("MCR.persistence_cm7_user_id");
-      String serverpw = MCRConfiguration.instance()
-        .getString("MCR.persistence_cm7_password");
-      for( int i = 0; i < maxConnections; i++ ) {
-        DKDatastoreDL connection = new DKDatastoreDL();
-        connection.connect(servername,serveruid,serverpw,"");
-        connection.setOption(DK_OPT_DL_WAKEUPSRV,new Integer(DK_TRUE));
-        freeConnections.addElement(connection);
-        System.out.print( "#" );
-        }
-      System.out.println( " created " + maxConnections + " connections" );
-      }
-    catch( Exception ex ) {
-      System.out.println( ex.getClass().getName() + ":" + ex.getMessage() ); }
-    }
+  /**
+   * Returns the connection pool singleton.
+   *
+   * @throws MCRPersistenceException if connect to CM7 was not successful
+   **/
+  public static synchronized MCRCM7ConnectionPool instance()
+  { 
+    if( singleton == null ) singleton = new MCRCM7ConnectionPool();
+    return singleton; 
+  }
+
+  /** The internal list of free connections */
+  protected Vector freeConnections = new Vector();
+  
+  /** The internal list of connections that are currently in use*/
+  protected Vector usedConnections = new Vector() ;
+
+  /** The maximum number of connections that will be built */
+  protected int maxNumConnections;
+
+  /** The symbolic name of the CM 7.1 library server */
+  protected String serverName;
+  
+  /** The user ID to be used for connecting to the library server */
+  protected String uid;
+  
+  /** The password to be used for connecting to the library server */
+  protected String password;
   
   /**
-   * This methode returns a connection to the DL.
+   * Builds the connection pool singleton.
    *
-   * @return a connected datastore
+   * @throws MCRPersistenceException if connect to CM7 was not successful
    **/
-  public static synchronized DKDatastoreDL getConnection()
-    {
-    if( usedConnections.size() == maxConnections ) {
-      try{ MCRCM7ConnectionPool.class.wait(); }
-      catch( InterruptedException ex ){}
-      return getConnection();
-      }
-    else {
-      DKDatastoreDL connection = (DKDatastoreDL)
-        (freeConnections.firstElement());
-      freeConnections.removeElement( connection );
-      usedConnections.addElement( connection );
-      return connection;
-      }
-    }
+  protected MCRCM7ConnectionPool()
+    throws MCRPersistenceException
+  {
+    System.out.println( "Building Content Manager connection pool..." );
+    
+    MCRConfiguration config = MCRConfiguration.instance();
+    
+    serverName = config.getString( "MCR.persistence_cm7_library_server" );
+    uid        = config.getString( "MCR.persistence_cm7_user_id"        );
+    password   = config.getString( "MCR.persistence_cm7_password"       );
 
+    maxNumConnections = config.getInt( "MCR.persistence_cm7_max_connections", 1 );
+    int initNumConnections = config.getInt( "MCR.persistence_cm7_init_connections", maxNumConnections );
+
+    initNumConnections = Math.max( maxNumConnections, initNumConnections );
+
+    // Build the initial number of JDBC connections
+    for( int i = 0; i < initNumConnections; i++ )
+      freeConnections.addElement( buildConnection() );
+  }
+  
   /**
-   * This methode release a given datastore connection.
+   * Creates a DKDatastoreDL connection to the Content Manager library server.
    *
-   * @param connection            the datastor connection
+   * @throws MCRPersistenceException if connect to Content Manager fails
    **/
-  public static synchronized void releaseConnection( DKDatastoreDL connection )
+  protected DKDatastoreDL buildConnection()  
+  {
+    System.out.println( "Building connection to Content Manager..." );
+
+    try 
     {
-    if((!freeConnections.contains(connection))
-      && (usedConnections.contains(connection))) {
-      usedConnections.removeElement( connection );
-      freeConnections.addElement   ( connection );
-      MCRCM7ConnectionPool.class.notifyAll();
-      }
+      DKDatastoreDL connection = new DKDatastoreDL();
+      connection.connect( serverName, uid, password, "" );
+      connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_TRUE ) );
+      return connection;
+    }
+    catch( Exception exc ) 
+    {
+      String msg = "Could not connect to Content Manager library server";
+      throw new MCRPersistenceException( msg, exc );
     }
   }
+  
+  /**
+   * Gets a free connection from the pool. When this
+   * connection is not used any more by the invoker, he is
+   * responsible for returning it into the pool by invoking
+   * the <code>releaseConnection()</code> method.
+   *
+   * @return a free connection to the Content Manager library server datastore
+   * @throws MCRPersistenceException if there was a problem connecting to CM
+   **/
+  public synchronized DKDatastoreDL getConnection()
+    throws MCRPersistenceException
+  {
+    // Wait for a free connection
+    while( usedConnections.size() == maxNumConnections )
+    try{ wait(); } catch( InterruptedException ignored ){}
+
+    DKDatastoreDL connection;
+    
+    // Do we have to build a connection or is there already one?
+    if( freeConnections.isEmpty() ) 
+      connection = buildConnection();
+    else
+    {
+      connection = (DKDatastoreDL)( freeConnections.firstElement() );
+      freeConnections.removeElement( connection );
+    }
+    
+    usedConnections.addElement( connection );
+    return connection;
+  }
+
+  /**
+   * Releases a connection, indicating that it is not used any more 
+   * and should be returned to to pool of free connections.
+   *
+   * @param connection the Content Manager connection that has been used
+   **/
+  synchronized void releaseConnection( DKDatastoreDL connection )
+  {
+    if( connection == null ) return;
+    
+    if( usedConnections.contains( connection ) )
+      usedConnections.removeElement( connection );
+    if( ! freeConnections.contains( connection ) ) 
+      freeConnections.addElement( connection );
+    
+    notifyAll();
+  }
+
+  /**
+   * Finalizer, closes all connections in this connection pool
+   **/
+  public void finalize()
+  {
+    try
+    {
+      for( int i = 0; i < usedConnections.size(); i++ )
+        ( (DKDatastoreDL)( usedConnections.elementAt( i ) ) ).disconnect();
+      for( int i = 0; i < freeConnections.size(); i++ )
+        ( (DKDatastoreDL)( freeConnections.elementAt( i ) ) ).disconnect();
+    }
+    catch( Exception ignored ){}
+  }
+}
 

@@ -28,16 +28,9 @@ import java.io.*;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRObjectService;
-import mycore.datamodel.MCRTypedContent;
-import mycore.datamodel.MCRObjectPersistenceInterface;
-import mycore.cm7.MCRCM7ConnectionPool;
-import mycore.cm7.MCRCM7Item;
-import mycore.sql.MCRSQLConnection;
+import mycore.common.*;
+import mycore.datamodel.*;
+import mycore.sql.*;
 
 /**
  * This class implements all methode for handling the data to the data store
@@ -147,7 +140,7 @@ public final void create(MCRTypedContent mcr_tc, String xml)
   try {
     DKDatastoreDL connection = null;
     try {
-      connection = MCRCM7ConnectionPool.getConnection();
+      connection = MCRCM7ConnectionPool.instance().getConnection();
       try {
         MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
           connection);
@@ -167,7 +160,7 @@ public final void create(MCRTypedContent mcr_tc, String xml)
       exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
       }
     finally {
-      MCRCM7ConnectionPool.releaseConnection(connection); }
+      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
@@ -209,7 +202,7 @@ private final void deleteCM7(MCRObjectID mcr_id)
   {
   DKDatastoreDL connection = null;
   try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    connection = MCRCM7ConnectionPool.instance().getConnection();
     try {
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       item.delete();
@@ -220,7 +213,7 @@ private final void deleteCM7(MCRObjectID mcr_id)
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
   finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   }
 
 /**
@@ -260,7 +253,7 @@ private final String receiveCM7(MCRObjectID mcr_id)
   DKDatastoreDL connection = null;
   String xml = new String();
   try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    connection = MCRCM7ConnectionPool.instance().getConnection();
     try {
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       xml = item.getPart(mcr_xml_part);
@@ -270,7 +263,7 @@ private final String receiveCM7(MCRObjectID mcr_id)
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
   finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   return xml;
   }
 
@@ -312,7 +305,7 @@ private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
   DKDatastoreDL connection = null;
   GregorianCalendar create = new GregorianCalendar();
   try {
-    connection = MCRCM7ConnectionPool.getConnection();
+    connection = MCRCM7ConnectionPool.instance().getConnection();
     try {
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       create = item.getKeyfieldToDate(mcr_create_name);
@@ -322,7 +315,7 @@ private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
   finally {
-    MCRCM7ConnectionPool.releaseConnection(connection); }
+    MCRCM7ConnectionPool.instance().releaseConnection(connection); }
   return create;
   }
 
@@ -348,7 +341,7 @@ public final String receiveLabel(MCRObjectID mcr_id)
   try {
     DKDatastoreDL connection = null;
     try {
-      connection = MCRCM7ConnectionPool.getConnection();
+      connection = MCRCM7ConnectionPool.instance().getConnection();
       try {
         MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
         label = item.getKeyfieldToString(mcr_label_name);
@@ -358,7 +351,7 @@ public final String receiveLabel(MCRObjectID mcr_id)
           "A object with ID "+mcr_id.getId()+"does not exists."); }
       }
     finally {
-      MCRCM7ConnectionPool.releaseConnection(connection); }
+      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
@@ -423,7 +416,7 @@ public final void update(MCRTypedContent mcr_tc, String xml)
         (mcr_create_name == null) || (mcr_modify_name == null)) {
       throw new MCRConfigurationException("Indexclass field name is false."); }
     try {
-      connection = MCRCM7ConnectionPool.getConnection();
+      connection = MCRCM7ConnectionPool.instance().getConnection();
       try {
         MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,
           connection);
@@ -442,7 +435,7 @@ public final void update(MCRTypedContent mcr_tc, String xml)
           "A object with ID "+mcr_id.getId()+"does not exists."); }
       }
     finally {
-      MCRCM7ConnectionPool.releaseConnection(connection); }
+      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }

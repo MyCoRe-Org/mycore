@@ -26,6 +26,7 @@ package mycore.sql;
 
 import java.sql.*;
 import java.util.*;
+import java.lang.reflect.*;
 import mycore.common.*;
 
 /**
@@ -51,7 +52,7 @@ public class MCRSQLConnectionPool
    *
    * @throws MCRPersistenceException if the JDBC driver could not be loaded or initial connections could not be created
    **/
-  public static MCRSQLConnectionPool instance()
+  public static synchronized MCRSQLConnectionPool instance()
   { 
     if( singleton == null ) singleton = new MCRSQLConnectionPool();
     return singleton; 
@@ -64,7 +65,7 @@ public class MCRSQLConnectionPool
   protected Vector usedConnections = new Vector() ;
 
   /** The maximum number of connections that will be built */
-  protected int maxNumberOfConnections;
+  protected int maxNumConnections;
 
   /**
    * Builds the connection pool singleton.
@@ -74,42 +75,57 @@ public class MCRSQLConnectionPool
   protected MCRSQLConnectionPool()
     throws MCRPersistenceException
   {
-    System.out.println( "Building JDBC connection pool." );
+    doWorkaround(); // Do workaround for FrnSysInitSharedMem bug in CM 7.1 AIX
+    
+    System.out.println( "Building JDBC connection pool..." );
+
     MCRConfiguration config = MCRConfiguration.instance();
 
-    // The following line is a workaround for CM 7.1 under AIX
-    // to prevent error FrnSysInitSharedMem to be thrown by CM:
-    // Before connecting to DB2, ensure connect to CM is already done
-    String pertype = config.getString("MCR.persistence_type","");
-    if (pertype.equals("CM7")) {
-      try {
-        MCRSQLCM7Interface cm7int = (MCRSQLCM7Interface)Class.
-          forName("mycore.cm7.MCRCM7SQLWorkaround").newInstance();
-        cm7int.connectToCM7();
-        }
-      catch (Exception e) { }
-      }
+    maxNumConnections = config.getInt( "MCR.persistence_sql_max_connections", 1 );
+    int initNumConnections = config.getInt( "MCR.persistence_sql_init_connections", maxNumConnections );
 
-    int initNumberOfConnections = config.getInt( "MCR.persistence_sql_init_connections", 1 );
-    maxNumberOfConnections  = config.getInt( "MCR.persistence_sql_max_connections" );
+    initNumConnections = Math.max( maxNumConnections, initNumConnections );
 
-    // Ok, we tolerate that the user is weak in math ;-)
-    if( initNumberOfConnections > maxNumberOfConnections )
-      maxNumberOfConnections = initNumberOfConnections;
-        
     String driver = config.getString( "MCR.persistence_sql_driver" );
     
-    // Load the JDBC driver
-    try{ Class.forName( driver );  }
+    try{ Class.forName( driver ); } // Load the JDBC driver
     catch( Exception exc )
     {
-      throw new MCRPersistenceException
-      ( "Could not find and load JDBC driver class " + driver, exc );
+      String msg = "Could not load JDBC driver class " + driver;
+      throw new MCRPersistenceException( msg, exc );
     }
     
     // Build the initial number of JDBC connections
-    for( int i = 0; i < initNumberOfConnections; i++ )
+    for( int i = 0; i < initNumConnections; i++ )
       freeConnections.addElement( new MCRSQLConnection() );
+  }
+  
+  /**
+   * This method implements a workaround for CM 7.1 under AIX
+   * to prevent error FrnSysInitSharedMem to be thrown by CM:
+   * Before connecting to DB2, ensure connect to CM is already done
+   **/
+  protected void doWorkaround()
+  {
+    try
+    {
+      String label = "MCR.persistence_type"; 
+      String value = MCRConfiguration.instance().getString( label, "" );
+      
+      if( value.equals( "CM7" ) ) 
+      {
+        // Call method mycore.cm7.MCRCM7ConnectionPool.instance()
+          
+        Class c = Class.forName( "mycore.cm7.MCRCM7ConnectionPool" );
+        Method m = c.getMethod( "instance", new Class[ 0 ] );
+        m.invoke( null, new Object[ 0 ] );
+      }
+    }
+    catch( Exception exc )
+    { 
+      String msg = "Error while running workaround for CM 7.1 connect bug";
+      throw new MCRPersistenceException( msg, exc ); 
+    }
   }
 
   /**
@@ -126,9 +142,9 @@ public class MCRSQLConnectionPool
   public synchronized MCRSQLConnection getConnection()
     throws MCRPersistenceException
   {
-  	// Wait for a free connection
-    while( usedConnections.size() == maxNumberOfConnections )
-      try{ wait(); } catch( InterruptedException ignored ){}
+    // Wait for a free connection
+    while( usedConnections.size() == maxNumConnections )
+    try{ wait(); } catch( InterruptedException ignored ){}
 
     MCRSQLConnection connection;
     
