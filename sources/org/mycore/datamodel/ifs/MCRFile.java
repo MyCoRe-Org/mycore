@@ -35,100 +35,41 @@ import javax.servlet.http.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRFile
+public class MCRFile extends MCRFilesystemNode
 {
   /** The ID of the store that holds this file's content */
   protected String storeID;  
   
   /** The ID that identifies the place where the store holds the content */
   protected String storageID;  
-  
-  /** The ID of the file owner, e .g. a MILESS derivate ID */
-  protected String ownerID;
 
   /** The ID of the content type of this file */
   protected String contentTypeID;
   
-  /** The file path */
-  protected String path;
-  
   /** The md5 checksum that was built when content was read for this file */
   protected String md5;
   
-  /** The file size in number of bytes */
-  protected long size;  
-  
-  /** The date of last modification of this file */
-  protected GregorianCalendar lastModified;
-  
   /** The optional extender for streaming audio/video files */
   protected MCRAudioVideoExtender avExtender;
-  
-  /**
-   * Creates a new empty, unstored MCRFile instance.
-   **/
-  public MCRFile()
+
+  public MCRFile( String name, String ownerID )
   {
-    storeID       = "";  
+    super( name, ownerID );
+    init();
+  }
+  
+  public MCRFile( String name, MCRDirectory parent )
+  { 
+    super( name, parent );
+    init();
+  }
+  
+  private void init()
+  {
     storageID     = "";
-    ownerID       = "";
-    path          = "";
-    size          = 0;  
-    contentTypeID = "unknown";
-    md5           = "d41d8cd98f00b204e9800998ecf8427e";
-    lastModified  = new GregorianCalendar();
-  }
-
-  /**
-   * Sets the ID of the owner of this file
-   * 
-   * @param ID the non-empty owner ID
-   **/
-  public void setOwnerID( String ID )
-  { 
-    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
-    this.ownerID = ID; 
-  }
-
-  /**
-   * Returns the ID of the owner of this file
-   *
-   * @return the ID of the owner of this file
-   **/
-  public String getOwnerID()
-  { return ownerID; }
-
-  /**
-   * Sets the relative path of this file
-   **/
-  public void setPath( String path )
-  { 
-    MCRArgumentChecker.ensureNotEmpty( path, "path" );
-    this.path = path; 
-  }
-  
-  /**
-   * Returns the relative path of this file
-   **/
-  public String getPath()
-  { return path; }
-  
-  /**
-   * Returns the filename of this file
-   **/
-  public String getFileName()
-  {                 
-    int pos = path.lastIndexOf( File.separator );
-    return ( pos == -1 ? path : path.substring( pos + 1 ) );
-  }
-
-  /**
-   * Returns the directory of this file
-   **/
-  public String getDirectory()
-  {
-    int pos = path.lastIndexOf( File.separator );
-    return ( pos == -1 ? "" : path.substring( 0, pos ) );
+    storeID       = "";
+    contentTypeID = MCRFileContentTypeFactory.getDefaultType().getID();
+    md5           = "d41d8cd98f00b204e9800998ecf8427e"; // md5 of empty file
   }
   
   /**
@@ -137,123 +78,31 @@ public class MCRFile
    **/
   public String getExtension()
   {
-    if( path.endsWith( "." ) ) return "";
+    ensureNotDeleted();
+
+    if( name.endsWith( "." ) ) return "";
     
-    int pos = path.lastIndexOf( "." );
-    return( pos == -1 ? "" : path.substring( pos + 1 ) );
-  }
-
-  /**
-   * Sets the file size
-   **/
-  public void setSize( long size )
-  { 
-    MCRArgumentChecker.ensureNotNegative( size, "size" );
-    this.size = size; 
-  }
-
-  /**
-   * Returns the file size as number of bytes
-   **/
-  public long getSize()
-  { return size; }
-  
-  /**
-   * Returns the file size, formatted as a string
-   **/
-  public String getSizeFormatted()
-  { return getSizeFormatted( size ); }
-  
-  /**
-   * Takes a file size in bytes and formats it as a string for output.
-   * For values &lt; 5 KB the output format is for example "320 Byte".
-   * For values &gt; 5 KB the output format is for example "6,8 KB".
-   * For values &gt; 1 MB the output format is for example "3,45 MB".
-   **/
-  public static String getSizeFormatted( long bytes )
-  {
-    String sizeUnit;
-    String sizeText;
-    double sizeValue;
-
-    if ( bytes >= 1024 * 1024 ) // >= 1 MB
-    {
-      sizeUnit  = "MB";
-      sizeValue = (double)( Math.round( (double)bytes / 10485.76 ) ) / 100;
-    }
-    else if ( bytes >= 5 * 1024 ) // >= 5 KB
-    {
-      sizeUnit  = "KB";
-      sizeValue = (double)( Math.round( (double)bytes / 102.4 ) ) / 10;
-    }
-    else // < 5 KB
-    {
-      sizeUnit  = "Byte";
-      sizeValue = (double)bytes;
-    }
-
-    sizeText = String.valueOf( sizeValue ).replace( '.', ',' );
-    if( sizeText.endsWith( ",0" ) ) 
-      sizeText = sizeText.substring( 0, sizeText.length() - 2 );
-
-    return sizeText + " " + sizeUnit;
-  }
-  
-  /**
-   * Sets the MD5 checksum for this file
-   **/
-  public void setChecksum( String md5 )
-  {
-    MCRArgumentChecker.ensureNotEmpty( md5, "md5 checksum" );
-    this.md5 = md5;
+    int pos = name.lastIndexOf( "." );
+    return( pos == -1 ? "" : name.substring( pos + 1 ) );
   }
 
   /**
    * Returns the MD5 checksum for this file
    **/
   public String getChecksum()
-  { return md5; }
-  
-  /**
-   * Sets the time of last modification of this file
-   **/
-  public void setLastModified( GregorianCalendar date )
-  {
-    MCRArgumentChecker.ensureNotNull( date, "date" );
-    this.lastModified = date;
-  }
-
-  /**
-   * Returns the time of last modification of this file
-   **/
-  public GregorianCalendar getLastModified()
-  { return lastModified; }
-
-  /**
-   * Sets the ID of the MCRContentStore implementation that holds the
-   * content of this file
-   **/
-  public void setStoreID( String ID )
   { 
-    MCRArgumentChecker.ensureNotNull( ID, "ID" );
-    this.storeID = ID.trim(); 
+    ensureNotDeleted();
+    return md5; 
   }
-  
+
   /**
    * Returns the ID of the MCRContentStore implementation that holds the
    * content of this file
    **/
   public String getStoreID()
-  { return storeID; }
-  
-  /**
-   * Sets the storage ID that identifies the place where the MCRContentStore 
-   * has stored the content of this file
-   **/
-  public void setStorageID( String ID )
   { 
-    MCRArgumentChecker.ensureNotNull( ID, "ID" );
-    this.storageID = ID.trim(); 
+    ensureNotDeleted();
+    return storeID; 
   }
   
   /**
@@ -261,7 +110,10 @@ public class MCRFile
    * has stored the content of this file
    **/
   public String getStorageID()
-  { return storageID; }
+  { 
+    ensureNotDeleted();
+    return storageID; 
+  }
   
   /**
    * Returns the MCRContentStore instance that holds the content of this file
@@ -273,43 +125,116 @@ public class MCRFile
     else
       return MCRContentStoreFactory.getStore( storeID );
   }
+
+  /**
+   * Reads the content of this file from a java.lang.String and
+   * stores its text as bytes, encoded in the default encoding of the
+   * platform where this is running.
+   **/
+  public void setContentFrom( String source )
+    throws MCRPersistenceException, IOException
+  { 
+    MCRArgumentChecker.ensureNotNull( source, "source string" );
+    byte[] bytes = source.getBytes();
+    
+    setContentFrom( bytes );
+  }
   
   /**
-   * Reads the content of this file from the source ContentInputStream and
-   * stores it in the ContentStore given
+   * Reads the content of this file from a java.lang.String and
+   * stores its text as bytes, encoded in the encoding given, 
+   * in an MCRContentStore.
    **/
-  public void setContentFrom( MCRContentInputStream source, MCRContentStore store )
-    throws MCRPersistenceException
+  public void setContentFrom( String source, String encoding )
+    throws MCRPersistenceException, IOException, UnsupportedEncodingException
   { 
-    if( source.getHeader().length == 0 )
+    MCRArgumentChecker.ensureNotNull( source, "source string"          );
+    MCRArgumentChecker.ensureNotNull( source, "source string encoding" );
+    byte[] bytes = source.getBytes( encoding );
+    
+    setContentFrom( bytes );
+  }
+  
+  /**
+   * Reads the content of this file from a source file in the local
+   * filesystem and stores it in an MCRContentStore.
+   **/
+  public void setContentFrom( File source )
+    throws MCRPersistenceException, IOException
+  { 
+    MCRArgumentChecker.ensureNotNull( source, "source file" );
+    MCRArgumentChecker.ensureIsTrue( source.exists(),  
+      "source file does not exist:" + source.getPath() );
+    MCRArgumentChecker.ensureIsTrue( source.canRead(), 
+      "source file not readable:" + source.getPath() );
+    
+    setContentFrom( new FileInputStream( source ) );
+  }
+  
+  /**
+   * Reads the content of this file from a byte array and
+   * stores it in an MCRContentStore.
+   **/
+  public void setContentFrom( byte[] source )
+    throws MCRPersistenceException, IOException
+  { 
+    MCRArgumentChecker.ensureNotNull( source, "source byte array" );
+    
+    setContentFrom( new ByteArrayInputStream( source ) );
+  }
+  
+  /**
+   * Reads the content of this file from the source InputStream and
+   * stores it in an MCRContentStore.
+   **/
+  public void setContentFrom( InputStream source )
+    throws MCRPersistenceException, IOException
+  { 
+    ensureNotDeleted();
+    
+    MCRArgumentChecker.ensureNotNull( source, "source input stream" );
+    
+    MCRContentInputStream cis = new MCRContentInputStream( source );
+    byte[] header = cis.getHeader();
+    
+    contentTypeID = 
+      MCRFileContentTypeFactory.detectType( this.getName(), header ).getID();
+
+    if( header.length == 0 ) // Do not store empty file content
     {
       storageID = "";
       storeID   = "";
     }
     else
-    { 
-      storageID = store.storeContent( this, source ); 
+    {
+      MCRContentStore store = MCRContentStoreFactory.selectStore( this );
+      
+      storageID = store.storeContent( this, cis ); 
       storeID   = store.getID();
     }
     
-    size = source.getLength();
-    md5  = source.getMD5String();
+    if( parent != null ) parent.sizeOfChildChanged( this.size, cis.getLength() );
+
+    size = cis.getLength();
+    md5  = cis.getMD5String();
   }
-  
+
   /**
-   * Deletes the content of this file from the ContentStore used
+   * Deletes this file and its content stored in the system
    **/
-  public void deleteContent()
+  public void delete()
     throws MCRPersistenceException
   {
-    if( storageID.length() != 0 ) getContentStore().deleteContent( this );
+    ensureNotDeleted();
     
-    storageID     = "";
-    storeID       = "";
-    contentTypeID = "unknown";
-    md5           = "d41d8cd98f00b204e9800998ecf8427e";
-    size          = 0;
-    lastModified  = new GregorianCalendar();
+    if( storageID.length() != 0 ) getContentStore().deleteContent( this );
+    super.delete();
+    
+    this.contentTypeID = null;
+    this.md5           = null;
+    this.storageID     = null;
+    this.storeID       = null;
+    this.avExtender    = null;
   }
 
   /**
@@ -318,6 +243,8 @@ public class MCRFile
   public void getContentTo( OutputStream target )
     throws MCRPersistenceException
   { 
+    ensureNotDeleted();
+    
     if( storageID.length() != 0 ) 
       getContentStore().retrieveContent( this, target ); 
   }
@@ -366,6 +293,8 @@ public class MCRFile
    **/
   public boolean hasAudioVideoExtender()
   {
+    ensureNotDeleted();
+
     if( storeID.length() == 0 ) 
       return false;
     else
@@ -378,6 +307,8 @@ public class MCRFile
    **/
   public MCRAudioVideoExtender getAudioVideoExtender()
   {
+    ensureNotDeleted();
+
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
       avExtender = MCRContentStoreFactory.buildExtender( this );
 
@@ -385,17 +316,20 @@ public class MCRFile
   }
 
   /**
-   * Sets the ID of the content type of this file
-   **/
-  public void setContentTypeID( String ID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( ID, "content type ID" );
-    this.contentTypeID = ID;
-  }
- 
-  /**
    * Gets the ID of the content type of this file
    **/
   public String getContentTypeID()
-  { return contentTypeID; }
+  { 
+    ensureNotDeleted();
+    return contentTypeID; 
+  }
+  
+  /**
+   * Gets the content type of this file
+   **/
+  public MCRFileContentType getContentType()
+  { 
+    ensureNotDeleted();
+    return MCRFileContentTypeFactory.getType( contentTypeID ); 
+  }
 }
