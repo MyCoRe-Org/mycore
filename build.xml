@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.49 $ $Date: 2003-08-06 07:29:33 $                      -->
+  <!-- $Revision: 1.50 $ $Date: 2003-08-06 07:45:47 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -62,7 +62,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.49 $ $Date: 2003-08-06 07:29:33 $</echo>
+    <echo>Ant build file   : $Revision: 1.50 $ $Date: 2003-08-06 07:45:47 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>Persistency type : ${env.MCR_PERSISTENCE}</echo>
@@ -268,11 +268,11 @@
     </condition>
 
     <condition property="exclude.cm8" value="org.mycore.backend.cm8">
-      <not><available classname="com.ibm.mm.sdk.common.DKServerDefICM" classpathref="mycore.classpath"/></not>
+      <not><available classname="com.ibm.mm.sdk.common.DKConstantICM" classpathref="mycore.classpath"/></not>
     </condition>
 
     <condition property="exclude.cm7" value="org.mycore.backend.cm7">
-      <not><available classname="com.ibm.mm.sdk.server.DKDatastoreDL" classpathref="mycore.classpath"/></not>
+      <not><available classname="com.ibm.mm.sdk.common.DKConstantDL" classpathref="mycore.classpath"/></not>
     </condition>
 
   </target>
