@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.83 $ $Date: 2004-06-25 11:46:16 $                      -->
+  <!-- $Revision: 1.84 $ $Date: 2004-08-10 09:26:19 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -64,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.83 $ $Date: 2004-06-25 11:46:16 $</echo>
+    <echo>Ant build file   : $Revision: 1.84 $ $Date: 2004-08-10 09:26:19 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -324,6 +324,10 @@
 
   <target name="up2date">
 
+    <path id="javadocs.classpath">
+      <fileset dir="${basedir}/lib" includes="*.jar"/>
+    </path>
+
     <condition property="javadocs.outdated">
       <not>
         <uptodate>
@@ -344,14 +348,6 @@
       </not>
     </condition>
 
-    <condition property="exclude.cm8" value="org.mycore.backend.cm8">
-      <not><available classname="com.ibm.mm.sdk.common.DKConstantICM" classpathref="mycore.classpath"/></not>
-    </condition>
-
-    <condition property="exclude.cm7" value="org.mycore.backend.cm7">
-      <not><available classname="com.ibm.mm.sdk.common.DKConstantDL" classpathref="mycore.classpath"/></not>
-    </condition>
-
   </target>
 
   <!-- =================================================================== -->
@@ -360,17 +356,18 @@
 
   <target name="javadocs" depends="init,up2date" if="javadocs.outdated" description="creates JavaDoc API documentation in HTML format">
     <echo>Building the MyCoRe JavaDoc API documentation...</echo>
+
     <javadoc
       packagenames        = "org.mycore.*"
-      excludepackagenames = "${exclude.cm7},${exclude.cm8}"
       sourcepath          = "${basedir}/sources"
       destdir             = "${basedir}/documentation/html"
-      classpathref        = "mycore.classpath"
+      classpathref        = "javadocs.classpath"
       author              = "true"
       version             = "true"
       use                 = "true"
       access              = "package"
       splitindex          = "true"
+      linksource          = "true"
       windowtitle         = "MyCoRe JavaDoc Documentation"
       doctitle            = "MyCoRe Source Code JavaDoc Documentation"
     >
@@ -382,15 +379,14 @@
       <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
       <group title="MyCoRe Access Control Lists"                packages="org.mycore.acl"        />
 
-      <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
-      <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
-<!--
-      <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
--->
-      <link href="http://www.mycore.de/library/jaxp/docs/api"/>
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+      <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
+      <link href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi"/>
+      <link href="http://java.sun.com/xml/jaxp/dist/1.1/docs/api/"/>
       <link href="http://www.jdom.org/docs/apidocs"/>
-      <link href="http://www.xmldb.org/xapi/api"/>
-      <link href="http://www.mycore.de/library/log4j/api"/>
+      <link href="http://xmldb-org.sourceforge.net/xapi/api/"/>
+      <link href="http://logging.apache.org/log4j/docs/api/"/>
+      <link href="http://jakarta.apache.org/lucene/docs/api/" />
     </javadoc>
     <echo>---------------------------------------------------------</echo>
   </target>
@@ -407,7 +403,7 @@
       packagenames        = "org.mycore.*"
       excludepackagenames = "${exclude.cm7},${exclude.cm8}"
       sourcepath          = "${basedir}/sources"
-      classpathref        = "mycore.classpath"
+      classpathref        = "javadocs.classpath"
       author              = "true"
       version             = "true"
       access              = "package"
@@ -468,6 +464,10 @@
   <target name="do-log" depends="init">
     <echo>Logging changes of the year ${changelog-year}...</echo>
 
+    <path id="changelog.classpath">
+      <fileset dir="${basedir}/lib" includes="*.jar"/>
+    </path>
+
     <mkdir dir="${basedir}/documentation/changelogs" />
     <cvschangelog 
       dir      = "."
@@ -485,6 +485,7 @@
       <user displayname = "Marc Schlüppmann / Essen"     userid = "mcrmslue" />
       <user displayname = "Thorsten Agemar / Göttingen"  userid = "mcrtagem" />
       <user displayname = "Thomas Scheffler / Jena"      userid = "mcrukroe" />
+      <user displayname = "Thomas Scheffler / Jena"      userid = "mcrtchef" />
       <user displayname = "Werner Gresshoff / Münster"   userid = "mcrwgres" />
       <user displayname = "Benno Süselbeck / Münster"    userid = "mcrbsuse" />
       <user displayname = "Johannes Bühler / Greifswald" userid = "mcrjbueh" />
@@ -492,14 +493,14 @@
     </cvschangelog>
  
     <java classname="org.apache.xalan.xslt.Process"
-      dir="${basedir}" fork="yes" classpathref="mycore.classpath" >
+      dir="${basedir}" fork="yes" classpathref="changelog.classpath" >
       <arg value="-IN"  /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
       <arg value="-XSL" /><arg value="${ant.home}/etc/changelog.xsl" />
       <arg value="-OUT" /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.html" />
       <arg value="-HTML"/>
       <arg value="-PARAM" /><arg value="title"  /><arg value="MyCoRe CVS ChangeLog for the year ${changelog-year}" />
       <arg value="-PARAM" /><arg value="module" /><arg value="mycore" />
-      <arg value="-PARAM" /><arg value="cvsweb" /><arg value="http://www.mycore.de/repository/cgi-bin/viewcvs.cgi/" />
+      <arg value="-PARAM" /><arg value="cvsweb" /><arg value="http://www.mycore.de/cvs/viewcvs.cgi/" />
     </java>
 
     <delete file="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
@@ -527,10 +528,10 @@
   <!-- =================================================================== -->
 
   <target name="postcommit">
-    <antcall target="update"   />
+    <antcall target="update" />
+    <antcall target="do-log"><param name="changelog-year" value="2004" /></antcall>
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
-    <antcall target="do-log"><param name="changelog-year" value="2004" /></antcall>
   </target>
 
   <!-- =================================================================== -->
