@@ -36,6 +36,8 @@ import org.mycore.user.*;
  *
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ *
  * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable
@@ -49,12 +51,60 @@ public class MCRSession implements Cloneable
   /** The language for this session */
   private String language = null;
 
+  /** The unique ID of this session */
+  private String sessionID = null;
+
+  /** A cache of MCRSession objects, used for method getSession( String ) */
+  private static MCRCache sessions = new MCRCache( 500 );
+
   /**
    * The constructor of a MCRSession. As default the user ID is set to the value
    * of the property variable named 'MCR.users_guestuser_username'.
    **/
   public MCRSession()
-  { reset(); }
+  { 
+    reset(); 
+    sessionID = buildSessionID();
+    sessions.put( sessionID, this );
+  }
+
+  /**
+   * Returns the MCRSession for the given sessionID.
+   **/
+  public static MCRSession getSession( String sessionID )
+  { return (MCRSession)( sessions.get( sessionID ) ); }
+
+  /**
+   * Constructs a unique session ID for this session, based on
+   * current time and IP address of host where the code runs.
+   **/
+  private static synchronized String buildSessionID()
+  {
+    String ip = "127.0.0.1";
+    try{ ip = java.net.InetAddress.getLocalHost().getHostAddress(); }
+    catch( java.net.UnknownHostException ignored ){}
+      
+    java.util.StringTokenizer st = new java.util.StringTokenizer( ip, "." );
+
+    long sum = Integer.parseInt( st.nextToken() );
+    while( st.hasMoreTokens() )
+      sum = ( sum << 8 ) + Integer.parseInt( st.nextToken() );
+
+    String address = Long.toString( sum, 36 );
+    address = "000000" + address;
+    String prefix = address.substring( address.length() - 6 );
+
+    long now = System.currentTimeMillis();
+    String suffix = Long.toString( now, 36 );    
+
+    return prefix + "-" + suffix;    
+  }
+
+  /**
+   * Returns the unique ID of this session
+   **/
+  public String getID()
+  { return sessionID; }
 
   /**
    * Implement a deep copy of instances of this class
@@ -105,6 +155,7 @@ public class MCRSession implements Cloneable
   {
     MCRConfiguration config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
+    logger.debug("SessionID          = "+sessionID);
     logger.debug("UserID             = "+userID);
     logger.debug("language           = "+language);
   }
