@@ -57,7 +57,7 @@ public class MCRXMLDBConnectionPool
   protected Hashtable connections = new Hashtable();
  
   /** The logger */
-  private static Logger LOGGER=Logger.getLogger("org.mycore.backend.XMLDB");
+  private static Logger LOGGER=Logger.getLogger(MCRXMLDBConnectionPool.class);
 
   private static String CONF_PREFIX = "MCR.persistence_xmldb_";
   private static String DRIVER      = "";
@@ -238,15 +238,6 @@ private Collection getCollection(String collection) throws XMLDBException {
   			((Collection)e.nextElement()).close();
   	}
   	catch(Exception ignored){}
-  }
-
-  /**
-   * The method return the logger for org.mycore.backend.xmldb.
-   * 
-   * @return the logger.
-   */
-  static final Logger getLogger(){
-  	return LOGGER;
   }
 
 }
