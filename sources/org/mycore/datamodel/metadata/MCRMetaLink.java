@@ -439,7 +439,7 @@ public final void debug()
   {
   System.out.println("MCRMetaLink debug start:");
   super.debug();
-  System.out.println("<xlink:type>"+type+"</xlink:type>");
+  System.out.println("<xlink:type>"+linktype+"</xlink:type>");
   if (linktype.equals("locator")) {
     System.out.println("<xlink:href>"+href+"</xlink:href>");
     System.out.println("<xlink:label>"+label+"</xlink:label>");
