@@ -286,6 +286,16 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
       
       storageID = store.storeContent( this, cis ); 
       storeID   = store.getID();
+      MCRContentIndexer indexer = MCRContentIndexerFactory.getIndexerFromFCT( contentTypeID );
+      try
+      {
+        if ( null != indexer )
+        {
+//          cis = new MCRContentInputStream( source );
+          indexer.doIndexContent( this, cis, header );
+        }
+      }
+      catch ( Exception ex ){}
     }
     
     size = cis.getLength();
@@ -315,6 +325,13 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     {  
       getContentStore().deleteContent( storageID );
       if( hasParent() ) getParent().sizeOfChildChanged( size, 0 );
+      MCRContentIndexer indexer = MCRContentIndexerFactory.getIndexerFromFCT( contentTypeID );
+      try
+      {
+        if ( null != indexer )
+          indexer.doDeleteIndex( this );
+      }
+      catch ( Exception ex ){}
     }
     
     super.delete();
