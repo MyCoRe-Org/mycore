@@ -32,6 +32,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+import org.jdom.input.DOMBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRSession;
@@ -136,44 +137,16 @@ public class WCMSActionServlet extends WCMSServlet {
         contentCurrentLang = request.getParameter("content_currentLang");
 
         //System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
-        /* code validation by JTidy */
+        
         if ( request.getParameter("codeValidationDisable") == null ) {
-        	//System.out.println("JTIDY bei der Arbeit..................................................................................................");
-            Tidy tidy = new Tidy();
-            
-            tidy.setXHTML(true);
-            tidy.setInputEncoding("UTF-8");
-            tidy.setOutputEncoding("UTF-8");
-			tidy.setPrintBodyOnly(true);
-			tidy.setIndentContent(true);
-			tidy.setForceOutput(true);
-			tidy.setMakeClean(true);
-			tidy.setMakeBare(true);
-			tidy.setQuoteAmpersand(true);
-			tidy.setQuoteMarks(true);
-			tidy.setQuoteNbsp(true);				
-            
-            if (content != null) {
-                ByteArrayInputStream bais = new ByteArrayInputStream(content.getBytes("UTF-8"));
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                tidy.parse(bais, baos);
-                content = baos.toString("UTF-8");
-                bais.close();
-                baos.flush();
-                baos.close();
-            }
-            if (contentCurrentLang != null) {
-                ByteArrayInputStream baisc = new ByteArrayInputStream(contentCurrentLang.getBytes("UTF-8"));
-                ByteArrayOutputStream baosc = new ByteArrayOutputStream();
-                tidy.parse(baisc, baosc);
-                contentCurrentLang = baosc.toString("UTF-8");
-                baisc.close();
-                baosc.flush();
-                baosc.close();
-            }
-        }
-        /* END: code validation by JTidy */
-
+        	/* xhtml code validation (valid parameters are:
+        	 *  	cyberneko 	- String
+        	 * 		jtidy 		- String )
+        	 */
+        	System.out.println("code validation an");
+        	codeValidation(VALIDATOR);
+        	
+        }	
         currentLangLabel = request.getParameter("label_currentLang");
 
         /*if (content != null ) {
@@ -333,7 +306,7 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void generateOutput(HttpServletRequest request, String error, HttpServletResponse response, File naviFile, String label, String fileName){
         try {
-        		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
+        	MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(naviFile);
             Element root = doc.getRootElement();
@@ -471,7 +444,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 .setAttribute("time", getTime())
                 .setAttribute("labelPath", labelPath)
                 .setAttribute("lastEditor", userRealName);
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
             xmlout.output(doc, new FileOutputStream(footer));
         }
         catch (Exception e) {
@@ -505,7 +478,7 @@ public class WCMSActionServlet extends WCMSServlet {
                                                   .setAttribute("lastEditor", userRealName));
                 root.addContent(meta);
             }
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
             xmlout.output(doc, new FileOutputStream(hrefFile));
         }
         catch (Exception e) {
@@ -550,7 +523,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 root.addContent(log);
             }
 
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
             xmlout.output(doc, new FileOutputStream(logFile));
         }
         catch (Exception e) {
@@ -747,7 +720,7 @@ public class WCMSActionServlet extends WCMSServlet {
 				/* END OF: set */
 				/* END OF: dynamic content binding */
 
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                 xmlout.output(doc, new FileOutputStream(inputFile));
             }
             catch (Exception e) {}
@@ -825,7 +798,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 /* END OF: remove */
 				/* END OF: dynamic content binding */
 
-                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                 outputter.output(doc, new FileOutputStream(inputFile));
             }
             catch (Exception e) {}
@@ -841,7 +814,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 label = actElem.getChildText("label");
                 actElem.detach();
 
-                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                 outputter.output(doc, new FileOutputStream(inputFile));
             }
             catch (Exception e) {}
@@ -867,7 +840,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 if (newEntry) {
                     actElem.addContent(new Element("label").setAttribute("lang", currentLang, ns).setText(label));
                 }
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                 xmlout.output(doc, new FileOutputStream(inputFile));
             }
             catch (Exception e) {}
@@ -926,7 +899,7 @@ public class WCMSActionServlet extends WCMSServlet {
 						.append("</MyCoReWebPage>\n");
                     BufferedInputStream bi = new BufferedInputStream(
 							new ByteArrayInputStream(output.toString()
-									.getBytes("UTF-8")));
+									.getBytes(OUTPUT_ENCODING)));
                     MCRUtils.copyStream(bi,bo);
                     bi.close();
                     bo.close();
@@ -973,7 +946,7 @@ public class WCMSActionServlet extends WCMSServlet {
 						parent.addContent(html);
 					}
 
-                    XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                    XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                     xmlout.output(doc, new FileOutputStream(hrefFile));
                 }
                 catch (JDOMException je) {
@@ -1038,7 +1011,7 @@ public class WCMSActionServlet extends WCMSServlet {
 					parent.addContent(html);
 				}
 
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                 xmlout.output(doc, new FileOutputStream(hrefFile));
             }
             catch (JDOMException je) {
@@ -1102,6 +1075,78 @@ public class WCMSActionServlet extends WCMSServlet {
         generateOutput(request, error, response, naviFile, label, fileName);
     }
 
+    public void codeValidation(String validator) {
+    	System.out.println("XHTML code validation using "+VALIDATOR);
+    	//JTidy Configuration
+    	Tidy tidy = new Tidy();
+    	//Dict dict = new Dict("toc", (short)4, 8, ParserImpl.BLOCK, null);
+    	tidy.setXHTML(true);
+    	tidy.setInputEncoding(OUTPUT_ENCODING);
+    	tidy.setOutputEncoding(OUTPUT_ENCODING);
+    	tidy.setPrintBodyOnly(true);
+    	tidy.setIndentContent(true);
+    	tidy.setForceOutput(true);
+    	tidy.setMakeClean(true);
+    	tidy.setMakeBare(true);
+    	tidy.setQuoteAmpersand(true);
+    	tidy.setQuoteMarks(true);
+    	tidy.setQuoteNbsp(true);
+    	
+    	if (content != null) {
+    		try {
+    			ByteArrayInputStream bais = new ByteArrayInputStream(content.getBytes(OUTPUT_ENCODING));
+    			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    			if (validator.equals("cyberneko")) {
+    				org.cyberneko.html.parsers.DOMParser parser = new 
+					org.cyberneko.html.parsers.DOMParser();
+    				parser.parse( new InputSource(bais) );
+    				System.out.println(parser.getDocument().getChildNodes());
+    				DOMBuilder builder = new DOMBuilder();
+    				Document document = builder.build( parser.getDocument() );                
+                    XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
+                    xmlout.output(document.getRootElement().getChild("BODY").getContent(), baos);
+                    content = baos.toString(OUTPUT_ENCODING);
+    			}
+    			else {
+    				tidy.parse(bais, baos);  				
+    			}
+    			content = baos.toString(OUTPUT_ENCODING);
+				baos.flush();
+				baos.close();
+    			bais.close();
+    		}
+    		catch (Exception e){
+    			e.printStackTrace();
+    		}
+    	}
+    	
+    	if (contentCurrentLang != null) {
+    		try {
+    			ByteArrayInputStream bais = new ByteArrayInputStream(contentCurrentLang.getBytes(OUTPUT_ENCODING));
+    			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    			if (validator.equals("cyberneko")) {
+    				org.cyberneko.html.parsers.DOMParser parser = new 
+					org.cyberneko.html.parsers.DOMParser();
+    				parser.parse( new InputSource(bais) );
+    				DOMBuilder builder = new DOMBuilder();
+    				Document document = builder.build( parser.getDocument() );                
+                    XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
+                    xmlout.output(document.getRootElement().getChild("BODY").getContent(), baos);
+    			}
+    			else {
+    				tidy.parse(bais, baos);
+    			}
+    			contentCurrentLang = baos.toString(OUTPUT_ENCODING);
+				baos.flush();
+				baos.close();
+    			bais.close();   		
+    		}
+    		catch (Exception e){
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    
     /** Returns a short description of the servlet.
      */
     public String getServletInfo() {
