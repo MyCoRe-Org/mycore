@@ -48,7 +48,6 @@
   <target name="init" >
    <mkdir dir="${classes}"/>
    <mkdir dir="${javadocs}"/>
-   <mkdir dir="${lib}"/>
   </target>
   
   <!-- =================================================================== -->
@@ -196,9 +195,9 @@
   <target name="clean" depends="init">
     <delete includeEmptyDirs="true" >
       <fileset dir="${javadocs}" />
-      <fileset dir="${classes}" />
-      <fileset dir="${lib}" />
+      <fileset dir="${classes}"  />
     </delete>
+    <delete file="${lib}/mycore.jar" />
   </target>
 
 </project>
