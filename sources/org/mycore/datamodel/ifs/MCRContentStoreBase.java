@@ -48,7 +48,7 @@ public abstract class MCRContentStoreBase
 
   public MCRContentStoreBase()
   {
-    formatter = new SimpleDateFormat( "yyyy-MM-dd_HHmmss_SSS" );
+    formatter = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss_SSS" );
     lastID    = null;
   }
   

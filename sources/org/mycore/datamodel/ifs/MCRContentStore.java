@@ -68,13 +68,13 @@ public interface MCRContentStore
     throws MCRPersistenceException;
 
   /**
-   * Deletes the content of the given MCRFile. Uses the StorageID set in the
+   * Deletes the content under the given StorageID set in the
    * MCRFile object to indentify the place where the file content was stored
    * in this store instance.
    *
-   * @param file the MCRFile thats content is to be deleted
+   * @param storageID the ID identifying where the content of a file was stored
    */
-  public void deleteContent( MCRFile file )
+  public void deleteContent( String storageID )
     throws MCRPersistenceException;
 
   /**

@@ -101,7 +101,9 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
         }
       }
       
-      String fileID = buildNextID() + "." + file.getExtension();
+      String fileID = buildNextID();
+      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
+      
       storageID.append( fileID );
       
       File local = new File( dir, fileID );
@@ -118,12 +120,11 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     }
   }
   
-  public void deleteContent( MCRFile file )
+  public void deleteContent( String storageID )
     throws MCRPersistenceException
   {
     try
     { 
-      String storageID = file.getStorageID();
       File local = new File( baseDir, storageID );
       local.delete();
       
@@ -147,7 +148,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     }
     catch( Exception exc )
     {
-      String msg = "Could not delete content of stored file: " + file.getStorageID();
+      String msg = "Could not delete content of stored file: " + storageID;
       throw new MCRPersistenceException( msg, exc );
     }
   }

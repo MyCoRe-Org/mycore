@@ -90,6 +90,8 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     throws MCRPersistenceException
   {
     String storageID = buildNextID();
+    if( file.getExtension().length() > 0 ) 
+      storageID += "." + file.getExtension();
 
     FTPClient connection = connect();
     try
@@ -106,15 +108,15 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     finally{ disconnect( connection ); }
   }
 
-  public void deleteContent( MCRFile file )
+  public void deleteContent( String storageID )
     throws MCRPersistenceException
   {
     FTPClient connection = connect();
     try
-    { connection.delete( file.getStorageID() ); }
+    { connection.delete( storageID ); }
     catch( Exception exc )
     {
-      String msg = "Could not delete content of stored file: " + file.getStorageID();
+      String msg = "Could not delete content of stored file: " + storageID;
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ disconnect( connection ); }

@@ -104,7 +104,9 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
         storageID.append( slots[ i ] ).append( "/" );
       }
       
-      String fileID = buildNextID() + "." + file.getExtension();
+      String fileID = buildNextID();
+      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
+      
       connection.put( source, fileID );
       storageID.append( fileID );
       
@@ -118,13 +120,12 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
     finally{ disconnect( connection ); }
   }
 
-  public void deleteContent( MCRFile file )
+  public void deleteContent( String storageID )
     throws MCRPersistenceException
   {
     FTPClient connection = connect();
     try
     { 
-      String storageID = file.getStorageID();
       connection.delete( storageID ); 
       
       // Recursively remove all directories that have been created, if empty:
@@ -143,7 +144,7 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
     }
     catch( Exception exc )
     {
-      String msg = "Could not delete content of stored file: " + file.getStorageID();
+      String msg = "Could not delete content of stored file: " + storageID;
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ disconnect( connection ); }

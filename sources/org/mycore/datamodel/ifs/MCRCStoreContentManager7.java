@@ -119,18 +119,18 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-  public void deleteContent( MCRFile file )
+  public void deleteContent( String storageID )
     throws MCRPersistenceException
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     try
     {
-      MCRCM7Item item = new MCRCM7Item ( connection, indexClass, file.getStorageID() );
+      MCRCM7Item item = new MCRCM7Item ( connection, indexClass, storageID );
       item.delete();
     }
     catch( Exception exc )
     {
-      String msg = "Error deleting parts of ContentManager item " + file.getStorageID();
+      String msg = "Error deleting parts of ContentManager item " + storageID;
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
