@@ -22,13 +22,12 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.*;
-import mycore.ifs.*;
-import mycore.cm7.*;
+import org.mycore.common.*;
+import org.mycore.datamodel.ifs.*;
 import java.util.*;
 import java.io.*;
 

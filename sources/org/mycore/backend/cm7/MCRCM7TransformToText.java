@@ -22,16 +22,16 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import java.util.*;
 import java.text.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
-import mycore.common.MCRPersistenceException;
-import mycore.common.MCRUtils;
-import mycore.datamodel.MCRObjectID;
-import mycore.xml.MCRQueryInterface;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.xml.MCRQueryInterface;
 
 /**
  * This is the basic tranformer implementation for CM 7 search text strings

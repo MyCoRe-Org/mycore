@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import java.util.*;
-import mycore.common.*;
-import mycore.sql.*;
+import org.mycore.common.*;
+import org.mycore.backend.sql.*;
 
 /**
  * This class provides methods to get the names of the tables and columns

@@ -22,13 +22,13 @@
  *
  **/
  
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRPersistenceException;
-import mycore.xml.MCRQueryResultArray;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
  * This is the search class for the IBM Content Manager 7 Text Search Engine.

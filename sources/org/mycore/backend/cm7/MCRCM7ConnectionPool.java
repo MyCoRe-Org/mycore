@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class implements a pool of database connections to 

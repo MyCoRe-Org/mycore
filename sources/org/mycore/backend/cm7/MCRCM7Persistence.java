@@ -22,15 +22,15 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import java.io.*;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.*;
-import mycore.datamodel.*;
-import mycore.sql.*;
+import org.mycore.common.*;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.backend.sql.*;
 
 /**
  * This class implements all methode for handling the data to the data store

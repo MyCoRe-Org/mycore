@@ -22,13 +22,13 @@
  *
  **/
 
-package mycore.cm7;
+package org.mycore.backend.cm7;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import java.util.*;
 import java.io.File;
-import mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * <B>This class implements the access routines for a IBM Content Manager
