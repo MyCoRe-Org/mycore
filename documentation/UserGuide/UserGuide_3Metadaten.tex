@@ -327,7 +327,7 @@ Der Basistyp \mcridentifier{MCRMetaNumber} ermöglicht das Speichern und Suchen v
 %
 %
 \subsubsection{XML-Syntax des Metadatentyps MCRMetaPerson}
-Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für natürliche Personen. Dabei wird berücksichtigt, dass die Namen in verschiedenen Sprachen und international gängigen Formen auftreten können. Das Attribut \mcridentifier{type} dient der Differenzierung der verschiedenen Namen einer Person, \zB Geburtsname, Synonym, Kosename usw. \mcridentifier{firstname} repräsentiert den/die Vornamen, \mcridentifier{callname} den Rufnamen, \mcridentifier{surename} den Familiennamen, \mcridentifier{academic} den akademischen Titel und \mcridentifier{peerage} den Adelstitel. Das optionale Attribut \mcridentifier{textsearch} hat den Effekt, dass alle textlichen Werte des Namens in das allgemeine Feld zur Textsuche des Metadatenobjektes übernommen werden.\\[2ex]
+Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für natürliche Personen. Dabei wird berücksichtigt, dass die Namen in verschiedenen Sprachen und international gängigen Formen auftreten können. Das Attribut \mcridentifier{type} dient der Differenzierung der verschiedenen Namen einer Person, \zB Geburtsname, Synonym, Kosename usw. \mcridentifier{firstname} repräsentiert den/die Vornamen, \mcridentifier{callname} den Rufnamen, \mcridentifier{surname} den Familiennamen, \mcridentifier{academic} den akademischen Titel und \mcridentifier{peerage} den Adelstitel. Das optionale Attribut \mcridentifier{textsearch} hat den Effekt, dass alle textlichen Werte des Namens in das allgemeine Feld zur Textsuche des Metadatenobjektes übernommen werden.\\[2ex]
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaPerson,label=lst:xml_syntax_basistyp_mcrperson]
@@ -335,7 +335,7 @@ Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für n
   <subtag type="..." xml:lang="..">
    <firstname>...</firstname>
    <callname>...</callname>
-   <surename>...<surename>
+   <surname>...<surname>
    <academic>...</academic>
    <peerage>...</peerage>
   </subtag>
@@ -349,12 +349,12 @@ Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für n
   <subtag type="geburtsname" xml:lang="de">
    <firstname>Lisa Marie</firstname>
    <callname>Lisa</callname>
-   <surename>Schnell<surename>
+   <surname>Schnell<surname>
   </subtag>
   <subtag type="familienname" xml:lang="de">
    <firstname>Lisa Marie</firstname>
    <callname>Lisa</callname>
-   <surename>Schmidt<surename>
+   <surname>Schmidt<surname>
    <academic>Dr. phil.</academic>
    <peerage>von</peerage>
   </subtag>

@@ -42,7 +42,7 @@ final public class MCRMetaPerson extends MCRMetaDefault
 // MetaPerson data
 private String firstname;
 private String callname;
-private String surename;
+private String surname;
 private String academic;
 private String peerage;
 
@@ -56,7 +56,7 @@ public MCRMetaPerson()
   super();
   firstname = "";
   callname  = "";
-  surename  = "";
+  surname  = "";
   academic  = "";
   peerage   = "";
   }
@@ -68,7 +68,7 @@ public MCRMetaPerson()
  * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
  * is null or empty an exception was throwed. The type element was set to
  * the value of <em>set_type<em>, if it is null, an empty string was set
- * to the type element. The firstname, callname, surename, academic and
+ * to the type element. The firstname, callname, surname, academic and
  * peerage element was set to the value of <em>set_...<em>, if they are null,
  * an empty string was set to this element.
  *
@@ -79,45 +79,45 @@ public MCRMetaPerson()
  * @param set_type        the optional type string
  * @param set_inherted    a value >= 0
  * @param set_firstname   the first name
- * @param set_callname    the call name
- * @param set_surename    the sure name
+ * @param set_callname    the callname
+ * @param set_surname    the surname
  * @param set_academic    the academic title
  * @param set_peerage     the peerage title
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaPerson(String set_datapart, String set_subtag, 
   String default_lang, String set_type, int set_inherted,
-  String set_firstname, String set_callname, String set_surename, 
+  String set_firstname, String set_callname, String set_surname, 
   String set_academic, String set_peerage) throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   firstname = "";
   callname  = "";
-  surename  = "";
+  surname  = "";
   academic  = "";
   peerage   = "";
-  set(set_firstname,set_callname,set_surename,set_academic,set_peerage);
+  set(set_firstname,set_callname,set_surname,set_academic,set_peerage);
   }
 
 /**
  * This methode set all name componets. 
  *
  * @param set_firstname   the first name
- * @param set_callname    the call name
- * @param set_surename    the sure name
+ * @param set_callname    the callname
+ * @param set_surname    the surname
  * @param set_academic    the academic title
  * @param set_peerage     the peerage title
  **/
 public final void set(String set_firstname, String set_callname, String 
-  set_surename, String set_academic, String set_peerage)
+  set_surname, String set_academic, String set_peerage)
   {
   if ((set_firstname == null) || (set_callname == null) ||
-      (set_surename  == null) || (set_academic == null) || 
+      (set_surname  == null) || (set_academic == null) || 
       (set_peerage   == null)) {
     throw new MCRException("One parameter is null."); }
   firstname = set_firstname.trim();
   callname  = set_callname.trim();
-  surename  = set_surename.trim();
+  surname  = set_surname.trim();
   academic  = set_academic.trim();
   peerage   = set_peerage.trim();
   }
@@ -139,12 +139,12 @@ public final String getCallname()
   { return callname; }
 
 /**
- * This method get the surename text element.
+ * This method get the surname text element.
  *
- * @return the surename
+ * @return the surname
  **/
-public final String getSurename()
-  { return surename; }
+public final String getSurname()
+  { return surname; }
 
 /**
  * This method get the academic text element.
@@ -175,8 +175,8 @@ public final void setFromDOM(org.jdom.Element element)
   if (firstname == null) { firstname = ""; }
   callname  = element.getChildTextTrim("callname");
   if (callname == null) { callname = ""; }
-  surename  = element.getChildTextTrim("surename");
-  if (surename == null) { surename = ""; }
+  surname  = element.getChildTextTrim("surname");
+  if (surname == null) { surname = ""; }
   academic  = element.getChildTextTrim("academic");
   if (academic == null) { academic = ""; }
   peerage   = element.getChildTextTrim("peerage");
@@ -204,8 +204,8 @@ public final org.jdom.Element createXML() throws MCRException
     elm.addContent(new org.jdom.Element("firstname").addContent(firstname)); }
   if ((callname  = callname .trim()).length() !=0) {
     elm.addContent(new org.jdom.Element("callname").addContent(callname)); }
-  if ((surename  = surename .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("surename").addContent(surename)); }
+  if ((surname  = surname .trim()).length() !=0) {
+    elm.addContent(new org.jdom.Element("surname").addContent(surname)); }
   if ((academic  = academic .trim()).length() !=0) {
     elm.addContent(new org.jdom.Element("academic").addContent(academic)); }
   if ((peerage   = peerage  .trim()).length() !=0) {
@@ -240,9 +240,9 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"callname");
     tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,callname);
     }
-  if ((surename = surename.trim()).length() !=0) {
-    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"surename");
-    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,surename);
+  if ((surname = surname.trim()).length() !=0) {
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"surname");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,surname);
     }
   if ((academic = academic.trim()).length() !=0) {
     tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"academic");
@@ -268,7 +268,7 @@ public final String createTextSearch(boolean textsearch)
   if (textsearch) { 
     StringBuffer sb = new StringBuffer(128);
     sb.append(firstname).append(' ').append(callname).append(' ')
-      .append(surename).append(' ').append(academic).append(' ')
+      .append(surname).append(' ').append(academic).append(' ')
       .append(peerage).append(NL);
     return sb.toString();
     }
@@ -281,7 +281,7 @@ public final String createTextSearch(boolean textsearch)
  * <ul>
  * <li> the firstname is empty and
  * <li> the callname  is empty and
- * <li> the surename  is empty and
+ * <li> the surname  is empty and
  * <li> the academic  is empty and
  * <li> the peerage   is empty
  * </ul>
@@ -293,7 +293,7 @@ public final boolean isValid()
   {
   if (((firstname=firstname.trim()).length() ==0) && 
       ((callname =callname.trim()).length()  ==0) &&
-      ((surename =surename.trim()).length()  ==0) &&
+      ((surname =surname.trim()).length()  ==0) &&
       ((academic =academic.trim()).length()  ==0) &&
       ((peerage  =peerage.trim()).length()   ==0)) {
     return false; }
@@ -306,7 +306,7 @@ public final boolean isValid()
 public final Object clone()
   {
   MCRMetaPerson out = new MCRMetaPerson(datapart,subtag,lang,type,inherited,
-    firstname,callname,surename,academic,peerage);
+    firstname,callname,surname,academic,peerage);
   return (Object)out;
   }
 
@@ -319,7 +319,7 @@ public final void debug()
   super.debugDefault();
   logger.debug("Firstname          = "+firstname);
   logger.debug("Callname           = "+callname);
-  logger.debug("Surename           = "+surename);
+  logger.debug("Surname           = "+surname);
   logger.debug("Academic           = "+academic);
   logger.debug("Peerage            = "+peerage);
   logger.debug("Stop");

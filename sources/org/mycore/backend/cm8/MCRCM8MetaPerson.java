@@ -124,8 +124,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it.addAttr(attr);
     lt.addSubEntity(it);
 
-    // add the person child component surename
-    name = prefix+"surename";
+    // add the person child component surname
+    name = prefix+"surname";
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);

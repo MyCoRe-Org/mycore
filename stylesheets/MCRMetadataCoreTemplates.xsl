@@ -190,7 +190,7 @@
      maxOccurs='1'/>
     <xsd:element name="callname" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
-    <xsd:element name="surename" type="xsd:string" minOccurs='0' 
+    <xsd:element name="surname" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
     <xsd:element name="academic" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
