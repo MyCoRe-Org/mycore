@@ -23,6 +23,7 @@
   <property name="mycore.source.datamodel" value="./sources/mycore/datamodel"/>
   <property name="mycore.source.cm7" value="./sources/mycore/cm7"/>
   <property name="mycore.source.sql" value="./sources/mycore/sql"/>
+  <property name="mycore.source.user" value="./sources/mycore/user"/>
   <property name="mycore.source.command" value="./sources/mycore/commandline"/>
   <property name="mycore.class" value="./classes"/>
   <property name="mycore.javadoc" value="./javadocs"/>
@@ -72,7 +73,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_datamodel,compile_sql,compile_cm7,compile_commandline,compile_demo_dublin_core">
+  <target name="compile" depends="init,compile_common,compile_datamodel,compile_sql,compile_cm7,compile_user,compile_commandline,compile_demo_dublin_core">
   </target>
   
   <target name="compile_common">
@@ -105,6 +106,15 @@
   <target name="compile_datamodel">
     <!-- compiles the datamodel source classes -->
     <javac srcdir="${mycore.source.datamodel}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_user">
+    <!-- compiles the user management source classes -->
+    <javac srcdir="${mycore.source.user}"
            destdir="${mycore.class}"
            debug="${debug}"
            optimize="${optimize}">
@@ -145,8 +155,10 @@
            >
       <group title="MyCoRe Common" packages="mycore.common.*"/>
       <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
-      <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
+      <group title="MyCoRe SQL" packages="mycore.sql.*"/>
       <group title="MyCoRe Content Manager 7" packages="mycore.cm7.*"/>
+      <group title="MyCoRe User Management" packages="mycore.user.*"/>
+      <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
     </javadoc>
     <!-- create the project java documentation -->
     <javadoc packagenames="demo_dublin_core.*"
