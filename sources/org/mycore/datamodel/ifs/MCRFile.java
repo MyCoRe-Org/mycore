@@ -55,21 +55,23 @@ public class MCRFile extends MCRFilesystemNode
   public MCRFile( String name, String ownerID )
   {
     super( name, ownerID );
-    init();
+    initContentFields();
   }
   
   public MCRFile( String name, MCRDirectory parent )
   { 
     super( name, parent );
-    init();
+    initContentFields();
   }
   
-  private void init()
+  private void initContentFields()
   {
     storageID     = "";
     storeID       = "";
     contentTypeID = MCRFileContentTypeFactory.getDefaultType().getID();
     md5           = "d41d8cd98f00b204e9800998ecf8427e"; // md5 of empty file
+    size          = 0;
+    avExtender    = null;
   }
   
   /**
@@ -89,7 +91,7 @@ public class MCRFile extends MCRFilesystemNode
   /**
    * Returns the MD5 checksum for this file
    **/
-  public String getChecksum()
+  public String getMD5()
   { 
     ensureNotDeleted();
     return md5; 
@@ -193,6 +195,14 @@ public class MCRFile extends MCRFilesystemNode
     ensureNotDeleted();
     
     MCRArgumentChecker.ensureNotNull( source, "source input stream" );
+    String md5_old = this.md5;
+    long size_old = this.size;
+    
+    if( storageID.length() != 0 ) // delete old content of file
+    {
+      getContentStore().deleteContent( this );
+      initContentFields();
+    }  
     
     MCRContentInputStream cis = new MCRContentInputStream( source );
     byte[] header = cis.getHeader();
@@ -200,12 +210,7 @@ public class MCRFile extends MCRFilesystemNode
     contentTypeID = 
       MCRFileContentTypeFactory.detectType( this.getName(), header ).getID();
 
-    if( header.length == 0 ) // Do not store empty file content
-    {
-      storageID = "";
-      storeID   = "";
-    }
-    else
+    if( header.length > 0 ) // Do not store empty file content
     {
       MCRContentStore store = MCRContentStoreFactory.selectStore( this );
       
@@ -213,10 +218,14 @@ public class MCRFile extends MCRFilesystemNode
       storeID   = store.getID();
     }
     
-    if( parent != null ) parent.sizeOfChildChanged( this.size, cis.getLength() );
-
     size = cis.getLength();
     md5  = cis.getMD5String();
+
+    if( ( size != size_old ) || ( ! md5.equals( md5_old ) ) )
+    {
+      lastModified = new GregorianCalendar();
+      if( parent != null ) parent.sizeOfChildChanged( size_old, size );
+    }
   }
 
   /**
