@@ -24,12 +24,10 @@
 
 package org.mycore.user;
 
-import java.io.*;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 import org.mycore.common.*;
 
@@ -188,7 +186,6 @@ public MCRUser(org.jdom.Element elm)
     description_len);
   this.primaryGroupID = trim(elm.getChildTextTrim("user.primary_group"),
     id_len);
-  org.jdom.Element userContactElement = elm.getChild("user.contact");
   org.jdom.Element userGroupElement = elm.getChild("user.groups");
   if (userGroupElement != null) {
     List groupIDList = userGroupElement.getChildren();

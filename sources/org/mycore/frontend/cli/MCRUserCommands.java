@@ -25,10 +25,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
-import java.sql.Timestamp;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -82,9 +79,9 @@ public static void initSuperuser(MCRSession session) throws MCRException
 
   session.setCurrentUserID(suser);
   try {
-    MCRUser testu = MCRUserMgr.instance().retrieveUser(session,suser);
-    MCRGroup testg = MCRUserMgr.instance().retrieveGroup(session,sgroup);
-    logger.info("The superuser already exist!");
+    if (MCRUserMgr.instance().retrieveUser(session,suser)!=null)
+     	if(MCRUserMgr.instance().retrieveGroup(session,sgroup)!=null)
+    		logger.info("The superuser already exist!");
     return;
     }
   catch (Exception e) { }

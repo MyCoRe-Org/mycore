@@ -99,8 +99,6 @@ public class MCROAIQueryService implements MCROAIQuery {
         MCRClassificationItem repository = MCRClassificationItem.
             getClassificationItem(classificationId);
         if ((repository != null) && (repository.hasChildren())) {
-        	MCRCategoryItem[] children = repository.getChildren();
-
 			list = getSets(list, repository.getChildren(), "", instance);
         }
 

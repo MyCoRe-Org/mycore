@@ -52,8 +52,6 @@ public class MCRXMLFileFilter extends FileFilter {
 	else {
 	    StringTokenizer stok = new StringTokenizer( pathname.getName(), "." );
 	    String ext = "";
-	    int tokens = stok.countTokens();
-	    int i = 0;
 	    while( stok.hasMoreTokens() ) 
 		ext = stok.nextToken();
 	    return ext.equalsIgnoreCase( "xml" );

@@ -660,12 +660,12 @@ public class MCROAIDataProvider extends HttpServlet {
         
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
-        String repositoryIdentifier = new String();
 	    MCRConfiguration config = MCRConfiguration.instance();
 		MCROAIQuery query = null;
 		        
 		try {
-	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+			//check if property is set, else Exception is thrown 
+	        config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
 			query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		} catch (MCRConfigurationException mcrx) {
 			logger.fatal("Missing configuration item: " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
@@ -954,7 +954,8 @@ public class MCROAIDataProvider extends HttpServlet {
         MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
 	    try {
-	        String format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
+			//check if property is set, else Exception is thrown 
+	        config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
 	    } catch (MCRConfigurationException mcrx) {
         	logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);

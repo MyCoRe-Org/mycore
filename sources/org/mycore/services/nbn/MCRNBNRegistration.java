@@ -32,7 +32,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.editor.MCREditorXMLSource;
 import org.mycore.frontend.editor.MCREditorXMLTarget;
 
@@ -95,7 +94,8 @@ public class MCRNBNRegistration
 			urn = root.getChildTextTrim("nbn");
 			logger.info("NBN: " + urn);
 			try {
-				long lUrn = Long.parseLong(urn);
+				//check if urn is a really a number or throw Exception
+				Long.parseLong(urn);
 				if (MCRNBN.exists(MCRNBN.getLocalPrefix() + urn)) {
 					nbn = new MCRNBN(MCRNBN.getLocalPrefix() + urn);
 				} else {

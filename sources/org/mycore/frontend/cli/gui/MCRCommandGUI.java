@@ -384,7 +384,6 @@ public class MCRCommandGUI extends JFrame {
 								  resarray);
 			resarray.wait();
 	    }
-	    String id = resarray.getId( 0 );
 	    detailView.setText( transformResult( resarray.exportElementToByteArray( 0 ) ) );
 	    detailView.updateUI();
 	}
