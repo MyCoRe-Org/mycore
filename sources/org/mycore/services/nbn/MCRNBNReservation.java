@@ -117,11 +117,13 @@ public class MCRNBNReservation implements MCREditorXMLSource, MCREditorXMLTarget
 		String author = root.getChildTextTrim("author");
 		String comment = root.getChildTextTrim("comment");
 		MCRNBN nbn = new MCRNBN(author, comment);
-		String urn = nbn.getNBN();
+		String urn = URLEncoder.encode(nbn.getNBN());
+		String _urn = URLEncoder.encode(URLEncoder.encode("urn:") + urn);
 		String url = "../nbn/reservation.xml?XSL.Author=" + URLEncoder.encode(author) 
 			+ "&XSL.Comment=" + URLEncoder.encode(comment) + "&XSL.Address=" + URLEncoder.encode(address)
 			+ "&XSL.LocalContact=" + URLEncoder.encode(localcontact) 
-			+ "&XSL.nbn=" + URLEncoder.encode(urn) + "&XSL.Resolver=" + URLEncoder.encode(resolver);
+			+ "&XSL.nbn=" + urn + "&XSL.Resolver=" + URLEncoder.encode(resolver)
+			+ "&XSL.CodedUrn=" + _urn;
 			
 		return url;
 	}
