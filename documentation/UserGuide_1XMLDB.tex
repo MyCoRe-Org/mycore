@@ -7,21 +7,56 @@
 Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
 %
 %
+\subsubsection{Vorbereitung}
+%
+%
+Als erster Schritt sind der Java-Compiler J2SE 1.3.1 oder höher und ANT zu installieren. Beide Befinden sich unter SuSE in der Distribution.
+\begin{itemize}
+\item {\bf java2-jre-1.3.1-521} oder höher
+\item {\bf java2-1.3.1-521} oder höher
+\item {\bf jakarta-ant-1.5-76} oder höher
+\end{itemize}
+Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin} anlegen, unter welchem Sie dann Ihre Applikationen laufen lassen.
+%
+%
 \subsubsection{Die Installation von MySQL}
 \begin{enumerate}
 \item Installieren Sie aus Ihrer Distribution die folgenden Pakete und danach ggf. noch vom Hersteller der Distribution per Netz angebotene Updates. Die angegebenen versionsnummern sind nur exemplarisch.
 \begin{itemize}
-\item {\bf mysql-3.23.52-83}
-\item {\bf mysql-shared-3.23.52-83}
-\item {\bf mysql-client-3.23.52-83}
-\item {\bf mysql-devel-3.23.52-83}
-\item {\bf mysql-bench-3.23.52-83}
+\item {\bf mysql-3.23.52-83} oder höher
+\item {\bf mysql-shared-3.23.52-83} oder höher
+\item {\bf mysql-client-3.23.52-83} oder höher
+\item {\bf mysql-devel-3.23.52-83} oder höher
+\item {\bf mysql-bench-3.23.52-83} oder höher
 \end{itemize}
 \item Die Dokumentation steht nun unter {\it /usr/share/doc/package/mysql}.
-\item Setzen Sie das Password für den User mysql und die Shell auf /bin/bash.
 \item Führe Sie das Kommando {\tt mysql\_install\_db } als mysql aus.
 \item Führe Sie das Kommando {\tt safe\_mysqld \& } als mysql aus.
 \item Zum verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
+\item Setzen Sie nun das {\bf root} Password mit dem Kommando {\tt /usr/bin/mysqladmin -u root  password PASSWORD} und {\tt mysqladmin -u root -h HOST password PASSWORD} . Ist das Password einmal gesetzt, müssen Sie zusätzlich die Option -p verwenden.
+\item die folgende Sequenz sorgt dafür, dass der MyCoRe-User {\bf mcradmin} alle Rechte auf der Datenbank hat. Dabei werden bei der Ausführung von Kommandos von {\bf localhost} aus keine Pssworte abgefragt. Von anderen Hosts aus muss 'ein\_password' eingegeben werden.
+{\tt
+\begin{verbatim}
+mysql --user=root -pPASSWORD mysql
+GRANT ALL PRIVILEGES ON *.* TO mcradmin@localhost WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO mcradmin@"%" IDENTIFIED BY 'ein\_passwort' WITH GRANT OPTION;
+quit
+\end{verbatim}
+}
+\item jetzt können Sie die Datenbasis für MyCoRe mit nachstehendem Kommando anlegen.
+{\tt
+\begin{verbatim}
+mysqladmin -u mcradmin create mycore 
+\end{verbatim}
+}
+\item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommanos
+{\tt
+\begin{verbatim}
+mysql --user=mcradmin -pPASSWORD mycore
+GRANT SELECT ON mycore.* TO mycorenutzer@'%';
+quit
+\end{verbatim}
+}
 \end{enumerate}
 %
 %

@@ -1,0 +1,33 @@
+%
+%
+\subsection{Grundlegende Konfigurationen}
+%
+%
+Dieser Abschnitt beschäftigt sich mit der Konfiguration der Beispielanwendung in allgemeinen Bereichen wie JDBC, Logger, usw. . Alle Konfigurationen für das Mycore-Beispiel stehen unter {\it \$MYCORE\_SAMPLE\_HOME/config}.
+%
+%
+\subsubsection{Allgemeines}
+%
+%
+In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter {\bf MCR.persistence\_type} fest, welchen Persitence Layer sie nutzen wollen. Mögliche Werte sind {\bf cm7}, {\bf cm8} oder {\bf xmldb}.
+%
+%
+\subsubsection{JDBC-Treiber}
+%
+%
+Im MyCoRe-Projekt werden ein Teil der Organisations- und Metadaten in klassischen relationalen Datenbanken gespeichert. Um die Arbeit mit verschiedenen Anbietern möglichst einfach zu gestalten, wurde die Arbeit mit dieser Datenbank gegen die JDBC-Schnittstellen programmiert.\\
+In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter{\bf MCR.persistence\_sql\_database\_url} fest, welcher JDBC-Treiber genommen werden soll. Weiterhin können Sie die minimale und maximale Anzahl der Connections festlegen.
+\begin{verbatim}
+# JDBC parameters for connecting to DB2
+#MCR.persistence_sql_database_url=jdbc:db2:LIB
+#MCR.persistence_sql_driver=COM.ibm.db2.jdbc.app.DB2Driver
+
+# JDBC parameters for connecting to MySQL
+MCR.persistence_sql_database_url=jdbc:mysql://localhost/mycore?user=ODBC
+MCR.persistence_sql_driver=org.gjt.mm.mysql.Driver
+
+MCR.persistence_sql_init_connections=1
+MCR.persistence_sql_max_connections=5
+\end{verbatim} 
+
+
