@@ -308,6 +308,9 @@ public class MCRLayoutServlet extends HttpServlet
             if( mcrSession != null ) user = mcrSession.getCurrentUserID();
           }
 
+          logger.debug( "LayoutServlet XSL.MCRSessionID=" + parameters.getProperty( "MCRSessionID" ) );
+          logger.debug( "LayoutServlet XSL.CurrentUser =" + user );
+
 	  parameters.put( "CurrentUser",           user               );
 	  parameters.put( "RequestURL",            requestURL         );
 	  parameters.put( "WebApplicationBaseURL", applicationBaseURL );
