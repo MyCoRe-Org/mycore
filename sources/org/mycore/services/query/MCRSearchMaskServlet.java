@@ -145,13 +145,16 @@ org.jdom.Document jdom = null;
   {  
   String type  = request.getParameter( "type"  );
   String layout = request.getParameter( "layout"  );
+  String host = "";
   String hosts[] = request.getParameterValues( "hosts" );
-  StringBuffer hostsb = new StringBuffer("");
-  for (int i=0;i<hosts.length;i++) {
-    if (i != 0) hostsb.append(',');
-    hostsb.append(hosts[i]);
+  if (hosts != null) {
+    StringBuffer hostsb = new StringBuffer("");
+    for (int i=0;i<hosts.length;i++) {
+      if (i != 0) hostsb.append(',');
+      hostsb.append(hosts[i]);
+      }
+    host = hostsb.toString();
     }
-  String host = hostsb.toString();
   if( host.length() == 0 ) host  = "local";
   if( type  == null ) return;
   if( layout  == null ) layout = type;
