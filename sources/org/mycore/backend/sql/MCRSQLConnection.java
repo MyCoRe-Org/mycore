@@ -43,8 +43,8 @@ import mycore.common.*;
  * without the need for transactions.</li>
  * </ul>
  *
- * @see doQuery()
- * @see #justDoQuery()
+ * @see #doQuery( String)
+ * @see #justDoQuery( String )
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
  *
@@ -84,7 +84,7 @@ public class MCRSQLConnection
    * Releases this connection back to the connection pool, indicating that it is
    * no longer needed by the current task.
    *
-   * @see MCRSQLConnectionPool#releaseConnection()
+   * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
    **/  
   public void release()
   { MCRSQLConnectionPool.instance().releaseConnection( this ); }

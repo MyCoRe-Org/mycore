@@ -37,8 +37,8 @@ import mycore.common.*;
  * @version $Revision$ $Date$
  *
  * @see java.sql.ResultSet
- * @see MCRSQLConnection#doQuery()
- * @see MCRSQLConnection#justDoQuery()
+ * @see MCRSQLConnection#doQuery( String )
+ * @see MCRSQLConnection#justDoQuery( String )
  */
 public class MCRSQLRowReader
 {
@@ -49,8 +49,8 @@ public class MCRSQLRowReader
    * Creates a new MCRSQLRowReader. This constructor is called by MCRSQLConnection
    * methods that execute an SQL query.
    *
-   * @see MCRSQLConnection#doQuery()
-   * @see MCRSQLConnection#justDoQuery()
+   * @see MCRSQLConnection#doQuery( String )
+   * @see MCRSQLConnection#justDoQuery( String )
    **/
   MCRSQLRowReader( ResultSet rs )
   { this.rs   = rs; }
