@@ -106,16 +106,12 @@ public final void create(MCRObjectID mcr_id, String mcr_label,
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
-  if (mcr_ts_index == null) {
-    throw new MCRConfigurationException("text search class name is false."); }
   try {
     createCM7(mcr_id,mcr_label,mcr_service,xml,ts); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
@@ -179,16 +175,12 @@ public final void delete(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
-  if (mcr_ts_index == null) {
-    throw new MCRConfigurationException("text search class name is false."); }
   try {
     deleteCM7(mcr_id); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
@@ -235,12 +227,10 @@ public final String receive(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   try {
     return receiveCM7(mcr_id); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
@@ -288,12 +278,10 @@ public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   try {
     return receiveCreateDateCM7(mcr_id); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
@@ -342,12 +330,10 @@ public final String receiveLabel(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   try {
     return receiveLabelCM7(mcr_id); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
@@ -399,16 +385,12 @@ public final void update(MCRObjectID mcr_id, String mcr_label,
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
-  if (mcr_index_class == null) {
-    throw new MCRConfigurationException("Index class name is false."); }
   sb.append("_ts");
   mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
-  if (mcr_ts_index == null) {
-    throw new MCRConfigurationException("text search class name is false."); }
   try {
     updateCM7(mcr_id,mcr_label,mcr_service,xml,ts); }
   catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
 /**
