@@ -252,4 +252,22 @@ public class MCRObjectCommands
     logger.info( "" );
     }
 
+ /**
+  * Get the next free MCRObjectID for the given MCRObjectID base.
+  *
+  * @param base the MCRObjectID base string
+  **/
+  public static void getID (String base)
+    {
+    MCRObjectID id = new MCRObjectID();
+    try {
+      id.setNextId(base);
+      logger.info("The next free ID  is "+id.getId());
+      }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      }
+    }
+
   }
