@@ -233,7 +233,7 @@ public final void addFlag(String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    0,value);
+    0,null,value);
   flags.add(flag);
   }
  
@@ -311,7 +311,7 @@ public final void replaceFlag(int index, String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    0,value);
+    0,null,value);
   flags.set(index,flag);
   }
 
