@@ -118,17 +118,21 @@ public String getDirectoryPath(String type)
  * The method return the information mail address for a given MCRObjectID type.
  *
  * @param type the MCRObjectID type
+ * @param todo the todo action String from the workflow.
  * @return the List of the information mail addresses
  **/
-public List getMailAddress(String type)
+public List getMailAddress(String type, String todo)
   {
-  if (mt.containsKey(type)) { return (List)mt.get(type); }
-  String mailaddr = config.getString("MCR.editor_"+type+"_mail",null);
+  if ((type == null) || ((type = type.trim()).length() ==0)) { 
+    return new ArrayList(); }
+  if ((todo == null) || ((todo = todo.trim()).length() ==0)) { 
+    return new ArrayList(); }
+  if (mt.containsKey(type+"_"+todo)) { return (List)mt.get(type+"_"+todo); }
+  String mailaddr = config.getString("MCR.editor_"+type+"_"+todo+"_mail","");
   ArrayList li = new ArrayList();
-  if (mailaddr == null) {
-    li.add("mcradmin@localhost");
+  if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() ==0)) {
     mt.put(type,li);
-    logger.warn("No mail address for "+type+" is in the configuration.");
+    logger.warn("No mail address for "+type+"_"+todo+" is in the configuration.");
     return li;
     }
   StringTokenizer st = new StringTokenizer(mailaddr,",");
