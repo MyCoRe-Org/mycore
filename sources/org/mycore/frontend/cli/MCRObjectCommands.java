@@ -254,6 +254,7 @@ public class MCRObjectCommands
   **/
   public static void save( String ID, String dirname )
     {
+    // check ID
     MCRObject obj = new MCRObject(); 
     MCRObjectID id = null;
     try { id = new MCRObjectID(ID); }
@@ -262,6 +263,14 @@ public class MCRObjectCommands
       logger.error("");
       return;
       }
+    // check dirname
+    File dir = new File(dirname);
+    if (dir.isFile()) {
+      logger.error(dirname+" is not a dirctory."); 
+      logger.error("");
+      return;
+      }
+    // get XML
     byte[] xml = null;
     try { xml = obj.receiveXMLFromDatastore(ID); }
     catch (MCRException ex) {
@@ -269,6 +278,7 @@ public class MCRObjectCommands
       logger.error("");
       return;
       }
+    // store the XML file
     String xslfile = "mcr_save-object.xsl";
     String filename = dirname+SLASH+id.toString()+".xml";
     try {
@@ -292,7 +302,7 @@ public class MCRObjectCommands
       logger.error("");
       return;
       }
-    logger.info( "Object "+ID+" stored under "+filename+"." );
+    logger.info( "Object "+id.toString()+" stored under "+filename+"." );
     logger.info( "" );
     }
 
@@ -307,6 +317,7 @@ public class MCRObjectCommands
   **/
   public static void save( String fromID, String toID, String dirname )
     {
+    // check fromID and toID
     MCRObject obj = new MCRObject(); 
     MCRObjectID fid = null;
     MCRObjectID tid = null;
@@ -319,6 +330,13 @@ public class MCRObjectCommands
     try { tid = new MCRObjectID(toID); }
     catch (Exception ex) {
       logger.error( "ToID : "+ex.getMessage() );
+      logger.error("");
+      return;
+      }
+    // check dirname
+    File dir = new File(dirname);
+    if (dir.isFile()) {
+      logger.error(dirname+" is not a dirctory."); 
       logger.error("");
       return;
       }
@@ -357,7 +375,7 @@ public class MCRObjectCommands
       }
     catch (Exception ex) {
       logger.error( ex.getMessage() );
-      logger.error( "Exception while store to file " + dirname );
+      logger.error( "Exception while store file to " + dirname );
       logger.error("");
       return;
       }

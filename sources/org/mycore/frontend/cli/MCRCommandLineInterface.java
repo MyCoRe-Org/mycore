@@ -157,7 +157,7 @@ public class MCRCommandLineInterface
     // Commands for derivate management
     // *************************************************
 
-	knownCommands[ numCommands++ ] = new MCRCommand(session,
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
 	  "delete derivate from {0} to {1}",
 	  "org.mycore.frontend.cli.MCRDerivateCommands.delete String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
@@ -176,8 +176,11 @@ public class MCRCommandLineInterface
       "update all derivates from directory {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save derivate {0} to {1}",
+      "save derivate of {0} to directory {1}",
       "org.mycore.frontend.cli.MCRDerivateCommands.save String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "save derivate from {0} to {1} to directory {2}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.save String String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next derivate ID for base {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.getID String" );
