@@ -222,6 +222,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 				}
 			} else {
 				result.importElements((MCRXMLContainer) startQuery(onetype));
+				for (int o=0;o<flags.size();o++) { flags.set(o,Boolean.FALSE); }
 			}
 			searchfulltext = false;
 		}
