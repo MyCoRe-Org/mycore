@@ -85,7 +85,8 @@ private String defaultLang = "";
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
-    String lang  = request.getParameter( "lang" );
+    String lang  = request.getParameter( "lang"  );
+    String sort  = request.getParameter( "sort"  );
 
     String att_mode  = (String) request.getAttribute( "mode"  );
     if (att_mode!=null) { mode = att_mode; }
@@ -95,8 +96,10 @@ private String defaultLang = "";
     if (att_type!=null) { type = att_type; }
     String att_host  = (String) request.getAttribute( "hosts" );
     if (att_host!=null) { host = att_host; }
-    String att_lang  = (String) request.getAttribute( "lang" );
+    String att_lang  = (String) request.getAttribute( "lang"  );
     if (att_lang!=null) { lang = att_lang; }
+    String att_sort  = (String) request.getAttribute( "sort"  );
+    if (att_sort != null) { sort = att_sort; }
 
     if( mode  == null ) mode  = "ResultList";
     if( host  == null ) host  = "local";
@@ -106,11 +109,14 @@ private String defaultLang = "";
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }
     lang = lang.toUpperCase();
+    if (sort == null) sort = "";
+    sort = sort.trim();
 
     System.out.println("MCRQueryServlet : mode = "+mode);
     System.out.println("MCRQueryServlet : type = "+type);
     System.out.println("MCRQueryServlet : hosts = "+host);
     System.out.println("MCRQueryServlet : lang = "+lang);
+    System.out.println("MCRQueryServlet : sort = " + sort);
     System.out.println("MCRQueryServlet : query = "+query);
 
     // query for classifications
@@ -163,7 +169,7 @@ private String defaultLang = "";
       {
         if (session != null)
         {
-          jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
+          jdom = sortList((org.jdom.Document) session.getAttribute( "CachedList" ), sort);
           type = (String)            session.getAttribute( "CachedType" );
         }
         else
@@ -191,11 +197,12 @@ private String defaultLang = "";
       MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
       jdom = resarray.exportAllToDocument();
-if (type.equals("Document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
 
       // create a new session if not already alive and encache result list
       if (mode.equals("ResultList"))
       {
+        jdom = sortList(jdom, sort);
+
         if (session == null)
           session = request.getSession(true);
         if (session != null)
@@ -205,6 +212,36 @@ if (type.equals("Document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
         }
         else
           System.out.println("session for setAttribute is null");
+      }
+    }
+
+    // append previous and next documents in list if they exist :
+    if (mode.equals("ObjectMetadata"))
+      if (session != null)
+    {
+      org.jdom.Document jdom_list = (org.jdom.Document) session.getAttribute("CachedList");
+      jdom_list = sortList(jdom_list, sort);
+      String xml_list = (new org.jdom.output.XMLOutputter()) .outputString(jdom_list);
+      String xml_doc = (new org.jdom.output.XMLOutputter()) .outputString(jdom);
+      int xml_doc_start = xml_doc.indexOf("<mcr_result ");
+      int xml_doc_end = xml_doc.indexOf("</mcr_results>");
+      String xml_doc_res = xml_doc.substring(xml_doc_start, xml_doc_end);
+      int pos_xml_doc = xml_list.indexOf(xml_doc_res);
+      if (pos_xml_doc > 0)
+      {
+        int prev_start = xml_list.lastIndexOf("<mcr_result ", pos_xml_doc - 3);
+        int next_end = xml_list.indexOf("</mcr_result>", pos_xml_doc + xml_doc_res.length()) + 13;
+        String xml_pn = xml_doc.substring(0, xml_doc_end);
+        if (prev_start > 0) xml_pn += xml_list.substring(prev_start, pos_xml_doc);
+        else xml_pn += "<mcr_result/>";
+        if (next_end > 0) xml_pn += xml_list.substring(pos_xml_doc + xml_doc_res.length(), next_end);
+        else xml_pn += "<mcr_result/>";
+        xml_pn += "</mcr_results>";
+System.out.println("-------------------------- xml_pn start ----------------------------------");
+System.out.println(xml_pn);
+System.out.println("-------------------------- xml_pn end ------------------------------------");
+        try { jdom = (new org.jdom.input.SAXBuilder()) .build(new ByteArrayInputStream(xml_pn.getBytes())); }
+        catch (org.jdom.JDOMException exc) { System.out.println(exc); }
       }
     }
 
@@ -306,27 +343,34 @@ if (type.equals("Document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
    * @exception MCRException              thrown if JDOM could not be transformed via XSLT
    */
   private static synchronized org.jdom.Document sortList (org.jdom.Document inp, String attr)
-    throws Exception
   {
+    if (attr.equals("")) return inp; // no sort if no attribute is specified
     String stylesheet = buildSortingStylesheet(attr);
-    BufferedWriter wr = new BufferedWriter(new FileWriter("machine-generated-sort.xsl"));
-    wr.write(stylesheet);
-    wr.close();
-    return transform(inp, "machine-generated-sort.xsl");
+    try
+    {
+      BufferedWriter wr = new BufferedWriter(new FileWriter("machine-generated-sort.xsl"));
+      wr.write(stylesheet);
+      wr.close();
+      return transform(inp, "machine-generated-sort.xsl");
+    }
+    catch (Exception exc)
+    {
+      System.out.println("Exception during sort list in MCRQueryServlet : " + exc.getMessage());
+      return inp;
+    }
   }
 
   /**
-   * <em>getStructure</em> retrieves all links outgoing from a single input document
-   * and gives the result as a vector of link lists (link folders).
+   * <em>getLinkFolder</em> retrieves all links outgoing from a single input document
+   * and belonging to a given link folder and gives the result as a JDOM.
    *
-   * @param inp                              the single input object as JDOM
-   * @return Vector                          the vector of JDOM's each of which is
-   *                                         a link folder
+   * @param doc                              the single input object as JDOM
+   * @param folder                           the name of the link folder without ending "s"
+   * @return org.jdom.Document               the result JDOM
    */
-  private static Vector getStructure (org.jdom.Document inp)
+  private static org.jdom.Document getLinkFolder (org.jdom.Document doc, String folder)
   {
-    Vector inpStruct = new Vector ();
-    return inpStruct;
+    return doc;
   }
 }
 
