@@ -33,6 +33,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import org.jdom.*;
 import mycore.common.*;
+import mycore.xml.*;
 
 /**
  * @author Frank Lützenkirchen
@@ -40,6 +41,23 @@ import mycore.common.*;
  **/
 public class MCRFileNodeServlet extends HttpServlet
 {
+// The configuration
+private MCRConfiguration conf = null;
+
+// Default Language (as UpperCase)
+private String defaultLang = "";
+
+ /**
+  * The initialization method for this servlet. This read the default
+  * language from the configuration.
+  **/
+  public void init() throws MCRConfigurationException
+  {
+    conf = MCRConfiguration.instance();
+    String defaultLang = conf
+      .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+  }
+
   public void doGet( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException
   {
@@ -133,6 +151,14 @@ public class MCRFileNodeServlet extends HttpServlet
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, MCRDirectory dir )
     throws IOException, ServletException
   {
+    String lang  = req.getParameter( "lang" );
+    String att_lang  = (String) req.getAttribute( "lang" );
+    if (att_lang!=null) { lang = att_lang; }
+    if( lang  == null ) { lang  = defaultLang; }
+    if (lang.equals("")) { lang = defaultLang; }
+    lang = lang.toUpperCase();
+    System.out.println("MCRFileNodeServlet : lang = "+lang);
+
     System.out.println( "Sending list of files in directory " + dir.getName() );
     
     Element root = new Element( "mcr_directory" );
@@ -180,9 +206,24 @@ public class MCRFileNodeServlet extends HttpServlet
       else node.setAttribute( "type", "directory" );
     }
     
-    req.setAttribute( "MCRLayoutServlet.Input.JDOM", doc );
-    RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
-    rd.forward( req, res );
+    // prepare the stylesheet name
+    Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
+    String style = parameters.getProperty("Style",lang);
+    System.out.println("Style = "+style);
+
+    if (style.equals("xml")) {
+      res.setContentType( "text/xml" );
+      OutputStream out = res.getOutputStream();
+      new org.jdom.output.XMLOutputter( "  ", true ).output( doc, out );
+      out.close();
+      }
+    else {
+      req.setAttribute( "MCRLayoutServlet.Input.JDOM", doc );
+      req.setAttribute( "XSL.Style", style );
+      RequestDispatcher rd = getServletContext()
+        .getNamedDispatcher( "MCRLayoutServlet" );
+      rd.forward( req, res );
+      }
   }
   
   private String     dateFormat    = "dd.MM.yyyy HH:mm:ss";
