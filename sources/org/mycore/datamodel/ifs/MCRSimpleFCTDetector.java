@@ -239,6 +239,16 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
     
     double getScore( String filename, byte[] header )
     {
+      if ( -1 == offset )                    // pattern in header?
+      {
+        String pat  = new String( pattern );
+        String head = new String( header );
+        if ( -1 != head.indexOf( pat ) )
+          return score;
+        else
+          return 0;
+      }
+      
       boolean matches = ( header.length >= ( pattern.length + offset ) );
       
       for( int i = 0; matches && ( i < pattern.length ); i++ )
