@@ -52,8 +52,7 @@ import org.mycore.datamodel.ifs.*;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRCStoreContentManager8 extends MCRContentStoreBase implements 
-  DKConstantICM, MCRContentStore
+public class MCRCStoreContentManager8 extends MCRContentStore implements DKConstantICM
 {
 /** The ItemType name to store the  content */
 protected String itemTypeName;

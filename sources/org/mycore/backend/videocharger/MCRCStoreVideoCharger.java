@@ -55,7 +55,7 @@ import com.enterprisedt.net.ftp.*;
  *
  * @see MCRAVExtVideoCharger
  */
-public class MCRCStoreVideoCharger extends MCRContentStoreBase implements MCRContentStore
+public class MCRCStoreVideoCharger extends MCRContentStore
 { 
   private static Logger logger = Logger.getLogger( MCRCStoreVideoCharger.class.getName() );
 

@@ -46,7 +46,7 @@ import java.io.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCRContentStore
+public class MCRCStoreContentManager7 extends MCRContentStore
 { 
   /** The maximum DKDDO size. When filesize is bigger, multiple DKDDOs are written */  
   protected int segmentSize;

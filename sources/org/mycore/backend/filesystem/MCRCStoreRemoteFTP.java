@@ -48,7 +48,7 @@ import com.enterprisedt.net.ftp.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRContentStore
+public class MCRCStoreRemoteFTP extends MCRContentStore
 { 
   /** Hostname of FTP server */
   protected String host;

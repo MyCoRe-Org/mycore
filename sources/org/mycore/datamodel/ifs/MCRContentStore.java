@@ -26,6 +26,8 @@ package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
 import java.io.*;
+import java.util.*;
+import java.text.*;
 
 /**
  * Stores the content of MCRFiles in a persistent datastore. This can be
@@ -38,24 +40,42 @@ import java.io.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public interface MCRContentStore
+public abstract class MCRContentStore
 {
+  /** The unique store ID for this MCRContentStore implementation */
+  protected String storeID;
+
+  /** The prefix of all properties in mycore.properties for this store */
+  protected String prefix;
+
+  public MCRContentStore()
+  {
+    formatter = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss_SSS" );
+    lastID    = null;
+  }
+  
   /** 
    * Initializes the store and sets its unique store ID. MCRFiles must remember 
    * this ID to indentify the store that holds their file content. The store 
    * ID is set by MCRContentStoreFactory when a new store instance is built.
+   * Subclasses should override this method.
    *
    * @param storeID the non-null unique store ID for this store instance
    **/
-  public void init( String storeID );
+  public void init( String storeID )
+  { 
+    this.storeID = storeID; 
+    this.prefix = "MCR.IFS.ContentStore." + storeID + ".";
+  }
   
   /** 
    * Returns the unique store ID that was set for this store instance
    *
    * @return the unique store ID that was set for this store instance
    **/
-  public String getID();
-    
+  public String getID()
+  { return storeID; }
+
   /**
    * Stores the content of an MCRFile by reading from an MCRContentInputStream.
    * Returns a StorageID to indentify the place where the content was stored.
@@ -64,7 +84,7 @@ public interface MCRContentStore
    * @param source the ContentInputStream where the file content is read from
    * @return an ID that indentifies the place where the content was stored
    **/
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
+  public abstract String storeContent( MCRFileReader file, MCRContentInputStream source )
     throws MCRPersistenceException;
 
   /**
@@ -73,7 +93,7 @@ public interface MCRContentStore
    *
    * @param storageID the storage ID of the MCRFile object
    */
-  public void deleteContent( String storageID )
+  public abstract void deleteContent( String storageID )
     throws MCRPersistenceException;
 
   /**
@@ -84,6 +104,38 @@ public interface MCRContentStore
    * @param file the MCRFile thats content should be retrieved
    * @param target the OutputStream to write the file content to
    */
-  public void retrieveContent( MCRFileReader file, OutputStream target )
+  public abstract void retrieveContent( MCRFileReader file, OutputStream target )
     throws MCRPersistenceException;
+  
+  /** DateFormat used to construct new unique IDs based on timecode */
+  protected DateFormat formatter;
+
+  /** The last ID that was constructed */
+  protected String lastID;
+  
+  /**
+   * Constructs a new unique ID based on timecode for storing content
+   */
+  protected synchronized String buildNextID()
+  {
+    String ID = null;
+    do{ ID = formatter.format( new Date() ); }
+    while( ID.equals( lastID ) );
+    return ( lastID = ID );
+  }
+  
+  protected String[] buildSlotPath()
+  {
+    Random random = new Random();
+    int na = random.nextInt( 100 );
+    int nb = random.nextInt( 100 );
+    String sa = String.valueOf( na );
+    String sb = String.valueOf( nb );
+    if( na < 10 ) sa = "0" + sa;
+    if( nb < 10 ) sb = "0" + sb;
+    String[] slots = new String[ 2 ];
+    slots[ 0 ] = sa;
+    slots[ 1 ] = sb;
+    return slots;
+  }
 }

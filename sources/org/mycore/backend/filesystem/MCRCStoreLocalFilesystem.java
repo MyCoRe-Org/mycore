@@ -42,7 +42,7 @@ import java.net.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCRContentStore
+public class MCRCStoreLocalFilesystem extends MCRContentStore
 { 
   /** Base directory on local filesystem where content is stored */
   protected File baseDir;
