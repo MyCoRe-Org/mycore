@@ -73,7 +73,10 @@ import org.jdom.output.XMLOutputter;
  * @version $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
-    static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
+	
+    private static final long serialVersionUID = 1L;
+
+	static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
 
 	// repository independent settings which are used for all repositories
     private static final String STR_OAI_ADMIN_EMAIL = "MCR.oai.adminemail"; //EMail address of oai admin
@@ -809,7 +812,11 @@ public class MCROAIDataProvider extends HttpServlet {
 	    		
 	            Element eSet = new Element("set", ns);
     	        eSet.addContent(newElementWithContent("setSpec", ns, set[0]));
-            	eSet.addContent(newElementWithContent("setName", ns, set[1]));
+    	        if (set[1].length() > 0) {
+    	        	eSet.addContent(newElementWithContent("setName", ns, set[1]));
+    	        } else {
+    	        	eSet.addContent(newElementWithContent("setName", ns, set[0]));
+    	        }
 	            if ((set[2] != null) && (set[2].length() > 0)) {
 	                Namespace oaidc = Namespace.getNamespace("oai_dc", STR_DC_NAMESPACE);
     	            Element eDC = new Element("dc", oaidc);
@@ -822,7 +829,9 @@ public class MCROAIDataProvider extends HttpServlet {
 	                Element eDescription = new Element("description", dc);
                 	eDescription.addContent(set[2]);
             	    eDC.addContent(eDescription);
-        	        eSet.addContent(eDC);
+            	    Element eSetDescription = new Element("setDescription", ns);
+            	    eSetDescription.addContent(eDC);
+        	        eSet.addContent(eSetDescription);
     	        }
             
             	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
