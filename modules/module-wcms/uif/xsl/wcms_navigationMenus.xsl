@@ -755,10 +755,14 @@
 				</xsl:variable>
 				<xsl:choose>
 					<xsl:when test="contains($newurl,'MCR:ERROR')">
-						<xsl:value-of select="$alternative"/>
+                        <xsl:call-template name="UrlAddSession">
+                            <xsl:with-param name="url" select="$alternative"/>
+                        </xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="$newurl"/>
+                        <xsl:call-template name="UrlAddSession">
+                            <xsl:with-param name="url" select="$alternative"/>
+                        </xsl:call-template>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
