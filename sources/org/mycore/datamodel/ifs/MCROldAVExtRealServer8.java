@@ -112,9 +112,9 @@ public class MCROldAVExtRealServer8 extends MCROldAudioVideoExtender
       if( sType.indexOf( "MPEG Layer 3" ) >= 0 )
         contentTypeID = "mp3";
       else if( sType.indexOf( "RealVideo" ) >= 0 )
-        contentTypeID = "real";
+        contentTypeID = "realvid";
       else if( sType.indexOf( "RealAudio" ) >= 0 )
-        contentTypeID = "real";
+        contentTypeID = "realaud";
       else if( sType.indexOf( "Wave File" ) >= 0 )
         contentTypeID = "wav";
     }
