@@ -60,5 +60,13 @@ public void create(String from, String to);
  **/
 public void delete( String from );
 
+/**
+ * The method count the number of references to the 'to' value of the table.
+ *
+ * @param to the object ID as String, they was referenced
+ * @return the number of references
+ **/
+public int countTo( String to ) ;
+
 }
 

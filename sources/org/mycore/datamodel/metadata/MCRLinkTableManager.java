@@ -233,5 +233,88 @@ public void deleteClassificationLink(MCRObjectID from)
 public void deleteClassificationLink(String from)
   { deleteReferenceLink("class",from); }
 
+/**
+ * The method coutn the reference links for a given object ID.
+ *
+ * @param type the table type
+ * @param to the object ID as String, they was referenced
+ * @return the number of references
+ **/
+public int countReferenceLinkTo(String type, String to)
+  {
+  int i = checkType(type);
+  if (i == -1) {
+    logger.warn("The type value of a reference link is false, the link was "+
+      "not added to the link table");
+    return 0;
+    }
+  if ((to == null) || ((to = to.trim()).length() ==0)) {
+    logger.warn("The to value of a reference link is false, the link was "+
+      "not added to the link table");
+    return 0;
+    }
+  try {
+    return ((MCRLinkTableInterface)tablelist.get(i)).countTo(to); }
+  catch (Exception e) {
+    logger.warn("An error was occured while search for references of "+
+      to+".");
+    }
+  return 0;
+  }
+
+/**
+ * The method coutn the reference links for a given object ID.
+ *
+ * @param type the table type
+ * @param to the object ID as MCRObjectID, they was referenced
+ * @return the number of references
+ **/
+public int countReferenceLinkTo(String type, MCRObjectID to)
+  { return countReferenceLinkTo(type,to.getId()); }
+
+/**
+ * The method count the number of references to a category of a classification
+ * without sub ID's.
+ *
+ * @param classid the classification ID as MCRObjectID
+ * @param caregid the category ID as String
+ * @return the number of references
+ **/
+public int countCategoryReferencesSharp(MCRObjectID classid, String categid)
+  { return countReferenceLinkTo("class",classid.getId()+"##"+categid); }
+
+/**
+ * The method count the number of references to a category of a classification
+ * without sub ID's.
+ *
+ * @param classid the classification ID as String
+ * @param caregid the category ID as String
+ * @return the number of references
+ **/
+public int countCategoryReferencesSharp(String classid, String categid)
+  { return countReferenceLinkTo("class",classid+"##"+categid); }
+
+/**
+ * The method count the number of references to a category of a classification
+ * including sub ID's.
+ *
+ * @param classid the classification ID as MCRObjectID
+ * @param caregid the category ID as String
+ * @return the number of references
+ **/
+public int countCategoryReferencesFuzzy(MCRObjectID classid, String categid)
+  { return countReferenceLinkTo("class",classid.getId()+"##"+categid+"%"); }
+
+/**
+ * The method count the number of references to a category of a classification
+ * including sub ID's.
+ *
+ * @param classid the classification ID as String
+ * @param caregid the category ID as String
+ * @return the number of references
+ **/
+public int countCategoryReferencesFuzzy(String classid, String categid)
+  { return countReferenceLinkTo("class",classid+"##"+categid+"%"); }
+
 }
 
