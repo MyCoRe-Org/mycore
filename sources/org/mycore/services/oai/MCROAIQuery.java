@@ -24,6 +24,8 @@
 
 package mycore.services.oai;
 
+import java.util.List;
+
 /**
  * @author Werner Gresshoff
  *
@@ -42,4 +44,11 @@ public interface MCROAIQuery {
 	 */
 	public boolean exists(String id);
 
+	/**
+	 * Method listSets. Gets a list of classificationId's and Labels for a given ID
+	 * @param classificationId
+	 * @return List
+	 */
+	public List listSets(String classificationId);
+	
 }
