@@ -124,7 +124,7 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
     
     try
     {
-      List list = buildFields(root, obj.getId().getTypeId());
+      List list = buildFields( root );
       if (null != list)
       {
         Document doc = buildLuceneDocument(obj.getId().getId(), list, obj.getId().getTypeId());
@@ -204,14 +204,14 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
    * @return list of childen, fields which correspond to lucene fields
    * 
    **/
-  private List buildFields(org.jdom.Element root, String typeId)
+  private List buildFields( org.jdom.Element root )
   {
     try
     {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
 
-      String stylesheet = "/mcr_4lucene_" + typeId + "2fields.xsl";
+      String stylesheet = "/mcr_object2lucene_fields.xsl";
       
       java.net.URL url      = MCRContentIndexerXML.class.getResource( stylesheet );
       if ( null == url )
