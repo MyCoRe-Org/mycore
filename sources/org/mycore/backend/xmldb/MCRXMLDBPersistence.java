@@ -263,7 +263,7 @@ public static org.jdom.Document convertResToDoc( XMLResource res )
 public synchronized String getNextFreeId( String project_ID, String type_ID )
   throws MCRPersistenceException { 
   logger.debug("MCRXMLDBPersistence: getNextFreeId");    
-  return "";
+  return "1";
   }
 
 /**

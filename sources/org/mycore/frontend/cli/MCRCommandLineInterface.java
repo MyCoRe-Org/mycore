@@ -135,8 +135,17 @@ public class MCRCommandLineInterface
       "save object {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.save String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "get last object ID for base {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.getLastID String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next object ID for base {0}",
-      "org.mycore.frontend.cli.MCRObjectCommands.getID String" );
+      "org.mycore.frontend.cli.MCRObjectCommands.getNextID String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "show last object ID for base {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.showLastID String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "show next object ID for base {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.showNextID String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "check file {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String" );

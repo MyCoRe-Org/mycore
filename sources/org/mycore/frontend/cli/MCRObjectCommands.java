@@ -213,14 +213,37 @@ public class MCRObjectCommands
   }
 
  /**
-  * Shows a list of next MCRObjectIDs.
+  * Shows the next free MCRObjectIDs.
   */
-  public static void getid( String base )
-  { 
+  public static void showNextID( String base )
+    { 
     MCRObjectID mcr_id = new MCRObjectID();
-    mcr_id.setNextId( base );
-    logger.info(mcr_id.getId());
-  }
+    try {
+      mcr_id.setNextId( base );
+      logger.info("The next free ID  is "+mcr_id.getId());
+      }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      }
+    }
+
+ /**
+  * Shows the last used MCRObjectIDs.
+  */
+  public static void showLastID( String base )
+    { 
+    MCRObjectID mcr_id = new MCRObjectID();
+    try {
+      mcr_id.setNextId( base );
+      mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
+      logger.info("The last used ID  is "+mcr_id.getId());
+      }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      }
+    }
 
  /**
   * Save an MCRObject.
@@ -252,12 +275,31 @@ public class MCRObjectCommands
   *
   * @param base the MCRObjectID base string
   **/
-  public static void getID (String base)
+  public static void getNextID (String base)
     {
     MCRObjectID id = new MCRObjectID();
     try {
       id.setNextId(base);
-      logger.info("The next free ID  is "+id.getId());
+      logger.info(id.getId());
+      }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      }
+    }
+
+ /**
+  * Get the last used MCRObjectID for the given MCRObjectID base.
+  *
+  * @param base the MCRObjectID base string
+  **/
+  public static void getLastID (String base)
+    {
+    MCRObjectID mcr_id = new MCRObjectID();
+    try {
+      mcr_id.setNextId(base);
+      mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
+      logger.info(mcr_id.getId());
       }
     catch (MCRException ex) {
       logger.error( ex.getMessage() );
