@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.74 $ $Date: 2004-04-02 10:43:45 $                      -->
+  <!-- $Revision: 1.75 $ $Date: 2004-05-06 15:46:46 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -26,7 +26,7 @@
   <property name="CVSRoot" value="server.mycore.de:/cvs" />
 
   <!-- Path where PDF doclet is installed -->
-  <property name="doclets" value="/mycore/cvs/doclets" />
+  <property name="doclets" value="/mcr/cvs/doclets" />
 
   <!-- =================================================================== -->
   <!-- Some help on using ant with this build file                         -->
@@ -62,7 +62,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.74 $ $Date: 2004-04-02 10:43:45 $</echo>
+    <echo>Ant build file   : $Revision: 1.75 $ $Date: 2004-05-06 15:46:46 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
