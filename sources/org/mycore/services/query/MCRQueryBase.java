@@ -85,18 +85,19 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 
 	/**
 	 * This method parses the XPath Query string and return the result as
-	 * MCRQueryResultArray. If the type is null or empty or maxresults
-	 * is lower 1 an empty list was returned.
-	 *
-	 * @param query                 the XQuery string
-	 * @param maxresults            the maximum of results
-	 * @param type                  a list of the MCRObject types seperated by ,
-	 * @return                      a result list as MCRXMLContainer
-	 **/
-	public MCRXMLContainer getResultList(
-		String query,
-		String type,
-		int maxresults) {
+	 * MCRQueryResultArray. If the type is null or empty or maxresults is lower
+	 * 1 an empty list was returned.
+	 * 
+	 * @param query
+	 *            the XQuery string
+	 * @param maxresults
+	 *            the maximum of results
+	 * @param type
+	 *            a list of the MCRObject types seperated by ,
+	 * @return a result list as MCRXMLContainer
+	 */
+	public MCRXMLContainer getResultList(String query, String type,
+			int maxresults) {
 		// check the input
 		MCRXMLContainer result = new MCRXMLContainer();
 		if ((type == null) || ((type = type.trim()).length() == 0))
@@ -119,7 +120,8 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			}
 			m = query.indexOf("[", l);
 			if (m == -1) {
-				logger.error("Error 1 while analyze the query string : "+query);
+				logger.error("Error 1 while analyze the query string : "
+						+ query);
 				break;
 			}
 			if (root == null) {
@@ -127,7 +129,8 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			}
 			n = query.indexOf("]", m);
 			if (n == -1) {
-				logger.error("Error 2 while analyze the query string : "+query);
+				logger.error("Error 2 while analyze the query string : "
+						+ query);
 				break;
 			}
 			kon = 1;
@@ -139,7 +142,8 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			for (int o = kon; o > 1; o--) {
 				n = query.indexOf("]", n + 1);
 				if (n == -1) {
-					logger.error("Error 3 while analyze the query string : "+query);
+					logger.error("Error 3 while analyze the query string : "
+							+ query);
 					break;
 				}
 			}
@@ -166,14 +170,18 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		}
 		// debug subqueries
 		for (i = 0; i < flags.size(); i++) {
-			logger.debug(
-				"Q: " + (String) subqueries.get(i) + " by " + (String) andor.get(i));
+			logger.debug("Q: " + (String) subqueries.get(i) + " by "
+					+ (String) andor.get(i));
 		}
 		logger.debug("R: The root string is " + root);
 		// run over all types
-                String typelist = config.getString("MCR.type_"+type,"none");
-                if (typelist.equals("none")) { return result; }
-                if (typelist.equals("true")) { typelist = type; }
+		String typelist = config.getString("MCR.type_" + type, "none");
+		if (typelist.equals("none")) {
+			return result;
+		}
+		if (typelist.equals("true")) {
+			typelist = type;
+		}
 		i = 0;
 		j = typelist.length();
 		l = i;
@@ -189,11 +197,14 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			if ((onetype == null) || ((onetype = onetype.trim()).length() == 0)) {
 				break;
 			}
-                        try {
-                          String ct = config.getString("MCR.type_"+onetype); 
-                          if (!ct.equals("true")) { continue; }
-                          }
-                        catch(MCRConfigurationException ce) { continue; }
+			try {
+				String ct = config.getString("MCR.type_" + onetype);
+				if (!ct.equals("true")) {
+					continue;
+				}
+			} catch (MCRConfigurationException ce) {
+				continue;
+			}
 			logger.debug("T: The separated query type is " + onetype);
 			boolean retdirect = false;
 			MCRObjectID testid = null;
@@ -221,8 +232,10 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 				} catch (Exception e) {
 				}
 			} else {
-				result.importElements((MCRXMLContainer) startQuery(onetype));
-				for (int o=0;o<flags.size();o++) { flags.set(o,Boolean.FALSE); }
+				result.importElements(startQuery(onetype));
+				for (int o = 0; o < flags.size(); o++) {
+					flags.set(o, Boolean.FALSE);
+				}
 			}
 			searchfulltext = false;
 		}
@@ -231,7 +244,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 
 	/**
 	 * returns the ObjectID of the Object containing derivate with given ID
-	 * @param DerivateID ID of Derivate
+	 * 
+	 * @param DerivateID
+	 *            ID of Derivate
 	 * @return ObjectID if found, else null
 	 */
 	public MCRObjectID getObjectID(String DerivateID) {

@@ -57,6 +57,8 @@ public class MCRXMLContainer implements MCRSortable {
 	private ArrayList status;
 	private String default_encoding;
 	private static Logger logger = Logger.getLogger(MCRXMLContainer.class);
+	protected static final org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+	
 
 	/** The tag for the result collection **/
 	public static final String TAG_RESULTS = "mcr_results";
@@ -86,6 +88,10 @@ public class MCRXMLContainer implements MCRSortable {
 	 * query result list.
 	 **/
 	public MCRXMLContainer() {
+		init();
+	}
+
+	private void init(){
 		MCRConfiguration config = MCRConfiguration.instance();
 		default_encoding =
 			config.getString("MCR.metadata_default_encoding", "UTF-8");
@@ -95,7 +101,6 @@ public class MCRXMLContainer implements MCRSortable {
 		xml = new ArrayList();
 		status = new ArrayList();
 	}
-
 	/**
 	 * This constructor create the MCRXMLContainer class with a given
 	 * query result list.
@@ -103,15 +108,7 @@ public class MCRXMLContainer implements MCRSortable {
 	 * @param in a MCRXMLContainer as input
 	 **/
 	public MCRXMLContainer(MCRXMLContainer in) {
-		MCRConfiguration config = MCRConfiguration.instance();
-		default_encoding =
-			config.getString("MCR.metadata_default_encoding", "UTF-8");
-		host = new ArrayList();
-		mcr_id = new ArrayList();
-		rank = new ArrayList();
-		xml = new ArrayList();
-		status = new ArrayList();
-
+		init();
 		for (int i = 0; i < in.size(); i++) {
 			host.add(in.getHost(i));
 			mcr_id.add(in.getId(i));
@@ -219,29 +216,35 @@ public class MCRXMLContainer implements MCRSortable {
 
 	/**
 	 * This methode add one element to the result list.
-	 *
-	 * @param in_host    the host input as a string
-	 * @param in_id      the MCRObjectId input as a string
-	 * @param in_rank    the rank input as an integer
-	 * @param in_xml     the JDOM Element of a mycoreobject
-	 **/
-	public final synchronized void add(
+	 * 
+	 * @param in_host
+	 *            the host input as a string
+	 * @param in_id
+	 *            the MCRObjectId input as a string
+	 * @param in_rank
+	 *            the rank input as an integer
+	 * @param in_xml
+	 *            the JDOM Element of a mycoreobject
+	 */
+public final void add(
 		String in_host,
 		String in_id,
 		int in_rank,
 		org.jdom.Element in_xml) {
-		host.add(in_host);
-		mcr_id.add(in_id);
-		rank.add(new Integer(in_rank));
-		xml.add(in_xml);
+		int index;
+		synchronized(host){
+			index=host.size();
+		}
+		host.add(index,in_host);
+		mcr_id.add(index,in_id);
+		rank.add(index,new Integer(in_rank));
+		xml.add(index,in_xml);
 		int in_status = 0;
-		if (status.size() > 0) {
-			// System.out.print("MCRXMLContainer: set status at "+(status.size()-1)+" from "+((Integer)status.get(status.size()-1)).intValue());
+		if (index > 0) {
 			status.set(
-				(status.size() - 1),
+				(index - 1),
 				new Integer(
-					((Integer) status.get(status.size() - 1)).intValue() + 1));
-			// System.out.println(" to "+((Integer)status.get(status.size()-1)).intValue() + " Element: "+((org.jdom.Element)getXML(status.size()-1)).getAttributeValue("ID"));
+					((Integer) status.get(index - 1)).intValue() + 1));
 			in_status = 2;
 		}
 		status.add(new Integer(in_status));
@@ -256,14 +259,13 @@ public class MCRXMLContainer implements MCRSortable {
 	 * @param in_xml     the well formed XML stream as a byte array
 	 * @exception org.jdom.JDOMException if a JDOm error was occured
 	 **/
-	public final synchronized void add(
+	public final void add(
 		String in_host,
 		String in_id,
 		int in_rank,
 		byte[] in_xml)
 		throws JDOMException, IOException {
-		ByteArrayInputStream bin = new ByteArrayInputStream(in_xml);
-		org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+		BufferedInputStream bin = new BufferedInputStream(new ByteArrayInputStream(in_xml));
 		org.jdom.Document jdom = builder.build(bin);
 		org.jdom.Element root = jdom.getRootElement();
 		add(in_host, in_id, in_rank, root);
@@ -441,9 +443,8 @@ public class MCRXMLContainer implements MCRSortable {
 	 * @exception MCRException a MyCoRe error is occured
 	 * @exception org.jdom.JDOMException cant read the byte array as XML
 	 **/
-	public final synchronized void importElements(InputStream in)
+	public final void importElements(InputStream in)
 		throws MCRException, JDOMException, IOException {
-		org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
 		org.jdom.Document jdom = builder.build(in);
 		importElements(jdom);
 	}
@@ -465,7 +466,7 @@ public class MCRXMLContainer implements MCRSortable {
 	 * @exception MCRException a MyCoRe error is occured
 	 * @exception org.jdom.JDOMException cant read the byte array as XML
 	 **/
-	public final synchronized void importElements(org.jdom.Document jdom)
+	public final void importElements(org.jdom.Document jdom)
 		throws MCRException, org.jdom.JDOMException {
 		org.jdom.Element root = jdom.getRootElement();
 		if (!root.getName().equals(TAG_RESULTS)) {
@@ -473,7 +474,6 @@ public class MCRXMLContainer implements MCRSortable {
 		}
 		List list = root.getChildren(TAG_RESULT);
 		int irank = 0;
-		int istatus = 0;
 		for (int i = 0; i < list.size(); i++) {
 			org.jdom.Element res = (org.jdom.Element) list.get(i);
 			String inhost = res.getAttributeValue(ATTR_HOST);
@@ -484,20 +484,10 @@ public class MCRXMLContainer implements MCRSortable {
 			} catch (NumberFormatException e) {
 				throw new MCRException(ERRORTEXT);
 			}
-			istatus =
-				((res.getAttributeValue(ATTR_SUCC).equals("true")) ? 1 : 0)
-					+ ((res.getAttributeValue(ATTR_PRED).equals("true")) ? 2 : 0);
 			List childlist = res.getChildren();
 			org.jdom.Element inxml = (org.jdom.Element) childlist.get(0);
-			host.add(inhost);
-			mcr_id.add(inid);
-			rank.add(new Integer(irank));
-			status.add(new Integer(istatus));
-			// System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
-			xml.add(inxml);
+			add(inhost,inid,irank,inxml);
 		}
-		if (list.size() > 1)
-			resetStatus();
 	}
 
 	/**
@@ -505,12 +495,10 @@ public class MCRXMLContainer implements MCRSortable {
 	 *
 	 * @param the other list as input
 	 **/
-	public final synchronized void importElements(MCRXMLContainer in) {
+	public final void importElements(MCRXMLContainer in) {
 		for (int i = 0; i < in.size(); i++) {
 			add(in.getHost(i), in.getId(i), in.getRank(i), in.getXML(i));
 		}
-		if (in.size() > 1)
-			resetStatus();
 	}
 
 	/**
@@ -552,7 +540,7 @@ public class MCRXMLContainer implements MCRSortable {
 	 * @see org.mycore.common.MCRSortable#sort(MCRXMLSortInterface)
 	 * @throws MCRException if sorting fails
 	 */
-	public synchronized void sort(MCRXMLSortInterface sorter)
+	public void sort(MCRXMLSortInterface sorter)
 		throws MCRException {
 		/* do some sorting here */
 		sort(sorter, false);
@@ -606,25 +594,6 @@ public class MCRXMLContainer implements MCRSortable {
 			rank = new ArrayList(rank.subList(0, newsize));
 			status = new ArrayList(status.subList(0, newsize));
 			xml = new ArrayList(xml.subList(0, newsize));
-			//  		if (host.size()>newsize)	//if some Objects in List are equal List still too big
-			//  			for (int i=newsize+1;i<host.size();i++)
-			//  				host.remove(i);
-			//  		mcr_id.retainAll(host.subList(0,newsize));
-			//  		if (mcr_id.size()>newsize)
-			//  			for (int i=newsize+1;i<mcr_id.size();i++)
-			//  				mcr_id.remove(i);
-			//  		rank.retainAll(host.subList(0,newsize));
-			//  		if (rank.size()>newsize)
-			//  			for (int i=newsize+1;i<rank.size();i++)
-			//  				rank.remove(i);
-			//  		status.retainAll(host.subList(0,newsize));
-			//  		if (status.size()>newsize)
-			//  			for (int i=newsize+1;i<status.size();i++)
-			//  				status.remove(i);
-			//  		xml.retainAll(host.subList(0,newsize));
-			//  		if (xml.size()>newsize)
-			//  			for (int i=newsize+1;i<xml.size();i++)
-			//  				xml.remove(i);
 			resetStatus();
 		}
 	}
