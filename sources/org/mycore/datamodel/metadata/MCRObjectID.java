@@ -24,15 +24,14 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.text.*;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.URLEncoder;
+import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.MCRUtils;
 
 /**
  * This class holds all information an methode to handle the MyCoRe Object ID.
@@ -80,6 +79,7 @@ public final class MCRObjectID {
 	 * The constructor for an empty MCRObjectId.
 	 **/
 	public MCRObjectID() {
+		init();
 	}
 
 	/**
@@ -88,6 +88,7 @@ public final class MCRObjectID {
 	 * @exception MCRException if the given string is not valid.
 	 **/
 	public MCRObjectID(String id) throws MCRException {
+		init();
 		if (!setID(id)) {
 			throw new MCRException("The ID is not valid: " + id);
 		}
