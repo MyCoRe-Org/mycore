@@ -116,6 +116,9 @@ MCR.JDBCStore.Type=mysql
 # MCR.XMLStore.BaseDir=d:\\_Kannweg\\lucene-1.3-rc2
 # MCR.XMLStore.Jars=lucene-1.3-rc2.jar
 
+# Native JDOM store in memory
+# MCR.XMLStore.Type=jdom
+
 #######################################################################
 
 

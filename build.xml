@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.85 $ $Date: 2004-08-19 13:56:47 $                      -->
+  <!-- $Revision: 1.86 $ $Date: 2004-11-16 10:31:29 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -64,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.85 $ $Date: 2004-08-19 13:56:47 $</echo>
+    <echo>Ant build file   : $Revision: 1.86 $ $Date: 2004-11-16 10:31:29 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -201,7 +201,7 @@
         <not><equals arg1="${MCR.XMLStore.Type}" arg2="tamino" /></not>
       </and>  
     </condition>
-    <condition property="mcr.packages" value="org/mycore/backend/cm7/**, org/mycore/backend/cm8/**, org/mycore/backend/xmldb/**">
+    <condition property="mcr.packages" value="org/mycore/backend/cm7/**, org/mycore/backend/cm8/**, org/mycore/backend/xmldb/** org/mycore/backend/jdom/**">
       <equals arg1="${MCR.XMLStore.Type}" arg2="all" />
     </condition>
     <condition property="mcr.packages" value="org/mycore/backend/xmldb/**, org/mycore/backend/tamino/**">
