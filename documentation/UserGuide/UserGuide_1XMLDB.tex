@@ -4,7 +4,7 @@
 %
 %
 \subsection{Installation der Komponenten unter Linux}
-Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
+Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werden diese gesondert vermerkt.
 %
 %
 \subsubsection{Vorbereitung}
@@ -70,15 +70,13 @@ Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen kön
 %
 %
 \subsubsection{Die Installation der freien XML:DB eXist}
-eXist ist eine Frei verfügbare XML:BD, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
+eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf dieser Schnittstelle basierender Persistence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
 \begin{enumerate}
-\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
+\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
 \item entpacken Sie die Distribution in ein entsprechendes Verzeichnis, z. B. unter {\it /usr/local/bin}.
-\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {/tt uri=xmldb:exist://localhost:8081} im File {\it client.properties}.
-\item Starten Sie den Server mit {\tt <installdir>/eXist-0.9.2/bin/startup.sh }.
-\item unter der URL \url{http://localhost:8080/exist/index.html} sollte jetzt die eXist-Homepage erscheinen. Dies nur als Test.
-\item Wenn alles okay ist, starten Sie {\tt <installdir>/eXist-0.9.2/bin/server.sh }.
-\item Anschliessend können Sie auch den Client mit {\tt <installdir>/eXist-0.9.2/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {\tt uri=xmldb:exist://localhost:8081} im File {\it client.properties}.
+\item Starten Sie {\tt <installdir>/eXist-0.9.2/bin/server.sh }.
+\item Anschließend können Sie auch den Client mit {\tt <installdir>/eXist-0.9.2/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
 %
 %
@@ -86,15 +84,13 @@ eXist ist eine Frei verfügbare XML:BD, welche die entsprechenden Interfaces impl
 %
 %
 \subsubsection{Die Installation der freien XML:DB eXist}
-eXist ist eine Frei verfügbare XML:BD, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
+eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persistence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
 \begin{enumerate}
-\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
+\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
 \item entpacken Sie die Distribution in ein entsprechendes Verzeichnis.
-\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {/tt uri=xmldb:exist://localhost:8081} im File {\it <installdir>\\eXist-0.9.2\\client.properties}.
-\item Starten Sie den Server mit {\tt <installdir>\\eXist-0.9.2\\bin\\startup.bat }.
-\item unter der URL \url{http://localhost:8080/exist/index.html} sollte jetzt die eXist-Homepage erscheinen. Dies nur als Test.
-\item Wenn alles okay ist, starten Sie {\tt <installdir>\\eXist-0.9.2\\bin\\server.bat }.
-\item Anschliessend können Sie auch den Client mit {\tt <installdir>\\eXist-0.9.2\\bin\\client.bat } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {\tt uri=xmldb:exist://localhost:8081} im File {\it <installdir>\\eXist-0.9.2\\client.properties}.
+\item Starten Sie {\tt <installdir>\\eXist-0.9.2\\bin\\server.bat }.
+\item Anschließend können Sie auch den Client mit {\tt <installdir>\\eXist-0.9.2\\bin\\client.bat } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
 %
 %
