@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.communication;
+package org.mycore.backend.remote;
 
 import java.io.*;
 import java.net.*;

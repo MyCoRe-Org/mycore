@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.communication;
+package org.mycore.backend.remote;
 
 import java.util.*;
-import mycore.common.MCRException;
-import mycore.xml.MCRQueryResultArray;
-import mycore.xml.MCRCommunicationInterface;
+import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRCommunicationInterface;
 
 /**
  * This class implements the interface to choose the communication methodes

@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.communication;
+package org.mycore.backend.remote;
 
 import java.net.*;
 import java.io.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class provides a remote Query Server for distributed
@@ -52,7 +52,7 @@ public class MCRRemoteQueryServer {
 
   public static void main(String[] args) throws IOException {
     init();
-    String helpScreen = "usage: java mycore.communication.MCRRemoteQueryServer (start|stop|restart|status|help)\n\n"
+    String helpScreen = "usage: java org.mycore.backend.remote.MCRRemoteQueryServer (start|stop|restart|status|help)\n\n"
       + "start   - start RQS\n"
       + "stop    - stop RQS\n"
       + "restart - restart RQS or start if not running\n"

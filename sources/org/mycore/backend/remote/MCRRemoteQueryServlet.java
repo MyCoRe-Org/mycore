@@ -22,15 +22,15 @@
  *
  **/
 
-package mycore.communication;
+package org.mycore.backend.remote;
 
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import mycore.common.*;
-import mycore.classifications.MCRClassification;
-import mycore.xml.MCRQueryInterface;
-import mycore.xml.MCRQueryResultArray;
+import org.mycore.common.*;
+import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 
 /**
