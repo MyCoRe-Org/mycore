@@ -132,6 +132,7 @@ public class WCMSChooseServlet extends HttpServlet {
         File [] contentTemplates = new File(mcrConf.getString("templatePath")+"content/".replace('/', File.separatorChar)).listFiles();
         File [] masterTemplates = new File(mcrConf.getString("templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
+        File conTemp = new File(mcrConf.getString("templatePath")+"content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -367,6 +368,9 @@ public class WCMSChooseServlet extends HttpServlet {
          *          <master>
          *              <template>$template</template>{0,*}
          *          </master>
+         *			<content>
+         *				<template>conTemp</template>
+         *			</content>
          *      </templates>
          * </cms>
          */
@@ -412,12 +416,12 @@ public class WCMSChooseServlet extends HttpServlet {
                     rootOut.addContent(new Element("content").setText(sw.toString()));
                     sw.flush();
                     sw.close();
-                    
+
                     if (action.equals("translate") && currentLangContentOutput != null) {
                         //rootOut.addContent(new Element("content_currentLang").setText(contentOut.outputString(currentLangContentOutput)));
-                    	
+
                         contentOut.output(currentLangContentOutput, sw);
-                        
+
                         rootOut.addContent(new Element("content_currentLang").setText(sw.toString()));
                         sw.flush();
                         sw.close();
@@ -447,8 +451,8 @@ public class WCMSChooseServlet extends HttpServlet {
                 images.addContent(new Element("image").setText(imageList[i].getName()));
             }
         }
-        
-        rootOut.addContent(new Element("imagePath").setText( mcrConf.getString("imagePath").substring( mcrConf.getString("imagePath").lastIndexOf("webapps")  )  ));      
+
+        rootOut.addContent(new Element("imagePath").setText( mcrConf.getString("imagePath").substring( mcrConf.getString("imagePath").lastIndexOf("webapps")  )  ));
         // rootOut.addContent(new Element("imagePath").setText(mcrConf.getString("imagePath")));
 
         Element documents = new Element("documents");
@@ -470,7 +474,10 @@ public class WCMSChooseServlet extends HttpServlet {
                master.addContent(new Element("template").setText(masterTemplates[i].getName()));
            }
         }
+        Element content = new Element("content");
+        content.addContent(new Element("template").setText(conTemp.toString()));
         templates.addContent(master);
+        templates.addContent(content);
         rootOut.addContent(templates);
 
         /**
