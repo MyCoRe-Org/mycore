@@ -196,18 +196,18 @@ public class WCMSActionServlet extends HttpServlet {
                     tidy.setCharEncoding(org.w3c.tidy.Configuration.UTF8);
                 }
             }*/
-            tidy.setXHTML(true)
-            	.setInputEncoding("UTF-8")
-            	.setOutputEncoding("UTF-8")
-            	.setPrintBodyOnly(true)
-				.setIndentContent(true)
-				.setForceOutput(true)
-				.setMakeClean(true)
-				.setMakeBare(true)
-				.setQuoteAmpersand(true)
-				.setQuoteMarks(true)
-				.setQuoteNbsp(true);				
-				
+            tidy.setXHTML(true);
+            tidy.setInputEncoding("UTF-8");
+            tidy.setOutputEncoding("UTF-8");
+			tidy.setPrintBodyOnly(true);
+			tidy.setIndentContent(true);
+			tidy.setForceOutput(true);
+			tidy.setMakeClean(true);
+			tidy.setMakeBare(true);
+			tidy.setQuoteAmpersand(true);
+			tidy.setQuoteMarks(true);
+			tidy.setQuoteNbsp(true);				
+            
             if (content != null) {
                 ByteArrayInputStream bais = new ByteArrayInputStream(content.getBytes("UTF-8"));
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -228,7 +228,7 @@ public class WCMSActionServlet extends HttpServlet {
             }
         }
         /* END: code validation by JTidy */
-        
+
         currentLangLabel = request.getParameter("label_currentLang");
 
         /*if (content != null ) {
