@@ -4,4 +4,4 @@ Admin interface:
 2. content templates 
 3. acl's
 4. autom. forwarding
-5. wysiwyg editor
+
