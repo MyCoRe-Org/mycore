@@ -107,6 +107,7 @@ public MCRObjectMetadata getHeritableMetadata ()
  * This methode return the MCRMetaElement selected by tag.
  * If this was not found, null was returned.
  *
+ * @param tag the element tag
  * @return the MCRMetaElement for the tag
  **/
 public final MCRMetaElement getMetadataElement(String tag)
@@ -118,6 +119,19 @@ public final MCRMetaElement getMetadataElement(String tag)
       return (MCRMetaElement)meta_list.get(i); }
     }
   return  null;
+  }
+
+/**
+ * This methode return the MCRMetaElement selected by an index.
+ * If this was not found, null was returned.
+ *
+ * @param index the element index
+ * @return the MCRMetaElement for the index
+ **/
+public final MCRMetaElement getMetadataElement(int index)
+  {
+  if ((index < 0)||(index > meta_list.size())) { return null; }
+  return (MCRMetaElement)meta_list.get(index);
   }
 
 /**
