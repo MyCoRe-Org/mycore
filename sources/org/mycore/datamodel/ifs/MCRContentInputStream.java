@@ -61,7 +61,7 @@ public class MCRContentInputStream extends FilterInputStream
    * @throws MCRConfigurationException if java classes supporting MD5 checksums are not found
    */
   public MCRContentInputStream( InputStream in )
-    throws IOException
+    throws MCRException
   {
     super( null );
 
@@ -74,12 +74,20 @@ public class MCRContentInputStream extends FilterInputStream
 
     byte[] buffer = new byte[ headerSize ];
 
+    try
+    {
     bis.mark( headerSize + 1 );
     int num = bis.read( buffer );
     bis.reset();    
 
     header = new byte[ Math.max( 0, num ) ];
     if( num > 0 ) System.arraycopy( buffer, 0, header, 0, num ); 
+    }
+    catch( IOException ex )
+    { 
+      String msg ="Error while reading content input stream header";
+      throw new MCRException( msg, ex );
+    }
 
     this.in = bis;
   }
