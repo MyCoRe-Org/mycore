@@ -323,6 +323,39 @@ public class MCROAIDataProvider extends HttpServlet {
         return element;
     }
 
+	private String getPrefix(String token) {
+	    MCRConfiguration config = MCRConfiguration.instance();
+	    String dir = new String();
+	    
+	    try {
+		    dir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
+	    } catch (MCRConfigurationException mcrx) {
+	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstützt.");
+	    	return null;
+	    }
+	    
+		File directory = new File(dir);
+		File[] tokenList = directory.listFiles(new TokenFileFilter(directory, 
+            STR_RESUMPTIONTOKEN_SUFFIX));
+		if (tokenList == null) {
+            return null;
+		}
+	
+		for (int i = 0; i < tokenList.length; i++) {
+            File tmpFile = tokenList[i];
+            String fileName = tmpFile.getName();
+            if (fileName.indexOf(token) != -1) {
+            	StringTokenizer tokenizer = new StringTokenizer(fileName, ".");
+            	String name = tokenizer.nextToken();
+            	name = tokenizer.nextToken();
+            	
+            	return name;
+            }
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Method deleteOutdatedTokenFiles. Helper function to delete outdated resumption token files
 	 */
@@ -368,13 +401,13 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @return Element The new List
 	 * @throws IOException
 	 */
-    private Element listFromResumptionToken(Element list, String resumptionToken) throws IOException {
+    private Element listFromResumptionToken(Element list, String resumptionToken, String prefix) throws IOException {
 	    MCRConfiguration config = MCRConfiguration.instance();
 		try {
 		   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
 		   	int maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 			File objectFile = new File(resumptionTokenDir +
-                resumptionToken + STR_RESUMPTIONTOKEN_SUFFIX);
+                resumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
 			if (!objectFile.exists()) {
 				return null;
 			}
@@ -448,14 +481,17 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @return Date the date or null
 	 */
     private Date getDate(String date) {
+    	logger.debug("Given date: " + date);
+    	logger.debug("First date: " + date);
    	    SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
    	    if (date.length() > STR_GRANULARITY.length()) {
    	    	return null;
    	    }
 		ParsePosition pos = new ParsePosition(0);
 		Date firstDate = dateFormat.parse(STR_FIRST_DATE, pos);
+		pos = new ParsePosition(0);
 		Date currentDate = dateFormat.parse(date, pos);
-		if (currentDate.before(firstDate)) {
+		if ((currentDate == null) || currentDate.before(firstDate)) {
 			return null;
 		}
 
@@ -490,7 +526,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @param list a list of Element's(!)
 	 * @return String The resumption token
 	 */
-    private String listToResumptionToken(List list) {
+    private String listToResumptionToken(List list, String prefix) {
 	    MCRConfiguration config = MCRConfiguration.instance();
 	    List tokenElements = new ArrayList(list);
 	    String fileName = null;
@@ -506,7 +542,7 @@ public class MCROAIDataProvider extends HttpServlet {
 				fileName = fileId + "x1x" + docs;
 		
  				FileOutputStream fos = new FileOutputStream(resumptionTokenDir +
-   	                fileName + STR_RESUMPTIONTOKEN_SUFFIX);
+   	                fileName + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
 			 	ObjectOutputStream oos = new ObjectOutputStream(fos);
 				 	
 			 	ListIterator tokenElementsIterator = tokenElements.listIterator();
@@ -738,7 +774,7 @@ public class MCROAIDataProvider extends HttpServlet {
         
         if (resumptionToken != null) {
 		    try {
-				eListSets = listFromResumptionToken(eListSets, resumptionToken[0]);
+				eListSets = listFromResumptionToken(eListSets, resumptionToken[0], "null");
 				if (eListSets == null) {
         			logger.info("Anfrage 'listSets' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
@@ -808,7 +844,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements);
+	    	String sResumptionToken = listToResumptionToken(tokenElements, "null");
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
@@ -889,14 +925,24 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
             eRequest.setAttribute("resumptionToken", resumptionToken[0]);
         }
-        eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
+        String prefix = null;
+        if (metadataPrefix != null) {
+        	prefix = metadataPrefix[0];
+        } else {
+        	prefix = getPrefix(resumptionToken[0]);
+        	if (prefix == null) {
+        		logger.info("Error in resumption token.");
+	            return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
+        	}
+        }
+        eRequest.setAttribute("metadataPrefix", prefix);
         
         MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
 	    try {
-	        String format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	        String format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
 	    } catch (MCRConfigurationException mcrx) {
-        	logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+        	logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
 	    }
         
@@ -904,7 +950,7 @@ public class MCROAIDataProvider extends HttpServlet {
         
         if (resumptionToken != null) {
 		    try {
-				eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0]);
+				eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0], prefix);
 				if (eListIdentifiers == null) {
         			logger.info("Anfrage 'listIdentifiers' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
@@ -969,7 +1015,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements);
+	    	String sResumptionToken = listToResumptionToken(tokenElements, prefix);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
@@ -1172,15 +1218,25 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
             eRequest.setAttribute("resumptionToken", resumptionToken[0]);
         }
-        eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
+        String prefix = null;
+        if (metadataPrefix != null) {
+        	prefix = metadataPrefix[0];
+        } else {
+        	prefix = getPrefix(resumptionToken[0]);
+        	if (prefix == null) {
+        		logger.info("Error in resumption token.");
+	            return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
+        	}
+        }
+        eRequest.setAttribute("metadataPrefix", prefix);
         
         MCRConfiguration config = MCRConfiguration.instance();
         String format = null;
         //Check, if the requested metadata format is supported
 	    try {
-	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
 	    } catch (MCRConfigurationException mcrx) {
-        	logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+        	logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
 	    }
 	    
@@ -1188,7 +1244,7 @@ public class MCROAIDataProvider extends HttpServlet {
         
         if (resumptionToken != null) {
 		    try {
-				eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0]);
+				eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0], prefix);
 				if (eListRecords == null) {
         			logger.info("Anfrage 'listRecords' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
@@ -1267,7 +1323,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	
 	    	}
 	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements);
+	    	String sResumptionToken = listToResumptionToken(tokenElements, prefix);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
