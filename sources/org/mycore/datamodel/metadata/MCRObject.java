@@ -53,7 +53,7 @@ final public class MCRObject
 /**
  * constant value for the object id length
  **/
-public final int MAX_LABEL_LENGTH = 256;
+public final static int MAX_LABEL_LENGTH = 256;
 /**
  * the header of all XML Files
  **/
