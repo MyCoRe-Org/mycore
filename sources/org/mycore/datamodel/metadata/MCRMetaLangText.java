@@ -43,16 +43,19 @@ public class MCRMetaLangText extends MCRMetaDefault
 
 // MetaLangText data
 protected String text;
+protected String form;
 
 /**
  * This is the constructor. <br>
  * The language element was set to <b>en</b>.
  * All other elemnts was set to an empty string.
+ * The <em>form</em> Attribute is set to 'plain'.
  */
 public MCRMetaLangText()
   {
   super();
   text = "";
+  form = "plain";
   }
 
 /**
@@ -72,16 +75,19 @@ public MCRMetaLangText()
  * @param default_lang     the default language
  * @param set_type         the optional type string
  * @param set_inherted     a value >= 0
+ * @param_set_form         the format string, if it is empty 'plain' is set.
  * @param set_text         the text string
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaLangText(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, int set_inherted, String set_text) 
-  throws MCRException
+  String default_lang, String set_type, int set_inherted, String set_form,
+  String set_text) throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   text = "";
   if (set_text != null) { text = set_text.trim(); }
+  form = "plain";
+  if (set_form != null) { form = set_form.trim(); }
   }
 
 /**
@@ -92,11 +98,14 @@ public MCRMetaLangText(String set_datapart, String set_subtag,
  * @param set_type        the optional type syting
  * @param set_text        the new text string
  **/
-public final void set(String set_lang, String set_type, String set_text)
+public final void set(String set_lang, String set_type, String set_form,
+  String set_text)
   {
   setLang(set_lang);
   setType(set_type);
   if (set_text != null) { text = set_text.trim(); }
+  form = "plain";
+  if (set_form != null) { form = set_form.trim(); }
   }
 
 /**
@@ -108,12 +117,28 @@ public final void setText(String set_text)
   { if (set_text != null) { text = set_text.trim(); } }
 
 /**
+ * This method set the form attribute.
+ *
+ * @param set_form        the new form string
+ **/
+public final void setForm(String set_form)
+  { if (set_form != null) { text = set_form.trim(); } }
+
+/**
  * This method get the text element.
  *
  * @return the text
  **/
 public final String getText()
   { return text; }
+
+/**
+ * This method get the form attribute.
+ *
+ * @return the form attribute
+ **/
+public final String getForm()
+  { return form; }
 
 /**
  * This method read the XML input stream part from a DOM part for the
@@ -124,9 +149,12 @@ public final String getText()
 public void setFromDOM(org.jdom.Element element)
   {
   super.setFromDOM(element);
-  String temp_text = (element.getText()).trim();
+  String temp_text = element.getText();
   if (temp_text==null) { temp_text = ""; }
-  text = temp_text;
+  text = temp_text.trim();
+  String temp_form = (String)element.getAttributeValue("form");
+  if (temp_form==null) { temp_form = "plain"; }
+  form = temp_form.trim();
   }
 
 /**
@@ -144,6 +172,8 @@ public org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("lang",lang,Namespace.XML_NAMESPACE);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
+  if ((form != null) && ((form = form.trim()).length() !=0)) {
+    elm.setAttribute("form",form); } 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   elm.addContent(text);
@@ -203,6 +233,8 @@ public boolean isValid()
   if (!super.isValid()) { return false; }
   if ((text == null) || ((text = text.trim()).length() ==0)) {
     return false; }
+  if ((form == null) || ((form = form.trim()).length() ==0)) {
+    form = "plain"; }
   return true;
   }
 
@@ -212,7 +244,7 @@ public boolean isValid()
 public Object clone()
   {
   MCRMetaLangText out = new MCRMetaLangText(datapart,subtag,lang,type,inherited,
-    text);
+    form,text);
   return (Object)out;
   }
 
@@ -223,6 +255,7 @@ public final void debug()
   {
   logger.debug("Start Class : MCRMetaLangText");
   super.debugDefault();
+  logger.debug("Format             = "+form);
   logger.debug("Text               = "+text);
   }
 
