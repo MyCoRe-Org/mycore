@@ -81,7 +81,7 @@ public class MCRLoginServlet extends MCRServlet
 
     // Do not change login, just redirect to given url:
     if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (backto_url != null)) {
-      job.getResponse().sendRedirect(backto_url);
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
       return;
     }
 
