@@ -81,7 +81,7 @@ public class MCRQueryCache {
 		queryint = (MCRQueryInterface)config.
 						getInstanceOf("MCR.persistence_"+
 		                      config.getString( "MCR.XMLStore.Type" ).toLowerCase()+
-							  "_query_name");
+							  "_merger_name");
 		int[] capacity= new int[2];
 		capacity[0]=config.getInt("MCR.query_cache_capacitity_class",100);
 		capacity[1]=config.getInt("MCR.query_cache_capacitity_other",100);

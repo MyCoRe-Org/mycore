@@ -80,7 +80,7 @@ public void run()
       else {
         String persist_type = config.getString( "MCR.XMLStore.Type" );
         String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-          "_query_name";
+          "_merger_name";
         mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);
         mcr_result.importElements(mcr_queryint.getResultList(mcr_query,mcr_type,
           vec_max_length));

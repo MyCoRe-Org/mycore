@@ -24,18 +24,18 @@
 
 package org.mycore.backend.cm8;
 
-import java.util.*;
+import java.util.HashSet;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.services.query.MCRQueryBase;
+import org.mycore.common.*;
+import org.mycore.common.xml.*;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.services.query.*;
 
 /**
  * This is the tranformer implementation for CM 8 from XPath language
@@ -44,157 +44,117 @@ import org.mycore.services.query.MCRQueryBase;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRCM8TransformXPathToCM8
-	extends MCRQueryBase
-	implements DKConstantICM {
-	// private data
-	public static final String DEFAULT_QUERY = "";
+public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface,
+  DKConstantICM {
 
-	/**
-	 * The constructor.
-	 **/
-	public MCRCM8TransformXPathToCM8() {
-		super();
-	}
+// private data
+public static final String DEFAULT_QUERY = "";
 
-	/**
-	 * This method start the Query over one object type and return the
-	 * result as MCRXMLContainer.
-	 *
-	 * @param type                  the MCRObject type
-	 * @return                      a result list as MCRXMLContainer
-	 **/
-	public final MCRXMLContainer startQuery(String type) {
-		MCRXMLContainer result = new MCRXMLContainer();
-		boolean hasts = false;
-		boolean hasmeta = false;
+// the logger
+protected static Logger logger =
+  Logger.getLogger(MCRCM8TransformXPathToeXist.class.getName());
+private MCRConfiguration config = null;
 
-		// Make all document searches
-		HashSet idts = new HashSet();
-		for (int i = 0; i < subqueries.size(); i++) {
-			if (((String) subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT)
-				!= -1) {
-				hasts = true;
-				flags.set(i, Boolean.TRUE);
-				logger.debug("TextSearch query : " + (String) subqueries.get(i));
-				// start the query against the textsearch
-				for (int j = 0; j < tsint.length; j++) {
-					String[] der = tsint[j].getDerivateIDs((String) subqueries.get(i));
-					for (int k = 0; k < der.length; k++) {
-						MCRObjectID oid=getObjectID(der[k]);
-						if (oid != null)
-							idts.add(oid);
-						else logger.warn("Ignoring ObjectID=null");
-					}
-				}
-			}
-		}
-		for (Iterator it = idts.iterator(); it.hasNext();) {
-			logger.debug("IDTS = " + ((String) ((MCRObjectID) it.next()).getId()));
-		}
+/**
+ * The constructor.
+ **/
+public MCRCM8TransformXPathToCM8()
+  {
+  config = MCRConfiguration.instance();
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  }
 
-		// prepare the query over the rest of the metadata
-		HashSet idmeta = new HashSet();
+/**
+ * This method start the Query over the XML:DB persitence layer for one
+ * object type and and return the query result as HashSet of MCRObjectIDs.
+ *
+ * @param root                  the query root
+ * @param query                 the metadata queries
+ * @param type                  the MCRObject type
+ * @return                      a result list as MCRXMLContainer
+ **/
+public final HashSet getResultIDs(String root, String query, String type)
+  {
+  // prepare the query over the rest of the metadata
+  HashSet idmeta = new HashSet();
+  logger.debug("Incomming condition : " + query);
+ 
+  // set the default
+  String newquery = "";
+  if ((root==null) && (query.length()==0)) { newquery = DEFAULT_QUERY; }
 
-		// read prefix from configuration
-		String sb = new String("MCR.persistence_cm8_" + type.toLowerCase());
-		String itemtypename = config.getString(sb);
-		String itemtypeprefix = config.getString(sb + "_prefix");
+  // read prefix from configuration
+  String sb = new String("MCR.persistence_cm8_" + type.toLowerCase());
+  String itemtypename = config.getString(sb);
+  String itemtypeprefix = config.getString(sb + "_prefix");
 
-		// Select the query strings
-		StringBuffer cond = new StringBuffer(1024);
-		for (int i = 0; i < subqueries.size(); i++) {
-			if (((Boolean) flags.get(i)).booleanValue())
-				continue;
-                        try {
-			cond
-				.append(' ')
-				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix)); }
-                        catch (MCRException me) {
-				logger.error(me.getMessage()); }
-                        boolean fl = false;
-                        for (int j=i+1;j<subqueries.size();j++) {
-                                if (!((Boolean) flags.get(j)).booleanValue())
-                                        fl = true;
-                                }
-                        if (fl) {
-                                cond.append(' ').append((String) andor.get(i)); }
+  // Select the query strings
+  StringBuffer cond = new StringBuffer(1024);
+  int i = 0;
+  int j = 0;
+  int l = query.length();
+  while (i < l) {
+    j = query.indexOf("#####",i);
+    if (j == -1) {
+      try {
+        cond.append(' ') .append(traceOneCondition(query.substring(i,l), itemtypeprefix)); }
+      catch (MCRException me) { logger.error(me.getMessage()); }
+      break;
+      }
+    try {
+      cond.append(' ') .append(traceOneCondition(query.substring(i,j), itemtypeprefix)); }
+    catch (MCRException me) { cond.append(' ').append(query.substring(i,j)); }
+    i = j+5;
+    }
+  logger.debug("Codition transformation " + cond.toString());
 
-			flags.set(i, Boolean.TRUE);
-		}
-		logger.debug("Codition transformation " + cond.toString());
-		// build the query
-		if ((cond.length() != 0) || (!hasts)) {
-			hasmeta = true;
-			StringBuffer query = new StringBuffer(1024);
-			query.append('/').append(itemtypename);
-			if (cond.toString().trim().length() > 0) {
-				query.append('[').append(cond.toString()).append(']');
-			}
-			logger.debug("Transformed query " + query);
+  // build the query
+  if (cond.length() != 0) {
+    StringBuffer nq = new StringBuffer(1024);
+    nq.append('/').append(itemtypename);
+    if (cond.toString().trim().length() > 0) {
+      nq.append('[').append(cond.toString()).append(']'); }
+    newuqery = nq.toString();
+    }
+  logger.debug("Transformed query " + newquery);
 
-			// Start the search
-			DKDatastoreICM connection = null;
-			try {
-				connection = MCRCM8ConnectionPool.instance().getConnection();
-				DKNVPair parms[] = new DKNVPair[3];
-				parms[0] =
-					new DKNVPair(
-						DK_CM_PARM_MAX_RESULTS,
-						new Integer(maxresults).toString());
-				parms[1] = new DKNVPair(DK_CM_PARM_RETRIEVE,
-					//new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
-	new Integer(DK_CM_CONTENT_YES));
-				parms[2] = new DKNVPair(DK_CM_PARM_END, null);
-				DKResults rsc =
-					(DKResults) connection.evaluate(
-						query.toString(),
-						DK_CM_XQPE_QL_TYPE,
-						parms);
-				dkIterator iter = rsc.createIterator();
-				logger.debug("Results :" + rsc.cardinality());
-				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-				String id = "";
-				int rank = 0;
-				byte[] xml = null;
-				short dataId = 0;
-				while (iter.more()) {
-					DKDDO resitem = (DKDDO) iter.next();
-					resitem.retrieve();
-					dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR, itemtypeprefix + "ID");
-					id = (String) resitem.getData(dataId);
-					idmeta.add(new MCRObjectID(id));
-				}
-			} catch (Exception e) {
-				throw new MCRPersistenceException("CM8 Search error." + e.getMessage());
-			} finally {
-				MCRCM8ConnectionPool.instance().releaseConnection(connection);
-			}
-		}
-		for (Iterator it = idmeta.iterator(); it.hasNext();) {
-			logger.debug("IDMETA = " + ((String) ((MCRObjectID) it.next()).getId()));
-		}
-
-		// merge the results
-		HashSet myresult = null;
-		if (!hasts) {
-			myresult = idmeta;
-		}
-		if (!hasmeta) {
-			myresult = idts;
-		}
-		if ((hasts) && (hasmeta)) {
-			myresult = MCRUtils.mergeHashSets(idts, idmeta, MCRUtils.COMMAND_AND);
-		}
-
-		// put the XML files in the result container
-		for (Iterator it = myresult.iterator(); it.hasNext();) {
-			logger.debug("IDRESULT = " + ((String) ((MCRObjectID) it.next()).getId()));
-		}
-		result = createResultContainer(myresult);
-
-		return result;
-	}
+  // Start the search
+  DKDatastoreICM connection = null;
+  try {
+    connection = MCRCM8ConnectionPool.instance().getConnection();
+    DKNVPair parms[] = new DKNVPair[3];
+    parms[0] = new DKNVPair(DK_CM_PARM_MAX_RESULTS,
+      new Integer(maxresults).toString());
+    parms[1] = new DKNVPair(DK_CM_PARM_RETRIEVE,
+      //new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
+      new Integer(DK_CM_CONTENT_YES));
+    parms[2] = new DKNVPair(DK_CM_PARM_END, null);
+    DKResults rsc = (DKResults) connection.evaluate(newquery,DK_CM_XQPE_QL_TYPE,
+      parms);
+    dkIterator iter = rsc.createIterator();
+    logger.debug("Results :" + rsc.cardinality());
+    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+    String id = "";
+    int rank = 0;
+    byte[] xml = null;
+    short dataId = 0;
+    while (iter.more()) {
+      DKDDO resitem = (DKDDO) iter.next();
+      resitem.retrieve();
+      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR, itemtypeprefix + "ID");
+      id = (String) resitem.getData(dataId);
+      idmeta.add(new MCRObjectID(id));
+      }
+    } 
+  catch (Exception e) {
+    throw new MCRPersistenceException("CM8 Search error." + e.getMessage()); }
+  finally {
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
+  for (Iterator it = idmeta.iterator(); it.hasNext();) {
+    logger.debug("IDMETA = " + ((String) ((MCRObjectID) it.next()).getId()));
+    }
+  return idmeta;
+  }
 
 	/**
 	 * This is a private routine they trace one condition.
