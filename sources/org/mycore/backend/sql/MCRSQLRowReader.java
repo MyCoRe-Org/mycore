@@ -69,7 +69,7 @@ public class MCRSQLRowReader
   {
     try{ return rs.next(); }
     catch( SQLException ex )
-    { throw new MCRPersistenceException( "Could not close JDBC statement", ex ); }
+    { throw new MCRPersistenceException( "Could not get next() on JDBC result set", ex ); }
   }
   
   /** 
@@ -211,8 +211,8 @@ public class MCRSQLRowReader
     }  
     catch( SQLException ex )
     { 
-      Logger logger = MCRSQLConnectionPool.getLogger();
-      logger.warn( "Could not close result set: " + ex.getMessage() ); 
+      // Logger logger = MCRSQLConnectionPool.getLogger();
+      // logger.warn( "Could not close result set: " + ex.getMessage() ); 
     }
   }
   
