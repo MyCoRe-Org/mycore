@@ -84,7 +84,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
   // connect to server
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     logger.info("CM8 Datastore Creation connected.");
     // create the Attribute for MCRObjectID
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"ID",
@@ -453,7 +453,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
     logger.info("CM8 Datastore Creation: "+mcr_item_type_name+" is created.");
     }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage(),e); }

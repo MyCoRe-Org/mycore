@@ -102,7 +102,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   // set up data to item
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     boolean test = false;
     try {
       MCRCM8Item checkitem = new MCRCM8Item(mcr_id.getId(),connection,
@@ -236,7 +236,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     throw new MCRPersistenceException(
       "Error while creating data in CM8 store,e"); }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   }
 
 /**
@@ -274,7 +274,7 @@ public final void delete(MCRObjectID mcr_id)
   // delete data item
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     MCRCM8Item item = null;
     try {
       item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
@@ -289,7 +289,7 @@ public final void delete(MCRObjectID mcr_id)
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   }
 
 /**
@@ -315,7 +315,7 @@ public final boolean exist(MCRObjectID mcr_id)
   // look for data item
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     try {
       MCRCM8Item item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
         itemtypeprefix); }
@@ -324,7 +324,7 @@ public final boolean exist(MCRObjectID mcr_id)
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   return true;
   }
 
@@ -352,7 +352,7 @@ public final byte[] receive(MCRObjectID mcr_id)
   // retrieve the XML byte stream
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     MCRCM8Item item = null;
     try {
       item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
@@ -367,7 +367,7 @@ public final byte[] receive(MCRObjectID mcr_id)
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   return xml;
   }
 

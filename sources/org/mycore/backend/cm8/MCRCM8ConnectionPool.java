@@ -34,9 +34,13 @@ import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
- * This class handle the connection pool to the IBM Content Manager 8.
+ * This class implements a pool of database connections to
+ * IBM Content Manager 7.1 Library Server. Other classes get
+ * a connection from the pool when they need one and release
+ * the connection after their work has finished.
  *
  * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
@@ -44,71 +48,140 @@ import org.mycore.common.MCRException;
  **/
 class MCRCM8ConnectionPool
   {
-  private static Vector freeConnections;
-  private static Vector usedConnections;
-  private static int    maxConnections;
+  /** The internal list of free connections */
+  protected Vector freeConnections = new Vector();
+
+  /** The internal list of connections that are currently in use*/
+  protected Vector usedConnections = new Vector() ;
+
+  /** The maximum number of connections that will be built */
+  protected int maxNumConnections;
+
+  /** The symbolic name of the CM 7.1 library server */
+  protected String serverName;
+
+  /** The user ID to be used for connecting to the library server */
+  protected String uid;
+
+  /** The password to be used for connecting to the library server */
+  protected String password;
+
+  /** The connection pool singleton */
+  protected static MCRCM8ConnectionPool singleton;
+
+  /** The logger */
   private static Logger logger=Logger.getLogger("org.mycore.backend.cm8");
 
-  static
+  /**
+   * Returns the connection pool singleton.
+   *
+   * @throws MCRPersistenceException if connect to CM8 was not successful
+   **/
+  public static synchronized MCRCM8ConnectionPool instance()
     {
+    if( singleton == null ) singleton = new MCRCM8ConnectionPool();
+    return singleton;
+    }
+
+  /**
+   * Builds the connection pool singleton.
+   *
+   * @throws MCRPersistenceException if connect to CM8 was not successful
+   **/
+  protected MCRCM8ConnectionPool() throws MCRPersistenceException
+    {
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    logger.info( "Building Content Manager connection pool..." );
+    serverName = config.getString( "MCR.persistence_cm8_library_server" );
+    uid        = config.getString( "MCR.persistence_cm8_user_id"        );
+    password   = config.getString( "MCR.persistence_cm8_password"       );
+    maxNumConnections = 
+      config.getInt( "MCR.persistence_cm8_max_connections",1);
+    int initNumConnections = 
+      config.getInt( "MCR.persistence_cm7_init_connections",maxNumConnections);
+    // Build the initial number of CM8 connections
+    for( int i = 0; i < initNumConnections; i++ )
+      freeConnections.addElement( buildConnection() );
+    }
+
+  /**
+   * Creates a DKDatastoreICM connection to the Content Manager library server.
+   *
+   * @throws MCRPersistenceException if connect to Content Manager fails
+   **/
+  protected DKDatastoreICM buildConnection()
+    {
+    logger.info( "Building one connection to Content Manager 8 ..." );
     try {
-      MCRConfiguration conf = MCRConfiguration.instance();
-      PropertyConfigurator.configure(conf.getLoggingProperties());
-      maxConnections  = conf.getInt("MCR.persistence_cm8_max_connections",1);
-      freeConnections = new Vector(maxConnections);
-      usedConnections = new Vector(maxConnections);
-      logger.info( "Connecting to ContentManager8: " );
-      String servername = conf.getString("MCR.persistence_cm8_library_server");
-      String serveruid = conf.getString("MCR.persistence_cm8_user_id");
-      String serverpw = conf.getString("MCR.persistence_cm8_password");
-      for( int i = 0; i < maxConnections; i++ ) {
-        DKDatastoreICM connection = new DKDatastoreICM();
-        connection.connect(servername,serveruid,serverpw,"");
-//      connection.setOption(DK_OPT_DL_WAKEUPSRV,new Integer(DK_TRUE));
-        freeConnections.addElement(connection);
-        logger.info( "  one connection created." );
-        }
-      logger.info( " now are " + maxConnections + " connection(s) created." );
+      DKDatastoreICM connection = new DKDatastoreICM();
+      connection.connect( serverName, uid, password, "" );
+//      connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_FALSE ) );
+      return connection;
       }
     catch( Exception ex ) {
-      throw new MCRException("Error while instanciate CM8 connection pool.",
-        ex ); }
-    }
-  
-  /**
-   * This methode returns a connection to the CM8.
-   *
-   * @return a connected datastore
-   **/
-  static synchronized DKDatastoreICM getConnection()
-    {
-    if( usedConnections.size() == maxConnections ) {
-      try{ MCRCM8ConnectionPool.class.wait(); }
-      catch( InterruptedException ex ){}
-      return getConnection();
-      }
-    else {
-      DKDatastoreICM connection = (DKDatastoreICM)
-        (freeConnections.firstElement());
-      freeConnections.removeElement( connection );
-      usedConnections.addElement( connection );
-      return connection;
+      String msg = "Could not connect to Content Manager 8 library server";
+      throw new MCRPersistenceException( msg, ex );
       }
     }
 
   /**
-   * This methode release a given datastore connection.
+   * Gets a free connection from the pool. When this
+   * connection is not used any more by the invoker, he is
+   * responsible for returning it into the pool by invoking
+   * the <code>releaseConnection()</code> method.
    *
-   * @param connection            the datastor connection
+   * @return a free connection to the Content Manager library server datastore
+   * @throws MCRPersistenceException if there was a problem connecting to CM
    **/
-  static synchronized void releaseConnection( DKDatastoreICM connection )
+  public synchronized DKDatastoreICM getConnection()
+    throws MCRPersistenceException
     {
-    if((!freeConnections.contains(connection))
-      && (usedConnections.contains(connection))) {
-      usedConnections.removeElement( connection );
-      freeConnections.addElement   ( connection );
-      MCRCM8ConnectionPool.class.notifyAll();
+    // Wait for a free connection
+    while( usedConnections.size() == maxNumConnections )
+    try{ wait(); } catch( InterruptedException ignored ){}
+
+    DKDatastoreICM connection;
+    // Do we have to build a connection or is there already one?
+    if( freeConnections.isEmpty() ) {
+      connection = buildConnection(); }
+    else {
+      connection = (DKDatastoreICM)( freeConnections.firstElement() );
+      freeConnections.removeElement( connection );
       }
+    usedConnections.addElement( connection );
+    return connection;
+    }
+
+
+  /**
+   * Releases a connection, indicating that it is not used any more
+   * and should be returned to to pool of free connections.
+   *
+   * @param connection the Content Manager connection that has been used
+   **/
+  public synchronized void releaseConnection( DKDatastoreICM connection )
+    {
+    if( connection == null ) return;
+    if( usedConnections.contains( connection ) )
+      usedConnections.removeElement( connection );
+    if( ! freeConnections.contains( connection ) )
+      freeConnections.addElement( connection );
+    notifyAll();
+    }
+
+  /**
+   * Finalizer, closes all connections in this connection pool
+   **/
+  public void finalize()
+    {
+    try {
+      for( int i = 0; i < usedConnections.size(); i++ )
+        ( (DKDatastoreICM)( usedConnections.elementAt( i ) ) ).disconnect();
+      for( int i = 0; i < freeConnections.size(); i++ )
+        ( (DKDatastoreICM)( freeConnections.elementAt( i ) ) ).disconnect();
+      }
+    catch( Exception ignored ){}
     }
 
   /**

@@ -135,7 +135,7 @@ public final MCRXMLContainer getResultList(String query, String type,
   // Start the search
   DKDatastoreICM connection = null;
   try {
-    connection = MCRCM8ConnectionPool.getConnection();
+    connection = MCRCM8ConnectionPool.instance().getConnection();
     DKNVPair parms [] = new DKNVPair[3];
     parms[0] = new DKNVPair(DK_CM_PARM_MAX_RESULTS,
       new Integer(maxresults).toString());
@@ -165,7 +165,7 @@ public final MCRXMLContainer getResultList(String query, String type,
   catch (Exception e) {
     throw new MCRPersistenceException("CM8 Search error."+e.getMessage()); }
   finally {
-    MCRCM8ConnectionPool.releaseConnection(connection); }
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   return result;
   }
 
