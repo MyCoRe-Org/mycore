@@ -533,8 +533,9 @@ class MCREditorRequest
         String name = elements[ j ];
         if( name.endsWith( "]" ) )
         {
-          name = name.replace( '[', '§' );
-          name = name.substring( 0, name.length() - 1 );
+          int pos = name.lastIndexOf( "[" );
+          name = name.substring( 0, pos ) + "_XXX_" +
+                 name.substring( pos + 1, name.length() - 1 );
         }
          
         Element child = parent.getChild( name );
@@ -579,7 +580,7 @@ class MCREditorRequest
   void renameRepeatedElements( Element element )
   {
     String name = element.getName();
-    int pos = name.lastIndexOf( "§" );
+    int pos = name.lastIndexOf( "_XXX_" );
   
     if( pos >= 0 ) element.setName( name.substring( 0, pos ) ); 
       
