@@ -31,6 +31,8 @@ import javax.servlet.http.*;
 import javax.servlet.*;
 import org.jdom.*;
 import org.mycore.common.*;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXMLSortInterface;
@@ -47,7 +49,7 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
 */
-public class MCRQueryServlet extends HttpServlet 
+public class MCRQueryServlet extends MCRServlet 
 {
 // The configuration
 private MCRConfiguration conf = null;
@@ -72,7 +74,8 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   **/
   public void init() throws MCRConfigurationException
     {
-    conf = MCRConfiguration.instance();
+    super.init();
+    conf = super.config;
     collector = (MCRQueryCollector)this.getServletContext().getAttribute("QueryCollector");
     if (collector == null)
     	collector = new MCRQueryCollector(2,6);
@@ -86,30 +89,17 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     }
 
  /**
-  * This method handles HTTP POST requests and resolves them to output.
+  * This method handles HTTP GET/POST requests and resolves them to output.
   *
-  * @param request the HTTP request instance
-  * @param response the HTTP response instance
+  * @param job MCRServletJob containing request and response objects
   * @exception IOException for java I/O errors.
   * @exception ServletException for errors from the servlet engine.
   **/
-  public void doPost( HttpServletRequest  request, 
-                      HttpServletResponse response )
-    throws IOException, ServletException
-  { doGet(request,response); }
-
- /**
-  * This method handles HTTP GET requests and resolves them to output.
-  *
-  * @param request the HTTP request instance
-  * @param response the HTTP response instance
-  * @exception IOException for java I/O errors.
-  * @exception ServletException for errors from the servlet engine.
-  **/
-  public void doGet( HttpServletRequest  request, 
-                     HttpServletResponse response )
+  public void doGetPost( MCRServletJob job )
     throws IOException, ServletException
   {  
+  	HttpServletRequest request=job.getRequest();
+  	HttpServletResponse response=job.getResponse();
     boolean cachedFlag = false;
     HttpSession session = request.getSession(false); //if session exists;
 
