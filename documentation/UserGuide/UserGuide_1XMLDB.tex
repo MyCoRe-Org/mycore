@@ -1,15 +1,12 @@
-%
-%
-\section{Hinweise zur Installation einer freier und komerzieller Datenbanken, XML:DB's und Web-Komponenten}
-%
-%
+
+\section{Hinweise zur Installation freier und komerzieller Datenbanken, XML:DB's und Web--Komponenten}
+
 \subsection{Installation der Komponenten unter Linux}
-Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werden diese gesondert vermerkt.
-%
-%
+Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
+
+
 \subsubsection{Vorbereitung}
-%
-%
+
 Als erster Schritt sind der Java-Compiler J2SE 1.3.1 oder höher und ANT zu installieren. Beide befinden sich unter in der SuSE in der Distribution. 
 \begin{itemize}
 \item {\bf java2-jre-1.3.1-521} oder höher
@@ -17,15 +14,22 @@ Als erster Schritt sind der Java-Compiler J2SE 1.3.1 oder höher und ANT zu insta
 \item {\bf jakarta-ant-1.5-76} oder höher
 \end{itemize}
 
-Wenn allerdings SuSE von einem ftp Server installiert wird, so ist Java nicht standardmäßig enthalten. Dann bitte die Java Linux Version von der \url{www.blackdown.org}\footnote{\url{ftp://ftp.informatik.hu-berlin.de/pub/Java/Linux/JDK-1.4.1/i386/01/j2sdk-1.4.1-01-linux-i586-gcc3.2.bin}} Homepage runterladen und wie folgt installieren. Download nach beispielsweise nach {\it /usr/local} anschließend mit {\tt chmod +x j2sdk-1.4.1-01-linux-<ARCH>.bin} ausführbar machen und ausführen {\tt ./j2sdk-1.4.1-01-linux-<ARCH>.bin}.  Damit die Pfad Variablen alle richtig gesetzt werden eine Vorlage unter {\it/etc/java} entsprechend editieren und mit {\tt setDefaultJava} als root die Links richtig setzten.
-Zudem sollte man in der Datei {\it /etc/profile.local}\footnote{Falls diese noch nicht existiert einfach anlegen} noch die Variable {\it ANT\_HOME}\footnote{export ANT\_HOME=/opt/jakarta/ant} gesetzt werden. 
+Wenn allerdings SuSE von einem ftp Server installiert wird, so ist Java nicht standardmäßig enthalten. Dann bitte die Java Linux Version von der \url{www.blackdown.org}
+\footnote{\url{ftp://ftp.informatik.hu-berlin.de/pub/Java/Linux/JDK-1.4.1/i386/01/j2sdk-1.4.1-01-linux-i586-gcc3.2.bin}}
+Homepage runterladen und wie folgt installieren. Download nach beispielsweise
+nach {\it /usr/local} anschließend mit {\tt chmod +x
+  j2sdk-1.4.1-01-linux-<ARCH>.bin} ausführbar machen und ausführen {\tt
+  ./j2sdk-1.4.1-01-linux-<ARCH>.bin}.  Damit die Pfad Variablen alle richtig
+gesetzt werden eine Vorlage unter {\it/etc/java} entsprechend editieren und
+mit {\tt setDefaultJava} als root die Links richtig setzten. Zudem sollte man
+in der Datei {\it /etc/profile.local}\footnote{Falls diese noch nicht
+  existiert einfach anlegen} noch die Variable {\it ANT\_HOME}\footnote{export
+  ANT\_HOME=/opt/jakarta/ant} gesetzt werden. 
 
-Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin} anlegen, unter welchem Sie dann Ihre Applikationen laufen lassen.
+Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin}) anlegen, unter welchem Sie dann Ihre Applikationen laufen lassen.
 
-
-%
-%
 \subsubsection{Die Installation von MySQL}
+\label{mysqlinstallation}
 MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicherung von Daten innerhalb des MyCoRe-Projektes benötigt wird. Sie besitzt eine JDBC Schnittstelle und ist SQL konform. Sie könnten MySQL auch durch eine andere verfügbare Datenbank mit gleicher Funktionalität ersetzen.
 \begin{enumerate}
 \item Installieren Sie aus Ihrer Distribution die folgenden Pakete und danach ggf. noch vom Hersteller der Distribution per Netz angebotene Updates. Die angegebenen versionsnummern sind nur exemplarisch.
@@ -37,14 +41,15 @@ MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicher
 \item {\bf mysql-bench-3.23.52-83} oder höher
 \end{itemize}
 \item Die Dokumentation steht nun unter {\it /usr/share/doc/package/mysql}.
-\item Führe Sie das Kommando {\tt rcmysql } als root aus. 
+\item Führe Sie das Kommando {\tt rcmysql start} als root aus. 
 \item Führe Sie das Kommando {\tt /usr/bin/mysqladmin -u root password 'new-password'} als root aus.
 \item die folgende Sequenz sorgt dafür, dass der MyCoRe-User {\bf mcradmin} alle Rechte auf der Datenbank hat. Dabei werden bei der Ausführung von Kommandos von {\bf localhost} aus keine Pssworte abgefragt. Von anderen Hosts aus muss 'ein\_password' eingegeben werden.
 {\tt
 \begin{verbatim}
 mysql --user=root -pPASSWORD mysql
 GRANT ALL PRIVILEGES ON *.* TO mcradmin@localhost WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO mcradmin@"%" IDENTIFIED BY 'ein\_passwort' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO mcradmin@"%" IDENTIFIED BY 'ein\_passwort' 
+WITH GRANT OPTION;
 quit
 \end{verbatim}
 }
@@ -64,25 +69,90 @@ GRANT SELECT ON mycore.* TO mycorenutzer@'%';
 quit
 \end{verbatim}
 }
+
+\item jetzt können Sie die Datenbasis für MyCoRe mit nachstehendem Kommando anlegen.
+{\tt
+\begin{verbatim}
+mysqladmin -u mcradmin create mycore 
+\end{verbatim}
+}
+\item Falls weitere Benutzer noch das Recht auf Selects von allen Hosts aus haben sollen, verwenden Sie die Kommandos
+{\tt
+\begin{verbatim}
+mysql --user=mcradmin -pPASSWORD mycore
+GRANT SELECT ON mycore.* TO mycorenutzer@'%';
+quit
+\end{verbatim}
+}
 \end{enumerate}
 
-Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei ???? geschrieben werden.
+Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei {\it /etc/hosts.allow} geschrieben werden.
 %
 %
 \subsubsection{Die Installation der freien XML:DB eXist}
-eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf dieser Schnittstelle basierender Persistence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
+eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So ist die Nutzung von eXist direkt möglich.
+\paragraph{Vorbedingungen} 
+Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, da es ansonsten zu einem Konflikt mit der hier vorgestellten Installtion kommt, weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. Den Port für Tomact ändern sie in der \mcrfile{<tomcat-installdir>/conf/server.xml}. Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene Installation vorausgesetzt. Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner in \&MYCORE\_HOME bzw. \&MYCORE\_SAMPLE\_HOME liegen. 
+
 \begin{enumerate}
-\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
-\item entpacken Sie die Distribution in ein entsprechendes Verzeichnis, z. B. unter {\it /usr/local/bin}.
-\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {\tt uri=xmldb:exist://localhost:8081} im File {\it client.properties}.
-\item Starten Sie {\tt <installdir>/eXist-0.9.2/bin/server.sh }.
-\item Anschließend können Sie auch den Client mit {\tt <installdir>/eXist-0.9.2/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden (cvs). Zum Test kam Version eXist-0.9.2.
+\item entpacken Sie die Distribution in ein entsprechendes Verzeichnis, z. B. unter {\it /usr/local}.
+\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {\tt uri=xmldb:exist://localhost:8081} im File {\it client.properties} und achten sie darauf, dass die Zeile {\tt uri=xmldb:exist://localhost:8082/exist/xmlrpc} auskommentiert wird ( vorwegsetzten). Dies Einstellung wird zum Beispiel für die direkte Einbindung in Tomcat verwendet, wenn man über xmlrpc auf eXist zugreifen möchte.
+\item Kopieren der benötigen Java Bibliotheken für MyCoRe 
+\begin{verbatim}
+cp <eXist-Installdir>/exist.jar $MYCORE_HOME/lib
+cp <eXist-Installdir>/lib/core/xmlrpc*.jar $MYCORE_HOME/lib
+\end{verbatim}
+\item Starten Sie den Server mit {\tt <installdir>/bin/startup.sh }.
+\item unter der URL \url{http://localhost:8080/exist/index.xml} sollte jetzt die eXist-Homepage erscheinen. Dies nur als Test.
+\item Wenn alles okay ist, starten Sie {\tt <eXist-installdir>/bin/server.sh }.
+\item Anschliessend können Sie auch den Client mit {\tt <eXist-installdir>/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\item erstelle Collections für das Einstellen der Dokumente:
+        \subitem \texttt{mkcol mycore}
+        \subitem \texttt{chown guest guest mycor}e
+        \subitem \texttt{cd mycore}
+        \subitem \texttt{mkcol legalentity}
+        \subitem \texttt{chown guest guest document}
+        \subitem \texttt{mkcol document}
+        \subitem \texttt{chown guest guest document}
+        \subitem \texttt{mkcol derivate}
+        \subitem \texttt{chown guest guest derivate}
+
+\item in \mcrpath{\$MYCORE\_HOME} die datei build.xml ändern:    
+\begin{verbatim}
+<property name="persistency"  value="xmldb"/>
+\end{verbatim}
+\item im Verzeichnis \texttt{\$MYCORE\_HOME} den Befehl \mcrcommand{ant jar} ausführen.
+    
+\item im Verzeichnis \mcrpath{\$MYCORE\_SAMPLE\_HOME/config} die Datei \mcrfile{mycore.properties.private}
+folgendermaßen ändern.
+\begin{verbatim} 
+MCR.root_path=/var/lib/mycore-cvs/mycore
+MCR.appl_path=/var/lib/mycore-cvs/mycore-sample-application
+MCR.persistence_sql_database_url=jdbc:mysql://localhost/mycore?
+                                        user=user&password=password
+
+\end{verbatim}   
+
+
+\begin{enumerate}
+\item Im Verzeichnis \mcrpath{\$MYCORE\_SAMPLE\_HOME} den Befehl
+  \mcrcommand{ant class} ausführen. Dieser Befehl läd die Classifiactions in die MySQL--Datenbank.
+\item \mcrcommand{ant legal} $\longrightarrow$ Personen werden eingefügt
+\item \mcrcommand{ant document} $\longrightarrow$ Dokumente werden eingestellt..
+\item \mcrcommand{ant derivates} ... und ihre zugehörigen Derivate
+\item \mcrcommand{ant webapps} Tomcat Installation vorbereiten
+\item MyCoRe in den Tomcat Servlet Container installieren. Dazu einfach die soeben erzeugte \mcrfile{mycore.war} Datei nach \verb+<tomcat-installdir>/webapps+ kopieren und den Tomcat--Server neu starten. Unter SuSE einfach als root \mcrcommand{rctomcat restart}. Bei einer anderen Distribution im Verzeichnis \verb+<tomcat-installdir>/bin+ das Skript \mcrcommand{startup.sh} ausführen.
+\item Tomcat starten und URL \url{http://localhost:<tomcatport>/mycore} sollte den MyCoRe-Startbildschirm bringen
+
 \end{enumerate}
-%
-%
+
+Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei {\it /etc/hosts.allow} geschrieben werden.
+
+
 \subsection{Installation der Komponenten unter MS Windows}
-%
-%
+
+
 \subsubsection{Die Installation der freien XML:DB eXist}
 eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persistence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
 \begin{enumerate}
@@ -92,5 +162,8 @@ eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces impl
 \item Starten Sie {\tt <installdir>\\eXist-0.9.2\\bin\\server.bat }.
 \item Anschließend können Sie auch den Client mit {\tt <installdir>\\eXist-0.9.2\\bin\\client.bat } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
-%
-%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "UserGuide"
+%%% End: 
