@@ -315,12 +315,32 @@ public class MCRNBN {
 	}
 	
 	/**
-	 * Method setURL. Returns the URL which has been locally attached with the URN
+	 * Method setURL. Sets the URL which is locally attached with the URN
 	 * @param the url which should be set for the URN.
 	 */
 	public void setURL(String url) {
 		if (isLocal()) {
 			manager.setURL(this, url);
+		}
+	}
+	
+	/**
+	 * @return the document id belonging to the URN
+	 */
+	public String getDocumentId() {
+		if (isLocal()) {
+			manager.getDocumentId(this);
+		}
+		return null;
+	}
+	
+	/**
+	 * Method setDocumentId. Sets the document id which is locally attached with the URN
+	 * @param the url which should be set for the URN.
+	 */
+	public void setDocumentId(String documentId) {
+		if (isLocal()) {
+			manager.setDocumentId(this, documentId);
 		}
 	}
 	
@@ -347,6 +367,13 @@ public class MCRNBN {
 	 */
 	public String getNBN() {
 		return (isValid() ? urn.substring(4) : null);
+	}
+  
+	/**
+	 * Returns the URN.
+	 */
+	public String getURN() {
+		return (isValid() ? urn : null);
 	}
   
 	/**

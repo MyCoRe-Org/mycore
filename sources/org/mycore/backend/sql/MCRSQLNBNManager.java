@@ -93,6 +93,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			.addColumn("AUTHOR VARCHAR(80) NOT NULL")
 			.addColumn("COMMENT VARCHAR(400)")
 			.addColumn("DATE TIMESTAMP NOT NULL")
+			.addColumn("DOCUMENTID VARCHAR(64)")
       		.toCreateTableStatement());
     	logger.info("NBN table created.");
 	}
@@ -218,9 +219,11 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-                String comment = null;
-                if( reader.next() ) comment = reader.getString("COMMENT");
-                reader.close();
+		String comment = null;
+		if (reader.next()) {
+			comment = reader.getString("COMMENT");
+		}
+		reader.close();
 
 		if (comment == null) {
 			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
@@ -238,11 +241,13 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-                GregorianCalendar date = null;
-                if( reader.next() ) date = reader.getDate("DATE");
-                reader.close();
+		GregorianCalendar date = null;
+		if (reader.next()) {
+			date = reader.getDate("DATE");
+		}
+		reader.close();
 
-		if (date==null) {
+		if (date == null) {
 			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
 		}
 
@@ -273,19 +278,12 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			PreparedStatement statement;
 			if (pattern != null) {
 				String sqlPattern = null;
-//				if ((pattern.indexOf('?') != -1) || (pattern.indexOf('*') != -1)) {
-					sqlPattern = pattern
-						.replace('?', '_')
-						.replace('*', '%');
-					statement = connection.getJDBCConnection()
-						.prepareStatement("select * from " + table + " where niss like ?");
-					logger.debug("Using 'like'-statement: select * from " + table + " where niss like " + sqlPattern);
-/*				} else {
-					sqlPattern = pattern;
-					statement = connection.getJDBCConnection()
-						.prepareStatement("select * from " + table + " where niss = ?");
-					logger.debug("Using '='-statement: select * from " + table + " where niss = " + sqlPattern);
-				} */
+				sqlPattern = pattern
+				.replace('?', '_')
+				.replace('*', '%');
+				statement = connection.getJDBCConnection()
+				.prepareStatement("select * from " + table + " where niss like ?");
+				logger.debug("Using 'like'-statement: select * from " + table + " where niss like " + sqlPattern);
 				statement.setString(1, sqlPattern);
 				logger.debug("Statement completed with " + sqlPattern);
 			} else {
@@ -305,11 +303,9 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			String msg = "Error in database while executing query.";
 			logger.info(msg);
 			throw new MCRPersistenceException(msg, exc);
-		} finally {
-			connection.release();
-			
-			return results;
 		}
+		connection.release();
+		return results;
 	}
 	
 	/**
@@ -330,11 +326,70 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			String msg = "Error in database while executing query.";
 			logger.info(msg);
 			throw new MCRPersistenceException(msg, exc);
-		} finally {
-			connection.release();
-			
-			return results;
 		}
+		connection.release();
+		return results;
 	}
 	
+	/**
+	 * Method getDocumentId. Gets the document id for the NBN
+	 * @param urn the NBN
+	 * @return String the document id
+	 */
+	public String getDocumentId(MCRNBN urn) {
+		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
+				.setCondition("NISS", urn.getNISSandChecksum())
+				.toSelectStatement());
+		String documentId = null;
+		if (reader.next()) {
+			documentId = reader.getString("DOCUMENTID");
+		}
+		reader.close();
+		
+		if (documentId == null) {
+			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
+		}
+		
+		return documentId; 
+	}
+	
+	/**
+	 * Sets the document id for the NBN URN given.
+	 *
+	 * @param urn the NBN URN that represents the URL
+	 * @param documentId the document id the NBN points to
+	 **/
+	public void setDocumentId(MCRNBN urn, String documentId) {
+		MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table)
+				.setValue("DOCUMENTID", documentId)
+				.setCondition("NISS", urn.getNISSandChecksum())
+				.toUpdateStatement());
+		logger.debug("Document id " + documentId + " set for NISS " + urn.getNISSandChecksum());
+	}
+	
+	/**
+	 * Finds the urn for a given document id
+	 * @param documentId the document id
+	 * @return the nbn or null
+	 */
+	public MCRNBN getNBNByDocumentId(String documentId) {
+		Set results = new HashSet();
+		MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			PreparedStatement statement = connection.getJDBCConnection()
+				.prepareStatement("select NISS from " + table + " where DOCUMENTID = " + documentId);
+			ResultSet set = statement.executeQuery();
+			if (set.next()) {
+				String NISS = set.getString(1); 
+				connection.release();
+				return new MCRNBN(MCRNBN.getLocalPrefix() + NISS);
+			}
+			connection.release();
+			return null;
+		} catch (Exception exc) {
+			String msg = "Error in database while executing query.";
+			logger.info(msg);
+			throw new MCRPersistenceException(msg, exc);
+		}
+	}
 }
