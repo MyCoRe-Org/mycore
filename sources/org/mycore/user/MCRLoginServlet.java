@@ -65,65 +65,62 @@ public class MCRLoginServlet extends MCRServlet
   /** This method overrides doGetPost of MCRServlet. */
   public void doGetPost(MCRServletJob job) throws Exception
   {
-    try
-    {
-      boolean loginOk = false;
-      String uid = getStringParameter(job, "uid").trim();
-      String pwd = getStringParameter(job, "pwd").trim();
-      String url = getStringParameter(job, "url").trim();
+    boolean loginOk = false;
 
-      if (uid.length() == 0) uid = null;
-      if (pwd.length() == 0) pwd = null;
-      if( url.length() == 0 ) url = null;
+    // Get the MCRSession object for the current thread from the session manager.
+    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-      // Do not change login, just redirect to given url:
-      if (job.getSession().getCurrentUserID().equals(uid) && (pwd == null) && (url != null)) {
+    String uid = getStringParameter(job, "uid").trim();
+    String pwd = getStringParameter(job, "pwd").trim();
+    String url = getStringParameter(job, "url").trim();
+
+    if (uid.length() == 0) uid = null;
+    if (pwd.length() == 0) pwd = null;
+    if( url.length() == 0 ) url = null;
+
+    // Do not change login, just redirect to given url:
+    if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (url != null)) {
+      job.getResponse().sendRedirect(url);
+      return;
+    }
+
+    if (url == null) url = MCRServlet.getBaseURL();
+
+    org.jdom.Element root = new org.jdom.Element("mcr_user");
+    org.jdom.Document jdomDoc = new org.jdom.Document(root);
+
+    root.addContent(new org.jdom.Element("guest_id").addContent(guestID));
+    root.addContent(new org.jdom.Element("guest_pwd").addContent(guestPWD));
+
+    try {
+      loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
+
+      // If the login attempt was successfull, change the user ID and redirect to target URL
+      if (loginOk) {
+        mcrSession.setCurrentUserID(uid);
+        job.getRequest().getSession().setAttribute( "XSL.CurrentUser", uid );
         job.getResponse().sendRedirect(url);
         return;
       }
-
-      if (url == null) url = MCRServlet.getBaseURL();
-
-      org.jdom.Element root = new org.jdom.Element("mcr_user");
-      org.jdom.Document jdomDoc = new org.jdom.Document(root);
-
-      root.addContent(new org.jdom.Element("guest_id").addContent(guestID));
-      root.addContent(new org.jdom.Element("guest_pwd").addContent(guestPWD));
-
-      try {
-        loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
-
-        // If the login attempt was successfull, change the user ID and redirect to target URL
-        if (loginOk) {
-          job.getSession().setCurrentUserID(uid);
-          job.getRequest().getSession().setAttribute( "XSL.CurrentUser", uid );
-          job.getResponse().sendRedirect(url);
-          return;
-        }
-        else {
-          if (uid != null)
-            root.setAttribute("invalid_password", "true");
-        }
+      else {
+        if (uid != null)
+          root.setAttribute("invalid_password", "true");
       }
-      catch (MCRException e) {
-        if (e.getMessage().equals("Unknown user.")) {
-          root.setAttribute("unknown_user", "true");
-          logger.info("MCRLoginServlet: unknown user:" + uid);
-        }
-        else if (e.getMessage().equals("Login denied. User is disabled.")) {
-          root.setAttribute("user_disabled", "true");
-          logger.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
-        }
-        else throw e;
+    }
+    catch (MCRException e) {
+      if (e.getMessage().equals("Unknown user.")) {
+        root.setAttribute("unknown_user", "true");
+        logger.info("MCRLoginServlet: unknown user:" + uid);
       }
-
-      root.addContent(new org.jdom.Element("url").addContent(url));
-      doLayout(job, "login", jdomDoc);
+      else if (e.getMessage().equals("Login denied. User is disabled.")) {
+        root.setAttribute("user_disabled", "true");
+        logger.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
+      }
+      else throw e;
     }
 
-    catch (Exception e) {
-      throw new Exception("Exception occured: " +e);
-    }
+    root.addContent(new org.jdom.Element("url").addContent(url));
+    doLayout(job, "login", jdomDoc); // use the stylesheet mcr_user-login-*.xsl
   }
 
   /**
@@ -139,33 +136,10 @@ public class MCRLoginServlet extends MCRServlet
   protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc)
                           throws ServletException, IOException
   {
-    // We get the desired language either from the request or from the session and build
-    // the corresponding name for the XSLT stylesheet. If there is a language parameter
-    // in the request, this takes precedence over the session parameter (otherwise one
-    // would not be able to choose another language).
+    String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
 
-    String language = job.getRequest().getParameter("lang");
-    String language_session = (String)job.getRequest().getSession().getAttribute("mycore.language");
-
-    // We try to determine the locale of the client from the request and set the default language
-    String language_locale = job.getRequest().getHeader("Accept-Language");
-
-    if (language_locale.toUpperCase().trim().equals("DE"))
-      language_locale = "DE";
-    else if (language_locale.toUpperCase().trim().equals("EN"))
-      language_locale = "EN";
-    else if (language_locale.toUpperCase().trim().equals("EN-US"))
-      language_locale = "EN";
-    else language_locale = "DE";
-
-    if (language == null) { // no language definition in the request
-      if (language_session != null) language = language_session;
-      else language = language_locale; // use the default language
-    }
-
-    language = language.toUpperCase();
-    job.getRequest().getSession().setAttribute("mycore.language", language );
-    job.getRequest().getSession().setAttribute("XSL.CurrentUser", job.getSession().getCurrentUserID());
+    job.getRequest().getSession().setAttribute("mycore.language", language);
+    job.getRequest().getSession().setAttribute("XSL.CurrentUser", MCRSessionMgr.getCurrentSession().getCurrentUserID());
 
     String styleSheet = styleBase + "-" + language;
     job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
