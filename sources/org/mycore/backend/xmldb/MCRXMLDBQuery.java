@@ -23,8 +23,6 @@
  **/
 package org.mycore.backend.xmldb;
 
-import java.text.*;
-import org.w3c.dom.Document;
 import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
