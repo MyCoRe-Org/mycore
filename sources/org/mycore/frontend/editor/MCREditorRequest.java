@@ -33,6 +33,8 @@ import javax.servlet.http.*;
 
 import org.jdom.*;
 
+import org.apache.log4j.Logger;
+
 import org.mycore.common.*;
 
 /**
@@ -43,6 +45,7 @@ import org.mycore.common.*;
  **/
 class MCREditorRequest
 {
+  protected static Logger logger=Logger.getLogger( MCREditorRequest.class );
   protected static MCRCache editorCache = new MCRCache( 20 );
 
   HttpServletRequest  request;
@@ -209,7 +212,7 @@ class MCREditorRequest
   {
     if( value.trim().length() == 0 ) return;
     variables.addElement( new MCREditorVariable( path, value ) );
-    System.out.println( "get var " + path + " = " + value );
+    logger.debug( "Editor get var " + path + " = " + value );
   }
     
   MCREditorVariable getVariable( int index )
@@ -312,7 +315,7 @@ class MCREditorRequest
       String path  = (String)( e.nextElement() );
       String value = (String)( maxtable.get( path ) );
       repeats.addElement( new MCREditorVariable( path, value ) );
-      System.out.println( "get num " + path + " = " + value );
+      logger.debug( "Editor get num " + path + " = " + value );
     }
   }
     
@@ -325,7 +328,7 @@ class MCREditorRequest
       {
         String value = request.getParameter( parameter );
         repeats.addElement( new MCREditorVariable( parameter.substring( 2 ), value ) );
-        System.out.println( "get num " + parameter.substring( 2 ) + " = " + value );
+        logger.debug( "Editor get num " + parameter.substring( 2 ) + " = " + value );
       }	
     }  
   }
@@ -341,7 +344,7 @@ class MCREditorRequest
     Document editor = (Document)( editorCache.getIfUpToDate( path, time ) );
     if( editor == null )
     {
-      System.out.println( name + " has to be built from file" );      
+      logger.debug( "Editor " + name + " has to be built from file" );      
       editor = new org.jdom.input.SAXBuilder().build( file );
       editorCache.put( path, editor );
     }
@@ -382,7 +385,7 @@ class MCREditorRequest
       variable.setAttribute( "path", getVariable( i ).getPath() );
       variable.addContent( getVariable( i ).getValue() );
       ve.addContent( variable );
-      System.out.println( "set var " + getVariable( i ).getPath() + " = " + getVariable( i ).getValue() );
+      logger.debug( "Editor set var " + getVariable( i ).getPath() + " = " + getVariable( i ).getValue() );
     }
     return ve;
   }
@@ -397,7 +400,7 @@ class MCREditorRequest
       repeat.setAttribute( "path", var.getPath()  );
       repeat.setAttribute( "num",  var.getValue() );
       vr.addContent( repeat );
-      System.out.println( "set num " + var.getPath() + " = " + var.getValue() );
+      logger.debug( "Editor set num " + var.getPath() + " = " + var.getValue() );
     }
     return vr;
   }
