@@ -73,27 +73,41 @@ public static void main(String argv[]) throws DKException, Exception
     System.out.println("The argument 1 is not doc or ifs.");
     System.out.println();
     }
-  try {
-    mcrid = new MCRObjectID(argv[1]); }
-  catch (MCRException e) {
-    System.out.println("The argument 2 is not a MCRObjectID.");
-    System.out.println();
-    }
   if (argv[0].equals("doc")) {
-    itemtype = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId());
-    prefix = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId()+"_prefix");
-    query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
-    //query = "/"+itemtype+"["+prefix+"service/"+prefix+"servdates/"+prefix+"servdate[@"+prefix+"servdate = 60010821 and @"+prefix+"type = \"validfromdate\"]]";
+    if (argv[1].equals("id")) {
+      try {
+        mcrid = new MCRObjectID(argv[2]); }
+      catch (MCRException e) {
+        System.out.println("The argument 3 is not a MCRObjectID.");
+        System.out.println();
+        System.exit(0);
+        }
+      itemtype = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId());
+      prefix = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId()+"_prefix");
+      query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
+      //query = "/"+itemtype+"["+prefix+"service/"+prefix+"servdates/"+prefix+"servdate[@"+prefix+"servdate = 60010821 and @"+prefix+"type = \"validfromdate\"]]";
+      }
     }
   if (argv[0].equals("ifs")) {
     itemtype = conf.getString("MCR.IFS.ContentStore.CM8.ItemType");
     ifsfile = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.File");
-    //query = "/"+itemtype+"[@ifsfile=\""+mcrid.getId()+"\"]";
+    if (argv[1].equals("id")) {
+      try {
+        mcrid = new MCRObjectID(argv[2]); }
+      catch (MCRException e) {
+        System.out.println("The argument 3 is not a MCRObjectID.");
+        System.out.println();
+        System.exit(0);
+        }
+      query = "/"+itemtype+"[@ifsowner=\""+mcrid.getId()+"\"]"; }
+    // show a nse items
+    if (argv[1].equals("nse")) {
+      query = "/"+itemtype+"[contains-text (@TIEREF,\"\'"+argv[2]+"\'\")=1]"; }
     // show all items
-    //query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
-    // show all items
-    query = "/"+itemtype;
+    if (argv[1].equals("all")) {
+      query = "/"+itemtype; }
     }
+  if (query.length()==0) { query = "/"+itemtype; }
 
   System.out.println(query);
 
