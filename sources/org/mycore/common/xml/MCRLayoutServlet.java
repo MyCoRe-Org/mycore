@@ -327,7 +327,7 @@ public class MCRLayoutServlet extends MCRServlet {
         }
 
         // Set some predefined XSL parameters:
-
+        
         String contextPath = request.getContextPath() + "/";
         String requestURL = getCompleteURL(request);
 
@@ -342,7 +342,13 @@ public class MCRLayoutServlet extends MCRServlet {
         String user = MCRConfiguration.instance().getString(
                 "MCR.users_guestuser_username");
         String lang = defaultLang;
+        
+        // handle HttpSession
+        if (session !=null && !request.isRequestedSessionIdFromCookie()){
+        	parameters.put("HttpSession",";jsessionid="+session.getId());
+        }
         if (session != null) {
+        		parameters.put("JSessionID",";jsessionid="+session.getId());
             MCRSession mcrSession = (MCRSession) (session
                     .getAttribute("mycore.session"));
             if (mcrSession != null) {
@@ -354,6 +360,7 @@ public class MCRLayoutServlet extends MCRServlet {
         LOGGER.debug("LayoutServlet XSL.MCRSessionID="
                 + parameters.getProperty("MCRSessionID"));
         LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
+        LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
 
         parameters.put("CurrentUser", user);
         parameters.put("RequestURL", requestURL);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.9 $ $Date: 2005-01-11 17:10:30 $ -->
+<!-- $Revision: 1.10 $ $Date: 2005-01-24 17:06:46 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" 
@@ -10,7 +10,7 @@
 	<!-- ================== get some wcms required global variables ===================================== -->      
       <!-- location of navigation base -->
       <xsl:variable name="navigationBase" 
-            select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/navigation.xml')" />
+            select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/navigation.xml',$JSessionID)" />
       <!-- base image path -->
       <xsl:variable name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/images/') " />
 	<!-- main title configured in mycore.properties.wcms -->

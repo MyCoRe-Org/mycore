@@ -149,9 +149,20 @@ public class MCRQueryServlet extends MCRServlet {
 
 		//check Parameter to meet requirements
 		if (!checkInputParameter(request)) {
+			StringBuffer buf=new StringBuffer();
+			Set entries=request.getParameterMap().entrySet();
+			Iterator it=entries.iterator();
+			Map.Entry entry;
+			while (it.hasNext()){
+				entry=(Map.Entry)it.next();
+				buf.append(entry.getKey())
+				.append(" : ")
+				.append(MCRUtils.arrayToString((Object[])entry.getValue(),", "))
+				.append("\n");
+			}
 			generateErrorPage(request, response,
 					HttpServletResponse.SC_NOT_ACCEPTABLE,
-					"Some input parameters don't meet the requirements!",
+					"Some input parameters don't meet the requirements!:\n"+buf.toString(),
 					new MCRException("Input parameter mismatch!"), false);
 			return;
 		}
@@ -549,9 +560,11 @@ public class MCRQueryServlet extends MCRServlet {
 			query = "";
 		}
 		if (type == null) {
+			LOGGER.debug("Parameter type is NULL!");
 			return false;
 		}
 		if (type.equals("")) {
+			LOGGER.debug("Parameter type is EMPTY!");
 			return false;
 		}
 		if (layout == null) {
@@ -573,6 +586,8 @@ public class MCRQueryServlet extends MCRServlet {
 		else
 			view = view.toLowerCase();
 
+		LOGGER.info("MCRQueryServlet: RequestEncoding = " + request.getCharacterEncoding());
+		LOGGER.info("MCRQueryServlet: ContentType = " + request.getContentType());
 		LOGGER.info("MCRQueryServlet : mode = " + mode);
 		LOGGER.info("MCRQueryServlet : type = " + type);
 		LOGGER.info("MCRQueryServlet : layout = " + layout);

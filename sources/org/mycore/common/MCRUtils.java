@@ -878,5 +878,14 @@ public static ArrayList getAllDirectoryNames(File basedir, String path)
     }
   return out;
   }
-
+public static String arrayToString(Object[] objArray, String seperator){
+	StringBuffer buf=new StringBuffer();
+	for (int i=0;i<objArray.length;i++){
+		buf.append(objArray[i])
+		.append(seperator);
+	}
+	if (objArray.length>0)
+		buf.setLength(buf.length()-seperator.length());
+	return buf.toString();
+}
 }

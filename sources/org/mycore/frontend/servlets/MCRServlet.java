@@ -155,7 +155,7 @@ public class MCRServlet extends HttpServlet {
 			prepareURLs(req);
 
 		try {
-			HttpSession theSession = req.getSession(true);
+			HttpSession theSession = req.getSession(false);
 			MCRSession session = null;
 
 			String sessionID = req.getParameter("MCRSessionID");
@@ -163,8 +163,9 @@ public class MCRServlet extends HttpServlet {
 			if (sessionID != null)
 				fromRequest = MCRSession.getSession(sessionID);
 
-			MCRSession fromHttpSession =
-				(MCRSession) theSession.getAttribute("mycore.session");
+			MCRSession fromHttpSession=null;
+			if (theSession!=null)
+				fromHttpSession=(MCRSession) theSession.getAttribute("mycore.session");
 
 			// Choose: 
 			if (fromRequest != null)
@@ -177,11 +178,23 @@ public class MCRServlet extends HttpServlet {
 				session = MCRSessionMgr.getCurrentSession();
 			// Create a new session
 
+			//Check if MCRSession is associated with a httpSession
+			if (session.get("httpSession")!=null && theSession==null){
+				HttpSession oldHttpSession=(HttpSession)session.get("httpSession");
+				theSession=oldHttpSession;
+			}
+			else {
+				theSession=req.getSession(true);
+			}
+
 			// Store current session in HttpSession
 			theSession.setAttribute("mycore.session", session);
 
 			// Bind current session to this thread:
 			MCRSessionMgr.setCurrentSession(session);
+			
+			//Bind the current HttpSession to the MCRSession
+			session.put("httpSession",theSession);
 
 			// Forward MCRSessionID to XSL Stylesheets
 			req.setAttribute("XSL.MCRSessionID", session.getID());
