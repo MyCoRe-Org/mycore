@@ -390,7 +390,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 			}
 		} catch (InterruptedException ignored) {
 		}
-		// set naighbour status for documents
+		// set neighbour status for documents
     	if (type.equals(sortType) && (resarray.size()==1))
 				resarray.setStatus(0,status);
 		// cut results if more than "maxresults"
