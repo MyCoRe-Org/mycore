@@ -27,8 +27,8 @@ package org.mycore.common;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.user.*;
+import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
+
 
 /**
  * Instances of this class collect information kept during a session like the currently
@@ -42,6 +42,7 @@ import org.mycore.user.*;
  */
 public class MCRSession implements Cloneable
 {
+
   /** the logger */
   private static Logger logger = Logger.getLogger(MCRSession.class.getName());
 
@@ -56,6 +57,9 @@ public class MCRSession implements Cloneable
 
   /** A cache of MCRSession objects, used for method getSession( String ) */
   private static MCRCache sessions = new MCRCache( 500 );
+
+  /** -ASC- für MCRClassificationBrowser Class session daten */
+  public MCRClassificationBrowserData BData = null;
 
   /**
    * The constructor of a MCRSession. As default the user ID is set to the value
