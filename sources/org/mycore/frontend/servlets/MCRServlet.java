@@ -305,7 +305,7 @@ protected String getProperty(HttpServletRequest request, String name) {
 	//fix encoding bug using solution of
 	//http://www.jguru.com/faq/view.jsp?EID=137281
 	try {
-		logger.debug("Char encoding: "+value);
+		logger.debug("Char encoding ("+ReqCharEncoding+"): "+value);
 		value = new String(value.getBytes(), ReqCharEncoding);
 		logger.debug(" - to: "+value);
 	} catch (UnsupportedEncodingException e) {
