@@ -24,6 +24,7 @@
 
 package org.mycore.backend.sql;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -104,13 +105,14 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 	 * @param urn the NBN URN to be reserved.
 	 */
 	public void reserveURN(MCRNBN urn) {
-		MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+		MCRSQLConnection mcrConnection = MCRSQLConnectionPool.instance().getConnection();
 		Date now = new Date();
+		Connection connection = mcrConnection.getJDBCConnection();
 		
 		try {
 			PreparedStatement statement;
-			statement = connection.getJDBCConnection()
-				.prepareStatement("insert into " + table + " values (?, ?, ?, ?, ?, ?)");
+			statement = connection.prepareStatement(
+					"insert into " + table + " values (?, ?, ?, ?, ?, ?)");
 			
 			statement.setString(1, urn.getNISSandChecksum());
 			statement.setNull(2, Types.VARCHAR);
@@ -125,12 +127,13 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			
 			statement.execute();
 			statement.close();
+			connection.commit();
 		} catch (Exception exc) {
 			String msg = "Error in database while reserving a new NBN.";
 			logger.info(msg);
 			throw new MCRPersistenceException(msg, exc);
 		} finally {
-			connection.release();
+			mcrConnection.release();
 		}
 		logger.debug("NISS " + urn.getNISSandChecksum() + " reserved.");
 	}
@@ -380,17 +383,20 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			PreparedStatement statement = connection.getJDBCConnection()
 				.prepareStatement("select NISS from " + table + " where DOCUMENTID = '" + documentId + "'");
 			ResultSet set = statement.executeQuery();
+			logger.debug("Got result set");
 			if (set.next()) {
+				logger.debug("Data set for id " + documentId + " found.");
 				String NISS = set.getString(1); 
-				connection.release();
 				return new MCRNBN(MCRNBN.getLocalPrefix() + NISS);
+			} else {
+				return null;
 			}
-			connection.release();
-			return null;
 		} catch (Exception exc) {
 			String msg = "Error in database while executing query.";
 			logger.info(msg);
 			throw new MCRPersistenceException(msg, exc);
+		} finally {
+			connection.release();
 		}
 	}
 }
