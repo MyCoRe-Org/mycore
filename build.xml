@@ -71,6 +71,7 @@
     <javac srcdir="${sources}"
            destdir="${classes}"
            includes="mycore/${package}/**"
+           classpath="${lib}/ftp.jar"
            debug="${debug}"
            optimize="${optimize}"
            deprecation="on">
