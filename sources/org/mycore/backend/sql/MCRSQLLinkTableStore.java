@@ -176,17 +176,10 @@ public final void delete( String from )
  **/
 public final int countTo( String to )
   {
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
+    return MCRSQLConnection.justCountRows(                                                                                                                       
     new MCRSQLStatement( tableName )
     .setCondition( "MCRTO", to )
     .toCountStatement() );
-  if( ! reader.next() ) return 0;
-  String number = reader.getString( "NUMBER" );
-  try {
-    return (number == null ? 0 : Integer.parseInt(number) );
-    }
-  catch (Exception e) {
-    throw new MCRException("SQL counter error",e); }
   }
 }
 

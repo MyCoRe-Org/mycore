@@ -142,11 +142,14 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("URL", url)
 			.toSelectStatement());
-		if (!reader.next()) {
+                String niss = null;
+                if( reader.next() ) niss = reader.getString("NISS");
+                reader.close();
+		if( niss == null ) {
 			logger.debug("No URN found for URL " + url);
 			return null;
 		}
-		MCRNBN nbn = new MCRNBN(MCRNBN.getLocalPrefix() + reader.getString("NISS"));
+		MCRNBN nbn = new MCRNBN(MCRNBN.getLocalPrefix() + niss );
 		
 		return nbn;
 	}		
@@ -176,12 +179,14 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-		if (!reader.next()) {
-			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
-			return null;
-		}
+                String url = null;
+                if( reader.next() ) url = reader.getString("URL");
+                reader.close();
 
-		return reader.getString("URL"); 
+		if ( url == null ) {
+			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
+		}
+		return url; 
 	}
 
 	/**
@@ -193,12 +198,15 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-		if (!reader.next()) {
+                String author = null;
+                if( reader.next() ) author = reader.getString("AUTHOR");
+                reader.close();
+
+		if (author == null) {
 			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
-			return null;
 		}
 
-		return reader.getString("AUTHOR"); 
+		return author; 
 	}
 	
 	/**
@@ -210,12 +218,15 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-		if (!reader.next()) {
+                String comment = null;
+                if( reader.next() ) comment = reader.getString("COMMENT");
+                reader.close();
+
+		if (comment == null) {
 			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
-			return null;
 		}
 
-		return reader.getString("COMMENT"); 
+		return comment; 
 	}
 	
 	/**
@@ -227,12 +238,15 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table)
 			.setCondition("NISS", urn.getNISSandChecksum())
 			.toSelectStatement());
-		if (!reader.next()) {
+                GregorianCalendar date = null;
+                if( reader.next() ) date = reader.getDate("DATE");
+                reader.close();
+
+		if (date==null) {
 			logger.debug("URN " + urn.getNISSandChecksum() + "not found.");
-			return null;
 		}
 
-		return reader.getDate("DATE");
+		return date;
 	}
 	
 	/**

@@ -157,7 +157,11 @@ public class MCRSQLConnection
   {
     MCRArgumentChecker.ensureNotEmpty( statement, "statement" );
     try
-    { connection.createStatement().executeUpdate( statement ); }
+    { 
+      Statement stmt = connection.createStatement();
+      stmt.executeUpdate( statement ); 
+      stmt.close();
+    }
     catch( SQLException ex )
     { 
       Logger logger = MCRSQLConnectionPool.getLogger();
@@ -181,7 +185,7 @@ public class MCRSQLConnection
     MCRSQLRowReader r = doQuery( query );
     String value = r.next() ? r.getString( 1 ) : null;
     r.close();
-    return ( value );
+    return value;
   }
 
   /**
@@ -194,7 +198,6 @@ public class MCRSQLConnection
   public int countRows( String condition )
     throws MCRPersistenceException
   {
-//    String query = "SELECT count(*) AS number FROM " + condition;
     String query = "SELECT count(*) FROM " + condition;
     String count = getSingleValue( query );
     return( count == null ? 0 : Integer.parseInt( count ) );
