@@ -47,27 +47,45 @@ private int vec_max_length;
 private Vector mcr_result = null;
 private Vector mcr_xml = null;
 private MCRQueryInterface mcr_transform = null;
+private MCRConfiguration config = null;
 
-/* The start tag for the result collection */
+/** The start tag for the result collection **/
 public static final String TAG_RESULTS_S = "<mcr_results>";
-/* The end tag for the result collection */
+/** The end tag for the result collection **/
 public static final String TAG_RESULTS_E = "</mcr_results>";
-/* The start tag for one result */
+/** The start tag for one result **/
 public static final String TAG_RESULT_S = "<mcr_result>";
-/* The end tag for one result */
+/** The end tag for one result **/
 public static final String TAG_RESULT_E = "</mcr_result>";
-/* The start tag for one MCRObjectId */
+/** The start tag for one MCRObjectId **/
 public static final String TAG_MCRID_S = "<mcr_objectid>";
-/* The end tag for one MCRObjectId */
+/** The end tag for one MCRObjectId **/
 public static final String TAG_MCRID_E = "</mcr_objectid>";
-/* The start tag for one XML document */
+/** The start tag for one XML document **/
 public static final String TAG_XML_S = "<mcr_xml>";
-/* The end tag for one XML document */
+/** The end tag for one XML document **/
 public static final String TAG_XML_E = "</mcr_xml>";
 /* The new line string */
 private String NL;
+
 /**
- * This constructor read the properties for the MCRObject type and call
+ * This constructor create the MCRQueryResult class with an empty
+ * query result vector.
+ *
+ * @exception MCRConfigurationException     
+ *                              an Exception of MyCoRe Configuration
+ **/
+public MCRQueryResult() throws MCRConfigurationException
+  {
+  NL = System.getProperty("line.separator");
+  config = MCRConfiguration.instance();
+  vec_max_length = config.getInt("MCR.query_max_results",10);
+  mcr_result = new Vector(vec_max_length);
+  mcr_xml = new Vector(vec_max_length);
+  }
+
+/**
+ * This methode read the properties for the MCRObject type and call
  * the coresponding class for a query to the persistence layer. If
  * it was succesful, the vector of MCRObject's is filled with answers.
  * Then the corresponding XML streams was loaded.
@@ -78,14 +96,9 @@ private String NL;
  * @exception MCRConfigurationException      
  *                              an Exception of MyCoRe Configuration
  **/
-public MCRQueryResult(String type, String query) 
+public final void setFromQuery(String type, String query) 
   throws MCRException, MCRConfigurationException
   {
-  NL = System.getProperty("line.separator");
-  MCRConfiguration config = MCRConfiguration.instance();
-  vec_max_length = config.getInt("MCR.query_max_results",10);
-  mcr_result = new Vector(vec_max_length);
-  mcr_xml = new Vector(vec_max_length);
   String persist_type = "";
   String proptype = "MCR.persistence_type_"+type.toLowerCase();
   try {
@@ -109,7 +122,7 @@ private static String ERRORTEXT =
   "The stream for the MCRQueryResult constructor is false.";
 
 /**
- * This constructor fills the internal MCRObjectId- and XML-vector
+ * This methode fills the internal MCRObjectId- and XML-vector
  * fron a XML input stream with following form:<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result&gt;<br>
@@ -124,10 +137,10 @@ private static String ERRORTEXT =
  * @exception MCRConfigurationException      
  *                              an Exception of MyCoRe Configuration
  **/
-public MCRQueryResult(String xmlstream) 
+public final void setFromXMLResultStream(String xmlstream) 
   {
   NL = System.getProperty("line.separator");
-  MCRConfiguration config = MCRConfiguration.instance();
+  config = MCRConfiguration.instance();
   vec_max_length = config.getInt("MCR.query_max_results",10);
   mcr_result = new Vector(vec_max_length);
   mcr_xml = new Vector(vec_max_length);
@@ -137,7 +150,7 @@ public MCRQueryResult(String xmlstream)
   int itagresultse = xmlstream.indexOf(TAG_RESULTS_E,itagresultss);
   if (itagresultse == -1) { throw new MCRException(ERRORTEXT); }
   int itagresults = xmlstream.indexOf(TAG_RESULT_S,itagresultss);
-  if (itagresults == -1) { throw new MCRException(ERRORTEXT); }
+  if (itagresults == -1) { return; }
   int ltagresulte = TAG_RESULT_E.length();
   int itagresulte = 0;
   int itagmcrids = 0;

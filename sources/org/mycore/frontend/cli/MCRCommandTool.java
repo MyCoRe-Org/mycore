@@ -42,7 +42,6 @@ import mycore.datamodel.*;
  * <li> delete an object from the datastore
  * <li> show an object from the datastore
  * <li> update an object in the datastore
- * <li> query to objects in the datastore
  * <li> getid to get the next MCRObjectId
  * </ul>
  *
@@ -66,7 +65,6 @@ private static String SLASH = new String((System.getProperties())
  * <li> to delete - java MCRCommandTool delete object_id
  * <li> to show   - java MCRCommandTool show object_id
  * <li> to update - java MCRCommandTool load [dir|file]
- * <li> to query  - java MCRCommandTool query type query
  * <li> to getid  - java MCRCommandTool getid MCRObjectId.Base()
  * </ul>
  **/
@@ -93,14 +91,12 @@ public static void main(String[] args)
   if (args[0].equals("load")) { todo = 2; }
   if (args[0].equals("show")) { todo = 3; }
   if (args[0].equals("update")) { todo = 4; }
-  if (args[0].equals("query")) { todo = 5; }
   if (args[0].equals("getid")) { todo = 6; }
   switch(todo) {
     case 1: delete(args); break;
     case 2: load(args); break;
     case 3: show(args); break;
     case 4: update(args); break;
-    case 5: query(args); break;
     case 6: getid(args); break;
     default : usage(); System.exit(1);
     }
@@ -123,8 +119,6 @@ private static final void usage()
     ("        java MCRCommandTool show object_id");
   System.out.println
     ("        java MCRCommandTool update [dir|file]");
-  System.out.println
-    ("        java MCRCommandTool query type query");
   System.out.println
     ("        java MCRCommandTool getid base_id");
   System.out.println(); 
@@ -319,34 +313,6 @@ private static final void update(String[] args)
     System.out.println("No valid *.xml file was found.");
     System.out.println();
     System.exit(1); }
-  }
-
-/**
- * This methode shows a list of MCRObjectID's as result of the query.
- * 
- * @param args   the argument stack from the command line
- **/
-private static final void query(String[] args)
-  {
-  if(args[1] == null) { 
-    System.out.println("Error, missing the 2nd argument (type).");
-    usage();
-    System.exit(1); }
-  if(args[2] == null) { 
-    System.out.println("Error, missing the 3nd argument (query string).");
-    usage();
-    System.exit(1); }
-  try {
-    String type = args[1];
-    StringBuffer query = new StringBuffer(args[2]);
-    for (int i=3;i<args.length;i++)
-    { query.append(' ').append(args[i]); }
-    MCRQueryResult mycore_obj = new MCRQueryResult(type,query.toString());
-    mycore_obj.debug();
-    }
-  catch (Exception e) {
-    System.out.println("\n"+e.getMessage());
-    System.out.println("Query for "+args[1]+" ignored.\n"); System.exit(1); }
   }
 
 /**
