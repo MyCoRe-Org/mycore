@@ -27,6 +27,8 @@ package org.mycore.frontend.editor2;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -125,10 +127,10 @@ public class MCREditorServlet extends MCRServlet
   }
 
   private void sendToDebug( HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub )
-    throws IOException
+    throws IOException, UnsupportedEncodingException
   {
     res.setContentType( "text/plain; charset=UTF-8" );
-    PrintWriter pw = new PrintWriter( res.getOutputStream() );
+    PrintWriter pw = new PrintWriter( new OutputStreamWriter( res.getOutputStream(), "UTF-8" ) );
 
     for( int i = 0; i < sub.getVariables().size(); i++ )
     {
@@ -148,7 +150,10 @@ public class MCREditorServlet extends MCRServlet
     Document xml = sub.getXML();
     
     XMLOutputter outputter = new XMLOutputter();
-    outputter.setFormat(Format.getPrettyFormat());
+    Format fmt = Format.getPrettyFormat();
+    fmt.setOmitDeclaration( true );
+    fmt.setEncoding( "UTF-8" );
+    outputter.setFormat( fmt );
     outputter.output( xml, pw );
 
     pw.close();
