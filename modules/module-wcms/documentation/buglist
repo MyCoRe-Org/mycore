@@ -7,4 +7,3 @@ Admin interface:
 #091.002 content templates doesn't work
 #091.003 mixed xhtml (xhtml + special tags) is not working together with JTidy
 #091.004 invalid xhtml won't be saved, some times content gets lost
-#091.005 translate modus: content of foreign lang is mixed with default one
