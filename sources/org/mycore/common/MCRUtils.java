@@ -351,9 +351,9 @@ public class MCRUtils {
 	 */
 	public static final String[] getStringArray(Object[] objects){
 		String[] returns=new String[objects.length];
-		for (int i=0;i<objects.length,i++)
+		for (int i=0;i<objects.length;i++)
 			returns[i]=objects[i].toString();
-		return returns
+		return returns;
 	}
 
 	/**
