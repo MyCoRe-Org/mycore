@@ -109,7 +109,11 @@ public class MCRXMLDBConnectionPool
 			// try to create database
 			if (config.getString(CONF_PREFIX + "database_create", "true")
 					.equals("true")) {
-				Collection col = DatabaseManager.getCollection(CONNECTION_STRING);
+				Collection col = null;
+				if (USER != null) 
+					col = DatabaseManager.getCollection(CONNECTION_STRING,USER,PASSWD);
+				else
+					col = DatabaseManager.getCollection(CONNECTION_STRING);
 				int i = CONNECTION_STRING.lastIndexOf("/");
 				String uri,collname;
 				if (i != -1) {
