@@ -105,6 +105,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "login {0}",
       "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "whoami",
+      "org.mycore.frontend.cli.MCRCommandLineInterface.whoami" );
 
     // *************************************************
     // Commands for object management
@@ -290,7 +293,7 @@ public class MCRCommandLineInterface
     StringTokenizer st = new StringTokenizer(externals,",");
     while (st.hasMoreTokens()) {
       String classname = st.nextToken();
-      logger.info("Will load commands from the external class "+classname);
+      logger.debug("Will load commands from the external class "+classname);
       Object obj = new Object();
       try {
         obj = Class.forName(classname).newInstance();
@@ -298,7 +301,7 @@ public class MCRCommandLineInterface
         for (int i=0;i<ar.size();i+=2) {
           knownCommands[ numCommands++ ] = new MCRCommand(session,
             (String)ar.get(i),(String)ar.get(i+1));
-          logger.info("Add command '"+(String)ar.get(i)+"'");
+          logger.debug("Add command '"+(String)ar.get(i)+"'");
           }
         }
       catch (ClassNotFoundException e) {
@@ -495,6 +498,12 @@ public class MCRCommandLineInterface
     showOutput( p.getInputStream() );
     showOutput( p.getErrorStream() );
     }
+
+ /**
+  * The method print the current user.
+  **/
+  public static void whoami()
+    { logger.info("You are user "+session.getCurrentUserID()); }
 
  /**
   * This command change the user of the session context to a new user.
