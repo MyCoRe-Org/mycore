@@ -825,13 +825,19 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	int elementCounter = 0;
 	    	
 	    	List tokenElements = new ArrayList();
+	    	List specs = new ArrayList();
 	    	
 	    	while (iterator.hasNext()) {
-	    		elementCounter++;
 	    		String[] set = (String[]) iterator.next();
 	    		
 	            Element eSet = new Element("set", ns);
 	            eSet = setSpec(eSet, set[0], ns);
+	            String content = eSet.getChildText("setSpec", ns);
+	            if (specs.contains(content)) {
+	            	continue;
+	            }
+	            specs.add(content);
+	    		elementCounter++;
     	        if (set[1].length() > 0) {
     	        	eSet.addContent(newElementWithContent("setName", ns, set[1]));
     	        } else {
