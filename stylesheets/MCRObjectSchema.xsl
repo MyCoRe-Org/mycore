@@ -26,9 +26,9 @@
             elementFormDefault="unqualified">
 
  <xsd:import namespace='http://www.w3.org/XML/1998/namespace'
-              schemaLocation='{$mycore_home}/schema/xml-2001.xsd'/> 
+              schemaLocation='./xml-2001.xsd'/> 
  <xsd:import namespace="http://www.w3.org/1999/xlink"
-              schemaLocation="{$mycore_home}/schema/xlinks-2001.xsd" />
+              schemaLocation="./xlinks-2001.xsd" />
 
  <xsl:variable name="var" select="/configuration/@type" />
  <xsl:choose>
