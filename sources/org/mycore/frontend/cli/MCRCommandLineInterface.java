@@ -353,7 +353,11 @@ public class MCRCommandLineInterface
       if( ex instanceof InvocationTargetException ) {
         Throwable t = ( (InvocationTargetException)ex ).getTargetException();
         logger.error(t.getMessage());
+System.out.println("--------------------------------------");
+        t.printStackTrace();
+System.out.println("--------------------------------------");
         logger.debug( MCRException.getStackTraceAsString((Exception)t));
+System.out.println("--------------------------------------");
         logger.error( "" );
         }
       else {

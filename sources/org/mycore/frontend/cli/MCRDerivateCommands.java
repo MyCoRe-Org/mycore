@@ -190,18 +190,20 @@ public class MCRDerivateCommands
       logger.warn( file + " ignored, is not a file." );
       return false;
       }
-    logger.info( "Reading file " + file + " ...\n" );
+    logger.info( "Reading file " + file + " ..." );
     try {
       MCRDerivate mycore_obj = new MCRDerivate();
       mycore_obj.setFromURI( file );
       logger.info( "Label --> " + mycore_obj.getLabel() );
       if( update ) {
         mycore_obj.updateInDatastore();
-        logger.info( mycore_obj.getId().getId() + " updated.\n" );
+        logger.info( mycore_obj.getId().getId() + " updated." );
+        logger.info("");
         }
       else {
         mycore_obj.createInDatastore();
-        logger.info( mycore_obj.getId().getId() + " loaded.\n" );
+        logger.info( mycore_obj.getId().getId() + " loaded." );
+        logger.info("");
         }
       return true;
       }
