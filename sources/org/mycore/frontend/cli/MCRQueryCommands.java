@@ -93,12 +93,10 @@ public static void queryRemote( String type, String query )
     logger.info("Query      = " + query );
 
     MCRQueryResult result = new MCRQueryResult();
-    MCRXMLContainer resarray = null;
+    MCRXMLContainer resarray = new MCRXMLContainer();
 
     if( type.equals( "class" ) ) // classifications
     {
-      resarray = new MCRXMLContainer();
-
       String squence = config.getString(
         "MCR.classifications_search_sequence", "remote-local" );
       synchronized(resarray){
