@@ -208,6 +208,7 @@ public class MCRSQLConnection
   public static MCRSQLRowReader justDoQuery( String query )
     throws MCRPersistenceException
   {
+//    System.out.println("MCRSQLRowReader justDoQuery: " + query);    
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try{ return c.doQuery( query ); }
     finally{ c.release(); }
@@ -272,22 +273,29 @@ public class MCRSQLConnection
   }
   
   /**
-   * Checks existence of table in MySQL
+   * Checks existence of table
    *
    * @param tablename 
    * @return true or false
    **/  
-  public static boolean MySQLTableExist( String tablename )
+  public static boolean doesTableExist( String tablename )
     throws MCRPersistenceException
   {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    MCRSQLConnection c  = MCRSQLConnectionPool.instance().getConnection();
     try{ 
-        String query = "SHOW TABLES LIKE '" + tablename + "'";
-        String count = c.getSingleValue( query );
-        System.out.println( "MCRSQLConnection getSingleValue: " + count + " query " + query );
-        return( count == null ? false : true );
+        String [] tableTypes  = { "TABLE" };
+        DatabaseMetaData dbmd = c.getJDBCConnection().getMetaData();
+        ResultSet resultSet   = dbmd.getTables(null, null, tablename, tableTypes); 
+        int recordCount = 0;
+        while (resultSet.next()) {
+         ++recordCount;
+        } 
+        return( recordCount != 0 );
        }
-    finally{ c.release(); }
+    catch( Exception exc )
+    { throw new MCRPersistenceException( "Error while checking existence of table " + tablename, exc ); }
+    finally
+    { c.release(); }
   }
 
 }
