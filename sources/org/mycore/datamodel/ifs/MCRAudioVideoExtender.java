@@ -397,11 +397,7 @@ public abstract class MCRAudioVideoExtender
     throws IOException
   {
     InputStream in = connection.getInputStream(); 
-    byte[] buffer = new byte[ 8192 ];
-
-    for( int bytes; ( bytes = in.read( buffer, 0, buffer.length ) ) != -1; )
-      out.write( buffer, 0, bytes );
-      
+    MCRUtils.copyStream( in, out );
     out.close();
   }
   

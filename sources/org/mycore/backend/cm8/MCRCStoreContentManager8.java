@@ -149,14 +149,8 @@ public void retrieveContent( MCRFileReader file, OutputStream target )
     ddo.retrieve(DK_CM_CONTENT_NO);
     String url = ddo.getContentURL(-1,-1,-1);
     logger.debug("URL = "+url);
-    URL content = new URL(url);
-    InputStream is = content.openStream();
-    int bufsize = 65536;
-    byte [] buf = new byte[bufsize];
-    int inread;
-    while ((inread = is.read(buf,0,bufsize)) != -1) { 
-      logger.debug("Read length = "+inread);
-      target.write(buf,0,inread); }
+    InputStream is = new URL( url ).openStream();
+    MCRUtils.copyStream( is, target );
     logger.debug("The file was retrieved from CM8 Ressource Manager.");
     }
   catch( Exception ex ) {

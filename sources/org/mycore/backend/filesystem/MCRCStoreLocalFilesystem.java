@@ -109,7 +109,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
       
       File local = new File( dir, fileID );
       OutputStream out = new BufferedOutputStream( new FileOutputStream( local ) );
-      copy( source, out );
+      MCRUtils.copyStream( source, out );
       out.close();
       
       return storageID.toString();
@@ -161,23 +161,13 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     { 
       File local = new File( baseDir, file.getStorageID() );
       InputStream in = new BufferedInputStream( new FileInputStream( local ) );
-      copy( in, target );
+      MCRUtils.copyStream( in, target );
     }
     catch( Exception exc )
     {
       String msg = "Could not get content of stored file to output stream: " + file.getStorageID();
       throw new MCRPersistenceException( msg, exc );
     }
-  }
-  
-  protected void copy( InputStream in, OutputStream out )
-    throws IOException
-  {
-    byte[] buffer = new byte[ 65536 ] ;
-    int num;
-      
-    while( ( num = in.read( buffer ) ) != -1 )
-      out.write( buffer, 0, num );
   }
 }
 

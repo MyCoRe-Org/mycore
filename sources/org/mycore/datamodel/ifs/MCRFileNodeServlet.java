@@ -223,8 +223,7 @@ private ArrayList remoteAliasList = null;
       if(!headercontext.equals("text/xml")) {
         res.setContentType(headercontext);
         OutputStream out = new BufferedOutputStream( res.getOutputStream() );
-        int inread;
-        while ((inread = in.read()) != -1) { out.write(inread); }
+        MCRUtils.copyStream( in, out );
         out.close();
         return;
         }
