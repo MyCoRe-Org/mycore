@@ -46,13 +46,9 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-     <xsd:simpleContent>
-       <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" type="xsd:string" />
-         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" />
-       </xsd:extension>
-     </xsd:simpleContent>
+    <xsd:sequence>
+     <xsd:any processContents="skip"/>
+    </xsd:sequence>
    </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
