@@ -179,8 +179,8 @@ public final MCRObjectStructure getStructure()
 
 /**
  * <em>addUniLinkTo</em> creates an unidirectional link to another object.
- * Note: An unidirectional link cannot occur twice with the same destination,
- *       label and href, resp. !
+ * Note: An unidirectional link cannot occur twice with the same destination
+ *       and label, resp. !
  * 
  * @param dest                  the link's destination MCRObject
  * @param label                 the link's label
@@ -197,28 +197,29 @@ public final boolean addUniLinkTo (MCRObject dest, String label, String title)
  *
  * @param dest                  the link's destination MCRObject
  * @param label                 the link's label
- * @param title                 the link's title
  * @return                      true, if operation successfully completed
  */
-public final boolean removeUniLinkTo (MCRObject dest, String label, String title)
+public final boolean removeUniLinkTo (MCRObject dest, String label)
 {
-  return mcr_struct.removeUniLinkTo(dest.mcr_id.getId(), label, title);
+  return mcr_struct.removeUniLinkTo(dest.mcr_id.getId(), label);
 }
 
 /**
  * <em>addBiLinkTo</em> creates a bidirectional link to another object.
- * Note: A bidirectional link cannot occur twice with the same destination,
- *       label and href, resp. !
+ * Note: A bidirectional link cannot occur twice with the same destination
+ *       and label, resp. !
  * 
  * @param dest                  the link's destination MCRObject
  * @param label                 the link's label
- * @param title                 the link's title
+ * @param titleTo               the linkTo's title
+ * @param titleFrom             the linkFrom's title
  * @return                      true, if operation successfully completed
  */
-public final boolean addBiLinkTo (MCRObject dest, String label, String title)
+public final boolean addBiLinkTo (MCRObject dest, String label,
+                                  String titleTo, String titleFrom)
 {
-	return mcr_struct.addLinkTo(dest.mcr_id.getId(), label, title)
-	  && dest.mcr_struct.addLinkFrom(mcr_id.getId(), label, title);
+	return mcr_struct.addLinkTo(dest.mcr_id.getId(), label, titleTo)
+	  && dest.mcr_struct.addLinkFrom(mcr_id.getId(), label, titleFrom);
 }
 
 /** <em>removeBiLinkTo</em> removes a bidirectional link. If the link was
@@ -226,13 +227,12 @@ public final boolean addBiLinkTo (MCRObject dest, String label, String title)
  *
  * @param dest                  the link's destination MCRObject
  * @param label                 the link's label
- * @param title                 the link's title
  * @return                      true, if operation successfully completed
  */
-public final boolean removeBiLinkTo (MCRObject dest, String label, String title)
+public final boolean removeBiLinkTo (MCRObject dest, String label)
 {
-  return mcr_struct.removeLinkTo(dest.mcr_id.getId(), label, title)
-    && dest.mcr_struct.removeLinkFrom(mcr_id.getId(), label, title);
+  return mcr_struct.removeLinkTo(dest.mcr_id.getId(), label)
+    && dest.mcr_struct.removeLinkFrom(mcr_id.getId(), label);
 }
 
 /**
@@ -244,14 +244,16 @@ public final boolean removeBiLinkTo (MCRObject dest, String label, String title)
  * 
  * @param child                 the child MCRObject
  * @param label                 the link's label
- * @param title                 the link's title
+ * @param titleChild            the child link's title
+ * @param titleParent           the parent's title
  * @return                      true, if operation successfully completed
  * @exception MCRException      thrown for multiple inheritance request
  */
-public final boolean addChild (MCRObject child, String label, String title)
+public final boolean addChild (MCRObject child, String label,
+                               String titleChild, String titleParent)
   throws MCRException
 {
-  boolean flag = mcr_struct.addChild(child.mcr_id.getId(), label, title);
+  boolean flag = mcr_struct.addChild(child.mcr_id.getId(), label, titleChild);
   Vector inh_metadata = new Vector();
   inh_metadata.addElement(mcr_metadata.getHeritableMetadata());
   Vector inh_fore = mcr_struct.getInheritedMetadata();
@@ -261,7 +263,7 @@ public final boolean addChild (MCRObject child, String label, String title)
       inh_metadata.addElement((MCRObjectMetadata) inh_fore.elementAt(i));
   }
   return flag &&
-    child.mcr_struct.setParent(mcr_id.getId(), label, title, inh_metadata);
+    child.mcr_struct.setParent(mcr_id.getId(), label, titleParent, inh_metadata);
 }
 
 /** <em>removeChild</em> removes a child link. If the link was

@@ -52,6 +52,10 @@ import mycore.common.MCRException;
  * heritable metadata will be inherited and so on.
  * Note, that it is impossible to inherit metadata from multiple parents.
  * In cases of multiple inheritance request, an exception is thrown.
+ * The xlink:label attribute can be used to group the links into folders
+ * while the xlink:title's use is free. A link cannot occur twice from the same
+ * object to the same href with the same label (preventing from doubled
+ * links).
  * Not supported by this class are links from or to a defined place
  * of a document (inner structure and combination of inner and outer
  * structures of the objects). This will possibly be done in a later
@@ -89,7 +93,7 @@ public class MCRObjectStructure
   
   /**
    * <em>areIdentLocators</em> checks whether two given MCRMetaLink's have
-   * identical href, label and title.
+   * identical href and label.
    * If so, a "true" will be returned, otherwise "false".
    * 
    * @param link1        1st link in comparison
@@ -106,11 +110,6 @@ public class MCRObjectStructure
 	  String label2 = link2.getXLinkLabel();
 	  if (label2 == null) label2 = "";
 	  if (! label1.equals(label2)) return false;
-	  String title1 = link1.getXLinkTitle();
-	  if (title1 == null) title1 = "";
-	  String title2 = link2.getXLinkTitle();
-	  if (title2 == null) title2 = "";
-	  if (! title1.equals(title2)) return false;
 	  return true;
   }
   
@@ -167,12 +166,11 @@ public class MCRObjectStructure
    *
    * @param href                 the MCRObjectID string of the linked object
    * @param label                the link's label
-   * @param title                the link's title
    * @return boolean             true, if operation successfully completed
    */
-  final boolean removeUniLinkTo (String href, String label, String title)
+  final boolean removeUniLinkTo (String href, String label)
   {
-	  MCRMetaLink link = createLink("uniLinkTo", href, label, title);
+	  MCRMetaLink link = createLink("uniLinkTo", href, label, "");
 	  int i, n = uniLinksTo.size();
 	  for (i = 0; i < n; ++i)
 		  if (areIdentLocators((MCRMetaLink) uniLinksTo.elementAt(i), link))
@@ -212,12 +210,11 @@ public class MCRObjectStructure
    *
    * @param href                 the MCRObjectID string of the linked object
    * @param label                the link's label
-   * @param title                the link's title
    * @return boolean             true, if operation successfully completed
    */
-  final boolean removeLinkTo (String href, String label, String title)
+  final boolean removeLinkTo (String href, String label)
   {
-	  MCRMetaLink link = createLink("linkTo", href, label, title);
+	  MCRMetaLink link = createLink("linkTo", href, label, "");
 	  int i, n = linksTo.size();
 	  for (i = 0; i < n; ++i)
 		  if (areIdentLocators((MCRMetaLink) linksTo.elementAt(i), link))
@@ -256,12 +253,11 @@ public class MCRObjectStructure
    *
    * @param href                 the MCRObjectID string of the linked object
    * @param label                the link's label
-   * @param title                the link's title
    * @return boolean             true, if operation successfully completed
    */
-  final boolean removeLinkFrom (String href, String label, String title)
+  final boolean removeLinkFrom (String href, String label)
   {
-	  MCRMetaLink link = createLink("linkFrom", href, label, title);
+	  MCRMetaLink link = createLink("linkFrom", href, label, "");
 	  int i, n = linksFrom.size();
 	  for (i = 0; i < n; ++i)
 		  if (areIdentLocators((MCRMetaLink) linksFrom.elementAt(i), link))
