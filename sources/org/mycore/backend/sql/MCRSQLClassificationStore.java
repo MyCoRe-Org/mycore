@@ -56,6 +56,7 @@ private int lengthClassID = MCRMetaClassification.MAX_CLASSID_LENGTH;
 private int lengthCategID = MCRMetaClassification.MAX_CATEGID_LENGTH;
 private int lengthLang    = MCRClassificationObject.MAX_CLASSIFICATION_LANG;
 private int lengthText    = MCRClassificationObject.MAX_CLASSIFICATION_TEXT;
+private int lengthURL     = MCRClassificationObject.MAX_CATEGORY_URL;
 private int lengthDescription = MCRClassificationObject
     .MAX_CLASSIFICATION_DESCRIPTION;
 
@@ -135,12 +136,10 @@ private final void createCateg()
   try { 
     // the category table
     c.doUpdate( new MCRSQLStatement( tableCateg )
-     .addColumn( "ID VARCHAR("+Integer.toString(lengthCategID)+
-       ") NOT NULL" )
-     .addColumn( "CLID VARCHAR("+Integer.toString(lengthClassID)+
-       ") NOT NULL" )
-     .addColumn( "PID VARCHAR("+Integer.toString(lengthCategID)+
-       ")" )
+     .addColumn( "ID VARCHAR("+Integer.toString(lengthCategID)+") NOT NULL" )
+     .addColumn( "CLID VARCHAR("+Integer.toString(lengthClassID)+") NOT NULL" )
+     .addColumn( "PID VARCHAR("+Integer.toString(lengthCategID)+")" )
+     .addColumn( "URL VARCHAR("+Integer.toString(lengthURL)+")" )
      .addColumn( "PRIMARY KEY ( CLID, ID )" )
      .toCreateTableStatement() );
     }
@@ -283,11 +282,21 @@ public final boolean classificationItemExists( String ID )
  **/
 public final void createCategoryItem( MCRCategoryItem category )
   {
-  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
+  try {
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
+    .setValue( "ID",    category.getID()               )
+    .setValue( "CLID",  category.getClassificationID() )
+    .setValue( "PID",   category.getParentID()         )
+    .setValue( "URL",   category.getURL()         )
+    .toInsertStatement() );
+    }
+  catch (Exception e) {
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
     .setValue( "ID",    category.getID()               )
     .setValue( "CLID",  category.getClassificationID() )
     .setValue( "PID",   category.getParentID()         )
     .toInsertStatement() );
+    }
   for (int i=0;i<category.getSize();i++) {
     MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCategLabel )
       .setValue( "ID",    category.getID() )
@@ -332,7 +341,11 @@ public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
     .toSelectStatement() );
   if( ! reader.next() ) return null;
   String PID = reader.getString( "PID"   );
+  String URL = "";
+  try { URL = reader.getString( "URL" ); } catch(Exception e) { URL = ""; }
+  if (URL == null) { URL = ""; }
   MCRCategoryItem c = new MCRCategoryItem( ID, CLID, PID );
+  c.setURL(URL);
   reader = MCRSQLConnection.justDoQuery( 
     new MCRSQLStatement( tableCategLabel )
     .setCondition( "ID",   ID   )
@@ -369,6 +382,16 @@ public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID,
   String desc = reader.getString( "MCRDESC" );
   MCRCategoryItem c = new MCRCategoryItem( ID, CLID, "" );
   c.addData(lang,text,desc);
+  reader = MCRSQLConnection.justDoQuery( 
+    new MCRSQLStatement( tableCateg )
+    .setCondition( "ID",   ID   )
+    .setCondition( "CLID", CLID )
+    .toSelectStatement() );
+  if( ! reader.next() ) return null;
+  String URL = "";
+  try { URL = reader.getString( "URL" ); } catch(Exception e) { URL = ""; }
+  if (URL == null) { URL = ""; }
+  c.setURL(URL);
   return c;
   }
 
@@ -404,7 +427,11 @@ public final ArrayList retrieveChildren( String CLID, String PID )
     .toSelectStatement() );
   while( reader.next() ) {
     String ID    = reader.getString( "ID"    );
+    String URL   = "";
+    try { URL = reader.getString( "URL" ); } catch(Exception e) { URL = ""; }
+    if (URL == null) { URL = ""; }
     MCRCategoryItem child = new MCRCategoryItem( ID, CLID, PID );
+    child.setURL(URL);
     children.add( child );
     }
   for (int i=0;i<children.size();i++) {

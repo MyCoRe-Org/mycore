@@ -45,6 +45,8 @@ public abstract class MCRClassificationObject
   public static final int MAX_CLASSIFICATION_TEXT = 254;
   /** The length of the description **/
   public static final int MAX_CLASSIFICATION_DESCRIPTION = 254;
+  /** The length of the URL **/
+  public static final int MAX_CATEGORY_URL = 254;
 
   protected String    ID;
   protected ArrayList lang;

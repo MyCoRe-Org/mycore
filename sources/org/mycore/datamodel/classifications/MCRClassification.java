@@ -124,7 +124,14 @@ private ArrayList cat;
           ci.addData(lang,text,desc);
           }
         else {
-          catflag = true; }
+          if (tag.getName().equals("url")) {
+            String url = tag.getAttributeValue("href",
+              org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            ci.setURL(url);
+            }
+          else {
+            catflag = true; }
+          }
         }
       cat.add(ci);
       if (catflag) {
@@ -262,6 +269,8 @@ private ArrayList cat;
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
       MCRDefaults.XSI_URL));
+    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+      MCRDefaults.XLINK_URL));
     String mcr_schema_path = "MCRClassification.xsd";
     elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
       org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
@@ -292,6 +301,12 @@ private ArrayList cat;
       list[deep+1].setAttribute("counter",Integer.toString(cou));
       for (int i=0;i<ci.getSize();i++) {
         list[deep+1].addContent(ci.getJDOMElement(i)); }
+      if (ci.getURL().length() != 0) {
+        org.jdom.Element u = new org.jdom.Element("url");
+        u.setAttribute("href",ci.getURL(),
+         org.jdom.Namespace.getNamespace("xlink",MCRDefaults.XLINK_URL));
+        list[deep+1].addContent(u);
+        }
       list[deep].addContent(list[deep+1]);
       if (ci.hasChildren()) {
         catlist [deep+1] = ci.getChildren();
@@ -332,6 +347,10 @@ private ArrayList cat;
     MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
+    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+      MCRDefaults.XSI_URL));
+    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+      MCRDefaults.XLINK_URL));
     elm.setAttribute("ID",classID);
     org.jdom.Element cats = new org.jdom.Element("categories");
     // get the classification
@@ -349,6 +368,12 @@ private ArrayList cat;
         cat.setAttribute("counter",Integer.toString(cou));
         for (int i=0;i<ci.getSize();i++) {
           cat.addContent(ci.getJDOMElement(i)); }
+        if (ci.getURL().length() != 0) {
+          org.jdom.Element u = new org.jdom.Element("url");
+          u.setAttribute("href",ci.getURL(),
+            org.jdom.Namespace.getNamespace("xlink",MCRDefaults.XLINK_URL));
+          cat.addContent(u);
+          }
         cats.addContent(cat);
         }
       }

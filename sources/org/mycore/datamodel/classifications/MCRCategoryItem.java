@@ -38,6 +38,7 @@ public class MCRCategoryItem extends MCRClassificationObject
   {
   protected String parentID;
   protected String classifID;
+  protected String URL;
     
   /**
    * The constructor to fill this item.
@@ -54,6 +55,7 @@ public class MCRCategoryItem extends MCRClassificationObject
       "A category ID can not be the same as its classification ID" );
     if( parent instanceof MCRCategoryItem) this.parentID  = parent.ID;
     if( parent.childrenIDs != null ) parent.childrenIDs = null;
+    URL = "";
     }
   
   /**
@@ -68,6 +70,7 @@ public class MCRCategoryItem extends MCRClassificationObject
     super( ID );
     this.classifID = classifID;
     this.parentID  = parentID;
+    URL = "";
     }
 
   /**
@@ -152,14 +155,34 @@ public class MCRCategoryItem extends MCRClassificationObject
     }
 
   /**
+   * The method returns the URL string.
+   *
+   * @return the URL string
+   **/
+  public final String getURL()
+  { return URL; }
+
+  /**
+   * The method set the URL string.
+   *
+   * @param url the URL string
+   **/
+  public final void setURL(String url)
+  {
+  if (url == null) { URL = ""; return; }
+  URL = url;
+  }
+
+  /**
    * Put all data to a string
    **/
-  public String toString()
+  public final String toString()
   {
     StringBuffer sb = new StringBuffer( );
     sb.append( "Classification: " ).append( classifID ).append( "\n" );
     sb.append( "Parent ID:      " ).append( parentID  ).append( "\n" );
     sb.append(super.toString());
+    sb.append( "URL             " ).append( URL  ).append( "\n" );
     return sb.toString();
   }
 }
