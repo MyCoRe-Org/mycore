@@ -11,21 +11,11 @@
 
 	<property name="build.sysclasspath" value="last" />
 
-	<!-- Provide a default value for MYCORE_HOME if not set in env -->
-	<property name="env.MYCORE_HOME" value="/home/mcrclient/workspace/mycore" />
-
-	<!-- Provide a default value for DOCPORTAL_HOME if not set in env -->
-	<property name="env.DOCPORTAL_HOME" value="/home/mcrclient/workspace/docportal" />
-
-	<!-- Provide a default value for MYCORESAMPLE_HOME if not set -->
-	<property name="env.MYCORESAMPLE_HOME" value="/home/mcrclient/workspace/mycoresample" />
-
 	<!-- ============================================== -->
 
 	<target name="usage">
 		<echo>
       All targets are internal!
-	  Use $MYCORE_HOME/modules/module-wcms/build.xml
 		</echo>
 	</target>
 
@@ -42,29 +32,29 @@
 	           Pluging MyCoReWCMS-Module into DocPortal...
 	    </echo>
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/archive" preservelastmodified="yes">
-	        	<fileset dir="aif/archive" />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/archive" />
    		</copy>			
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/config" preservelastmodified="yes">
-	        	<fileset dir="aif/config" />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/config" />
    		</copy>			
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/web/admin" preservelastmodified="yes">
-	        	<fileset dir="aif/web/admin" />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/web/admin" />
    		</copy>			
 		
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif" preservelastmodified="yes">
-	        	<fileset dir="uif"  />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/uif"  />
    		</copy>					
 	    <delete dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/templates"    />		
 		
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/templates" preservelastmodified="yes">
-	        	<fileset dir="uif/templates" />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/uif/templates" />
    		</copy>							
 		<copy todir="${env.DOCPORTAL_HOME}/stylesheets/modules/module-wcms" preservelastmodified="yes">
-	        	<fileset dir="appsSupport/DocPortal/uif/xsl" includes="*.xsl" />
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/appsSupport/DocPortal/uif/xsl" includes="*.xsl" />
    		</copy>					
 
 		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms" preservelastmodified="yes">
-	        	<fileset dir="appsSupport/DocPortal/install" >
+	        	<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/appsSupport/DocPortal" >
 	                <include name="build.xml"/>
 	              </fileset>			
    		</copy>									
@@ -134,6 +124,14 @@
 				<include name="jtidy.jar" />
 			</fileset>
 		</copy>		
+
+		<!-- copy config file -->
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/classes/mycore.properties.wcms" />		
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/classes" preservelastmodified="yes">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/config">
+				<include name="mycore.properties.wcms" />
+			</fileset>
+		</copy>				
 		
 		<!-- ===================== copy right xsl ========================== -->
 		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReLayout.xsl" />
