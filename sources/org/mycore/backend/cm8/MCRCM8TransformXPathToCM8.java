@@ -95,7 +95,7 @@ public final MCRXMLContainer startQuery(String type)
   StringBuffer query = new StringBuffer(1024);
   query.append('/').append(itemtypename); 
   if (cond.toString().trim().length() > 0) {
-    query.append('[').append(cond).append(']'); }
+    query.append('[').append(cond.toString()).append(']'); }
   logger.debug("Transformed query "+query);
   // Start the search
   DKDatastoreICM connection = null;
