@@ -154,7 +154,7 @@ System.out.println("Results :"+rsc.cardinality());
       dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
       id = (String) resitem.getData(dataId);
 System.out.println(itemtypeprefix+"ID :"+id);
-      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,"xml");     
+      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");     
       xml = (byte []) resitem.getData(dataId);
       result.add("local",id,rank,xml);
       }
@@ -341,7 +341,9 @@ private final String traceOneCondition(String cond, String itemtypename,
             .append(tag[i].substring(j,k)); break;
           }
         }
-      sbout.append(itemtypeprefix).append(tag[i].substring(j,l)).append('/');
+      if (!tag[i].substring(j,l).equals("*")) {
+        sbout.append(itemtypeprefix); }
+      sbout.append(tag[i].substring(j,l)).append('/');
       m = j; n = l;
       j = l+1; 
       }
