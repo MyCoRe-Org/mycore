@@ -134,12 +134,15 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	 * @see org.mycore.common.xml.MCRXMLSortInterface#sort(boolean)
 	 */
 	public Object[] sort(boolean reversed) throws MCRException {
-		if (ObjectPool.size()==0)
-			throw new MCRException("ObjectPool is empty!\n What should I sort?");
+		if (ObjectPool.size()==0){
+			//throw new MCRException("ObjectPool is empty!\n What should I sort?");
+			System.err.println("MCRXMLSorter: ObjectPool is empty!\n What should I sort?");
+			return ObjectPool.toArray();
+		}
 		if ((orderList.size()==0) || (sortKeys.size()==0)){
 			//throw new MCRException("List of sorting keys is empty!\n How should I sort?");
 			//maybe the list should returned unsorted here?
-			System.err.println("MCRXMSorter: List of sorting keys is empty!\n How should I sort?");
+			System.err.println("MCRXMLSorter: List of sorting keys is empty!\n How should I sort?");
 			return ObjectPool.toArray();
 		}
 		if (orderList.size()!=sortKeys.size())
