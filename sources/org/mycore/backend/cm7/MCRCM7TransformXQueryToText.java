@@ -158,7 +158,7 @@ private final String getNextCondition(int startpos,int stoppos,String query)
 private final String traceOneCondition(String cond)
   {
   StringBuffer sb = new StringBuffer(128);
-//  System.out.println("ONECOND="+cond);
+  System.out.println("ONECOND="+cond);
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
   if ((klammerauf==-1)||(klammerzu==-1)) { return ""; }
@@ -245,14 +245,14 @@ private final String traceOneCondition(String cond)
       else { tagstart+=5; }
       }
     }
-/*
+
   System.out.println("PRETAG="+pretag);
   for (i=0;i<counter;i++) {
     System.out.println("VALUE="+value[i]);
     System.out.println("OPER="+op[i]);
     System.out.println("TAG="+tag[i]);
     }
-*/
+
   // Check for value as date
   GregorianCalendar date = new GregorianCalendar();
   boolean isdate = false;
@@ -317,9 +317,12 @@ private final String traceOneCondition(String cond)
     return sb.toString();
     }
   // check value of MCRObjectID
-  MCRObjectID mid = new MCRObjectID(value[0]);
-  if (mid.isValid()) {
-    value[0] = mid.getId().replace('_','X'); }
+  try {
+    MCRObjectID mid = new MCRObjectID(value[0]);
+    if (mid.isValid()) {
+      value[0] = mid.getId().replace('_','X'); }
+    }
+  catch (MCRException e) { }
   // text search
   sb.append("($PARA$ {");
   for (i=0;i<counter;i++) {
@@ -341,8 +344,10 @@ private final String traceOneCondition(String cond)
         sb.append(word).append(' '); }
       else {
         sb.append(" $MC=*$ ").append(word).append(' '); }
+      if (i+1 != counter) { sb.append(", "); }
       valuestart = valuestop+1;
       }
+    if (counter > 0) { sb.append(", "); }
     sb.append(" $MC=*$ *").append(pretag).append("XXX");
     if (tag[i].charAt(0)!='.') { 
       sb.append(tag[i]).append("XXX*"); }

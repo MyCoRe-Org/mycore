@@ -92,12 +92,14 @@ public final String createSearchStringText(String part, String tag,
   sb.append(' ');
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX ");
       }
     }
   if (iattrib != null) {
     for (int i=0;i<iattrib.length;i++) {
+      if (iattrib[i]==null) { continue; }
       sb.append("XXX").append(iattrib[i].toUpperCase()).append("XXX")
         .append(ivalue[i].toUpperCase()).append("XXX ");
       }
@@ -139,6 +141,7 @@ public final String createSearchStringDate(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
       sb.append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
@@ -186,15 +189,16 @@ public final String createSearchStringBoolean(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
       sb.append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
   if (bvalue) {
-    sb.append("TRUEXXX"); }
+    sb.append(" TRUE"); }
   else {
-    sb.append("FALSEXXX"); }
+    sb.append(" FALSE"); }
   sb.append(NL);
   return sb.toString();
   }
@@ -231,11 +235,13 @@ public final String createSearchStringDouble(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
       sb.append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
+  sb.append(' ');
   long a = Math.round(number*100.); 
   String binstr = Long.toBinaryString(a);
   String binstrmax = Integer.toBinaryString(MAX_NUMBER_STRING_LENGTH);
@@ -274,6 +280,7 @@ public final String createSearchStringHref(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX ");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX ");
       }
@@ -286,6 +293,7 @@ public final String createSearchStringHref(String part, String tag,
     .append(subtag.toUpperCase()).append("XXX ");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX ");
       }
