@@ -407,5 +407,22 @@ private ArrayList cat;
     else {
       return receiveClassificationAsJDOM(classname); }
     }
+
+  /**
+   * The method return a category ID for the given category label of
+   * a defined classification.
+   *
+   * @param classid the classification id as MCRObjectID
+   * @param labeltext the text of a categoy label
+   * @return the correspondig category ID
+   **/
+  public static final String getCategoyID(MCRObjectID classid, String labeltext)
+    {
+    MCRClassificationItem cl = new MCRClassificationItem(classid);
+    MCRCategoryItem cat = cl.getCategoryItemForLabelText(labeltext);
+    if (cat == null) { return ""; }
+    return cat.getID();
+    }
+
   }
 

@@ -104,6 +104,19 @@ public class MCRClassificationItem extends MCRClassificationObject
     MCRArgumentChecker.ensureNotEmpty( categID, "categID" );  
     return MCRCategoryItem.getCategoryItem( this.ID, categID );
     }  
+
+  /**
+   * The method return a MCRCategoryItem for the given category labeltext.
+   *
+   * @param categID the category label text
+   * @return the MCRCategoryItem
+   **/
+  public MCRCategoryItem getCategoryItemForLabelText( String labeltext )
+    { 
+    ensureNotDeleted();
+    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext" );  
+    return MCRCategoryItem.getCategoryItemForLabelText( this.ID, labeltext );
+    }  
   
   /**
    * The method return a MCRClassificationItem for the given classification ID.

@@ -136,6 +136,22 @@ public class MCRCategoryItem extends MCRClassificationObject
     }
 
   /**
+   * The method return a MCRCategoryItem for the given Classification and
+   * Category label text.
+   *
+   * @param classifID the classification ID
+   * @param labeltext the category label text 
+   * @return a MCRCategoryItem
+   **/
+  public static MCRCategoryItem getCategoryItemForLabelText( String classifID, 
+    String labeltext )
+    {
+    MCRArgumentChecker.ensureNotEmpty( classifID, "classifID" );  
+    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext"   );  
+    return manager().retrieveCategoryItemForLabelText( classifID, labeltext );
+    }
+
+  /**
    * Put all data to a string
    **/
   public String toString()

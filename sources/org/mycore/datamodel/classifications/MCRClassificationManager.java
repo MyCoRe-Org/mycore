@@ -120,6 +120,14 @@ class MCRClassificationManager
     return c;
     }
   
+  MCRCategoryItem retrieveCategoryItemForLabelText( String classifID, 
+    String labeltext )
+    {
+    MCRCategoryItem c = store.retrieveCategoryItemForLabelText( classifID, 
+      labeltext );
+    return c;
+    }
+
   MCRCategoryItem[] retrieveChildren( String classifID, String parentID )
     {
     ArrayList retrieved = store.retrieveChildren( classifID, parentID );

@@ -90,6 +90,15 @@ public interface MCRClassificationInterface
   public MCRCategoryItem retrieveCategoryItem(String CLID, String ID);
   
   /**
+   * The method return a MCRCategoryItem from the datastore.
+   *
+   * @param CLID the ID of the MCRClassificationItem
+   * @param labeltext   the label text of the MCRCategoryItem
+   **/
+  public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID, 
+    String labeltext);
+  
+  /**
    * The method return if the MCRCategoryItem is in the datastore.
    *
    * @param CLID the ID of the MCRClassificationItem
