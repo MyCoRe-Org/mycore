@@ -93,15 +93,15 @@ try
       if ( null != sea && null != name && null != fieldType )
         if ( sea.equals( "true" ) )
         {
-          System.out.println("Search: " + sea + " Name: " + name + " fieldType:" + fieldType );
+          logger.debug("Search: " + sea + " Name: " + name + " fieldType:" + fieldType );
           search.put( name, fieldType );
         }
     }
-    System.out.println("Search size: " + search.size() );
+    logger.debug("Search size: " + search.size() );
   }
   catch (Exception e)
   {
-    System.out.println(e);
+    logger.info(e);
   }
   }
 
@@ -149,7 +149,7 @@ private void addDocumentToLucene( Document doc )
     writer.close();
     writer = null;
    }
-    catch(Exception e) { System.out.println( "error adding to lucene" ); }
+    catch(Exception e) { logger.info( "error adding to lucene" ); }
 }
 
 /**
@@ -164,37 +164,36 @@ private void addDocumentToLucene( Document doc )
     Analyzer analyzer = new GermanAnalyzer();
 
     Query qu = QueryParser.parse("key:"+id, "", analyzer);
-    System.out.println("Searching for: " + qu.toString(""));
+    logger.info("Searching for: " + qu.toString(""));
 
     Hits hits = searcher.search( qu );
       
-    System.out.println("Number of documents found : " + hits.length());
+    logger.info("Number of documents found : " + hits.length());
     if ( 1 == hits.length() )
     {    
-//      System.out.println("NAME: " + hits.doc(0).get("path") + " id: " + hits.id(0) 
-      System.out.println(" id: " + hits.id(0) 
+      logger.info(" id: " + hits.id(0) 
       + " score: " + hits.score(0) + " key: " +  hits.doc(0).get("key") );
       if ( id.equals( hits.doc(0).get("key") ) )
       {    
        IndexReader reader = IndexReader.open( indexDir );
        reader.delete( hits.id(0) ); 
        reader.close();
-       System.out.println("DELETE: " + id);
+       logger.info("DELETE: " + id);
       } 
     }  
 
   }
 
   /**
-   * Builds an index of the content of an MCRFile by reading from an MCRContentInputStream.
+   * Builds an index of the content of an MCRFile object
    *
    * @param file the MCRFile thats content is to be indexed
-   * @param source the ContentInputStream where the file content is read from
+   *
    **/
   protected void doIndexContent( MCRFile file )
     throws MCRException
   {
-    System.out.println( "++++ doIndexContent: " + file.getID() + " Store: " + file.getStoreID( ) +
+    logger.info( "++++ doIndexContent: " + file.getID() + " Store: " + file.getStoreID( ) +
                           " ContentTypeID: " + file.getContentTypeID() );
     List list = trans( file ); 
     if ( null != list)
@@ -206,26 +205,27 @@ private void addDocumentToLucene( Document doc )
   }
 
   /**
-   * Deletes the index of an MCRFile object that is indexed under the given
-   * Storage ID in this indexer instance.
+   * Deletes the index of an MCRFile object
    *
-   * @param storageID the storage ID of the MCRFile object
+   * @param the MCRFile object
    */
   protected void doDeleteIndex( MCRFile file )
     throws MCRException
   {
-    System.out.println( "++++ doDeleteIndex: " + file.getID() + " Store: " + file.getStoreID( ) +
+    logger.info( "++++ doDeleteIndex: " + file.getID() + " Store: " + file.getStoreID( ) +
                           " ContentTypeID: " + file.getContentTypeID() );
     try
     {
       deleteDocument( file.getID(), "String type" );
     }
-    catch( Exception e){ System.out.println( "error deleting from lucene" ); } 
+    catch( Exception e){ logger.info( "error deleting from lucene" ); } 
   }
   
 /**
  * Transforms xml data with stylesheet mcr_make_types.xsl 
- * @param header contains xml data ( size is limited to 64 k!)
+ * @param file the MCRFile to be transformed
+ * 
+ * @return list of childen (typed content)
  * 
  **/
 private List trans( MCRFile file )    
@@ -234,7 +234,8 @@ private List trans( MCRFile file )
   {
   ByteArrayOutputStream out = new ByteArrayOutputStream();
   MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
-  Templates xsl = transformer.getStylesheet( "D:/wd_sample/mycore-sample-application/stylesheets/mcr_make_types.xsl" );
+  java.net.URL url      = MCRContentIndexerXML.class.getResource( "/mcr_make_types.xsl" );
+  Templates xsl = transformer.getStylesheet( url.getFile() );
   TransformerHandler handler = transformer.getTransformerHandler( xsl );
   transformer.transform( file.getContentAsJDOM(), handler, out );
   out.close();
@@ -245,7 +246,7 @@ private List trans( MCRFile file )
   }   
   catch (Exception e)
   {
-    System.out.println(e);
+    logger.info(e);
     return null;
   }
 }
@@ -253,7 +254,7 @@ private List trans( MCRFile file )
 /**
  * Build lucene document from transformed xml list 
  * @param key MCRFile ID           
- * @param types xml data as list
+ * @param types xml data as list (typed content)
  * 
  * @return The lucene document
  * 
@@ -273,7 +274,7 @@ private Document buildLuceneDocument( String key, List types )
       if ( search.containsKey( name ) )
       {
         String field = (String)search.get( name );
-        System.out.println( "Name: " + name + " Value: " + value + " Field: " + field );
+        logger.debug( "Name: " + name + " Value: " + value + " Field: " + field );
         if ( field.equals( "Keyword" ) )
           doc.add( Field.Keyword( name, value ) );
         if ( field.equals( "Text" ) )
