@@ -1,2 +1,9 @@
 \chapter{Querverweise}
-To be continued
+\section{Verweise erstellen}
+Eine Textstelle, Bild, Tabelle oder Gliederungsabschnitt kann einfach mit {\tt \verb+\label{Markierung}+} markiert werden um danach mit {\tt \verb+\ref{teststelle1}+} daruf zu verweisen. Es ist Darauf zu achten, dass keine Sonderzeichen in der Markierung verwendet werden.   
+Mit {\tt \verb+\pageref{Markierung}+} kann dann einfach auf die Markierung Bezug genommen werden und es erscheint an dieser Stelle die Seitenzahl. 
+Ein weiterer Befehl um Querverweise zu erzeugen ist {\tt \verb+\ref{Markierung}+}. Wenn der {\tt \verb+\label{Markierung}+} Befehl in einer Umgebung wie {\tt table}, {\tt figure} {\tt enumerate} Umgebung oder einem Abschnitt verwendet wird, kann mit {\tt \verb+\ref{Markierung}+} darauf Bezug genommen werden.
+
+\section{Hyperlinks}
+Vor allem für die Erstellung von PDF--Dokumenten und Webseiten sind Hyperlinks unerläßlich. Aber auch um Trennen von langen URLs zu ermöglichen müssen URLs als solche gekennzeichnet werden.
+{\tt \verb+\url{Webadresse}+}. 
