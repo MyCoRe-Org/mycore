@@ -35,18 +35,23 @@ import mycore.common.MCRException;
  * linking from one object to another one. A link is described by the
  * <em>MCRMetaLink</em> class. The href variable of MCRMetaLink gives
  * the ID of the linked document, while the label and title variables
- * can be used for further description of the link. Four types of links
+ * can be used for further description of the link. Five types of links
  * are supported. Subtag name = "<linkTo...>" (corresponding links are
  * collected in the "<linksTo>" section of the "<structure...>" part)
  * means a simple link to another object, while subtag name = "linkFrom"
  * (in the "linksFrom" section) means the inverse of such a link.
- * Subtag name = "child" means a child link to a "parent" object
+ * Subtag name = "uniLinkTo" (in the "uniLinksTo" section) is an
+ * unidirectional link to another object, not accomplished by a "linkFrom".
+ * Subtag name = "child" means a child link from a "parent" object
  * (collected in the "children" and "parents" section, respectively).
- * In this case, the child inherits all heritable metadata of the parent(s).
- * Note, that it is impossible to a priori prohibit multiple inheritance,
- * the MCRObjectStructure object can not decide what to do in cases
- * of such a "multiple parents" request. The user of this class still
- * should prevent or support multiple inheritance.
+ * In this case, the child inherits all heritable metadata of the parent.
+ * If the parent itself is a child of another parent, the heritable
+ * metadata of this "grand parent" is inherited by the child as well.
+ * This mechanism recursively traces the full inheritance hierarchy.
+ * So if the grand parent itself has a parent, this grand parent parent's
+ * heritable metadata will be inherited and so on.
+ * Note, that it is impossible to inherit metadata from multiple parents.
+ * In cases of multiple inheritance request, an exception is thrown.
  * Not supported by this class are links from or to a defined place
  * of a document (inner structure and combination of inner and outer
  * structures of the objects). This will possibly be done in a later
@@ -59,13 +64,12 @@ import mycore.common.MCRException;
 public class MCRObjectStructure
 {
   private String NL = null;
+  private Vector uniLinksTo = null;
   private Vector linksTo = null;
   private Vector linksFrom = null;
   private Vector children = null;
-  private Vector parents = null;
+  private MCRMetaLink parent = null;
   private Vector inherited_metadata = null;
-  // deprecated:
-  private Vector the_links = null;
   private Vector the_derivates = null;
 
   /**
@@ -76,13 +80,10 @@ public class MCRObjectStructure
   public MCRObjectStructure ()
   {
     NL = System.getProperties().getProperty("line.separator");
+    uniLinksTo = new Vector ();
     linksTo = new Vector ();
-	linksFrom = new Vector ();
+    linksFrom = new Vector ();
     children = new Vector ();
-	parents = new Vector ();
-	inherited_metadata = new Vector ();
-	// deprecated:
-	the_links = new Vector();
     the_derivates = new Vector ();
   }
   
@@ -124,23 +125,69 @@ public class MCRObjectStructure
    * @return MCRMetaLink            the xlink ("locator" type)
    */
   private static MCRMetaLink createLink (String subtag, String href,
-										 String label, String title)
+                                         String label, String title)
   {
 	  String lang = "en";
 	  MCRMetaLink link = null;
 	  try
 	  {
 		  link = new MCRMetaLink ("structure", subtag, lang, "locator",
-								  href, label, title);
+					  href, label, title);
 	  }
 	  catch (MCRException exc) { ; } // never thrown
 	  return link;
   }
 
   /**
+   * <em>addUniLinkTo</em> appends a link to another object if and only if
+   * not already contained in the link vector, preventing from 
+   * doubly-linked objects. The link remains unidirectional (the linked object
+   * does not know about the link).
+   * If the link could be added a "true" will be returned, otherwise "false".
+   *
+   * @param href                 the MCRObjectID string of the linked object
+   * @param label                the link's label
+   * @param title                the link's title
+   * @return boolean             true, if operation successfully completed
+   */
+  final boolean addUniLinkTo (String href, String label, String title)
+  {
+	  MCRMetaLink link = createLink("uniLinkTo", href, label, title);
+	  int i, n = uniLinksTo.size();
+	  for (i = 0; i < n; ++i)
+		  if (areIdentLocators((MCRMetaLink) uniLinksTo.elementAt(i), link))
+			  return false;
+	  uniLinksTo.addElement(link);
+	  return true;
+  }
+
+  /**
+   * <em>removeUniLinkTo</em> removes an unidirectional link from the link vector.
+   * If the link was found a "true" will be returned, otherwise "false".
+   *
+   * @param href                 the MCRObjectID string of the linked object
+   * @param label                the link's label
+   * @param title                the link's title
+   * @return boolean             true, if operation successfully completed
+   */
+  final boolean removeUniLinkTo (String href, String label, String title)
+  {
+	  MCRMetaLink link = createLink("uniLinkTo", href, label, title);
+	  int i, n = uniLinksTo.size();
+	  for (i = 0; i < n; ++i)
+		  if (areIdentLocators((MCRMetaLink) uniLinksTo.elementAt(i), link))
+	  {
+		  uniLinksTo.removeElementAt(i);
+		  return true;
+	  }
+	  return false;
+  }
+
+  /**
    * <em>addLinkTo</em> appends a link to another object if and only if
    * not already contained in the link vector, preventing from 
-   * doubly-linked objects.
+   * doubly-linked objects. The link is accomplished by an inverse link from
+   * the linked object to this object (bidirectional link).
    * If the link could be added a "true" will be returned, otherwise "false".
    *
    * @param href                 the MCRObjectID string of the linked object
@@ -231,114 +278,161 @@ public class MCRObjectStructure
    * doubly-linked objects.
    * If the link could be added a "true" will be returned, otherwise "false".
    *
-   * @param href                 the MCRObjectID string of the linked object
+   * @param href                 the MCRObjectID string of the child
    * @param label                the link's label
    * @param title                the link's title
    * @return boolean             true, if operation successfully completed
    */
   final boolean addChild (String href, String label, String title)
   {
-	  MCRMetaLink link = createLink("child", href, label, title);
-	  int i, n = children.size();
-	  for (i = 0; i < n; ++i)
-		  if (areIdentLocators((MCRMetaLink) children.elementAt(i), link))
-			  return false;
-	  children.addElement(link);
-	  return true;
+    MCRMetaLink link = createLink("child", href, label, title);
+    int i, n = children.size();
+    for (i = 0; i < n; ++i)
+      if (((MCRMetaLink) children.elementAt(i)).getXLinkHrefToString().equals(href))
+        return false;
+    children.addElement(link);
+    return true;
   }
 
   /**
    * <em>removeChild</em> removes a child link to another object from the link vector.
    * If the link was found a "true" will be returned, otherwise "false".
    *
-   * @param href                 the MCRObjectID string of the linked object
-   * @param label                the link's label
-   * @param title                the link's title
+   * @param href                 the MCRObjectID string of the child
    * @return boolean             true, if operation successfully completed
    */
-  final boolean removeChild (String href, String label, String title)
+  final boolean removeChild (String href)
   {
-	  MCRMetaLink link = createLink("child", href, label, title);
-	  int i, n = children.size();
-	  for (i = 0; i < n; ++i)
-		  if (areIdentLocators((MCRMetaLink) children.elementAt(i), link))
-	  {
-		  children.removeElementAt(i);
-		  return true;
-	  }
-	  return false;
+    int i, n = children.size();
+    for (i = 0; i < n; ++i)
+      if (((MCRMetaLink) children.elementAt(i)).getXLinkHrefToString().equals(href))
+    {
+      children.removeElementAt(i);
+      return true;
+    }
+    return false;
   }
 
   /**
-   * <em>addParent</em> appends a parent link to another object if and only if
-   * not already contained in the link vector, preventing from 
-   * doubly-linked objects.The corresponding metadata vector is appended to the
-   * inherited_metadata vector.
-   * If the link could be added a "true" will be returned, otherwise "false".
+   * <em>setParent</em> sets the parent link of this object as well as the parent's,
+   * grand parent's, a.s.o. heritable metadata MCRObjectMetadata Vector.
+   * If the object already has a parent, an exception is thrown (multiple inheritance
+   * request).
    *
-   * @param href                 the MCRObjectID string of the linked object
+   * @param href                 the MCRObjectID string of the parent
    * @param label                the link's label
    * @param title                the link's title
    * @param inh_metadata         the Vector of the parent's heritable metadata
    * @return boolean             true, if operation successfully completed
+   * @exception MCRException     thrown for multiple inheritance
    */
-  final boolean addParent (String href, String label, String title,
-						   Vector inh_metadata)
+  final boolean setParent (String href, String label, String title, Vector inh_metadata)
+    throws MCRException
   {
-	  MCRMetaLink link = createLink("parent", href, label, title);
-	  int i, n = parents.size();
-	  for (i = 0; i < n; ++i)
-		  if (areIdentLocators((MCRMetaLink) parents.elementAt(i), link))
-			  return false;
-	  parents.addElement(link);
-	  inherited_metadata.addElement(inh_metadata);
-	  return true;
+    if (parent != null)
+      throw new MCRException("multiple inheritance request");
+    parent = createLink("parent", href, label, title);
+    setInheritedMetadata(inh_metadata);
+    return true;
   }
 
   /**
-   * <em>removeParent</em> removes a parent link to another object from the link
-   * vector and the corresponding metadata vector from the inherited_metadata vector.
+   * <em>removeParent</em> removes the parent link from this object 
+   * and the corresponding metadata vector from the inherited_metadata vector.
    * If the link was found a "true" will be returned, otherwise "false".
    *
-   * @param href                 the MCRObjectID string of the linked object
-   * @param label                the link's label
-   * @param title                the link's title
+   * @param href                 the MCRObjectID string of the parent
    * @return boolean             true, if operation successfully completed
    */
-  final boolean removeParent (String href, String label, String title)
+  final boolean removeParent (String href)
   {
-	  MCRMetaLink link = createLink("parent", href, label, title);
-	  int i, n = parents.size();
-	  for (i = 0; i < n; ++i)
-		  if (areIdentLocators((MCRMetaLink) parents.elementAt(i), link))
-	  {
-		  parents.removeElementAt(i);
-		  inherited_metadata.removeElementAt(i);
-		  return true;
-	  }
-	  return false;
+    if (parent == null)
+      return false;
+    if (! parent.getXLinkHrefToString().equals(href))
+      return false;
+    parent = null;
+    setInheritedMetadata(null);
+    return true;
   }
   
   /**
-   * <em>setInhMetaFromMCRObj</em> is used by the corresponding MCRObject
-   * to set the inherited metadata vector collected from all parents.
+   * <em>setInheritedMetadata</em> is used by the corresponding MCRObject
+   * to set the inherited metadata vector collected from parent, grand parent,
+   * and so on.
    * 
    * @param inh_metadata        the inherited metadata vector
    */
-  final void setInhMetaFromMCRObj (Vector inh_metadata)
+  final void setInheritedMetadata (Vector inh_metadata)
   {
-	  inherited_metadata = inh_metadata;
+    if (inherited_metadata != null)
+      inherited_metadata.removeAllElements();
+    inherited_metadata = null;
+    if (inh_metadata != null)
+    {
+      inherited_metadata = new Vector();
+      for (int i = 0; i < inh_metadata.size(); ++i)
+        inherited_metadata.addElement((MCRObjectMetadata) inh_metadata.elementAt(i));
+    }
+  }
+
+  /**
+   * <em>getInheritedMetadata</em> returns the inherited metadata vector
+   * (null if no parent specified).
+   *
+   * @return                   Vector of inherited metadata
+   */
+  final Vector getInheritedMetadata ()
+  {
+    if (parent == null) return null;
+    if (inherited_metadata == null) collectInheritedMetadata();
+    Vector meta = new Vector ();
+    for (int i = 0; i < inherited_metadata.size(); ++i)
+      meta.addElement((MCRObjectMetadata) inherited_metadata.elementAt(i));
+    return meta;
+  }
+
+  /**
+   * <em>collectInheritedMetadata</em> collects the metadata inherited from
+   * parent, grand parent, a.s.o.
+   */
+  private final void collectInheritedMetadata ()
+  {
+    try
+    {
+      inherited_metadata = new Vector ();
+      MCRMetaLink prt = parent;
+      MCRObject obj = null;
+      MCRObjectMetadata meta = null;
+      MCRObjectStructure stru = null;
+      while (prt != null)
+      {
+        obj = new MCRObject ();
+        obj.receiveFromDatastore(prt.getXLinkHrefToString());
+        meta = obj.getMetadata();
+        stru = obj.getStructure();
+        inherited_metadata.addElement(meta.getHeritableMetadata());
+        prt = stru.getParent();
+      }
+    }
+    catch (Exception exc) { ; }
   }
   
   /**
-   * <em>countLinksTo</em> returns the number of links to another object.
+   * <em>countUniLinksTo</em> returns the number of unidirectional links.
+   * 
+   * @return int               number of links to another object
+   */
+  public final int countUniLinksTo () { return uniLinksTo.size(); }
+
+  /**
+   * <em>countLinksTo</em> returns the number of bidirectional links to another object.
    * 
    * @return int               number of links to another object
    */
   public final int countLinksTo () { return linksTo.size(); }
 
   /**
-   * <em>countLinksFrom</em> returns the number of links from another object.
+   * <em>countLinksFrom</em> returns the number of bidirectional links from another object.
    * 
    * @return int               number of links from another object
    */
@@ -352,30 +446,18 @@ public class MCRObjectStructure
   public final int countChildren () { return children.size(); }
 
   /**
-   * <em>countParents</em> returns the number of parent links.
+   * <em>getUniLinkTo</em> returns the unidirectional link to another object at a given index.
    * 
-   * @return int               number of parents
+   * @param index              the index in the link vector
+   * @return MCRMetaLink       the corresponding link
    */
-  public final int countParents () { return parents.size(); }
-  
-  /**
-   * <em>countInheritedMetadata</em> returns the number of items in the
-   * inherited metadata vector, which are Vectors of MCRObjectMetadata's.
-   * Note that this is not necessarily the number of parents (though
-   * one MCRObjectMetadata Vector is inherited by each parent). In cases
-   * of calling this routine after setFromDOM but prior to setInhMetaFromMCRObj
-   * it will return zero, since the inherited metadata are NOT (doubly)
-   * saved in the children's XML part !!!
-   * 
-   * @return int               number of metadata vectors
-   */
-  public final int countInheritedMetadata ()
+  public final MCRMetaLink getUniLinkTo (int index)
   {
-	  return inherited_metadata.size();
+	  return (MCRMetaLink) uniLinksTo.elementAt(index);
   }
 
   /**
-   * <em>getLinkTo</em> returns the link to another object at a given index.
+   * <em>getLinkTo</em> returns the bidirectional link to another object at a given index.
    * 
    * @param index              the index in the link vector
    * @return MCRMetaLink       the corresponding link
@@ -386,7 +468,7 @@ public class MCRObjectStructure
   }
 
   /**
-   * <em>getLinkFrom</em> returns the link from another object at a given index.
+   * <em>getLinkFrom</em> returns the bidirectional link from another object at a given index.
    * 
    * @param index              the index in the link vector
    * @return MCRMetaLink       the corresponding link
@@ -408,55 +490,13 @@ public class MCRObjectStructure
   }
 
   /**
-   * <em>getParent</em> returns the parent link at a given index.
+   * <em>getParent</em> returns the parent link.
    * 
-   * @param index              the index in the link vector
    * @return MCRMetaLink       the corresponding link
    */
-  public final MCRMetaLink getParent (int index)
+  public final MCRMetaLink getParent ()
   {
-	  return (MCRMetaLink) parents.elementAt(index);
-  }
-
-  /**
-   * <em>getInheritedMetadata</em> returns the MCRObjectMetadata Vector
-   * at a given index.
-   * 
-   * @param index              the index in the inherited metadata vector
-   * @return Vector            the corresponding MCRObjectMetadata Vector
-   */
-  public final Vector getInheritedMetadata (int index)
-  {
-	  return (Vector) inherited_metadata.elementAt(index);
-  }
-
-  /**
-   * <em>addLink</em> methode append the given link data to the
-   * link vector.
-   * If the link could be added a "true" will be returned, otherwise "false".
-   *
-   * @deprecated
-   * @param add_link             the link to be added
-   * @return boolean             true, if operation successfully completed
-   */
-  public final boolean addLink (MCRMetaLink add_link)
-  {
-    the_links.addElement(add_link);
-    return true;
-  }
-
-  /**
-   * <em>removeLink</em> the link from the link vector for 
-   * the given number.
-   *
-   * @deprecated
-   * @param rem_link             the link to be removed
-   * @return boolean             true, if operation successfully completed
-   */
-  public final boolean removeLink (int number)
-  {
-    the_links.removeElementAt(number);
-    return true;
+	  return parent;
   }
 
   /**
@@ -464,7 +504,6 @@ public class MCRObjectStructure
    * derivate vector.
    * If the link could be added a "true" will be returned, otherwise "false".
    *
-   * @deprecated
    * @param add_derivate         the link to be added
    * @return boolean             true, if operation successfully completed
    */
@@ -478,7 +517,6 @@ public class MCRObjectStructure
    * <em>removeDerivate</em> the derivate link from the derivate vector for 
    * the given number.
    *
-   * @deprecated
    * @param rem_derivate         the link to be removed
    * @return boolean             true, if operation successfully completed
    */
@@ -489,17 +527,16 @@ public class MCRObjectStructure
   }
 
   /**
-   * <em>removeAllLinks</em> removes all links from the link vector.
+   * <em>removeAll</em> removes all links from the link vectors.
    */
   private final void removeAll ()
   {
+    uniLinksTo.removeAllElements();
     linksTo.removeAllElements();
     linksFrom.removeAllElements();
     children.removeAllElements();
-    parents.removeAllElements();
-    inherited_metadata.removeAllElements();
-	// deprecated:
-	the_links.removeAllElements();
+    parent = null;
+    setInheritedMetadata(null);
     the_derivates.removeAllElements();
   }
 
@@ -519,6 +556,20 @@ public class MCRObjectStructure
     Element struct_element = (Element)dom_element_list.item(0);
     // Structure link part
     NodeList struct_links_list = null;
+    struct_links_list = struct_element.getElementsByTagName("uniLinksTo");
+    if (struct_links_list.getLength()>0) {
+      Node struct_links_element = struct_links_list.item(0);
+      NodeList struct_link_list = struct_links_element.getChildNodes();
+      int link_len = struct_link_list.getLength();
+      for (int i=0;i<link_len;i++) {  
+        link_element = struct_link_list.item(i);
+        if (link_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+        MCRMetaLink link = new MCRMetaLink();
+        link.setDataPart("structure");
+        link.setFromDOM(link_element);
+        uniLinksTo.addElement(link);
+        }
+      }
     struct_links_list = struct_element.getElementsByTagName("linksTo");
     if (struct_links_list.getLength()>0) {
       Node struct_links_element = struct_links_list.item(0);
@@ -572,22 +623,7 @@ public class MCRObjectStructure
         MCRMetaLink link = new MCRMetaLink();
         link.setDataPart("structure");
         link.setFromDOM(link_element);
-        parents.addElement(link);
-        }
-      }
-	// deprecated:
-    struct_links_list = struct_element.getElementsByTagName("links");
-    if (struct_links_list.getLength()>0) {
-      Node struct_links_element = struct_links_list.item(0);
-      NodeList struct_link_list = struct_links_element.getChildNodes();
-      int link_len = struct_link_list.getLength();
-      for (int i=0;i<link_len;i++) {  
-        link_element = struct_link_list.item(i);
-        if (link_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
-        MCRMetaLink link = new MCRMetaLink();
-        link.setDataPart("structure");
-        link.setFromDOM(link_element);
-        addLink(link);
+        parent = link;
         }
       }
     // Structure derivate part
@@ -620,9 +656,14 @@ public class MCRObjectStructure
     if (!isValid()) {
       debug();
       throw new MCRException("The content is not valid."); }
-    int i, n, m = the_derivates.size();
+    int i, n;
     StringBuffer sb = new StringBuffer(2048);
     sb.append("<structure>").append(NL);
+	n = uniLinksTo.size();
+    sb.append("<uniLinksTo>").append(NL);
+    for (i = 0; i < n; ++i) {
+      sb.append(((MCRMetaLink) uniLinksTo.elementAt(i)).createXML()); }
+    sb.append("</uniLinksTo>").append(NL);
 	n = linksTo.size();
     sb.append("<linksTo>").append(NL);
     for (i = 0; i < n; ++i) {
@@ -638,82 +679,85 @@ public class MCRObjectStructure
     for (i = 0; i < n; ++i) {
       sb.append(((MCRMetaLink) children.elementAt(i)).createXML()); }
     sb.append("</children>").append(NL);
-	n = parents.size();
     sb.append("<parents>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) parents.elementAt(i)).createXML()); }
+    if (parent != null)
+      sb.append(parent.createXML());
     sb.append("</parents>").append(NL);
-	// deprecated:
-	n = the_links.size();
-    sb.append("<links>").append(NL);
-    for (i = 0; i < n; ++i) {
-      sb.append(((MCRMetaLink) the_links.elementAt(i)).createXML()); }
-    sb.append("</links>").append(NL);
     sb.append("<derivates>").append(NL);
-    for (i = 0; i < m; ++i) {
+    n = the_derivates.size();
+    for (i = 0; i < n; ++i) {
       sb.append(((MCRMetaLink) the_derivates.elementAt(i)).createXML()); }
     sb.append("</derivates>").append(NL);
     sb.append("</structure>").append(NL);
     return sb.toString();
   }
 
-/**
- * This methode create a typed content list for all data in this instance.
- *
- * @exception MCRException if the content of this class is not valid
- * @return a MCRTypedContent with the data of the MCRObject data
- **/
-public final MCRTypedContent createTypedContent() throws MCRException
+  /**
+   * This methode create a typed content list for all data in this instance.
+   *
+   * @exception MCRException if the content of this class is not valid
+   * @return a MCRTypedContent with the data of the MCRObject data
+   **/
+  public final MCRTypedContent createTypedContent() throws MCRException
   {
-  if (!isValid()) {
-    debug();
-    throw new MCRException("The content is not valid."); }
-  MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"structure");
-  tc.addTagElement(tc.TYPE_TAG,"linksTo");
-  for (int i=0;i<linksTo.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) linksTo.elementAt(i))
-      .createTypedContent(true,true));
+    if (!isValid())
+    {
+      debug();
+      throw new MCRException("The content is not valid.");
     }
-  tc.addTagElement(tc.TYPE_TAG,"linksFrom");
-  for (int i=0;i<linksFrom.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) linksFrom.elementAt(i))
-      .createTypedContent(true,true));
+    MCRTypedContent tc = new MCRTypedContent();
+    tc.addTagElement(tc.TYPE_MASTERTAG,"structure");
+    tc.addTagElement(tc.TYPE_TAG,"uniLinksTo");
+    for (int i=0;i<uniLinksTo.size();i++)
+      tc.addMCRTypedContent(((MCRMetaLink) uniLinksTo.elementAt(i))
+        .createTypedContent(true,true));
+    tc.addTagElement(tc.TYPE_TAG,"linksTo");
+    for (int i=0;i<linksTo.size();i++)
+      tc.addMCRTypedContent(((MCRMetaLink) linksTo.elementAt(i))
+        .createTypedContent(true,true));
+    tc.addTagElement(tc.TYPE_TAG,"linksFrom");
+    for (int i=0;i<linksFrom.size();i++)
+      tc.addMCRTypedContent(((MCRMetaLink) linksFrom.elementAt(i))
+        .createTypedContent(true,true));
+    tc.addTagElement(tc.TYPE_TAG,"children");
+    for (int i=0;i<children.size();i++)
+      tc.addMCRTypedContent(((MCRMetaLink) children.elementAt(i))
+        .createTypedContent(true,true));
+    if (parent != null)
+    {
+      tc.addTagElement(tc.TYPE_TAG,"parents");
+      tc.addMCRTypedContent(parent
+        .createTypedContent(true,true));
+      if (inherited_metadata == null)
+        collectInheritedMetadata();
+      tc.addTagElement(tc.TYPE_TAG, "parents_metadata");
+      for (int i = 0; i < inherited_metadata.size(); ++i)
+      {
+        MCRObjectMetadata meta = (MCRObjectMetadata) inherited_metadata.elementAt(i);
+        for (int j = 0; j < meta.size(); ++j)
+          tc.addMCRTypedContent(meta.getMetadataElement(meta.tagName(j))
+            .createTypedContent());
+      }
     }
-  tc.addTagElement(tc.TYPE_TAG,"children");
-  for (int i=0;i<children.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) children.elementAt(i))
-      .createTypedContent(true,true));
-    }
-  tc.addTagElement(tc.TYPE_TAG,"parents");
-  for (int i=0;i<parents.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) parents.elementAt(i))
-      .createTypedContent(true,true));
-    }
-  //append the inherited metadata here, to be done next time:
-  //#####
-  // deprecated:
-  tc.addTagElement(tc.TYPE_TAG,"links");
-  for (int i=0;i<the_links.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) the_links.elementAt(i))
-      .createTypedContent(true,true));
-    }
-  tc.addTagElement(tc.TYPE_TAG,"derivates");
-  for (int i=0;i<the_derivates.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
-      .createTypedContent(true,true));
-    }
-  return tc;
+    tc.addTagElement(tc.TYPE_TAG,"derivates");
+    for (int i=0;i<the_derivates.size();i++)
+      tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
+        .createTypedContent(true,true));
+    return tc;
   }
 
   /**
    * <em>isValid</em> checks whether all of the MCRMetaLink's in the
-   * link vector are valid or not.
+   * link vectors are valid or not.
    *
    * @return boolean             true, if structure is valid
    */
   public final boolean isValid ()
   {
+    for (int i = 0; i < uniLinksTo.size(); ++i) {
+      if (! ((MCRMetaLink) uniLinksTo.elementAt(i)).isValid())
+        return false;
+      }
     for (int i = 0; i < linksTo.size(); ++i) {
       if (! ((MCRMetaLink) linksTo.elementAt(i)).isValid())
         return false;
@@ -726,13 +770,8 @@ public final MCRTypedContent createTypedContent() throws MCRException
       if (! ((MCRMetaLink) children.elementAt(i)).isValid())
         return false;
       }
-    for (int i = 0; i < parents.size(); ++i) {
-      if (! ((MCRMetaLink) parents.elementAt(i)).isValid())
-        return false;
-      }
-	// deprecated:
-    for (int i = 0; i < the_links.size(); ++i) {
-      if (! ((MCRMetaLink) the_links.elementAt(i)).isValid())
+    if (parent != null) {
+      if (! parent.isValid())
         return false;
       }
     for (int i = 0; i < the_derivates.size(); ++i) {
@@ -744,14 +783,22 @@ public final MCRTypedContent createTypedContent() throws MCRException
 
   /**
    * <em>debug</em> prints all information about the structure of the
-   * document (contained in the link vector).
+   * document (contained in the link vectors).
    */
   public final void debug ()
   {
     System.out.println("The document's structure data :");
-    int i, n, m = the_derivates.size();
+    int i, n;
     MCRMetaLink link = null;
-	n = linksTo.size();
+    n = uniLinksTo.size();
+    System.out.println("The outer structure contains " + n + " uniLinksTo :");
+    for (i = 0; i < n; ++i)
+    {
+      link = (MCRMetaLink) uniLinksTo.elementAt(i);
+      System.out.println("-->"+i+"<--");
+      link.debug();
+    }
+    n = linksTo.size();
     System.out.println("The outer structure contains " + n + " linksTo :");
     for (i = 0; i < n; ++i)
     {
@@ -759,7 +806,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
       System.out.println("-->"+i+"<--");
       link.debug();
     }
-	n = linksFrom.size();
+    n = linksFrom.size();
     System.out.println("The outer structure contains " + n + " linksFrom :");
     for (i = 0; i < n; ++i)
     {
@@ -767,7 +814,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
       System.out.println("-->"+i+"<--");
       link.debug();
     }
-	n = children.size();
+    n = children.size();
     System.out.println("The outer structure contains " + n + " children :");
     for (i = 0; i < n; ++i)
     {
@@ -775,27 +822,34 @@ public final MCRTypedContent createTypedContent() throws MCRException
       System.out.println("-->"+i+"<--");
       link.debug();
     }
-	n = parents.size();
+    n = 0;
+    if (parent != null) n = 1;
     System.out.println("The outer structure contains " + n + " parents :");
-    for (i = 0; i < n; ++i)
+    if (parent != null)
     {
-      link = (MCRMetaLink) parents.elementAt(i);
-      System.out.println("-->"+i+"<--");
-      link.debug();
-	  //append the inherited metadata here, to be done next time:
-	  //#####
+      System.out.println("-->parent<--");
+      parent.debug();
+      if (inherited_metadata == null)
+        collectInheritedMetadata();
+      n = inherited_metadata.size();
+      System.out.println("The object inherits metadata from " + n + " forefather(s) :");
+      for (i = 0; i < n; ++i)
+      {
+        System.out.println("-->" + i + "<--");
+        MCRObjectMetadata meta = (MCRObjectMetadata) inherited_metadata.elementAt(i);
+        int j, m = meta.size();
+        System.out.println("From this forefather the object inherits " + m + " metadata :");
+        for (j = 0; j < m; ++j)
+        {
+          System.out.println("->" + j + "<-");
+          System.out.println(meta.tagName(j) + " :");
+          meta.getMetadataElement(meta.tagName(j)).debug();
+        }
+      }
     }
-	// deprecated:
-	n = the_links.size();
-    System.out.println("The outer structure contains " + n + " links :");
+    n = the_derivates.size();
+    System.out.println("The outer structure contains " + n + " derivates :");
     for (i = 0; i < n; ++i)
-    {
-      link = (MCRMetaLink) the_links.elementAt(i);
-      System.out.println("-->"+i+"<--");
-      link.debug();
-    }
-    System.out.println("The outer structure contains " + m + " derivates :");
-    for (i = 0; i < m; ++i)
     {
       link = (MCRMetaLink) the_derivates.elementAt(i);
       System.out.println("-->"+i+"<--");
