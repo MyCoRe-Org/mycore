@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQuery.java,v $
- * $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * $Revision: 1.5 $ $Date: 2003/01/28 13:25:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * @version $Revision: 1.5 $ $Date: 2003/01/28 13:25:25 $
  * 
  * This is an interface which encapsulates the functions needed for
  * the communication with the datastore. All functions which are
@@ -47,7 +47,8 @@ public interface MCROAIQuery {
 	/**
 	 * Method listSets. Gets a list of classificationId's and Labels for a given ID
 	 * @param classificationId
-	 * @return List
+	 * @return List A list that contains an array of three Strings: the category id, 
+	 * 				the label and a description
 	 */
 	public List listSets(String classificationId);
 	

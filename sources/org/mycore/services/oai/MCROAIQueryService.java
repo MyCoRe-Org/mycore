@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQueryService.java,v $
- * $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * $Revision: 1.5 $ $Date: 2003/01/28 13:30:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -24,12 +24,15 @@
 
 package org.mycore.services.oai;
 
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.oai.MCROAIQuery;
 
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.0 $ $Date: 2003/01/21 10:18:25 $
+ * @version $Revision: 1.5 $ $Date: 2003/01/28 13:30:25 $
  *
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
  */
@@ -42,5 +45,35 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 */
 	public boolean exists(String id) {
 		return MCRObject.existInDatastore(id);
+	}
+	
+	/**
+	 * Method listSets. Gets a list of classificationId's and Labels for a given ID
+	 * @param classificationId
+	 * @return List A list that contains an array of three Strings: the category id, 
+	 * 				the label and a description
+	 */
+	public List listSets(String classificationId) {
+		List list = new ArrayList();
+        MCRClassificationItem repository = MCRClassificationItem.
+            getClassificationItem(classificationIdentifier);
+        if ((repository != null) && repository.hasChildren()) {
+        	MCRCategoryItem[] children = repository.getChildren();
+
+	        for (int i = 0; i < children.length; i++) {
+            	String[] set = new String[3];
+    	        set[0] = new String(children[i].getID());
+        	    set[1] = new String(children[i].getLabel("en"));
+            	set[2] = new String(children[i].getDescription("en"));
+
+        	    if (children[i].hasChildren()) {
+/*            	    document = getSets(document, ns, children[i].getChildren(),
+                	    parentSpec + categoryID + ":");
+*/	            }
+			}
+			
+			return list;
+        }
+        return null;
 	}
 }

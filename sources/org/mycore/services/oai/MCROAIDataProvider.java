@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.3 $ $Date: 2003/01/23 10:07:25 $
+ * $Revision: 1.9 $ $Date: 2003/01/28 13:31:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -34,6 +34,7 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
@@ -63,7 +64,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.3 $ $Date: 2003/01/23 10:07:25 $
+ * @version $Revision: 1.9 $ $Date: 2003/01/28 13:31:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -202,17 +203,17 @@ public class MCROAIDataProvider extends HttpServlet {
             } else {
                 //Check if a correct verb was given
                 if (verb[0].equalsIgnoreCase(STR_VERBS[0])) {
-                    document = getRecord(request, header, ns);
+                    // document = getRecord(request, header, ns);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[1])) {
-                    document = identify(request, header, ns);
+                    document = identify(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[2])) {
-                    document = listIdentifiers(request, header, ns);
+                    // document = listIdentifiers(request, header, ns);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[3])) {
-                    document = listMetadataFormats(request, header, ns);
+                    document = listMetadataFormats(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[4])) {
-                    document = listRecords(request, header, ns);
+                    // document = listRecords(request, header, ns);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[5])) {
-                    document = listSets(request, header, ns);
+                    document = listSets(request, header);
                 } else {
 	            	logger.info("Request with a bad verb:" + verb[0]);
                 	document = addError(header, "badVerb", ERR_ILLEGAL_VERB);
