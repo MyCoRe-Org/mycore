@@ -47,7 +47,7 @@ import java.io.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCStoreContentManager7 implements MCRContentStore
+public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCRContentStore
 { 
   /** The maximum DKDDO size. When filesize is bigger, multiple DKDDOs are written */  
   protected int segmentSize;
@@ -61,20 +61,9 @@ public class MCRCStoreContentManager7 implements MCRContentStore
   /** The name of the keyfield that stores the MCRFile.getPath() */
   protected String keyfieldPath;
   
-  /** The unique store ID for this MCRContentStore implementation */
-  protected String storeID;
-
-  /** 
-   * Creates a new MCRCStoreContentManager7 instance. This instance has to 
-   * be initialized by calling init() before it can be used.
-   */
-  public MCRCStoreContentManager7()
-  {}
-
   public void init( String storeID )
   {
-    this.storeID = storeID;
-    String prefix = "MCR.IFS.ContentStore." + storeID + ".";
+    super.init( storeID );
       
     MCRConfiguration config = MCRConfiguration.instance();  
       
@@ -84,9 +73,6 @@ public class MCRCStoreContentManager7 implements MCRContentStore
     keyfieldPath  = config.getString( prefix + "Keyfield.Path"  );
   }
   
-  public String getID()
-  { return storeID; }
-
   public String storeContent( MCRFile file, MCRContentInputStream source )
     throws MCRPersistenceException
   {

@@ -28,35 +28,31 @@ import mycore.common.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
-import java.text.*;
 import com.enterprisedt.net.ftp.*;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
- * MCRFile objects on a Real Server. This allows the content to be 
- * streamed. This implementation uses FTP to manage the files in Real Server.
- * The FTP connection parameters are configured in mycore.properties:
+ * MCRFile objects on an FTP Server. The FTP connection parameters are 
+ * configured in mycore.properties:
  *
  * <code>
- *   MCR.IFS.ContentStore.<StoreID>.Hostname       Hostname of Real Server
- *   MCR.IFS.ContentStore.<StoreID>.FTPPort        FTP port of Real Server, default is 21
- *   MCR.IFS.ContentStore.<StoreID>.UserID         User ID for FTP connections, e. g. vsloader
+ *   MCR.IFS.ContentStore.<StoreID>.Hostname       Hostname of remote server
+ *   MCR.IFS.ContentStore.<StoreID>.FTPPort        FTP port of remote server, default is 21
+ *   MCR.IFS.ContentStore.<StoreID>.UserID         User ID for FTP connections
  *   MCR.IFS.ContentStore.<StoreID>.Password       Password for this user
- *   MCR.IFS.ContentStore.<StoreID>.BaseDirectory  Directory on server where content is stored
+ *   MCR.IFS.ContentStore.<StoreID>.BaseDirectory  Directory on server where content will be stored
  *   MCR.IFS.ContentStore.<StoreID>.DebugFTP       If true, FTP debug messages are written to stdout, default is false
  * </code>
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- *
- * @see MCRAVExtRealServer8
  */
-public class MCRCStoreRealServer8 implements MCRContentStore
+public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRContentStore
 { 
-  /** Hostname of Real Server */
+  /** Hostname of FTP server */
   protected String host;
   
-  /** FTP Port of Real Server host */
+  /** FTP Port of remote host */
   protected int port;
 
   /** User ID for FTP login */
@@ -65,20 +61,11 @@ public class MCRCStoreRealServer8 implements MCRContentStore
   /** Password for FTP login */
   protected String password;
   
-  /** Base directory on Real Server where content is stored */
+  /** Base directory on FTP server where content is stored */
   protected String baseDir;
 
   /** If true, FTP debug messages are written to stdout */
   protected boolean debugFTP;
-
-  /** DateFormat used to construct new unique IDs */
-  protected DateFormat formatter;
-
-  /** The last ID that was constructed */
-  protected String lastID;
-  
-  /** The unique store ID for this MCRContentStore implementation */
-  protected String storeID;
 
   /** FTP Return codes if mkdir is successful in our interpretation */
   protected final static String[] mkdirOK = { "257", "521", "550" };
@@ -86,20 +73,9 @@ public class MCRCStoreRealServer8 implements MCRContentStore
   /** FTP Return codes if rmdir is successful in our interpretation */
   protected final static String[] rmdirOK = { "250", "550" };
   
-  /** 
-   * Creates a new MCRCStoreRealServer8 instance. This instance has to 
-   * be initialized by calling init() before it can be used.
-   */
-  public MCRCStoreRealServer8()
-  {
-    formatter = new SimpleDateFormat( "yyyyMMdd_HHmmss" );
-    lastID    = "YYYYMMDD_HHMMSS";
-  }
-  
   public void init( String storeID )
   {
-    this.storeID = storeID;
-    String prefix = "MCR.IFS.ContentStore." + storeID + ".";
+    super.init( storeID );
     
     MCRConfiguration config = MCRConfiguration.instance();  
       
@@ -111,9 +87,6 @@ public class MCRCStoreRealServer8 implements MCRContentStore
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String getID()
-  { return storeID; }
-
   public String storeContent( MCRFile file, MCRContentInputStream source )
     throws MCRPersistenceException
   {
@@ -121,15 +94,14 @@ public class MCRCStoreRealServer8 implements MCRContentStore
     try
     {
       StringBuffer storageID = new StringBuffer();  
-      StringTokenizer st = new StringTokenizer( file.getOwnerID(), "_" );
+      String[] slots = buildSlotPath();
       
-      // Recursively create directories, each "_" marks a new subdirectory:
-      while( st.hasMoreTokens() )
+      // Recursively create slot directories
+      for( int i = 0; i < slots.length; i++ )
       {
-        String dir = st.nextToken();
-        connection.quote( "MKD " + dir, mkdirOK );
-        connection.chdir( dir );
-        storageID.append( dir ).append( "/" );
+        connection.quote( "MKD " + slots[ i ], mkdirOK );
+        connection.chdir( slots[ i ] );
+        storageID.append( slots[ i ] ).append( "/" );
       }
       
       String fileID = buildNextID() + "." + file.getExtension();
@@ -196,18 +168,7 @@ public class MCRCStoreRealServer8 implements MCRContentStore
   }
   
   /**
-   * Constructs a new unique ID for storing content in Real Server
-   */
-  protected synchronized String buildNextID()
-  {
-    String ID = null;
-    do{ ID = formatter.format( new Date() ); }
-    while( ID.equals( lastID ) );
-    return ( lastID = ID );
-  }
-
-  /**
-   * Connects to Real Server host via FTP
+   * Connects to remote host via FTP
    */
   protected FTPClient connect() 
     throws MCRPersistenceException
@@ -239,7 +200,7 @@ public class MCRCStoreRealServer8 implements MCRContentStore
   }
 
   /** 
-   * Closes the FTP connection to Real Server host
+   * Closes the FTP connection to remote host
    *
    * @param connection the FTP connection to close
    */

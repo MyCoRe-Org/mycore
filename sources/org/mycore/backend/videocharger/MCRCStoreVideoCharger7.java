@@ -53,7 +53,7 @@ import com.enterprisedt.net.ftp.*;
  *
  * @see MCRAVExtVideoCharger7
  */
-public class MCRCStoreVideoCharger7 implements MCRContentStore
+public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRContentStore
 { 
   /** Hostname of VideoCharger server */
   protected String host;
@@ -70,32 +70,12 @@ public class MCRCStoreVideoCharger7 implements MCRContentStore
   /** If true, FTP debug messages are written to stdout */
   protected boolean debugFTP;
 
-  /** SimpleDateFormat used to construct new unique asset IDs */
-  protected DateFormat formatter;
-
-  /** The last ID that was constructed */
-  protected String lastID;
-  
-  /** The unique store ID for this MCRContentStore implementation */
-  protected String storeID;
-
   /** FTP Return code if "quote site avs attr" is successful */
   protected final static String[] ok = { "200" };
 
-  /** 
-   * Creates a new MCRCStoreVideoCharger7 instance. This instance has to 
-   * be initialized by calling init() before it can be used.
-   */
-  public MCRCStoreVideoCharger7()
-  {
-    formatter = new SimpleDateFormat( "yyyyMMdd_HHmmss" );
-    lastID    = "OWNERID_YYYYMMDD_HHMMSS";
-  }
-  
   public void init( String storeID )
   { 
-    this.storeID = storeID;
-    String prefix = "MCR.IFS.ContentStore." + storeID + ".";
+    super.init( storeID );
       
     MCRConfiguration config = MCRConfiguration.instance();  
       
@@ -106,13 +86,10 @@ public class MCRCStoreVideoCharger7 implements MCRContentStore
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String getID()
-  { return storeID; }
- 
   public String storeContent( MCRFile file, MCRContentInputStream source )
     throws MCRPersistenceException
   {
-    String storageID = buildNextStorageID( file );
+    String storageID = buildNextID();
 
     FTPClient connection = connect();
     try
@@ -191,26 +168,6 @@ public class MCRCStoreVideoCharger7 implements MCRContentStore
       new MCRCStoreVideoCharger7().retrieveContent( list[ i ], target );
       target.close();
     }
-  }
-
-  /**
-   * Constructs a new unique ID for storing content in VideoCharger
-   *
-   * @param file the MCRFile to build an ID for
-   */
-  protected synchronized String buildNextStorageID( MCRFile file )
-  {
-    String ID = null;
-    do
-    { 
-      StringBuffer buffer = new StringBuffer();
-      buffer.append( file.getOwnerID() );
-      buffer.append( "_" );
-      buffer.append( formatter.format( new Date() ) );
-      ID = buffer.toString(); 
-    }
-    while( ID.equals( lastID ) );
-    return ( lastID = ID );
   }
 
   /**
