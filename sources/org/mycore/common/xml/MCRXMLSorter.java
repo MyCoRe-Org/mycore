@@ -4,7 +4,6 @@ import org.mycore.common.MCRException;
 // JDOM imports
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.jdom.transform.JDOMResult;
@@ -14,10 +13,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
