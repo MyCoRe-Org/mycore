@@ -240,7 +240,7 @@ public class MCRUserMgr
 
   /**
    * This method creates a group in the datastore (and the group cache as well).
-   *
+   * The logical correctness of the data is checked.
    * @param group    The group object to be created
    */
   public final synchronized void createGroup(MCRGroup group) throws MCRException
@@ -309,17 +309,6 @@ public class MCRUserMgr
       // such that we do not have to make a rollback.
       MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
       linkedGroup.modificationIsAllowed();
-
-      /* ========= old version by Jens: ================================================
-      MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
-      if ((!linkedGroup.getAdminUserIDs().contains(admin.getID())) &&
-         (!linkedGroup.getAdminGroupIDs().contains(admin.getPrimaryGroupID())))
-      {
-        throw new MCRException("MCRUserMgr.createGroup(): cannot set member to "+
-          " groupIDs: "+(String)groupIDs.get(j)+" because this session is not an"+
-          "adminMember.");
-      }
-      =============================================================================== */
     }
 
     // We now check if the privileges set for the group really exist at all.
@@ -355,7 +344,7 @@ public class MCRUserMgr
 
   /**
    * This method creates a user in the datastore (and the user cache as well).
-   *
+   * The logical correctness of the data is checked.
    * @param user   The user object which will be created
    */
   public final synchronized void createUser(MCRUser user) throws MCRException
@@ -408,17 +397,6 @@ public class MCRUserMgr
       // such that we do not have to make a rollback.
       MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
       linkedGroup.modificationIsAllowed();
-
-      /* ========= old version by Jens: ================================================
-      MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
-      if ((!linkedGroup.getAdminUserIDs().contains(admin.getID())) &&
-          (!linkedGroup.getAdminGroupIDs().contains(admin.getPrimaryGroupID())))
-      {
-        throw new MCRException("MCRUserMgr.createUser(): cant set member to "+
-          " groupIDs: "+(String)groupIDs.get(j)+" because this session is not an"+
-          " adminMember.");
-      }
-      =============================================================================== */
     }
     try {
       // Set some data by the manager
@@ -798,10 +776,12 @@ public class MCRUserMgr
 
   /**
    * This method imports a user or a group to the mycore system. Importing a user or a
-   * group is essentially the same as creating a user or a group. The only difference is
-   * that the values for the creator, creation date and modified date are taken from the
-   * given user or group object. This is important if the user or group is read from an
-   * xml file and was formerly created in a different system.
+   * group is essentially the same as creating a user or a group. However, the data will
+   * be imported without checking the logical correctness. This method will be used for
+   * administrative purposes, i.e. restoring a set of users after a crash of the database.
+   * Another difference is that the values for the creator, creation date and modified date
+   * are taken from the given user or group object. This is important if the user or group
+   * is read from an xml file and was formerly created in a different system.
    *
    * @param userObject The user or group object which will be imported
    */
@@ -823,8 +803,8 @@ public class MCRUserMgr
 
       // now create the user or group
       if (obj instanceof MCRUser)
-        createUser((MCRUser)obj);
-      else createGroup((MCRGroup)obj);
+        initializeUser((MCRUser)obj, creator);
+      else initializeGroup((MCRGroup)obj, creator);
 
       // finally set the old values and update the user or group
       obj.setCreator(creator);
@@ -842,8 +822,9 @@ public class MCRUserMgr
   }
 
   /**
-   * This method initalizes the User/Group system and creates the start configuration
-   * without checking the consistency of the data.
+   * This method is used by the initialization process of the user/group system to
+   * create a starting configuration without checking the consistency of the data.
+   * It is also used when importing groups into the system.
    *
    * @param group    The group object which should be created
    * @param creator  the creator
@@ -875,8 +856,9 @@ public class MCRUserMgr
   }
 
   /**
-   * This method initalized the User/Group system and create the start
-   * configuration without check the data.
+   * This method is used by the initialization process of the user/group system to
+   * create a starting configuration without checking the consistency of the data.
+   *
    * @param privileges The privileges ArrayList which should be created
    */
   public final synchronized void initializePrivileges(ArrayList privileges) throws MCRException
@@ -898,10 +880,11 @@ public class MCRUserMgr
   }
 
   /**
-   * This method initalizes the User/Group system and creates the start configuration
-   * without checking the consistency of the data.
+   * This method is used by the initialization process of the user/group system to
+   * create a starting configuration without checking the consistency of the data.
+   * It is also used when importing users into the system.
    *
-   * @param group    The group object which should be created
+   * @param user     The user object which should be created
    * @param creator  The creator
    */
   public final synchronized void initializeUser(MCRUser user, String creator) throws MCRException
@@ -1561,3 +1544,4 @@ public class MCRUserMgr
     }
   }
 }
+
