@@ -118,4 +118,12 @@ public abstract class MCRClassificationObject
     
     deleted = true;
   }
+
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer( getClass().getName() ).append( "\n" );
+    sb.append( "ID:             " ).append( ID    ).append( "\n" );
+    sb.append( "Label:          " ).append( label );
+    return sb.toString();
+  }
 }

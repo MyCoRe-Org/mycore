@@ -103,4 +103,12 @@ public class MCRCategory extends MCRClassificationObject
     
     return manager().retrieveCategory( classifID, categID );
   }
+
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer( super.toString() ).append( "\n" );
+    sb.append( "Classification: " ).append( classifID ).append( "\n" );
+    sb.append( "Parent ID:      " ).append( parentID  );
+    return sb.toString();
+  }
 }
