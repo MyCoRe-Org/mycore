@@ -50,7 +50,7 @@ public class MCRSQLStatement
     this.columns    = new Vector();
   }
   
-  public MCRSQLStatement setValue( String columnName, String columnValue )
+  public final MCRSQLStatement setValue( String columnName, String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
 
@@ -62,7 +62,8 @@ public class MCRSQLStatement
     return this;
   }
   
-  public MCRSQLStatement setCondition( String columnName, String columnValue )
+  public final MCRSQLStatement setCondition( String columnName, 
+    String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
 
@@ -74,20 +75,20 @@ public class MCRSQLStatement
     return this;
   }
   
-  public MCRSQLStatement addColumn( String columnDefinition )
+  public final MCRSQLStatement addColumn( String columnDefinition )
   {
     MCRArgumentChecker.ensureNotEmpty( columnDefinition, "columnDefinition" );
     columns.addElement( columnDefinition );
     return this;
   }
   
-  protected String getSQLValue( String key )
+  protected final String getSQLValue( String key )
   {
     String value = values.getProperty( key );
     return ( value == NULL ? "NULL" : "'" + value + "'" );
   }
   
-  protected String condition()
+  protected final String condition()
   {
     if( conditions.isEmpty() ) return "";
     
@@ -101,17 +102,21 @@ public class MCRSQLStatement
       
       sql.append( key ).append( " " );
       
-      if( value == NULL )
-        sql.append( "IS NULL" );
-      else
-        sql.append( "= '" ).append( value ).append( "'" );
+      if( value == NULL ) {
+        sql.append( "IS NULL" ); }
+      else {
+        if (value.indexOf("%") == -1) {
+          sql.append( "= '" ).append( value ).append( "'" ); }
+        else {
+          sql.append( "LIKE '" ).append( value ).append( "'" ); }
+        }
       
       if( keys.hasMoreElements() ) sql.append( " AND " );
     }
     return sql.toString();
   }
   
-  public String toInsertStatement()
+  public final String toInsertStatement()
   {
     StringBuffer statement = new StringBuffer( "INSERT INTO " );  
     statement.append( tableName ).append( " (" );
@@ -141,7 +146,7 @@ public class MCRSQLStatement
     return statement.toString();
   }
   
-  public String toUpdateStatement()
+  public final String toUpdateStatement()
   {
     StringBuffer statement = new StringBuffer( "UPDATE " );  
     statement.append( tableName ).append( " SET" );
@@ -162,7 +167,7 @@ public class MCRSQLStatement
     return statement.toString();
   }
   
-  public String toCreateTableStatement()
+  public final String toCreateTableStatement()
   {
     StringBuffer statement = new StringBuffer( "CREATE TABLE " );  
     statement.append( tableName ).append( " (" );
@@ -178,12 +183,16 @@ public class MCRSQLStatement
     return statement.toString();
   }
   
-  public String toRowSelector()
+  public final String toRowSelector()
   { return new StringBuffer( tableName ).append( condition() ).toString(); }
   
-  public String toSelectStatement()
+  public final String toSelectStatement()
   { return "SELECT * FROM " + toRowSelector(); }
   
-  public String toDeleteStatement()
+  public final String toDeleteStatement()
   { return "DELETE FROM " + toRowSelector(); }
+
+  public final String toCountStatement()
+  { return "SELECT COUNT( DISTINCT FROM ) AS NUMBER FROM " + toRowSelector(); }
+  
 }
