@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+            xmlns:xml='http://www.w3.org/XML/1998/namespace'
+            elementFormDefault="unqualified">
 
  <xsd:annotation>
   <xsd:documentation xml:lang="en">
@@ -7,6 +9,9 @@
    part of a MCRObject.
   </xsd:documentation>
  </xsd:annotation>
+
+ <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+             schemaLocation="./xml-2001.xsd" />
 
  <xsd:complexType name="MCRObjectService" >
   <xsd:sequence>
@@ -35,6 +40,7 @@
          </xsd:restriction>
         </xsd:simpleType>
        </xsd:attribute>
+       <xsd:attribute ref="xml:lang" />
       </xsd:extension>
      </xsd:simpleContent>
     </xsd:complexType>
@@ -44,8 +50,15 @@
 
  <xsd:complexType name="MCRServiceFlags">
   <xsd:sequence>
-   <xsd:element name="flag" type='xsd:string' minOccurs='1' 
-     maxOccurs='unbounded'/>
+   <xsd:element name="flag" minOccurs='1' maxOccurs='unbounded'>
+    <xsd:complexType>
+     <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+       <xsd:attribute ref="xml:lang" />
+      </xsd:extension>
+     </xsd:simpleContent>
+    </xsd:complexType>
+   </xsd:element>
   </xsd:sequence>
  </xsd:complexType>
 

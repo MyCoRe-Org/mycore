@@ -72,12 +72,15 @@ private Document mcr_document = null;
 // the object content
 private MCRObjectID mcr_id = null;
 private String mcr_label = null;
+private String mcr_schema = null;
+private String mcr_schema_path = null;
 private MCRObjectStructure mcr_struct = null;
 private MCRObjectService mcr_service = null;
 private MCRObjectMetadata mcr_metadata = null;
 
 // other
 private String NL;
+private String SLASH;
 
 /**
  * This is the constructor of the MCRObject class. It make an
@@ -93,9 +96,12 @@ private String NL;
  */
 public MCRObject() throws MCRException, MCRConfigurationException
   {
-  NL = new String((System.getProperties()).getProperty("line.separator"));
+  NL = System.getProperty("line.separator");
+  SLASH = System.getProperty("file.separator");
   mcr_id = new MCRObjectID();
   mcr_label = new String("");
+  mcr_schema = new String("");
+  mcr_schema_path = new String("");
   persist_type = new String("");
   mcr_persist = null;
   mcr_query = null;
@@ -104,6 +110,9 @@ public MCRObject() throws MCRException, MCRConfigurationException
     parser_name = MCRConfiguration.instance()
       .getString("MCR.parser_class_name");
     mcr_parser = (MCRParserInterface)Class.forName(parser_name).newInstance();
+  // Path of XML schema
+    mcr_schema_path = MCRConfiguration.instance()
+      .getString("MCR.parser_schema_path");
   // Metadata class
     mcr_metadata = new MCRObjectMetadata();
   // Structure class
@@ -176,6 +185,12 @@ private final void set() throws MCRException
   mcr_label = dom_element.getAttribute("label").trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
    mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
+  mcr_schema = dom_element.getAttribute("xsi:noNamespaceSchemaLocation").trim();
+  int i=0;
+  int j=0;
+  while (j!=-1) {
+    j = mcr_schema.indexOf(SLASH,i+1); if (j!=-1) { i = j; } }
+  mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
   // get the structure data of the object
   dom_element_list = mcr_document.getElementsByTagName("structure");
   mcr_struct.setFromDOM(dom_element_list);
@@ -315,8 +330,8 @@ public final String createXML() throws MCRException
     .append(NL);
   sb.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\"")
     .append(NL);
-  sb.append("xsi:noNamespaceSchemaLocation=\"../schema/")
-    .append(mcr_id.getBase()).append(".xsd\"").append(NL);
+  sb.append("xsi:noNamespaceSchemaLocation=\"").append(mcr_schema_path)
+    .append(SLASH).append(mcr_schema).append("\"").append(NL);
   sb.append("ID=\"").append(mcr_id.getId()).append("\" ").append(NL);
   sb.append("label=\"").append(mcr_label).append("\">").append(NL);
   sb.append(mcr_struct.createXML());
@@ -394,17 +409,35 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
   }
 
 /**
- * The methode receive the object in the data store.
+ * The methode receive the object for the given MCRObjectID and stored
+ * it in this MCRObject.
  *
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void receiveFromDatastore(String id) throws MCRPersistenceException
+public final void receiveFromDatastore(String id) 
+  throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
   if (mcr_persist==null) { setPersistence(); }
   String xml = mcr_persist.receive(mcr_id);
   setFromXML(xml);
+  }
+
+/**
+ * The methode receive the object for the given MCRObjectID and returned
+ * it as XML stream.
+ *
+ * @param id   the object ID
+ * @return the XML stream of the object as string
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final String receiveXMLFromDatastore(String id) 
+  throws MCRPersistenceException
+  {
+  mcr_id = new MCRObjectID(id);
+  if (mcr_persist==null) { setPersistence(); }
+  return mcr_persist.receive(mcr_id);
   }
 
 /**
@@ -438,6 +471,8 @@ public final boolean isValid()
   if (!mcr_id.isValid()) { return false; }
   if ((mcr_label == null) || ((mcr_label = mcr_label.trim()).length() ==0)) {
     return false; }
+  if ((mcr_schema == null) || ((mcr_schema = mcr_schema.trim()).length() ==0)) {
+    return false; }
   return true;
   }
 
@@ -448,8 +483,9 @@ public final void debug()
   {
   System.out.println();
   System.out.println("The object content :");
-  System.out.println("  ID    = "+mcr_id.getId());
-  System.out.println("  label = "+mcr_label);
+  System.out.println("  ID     = "+mcr_id.getId());
+  System.out.println("  label  = "+mcr_label);
+  System.out.println("  schema = "+mcr_schema);
   System.out.println();
   }
 }

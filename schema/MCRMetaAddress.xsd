@@ -11,7 +11,7 @@
  </xsd:annotation>
 
  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
-             schemaLocation="../../schema/xml-2001.xsd" />
+             schemaLocation="./xml-2001.xsd" />
 
  <xsd:complexType name="MCRMetaAddress">
   <xsd:sequence>
