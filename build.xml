@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.84 $ $Date: 2004-08-10 09:26:19 $                      -->
+  <!-- $Revision: 1.85 $ $Date: 2004-08-19 13:56:47 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -64,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.84 $ $Date: 2004-08-10 09:26:19 $</echo>
+    <echo>Ant build file   : $Revision: 1.85 $ $Date: 2004-08-19 13:56:47 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -182,7 +182,7 @@
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-    depends="compile_common, compile_servlets, compile_user, compile_acl, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency"/>
+    depends="compile_common, compile_servlets, compile_user, compile_acl, compile_metadata, compile_classifications, compile_nbn, compile_workflow, compile_editor, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency"/>
 
   <target name="compile_common">
     <echo>Compiling common classes...</echo>
@@ -308,6 +308,13 @@
     <echo>Compiling Plugin support classes...</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/services/plugins/**"/>
+    </antcall>
+  </target>
+
+  <target name="compile_workflow">
+    <echo>Compiling support for the workflow ...</echo>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/frontend/workflow/**"/>
     </antcall>
   </target>
 
