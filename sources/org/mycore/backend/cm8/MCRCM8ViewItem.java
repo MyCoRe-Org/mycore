@@ -40,6 +40,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *   java CRCM8ViewItem ifs <em>MCRObjectID</em><br />
  * 
  * @author Holger König
+ * @author Jens Kupferschmidt
+ * @author Kathleen Krebs
  * @version $Revision$ $Date$
  **/
 
@@ -88,9 +90,9 @@ public static void main(String argv[]) throws DKException, Exception
     ifsfile = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.File");
     //query = "/"+itemtype+"[@ifsfile=\""+mcrid.getId()+"\"]";
     // show all items
-    query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
+    //query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
     // show all items
-    //query = "/"+itemtype;
+    query = "/"+itemtype;
     }
 
   System.out.println(query);
@@ -160,6 +162,11 @@ private static void processDDO(Object obj, String pre) throws Exception
 	processDDO((DKDDO)iter.next(),"|  "+pre); }
       }			
     }
+
+    //uncomment the next lines if you will delete the items from the itemtype
+    //String storageID = ddo.getPidObject().pidString();
+    //doDeleteContent(storageID);
+    //System.out.println("Item Deleted");
 
   }
 }
