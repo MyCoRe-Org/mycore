@@ -42,6 +42,19 @@ import mycore.common.*;
 */
 public class MCRQueryServlet extends HttpServlet 
 {
+// Default Language (as UpperCase)
+private String defaultLang = "";
+
+ /**
+  * The initialization method for this servlet. This read the default
+  * language from the configuration.
+  **/
+  public void init() throws MCRConfigurationException
+    {
+    String defaultLang = MCRConfiguration.instance()
+      .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    }
+
  /**
   * This method handles HTTP GET requests and resolves them to output.
   *
@@ -64,6 +77,12 @@ public class MCRQueryServlet extends HttpServlet
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
     String lang  = request.getParameter( "lang" );
+
+    System.out.println("MCRQueryServlet : mode = "+mode);
+    System.out.println("MCRQueryServlet : type = "+type);
+    System.out.println("MCRQueryServlet : hosts = "+host);
+    System.out.println("MCRQueryServlet : lang = "+lang);
+    System.out.println("MCRQueryServlet : query = "+query);
 
     if( mode  == null ) mode  = "ResultList";
 
@@ -103,7 +122,7 @@ public class MCRQueryServlet extends HttpServlet
     if( host  == null ) host  = "local";
     if( query == null ) query = "";
     if( type  == null ) return;
-    if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
+    if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
 
     // prepare the stylesheet name
     String style = mode + "-" + type+ "-" + lang;
