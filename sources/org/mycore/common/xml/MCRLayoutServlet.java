@@ -196,7 +196,7 @@ public class MCRLayoutServlet extends HttpServlet
     return input;
   }
   
-  protected Properties buildXSLParameters( HttpServletRequest request )
+  public Properties buildXSLParameters( HttpServletRequest request )
   {
     Properties parameters = new Properties();
     
