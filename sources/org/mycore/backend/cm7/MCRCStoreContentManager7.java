@@ -39,8 +39,8 @@ import java.io.*;
  * <code>
  *   MCR.IFS.ContentStore.<StoreID>.SegmentSize     Maximum DKDDO size in bytes, default is 1 MB
  *   MCR.IFS.ContentStore.<StoreID>.IndexClass      Index Class to use
- *   MCR.IFS.ContentStore.<StoreID>.Keyfield.Owner  Name of file owner keyfield
- *   MCR.IFS.ContentStore.<StoreID>.Keyfield.Path   Name of file path  keyfield
+ *   MCR.IFS.ContentStore.<StoreID>.Keyfield.File   Keyfield storing file ID
+ *   MCR.IFS.ContentStore.<StoreID>.Keyfield.Time   Keyfield storing timestamp
  * </code>
  *
  * @author Frank Lützenkirchen
