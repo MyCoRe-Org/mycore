@@ -25,7 +25,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
-import java.text.*;
 import java.util.*;
 import java.lang.reflect.*;
 
@@ -48,6 +47,7 @@ import org.mycore.common.*;
  * @author Frank Lützenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRCommandLineInterface
@@ -154,12 +154,12 @@ public class MCRCommandLineInterface
     // Commands for derivate management
     // *************************************************
 
+	knownCommands[ numCommands++ ] = new MCRCommand(session,
+	  "delete derivate from {0} to {1}",
+	  "org.mycore.frontend.cli.MCRDerivateCommands.delete String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete derivate {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "delete derivate from {0} to {1}",
-      "org.mycore.frontend.cli.MCRObjectCommands.delete String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load derivate from file {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String" );
