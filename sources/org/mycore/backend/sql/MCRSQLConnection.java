@@ -72,7 +72,7 @@ public class MCRSQLConnection
 
     String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
     
-    logger.info( "MCRSQLConnection: Building connection to JDBC datastore... with " + url);
+    logger.debug( "MCRSQLConnection: Building connection to JDBC datastore... with " + url);
     
     Connection connection = null;
     try{ connection = DriverManager.getConnection( url ); }
@@ -279,26 +279,28 @@ public class MCRSQLConnection
    * Checks existence of table
    *
    * @param tablename 
+   * @throws MCRPersistenceException if the JDBC driver could not be loaded or
+   *   initial connections could not be created or can not get a connection
    * @return true or false
    **/  
   public static boolean doesTableExist( String tablename )
     throws MCRPersistenceException
-  {
-    MCRSQLConnection c  = MCRSQLConnectionPool.instance().getConnection();
-    try{ 
-        String [] tableTypes  = { "TABLE" };
-        DatabaseMetaData dbmd = c.getJDBCConnection().getMetaData();
-        ResultSet resultSet   = dbmd.getTables(null, null, tablename, tableTypes); 
-        int recordCount = 0;
-        while (resultSet.next()) {
-         ++recordCount;
-        } 
-        return( recordCount != 0 );
-       }
+    {
+    boolean ret = false;
+    MCRSQLConnection c  = MCRSQLConnectionPool.instance().getConnection(); 
+    try { 
+      String [] tableTypes  = { "TABLE" };
+      DatabaseMetaData dbmd = c.getJDBCConnection().getMetaData();
+      ResultSet resultSet   = dbmd.getTables(null, null, tablename, tableTypes); 
+      int recordCount = 0;
+      while (resultSet.next()) { ++recordCount; } 
+      if( recordCount != 0 ) { ret = true; }
+      }
     catch( Exception exc )
-    { throw new MCRPersistenceException( "Error while checking existence of table " + tablename, exc ); }
+      { }
     finally
-    { c.release(); }
-  }
+      { c.release(); }
+    return ret;
+    }
 
 }

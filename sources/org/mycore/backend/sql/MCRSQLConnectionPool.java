@@ -70,6 +70,7 @@ public class MCRSQLConnectionPool
    *   initial connections could not be created
    **/
   public static synchronized MCRSQLConnectionPool instance()
+    throws MCRPersistenceException
     { 
     if( singleton == null ) singleton = new MCRSQLConnectionPool();
     return singleton; 
@@ -92,7 +93,7 @@ public class MCRSQLConnectionPool
     int initNumConnections = 
       config.getInt("MCR.persistence_sql_init_connections",maxNumConnections);
     String driver = config.getString("MCR.persistence_sql_driver");
-    logger.info( "MCR.persistence_sql_driver: " + driver );
+    logger.debug( "MCR.persistence_sql_driver: " + driver );
     
     try{ Class.forName( driver ); } // Load the JDBC driver
     catch( Exception exc ) {
@@ -101,9 +102,10 @@ public class MCRSQLConnectionPool
       }
     
     // Build the initial number of JDBC connections
-    for( int i = 0; i < initNumConnections; i++ )
+    for( int i = 0; i < initNumConnections; i++ ) {
       freeConnections.addElement( new MCRSQLConnection() );
-    logger.info("");
+      logger.info("Initialize a MCRSQLConnection.");
+      }
     }
   
   /**

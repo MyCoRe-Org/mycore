@@ -28,6 +28,10 @@ import java.io.*;
 import java.sql.*;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
@@ -42,6 +46,9 @@ import org.mycore.user.*;
  */
 public class MCRSQLUserStore implements MCRUserStore
 {
+  /** the logger */
+  static Logger logger=Logger.getLogger(MCRSQLUserStore.class.getName());
+
   /** name of the sql table containing user information */
   private String SQLUsersTable;
 
@@ -66,16 +73,171 @@ public class MCRSQLUserStore implements MCRUserStore
    * do not yet exist they will be created.
    */
   public MCRSQLUserStore()
-  {
-    SQLUsersTable        = MCRConfiguration.instance().getString("MCR.users_store_sql_table_users");
-    SQLGroupsTable       = MCRConfiguration.instance().getString("MCR.users_store_sql_table_groups");
-    SQLGroupMembersTable = MCRConfiguration.instance().getString("MCR.users_store_sql_table_group_members");
-    SQLGroupAdminsTable  = MCRConfiguration.instance().getString("MCR.users_store_sql_table_group_admins");
-    SQLPrivilegesTable   = MCRConfiguration.instance().getString("MCR.users_store_sql_table_privileges");
-    SQLPrivsLookupTable  = MCRConfiguration.instance().getString("MCR.users_store_sql_table_privs_lookup");
+    {
+    // set configuration
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    SQLUsersTable        = config.getString(
+      "MCR.users_store_sql_table_users","MCRUSERS");
+    SQLGroupsTable       = config.getString(
+      "MCR.users_store_sql_table_groups","MCRGROUPS");
+    SQLGroupMembersTable = config.getString(
+      "MCR.users_store_sql_table_group_members","MCRGROUPMEMBERS");
+    SQLGroupAdminsTable  = config.getString(
+      "MCR.users_store_sql_table_group_admins","MCRGROUPADMINS");
+    SQLPrivilegesTable   = config.getString(
+      "MCR.users_store_sql_table_privileges","MCRPRIVS");
+    SQLPrivsLookupTable  = config.getString(
+      "MCR.users_store_sql_table_privs_lookup","MCRPRIVSLOOKUP");
+    // create tables
+    if(! MCRSQLConnection.doesTableExist(SQLUsersTable)) {
+      logger.info("Create table "+SQLUsersTable);
+      createSQLUsersTable();
+      logger.info("Done."); }
+    if(! MCRSQLConnection.doesTableExist(SQLGroupsTable)) {
+      logger.info("Create table "+SQLGroupsTable);
+      createSQLGroupsTable();
+      logger.info("Done."); }
+    if(! MCRSQLConnection.doesTableExist(SQLGroupMembersTable)) {
+      logger.info("Create table "+SQLGroupMembersTable);
+      createSQLGroupMembersTable();
+      logger.info("Done."); }
+    if(! MCRSQLConnection.doesTableExist(SQLGroupAdminsTable)) {
+      logger.info("Create table "+SQLGroupAdminsTable);
+      createSQLGroupAdminsTable();
+      logger.info("Done."); }
+    if(! MCRSQLConnection.doesTableExist(SQLPrivilegesTable)) {
+      logger.info("Create table "+SQLPrivilegesTable);
+      createSQLPrivilegesTable();
+      logger.info("Done."); }
+    if(! MCRSQLConnection.doesTableExist(SQLPrivsLookupTable)) {
+      logger.info("Create table "+SQLPrivsLookupTable);
+      createSQLPrivsLookupTable();
+      logger.info("Done."); }
+    }
 
-    if (!tablesExist()) createTables();
-  }
+  /**
+   * This method creates the table named SQLUsersTable.
+   */
+  private final void createSQLUsersTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+      c.doUpdate (new MCRSQLStatement(SQLUsersTable)
+       .addColumn("NUMID INTEGER NOT NULL")
+       .addColumn("UID VARCHAR(20) NOT NULL")
+       .addColumn("CREATOR VARCHAR(20) NOT NULL")
+       .addColumn("CREATIONDATE TIMESTAMP")
+       .addColumn("MODIFIEDDATE TIMESTAMP")
+       .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("PASSWD VARCHAR(20) NOT NULL")
+       .addColumn("ENABLED VARCHAR(8) NOT NULL")
+       .addColumn("UPD VARCHAR(8) NOT NULL")
+       .addColumn("SALUTATION VARCHAR(25) NOT NULL")
+       .addColumn("FIRSTNAME VARCHAR(25) NOT NULL")
+       .addColumn("LASTNAME VARCHAR(25) NOT NULL")
+       .addColumn("STREET VARCHAR(40)")
+       .addColumn("CITY VARCHAR(25)")
+       .addColumn("POSTALCODE VARCHAR(16)")
+       .addColumn("COUNTRY VARCHAR(25)")
+       .addColumn("STATE VARCHAR(25)")
+       .addColumn("INSTITUTION VARCHAR(64)")
+       .addColumn("FACULTY VARCHAR(64)")
+       .addColumn("DEPARTMENT VARCHAR(64)")
+       .addColumn("INSTITUTE VARCHAR(64)")
+       .addColumn("TELEPHONE VARCHAR(20) NOT NULL")
+       .addColumn("FAX VARCHAR(20)")
+       .addColumn("EMAIL VARCHAR(64) NOT NULL")
+       .addColumn("CELLPHONE VARCHAR(20)")
+       .addColumn("PRIMGROUP VARCHAR(20) NOT NULL")
+       .addColumn("PRIMARY KEY(UID)")
+       .addColumn("UNIQUE (NUMID)")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
+
+  /**
+   * This method creates the table named SQLGroupsTable.
+   */
+  private final void createSQLGroupsTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+      c.doUpdate (new MCRSQLStatement(SQLGroupsTable)
+       .addColumn("GID VARCHAR(20) NOT NULL")
+       .addColumn("CREATOR VARCHAR(20) NOT NULL")
+       .addColumn("CREATIONDATE TIMESTAMP")
+       .addColumn("MODIFIEDDATE TIMESTAMP")
+       .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("PRIMARY KEY(GID)")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
+
+  /**
+   * This method creates the table named SQLGroupAdminsTable
+   */
+  private final void createSQLGroupAdminsTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+       c.doUpdate (new MCRSQLStatement(SQLGroupAdminsTable)
+       .addColumn("GID VARCHAR(20) NOT NULL")
+       .addColumn("USERID VARCHAR(20)")
+       .addColumn("GROUPID VARCHAR(20)")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
+
+  /**
+   * This method creates the table named SQLGroupMembersTable.
+   */
+  private final void createSQLGroupMembersTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+      c.doUpdate (new MCRSQLStatement(SQLGroupMembersTable)
+       .addColumn("GID VARCHAR(20) NOT NULL")
+       .addColumn("USERID VARCHAR(20)")
+       .addColumn("GROUPID VARCHAR(20)")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
+
+  /**
+   * This method creates the table named SQLPrivilegesTable.
+   */
+  private final void createSQLPrivilegesTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+      c.doUpdate (new MCRSQLStatement(SQLPrivilegesTable)
+       .addColumn("NAME VARCHAR(64) NOT NULL")
+       .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("PRIMARY KEY(NAME)")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
+
+  /**
+   * This method creates the table named SQLPrivsLookupTable.
+   */
+  private final void createSQLPrivsLookupTable()
+    {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try {
+      c.doUpdate (new MCRSQLStatement(SQLPrivsLookupTable)
+       .addColumn("GID VARCHAR(20) NOT NULL")
+       .addColumn("NAME VARCHAR(64) NOT NULL")
+       .toCreateTableStatement());
+      }
+    finally {c.release();}
+    }
 
   /**
    * This method creates a MyCoRe user object in the persistent datastore.
@@ -1002,84 +1164,6 @@ public class MCRSQLUserStore implements MCRUserStore
       "' OR TABNAME = '" + SQLPrivsLookupTable + "'");
     return (number == 6);
 */
-  }
-
-  /**
-   * This method creates all necessary SQL tables for the user management.
-   */
-  private void createTables()
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-
-    try
-    {
-      c.doUpdate (new MCRSQLStatement(SQLUsersTable)
-       .addColumn("NUMID INTEGER NOT NULL")
-       .addColumn("UID VARCHAR(20) NOT NULL")
-       .addColumn("CREATOR VARCHAR(20) NOT NULL")
-       .addColumn("CREATIONDATE TIMESTAMP")
-       .addColumn("MODIFIEDDATE TIMESTAMP")
-       .addColumn("DESCRIPTION VARCHAR(200)")
-       .addColumn("PASSWD VARCHAR(20) NOT NULL")
-       .addColumn("ENABLED VARCHAR(8) NOT NULL")
-       .addColumn("UPD VARCHAR(8) NOT NULL")
-       .addColumn("SALUTATION VARCHAR(25) NOT NULL")
-       .addColumn("FIRSTNAME VARCHAR(25) NOT NULL")
-       .addColumn("LASTNAME VARCHAR(25) NOT NULL")
-       .addColumn("STREET VARCHAR(40)")
-       .addColumn("CITY VARCHAR(25)")
-       .addColumn("POSTALCODE VARCHAR(16)")
-       .addColumn("COUNTRY VARCHAR(25)")
-       .addColumn("STATE VARCHAR(25)")
-       .addColumn("INSTITUTION VARCHAR(64)")
-       .addColumn("FACULTY VARCHAR(64)")
-       .addColumn("DEPARTMENT VARCHAR(64)")
-       .addColumn("INSTITUTE VARCHAR(64)")
-       .addColumn("TELEPHONE VARCHAR(20) NOT NULL")
-       .addColumn("FAX VARCHAR(20)")
-       .addColumn("EMAIL VARCHAR(64) NOT NULL")
-       .addColumn("CELLPHONE VARCHAR(20)")
-       .addColumn("PRIMGROUP VARCHAR(20) NOT NULL")
-       .addColumn("PRIMARY KEY(UID)")
-       .addColumn("UNIQUE (NUMID)")
-       .toCreateTableStatement());
-
-      c.doUpdate (new MCRSQLStatement(SQLGroupsTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("CREATOR VARCHAR(20) NOT NULL")
-       .addColumn("CREATIONDATE TIMESTAMP")
-       .addColumn("MODIFIEDDATE TIMESTAMP")
-       .addColumn("DESCRIPTION VARCHAR(200)")
-       .addColumn("PRIMARY KEY(GID)")
-       .toCreateTableStatement());
-
-       c.doUpdate (new MCRSQLStatement(SQLGroupAdminsTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("USERID VARCHAR(20)")
-       .addColumn("GROUPID VARCHAR(20)")
-       .toCreateTableStatement());
-
-      c.doUpdate (new MCRSQLStatement(SQLGroupMembersTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("USERID VARCHAR(20)")
-       .addColumn("GROUPID VARCHAR(20)")
-       .toCreateTableStatement());
-
-      c.doUpdate (new MCRSQLStatement(SQLPrivilegesTable)
-       .addColumn("NAME VARCHAR(64) NOT NULL")
-       .addColumn("DESCRIPTION VARCHAR(200)")
-       .addColumn("PRIMARY KEY(NAME)")
-       .toCreateTableStatement());
-
-      c.doUpdate (new MCRSQLStatement(SQLPrivsLookupTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("NAME VARCHAR(64) NOT NULL")
-       //.addColumn("FOREIGN KEY (GID) REFERENCES "+ SQLGroupsTable +" (GID)")
-       //.addColumn("FOREIGN KEY (NAME) REFERENCES "+ SQLPrivilegesTable +" (NAME)")
-       .toCreateTableStatement());
-
-    }
-    finally {c.release();}
   }
 
   /**
