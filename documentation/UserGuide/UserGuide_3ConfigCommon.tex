@@ -3,36 +3,44 @@
 \subsection{Grundlegende Konfigurationen}
 %
 %
-Dieser Abschnitt beschäftigt sich mit der Konfiguration der Beispielanwendung in allgemeinen Bereichen wie JDBC, Logger, usw. . Alle Konfigurationen für das Mycore-Beispiel stehen unter {\it \$MYCORE\_SAMPLE\_HOME/config}.
+Dieser Abschnitt beschäftigt sich mit der Konfiguration der Beispielanwendung in allgemeinen Bereichen wie JDBC, Logger, usw. Die MyCoRe Konfigurationen für das Beispiel finden Sie im Verzeichnis {\tt /config}.
 %
 %
-\subsubsection{Allgemeines}
-%
-%
-In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter {\bf MCR.persistence\_type} fest, welchen Persitence Layer sie nutzen wollen. Mögliche Werte sind {\bf cm7}, {\bf cm8} oder {\bf xmldb}. Entfernen Sie einfach den entsprechenden Kommentar.
-\begin{verbatim}
-# The type of persistence layer (Content Manager 7 of IBM)
-#MCR.persistence_type=cm7
+\subsubsection{Pfade und Systemumgebung anpassen}
 
-# The type of persistence layer (Content Manager 8 of IBM)
-#MCR.persistence_type=cm8
+Auch für die Zusammenstellung und Installation der Beispiel-Anwendung verwendet MyCoRe das Apache Ant Build-Tool. 
+Entsprechend der Installationsanleitung des Ant-Paketes sollten Sie zunächst die 
+Umgebungsvariablen {\tt JAVA\_HOME} und {\tt ANT\_HOME} gesetzt haben. Sollten diese Variablen auf Ihrem System noch nicht 
+gesetzt sein, können Sie dies in der Datei {\tt build.sh} (Unix) bzw. {\tt build.cmd} (Windows) nachholen und korrigieren. 
 
-# The type of persistence layer (XML:DB)
-MCR.persistence_type=xmldb
-\end{verbatim}
-Weiterhin sind die allgemein gültigen Pfadvariablen für den MyCoRe-Kern und das MyCoRe-Sample anzupassen:
-\begin{verbatim}
-# The application root
-MCR.root_path=/home/mcradmin/mycore
-MCR.appl_path=/home/mcradmin/mycore-sample-application
-\end{verbatim}
-%
-%
-\subsubsection{JDBC-Treiber}
-%
-%
-Im MyCoRe-Projekt werden ein Teil der Organisations- und Metadaten in klassischen relationalen Datenbanken gespeichert. Um die Arbeit mit verschiedenen Anbietern möglichst einfach zu gestalten, wurde die Arbeit mit dieser Datenbank gegen die JDBC-Schnittstellen programmiert.\\
-In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter{\bf MCR.persistence\_sql\_database\_url} fest, welcher JDBC-Treiber genommen werden soll. Weiterhin können Sie die minimale und maximale Anzahl der Connections festlegen.
+Die MyCoRe Beispiel-Anwendung verwendet die Dateien aus dem MyCore Kern, insbesondere die erzeugte Datei 
+{\tt mycore-for[cm7|cm8|xmldb].jar} und die Konfigurationsdatei für den Build-Prozess {\tt build.properties}.
+Wenn die Verzeichnisse {\tt mycore} und \\
+{\tt mycore-sample-application} auf Ihrem System nicht in einem gemeinsamen
+übergeordneten Verzeichnis liegen, können Sie im build-Skript auch die Umgebungsvariable {\tt MYCORE\_HOME} auf einen entsprechend
+korrigierten Wert setzen, da die Vorgabe {\tt ../mycore} ist.
+
+Sie sollten zunächst prüfen, ob ihre Systemumgebung korrekt eingerichtet ist, indem Sie 
+\begin{center} 
+{\tt build.sh info } \qquad bzw. \qquad {\tt build.cmd info } 
+\end{center} 
+ausführen. Das Ant Build Tool zeigt Ihnen daraufhin die verwendeten JDK- und Ant-Software-Versionen und den 
+generierten CLASSPATH und LIBPATH (für Unix Systeme) an. 
+Eine Übersicht über alle wesentlichen Build-Ziele erhalten Sie mit 
+\begin{center} 
+{\tt build.sh usage } \qquad bzw. \qquad {\tt build.cmd usage } 
+\end{center} 
+
+\subsubsection{JDBC-Treiber konfigurieren}
+
+Im MyCoRe-Projekt werden ein Teil der Organisations- und Metadaten in klassischen relationalen Datenbanken gespeichert. 
+Um die Arbeit mit verschiedenen Anbietern möglichst einfach zu gestalten, wurde die Arbeit mit dieser Datenbank gegen die JDBC-Schnittstellen programmiert.\\
+In der Konfigurationsdatei {\it mycore.properties.private} legen Sie im Parameter \\
+{\bf MCR.persistence\_sql\_driver} fest, welcher JDBC-Treiber verwendet werden soll. 
+Weiterhin müssen Sie die Variable {\bf MCR.persistence\_sql\_database\_url} anpassen, die die JDBC URL für Verbindungen
+zu Ihrer Datenbank festlegt. Beachten Sie dabei insbesondere, dass meist Gross/Kleinschreibung relevant ist!
+Weiterhin können Sie die minimale und maximale Anzahl der gleichzeitigen Verbindungen zur Datenbank festlegen.
+
 \begin{verbatim}
 # JDBC parameters for connecting to DB2
 #MCR.persistence_sql_database_url=jdbc:db2:LIB
@@ -46,4 +54,55 @@ MCR.persistence_sql_init_connections=1
 MCR.persistence_sql_max_connections=5
 \end{verbatim}
 
+\subsubsection{XML-Datenbank konfigurieren}
+
+Den Typ der zur Laufzeit des Systems zu wählenden XML-Datenbank haben Sie bereits in der Datei {\tt build.properties} 
+über den Parameter {\tt MCR.XMLStore.Type} festgelegt. Dabei sind die Werte {\tt cm7} für IBM Content Manager 7, 
+{\tt cm8} für IBM Content Manager 8, oder {\tt xmldb} für eine XML:DB kompatible XML-Datenbank wie Apache Xindice, eXist 
+oder Tamino (Software AG) möglich. Die MyCoRe Beispiel-Anwendung verwendet automatisch diese Konfiguration, sie 
+müssen nun nur noch die Parameter der einzelnen XML-Datenbanken konfigurieren.
+
+\subsubsection{Konfiguration von IBM Content Manager 7}
+
+Falls Sie {\tt MCR.XMLStore.Type=cm7} verwenden, passen Sie in der Datei \\
+{\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_cm7\_*} an.
+
+\subsubsection{Konfiguration von IBM Content Manager 8}
+
+Falls Sie {\tt MCR.XMLStore.Type=cm8} verwenden, passen Sie in der Datei \\
+{\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_cm8\_*} an.
+
+\subsubsection{Die Nutzung von eXist als XML:DB Backend}
+
+Falls Sie {\tt MCR.XMLStore.Type=xmldb} verwenden, passen Sie in der Datei \\
+{\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_xmldb\_driver} \\
+und {\tt MCR.persistence\_xmldb\_database\_url} an.
+
+\begin{verbatim}
+MCR.persistence_xmldb_driver=org.exist.xmldb.DatabaseImpl
+MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/mycore
+MCR.persistence_xmldb_database=exist
+\end{verbatim}
+
+Starten Sie nun den eXist-Client und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
+
+\begin{verbatim}
+mkcol mycore
+chown guest guest mycore
+cd mycore
+mkcol legalentity
+chown guest guest legalentity
+mkcol document
+chown guest guest document
+mkcol derivate
+chown guest guest
+quit
+\end{verbatim}
+
+\subsubsection{Speicherung von Datei-Inhalten konfigurieren}
+
+In der Grundkonfiguration verwendet die Beispiel-Applikation zur Speicherung der Datei-Inhalte
+der Derivate das lokale Dateisystem. Passen Sie in der Datei \\
+{\tt mycore.properties.private} die Variable {\tt MCR.IFS.ContentStore.FS.BaseDirectory} 
+an und erzeugen Sie ein neues, leeres Verzeichnis am angegebenen Ort.
 

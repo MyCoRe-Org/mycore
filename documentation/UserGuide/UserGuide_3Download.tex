@@ -15,16 +15,14 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \hline
 {\bf mycore-sample-application} &  Das Root-Verzeichnis des MyCoRe-Samples \\
 \quad {\bf bin} & Das Verzeichnis der Shellscripte \\
-\qquad build.sh & Shellscript zum Compilieren unter einem UNIX-System \\
-\qquad build.cmd & Shellscript zum Compilieren unter einem UNIX-System \\
-\qquad setup.sh & Shellscript, welches die Umgebung für das Sample setzt \\
-\qquad setup.cmd & Shellscript, welches die Umgebung für das Sample setzt \\
+\qquad build.sh & Shellscript für den Build-Prozess unter einem UNIX-System \\
+\qquad build.cmd & Shellscript für den Build-Prozess unter einem Windows-System \\
 \quad {\bf config} & Das Verzeichnis der Konfigurationsdateien \\
-\qquad ContentStoreSelectionRules.xml & Das Regelwerk zur Speicherung des Contents in die einzelnen Stores. \\
-\qquad FileContentTypes.xml & Eine Liste der verschiedenen Content-Typen \\
+\qquad ContentStoreSelectionRules.xml & Regeln, in welchem FileContentStore welche Dateien gespeichert werden \\
+\qquad FileContentTypes.xml & Liste der erkannten Dateitypen (FileContentTypes) \\
 \qquad MyCoReDemoDC\_....xml & Die Konfigurationsdateien der einzelnen Sample-Metadatentypen. \\
 \qquad SearchMask\_....xml & Die Konfigurationsdateien der Suchmasken \\
-\qquad editor-...-nbn.xml & Die Konfigurationsdateien für die NBN Funktionalität. \\
+\qquad editor-...-nbn.xml & Konfigurationsdateien für die NBN Funktionalität. \\
 \qquad ibm-web-... & Zusätzliche Dateien zur Nutzung von IBM WebSphere. \\
 \qquad mycore.properties & Das Master-Property-File für MyCoRe \\
 \qquad mycore.properties.application & Ein Platzhalter-Property-File für andere MyCoRe-Anwendungen. \\
@@ -40,16 +38,14 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \qquad mycore.properties.user & Das Property-File für den User- und Rechteverwaltungs-Bereich. \\
 \qquad mycore.properties.xmlsortkeys & Das Property-File für den Präsentationsbereich. \\
 \qquad reservation.xml & ein Konfigurations-File für den NBN-Bereich. \\
-\qquad {\bf user} & In diesem Verzeichnis sind alle Gruppen, Nutzer und Privilegien abgelegt, welche für das Sample benötigt werden. \\
 \qquad web.xml & Das Konfigurations-File für die Servlet-Engine \\
 \quad {\bf content} & Hier finden Sie alle Beispieldaten. \\
 \qquad {\bf classifications} & Die Daten der Klassifikationen. \\
 \qquad {\bf documents} & Die Daten der Dokumente. \\
 \qquad {\bf derivates} & Die Daten der Derivate. \\
 \qquad {\bf legalentities} & Die Daten der LegalEntities. \\
+\qquad {\bf user} & Gruppen, Nutzer und Privilegien, welche für das Sample benötigt werden. \\
 \qquad {\bf objects} & Die eigentlichen multimedialen Objekte. \\
-\quad {\bf schema} & Das Verzeichnis der XML-Schema-Files für das Sample. \\
-\quad {\bf sources} & Hier sind zusätzliche Java-Klassen abgelegt, welche nur für diese Anwendung gültig sind. Die Struktur ist analog dem MyCoRe-Kern. \\
 \quad {\bf stylesheets} & Die verwendeten XSLT-Stylesheets der Präsentation dieses Samples. \\
 \quad build.xml & Konfigurations-File für die Arbeit mit ANT \\
 \quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen. \\

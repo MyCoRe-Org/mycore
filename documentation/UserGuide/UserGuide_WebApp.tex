@@ -1,0 +1,27 @@
+\section{Erzeugen und Konfigurieren der Web-Anwendung}
+\subsection{Erzeugen der Web-Anwendung}
+Durch Eingabe von
+\begin{center} 
+{\tt build.sh webapp } \qquad bzw. \qquad {\tt build.cmd webapp } 
+\end{center} 
+wird die MyCoRe Sample Web Application im Verzeichnis {\tt webapps}
+erzeugt. Alternativ können Sie auch ein Web Application Archive (war)
+erzeugen, indem Sie
+\begin{center}
+{\tt build.sh war } \qquad bzw. \qquad {\tt build.cmd war }
+\end{center}
+aufrufen. 
+
+Das MyCoRe Build-Script kopiert beim Erzeugen der Web Applikation
+auch alle externen, erforderlichen jar-Dateien Ihrer verwendeten 
+Datenbank-Systeme (IBM Content Manager / DB2, MySQL, eXist) in das
+Verzeichnis {\tt WEB-INF/lib}, entsprechend den Vorgaben Ihrer
+Konfiguration in {\tt build.properties}. Beachten Sie dazu bitte die 
+Hinweise in der Ausgabe beim Erzeugen der Web Application.
+
+\subsection{Konfiguration des Web Application Server}
+\subsubsection{ Tomcat}
+\subsubsection{ Websphere}
+\subsection{Das Layout-Setvlet und das Zusammenspiel der Servlets untereinander}
+\subsection{Die Nutzung des Editor-Servlets}
+
