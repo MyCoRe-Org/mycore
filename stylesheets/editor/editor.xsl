@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.21 $ $Date: 2004-12-16 16:10:37 $ -->
+<!-- $Revision: 1.22 $ $Date: 2004-12-22 22:25:35 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
   version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:editor="http://www.mycore.org/editor"
 >
 
 <!-- ========================================================================= -->
@@ -16,15 +15,12 @@
 <xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameters ======== -->
-<xsl:param name="editor.source.new" select="'false'" /> <!-- if true, empty source -->
-
-<xsl:param name="editor.source.url" /> <!-- if given, get source from this url -->
-<xsl:param name="editor.source.id"  /> <!-- if given, substitute @@ID@@ in source/@url -->
 
 <xsl:param name="editor.cancel.url" /> <!-- if given, use this url for cancel button -->
 <xsl:param name="editor.cancel.id"  /> <!-- if given, substitute @@ID@@ in cancel/@url -->
 
-<xsl:param name="StaticFilePath" /> <!-- path of static webpage including this editor -->
+<xsl:param name="StaticFilePath"  /> <!-- path of static webpage including this editor -->
+<xsl:param name="RequestParamKey" /> <!-- key for accessing http request params in session -->
 
 <!-- ========= http request parameter zum Durchreichen an target ======== -->
 <xsl:param name="target.param.0" />
@@ -44,123 +40,12 @@
 
 <xsl:template match="editor">
 
+  <!-- ======== import editor definition ======== -->
   <xsl:variable name="uri" select="concat('webapp:', $StaticFilePath)" />
-  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=load.definition&amp;_uri=',$uri,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID)" />
-
-  <xsl:variable name="combined">
-    <editor>
-      <!-- ======== import editor definition ======== -->
-      <xsl:variable name="imported.editor" select="document($url,.)/editor" />
-
-      <!-- ======== remember editor session ID ======== -->
-      <xsl:attribute name="session">
-        <xsl:value-of select="$imported.editor/@session" />
-      </xsl:attribute>
-
-      <!-- ======== read input xml from source url ======== -->
-      <xsl:for-each select="$imported.editor">
-        <xsl:call-template name="editor.read.source" />
-      </xsl:for-each>
-
-      <!-- ======== copy editor definition ======== -->
-      <xsl:apply-templates select="$imported.editor/*" mode="copy-editor" />
-    </editor>
-  </xsl:variable>
+  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=start.session&amp;_uri=',$uri,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID,'&amp;_requestParamKey=',$RequestParamKey)" />
 
   <!-- ======== build nested panel structure ======== -->
-  <xsl:apply-templates select="xalan:nodeset($combined)/editor/components" />
-
-</xsl:template>
-
-<!-- ======== copy imported editor definition ======== -->
-<xsl:template match="*" mode="copy-editor">
-
-  <xsl:copy>
-    <xsl:for-each select="@*">
-      <xsl:copy-of select="." />
-    </xsl:for-each>
-    <xsl:apply-templates select="node()" mode="copy-editor" />
-  </xsl:copy>
-</xsl:template>
-
-<!-- ========================================================================= -->
-
-<!-- ======== transforms xml to flat name=value pairs ======== -->
-
-<xsl:template match="*" mode="editor.source.to.list">
-  <xsl:param name="prefix" select="$editor.delimiter.root" />
-
-  <!-- ======== local helper variables ======== -->
-  <xsl:variable name="my.name" select="local-name()" />
-  <xsl:variable name="my.position" 
-    select="1 + count(preceding-sibling::*[local-name()=$my.name])" 
-  />
-
-  <!-- ======== build new prefix ======== -->
-  <xsl:variable name="prefix.new">
-    <xsl:value-of select="$prefix" />
-    <xsl:if test="$prefix != $editor.delimiter.root">
-      <xsl:value-of select="$editor.delimiter.element" />
-    </xsl:if>
-    <xsl:value-of select="local-name()" />
-    <xsl:if test="$my.position &gt; 1">
-      <xsl:value-of select="$editor.delimiter.pos.start" />
-      <xsl:value-of select="$my.position" />
-      <xsl:value-of select="$editor.delimiter.pos.end" />
-    </xsl:if>
-  </xsl:variable>
-
-  <!-- ======== transform text content ======== -->
-  <xsl:if test="string-length(normalize-space(text())) &gt; 0">
-    <editor:source-variable name="{$prefix.new}" value="{text()}" />
-  </xsl:if>
-
-  <!-- ======== transform all attributes ======== -->
-  <xsl:for-each select="./@*">
-    <xsl:if test="string-length(normalize-space(.)) &gt; 0">
-      <editor:source-variable name="{concat($prefix.new,$editor.delimiter.element,$editor.delimiter.attribute,local-name())}" value="{.}" />
-    </xsl:if>
-  </xsl:for-each>
-
-  <!-- ======== transform all child elements ======== -->
-  <xsl:for-each select="*">
-    <xsl:apply-templates mode="editor.source.to.list" select=".">
-      <xsl:with-param name="prefix" select="$prefix.new" />
-    </xsl:apply-templates>
-  </xsl:for-each>
-</xsl:template>
-
-<!-- ========================================================================= -->
-
-<!-- ======== read source xml and transform to name=value pairs ======== -->
-<xsl:template name="editor.read.source">
-
-  <!-- ======== build url where to get the xml source from ======== -->
-  <xsl:variable name="url.helper">
-    <xsl:choose>
-      <xsl:when test="string-length($editor.source.url) &gt; 0">
-        <xsl:value-of select="$editor.source.url"/>
-      </xsl:when>
-      <xsl:when test="string-length($editor.source.id) &gt; 0">
-        <xsl:value-of select="substring-before(source/@url,source/@token)"/>
-        <xsl:value-of select="$editor.source.id"/>
-        <xsl:value-of select="substring-after(source/@url,source/@token)"/>
-      </xsl:when>
-      <xsl:when test="string-length(source/@url) &gt; 0">
-        <xsl:value-of select="source/@url" />
-      </xsl:when>
-    </xsl:choose>
-  </xsl:variable>
-
-  <!-- ======== if not empty new document, transform source to name=value ======== -->
-  <xsl:if test="($editor.source.new != 'true') and (string-length($url.helper) &gt; 0)">
-    <xsl:variable name="url">
-      <xsl:call-template name="build.url">
-        <xsl:with-param name="url" select="$url.helper" />
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:apply-templates select="document($url)/*" mode="editor.source.to.list" />
-  </xsl:if>
+  <xsl:apply-templates select="document($url,.)/editor/components" />
 </xsl:template>
 
 <!-- ========================================================================= -->
@@ -415,7 +300,7 @@
   <xsl:variable name="num.next" select="count($cells[@col &gt; (number($col.nr) + number($col.span) - 1)])"/>
 
   <td colspan="{$col.span}">
-    <xsl:variable name="the.cell" select="$cells[(@row=$row.nr) and (@col=$col.nr)]" />
+    <xsl:variable name="the.cell" select="$cells[(@row=$row.nr) and (@col=$col.nr)][1]" />
 
     <!-- ======== if there is no cell here, add space ======== -->
     <xsl:if test="count($the.cell) = 0">
@@ -648,7 +533,7 @@
 
   <!-- ======== select matching nodes from source xml ======== -->  
   <xsl:variable name="selected.source.values" 
-    select="ancestor::editor/editor:source-variable[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]"
+    select="ancestor::editor/source-variable[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]"
   />
   <xsl:choose>
     <!-- ======== if there are nodes, copy values to hidden fields ======== -->
@@ -686,7 +571,7 @@
   <!-- ======== get the value of this field from xml source ======== -->
   <span style="{$editor.font}">
     <xsl:variable name="selected.cell" 
-      select="ancestor::editor/editor:source-variable[@name=$var.new]" 
+      select="ancestor::editor/source-variable[@name=$var.new]" 
     />
     <xsl:choose>
       <xsl:when test="$selected.cell">
@@ -708,7 +593,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/editor:source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
   </xsl:variable>
 
   <!-- ======== build the value to display ======== -->
@@ -751,7 +636,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/editor:source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
   </xsl:variable>
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
@@ -785,7 +670,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/editor:source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
   </xsl:variable>
 
   <input type="password" size="{@width}" value="{$source}" name="{$var}"
@@ -885,7 +770,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/editor:source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
   </xsl:variable>
 
   <!-- ======== build the value to display ======== -->
@@ -1033,7 +918,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/editor:source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
   </xsl:variable>
 
   <input type="checkbox" name="{$var}" value="{@value}">
