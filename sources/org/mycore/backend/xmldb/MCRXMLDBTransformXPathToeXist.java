@@ -24,20 +24,21 @@
 package org.mycore.backend.xmldb;
 
 import java.util.HashSet;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import org.xmldb.api.base.*;
-import org.xmldb.api.modules.*;
-
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.services.query.*;
+import org.jdom.input.SAXHandler;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.query.MCRMetaSearchInterface;
+import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ResourceIterator;
+import org.xmldb.api.base.ResourceSet;
+import org.xmldb.api.modules.XPathQueryService;
 
 /**
  * This is the implementation of the MCRMetaSearchInterface for the XML:DB API
@@ -80,53 +81,62 @@ public MCRXMLDBTransformXPathToeXist() {
  * @param maxresults            the maximum of results
  * @return                      a result list as MCRXMLContainer
  **/
-public final HashSet getResultIDs(String root, String query, String type,
-  int maxresults)
-  {
-  // prepare the query over the rest of the metadata
-  HashSet idmeta = new HashSet();
-  logger.debug("Incomming condition : " + query);
-  String newquery = "";
-  if ((root==null) && (query.length()==0)) { newquery = DEFAULT_QUERY; }
-  if (database.equals("exist") && (query.length() != 0)) {
-    newquery = handleQueryStringExist(root,query,type); }
-  if ( database.equals("tamino") && (query.length() != 0)) {
-    newquery = handleQueryStringTamino(root,query,type ); }
-  logger.debug("Transformed query : " + newquery);
+	public final HashSet getResultIDs(String root, String query, String type,
+			int maxresults) {
+		// prepare the query over the rest of the metadata
+		HashSet idmeta = new HashSet();
+		SAXHandler handler = new SAXHandler();
+		logger.debug("Incomming condition : " + query);
+		String newquery = "";
+		if ((root == null) && (query.length() == 0)) {
+			newquery = DEFAULT_QUERY;
+		}
+		if (database.equals("exist") && (query.length() != 0)) {
+			newquery = handleQueryStringExist(root, query, type);
+		}
+		if (database.equals("tamino") && (query.length() != 0)) {
+			newquery = handleQueryStringTamino(root, query, type);
+		}
+		logger.debug("Transformed query : " + newquery);
 
-  // do it over the metadata
-  if (newquery.length() != 0) {
-    try {
-      Collection collection = MCRXMLDBConnectionPool.instance().getConnection(type);
-      XPathQueryService xps = (XPathQueryService) collection.getService("XPathQueryService", "1.0");
+		// do it over the metadata
+		if (newquery.length() != 0) {
+			try {
+				Collection collection = MCRXMLDBConnectionPool.instance()
+						.getConnection(type);
+				XPathQueryService xps = (XPathQueryService) collection
+						.getService("XPathQueryService", "1.0");
 
-      MCRXMLDBConnectionPool.instance().releaseConnection(collection);
-      ResourceSet resultset = xps.query(newquery);
-      logger.debug("Results: " + Integer.toString((int) resultset.getSize()));
-      org.jdom.Document doc;
-      ResourceIterator ri = resultset.getIterator();
-      MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-      while (ri.hasMoreResources()) {
-        XMLResource xmldoc = (XMLResource) ri.nextResource();
-        doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
-        if (doc==null) {
-          throw new NullPointerException("Document is null"); }
-        if (doc.getRootElement()==null) {
-          throw new NullPointerException("Document root element is null"); }
-	if (doc.getRootElement().getAttribute("ID")==null) {
-          XMLOutputter output=new XMLOutputter(Format.getPrettyFormat());
-          output.output(doc,System.err);
-          throw new NullPointerException("Root elements Attribute \"ID\" is not available");
-          }
-        idmeta.add(new MCRObjectID(doc.getRootElement().getAttribute("ID").getValue()));
-        }
-      } 
-    catch (Exception e) {
-      throw new MCRPersistenceException(e.getMessage(), e); }
-    }
-
-  return idmeta;
-  }
+				MCRXMLDBConnectionPool.instance().releaseConnection(collection);
+				ResourceSet resultset = xps.query(newquery);
+				logger.debug("Results: "
+						+ Integer.toString((int) resultset.getSize()));
+				org.jdom.Document doc;
+				ResourceIterator ri = resultset.getIterator();
+				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+				long start = System.currentTimeMillis();
+				for (int i=0;(ri.hasMoreResources()) && (i < maxresults);i++) {
+					//doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
+					//OK we simply asume that all docs are well in exist
+					//and their ID is our ObjectID :o)
+					//ID=ObjectID+"_1" we remove the "_1" now
+					StringTokenizer tok=new StringTokenizer(ri.nextResource().getId(),"_");
+					idmeta.add(new MCRObjectID(new StringBuffer(tok.nextToken())
+							.append('_')
+							.append(tok.nextToken())
+							.append('_')
+							.append(tok.nextToken())
+							.toString()
+							));
+				}
+				long end = System.currentTimeMillis();
+				logger.debug("converting Res2Doc took: " + (end - start));
+			} catch (Exception e) {
+				throw new MCRPersistenceException(e.getMessage(), e);
+			}
+		}
+		return idmeta;
+	}
 
 /**
  * Handle query string for exist
