@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.18 $ $Date: 2004-12-13 12:43:28 $ -->
+<!-- $Revision: 1.19 $ $Date: 2004-12-13 15:03:04 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1133,7 +1133,7 @@
     </xsl:if>
 
     <xsl:attribute name="style">
-      <xsl:value-of select="concat($editor.font,' border: ',$editor.textinput.border,'; ')"/>
+      <xsl:value-of select="concat($editor.font.select,' border: ',$editor.textinput.border,'; ')"/>
       <xsl:if test="@width">
         <xsl:value-of select="concat('width: ',@width,';')"/>
       </xsl:if>
