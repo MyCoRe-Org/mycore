@@ -137,6 +137,7 @@ private String handleQueryString(String type) {
 private String handleQueryStringExist( String query, String type ) {
   query = MCRUtils.replaceString(query, "like", "&=");
   query = MCRUtils.replaceString(query, "text()", ".");
+  query = MCRUtils.replaceString(query, "ts()", ".");
   query = MCRUtils.replaceString(query, "contains(", ".&=");
   query = MCRUtils.replaceString(query, ")", "");
   // combine the separated queries
