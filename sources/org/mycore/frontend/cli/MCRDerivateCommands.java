@@ -26,15 +26,9 @@ package org.mycore.frontend.cli;
 
 import java.io.*;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.input.SAXBuilder;
-import org.jdom.Document;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.ifs.*;
@@ -255,7 +249,7 @@ public class MCRDerivateCommands
     if (!dir.mkdir()) {
       logger.error("Can not create dirctory "+dirname+"."); return; }
     // checkID
-    MCRObjectID mcr_id = new MCRObjectID(ID);
+    MCRObjectID.isValidOrDie(ID);
     // store the derivate metadata in dirname.xml
     MCRDerivate obj = new MCRDerivate();
     String filename = dirname+".xml";
