@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -42,7 +42,7 @@ public interface MCRClassificationInterface
    *
    * @param classification an instance of a MCRClassificationItem
    **/
-  public void createClassificationItem(MCRClassificationItem classification);  
+  public void createClassificationItem(MCRClassificationItem classification);
 
   /**
    * The method remove a MCRClassificationItem from the datastore.
@@ -72,7 +72,7 @@ public interface MCRClassificationInterface
    * @param category an instance of a MCRCategoryItem
    **/
   public void createCategoryItem(MCRCategoryItem category);
-    
+
   /**
    * The method remove a MCRCategoryItem from the datastore.
    *
@@ -88,16 +88,16 @@ public interface MCRClassificationInterface
    * @param ID   the ID of the MCRCategoryItem
    **/
   public MCRCategoryItem retrieveCategoryItem(String CLID, String ID);
-  
+
   /**
    * The method return a MCRCategoryItem from the datastore.
    *
    * @param CLID the ID of the MCRClassificationItem
    * @param labeltext   the label text of the MCRCategoryItem
    **/
-  public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID, 
+  public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID,
     String labeltext);
-  
+
   /**
    * The method return if the MCRCategoryItem is in the datastore.
    *
@@ -115,7 +115,7 @@ public interface MCRClassificationInterface
    * @return a list of MCRCategoryItem children
    **/
   public ArrayList retrieveChildren(String CLID, String PID);
-  
+
   /**
    * The method return the number of MCRCategoryItems from the datastore.
    *
@@ -124,7 +124,17 @@ public interface MCRClassificationInterface
    * @return the number of MCRCategoryItem children
    **/
   public int retrieveNumberOfChildren(String CLID, String PID);
-  
+
+  /**
+   * The method returns the Count of the documents that
+   * are members of any category in this classification
+   *
+   * @param CLID the ID of the MCRClassificationItem
+   * @return the number of documents
+   */
+  public int retrieveNumberofDocs( String CLID );
+
+
   /**
    * The method returns all availiable classification ID's they are loaded.
    *
