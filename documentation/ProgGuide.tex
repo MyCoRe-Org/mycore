@@ -1,0 +1,68 @@
+\documentclass[a4paper,12pt]{book}
+\usepackage{german}
+\usepackage{fancyheadings} 
+\pagestyle{fancyplain} 
+\addtolength{\headwidth}{\marginparsep} 
+\addtolength{\headwidth}{\marginparwidth} 
+\renewcommand{\chaptermark}[1]% 
+      {\markboth{#1}{}} 
+\renewcommand{\sectionmark}[1]% 
+      {\markright{\thesection\ #1}} 
+\lhead[\fancyplain{}{\bfseries\thepage}]% 
+      {\fancyplain{}{\bfseries\rightmark}} 
+\rhead[\fancyplain{}{\bfseries\leftmark}]% 
+      {\fancyplain{}{\bfseries\thepage}} 
+\cfoot{} 
+\begin{document}
+%-------   Vorspann
+\title{MyCoRe Internal Design Guilde}
+\maketitle{}
+\setcounter{secnumdepth}{10} 
+\chapter*{Vorwort} 
+\chapter{ Einf"uhrung und Grundprinzipien} 
+\section{XML/XSLT}
+\section{XPath/Queries}
+\section{Sessionmodell}
+\section{Das Vererbungsmodell}
+\section{Das API-Konzept allgemein}
+\section{Klassen und Verantwortlichkeiten }
+\section{Allgemeine Klassen / Exception-Modell / MCRCache}
+\section{Das Metadatenmodell}
+\subsection{MCRClassification}
+\subsection{MCRObject}
+\subsection{MCRDerivate}
+\subsection{MCRLinkManager}
+\subsection{Erweiterungsm"oglichkeiten}
+Seitenumbruch erzwingen?
+\section{Das IFS Modell (ohne Stores)}
+\section{Das User- und ACL-Modell}
+\section{Der Backend-Store}
+\subsection{CM7}
+\subsection{CM8.2 (inklusive Datenspeichermodell und Query Umsetztung)}
+\subsection{XMLDB (inklusive Datenspeichermodell und Query Umsetztung)}
+\subsection{DB2 / MySQL / Oracle}
+\subsection{Filesystem-Store}
+\subsection{VideoStores}
+\subsection{RemoteStore im Detail}
+\subsection{Weitere Ausbaumöglichkeiten}
+\section{Die Frontend Komponenten}
+\subsection{Das Commandline-Tool und seine Erweiterungen}
+\subsection{Zusammenspiel der Servlets und Funktion der einzelnen}
+\subsection{Login-Servlet und MCRSession}
+\subsection{IFS-Servlet}
+\subsection{Query-Servlet}
+\subsection{Innere Struktur des Editor-Servlets}
+\subsection{Innere Struktur des User-Servlets}
+\section{Funktionsprinzipen der Services}
+\subsection{OAI}
+\subsection{NBN}
+\subsection{Weitere}
+\chapter{Konfiguration im Detail}
+\section{Mycore.properties}
+\section{Suchmasken}
+\section{Stylesheets}
+\end{document}
+
+
+
+

@@ -1,0 +1,82 @@
+\documentclass[a4paper,12pt]{book}
+\usepackage{german}
+\usepackage{fancyheadings}
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{\marginparsep}
+\addtolength{\headwidth}{\marginparwidth}
+\renewcommand{\chaptermark}[1]%
+      {\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]%
+      {\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\bfseries\thepage}]%
+      {\fancyplain{}{\bfseries\rightmark}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]%
+      {\fancyplain{}{\bfseries\thepage}}
+\cfoot{}
+\begin{document}
+%-------   Vorspann
+\title{MyCoRe User Guide}
+\author{
+    Frank L"utzenkirchen\\
+    Jens Kupferschmidt\\
+    Detlef Degenhardt\\
+    Ulrike Kr"onert}
+\maketitle
+\setcounter{secnumdepth}{10}
+\chapter*{Vorwort}
+In diesem Dokument sind alle Arbeiten zum Start der Beispielanwendung und zur Gestaltung eigener Anwendungen beschrieben. Teilweise wird auch auf das MyCoRe Design Guide verwiesen.
+\tableofcontents
+\listoffigures
+\listoftables
+%-------    Hauptteil
+\chapter{Voraussetzungen f"ur eine MyCoRe Anwendung}
+Vor- und Nachteile der einzelnen Basissysteme [IBM / Linux / Sun] 
+\section{Hinweise zur Bereitstellung der einzelnen Systeme (Quick Installation der wichtigen Komponenten und Test)}
+\section{Hinweise zur Nutzung m"oglicher Webserver und Servlet-Maschinen und deren Konfiguration}
+\chapter{Download und Installation des MyCoRe Kerns}
+\section{Konfiguration zum "Ubersetzten des Kerns}
+\section{Compile}
+\chapter{Die MyCore Beispielanwendung}
+\section{Grundlegender Aufbau und Ziel der Beispielanwendung}
+\section{Vereinfachte Funktionsprinzipien der Anwendung}
+\subsection{User- und Rechtesystem}
+\subsection{Klassifikationen}
+\subsection{Metadatenmodel}
+\subsection{IFS und Content Store}
+\subsection{Datenpr"asentation}
+\subsection{Interaktive Arbeit mit den Daten}
+\section{Download der Beispielanwendung}
+\section{Konfiguration zur Arbeit mit den Beispieldaten}
+Wenn man nur sections und subsections aneinanderf"ugt, wird offensichtlich kein Seitenumbruch gemacht??
+\subsection{Grundlegende Konfigurationen (JDBC, CM, Logger, usw.)}
+\subsection{Das User- und Rechtesystem  + Laden der Beispieldaten}
+\subsection{Das Klassifikationsmodel + Laden der Beispieldaten}
+\subsection{Das Metadatenmodel + Laden der Beispieldaten}
+\subsection{Das IFS + Laden der Beispieldaten}
+\section{Arbeiten mit der Kommandzeilen-Shell mycore.sh}
+\subsection{"Ubersicht der Kommando und Beispiele}
+\section{Arbeiten mit der Web-Anwendung}
+\subsection{Konfiguration und Start der Webanwendung }
+\subsubsection{Apache / Tomcat}
+\subsubsection{Apache / Websphere}
+\subsection{Das Layout-Setvlet und das Zusammenspiel der Servlets untereinander}
+\subsection{Die Nutzung des Editor-Servlets}
+\section{Zusammenarbeit mit anderen Installationen (Remote)}
+\section{Vom Sample zum eigenen Dokumentserver}
+Hier sollen Anpassungsschritte detailliert erkl"art werden.
+\subsection{Anpassungen des Layout an eigene Bedürfnisse}
+\subsection{Weitere User und Gruppen / Nutzung zur selektierten Darstellung durch Stylesheets}
+\subsection{Metadatenvererbung}
+\subsection{Nutzung der OAI Schnittstelle }
+\subsection{Arbeiten mit NBN}
+\subsection{M"ogliche Workflow-Szenarien im Bibliotheksumfeld}
+\section{Einbindung weiterer Content Stores (Helix \& Co.)}
+\section{Hints \& Tips / Trobleshooting}
+\chapter{Erstellen einer eigenen Anwendung auf Basis des MyCoRe-Kernes}
+(am Beispiel des Papyrus-Projektes)
+\section{Erforderliche Schritte zu einer Sammlungsanwendung mit eigenen Metadaten}
+\begin{flushright}
+{\em macht Jens}
+\end{flushright}
+\chapter{Weitere Anwendungen (Archivl"osung)}
+\end{document}

@@ -1,0 +1,40 @@
+\documentclass[a4paper,12pt]{book}
+\usepackage{german}
+\usepackage{fancyheadings} 
+\usepackage[dvips]{graphicx}
+\DeclareGraphicsRule{.jpg}{eps}{jpeg2ps #1}
+\pagestyle{fancyplain} 
+\addtolength{\headwidth}{\marginparsep} 
+\addtolength{\headwidth}{\marginparwidth} 
+\renewcommand{\chaptermark}[1]% 
+      {\markboth{#1}{}} 
+\renewcommand{\sectionmark}[1]% 
+      {\markright{\thesection\ #1}} 
+\lhead[\fancyplain{}{\bfseries\thepage}]% 
+      {\fancyplain{}{\bfseries\rightmark}} 
+\rhead[\fancyplain{}{\bfseries\leftmark}]% 
+      {\fancyplain{}{\bfseries\thepage}} 
+\cfoot{} 
+\begin{document}
+%-------   Vorspann
+\title{MyCoRe Starting Guide}
+\author{
+    Frank L"utzenkirchen\\
+    Jens Kupferschmidt}
+\maketitle
+\setcounter{secnumdepth}{10}
+\chapter*{Vorwort}
+Das Dokument soll eine grunds"atzliche Einf"uhrung in MyCoRe geben.
+
+\tableofcontents
+\listoffigures
+\listoftables
+%-------    Hauptteil
+\chapter{Leistungsumfang von MyCoRe}
+\includegraphics{bechtle.jpg}
+\chapter{Grunds"atzliche Hard- und Software-Voraussetzungen}
+\chapter{Nutzungs- und Lizenzbedingungen}
+\chapter{Unterst"utzte Features der Releases / Roadmap}
+\chapter{Grunds"atzliches Modell (MCRObjectID, Vererbung, XML, Stylesheets, usw.)}
+\chapter{Mitwirkende am Projekt / Ansprechpartner}
+\end{document}
