@@ -186,7 +186,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
      * Creates a new rule for a match based on a magic bytes pattern at a given offset
      * 
      * @param pattern the magic bytes pattern this rule matches
-     * @param format the format in which the pattern is given, either "text" or "hex"
+     * @param format the format in which the pattern is given, text | hex | bytes
      * @param offset the position where the pattern occurs in the file header
      * @param score the score for matching this rule, a value between 0.0 and 1.0
      **/
@@ -203,8 +203,16 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
         for( int i = 0; i < pattern.length(); i+=2 )
         {
           String hex = pattern.substring( i, i + 2 ).toLowerCase();
-          this.pattern[ i / 2 ] = Byte.parseByte( hex, 16 );
+          this.pattern[ i / 2 ] = (byte)( Integer.parseInt( hex, 16 ) );
         }
+      }
+      else if( format.equals( "bytes" ) )
+      {
+        StringTokenizer st = new StringTokenizer( pattern, " ,:;\t" );
+        this.pattern = new byte[ st.countTokens() ];
+        
+        for( int i = 0; st.hasMoreTokens(); i++ )
+          this.pattern[ i ] = (byte)( Integer.parseInt( st.nextToken(), 10 ) );
       }
       else
       {
