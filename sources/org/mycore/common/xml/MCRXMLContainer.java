@@ -378,6 +378,19 @@ public final byte [] exportElementToByteArray(int index) throws IOException
   return os.toByteArray();
   }
 
+  /**
+   * This methode return a MCRXMLContainer.<br> &lt;?xml version="1.0"
+   *
+   * @param index the index number of the element
+   * @return one result as MCRXMLContainer. If index is out of border an
+   * Container was returned. */
+public final MCRXMLContainer exportElementToContainer(int index){
+	MCRXMLContainer returns=new MCRXMLContainer();
+	returns.add(getHost(index),getId(index),getRank(index),getXML(index));
+	return returns;
+}
+
+
 private static String ERRORTEXT =
   "The stream for the MCRXMLContainer import is false.";
 

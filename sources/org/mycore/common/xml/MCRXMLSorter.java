@@ -192,26 +192,8 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 				else{
 					fContCont=new Object[finalCont.size()];
 					for (int i=0;i<finalCont.size();i++){
-						MCRXMLContainer tmpCont=new MCRXMLContainer();
-						try {
-							tmpCont.importElements(finalCont.exportElementToDocument(i));
-							//System.out.println("MCRXMLSorter debug run: "+i);
-							//tmpCont.debug();
-						} catch (JDOMException e) {
-							throw new MCRException(
-							"All seems to go well but then suddenly a JDOMException occured:",e);
-						}
-						fContCont[i]=tmpCont.clone();
+						fContCont[i]=finalCont.exportElementToContainer(i);
 					}
-//					try{
-//						for (int i=0; i<fContCont.length; i++){
-//							System.out.println("MCRXMLSorter debug run: "+i);
-//							((MCRXMLContainer)fContCont[i]).debug();
-//						}
-//					}
-//					catch (IOException ioe){
-//						throw new MCRException("IOException while transforming document!",ioe);
-//					}
 				}
 			}
 		}
