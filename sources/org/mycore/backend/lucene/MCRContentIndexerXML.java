@@ -29,6 +29,8 @@ import org.mycore.datamodel.ifs.*;
 import java.text.*;
 import java.util.*;
 import java.io.*;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +38,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.*;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexReader;
@@ -53,12 +56,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.queryParser.QueryParser;
 
-//import javax.xml.transform.Result;
-//import org.jdom.*;
-
 /**
- * This class implements all methods for handling searchdata with Lucene
- * based on MCRCM8Persistence.java
+ * This class implements all methods for handling searchdata of xml-files with Lucene
  *
  * @author Harald Richter
  *
@@ -113,6 +112,11 @@ try
   {
   }
 
+/**
+ * Adds document to Lucene
+ * @param doc lucene document to add to index
+ * 
+ **/
 private void addDocumentToLucene( Document doc )    
 {
  try
@@ -187,12 +191,12 @@ private void addDocumentToLucene( Document doc )
    * @param file the MCRFile thats content is to be indexed
    * @param source the ContentInputStream where the file content is read from
    **/
-  protected void doIndexContent( MCRFileReader file, MCRContentInputStream source,  byte[] header )
+  protected void doIndexContent( MCRFile file )
     throws MCRException
   {
     System.out.println( "++++ doIndexContent: " + file.getID() + " Store: " + file.getStoreID( ) +
                           " ContentTypeID: " + file.getContentTypeID() );
-    List list = trans( file, source, header ); 
+    List list = trans( file ); 
     if ( null != list)
     {
       Document doc = buildLuceneDocument( file.getID(), list );
@@ -219,40 +223,26 @@ private void addDocumentToLucene( Document doc )
     catch( Exception e){ System.out.println( "error deleting from lucene" ); } 
   }
   
-private List trans(  MCRFileReader file, MCRContentInputStream source,  byte[] header )    
+/**
+ * Transforms xml data with stylesheet mcr_make_types.xsl 
+ * @param header contains xml data ( size is limited to 64 k!)
+ * 
+ **/
+private List trans( MCRFile file )    
 {
   try
   {
-    File xsltFile = new File("D:/Lernen/xsl/typed/maketypes.xsl");
-    javax.xml.transform.Source xmlSource = 
-                new javax.xml.transform.stream.StreamSource( new ByteArrayInputStream( header ) );
-    javax.xml.transform.Source xsltSource =
-                new javax.xml.transform.stream.StreamSource( xsltFile );
-    StringWriter sw =  new StringWriter();
-    javax.xml.transform.Result result =
-                new javax.xml.transform.stream.StreamResult( sw );
-
-//     javax.xml.transform.Result result2 = new org.jdom.transform.JDOMResult();
-    
-    // create an instance of TransformerFactory
-    javax.xml.transform.TransformerFactory transFact =
-                javax.xml.transform.TransformerFactory.newInstance();
-
-    javax.xml.transform.Transformer trans =
-                transFact.newTransformer(xsltSource);
-
-    trans.transform(xmlSource, result);
-//    org.jdom.Document jdom = result2.getDocument();
-//    System.out.println( sw.toString() );
-//*************************************************************************************
-
-    org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-    org.jdom.Document jdom = builder.build(new StringBufferInputStream( sw.toString() ) );
-    org.jdom.Element root = jdom.getRootElement();
-    return root.getChildren( "type" );
-//*************************************************************************************
-  }
-//  catch (javax.xml.transform.TransformerException e)
+  ByteArrayOutputStream out = new ByteArrayOutputStream();
+  MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
+  Templates xsl = transformer.getStylesheet( "D:/wd_sample/mycore-sample-application/stylesheets/mcr_make_types.xsl" );
+  TransformerHandler handler = transformer.getTransformerHandler( xsl );
+  transformer.transform( file.getContentAsJDOM(), handler, out );
+  out.close();
+  byte[] output = out.toByteArray();
+  org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+  org.jdom.Document jdom = builder.build( new ByteArrayInputStream( output ) );
+  return jdom.getRootElement().getChildren( "type" );
+  }   
   catch (Exception e)
   {
     System.out.println(e);
@@ -260,6 +250,14 @@ private List trans(  MCRFileReader file, MCRContentInputStream source,  byte[] h
   }
 }
 
+/**
+ * Build lucene document from transformed xml list 
+ * @param key MCRFile ID           
+ * @param types xml data as list
+ * 
+ * @return The lucene document
+ * 
+ **/
 private Document buildLuceneDocument( String key, List types )    
 {
   Document doc = new Document();
