@@ -100,11 +100,11 @@ public class MCRCommandLineInterface
       "! {0}",
       "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "change to user {0}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String" );
+      "change to user {0} with {1}",
+      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "login {0}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String" );
+      "org.mycore.frontend.cli.MCRCommandLineInterface.login String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "whoami",
       "org.mycore.frontend.cli.MCRCommandLineInterface.whoami" );
@@ -524,22 +524,34 @@ public class MCRCommandLineInterface
   * This command change the user of the session context to a new user.
   * 
   * @param newuser the new user ID
+  * @param password the password of the new user
   **/
-  public static void changeToUser( String user )
+  public static void changeToUser( String user, String password )
     {
     logger.info("The old user is "+session.getCurrentUserID());
-    String passwd = "";
-    do {
-      logger.info( "Enter the password for user "+user+" > " );
-      try{ passwd = console.readLine(); }catch( IOException ex ){}
-      }
-    while( ( passwd = passwd.trim() ).length() == 0 );
-    if (org.mycore.user.MCRUserMgr.instance().login(user,passwd)) {
+    if (org.mycore.user.MCRUserMgr.instance().login(user.trim(),password.trim())) {
       session.setCurrentUserID(user); 
       logger.info("The new user is "+session.getCurrentUserID());
       }
     else {
       logger.error("The password was false, no changes of session context!"); }
+    }
+
+ /**
+  * This command change the user of the session context to a new user.
+  * 
+  * @param newuser the new user ID
+  **/
+  public static void login( String user )
+    {
+    logger.info("The old user is "+session.getCurrentUserID());
+    String password = "";
+    do {
+      logger.info( "Enter the password for user "+user+" > " );
+      try{ password = console.readLine(); }catch( IOException ex ){}
+      }
+    while( ( password = password.trim() ).length() == 0 );
+    changeToUser(user,password);
     }
 
  /**
