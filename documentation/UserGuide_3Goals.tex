@@ -1,0 +1,21 @@
+%
+%
+\section{Grundlegender Aufbau und Ziel der Beispielanwendung}
+%
+%
+\subsection{Allgemeines}
+Um die Funktionsweise des MyCoRe-Kernes zu testen wurde eine Beispielanwendung basiered auf diesem Kern entwickelt. Sie soll dem Anwender eine voll funktionsf"ahige Applikation in die Hand geben, welche eine Vielzahl von Komponenten des MyCoRe-Projektes nutzt und deren Arbeitweise klar werden l"asst. Um die Anwendung, im weiteren MyCore-Sample genannt, gleichzeitig sinnvoll einsetzten zu k"onnen, wurde als Beispielszenario ein Dokumentserver gew"ahlt, wie er bei vielen potentiellen Nutzern zur Anwendung kommt. Auch soll das MyCore-Sample die Nachfolge des erfolgreichen MILESS-Dokumentservers sein und den Migrationspfad zu MyCoRe hin aufzeigen. \\[2ex]
+Analog zum MILESS werden auch hier die Metadaten in drei Gruppen aufgeteilt und von den eigentlichen multimedialen Objekten getrennt behandelt. Zur Modellierung des Datenmodells f"ur die Multimedia-metadaten wurde das allgemein verbreitete Dublin Core Datenmodell herangezogen und umgesetzt. Zur Realisierung wurden folgende Metadaten-Objekte entwickelt:
+\begin{itemize}
+\item {\bf Document} - Dieses Objekt beinhaltet die eigentlichen Metadaten des Multimedi-Objektes, in unserem Fall im Dublin Core Format, sowie Verweise auf extern gehaltene Daten wie die drei im weiteren genannten. Das Datenmodell besteht aus 15 Feldern, zur Speicherung verschiedener Datentypen gibt es atomare Grundkomponenetn. Weiterhin beinhalten die Metaddaten noch Teile zu ihrer Struktur und Verwaltung.
+\item {\bf Klassifikation} - Hier k"onnen lineare oder hierarchich strukturierte Klassifikationen mit ihren Kategorien abgelegt werden. Jeder Verweis auf eine solche Kategorie aus einem Dokument heraus erfolgt mittels der ID der selben und nat"urlich der ID der Klassifikation als Identifiziererpaar. F"ur die Gestaltung der Klassifikationen wurde ein eigens Datenmmodel entwicklet.
+\item {\bf LegalEntity} - Auch diese Metadaten sind analog dem {\bf Document} aus atomaren Komponenten zusammengesetzt und repr"asentieren nat"urliche und juristische personen, wie Autoren oder Einrichtunge.
+\item {\bf Derivate} - Hinter diesem Begriff verbergen sich Darstellungsformen der eigentlichen multimedialen Objekte. Beispielsweise k"onnen das verschieden Dateiformate eines Images sein. Diese werden an das eigentliche Dokument gebunden.
+\end{itemize}
+Eine "Ubersicht zu den Beziehungen der Objektteile zueinander soll die folgende Grafik vermitteln. Wir haben uns aus den guten Erfahrungen von MILESS herraus entschlossen, diese Aufteilung beizubehalten, da so Einzelkomponeneten in Projekten schon geladen werden k"onnen, bevor andere Teile, z. B. das Scannen, abgeschlossen sind. \\
+\begin{figure}[H]
+\begin{center}
+\fbox{\includegraphics{UserGuide_3Goals_Pic01.eps}} \caption [Beziehungen der Datenobjekte im MyCoRe-Sample]{Beziehungen der Datenobjekte im MyCoRe-Sample]}
+\end{center}
+\end{figure}
+Wie man der Grafik entnehmen kann, ist es m"oglich, neben Kategorien in Klassifikationen auch Metadaten der Documnets und LegalEntities hierarchich ineienander zu verschachteln. Auf dieser Basis k"onnen dann Strukturen wie z. B. die eines Buches abgebildet werden. Alle Beziehungen zwischen den Metadaten sind "uber eine eindeutige MCRObjectID gel"ost. \\
