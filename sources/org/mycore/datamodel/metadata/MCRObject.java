@@ -307,10 +307,14 @@ public final void setStructure(MCRObjectStructure structure)
 /**
  * This methode create a XML stream for all object data.
  *
+ * @exception MCRException if the content of this class is not valid
  * @return a XML string with the XML data of the object
  **/
-public final String createXML()
+public final String createXML() throws MCRException
   {
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(4096);
   sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL);
   sb.append("<mycoreobject ")
@@ -334,11 +338,15 @@ public final String createXML()
  * <em>MCR.persistence_type</em> and <em>MCR.persistence_..._query_name</em>
  * configuration.
  *
+ * @exception MCRException if the content of this class is not valid
  * @exception MCRConfigurationException if the configuration faild
  * @return a Text Search string with the Text Search data of the object
  **/
-public final String createTS() throws MCRConfigurationException
+public final String createTS() throws MCRException, MCRConfigurationException
   {
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
   if (mcr_query == null) {
     try {
       String propquery = "MCR.persistence_"+persist_type.toLowerCase()+
@@ -353,9 +361,9 @@ public final String createTS() throws MCRConfigurationException
     }
   StringBuffer sb = new StringBuffer(4096);
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    null,null,"ID",null,null,mcr_id.getId()));
+    "ID",null,null,null,null,null,mcr_id.getId()));
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    null,null,"Label",null,null,mcr_label));
+    "Label",null,null,null,null,null,mcr_label));
   sb.append(mcr_struct.createTS(mcr_query));
   sb.append(mcr_metadata.createTS(mcr_query));
   sb.append(mcr_service.createTS(mcr_query));
@@ -370,10 +378,8 @@ public final String createTS() throws MCRConfigurationException
 public final void createInDatastore() throws MCRPersistenceException
   {
   if (mcr_persist==null) { setPersistence(); }
-  mcr_service.setCreateDate();
-  mcr_service.setSubmitDate("");
-  mcr_service.setAcceptDate("");
-  mcr_service.setModifyDate("");
+  mcr_service.setDate("createdate");
+  mcr_service.setDate("modifydate");
   String xml = createXML();
   String ts = createTS();
   mcr_persist.create(mcr_id,mcr_label,mcr_service,xml,ts);
@@ -414,14 +420,30 @@ public final void receiveFromDatastore(String id) throws MCRPersistenceException
 public final void updateInDatastore() throws MCRPersistenceException
   {
   if (mcr_persist==null) { setPersistence(); }
-  if (mcr_service.getCreateString()==null) {
-    MCRObjectService service = mcr_persist.receiveService(mcr_id); 
-    mcr_service.setCreateDate(service.getCreateDate());
-    }
-  mcr_service.setModifyDate();
+  mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
+  mcr_service.setDate("modifydate");
   String xml = createXML();
   String ts = createTS();
   mcr_persist.update(mcr_id,mcr_label,mcr_service,xml,ts); 
+  }
+
+/**
+ * This method check the validation of the content of this class.
+ * The method returns <em>true</em> if
+ * <ul>
+ * <li> the mcr_id value is valid
+ * <li> the label value is not null or empty
+ * </ul>
+ * otherwise the method return <em>false</em>
+ *
+ * @return a boolean value
+ **/
+public final boolean isValid()
+  {
+  if (!mcr_id.isValid()) { return false; }
+  if ((mcr_label == null) || ((mcr_label = mcr_label.trim()).length() ==0)) {
+    return false; }
+  return true;
   }
 
 /**

@@ -24,36 +24,41 @@
 
 package mycore.datamodel;
 
+import java.text.*;
+import java.util.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import mycore.common.MCRException;
 
 /**
- * This class implements all method for handling with the MCRMetaLangText part
- * of a metadata object. The MCRMetaLangText class present a single item,
- * which has triples of a text and his corresponding language and optional a
- * type. 
+ * This class implements all method for handling with the MCRMetaDate part
+ * of a metadata object. The MCRMetaDate class present a single item,
+ * which has pair of a date and his corresponding optional type.
+ * The date is stored as GregorianCalendar.
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaLangText extends MCRMetaDefault 
+final public class MCRMetaDate extends MCRMetaDefault 
   implements MCRMetaInterface 
 {
+// common data
+private static DateFormat df =
+  DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
 
-// MetaLangText data
-private String text;
+// MetaDate data
+private GregorianCalendar date;
 
 /**
  * This is the constructor. <br>
  * The language element was set to <b>en</b>.
- * All other elemnts was set to an empty string.
+ * All other elements was set to null.
  */
-public MCRMetaLangText()
+public MCRMetaDate()
   {
   super();
-  text = "";
+  date = new GregorianCalendar();
   }
 
 /**
@@ -63,24 +68,24 @@ public MCRMetaLangText()
  * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
  * is null or empty an exception was throwed. The type element was set to
  * the value of <em>set_type<em>, if it is null, an empty string was set
- * to the type element. The text element was set to the value of 
- * <em>set_text<em>, if it is null, an empty string was set
- * to the text element.
+ * to the type element. The date element was set to the value of 
+ * <em>set_date<em>, if it is null, the date was set to this null.
  *
  * @param set_datapart     the global part of the elements like 'metadata'
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
- * @param set_text         the text string
+ * @param set_date         the date as GregorianCalendar
  * @exception MCRException if the set_subtag value is null or empty
  */
-public MCRMetaLangText(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_text) throws MCRException
+public MCRMetaDate(String set_datapart, String set_subtag, 
+  String default_lang, String set_type, GregorianCalendar set_date) 
+  throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,set_type);
-  text = "";
-  if (set_text != null) { text = set_text.trim(); }
+  date = null;
+  if (set_date != null) { date = set_date; }
   }
 
 /**
@@ -89,30 +94,69 @@ public MCRMetaLangText(String set_datapart, String set_subtag,
  * @param set_lang        the new language string, if this is null or
  *                        empty, nothing is to do
  * @param set_type        the optional type syting
- * @param set_text        the new text string
+ * @param set_date        the date as GregorianCalendar
  **/
-public final void set(String set_lang, String set_type, String set_text)
+public final void set(String set_lang, String set_type, GregorianCalendar
+  set_date)
   {
   setLang(set_lang);
   setType(set_type);
-  if (set_text != null) { text = set_text.trim(); }
+  if (set_date != null) { date = set_date; }
   }
 
 /**
- * This method set the text. 
- *
- * @param set_text        the new text string
+ * This methode set the date to the actual date.
  **/
-public final void setText(String set_text)
-  { if (set_text != null) { text = set_text.trim(); } }
+public final void setDate()
+  { date = new GregorianCalendar(); }
 
 /**
- * This method get the text element.
+ * This methode set the date to the given date.
  *
- * @return the text
+ * @param set_date        the date as GregorianCalendar
  **/
-public final String getText()
-  { return text; }
+public final void setDate(GregorianCalendar set_date)
+  { 
+  date = null;
+  if (set_date != null) { date = set_date; }
+  }
+
+/**
+ * This methode set the date to the given date.
+ *
+ * @param set_date           a date string
+ * @exception MCRException   if the date is bad
+ **/
+public final void setDate(String set_date) throws MCRException
+  {
+  date = null;
+  if ((set_date == null) || ((set_date = set_date.trim()).length() ==0)) { 
+    return; }
+  try {
+    date = new GregorianCalendar();
+    date.setTime(df.parse(set_date)); }
+  catch (ParseException e) {
+    throw new MCRException( "Can't parse date."); }
+  }
+
+/**
+ * This method get the date element as GregorianCalendar.
+ *
+ * @return the date
+ **/
+public final GregorianCalendar getDate()
+  { return date; }
+
+/**
+ * This methode return the date as string.
+ *
+ * @return the date
+ **/
+public final String getDateToString()
+  {
+  if (date == null) { return null; }
+  return df.format(date.getTime());
+  }
 
 /**
  * This method read the XML input stream part from a DOM part for the
@@ -120,21 +164,21 @@ public final String getText()
  *
  * @param metadata_langtext_node a relevant DOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_langtext_node)
+public final void setFromDOM(Node metadata_date_node)
   {
-  super.setFromDOM(metadata_langtext_node);
-  Node langtext_textelement = metadata_langtext_node.getFirstChild();
-  String temp_text = ((Text)langtext_textelement).getData().trim();
-  if (temp_text==null) { temp_text = ""; }
-  text = temp_text;
+  super.setFromDOM(metadata_date_node);
+  Node date_textelement = metadata_date_node.getFirstChild();
+  String temp_date = ((Text)date_textelement).getData().trim();
+  if (temp_date==null) { temp_date = ""; }
+  setDate(temp_date);
   }
 
 /**
  * This method create a XML stream for all data in this class, defined
- * by the MyCoRe XML MCRMetaLangText definition for the given subtag.
+ * by the MyCoRe XML MCRMetaDate definition for the given subtag.
  *
  * @exception MCRException if the content of this class is not valid
- * @return a XML string with the XML MCRMetaLangText part
+ * @return a XML string with the XML MCRMetaDate part
  **/
 public final String createXML() throws MCRException
   {
@@ -142,25 +186,25 @@ public final String createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append('<').append(subtag).append(" xml:lang=\"").append(lang);
+  sb.append('<').append(subtag);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     sb.append("\" type=\"").append(type).append("\""); }
-  sb.append(">").append(NL);
-  sb.append(text);
+  sb.append('>').append(NL);
+  sb.append(getDateToString());
   sb.append("</").append(subtag).append('>').append(NL);
   return sb.toString();
   }
 
 /**
  * This method create a Text Search stream for all data in this class, defined
- * by the MyCoRe TS MCRMetaLangText definition for the given tag and subtag.
+ * by the MyCoRe TS MCRMetaDate definition for the given tag and subtag.
  * The content of this stream is depended by the implementation for
  * the persistence database. It was choose over the
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
  * @exception MCRException if the content of this class is not valid
- * @return a TS string with the TS MCRMetaLangText part
+ * @return a TS string with the TS MCRMetaDate part
  **/
 public final String createTS(Object mcr_query) throws MCRException
   {
@@ -174,8 +218,11 @@ public final String createTS(Object mcr_query) throws MCRException
     svalue = new String[1]; svalue[0] = type; 
     }
   StringBuffer sb = new StringBuffer(1024);
+/*
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
     subtag,sattrib,svalue,null,null,null,text));
+*/
+  sb.append("");
   return sb.toString();
   }
 
@@ -184,7 +231,7 @@ public final String createTS(Object mcr_query) throws MCRException
  * The method returns <em>true</em> if
  * <ul>
  * <li> the subtag is not null or empty
- * <li> the text is not null or empty
+ * <li> the date is not null 
  * </ul>
  * otherwise the method return <em>false</em>
  *
@@ -193,18 +240,17 @@ public final String createTS(Object mcr_query) throws MCRException
 public final boolean isValid()
   {
   if (!super.isValid()) { return false; }
-  if ((text == null) || ((text = text.trim()).length() ==0)) {
-    return false; }
+  if (date == null) { return false; }
   return true;
   }
 
 /**
- * This method print all data content from the MCRMetaLangText class.
+ * This method print all data content from the MCRMetaDate class.
  **/
 public final void debug()
   {
   super.debug();
-  if (text.trim().length()!=0) { System.out.println(text); }
+  if (date != null) { System.out.println(getDateToString()); }
   System.out.println("--- ---");
   }
 

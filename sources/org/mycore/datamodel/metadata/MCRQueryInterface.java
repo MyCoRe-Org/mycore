@@ -59,6 +59,8 @@ public Vector getResultList(String query, String type, int maxresult)
  * &lt;/innertag&gt;<br>
  * &lt;/subtag&gt;
  *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
  * @param svalue             the optional value vector of sattrib
@@ -68,9 +70,9 @@ public Vector getResultList(String query, String type, int maxresult)
  * @param text               the text value of this element
  * @return the search string for the CM7 text search engine
  **/
-public String createSearchStringText(String subtag, String [] sattrib,
-  String [] svalue, String innertag, String [] iattrib, String [] ivalue,
-  String text);
+public String createSearchStringText(String part, String subtag, 
+  String [] sattrib, String [] svalue, String innertag, String [] iattrib, 
+  String [] ivalue, String text);
 
 }
 

@@ -43,15 +43,18 @@ public abstract class MCRMetaDefault
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 protected static String DEFAULT_LANGUAGE = "en";
+protected static String DEFAULT_DATAPART = "metadata";
 
 // MetaLangText data
 protected String subtag;
 protected String lang;
 protected String type;
+protected String datapart;
 
 /**
  * This is the constructor. <br>
  * The language element was set to <b>en</b>.
+ * The datapart element was set to <b>metadata<b>
  * All other elemnts was set to an empty string.
  */
 public MCRMetaDefault()
@@ -59,13 +62,14 @@ public MCRMetaDefault()
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
+  datapart = DEFAULT_DATAPART;
   }
 
 /**
  * This is the constructor. <br>
  * The language element was set. If the value of <em>default_lang</em>
- * is empty or false <b>en</b> was set. All other elemnts was set to an 
- * empty string.
+ * is empty or false <b>en</b> was set. The datapart was set to default.
+ * All other elemnts was set to an empty string.
  *
  * @param default_lang     the default language
  */
@@ -77,6 +81,7 @@ public MCRMetaDefault(String default_lang)
     lang = default_lang; }
   subtag = "";
   type = "";
+  datapart = DEFAULT_DATAPART;
   }
 
 /**
@@ -86,14 +91,17 @@ public MCRMetaDefault(String default_lang)
  * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
  * is null or empty an exception was throwed. The type element was set to 
  * the value of <em>set_type<em>, if it is null, an empty string was set 
- * to the type element.
+ * to the type element. The datapart element was set. If the value of
+ * <em>set_datapart,/em> is null or empty the default was set.
  *
+ * @param set_datapart     the data part name
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
  * @exception MCRException if the set_subtag value is null or empty
  */
-public MCRMetaDefault(String set_subtag, String default_lang, String set_type)
+public MCRMetaDefault(String set_datapart, String set_subtag, 
+  String default_lang, String set_type)
   throws MCRException
   {
   lang = DEFAULT_LANGUAGE;
@@ -107,6 +115,9 @@ public MCRMetaDefault(String set_subtag, String default_lang, String set_type)
     lang = default_lang; }
   if (set_type != null) {
     type = set_type; }
+  if ((set_datapart != null) &&
+    ((set_datapart = set_datapart.trim()).length() !=0)) {
+    datapart = set_datapart; }
   }
 
 /**
@@ -151,6 +162,21 @@ public final void setType(String set_type)
   }
 
 /**
+ * This method set the datapart element. If the value of <em>set_datapart</em>
+ * is null, empty or false nothing was changed.
+ *
+ * @param set_datapart     the data part name
+ **/
+public final void setDataPart(String set_datapart)
+  {
+  if ((set_datapart == null) ||
+    ((set_datapart = set_datapart.trim()).length() ==0)) {
+    datapart = DEFAULT_DATAPART; }
+  else {
+    datapart = set_datapart; }
+  }
+
+/**
  * This method get the language element.
  *
  * @return the language
@@ -173,6 +199,14 @@ public final String getSubTag()
  **/
 public final String getType()
   { return type; }
+
+/**
+ * This method get the datapart element.
+ *
+ * @return the datapart
+ **/
+public final String getDataPart()
+  { return datapart; }
 
 /**
  * This method read the XML input stream part from a DOM part for the
@@ -241,10 +275,11 @@ public boolean isValid()
 public void debug()
   {
   if (type.trim().length()!=0) {
-    System.out.println("--- SubTag "+subtag+" with lang "+lang+" and type "+
-      type+" ---"); }
+    System.out.println("--- "+datapart+" --- "+subtag+" with lang "+lang+
+      " and type "+type+" ---"); }
   else {
-    System.out.println("--- SubTag "+subtag+" with lang "+lang+" ---"); }
+    System.out.println("--- "+datapart+" --- "+subtag+" with lang "+lang+
+      " ---"); }
   }
 
 }

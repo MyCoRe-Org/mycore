@@ -24,6 +24,7 @@
 
 package mycore.datamodel;
 
+import java.util.*;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
@@ -77,11 +78,11 @@ public String receive(MCRObjectID mcr_id)
  * The methode receive a object from the data store.
  *
  * @param mcr_id   the MyCoRe object ID
- * @return the instance of the MCRObjectService class of the object
+ * @return the instance of the GregorianCalendar class of the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public MCRObjectService receiveService(MCRObjectID mcr_id)
+public GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**

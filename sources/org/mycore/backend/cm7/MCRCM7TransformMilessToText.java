@@ -51,7 +51,8 @@ public MCRCM7TransformMilessToText()
 
 /**
  * This method parse the Miless query string and return a vector of 
- * MCRObjectId's as strings.
+ * MCRObjectId's as strings. If the type is null or empty or maxresults
+ * is lower 1 a MCRException was throwed.
  *
  * @param query	                the Miless query string
  * @param maxresults            the maximum of results
@@ -63,8 +64,6 @@ public final Vector getResultList(String query, String type, int maxresults)
   throws MCRPersistenceException
   {
   // check the parameter
-  if ((query == null) || ((query = query.trim()).length() ==0)) {
-    throw new MCRPersistenceException("The query is empty."); }
   if ((type == null) || ((type = type.trim()).length() ==0)) {
     throw new MCRPersistenceException("The type is empty."); }
   if (maxresults < 1) {
@@ -83,8 +82,10 @@ public final Vector getResultList(String query, String type, int maxresults)
   int operpos = -1;
   String onecond = "";
   String oper = "";
+  cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
+    System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.indexOf("CONTAINS") != -1) {
       cond.append(setContainsCondition(onecond)); }
@@ -97,7 +98,8 @@ public final Vector getResultList(String query, String type, int maxresults)
         }
       }
     }
-  if (cond.length()==0) { cond.append("(\"*\")"); }
+  if (cond.length()==1) { cond.append("(XXXOBJECTXXXIDXXX)"); }
+  cond.append(')');
   System.out.println("MCRCM7TransformMilessToText : "+cond.toString());
   System.out.println("================================");
   // search
@@ -112,6 +114,8 @@ public final Vector getResultList(String query, String type, int maxresults)
   try {
     ts.search(cond.toString()); result = ts.getResultVector(); }
   catch (Exception e) {
+    System.out.println(e.getMessage());
+    e.printStackTrace();
     throw new MCRPersistenceException("The text search error.");
     }
   System.out.println("================================");
@@ -151,11 +155,57 @@ private final String setContainsCondition(String condition)
   {
   StringBuffer sb = new StringBuffer(128);
   int i = condition.indexOf("CONTAINS");
-  String value = condition.substring(i+8,condition.length()-1);
-  value = value.replace('"',' ').trim();
+  if (i==-1) { return ""; }
   String tag = condition.substring(1,i).trim();
-  sb.append("($PARA$ { ").append(value).append(" XXX").append(tag)
-    .append("XXX })");
+  int start = condition.indexOf("\"",i);
+  if (start==-1) { return ""; }
+  int stop = condition.indexOf("\"",start+1);
+  if (stop==-1) { return ""; }
+  String value = condition.substring(start+1,stop);
+  int l = stop;
+  value = value.replace('"',' ').trim();
+  sb.append('(');
+  if (!tag.equals("METADATA")) { sb.append("$PARA$ {"); }
+  int j = 0;
+  String word = "";
+  while (j<value.length()) {
+    int k = value.indexOf(" ",j);
+    if (k==-1) { k= value.length(); }
+    word = value.substring(j,k); 
+    if (word.indexOf("*")!=-1) {
+      sb.append("$MC=*$ ").append(word).append(' '); }
+    else {
+      sb.append(word).append(' '); }
+    j = k+1;
+    }
+  while(true) {
+    i = condition.indexOf("WITH",l);
+    if (i==-1) { break; }
+    start = condition.indexOf("\"",i+4);
+    if (start==-1) { return ""; }
+    stop = condition.indexOf("\"",start+1);
+    if (stop==-1) { return ""; }
+    int k = condition.indexOf("=",start+1);
+    sb.append("XXX").append(condition.substring(start+1,k)).append("XXX")
+      .append(condition.substring(k+1,stop)).append("XXX ");
+    l = stop;
+    }
+  if (!tag.equals("METADATA")) {
+    i = tag.indexOf(".");
+    if (i==-1) {
+      sb.append("XXX").append(tag).append("XXX}"); }
+    else {
+      j = tag.indexOf(".",i+1);
+      if (j==-1) {
+        sb.append("XXX").append(tag.substring(0,i)).append("XXX")
+          .append(tag.substring(i+1,tag.length())).append("XXX}"); }
+      else {
+        sb.append("XXX").append(tag.substring(0,i)).append("XXX")
+          .append(tag.substring(i+1,j)).append("XXX")
+          .append(tag.substring(j+1,tag.length())).append("XXX}"); }
+      }
+    }
+  sb.append(')');
   return sb.toString();
   }
 
@@ -169,6 +219,8 @@ private final String setContainsCondition(String condition)
  * &lt;/innertag&gt;<br>
  * &lt;/subtag&gt;
  *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
  * @param subtag             the tagname of an element from the list in a tag
  * @param sattrib            the optional attribute vector of a subtag
  * @param svalue             the optional value vector of sattrib
@@ -178,14 +230,15 @@ private final String setContainsCondition(String condition)
  * @param text               the text value of this element
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringText(String subtag, String [] sattrib,
-  String [] svalue, String innertag, String [] iattrib, String [] ivalue,
-  String text)
+public final String createSearchStringText(String part, String subtag, 
+  String [] sattrib, String [] svalue, String innertag, String [] iattrib, 
+  String [] ivalue, String text)
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return ""; }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(subtag.toUpperCase()).append("XXX");
+  sb.append("XXX").append(part.toUpperCase()).append("XXX").
+     append(subtag.toUpperCase()).append("XXX");
   if ((innertag != null) && ((innertag = innertag.trim()).length() !=0)) {
     sb.append(innertag.toUpperCase()).append("XXX"); }
   sb.append(' ');

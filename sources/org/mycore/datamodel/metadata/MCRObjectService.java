@@ -32,20 +32,27 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
+import mycore.datamodel.MCRMetaDate;
+import mycore.datamodel.MCRMetaLangText;
 
 /**
  * This class implements all methode for handling one document service data.
  * The service data are to use to handel the database with batch jobs
- * automatical changes.<p>
- *
- * The following data fields are in this class:
+ * automatical changes. The service class holds two types of data, dates
+ * and flags. The flags are text strings and are optional.<p>
+ * 
+ * The dates are represent by a date and a type. Two types are in service
+ * data at every time and can't remove:
  * <ul>
  * <li>createdate - for the creating date of the object, this was set
  *                  only one time</li>
- * <li>submitdate - for the submiting date of the object</li>
- * <li>acceptdate - for the accepting date of the object</li>
  * <li>modifydate - for the accepting date of the object, this was set
  *                  at every changes</li>
+ * </ul>
+ * Other date types are optional, but as example in Dublin Core:
+ * <ul>
+ * <li>submitdate - for the submiting date of the object</li>
+ * <li>acceptdate - for the accepting date of the object</li>
  * <li>validfromdate - for the date of the object, at this the object is valid 
  *                     to use</li>
  * <li>validtodate - for the date of the object, at this the object is no 
@@ -57,18 +64,12 @@ import mycore.common.MCRException;
  **/
 public class MCRObjectService
 {
+// common data
 private String NL;
-private GregorianCalendar createdate;
-private GregorianCalendar submitdate;
-private GregorianCalendar acceptdate;
-private GregorianCalendar modifydate;
-private GregorianCalendar validfromdate;
-private GregorianCalendar validtodate;
-private Vector flag;
-private int vec_max_length = 1;
 
-private static DateFormat df =
-  DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
+// service data
+private ArrayList dates = null;
+private ArrayList flags = null;
 
 /**
  * This is the constructor of the MCRObjectService class. All data
@@ -77,15 +78,14 @@ private static DateFormat df =
 public MCRObjectService()
   {
   NL = new String((System.getProperties()).getProperty("line.separator"));
-  createdate = null;
-  submitdate = null;
-  acceptdate = null;
-  modifydate = null;
-  validfromdate = null;
-  validtodate = null;
-  vec_max_length = MCRConfiguration.instance()
-    .getInt("MCR.metadata_service_vec_max_length",1);
-  flag = new Vector(vec_max_length);
+  dates = new ArrayList();
+  MCRMetaDate d = new MCRMetaDate("service","date",null,"createdate",
+    new GregorianCalendar());
+  dates.add(d);
+  d = new MCRMetaDate("service","date",null,"modifydate",
+    new GregorianCalendar());
+  dates.add(d);
+  flags = new ArrayList();
   }
 
 /**
@@ -97,403 +97,169 @@ public MCRObjectService()
  **/
 public final void setFromDOM(NodeList dom_element_list)
   {
-  Node textelement, flags_node;
-  Element dates_element, flags_element;
+  Node date_element, flag_element;
   NodeList date_list, flag_list;
   Element service_element = (Element)dom_element_list.item(0);
+  // Date part
   NodeList service_dates_list =
     service_element.getElementsByTagName("dates");
-  int dates_len = service_dates_list.getLength();
-  if (dates_len != 0) {
-    dates_element = (Element)service_dates_list.item(0);
-    date_list = dates_element.getElementsByTagName("createdate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setCreateDate(((Text)textelement).getData().trim());
-      }
-    date_list = dates_element.getElementsByTagName("submitdate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setSubmitDate(((Text)textelement).getData().trim());
-      }
-    date_list = dates_element.getElementsByTagName("acceptdate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setAcceptDate(((Text)textelement).getData().trim());
-      }
-    date_list = dates_element.getElementsByTagName("modifydate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setModifyDate(((Text)textelement).getData().trim());
-      }
-    date_list = dates_element.getElementsByTagName("validfromdate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setValidFromDate(((Text)textelement).getData().trim());
-      }
-    date_list = dates_element.getElementsByTagName("validtodate");
-    if (date_list.getLength() != 0) {
-      textelement = (Node)(date_list.item(0)).getFirstChild();
-      setValidToDate(((Text)textelement).getData().trim());
+  if (service_dates_list.getLength()>0) {
+    Node service_dates_element = service_dates_list.item(0);
+    NodeList service_date_list = service_dates_element.getChildNodes();
+    int date_len = service_date_list.getLength();
+    for (int i=0;i<date_len;i++) {  
+      date_element = service_date_list.item(i);
+      if (date_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+      MCRMetaDate date = new MCRMetaDate();
+      date.setDataPart("service");
+      date.setFromDOM(date_element);
+      dates.add(date);
       }
     }
+  // Flag part
   NodeList service_flags_list =
     service_element.getElementsByTagName("flags");
-  Node service_flags_node = service_flags_list.item(0);
-  NodeList flags_list = service_flags_node.getChildNodes();
-  int flags_len = flags_list.getLength();
-  for (int i=0;i<flags_len;i++) {
-    flags_node = flags_list.item(i);
-    if (flags_node.getNodeType() != Node.ELEMENT_NODE) { continue; }
-    textelement = flags_node.getFirstChild();
-    flag.addElement(((Text)textelement).getData().trim());
+  if (service_dates_list.getLength()>0) {
+    Node service_flags_element = service_flags_list.item(0);
+    NodeList service_flag_list = service_flags_element.getChildNodes();
+    int flag_len = service_flag_list.getLength();
+    for (int i=0;i<flag_len;i++) {
+      flag_element = service_flag_list.item(i);
+      if (flag_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+      MCRMetaLangText flag = new MCRMetaLangText();
+      flag.setDataPart("service");
+      flag.setFromDOM(flag_element);
+      flags.add(flag);
+      }
     }
   }
 
 /**
- * This methode return the create date as GregorianCalendar.
+ * This method get a date for a given type. If the type was not found,
+ * an null was returned.
  *
- * @return the create date
+ * @param type           the type of the date
+ * @return the date as GregorianCalendar
  **/
-public final GregorianCalendar getCreateDate()
-  { return createdate; }
-
-/**
- * This methode return the create date as string.
- *
- * @return the create date
- **/
-public final String getCreateString()
+public final GregorianCalendar getDate(String type)
   {
-  if (createdate == null) { return null; }
-  return df.format(createdate.getTime());
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    return null; }
+  int i = -1;
+  for (int j=0;j<dates.size();j++) {
+    if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
+  if (i==-1) { return null; }
+  MCRMetaDate d = (MCRMetaDate)dates.get(i);
+  return d.getDate();
   }
 
 /**
- * This methode return the submit date as GregorianCalendar.
+ * This method remove a date for a given type. 
  *
- * @return the submit date
+ * @param type           the type of the date
  **/
-public final GregorianCalendar getSubmitDate()
-  { return submitdate; }
-
-/**
- * This methode return the submit date as string.
- *
- * @return the submit date
- **/
-public final String getSubmitString()
+public final void removeDate(String type)
   {
-  if (submitdate == null) { return null; }
-  return df.format(submitdate.getTime());
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    return; }
+  int i = -1;
+  for (int j=0;j<dates.size();j++) {
+    if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
+  if (i==-1) { return; }
+  dates.remove(i);
   }
 
 /**
- * This methode return the accept date as GregorianCalendar.
+ * This methode set a date element in the dates list to a actual date value.
+ * If the given type exists, the date was update.
  *
- * @return the accept date
+ * @param type           the type of the date
  **/
-public final GregorianCalendar getAcceptDate()
-  { return acceptdate; }
-
-/**
- * This methode return the accept date as string.
- *
- * @return the accept date
- **/
-public final String getAcceptString()
+public final void setDate(String type)
   {
-  if (acceptdate == null) { return null; }
-  return df.format(acceptdate.getTime());
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    return; }
+  int i = -1;
+  for (int j=0;j<dates.size();j++) {
+    if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
+  if (i==-1) {
+    MCRMetaDate d = new MCRMetaDate("service","date",null,type,
+      new GregorianCalendar());
+    dates.add(d);
+    }
+  else {
+    MCRMetaDate d = (MCRMetaDate)dates.get(i);
+    d.setDate(new GregorianCalendar());
+    dates.set(i,d);
+    }
   }
 
 /**
- * This methode return the modify date as GregorianCalendar.
+ * This methode set a date element in the dates list to a given date value.
+ * If the given type exists, the date was update.
  *
- * @return the modify date
+ * @param type           the type of the date
+ * @param date           the given date
  **/
-public final GregorianCalendar getModifyDate()
-  { return modifydate; }
-
-/**
- * This methode return the modify date as string.
- *
- * @return the modify date
- **/
-public final String getModifyString()
+public final void setDate(String type, GregorianCalendar date)
   {
-  if (modifydate == null) { return null; }
-  return df.format(modifydate.getTime());
-  }
-
-/**
- * This methode return the validfrom date as GregorianCalendar.
- *
- * @return the validfrom date
- **/
-public final GregorianCalendar getValidFromDate()
-  { return validfromdate; }
-
-/**
- * This methode return the validfrom date as string.
- *
- * @return the validfrom date
- **/
-public final String getValidFromString()
-  {
-  if (validfromdate == null) { return null; }
-  return df.format(validfromdate.getTime());
-  }
-
-/**
- * This methode return the validto date as GregorianCalendar.
- *
- * @return the validto date
- **/
-public final GregorianCalendar getValidToDate()
-  { return validtodate; }
-
-/**
- * This methode return the validto date as string.
- *
- * @return the validto date
- **/
-public final String getValidToString()
-  {
-  if (validtodate == null) { return null; }
-  return df.format(validtodate.getTime());
-  }
-
-/**
- * This methode return the value of the single flag with index number.
- *
- * @return the string of flag from index
- **/
-public final String getFlag(int index)
-  { return (String)flag.elementAt(index); }
-
-/**
- * This methode return the values of the flag list as string.
- * each element begins with the <em>XXXFLAGXXX</em> string.
- *
- * @return the string of the flags
- **/
-public final String getFlags()
-  { 
-  StringBuffer sb = new StringBuffer(256);
-  for (int i=0;i<flag.size();i++) {
-    sb.append("XXXFLAGXXX ").append(flag.elementAt(i)).append(' '); }
-  return sb.toString();
-  }
-
-/**
- * This methode set the create date to the actual date.
- **/
-public final void setCreateDate()
-  { createdate = new GregorianCalendar(); }
-
-/**
- * This methode set the create date to the given date.
- **/
-public final void setCreateDate(GregorianCalendar date)
-  { 
-  createdate = null;
-  if (date != null) { createdate = date; }
-  }
-
-/**
- * This methode set the create date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setCreateDate(String date) throws MCRException
-  {
-  createdate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    createdate = new GregorianCalendar();
-    createdate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse create date."); }
-  }
-
-/**
- * This methode set the submit date to the actual date.
- **/
-public final void setSubmitDate()
-  { submitdate = new GregorianCalendar(); }
-
-/**
- * This methode set the submit date to the given date.
- **/
-public final void setSubmitDate(GregorianCalendar date)
-  { 
-  submitdate = null;
-  if (date != null) { submitdate = date; }
-  }
-
-/**
- * This methode set the submit date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setSubmitDate(String date) throws MCRException
-  {
-  submitdate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    submitdate = new GregorianCalendar();
-    submitdate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse submit date."); }
-  }
-
-/**
- * This methode set the accept date to the actual date.
- **/
-public final void setAcceptDate()
-  { acceptdate = new GregorianCalendar(); }
-
-/**
- * This methode set the accept date to the given date.
- **/
-public final void setAcceptDate(GregorianCalendar date)
-  { 
-  acceptdate = null;
-  if (date != null) { acceptdate = date; }
-  }
-
-/**
- * This methode set the accept date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setAcceptDate(String date) throws MCRException
-  {
-  acceptdate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    acceptdate = new GregorianCalendar();
-    acceptdate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse accept date."); }
-  }
-
-/**
- * This methode set the modify date to the actual date.
- **/
-public final void setModifyDate()
-  { modifydate = new GregorianCalendar(); }
-
-/**
- * This methode set the modify date to the given date.
- **/
-public final void setModifyDate(GregorianCalendar date)
-  { 
-  modifydate = null;
-  if (date != null) { modifydate = date; }
-  }
-
-/**
- * This methode set the modify date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setModifyDate(String date) throws MCRException
-  {
-  modifydate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    modifydate = new GregorianCalendar();
-    modifydate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse modify date."); }
-  }
-
-/**
- * This methode set the validfrom date to the actual date.
- **/
-public final void setValidFromDate()
-  { validfromdate = new GregorianCalendar(); }
-
-/**
- * This methode set the validfrom date to the given date.
- **/
-public final void setValidFromDate(GregorianCalendar date)
-  { 
-  validfromdate = null;
-  if (date != null) { validfromdate = date; }
-  }
-
-/**
- * This methode set the validfrom date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setValidFromDate(String date) throws MCRException
-  {
-  validfromdate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    validfromdate = new GregorianCalendar();
-    validfromdate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse validfrom date."); }
-  }
-
-/**
- * This methode set the validto date to the actual date.
- **/
-public final void setValidToDate()
-  { validtodate = new GregorianCalendar(); }
-
-/**
- * This methode set the validto date to the given date.
- **/
-public final void setValidToDate(GregorianCalendar date)
-  { 
-  validtodate = null;
-  if (date != null) { validtodate = date; }
-  }
-
-/**
- * This methode set the validto date to the given date.
- *
- * @param date               a date string
- * @exception MCRException   if the date is bad
- **/
-public final void setValidToDate(String date) throws MCRException
-  {
-  validtodate = null;
-  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
-  try {
-    validtodate = new GregorianCalendar();
-    validtodate.setTime(df.parse(date)); }
-  catch (ParseException e) {
-    throw new MCRException( "Can't parse validto date."); }
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    return; }
+  if (date == null) { return; }
+  int i = -1;
+  for (int j=0;j<dates.size();j++) {
+    if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
+  if (i==-1) {
+    MCRMetaDate d = new MCRMetaDate("service","date",null,type,date);
+    dates.add(d);
+    }
+  else {
+    MCRMetaDate d = (MCRMetaDate)dates.get(i);
+    d.setDate(date);
+    dates.set(i,d);
+    }
   }
 
 /**
  * This methode add a flag to the flag list.
  *
  * @param value          - the new flag as string
- * @exception IndexOutOfBoundsException throw this exception, if
- *                              the vector is full
  **/
-public final void addFlag(String value) throws IndexOutOfBoundsException
+public final void addFlag(String value)
   {
-  if (flag.size()>=vec_max_length) {
-    throw new IndexOutOfBoundsException("Index error in addFlag."); }
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
-  flag.addElement(value);
+  MCRMetaLangText flag = new MCRMetaLangText("service","flag",null,null,value);
+  flags.add(flag);
   }
  
+/**
+ * This methode get all flags from the flag list as a string.
+ *
+ * @return the flags string
+ **/
+public final String getFlags()
+  {
+  StringBuffer sb = new StringBuffer("");
+  for (int i=0;i<flags.size();i++) {
+    sb.append(((MCRMetaLangText)flags.get(i)).getText()).append(" "); }
+  return sb.toString();
+  }
+
+/**
+ * This methode get a single flag from the flag list as a string.
+ *
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the index is false
+ * @return a flag string
+ **/
+public final String getFlag(int index) throws IndexOutOfBoundsException
+  {
+  if ((index<0)||(index>flags.size())) {
+    throw new IndexOutOfBoundsException("Index error in removeFlag."); }
+  return ((MCRMetaLangText)flags.get(index)).getText();
+  }
+
 /**
  * This methode return a boolean value if the given flag is set or not.
  *
@@ -504,8 +270,10 @@ public final boolean isFlagSet(String value)
   {
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return false; }
-  for (int i=0;i<flag.size();i++) {
-    if (flag.elementAt(i).equals(value)) { return true; } }
+  for (int i=0;i<flags.size();i++) {
+    if (((MCRMetaLangText)flags.get(i)).getText().equals(value)) { 
+      return true; }
+    }
   return false;
   }
  
@@ -518,13 +286,13 @@ public final boolean isFlagSet(String value)
  **/
 public final void removeFlag(int index) throws IndexOutOfBoundsException
   {
-  if ((index<0)||(index>flag.size())) {
+  if ((index<0)||(index>flags.size())) {
     throw new IndexOutOfBoundsException("Index error in removeFlag."); }
-  flag.removeElementAt(index);
+  flags.remove(index);
   }
 
 /**
- * This methode replace a flag in the flag list.
+ * This methode set a flag in the flag list.
  *
  * @param index                 a index in the list
  * @param value                 the value of a flag as string
@@ -534,75 +302,37 @@ public final void removeFlag(int index) throws IndexOutOfBoundsException
 public final void replaceFlag(int index, String value) 
   throws IndexOutOfBoundsException
   {
-  if ((index<0)||(index>flag.size())) {
+  if ((index<0)||(index>flags.size())) {
     throw new IndexOutOfBoundsException("Index error in replaceFlag."); }
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
-  flag.setElementAt(value,index);
-  }
-
-/**
- * This methode sets the new flag vector from a given string.
- * Each new flag begins with XXXFLAGXXX in the string.
- *
- * @param value                 the flag string
- **/
-public final void setFlags(String value)
-  {
-  if (value == null) { return; }
-  int len = 0;
-  value = value.trim();
-  len = value.length();
-  if (len == 0) { return; }
-  int i = value.indexOf("XXXFLAGXXX");
-  if ( i== -1) { return; }
-  while (i+11<=len) {
-    int j = value.indexOf("XXXFLAGXXX",i+11);
-    if (j == -1) {
-      addFlag(value.substring(i+11,len)); i = len; }
-    else {
-      addFlag(value.substring(i+11,j)); i = j; }
-    }
+  MCRMetaLangText flag = new MCRMetaLangText("service","flag",null,null,value);
+  flags.set(index,flag);
   }
 
 /**
  * This methode create a XML stream for all structure data.
  *
+ * @exception MCRException if the content of this class is not valid
  * @return a XML string with the XML data of the structure data part
  **/
-public final String createXML()
+public final String createXML() throws MCRException
   {
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(2048);
   sb.append("<service>").append(NL);
-  if ((createdate != null) || (submitdate != null) || 
-      (acceptdate != null) || (modifydate != null) ||
-      (validfromdate != null) || (validtodate != null)) {
+  if (dates.size()!=0) {
     sb.append("<dates>").append(NL);
-    if (createdate != null) {
-      sb.append("<createdate>").append(getCreateString())
-        .append("</createdate>").append(NL); }
-    if (submitdate != null) {
-      sb.append("<submitdate>").append(getSubmitString())
-        .append("</submitdate>").append(NL); }
-    if (acceptdate != null) {
-      sb.append("<acceptdate>").append(getAcceptString())
-        .append("</acceptdate>").append(NL); }
-    if (modifydate != null) {
-      sb.append("<modifydate>").append(getModifyString())
-        .append("</modifydate>").append(NL); }
-    if (validfromdate != null) {
-      sb.append("<validfromdate>").append(getValidFromString())
-        .append("</validfromdate>").append(NL); }
-    if (validtodate != null) {
-      sb.append("<validtodate>").append(getValidToString())
-        .append("</validtodate>").append(NL); }
+    for (int i=0;i<dates.size();i++) {
+      sb.append(((MCRMetaDate)dates.get(i)).createXML()); }
     sb.append("</dates>").append(NL);
     }
-  if (flag.size()!=0) {
+  if (flags.size()!=0) {
     sb.append("<flags>").append(NL);
-    for (int i=0;i<flag.size();i++) {
-      sb.append("<flag>").append(flag.elementAt(i)).append("</flag>")
-        .append(NL); }
+    for (int i=0;i<flags.size();i++) {
+      sb.append(((MCRMetaLangText)flags.get(i)).createXML()); }
     sb.append("</flags>").append(NL);
     }
   sb.append("</service>").append(NL);
@@ -616,20 +346,46 @@ public final String createXML()
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @exception MCRException if the content of this class is not valid
  * @return a Text Search string with the data of the metadata part
  **/
-public final String createTS(Object mcr_query)
+public final String createTS(Object mcr_query)  throws MCRException
   {
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(2048);
-  if (flag.size()!=0) {
-    for (int i=0;i<flag.size();i++) {
-      sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Flag",
-        null,null,null,null,null,(String)flag.elementAt(i)));
-      }
+  if (dates.size()!=0) {
+    for (int i=0;i<dates.size();i++) {
+      sb.append(((MCRMetaDate)dates.get(i)).createTS(mcr_query)); }
     }
   else {
-    sb.append("").append(NL); }
+    sb.append(""); }
+  if (flags.size()!=0) {
+    for (int i=0;i<flags.size();i++) {
+      sb.append(((MCRMetaLangText)flags.get(i)).createTS(mcr_query)); }
+    }
+  else {
+    sb.append(""); }
   return sb.toString();
+  }
+
+/**
+ * This method check the validation of the content of this class.
+ * The method returns <em>true</em> if
+ * <ul>
+ * <li> the date value of "createdate" is not null or empty
+ * <li> the date value of "modifydate" is not null or empty
+ * </ul>
+ * otherwise the method return <em>false</em>
+ *
+ * @return a boolean value
+ **/
+public final boolean isValid()
+  {
+  if (getDate("createdate") == null) { return false; }
+  if (getDate("modifydate") == null) { return false; }
+  return true;
   }
 
 /**
@@ -639,20 +395,10 @@ public final String createTS(Object mcr_query)
 public final void debug()
   {
   System.out.println("The document service data content :");
-  if (createdate != null) {
-    System.out.println("create date          = "+getCreateString()); }
-  if (submitdate != null) {
-    System.out.println("submit date          = "+getSubmitString()); }
-  if (acceptdate != null) {
-    System.out.println("accept date          = "+getAcceptString()); }
-  if (modifydate != null) {
-    System.out.println("modify date          = "+getModifyString()); }
-  if (validfromdate != null) {
-    System.out.println("validfrom date       = "+getValidFromString()); }
-  if (validtodate != null) {
-    System.out.println("validto date         = "+getValidToString()); }
-  for (int i=0;i<flag.size();i++) {
-    System.out.println("flag                 = "+flag.elementAt(i)); }
+  for (int i=0;i<dates.size();i++) {
+    ((MCRMetaDate)dates.get(i)).debug(); }
+  for (int i=0;i<flags.size();i++) {
+    ((MCRMetaLangText)flags.get(i)).debug(); }
   System.out.println();
   }
 

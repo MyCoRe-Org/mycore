@@ -77,6 +77,8 @@ public MCRMetaPerson()
  * peerage element was set to the value of <em>set_...<em>, if they are null,
  * an empty string was set to this element.
  *
+ * @param set_datapart     the global part of the elements like 'metadata'
+ *                         or 'service'
  * @param set_subtag      the name of the subtag
  * @param default_lang    the default language
  * @param set_type        the optional type string
@@ -87,11 +89,12 @@ public MCRMetaPerson()
  * @param set_peerage     the peerage title
  * @exception MCRException if the parameter values are invalid
  **/
-public MCRMetaPerson(String set_subtag, String default_lang, String set_type,
-  String set_firstname, String set_callname, String set_surename, String
-  set_academic, String set_peerage) throws MCRException
+public MCRMetaPerson(String set_datapart, String set_subtag, 
+  String default_lang, String set_type, String set_firstname, 
+  String set_callname, String set_surename, String set_academic, 
+  String set_peerage) throws MCRException
   {
-  super(set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type);
   firstname = "";
   callname  = "";
   surename  = "";
@@ -252,20 +255,20 @@ public final String createTS(Object mcr_query) throws MCRException
     svalue = new String[1]; svalue[0] = type;
     }
   if (firstname.trim().length()!=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-      sattrib,svalue,"firstname",null,null,firstname)); }
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"firstname",null,null,firstname)); }
   if (surename.trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-      sattrib,svalue,"surename",null,null,surename)); }
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"surename",null,null,surename)); }
   if (callname.trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-      sattrib,svalue,"callname",null,null,callname)); }
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"callname",null,null,callname)); }
   if (academic.trim().length() !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-      sattrib,svalue,"academic",null,null,academic)); }
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"academic",null,null,academic)); }
   if (peerage.trim().length()  !=0) {
-    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
-      sattrib,svalue,"peerage",null,null,peerage)); }
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
+      subtag,sattrib,svalue,"peerage",null,null,peerage)); }
   return sb.toString();
   }
 

@@ -227,8 +227,7 @@ private static final void show(String[] args)
     mycore_obj.debug();
     MCRObjectStructure st = mycore_obj.getStructure();
     if (st != null) { st.debug(); }
-    MCRMetaLangText me = 
-      (MCRMetaLangText)mycore_obj.getMetadataElement("titles");
+    MCRMetaElement me = mycore_obj.getMetadataElement("titles");
     if (me != null) {me.debug(); }
     MCRObjectService se = mycore_obj.getService();
     if (se != null) { se.debug(); }
@@ -326,8 +325,10 @@ private static final void query(String[] args)
     System.exit(1); }
   try {
     String type = args[1];
-    String query = args[2];
-    MCRQueryResult mycore_obj = new MCRQueryResult(type,query);
+    StringBuffer query = new StringBuffer(args[2]);
+    for (int i=3;i<args.length;i++)
+    { query.append(' ').append(args[i]); }
+    MCRQueryResult mycore_obj = new MCRQueryResult(type,query.toString());
     mycore_obj.debug();
     }
   catch (Exception e) {
