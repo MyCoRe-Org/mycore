@@ -43,6 +43,8 @@ import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
+
 import org.mycore.services.oai.MCROAIQuery;
 import org.mycore.services.query.MCRQueryResult;
 
@@ -61,6 +63,8 @@ public class MCROAIQueryService implements MCROAIQuery {
 	private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme"; // the classification id which serves as scheme for the OAI set structure
     private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier of the repository
 
+	private static MCRLinkTableManager lm = MCRLinkTableManager.instance();
+	
 	private MCRConfiguration config;
 	
 	/**
@@ -122,38 +126,17 @@ public class MCROAIQueryService implements MCROAIQuery {
 	    	logger.debug("Suche nach Kategorie: " + categories[i].getID());    
     		
     		//We should better have a look if the set is empty...        
-	        StringBuffer query = new StringBuffer("");
-            query.append("/mycoreobject[@classid=\"").append(categories[i].getClassificationID()).
-                append("\" and @categid=\"").append(categories[i].getID()).append("\"]");
-
-			try {
-				String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
-				String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
-				
-				query.append(" and ").append("/mycoreobject[@classid=\"").append(restrictionClassification).
-	                append("\" and @categid=\"").append(restrictionCategory).append("\"]");
-		    } catch (MCRConfigurationException mcrx) {
-		    }
-			    
-   	    	logger.debug("Die erzeugte Query ist: " + query.toString());
-   	    	
-			MCRQueryResult qr = new MCRQueryResult();
-			MCRXMLContainer qra = null;
-    	    try {
-		        qra = qr.setFromQuery("local", "document", query.toString());
-    	    } catch (MCRException mcrx) {
-    	    	logger.error("Die Query ist fehlgeschlagen.");
-    	    	return newList;
-    	    }
-
-			if (qra.size() > 0) {
+			if (lm.countCategoryReferencesSharp(categories[i].getClassificationID(), categories[i].getID()) > 0) {
 		    	newList.add(set);
 		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugefügt.");
-		    	
-    	        if (categories[i].hasChildren()) {
-        	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
-	            }
 			}
+		    	
+		    //Only add childs if they have content
+   	        if (categories[i].hasChildren() &&
+		   	        (lm.countCategoryReferencesFuzzy(categories[i].getClassificationID(), categories[i].getID()) > 
+   	    		    lm.countCategoryReferencesSharp(categories[i].getClassificationID(), categories[i].getID()))) {
+       	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
+            }
 		}
         
         return newList;
