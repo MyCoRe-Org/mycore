@@ -81,7 +81,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common,compile_datamodel,compile_classifications,compile_nbn,compile_xml,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_webservice,compile_user,compile_persistency,compile_database,compile_gui"/>
+  <target name="compile" depends="compile_common,compile_datamodel,compile_classifications,compile_nbn,compile_editor,compile_xml,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_webservice,compile_user,compile_persistency,compile_database,compile_gui"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -90,7 +90,7 @@
   </target>
 
   <target name="compile_persistency">
-    <echo>Compiling for for persitence layer ${persistency}</echo>
+    <echo>Compiling for for persistence layer ${persistency}</echo>
     <antcall target="compile_${persistency}">
       <param name="packages" value="mycore/${persistency}/**"/>
     </antcall>
@@ -151,6 +151,12 @@
     </antcall>
   </target>
 
+  <target name="compile_editor">
+    <antcall target="javac">
+      <param name="packages" value="mycore/editor/**"/>
+    </antcall>
+  </target>
+
   <target name="compile_user">
     <antcall target="javac">
       <param name="packages" value="mycore/user/**"/>
@@ -206,7 +212,7 @@
       ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
     </echo>
     <javadoc
-      packagenames        = "mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.classifications.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.${database}.*,mycore.gui.*,mycore.webservice.*"
+      packagenames        = "mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.classifications.*,mycore.ifs.*,mycore.nbn.*,mycore.editor.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.${database}.*,mycore.gui.*,mycore.webservice.*"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
       classpath           = "${lib}/ftp.jar"
