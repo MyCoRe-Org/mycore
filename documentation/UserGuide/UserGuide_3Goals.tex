@@ -34,4 +34,109 @@ Dreh- und Angelpunkt aller Beziehungen von Metadaten und der daran angeknüpften 
 Zur Umsetztung des Datenmodells wurden weiterhin die Typen {\bf document} für Dokumente und {\bf legalentity} für Personen verwendet.
 {\it number} - Dieser Teil dient der Identifizierung des Einzelobjektes. Es dürfen nur natürliche Zahlen angegeben werden. Planen Sie Ihre Vergabe der Nummern bei eigenen Objekten sorgfältig. Da die Nummern teilweise als Strings verarbeitet werden, ist es sinnvoll, sie mit einer ausreichenden Zahl von Vornullen zu versehen. Dies erledigt das MyCoRe-System automatisch unter Zuhilfenahme des Konfogurationswertes {\tt MCR.metadata\_objectid\_number\_pattern } im File {\it mycore.properties.private }.
 \subsection{Das Sample-Datenmodell}
-Das Datenmodell des MyCoRe-Samples soll exemplarisch einen kleinen Dokumentserver abbliden, wie er dann für große Lösungen übernommen werden kann. Dabei sollen Multimediale Objekte verschiedenster Art und Herkunft gemeinsam verwaltet werden.
+Das Datenmodell des MyCoRe-Samples soll exemplarisch einen kleinen Dokumentserver abbliden, wie er dann für große Lösungen übernommen werden kann. Dabei sollen Multimediale Objekte verschiedenster Art und Herkunft gemeinsam verwaltet werden. Als Grundgerüst für die Dokumente diente uns das Dublin Core Datenmodell, welches in einigen Punkten inhaltlich etwas nach unseren Auffassungen angepasst wurde. Das Personen-Datenmodell ist hingegen derzeit propitär. Ggf. kommen hier in einer späteren version von MyCoRe Standard-Datenmodelle zum Einsatz. Die Klassifikationen sind hierarchich angelegt, d. h. Kategorien können wieder Unterkategorien beherbergen. Im folgenden werden die einzelnen Felder des Metadatenmodelles beschrieben und es wird aufgezeigt, welche Suchen vorgesehen sind. Dabei bedeutet PS - parametrische Suche, TS - Volltextsuche. Eine genaue Beschreibung der Suchmechanismen finden Sie im Programmers Guide. \\[2ex]
+{\bf Die Klassifikationen (Classifications)}  \\[2ex]
+Für das Datenmodell sind die folgenden Klassifikationen vorgesehen. Alle Label und Descriptions der einzelnen Kategorien können dabei in mehreren Sprachen angegeben werden.
+\begin{itemize}
+\item {\bf Format} - enthält eine einfache Liste der möglichen Formate des Dokumentes.
+\item {\bf Typen}  - enthält eine einfache Liste der möglichen Typen des Dokumente.
+\item {\bf Einger} - enthält eine hierarchiche Liste aller möglichen Eignergruppen eines Dokumentes.
+\end{itemize}
+{\bf Das Dokument (Document)}  \\[2ex]
+\small
+\bottomcaption{Das Document Datenmodell}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{2cm}|p{4cm}|p{9cm}|}
+\hline
+{\bf Bezeichner} & {\bf Type} & {\bf Beschreibung} \\[1,5ex] \hline
+Title & MCRMetaLangText & Titel des Werkes, alternative Titel usw. in mehreren Sprachen\\ \hline
+Creator & MCRMetaLink & Enthält eine Liste von Links auf Autoren, Erzeuger, Einrichtungen usw. \\[1,5ex] \hline
+Subject & MCRMetaClass & Subjekte, die in Form von Klassifikationen vorliegen. Dies können z. B. Schlagworte sein. \\ \hline
+Description & MCRMetaLangText &  Eine verbale Kurzbeschreibung des Objektes, ggf. ist diese in verschiedenen Sprachen gehalten.\\ \hline
+Publisher & MCRMetaLink & Enthält eine Liste von Links auf Personen und deren Institutionen, die an der Veröffentlichung des Objektes beteiligt waren.\\ \hline
+Contributor & MCRMetaLink & Enthält eine Liste von Links auf Personen und deren Institutionen, die anderweitig am Entstehen des Objektes beteiligt waren.\\ \hline
+Date & MCRMetaDate & Datumsangaben zum Objekt. \\ \hline
+Type & MCRMetaClass & Type des Objktes. \\ \hline
+Format & MCRMetaClass & Angaben über die physikalischen Eigenschaften des physischen Objektes.\\ \hline
+Identifier & MCRMetaLangText & Inventarnummern und Angaben zur physikalischen Aufbewahrung des Objektes.\\ \hline
+Source & MCRMetaLangText & Quellen und Erwerbsangaben des physikalischen Objektes, ggf. in mehreren Sprachen.\\ \hline
+Language & Entfällt, wird innerhalb der einzelnen Metadaten abgelegt. & Angaben über die Sprache, in der das physikalische Objekt gehalten ist. \\ \hline
+Keywords & MCRMetaLangText & Schlüsselworte für die Suche, ggf. in mehreren Sprachen. \\ \hline
+Coverage & MCRMetaLangText & Zeitliche und räumliche Erstreckung des Werkes, ggf. in mehreren Sprachen. \\ \hline
+Rights & MCRMetaLangText & Text zu den Rechten eines Werkes, ggf. in mehreren Sprachen.\\ \hline
+\end{supertabular}
+\normalsize
+
+\small
+\bottomcaption{Das Document Suchmodell}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{8cm}|p{2cm}|p{2cm}|}
+\hline
+{\bf relativer Pfad} & {\bf PS} & {\bf TS}\\[1,5ex] \hline
+ID & $\Delta$ & - \\ \hline
+label & $\Delta$ & - \\ \hline
+structure/derobjects/derobject & $\Delta$ & - \\ \hline
+structure/parents/parent  & - & - \\ \hline
+structure/children/child  & - & - \\ \hline
+metadata/titles/title & $\Delta$ & $\Delta$ \\ \hline
+metadata/creators/creator & $\Delta$ & - \\ \hline
+metadata/subjects/subject & $\Delta$ & - \\ \hline
+metadata/descriptions/description & $\Delta$ & $\Delta$ \\ \hline
+metadata/publishers/publisher & $\Delta$ & - \\ \hline
+metadata/contributors/contributor  & $\Delta$ & - \\ \hline
+metadata/dates/date & $\Delta$ & - \\ \hline
+metadata/types/type & $\Delta$ & - \\ \hline
+metadata/formats/format & $\Delta$ & - \\ \hline
+metadata/identifiers/idenifier & $\Delta$ & - \\ \hline
+metadata/sources/source & - & - \\ \hline
+metadata/keywords/keyword  & $\Delta$ & $\Delta$ \\ \hline
+metadata/coverages/coverage  & $\Delta$ & $\Delta$ \\ \hline
+metadata/rights/right & $\Delta$ & - \\ \hline
+service/servdates/servdate & $\Delta$ & - \\ \hline
+service/servflags/servflag & $\Delta$ & - \\ \hline
+\end{supertabular}
+\normalsize
+
+{\bf Die Personendaten (LegalEntities)}  \\[2ex]
+\small
+\bottomcaption{Das Personen Datenmodell}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{2cm}|p{4cm}|p{9cm}|}
+\hline
+{\bf Bezeichner} & {\bf Type} & {\bf Beschreibung} \\[1,5ex] \hline
+Person & MCRMetaPerson & Name einer Person mit akademischen Titel, Adelstitel, Namen, Vornamen und ggf. Typ des Namens (Alias usw.).\\ \hline
+Corporation & MCRMetaCorporation & Name einer Institution oder Einrichtung mit Bereichs- und Abteilungsbezeichnungen und ggf. Typ des namens. \\ \hline
+Address & MCRMetaAddress & Die Adresse mit Land, Staat, Ort, PLZ, Straße und Nummer.\\ \hline
+Date & MCRMetaDate & Datumsangaben.\\ \hline
+Phone & MCRMetaLangText & Die Telefonnummern.\\ \hline
+WEB & MCRMetaLangText & Die Web Adressen.\\ \hline
+eMail & MCRMetaLangText & Die eMail Adressen.\\ \hline
+\end{supertabular}
+\normalsize
+
+\small
+\bottomcaption{Das LegalEntity Suchmodell}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{8cm}|p{2cm}|p{2cm}|}
+\hline
+{\bf relativer Pfad} & {\bf PS} & {\bf TS}\\[1,5ex] \hline
+ID & $\Delta$ & - \\ \hline
+label & $\Delta$ & - \\ \hline
+structure/derobjects/derobject & $\Delta$ & - \\ \hline
+structure/parents/parent  & - & - \\ \hline
+structure/children/child  & - & - \\ \hline
+metadata/persons/person & $\Delta$ & $\Delta$ \\ \hline
+metadata/corporations/corporation & $\Delta$ & $\Delta$ \\ \hline
+metadata/addresses/address & $\Delta$ & - \\ \hline
+metadata/dates/date & $\Delta$ & - \\ \hline
+metadata/phones/phone & - & - \\ \hline
+metadata/webs/web & - & - \\ \hline
+service/servdates/servdate & $\Delta$ & - \\ \hline
+service/servflags/servflag & $\Delta$ & - \\ \hline
+\end{supertabular}
+\normalsize
+
