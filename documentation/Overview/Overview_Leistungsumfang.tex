@@ -56,10 +56,13 @@ Dazu bietet die Benutzerverwaltung insbesondere die M"oglichkeit, dass sich Benu
 und Benutzerinnen am System authentifizieren k"onnen.
 
 Die Gesch"aftsprozesse einer Benutzerverwaltung wie zum Beispiel das Anlegen neuer 
-Benutzer, das Setzen von Passw"ortern, das Deaktivieren von Benutzern usw. erfordern 
-unterschiedliche Privilegien. 
+Benutzer, das Setzen von Passw"ortern, die Aktivierung/Deaktivierung von Benutzern 
+usw. erfordern unterschiedliche Privilegien. 
 Das Benutzerverwaltungs-Komponente des MyCoRe-Projekts erm"oglicht eine detaillierte 
-Vergabe von Privilegien auf der Basis von Benutzergruppen. 
+Rollen"ubernahme einzelner Personen auf Basis von Benutzergruppen, denen bestimmte
+Privilegien zugewiesen werden k"onnen.
+Das Privilegiensystem ist dabei frei definierbar (ein Satz grundlegender Privilegien
+wird in der Dublin Core Beispielanwendung von MyCoRe mitgeliefert).
 Zur Entlastung der Betreiber der digitalen Bibliothek ist es insbesondere m"oglich, 
 dediziert administrative Privilegien an Kunden zu delegieren. 
 Dies wird durch das Konzept von Gruppenadministratoren erm"oglicht, die besondere
@@ -68,14 +71,18 @@ Durch ein System von Regeln wird dabei gew"ahrleistet, dass sich ein Benutzer od
 eine Benutzerin nicht selbst h"ohere Privilegien zuweisen kann, als vom jeweils 
 "ubergeordneten Administrator festgelegt wurde.
 
+Daten "uber Benutzer, Gruppen und Privilegien k"onnen aus XML-Dateien importiert
+und in XML-Dateien exportiert werden.
+Die Datenhaltung geschieht auf Basis einer SQL-Datenbank (z.B. IBM DB2, MySQL usw., je
+nachdem, in welcher Softwareumgebung das MyCoRe-System betrieben wird).
+Die Anmeldung am System geschieht "uber ein Servlet (MCRLoginServlet), auf das von
+verschiedenen Stellen der Webanwendung hingewiesen werden kann. 
+Dabei ist "uber ein MyCoRe-internes Session-Management gew"ahrleistet, dass die
+Anmeldung "uber mehrere Transaktionen bzw. mehrere Anfragen an das System erhalten bleibt.
+(Detaillierte Informationen hierzu finden Sie im 'MyCoRe Internal Design Guide'.)
+
 \subsection{Verwaltung von Zugriffsrechten}
-Dieses Subsystem ist derzeit noch nicht implementiert.
-
-\subsection{Digital Rights Management}
-Dieses Subsystem ist derzeit noch nicht implementiert.
-
-\section{Workflow- und Workbasketfunktionen}
-Dieses Subsystem ist derzeit noch nicht implementiert.
+Macht Benno S"uselbeck...
 
 \section{Benutzer- und Autoreninterface}
 
