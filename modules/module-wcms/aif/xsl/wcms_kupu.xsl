@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" >
-	<!-- ================================================================================= -->
+	<xsl:param name="MCR.WCMS.KUPU.kupuToolboxAddLinks" />
+      <xsl:param name="MCR.WCMS.KUPU.kupuToolboxAddImages" />
+      <xsl:param name="MCR.WCMS.KUPU.kupuToolboxAddTables" />
+      <xsl:param name="MCR.WCMS.KUPU.kupuToolboxDebug" />
+      <!-- ================================================================================= -->
 	<xsl:template name="kupu">
-
 		<div style="display: none;">
 			<xml id="kupuconfig">
 				<kupuconfig>
@@ -156,41 +159,83 @@
                         <h1  xmlns:i18n="http://xml.zope.org/namespaces/i18n" >HTML-Codekorrektur</h1>
 				<input type="checkbox" name="codeValidationDisable" value="true"><text></text></input>
                         Codekorrektur ausschalten 
-                        <br/>
-				<div class="kupu-toolbox" id="kupu-toolbox-properties">
+                        <br/>                        
+				<div style="visibility:hidden;" class="kupu-toolbox" id="kupu-toolbox-properties">
 					<div class="kupu-toolbox-label"></div>
 					<input id="kupu-properties-title" type="hidden"/>
 					<div class="kupu-toolbox-label"></div>
 					<input id="kupu-properties-description" type="hidden"/>
 				</div>
-				<div class="kupu-toolbox" id="kupu-toolbox-links">
-					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="links">Links</h1>
-					<div id="kupu-toolbox-addlink">
-						<div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" 
-							i18n:translate="items-matching-keyword"> Link the highlighted text to this URL </span>: </div>
-						<input id="kupu-link-input" class="kupu-toolbox-st" type="text" style="width: 98%"/>
-						<div style="text-align: center">
-							<button type="button" id="kupu-link-button" class="kupu-toolbox-action">Make Link</button>
-						</div>
-					</div>
-				</div>
-				<div class="kupu-toolbox" id="kupu-toolbox-images">
-					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="images">Images</h1>
-					<div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
-						Insert image at the following URL </span>: </div>
-					<input id="kupu-image-input" value="kupuimages/kupu_icon.gif" class="kupu-toolbox-st" type="text" 
-						style="width: 98%"/>
-					<div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
-						Image float </span>: </div>
-					<select id="kupu-image-float-select" class="kupu-toolbox-st">
-						<option value="none">No float</option>
-						<option value="left">Left</option>
-						<option value="right">Right</option>
-					</select>
-					<div style="text-align: center">
-						<button type="button" id="kupu-image-addbutton" class="kupu-toolbox-action">Insert Image</button>
-					</div>
-				</div>
+                        <xsl:choose>
+                              <xsl:when test="$MCR.WCMS.KUPU.kupuToolboxAddLinks = 'true' " >
+                                    <div class="kupu-toolbox" id="kupu-toolbox-links">
+                                          <h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="links">Links</h1>
+                                          <div id="kupu-toolbox-addlink">
+                                                <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" 
+                                                      i18n:translate="items-matching-keyword"> Link the highlighted text to this URL </span>: </div>
+                                                <input id="kupu-link-input" class="kupu-toolbox-st" type="text" style="width: 98%"/>
+                                                <div style="text-align: center">
+                                                      <button type="button" id="kupu-link-button" class="kupu-toolbox-action">Make Link</button>
+                                                </div>
+                                          </div>
+                                    </div>                                    
+                              </xsl:when>
+                              <xsl:otherwise>
+                                    <div style="visibility:hidden;" class="kupu-toolbox" id="kupu-toolbox-links">
+                                          <h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="links">Links</h1>
+                                          <div id="kupu-toolbox-addlink">
+                                                <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" 
+                                                      i18n:translate="items-matching-keyword"> Link the highlighted text to this URL </span>: </div>
+                                                <input id="kupu-link-input" class="kupu-toolbox-st" type="text" style="width: 98%"/>
+                                                <div style="text-align: center">
+                                                      <button type="button" id="kupu-link-button" class="kupu-toolbox-action">Make Link</button>
+                                                </div>
+                                          </div>
+                                    </div>                                                                        
+                              </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                              <xsl:when test="$MCR.WCMS.KUPU.kupuToolboxAddImages = 'true' " >
+                                    <div class="kupu-toolbox" id="kupu-toolbox-images">
+                                    <h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="images">Images</h1>
+                                          <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
+                                          Insert image at the following URL </span>: </div>
+                                          <input id="kupu-image-input" value="kupuimages/kupu_icon.gif" class="kupu-toolbox-st" type="text" 
+                                          style="width: 98%"/>
+                                                <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
+                                                Image float </span>: </div>
+                                                <select id="kupu-image-float-select" class="kupu-toolbox-st">
+                                                      <option value="none">No float</option>
+                                                      <option value="left">Left</option>
+                                                      <option value="right">Right</option>
+                                                </select>
+                                          <div style="text-align: center">
+                                          <button type="button" id="kupu-image-addbutton" class="kupu-toolbox-action">Insert Image</button>
+                                          </div>
+                                    </div>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                    <div style="visibility:hidden;" class="kupu-toolbox" id="kupu-toolbox-images">
+                                    <h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="images">Images</h1>
+                                          <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
+                                          Insert image at the following URL </span>: </div>
+                                          <input id="kupu-image-input" value="kupuimages/kupu_icon.gif" class="kupu-toolbox-st" type="text" 
+                                          style="width: 98%"/>
+                                                <div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
+                                                Image float </span>: </div>
+                                                <select id="kupu-image-float-select" class="kupu-toolbox-st">
+                                                      <option value="none">No float</option>
+                                                      <option value="left">Left</option>
+                                                      <option value="right">Right</option>
+                                                </select>
+                                          <div style="text-align: center">
+                                          <button type="button" id="kupu-image-addbutton" class="kupu-toolbox-action">Insert Image</button>
+                                          </div>
+                                    </div>
+                              </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                              <xsl:when test="$MCR.WCMS.KUPU.kupuToolboxAddTables = 'true' " >
 				<div class="kupu-toolbox" id="kupu-toolbox-tables">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="table-inspector">Tables</h1>
 					<div class="kupu-toolbox-label">Table Class <select id="kupu-table-classchooser"> </select> </div>
@@ -222,11 +267,57 @@
 						</div>
 					</div>
 				</div>
+                        </xsl:when>
+                        <xsl:otherwise>
+                              <div style="visibility:hidden;" class="kupu-toolbox" id="kupu-toolbox-tables">
+					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="table-inspector">Tables</h1>
+					<div class="kupu-toolbox-label">Table Class <select id="kupu-table-classchooser"> </select> </div>
+					<div id="kupu-toolbox-addtable">
+						<div class="kupu-toolbox-label">Rows</div>
+						<input type="text" id="kupu-table-newrows" style="width: 98%"/>
+						<div class="kupu-toolbox-label">Columns</div>
+						<input type="text" id="kupu-table-newcols" style="width: 98%"/>
+						<div class="kupu-toolbox-label"> Headings <input name="kupu-table-makeheader" 
+							id="kupu-table-makeheader" type="checkbox"/> <label for="kupu-table-makeheader">Create</label> 
+							</div>
+						<div style="text-align: center">
+							<button type="button" id="kupu-table-fixall-button">Fix Table</button>
+							<button type="button" id="kupu-table-addtable-button">Add Table</button>
+						</div>
+					</div>
+					<div id="kupu-toolbox-edittable">
+						<div class="kupu-toolbox-label">Col Align <select id="kupu-table-alignchooser"><option 
+							value="left">Left</option><option value="center">Center</option><option 
+							value="right">Right</option></select> </div>
+						<br/>
+						<button type="button" id="kupu-table-addcolumn-button">Add Column</button>
+						<button type="button" id="kupu-table-delcolumn-button">Remove Column</button>
+						<br/>
+						<button type="button" id="kupu-table-addrow-button">Add Row</button>
+						<button type="button" id="kupu-table-delrow-button">Remove Row</button>
+						<div style="text-align: center">
+							<button type="button" id="kupu-table-fix-button">Fix</button>
+						</div>
+					</div>
+				</div>
+                        </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                              <xsl:when test="$MCR.WCMS.KUPU.kupuToolboxDebug = 'true' " >
 				<div class="kupu-toolbox" id="kupu-toolbox-debug">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="debug-log">Debug Log</h1>
 					<div id="kupu-toolbox-debuglog" class="kupu-toolbox-label" style="height: 10px;">
 					</div>
 				</div>
+                        </xsl:when>
+                        <xsl:otherwise>
+                              <div style="visibility:hidden;" class="kupu-toolbox" id="kupu-toolbox-debug">
+					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="debug-log">Debug Log</h1>
+					<div id="kupu-toolbox-debuglog" class="kupu-toolbox-label" style="height: 10px;">
+					</div>
+				</div>
+                        </xsl:otherwise>
+                        </xsl:choose>
 			</div>
 			<table id="kupu-colorchooser" cellpadding="0" cellspacing="0" 
 				style="position: fixed; border-style: solid; border-color: black; border-width: 1px;">
