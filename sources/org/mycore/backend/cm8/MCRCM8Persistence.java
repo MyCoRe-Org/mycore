@@ -416,7 +416,40 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   public synchronized String getNextFreeId( String project_ID, String type_ID ) 
     throws MCRPersistenceException
   { 
-    return "";
+  // Read the item type name from the configuration
+  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
+  sb.append(type_ID.toLowerCase());
+  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix")+
+    "ID";
+  // search for the last object
+  DKDatastoreICM connection = null;
+  try {
+    connection = MCRCM8ConnectionPool.instance().getConnection();
+    DKNVPair options[] = new DKNVPair[3];
+    options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "1");
+    options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,new
+      Integer(DKConstant.DK_CM_CONTENT_ATTRONLY));
+    options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END,null);
+    StringBuffer query = new StringBuffer(1024);
+    query.append('/').append(itemtypename).append(" SORTBY (@")
+      .append(itemtypeprefix).append(" DESCENDING)");
+    DKResults results = (DKResults)connection.evaluate(query.toString(),
+      DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
+    dkIterator iter = results.createIterator();
+    if (results.cardinality() == 0) { return "1"; }
+    while(iter.more()) {
+      DKDDO ddo=(DKDDO) iter.next();  
+      MCRObjectID mid = 
+        new MCRObjectID((String)ddo.getDataByName(itemtypeprefix));
+      return String.valueOf(mid.getNumberAsInteger()+1);
+      }
+    }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
+  finally {
+    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
+  return "";
   }
 
   /** This table stores the highest IDs delivered by getNextFreeId() */
