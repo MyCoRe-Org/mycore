@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.editor;
+package org.mycore.frontend.editor;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +31,7 @@ import java.net.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This servlet provides funtions to edit XML documents using

@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.util.Vector;
 import org.jdom.Document;
 import org.jdom.Element;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class defines the set of privileges of the MyCoRe user management. It
@@ -39,7 +39,7 @@ import mycore.common.*;
  */
 public class MCRPrivilegeSet
 {
-  /** This vector holds all privileges of the mycore user management system */
+  /** This vector holds all privileges of the org.mycore.user management system */
   private Vector privileges = null;
 
   /** the class responsible for persistent datastore (configurable ) */
@@ -126,4 +126,3 @@ public class MCRPrivilegeSet
    */
   private static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
-}

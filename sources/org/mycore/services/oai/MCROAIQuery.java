@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.services.oai;
+package org.mycore.services.oai;
 
 import java.util.List;
 

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.services.oai;
+package org.mycore.services.oai;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,8 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUtils;
 
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

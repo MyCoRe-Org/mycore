@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.util.Vector;
 
@@ -112,4 +112,3 @@ public class MCRUserPolicy
    */
   public Vector getRequiredGroupAttributes()
   { return reqGroupAttributes; }
-}

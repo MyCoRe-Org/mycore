@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package mycore.gui;
+package org.mycore.frontend.cli.gui;
 
 import javax.swing.filechooser.*;
 import java.io.File;

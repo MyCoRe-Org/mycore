@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.editor;
+package org.mycore.frontend.editor;
 
 import java.io.*;
 import java.util.*;
@@ -33,7 +33,7 @@ import javax.servlet.http.*;
 
 import org.jdom.*;
 
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Represents a HTTP request to edit an XML document in EditorServlet.

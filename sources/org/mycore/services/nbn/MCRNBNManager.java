@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.nbn;
+package org.mycore.services.nbn;
 
 import java.util.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Provides persistency functions for managing NBN URNs.

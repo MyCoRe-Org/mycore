@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.io.*;
 import java.sql.Timestamp;
@@ -33,8 +33,8 @@ import org.jdom.Element;
 /**
  * This is the abstract super class of MCRUser and MCRGroup
  *
- * @see mycore.user.MCRUser
- * @see mycore.user.MCRGroup
+ * @see org.mycore.user.MCRUser
+ * @see org.mycore.user.MCRGroup
  *
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$

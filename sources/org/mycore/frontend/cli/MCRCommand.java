@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.commandline;
+package org.mycore.frontend.cli;
 
 import java.text.*;
 import java.util.*;
 import java.lang.reflect.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /** 
  * Represents a command understood by the command line interface. A command

@@ -21,12 +21,12 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package mycore.gui;
+package org.mycore.frontend.cli.gui;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import mycore.datamodel.*;
-import mycore.xml.*;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.common.xml.*;
 
 /**
  * This class implements the ListModel interface for displaying MyCoRe

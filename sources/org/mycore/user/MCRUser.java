@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.io.*;
 import java.sql.Timestamp;
@@ -31,12 +31,12 @@ import java.util.Vector;
 import java.util.ListIterator;
 import org.jdom.Document;
 import org.jdom.Element;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Instances of this class represent MyCoRe users.
  *
- * @see mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUserMgr
  *
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$

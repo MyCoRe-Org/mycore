@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import org.jdom.Element;
 

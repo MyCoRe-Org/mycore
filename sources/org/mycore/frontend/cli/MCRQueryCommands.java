@@ -22,17 +22,17 @@
  *
  **/
 
-package mycore.commandline;
+package org.mycore.frontend.cli;
 
 import java.io.*;
 import java.util.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
-import mycore.common.*;
-import mycore.xml.MCRQueryResult;
-import mycore.xml.MCRQueryResultArray;
-import mycore.classifications.MCRClassification;
+import org.mycore.common.*;
+import org.mycore.common.xml.MCRQueryResult;
+import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
  * This class implements the query command to start a query to a local

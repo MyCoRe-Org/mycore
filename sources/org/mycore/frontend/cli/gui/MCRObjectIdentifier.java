@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package mycore.gui;
+package org.mycore.frontend.cli.gui;
 
 /**
  * This class implements a simple MyCoRe object identifier. I did not

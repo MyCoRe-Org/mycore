@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.editor;
+package org.mycore.frontend.editor;
 
 import java.util.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Represents a variable that is read from/to an XML document

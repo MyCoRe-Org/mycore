@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.io.*;
 import java.util.Vector;
@@ -34,8 +34,8 @@ import org.jdom.Element;
  * MCRUserContact is aggregated by MCRUser and all user objects are managed by the
  * user manager (the instance of the singleton MCRUserMgr).
  *
- * @see mycore.user.MCRUserMgr
- * @see mycore.user.MCRUser
+ * @see org.mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUser
  *
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$

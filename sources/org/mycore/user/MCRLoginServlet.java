@@ -22,13 +22,13 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import mycore.common.*;
-import mycore.user.*;
+import org.mycore.common.*;
+import org.mycore.user.*;
 
 /**
  * This servlet is used to login a user to the mycore system.

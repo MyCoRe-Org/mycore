@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package mycore.gui;
+package org.mycore.frontend.cli.gui;
 
 import java.io.*;
 import java.util.*;
@@ -35,10 +35,10 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
-import mycore.common.*;
-import mycore.commandline.*;
-import mycore.datamodel.*;
-import mycore.xml.*;
+import org.mycore.common.*;
+import org.mycore.frontend.cli.*;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.common.xml.*;
 
 /**
  * This class is a very simple GUI for handling MyCoRe objects. 

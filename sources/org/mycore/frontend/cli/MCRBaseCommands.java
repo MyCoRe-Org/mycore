@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.commandline;
+package org.mycore.frontend.cli;
 
 import java.io.*;
 import javax.xml.transform.*;
@@ -30,8 +30,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
-import mycore.common.*;
-import mycore.datamodel.*;
+import org.mycore.common.*;
+import org.mycore.datamodel.metadata.*;
 
 /**
  * Provides static methods that implement commands for the

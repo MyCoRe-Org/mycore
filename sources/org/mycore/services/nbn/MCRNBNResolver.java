@@ -22,14 +22,14 @@
  *
  **/
 
-package mycore.nbn;
+package org.mycore.services.nbn;
 
 import java.util.*;
 import java.io.*;
 import java.net.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This servlet resolves a given NBN URN from a HTTP request

@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.nbn;
+package org.mycore.services.nbn;
 
 import java.util.*;
 import java.text.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Represents a "National Bibliographic Name" URN that is

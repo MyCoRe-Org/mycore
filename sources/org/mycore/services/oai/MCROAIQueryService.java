@@ -22,9 +22,9 @@
  *
  **/
 
-package mycore.services.oai;
+package org.mycore.services.oai;
 
-import mycore.services.oai.MCROAIQuery;
+import org.mycore.services.oai.MCROAIQuery;
 
 /**
  * @author Werner Gresshoff

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.commandline;
+package org.mycore.frontend.cli;
 
 import java.io.*;
 import java.sql.Timestamp;
@@ -33,11 +33,11 @@ import java.util.Vector;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import mycore.common.*;
-import mycore.user.*;
+import org.mycore.common.*;
+import org.mycore.user.*;
 
 /**
- * This class provides a set of commands for the mycore user management which
+ * This class provides a set of commands for the org.mycore.user management which
  * can be used by the command line interface.
  *
  * @author Detlev Degenhardt
@@ -651,4 +651,3 @@ public class MCRUserCommands
       System.err.println(e);
     }
   }
-}

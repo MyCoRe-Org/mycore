@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.io.IOException;
 import java.util.Vector;
-import mycore.common.MCRException;
+import org.mycore.common.MCRException;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
@@ -171,4 +171,3 @@ public interface MCRUserStore
    * @param user       the user to be updated
    */
   public void updateUser(MCRUser user) throws Exception;
-}

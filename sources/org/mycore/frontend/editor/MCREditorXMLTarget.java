@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.editor;
+package org.mycore.frontend.editor;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.jdom.Document;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Saves an XML document that was edited with EditorServlet

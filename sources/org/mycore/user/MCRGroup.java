@@ -22,14 +22,14 @@
  *
  **/
 
-package mycore.user;
+package org.mycore.user;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 import org.jdom.Document;
 import org.jdom.Element;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Instances of this class represent MyCoRe groups.
@@ -39,7 +39,7 @@ import mycore.common.*;
  * to a group. Hence the main duty of a group object is to define exactly which privileges
  * the members will have.
  *
- * @see mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUserMgr
  *
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
@@ -514,4 +514,3 @@ public class MCRGroup extends MCRUserObject
       MCRUserMgr.instance().updateGroup(this);
     }
   }
-}
