@@ -44,7 +44,7 @@ import org.mycore.datamodel.classifications.MCRClassification;
  * MyCoRe command line interface for classifications.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  **/
 
@@ -181,10 +181,7 @@ public class MCRClassificationCommands
       return true;
       }
     catch( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while loading from file " + file );
-      logger.error("");
+      logger.error( "Exception while loading from file " + file, ex);
       return false;
     }
   }

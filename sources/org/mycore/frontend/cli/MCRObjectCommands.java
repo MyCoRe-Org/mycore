@@ -204,10 +204,7 @@ public class MCRObjectCommands
       return true;
       }
     catch( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "Exception while loading from file " + file );
-      logger.error("");
+      logger.error( "Exception while loading from file " + file,ex );
       return false;
     }
   }
