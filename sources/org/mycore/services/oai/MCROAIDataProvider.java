@@ -464,15 +464,13 @@ public class MCROAIDataProvider extends HttpServlet {
  			fis.close();	
 	    } catch (MCRConfigurationException mcrx) {
             logger.fatal(mcrx.getMessage());
-			return list;
     	} catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
-			return list;
 	    } catch (IOException e) { 	
 	    	throw new IOException(e.getMessage());
-        } finally {
-        	return list;
 		}
+        
+        return list;
     }
     
 	/**
@@ -1095,6 +1093,7 @@ public class MCROAIDataProvider extends HttpServlet {
         //Check, if the requested metadata format is supported
 	    try {
 	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	        logger.info("Transformer: " + format);
 	    } catch (MCRConfigurationException mcrx) {
         	logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
@@ -1138,7 +1137,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	            
 	            eGetRecord.addContent(eRecord);
 		    	eRoot.addContent(eGetRecord);
-		    	
+
             	org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
             		getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
         	    if (newDocument != null) {

@@ -26,8 +26,13 @@ package org.mycore.services.oai;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -180,93 +185,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 */
 	public List listIdentifiers(String[] set, String[] from, String[] until, String instance) {
-		List list = new ArrayList();
-        StringBuffer restrictQuery = new StringBuffer("");
-        String classificationId = null;
-        String repositoryId = null;
-
-		try {
-			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
-			String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
-				
-			restrictQuery.
-				append(" and ").
-				append("/mycoreobject[@classid=\"").
-				append(restrictionClassification).
-                append("\" and @categid=\"").
-				append(restrictionCategory).
-				append("\"]");
-	    } catch (MCRConfigurationException mcrx) {
-	    }
-			    
-		try {
-	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
-        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
-	    } catch (MCRConfigurationException mcrx) {
-	    	return list;
-	    }
-
-	    String classification[];
-	    if (classificationId.length() == 0) {
-	    	logger.debug("Suche in allen Klassifikationen");
-	    	classification = MCRClassification.getAllClassificationID();
-	    } else {
-	    	logger.debug("Suche in Klassifikationen: " + classificationId);
-	    	StringTokenizer tokenizer = new StringTokenizer(classificationId, " ");
-	    	classification = new String[tokenizer.countTokens()];
-	    	int i = 0;
-	    	while (tokenizer.hasMoreTokens()) {
-	    		classification[i++] = tokenizer.nextToken();
-	    	}
-	    }
-    	    
-		for (int i = 0; i < classification.length; i++) {
-	        StringBuffer query = new StringBuffer("");
-
-	        if (set == null) {
-            	query.append("/mycoreobject/metadata/*/*[@classid=\"").append(classification[i]).append("\"]");
-    	    } else {
-	            String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
-            	query.append("/mycoreobject/metadata/*/*[@classid=\"").append(classification[i]).
-        	        append("\" and @categid=\"").append(categoryId).append("\"]");
-    	    }
-	        if (from != null) {
-    	        String date = from[0];
-	            query.append(" and ").append("/mycoreobject/service/servdates/servdate>=\"").append(date).
-            	    append("\" and service.dates.date/@type=\"modifydate\"]");
-        	}
-    	    if (until != null) {
-            	String date = until[0];
-        	    query.append(" and ").append("/mycoreobject[service.dates.date<=\"").append(date).
-    	            append("\" and service.dates.date/@type=\"modifydate\"]");
-	        }
-    	    query.append(restrictQuery);
-    	    
-    	    logger.debug("Die erzeugte Query ist: " + query.toString());
-    	    
-    	    try {
-    	    	MCRXMLContainer qra=new MCRXMLContainer();
-    	    	synchronized(qra){
-    	    		collector.collectQueryResults("local", "document", query.toString(),qra);
-    	    		qra.wait();
-    	    	}
-    	    	
-    	    	for (int j = 0; j < qra.size(); j++) {
-    	    		String objectId = qra.getId(j);
-    	    		
-    	    		MCRObject object = new MCRObject();
-    	    		object.receiveFromDatastore(objectId);
-    	    		
-    	    		String[] identifier = getHeader(object, objectId, repositoryId);
-    	    		list.add(identifier);
-    	    	}
-    	    } catch (Exception mcrx) {
-    	    	logger.error("Die Query ist fehlgeschlagen.");
-    	    	return list;
-    	    }
-		}
-		
-		return list;
+		return listRecordsOrIdentifiers(set, from, until, instance, false);
 	}
 	
 	/**
@@ -278,7 +197,10 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 */
-	private String[] getHeader(MCRObject object, String objectId, String repositoryId) {
+	private String[] getHeader(MCRObject object, 
+			String objectId, 
+			String repositoryId,
+			String instance) {
 	    Calendar calendar = object.getService().getDate("modifydate");
 	    // Format the date.
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
@@ -291,27 +213,32 @@ public class MCROAIQueryService implements MCROAIQuery {
        	identifier[1] = datestamp;
    		identifier[2] = new String("");
         
+	    List classifications = Arrays.asList(getClassifications(
+	    		instance));
+			
         for (int j = 0; j < object.getMetadata().size(); j++) {
+        	MCRMetaElement meta = object.getMetadata().getMetadataElement(j);
+        	//logger.debug("Metaelement: " + meta.getTag());
    		    if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
            		MCRMetaElement element = object.getMetadata().getMetadataElement(j);
                 		
-                if (element.getTag().equals("subjects")) {
-   		            for (int k = 0; k < element.size(); k++) {
-           		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
-           		        String classificationId = classification.getClassId();
-                        String categoryId = classification.getCategId();
-                        MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
-                        MCRCategoryItem parent;
-   		                while ((parent = category.getParent()) != null) {
-                            categoryId = parent.getID() + ":" + categoryId;
-                   		    category = parent;
-           		        }
-                		        
-           		        setSpec.append(" ").append(categoryId);
-               		}
-                    		
-               		identifier[2] = setSpec.toString().trim();
+           		for (int k = 0; k < element.size(); k++) {
+           			MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
+           			String classificationId = classification.getClassId();
+           			if (classifications.contains(classificationId)) {
+           				String categoryId = classification.getCategId();
+           				MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
+           				MCRCategoryItem parent;
+           				while ((parent = category.getParent()) != null) {
+           					categoryId = parent.getID() + ":" + categoryId;
+           					category = parent;
+           				}
+           				
+           				setSpec.append(" ").append(categoryId);
+           			}
            		}
+           		
+           		identifier[2] = setSpec.toString().trim();
        		}
    		}
    		
@@ -341,11 +268,13 @@ public class MCROAIQueryService implements MCROAIQuery {
             return null;
         }
 	 	
-   		String[] identifier = getHeader(object, id, repositoryId);
+   		String[] identifier = getHeader(object, id, repositoryId, instance);
    		list.add(identifier);
-
+   		logger.debug("Identifier hinzugefügt");
+   		
         Element eMetadata = object.getMetadata().createXML();
         list.add(eMetadata);
+   		logger.debug("Metadaten hinzugefügt");
         
         return list;
 	}
@@ -361,79 +290,167 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 */
 	public List listRecords(String[] set, String[] from, String[] until, String instance) {
-		List list = new ArrayList();
-        StringBuffer query = new StringBuffer("");
-        String classificationId = null;
-        String repositoryId = null;
-
-		try {
-	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
-        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
-
-        	if (set == null) {
-            	query.append("/mycoreobject[metadata/*/*/@classid=\"").append(classificationId).append("\"]");
-    	    } else {
-	            String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
-            	query.append("/mycoreobject[@classid=\"").append(classificationId).
-        	        append("\" and @categid=\"").append(categoryId).append("\"]");
-    	    }
-	        if (from != null) {
-/*        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
-    	            "." + from[0].substring(0, 4); */
-    	        String date = from[0];
-	            query.append(" and ").append("/mycoreobject[service.dates.date>=\"").append(date).
-            	    append("\" and service.dates.date/@type=\"modifydate\"]");
-        	}
-    	    if (until != null) {
-/*	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
-            	    "." + until[0].substring(0, 4); */
-    	        String date = until[0];
-        	    query.append(" and ").append("/mycoreobject[service.dates.date<=\"").append(date).
-    	            append("\" and service.dates.date/@type=\"modifydate\"]");
-	        }
-	    } catch (MCRConfigurationException mcrx) {
+		return listRecordsOrIdentifiers(set, from, until, instance, true);
+	}
+	
+	/**
+	 * @param instance
+	 * @return all classification id's from configuration file
+	 * @throws MCRConfigurationException
+	 */
+	private String[] getClassifications(String instance)
+	throws MCRConfigurationException {
+	    String classification[];
+	    String id = config.getString(
+	    		STR_OAI_SETSCHEME + "." + instance);
+	    
+	    if (id.length() == 0) {
+	    	logger.debug("Suche in allen Klassifikationen");
+	    	classification = MCRClassification.getAllClassificationID();
+	    } else {
+	    	logger.debug("Suche in Klassifikationen: " + id);
+	    	StringTokenizer tokenizer = new StringTokenizer(id, " ");
+	    	classification = new String[tokenizer.countTokens()];
+	    	int i = 0;
+	    	while (tokenizer.hasMoreTokens()) {
+	    		classification[i++] = tokenizer.nextToken();
+	    	}
 	    }
+
+	    return classification;
+	}
+
+	private Collection doQuery(String query) {
+		List results = new ArrayList();
+		
+	    try {
+	    	MCRXMLContainer qra=new MCRXMLContainer();
+	    	synchronized(qra){
+	    		collector.collectQueryResults("local", 
+	    				"document", query, qra);
+	    		qra.wait();
+	    	}
+	    	
+	    	for (int j = 0; j < qra.size(); j++) {
+	    		results.add(qra.getId(j));
+	    	}
+	    } catch (Exception mcrx) {
+	    	logger.error("Die Query ist fehlgeschlagen.");
+	    }
+		
+	    return results;
+	}
+	
+	private List listRecordsOrIdentifiers(
+			String[] set, 
+			String[] from, 
+			String[] until, 
+			String instance,
+			boolean listRecords) {
+		List list = new ArrayList();
+		List queries = new ArrayList();
+		List restrictionQueries = new ArrayList();
+        String repositoryId = null;
         
 		try {
 			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
 			String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
-				
-			query.append(" and ").append("/mycoreobject[@classid=\"").append(restrictionClassification).
-                append("\" and @categid=\"").append(restrictionCategory).append("\"]");
+	        StringBuffer query = new StringBuffer("");
+			
+			query.
+				append("/mycoreobject/metadata/*/*[@classid=\"").
+				append(restrictionClassification).
+                append("\" and @categid=\"").
+				append(restrictionCategory).
+				append("\"]");
+			
+			restrictionQueries.add(query.toString());
 	    } catch (MCRConfigurationException mcrx) {
 	    }
 			    
-    	logger.debug("Die erzeugte Query ist: " + query.toString());
-    	
-   	    try {
-	        MCRXMLContainer qra = new MCRXMLContainer();
-	        synchronized(qra){
-				collector.collectQueryResults("local", "document", query.toString(),qra);
-				qra.wait();
-	        }
-   	    
-   	    	if (qra.size() == 0) {
-   	    		return list;
-   	    	}
-   	    	
-	   	    for (int i = 0; i < qra.size(); i++) {
-   		    	String objectId = qra.getId(i);
-   	    	
-	    	    MCRObject object = new MCRObject();
-    	        object.receiveFromDatastore(objectId);
-	 	
-        		String[] identifier = getHeader(object, objectId, repositoryId);
-        		list.add(identifier);
+	    String classification[];
+		try {
+			classification = getClassifications(instance);
+        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
+	    } catch (MCRConfigurationException mcrx) {
+	    	return list;
+	    }
 
-    		    Element eMetadata = object.getMetadata().createXML();
-	        	list.add(eMetadata);
-	   	    }
-	   	    
-   	    	return list;
-   	    } catch (Exception mcrx) {
-   	    	logger.error("Die Query ist fehlgeschlagen.");
-   	    	return list;
-   	    }
+		for (int i = 0; i < classification.length; i++) {
+	        StringBuffer query = new StringBuffer("");
+
+	        if (set == null) {
+            	query.
+					append("/mycoreobject/metadata/*/*[@classid=\"").
+					append(classification[i]).
+					append("\"]");
+    	    } else {
+	            String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
+            	query.
+					append("/mycoreobject/metadata/*/*[@classid=\"").
+					append(classification[i]).
+        	        append("\" and @categid=\"").
+					append(categoryId).
+					append("\"]");
+    	    }
+	        
+	        queries.add(query.toString());
+		}
+		
+		if (from != null) {
+			StringBuffer query = new StringBuffer("");
+			
+			String date = from[0];
+			query.
+				append("/mycoreobject/service/servdates/servdate[text()>=\"").
+				append(date).
+				append("\" and @type=\"modifydate\"]");
+	        
+			restrictionQueries.add(query.toString());
+		}
+		
+		if (until != null) {
+			StringBuffer query = new StringBuffer("");
+			
+			String date = until[0];
+			query.
+				append("/mycoreobject/service/servdates/servdate[text()<=\"").
+				append(date).
+				append("\" and @type=\"modifydate\"]");
+	        
+			restrictionQueries.add(query.toString());
+		}
+    	
+		Set results = new HashSet();
+		for (int i = 0; i < queries.size(); i++) {
+			String query = (String) queries.get(i);
+			results.addAll(doQuery(query));
+    	}
+
+		for (int i = 0; i < restrictionQueries.size(); i++) {
+			String query = (String) restrictionQueries.get(i);
+			results.retainAll(doQuery(query));
+		}
+		
+		Iterator iterator = results.iterator();
+		while (iterator.hasNext()) {
+			String objectId = (String) iterator.next();
+			MCRObject object = new MCRObject();
+			object.receiveFromDatastore(objectId);
+			
+			String[] identifier = getHeader(object, 
+					objectId, 
+					repositoryId,
+					instance);
+			list.add(identifier);
+			
+			if (listRecords) {
+				Element eMetadata = object.getMetadata().createXML();
+				list.add(eMetadata);
+			}
+		}
+		
+		return list;
 	}
 	
 }
