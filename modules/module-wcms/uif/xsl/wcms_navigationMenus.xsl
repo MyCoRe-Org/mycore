@@ -16,37 +16,30 @@
 	<!-- ================================================================================= -->
 	<xsl:template name="HistoryNavigationRow">
 		<xsl:param name="browserAddress" />
-		<xsl:param name="CSSLayoutClass" />
 		<!-- get href of starting page -->
 		<xsl:variable name="hrefStartingPage" 
 			select="document($navigationBase)/navigation/@hrefStartingPage" />
 		<!-- END OF: get href of starting page -->
-		<table class="{$CSSLayoutClass}" width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr>
-				<td>
-					Navigation:
-					<xsl:for-each 
-						select="document($navigationBase)/navigation//item[@href]">
-						<xsl:if test="@href = $browserAddress ">
-							<a href="{ concat($WebApplicationBaseURL,substring-after($hrefStartingPage,'/') )}" >
-								<xsl:value-of select="$MainTitle" />
-							</a>
-							<xsl:for-each select="ancestor-or-self::item">
-								<xsl:if test="$browserAddress != $hrefStartingPage " > > <xsl:choose> <xsl:when 
-									test="position() != last()"> <a 
-									href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}" > <xsl:choose> <xsl:when 
-									test="./label[lang($CurrentLang)] != ''"> <xsl:value-of select="./label[lang($CurrentLang)]" 
-									/> </xsl:when> <xsl:otherwise> <xsl:value-of select="./label[lang($DefaultLang)]" /> 
-									</xsl:otherwise> </xsl:choose> </a> </xsl:when> <xsl:otherwise> <xsl:choose> <xsl:when 
-									test="./label[lang($CurrentLang)] != ''"> <xsl:value-of select="./label[lang($CurrentLang)]" 
-									/> </xsl:when> <xsl:otherwise> <xsl:value-of select="./label[lang($DefaultLang)]" /> 
-									</xsl:otherwise> </xsl:choose> </xsl:otherwise> </xsl:choose> </xsl:if>
-							</xsl:for-each>
-						</xsl:if>
-					</xsl:for-each>
-				</td>
-			</tr>
-		</table>
+				Navigation:
+				<xsl:for-each 
+					select="document($navigationBase)/navigation//item[@href]">
+					<xsl:if test="@href = $browserAddress ">
+						<a href="{ concat($WebApplicationBaseURL,substring-after($hrefStartingPage,'/') )}" >
+							<xsl:value-of select="$MainTitle" />
+						</a>
+						<xsl:for-each select="ancestor-or-self::item">
+							<xsl:if test="$browserAddress != $hrefStartingPage " > > <xsl:choose> <xsl:when 
+								test="position() != last()"> <a 
+								href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}" > <xsl:choose> <xsl:when 
+								test="./label[lang($CurrentLang)] != ''"> <xsl:value-of select="./label[lang($CurrentLang)]" 
+								/> </xsl:when> <xsl:otherwise> <xsl:value-of select="./label[lang($DefaultLang)]" /> 
+								</xsl:otherwise> </xsl:choose> </a> </xsl:when> <xsl:otherwise> <xsl:choose> <xsl:when 
+								test="./label[lang($CurrentLang)] != ''"> <xsl:value-of select="./label[lang($CurrentLang)]" 
+								/> </xsl:when> <xsl:otherwise> <xsl:value-of select="./label[lang($DefaultLang)]" /> 
+								</xsl:otherwise> </xsl:choose> </xsl:otherwise> </xsl:choose> </xsl:if>
+						</xsl:for-each>
+					</xsl:if>
+				</xsl:for-each>
 	</xsl:template>
 	<!-- ================================================================================= -->
 	<!-- ================================================================================= -->
