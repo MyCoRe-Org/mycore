@@ -74,5 +74,24 @@ public String createSearchStringText(String part, String subtag,
   String [] sattrib, String [] svalue, String innertag, String [] iattrib, 
   String [] ivalue, String text);
 
+/**
+ * The method returns the search string for a XML date field for
+ * the IBM Content Manager 7 persistence system.<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag sattrib="svalue" ... &gt;<br>
+ * date<br>
+ * &lt;/subtag&gt;
+ *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
+ * @param subtag             the tagname of an element from the list in a tag
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param date               the date value of this element
+ * @return the search string for the CM7 text search engine
+ **/
+public String createSearchStringDate(String part, String subtag,
+  String [] sattrib, String [] svalue, GregorianCalendar date);
+
 }
 

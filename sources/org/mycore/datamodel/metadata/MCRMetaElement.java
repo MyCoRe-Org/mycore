@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 
 /**
  * This class is designed to to have a basic class for all metadata.
@@ -44,7 +45,7 @@ public class MCRMetaElement
 // common data
 private static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
-private static String DEFAULT_LANGUAGE = "en";
+private static String DEFAULT_LANGUAGE = "de";
 private String META_PACKAGE_NAME = "mycore.datamodel.";
 
 // MetaElement data
@@ -70,7 +71,7 @@ public MCRMetaElement()
 /**
  * This is the constructor of the MCRMetaElement class. 
  * The default language for the element was set. If the default languge
- * is empty or false <b>en</b> was set.
+ * is empty or false <b>de</b> was set.
  *
  * @param default_lang     the default language
  **/
@@ -261,6 +262,7 @@ public final String createTS(Object mcr_query) throws MCRException
  * <li> the classname is not null or empty
  * <li> the tag is not null or empty
  * <li> if the list is empty
+ * <li> the lang value was supported
  * </ul>
  * otherwise the methode return <em>false</em>
  *
@@ -273,6 +275,7 @@ public final boolean isValid()
   if (list.size() == 0) { return false; }
   if ((tag == null) || ((tag = tag.trim()).length() ==0)) {
     return false; }
+  if (!MCRUtils.isSupportedLang(lang)) { return false; }
   return true;
   }
 

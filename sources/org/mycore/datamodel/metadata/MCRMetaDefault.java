@@ -27,6 +27,7 @@ package mycore.datamodel;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 
 /**
  * This class implements any methods for handling the basic data for all 
@@ -257,6 +258,7 @@ public abstract String createTS(Object mcr_query) throws MCRException;
  * The method returns <em>true</em> if
  * <ul>
  * <li> the subtag is not null or empty
+ * <li> the lang value was supported
  * </ul>
  * otherwise the method return <em>false</em>
  *
@@ -266,6 +268,7 @@ public boolean isValid()
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return false; }
+  if (!MCRUtils.isSupportedLang(lang)) { return false; }
   return true;
   }
 

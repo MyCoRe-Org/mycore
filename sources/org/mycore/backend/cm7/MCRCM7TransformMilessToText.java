@@ -25,9 +25,11 @@
 package mycore.cm7;
 
 import java.util.*;
+import java.text.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
+import mycore.common.MCRUtils;
 import mycore.datamodel.MCRQueryInterface;
 
 /**
@@ -42,6 +44,8 @@ public class MCRCM7TransformMilessToText implements MCRQueryInterface
 // common data
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
+// 31 Bit
+protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
 
 /**
  * The constructor.
@@ -89,6 +93,8 @@ public final Vector getResultList(String query, String type, int maxresults)
     startpos += onecond.length();
     if (onecond.indexOf("CONTAINS") != -1) {
       cond.append(setContainsCondition(onecond)); }
+    if (onecond.indexOf("DD.MM.YYYY") != -1) {
+      cond.append(setDateCondition(onecond)); }
     if (startpos<stoppos) {
       operpos = rawtext.indexOf("(",startpos);
       if (operpos != -1) {
@@ -123,7 +129,7 @@ public final Vector getResultList(String query, String type, int maxresults)
   }
 
 /**
- * This private methode get the next condition of the query string.
+ * This private method get the next condition of the query string.
  * 
  * @param startpos   the first character position
  * @param stoppos    the last character position
@@ -145,7 +151,7 @@ private final String getNextCondition(int startpos,int stoppos,String query)
   }
 
 /**
- * This private methode set the part of the CM7 search string for the
+ * This private method set the part of the CM7 search string for the
  * 'CONTAINS' condition.
  *
  * @param condition   a single condition
@@ -164,8 +170,7 @@ private final String setContainsCondition(String condition)
   String value = condition.substring(start+1,stop);
   int l = stop;
   value = value.replace('"',' ').trim();
-  sb.append('(');
-  if (!tag.equals("METADATA")) { sb.append("$PARA$ {"); }
+  sb.append("($PARA$ {"); 
   int j = 0;
   String word = "";
   while (j<value.length()) {
@@ -190,28 +195,127 @@ private final String setContainsCondition(String condition)
       .append(condition.substring(k+1,stop)).append("XXX ");
     l = stop;
     }
-  if (!tag.equals("METADATA")) {
-    i = tag.indexOf(".");
-    if (i==-1) {
-      sb.append("XXX").append(tag).append("XXX}"); }
+  i = tag.indexOf(".");
+  if (i==-1) {
+    sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
+  else {
+    j = tag.indexOf(".",i+1);
+    if (j==-1) {
+      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
     else {
-      j = tag.indexOf(".",i+1);
-      if (j==-1) {
-        sb.append("XXX").append(tag.substring(0,i)).append("XXX")
-          .append(tag.substring(i+1,tag.length())).append("XXX}"); }
-      else {
-        sb.append("XXX").append(tag.substring(0,i)).append("XXX")
-          .append(tag.substring(i+1,j)).append("XXX")
-          .append(tag.substring(j+1,tag.length())).append("XXX}"); }
-      }
+      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,j)).append("XXX")
+        .append(tag.substring(j+1,tag.length())).append("XXX* }"); }
     }
   sb.append(')');
   return sb.toString();
   }
 
 /**
- * The methode returns the search string for a XML text field for
- * the IBM Content Manager 7 persistence system.a<p>
+ * This private method set the part of the CM7 search string for the
+ * 'DD.MM.YYYY' condition.
+ *
+ * @param condition   a single condition
+ * @return the CM7 query substring
+ **/
+private final String setDateCondition(String condition)
+  {
+  StringBuffer sb = new StringBuffer(128);
+  // split condition
+  int i = condition.indexOf("DD.MM.YYYY");
+  if (i==-1) { return ""; }
+  String tag = condition.substring(1,i).trim();
+  int start = condition.indexOf("\"",i);
+  if (start==-1) { return ""; }
+  String oper = condition.substring(i+10,start).trim();
+  int stop = condition.indexOf("\"",start+1);
+  if (stop==-1) { return ""; }
+  String value = condition.substring(start+1,stop);
+  value = value.replace('"',' ').trim();
+  // create date string
+  GregorianCalendar date = new GregorianCalendar();
+  try {
+    DateFormat df = MCRUtils.getDateFormat("de");
+    date.setTime(df.parse(value)); }
+  catch (ParseException e) {
+    return ""; }
+  int idate = date.get(Calendar.YEAR)*10000 +
+              date.get(Calendar.MONTH)*100 +
+              date.get(Calendar.DAY_OF_MONTH);
+  int ioper = 0;
+  if (oper.indexOf("<=")>=0) { idate += 1; ioper = 3; }
+  else if (oper.indexOf(">=")>=0) { ioper = 2; }
+    else if (oper.indexOf(">")>=0) { idate += 1; ioper = 2; }
+      else if (oper.indexOf("<")>=0) { ioper = 3; }
+        else if (oper.indexOf("=")>=0) { ioper = 1; }
+          else { return ""; }
+  String binstr = Integer.toBinaryString(idate);
+  String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
+  int lenstr = binstr.length();
+  int lenstrmax = binstrmax.length();
+  StringBuffer sbdate = new StringBuffer(32);
+  for (int k=0;k<(lenstrmax-lenstr);k++) { sbdate.append('2'); }
+  sbdate.append(binstr);
+  String stdate = sbdate.toString();
+  // create the tag string
+  StringBuffer sbtag = new StringBuffer(32);
+  i = tag.indexOf(".");
+  int j;
+  if (i==-1) {
+    sbtag.append("XXX").append(tag).append("XXX"); }
+  else {
+    j = tag.indexOf(".",i+1);
+    if (j==-1) {
+      sbtag.append("XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,tag.length())).append("XXX"); }
+    else {
+      sbtag.append("XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,j)).append("XXX")
+        .append(tag.substring(j+1,tag.length())).append("XXX"); }
+    }
+  int l = stop;
+  while(true) {
+    i = condition.indexOf("WITH",l);
+    if (i==-1) { break; }
+    start = condition.indexOf("\"",i+4);
+    if (start==-1) { return ""; }
+    stop = condition.indexOf("\"",start+1);
+    if (stop==-1) { return ""; }
+    int k = condition.indexOf("=",start+1);
+    if (k==-1) { break; }
+    sbtag.append(condition.substring(start+1,k)).append("XXX")
+      .append(condition.substring(k+1,stop)).append("XXX");
+    l = stop;
+    }
+  String sttag = sbtag.toString();
+  // build the search string
+  if (ioper==1) {
+    stdate = stdate.replace('2','0');
+    sb.append("(").append(sttag).append(stdate).append(")").append(NL);
+    return sb.toString(); }
+  String standor = "";
+  String stnot = "(";
+  if (ioper==3) { stnot = "(NOT "; }
+  stdate = stdate.replace('2','?');
+  int k=stdate.indexOf("0");
+  while(k<stdate.length())
+    {
+    sb.append(standor).append(stnot).append("$SC=?$ ").append(sttag);
+    StringBuffer sbtemp = new StringBuffer(32);
+    sbtemp.append(stdate.substring(0,k)).append('1');
+    for (l=k+1;l<stdate.length();l++) { sbtemp.append('?'); }
+    sb.append(sbtemp.toString()).append(")");
+    if (ioper==2) { standor = " OR "; } else { standor = " AND "; }
+    k=stdate.indexOf("0",k+1);
+    if (k==-1) break;
+    }
+  return sb.toString();
+  }
+
+/**
+ * The method returns the search string for a XML text field for
+ * the IBM Content Manager 7 persistence system.<p>
  * A full XML tag element shows like<br>
  * &lt;subtag sattrib="svalue"&gt;<br>
  * &lt;innertag iattrib="ivalue"&gt;<br>
@@ -257,6 +361,54 @@ public final String createSearchStringText(String part, String subtag,
   if ((text != null) && ((text = text.trim()).length() !=0)) {
     sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); }
   sb.append(NL);
+  return sb.toString();
+  }
+
+/**
+ * The method returns the search string for a XML date field for
+ * The date was transformed to a bit string with 
+ * <em>10000*year+100*month+day</em>.
+ * the IBM Content Manager 7 persistence system.<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag sattrib="svalue" ... &gt;<br>
+ * date<br>
+ * &lt;/subtag&gt;
+ *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
+ * @param subtag             the tagname of an element from the list in a tag
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param date               the date value of this element
+ * @return the search string for the CM7 text search engine
+ **/
+public final String createSearchStringDate(String part, String subtag,
+  String [] sattrib, String [] svalue, GregorianCalendar date)
+  {
+  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
+    return ""; }
+  if (date == null) { return ""; }
+  StringBuffer sb = new StringBuffer(1024);
+  sb.append("XXX").append(part.toUpperCase()).append("XXX").
+     append(subtag.toUpperCase()).append("XXX");
+  if (sattrib != null) {
+    for (int i=0;i<sattrib.length;i++) {
+      if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
+      sb.append(sattrib[i].toUpperCase()).append("XXX")
+        .append(svalue[i].toUpperCase()).append("XXX");
+      }
+    }
+  int idate = date.get(Calendar.YEAR)*10000 +
+              date.get(Calendar.MONTH)*100 +
+              date.get(Calendar.DAY_OF_MONTH);
+  String binstr = Integer.toBinaryString(idate);
+  String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
+  int lenstr = binstr.length();
+  int lenstrmax = binstrmax.length();
+  for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
+  sb.append(binstr);
+  sb.append(NL);
+System.out.println(sb.toString());
   return sb.toString();
   }
 

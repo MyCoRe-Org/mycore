@@ -66,8 +66,10 @@ public class MCRObjectService
 {
 // common data
 private String NL;
+private static String DEFAULT_LANGUAGE = "de";
 
 // service data
+private String lang = null;
 private ArrayList dates = null;
 private ArrayList flags = null;
 
@@ -78,11 +80,12 @@ private ArrayList flags = null;
 public MCRObjectService()
   {
   NL = new String((System.getProperties()).getProperty("line.separator"));
+  lang = DEFAULT_LANGUAGE;
   dates = new ArrayList();
-  MCRMetaDate d = new MCRMetaDate("service","date",null,"createdate",
+  MCRMetaDate d = new MCRMetaDate("service","date",lang,"createdate",
     new GregorianCalendar());
   dates.add(d);
-  d = new MCRMetaDate("service","date",null,"modifydate",
+  d = new MCRMetaDate("service","date",lang,"modifydate",
     new GregorianCalendar());
   dates.add(d);
   flags = new ArrayList();
@@ -112,6 +115,7 @@ public final void setFromDOM(NodeList dom_element_list)
       if (date_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
       MCRMetaDate date = new MCRMetaDate();
       date.setDataPart("service");
+      date.setLang(lang);
       date.setFromDOM(date_element);
       dates.add(date);
       }
@@ -127,6 +131,7 @@ public final void setFromDOM(NodeList dom_element_list)
       flag_element = service_flag_list.item(i);
       if (flag_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
       MCRMetaLangText flag = new MCRMetaLangText();
+      flag.setLang(lang);
       flag.setDataPart("service");
       flag.setFromDOM(flag_element);
       flags.add(flag);

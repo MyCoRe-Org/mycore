@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 
 /**
  * This class implements all method for handling with the MCRMetaDate part
@@ -44,8 +45,6 @@ final public class MCRMetaDate extends MCRMetaDefault
   implements MCRMetaInterface 
 {
 // common data
-private static DateFormat df =
-  DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
 
 // MetaDate data
 private GregorianCalendar date;
@@ -134,6 +133,7 @@ public final void setDate(String set_date) throws MCRException
     return; }
   try {
     date = new GregorianCalendar();
+    DateFormat df = MCRUtils.getDateFormat(lang);
     date.setTime(df.parse(set_date)); }
   catch (ParseException e) {
     throw new MCRException( "Can't parse date."); }
@@ -155,6 +155,8 @@ public final GregorianCalendar getDate()
 public final String getDateToString()
   {
   if (date == null) { return ""; }
+  DateFormat df = MCRUtils.getDateFormat(lang);
+  if (df==null) { return ""; }
   return df.format(date.getTime());
   }
 
@@ -213,15 +215,16 @@ public final String createTS(Object mcr_query) throws MCRException
     throw new MCRException("The content is not valid."); }
   String [] sattrib = null;
   String [] svalue = null;
-  if ((type != null) && ((type = type.trim()).length() !=0)) {
-    sattrib = new String[1]; sattrib[0] = "type";
-    svalue = new String[1]; svalue[0] = type; 
+  int count = 1;
+  if ((type != null) && ((type = type.trim()).length() !=0)) { count++; }
+    sattrib = new String[count]; sattrib[0] = "lang";
+    svalue = new String[count]; svalue[0] = lang; 
+  if ((type != null) && ((type = type.trim()).length() !=0)) { 
+    sattrib[1] = "type"; svalue[1] = type;
     }
   StringBuffer sb = new StringBuffer(1024);
-/*
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-    subtag,sattrib,svalue,null,null,null,text));
-*/
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringDate(datapart,
+    subtag,sattrib,svalue,date));
   sb.append("");
   return sb.toString();
   }
