@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.64 $ $Date: 2003-11-17 16:17:14 $                      -->
+  <!-- $Revision: 1.65 $ $Date: 2003-11-24 07:15:51 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -16,9 +16,9 @@
   <property name="optimize"    value="on"  />
   <property name="deprecation" value="off" />
 
-
   <!-- persistency -->
   <property name="persistency"  value="xmldb"/>
+
   <!-- Read in all environment variables -->
   <property environment="env" />
 
@@ -67,7 +67,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.64 $ $Date: 2003-11-17 16:17:14 $</echo>
+    <echo>Ant build file   : $Revision: 1.65 $ $Date: 2003-11-24 07:15:51 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -226,7 +226,7 @@
   <target name="compile_editor">
     <echo>Compiling online html-based metadata editor...</echo>
     <antcall target="javac">
-      <param name="packages" value="org/mycore/frontend/editor/**"/>
+      <param name="packages" value="org/mycore/frontend/editor*/**"/>
     </antcall>
   </target>
 
