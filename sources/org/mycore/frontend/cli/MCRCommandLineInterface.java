@@ -176,10 +176,10 @@ public class MCRCommandLineInterface
 
     knownCommands[ numCommands++ ] = new MCRCommand(
       "create database for {0}",
-      "mycore.commandline.MCRObjectCommands.createDataBase String" );
+      "mycore.commandline.MCRBaseCommands.createDataBase String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "create schema for {0}",
-      "mycore.commandline.MCRObjectCommands.createXMLSchema String" );
+      "mycore.commandline.MCRBaseCommands.createXMLSchema String" );
 
     // ******************************
     // Commands for executing queries
