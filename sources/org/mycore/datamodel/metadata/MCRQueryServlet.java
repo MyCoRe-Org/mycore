@@ -122,7 +122,7 @@ private String defaultLang = "";
       if (jdom==null) {
         throw new MCRException( 
           "No classification or category exists" ); }
-System.out.println(new String(MCRUtils.getByteArray(jdom)));
+//System.out.println(new String(MCRUtils.getByteArray(jdom)));
       try {
         if (style.equals("xml")) {
           response.setContentType( "text/xml" );
