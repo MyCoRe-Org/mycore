@@ -1,13 +1,13 @@
 %
 %
-\section{Hints \& Tips / Troubleshooting}
+\chapter{Hints \& Tips / Troubleshooting}
 %
 %
-\subsection{Nach dem Einspielen eines DB2/NSE bringt der CM Fehler}
+\section{Nach dem Einspielen eines DB2/NSE bringt der CM Fehler}
 {\bf Fehlerbild: } Nach dem Einspielen eines DB2/NSE FixPack fehlen die ICM-Umgebungsvariablen.\\
 {\bf Ursache: } Im File {\it \$DB2INST/sqllib/db2profile} fehlt nach dem Update der per Hand eingetragene Aufruf des Scripts zum setzten der CM Umgebungsvariablen. Dieser Aufruf muss wieder eingefügt werden.
 %
-\subsection{Fehler bei der Kommunikation der Servlets untereinander}
+\section{Fehler bei der Kommunikation der Servlets untereinander}
 {\bf Fehlerbild: } Die Servlets verlieren in der Abfolge ihrer Nutzung Informationen über den Zustand der Session.\\
 {\bf Ursache: } Sie haben die Nutzung von Coockies komplett abgeschaltet. Gestatten Sie wenigstens Coockies von den eigenen WEB-Seiten in der Konfiguration Ihres WEB-Browsers.
 
