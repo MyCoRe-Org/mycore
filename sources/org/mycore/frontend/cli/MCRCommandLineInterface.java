@@ -89,7 +89,7 @@ public class MCRCommandLineInterface
       "mycore.commandline.MCRCommandLineInterface.executeShellCommand String" );
 
     // *************************************************
-    // Commands for document and legal entity management
+    // Commands for object management
     // *************************************************
 
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -116,6 +116,35 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
+
+    // *************************************************
+    // Commands for derivate management
+    // *************************************************
+
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete derivate {0}",
+      "mycore.commandline.MCRDerivateCommands.delete String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load derivate from file {0}",
+      "mycore.commandline.MCRDerivateCommands.loadFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update derivate from file {0}",
+      "mycore.commandline.MCRDerivateCommands.updateFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load all derivates from directory {0}",
+      "mycore.commandline.MCRDerivateCommands.loadFromDirectory String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update all derivates from directory {0}",
+      "mycore.commandline.MCRDerivateCommands.updateFromDirectory String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show derivate {0}",
+      "mycore.commandline.MCRDerivateCommands.show String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "save derivate {0} to {1}",
+      "mycore.commandline.MCRDerivateCommands.save String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "get next derivate ID for base {0}",
+      "mycore.commandline.MCRDerivateCommands.getID String" );
 
     // **************************************
     // Commands for classification management
