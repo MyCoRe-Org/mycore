@@ -40,6 +40,7 @@ import org.mycore.common.xml.MCRXMLContainer;
  *
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 public class MCRQueryResult
@@ -77,6 +78,7 @@ public MCRQueryResult()
 /**
  * IF it was succesful, the MCRXMLContainer is filled with answers.
  *
+ * @deprecated Use MCRQueryCollector instead!
  * @param type                  the MCRObjectID type
  * @param hostlist              a String of host name aliases
  * @param query	                the Query string
