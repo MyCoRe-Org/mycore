@@ -95,12 +95,64 @@ public class MCRXMLDBConnectionPool
       Class driverclass = Class.forName( driver );
       database = (Database)driverclass.newInstance();
       DatabaseManager.registerDatabase( database );
+      Collection col = DatabaseManager.getCollection( connString );
+      if( col == null ) 
+      {
+       int i = connString.lastIndexOf("/");
+       if ( -1 != i )
+       {
+        String uri  = connString.substring(0,i); 
+        String coll =  connString.substring(i+1);
+        createCollection( uri, coll ); 
+       }
+      }
+      else
+       col.close();
      }
     catch( Exception e ) 
     {
      throw new MCRPersistenceException( e.getMessage(), e );
     }
    }
+  
+  /**
+   * Creates a collection in an XML:DB collection
+   *
+   * @throws MCRPersistenceException if create fails
+   **/
+  private void createCollection( String uri, String collection ) throws MCRPersistenceException
+  {
+     try
+     {
+      Collection col;
+   
+      logger.info( "try to create collection in XML:DB: " + collection );
+      Collection root = DatabaseManager.getCollection( uri );
+      if ( null == root ) 
+      {
+       String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: " + uri;
+       throw new MCRPersistenceException( msg );
+      }
+   
+      CollectionManagementService mgtService = 
+                (CollectionManagementService)root.getService("CollectionManagementService", "1.0");
+      col = mgtService.createCollection( collection );
+      if ( null == col )
+      {
+       String msg = "MCRXMLDBConnectionPool: Could not create collection in XML:DB: " + collection;
+       throw new MCRPersistenceException( msg );
+      }
+      else
+      {    
+       logger.info( "...done and successful" );
+       col.close();   
+      } 
+     }
+    catch( Exception e ) 
+    {
+     throw new MCRPersistenceException( e.getMessage(), e );
+    }
+  }
   
   /**
    * Creates a connection to an XML:DB collection
@@ -111,15 +163,20 @@ public class MCRXMLDBConnectionPool
     {
      Collection connection = null;
      String con = connString + "/" + collection;
-     logger.info( "Building connection to XML:DB..." + con );
+     logger.info( "MCRXMLDBConnectionPool: Building connection to: " + con );
      try
      {
       connection = DatabaseManager.getCollection( con );
+      if ( null == connection )
+      {
+       createCollection( connString, collection );    
+       connection = DatabaseManager.getCollection( con );
+      }
       return connection;
      }
      catch( Exception ex ) 
      {
-      String msg = "Could not connect to XML:DB: " + con;
+      String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: " + con;
       throw new MCRPersistenceException( msg, ex );
      }
     }
@@ -152,6 +209,12 @@ public class MCRXMLDBConnectionPool
      }
      catch( Exception e ) {
        throw new MCRPersistenceException( e.getMessage(), e );
+     }
+     
+     if ( null == connection )
+     {
+      String msg = "MCRXMLDBConnectionPool: Collection not available: " + collection;
+      throw new MCRPersistenceException( msg );
      }
      return connection;
     }
