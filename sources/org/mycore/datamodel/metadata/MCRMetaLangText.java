@@ -179,7 +179,8 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
 public final String createTextSearch(boolean textsearch)
   throws MCRException
   {
-  return text;
+  if (textsearch) return text;
+  return "";
   }
 
 /**

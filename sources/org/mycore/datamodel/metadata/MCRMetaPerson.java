@@ -261,6 +261,13 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
 public final String createTextSearch(boolean textsearch)
   throws MCRException
   {
+  if (textsearch) { 
+    StringBuffer sb = new StringBuffer(128);
+    sb.append(firstname).append(' ').append(callname).append(' ')
+      .append(surename).append(' ').append(academic).append(' ')
+      .append(peerage).append(NL);
+    return sb.toString();
+    }
   return "";
   }
 
