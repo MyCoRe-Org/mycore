@@ -150,7 +150,6 @@ public class MCRCM8TransformXPathToCM8
 					resitem.retrieve();
 					dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR, itemtypeprefix + "ID");
 					id = (String) resitem.getData(dataId);
-					logger.debug(itemtypeprefix + "ID :" + id);
 					idmeta.add(new MCRObjectID(id));
 				}
 			} catch (Exception e) {
@@ -158,6 +157,9 @@ public class MCRCM8TransformXPathToCM8
 			} finally {
 				MCRCM8ConnectionPool.instance().releaseConnection(connection);
 			}
+		}
+		for (Iterator it = idmeta.iterator(); it.hasNext();) {
+			logger.debug("IDMETA = " + ((String) ((MCRObjectID) it.next()).getId()));
 		}
 
 		// merge the results
@@ -173,6 +175,9 @@ public class MCRCM8TransformXPathToCM8
 		}
 
 		// put the XML files in the result container
+		for (Iterator it = myresult.iterator(); it.hasNext();) {
+			logger.debug("IDRESULT = " + ((String) ((MCRObjectID) it.next()).getId()));
+		}
 		result = createResultContainer(myresult);
 
 		return result;

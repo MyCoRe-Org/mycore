@@ -352,6 +352,7 @@ public class MCRCStoreContentManager8
         short dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,attributeOwner);
         outgo[i] = (String) resitem.getData(dataId);
         logger.debug("MCRDerivateID :"+outgo[i]);
+        i++;
         }
       }
     catch (Exception e) { }
