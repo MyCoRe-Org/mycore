@@ -75,7 +75,7 @@ public class MCRRequestParameters
       parser.setRepositoryPath( tmpPath );
 
       List items = null;
-      try{ parser.parseRequest( req ); }
+      try{ items = parser.parseRequest( req ); }
       catch( FileUploadException ex )
       {
         String msg = "Error while parsing http multipart/form-data request from file upload webpage";
