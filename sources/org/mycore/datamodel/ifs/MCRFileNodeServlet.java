@@ -34,6 +34,7 @@ import javax.servlet.http.*;
 
 import org.jdom.*;
 import org.apache.log4j.Logger;
+
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.backend.remote.*;
@@ -44,71 +45,84 @@ import org.mycore.backend.remote.*;
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt 
+ *
  * @version $Revision$ $Date$
  **/
 public class MCRFileNodeServlet extends HttpServlet
 {
   private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
-// The configuration
-private MCRConfiguration conf = null;
+  // The configuration
+  private MCRConfiguration conf = null;
 
-// Default Language (as UpperCase)
-private String defaultLang = "";
+  // Default language toUpperCase()
+  private String defaultLang = "";
 
-// The list of hosts from the configuration
-private ArrayList remoteAliasList = null;
+  // The list of hosts from the configuration
+  private ArrayList remoteAliasList = null;
 
  /**
-  * The initialization method for this servlet. This read the default
+  * Initializes the servlet and reads the default
   * language and the remote host list from the configuration.
   **/
   public void init() throws MCRConfigurationException
   {
     conf = MCRConfiguration.instance();
+    
     // read the default language
-    String defaultLang = conf
-      .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    String defaultLang = conf.getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    
     // read host list from configuration
-    String hostconf = conf.getString("MCR.remoteaccess_hostaliases","local");
+    String hostconf = conf.getString( "MCR.remoteaccess_hostaliases", "local" );
+    
     remoteAliasList = new ArrayList();
-    remoteAliasList.add("local");
-    int i = 0;
-    int j = hostconf.length();
-    int k = 0;
-    while (k!=-1) 
-    {
-      k = hostconf.indexOf(",",i);
-      if (k==-1) { remoteAliasList.add(hostconf.substring(i,j)); }
-      else { remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
-    }
+    if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
+    
+    StringTokenizer st = new StringTokenizer( hostconf, ", " );
+    while( st.hasMoreTokens() ) remoteAliasList.add( st.nextToken() );
   }
 
- /**
-  * This method handles HTTP POST requests and resolves them to output.
-  *
-  * @param request the HTTP request instance
-  * @param response the HTTP response instance
-  * @exception IOException for java I/O errors.
-  * @exception ServletException for errors from the servlet engine.
-  **/
   public void doPost( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException
   { doGet(req,res); }
 
- /**
-  * This method handles HTTP GET requests and resolves them to output.
-  *
-  * @param request the HTTP request instance
-  * @param response the HTTP response instance
-  * @exception IOException for java I/O errors.
-  * @exception ServletException for errors from the servlet engine.
-  **/
   public void doGet( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException
   {
+    // get the language
+    String lang = req.getParameter( "lang" );
+    String att_lang = (String)( req.getAttribute( "lang" ) );
+    
+    if( att_lang != null ) 
+      lang = att_lang;
+    if( ( lang  == null ) || ( lang.trim().length() == 0 ) ) 
+      lang  = defaultLang;
+    
+    lang = lang.toUpperCase();
+    
+    logger.debug( "MCRFileNodeServlet: lang = " + lang );
+
+    // get the host alias
+    String hostAlias = req.getParameter( "hosts" );
+    String att_host = (String)( req.getAttribute( "hosts" ) );
+    
+    if( att_host != null ) 
+      hostAlias = att_host;
+    if( ( hostAlias == null ) || ( hostAlias.trim().length() == 0 ) )
+      hostAlias = "local";
+
+    logger.debug( "MCRFileNodeServlet : host = " + hostAlias );
+    
+    if( ! remoteAliasList.contains( hostAlias ) )
+    {
+      String msg = "Error: HTTP request host is not in the alias list";
+      logger.error( msg );
+      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+      return;
+    }
+
     String requestPath = req.getPathInfo();
-    logger.info( "requestPath = " + requestPath );
+    logger.info( "MCRFileNodeServlet: request path = " + requestPath );
 
     if( requestPath == null ) 
     {
@@ -119,44 +133,17 @@ private ArrayList remoteAliasList = null;
     }
     
     StringTokenizer st = new StringTokenizer( requestPath, "/" );
-    if(!st.hasMoreTokens()) {
+    if( ! st.hasMoreTokens() ) 
+    {
       String msg = "Error: HTTP request path is empty";
       logger.error( msg );
       res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
       return;
-      }
+    }
     
-    // get the language
-    String lang  = req.getParameter( "lang" );
-    String att_lang  = (String) req.getAttribute( "lang" );
-    if (att_lang!=null) { lang = att_lang; }
-    if( lang  == null ) { lang  = defaultLang; }
-    if (lang.equals("")) { lang = defaultLang; }
-    lang = lang.toUpperCase();
-    logger.debug( "MCRFileNodeServlet : lang = " + lang );
-
-    // get the host alias
-    String hostAlias  = req.getParameter( "hosts" );
-    String att_host  = (String) req.getAttribute( "hosts" );
-    if (att_host!=null) { hostAlias = att_host; }
-    if( hostAlias  == null ) hostAlias  = "local";
-    if( hostAlias.equals("") ) hostAlias  = "local";
-    boolean test = false;
-    for (int i=0;i<remoteAliasList.size();i++) {
-      if (((String)remoteAliasList.get(i)).equals(hostAlias)) {
-        test = true; break; }
-      }
-    if (!test) {
-      String msg = "Error: HTTP request host is not in the alias list";
-      logger.error( msg );
-      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
-      return;
-      }
-     logger.debug( "MCRFileNodeServlet : hosts = " + hostAlias );
-
     String ownerID = st.nextToken();
     
-    if (hostAlias.equals("local"))
+    if( hostAlias.equals( "local" ) ) // local node to be retrieved
     {
       MCRFilesystemNode root = MCRFilesystemNode.getRootNode( ownerID );
       if( root == null )
@@ -169,7 +156,7 @@ private ArrayList remoteAliasList = null;
     
       if( root instanceof MCRFile )
       {
-        if( st.hasMoreTokens() )
+        if( st.hasMoreTokens() ) // request path is too long
         {
           String msg = "Error: No such file or directory " + st.nextToken();
           logger.error( msg );
@@ -182,7 +169,7 @@ private ArrayList remoteAliasList = null;
           return;
         }
       }
-      else
+      else // root node is a directory
       {
         int pos = ownerID.length() + 1;
         String path = requestPath.substring( pos );
@@ -204,85 +191,94 @@ private ArrayList remoteAliasList = null;
         }
         else
         {
-          sendDirectory( req, res, (MCRDirectory)node );
+          sendDirectory( req, res, (MCRDirectory)node, lang );
           return;
         }
       }
     }
-    else
+    else // remote node to be retrieved
     {
-      // call the remote access backend
-      MCRRemoteAccessInterface comm = (MCRRemoteAccessInterface)
-        conf.getInstanceOf("MCR.remoteaccess_"+hostAlias+"_query_class");
+      String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
+      MCRRemoteAccessInterface comm = 
+        (MCRRemoteAccessInterface)( conf.getInstanceOf( prop ) );
 
-      BufferedInputStream in = comm.requestIFS(hostAlias,requestPath);
+      BufferedInputStream in = comm.requestIFS( hostAlias, requestPath );
+      if( in == null ) return;
+
       String headercontext = comm.getHeaderContent();
-      if (in == null) { return; }
-
-      if(!headercontext.equals("text/xml")) {
-        res.setContentType(headercontext);
+      if( ! headercontext.equals( "text/xml" ) ) 
+      {
+        res.setContentType( headercontext );
         OutputStream out = new BufferedOutputStream( res.getOutputStream() );
         MCRUtils.copyStream( in, out );
         out.close();
         return;
-        }
+      }
 
       org.jdom.Document jdom = null;
       String style = "";
       Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
-      StringBuffer buf = new StringBuffer(1024);
-      int inread;
-      while (( inread = in.read()) != -1) { buf.append((char) inread); }
+      
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      MCRUtils.copyStream( in, baos );
+      baos.close();
+      byte[] bytes = baos.toByteArray();
+      
       boolean ismcrxml = true;
       MCRXMLContainer resarray = new MCRXMLContainer();
-      try {
-        resarray.importElements(buf.toString().getBytes()); }
-      catch (org.jdom.JDOMException e) {
-        res.setContentType(headercontext);
-        OutputStream out = new BufferedOutputStream( res.getOutputStream() );
-        out.write(buf.toString().getBytes()); 
+      
+      try
+      { resarray.importElements( bytes ); }
+      catch( org.jdom.JDOMException e ) 
+      {
+        res.setContentType( headercontext );
+        OutputStream out = res.getOutputStream();
+        out.write( bytes );
         out.close();
         return;
-        }
-      catch (MCRException e) {
-        ismcrxml = false; }
-      if (!ismcrxml) {
-        ByteArrayInputStream bin = new ByteArrayInputStream(buf.toString()
-          .getBytes());
+      }
+      catch( MCRException e ) 
+      {ismcrxml = false; }
+      
+      if( ! ismcrxml ) 
+      {
+        ByteArrayInputStream bin = new ByteArrayInputStream( bytes );
         org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-        try {
-          jdom = builder.build(bin); }
-        catch (org.jdom.JDOMException f) { }
-        style = parameters.getProperty("Style");
-        }
-      else {
-        resarray.setHost(0,hostAlias);
+        try 
+        { jdom = builder.build( bin ); }
+        catch( org.jdom.JDOMException f ) { }
+        
+        style = parameters.getProperty( "Style" );
+      }
+      else 
+      {
+        resarray.setHost( 0, hostAlias );
         jdom = resarray.exportAllToDocument();
-        style = parameters.getProperty("Style","IFSMetadata-"+lang);
-        }
+        style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
+      }
       logger.debug( "Style = " + style );
 
-    if (style.equals("xml")) {
-      res.setContentType( "text/xml" );
-      OutputStream out = res.getOutputStream();
-      new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
-      out.close();
+      if( style.equals( "xml" ) ) 
+      {
+        res.setContentType( "text/xml" );
+        OutputStream out = res.getOutputStream();
+        new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+        out.close();
       }
-    else {
-      req.setAttribute( "MCRLayoutServlet.Input.JDOM", jdom );
-      req.setAttribute( "XSL.Style", style );
-      RequestDispatcher rd = getServletContext()
-        .getNamedDispatcher( "MCRLayoutServlet" );
-      rd.forward( req, res );
+      else 
+      {
+        req.setAttribute( "MCRLayoutServlet.Input.JDOM", jdom );
+        req.setAttribute( "XSL.Style", style );
+        RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
+        rd.forward( req, res );
       }
-
     }
   }
   
   private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
     throws IOException, ServletException
   {
-    logger.info( "Sending file " + file.getName() );
+    logger.info( "MCRFileNodeServlet: Sending file " + file.getName() );
     
     res.setContentType( file.getContentType().getMimeType() );
     res.setContentLength( (int)( file.getSize() ) );
@@ -293,17 +289,10 @@ private ArrayList remoteAliasList = null;
   }
   
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, 
-    MCRDirectory dir ) throws IOException, ServletException
+                              MCRDirectory dir, String lang ) 
+    throws IOException, ServletException
   {
-    String lang  = req.getParameter( "lang" );
-    String att_lang  = (String) req.getAttribute( "lang" );
-    if (att_lang!=null) { lang = att_lang; }
-    if( lang  == null ) { lang  = defaultLang; }
-    if (lang.equals("")) { lang = defaultLang; }
-    lang = lang.toUpperCase();
-    logger.debug( "MCRFileNodeServlet : lang = " + lang );
-
-    logger.info( "Sending list of files in directory " + dir.getName() );
+    logger.info( "MCRFileNodeServlet: Sending listing of directory " + dir.getName() );
     
     Element root = new Element( "mcr_directory" );
     Document doc = new org.jdom.Document( root );
@@ -366,27 +355,28 @@ private ArrayList remoteAliasList = null;
     
     // put it in an MCRXMLContainer
     MCRXMLContainer resarray = new MCRXMLContainer();
-    resarray.add("local",dir.getOwnerID(),1,doc.getRootElement());
+    resarray.add( "local", dir.getOwnerID(), 1, doc.getRootElement() );
     org.jdom.Document jdom = resarray.exportAllToDocument();
     
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
-    String style = parameters.getProperty("Style","IFSMetadata-"+lang);
+    String style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
     logger.debug( "Style = " + style );
 
-    if (style.equals("xml")) {
+    if( style.equals( "xml" ) ) 
+    {
       res.setContentType( "text/xml" );
       OutputStream out = res.getOutputStream();
       new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
       out.close();
-      }
-    else {
+    }
+    else 
+    {
       req.setAttribute( "MCRLayoutServlet.Input.JDOM", jdom );
       req.setAttribute( "XSL.Style", style );
-      RequestDispatcher rd = getServletContext()
-        .getNamedDispatcher( "MCRLayoutServlet" );
+      RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
       rd.forward( req, res );
-      }
+    }
   }
   
   private String     dateFormat    = "dd.MM.yyyy HH:mm:ss";
