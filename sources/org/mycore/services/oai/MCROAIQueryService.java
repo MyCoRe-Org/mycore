@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
@@ -51,12 +54,24 @@ import org.mycore.services.query.MCRQueryResult;
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
  */
 public class MCROAIQueryService implements MCROAIQuery {
+    static Logger logger = Logger.getLogger(MCROAIQueryService.class);
 
     private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
 	private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme"; // the classification id which serves as scheme for the OAI set structure
     private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier of the repository
 
+	private MCRConfiguration config;
+	
+	/**
+	 * Method MCROAIQueryService.
+	 */
+	public MCROAIQueryService() {
+		config = MCRConfiguration.instance();
+    	config.reload(true);
+    	PropertyConfigurator.configure(config.getLoggingProperties());
+	}
+	
 	/**
 	 * Method exists. Checks if the given ID exists in the data repository
 	 * @param id The ID to be checked
@@ -104,14 +119,13 @@ public class MCROAIQueryService implements MCROAIQuery {
        	    set[1] = new String(categories[i].getText("en"));
           	set[2] = new String(categories[i].getDescription("en"));
           	
-	    	// logger.debug("Suche nach Kategorie: " + set[0]);    
+	    	logger.debug("Suche nach Kategorie: " + categories[i].getID());    
     		
     		//We should better have a look if the set is empty...        
 	        StringBuffer query = new StringBuffer("");
             query.append("/mycoreobject[@classid=\"").append(categories[i].getClassificationID()).
                 append("\" and @categid=\"").append(categories[i].getID()).append("\"]");
 
-			MCRConfiguration config = MCRConfiguration.instance();
 			try {
 				String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
 				String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
@@ -126,13 +140,14 @@ public class MCROAIQueryService implements MCROAIQuery {
     	    try {
 		        qra = qr.setFromQuery("local", "document", query.toString());
     	    } catch (MCRException mcrx) {
-    	    	// logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
+    	    	logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
     	    	return newList;
     	    }
 
 			if (qra.size() > 0) {
 		    	newList.add(set);
-		    
+		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugefügt.");
+		    	
     	        if (categories[i].hasChildren()) {
         	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
 	            }
@@ -157,7 +172,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         StringBuffer query = new StringBuffer("");
         String classificationId = null;
         String repositoryId = null;
-		MCRConfiguration config = MCRConfiguration.instance();
+
 		try {
 	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
         	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
@@ -278,7 +293,6 @@ public class MCROAIQueryService implements MCROAIQuery {
 	public List getRecord(String id, String instance) {
 		List list = new ArrayList();
 
-		MCRConfiguration config = MCRConfiguration.instance();
         MCRObject object = new MCRObject();
         String repositoryId = null;
         try {
