@@ -39,19 +39,24 @@ import java.util.*;
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
 {
-  private List rulesList = new Vector();
+  /** List of file content types we have rules for */
+  private List typesList = new Vector();
   
+  /** Keys are file content types, values are vectors of MCRDetectionRule */
+  private Hashtable rulesTable = new Hashtable();
+  
+  /** Creates a new detector */
   public MCRSimpleFCTDetector(){}
   
-  public void addRule( MCRFileContentType type, Element rules )
+  public void addRule( MCRFileContentType type, Element xRules )
   {
-    MCRDetectionRule rule = new MCRDetectionRule( type );
-    rulesList.add( rule );
+    Vector rules = new Vector();
+    rulesTable.put( type, rules );
+    typesList.add( type );
           
     try
     {
-      List extensions = rules.getChildren( "extension" );
-      
+      List extensions = xRules.getChildren( "extension" );
       for( int i = 0; i < extensions.size(); i++ )
       {
         Element elem  = (Element)( extensions.get( i ) );
@@ -59,7 +64,20 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
         double  score = elem.getAttribute( "score" ).getDoubleValue();
         String  ext   = elem.getTextTrim();
         
-        rule.addExtensionRule( ext, score );
+        rules.addElement( new MCRExtensionRule( ext, score ) );
+      }
+      
+      List patterns = xRules.getChildren( "pattern" );
+      for( int i = 0; i < patterns.size(); i++ )
+      {
+        Element elem = (Element)( patterns.get( i ) );
+        
+        double  score   = elem.getAttribute( "score"  ).getDoubleValue();
+        int     offset  = elem.getAttribute( "offset" ).getIntValue();
+        String  format  = elem.getAttributeValue( "format" );
+        String  pattern = elem.getTextTrim();
+        
+        rules.addElement( new MCRPatternRule( pattern, format, offset, score ) );
       }
     }
     catch( Exception exc )
@@ -74,51 +92,137 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
     double maxScore = 0.0;
     MCRFileContentType detected = null;
     
-    for( int i = 0; ( i < rulesList.size() ) && ( maxScore < 1.0 ) ; i++ )
+    for( int i = 0; ( i < typesList.size() ) && ( maxScore < 1.0 ) ; i++ )
     {
-      MCRDetectionRule rule = (MCRDetectionRule)( rulesList.get( i ) );
-      double score = rule.getTotalScore( filename );
+      MCRFileContentType type = (MCRFileContentType)( typesList.get( i ) );
+      Vector rules = (Vector)( rulesTable.get( type ) );
+      
+      double score = 0.0;
+      for( int j = 0;  ( j < rules.size() ) && ( score < 1.0 ); j++ )
+      {
+        MCRDetectionRule rule = (MCRDetectionRule)( rules.elementAt( j ) );
+        score += rule.getScore( filename, header );
+        score = Math.min( 1.0, score );
+      }
       
       if( score > maxScore )
       {
         maxScore = score;
-        detected = rule.getFileContentType();
+        detected = type;
       }
     }
     
     return detected;
   }
-  
-  class MCRDetectionRule
+
+  /** Common superclass of different kinds of detection rules */
+  abstract class MCRDetectionRule
   {
-    private MCRFileContentType type;
-    private Hashtable extensions;
+    /** The score for matching this rule, a value between 0.0 and 1.0 */
+    protected double score;
     
-    MCRDetectionRule( MCRFileContentType type )
-    { this.type = type; }
-    
-    void addExtensionRule( String extension, double score )
-    {  extensions.put( extension, new Double( score ) ); }
-    
-    MCRFileContentType getFileContentType()
-    { return type; }
-    
-    double getTotalScore( String filename )
+    /** 
+     * Creates a new detection rule
+     * 
+     * @param score The score for matching this rule, a value between 0.0 and 1.0
+     **/
+    protected MCRDetectionRule( double score )
     {
-      Enumeration exts = extensions.keys();
-      double maxScore = 0.0;
+      this.score = Math.min( score, 1.0 );
+      this.score = Math.max( score, 0.0 );
+    }
+    
+    /**
+     * Returns the score if filename and/or header matches this rule, or 0.0
+     *
+     * @param filename the name of the file to detect the content type of
+     * @param header the first bytes of the file content
+     *
+     * @return the score between 0.0 and 1.0 for matching this rule
+     **/
+    abstract double getScore( String filename, byte[] header );
+  }
+  
+  /** A rule that decides based on the file extension */
+  class MCRExtensionRule extends MCRDetectionRule
+  {
+    /** The lowercase file name extension that a file must match */
+    protected String extension;
+    
+    /** 
+     * Creates a new rule based on a match of the file extension
+     * 
+     * @param extension lowercase file name extension that a file must match
+     * @param score the score for matching this rule, a value between 0.0 and 1.0
+     **/
+    MCRExtensionRule( String extension, double score )
+    {
+      super( score );
+      this.extension = extension.toLowerCase();
+    }
+    
+    double getScore( String filename, byte[] header )
+    {
+      if( filename.toLowerCase().endsWith( extension ) )
+        return score;
+      else
+        return 0.0;
+    }
+  }
+
+  /** 
+   * A rule that decides based on a magic bytes pattern that has to occur in 
+   * the file header at a given offset
+   **/
+  class MCRPatternRule extends MCRDetectionRule
+  {
+    /** The byte pattern (magic bytes) */
+    protected byte[] pattern;
+    
+    /** The offset where the magic bytes are located in the file header */
+    protected int offset;
+    
+    /** 
+     * Creates a new rule for a match based on a magic bytes pattern at a given offset
+     * 
+     * @param pattern the magic bytes pattern this rule matches
+     * @param format the format in which the pattern is given, either "text" or "hex"
+     * @param offset the position where the pattern occurs in the file header
+     * @param score the score for matching this rule, a value between 0.0 and 1.0
+     **/
+    MCRPatternRule( String pattern, String format, int offset, double score )
+    {
+      super( score );
       
-      while( exts.hasMoreElements() && ( maxScore < 0 ) )
+      if( format.equals( "text" ) )
+        this.pattern = pattern.getBytes();
+      else if( format.equals( "hex" ) )
       {
-        String ext = (String)( exts.nextElement() );
-        if( filename.endsWith( "." + ext ) )
+        this.pattern = new byte[ pattern.length() / 2 ];
+        
+        for( int i = 0; i < pattern.length(); i+=2 )
         {
-          double score = ( (Double)( extensions.get( ext ) ) ).doubleValue();
-          maxScore = Math.max( maxScore, score );
+          String hex = pattern.substring( i, i + 2 ).toLowerCase();
+          this.pattern[ i / 2 ] = Byte.parseByte( hex, 16 );
         }
       }
+      else
+      {
+        String msg = "Unsupported pattern format in content type detection rule: " + format;
+        throw new MCRConfigurationException( msg );
+      }
       
-      return maxScore;
+      this.offset = offset;
+    }
+    
+    double getScore( String filename, byte[] header )
+    {
+      boolean matches = ( header.length >= ( pattern.length + offset ) );
+      
+      for( int i = 0; matches && ( i < pattern.length ); i++ )
+        matches = ( header[ offset + i ] == pattern[ i ] );
+      
+      return( matches ? score : 0 );
     }
   }
 }
