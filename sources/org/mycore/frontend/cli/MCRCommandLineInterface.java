@@ -183,7 +183,7 @@ public class MCRCommandLineInterface
       "org.mycore.frontend.cli.MCRDerivateCommands.save String String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next derivate ID for base {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.getID String" );
+      "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String" );
 
     // **************************************
     // Commands for classification management

@@ -228,11 +228,17 @@ public class MCRDerivateCommands
  /**
   * Shows a list of next MCRObjectIDs.
   */
-  public static void getid( String base )
+  public static void getNextID( String base )
     { 
     MCRObjectID mcr_id = new MCRObjectID();
-    mcr_id.setNextFreeId( base );
-    logger.info(mcr_id.getId());
+    try {
+      mcr_id.setNextFreeId( base );
+      logger.info(mcr_id.getId());
+      }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      }
     }
 
  /**
