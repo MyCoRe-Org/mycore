@@ -127,7 +127,7 @@ public abstract class MCRClassificationObject
     { ensureNotDeleted(); return ((String)label.get(index)); }
   
   /**
-   * The method return the label String for a given language.
+   * The method returns the label String for a given language.
    *
    * @param index a language
    * @exception MCRUsageException if the classification is deleted.
@@ -139,7 +139,7 @@ public abstract class MCRClassificationObject
     if (this.lang==null) { return ((String)this.label.get(0)); }
     for (int i=0;i<this.lang.size();i++) {
       if (((String)this.lang.get(i)).equals(lang)) {
-        return (String)this.lang.get(i); }
+        return (String)this.label.get(i); }
       }
     return "";
     }
@@ -175,6 +175,24 @@ public abstract class MCRClassificationObject
    **/
   public String getDescription(int index) throws MCRUsageException
     { ensureNotDeleted(); return ((String)description.get(index)); }
+  
+  /**
+   * The method returns the description String for a given language.
+   *
+   * @param index a language
+   * @exception MCRUsageException if the classification is deleted.
+   **/
+  public String getDescription(String lang) throws MCRUsageException
+    { 
+    ensureNotDeleted(); 
+    if (this.description.size()==0) { return ""; }
+    if (this.lang==null) { return ((String)this.description.get(0)); }
+    for (int i=0;i<this.lang.size();i++) {
+      if (((String)this.lang.get(i)).equals(lang)) {
+        return (String)this.description.get(i); }
+      }
+    return "";
+    }
   
   /**
    * The method add a triple of a lang with a lable and a description
