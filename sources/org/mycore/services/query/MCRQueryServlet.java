@@ -279,11 +279,16 @@ public class MCRQueryServlet extends MCRServlet {
 			// cut results if more than "maxresults"
 			else if (maxresults > 0)
 				resarray.cutDownTo(maxresults);
-			jdom = resarray.exportAllToDocument();
+			StringTokenizer st = new StringTokenizer(CONFIG.getString(MCR_SORTER_CONFIG_PREFIX+".types"),",");
+			HashSet sortTypes=new HashSet();
+			while (st.hasMoreTokens()){
+			    sortTypes.add(st.nextToken().trim());
+			}
 			if (customSort) {
 				// when I'm in here a ResultList exists and I have to resort it.
 				try {
-					jdom = reSort(jdom);
+				    jdom = resarray.exportAllToDocument();
+				    jdom = reSort(jdom);
 				} catch (JDOMException e) {
 					generateErrorPage(
 							request,
@@ -294,6 +299,11 @@ public class MCRQueryServlet extends MCRServlet {
 									"Import of elements failed due to some reason!",
 									e), false);
 				}
+			} else if (sortTypes.contains(type)){
+			    sort(resarray,lang.toLowerCase());
+					jdom = resarray.exportAllToDocument();
+			} else {
+			    jdom = resarray.exportAllToDocument();
 			}
 		}
 		if (mode.equals("ResultList")) {
@@ -384,50 +394,51 @@ public class MCRQueryServlet extends MCRServlet {
 	}
 
 	private final MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang) {
-		MCRXMLSortInterface sorter = null;
-		try {
-			sorter = (MCRXMLSortInterface) (Class.forName(MCR_CONFIG.getString(
-					"MCR.XMLSortInterfaceImpl", MCR_STANDARD_SORTER)))
-					.newInstance();
-		} catch (InstantiationException e) {
-			throw new MCRException(e.getMessage(), e);
-		} catch (IllegalAccessException e) {
-			throw new MCRException(e.getMessage(), e);
-		} catch (ClassNotFoundException e) {
-			throw new MCRException(e.getMessage(), e);
-		}
-		if (sorter.getServletContext() == null)
-			sorter.setServletContext(getServletContext());
-		//MCRXMLSorter sorter=new MCRXMLSorter();
-		/*
-		 * maybe here should be a property used XPath Expression can be relative
-		 * to mcr_result
-		 */
-		// sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
-		if (customSort) {
-			LOGGER
-					.info("MCRQueryServlet: CustomSort enalbed. Sorting inorder: "
-							+ inOrder);
-			sorter.addSortKey(replString(sortKey, MCR_SORTER_CONFIG_DELIMITER,
-					lang), inOrder);
-		} else {
-			int keynum = Integer.parseInt(MCR_CONFIG.getString(
-					MCR_SORTER_CONFIG_PREFIX + ".keys.count", "0"));
-			boolean inorder = true;
-			for (int key = 1; key <= keynum; key++) {
-				// get XPATH Expression and hope it's good, if not exist sort
-				// for title
-				inorder = MCR_CONFIG.getBoolean(MCR_SORTER_CONFIG_PREFIX
-						+ ".keys." + key + ".inorder", true);
-				sorter.addSortKey(replString(MCR_CONFIG.getString(
-						MCR_SORTER_CONFIG_PREFIX + ".keys." + key,
-						"./*/*/*/title[lang('" + lang + "')]"),
-						MCR_SORTER_CONFIG_DELIMITER, lang), inorder);
-			}
-		}
-		xmlcont.sort(sorter);
-		return xmlcont;
-	}
+        MCRXMLSortInterface sorter = null;
+        try {
+            sorter = (MCRXMLSortInterface) (Class.forName(MCR_CONFIG.getString(
+                    "MCR.XMLSorter." + type + ".InterfaceImpl",
+                    MCR_STANDARD_SORTER))).newInstance();
+        } catch (InstantiationException e) {
+            throw new MCRException(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            throw new MCRException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new MCRException(e.getMessage(), e);
+        }
+        if (sorter.getServletContext() == null)
+            sorter.setServletContext(getServletContext());
+        if (customSort) {
+            LOGGER
+                    .info("MCRQueryServlet: CustomSort enalbed. Sorting inorder: "
+                            + inOrder);
+            sorter.addSortKey(replString(sortKey, MCR_SORTER_CONFIG_DELIMITER,
+                    lang), inOrder);
+        } else {
+            LOGGER.info("MCRQueryServlet: default sorting enabled by properties...");
+            StringBuffer prop = new StringBuffer();
+            prop.append(MCR_SORTER_CONFIG_PREFIX).append('.').append(type)
+                    .append(".keys.count");
+            int keynum = Integer.parseInt(MCR_CONFIG.getString(prop.toString(),
+                    "0"));
+            boolean inorder = true;
+            int prefix = MCR_SORTER_CONFIG_PREFIX.length() + 1 + type.length()
+                    + ".keys.".length();
+            for (int key = 1; key <= keynum; key++) {
+                // get XPATH Expression and hope it's good, if not exist sort
+                // for title
+                prop.delete(prefix, prop.length()).append(key)
+                        .append(".inorder");
+                inorder = MCR_CONFIG.getBoolean(prop.toString(), true);
+                prop.delete(prefix, prop.length()).append(key);
+                sorter.addSortKey(replString(MCR_CONFIG.getString(prop
+                        .toString(), "./*/*/*/title[lang('" + lang + "')]"),
+                        MCR_SORTER_CONFIG_DELIMITER, lang), inorder);
+            }
+        }
+        xmlcont.sort(sorter);
+        return xmlcont;
+    }
 
 	private static String replString(String parse, String from, String to) {
 		StringBuffer result = new StringBuffer(parse);
