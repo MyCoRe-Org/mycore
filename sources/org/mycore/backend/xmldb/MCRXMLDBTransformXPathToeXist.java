@@ -148,8 +148,14 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 		for (int i = 0; i < subqueries.size(); i++) {
 			if (((Boolean) flags.get(i)).booleanValue())
 				continue;
-			qsb.append(' ').append((String) subqueries.get(i)).append(' ').append(
-				(String) andor.get(i));
+			qsb.append(' ').append((String) subqueries.get(i));
+			boolean fl = false;
+			for (int j=i+1;j<subqueries.size();j++) {
+				if (!((Boolean) flags.get(j)).booleanValue())
+					fl = true;
+				}
+			if (fl) {
+				qsb.append(' ').append((String) andor.get(i)); }
 			flags.set(i, Boolean.TRUE);
 		}
 		logger.debug("Incomming condition : " + qsb.toString());
