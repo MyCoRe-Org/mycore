@@ -56,6 +56,7 @@ private MCRConfiguration conf = null;
 
 // Default Language (as UpperCase)
 private String defaultLang = "";
+private String sortType = "";
 private static final String MCRSorterConfPrefix="MCR.XMLSorter";
 private static final String MCRSorterConfDelim="\"+lang+\"";
 private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
@@ -67,8 +68,11 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
   public void init() throws MCRConfigurationException
     {
     conf = MCRConfiguration.instance();
-    String defaultLang = conf
+    defaultLang = conf
       .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    sortType = conf.getString("MCR.XMLSortType", "OutOfFunction");
+    if (sortType.equals("OutOfFunction"))
+    	throw new MCRException("Property MCR.XMLSortType undefined but needed for sorting and browsing!");
     }
 
  /**
@@ -145,7 +149,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
     System.out.println("MCRQueryServlet : lang = "+lang);
     System.out.println("MCRQueryServlet : query = "+query);
 
-	if (type.equals("document")){
+	if (type.equals(sortType)){
 		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
 		String att_status  = (String) request.getAttribute( "status"  );
 		if (att_status!=null) { status = Integer.parseInt(att_status); }
@@ -244,7 +248,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
     {
       MCRQueryResult result = new MCRQueryResult();
       MCRXMLContainer resarray = result.setFromQuery(host, type, query );
-	  if (type.equals("document")){
+	  if (type.equals(sortType)){
 		/** Status setzen für Dokumente **/
     	if (resarray.size()==1)
     	  resarray.setStatus(0,status);  
@@ -257,7 +261,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
           session = request.getSession(true);
         if (session != null)
         {
-		  if (type.equals("document"))
+		  if (type.equals(sortType))
 		  	jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
 		  else
 		    jdom = resarray.exportAllToDocument(); // no Resultlist for documents: why sort?
@@ -283,7 +287,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
     		          .append(refGet.nextToken()).append("']").toString();
     		host=refGet.nextToken();
     		mode="ObjectMetadata";
-    		type="document";
+    		type=sortType;
     		request.setAttribute("mode",mode);
     		request.removeAttribute("status");
     		request.setAttribute("status",StrStatus);
