@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
- 
+
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
@@ -31,11 +31,11 @@ import org.mycore.common.*;
 /**
  * This class is the manangement class for the whole classification system
  * of MyCoRe. They would only used by the ClassificationItem and CategoryItem.
- **/ 
+ **/
 class MCRClassificationManager
   {
   protected static MCRClassificationManager manager;
-  
+
   /**
    * Make an instance of MCRClassificationManager.
    **/
@@ -44,10 +44,10 @@ class MCRClassificationManager
     if( manager == null ) manager = new MCRClassificationManager();
     return manager;
     }
-  
+
   protected MCRCache categoryCache;
   protected MCRCache classificationCache;
-  
+
   protected MCRClassificationInterface store;
 
   /**
@@ -56,7 +56,7 @@ class MCRClassificationManager
   protected MCRClassificationManager()
     {
     MCRConfiguration config = MCRConfiguration.instance();
-    Object object = config.getInstanceOf( "MCR.classifications_store_class" );  
+    Object object = config.getInstanceOf( "MCR.classifications_store_class" );
     store = (MCRClassificationInterface)object;
     int classifSize = config
       .getInt( "MCR.classifications_classification_cache_size", 30 );
@@ -65,7 +65,7 @@ class MCRClassificationManager
     classificationCache = new MCRCache( classifSize );
     categoryCache       = new MCRCache( categSize   );
     }
-  
+
   void createClassificationItem( MCRClassificationItem classification )
     {
     if( store.classificationItemExists( classification.getID() ) )
@@ -80,17 +80,17 @@ class MCRClassificationManager
     //classificationCache.remove( classification.getID() );
     //classificationCache.put   ( classification.getID(), classification );
     }
-  
+
   void createCategoryItem( MCRCategoryItem category )
     {
-    if( store.categoryItemExists( category.getClassificationID(), 
+    if( store.categoryItemExists( category.getClassificationID(),
       category.getID() ) )
       throw new MCRPersistenceException( "Category "+category.getID()
         +" already exists" );
     store.createCategoryItem( category );
     categoryCache.put( getCachingID( category ), category );
     }
-  
+
   void updateCategoryItem( MCRCategoryItem category )
     {
     //store.updateCategoryItem( category );
@@ -108,7 +108,7 @@ class MCRClassificationManager
       }
     return c;
     }
-  
+
   MCRCategoryItem retrieveCategoryItem( String classifID, String categID )
     {
     String cachingID = classifID + "@@" + categID;
@@ -119,11 +119,11 @@ class MCRClassificationManager
       }
     return c;
     }
-  
-  MCRCategoryItem retrieveCategoryItemForLabelText( String classifID, 
+
+  MCRCategoryItem retrieveCategoryItemForLabelText( String classifID,
     String labeltext )
     {
-    MCRCategoryItem c = store.retrieveCategoryItemForLabelText( classifID, 
+    MCRCategoryItem c = store.retrieveCategoryItemForLabelText( classifID,
       labeltext );
     return c;
     }
@@ -146,31 +146,29 @@ class MCRClassificationManager
       }
     return children;
     }
-  
+
   int retrieveNumberOfChildren( String classifID, String parentID )
     { return store.retrieveNumberOfChildren( classifID, parentID ); }
 
-  int retrieveNumberOfDocs( String classifID)
-	{ return store.retrieveNumberofDocs( classifID ); 
-	}
-  
+
+
   void deleteClassificationItem( String classifID )
     {
     classificationCache.remove( classifID );
     store.deleteClassificationItem( classifID );
     }
-  
+
   void deleteCategoryItem( String classifID, String categID )
     {
     categoryCache.remove( classifID + "@@" + categID );
     store.deleteCategoryItem( classifID, categID );
     }
-  
+
   protected String getCachingID( MCRCategoryItem category )
     { return category.getClassificationID() + "@@" + category.getID(); }
 
   protected String [] getAllClassificationID()
     { return store.getAllClassificationID(); }
   }
-  
-  
+
+
