@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ============================================== -->
+<!-- $Revision: 1.6 $ $Date: 2004-12-28 23:20:36 $ -->
+<!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-<!--
-      <xsl:output method="html" encoding="UTF-8" media-type="text/html" doctype-public="-//W3C//DTD HTML 3.2 Final//EN" />
--->      
-
-      <xsl:output method="xml" indent="yes" encoding="UTF-8" media-type="text/html" 
-      doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" 
-      doctype-system="http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd" />
+   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" 
+     doctype-public="-//W3C//DTD HTML 4.01//EN"
+     doctype-system="http://www.w3.org/TR/html4/strict.dtd" />
       
 	<!-- ================== get some wcms required global variables ===================================== -->      
       <!-- location of navigation base -->
