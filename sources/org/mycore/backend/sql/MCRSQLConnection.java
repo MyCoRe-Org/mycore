@@ -170,7 +170,6 @@ public class MCRSQLConnection
   public String getSingleValue( String query )
     throws MCRPersistenceException
   {
-//    System.out.println(query);  
     MCRSQLRowReader r = doQuery( query );
     return ( r.next() ? r.getString( 1 ) : null );
   }
@@ -211,7 +210,6 @@ public class MCRSQLConnection
   public static MCRSQLRowReader justDoQuery( String query )
     throws MCRPersistenceException
   {
-//    System.out.println("MCRSQLRowReader justDoQuery: " + query);    
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try{ return c.doQuery( query ); }
     finally{ c.release(); }

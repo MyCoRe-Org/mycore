@@ -125,31 +125,52 @@ public class MCRSQLUserStore implements MCRUserStore
     try {
       c.doUpdate (new MCRSQLStatement(SQLUsersTable)
        .addColumn("NUMID INTEGER NOT NULL")
-       .addColumn("UID VARCHAR(20) NOT NULL")
-       .addColumn("CREATOR VARCHAR(20) NOT NULL")
+       .addColumn("UID VARCHAR("+
+         Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("CREATOR VARCHAR("+
+         Integer.toString(MCRUser.id_len)+") NOT NULL")
        .addColumn("CREATIONDATE TIMESTAMP")
        .addColumn("MODIFIEDDATE TIMESTAMP")
-       .addColumn("DESCRIPTION VARCHAR(200)")
-       .addColumn("PASSWD VARCHAR(20) NOT NULL")
+       .addColumn("DESCRIPTION VARCHAR("+
+         Integer.toString(MCRUser.description_len)+")")
+       .addColumn("PASSWD VARCHAR("+
+         Integer.toString(MCRUser.password_len)+") NOT NULL")
        .addColumn("ENABLED VARCHAR(8) NOT NULL")
        .addColumn("UPD VARCHAR(8) NOT NULL")
-       .addColumn("SALUTATION VARCHAR(25) NOT NULL")
-       .addColumn("FIRSTNAME VARCHAR(25) NOT NULL")
-       .addColumn("LASTNAME VARCHAR(25) NOT NULL")
-       .addColumn("STREET VARCHAR(40)")
-       .addColumn("CITY VARCHAR(25)")
-       .addColumn("POSTALCODE VARCHAR(16)")
-       .addColumn("COUNTRY VARCHAR(25)")
-       .addColumn("STATE VARCHAR(25)")
-       .addColumn("INSTITUTION VARCHAR(64)")
-       .addColumn("FACULTY VARCHAR(64)")
-       .addColumn("DEPARTMENT VARCHAR(64)")
-       .addColumn("INSTITUTE VARCHAR(64)")
-       .addColumn("TELEPHONE VARCHAR(20) NOT NULL")
-       .addColumn("FAX VARCHAR(20)")
-       .addColumn("EMAIL VARCHAR(64) NOT NULL")
-       .addColumn("CELLPHONE VARCHAR(20)")
-       .addColumn("PRIMGROUP VARCHAR(20) NOT NULL")
+       .addColumn("SALUTATION VARCHAR("+
+         Integer.toString(MCRUserContact.salutation_len)+")")
+       .addColumn("FIRSTNAME VARCHAR("+
+         Integer.toString(MCRUserContact.firstname_len)+")")
+       .addColumn("LASTNAME VARCHAR("+
+         Integer.toString(MCRUserContact.lastname_len)+")")
+       .addColumn("STREET VARCHAR("+
+         Integer.toString(MCRUserContact.street_len)+")")
+       .addColumn("CITY VARCHAR("+
+         Integer.toString(MCRUserContact.city_len)+")")
+       .addColumn("POSTALCODE VARCHAR("+
+         Integer.toString(MCRUserContact.postalcode_len)+")")
+       .addColumn("COUNTRY VARCHAR("+
+         Integer.toString(MCRUserContact.country_len)+")")
+       .addColumn("STATE VARCHAR("+
+         Integer.toString(MCRUserContact.state_len)+")")
+       .addColumn("INSTITUTION VARCHAR("+
+         Integer.toString(MCRUserContact.institution_len)+")")
+       .addColumn("FACULTY VARCHAR("+
+         Integer.toString(MCRUserContact.faculty_len)+")")
+       .addColumn("DEPARTMENT VARCHAR("+
+         Integer.toString(MCRUserContact.department_len)+")")
+       .addColumn("INSTITUTE VARCHAR("+
+         Integer.toString(MCRUserContact.institute_len)+")")
+       .addColumn("TELEPHONE VARCHAR("+
+         Integer.toString(MCRUserContact.telephone_len)+")")
+       .addColumn("FAX VARCHAR("+
+         Integer.toString(MCRUserContact.fax_len)+")")
+       .addColumn("EMAIL VARCHAR("+
+         Integer.toString(MCRUserContact.email_len)+")")
+       .addColumn("CELLPHONE VARCHAR("+
+         Integer.toString(MCRUserContact.cellphone_len)+")")
+       .addColumn("PRIMGROUP VARCHAR("+
+         Integer.toString(MCRUser.id_len)+") NOT NULL")
        .addColumn("PRIMARY KEY(UID)")
        .addColumn("UNIQUE (NUMID)")
        .toCreateTableStatement());
@@ -165,11 +186,11 @@ public class MCRSQLUserStore implements MCRUserStore
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try {
       c.doUpdate (new MCRSQLStatement(SQLGroupsTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("CREATOR VARCHAR(20) NOT NULL")
+       .addColumn("GID VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("CREATOR VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
        .addColumn("CREATIONDATE TIMESTAMP")
        .addColumn("MODIFIEDDATE TIMESTAMP")
-       .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("DESCRIPTION VARCHAR("+Integer.toString(MCRUser.id_len)+")")
        .addColumn("PRIMARY KEY(GID)")
        .toCreateTableStatement());
       }
@@ -184,9 +205,9 @@ public class MCRSQLUserStore implements MCRUserStore
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try {
        c.doUpdate (new MCRSQLStatement(SQLGroupAdminsTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("USERID VARCHAR(20)")
-       .addColumn("GROUPID VARCHAR(20)")
+       .addColumn("GID VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("USERID VARCHAR("+Integer.toString(MCRUser.id_len)+")")
+       .addColumn("GROUPID VARCHAR("+Integer.toString(MCRUser.id_len)+")")
        .toCreateTableStatement());
       }
     finally {c.release();}
@@ -200,9 +221,9 @@ public class MCRSQLUserStore implements MCRUserStore
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try {
       c.doUpdate (new MCRSQLStatement(SQLGroupMembersTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("USERID VARCHAR(20)")
-       .addColumn("GROUPID VARCHAR(20)")
+       .addColumn("GID VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("USERID VARCHAR("+Integer.toString(MCRUser.id_len)+")")
+       .addColumn("GROUPID VARCHAR("+Integer.toString(MCRUser.id_len)+")")
        .toCreateTableStatement());
       }
     finally {c.release();}
@@ -216,8 +237,10 @@ public class MCRSQLUserStore implements MCRUserStore
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try {
       c.doUpdate (new MCRSQLStatement(SQLPrivilegesTable)
-       .addColumn("NAME VARCHAR(64) NOT NULL")
-       .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("NAME VARCHAR("+
+         Integer.toString(MCRPrivilege.privilege_len)+") NOT NULL")
+       .addColumn("DESCRIPTION VARCHAR("+
+         Integer.toString(MCRPrivilege.description_len)+")")
        .addColumn("PRIMARY KEY(NAME)")
        .toCreateTableStatement());
       }
@@ -232,8 +255,9 @@ public class MCRSQLUserStore implements MCRUserStore
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try {
       c.doUpdate (new MCRSQLStatement(SQLPrivsLookupTable)
-       .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("NAME VARCHAR(64) NOT NULL")
+       .addColumn("GID VARCHAR("+Integer.toString(MCRUser.id_len)+") NOT NULL")
+       .addColumn("NAME VARCHAR("+
+         Integer.toString(MCRPrivilege.privilege_len)+") NOT NULL")
        .toCreateTableStatement());
       }
     finally {c.release();}
@@ -531,19 +555,37 @@ public class MCRSQLUserStore implements MCRUserStore
   }
 
   /**
-   * This method tests if a MyCoRe privilege object is available in the persistent datastore.
-   * @param privName  a String representing the MyCoRe privilege object which is to be looked for
+   * This method tests if a MyCoRe privilege object is available in the 
+   * persistent datastore.
+   *
+   * @param privName  a String representing the MyCoRe privilege object which 
+   *    is to be looked for
+   * @return true if the privilege exist, else return false
    */
-  public synchronized boolean existsPrivilege(String privName) throws MCRException
-  {
-  try {
-    return MCRSQLConnection.justCheckExists(new MCRSQLStatement(SQLPrivilegesTable)
-      .setCondition("NAME", privName)
-      .toRowSelector());
+  public synchronized boolean existsPrivilege(String privName) 
+    {
+    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+    ResultSet rs = null;
+    try {
+      String select = "SELECT * FROM "+SQLPrivilegesTable+" WHERE NAME = "+ 
+        "'"+privName+"'";
+      Statement statement = connection.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+      if (rs.next())
+        return true;
+      else return false;
+      }
+    catch (Exception ex) {
+      throw new MCRException("Error in UserStore.",ex); }
+    finally {
+      try {
+        rs.close();
+        connection.release();
+        }
+      catch (Exception ex) {
+        throw new MCRException("Error in UserStore.",ex); }
+      }
     }
-  catch (Exception ex) {
-    throw new MCRException("Error in UserStore.",ex); }
-  }
 
   /**
    * This method tests if a MyCoRe privilege set object is available in the persistent datastore.
@@ -852,37 +894,45 @@ public class MCRSQLUserStore implements MCRUserStore
   }
 
   /**
-   * This method updates a MyCoRe privilege set object in the persistent datastore.
-   * At the moment we only insert *new* privileges, we do not overwrite existent
-   * privileges and we do not delete any privilege.
+   * This method updates a MyCoRe privilege set object in the persistent 
+   * datastore. New privileges was insert in the database, existing privileges
+   * can be update.
    *
    * @param privilegeSet the privilege set object to be updated
    */
-  public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) throws MCRException
-  {
-    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+  public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) 
+    throws MCRException
+    {
+    MCRSQLConnection connection = MCRSQLConnectionPool.instance()
+      .getConnection();
     MCRPrivilege thePrivilege;
     ArrayList privileges = privilegeSet.getPrivileges();
 
-    try
-    {
-      connection.getJDBCConnection().setAutoCommit(false);
+    try {
       String insert = "INSERT INTO " + SQLPrivilegesTable + " VALUES (?,?)";
-      PreparedStatement statement = connection.getJDBCConnection().prepareStatement(insert);
+      String update = "UPDATE " + SQLPrivilegesTable + " SET DESCRIPTION = ? "+
+        "WHERE NAME = ? ";
+      Connection con = connection.getJDBCConnection();
+      PreparedStatement istatement = con.prepareStatement(insert);
+      PreparedStatement ustatement = con.prepareStatement(update);
 
       for (int i=0; i<privileges.size(); i++) {
         thePrivilege = (MCRPrivilege)privileges.get(i);
         if (!existsPrivilege(thePrivilege.getName())) {
-          statement.setString ( 1, (String)thePrivilege.getName() );
-          statement.setString ( 2, (String)thePrivilege.getDescription() );
-          statement.execute();
-          statement.clearParameters();
+          istatement.setString ( 1, (String)thePrivilege.getName() );
+          istatement.setString ( 2, (String)thePrivilege.getDescription() );
+          istatement.execute();
+          istatement.clearParameters();
+        }
+        else {
+          ustatement.setString ( 1, (String)thePrivilege.getDescription() );
+          ustatement.setString ( 2, (String)thePrivilege.getName() );
+          ustatement.execute();
+          ustatement.clearParameters();
         }
       }
-      statement.close();
-
-      connection.getJDBCConnection().commit();
-      connection.getJDBCConnection().setAutoCommit(true);
+      istatement.close();
+      ustatement.close();
     }
 
     catch(Exception ex)
