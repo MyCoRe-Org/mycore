@@ -3,7 +3,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   elementFormDefault="unqualified">
 
-<xsd:import schemaLocation="/dlwww/cvs/mycore/schema/xml-2001.xsd"
+<xsd:import schemaLocation="./xml-2001.xsd"
   namespace="http://www.w3.org/XML/1998/namespace"/>
  
 <xsd:element type="MCRClass" name="mycoreclass"/>
