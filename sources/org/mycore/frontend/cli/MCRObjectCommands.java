@@ -91,7 +91,7 @@ public class MCRObjectCommands
       return;
     }
 
-    String[] list = dir.list( new MCRXMLFilenameFilter() );
+    String[] list = dir.list();
 
     if( list.length == 0)
     {
@@ -101,6 +101,7 @@ public class MCRObjectCommands
 
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
+	if ( ! list[ i ].endsWith(".xml") ) continue;
 	if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
     }
