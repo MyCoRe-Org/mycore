@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<navigation dir="/content" template="template_docportal" hrefStartingPage="/content/below/index.xml" mainTitle="Docportal">
+<navigation dir="/content" template="template_mycore-de-2" hrefStartingPage="/content/below/index.xml" mainTitle="Docportal">
 	
 	<!-- main menu  -->
 	<navi-main label="Hauptmenü links" dir="/main/">

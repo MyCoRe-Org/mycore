@@ -77,7 +77,7 @@
 			<!-- set name of default template -->
 			<!-- ===================================================================================== -->
 			<xsl:otherwise>
-				<xsl:call-template name="template_docportal">
+				<xsl:call-template name="template_mycore-de-2">
 					<xsl:with-param name="template" 
 						select="document($navigationBase) /navigation/@template" 
 						/>
