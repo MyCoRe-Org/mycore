@@ -543,7 +543,6 @@ public class MCRCStoreContentManager8
 			MCRCM8ConnectionPool.instance().releaseConnection(ds);
 			throw new MCRPersistenceException("Cannot get DKHandle from MCRCM8ConnectionPool!",e);
 		}
-		logger.debug("Counting indexed derivates...");
 		ResultSet rs;
 		try {
 			rs=connection.createStatement().executeQuery(new MCRSQLStatement(TIEREF_TABLE).setCondition(DerivateAttribute,derivateID).toSelectStatement("COUNT(*)"));
@@ -558,6 +557,7 @@ public class MCRCStoreContentManager8
 			throw new MCRPersistenceException("Cannot query TIEREF Table out of Library Server",e1);
 		}
 		MCRCM8ConnectionPool.instance().releaseConnection(ds);
+		logger.debug("Derivate: "+derivateID+" has "+count+" indexed files!");
 		return count;
 	}
 
