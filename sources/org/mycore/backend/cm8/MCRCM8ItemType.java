@@ -93,12 +93,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
       mcr_item_type_prefix+"label",MCRObject.MAX_LABEL_LENGTH,false)) {
       logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"label already exists."); }
-    // create the Attribut for the XML byte array
-    if (!MCRCM8ItemTypeCommon.createAttributeBlob(connection,
-      mcr_item_type_prefix+"xml",100*1024,false)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"xml already exists."); }
-    // create the Attribut for the XML byte array
+    // create the Attribut for the TS byte array
     if (!MCRCM8ItemTypeCommon.createAttributeClob(connection,
       mcr_item_type_prefix+"ts",100*1024,true)) {
       logger.warn("CM8 Datastore Creation attribute "+
@@ -146,10 +141,6 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
     attr.setUnique(true);
     item_type.addAttr(attr);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix+"label");
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix+"xml");
     attr.setNullable(false);
     attr.setUnique(false);
     item_type.addAttr(attr);

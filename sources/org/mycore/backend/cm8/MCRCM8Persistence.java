@@ -68,7 +68,7 @@ public MCRCM8Persistence()
  * As example: Document --> MCR.persistence_cm8_document
  *
  * @param mcr_tc      the typed content array
- * @param xml         the XML stream from the object as JDOM
+ * @param jdom        the XML stream from the object as JDOM
  * @param mcr_ts_in   the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
@@ -77,8 +77,6 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   String mcr_ts_in) throws MCRConfigurationException, MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger();
-  // convert the JDOM tree
-  byte [] xml = MCRUtils.getByteArray(jdom);
   // get root data
   MCRObjectID mcr_id = null;
   String mcr_label = null;
@@ -110,7 +108,17 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     MCRCM8Item item = new MCRCM8Item(connection,itemtypename);
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
-    item.setAttribute("/",itemtypeprefix+"xml",xml);
+    // set xml only if the attribute exist (for old versions)
+    try {
+      DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
+      DKAttrDefICM attr = (DKAttrDefICM) dsDefICM
+        .retrieveAttr(itemtypeprefix+"xml");
+      if (attr != null) {
+        byte [] xml = MCRUtils.getByteArray(jdom);
+        item.setAttribute("/",itemtypeprefix+"xml",xml);
+        }
+      }
+    catch(Exception e) { }
     logger.debug(mcr_ts_in);
     item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
 
@@ -289,95 +297,15 @@ public final void delete(MCRObjectID mcr_id)
       item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
         itemtypeprefix); 
       item.delete();
+      logger.info("Item "+mcr_id.getId()+" was deleted.");
       }
     catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
-        " does not exist."); }
-    logger.info("Item "+mcr_id.getId()+" was deleted.");
+      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
     MCRCM8ConnectionPool.instance().releaseConnection(connection); }
-  }
-
-/**
- * The methode return true if an object  for the MCRObjectId exists.
- * The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case
- * configuration name.<br>
- * As example: Document --> MCR.persistence_cm7_document
- *
- * @param mcr_id      the object id
- * @return true if the object exists, else false
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final boolean exist(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
-  {
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
-  // look for data item
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.instance().getConnection();
-    try {
-      new MCRCM8Item(mcr_id.getId(),connection,itemtypename,itemtypeprefix);
-    }
-    catch (MCRPersistenceException e) {  return false; }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
-  return true;
-  }
-
-/**
- * The methode receive an object from the data store and return the object
- * as a XML stream. The index class
- * is determinated by the type of the object ID. This <b>must</b>
- * correspond with the lower case configuration name.<br>
- * As example: Document --> MCR.persistence_cm8_document
- *
- * @param mcr_id      the object id
- * @return the XML stream of the object as string
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final byte[] receive(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
-  {
-  byte [] xml = null;
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
-  // retrieve the XML byte stream
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.instance().getConnection();
-    MCRCM8Item item = null;
-    try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
-        itemtypeprefix);
-      item.retrieve();
-      xml = item.getBlob("/",itemtypeprefix+"xml");
-      }
-    catch (MCRPersistenceException e) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
-        " does not exist."); }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
-  return xml;
   }
 
 /**
@@ -407,62 +335,6 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   // create the item with the MCRObjectID
   create(mcr_tc,jdom,mcr_ts_in);
   }
-
- /**
-  * This method returns the next free ID number for a given 
-  * MCRObjectID base. This method ensures that any invocation
-  * returns a new, exclusive ID by remembering the highest ID
-  * ever returned and comparing it with the highest ID stored
-  * in the related index class.
-  * 
-  * @param project_ID   the project ID part of the MCRObjectID base
-  * @param type_ID      the type ID part of the MCRObjectID base
-  *
-  * @exception MCRPersistenceException if a persistence problem is occured
-  *
-  * @return the next free ID number as a String
-  **/
-  public synchronized String getNextFreeId( String project_ID, String type_ID ) 
-    throws MCRPersistenceException
-  { 
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(type_ID.toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix")+
-    "ID";
-  // search for the last object
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.instance().getConnection();
-    DKNVPair options[] = new DKNVPair[3];
-    options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "1");
-    options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,new
-      Integer(DKConstant.DK_CM_CONTENT_ATTRONLY));
-    options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END,null);
-    StringBuffer query = new StringBuffer(1024);
-    query.append('/').append(itemtypename).append(" SORTBY (@")
-      .append(itemtypeprefix).append(" DESCENDING)");
-    DKResults results = (DKResults)connection.evaluate(query.toString(),
-      DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
-    dkIterator iter = results.createIterator();
-    if (results.cardinality() == 0) { return "1"; }
-    while(iter.more()) {
-      DKDDO ddo=(DKDDO) iter.next();  
-      MCRObjectID mid = 
-        new MCRObjectID((String)ddo.getDataByName(itemtypeprefix));
-      return String.valueOf(mid.getNumberAsInteger()+1);
-      }
-    }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
-  return "";
-  }
-
-  /** This table stores the highest IDs delivered by getNextFreeId() */
-  protected static Properties highestIDs = new Properties();
 
 }
 

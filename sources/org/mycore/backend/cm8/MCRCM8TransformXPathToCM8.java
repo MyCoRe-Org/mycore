@@ -130,11 +130,14 @@ public final MCRXMLContainer startQuery(String type)
         result.add( "local", id, 0, xml);
         }
       catch (Exception e) {
-        //e.printStackTrace();
-        logger.debug(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
-        dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");     
-        xml = (byte []) resitem.getData(dataId);
-        result.add("local",id,rank,xml);
+        logger.warn(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
+        try {
+          dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");
+          xml = (byte []) resitem.getData(dataId);
+          result.add("local",id,rank,xml);
+          }
+        catch (Exception ex) {
+          logger.warn("Can not retieve the XML data from the old CM8 store."); }
         }
       }
     }
