@@ -137,11 +137,10 @@ public class MCRFileImportExport
         
         MCRContentInputStream cis = new MCRContentInputStream( fin );
         
-        try{ MCRUtils.copyStream( cis, null ); }
-        catch( IOException ex )
+        if (! MCRUtils.copyStream( cis, null ) )
         {
           String msg = "Error while reading local file " + local.getPath();
-          throw new MCRException( msg, ex );
+          throw new MCRException( msg );
         }
         
         String local_md5 = cis.getMD5String();
