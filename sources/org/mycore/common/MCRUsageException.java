@@ -24,35 +24,31 @@
 
 package mycore.common;
 
-import mycore.common.MCRException;
-
 /**
- * Instances of this class represent an exception thrown because of an error in the MyCoRe 
- * configuration. Normally this will be the case when a configuration property that is 
- * required is not set or has an illegal value.
+ * Instances of MCRUsageException are thrown when the MyCoRe API is used in an 
+ * illegal way. For example, this could happen when you provide illegal 
+ * arguments to a method.
  *
- * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-public class MCRConfigurationException extends MCRException
+public class MCRUsageException extends MCRException
 {
   /**
-   * Creates a new MCRConfigurationException with an error message
+   * Creates a new MCRUsageException with an error message
    *
    * @param message the error message for this exception
    */  
-  public MCRConfigurationException( String message )
-  { super( message ); }
+  public MCRUsageException( String message )
+  { super( message); }
   
   /**
-   * Creates a new MCRConfigurationException with an error message and a reference 
+   * Creates a new MCRUsageException with an error message and a reference 
    * to an exception thrown by an underlying system.
    *
    * @param message the error message for this exception
    * @param exception the exception that was thrown by an underlying system
    */  
-  public MCRConfigurationException( String message, Exception exception )
-  { super( message, exception ); };
+  public MCRUsageException( String message, Exception exception )
+  { super( message, exception ); }
 } 
-
