@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.13 $ $Date: 2003/01/30 10:41:25 $
+ * $Revision: 1.14 $ $Date: 2003/01/30 11:20:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.13 $ $Date: 2003/01/30 10:41:25 $
+ * @version $Revision: 1.14 $ $Date: 2003/01/30 11:20:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -695,13 +695,13 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	ListIterator iterator = sets.listIterator();
 	    	
 			try {
-		        maxreturns = config.getString(STR_OAI_MAXRETURNS);
+		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 			} catch (NumberFormatException nfx) {
 				//do nothing, just let maxreturns be 0
 			}
 	    	
 	    	while (iterator.hasNext()) {
-	    		String[] set = (String[3]) (iterator.next());
+	    		String[] set = (String[]) (iterator.next());
 	    	}
 	    }
         
