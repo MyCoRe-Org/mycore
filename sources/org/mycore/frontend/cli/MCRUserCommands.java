@@ -210,7 +210,7 @@ public class MCRUserCommands
       groupIDs.add(sgroup);
       groupIDs.add(ggroup);
 
-      MCRUser u = new MCRUser(1, suser, suser, null, null, true, false,
+      MCRUser u = new MCRUser(1, suser, suser, null, null, true, true,
 			"Superuser", spasswd, sgroup, groupIDs,
 			null, null, null, null, null, null, null, null,
 			null, null, null, null, null, null, null, null);
