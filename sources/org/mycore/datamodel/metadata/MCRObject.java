@@ -140,11 +140,7 @@ private final void set() throws MCRException
  **/
 public final void setFromURI(String uri) throws MCRException
   {
-  try {
-    jdom_document = MCRXMLHelper.parseURI(uri);
-    }
-  catch (Exception e) {
-    throw new MCRException(e.getMessage(),e); }
+  jdom_document = MCRXMLHelper.parseURI(uri);
   set();
   }
 
@@ -157,11 +153,7 @@ public final void setFromURI(String uri) throws MCRException
  **/
 public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
-  try {
-    jdom_document = MCRXMLHelper.parseXML(xml,valid);
-    }
-  catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+  jdom_document = MCRXMLHelper.parseXML(xml,valid);
   set();
   }
 
