@@ -26,9 +26,8 @@ package mycore.xml;
 
 import java.io.*;
 import java.util.Vector;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
+import mycore.common.*;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
@@ -37,10 +36,45 @@ import org.w3c.dom.NodeList;
  * package mycore.user to the package mycore.common.
  *
  * @author Detlev Degenhardt
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRXMLHelper
 {
+  private static MCRParserInterface parser;
+
+  /** Returns the XML Parser as configured in mycore.properties */
+  private static MCRParserInterface getParser()
+    throws MCRException
+  {
+    if( parser == null )
+    {
+      Object o = MCRConfiguration.instance().getInstanceOf( "MCR.parser_class_name" );
+      parser = (MCRParserInterface)o;
+    }
+    return parser;
+  }
+
+ /**
+  * Parses an XML file from a URI and returns it as DOM.
+  *
+  * @param uri           the URI of the XML file 
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseURI( String uri ) throws MCRException
+  { return getParser().parseURI( uri ); }
+
+ /**
+  * Parses an XML String and returns it as DOM.
+  *
+  * @param xml           the XML String to be parsed
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseXML( String xml ) throws MCRException
+  { return getParser().parseXML( xml ); }
+
   /**
    * This method prints out a node. It is meant only for debugging purposes
    * during the software development .
@@ -138,3 +172,4 @@ public class MCRXMLHelper
     return textVector;
   }
 }
+

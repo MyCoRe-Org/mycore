@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 import mycore.common.MCRCache;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
-import mycore.xml.MCRParserInterface;
+import mycore.xml.MCRXMLHelper;
 
 /**
  * This class is the user (and group) manager of the MyCoRe system. It is implemented
@@ -57,9 +57,6 @@ public class MCRUserMgr
   /** the group cache */
   private MCRCache groupCache;
 
-  /** the XML parser we are using (configurable) */
-  private MCRParserInterface mcrParser;
-
   /** the class responsible for persistent datastore (configurable ) */
   private MCRUserStore mcrUserStore;
 
@@ -77,9 +74,6 @@ public class MCRUserMgr
     SLASH = new String((System.getProperties()).getProperty("file.separator"));
     String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
     mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
-
-    String parserName = MCRConfiguration.instance().getString("MCR.parser_class_name");
-    mcrParser = (MCRParserInterface)Class.forName(parserName).newInstance();
 
     userCache  = new MCRCache(10);  // ok, this will be read from mycore.properties later
     groupCache = new MCRCache(10);  //                   -"-
@@ -418,7 +412,7 @@ public class MCRUserMgr
         throw new MCRException("Unknown group!");
       else
       {
-        mcrDocument = mcrParser.parseXML(reqGroupXML);
+        mcrDocument = MCRXMLHelper.parseXML(reqGroupXML);
         NodeList domGroupList = mcrDocument.getElementsByTagName("group");
         reqGroup = new MCRGroup((Element)domGroupList.item(0));
         groupCache.put(groupID, reqGroup);
@@ -452,7 +446,7 @@ public class MCRUserMgr
         throw new MCRException("Unknown user!");
       else
       {
-        mcrDocument = mcrParser.parseXML(reqUserXML);
+        mcrDocument = MCRXMLHelper.parseXML(reqUserXML);
         NodeList domUserList = mcrDocument.getElementsByTagName("user");
         reqUser = new MCRUser((Element)domUserList.item(0));
         userCache.put(userID, reqUser);
@@ -477,7 +471,7 @@ public class MCRUserMgr
   private final void loadUsersOrGroupsFromXMLFile(String filename) throws Exception
   {
     System.out.print("Reading file : "+filename+"\n");  // output only during the debugging phase!
-    mcrDocument = mcrParser.parseURI(filename);
+    mcrDocument = MCRXMLHelper.parseURI(filename);
 
     // At first we check whether we are loading users or groups. This information is provided
     // by the XML-Representation (attribute of the first element).

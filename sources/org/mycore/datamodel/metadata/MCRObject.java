@@ -37,7 +37,7 @@ import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectStructure;
 import mycore.datamodel.MCRObjectService;
 import mycore.datamodel.MCRQueryInterface;
-import mycore.xml.MCRParserInterface;
+import mycore.xml.MCRXMLHelper;
 
 /**
  * This class implements all methode for handling one metadata object.
@@ -63,7 +63,6 @@ private String persist_type;
 private String query_name;
 
 // interface classes
-private MCRParserInterface mcr_parser;
 private MCRObjectPersistenceInterface mcr_persist;
 private MCRQueryInterface mcr_query;
 
@@ -107,10 +106,6 @@ public MCRObject() throws MCRException, MCRConfigurationException
   mcr_persist = null;
   mcr_query = null;
   try {
-  // Parser class
-    parser_name = MCRConfiguration.instance()
-      .getString("MCR.parser_class_name");
-    mcr_parser = (MCRParserInterface)Class.forName(parser_name).newInstance();
   // Path of XML schema
     mcr_schema_path = MCRConfiguration.instance()
       .getString("MCR.parser_schema_path");
@@ -238,7 +233,7 @@ private final void setPersistence() throws MCRException
 public final void setFromURI(String uri) throws MCRException
   {
   try {
-    mcr_document = mcr_parser.parseURI(uri);
+    mcr_document = MCRXMLHelper.parseURI(uri);
     set();
     }
   catch (Exception e) {
@@ -255,7 +250,7 @@ public final void setFromURI(String uri) throws MCRException
 public final void setFromXML(String xml) throws MCRException
   {
   try {
-    mcr_document = mcr_parser.parseXML(xml);
+    mcr_document = MCRXMLHelper.parseXML(xml);
     set();
     }
   catch (Exception e) {
