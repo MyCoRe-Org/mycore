@@ -32,6 +32,7 @@ import java.text.DateFormat;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.jdom.*;
+import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.backend.remote.*;
@@ -46,6 +47,8 @@ import org.mycore.backend.remote.*;
  **/
 public class MCRFileNodeServlet extends HttpServlet
 {
+  private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
+
 // The configuration
 private MCRConfiguration conf = null;
 
@@ -104,11 +107,12 @@ private ArrayList remoteAliasList = null;
     throws IOException, ServletException
   {
     String requestPath = req.getPathInfo();
-System.out.println("requestPath = "+requestPath);
+    logger.info( "requestPath = " + requestPath );
+
     if( requestPath == null ) 
     {
       String msg = "Error: HTTP request path is null";
-      System.out.println( msg );
+      logger.error( msg );
       res.sendError( res.SC_NOT_FOUND, msg );
       return;
     }
@@ -116,7 +120,7 @@ System.out.println("requestPath = "+requestPath);
     StringTokenizer st = new StringTokenizer( requestPath, "/" );
     if(!st.hasMoreTokens()) {
       String msg = "Error: HTTP request path is empty";
-      System.out.println( msg );
+      logger.error( msg );
       res.sendError( res.SC_NOT_FOUND, msg );
       return;
       }
@@ -128,7 +132,7 @@ System.out.println("requestPath = "+requestPath);
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }
     lang = lang.toUpperCase();
-System.out.println("MCRFileNodeServlet : lang = "+lang);
+    logger.debug( "MCRFileNodeServlet : lang = " + lang );
 
     // get the host alias
     String hostAlias  = req.getParameter( "hosts" );
@@ -143,11 +147,11 @@ System.out.println("MCRFileNodeServlet : lang = "+lang);
       }
     if (!test) {
       String msg = "Error: HTTP request host is not in the alias list";
-      System.out.println( msg );
+      logger.error( msg );
       res.sendError( res.SC_NOT_FOUND, msg );
       return;
       }
-System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
+     logger.debug( "MCRFileNodeServlet : hosts = " + hostAlias );
 
     String ownerID = st.nextToken();
     
@@ -157,7 +161,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
       if( roots.length == 0 )
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
-        System.out.println( msg );
+        logger.error( msg );
         res.sendError( res.SC_NOT_FOUND, msg );
         return;
       }
@@ -169,7 +173,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
         if( st.hasMoreTokens() )
         {
           String msg = "Error: No such file or directory " + st.nextToken();
-          System.out.println( msg );
+          logger.error( msg );
           res.sendError( res.SC_NOT_FOUND, msg );
           return;
         }
@@ -190,7 +194,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
         if( node == null )
         {
           String msg = "Error: No such file or directory " + path;
-          System.out.println( msg );
+          logger.error( msg );
           res.sendError( res.SC_NOT_FOUND );
           return;
         }
@@ -258,7 +262,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
         jdom = resarray.exportAllToDocument();
         style = parameters.getProperty("Style","IFSMetadata-"+lang);
         }
-      System.out.println("Style = "+style);
+      logger.debug( "Style = " + style );
 
     if (style.equals("xml")) {
       res.setContentType( "text/xml" );
@@ -280,7 +284,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
   private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
     throws IOException, ServletException
   {
-    System.out.println( "Sending file " + file.getName() );
+    logger.info( "Sending file " + file.getName() );
     
     res.setContentType( file.getContentType().getMimeType() );
     res.setContentLength( (int)( file.getSize() ) );
@@ -299,9 +303,9 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }
     lang = lang.toUpperCase();
-    System.out.println("MCRFileNodeServlet : lang = "+lang);
+    logger.debug( "MCRFileNodeServlet : lang = " + lang );
 
-    System.out.println( "Sending list of files in directory " + dir.getName() );
+    logger.info( "Sending list of files in directory " + dir.getName() );
     
     Element root = new Element( "mcr_directory" );
     Document doc = new org.jdom.Document( root );
@@ -356,7 +360,7 @@ System.out.println("MCRFileNodeServlet : hosts = "+hostAlias);
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
     String style = parameters.getProperty("Style","IFSMetadata-"+lang);
-    System.out.println("Style = "+style);
+    logger.debug( "Style = " + style );
 
     if (style.equals("xml")) {
       res.setContentType( "text/xml" );

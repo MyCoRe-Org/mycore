@@ -24,6 +24,7 @@
 
 package org.mycore.backend.videocharger;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
 import java.util.*;
@@ -56,6 +57,8 @@ import com.enterprisedt.net.ftp.*;
  */
 public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRContentStore
 { 
+  private static Logger logger = Logger.getLogger( MCRCStoreVideoCharger7.class.getName() );
+
   /** Hostname of VideoCharger server */
   protected String host;
   
@@ -162,7 +165,7 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
 
     for( int i = 0; i < list.length; i++ )
     {
-      System.out.println( "Backup of asset with ID = " + list[ i ] );
+      logger.info( "Backup of asset with ID = " + list[ i ] );
       
       File local = new File( directory, list[ i ] );
       if( local.exists() ) continue;

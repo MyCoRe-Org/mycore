@@ -25,11 +25,14 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
+import org.apache.log4j.Logger;
 import java.util.Vector;
 import java.util.GregorianCalendar;
 
 public class MCRFileMetadataManager
 {
+  private static Logger logger = Logger.getLogger( MCRFileMetadataManager.class.getName() );
+
   private static MCRFileMetadataManager manager;
   
   public static synchronized MCRFileMetadataManager instance()
@@ -65,7 +68,7 @@ public class MCRFileMetadataManager
   void storeNode( MCRFilesystemNode node )
     throws MCRPersistenceException
   {
-    System.out.println( "IFS StoreNode " + node.getName() );
+    logger.debug( "IFS StoreNode " + node.getName() );
     store.storeNode( node );
     cache.put( node.getID(), node );
   }
@@ -73,7 +76,7 @@ public class MCRFileMetadataManager
   MCRFilesystemNode retrieveNode( String ID )
     throws MCRPersistenceException
   {
-    System.out.println( "IFS RetrieveNode " + ID );
+    logger.debug( "IFS RetrieveNode " + ID );
     MCRFilesystemNode n = (MCRFilesystemNode)( cache.get( ID ) );
     if( n != null ) 
       return n;  
@@ -120,7 +123,7 @@ public class MCRFileMetadataManager
   void deleteNode( String ID )
     throws MCRPersistenceException
   {
-    System.out.println( "IFS DeleteNode " + ID );
+    logger.debug( "IFS DeleteNode " + ID );
     cache.remove( ID );
     store.deleteNode( ID );
   }
