@@ -242,7 +242,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         		String[] identifier = getHeader(object, objectId, repositoryId);
         		list.add(identifier);
 	   	    }
-   	    } catch (MCRException mcrx) {
+   	    } catch (Exception mcrx) {
    	    	logger.error("Die Query ist fehlgeschlagen.");
    	    } finally {
    	    	return list;
@@ -408,7 +408,7 @@ public class MCROAIQueryService implements MCROAIQuery {
     		    Element eMetadata = object.getMetadata().createXML();
 	        	list.add(eMetadata);
 	   	    }
-   	    } catch (MCRException mcrx) {
+   	    } catch (Exception mcrx) {
    	    	logger.error("Die Query ist fehlgeschlagen.");
    	    } finally {
    	    	return list;
