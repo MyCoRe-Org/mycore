@@ -4,7 +4,7 @@
 ### content and configuratin stuff
 #########################################################################
 #Path and File containing the WCMS user Database. Normally WCMSUserDB.xml
-MCR.WCMS.wcmsUserDBFile=$MYCORESAMPLE_HOME/modules/module-wcms/aif/config/WCMSUserDB.xml
+MCR.WCMS.wcmsUserDBFile=$MYCOREAPPLICATION_HOME/modules/module-wcms/aif/config/WCMSUserDB.xml
 
 #Path to the content section
 MCR.WCMS.contentRoot=$MYCOREAPPLICATION_HOME/webapps/content/
