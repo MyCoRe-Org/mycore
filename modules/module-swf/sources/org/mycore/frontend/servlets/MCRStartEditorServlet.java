@@ -38,6 +38,7 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -155,8 +156,8 @@ public class MCRStartEditorServlet extends MCRServlet
       !mytodo.equals("weditobj") && !mytodo.equals("weditder") && 
       !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") &&
       !mytodo.equals("wcommit") &&
-      !mytodo.equals("seditobj") && !mytodo.equals("weditder") &&
-      !mytodo.equals("sdelobj") && !mytodo.equals("wdelder") && 
+      !mytodo.equals("seditobj") && !mytodo.equals("seditder") &&
+      !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && 
       !mytodo.equals("snewder") && !mytodo.equals("scommitder") &&
       !mytodo.equals("saddfile") && !mytodo.equals("sdelfile")) {
       mytodo = "wnewobj"; }
@@ -474,6 +475,47 @@ public class MCRStartEditorServlet extends MCRServlet
        StringBuffer text = new StringBuffer();
        text.append("Es wurde ein Objekt vom Typ ").append(mytype)
          .append(" mit der ID ").append(mytfmcrid)
+         .append(" aus dem Server gelöscht.");
+       LOGGER.info(text.toString());
+       try {
+         MCRMailer.send(sender,addr,subject,text.toString(),false); }
+       catch (Exception ex) {
+       LOGGER.error("Can't send a mail to "+addr); }
+       }
+     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+myfile));
+     return;
+     }
+
+   // action SDELDER from the database
+   if (mytodo.equals("sdelder")) {
+     if (!checkAccess(mysemcrid,userid,privs,"delete-"+mytype,true)) {
+       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+       return;
+       }
+     if (mysemcrid.length()==0) {
+       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+       return;
+       }
+     MCRDerivate der = new MCRDerivate();
+     try {
+       der.deleteFromDatastore(myremcrid);
+       MCRObjectID ID = new MCRObjectID(mysemcrid);
+       StringBuffer sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
+       String searchtype = CONFIG.getString(sb.toString(),ID.getTypeId());
+       sb = new StringBuffer();
+       sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
+       sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(mysemcrid).append("\']");
+       myfile = sb.toString();
+       }
+     catch (Exception e) { myfile = deleteerrorpage; }
+     List addr = WFM.getMailAddress(mytype,"sdelder");
+     if (addr.size() != 0) {
+       String sender = WFM.getMailSender();
+       String appl = CONFIG.getString("MCR.editor_mail_application_id","DocPortal");
+       String subject = "Automaticaly message from "+appl;
+       StringBuffer text = new StringBuffer();
+       text.append("Es wurde ein Derivate mit der ID ").append(myremcrid)
+         .append(" des Objektes mit der ID ").append(mytfmcrid)
          .append(" aus dem Server gelöscht.");
        LOGGER.info(text.toString());
        try {
