@@ -87,7 +87,7 @@ public class MCRContentIndexerFactory
   {
     if( indexerDetector == null )
     {
-      String property = "MCF.IFS.ContentIndexerDetector.Class";
+      String property = "MCR.IFS.ContentIndexerDetector.Class";
       Object obj = MCRConfiguration.instance().getInstanceOf( property );
       indexerDetector = (MCRContentIndexerDetector)obj;
     }

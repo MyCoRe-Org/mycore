@@ -125,7 +125,7 @@ public class MCRContentStoreFactory {
 	}
 
 	private static void initStoreSelector() {
-		String property = "MCF.IFS.ContentStoreSelector.Class";
+		String property = "MCR.IFS.ContentStoreSelector.Class";
 		Object obj = MCRConfiguration.instance().getInstanceOf(property);
 		storeSelector = (MCRContentStoreSelector) obj;
 	}
