@@ -86,9 +86,17 @@ public final class MCRXMLDBPersistence
             // open the collection
 	    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
             // check that the item not exist
-            XMLResource res = (XMLResource)collection.getResource( mcr_id.getId() );
-            if (res != null) {
-              throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" exists."); }
+            XMLResource res;
+            try 
+            {
+              res = (XMLResource)collection.getResource( mcr_id.getId() );
+              if (res != null) {
+                throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" exists."); }
+            }
+            catch ( Exception e ) 
+            { 
+              /* ignore tamino throws Exception, if resource does not exist */ 
+            }
             // create a new item
             res = (XMLResource)collection.createResource( mcr_id.getId(),
                 XMLResource.RESOURCE_TYPE );
@@ -147,9 +155,17 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
             // open the collection
 	    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
             // check that the item exist
-            XMLResource res = (XMLResource)collection.getResource( mcr_id.getId() );
-            if (res == null) {
-              throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" does not exist."); }
+            XMLResource res;
+            try
+            {
+              res = (XMLResource)collection.getResource( mcr_id.getId() );
+              if (res == null) {
+                throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" does not exist."); }
+            }
+            catch ( Exception e ) /* should only happen with tamino */
+            {
+              throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" does not exist."); 
+            }
             // delete the old item
             delete(mcr_id);
             // create the new item
@@ -179,11 +195,19 @@ public void delete( MCRObjectID mcr_id )
   logger.debug("MCRXMLDBPersistence delete: MCRObjectID    : " + mcr_id.getId());
   try {
     collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
-    Resource document = collection.getResource( mcr_id.getId() ); 
-    if ( null != document ) {
-      collection.removeResource(document); }
-    else {
-      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
+    Resource document;
+    try
+    {
+      document = collection.getResource( mcr_id.getId() ); 
+      if ( null != document ) {
+        collection.removeResource(document); }
+      else {
+        logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
+    }
+    catch ( Exception e ) /* should only happen with tamino */
+    {
+      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); 
+    }
     }
   catch( Exception e ) {
     throw new MCRPersistenceException( e.getMessage(), e ); }
