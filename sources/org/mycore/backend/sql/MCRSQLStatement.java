@@ -188,6 +188,11 @@ public class MCRSQLStatement
   public final String toSelectStatement()
   { return "SELECT * FROM " + toRowSelector(); }
   
+  public final String toSelectStatement(String columns){
+		MCRArgumentChecker.ensureNotEmpty( columns, "Columns" );
+		return new StringBuffer("SELECT ").append(columns).append(" FROM ").append(toRowSelector()).toString();
+  }
+  
   public final String toDeleteStatement()
   { return "DELETE FROM " + toRowSelector(); }
 
