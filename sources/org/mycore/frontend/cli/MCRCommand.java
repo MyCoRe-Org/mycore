@@ -62,13 +62,17 @@ public class MCRCommand
   /** The beginning of the message format up to the first parameter */
   protected String suffix;
 
+  /** The session context */
+  protected MCRSession session;
+
  /** 
   * Creates a new MCRCommand.
   *
+  * @param session         the session data
   * @param format          the command syntax, e.g. "save document {0} to directory {1}"
   * @param methodSignature the method to invoke, e.g. "miless.commandline.DocumentCommands.saveDoc int String"
   **/
-  MCRCommand( String format, String methodSignature )
+  MCRCommand( MCRSession session, String format, String methodSignature )
   {
     StringTokenizer st = new StringTokenizer( methodSignature, " " );
 
@@ -80,6 +84,7 @@ public class MCRCommand
     numParameters  = st.countTokens();
     parameterTypes = new Class[ numParameters ];
     messageFormat  = new MessageFormat( format );
+    this.session   = session;
 
     for( int i = 0; i < numParameters; i++ )
     {
@@ -94,6 +99,11 @@ public class MCRCommand
       else if( token.equals( "String" ) ) 
       {
         parameterTypes[ i ] = String.class;
+        f = null;
+      }
+      else if( token.equals( "MCRSession" ) ) 
+      {
+        parameterTypes[ i ] = MCRSession.class;
         f = null;
       }
       else 
@@ -149,12 +159,16 @@ public class MCRCommand
   protected Object[] buildInvocationParameters( Object[] commandParameters )
   {
     Object[] parameters = new Object[ numParameters ];
+    int j = 0;
     for( int i = 0; i < numParameters; i++ )
     {
-      if( parameterTypes[ i ] == Integer.TYPE )
-        parameters[ i ] = new Integer( ( (Number)commandParameters[ i ] ).intValue() );
-      else // if( parameterTypes[ i ] == String.class )
-        parameters[ i ] = commandParameters[ i ];
+      if( parameterTypes[ i ] == Integer.TYPE ) {
+        parameters[ i ] = new Integer( ( (Number)commandParameters[ j ] ).intValue() );
+        j++; continue; }
+      if( parameterTypes[ i ] == String.class ) {
+        parameters[ i ] = commandParameters[ j ]; j++; continue; }
+      if( parameterTypes[ i ] == MCRSession.class ) {
+        parameters[ i ] = session; continue; }
     }
     return parameters;
   }

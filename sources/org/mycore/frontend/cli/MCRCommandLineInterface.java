@@ -47,6 +47,7 @@ import org.mycore.common.*;
  *
  * @author Frank Lützenkirchen
  * @author Detlev Degenhardt
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRCommandLineInterface
@@ -70,6 +71,9 @@ public class MCRCommandLineInterface
   /** The standard input console where the user enters commands */
   protected static BufferedReader console = new BufferedReader( new InputStreamReader( System.in ) );
 
+  /** The current session */
+  private static MCRSession session = null;
+
  /**
   * Reads command definitions from a configuration file
   * and builds the MCRCommand instances
@@ -80,48 +84,54 @@ public class MCRCommandLineInterface
     // Built-in commands
     // **************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "process {0}",
       "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "help",
       "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "exit",
       "org.mycore.frontend.cli.MCRCommandLineInterface.exit" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "quit",
       "org.mycore.frontend.cli.MCRCommandLineInterface.exit" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "! {0}",
       "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "change to user {0}",
+      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "login {0}",
+      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String" );
 
     // *************************************************
     // Commands for object management
     // *************************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete object from {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete object {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load object from file {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update object from file {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load all objects from directory {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update all objects from directory {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save object {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.save String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next object ID for base {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.getID String" );
 
@@ -129,31 +139,31 @@ public class MCRCommandLineInterface
     // Commands for derivate management
     // *************************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete derivate {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete derivate from {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.delete String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load derivate from file {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update derivate from file {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load all derivates from directory {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update all derivates from directory {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save derivate {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.save String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save derivate {0} to {1}",
       "org.mycore.frontend.cli.MCRDerivateCommands.save String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next derivate ID for base {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.getID String" );
 
@@ -161,23 +171,23 @@ public class MCRCommandLineInterface
     // Commands for classification management
     // **************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete classification {0}",
       "org.mycore.frontend.cli.MCRClassificationCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load classification from file {0}",
       "org.mycore.frontend.cli.MCRClassificationCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update classification from file {0}",
       "org.mycore.frontend.cli.MCRClassificationCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "load all classifications from directory {0}",
       "org.mycore.frontend.cli.MCRClassificationCommands.loadFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update all classifications from directory {0}",
       "org.mycore.frontend.cli.MCRClassificationCommands.updateFromDirectory String"
       );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save classification {0} to {1}",
       "org.mycore.frontend.cli.MCRClassificationCommands.save String String" );
 
@@ -185,10 +195,10 @@ public class MCRCommandLineInterface
     // Commands for executing configurations
     // *************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "create database for {0}",
       "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "create schema for {0}",
       "org.mycore.frontend.cli.MCRBaseCommands.createXMLSchema String" );
 
@@ -196,13 +206,13 @@ public class MCRCommandLineInterface
     // Commands for executing queries
     // ******************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "query local {0} {1}",
       "org.mycore.frontend.cli.MCRQueryCommands.queryLocal String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "query remote {0} {1}",
       "org.mycore.frontend.cli.MCRQueryCommands.queryRemote String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "query host {0} {1} {2}",
       "org.mycore.frontend.cli.MCRQueryCommands.query String String String" );
 
@@ -210,63 +220,94 @@ public class MCRCommandLineInterface
     // Commands for user and group management
     // **************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "init superuser",
+      "org.mycore.frontend.cli.MCRUserCommands.initSuperuser MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "check user data consistency",
-      "org.mycore.frontend.cli.MCRUserCommands.checkConsistency" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "create user data from file or directory {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.createFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "import user data from file or directory {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.importFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "update user data from file or directory {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.checkConsistency MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "create user data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "create group data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "update user data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "update group data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.updateGroupFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.deleteUser String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.deleteUser MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete group {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.deleteGroup MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "list all users",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllUsers" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.listAllUsers MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "list all groups",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllGroups" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.listAllGroups MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "list all privileges",
       "org.mycore.frontend.cli.MCRUserCommands.listAllPrivileges" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save all users to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save all groups to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save all privileges to file {0}",
       "org.mycore.frontend.cli.MCRUserCommands.saveAllPrivilegesToFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save user {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save group {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "set password for user {0} to {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.setPassword String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.setPassword MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "set user management to read only mode",
-      "org.mycore.frontend.cli.MCRUserCommands.setLock" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.setLock MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "set user management to read/write mode",
-      "org.mycore.frontend.cli.MCRUserCommands.unLock" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.unLock MCRSession" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "show user {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.showUser String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
+      "org.mycore.frontend.cli.MCRUserCommands.showUser MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "show group {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.showGroup String" );
+      "org.mycore.frontend.cli.MCRUserCommands.showGroup MCRSession String" );
+
+    // Read external commands
+    String externals = config.getString("MCR.external_command_classes","");
+    if (externals.length()==0) return;
+    StringTokenizer st = new StringTokenizer(externals,",");
+    while (st.hasMoreTokens()) {
+      String classname = st.nextToken();
+      logger.info("Will load commands from the external class "+classname);
+      Object obj = new Object();
+      try {
+        obj = Class.forName(classname).newInstance();
+        ArrayList ar = ((MCRExternalCommandInterface)obj).getPossibleCommands();
+        for (int i=0;i<ar.size();i+=2) {
+          knownCommands[ numCommands++ ] = new MCRCommand(session,
+            (String)ar.get(i),(String)ar.get(i+1));
+          logger.info("Add command '"+(String)ar.get(i)+"'");
+          }
+        }
+      catch (ClassNotFoundException e) {
+        logger.error(classname+" ClassNotFoundException"); }
+      catch (IllegalAccessException e) {
+        logger.error(classname+" IllegalAccessException"); }
+      catch (InstantiationException e) {
+        logger.error(classname+" InstantiationException"); }
+      }
     }
 
  /**
@@ -277,6 +318,7 @@ public class MCRCommandLineInterface
     {
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
+    session = new MCRSession();
 
     logger.info( "" );
     logger.info( "MyCoRe Command Line Interface. Type 'help' to get help!" );
@@ -452,6 +494,28 @@ public class MCRCommandLineInterface
     Process p = Runtime.getRuntime().exec( command );
     showOutput( p.getInputStream() );
     showOutput( p.getErrorStream() );
+    }
+
+ /**
+  * This command change the user of the session context to a new user.
+  * 
+  * @param newuser the new user ID
+  **/
+  public static void changeToUser( String user )
+    {
+    logger.info("The old user is "+session.getCurrentUserID());
+    String passwd = "";
+    do {
+      logger.info( "Enter the password for user "+user+" > " );
+      try{ passwd = console.readLine(); }catch( IOException ex ){}
+      }
+    while( ( passwd = passwd.trim() ).length() == 0 );
+    if (org.mycore.user.MCRUserMgr.instance().login(user,passwd)) {
+      session.setCurrentUserID(user); 
+      logger.info("The new user is "+session.getCurrentUserID());
+      }
+    else {
+      logger.error("The password was false, no changes of session context!"); }
     }
 
  /**

@@ -29,15 +29,13 @@ import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.*;
+import org.mycore.common.xml.*;
 import org.mycore.user.*;
 
 /**
@@ -46,638 +44,560 @@ import org.mycore.user.*;
  *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRUserCommands
 {
-  private static Logger logger =
-    Logger.getLogger(MCRUserCommands.class.getName());
+private static Logger logger =
+  Logger.getLogger(MCRUserCommands.class.getName());
+private static MCRConfiguration config = null;
 
- /**
-  * Initialize common data.
-  **/
-  private static void init()
-    {
-    MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
+/**
+ * Initialize common data.
+ **/
+private static void init()
+  {
+  config = MCRConfiguration.instance();
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  }
+
+/**
+ * The method initialized the user and group system an creat a
+ * superunser with the values of the mycore.properties. As 'super'
+ * default, if no properties was find, mcradmin with password mycore was 
+ * used.
+ *
+ * @param session the MCRSession object
+ **/
+public static void initSuperuser(MCRSession session) throws MCRException
+  {
+  init();
+  String suser = config.getString("MCR.users_superuser_username","mcradmin");
+  String spasswd = config.getString("MCR.users_superuser_userpasswd","mycore");
+  String sgroup = config.getString("MCR.users_superuser_groupname","mcrgroup");
+  String guser = config.getString("MCR.users_guestuser_username","gast");
+  String gpasswd = config.getString("MCR.users_guestuser_userpasswd","gast");
+  String ggroup = config.getString("MCR.users_guestuser_groupname","mcrgast");
+
+  try {
+    MCRUser testu = MCRUserMgr.instance().retrieveUser(suser);
+    MCRGroup testg = MCRUserMgr.instance().retrieveGroup(sgroup);
+    logger.info("The superuser already exist!");
+    return;
     }
+  catch (Exception e) { }
 
-  /**
-   * This method checks the data consistency of the user management and should be
-   * called after a system crash or after importing data from files, respectively.
-   */
-  public static void checkConsistency() throws Exception
-  { MCRUserMgr.instance().checkConsistency(); }
+  try {
+    MCRPrivilegeSet p = MCRPrivilegeSet.instance();
+    ArrayList privList = new ArrayList();
+    privList.add(new MCRPrivilege("create user",
+      "Users with this privilege may create new users."));
+    privList.add(new MCRPrivilege("create group",
+      "Users with this privilege may create new groups."));
+    privList.add(new MCRPrivilege("delete user",
+      "Users with this privilege may delete other users."));
+    privList.add(new MCRPrivilege("delete group",
+      "Users with this privilege may delete groups."));
+    privList.add(new MCRPrivilege("modify user",
+      "Users with this privilege may modify data of other users."));
+    privList.add(new MCRPrivilege("modify group",
+      "Users with this privilege may modify data of groups."));
+    privList.add(new MCRPrivilege("user administrator",
+      "Users with this privilege has administrator rights in the system."));
+    privList.add(new MCRPrivilege("list all users",
+      "Users with this privilege may list the users of the system."));
+    privList.add(new MCRPrivilege("create object in datastore",
+      "Users with this privilege may create objects (documents etc.)."));
+    p.loadPrivileges(privList);
+    }
+  catch (Exception e) {
+    throw new MCRException("Can't create the privileges.",e); }
+  logger.info("The privillege set is installed.");
 
-  /**
-   * This method creates user, group or privilege data from a file or from files in a
-   * directory. In contrast to the "import" mode (see importFromFile()) the group
-   * information is taken into account when creating users, i.e. the corresponding
-   * groups will be notified that they have a new user.
-   *
-   * @param filename
-   *   name of a file or directory containing user, group or privilege data in XML files
-   */
-  public static void createFromFile(String filename) throws Exception
-  { loadFromFile(filename, "create"); }
+  // the superuser group
+  try {
+    ArrayList admUserIDs = new ArrayList();
+    admUserIDs.add(suser);
+    ArrayList admGroupIDs = new ArrayList();
+    ArrayList mbrUserIDs = new ArrayList();
+    mbrUserIDs.add(suser);
+    ArrayList mbrGroupIDs = new ArrayList();
+    ArrayList groupIDs = new ArrayList();
+    ArrayList privileges= new ArrayList();
+    privileges.add("create user");
+    privileges.add("delete user");
+    privileges.add("modify user");
+    privileges.add("create group");
+    privileges.add("delete group");
+    privileges.add("modify group");
+    privileges.add("list all users");
+    privileges.add("user administrator");
+    privileges.add("create object in datastore");
+    MCRGroup g = new MCRGroup(sgroup,suser,null,null,"The superuser group",
+      admUserIDs,admGroupIDs,mbrUserIDs,mbrGroupIDs,groupIDs,privileges);
+    MCRUserMgr.instance().initializeGroup(g,suser);
+    }
+  catch (Exception e) {
+    throw new MCRException("Can't create the superuser group.",e); }
+  logger.info("The group "+sgroup+" is installed.");
 
-  /**
-   * This method invokes MCRUserMgr.deleteGroup() and permanently removes
-   * a group from the system.
-   *
-   * @param groupID the ID of the group which will be deleted
-   */
-  public static void deleteGroup(String groupID) throws Exception
-  {
-    init();
-    MCRUserMgr.instance().deleteGroup(groupID);
-    logger.info("Group ID " + groupID + " deleted!");
+  // the guest group
+  try {
+    ArrayList admUserIDs = new ArrayList();
+    admUserIDs.add(suser);
+    ArrayList admGroupIDs = new ArrayList();
+    admGroupIDs.add(sgroup);
+    ArrayList mbrUserIDs = new ArrayList();
+    mbrUserIDs.add(guser);
+    mbrUserIDs.add(suser);
+    ArrayList mbrGroupIDs = new ArrayList();
+    mbrGroupIDs.add(sgroup);
+    ArrayList groupIDs = new ArrayList();
+    ArrayList privileges= new ArrayList();
+    MCRGroup g = new MCRGroup(ggroup,suser,null,null,"The guest group",
+      admUserIDs,admGroupIDs,mbrUserIDs,mbrGroupIDs,groupIDs,privileges);
+    MCRUserMgr.instance().initializeGroup(g,suser);
+    }
+  catch (Exception e) {
+    throw new MCRException("Can't create the superuser group.",e); }
+  logger.info("The group "+ggroup+" is installed.");
+
+  // the superuser
+  try {
+    ArrayList groupIDs = new ArrayList();
+    groupIDs.add(sgroup);
+    groupIDs.add(ggroup);
+    MCRUser u = new MCRUser(1,suser,suser,null,null,true,false,"Superuser",
+      spasswd,sgroup,groupIDs,null,null,null,null,null,null,null,null,
+      null,null,null,null,null,null,null,null);
+    MCRUserMgr.instance().initializeUser(u,suser);
+    }
+  catch (Exception e) {
+    throw new MCRException("Can't create the superuser.",e); }
+  logger.info("The user "+suser+" with password "+spasswd+" is installed.");
+
+  // the guest
+  try {
+    ArrayList groupIDs = new ArrayList();
+    groupIDs.add(ggroup);
+    MCRUser u = new MCRUser(2,guser,suser,null,null,true,true,"guest",
+      gpasswd,ggroup,groupIDs,null,null,null,null,null,null,null,null,
+      null,null,null,null,null,null,null,null);
+    MCRUserMgr.instance().initializeUser(u,suser);
+    }
+  catch (Exception e) {
+    throw new MCRException("Can't create the guest.",e); }
+  logger.info("The user "+guser+" with password "+gpasswd+" is installed.");
+
+  // check all
+  session.setCurrentUserID(suser);
+  MCRUserMgr.instance().checkConsistency(session);
+  logger.info("");
   }
 
-  /**
-   * This method invokes MCRUserMgr.deleteUser() and permanently removes
-   * a user from the system.
-   *
-   * @param userID the ID of the user which will be deleted
-   */
-  public static void deleteUser(String userID) throws Exception
+/**
+ * This method checks the data consistency of the user management and should be
+ * called after a system crash or after importing data from files, respectively.
+ *
+ * @param session the MCRSession object
+ **/
+public static void checkConsistency(MCRSession session) throws Exception
+  { MCRUserMgr.instance().checkConsistency(session); }
+
+/**
+ * This method invokes MCRUserMgr.deleteGroup() and permanently removes
+ * a group from the system.
+ *
+ * @param session the MCRSession object
+ * @param groupID the ID of the group which will be deleted
+ **/
+public static void deleteGroup(MCRSession session, String groupID) throws Exception
   {
-    init();
-    MCRUserMgr.instance().deleteUser(userID);
-    logger.info("User ID " + userID + " deleted!");
+  init();
+  MCRUserMgr.instance().deleteGroup(session, groupID);
+  logger.info("Group ID " + groupID + " deleted!");
   }
 
-  /**
-   * This method invokes MCRUserMgr.getAllUserIDs() and retrieves a vector
-   * of all users stored in the persistent datastore.
-   */
-  public static void listAllUsers() throws Exception
+/**
+ * This method invokes MCRUserMgr.deleteUser() and permanently removes
+ * a user from the system.
+ *
+ * @param session the MCRSession object
+ * @param userID the ID of the user which will be deleted
+ **/
+public static void deleteUser(MCRSession session, String userID) throws Exception
   {
-    init();
-    Vector users = new Vector(MCRUserMgr.instance().getAllUserIDs());
-    logger.info("");
-    for (int i=0; i<users.size(); i++)
-      logger.info(users.elementAt(i));
+  init();
+  MCRUserMgr.instance().deleteUser(session,userID);
+  logger.info("User ID " + userID + " deleted!");
   }
 
-  /**
-   * This method invokes MCRUserMgr.getAllGroupIDs() and retrieves a vector
-   * of all groups stored in the persistent datastore.
-   */
-  public static void listAllGroups() throws Exception
+/**
+ * This method invokes MCRUserMgr.getAllUserIDs() and retrieves a ArrayList
+ * of all users stored in the persistent datastore.
+ *
+ * @param session the MCRSession object
+ **/
+public static void listAllUsers(MCRSession session) throws Exception
   {
-    init();
-    Vector groups = new Vector(MCRUserMgr.instance().getAllGroupIDs());
-    logger.info("");
-    for (int i=0; i<groups.size(); i++)
-      logger.info(groups.elementAt(i));
+  init();
+  ArrayList users = MCRUserMgr.instance().getAllUserIDs(session);
+  logger.info("");
+  for (int i=0; i<users.size(); i++) { logger.info((String)users.get(i)); }
   }
 
-  /**
-   * This method invokes MCRPrivilegeSet.getPrivileges() and retrieves a vector
-   * of all privileges stored in the persistent datastore.
-   */
-  public static void listAllPrivileges() throws Exception
+/**
+ * This method invokes MCRUserMgr.getAllGroupIDs() and retrieves a ArrayList
+ * of all groups stored in the persistent datastore.
+ *
+ * @param session the MCRSession object
+ **/
+public static void listAllGroups(MCRSession session) throws Exception
   {
+  init();
+  ArrayList groups = MCRUserMgr.instance().getAllGroupIDs(session);
+  logger.info("");
+  for (int i=0; i<groups.size(); i++) { logger.info((String)groups.get(i)); }
+  }
+
+/**
+ * This method invokes MCRPrivilegeSet.getPrivileges() and retrieves a ArrayList
+ * of all privileges stored in the persistent datastore.
+ **/
+public static void listAllPrivileges() throws MCRException
+  {
+  try {
     init();
-    Vector privs = new Vector(MCRPrivilegeSet.instance().getPrivileges());
+    ArrayList privs = MCRPrivilegeSet.instance().getPrivileges();
     logger.info("");
     for (int i=0; i<privs.size(); i++) {
-      MCRPrivilege currentPriv = (MCRPrivilege)privs.elementAt(i);
+      MCRPrivilege currentPriv = (MCRPrivilege)privs.get(i);
       logger.info(currentPriv.getName());
       logger.info("    "+currentPriv.getDescription());
+      }
     }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveAllGroupsToFile()",e); }
   }
 
-  /**
-   * Import data from a file or directory. Importing data from files is different from creating
-   * user or group objects from data files (see createFromFile()): If a user or group is "imported"
-   * the group information in the xml representation is not taken into account (since these data are
-   * redundant). The import mode is used when a recreation of a whole set of user management
-   * information is necessary, e.g. for a migration of data to another system.
-   *
-   * @param filename
-   *   name of a file or directory containing user, group or privilege data in XML files
-   */
-  public static void importFromFile(String filename) throws Exception
-  { loadFromFile(filename, "import"); }
-
-  /**
-   * This command takes a file name as a parameter, retrieves all groups from MCRUserMgr as JDOM
-   * document and saves this to the given file.
-   *
-   * @param filename Name of the file the groups will be saved to
-   */
-  public static void saveAllGroupsToFile(String filename) throws Exception
+/**
+ * This command takes a file name as a parameter, retrieves all groups from 
+ * MCRUserMgr as JDOM document and saves this to the given file.
+ *
+ * @param session the MCRSession object
+ * @param filename Name of the file the groups will be saved to
+ */
+public static void saveAllGroupsToFile(MCRSession session, String filename) 
+  throws MCRException
   {
-    Document jdomDoc = MCRUserMgr.instance().getAllGroups();
+  try {
+    org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups(session);
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
+    }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveAllGroupsToFile()",e); }
   }
 
-  /**
-   * This command takes a file name as a parameter, retrieves all privileges from MCRPrivilegeSet
-   * as JDOM document and saves this to the given file.
-   *
-   * @param filename Name of the file the privileges will be saved to
-   */
-  public static void saveAllPrivilegesToFile(String filename) throws Exception
+/**
+ * This command takes a file name as a parameter, retrieves all privileges 
+ * from MCRPrivilegeSet as JDOM document and saves this to the given file.
+ *
+ * @param filename Name of the file the privileges will be saved to
+ */
+public static void saveAllPrivilegesToFile(String filename)
+  throws MCRException
   {
-    Document jdomDoc = MCRPrivilegeSet.instance().toJDOMDocument();
+  try {
+    org.jdom.Document jdomDoc = MCRPrivilegeSet.instance().toJDOMDocument();
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
+    }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveAllPrivilegesToFile()",e); }
   }
 
-  /**
-   * This command takes a file name as a parameter, retrieves all users from MCRUserMgr as JDOM
-   * document and saves this to the given file.
-   *
-   * @param filename Name of the file the users will be saved to
-   */
-  public static void saveAllUsersToFile(String filename) throws Exception
+/**
+ * This command takes a file name as a parameter, retrieves all users from 
+ * MCRUserMgr as JDOM document and saves this to the given file.
+ *
+ * @param session the MCRSession object
+ * @param filename Name of the file the users will be saved to
+ */
+public static void saveAllUsersToFile(MCRSession session, String filename) 
+  throws MCRException
   {
-    Document jdomDoc = MCRUserMgr.instance().getAllUsers();
+  try {
+    org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers(session);
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
+    }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveAllUsersToFile()",e); }
   }
 
-  /**
-   * This command takes a groupID and file name as a parameter, retrieves the group from
-   * MCRUserMgr as JDOM document and saves this to the given file.
-   *
-   * @param groupID  ID of the group to be saved
-   * @param filename Name of the file the groups will be saved to
-   */
-  public static void saveGroupToFile(String groupID, String filename) throws Exception
+/**
+ * This command takes a groupID and file name as a parameter, retrieves the 
+ * group from MCRUserMgr as JDOM document and saves this to the given file.
+ *
+ * @param session the MCRSession object
+ * @param groupID  ID of the group to be saved
+ * @param filename Name of the file the groups will be saved to
+ */
+public static void saveGroupToFile(MCRSession session, String groupID, 
+  String filename) throws Exception
   {
-    MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
-    Document jdomDoc = group.toJDOMDocument();
+  try {
+    MCRGroup group = MCRUserMgr.instance().retrieveGroup(session,groupID);
+    org.jdom.Document jdomDoc = group.toJDOMDocument();
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
+    }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveGroupToFile()",e); }
   }
 
-  /**
-   * This command takes a userID and file name as a parameter, retrieves the user from
-   * MCRUserMgr as JDOM document and saves this to the given file.
-   *
-   * @param userID   ID of the user to be saved
-   * @param filename Name of the file the user will be saved to
-   */
-  public static void saveUserToFile(String userID, String filename) throws Exception
+/**
+ * This command takes a userID and file name as a parameter, retrieves the 
+ * user from MCRUserMgr as JDOM document and saves this to the given file.
+ *
+ * @param session the MCRSession object
+ * @param userID   ID of the user to be saved
+ * @param filename Name of the file the user will be saved to
+ */
+public static void saveUserToFile(MCRSession session, String userID, 
+  String filename) throws MCRException
   {
-    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-    Document jdomDoc = user.toJDOMDocument();
+  try {
+    MCRUser user = MCRUserMgr.instance().retrieveUser(session,userID);
+    org.jdom.Document jdomDoc = user.toJDOMDocument();
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
-  }
-
-  /**
-   * This method invokes MCRUserMgr.retrieveUser() and then works with the
-   * retrieved user object to change the password.
-   *
-   * @param userID the ID of the user for which the password will be set
-   */
-  public static void setPassword(String userID, String password) throws Exception
-  {
-    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-    user.setPassword(password);
-  }
-
-  /** This method sets the user management component to read only mode */
-  public static void setLock() throws Exception
-  {
-    init();
-    MCRUserMgr.instance().setLock(true);
-    logger.info("Write access to the user component persistent database now is denied.");
-  }
-
-  /**
-   * This method invokes MCRUserMgr.retrieveGroup() and then works with the
-   * retrieved group object to get an XML-Representation.
-   *
-   * @param groupID the ID of the group for which the XML-representation is needed
-   */
-  public static void showGroup(String groupID) throws Exception
-  {
-    MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID, true);
-    Document jdomDoc = group.toJDOMDocument();
-    showAsXML(jdomDoc);
-  }
-
-  /**
-   * This method invokes MCRUserMgr.retrieveUser() and then works with the
-   * retrieved user object to get an XML-Representation.
-   *
-   * @param userID the ID of the user for which the XML-representation is needed
-   */
-  public static void showUser(String userID) throws Exception
-  {
-    MCRUser user = MCRUserMgr.instance().retrieveUser(userID, true);
-    Document jdomDoc = user.toJDOMDocument();
-    showAsXML(jdomDoc);
-  }
-
-  /** This method sets the user management component to read/write access mode */
-  public static void unLock() throws Exception
-  {
-    init();
-    MCRUserMgr.instance().setLock(false);
-    logger.info("Write access to the user component persistent database now is allowed.");
-  }
-
-  /**
-   * update data from a file. This method calls loadFromFile().
-   *
-   * @param filename
-   *   name of a file or directory containing user or group information in XML files
-   */
-  public static void updateFromFile(String filename) throws Exception
-  { loadFromFile(filename, "update"); }
-
-  /**
-   * This method takes a filename or a directory as a parameter, determines whether the
-   * given file is a directory or data file. If it is a directory, loadFromXMLFile()
-   * is called for all files in the directory. If it is a file, loadFromXMLFile() is
-   * called directly for this file.
-   *
-   * @param filename
-   *   name of a file or directory containing user, group or privilege data in XML files
-   * @param todo
-   *   String value determining what to to (either "import", "create" or "update")
-   */
-  private static void loadFromFile(String filename, String todo) throws Exception
-  {
-    init();
-    String SLASH = new String((System.getProperties()).getProperty("file.separator"));
-    int fnLength;  // Length of the file name
-    File inFile = new File(filename);
-
-    logger.info("Creating|importing|updating user/group/privilege data "
-                      + " from file|directory: "+filename);
-
-    if (inFile.isDirectory())
-    {
-      String [] fileList = inFile.list();
-      if (fileList.length == 0)
-        logger.info("The given directory is empty!");
-
-      int xmlFileCounter = 0;
-      for (int i=0; i<fileList.length; i++)
-      {
-        fnLength = fileList[i].length();
-        if (fileList[i].substring(fnLength-4, fnLength).equals(".xml")) {
-          xmlFileCounter++;
-          String uri = filename+SLASH+fileList[i];
-          loadFromXMLFile(uri, todo);
-        }
-      }
-      if (xmlFileCounter == 0)
-        logger.info("The given directory contains no .xml file!");
-
-      return;  // All .xml-files in the given directory are read.
-    }  // No, the given parameter is *not* a directory...
-
-    if (inFile.isFile() && filename.substring(filename.length()-4, filename.length()).equals(".xml"))
-      loadFromXMLFile(filename, todo);
-    else logger.info("File not valid or not !");
-  }
-
-  /**
-   * This private method is invoked by loadFromFile(). It takes a filename (String) as a parameter
-   * and expects that this file is an XML file. The second parameter (String) determines if the user objects are
-   * "imported", "created" or "updated". The difference is the handling of the group information when creating
-   * resp. importing or updating users. This method parses the file and passes the jdom documents to other
-   * methods, depending on the type of the object to be created, i.e. users, groups or privileges.
-   *
-   * @param filename    name of the XML-file
-   * @param todo        String value "import", "create" or "update"
-   */
-  private static void loadFromXMLFile(String filename, String todo) throws Exception
-  {
-    init();
-    logger.info("Reading file : "+filename+"\n");
-    Document jdomDoc = null;
-    File inFile = new File(filename);
-
-    try {
-      org.jdom.input.SAXBuilder b = new org.jdom.input.SAXBuilder(false);
-      jdomDoc = b.build(inFile);
-      Element jdomRootElement = jdomDoc.getRootElement();
-      String type = (String)jdomRootElement.getAttributeValue("type").trim();
-
-      if (type.equals("user"))
-        loadUserFromXMLFile(jdomRootElement, todo);
-      else if (type.equals("group"))
-        loadGroupFromXMLFile(jdomRootElement, todo);
-      else if (type.equals("privilege"))
-        loadPrivilegeFromXMLFile(jdomRootElement);
-      else
-        logger.info("MCRUserCommands: unknown object type!");
     }
-    catch (Exception e) {
-      logger.info("Exception: "+e.getMessage());
-    }
+  catch (Exception e) {
+    throw new MCRException("Error while command saveUserToFile()",e); }
   }
 
-  /**
-   * This private method is invoked by loadFromXMLFile(). It takes a jdom element as a parameter. This
-   * element contains the information to import, create or update one or more users. The second parameter
-   * (String) determines if the user objects are "imported", "created" or "updated". The difference is the
-   * handling of the group information. If a user is "imported" the group information in the document
-   * is not taken into account (since typically groups are imported at the same time and the information
-   * is redundant).
-   *
-   * @param rootElement  the root element of the xml document read in in loadFromXMLFile()
-   * @param todo         String value "import", "create" or "update"
-   */
-  private static void loadUserFromXMLFile(Element rootElement, String todo) throws Exception
+/**
+ * This method invokes MCRUserMgr.retrieveUser() and then works with the
+ * retrieved user object to change the password.
+ *
+ * @param session the MCRSession object
+ * @param userID the ID of the user for which the password will be set
+ */
+public static void setPassword(MCRSession session,String userID, 
+  String password) throws MCRException
   {
-    init();
-    List userList  = rootElement.getChildren();
-    int iNumUsers  = userList.size();
-    logger.info("Number of users to create resp. update: "+iNumUsers);
-
-    for (int i=0; i<iNumUsers; i++) {
-      Element userElement = (Element)userList.get(i);
-      Element userContactElement = userElement.getChild("user.contact");
-      Element userGroupElement = userElement.getChild("user.groups");
-      List groupIDList = userGroupElement.getChildren();
-      Vector groups = null;  // this is for the "import" case
-
-      if ((todo.equals("create")) || (todo.equals("update"))) {
-        groups = new Vector();
-        for (int j=0; j<groupIDList.size(); j++) {
-          Element groupID = (Element)groupIDList.get(j);
-          if (!((String)groupID.getTextTrim()).equals(""))
-            groups.add((String)groupID.getTextTrim());
-        }
-      }
-
-      boolean idEnabled = (userElement.getAttributeValue("id_enabled").equals("true")) ? true : false;
-      boolean updateAllowed = (userElement.getAttributeValue("update_allowed").equals("true")) ? true : false;
-
-      String salutation = (userContactElement.getChildTextTrim("contact.salutation") != null)
-        ? userContactElement.getChildTextTrim("contact.salutation") : "";
-      String firstname = (userContactElement.getChildTextTrim("contact.firstname") != null)
-        ? userContactElement.getChildTextTrim("contact.firstname") : "";
-      String lastname = (userContactElement.getChildTextTrim("contact.lastname") != null)
-        ? userContactElement.getChildTextTrim("contact.lastname") : "";
-      String street = (userContactElement.getChildTextTrim("contact.street") != null)
-        ? userContactElement.getChildTextTrim("contact.street") : "";
-      String city = (userContactElement.getChildTextTrim("contact.city") != null)
-        ? userContactElement.getChildTextTrim("contact.city") : "";
-      String postalcode = (userContactElement.getChildTextTrim("contact.postalcode") != null)
-        ? userContactElement.getChildTextTrim("contact.postalcode") : "";
-      String country = (userContactElement.getChildTextTrim("contact.country") != null)
-        ? userContactElement.getChildTextTrim("contact.country") : "";
-      String institution = (userContactElement.getChildTextTrim("contact.institution") != null)
-        ? userContactElement.getChildTextTrim("contact.institution") : "";
-      String faculty = (userContactElement.getChildTextTrim("contact.faculty") != null)
-        ? userContactElement.getChildTextTrim("contact.faculty") : "";
-      String department = (userContactElement.getChildTextTrim("contact.department") != null)
-        ? userContactElement.getChildTextTrim("contact.department") : "";
-      String institute = (userContactElement.getChildTextTrim("contact.institute") != null)
-        ? userContactElement.getChildTextTrim("contact.institute") : "";
-      String telephone = (userContactElement.getChildTextTrim("contact.telephone") != null)
-        ? userContactElement.getChildTextTrim("contact.telephone") : "";
-      String fax = (userContactElement.getChildTextTrim("contact.fax") != null)
-        ? userContactElement.getChildTextTrim("contact.fax") : "";
-      String email = (userContactElement.getChildTextTrim("contact.email") != null)
-        ? userContactElement.getChildTextTrim("contact.email") : "";
-      String cellphone = (userContactElement.getChildTextTrim("contact.cellphone") != null)
-        ? userContactElement.getChildTextTrim("contact.cellphone") : "";
-
-      if ((todo.equals("import")) || (todo.equals("create")))
-      {
-        Timestamp creationDate = null;
-        String date = (String)userElement.getChildTextTrim("user.creation_date");
-        if (date.length() > 0)
-          creationDate = Timestamp.valueOf(date);
-        else creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-
-        Timestamp modifiedDate = null;
-        date = (String)userElement.getChildTextTrim("user.last_modified");
-        if (date.length() > 0)
-          modifiedDate = Timestamp.valueOf(date);
-        else modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-
-        MCRUser newUser = new MCRUser(
-          Integer.parseInt((String)userElement.getAttributeValue("numID")),
-          userElement.getAttributeValue("ID"),
-          idEnabled, updateAllowed,
-          userElement.getChildTextTrim("user.creator"),
-          creationDate, modifiedDate,
-          userElement.getChildTextTrim("user.description"),
-          userElement.getChildTextTrim("user.password"),
-          salutation, firstname, lastname, street, city, postalcode, country,
-          institution, faculty, department, institute, telephone, fax, email, cellphone,
-          userElement.getChildTextTrim("user.primary_group"),
-          groups, "create");
-      }
-      else { // the "update" case
-        String userID = (String)userElement.getAttributeValue("ID");
-        MCRUser updUser = MCRUserMgr.instance().retrieveUser(userID, true);
-        updUser.update(
-          idEnabled, updateAllowed,
-          userElement.getChildTextTrim("user.description"),
-          userElement.getChildTextTrim("user.password"),
-          salutation, firstname, lastname, street, city, postalcode, country,
-          institution, faculty, department, institute, telephone, fax,
-          email, cellphone,
-          userElement.getChildTextTrim("user.primary_group"),
-          groups, "update");
-      }
-    } // end for
-    logger.info("All users created resp. updated.");
+  if (password == null) return;
+  init();
+  MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
+  user.setPassword(password);
+  MCRUserMgr.instance().updateUser(session,user);
+  logger.info("The new password was set.");
   }
 
-  /**
-   * This private method is invoked by loadFromXMLFile(). It takes a jdom element as a parameter. This
-   * element contains the information to import, create or update one or more groups. The second parameter
-   * (String) determines if the group objects are "imported", "created" or "updated". The difference is the
-   * handling of the group information. If a group is "imported" the information determining in which other
-   * group the current group is a member of is not taken into account since this is redundant information
-   * (the other groups know which members they have).
-   *
-   * @param rootElement  the root element of the xml document read in in loadFromXMLFile()
-   * @param todo         String value "import", "create" or "update"
-   */
-  private static void loadGroupFromXMLFile(Element rootElement, String todo) throws Exception
+/** 
+ *This method sets the user management component to read only mode
+ *
+ * @param session the MCRSession object
+ */
+public static void setLock(MCRSession session) throws MCRException
   {
-    init();
-    boolean create = false;
-    List groupList = rootElement.getChildren();
-    int iNumGroups = groupList.size();
-    logger.info("Number of groups to create resp. update: "+iNumGroups);
+  init();
+  MCRUserMgr.instance().setLock(session,true);
+  logger.info("Write access to the user component persistent database now is"+
+    " denied.");
+  }
 
-    for (int i=0; i<iNumGroups; i++) { // Loop over all groups in the xml file
-      Vector groups  = null;
-      Vector users   = null;
-      Vector memberGroups = null;
-      Vector adminUsers = null;
-      Vector adminGroups = null;
-      Vector privileges = null;
+/** 
+ * This method sets the user management component to read/write access mode
+ *
+ * @param session the MCRSession object
+ */
+public static void unLock(MCRSession session) throws MCRException
+  {
+  init();
+  MCRUserMgr.instance().setLock(session,false);
+  logger.info("Write access to the user component persistent database now is"+
+    " allowed.");
+  }
 
-      Element groupElement   = (Element)groupList.get(i);
-      Element adminsElement  = groupElement.getChild("group.admins");
-      Element membersElement = groupElement.getChild("group.members");
-      Element groupsElement  = groupElement.getChild("group.groups");
-      Element privsElement   = groupElement.getChild("group.privileges");
+/**
+ * This method invokes MCRUserMgr.retrieveGroup() and then works with the
+ * retrieved group object to get an XML-Representation.
+ *
+ * @param session the MCRSession object
+ * @param groupID the ID of the group for which the XML-representation is needed
+ */
+public static final void showGroup(MCRSession session,String groupID) 
+  throws MCRException
+  {
+  MCRGroup group = MCRUserMgr.instance().retrieveGroup(session,groupID, true);
+  org.jdom.Document jdomDoc = group.toJDOMDocument();
+  showAsXML(jdomDoc);
+  }
 
-      List admUserIDList = adminsElement.getChildren("admins.userID");
-      if (admUserIDList.size() > 0) {
-        adminUsers = new Vector();
-        for (int j=0; j<admUserIDList.size(); j++) {
-          Element admUserIDElement = (Element)admUserIDList.get(j);
-          if (!((String)admUserIDElement.getTextTrim()).equals(""))
-            adminUsers.add((String)admUserIDElement.getTextTrim());
-        }
-      }
+/**
+ * This method invokes MCRUserMgr.retrieveUser() and then works with the
+ * retrieved user object to get an XML-Representation.
+ *
+ * @param session the MCRSession object
+ * @param userID the ID of the user for which the XML-representation is needed
+ */
+public static final void showUser(MCRSession session, String userID) 
+  throws MCRException
+  {
+  MCRUser user = MCRUserMgr.instance().retrieveUser(session,userID, true);
+  org.jdom.Document jdomDoc = user.toJDOMDocument();
+  showAsXML(jdomDoc);
+  }
 
-      List admGroupIDList = adminsElement.getChildren("admins.groupID");
-      if (admGroupIDList.size() > 0) {
-        adminGroups = new Vector();
-        for (int j=0; j<admGroupIDList.size(); j++) {
-          Element admGroupIDElement = (Element)admGroupIDList.get(j);
-          if (!((String)admGroupIDElement.getTextTrim()).equals(""))
-            adminGroups.add((String)admGroupIDElement.getTextTrim());
-        }
-      }
+/**
+ * Check the file name
+ * @param filename the filename of the user data input
+ * @return true if the file name is okay
+ **/
+private static final boolean checkFilename(String filename)
+  {
+  init();
+  if( ! filename.endsWith( ".xml" ) ) {
+    logger.warn( filename + " ignored, does not end with *.xml" ); 
+    return false; }
+  if( ! new File( filename ).isFile() ) {
+    logger.warn( filename + " ignored, is not a file." ); 
+    return false;}
+  return true;
+  }
 
-      List userIDList = membersElement.getChildren("members.userID");
-      if (userIDList.size() > 0) {
-        users = new Vector();
-        for (int j=0; j<userIDList.size(); j++) {
-          Element userIDElement = (Element)userIDList.get(j);
-          if (!((String)userIDElement.getTextTrim()).equals(""))
-            users.add((String)userIDElement.getTextTrim());
-        }
-      }
-
-      List memberGroupIDList = membersElement.getChildren("members.groupID");
-      if (memberGroupIDList.size() > 0) {
-        memberGroups = new Vector();
-        for (int j=0; j<memberGroupIDList.size(); j++) {
-          Element memberGroupID = (Element)memberGroupIDList.get(j);
-          if (!((String)memberGroupID.getTextTrim()).equals(""))
-            memberGroups.add((String)memberGroupID.getTextTrim());
-        }
-      }
-
-      List privsList = privsElement.getChildren("privileges.privilege");
-      if (privsList.size() > 0) {
-        privileges = new Vector();
-        for (int j=0; j<privsList.size(); j++) {
-          Element privilege = (Element)privsList.get(j);
-          if (!((String)privilege.getTextTrim()).equals(""))
-            privileges.add((String)privilege.getTextTrim());
-        }
-      }
-
-      List groupIDList = groupsElement.getChildren();
-      if (todo.equals("import")) {
-        groups = null;
-      }
-      else if ((todo.equals("create")) || (todo.equals("update"))) {
-        groups = new Vector();
-        for (int j=0; j<groupIDList.size(); j++) {
-          Element groupID = (Element)groupIDList.get(j);
-          if (!((String)groupID.getTextTrim()).equals(""))
-            groups.add((String)groupID.getTextTrim());
-        }
-      }
-
-      if (todo.equals("create"))
-        create = true;
-      else create = false;
-
-      if ((todo.equals("import")) || (todo.equals("create")))
-      {
-        Timestamp creationDate = null;
-        String date = (String)groupElement.getChildTextTrim("group.creation_date");
-        if (date.length() > 0)
-          creationDate = Timestamp.valueOf(date);
-        else creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-
-        Timestamp modifiedDate = null;
-        date = (String)groupElement.getChildTextTrim("group.last_modified");
-        if (date.length() > 0)
-          modifiedDate = Timestamp.valueOf(date);
-        else modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-
-        MCRGroup newGroup = new MCRGroup(
-          groupElement.getAttributeValue("ID"),
-          groupElement.getChildTextTrim("group.creator"),
-          creationDate, modifiedDate, groupElement.getChildTextTrim("group.description"),
-          adminUsers, adminGroups, users, memberGroups, groups, privileges, create, "create");
-      }
-      else { // the "update" case
-        String groupID = (String)groupElement.getAttributeValue("ID");
-        MCRGroup updGroup = MCRUserMgr.instance().retrieveGroup(groupID, true);
-        updGroup.update(
-          groupElement.getChildTextTrim("group.description"),
-          adminUsers, adminGroups, users, memberGroups, groups, privileges, "update");
+/**
+ * This method invokes MCRUserMgr.createUser() with data from a file.
+ * @param session the MCRSession object
+ * @param filename the filename of the user data input
+ **/
+public static final void createUserFromFile(MCRSession session,String filename)
+  {
+  init();
+  if (!checkFilename(filename)) return;
+  logger.info( "Reading file " + filename + " ..." );
+  try {
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Element rootelm = doc.getRootElement();
+    if (!rootelm.getAttribute("type").getValue().equals("user")) {
+      throw new MCRException("The data are not for user."); }
+    List listelm = rootelm.getChildren();
+    for (int i=0;i<listelm.size();i++) {
+      MCRUser u = new MCRUser((org.jdom.Element)listelm.get(i));
+      MCRUserMgr.instance().createUser(session,u);
       }
     }
-    logger.info("All groups created resp. updated.");
+  catch (Exception e) {
+    throw new MCRException("Error while loading user data.",e); }
   }
 
-  /**
-   * This private method is invoked by loadFromXMLFile(). It takes a jdom element as a parameter. This
-   * element contains the information to import or create one or more privileges.
-   *
-   * @param rootElement  the root element of the xml document read in in loadFromXMLFile()
-   */
-  private static void loadPrivilegeFromXMLFile(Element rootElement) throws Exception
+/**
+ * This method invokes MCRUserMgr.createGroup() with data from a file.
+ * @param session the MCRSession object
+ * @param filename the filename of the user data input
+ **/
+public static final void createGroupFromFile(MCRSession session,String filename)
   {
-    init();
-    List privList = rootElement.getChildren();
-    int iNumPrivs = privList.size();
-    Vector privileges = new Vector();
-    logger.info("Number of privileges to create resp. update: "+iNumPrivs);
-
-    for (int i=0; i<iNumPrivs; i++) {
-      Element privElement = (Element)privList.get(i);
-
-      MCRPrivilege priv = new MCRPrivilege(
-        (String)privElement.getAttributeValue("name"),
-        privElement.getChildTextTrim("privilege.description"));
-
-      privileges.add(priv);
+  init();
+  if (!checkFilename(filename)) return;
+  logger.info( "Reading file " + filename + " ..." );
+  try {
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Element rootelm = doc.getRootElement();
+    if (!rootelm.getAttribute("type").getValue().equals("group")) {
+      throw new MCRException("The data are not for group."); }
+    List listelm = rootelm.getChildren();
+    for (int i=0;i<listelm.size();i++) {
+      MCRGroup g = new MCRGroup((org.jdom.Element)listelm.get(i));
+      MCRUserMgr.instance().createGroup(session,g);
+      }
     }
-    MCRPrivilegeSet.instance().loadPrivileges(privileges);
-    logger.info("All privileges created resp. updated.");
+  catch (Exception e) {
+    throw new MCRException("Error while loading group data.",e); }
   }
 
-  /**
-   * This method just prints a pretty XML output to System.out.
-   * @param jdomDoc  the JDOM XML document to be printed
-   */
-  private static final void showAsXML(Document jdomDoc)
+/**
+ * This method invokes MCRUserMgr.updateUser() with data from a file.
+ * @param session the MCRSession object
+ * @param filename the filename of the user data input
+ **/
+public static final void updateUserFromFile(MCRSession session,String filename)
   {
-    XMLOutputter outputter = new XMLOutputter("  ", true);
-    try {
-      outputter.output(jdomDoc, System.out);
+  init();
+  if (!checkFilename(filename)) return;
+  logger.info( "Reading file " + filename + " ..." );
+  try {
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Element rootelm = doc.getRootElement();
+    if (!rootelm.getAttribute("type").getValue().equals("user")) {
+      throw new MCRException("The data are not for user."); }
+    List listelm = rootelm.getChildren();
+    for (int i=0;i<listelm.size();i++) {
+      MCRUser u = new MCRUser((org.jdom.Element)listelm.get(i));
+      MCRUserMgr.instance().updateUser(session,u);
+      }
     }
-    catch (IOException e) {
-      System.err.println(e);
-    }
+  catch (Exception e) {
+    throw new MCRException(e.getMessage()); }
   }
 
-  /**
-   * This method just saves a JDOM document to a file
-   * @param jdomDoc  the JDOM XML document to be printed
-   * @param outFile  a FileWriter object for the output
-   */
-  private static final void saveToXMLFile(Document jdomDoc, FileWriter outFile)
+/**
+ * This method invokes MCRUserMgr.updateGroup() with data from a file.
+ * @param session the MCRSession object
+ * @param filename the filename of the user data input
+ **/
+public static final void updateGroupFromFile(MCRSession session,String filename)
   {
-    XMLOutputter outputter = new XMLOutputter("  ", true);
-    try {
-      outputter.output(jdomDoc, outFile);
+  init();
+  if (!checkFilename(filename)) return;
+  logger.info( "Reading file " + filename + " ..." );
+  try {
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename));
+    org.jdom.Element rootelm = doc.getRootElement();
+    if (!rootelm.getAttribute("type").getValue().equals("group")) {
+      throw new MCRException("The data are not for group."); }
+    List listelm = rootelm.getChildren();
+    for (int i=0;i<listelm.size();i++) {
+      MCRGroup g = new MCRGroup((org.jdom.Element)listelm.get(i));
+      MCRUserMgr.instance().updateGroup(session,g);
+      }
     }
-    catch (IOException e) {
-      System.err.println(e);
-    }
+  catch (Exception e) {
+    throw new MCRException(e.getMessage()); }
+  }
+
+/**
+ * This method just prints a pretty XML output to System.out.
+ * @param jdomDoc  the JDOM XML document to be printed
+ **/
+private static final void showAsXML(org.jdom.Document jdomDoc)
+  {
+  org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter("  ", true);
+  try { outputter.output(jdomDoc, System.out); }
+  catch (Exception e) {
+    throw new MCRException("Error while show XML to file."); }
+  }
+
+/**
+ * This method just saves a JDOM document to a file
+ * @param jdomDoc  the JDOM XML document to be printed
+ * @param outFile  a FileWriter object for the output
+ */
+private static final void saveToXMLFile(org.jdom.Document jdomDoc, 
+  FileWriter outFile)
+  {
+  org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter("  ", true);
+  try { outputter.output(jdomDoc, outFile); }
+  catch (Exception e) { 
+    throw new MCRException("Error while save XML to file."); }
   }
 }
 

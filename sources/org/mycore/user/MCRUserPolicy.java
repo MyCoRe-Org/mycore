@@ -24,7 +24,7 @@
 
 package org.mycore.user;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * This class defines the policies of the MyCoRe user and group objects such as
@@ -36,33 +36,27 @@ import java.util.Vector;
  */
 public class MCRUserPolicy
 {
-  /** Vector with Strings indicating required user fields */
-  private Vector reqUserAttributes = null;
+  /** ArrayList with Strings indicating required user fields */
+  private ArrayList reqUserAttributes = null;
 
-  /** Vector with Strings indicating required group fields */
-  private Vector reqGroupAttributes = null;
+  /** ArrayList with Strings indicating required group fields */
+  private ArrayList reqGroupAttributes = null;
 
   /** The one and only instance of this class */
   private static MCRUserPolicy theInstance = null;
 
   /** private constructor to create the singleton instance. */
-  private MCRUserPolicy() throws Exception
+  private MCRUserPolicy()
   {
     // For the moment this is hard coded but this will change soon....
-    reqUserAttributes = new Vector();
+    reqUserAttributes = new ArrayList();
     reqUserAttributes.add("numID");
     reqUserAttributes.add("userID");
     reqUserAttributes.add("password");
     reqUserAttributes.add("creator");
-    //reqUserAttributes.add("description");
-    reqUserAttributes.add("salutation");
-    reqUserAttributes.add("firstname");
-    reqUserAttributes.add("lastname");
-    reqUserAttributes.add("telephone");
-    reqUserAttributes.add("email");
     reqUserAttributes.add("primary_group");
 
-    reqGroupAttributes = new Vector();
+    reqGroupAttributes = new ArrayList();
     reqGroupAttributes.add("groupID");
     reqGroupAttributes.add("creator");
   }
@@ -74,7 +68,7 @@ public class MCRUserPolicy
    * @return
    *   returns the one and only instance of <CODE>MCRUserPolicy</CODE>
    */
-  public final static synchronized MCRUserPolicy instance() throws Exception
+  public final static synchronized MCRUserPolicy instance()
   {
     if (theInstance == null)
       theInstance = new MCRUserPolicy();
@@ -99,18 +93,18 @@ public class MCRUserPolicy
 
   /**
    * @return
-   *   This method returns a vector of strings with the names of required
+   *   This method returns a ArrayList of strings with the names of required
    *   user attributes.
    */
-  public Vector getRequiredUserAttributes()
+  public ArrayList getRequiredUserAttributes()
   { return reqUserAttributes; }
 
   /**
    * @return
-   *   This method returns a vector of strings with the names of required
+   *   This method returns a ArrayList of strings with the names of required
    *   group attributes.
    */
-  public Vector getRequiredGroupAttributes()
+  public ArrayList getRequiredGroupAttributes()
   { return reqGroupAttributes; }
 }
 

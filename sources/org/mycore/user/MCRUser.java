@@ -27,10 +27,10 @@ package org.mycore.user;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.ListIterator;
-import org.jdom.Document;
-import org.jdom.Element;
+
 import org.mycore.common.*;
 
 /**
@@ -38,127 +38,181 @@ import org.mycore.common.*;
  *
  * @see org.mycore.user.MCRUserMgr
  *
+ * @see org.mycore.user.MCRUserObject
+ * @see org.mycore.user.MCRUserContact
+ * @see org.mycore.user.MCRUserMgr
+ *
  * @author Detlev Degenhardt
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRUser extends MCRUserObject
 {
-  /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
-  private int numID = -1;
+/** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
+private int numID = -1;
 
-  /** Specify whether the user ID is enabled or disabled */
-  private boolean idEnabled = false;
+/** Specify whether the user ID is enabled or disabled */
+private boolean idEnabled = false;
 
-  /** Specify whether the user is allowed to update the user object */
-  private boolean updateAllowed = false;
+/** Specify whether the user is allowed to update the user object */
+private boolean updateAllowed = false;
 
-  /** The password of the MyCoRe user */
-  private String passwd = "";
+/** The password of the MyCoRe user */
+private String passwd = "";
 
-  /** The primary group ID of the user */
-  private String primaryGroupID = "";
+/** The primary group ID of the user */
+private String primaryGroupID = "";
 
-  /** Object representing user address information */
-  private MCRUserContact userContact;
+/** Object representing user address information */
+private MCRUserContact userContact;
 
-  /**
-   * Default constructor. It is used to create a user object with empty fields. This is
-   * useful for constructing an XML representation of a user without specialized data
-   * which is used e.g. by MCRCreateUserServlet just to get an XML-representation. The
-   * XML representation is the used by the XSLT-Stylesheet to create HTML output for
-   * the servlet. This empty user object will not be created in the persistent data store.
-   */
-  public MCRUser() throws Exception
+/**
+ * Default constructor. It is used to create a user object with empty fields. 
+ * This is useful for constructing an XML representation of a user without 
+ * specialized data which is used e.g. by MCRCreateUserServlet just to get an 
+ * XML-representation. The XML representation is the used by the 
+ * XSLT-Stylesheet to create HTML output for the servlet. This empty user 
+ * object will not be created in the persistent data store.
+ */
+public MCRUser()
   {
-    this(-1, "", false, false, "", null, null, "", "", "", "", "", "", "", "", "", "",
-         "", "", "", "", "", "", "", "", null, "");
+  super();
+  numID = -1;
+  idEnabled = false;
+  updateAllowed = false;
+  passwd = "";
+  primaryGroupID = "";
+  userContact = new MCRUserContact();
   }
 
-  /**
-   * This constructor takes all attributes of this class as single variables.
-   *
-   * @param numID            (int) the numerical user ID
-   * @param ID               the named user ID
-   * @param idEnabled        (boolean) specifies whether the account is disabled or enabled
-   * @param updateAllowed    (boolean) specifies whether the user may update his or her data
-   * @param creator          the user ID who created this user
-   * @param creationDate     timestamp of the creation of this user, if null the current date will be used
-   * @param modifiedDate     timestamp of the last modification of this user
-   * @param description      description of the user
-   * @param passwd           password of the user
-   * @param salutation       how to address the user, e.g. Mr. or Prof. Dr. ...
-   * @param firstname        the first name (or given name) of the user
-   * @param lastname         the last name (or surname) of the user
-   * @param street           contact information
-   * @param city             contact information
-   * @param postalcode       contact information
-   * @param country          contact information
-   * @param institution      contact information
-   * @param faculty          contact information
-   * @param department       contact information
-   * @param institute        contact information
-   * @param telephone        telephone number
-   * @param fax              fax number
-   * @param email            email address
-   * @param cellphone        number of cellular phone, if available
-   * @param primaryGroupID   the ID of the primary group of the user
-   * @param groupIDs         a Vector of groups (IDs) the user belongs to
-   * @param todoInMgr        String value which specifies whether the MCRUserMgr must be notified
-   *                         about the construction of this object. Values may be "" (no action)
-   *                         and "create" (create new user).
-   */
-  public MCRUser(int numID, String ID, boolean idEnabled, boolean updateAllowed, String creator,
-                 Timestamp creationDate, Timestamp modifiedDate, String description, String passwd,
-                 String salutation, String firstname, String lastname, String street, String city,
-                 String postalcode, String country, String institution, String faculty,
-                 String department, String institute, String telephone, String fax, String email,
-                 String cellphone, String primaryGroupID, Vector groupIDs,
-                 String todoInMgr) throws MCRException, Exception
+/**
+ * This constructor takes all attributes of this class as single variables.
+ *
+ * @param numID            (int) the numerical user ID
+ * @param ID               the named user ID
+ * @creator                the creator name
+ * @creationDate           the timestamp of creation
+ * @modifiedDate           the timestamp of modification
+ * @param idEnabled        (boolean) specifies whether the account is disabled or enabled
+ * @param updateAllowed    (boolean) specifies whether the user may update his or her data
+ * @param description      description of the user
+ * @param passwd           password of the user
+ * @param primaryGroupID   the ID of the primary group of the user
+ * @param groupIDs         a ArrayList of groups (IDs) the user belongs to
+ * @param salutation       contact information
+ * @param firstname        contact information
+ * @param lastname         contact information
+ * @param street           contact information
+ * @param city             contact information
+ * @param postalcode       contact information
+ * @param country          contact information
+ * @param state            contact information
+ * @param institution      contact information
+ * @param faculty          contact information
+ * @param department       contact information
+ * @param institute        contact information
+ * @param telephone        telephone number
+ * @param fax              fax number
+ * @param email            email address
+ * @param cellphone        number of cellular phone, if available
+ */
+public MCRUser(int numID, String ID, String creator, Timestamp creationDate,
+  Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed, 
+  String description, String passwd, String primaryGroupID, ArrayList groupIDs,
+  String salutation, String firstname, String lastname, String street, 
+  String city, String postalcode, String country, String state, 
+  String institution, String faculty, String department, String institute, 
+  String telephone, String fax, String email, String cellphone) 
+  throws MCRException, Exception
   {
-    // The following data will never be changed, thus it must not be passed to the following
-    // update method...
+  // The following data will never be changed by update
+  super.ID      = trim(ID);
+  this.numID    = numID;
+  super.creator = trim(creator);
+  // check if the creation timestamp is provided. If not, use current timestamp
+  if (creationDate == null) {
+    super.creationDate = new Timestamp(new GregorianCalendar().getTime()
+      .getTime()); }
+  else {
+    super.creationDate = creationDate; }
+  if (modifiedDate == null) {
+    super.modifiedDate = new Timestamp(new GregorianCalendar().getTime()
+      .getTime()); }
+  else {
+    super.modifiedDate = modifiedDate; }
+  this.idEnabled = idEnabled;
+  this.updateAllowed = updateAllowed;
+  super.description = trim(description);
+  this.passwd = trim(passwd);
+  this.primaryGroupID = trim(primaryGroupID);
+  super.groupIDs = groupIDs;
+  userContact = new MCRUserContact(salutation,firstname,lastname,
+    street, city,postalcode,country,state,institution,faculty,department,
+    institute,telephone,fax,email,cellphone);
+  }
 
-    super.ID      = trim(ID);
-    super.creator = trim(creator);
-    this.numID    = numID;
-
-    // check if the creation timestamp is provided. If not, use current date and time
-    if (creationDate == null)
-      super.creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-    else super.creationDate = creationDate;
-
-    // use the update method to populate the remaining attributes
-    update(idEnabled, updateAllowed, description, passwd, salutation, firstname, lastname,
-           street, city, postalcode, country, institution, faculty, department, institute,
-           telephone, fax, email, cellphone, primaryGroupID, groupIDs, "");
-
-    // The timestamp of the last changes has been set to the current date and time in update().
-    // If this is not wanted (i.e. if the parameter lastChanges is not null), it will be reset here:
-
-    if (modifiedDate != null)
-      super.modifiedDate = modifiedDate;
-
-    // Eventually notify the User Manager and create a new user object in the datastore,
-    // but only if this object is valid, i.e. all required fields are provided
-
-    if (todoInMgr.trim().equals("create")) {
-      if (isValid())
-        MCRUserMgr.instance().createUser(this);
-      else throw new MCRException("User object "+ID+" is not valid! Attributes are missing.");
+/**
+ * This constructor create the data of this class from an JDOM Element.
+ *
+ * @param the JDOM Element
+ **/
+public MCRUser(org.jdom.Element elm)
+  {
+  this();
+  if (!elm.getName().equals("user")) { return; }
+  super.ID = ((String)elm.getAttributeValue("ID")).trim();
+  String numIDtmp = ((String)elm.getAttributeValue("numID")).trim();
+  try {
+    this.numID = Integer.parseInt(numIDtmp); }
+  catch (Exception e) {
+    this.numID = -1; }
+  this.idEnabled = 
+    (elm.getAttributeValue("id_enabled").equals("true")) ? true : false;
+  this.updateAllowed = 
+    (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
+  String tmp = elm.getChildTextTrim("user.creator");
+  if (tmp != null) { this.creator = tmp; }
+  tmp = elm.getChildTextTrim("user.password");
+  if (tmp != null) { this.passwd = tmp; }
+  tmp = elm.getChildTextTrim("user.creation_date");
+  if (tmp != null) {
+    try {
+      super.creationDate = Timestamp.valueOf(tmp); }
+    catch (Exception e) { }
+    }
+  tmp = elm.getChildTextTrim("user.last_modified");
+  if (tmp != null) {
+    try {
+      super.modifiedDate = Timestamp.valueOf(tmp); }
+    catch (Exception e) { }
+    }
+  tmp = elm.getChildTextTrim("user.description");
+  if (tmp != null) { this.description = tmp; }
+  tmp = elm.getChildTextTrim("user.primary_group");
+  if (tmp != null) { this.primaryGroupID = tmp; }
+  org.jdom.Element userContactElement = elm.getChild("user.contact");
+  org.jdom.Element userGroupElement = elm.getChild("user.groups");
+  if (userGroupElement != null) {
+    List groupIDList = userGroupElement.getChildren();
+    for (int j=0; j<groupIDList.size(); j++) {
+      org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
+      if (!((String)groupID.getTextTrim()).equals("")) {
+        groupIDs.add((String)groupID.getTextTrim()); }
+      }
     }
   }
 
-  /**
-   * @return
-   *   This method returns the address object of the user
-   */
-  public MCRUserContact getContactInfo()
+/**
+ * @return
+ *   This method returns the address object of the user
+ */
+public MCRUserContact getUserContact()
   { return userContact; }
 
-  /**
-   * @return  This method returns the numerical ID of the user object.
-   */
-  public int getNumID()
+/**
+ * @return  This method returns the numerical ID of the user object.
+ */
+public int getNumID()
   { return numID; }
 
   /**
@@ -183,7 +237,7 @@ public class MCRUser extends MCRUserObject
    *   returns true if the given privilege is in one of the list of privileges
    *   of one of the groups
    */
-  public boolean hasPrivilege(String privilege) throws Exception
+  public boolean hasPrivilege(String privilege) 
   {
     ListIterator groupIter = groupIDs.listIterator();
     while (groupIter.hasNext()) {
@@ -193,13 +247,6 @@ public class MCRUser extends MCRUserObject
     }
     return false;
   }
-
-  /**
-   * @return
-   *   This method returns true if the user is member of the administrators group.
-   */
-  public boolean isAdmin()
-  { return (groupIDs.contains("administrators")) ? true : false; }
 
   /**
    * @return
@@ -225,7 +272,8 @@ public class MCRUser extends MCRUserObject
    */
   public boolean isValid() throws Exception
   {
-    Vector requiredUserAttributes = MCRUserPolicy.instance().getRequiredUserAttributes();
+    ArrayList requiredUserAttributes = 
+      MCRUserPolicy.instance().getRequiredUserAttributes();
     boolean test = true;
 
     if (requiredUserAttributes.contains("userID"))
@@ -236,181 +284,118 @@ public class MCRUser extends MCRUserObject
       test = test && this.passwd.length() > 0;
     if (requiredUserAttributes.contains("creator"))
       test = test && super.creator.length() > 0;
-    if (requiredUserAttributes.contains("description"))
-      test = test && super.description.length() > 0;
-    if (requiredUserAttributes.contains("salutation"))
-      test = test && userContact.getSalutation().length() > 0;
-    if (requiredUserAttributes.contains("firstname"))
-      test = test && userContact.getFirstName().length() > 0;
-    if (requiredUserAttributes.contains("lastname"))
-      test = test && userContact.getLastName().length() > 0;
-    if (requiredUserAttributes.contains("street"))
-      test = test && userContact.getStreet().length() > 0;
-    if (requiredUserAttributes.contains("city"))
-      test = test && userContact.getCity().length() > 0;
-    if (requiredUserAttributes.contains("postalcode"))
-      test = test && userContact.getPostalCode().length() > 0;
-    if (requiredUserAttributes.contains("country"))
-      test = test && userContact.getCountry().length() > 0;
-    if (requiredUserAttributes.contains("institution"))
-      test = test && userContact.getInstitution().length() > 0;
-    if (requiredUserAttributes.contains("faculty"))
-      test = test && userContact.getFaculty().length() > 0;
-    if (requiredUserAttributes.contains("department"))
-      test = test && userContact.getDepartment().length() > 0;
-    if (requiredUserAttributes.contains("institute"))
-      test = test && userContact.getInstitute().length() > 0;
-    if (requiredUserAttributes.contains("telephone"))
-      test = test && userContact.getTelephone().length() > 0;
-    if (requiredUserAttributes.contains("fax"))
-      test = test && userContact.getFax().length() > 0;
-    if (requiredUserAttributes.contains("email"))
-      test = test && userContact.getEmail().length() > 0;
-    if (requiredUserAttributes.contains("cellphone"))
-      test = test && userContact.getCellphone().length() > 0;
     if (requiredUserAttributes.contains("primary_group"))
       test = test && this.primaryGroupID.length() >0;
 
     return test;
   }
 
-  /**
-   * This method sets the password of the user.
-   *
-   * @param newPassword   The new password of the user
-   */
-  public boolean setPassword(String newPassword) throws Exception
+/**
+ * This method sets the password of the user.
+ *
+ * @param newPassword   The new password of the user
+ */
+public boolean setPassword(String newPassword)
   {
-    // We do not allow empty passwords. Later we might check if the password is
-    // conform with a password policy.
-
-    if (newPassword.length() != 0) {
-      passwd = newPassword;
-      super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-      MCRUserMgr.instance().updateUser(this);
-      return true;
+  // We do not allow empty passwords. Later we might check if the password is
+  // conform with a password policy.
+  if (newPassword == null) { return false; }
+  if (newPassword.length() != 0) {
+    passwd = newPassword;
+    super.modifiedDate = new Timestamp(new GregorianCalendar().getTime()
+      .getTime());
+    return true;
     }
-    else return false;
+  return false;
   }
 
-  /**
-   * Updates some of the attributes of the user. Some attributes (ID, creator, creationDate)
-   * cannot be updated. The date of the last changes will be updated automatically in this
-   * method.
-   *
-   * @param idEnabled        (boolean) specifies whether the account is disabled or enabled
-   * @param updateAllowed    (boolean) specifies whether the user may update his or her data
-   * @param description      description of the user
-   * @param passwd           password of the user
-   * @param salutation       how to address the user, e.g. Mr. or Prof. Dr. ...
-   * @param firstname        the first name (or given name) of the user
-   * @param lastname         the last name (or surname) of the user
-   * @param street           contact information
-   * @param city             contact information
-   * @param postalcode       contact information
-   * @param country          contact information
-   * @param institution      contact information
-   * @param faculty          contact information
-   * @param department       contact information
-   * @param institute        contact information
-   * @param telephone        telephone number
-   * @param fax              fax number
-   * @param email            email address
-   * @param cellphone        number of cellular phone, if available
-   * @param primaryGroupID   the ID of the primary group of the user
-   * @param groupIDs         a Vector of groups (IDs) the user belongs to
-   * @param todoInMgr        String value which specifies whether the MCRUserMgr must be notified.
-   */
-  public void update(boolean idEnabled, boolean updateAllowed, String description, String passwd,
-                     String salutation, String firstname, String lastname, String street, String city,
-                     String postalcode, String country, String institution, String faculty,
-                     String department, String institute, String telephone, String fax, String email,
-                     String cellphone, String primaryGroupID, Vector groupIDs,
-                     String todoInMgr) throws MCRException, Exception
+/**
+ * This method update this instance with the data of the given MCRUser.
+ *
+ * @param newuser the data for the update.
+ **/
+public final void updateUser(MCRUser newuser)
   {
-    super.description = trim(description);
-    this.idEnabled = idEnabled;
-    this.updateAllowed = updateAllowed;
-    this.passwd = trim(passwd);
-    this.primaryGroupID = trim(primaryGroupID);
-
-    // the groupID vector might be null due to the default constructor
-    if (groupIDs != null)
-      super.groupIDs = groupIDs;
-    else super.groupIDs = new Vector();
-
-    // check if the primary group is in the groups list. If not, put it into the list.
-    if ((primaryGroupID.length() > 0) && (!super.groupIDs.contains(primaryGroupID)))
-      super.groupIDs.add(primaryGroupID);
-
-    // update the date of the last changes
-    super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-
-    // create the MCRuserContact object
-    userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode,
-                                     country, institution, faculty, department, institute,
-                                     telephone, fax, email, cellphone);
-
-    // Eventually notify the User Manager and update the user object in the datastore,
-    // but only if this object is valid.
-    if (todoInMgr.trim().equals("update")) {
-      if (isValid())
-        MCRUserMgr.instance().updateUser(this);
-      else throw new MCRException("User object "+ID+" is not valid! Attributes are missing.");
-    }
+  if (!updateAllowed) return;
+  idEnabled = newuser.isEnabled();
+  passwd = newuser.getPassword();
+  primaryGroupID = newuser.getPrimaryGroupID();
+  description = newuser.getDescription();
+  groupIDs = newuser.getGroupIDs();
+  userContact = newuser.getUserContact();
   }
 
-  /**
-   * @return
-   *   This method returns the user or group object as a JDOM document.
-   */
-  public Document toJDOMDocument() throws Exception
+/**
+ * @return
+ *   This method returns the user or group object as a JDOM document.
+ */
+public org.jdom.Document toJDOMDocument() throws MCRException
   {
-    Element root = new Element("mcr_userobject");
-    root.setAttribute("type", "user");
-    root.addContent(this.toJDOMElement());
-    Document jdomDoc = new Document(root);
-    return jdomDoc;
+  org.jdom.Element root = new org.jdom.Element("mycoreuser");
+  root.setAttribute("type", "user");
+  root.addContent(this.toJDOMElement());
+  org.jdom.Document jdomDoc = new org.jdom.Document(root);
+  return jdomDoc;
   }
 
-  /**
-   * @return
-   *   This method returns the user or group object as a JDOM element. This is needed if
-   *   one wants to get a representation of several user objects in one xml document.
-   */
-  public Element toJDOMElement() throws Exception
+/**
+ * This method returns the user object as a JDOM element. This is needed if
+ * one wants to get a representation of several user objects in one xml 
+ * document.
+ *
+ * @return this user data as JDOM element
+ */
+public org.jdom.Element toJDOMElement() throws MCRException
   {
-    Element user = new Element("user")
-      .setAttribute("numID", Integer.toString(numID))
-      .setAttribute("ID", ID)
-      .setAttribute("id_enabled", (idEnabled) ? "true" : "false")
-      .setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
-
-    Element Passwd       = new Element("user.password").setText(passwd);
-    Element Creator      = new Element("user.creator").setText(super.creator);
-    Element CreationDate = new Element("user.creation_date").setText(super.creationDate.toString());
-    Element ModifiedDate = new Element("user.last_modified").setText(super.modifiedDate.toString());
-    Element Description  = new Element("user.description").setText(super.description);
-    Element Primarygroup = new Element("user.primary_group").setText(primaryGroupID);
-    Element Groups       = new Element("user.groups");
-
-
-    // Loop over all group IDs
-    for (int i=0; i<groupIDs.size(); i++) {
-      Element groupID = new Element("groups.groupID").setText((String)groupIDs.elementAt(i));
-      Groups.addContent(groupID);
+  org.jdom.Element user = new org.jdom.Element("user")
+    .setAttribute("numID", Integer.toString(numID))
+    .setAttribute("ID", ID)
+    .setAttribute("id_enabled", (idEnabled) ? "true" : "false")
+    .setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
+  org.jdom.Element Passwd = 
+    new org.jdom.Element("user.password").setText(passwd);
+  org.jdom.Element Creator = 
+    new org.jdom.Element("user.creator").setText(super.creator);
+  org.jdom.Element CreationDate = 
+    new org.jdom.Element("user.creation_date")
+    .setText(super.creationDate.toString());
+  org.jdom.Element ModifiedDate = 
+    new org.jdom.Element("user.last_modified")
+    .setText(super.modifiedDate.toString());
+  org.jdom.Element Description  = 
+    new org.jdom.Element("user.description")
+    .setText(super.description);
+  org.jdom.Element Primarygroup = 
+    new org.jdom.Element("user.primary_group")
+    .setText(primaryGroupID);
+  // Loop over all group IDs
+  org.jdom.Element Groups = new org.jdom.Element("user.groups");
+  for (int i=0; i<groupIDs.size(); i++) {
+    org.jdom.Element groupID = new org.jdom.Element("groups.groupID")
+      .setText((String)groupIDs.get(i));
+    Groups.addContent(groupID);
     }
+  // Aggregate user element
+  user.addContent(Passwd)
+      .addContent(Creator)
+      .addContent(CreationDate)
+      .addContent(ModifiedDate)
+      .addContent(Description)
+      .addContent(Primarygroup)
+      .addContent(userContact.toJDOMElement())
+      .addContent(Groups);
+  return user;
+  }
 
-    // Aggregate user element
-    user.addContent(Passwd)
-        .addContent(Creator)
-        .addContent(CreationDate)
-        .addContent(ModifiedDate)
-        .addContent(Description)
-        .addContent(Primarygroup)
-        .addContent(userContact.toJDOMElement())
-        .addContent(Groups);
-
-    return user;
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  debugDefault();
+  logger.debug("primaryGroupID     = "+primaryGroupID); 
+  for (int i=0;i<groupIDs.size();i++) {
+    logger.debug("groupIDs           = "+(String)groupIDs.get(i)); }
+  userContact.debug();
   }
 }

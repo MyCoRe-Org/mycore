@@ -24,9 +24,7 @@
 
 package org.mycore.user;
 
-import java.util.Vector;
-import org.jdom.Document;
-import org.jdom.Element;
+import java.util.ArrayList;
 import org.mycore.common.*;
 
 /**
@@ -40,7 +38,7 @@ import org.mycore.common.*;
 public class MCRPrivilegeSet
 {
   /** This vector holds all privileges of the org.mycore.user management system */
-  private Vector privileges = null;
+  private ArrayList privileges = null;
 
   /** the class responsible for persistent datastore (configurable ) */
   private MCRUserStore mcrUserStore;
@@ -51,7 +49,7 @@ public class MCRPrivilegeSet
   /** private constructor to create the singleton instance. */
   private MCRPrivilegeSet() throws Exception
   {
-    Vector privs = new Vector();
+    ArrayList privs = new ArrayList();
     String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
     mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
     privs = mcrUserStore.retrievePrivilegeSet();
@@ -75,12 +73,12 @@ public class MCRPrivilegeSet
   }
 
   /**
-   * This method takes a Vector of privileges as parameter and creates resp. updates
+   * This method takes a ArrayList of privileges as parameter and creates resp. updates
    * them in the persistent datastore.
    *
-   * @param privList   Vector containing privilege objects
+   * @param privList   ArrayList containing privilege objects
    */
-  public void loadPrivileges(Vector privList) throws Exception
+  public void loadPrivileges(ArrayList privList) throws Exception
   {
     if (!MCRUserMgr.instance().isLocked())
     {
@@ -96,27 +94,27 @@ public class MCRPrivilegeSet
 
   /**
    * @returns
-   *   This method returns a Vector of strings containing all names of the
+   *   This method returns a ArrayList of strings containing all names of the
    *   privileges of the system.
    */
-  public Vector getPrivileges()
+  public ArrayList getPrivileges()
   { return privileges; }
 
   /**
    * @return
    *   This method returns the privilege set object as a DOM document.
    */
-  public synchronized Document toJDOMDocument() throws Exception
+  public synchronized org.jdom.Document toJDOMDocument() throws Exception
   {
-    Element root = new Element("mcr_userobject");
+    org.jdom.Element root = new org.jdom.Element("mycoreuser");
     root.setAttribute("type", "privilege");
 
     for (int i=0; i<privileges.size(); i++) {
-      MCRPrivilege currentPriv = (MCRPrivilege)privileges.elementAt(i);
+      MCRPrivilege currentPriv = (MCRPrivilege)privileges.get(i);
       root.addContent(currentPriv.toJDOMElement());
     }
 
-    Document jdomDoc = new Document(root);
+    org.jdom.Document jdomDoc = new org.jdom.Document(root);
     return jdomDoc;
   }
 
