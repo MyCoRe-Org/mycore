@@ -285,14 +285,5 @@ public class MCRDerivateCommands
     logger.info( "" );
     }
 
- /**
-  * Save an MCRDerivate with the ID under the ID as name and store the 
-  * derivate metadata under ID_name.xml.
-  *
-  * @param ID the ID of the MCRDerivate to be save.
-  **/
-  public static void save( String ID )
-    { save(ID,ID); }
-
   }
 

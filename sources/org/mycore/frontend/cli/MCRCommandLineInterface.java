@@ -161,9 +161,6 @@ public class MCRCommandLineInterface
       "update all derivates from directory {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save derivate {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.save String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save derivate {0} to {1}",
       "org.mycore.frontend.cli.MCRDerivateCommands.save String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
@@ -207,14 +204,14 @@ public class MCRCommandLineInterface
     // ******************************
 
     knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "query host {0} {1} {2}",
+      "org.mycore.frontend.cli.MCRQueryCommands.query String String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "query local {0} {1}",
       "org.mycore.frontend.cli.MCRQueryCommands.queryLocal String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "query remote {0} {1}",
       "org.mycore.frontend.cli.MCRQueryCommands.queryRemote String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "query host {0} {1} {2}",
-      "org.mycore.frontend.cli.MCRQueryCommands.query String String String" );
 
     // **************************************
     // Commands for user and group management
