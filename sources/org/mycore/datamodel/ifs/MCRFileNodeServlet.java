@@ -46,14 +46,18 @@ public class MCRFileNodeServlet extends HttpServlet
     String requestPath = req.getPathInfo();
     if( requestPath == null ) 
     {
-      res.sendError( res.SC_NOT_FOUND );
+      String msg = "Error: HTTP request path is null";
+      System.out.println( msg );
+      res.sendError( res.SC_NOT_FOUND, msg );
       return;
     }
     
     StringTokenizer st = new StringTokenizer( requestPath, "/" );
     if( ! st.hasMoreTokens() )
     {
-      res.sendError( res.SC_NOT_FOUND );
+      String msg = "Error: HTTP request path is empty";
+      System.out.println( msg );
+      res.sendError( res.SC_NOT_FOUND, msg );
       return;
     }
     
@@ -62,7 +66,9 @@ public class MCRFileNodeServlet extends HttpServlet
     MCRFilesystemNode[] roots = MCRFilesystemNode.getRootNodes( ownerID );
     if( roots.length == 0 )
     {
-      res.sendError( res.SC_NOT_FOUND );
+      String msg = "Error: No root node found for owner ID " + ownerID;
+      System.out.println( msg );
+      res.sendError( res.SC_NOT_FOUND, msg );
       return;
     }
     
@@ -72,7 +78,9 @@ public class MCRFileNodeServlet extends HttpServlet
     {
       if( st.hasMoreTokens() )
       {
-        res.sendError( res.SC_NOT_FOUND );
+        String msg = "Error: No such file or directory " + st.nextToken();
+        System.out.println( msg );
+        res.sendError( res.SC_NOT_FOUND, msg );
         return;
       }
       else
@@ -91,6 +99,8 @@ public class MCRFileNodeServlet extends HttpServlet
       
       if( node == null )
       {
+        String msg = "Error: No such file or directory " + path;
+        System.out.println( msg );
         res.sendError( res.SC_NOT_FOUND );
         return;
       }
@@ -110,6 +120,8 @@ public class MCRFileNodeServlet extends HttpServlet
   private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
     throws IOException, ServletException
   {
+    System.out.println( "Sending file " + file.getName() );
+    
     res.setContentType( file.getContentType().getMimeType() );
     res.setContentLength( (int)( file.getSize() ) );
     
@@ -121,7 +133,9 @@ public class MCRFileNodeServlet extends HttpServlet
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, MCRDirectory dir )
     throws IOException, ServletException
   {
-    Element root = new Element( "DirectoryListing" );
+    System.out.println( "Sending list of files in directory " + dir.getName() );
+    
+    Element root = new Element( "mcr_directory" );
     Document doc = new org.jdom.Document( root );
     
     root.setAttribute( "ID", dir.getID() );
