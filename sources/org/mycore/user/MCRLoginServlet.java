@@ -58,8 +58,8 @@ public class MCRLoginServlet extends MCRServlet
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
 
-    guestID  = config.getString("MCR.users_guestuser_username","gast");
-    guestPWD = config.getString("MCR.users_guestuser_userpasswd","gast");
+    guestID  = config.getString( "MCR.users_guestuser_username"   );
+    guestPWD = config.getString( "MCR.users_guestuser_userpasswd" );
   }
 
   /** This method overrides doGetPost of MCRServlet. */
@@ -98,7 +98,6 @@ public class MCRLoginServlet extends MCRServlet
       // If the login attempt was successfull, change the user ID and redirect to target URL
       if (loginOk) {
         mcrSession.setCurrentUserID(uid);
-        job.getRequest().getSession().setAttribute( "XSL.CurrentUser", uid );
         job.getResponse().sendRedirect(url);
         return;
       }
@@ -139,7 +138,6 @@ public class MCRLoginServlet extends MCRServlet
     String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
 
     job.getRequest().getSession().setAttribute("mycore.language", language);
-    job.getRequest().getSession().setAttribute("XSL.CurrentUser", MCRSessionMgr.getCurrentSession().getCurrentUserID());
 
     String styleSheet = styleBase + "-" + language;
     job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
