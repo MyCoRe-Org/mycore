@@ -260,7 +260,7 @@ public static final byte [] getByteArray(org.jdom.Document jdom)
  * @param in the InputStream to read the bytes from
  * @param out the OutputStream to write the bytes to
  **/
-  public void copyStream( InputStream in, OutputStream out )
+  public static void copyStream( InputStream in, OutputStream out )
     throws IOException
   {
     MCRArgumentChecker.ensureNotNull( in, "InputStream in"    );
