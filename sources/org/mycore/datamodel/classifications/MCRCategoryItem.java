@@ -39,6 +39,7 @@ public class MCRCategoryItem extends MCRClassificationObject
   protected String parentID;
   protected String classifID;
   protected String URL;
+  
     
   /**
    * The constructor to fill this item.
@@ -101,6 +102,8 @@ public class MCRCategoryItem extends MCRClassificationObject
   public String getClassificationID()
     { return classifID; }
   
+  
+  
   public MCRClassificationItem getClassificationItem()
     { 
     ensureNotDeleted();
@@ -153,6 +156,18 @@ public class MCRCategoryItem extends MCRClassificationObject
     MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext"   );  
     return manager().retrieveCategoryItemForLabelText( classifID, labeltext );
     }
+
+   /**
+	 * The method return a the number of Documents
+	 * for the ClassifID 
+	 * @return int 
+	 **/
+	public int countDocLinks()
+	{
+	  String classifIDandID = this.classifID+"##"+this.ID	;
+	  return manager().retrieveNumberOfDocs(classifIDandID);	
+    }
+
 
   /**
    * The method returns the URL string.
