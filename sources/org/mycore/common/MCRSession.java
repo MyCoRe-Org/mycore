@@ -48,7 +48,7 @@ public class MCRSession implements Cloneable
   /** The user ID of the session */
   private String userID = null;
 
-  /** The language for this session */
+  /** The language for this session as upper case character */
   private String language = null;
 
   /** The unique ID of this session */
@@ -65,7 +65,7 @@ public class MCRSession implements Cloneable
   { 
     MCRConfiguration config = MCRConfiguration.instance();
     userID = config.getString("MCR.users_guestuser_username","gast");
-    language = "DE";
+    language = config.getString("MCR.metadata_default_lang","de").toUpperCase();
     sessionID = buildSessionID();
     sessions.put( sessionID, this );
   }
@@ -150,7 +150,7 @@ public class MCRSession implements Cloneable
 
   /** sets the current language */
   public final void setCurrentLanguage(String language)
-  { this.language = language; }
+  { this.language = language.toUpperCase(); }
 
   /** Write data to the logger for debugging purposes */
   public final void debug()

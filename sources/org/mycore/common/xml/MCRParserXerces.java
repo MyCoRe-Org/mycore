@@ -188,6 +188,7 @@ public class MCRParserXerces
     try
     {
       parser.setFeature( setvalidation, validate );
+      parser.setFeature( setschemasupport, validate);
       parser.parse( source );
       return parser.getDocument();
     }
