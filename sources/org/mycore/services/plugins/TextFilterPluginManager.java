@@ -35,7 +35,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -73,7 +72,6 @@ public class TextFilterPluginManager {
 	}
 	private void init() {
 		CONTENT_TYPE_PLUGIN_BAG = new Hashtable();
-		PropertyConfigurator.configure(CONF.getLoggingProperties());
 		PLUGINS = new Hashtable();
 		loadPlugins();
 	}

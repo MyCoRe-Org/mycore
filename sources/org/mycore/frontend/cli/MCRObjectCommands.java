@@ -61,7 +61,6 @@ public class MCRObjectCommands
     {
   	if (CONFIG==null)
   		CONFIG = MCRConfiguration.instance();
-    PropertyConfigurator.configure(CONFIG.getLoggingProperties());
     }
 
  /**

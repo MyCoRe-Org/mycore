@@ -89,8 +89,6 @@ static
   try {
     // Load the configuration
     mcr_conf = MCRConfiguration.instance();
-    // set the logger property
-    PropertyConfigurator.configure(mcr_conf.getLoggingProperties());
     // Link table manager
     mcr_linktable = MCRLinkTableManager.instance();
     // XML table manager

@@ -24,11 +24,7 @@
 
 package org.mycore.user;
 
-import java.io.*;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -190,7 +186,6 @@ public class MCRUserContact
   private final void init()
   {
     config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
     salutation = "";
     firstname = "";
     lastname = "";

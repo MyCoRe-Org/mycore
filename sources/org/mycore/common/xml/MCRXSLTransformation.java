@@ -105,8 +105,7 @@ public class MCRXSLTransformation {
 	 */
 	static {
 		logger = Logger.getLogger(MCRXSLTransformation.class);
-    	MCRConfiguration.instance().reload(true);
-    	PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
+    MCRConfiguration.instance();
     	
     	try {
 	    	TransformerFactory tf = TransformerFactory.newInstance();

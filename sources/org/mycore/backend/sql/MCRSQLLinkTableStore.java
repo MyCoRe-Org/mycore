@@ -67,8 +67,6 @@ public final void init(String type)
   throws MCRPersistenceException
   { 
   MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // Check the parameter
   if ((type == null) || ((type = type.trim()).length() ==0)) {
      throw new MCRPersistenceException("The type of the constructor"+

@@ -68,7 +68,6 @@ public class MCRTaminoCollectionClean {
  public static void main(String[] args) throws Exception  {
 
    MCRConfiguration config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
 
     /** the TaminoDATABASE_URI is defined in properity file  */
    String TaminoDATABASE_URI=config.getString(  "MCR.persistence_taminoxmldb_TaminoDATABASE_URI" , "");

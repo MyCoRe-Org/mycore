@@ -24,18 +24,25 @@
 
 package org.mycore.frontend.servlets;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+import java.net.InetAddress;
 
-import java.io.*;
-import java.net.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Content;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutServlet;
 
 /**
@@ -67,7 +74,6 @@ public class MCRServlet extends HttpServlet {
 		System.err.println("Initializing MCRServlet...");
 		MCRConfiguration.instance().reload(true);
 		CONFIG = MCRConfiguration.instance();
-		PropertyConfigurator.configure(CONFIG.getLoggingProperties());
 	}
 
 	/** returns the base URL of the mycore system */

@@ -136,8 +136,7 @@ public class MCRSession implements Cloneable
   /** Write data to the logger for debugging purposes */
   public final void debug()
   {
-    MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
+    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
     logger.debug("SessionID          = "+sessionID);
     logger.debug("UserID             = "+userID);
     logger.debug("language           = "+language);

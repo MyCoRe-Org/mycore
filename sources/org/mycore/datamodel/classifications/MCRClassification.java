@@ -60,8 +60,6 @@ private ArrayList cat;
   public MCRClassification()
     { 
     MCRConfiguration config = MCRConfiguration.instance();
-    // set the logger property
-    PropertyConfigurator.configure(config.getLoggingProperties());
     }
 
   /**

@@ -192,7 +192,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	 */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	MCRConfiguration.instance().reload(true);
     	PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
         response.setContentType("text/xml; charset=UTF-8");
         

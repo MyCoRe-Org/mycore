@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Provides methods to manage and read all configuration properties from the
@@ -158,7 +159,9 @@ public class MCRConfiguration
         if( value != null ) set( name, value );
       }
     }
-  }
+    // set the logger property
+    PropertyConfigurator.configure(getLoggingProperties());
+ }
     
 /**
  * Reloads all properties from the configuration files.

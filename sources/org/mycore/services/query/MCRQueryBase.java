@@ -23,17 +23,19 @@
  **/
 package org.mycore.services.query;
 
-import java.util.*;
-
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.datamodel.ifs.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * This is the implementation of the MCRQueryInterface is a basic class which
@@ -75,7 +77,6 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	 **/
 	public MCRQueryBase() {
 		config = MCRConfiguration.instance();
-		PropertyConfigurator.configure(config.getLoggingProperties());
 		maxres = config.getInt("MCR.query_max_results", MAX_RESULTS);
 		logger.info("The maximum of the results is " + Integer.toString(maxres));
 		xmltable = MCRXMLTableManager.instance();

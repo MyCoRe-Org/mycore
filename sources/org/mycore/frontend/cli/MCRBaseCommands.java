@@ -24,19 +24,14 @@
 
 package org.mycore.frontend.cli;
 
-import java.io.*;
-
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
+import java.io.InputStream;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.jdom.input.SAXBuilder;
-import org.jdom.Document;
-import org.mycore.common.*;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * Provides static methods that implement commands for the
@@ -58,7 +53,6 @@ public class MCRBaseCommands
   static
   {
     config = MCRConfiguration.instance();
-    PropertyConfigurator.configure( config.getLoggingProperties() );
   }
 
  /**

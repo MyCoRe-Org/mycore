@@ -71,9 +71,8 @@ public class MCRMailer {
 	static {
 		MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
-    	PropertyConfigurator.configure(config.getLoggingProperties());
     	
-    	mailProperties = new Properties();
+    mailProperties = new Properties();
     	
 		try {
 			mailProperties.setProperty("mail.smtp.host", config.getString("MCR.mail.server"));

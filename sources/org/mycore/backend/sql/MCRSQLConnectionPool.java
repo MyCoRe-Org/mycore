@@ -84,10 +84,7 @@ public class MCRSQLConnectionPool
   protected MCRSQLConnectionPool() throws MCRPersistenceException
     {
     MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
 
-    doWorkaround(); // Do workaround for FrnSysInitSharedMem bug in CM 7.1 AIX
-    
     logger.info( "Building JDBC connection pool..." );
     maxNumConnections = config.getInt("MCR.persistence_sql_max_connections",1);
     int initNumConnections = 
@@ -108,34 +105,6 @@ public class MCRSQLConnectionPool
       }
     }
   
-  /**
-   * This method implements a workaround for CM 7.1 under AIX
-   * to prevent error FrnSysInitSharedMem to be thrown by CM:
-   * Before connecting to DB2, ensure connect to CM is already done
-   **/
-  protected void doWorkaround()
-  {
-    try
-    {
-      String label = "MCR.XMLStore.Type"; 
-      String value = MCRConfiguration.instance().getString( label, "" );
-      
-      if( value.equalsIgnoreCase( "cm7" ) ) 
-      {
-        // Call method org.mycore.backend.cm7.MCRCM7ConnectionPool.instance()
-          
-        Class c = Class.forName( "org.mycore.backend.cm7.MCRCM7ConnectionPool" );
-        Method m = c.getMethod( "instance", new Class[ 0 ] );
-        m.invoke( null, new Object[ 0 ] );
-      }
-    }
-    catch( Exception exc )
-    { 
-      String msg = "Error while running workaround for CM 7.1 connect bug";
-      throw new MCRPersistenceException( msg, exc ); 
-    }
-  }
-
   /**
    * Gets a free connection from the pool. When this
    * connection is not used any more by the invoker, he is

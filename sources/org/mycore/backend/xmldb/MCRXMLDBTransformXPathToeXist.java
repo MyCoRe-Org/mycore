@@ -27,13 +27,10 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jdom.input.SAXHandler;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.services.query.MCRMetaSearchInterface;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ResourceIterator;
@@ -65,7 +62,6 @@ private String database;
  **/
 public MCRXMLDBTransformXPathToeXist() {
   config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
   MCRXMLDBConnectionPool.instance();
   database = config.getString("MCR.persistence_xmldb_database", "");
   logger.debug("MCR.persistence_xmldb_database    : " + database);
@@ -86,7 +82,6 @@ public MCRXMLDBTransformXPathToeXist() {
 	public final HashSet getResultIDs(String root, String query, String type) {
 		// prepare the query over the rest of the metadata
 		HashSet idmeta = new HashSet();
-		SAXHandler handler = new SAXHandler();
 		logger.debug("Incomming condition : " + query);
 		String newquery = "";
 		if ((root == null) && (query.length() == 0)) {
@@ -111,9 +106,7 @@ public MCRXMLDBTransformXPathToeXist() {
 				ResourceSet resultset = xps.query(newquery);
 				logger.debug("Results: "
 						+ Integer.toString((int) resultset.getSize()));
-				org.jdom.Document doc;
 				ResourceIterator ri = resultset.getIterator();
-				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
 				while (ri.hasMoreResources()) {
 					//doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
 					//OK we simply asume that all docs are well in exist
@@ -160,7 +153,7 @@ private String handleQueryStringExist(String root, String query, String type) {
                 if (k == Math.floor(k)) {
                   int m = (int)k; sb.append(m); }
                 else { 
-                  String s = ((String)Double.toString(k)).replace(',','.');
+                  String s = Double.toString(k).replace(',','.');
                   sb.append(s);
                   }
                 sb.append(query.substring(j+1,l));

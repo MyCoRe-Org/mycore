@@ -36,10 +36,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.jdom.Element;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -47,7 +44,6 @@ import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
-//import org.mycore.datamodel.classifications.MCRClassificationManager;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -78,9 +74,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 */
 	public MCROAIQueryService() {
 		config = MCRConfiguration.instance();
-    	config.reload(true);
-    	PropertyConfigurator.configure(config.getLoggingProperties());
-    	if (collector==null){
+   	if (collector==null){
 			int cThreads=config.getInt("MCR.Collector_Thread_num",2);
 			int aThreads=config.getInt("MCR.Agent_Thread_num",6);
 			collector=new MCRQueryCollector(cThreads,aThreads);

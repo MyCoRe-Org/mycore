@@ -51,8 +51,6 @@ public class MCRMetaElement
 {
 
 // common data
-private static String NL =
-  new String((System.getProperties()).getProperty("line.separator"));
 public static String DEFAULT_LANGUAGE = "de";
 public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
 public static boolean DEFAULT_TEXT_SEARCH = false;
@@ -535,10 +533,8 @@ public final Object clone()
  **/
 public final void debug()
   {
-  // get the instance of MCRConfiguration
-  MCRConfiguration config = MCRConfiguration.instance();
   // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
+  PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
   // the output
   logger.debug("ClassName          = "+classname);
   logger.debug("Tag                = "+tag);

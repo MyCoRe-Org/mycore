@@ -24,14 +24,11 @@
 
 package org.mycore.user;
 
-import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -92,7 +89,6 @@ abstract class MCRUserObject
     description = "";
     groupIDs = new ArrayList();
     config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
   }
 
   /**
@@ -240,8 +236,7 @@ abstract class MCRUserObject
       logger.warn("The string \'"+sn+"\' is too long (max. "+Integer.toString(len)+").");
       return sn.substring(0,len);
     }
-    else {
-      return sn; }
+    return sn;
   }
 
   /**

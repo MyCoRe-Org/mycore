@@ -24,16 +24,15 @@
 
 package org.mycore.services.nbn;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.mycore.common.*;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * This servlet resolves a given NBN URN from a HTTP request
@@ -58,7 +57,6 @@ public class MCRNBNResolver extends HttpServlet
 	public void init() {
 		MCRConfiguration.instance().reload(true);
 		MCRConfiguration config = MCRConfiguration.instance();
-    	PropertyConfigurator.configure(config.getLoggingProperties());
     
 		resolver = config.getString( "MCR.NBN.TopLevelResolver" );  
 	}

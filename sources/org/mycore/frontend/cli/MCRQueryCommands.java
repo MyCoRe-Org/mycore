@@ -24,19 +24,20 @@
 
 package org.mycore.frontend.cli;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.jdom.transform.JDOMSource;
-import org.mycore.common.*;
-import org.mycore.services.query.MCRQueryCollector;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.services.query.MCRQueryCollector;
 
 /**
  * This class implements the query command to start a query to a local
@@ -76,7 +77,6 @@ public static void queryRemote( String type, String query )
   public static void query( String host, String type, String query )
   {
     MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure( config.getLoggingProperties() );
 	if (COLLECTOR==null){
 		int cThreads=config.getInt("MCR.Collector_Thread_num",2);
 		int aThreads=config.getInt("MCR.Agent_Thread_num",6);

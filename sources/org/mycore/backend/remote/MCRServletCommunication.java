@@ -71,8 +71,6 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface {
 	public MCRServletCommunication() {
 		// get the instance of MCRConfiguration
 		config = MCRConfiguration.instance();
-		// set the logger property
-		PropertyConfigurator.configure(config.getLoggingProperties());
 		// set the defaults
 		headercontext = "";
 		hasifsdata = false;

@@ -91,7 +91,6 @@ class MCRCM8ConnectionPool
   protected MCRCM8ConnectionPool() throws MCRPersistenceException
     {
     MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
     logger.info( "Building Content Manager connection pool..." );
     serverName = config.getString( "MCR.persistence_cm8_library_server" );
     uid        = config.getString( "MCR.persistence_cm8_user_id"        );

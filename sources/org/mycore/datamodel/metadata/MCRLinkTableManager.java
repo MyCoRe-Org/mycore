@@ -69,8 +69,6 @@ public static synchronized MCRLinkTableManager instance()
 protected MCRLinkTableManager()
   {
   MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // Load the persistence class
   persistclassname = config.getString("MCR.linktable_store_class");
   Object obj = new Object();

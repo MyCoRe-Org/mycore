@@ -23,14 +23,14 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 /**
  * This class manages all handles of file upload as implementation of 
@@ -72,7 +72,6 @@ public class MCRUploadHandlerManager
   protected MCRUploadHandlerManager ()
     {
     config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
     generator = new Random();
     ids = new ArrayList();
     upl = new ArrayList();

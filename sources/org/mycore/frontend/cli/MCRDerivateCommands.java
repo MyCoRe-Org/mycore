@@ -59,8 +59,7 @@ public class MCRDerivateCommands
   **/
   private static void init()
     {
-    MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
+    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
     }
 
  /**
@@ -286,7 +285,7 @@ public class MCRDerivateCommands
         StreamSource source = new StreamSource( in );
         TransformerFactory transfakt = TransformerFactory.newInstance();
         Transformer trans = transfakt.newTransformer( source );
-        StreamResult sr = new StreamResult( (OutputStream)out );
+        StreamResult sr = new StreamResult(out);
         trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(
 xml,false)),sr);
         }
@@ -377,7 +376,7 @@ xml,false)),sr);
         String filename = dirname+SLASH+nid.toString()+".xml";
         FileOutputStream out = new FileOutputStream(filename);
         if( trans != null ) {
-          StreamResult sr = new StreamResult( (OutputStream)out );
+          StreamResult sr = new StreamResult(out);
           trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml,false)),sr);
           }
         else {

@@ -45,9 +45,6 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRPrivilege
 {
-  /** The logger */
-  private static Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
-
   /** The length of the decription */
   public static final int description_len = MCRUserObject.description_len;
 
@@ -80,13 +77,13 @@ public class MCRPrivilege
     privName = "";
     privDescription = "";
     if (!priv.getName().equals("privilege")) return;
-    privName = MCRUserObject.trim((String)priv.getAttributeValue("name"),
+    privName = MCRUserObject.trim(priv.getAttributeValue("name"),
       privilege_len);
     List listelm = priv.getChildren();
     for (int i=0;i<listelm.size();i++) {
       org.jdom.Element elm = (org.jdom.Element)listelm.get(i);
       if (!elm.getName().equals("privilege.description")) return;
-      privDescription = MCRUserObject.trim((String)elm.getText(),
+      privDescription = MCRUserObject.trim(elm.getText(),
         description_len);
     }
   }
@@ -126,8 +123,8 @@ public class MCRPrivilege
    */
   public final void debug()
   {
-    MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
+    Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
+    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
     logger.debug("privName           = "+privName);
     logger.debug("privDescription    = "+privDescription);
   }

@@ -28,13 +28,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.services.nbn.MCRNBNManager;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Represents a "National Bibliographic Name" URN that is
@@ -72,7 +70,6 @@ public class MCRNBN {
 	static {
 		MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
-    	PropertyConfigurator.configure(config.getLoggingProperties());
     	
 		codes = new Properties();
 		codes.put( "0",  "1" );

@@ -86,7 +86,6 @@ public class MCRXMLDBConnectionPool
    */
 	protected MCRXMLDBConnectionPool() throws MCRPersistenceException {
 		MCRConfiguration config = MCRConfiguration.instance();
-		PropertyConfigurator.configure(config.getLoggingProperties());
 		LOGGER.info("Building connection to XML:DB...");
 		DRIVER = config.getString(CONF_PREFIX + "driver");
 		LOGGER

@@ -147,10 +147,8 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
  **/
 private void initLogger()
   {
-  // get the instance of MCRConfiguration
-  MCRConfiguration config = MCRConfiguration.instance();
   // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
+  PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
   }
 
 /**

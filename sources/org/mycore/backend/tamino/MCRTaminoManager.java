@@ -59,7 +59,6 @@ public class MCRTaminoManager {
  public static void main(String[] args) throws Exception  {
 
      MCRConfiguration config = MCRConfiguration.instance();
-     PropertyConfigurator.configure(config.getLoggingProperties());
 
      /** the database url in Tamino http form that got from properity file  */
      String TaminoDATABASE_URI=config.getString(  "MCR.persistence_taminoxmldb_TaminoDATABASE_URI" , "");

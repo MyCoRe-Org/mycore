@@ -65,7 +65,6 @@ private MCRConfiguration config = null;
 public MCRCM8TransformXPathToCM8()
   {
   config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
   }
 
 /**

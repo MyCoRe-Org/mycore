@@ -26,19 +26,27 @@
 package org.mycore.frontend.workflow;
 
 // Imported java classes
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.StringTokenizer;
 
-// Imported log4j classes
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-// Importes MyCoRe classes
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.frontend.cli.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRDefaults;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.frontend.cli.MCRDerivateCommands;
+import org.mycore.frontend.cli.MCRObjectCommands;
 
 /**
  * This class holds methods to manage the workflow file system of MyCoRe.
@@ -86,8 +94,6 @@ public static synchronized MCRWorkflowManager instance()
 protected MCRWorkflowManager()
   {
   config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // read mail sender address
   sender = config.getString("MCR.editor_mail_sender","mcradmin@localhost");
   // int tables

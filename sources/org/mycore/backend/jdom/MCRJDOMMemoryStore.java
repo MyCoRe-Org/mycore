@@ -83,8 +83,6 @@ public static synchronized MCRJDOMMemoryStore instance()
 protected MCRJDOMMemoryStore()
   {
   MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // initalize the table
   trees = new Hashtable();
   // XSL Namespace

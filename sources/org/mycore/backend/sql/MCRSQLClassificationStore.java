@@ -69,8 +69,6 @@ private int lengthDescription = MCRClassificationObject.MAX_CLASSIFICATION_DESCR
 public MCRSQLClassificationStore()
   {
   MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // set configuration
   tableClass = config.getString(
     "MCR.classifications_store_sql_table_class","MCRCLASS" );

@@ -24,7 +24,6 @@
 package org.mycore.services.query;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.backend.remote.MCRRemoteAccessInterface;
@@ -76,7 +75,6 @@ public class MCRQueryCache {
 	public synchronized static void init(){
 		logger=Logger.getLogger(MCRQueryCache.class.getName());
 		config = MCRConfiguration.instance();
-		PropertyConfigurator.configure(config.getLoggingProperties());
 		queryint = (MCRQueryInterface)config.
 						getInstanceOf("MCR.persistence_"+
 		                      config.getString( "MCR.XMLStore.Type" ).toLowerCase()+

@@ -24,18 +24,23 @@
 
 package org.mycore.backend.sql;
 
-import java.io.*;
-import java.sql.*;
-import java.util.StringTokenizer;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUsageException;
-import org.mycore.user.*;
+import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRPrivilege;
+import org.mycore.user.MCRPrivilegeSet;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserContact;
+import org.mycore.user.MCRUserStore;
 
 /**
  * This class implements the interface MCRUserStore and uses SQL tables for
@@ -76,7 +81,6 @@ public class MCRSQLUserStore implements MCRUserStore
     {
     // set configuration
     MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
     SQLUsersTable        = config.getString(
       "MCR.users_store_sql_table_users","MCRUSERS");
     SQLGroupsTable       = config.getString(
@@ -443,8 +447,8 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<privileges.size(); i++) {
         thePrivilege = (MCRPrivilege)privileges.get(i);
-        statement.setString ( 1, (String)thePrivilege.getName() );
-        statement.setString ( 2, (String)thePrivilege.getDescription() );
+        statement.setString ( 1, thePrivilege.getName() );
+        statement.setString ( 2, thePrivilege.getDescription() );
         statement.execute();
         statement.clearParameters();
       }
@@ -537,9 +541,7 @@ public class MCRSQLUserStore implements MCRUserStore
       Statement statement = connection.getJDBCConnection().createStatement();
       rs = statement.executeQuery(select);
 
-      if (rs.next())
-        return true;
-      else return false;
+      return rs.next();
       }
     catch (Exception ex) {
       throw new MCRException("Error in UserStore.",ex); }
@@ -571,9 +573,7 @@ public class MCRSQLUserStore implements MCRUserStore
         "'"+privName+"'";
       Statement statement = connection.getJDBCConnection().createStatement();
       rs = statement.executeQuery(select);
-      if (rs.next())
-        return true;
-      else return false;
+      return rs.next();
       }
     catch (Exception ex) {
       throw new MCRException("Error in UserStore.",ex); }
@@ -919,14 +919,14 @@ public class MCRSQLUserStore implements MCRUserStore
       for (int i=0; i<privileges.size(); i++) {
         thePrivilege = (MCRPrivilege)privileges.get(i);
         if (!existsPrivilege(thePrivilege.getName())) {
-          istatement.setString ( 1, (String)thePrivilege.getName() );
-          istatement.setString ( 2, (String)thePrivilege.getDescription() );
+          istatement.setString ( 1, thePrivilege.getName() );
+          istatement.setString ( 2, thePrivilege.getDescription() );
           istatement.execute();
           istatement.clearParameters();
         }
         else {
-          ustatement.setString ( 1, (String)thePrivilege.getDescription() );
-          ustatement.setString ( 2, (String)thePrivilege.getName() );
+          ustatement.setString ( 1, thePrivilege.getDescription() );
+          ustatement.setString ( 2, thePrivilege.getName() );
           ustatement.execute();
           ustatement.clearParameters();
         }
@@ -990,7 +990,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<newAdminUserIDs.size(); i++)
       {
-        if (!oldAdminUserIDs.contains((String)newAdminUserIDs.get(i))) {
+        if (!oldAdminUserIDs.contains(newAdminUserIDs.get(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newAdminUserIDs.get(i) );
           statement.execute();
@@ -1004,7 +1004,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<newAdminGroupIDs.size(); i++)
       {
-        if (!oldAdminGroupIDs.contains((String)newAdminGroupIDs.get(i))) {
+        if (!oldAdminGroupIDs.contains(newAdminGroupIDs.get(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newAdminGroupIDs.get(i) );
           statement.execute();
@@ -1016,7 +1016,7 @@ public class MCRSQLUserStore implements MCRUserStore
       // We search for the recently removed admins and remove them from the table
       for (int i=0; i<oldAdminUserIDs.size(); i++)
       {
-        if (!newAdminUserIDs.contains((String)oldAdminUserIDs.get(i))) {
+        if (!newAdminUserIDs.contains(oldAdminUserIDs.get(i))) {
           String sql = "DELETE FROM " + SQLGroupAdminsTable
                      + " WHERE GID = '" + group.getID()
                      + "' AND USERID = '" + (String)oldAdminUserIDs.get(i) + "'";
@@ -1026,7 +1026,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<oldAdminGroupIDs.size(); i++)
       {
-        if (!newAdminGroupIDs.contains((String)oldAdminGroupIDs.get(i))) {
+        if (!newAdminGroupIDs.contains(oldAdminGroupIDs.get(i))) {
           String sql = "DELETE FROM " + SQLGroupAdminsTable
                      + " WHERE GID = '" + group.getID()
                      + "' AND GROUPID = '" + (String)oldAdminGroupIDs.get(i) + "'";
@@ -1049,7 +1049,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<newUserIDs.size(); i++)
       {
-        if (!oldUserIDs.contains((String)newUserIDs.get(i))) {
+        if (!oldUserIDs.contains(newUserIDs.get(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newUserIDs.get(i) );
           statement.execute();
@@ -1063,7 +1063,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<oldUserIDs.size(); i++)
       {
-        if (!newUserIDs.contains((String)oldUserIDs.get(i))) {
+        if (!newUserIDs.contains(oldUserIDs.get(i))) {
           String sql = "DELETE FROM " + SQLGroupMembersTable
                      + " WHERE GID = '" + group.getID()
                      + "' AND USERID = '" + (String)oldUserIDs.get(i) + "'";
@@ -1087,7 +1087,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<newGroupIDs.size(); i++)
       {
-        if (!oldGroupIDs.contains((String)newGroupIDs.get(i))) {
+        if (!oldGroupIDs.contains(newGroupIDs.get(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newGroupIDs.get(i) );
           statement.execute();
@@ -1101,7 +1101,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<oldGroupIDs.size(); i++)
       {
-        if (!newGroupIDs.contains((String)oldGroupIDs.get(i))) {
+        if (!newGroupIDs.contains(oldGroupIDs.get(i))) {
           String sql = "DELETE FROM " + SQLGroupMembersTable
                      + " WHERE GID = '" + group.getID()
                      + "' AND GROUPID = '" + (String)oldGroupIDs.get(i) + "'";
@@ -1123,7 +1123,7 @@ public class MCRSQLUserStore implements MCRUserStore
       statement = connection.getJDBCConnection().prepareStatement(insert);
 
       for (int i=0; i<newPrivs.size(); i++) {
-        if (!oldPrivs.contains((String)newPrivs.get(i))) {
+        if (!oldPrivs.contains(newPrivs.get(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newPrivs.get(i) );
           statement.execute();
@@ -1137,7 +1137,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
       for (int i=0; i<oldPrivs.size(); i++)
       {
-        if (!newPrivs.contains((String)oldPrivs.get(i))) {
+        if (!newPrivs.contains(oldPrivs.get(i))) {
           String sql = "DELETE FROM " + SQLPrivsLookupTable
                      + " WHERE GID = '" + group.getID()
                      + "' AND NAME = '" + (String)oldPrivs.get(i) + "'";
@@ -1158,62 +1158,6 @@ public class MCRSQLUserStore implements MCRUserStore
 
     finally
     { connection.release(); }
-  }
-
-  /**
-   * This method checks whether all the user management tables exists in
-   * the SQL database.
-   */
-  private boolean tablesExist()
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try
-    {
-      // At the moment this is a workaround. Since MySQL does not provide certain
-      // SQL system information like SYSCAT.TABLES we have to produce an SQL error
-      // in order to find out if the table exists or not. Therefore we simply produce
-      // an SQLException if the table does not yet exist.
-
-      String select = "SELECT COUNT(*) FROM " + SQLUsersTable;
-      Statement statement = c.getJDBCConnection().createStatement();
-      ResultSet rs = statement.executeQuery(select);
-      rs.close();
-
-      select = "SELECT COUNT(*) FROM " + SQLGroupsTable;
-      statement = c.getJDBCConnection().createStatement();
-      rs = statement.executeQuery(select);
-      rs.close();
-
-      select = "SELECT COUNT(*) FROM " + SQLGroupAdminsTable;
-      statement = c.getJDBCConnection().createStatement();
-      rs = statement.executeQuery(select);
-      rs.close();
-
-      select = "SELECT COUNT(*) FROM " + SQLGroupMembersTable;
-      statement = c.getJDBCConnection().createStatement();
-      rs = statement.executeQuery(select);
-      rs.close();
-
-      select = "SELECT COUNT(*) FROM " + SQLPrivilegesTable;
-      statement = c.getJDBCConnection().createStatement();
-      rs = statement.executeQuery(select);
-      rs.close();
-
-      return true;  // ok, obviously the tables exists (there is no SQLException)
-    }
-
-    catch (SQLException e) { return false; } // the table does not exist!
-    finally { c.release(); }
-/*
-    int number = MCRSQLConnection.justCountRows(
-      "SYSCAT.TABLES WHERE TABNAME = '" + SQLUsersTable +
-      "' OR TABNAME = '" + SQLGroupsTable +
-      "' OR TABNAME = '" + SQLGroupAdminsTable +
-      "' OR TABNAME = '" + SQLGroupMembersTable +
-      "' OR TABNAME = '" + SQLPrivilegesTable +
-      "' OR TABNAME = '" + SQLPrivsLookupTable + "'");
-    return (number == 6);
-*/
   }
 
   /**

@@ -24,12 +24,14 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.mycore.common.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class manage  all accesses to the XML table database. This database
@@ -66,8 +68,6 @@ public static synchronized MCRXMLTableManager instance()
 protected MCRXMLTableManager()
   {
   MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
   // Load the persistence class
   persistclassname = config.getString("MCR.xml_store_class");
   tablelist = new Hashtable();

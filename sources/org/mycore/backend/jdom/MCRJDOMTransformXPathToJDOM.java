@@ -61,7 +61,6 @@ private MCRConfiguration config = null;
  **/
 public MCRJDOMTransformXPathToJDOM() {
   config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties());
   transfakt = javax.xml.transform.TransformerFactory.newInstance();
   }
 

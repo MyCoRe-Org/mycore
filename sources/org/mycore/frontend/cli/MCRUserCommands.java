@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
@@ -38,11 +37,11 @@ import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.user.MCRCrypt;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRPrivilege;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
-import org.mycore.user.MCRCrypt;
 
 /**
  * This class provides a set of commands for the org.mycore.user management which
@@ -64,7 +63,6 @@ public class MCRUserCommands
    */
   private static void init() {
     config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
   }
 
   /**
