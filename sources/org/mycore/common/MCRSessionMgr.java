@@ -85,6 +85,7 @@ public class MCRSessionMgr
    * a Thread-pooling environment like Servlet engines.
    */
   public static void releaseCurrentSession() {
+    MCRSession.logger.debug( "MCRSession released " + getCurrentSession().getID() );
     theThreadLocalSession = new ThreadLocalSession();
   }
 }

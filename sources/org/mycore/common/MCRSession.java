@@ -47,7 +47,7 @@ public class MCRSession implements Cloneable
   private Map map = new HashMap();
 
   /** the logger */
-  private static Logger logger = Logger.getLogger(MCRSession.class.getName());
+  static Logger logger = Logger.getLogger(MCRSession.class.getName());
 
   /** The user ID of the session */
   private String userID = null;
@@ -59,7 +59,7 @@ public class MCRSession implements Cloneable
   private String sessionID = null;
 
   /** A cache of MCRSession objects, used for method getSession( String ) */
-  private static MCRCache sessions = new MCRCache( 500 );
+  private static MCRCache sessions = new MCRCache( 1000 );
 
   /** -ASC- für MCRClassificationBrowser Class session daten */
   public MCRClassificationBrowserData BData = null;
@@ -75,6 +75,8 @@ public class MCRSession implements Cloneable
     language = config.getString("MCR.metadata_default_lang","de");
     sessionID = buildSessionID();
     sessions.put( sessionID, this );
+
+    logger.debug( "MCRSession created " + sessionID );
   }
 
   /**
