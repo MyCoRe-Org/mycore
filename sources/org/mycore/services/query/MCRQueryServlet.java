@@ -35,7 +35,7 @@ import org.jdom.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.*;
 import org.mycore.common.xml.MCRLayoutServlet;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This servlet provides a web interface to query
@@ -126,7 +126,7 @@ private String defaultLang = "";
       MCRQueryResult result = new MCRQueryResult();
       String squence = conf.getString("MCR.classifications_search_sequence",
         "remote-local");
-      MCRQueryResultArray resarray = new MCRQueryResultArray();
+      MCRXMLContainer resarray = new MCRXMLContainer();
       if (squence.equalsIgnoreCase("local-remote")) { 
         resarray = result.setFromQuery("local",type,query );
         if (resarray.size()==0) {
@@ -206,7 +206,7 @@ private String defaultLang = "";
     if (! cachedFlag)
     {
       MCRQueryResult result = new MCRQueryResult();
-      MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
+      MCRXMLContainer resarray = result.setFromQuery(host, type, query );
 
       jdom = resarray.exportAllToDocument();
 if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }

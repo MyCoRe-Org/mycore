@@ -41,7 +41,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
-public class MCRQueryResultArray
+public class MCRXMLContainer
 {
 
 // data
@@ -63,10 +63,10 @@ public static final String ATTR_ID = "id";
 public static final String ATTR_RANK = "rank";
 
 /**
- * This constructor create the MCRQueryResultArray class with an empty
+ * This constructor create the MCRXMLContainer class with an empty
  * query result list.
  **/
-public MCRQueryResultArray()
+public MCRXMLContainer()
   {
   MCRConfiguration config = MCRConfiguration.instance();
   default_encoding = config.getString("MCR.metadata_default_encoding","UTF-8");
@@ -77,12 +77,12 @@ public MCRQueryResultArray()
   }
 
 /**
- * This constructor create the MCRQueryResultArray class with a given
+ * This constructor create the MCRXMLContainer class with a given
  * query result list.
  *
- * @param in a MCRQueryResultArray as input
+ * @param in a MCRXMLContainer as input
  **/
-public MCRQueryResultArray(MCRQueryResultArray in)
+public MCRXMLContainer(MCRXMLContainer in)
   {
   MCRConfiguration config = MCRConfiguration.instance();
   default_encoding = config.getString("MCR.metadata_default_encoding","UTF-8");
@@ -323,7 +323,7 @@ public final byte [] exportElementToByteArray(int index) throws IOException
   }
 
 private static String ERRORTEXT =
-  "The stream for the MCRQueryResultArray import is false.";
+  "The stream for the MCRXMLContainer import is false.";
 
 /**
  * This methode import a well formed XML stream of results as byte array and add it to an
@@ -351,7 +351,7 @@ public final synchronized void importElements(byte [] in)
   org.jdom.Document jdom = builder.build(bin);
   org.jdom.Element root = jdom.getRootElement();
   if (!root.getName().equals(TAG_RESULTS)) {
-    throw new MCRException("The input is not an MCRQueryResultArray."); }
+    throw new MCRException("The input is not an MCRXMLContainer."); }
   List list = root.getChildren(TAG_RESULT);
   int irank = 0;
   for (int i=0;i<list.size();i++) {
@@ -372,25 +372,25 @@ public final synchronized void importElements(byte [] in)
   }
 
 /**
- * This method imports another MCRQueryResultArray and add it to the existing list.
+ * This method imports another MCRXMLContainer and add it to the existing list.
  *
  * @param the other list as input
  **/
-public final synchronized void importElements(MCRQueryResultArray in)
+public final synchronized void importElements(MCRXMLContainer in)
   { 
   for (int i=0; i<in.size(); i++) {
     add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i)); }
   }
 
 /**
- * This methode print the content of this MCRQueryResultArray as
+ * This methode print the content of this MCRXMLContainer as
  * an XML String.
  *
  * @exception IOException if an error in the XMLOutputter was occured
  **/
 public final void debug() throws IOException
   { 
-  System.out.println("Debug of MCRQueryResultArray");
+  System.out.println("Debug of MCRXMLContainer");
   System.out.println("============================");
   System.out.println("Size = "+size()); 
   System.out.println(new String(exportAllToByteArray())); 

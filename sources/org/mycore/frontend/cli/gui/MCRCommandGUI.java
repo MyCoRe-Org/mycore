@@ -186,7 +186,7 @@ public class MCRCommandGUI extends JFrame {
 		public void actionPerformed( ActionEvent evt ) {
 		    try {
 			MCRQueryResult result = new MCRQueryResult();
-			MCRQueryResultArray resarray = result.setFromQuery( queryHostString, 
+			MCRXMLContainer resarray = result.setFromQuery( queryHostString, 
 									    queryItemString, 
 									    queryField.getText() 
 									    );
@@ -302,7 +302,7 @@ public class MCRCommandGUI extends JFrame {
 	detailView.setEditable( false );
     }
 
-    public void setResults( MCRQueryResultArray results ) {
+    public void setResults( MCRXMLContainer results ) {
 	if( results != null ) {
 	    resultList.setModel( new MCRQueryResultModel( results ) );
 	    resultListLabel.setText( "available Objects: " 
@@ -370,7 +370,7 @@ public class MCRCommandGUI extends JFrame {
     public void showResult( MCRObjectIdentifier objID ) {
 	try {
 	    MCRQueryResult result = new MCRQueryResult();
-	    MCRQueryResultArray resarray = result.setFromQuery( objID.getHost(), 
+	    MCRXMLContainer resarray = result.setFromQuery( objID.getHost(), 
 								objID.getType(), 
 								"/mycoreobject[@ID='" + objID.getId() + "']" 
 								);

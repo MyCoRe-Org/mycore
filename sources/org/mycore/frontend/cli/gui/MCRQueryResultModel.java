@@ -36,9 +36,9 @@ import org.mycore.common.xml.*;
  * @version $Revision$ $Date$
  */
 public class MCRQueryResultModel implements ListModel { 
-    private MCRQueryResultArray results;
+    private MCRXMLContainer results;
 
-    public MCRQueryResultModel( MCRQueryResultArray result ) {
+    public MCRQueryResultModel( MCRXMLContainer result ) {
 	results = result;
     }
 

@@ -29,7 +29,7 @@ import java.io.*;
 import java.net.*;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.services.query.MCRCommunicationInterface;
 
 /**
@@ -67,9 +67,9 @@ public MCRSocketCommunication()
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
- * @return the result of the query as MCRQueryResultArray
+ * @return the result of the query as MCRXMLContainer
  **/
-public MCRQueryResultArray requestQuery(String hostAlias, String mcrtype, 
+public MCRXMLContainer requestQuery(String hostAlias, String mcrtype, 
   String query) throws MCRException
   {
   System.out.println("Hostname = "+hostAlias);
@@ -81,7 +81,7 @@ public MCRQueryResultArray requestQuery(String hostAlias, String mcrtype,
   String NL = System.getProperty("line.separator");
   String host;            // in this format: server.domain.de
   int port;               // the port: 12345
-  MCRQueryResultArray result = new MCRQueryResultArray();
+  MCRXMLContainer result = new MCRXMLContainer();
   MCRConfiguration config = MCRConfiguration.instance();
   host = config.getString("MCR.communication_"+hostAlias+"_host");
   port = config.getInt("MCR.communication_"+hostAlias+"_port");

@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import org.mycore.common.*;
 import org.mycore.services.query.MCRQueryResult;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
@@ -85,7 +85,7 @@ final public class MCRQueryCommands
       MCRQueryResult result = new MCRQueryResult();
       String squence = config.getString("MCR.classifications_search_sequence",
         "remote-local");
-      MCRQueryResultArray resarray = new MCRQueryResultArray();
+      MCRXMLContainer resarray = new MCRXMLContainer();
       if (squence.equalsIgnoreCase("local-remote")) {
         resarray = result.setFromQuery("local",type,query );
         if (resarray.size()==0) {
@@ -119,7 +119,7 @@ final public class MCRQueryCommands
 
     // other types
     MCRQueryResult result = new MCRQueryResult();
-    MCRQueryResultArray resarray = result.setFromQuery(host,type,query);
+    MCRXMLContainer resarray = result.setFromQuery(host,type,query);
 
     // Configuration
     String applpath = config.getString("MCR.appl_path");

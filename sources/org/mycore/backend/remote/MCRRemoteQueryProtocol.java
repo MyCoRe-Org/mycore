@@ -28,7 +28,7 @@ import java.net.*;
 import java.io.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.services.query.MCRQueryInterface;
 
 /**
@@ -109,14 +109,14 @@ public class MCRRemoteQueryProtocol {
                   String type = extractType(theInput);
                   String query = extractQuery(theInput);
                   // start the local query
-                  MCRQueryResultArray result = new MCRQueryResultArray();
+                  MCRXMLContainer result = new MCRXMLContainer();
                   if (type.equalsIgnoreCase("class")) {
                     MCRClassification cl = new MCRClassification();
                     org.jdom.Document jdom = cl.search(query);
                     if (jdom != null) {
                       org.jdom.Element el = jdom.getRootElement();
                       String id = el.getAttributeValue("ID");
-                      MCRQueryResultArray res = new MCRQueryResultArray();
+                      MCRXMLContainer res = new MCRXMLContainer();
                       res.add("local",id,1,el);
                       result.importElements(res);
                       }

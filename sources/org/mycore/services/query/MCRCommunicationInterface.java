@@ -26,7 +26,7 @@ package org.mycore.services.query;
 
 import java.util.*;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This interface is designed to choose the communication methodes
@@ -47,10 +47,10 @@ public interface MCRCommunicationInterface
  * @param hostAlias the host alias as string that shall be requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
- * @return the result of the query as MCRQueryResultArray
+ * @return the result of the query as MCRXMLContainer
  * @exception MCRException general Exception of MyCoRe
  **/
-public MCRQueryResultArray requestQuery(String hostAlias, String mcrtype, 
+public MCRXMLContainer requestQuery(String hostAlias, String mcrtype, 
   String query) throws MCRException;
 
 }

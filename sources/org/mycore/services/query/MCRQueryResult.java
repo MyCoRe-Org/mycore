@@ -28,7 +28,7 @@ import java.util.*;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This class is the result list of a XQuery question to the persistence
@@ -75,17 +75,17 @@ public MCRQueryResult()
   }
 
 /**
- * IF it was succesful, the MCRQueryResultArray is filled with answers.
+ * IF it was succesful, the MCRXMLContainer is filled with answers.
  *
  * @param type                  the MCRObjectID type
  * @param hostlist              a String of host name aliases
  * @param query	                the Query string
- * @return                      the filled MCRQueryResultArray
+ * @return                      the filled MCRXMLContainer
  * @exception MCRException      general Exception of MyCoRe
  * @exception MCRConfigurationException
  *                              an Exception of MyCoRe Configuration
  **/
-public final MCRQueryResultArray setFromQuery(String host, String type,
+public final MCRXMLContainer setFromQuery(String host, String type,
   String query) throws MCRException, MCRConfigurationException
   {
   System.out.println( "hosts = " + host  );
@@ -151,7 +151,7 @@ public final MCRQueryResultArray setFromQuery(String host, String type,
   System.out.println();
 
   ThreadGroup threadGroup = new ThreadGroup("threadGroup");
-  MCRQueryResultArray result = new MCRQueryResultArray();
+  MCRXMLContainer result = new MCRXMLContainer();
   MCRQueryThread[] thr = new MCRQueryThread[hostAliasList.size()];
   boolean threadsRunning = false;
   try {

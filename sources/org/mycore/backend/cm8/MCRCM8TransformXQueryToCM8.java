@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.query.MCRQueryInterface;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This is the tranformer implementation for CM 8 from XQuery language
@@ -66,19 +66,19 @@ public MCRCM8TransformXQueryToCM8()
 
 /**
  * This method parse the XQuery string and return the result as
- * MCRQueryResultArray. If the type is null or empty or maxresults
+ * MCRXMLContainer. If the type is null or empty or maxresults
  * is lower 1 an empty list was returned.
  *
  * @param query                 the XQuery string
  * @param maxresults            the maximum of results
  * @param type                  the MCRObject type
- * @return                      a result list as MCRQueryResultArray
+ * @return                      a result list as MCRXMLContainer
  **/
-public final MCRQueryResultArray getResultList(String query, String type, 
+public final MCRXMLContainer getResultList(String query, String type, 
   int maxresults) 
   {
   // check the parameter
-  MCRQueryResultArray result = new MCRQueryResultArray();
+  MCRXMLContainer result = new MCRXMLContainer();
   if ((type == null) || ((type = type.trim()).length() ==0)) {
     return result; }
   if ((maxresults < 1) || (maxresults > maxres)) {

@@ -30,7 +30,7 @@ import javax.servlet.http.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.services.query.MCRQueryInterface;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This class provides a Servlet for remote Querying for distributed
@@ -63,14 +63,14 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
   String query = request.getParameter("query");
   try {
     // start the local query 
-    MCRQueryResultArray result = new MCRQueryResultArray();
+    MCRXMLContainer result = new MCRXMLContainer();
     if (type.equalsIgnoreCase("class")) {
       MCRClassification cl = new MCRClassification();
       org.jdom.Document jdom = cl.search(query);
       if (jdom != null) {
         org.jdom.Element el = jdom.getRootElement();
         String id = el.getAttributeValue("ID");
-        MCRQueryResultArray res = new MCRQueryResultArray();
+        MCRXMLContainer res = new MCRXMLContainer();
         res.add("local",id,1,el);
         result.importElements(res);
         }

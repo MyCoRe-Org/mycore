@@ -28,7 +28,7 @@ import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This is the search class for the IBM Content Manager 7 Text Search Engine.
@@ -52,7 +52,7 @@ private String mcr_tsserver;
 private String mcr_tsindex;
 private String mcr_fieldid;
 private int mcr_partid;
-private MCRQueryResultArray mcr_result;
+private MCRXMLContainer mcr_result;
 
 /**
  * The constructor.<br>
@@ -84,15 +84,15 @@ public MCRCM7SearchTS()
   mcr_tsindex = "";
   mcr_fieldid = conf.getString("MCR.persistence_cm7_field_id");
   mcr_partid = conf.getInt("MCR.persistence_cm7_part_xml",2);
-  mcr_result = new MCRQueryResultArray();
+  mcr_result = new MCRXMLContainer();
   }
 
 /**
  * This methode return the answer list of a query.
  *
- * @return the MCRQueryResultArray
+ * @return the MCRXMLContainer
  **/
-public final MCRQueryResultArray getResult()
+public final MCRXMLContainer getResult()
   { return mcr_result; }
 
 /**
@@ -150,7 +150,7 @@ public final void setIndexTS(String index)
   }
 
 /**
- * This methode starts the query and store the result in a MCRQueryResultArray.
+ * This methode starts the query and store the result in a MCRXMLContainer.
  *
  * @param cond                 the query string for CM7 text search
  **/

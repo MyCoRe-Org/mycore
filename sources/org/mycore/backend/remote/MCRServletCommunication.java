@@ -29,7 +29,7 @@ import java.io.*;
 import java.net.*;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.services.query.MCRCommunicationInterface;
 
 /**
@@ -57,9 +57,9 @@ public MCRServletCommunication()
  * @param reqtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
- * @return the result of the query as MCRQueryResultArray
+ * @return the result of the query as MCRXMLContainer
  **/
-public MCRQueryResultArray requestQuery(String hostAlias, String reqtype, 
+public MCRXMLContainer requestQuery(String hostAlias, String reqtype, 
   String query) throws MCRException
   {
   System.out.println("Hostname = "+hostAlias);
@@ -76,7 +76,7 @@ public MCRQueryResultArray requestQuery(String hostAlias, String reqtype,
     +"_query_servlet");
 
   URL currentURL;
-  MCRQueryResultArray result = new MCRQueryResultArray();
+  MCRXMLContainer result = new MCRXMLContainer();
   try {
     currentURL = new URL(protocol,host,port,location);
     HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();

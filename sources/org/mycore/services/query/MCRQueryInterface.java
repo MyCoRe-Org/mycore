@@ -26,7 +26,7 @@ package org.mycore.services.query;
 
 import java.util.*;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This interface is designed to choose the tranformer from XQuery to
@@ -40,15 +40,15 @@ public interface MCRQueryInterface
 
 /**
  * This method parse the XQuery string and return the result as
- * MCRQueryResultArray. If the type is null or empty or maxresults
+ * MCRXMLContainer. If the type is null or empty or maxresults
  * is lower 1 an empty list was returned.
  *
  * @param query                 the XQuery string
  * @param maxresults            the maximum of results
  * @param type                  the MCRObject type
- * @return                      a result list as MCRQueryResultArray
+ * @return                      a result list as MCRXMLContainer
  **/
-public MCRQueryResultArray getResultList(String query, String type,
+public MCRXMLContainer getResultList(String query, String type,
   int maxresults);
 
 }

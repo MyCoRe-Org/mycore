@@ -27,7 +27,7 @@ package org.mycore.services.query;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRClassification;
 import java.net.*;
 import java.io.*;
@@ -42,7 +42,7 @@ public class MCRQueryThread extends Thread {
     private int vec_max_length;
     private MCRConfiguration config;
     private MCRQueryInterface mcr_queryint;
-    private MCRQueryResultArray mcr_result;
+    private MCRXMLContainer mcr_result;
     private String mcr_type;
     private String mcr_query;
     private String hostAlias;
@@ -50,7 +50,7 @@ public class MCRQueryThread extends Thread {
 // constructor
     public MCRQueryThread(ThreadGroup threadGroup, String hostAlias,
                           String mcr_query, String mcr_type,
-                          MCRQueryResultArray mcr_result) {
+                          MCRXMLContainer mcr_result) {
 	super(threadGroup,hostAlias);
         this.hostAlias = hostAlias;
         this.mcr_query = mcr_query;
@@ -71,7 +71,7 @@ public void run()
         if (jdom != null) {
           org.jdom.Element el = jdom.getRootElement();
           String id = el.getAttributeValue("ID");
-          MCRQueryResultArray res = new MCRQueryResultArray();
+          MCRXMLContainer res = new MCRXMLContainer();
           res.add("local",id,1,el);
           mcr_result.importElements(res);
           }

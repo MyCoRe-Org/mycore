@@ -232,7 +232,7 @@ System.out.println("Location = "+location);
       int inread;
       while (( inread = in.read()) != -1) { buf.append((char) inread); }
       boolean ismcrxml = true;
-      MCRQueryResultArray resarray = new MCRQueryResultArray();
+      MCRXMLContainer resarray = new MCRXMLContainer();
       try {
         resarray.importElements(buf.toString().getBytes()); }
       catch (org.jdom.JDOMException e) {
@@ -348,8 +348,8 @@ System.out.println("Location = "+location);
       else node.setAttribute( "type", "directory" );
     }
     
-    // put it in an MCRQueryResultArray
-    MCRQueryResultArray resarray = new MCRQueryResultArray();
+    // put it in an MCRXMLContainer
+    MCRXMLContainer resarray = new MCRXMLContainer();
     resarray.add("local",dir.getOwnerID(),1,doc.getRootElement());
     org.jdom.Document jdom = resarray.exportAllToDocument();
     

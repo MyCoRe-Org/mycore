@@ -26,7 +26,7 @@ package org.mycore.backend.remote;
 
 import java.util.*;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRQueryResultArray;
+import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.services.query.MCRCommunicationInterface;
 
 /**
@@ -56,10 +56,10 @@ public MCRCommunicationDummy()
  * @param hostlist the list of hostnames as string they should requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
- * @return an empty MCRQueryResultArray as the response.
+ * @return an empty MCRXMLContainer as the response.
  * @exception MCRException general Exception of MyCoRe
  **/
-public final MCRQueryResultArray requestQuery(String hostAlias, String mcrtype,
+public final MCRXMLContainer requestQuery(String hostAlias, String mcrtype,
   String query) throws MCRException
   {
   System.out.println("Hostname = "+hostAlias);
@@ -67,7 +67,7 @@ public final MCRQueryResultArray requestQuery(String hostAlias, String mcrtype,
   System.out.println("Query    = "+query);
   System.out.println();
 
-  return new MCRQueryResultArray() ;
+  return new MCRXMLContainer() ;
   }
 
 }
