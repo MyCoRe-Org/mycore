@@ -81,7 +81,10 @@ public class MCRCM8TransformXPathToCM8
 				for (int j = 0; j < tsint.length; j++) {
 					String[] der = tsint[j].getDerivateIDs((String) subqueries.get(i));
 					for (int k = 0; k < der.length; k++) {
-						idts.add(getObjectID(der[k]));
+						MCRObjectID oid=getObjectID(der[k]);
+						if (oid != null)
+							idts.add(oid);
+						else logger.warn("Ignoring ObjectID=null");
 					}
 				}
 			}

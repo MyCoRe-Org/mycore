@@ -235,6 +235,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 						Namespace.getNamespace("http://www.w3.org/1999/xlink"));
 			return (new MCRObjectID(objectID));
 		}
+		else logger.warn("Error retrieving Meta infos of "+DerivateID);
 		return null;
 	}
 
