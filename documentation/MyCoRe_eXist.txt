@@ -1,0 +1,83 @@
+Use eXist with MyCoRe-Sample under Windows XP Professional       08.07.2003
+
+eXist supports the XML:DB-interface. Before you start change build.xml in
+mycore-directory from
+
+ <property name="persistency"  value="cm7"/>
+
+ <property name="persistency"  value="xmldb"/>
+
+1. download eXist from http://exist-db.org/
+
+2. to install it run java -jar eXist-0.9.1-install.jar on the commandline
+   may be that this step is not necessary and you use step 3 instead
+
+3. in this version there is a bug, so after installation download 
+   the development version from http://sourceforge.net/project/showfiles.php?group_id=17691
+   I had to add mysql.jar, xalan-2.3.1.jar, xercesImpl.jar and xmpl-apis.jar to lib/core 
+   directory of eXist 
+
+4. in client.properties of eXist 
+   # uncomment following line if you want to access a
+   # stand-alone server
+   uri=xmldb:exist://localhost:8081
+
+5. To test, if all is ok start eXist as server application by running startup.bat in 
+   directory bin
+
+6. put url http://localhost:8080/exist/index.xml in your browser. You should see the eXist 
+   homepage on your machine. If there are any problems consult ...
+   steps 5 and 6 should be done once
+
+7. if all is ok, run server.bat in the bin-directory
+
+8. now generate the collections with client.bat
+
+   mkcol mycore
+   chown guest guest mycore
+   cd mycore
+   mkcol legalentity
+   chown guest guest document
+   mkcol document
+   chown guest guest document
+   mkcol derivate
+   chown guest guest derivate
+
+9. now set in mycore.properties.private
+
+   MCR.persistence_type=xmldb
+   MCR.persistence_xmldb_driver=org.exist.xmldb.DatabaseImpl
+   MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/mycore
+   MCR.persistence_xmldb_database=exist
+
+   make sure that the cm7 and cm8 persistence types are deactivated, add # at the beginning
+   of the line
+
+10. copy exist/exist.jar and exist/core/xmlrpc-1.1.jar to the lib directory of mycore
+    make sure that xindice.jar is NOT in this directory
+
+11. Try to load legal entities into mycore/legalentity collection
+    This is done by running ant legal in the mycore-sample-application directory
+    if all ist ok you can view the xml-data by using exist/bin/client.bat
+
+12. If all is ok you can run ant documents to load the documents 
+
+13. If all is ok you can run ant derivates to load the derivates 
+
+On my system all these step worked. With the actual mycore-sample application
+in combination with MySQL I could view listing of legal entities and documents.
+
+Searching works pretty good. In the search mask for documents type in datafield
+Title       eide        and in datafield
+Freetext    2000
+
+you should get MyCoReDemoDC_document_0001 in your resultlist
+
+"More documents" in the result of a legalentity search doesn't work.
+Furthermore are problems with national characters.
+
+
+
+
+
+      
