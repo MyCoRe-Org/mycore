@@ -149,13 +149,13 @@ public class MCRServlet extends HttpServlet
       theSession.setAttribute( "mycore.session", session );
       
       // Bind current session to this thread:
-      MCRSessionMgr.setCurrentSession(mcrSession);
+      MCRSessionMgr.setCurrentSession(session);
 
       // Forward MCRSessionID to XSL Stylesheets
       req.setAttribute( "XSL.MCRSessionID", session.getID() );
 
       String s = ( theSession.isNew() ? "new" : "old" ) + " HttpSession=" + theSession.getId() + " MCRSession=" + session.getID() ;
-      String u = mcrSession.getCurrentUserID();
+      String u = session.getCurrentUserID();
       String h = req.getRemoteHost();
 
       if ((h == null) || (h.trim().length() == 0))
@@ -171,16 +171,12 @@ public class MCRServlet extends HttpServlet
       // Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal nur als Test!!!
       String lang = getStringParameter(job, "lang");
       if (lang.trim().length() != 0)
-        mcrSession.setCurrentLanguage(lang.trim().toUpperCase());
+        session.setCurrentLanguage(lang.trim().toUpperCase());
 
       if(GETorPOST == GET)
         doGet(job);
       else doPost(job);
 
-      // The MyCoRe session object might have changed while processing the current thread. Before
-      // resetting the session object in the finally clause we need to put a copy into the
-      // HttpSession in case the HttpSession will be reused.
-      theSession.setAttribute("mycore.session", mcrSession.clone());
     }
 
     catch(Exception ex)
