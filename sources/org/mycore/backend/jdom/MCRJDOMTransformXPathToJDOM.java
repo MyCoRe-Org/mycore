@@ -104,16 +104,20 @@ public final HashSet getResultIDs(String root, String query, String type) {
 
   // select the results
   org.jdom.Document resdoc = jdomres.getDocument();
-  org.jdom.Element reselmroot = resdoc.getRootElement();
-  List listresults = reselmroot.getChildren();
-  for (int i=0; i<listresults.size(); i++) {
-    org.jdom.Element reselm = (org.jdom.Element)listresults.get(i);
-    String id = reselm.getAttributeValue("ID");
-    try {
-      MCRObjectID mid = new MCRObjectID(id);
-      idmeta.add(mid);
-      }
-    catch (Exception e) {
+  if (resdoc != null) {
+    org.jdom.Element reselmroot = resdoc.getRootElement();
+    if (reselmroot != null) {
+      List listresults = reselmroot.getChildren();
+      for (int i=0; i<listresults.size(); i++) {
+        org.jdom.Element reselm = (org.jdom.Element)listresults.get(i);
+        String id = reselm.getAttributeValue("ID");
+        try {
+          MCRObjectID mid = new MCRObjectID(id);
+          idmeta.add(mid);
+          }
+        catch (Exception e) {
+          }
+        }
       }
     }
 

@@ -58,6 +58,7 @@ public class MCRJDOMMemoryStore
 
   /** The search XSL file */
   private InputStream searchxsl = null;
+  private org.jdom.Document xslorig = null;
 
   /** The XSL namespace */
   private org.jdom.Namespace ns = null;
@@ -88,8 +89,13 @@ protected MCRJDOMMemoryStore()
   trees = new Hashtable();
   // XSL Namespace
   ns = org.jdom.Namespace.getNamespace("xsl",MCRDefaults.XSL_URL);
+  // Read stylesheet
   searchxsl = MCRJDOMMemoryStore.class.getResourceAsStream( "/MCRJDOMSearch.xsl"); 
-  if( searchxsl == null ) throw new MCRConfigurationException( "Can't read stylesheet file MCRJDOMSearch.xsl" ); 
+  if( searchxsl == null ) throw new MCRConfigurationException( "Can't find stylesheet file MCRJDOMSearch.xsl" ); 
+  try {
+    xslorig = (new org.jdom.input.SAXBuilder()).build(searchxsl); }
+  catch (Exception e) {
+    throw new MCRException("Error while read XML file MCRJDOMSearch.xsl."); }
   // set the start time and the diff from the config
   ts = new Date();
   tsdiff = (config.getInt("MCR.persistence_jdom_reload",tsdiffdefault))*1000;
@@ -103,9 +109,8 @@ protected MCRJDOMMemoryStore()
  **/
 public final org.jdom.Document getStylesheet(String query)
   { 
-  org.jdom.Document xslfile = new org.jdom.Document();
+  org.jdom.Document xslfile = (org.jdom.Document)xslorig.clone();
   try {
-    xslfile = (new org.jdom.input.SAXBuilder()).build(searchxsl);
     org.jdom.Element root = xslfile.getRootElement();
     org.jdom.Element template = root.getChild("template",ns);
     org.jdom.Element result = template.getChild("mcr_search_results");
@@ -116,11 +121,6 @@ public final org.jdom.Document getStylesheet(String query)
     org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
     outputter.output(xslfile, System.out);
     }
-  catch (IOException jdomex) {
-    jdomex.printStackTrace(); }
-  catch (org.jdom.JDOMException jdomex) {
-    //jdomex.printStackTrace(); }
-    jdomex.getMessage(); }
   catch (Exception e) {
     throw new MCRException("Error while show XML to file."); }
   return xslfile;
