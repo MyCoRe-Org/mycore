@@ -440,7 +440,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			    String newResumptionToken = resumptionToken.substring(0, resumptionToken.indexOf('x')) + 
                     "x" + (tokenNo + 1) + "x" + (objectsInFile - endObject);
 			    File newObjectFile = new File(resumptionTokenDir +
-                    newResumptionToken + STR_RESUMPTIONTOKEN_SUFFIX);
+                    newResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
 				FileOutputStream fos = new FileOutputStream(newObjectFile);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 					
