@@ -20,7 +20,7 @@ set JAVA_HOME=C:\Programme\j2re1.4.0_01
 rem Directory where Ant is installed on your machine
 set ANT_HOME=C:\Programme\apache-ant-1.5.3-1
 
-rem Persistence implementation to use [cm7 | cm8 | xmldb]
+rem Persistence implementation to use [cm7 / cm8 / xmldb]
 set PERSISTENCE=xmldb
 
 rem If you use cm7 or cm8, directory where IBM Content Manager is installed
@@ -35,5 +35,5 @@ rem #######################################################################
 set PATH=%ANT_HOME%;%PATH%
                                                                                                                                                                                
 cd ..
-ant -DCM_HOME=$CM_HOME -DPERSISTENCE=$PERSISTENCE $*
+ant -DCM_HOME=%CM_HOME% -DPERSISTENCE=%PERSISTENCE% %1 %2 %3 %4 %5 %6 %7 %8 %9
 
