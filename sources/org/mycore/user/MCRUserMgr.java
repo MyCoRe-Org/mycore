@@ -1177,6 +1177,40 @@ public final synchronized void updatePrivileges(MCRSession session,ArrayList upd
   }
 
 /**
+ * The method gets all current privileges for the given user, included
+ * all privilegs of groups in which his group is member.
+ *
+ * @param username  the string of the user name
+ * @return a ArrayList with the privileges
+ **/
+public final ArrayList retrieveAllPrivsOfTheUser(String user)
+  {
+  ArrayList ar = new ArrayList();
+  try {
+    MCRUser u = retrieveUser(user);
+    ar.addAll(u.getPrivileges());
+    }
+  catch(MCRException ex) {}
+  return ar;
+  }
+
+/**
+ * The method check a privilege of a user.
+ *
+ * @param user  the user name as String
+ * @param priv  the privilege as String
+ **/
+public final boolean hasPrivilege(String user, String priv)
+  {
+  try {
+    MCRUser u = retrieveUser(user);
+    return u.hasPrivilege(priv);
+    }
+  catch (MCRException e) { }
+  return false; 
+  }
+
+/**
  * This method enable the user.
  *
  * @param session the MCRSession object

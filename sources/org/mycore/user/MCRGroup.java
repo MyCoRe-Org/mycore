@@ -280,6 +280,23 @@ public final ArrayList getPrivileges()
   { return privileges; }
 
 /**
+ * This method return all privileges of this group and of groups in which this
+ * group is member as an ArrayList.
+ *
+ * @return a ArrayList of all priviliges, that this group holds
+ **/
+public final ArrayList getAllPrivileges()
+  {
+  ArrayList ar = new ArrayList();
+  for (int i=0;i<privileges.size();i++) { ar.add(privileges.get(i)); }
+  for (int i=0; i<groupIDs.size(); i++) {
+    MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i));
+    ar.addAll(nextGroup.getAllPrivileges());
+    }
+  return ar;
+  }
+
+/**
  * This method checks if members of this group have a given privilege. Not only the
  * privileges of this group will be tested but also the privileges of the groups where
  * this group is a member of (recursivley).

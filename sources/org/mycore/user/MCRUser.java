@@ -224,8 +224,39 @@ public int getNumID()
    * @return
    *   This method returns the ID of the primary group of the user.
    */
-  public String getPrimaryGroupID()
+  public final String getPrimaryGroupID()
   { return primaryGroupID; }
+
+  /**
+   * This method returns a normalized ArrayList of all privileges of this user.
+   * 
+   * @return a privilege list of this user
+   **/
+  public final ArrayList getPrivileges()
+    {
+    ArrayList ar = new ArrayList();
+    try {
+      // Privileges of the primary group
+      MCRGroup g = MCRUserMgr.instance().retrieveGroup(primaryGroupID);
+      ar.addAll(g.getAllPrivileges());
+      for (int i=0;i<groupIDs.size();i++) {
+        g = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i));
+        ar.addAll(g.getAllPrivileges());
+        }
+      }
+    catch(MCRException ex) {}
+    ArrayList n = new ArrayList();
+    for (int i=0;i<ar.size();i++) {
+      boolean test = false;
+      String name = ((String)ar.get(i));
+      for (int j=0;j<n.size();j++) {
+        if (name.equals((String)n.get(j))) { test = true; }
+        }
+      if (!test) { n.add(ar.get(i)); }
+      }
+    for (int i=0;i<n.size();i++) { logger.debug("Privileg = "+(String)ar.get(i)); }
+    return n;
+    }
 
   /**
    * This method checks if the user has a specific privilege. To do this all groups of
@@ -236,15 +267,7 @@ public int getNumID()
    *   of one of the groups
    */
   public boolean hasPrivilege(String privilege) 
-  {
-    ListIterator groupIter = groupIDs.listIterator();
-    while (groupIter.hasNext()) {
-      MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup((String)groupIter.next());
-      if (currentGroup.hasPrivilege(privilege))
-        return true;
-    }
-    return false;
-  }
+    { return getPrivileges().contains(privilege); }
 
   /**
    * @return
