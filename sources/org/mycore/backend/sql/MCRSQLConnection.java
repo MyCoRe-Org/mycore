@@ -25,6 +25,9 @@
 package org.mycore.backend.sql;
 
 import java.sql.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.*;
 
 /**
@@ -58,16 +61,18 @@ public class MCRSQLConnection
   protected Connection connection;
 
   /** 
-   * Creates a new connection. This constructor is used by the connection pool class.
+   * Creates a new connection. This constructor is used by the connection pool 
+   * class.
    * 
    * @see MCRSQLConnectionPool#getConnection()
    **/
-  MCRSQLConnection()
-    throws MCRPersistenceException
+  MCRSQLConnection() throws MCRPersistenceException
   {
+    Logger logger = MCRSQLConnectionPool.getLogger();
+
     String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
     
-    System.out.println( "Building connection to JDBC datastore..." );
+    logger.info( "Building connection to JDBC datastore..." );
     
     Connection connection = null;
     try{ connection = DriverManager.getConnection( url ); }
