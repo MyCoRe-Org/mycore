@@ -60,7 +60,7 @@ public MCRQueryResult()
   // get an instance of configuration
   conf = MCRConfiguration.instance();
   // read host list from configuration
-  String hostconf = conf.getString("MCR.communication_hostaliases","local");
+  String hostconf = conf.getString("MCR.remoteaccess_hostaliases","local");
   remoteAliasList = new ArrayList();
   int i = 0;
   int j = hostconf.length();

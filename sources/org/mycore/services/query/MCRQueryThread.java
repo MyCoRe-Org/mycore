@@ -29,6 +29,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.backend.remote.MCRRemoteAccessInterface;
 import java.net.*;
 import java.io.*;
 
@@ -38,7 +39,7 @@ import java.io.*;
  * @author Mathias Zarick
  * @version $Revision$ $Date$
  */
-public class MCRQueryThread extends Thread {
+class MCRQueryThread extends Thread {
     private int vec_max_length;
     private MCRConfiguration config;
     private MCRQueryInterface mcr_queryint;
@@ -89,9 +90,9 @@ public void run()
        throw new MCRException(e.getMessage(),e); }
     }
   else {
-    MCRCommunicationInterface comm = null;
-    comm = (MCRCommunicationInterface)
-      config.getInstanceOf("MCR.communication_"+hostAlias+"_query_class");
+    MCRRemoteAccessInterface comm = null;
+    comm = (MCRRemoteAccessInterface)
+      config.getInstanceOf("MCR.remoteaccess_"+hostAlias+"_query_class");
     mcr_result.importElements(comm.requestQuery(hostAlias,mcr_type,mcr_query));
     }
   }

@@ -66,6 +66,19 @@ private String defaultLang = "";
     }
 
  /**
+  * This method handles HTTP POST requests and resolves them to output.
+  *
+  * @param request the HTTP request instance
+  * @param response the HTTP response instance
+  * @exception IOException for java I/O errors.
+  * @exception ServletException for errors from the servlet engine.
+  **/
+  public void doPost( HttpServletRequest  request, 
+                      HttpServletResponse response )
+    throws IOException, ServletException
+  { doGet(request,response); }
+
+ /**
   * This method handles HTTP GET requests and resolves them to output.
   *
   * @param request the HTTP request instance
