@@ -1,4 +1,6 @@
 /**
+ * $RCSfile$
+ * $Revision$ $Date$
  *
  * Copyright (C) 2000 University of Essen, Germany
  *
@@ -25,43 +27,45 @@ import org.mycore.common.MCRConfiguration;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom.*;
-import java.net.*;
+
 
 /**
- * Instances of MCRClassificationBrowserData contain the data of the currently displayed
- * navigation tree by the servlet MCRClassificationBrowser.
+ * Instances of MCRClassificationBrowser contain the data of the currently displayed 
+ * navigation tree. MCRClassificationBrowser uses one MCRClassificationBrowserData instance per
+ * browser session to store and update the category lines to be displayed.
  *
  * @author Anja Schaar
- *
+ * 
  */
 public class MCRClassificationBrowserData
 {
   protected boolean        				showComments;
-  protected String						pageName;
-  protected String						xslStyle;
+  protected String						pageName; 
+  protected String						xslStyle;	
   protected String 						uri;
-
+  
   private 	static 	MCRConfiguration 	config;
   private 	static 	Logger 				logger=Logger.getLogger(MCRClassificationBrowserData.class);
-  private   MCRCategoryItem[] 			categItem ;
+  private   MCRCategoryItem[] 			categItem ;   
   private 	Vector         				lines;
   private 	MCRClassificationItem 		classif;
   private   String						startPath;
-  private   String						actItemID, lastItemID;
+  private   String						actItemID, lastItemID;		
   private   String[]					categFields;
-
-
+  private   String						emptyLeafs;
+  private   String						view;
+  private   String						comments;
+  
+  
+  
+  
   public MCRClassificationBrowserData( String u )   throws Exception
   {
   	uri = u;
 	config = MCRConfiguration.instance();
 	String classifID = "";
-
+	
 	logger.info( this.getClass() + " incomming Path " + uri);
-	if (uri.endsWith("ChangeComments")) {
-		showComments = showComments?false:true;
-	}
-
 	String[] uriParts = mySplit();
 	logger.info( this.getClass() + " Start" );
 	if ( uriParts.length > 1) {
@@ -70,21 +74,27 @@ public class MCRClassificationBrowserData
 		classifID = config.getString( "MCR.ClassificationBrowser." + uriParts[1] +".Classification" );
 		pageName  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".EmbeddingPage" );
 		xslStyle  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Style" );
+		emptyLeafs= config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".EmptyLeafs" );
+		view  	  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".View" );		
+		comments  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Comments" );		
 		startPath = uriParts[1];
 	}
 	setClassification(classifID);
-	logger.info( this.getClass() + " SetClassification " + classifID);
-
-	clearPath(uriParts );
-	logger.info( this.getClass() + " clear Path " + uri);
-
+	clearPath(uriParts );	 
 	setActualPath();
+	if ( view == null || !view.endsWith("tree") ) 	view = "flat";
+	if ( comments == null ) 		 				comments = "false";
+	showComments  = comments.endsWith("true")?true:false;		
+	
+	logger.info( this.getClass() + " SetClassification " + classifID);
+	logger.info( this.getClass() + " Leere Knoten auslassen: " + emptyLeafs );
+	logger.info( this.getClass() + " Darstellung: " + view );
+	logger.info( this.getClass() + " Kommentare: " + comments );
+
   }
-
-  private String[]  mySplit(  )   throws Exception {
-
-        //String[]  uriParts = uri.split("/");
-
+  
+  private String[]  mySplit( )   throws Exception {
+        //entspricht:  String[]  uriParts = uri.split("/");
         if (uri.endsWith("/")) uri = uri.substring(0, uri.length()-1);
         String[] tmpP = new String[uri.length()];
         int pCount =0;
@@ -92,7 +102,7 @@ public class MCRClassificationBrowserData
         logger.debug( this.getClass() + " Index " + first);
         while( first >= 0 && first+1 < uri.length() ) {
                 logger.info( this.getClass() + " Länge " + uri.length());
-                logger.info( this.getClass() + " tmpP " + tmpP[pCount] );
+                //logger.info( this.getClass() + " tmpP " + tmpP[pCount] );
                 tmpP[pCount] = uri.substring(0, first);
                 uri = uri.substring(first+1);
                 first = uri.indexOf ( "/" );
@@ -105,15 +115,16 @@ public class MCRClassificationBrowserData
 
         String[] Parts = new String[pCount+1];
         for (int i=0; i<=pCount; i++ ) Parts[i]=tmpP[i];
+        
 	return Parts;
   }
-
+  
   private void setClassification( String classifID )   throws Exception
   {
     lines       	= new Vector();
 	classif 		= MCRClassificationItem.getClassificationItem(classifID);
-
-	categItem = classif.getChildren();
+	
+	categItem = classif.getChildren(); 
     for( int i = 0,j = classif.getNumChildren(); i<j; i++) {
       lines.addElement( new MCRNavigTreeLine( categItem[i] , 1 ) );
     }
@@ -121,29 +132,31 @@ public class MCRClassificationBrowserData
 
   private void clearPath(String[] uriParts )  throws Exception {
   	String[] cati = new String[uriParts.length];
-  	String   path = "";
+  	String   path = ""; 
 	int len =0;
     // pfad bereinigen
 	for ( int k=2; k< uriParts.length; k++ ) {
-		  logger.debug( this.getClass() + " uriParts[k]=" + uriParts[k] + " k=" + k);
+		  logger.debug( this.getClass() + " uriParts[k]=" + uriParts[k] + " k=" + k);	  
 		  if ( uriParts[k].length()>0 ){
-		  	  if(!uriParts[k].equalsIgnoreCase("ChangeComments")){
+		  	  if (uriParts[k].equalsIgnoreCase("..") && len > 0) {
+		  	  	len--;
+		  	  }else {
 				cati[len]= uriParts[k];
 				len ++;
 		  	  }
 		  }
-		  logger.debug( this.getClass() + " cati[len]=" + cati[len] + " len=" + len);
-	}
-
+		  logger.debug( this.getClass() + " cati[len]=" + cati[len] + " len=" + len);	  			   
+	} 
+	
 	//reinitialisieren
 	categFields = new String[len];
 	for ( int i=0; i < len ; i++ ){
 		categFields[i]= cati[i];
 		path += categFields[i]+ (i+1<categFields.length?"/":"");
 	}
-	uri = new String( uriParts[1] + "/" + path);
+	uri = new String( uriParts[1] + "/" + path);	
   }
-
+   	 
   private void setActualPath(  )   throws Exception {
 	actItemID = lastItemID ="";
 	for ( int k=0; k< categFields.length; k++) {
@@ -155,18 +168,10 @@ public class MCRClassificationBrowserData
 	logger.debug( this.getClass() + " actItemID " + actItemID);
 	logger.debug( this.getClass() + " setActualPath OK" );
   }
-
-  private void setStartPath( )   throws Exception
-  {
-    MCRNavigTreeLine tl;
-	for ( int k=0; k< categFields.length; k++) {
-	 startPath += categFields[k]+ (k+1<categFields.length?"/":"");
-	}
-	logger.info( this.getClass() + " startPath " + startPath + " OK ");
-  }
-
+  
+ 
   /**
-   * Returns true if category comments for the classification
+   * Returns true if category comments for the classification 
    * currently displayed should be shown.
    */
   public boolean showComments()
@@ -174,13 +179,13 @@ public class MCRClassificationBrowserData
 
 
   /**
-   * Returns the pageName for the classification
+   * Returns the pageName for the classification 
    */
   public String getPageName()
   { return pageName; }
 
   /**
-	 * Returns the xslStyle for the classification
+	 * Returns the xslStyle for the classification 
 	 */
   public String getXslStyle()
   { return xslStyle; }
@@ -189,20 +194,20 @@ public class MCRClassificationBrowserData
    return  classif;
   }
 
-  public MCRNavigTreeLine getLine( int i )  {
-    if( i >= lines.size() )
+  public MCRNavigTreeLine getLine( int i )  { 
+    if( i >= lines.size() )  
       return null;
     else
-      return (MCRNavigTreeLine)( lines.elementAt( i ) );
+      return (MCRNavigTreeLine)( lines.elementAt( i ) ); 
   }
-
-  public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover,
+  
+  public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover, 
   		org.jdom.Document  browser ){
-
+  			
 		Element placeholder = cover.getRootElement().getChild( "classificationBrowser" );
   		logger.info( this.getClass() + " Found Entry at " + placeholder);
 	    if ( placeholder != null ) {
-			List children = browser.getRootElement().getChildren();
+			List children = browser.getRootElement().getChildren(); 
 			for( int j = 0; j < children.size(); j++ )	{
 			    Element child = (Element)( (Element)( children.get( j ) ) ).clone();
 				placeholder.addContent( child );
@@ -211,69 +216,77 @@ public class MCRClassificationBrowserData
 		logger.debug(cover);
     	return cover;
   }
-
-  /**
-	* Creates an XML representation of MCRClassificationBrowserData
+  
+  /** 
+	* Creates an XML representation of MCRClassificationBrowserData 
 	* @author Anja Schaar
-	*
+	* 
 	*/
    public org.jdom.Document  createXmlTree( String lang )
 	 throws Exception
    {
-
+  	
 	 MCRClassificationItem cl = getClassification();
 	 Element xDocument = new Element( "classificationBrowse" );
-
+	 
 	 logger.info(cl.toString());
-
+	 
 	 Element xID = new Element( "classifID" );
-	 xID.addContent(cl.getClassificationID());
+	 xID.addContent(cl.getClassificationID());  
 	 xDocument.addContent( xID );
 
 	 Element xLabel = new Element( "label" );
-	 xLabel.addContent(cl.getText(lang));
+	 xLabel.addContent(cl.getText(lang));  
 	 xDocument.addContent( xLabel );
-
+	
 	 Element xDesc = new Element( "description" );
 	 xDesc.addContent(cl.getDescription(lang));
 	 xDocument.addContent( xDesc );
-
+	
 	 Element xDocuments = new Element( "cntDocuments" );
 	 xDocuments.addContent( String.valueOf( cl.countDocLinks() ) );
 	 xDocument.addContent( xDocuments );
-
+    
 	 Element xShowComments = new Element( "showComments" );
 	 xShowComments.addContent( String.valueOf( showComments() ) );
 	 xDocument.addContent( xShowComments );
-
+    
 	 Element xUri = new Element( "uri" );
-	 xUri.addContent(uri);
+	 xUri.addContent(uri);  
 	 xDocument.addContent( xUri );
-
+     
 	 Element xStartPath = new Element( "startPath" );
-	 xStartPath.addContent(startPath);
+	 xStartPath.addContent(startPath);  
 	 xDocument.addContent( xStartPath );
-
+     
 	 // data as XML from outputNavigationTree
 	 Element xNavtree = new Element( "navigationtree" );
-	 xNavtree.setAttribute( "classifID", cl.getClassificationID() );
-	 xNavtree.setAttribute( "categID", actItemID );
-	 xNavtree.setAttribute( "predecessor",  lastItemID);
-
+	 xNavtree.setAttribute ( "classifID", cl.getClassificationID() );
+	 xNavtree.setAttribute ( "categID", actItemID );
+	 xNavtree.setAttribute ( "predecessor",  lastItemID);
+	 xNavtree.setAttribute ( "emptyLeafs",  emptyLeafs);
+	 xNavtree.setAttribute ( "view",  view);
+	 
 	 xDocument.addContent( xNavtree );
 
 	 int i = 0;
 	 MCRNavigTreeLine line;
-
+   
 	 while( ( line = getLine( i++ ) ) != null )
 	 {
 	   int numDocs =  line.cat.countDocLinks();
+	   
+	   if ( emptyLeafs.endsWith("no") && numDocs == 0    ) {
+		    logger.debug( this.getClass() + " empty Leaf continue - " + emptyLeafs );	   		
+	   		continue;  
+	   }
 	   Element xRow = new Element( "row" );
 	   xNavtree.addContent( xRow );
 	   Element xCol = new Element( "col" );
 	   xRow.addContent( xCol );
 	   xCol.setAttribute( "lineLevel",  String.valueOf( line.level - 1 ) );
 
+	
 	   if( line.status.equals( "T" ) )
 	   {
 		 xCol.setAttribute( "plusminusbase",  line.cat.getID() );
@@ -291,76 +304,88 @@ public class MCRClassificationBrowserData
 		 xCol.setAttribute( "folder1", "folder_plain" );
 		 xCol.setAttribute( "folder2", numDocs > 0 ? "folder_closed_in_use" : "folder_closed_empty" );
 	   }
-
+      
 	   int numLength = String.valueOf( numDocs ).length();
 
 	   xCol = new Element( "col" );
 	   xRow.addContent( xCol );
 	   xCol.setAttribute( "numDocs",  String.valueOf( numDocs ) );
-
+       
 	   if( numLength > 0 )
 	   {
-		 String search ="/"+uri;
-		 if ( line.cat.getID().equalsIgnoreCase(actItemID)	 )
+		 String search ="/"+uri;  
+		 if ( line.cat.getID().equalsIgnoreCase(actItemID)	 ) 
 			 search+= "/..";
-		 else
+		 else 	   		 
 		 	 search+= "/" +line.cat.getID();
-
+		 
 		 if ( search.indexOf("//") > 0 )
 			search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//")+1);
-		 //search = search.replaceAll("//","/");
+		 //search = search.replaceAll("//","/");		
 		 xCol.setAttribute( "searchbase",  search );
 		 xCol.setAttribute( "lineID",  line.cat.getID() );
 	   }
+      
+	   xCol.addContent( line.cat.getText(lang)); 
 
-	   xCol.addContent( line.cat.getText(lang));
-
-	   if( showComments() && ( line.cat.getDescription(lang) != null)  )  {
+	   if( showComments() && ( line.cat.getDescription(lang) != null)  )  {    
 		 Element comment = new Element( "comment" );
 		 xCol.addContent( comment );
 		 comment.setText(line.cat.getDescription(lang) );
-	   }
+	   }  
 
-	 }
+	 } 
 	 return new org.jdom.Document( xDocument );
   }
 
 
   public void update( String categID )    throws Exception  {
-    int     last_level = 0;
-    //boolean ausblenden = false;
-
+    int     lastLevel = 0;
+    boolean hideLevel = false;
+  
 	logger.debug( this.getClass() + " update CategoryTree for: " + categID);
     for( int i = 0; i < lines.size(); i++ )
     {
       MCRNavigTreeLine 	line = getLine( i );
-      //ausblenden = ausblenden && ( line.level > last_level );
+	  hideLevel = hideLevel && ( line.level > lastLevel );
 	  logger.debug( this.getClass() + " compare CategoryTree on " +i + "_" +line.cat.getID() + " to " + categID);
-
-      if( categID.equalsIgnoreCase(line.cat.getID() ) )  {
-        if( line.status.equals( "F" ) ) // hide expanded category children
-        {
-		  logger.debug( this.getClass() + " contract " + line.cat.getID());
-          line.status = "T";
-          // ausblenden  = true;
-          last_level  = line.level;
-        }
-        else if( line.status.equals( "T" ) ) // expand category children
-        {
-		  logger.info( this.getClass() + " expand " +line.cat.getID());
-          line.status = "F";
-		  MCRCategoryItem[] children = line.cat.getChildren();
-          for( int j = 0, k= children.length;  j < k ; j++ )    {
-			MCRCategoryItem cat = children[j] ;
-            lines.insertElementAt( new MCRNavigTreeLine( cat, line.level + 1 ), ++i );
-          }
-        }
-      } else if (categID.length()>0) {
-		// ehemals if( ausblenden )
-		logger.debug( this.getClass() + " remove lines " + i + "_" +line.cat.getID() );
-		lines.removeElementAt( i-- );
-	  }
-
+   
+      if ( view.endsWith("tree")) {
+      	if ( hideLevel) {
+			lines.removeElementAt( i-- );
+      	} else if( categID.equals( line.cat.getID() ) )  
+      	{
+			if( line.status.equals( "F" ) ) // hide expanded category children
+			{
+			   line.status = "T";
+			   hideLevel  = true;
+			   lastLevel  = line.level;
+			} else if( line.status.equals( "T" ) ) // expand category children
+			{
+			  line.status = "F";
+			  MCRCategoryItem[] children = line.cat.getChildren();            
+			  for( int j = 0, k= children.length;  j < k ; j++ )    {
+					MCRCategoryItem cat = children[j] ;
+					lines.insertElementAt( new MCRNavigTreeLine( cat, line.level + 1 ), ++i );
+			  }
+      		}
+      	}	      		
+      } else {      	
+      	if( categID.equalsIgnoreCase(line.cat.getID() ) )  {     
+      		line.level=0;  
+		    logger.info( this.getClass() + " expand " +line.cat.getID());
+			line.status = "F";
+		    MCRCategoryItem[] children = line.cat.getChildren();            
+          	for( int j = 0, k= children.length;  j < k ; j++ )    {
+			  MCRCategoryItem cat = children[j] ;
+          	  lines.insertElementAt( new MCRNavigTreeLine( cat, line.level + 1 ), ++i );
+          	}
+          } 
+         else {   
+			logger.debug( this.getClass() + " remove lines " + i + "_" +line.cat.getID() );
+			lines.removeElementAt( i-- );
+	  	  }       
+	   }
     }
   }
 }
