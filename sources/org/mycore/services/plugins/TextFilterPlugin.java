@@ -25,13 +25,14 @@ package org.mycore.services.plugins;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.Writer;
 import java.util.HashSet;
 
 import org.mycore.datamodel.ifs.MCRFileContentType;
 
 /**
  * The Plugin spec for filtering several documents for the fulltext search.
+ * A class implementing this interface may throw a FilterPluginInstantiationException
+ * if it fails to initialize correctly and though is not usable.
  * 
  * @author Thomas Scheffler (yagee)
  */
