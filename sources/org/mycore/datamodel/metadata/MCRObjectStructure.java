@@ -24,15 +24,17 @@
 
 package mycore.datamodel;
 
+import java.util.Vector;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import java.util.Vector;
+import mycore.common.MCRException;
 
 /**
  * This class treats the outer structure of documents, that is the
  * linking from one object to another one. A link is described by the
  * <em>MCRMetaLink</em> class. The href variable of MCRMetaLink gives
- * the ID of the linked document, while the role variable is used for
+ * the ID of the linked document, while the label variable is used for
  * further description of the link. Two special cases of roles are
  * supported: "role=child" declares the linked object to be a child of
  * the linking object and possibly inherit metadata from it as given
@@ -51,6 +53,7 @@ public class MCRObjectStructure
 {
   private String NL = null;
   private Vector the_links = null;
+  private Vector the_derivates = null;
 
   /**
    * The constructor initializes NL (non-static, in order to enable
@@ -61,13 +64,11 @@ public class MCRObjectStructure
   {
     NL = System.getProperties().getProperty("line.separator");
     the_links = new Vector();
+    the_derivates = new Vector();
   }
 
   /**
-   * <em>addLink</em> checks whether a (new) link is already contained
-   * in the link vector (identical role and href) or not. If not, the
-   * link will be added to the vector, otherwise nothing will be done,
-   * preventing double-linked objects.
+   * <em>addLink</em> methode append the given link data to the link vector.
    * If the link could be added a "true" will be returned, otherwise "false".
    *
    * @param add_link             the link to be added
@@ -75,67 +76,56 @@ public class MCRObjectStructure
    */
   public final boolean addLink (MCRMetaLink add_link)
   {
-/*
-    String role = add_link.getRole();
-    String role_link= null;
-    if (role == null) role = "";
-    role = role.trim();
-    String href = add_link.getHrefToString();
-    MCRMetaLink link = null;
-    for (int i = 0; i < the_links.size(); ++i)
-    {
-      link = (MCRMetaLink) the_links.elementAt(i);
-      role_link = link.getRole();
-      if (role_link == null) role_link = "";
-      role_link = role_link.trim();
-      if (href.equals(link.getHrefToString()) && role.equals(role_link))
-        return false;
-    }
-*/
     the_links.addElement(add_link);
     return true;
   }
 
   /**
-   * <em>removeLink</em> checks whether a link is contained in the link
-   * vector (identical role and href) or not. If so, the link will be
-   * removed from the vector, returning true. Otherwise nothing is done,
-   * returning false.
+   * <em>addDerivate</em> methode append the given derivate link data to the
+   * derivate vector.
+   * If the link could be added a "true" will be returned, otherwise "false".
+   *
+   * @param add_derivate         the link to be added
+   * @return boolean             true, if operation successfully completed
+   */
+  public final boolean addDerivate (MCRMetaLink add_derivate)
+  {
+    the_derivates.addElement(add_derivate);
+    return true;
+  }
+
+  /**
+   * <em>removeLink</em> the link from the link vector for the given number.
    *
    * @param rem_link             the link to be removed
    * @return boolean             true, if operation successfully completed
    */
-  public final boolean removeLink (MCRMetaLink rem_link)
+  public final boolean removeLink (int number)
   {
-/*
-    String role = rem_link.getRole();
-    String role_link = null;
-    if (role == null) role = "";
-    role = role.trim();
-    String href = rem_link.getHrefToString();
-    MCRMetaLink link = null;
-    for (int i = 0; i < the_links.size(); ++i)
-    {
-      link = (MCRMetaLink) the_links.elementAt(i);
-      role_link = link.getRole();
-      if (role_link == null) role_link = "";
-      role_link = role_link.trim();
-      if (href.equals(link.getHrefToString()) && role.equals(role_link))
-      {
-        the_links.removeElementAt(i);
-        return true;
-      }
-    }
-*/
-    return false;
+    the_links.removeElementAt(number);
+    return true;
+  }
+
+  /**
+   * <em>removeDerivate</em> the derivate link from the derivate vector for 
+   * the given number.
+   *
+   * @param rem_derivate         the link to be removed
+   * @return boolean             true, if operation successfully completed
+   */
+  public final boolean removeDerivate (int number)
+  {
+    the_derivates.removeElementAt(number);
+    return true;
   }
 
   /**
    * <em>removeAllLinks</em> removes all links from the link vector.
    */
-  public final void removeAllLinks ()
+  public final void removeAll ()
   {
     the_links.removeAllElements();
+    the_derivates.removeAllElements();
   }
 
   /**
@@ -144,47 +134,74 @@ public class MCRObjectStructure
    * Thereby <em>setFromDOM</em> will read the structure data from an XML
    * input stream (the "structure" entry).
    *
-   * @param dom_elem_list        the structure node list
+   * @param dom_element_list        the structure node list
    */
-  public final void setFromDOM (NodeList dom_elem_list)
+  public final void setFromDOM (NodeList dom_element_list)
   {
-    removeAllLinks();
-    Node struct_node = dom_elem_list.item(0);
-    NodeList link_list = struct_node.getChildNodes();
-    int i, n = link_list.getLength();
-    MCRMetaLink link = null;
-    Node link_node = null;
-    for (i = 0; i < n; ++i)
-    {
-      link = new MCRMetaLink();
-      link_node = link_list.item(i);
-      link.setFromDOM(link_node);
-      // When read from an XML input stream, the check for double-linkings
-      // is omitted. XML files are considered to be clean, this will increase
-      // the load performance !
-      the_links.addElement(link);
-    }
+    removeAll();
+    Node link_element, der_element;
+    NodeList link_list, der_list;
+    Element struct_element = (Element)dom_element_list.item(0);
+    // Structure link part
+    NodeList struct_links_list =
+      struct_element.getElementsByTagName("links");
+    if (struct_links_list.getLength()>0) {
+      Node struct_links_element = struct_links_list.item(0);
+      NodeList struct_link_list = struct_links_element.getChildNodes();
+      int link_len = struct_link_list.getLength();
+      for (int i=0;i<link_len;i++) {  
+        link_element = struct_link_list.item(i);
+        if (link_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+        MCRMetaLink link = new MCRMetaLink();
+        link.setDataPart("structure");
+        link.setFromDOM(link_element);
+        addLink(link);
+        }
+      }
+    // Structure derivate part
+    NodeList struct_ders_list =
+      struct_element.getElementsByTagName("derivates");
+    if (struct_ders_list.getLength()>0) {
+      Node struct_ders_element = struct_ders_list.item(0);
+      NodeList struct_der_list = struct_ders_element.getChildNodes();
+      int der_len = struct_der_list.getLength();
+      for (int i=0;i<der_len;i++) {  
+        der_element = struct_der_list.item(i);
+        if (der_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+        MCRMetaLink der = new MCRMetaLink();
+        der.setDataPart("structure");
+        der.setFromDOM(der_element);
+        addDerivate(der);
+        }
+      }
   }
 
   /**
    * <em>createXML</em> is the inverse of setFromDOM and converts the
    * structure's memory copy into an XML string.
    *
+   * @exception MCRException if the content of this class is not valid
    * @return String              the structure XML string
    */
-  public final String createXML ()
+  public final String createXML () throws MCRException
   {
-    int i, n = the_links.size();
-    if (n==0) { return "<structure/>" + NL; }
-    String xml_str = "<structure>" + NL;
-    MCRMetaLink link = null;
-    for (i = 0; i < n; ++i)
-    {
-      link = (MCRMetaLink) the_links.elementAt(i);
-      xml_str += link.createXML();
-    }
-    xml_str += "</structure>" + NL;
-    return xml_str;
+    if (!isValid()) {
+      debug();
+      throw new MCRException("The content is not valid."); }
+    int i, n = the_links.size(), m = the_derivates.size();
+    if ((n==0)&&(m==0)) { return "<structure/>" + NL; }
+    StringBuffer sb = new StringBuffer(2048);
+    sb.append("<structure>").append(NL);
+    sb.append("<links>").append(NL);
+    for (i = 0; i < n; ++i) {
+      sb.append(((MCRMetaLink) the_links.elementAt(i)).createXML()); }
+    sb.append("</links>").append(NL);
+    sb.append("<derivates>").append(NL);
+    for (i = 0; i < m; ++i) {
+      sb.append(((MCRMetaLink) the_derivates.elementAt(i)).createXML()); }
+    sb.append("</derivates>").append(NL);
+    sb.append("</structure>").append(NL);
+    return sb.toString();
   }
 
   /**
@@ -194,27 +211,30 @@ public class MCRObjectStructure
    * string depends on the persistency database implementation.
    *
    * @param mcr_query            implementor of MCRQueryInterface
+   * @exception MCRException if the content of this class is not valid
    * @return String              text search output string
    */
-  public final String createTS (Object mcr_query)
+  public final String createTS (Object mcr_query) throws MCRException
   {
-    String ts_str = "" + NL;
-    int i, n = the_links.size();
-    MCRMetaLink link = null;
-    for (i = 0; i < n; ++i)
-    {
-      link = (MCRMetaLink) the_links.elementAt(i);
-      ts_str += link.createTS(mcr_query, "child");
-/*
-      role = link.getRole();
-      if (role == null) continue;
-      if (! role.trim().equals("parent")) continue;
-      // treat the parent case here:
-      // ##### metadata inheritance not yet supported in this version,
-      // ##### to be done next time !!
-*/
-    }
-    return ts_str;
+    if (!isValid()) {
+      debug();
+      throw new MCRException("The content is not valid."); }
+    int i, n = the_links.size(), m = the_derivates.size();
+    if ((n==0)&&(m==0)) { return ""; }
+    StringBuffer sb = new StringBuffer(2048);
+    if (n!=0) {
+    for (i=0;i<n;i++) {
+      sb.append(((MCRMetaLink) the_links.elementAt(i))
+        .createTS(mcr_query,"links")); }
+      }
+    else { sb.append(""); }
+    if (m!=0) {
+      for (i=0;i<m;i++) {
+        sb.append(((MCRMetaLink) the_derivates.elementAt(i))
+          .createTS(mcr_query,"derivates")); }
+      }
+    else { sb.append(""); }
+    return sb.toString();
   }
 
   /**
@@ -225,9 +245,14 @@ public class MCRObjectStructure
    */
   public final boolean isValid ()
   {
-    for (int i = 0; i < the_links.size(); ++i)
+    for (int i = 0; i < the_links.size(); ++i) {
       if (! ((MCRMetaLink) the_links.elementAt(i)).isValid())
         return false;
+      }
+    for (int i = 0; i < the_derivates.size(); ++i) {
+      if (! ((MCRMetaLink) the_derivates.elementAt(i)).isValid())
+        return false;
+      }
     return true;
   }
 
@@ -238,12 +263,19 @@ public class MCRObjectStructure
   public final void debug ()
   {
     System.out.println("The document's structure data :");
-    int i, n = the_links.size();
+    int i, n = the_links.size(), m = the_derivates.size();
     MCRMetaLink link = null;
     System.out.println("The outer structure consists of " + n + " links :");
     for (i = 0; i < n; ++i)
     {
       link = (MCRMetaLink) the_links.elementAt(i);
+      System.out.println("-->"+i+"<--");
+      link.debug();
+    }
+    System.out.println("The outer structure consists of " + n + " derivates :");
+    for (i = 0; i < m; ++i)
+    {
+      link = (MCRMetaLink) the_derivates.elementAt(i);
       System.out.println("-->"+i+"<--");
       link.debug();
     }
