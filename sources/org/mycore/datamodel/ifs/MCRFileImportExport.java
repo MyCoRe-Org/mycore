@@ -36,19 +36,24 @@ import java.io.*;
  */
 public class MCRFileImportExport
 {
-  public static MCRDirectory importFiles( File local, String ownerID, String dirName )
-    throws IOException
+  public static MCRDirectory importFiles( File local, String ownerID )
   {
-    MCRArgumentChecker.ensureNotEmpty( ownerID, "path" );
-    MCRArgumentChecker.ensureNotEmpty( dirName, "path" );
+    MCRArgumentChecker.ensureNotEmpty( ownerID, "owner ID" );
     
-    MCRDirectory dir = new MCRDirectory( dirName, ownerID );
-    importFiles( local, dir );
+    MCRDirectory dir = new MCRDirectory( ownerID, ownerID );
+    try
+    { importFiles( local, dir ); }
+    catch( MCRException mex )
+    {
+      try{ dir.delete(); }  // try to delete all content stored so far
+      catch( Exception ignored ){}
+      
+      throw mex;
+    }
     return dir;
   }
   
   public static void importFiles( File local, MCRDirectory dir )
-    throws IOException
   {
     MCRArgumentChecker.ensureNotNull( local, "local file" );
     
@@ -72,7 +77,27 @@ public class MCRFileImportExport
       if( existing == null )
         file = new MCRFile( name, dir );
       else 
+      {  
         file = (MCRFile)existing;
+        
+        FileInputStream fin = null;
+        try{ fin = new FileInputStream( local ); }
+        catch( FileNotFoundException willNotBeThrown ){}
+        
+        MCRContentInputStream cis = new MCRContentInputStream( fin );
+        
+        try{ MCRUtils.copyStream( cis, null ); }
+        catch( IOException ex )
+        {
+          String msg = "Error while reading local file " + local.getPath();
+          throw new MCRException( msg, ex );
+        }
+        
+        String local_md5 = cis.getMD5String();
+        
+        // If file content of local file has not changed, do not load it again
+        if( file.getMD5().equals( local_md5 ) ) return;
+      }
       
       file.setContentFrom( local );
     }
