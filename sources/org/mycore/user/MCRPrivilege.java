@@ -24,6 +24,8 @@
 
 package mycore.user;
 
+import org.jdom.Element;
+
 /**
  * This class defines a privilege of the MyCoRe user management system.
  *
@@ -52,5 +54,19 @@ public class MCRPrivilege
   /** @return returns the description of the privilege */
   public String getDescription()
   { return privDescription; }
-}
 
+  /**
+   * @return
+   *   This method returns the privilege object as a JDOM element. This is needed if
+   *   one wants to get a representation of several privileges in one xml document.
+   */
+  public Element toJDOMElement() throws Exception
+  {
+    Element priv = new Element("privilege").setAttribute("name", privName);
+    Element Description = new Element("privilege.descrition").setText(privDescription);
+
+    // Aggregate privilege element
+    priv.addContent(Description);
+    return priv;
+  }
+}

@@ -25,10 +25,9 @@
 package mycore.user;
 
 import java.util.Vector;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import mycore.xml.MCRXMLHelper;
+import org.jdom.Document;
+import org.jdom.Element;
+import mycore.common.*;
 
 /**
  * This class defines the set of privileges of the MyCoRe user management. It
@@ -43,6 +42,9 @@ public class MCRPrivilegeSet
   /** This vector holds all privileges of the mycore user management system */
   private Vector privileges = null;
 
+  /** the class responsible for persistent datastore (configurable ) */
+  private MCRUserStore mcrUserStore;
+
   /** The one and only instance of this class */
   private static MCRPrivilegeSet theInstance = null;
 
@@ -50,7 +52,8 @@ public class MCRPrivilegeSet
   private MCRPrivilegeSet() throws Exception
   {
     Vector privs = new Vector();
-    MCRUserStore mcrUserStore = MCRUserMgr.instance().getUserStore();
+    String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
+    mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
     privs = mcrUserStore.retrievePrivilegeSet();
 
     if (!(privs == null)) // There already exists a privilege set
@@ -72,39 +75,23 @@ public class MCRPrivilegeSet
   }
 
   /**
-   * This method takes a NodeList as parameter and fills the vector of known
-   * privileges of the system.
+   * This method takes a Vector of privileges as parameter and creates resp. updates
+   * them in the persistent datastore.
    *
-   * @param privList
-   *   DOM NodeList with information about the privileges
-   * @param createInStore
-   *   boolean value to determine whether the privileges have to be stored in
-   *   the persistent data store
+   * @param privList   Vector containing privilege objects
    */
-  public void loadPrivileges(NodeList privList, boolean createInStore)
-              throws Exception
+  public void loadPrivileges(Vector privList) throws Exception
   {
-    NodeList privElements = null;
-    MCRPrivilege thePrivilege;
-    privileges.clear();
-
-    for (int i=0; i<privList.getLength(); i++) {
-      privElements = privList.item(i).getChildNodes();
-      thePrivilege = new MCRPrivilege(
-         trim(MCRXMLHelper.getElementText("name", privElements)),
-         trim(MCRXMLHelper.getElementText("description", privElements))
-         );
-      privileges.add(thePrivilege);
-    }
-
-    if (createInStore)
+    if (!MCRUserMgr.instance().isLocked())
     {
-      MCRUserStore mcrUserStore = MCRUserMgr.instance().getUserStore();
+      this.privileges = privList;
+
       if (mcrUserStore.existsPrivilegeSet())
         mcrUserStore.updatePrivilegeSet(this);
-      else
-        mcrUserStore.createPrivilegeSet(this);
+      else mcrUserStore.createPrivilegeSet(this);
     }
+    else
+      throw new MCRException("The user component is locked. At the moment write access is denied.");
   }
 
   /**
@@ -119,34 +106,18 @@ public class MCRPrivilegeSet
    * @return
    *   This method returns the privilege set object as a DOM document.
    */
-  public Document toDOM()
-  { return MCRXMLHelper.parseXML(this.toXML("")); }
-
-  /**
-   * This method returns the privilege set object as an xml representation.
-   *
-   * @param NL
-   *   separation sequence. Typically this will be an empty string (if the XML
-   *   representation is needed as one line) or a newline ("\n") sequence.
-   * @return
-   *   returns the privilege object as an xml representation
-   */
-  public String toXML(String NL)
+  public synchronized Document toJDOMDocument() throws Exception
   {
-    MCRPrivilege thePrivilege;
-    StringBuffer sb = new StringBuffer();
-    sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL)
-      .append("<userinfo type=\"privilege\">").append(NL);
+    Element root = new Element("mcr_userobject");
+    root.setAttribute("type", "privilege");
 
     for (int i=0; i<privileges.size(); i++) {
-      thePrivilege = (MCRPrivilege)privileges.elementAt(i);
-      sb.append("<privilege>").append(NL)
-        .append("<name>").append((String)thePrivilege.getName()).append("</name>").append(NL)
-        .append("<description>").append((String)thePrivilege.getDescription()).append("</description>").append(NL)
-        .append("</privilege>").append(NL);
+      MCRPrivilege currentPriv = (MCRPrivilege)privileges.elementAt(i);
+      root.addContent(currentPriv.toJDOMElement());
     }
-    sb.append("</userinfo>").append(NL);
-    return sb.toString();
+
+    Document jdomDoc = new Document(root);
+    return jdomDoc;
   }
 
   /**

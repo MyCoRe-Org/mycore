@@ -50,10 +50,9 @@ public class MCRUserPolicy
   {
     // For the moment this is hard coded but this will change soon....
     reqUserAttributes = new Vector();
+    reqUserAttributes.add("numID");
     reqUserAttributes.add("userID");
     reqUserAttributes.add("password");
-    reqUserAttributes.add("id_enabled");
-    reqUserAttributes.add("update_allowed");
     reqUserAttributes.add("creator");
     //reqUserAttributes.add("description");
     reqUserAttributes.add("salutation");

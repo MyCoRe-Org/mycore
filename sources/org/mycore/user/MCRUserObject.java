@@ -26,8 +26,9 @@ package mycore.user;
 
 import java.io.*;
 import java.sql.Timestamp;
-import org.w3c.dom.Document;
-import mycore.xml.MCRXMLHelper;
+import java.util.Vector;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * This is the abstract super class of MCRUser and MCRGroup
@@ -38,7 +39,7 @@ import mycore.xml.MCRXMLHelper;
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
-abstract class MCRUserUnit
+abstract class MCRUserObject
 {
   /** The ID of the MyCoRe user unit (either user ID or group ID) */
   protected String ID = "";
@@ -46,74 +47,73 @@ abstract class MCRUserUnit
   /** Specifies the user responsible for the creation of this user unit */
   protected String creator = "";
 
-  /** The date of creation of the user unit object in the MyCoRe system */
+  /** The date of creation of the user object in the MyCoRe system */
   protected Timestamp creationDate = null;
 
-  /** The date of the last changes of this user unit */
-  protected Timestamp lastChanges = null;
+  /** The date of the last modification of this user object */
+  protected Timestamp modifiedDate = null;
 
   /** Description of the user unit */
   protected String description = "";
 
-  /**
-   * @return  This method returns the creation date (timestamp) of the user
-   *          unit object.
-   */
-  public Timestamp getCreationDate()
-  { return creationDate; }
+  /** A list of groups (IDs) where this object is a member of */
+  protected Vector groupIDs = null;
 
   /**
-   * @return  This method returns the date of the last modifications
-   *          (timestamp)of the user unit object.
-   */
-  public Timestamp getLastChangesDate()
-  { return lastChanges; }
-
-  /**
-   * @return  This method returns the user ID of the creator of this
-   *          user unit object.
-   */
-  public String getCreator()
-  { return creator; }
-
-  /**
-   * @return  This method returns the description of the user unit object.
-   */
-  public String getDescription()
-  { return description; }
-
-  /**
-   * @return  This method returns the ID (user ID or group ID) of the user unit.
+   * @return
+   *   This method returns the ID (user ID or group ID) of the user object.
    */
   public String getID()
   { return ID; }
 
   /**
-   * This method returns the user unit information as a formatted string. Being
-   * an abstract class it must be implemented by a subclass, i.e. MCRuser or
-   * MCRGroup.
+   * @return
+   *   This method returns the creation date (timestamp) of the user object.
    */
-  abstract public String getFormattedInfo() throws Exception;
+  public Timestamp getCreationDate()
+  { return creationDate; }
 
   /**
-   * This method checks if the user unit has a specific privilege. Being an
-   * abstract class it must be implemented by a subclass, i.e. MCRuser or
-   * MCRGroup.
+   * @return
+   *   This method returns the time of the last modifications (timestamp) of the user object.
    */
-  abstract public boolean hasPrivilege(String privilege) throws Exception;
+  public Timestamp getModifiedDate()
+  { return modifiedDate; }
 
   /**
-   * @return This method returns the user or group object as a DOM document.
+   * @return
+   *   This method returns the user ID of the creator of this user object.
    */
-  public Document toDOM() throws Exception
-  { return MCRXMLHelper.parseXML(this.toXML("")); }
+  public String getCreator()
+  { return creator; }
 
   /**
-   * This method returns the user unit object as an xml representation. Being
-   * an abstract class it must be implemented by a subclass, i.e. MCRuser or
-   * MCRGroup.
+   * @return
+   *   This method returns the description of the user object.
    */
-  abstract public String toXML(String NL) throws Exception;
+  public String getDescription()
+  { return description; }
+
+  /**
+   * @return
+   *   This method returns the list of groups as a Vector of strings. These are the
+   *   groups where the object itself is a member of.
+   */
+  public Vector getGroupIDs()
+  { return groupIDs; }
+
+  /**
+   * This method must be implemented by a subclass and then returns the user or group
+   * object as a JDOM document.
+   */
+  abstract public Document toJDOMDocument() throws Exception;
+
+  /**
+   * This method must be implemented by a subclass and then returns the user or group
+   * object as a JDOM element. This is needed if one wants to get a representation of
+   * several user objects in one xml document.
+   */
+  abstract public Element toJDOMElement() throws Exception;
 
   /**
    * This helper method replaces null with an empty string and trims whitespace from

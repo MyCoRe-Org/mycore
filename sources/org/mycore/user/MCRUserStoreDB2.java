@@ -26,7 +26,6 @@ package mycore.user;
 
 import java.io.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import mycore.common.MCRConfiguration;
@@ -86,55 +85,43 @@ public class MCRUserStoreDB2 implements MCRUserStore
   {
     String idEnabled = (newUser.isEnabled()) ? "true" : "false";
     String updateAllowed = (newUser.isUpdateAllowed()) ? "true" : "false";
-    Vector groups = newUser.getGroups();
-    MCRUserAddress userAddress = newUser.getAddressObject();
+    MCRUserContact userContact = newUser.getContactInfo();
     MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
 
     try
     {
       connection.getJDBCConnection().setAutoCommit(false);
       String insert = "INSERT INTO " + DB2UsersTable
-                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       PreparedStatement statement = connection.getJDBCConnection().prepareStatement(insert);
 
-      statement.setString    ( 1, newUser.getID()              );
-      statement.setString    ( 2, newUser.getPassword()        );
-      statement.setString    ( 3, idEnabled                    );
-      statement.setString    ( 4, updateAllowed                );
-      statement.setString    ( 5, newUser.getCreator()         );
-      statement.setTimestamp ( 6, newUser.getCreationDate()    );
-      statement.setTimestamp ( 7, newUser.getLastChangesDate() );
-      statement.setString    ( 8, newUser.getDescription()     );
-      statement.setString    ( 9, userAddress.getSalutation()  );
-      statement.setString    (10, userAddress.getFirstName()   );
-      statement.setString    (11, userAddress.getLastName()    );
-      statement.setString    (12, userAddress.getStreet()      );
-      statement.setString    (13, userAddress.getCity()        );
-      statement.setString    (14, userAddress.getPostalCode()  );
-      statement.setString    (15, userAddress.getCountry()     );
-      statement.setString    (16, userAddress.getInstitution() );
-      statement.setString    (17, userAddress.getFaculty()     );
-      statement.setString    (18, userAddress.getDepartment()  );
-      statement.setString    (19, userAddress.getInstitute()   );
-      statement.setString    (20, userAddress.getTelephone()   );
-      statement.setString    (21, userAddress.getFax()         );
-      statement.setString    (22, userAddress.getEmail()       );
-      statement.setString    (23, userAddress.getCellphone()   );
-      statement.setString    (24, newUser.getPrimaryGroup()    );
+      statement.setInt       ( 1, newUser.getNumID()          );
+      statement.setString    ( 2, newUser.getID()             );
+      statement.setString    ( 3, newUser.getCreator()        );
+      statement.setTimestamp ( 4, newUser.getCreationDate()   );
+      statement.setTimestamp ( 5, newUser.getModifiedDate()   );
+      statement.setString    ( 6, newUser.getDescription()    );
+      statement.setString    ( 7, newUser.getPassword()       );
+      statement.setString    ( 8, idEnabled                   );
+      statement.setString    ( 9, updateAllowed               );
+      statement.setString    (10, userContact.getSalutation() );
+      statement.setString    (11, userContact.getFirstName()  );
+      statement.setString    (12, userContact.getLastName()   );
+      statement.setString    (13, userContact.getStreet()     );
+      statement.setString    (14, userContact.getCity()       );
+      statement.setString    (15, userContact.getPostalCode() );
+      statement.setString    (16, userContact.getCountry()    );
+      statement.setString    (17, userContact.getInstitution());
+      statement.setString    (18, userContact.getFaculty()    );
+      statement.setString    (19, userContact.getDepartment() );
+      statement.setString    (20, userContact.getInstitute()  );
+      statement.setString    (21, userContact.getTelephone()  );
+      statement.setString    (22, userContact.getFax()        );
+      statement.setString    (23, userContact.getEmail()      );
+      statement.setString    (24, userContact.getCellphone()  );
+      statement.setString    (25, newUser.getPrimaryGroupID() );
 
       statement.execute();
-      statement.close();
-
-      // now update the member lookup table
-      insert = "INSERT INTO " + DB2GroupMembersTable + " VALUES (?,?)";
-      statement = connection.getJDBCConnection().prepareStatement(insert);
-
-      for (int i=0; i<newUser.getGroups().size(); i++) {
-        statement.setString ( 1, newUser.getID() );
-        statement.setString ( 2, (String)newUser.getGroups().elementAt(i) );
-        statement.execute();
-        statement.clearParameters();
-      }
       statement.close();
 
       connection.getJDBCConnection().commit();
@@ -167,40 +154,61 @@ public class MCRUserStoreDB2 implements MCRUserStore
                     + " VALUES (?,?,?,?,?)";
       PreparedStatement statement = connection.getJDBCConnection().prepareStatement(insert);
 
-      statement.setString    ( 1, newGroup.getID()              );
-      statement.setString    ( 2, newGroup.getCreator()         );
-      statement.setTimestamp ( 3, newGroup.getCreationDate()    );
-      statement.setTimestamp ( 4, newGroup.getLastChangesDate() );
-      statement.setString    ( 5, newGroup.getDescription()     );
+      statement.setString    ( 1, newGroup.getID()           );
+      statement.setString    ( 2, newGroup.getCreator()      );
+      statement.setTimestamp ( 3, newGroup.getCreationDate() );
+      statement.setTimestamp ( 4, newGroup.getModifiedDate() );
+      statement.setString    ( 5, newGroup.getDescription()  );
 
       statement.execute();
       statement.close();
 
-      // Now we update the group admins table. First the admin users and
-      // thereafter the admin groups
-
-      insert = "INSERT INTO " + DB2GroupAdminsTable + " VALUES (?,?,?)";
+      // now update the member lookup table
+      insert = "INSERT INTO " + DB2GroupMembersTable + "(GID, USERID) VALUES (?,?)";
       statement = connection.getJDBCConnection().prepareStatement(insert);
 
-      for (int i=0; i<newGroup.getAdminUsers().size(); i++) {
+      for (int i=0; i<newGroup.getMemberUserIDs().size(); i++) {
         statement.setString ( 1, newGroup.getID() );
-        statement.setString ( 2, (String)newGroup.getAdminUsers().elementAt(i) );
-        statement.setString ( 3, "user" );
+        statement.setString ( 2, (String)newGroup.getMemberUserIDs().elementAt(i) );
         statement.execute();
         statement.clearParameters();
       }
 
-      for (int i=0; i<newGroup.getAdminGroups().size(); i++) {
+      statement.close();
+      insert = "INSERT INTO " + DB2GroupMembersTable + "(GID, GROUPID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newGroup.getMemberGroupIDs().size(); i++) {
         statement.setString ( 1, newGroup.getID() );
-        statement.setString ( 2, (String)newGroup.getAdminGroups().elementAt(i) );
-        statement.setString ( 3, "group" );
+        statement.setString ( 2, (String)newGroup.getMemberGroupIDs().elementAt(i) );
+        statement.execute();
+        statement.clearParameters();
+      }
+
+      statement.close();
+
+      // now update the group admins table.
+      insert = "INSERT INTO " + DB2GroupAdminsTable + "(GID, USERID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newGroup.getAdminUserIDs().size(); i++) {
+        statement.setString ( 1, newGroup.getID() );
+        statement.setString ( 2, (String)newGroup.getAdminUserIDs().elementAt(i) );
+        statement.execute();
+        statement.clearParameters();
+      }
+
+      statement.close();
+      insert = "INSERT INTO " + DB2GroupAdminsTable + "(GID, GROUPID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newGroup.getAdminGroupIDs().size(); i++) {
+        statement.setString ( 1, newGroup.getID() );
+        statement.setString ( 2, (String)newGroup.getAdminGroupIDs().elementAt(i) );
         statement.execute();
         statement.clearParameters();
       }
       statement.close();
-
-      // We do not need to update the membership lookup table. This is done
-      // while creating/updating a user.
 
       // Now update the privileges lookup table
       insert = "INSERT INTO " + DB2PrivsLookupTable + " VALUES (?,?)";
@@ -276,10 +284,6 @@ public class MCRUserStoreDB2 implements MCRUserStore
    */
   public synchronized void deleteUser(String delUserID) throws Exception
   {
-    // We need not to care about updating the Member-Lookup Table (removing all the
-    // references to this user object). This will be done automatically by DB2. See
-    // the create table statements for that.
-
     String sql = "DELETE FROM " + DB2UsersTable + " WHERE UID = '" + delUserID + "'";
     MCRSQLConnection.justDoUpdate(sql);
   }
@@ -290,11 +294,19 @@ public class MCRUserStoreDB2 implements MCRUserStore
    */
   public synchronized void deleteGroup(String delGroupID) throws Exception
   {
-    // We need not to care about updating the Member-Lookup Table (removing all the
-    // references to this group object). This will be done automatically by DB2. See
-    // the create table statements for that.
+    // We need to update the group table, the admin-lookup table, the member-lookup Table and
+    // the privilege lookup table (removing all the references to this group object).
 
     String sql = "DELETE FROM " + DB2GroupsTable + " WHERE GID = '" + delGroupID + "'";
+    MCRSQLConnection.justDoUpdate(sql);
+
+    sql = "DELETE FROM " + DB2GroupAdminsTable + " WHERE GID = '" + delGroupID + "'";
+    MCRSQLConnection.justDoUpdate(sql);
+
+    sql = "DELETE FROM " + DB2GroupMembersTable + " WHERE GID = '" + delGroupID + "'";
+    MCRSQLConnection.justDoUpdate(sql);
+
+    sql = "DELETE FROM " + DB2PrivsLookupTable + " WHERE GID = '" + delGroupID + "'";
     MCRSQLConnection.justDoUpdate(sql);
   }
 
@@ -306,6 +318,45 @@ public class MCRUserStoreDB2 implements MCRUserStore
   {
     return MCRSQLConnection.justCheckExists(new MCRSQLStatement(DB2UsersTable)
       .setCondition("UID", userID)
+      .toRowSelector());
+  }
+
+  /**
+   * This method tests if a MyCoRe user object is available in the persistent datastore.
+   * The numerical userID is taken into account, too.
+   *
+   * @param numID         (int) numerical userID of the MyCoRe user object
+   * @param userID        a String representing the MyCoRe user object which is to be looked for
+   */
+  public synchronized boolean existsUser(int numID, String userID) throws Exception
+  {
+    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+    ResultSet rs = null;
+
+    try {
+      String select = "SELECT * FROM " + DB2UsersTable + " WHERE NUMID = " + numID + " OR UID = '" + userID + "'";
+      Statement statement = connection.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+
+      if (rs.next())
+        return true;
+      else return false;
+    }
+
+    finally {
+      rs.close();
+      connection.release();
+    }
+  }
+
+  /**
+   * This method tests if a MyCoRe privilege object is available in the persistent datastore.
+   * @param privName  a String representing the MyCoRe privilege object which is to be looked for
+   */
+  public synchronized boolean existsPrivilege(String privName) throws Exception
+  {
+    return MCRSQLConnection.justCheckExists(new MCRSQLStatement(DB2PrivilegesTable)
+      .setCondition("NAME", privName)
       .toRowSelector());
   }
 
@@ -352,6 +403,34 @@ public class MCRUserStoreDB2 implements MCRUserStore
   }
 
   /**
+   * This method gets all group IDs where a given user ID can manage the group (i.e. is
+   * in the administrator user IDs list) as a vector of strings.
+   *
+   * @param userID   a String representing the administrative user
+   * @return         Vector of strings including the group IDs of the system which
+   *                 have userID in their administrators list
+   */
+  public synchronized Vector getGroupIDsWithAdminUser(String userID) throws Exception
+  {
+    String select = "SELECT GID FROM " + DB2GroupAdminsTable + " WHERE USERID='" + userID + "'";
+    return getSelectResult(select);
+  }
+
+  /**
+   * This method gets all user IDs with a given primary group and returns them as a
+   * Vector of strings.
+   *
+   * @param groupID  a String representing a primary Group
+   * @return         Vector of strings including the user IDs of the system which
+   *                 have groupID as primary group
+   */
+  public synchronized Vector getUserIDsWithPrimaryGroup(String groupID) throws Exception
+  {
+    String select = "SELECT UID FROM " + DB2UsersTable + " WHERE PRIMGROUP='" + groupID + "'";
+    return getSelectResult(select);
+  }
+
+  /**
    * This method retrieves a MyCoRe user object from the persistent datastore.
    * @param userID  a String representing the MyCoRe user object which is to be retrieved
    * @return        the requested user object
@@ -367,50 +446,54 @@ public class MCRUserStoreDB2 implements MCRUserStore
 
       if(!rs.next())
       {
-        String msg = "There is no user with ID = " + userID;
+        String msg = "MCRUserStoreDB2.retrieveUser(): There is no user with ID = " + userID;
         throw new MCRException(msg);
       }
 
-      String passwd        = rs.getString    ( 2);
-      String idEnabled     = rs.getString    ( 3);
-      String updateAllowed = rs.getString    ( 4);
-      String creator       = rs.getString    ( 5);
-      Timestamp created    = rs.getTimestamp ( 6);
-      Timestamp modified   = rs.getTimestamp ( 7);
-      String description   = rs.getString    ( 8);
-      String salutation    = rs.getString    ( 9);
-      String firstname     = rs.getString    (10);
-      String lastname      = rs.getString    (11);
-      String street        = rs.getString    (12);
-      String city          = rs.getString    (13);
-      String postalcode    = rs.getString    (14);
-      String country       = rs.getString    (15);
-      String institution   = rs.getString    (16);
-      String faculty       = rs.getString    (17);
-      String department    = rs.getString    (18);
-      String institute     = rs.getString    (19);
-      String telephone     = rs.getString    (20);
-      String fax           = rs.getString    (21);
-      String email         = rs.getString    (22);
-      String cellphone     = rs.getString    (23);
-      String primaryGroup  = rs.getString    (24);
+      int numID             = rs.getInt       ( 1);
+      String creator        = rs.getString    ( 3);
+      Timestamp created     = rs.getTimestamp ( 4);
+      Timestamp modified    = rs.getTimestamp ( 5);
+      String description    = rs.getString    ( 6);
+      String passwd         = rs.getString    ( 7);
+      String idEnabled      = rs.getString    ( 8);
+      String updateAllowed  = rs.getString    ( 9);
+      String salutation     = rs.getString    (10);
+      String firstname      = rs.getString    (11);
+      String lastname       = rs.getString    (12);
+      String street         = rs.getString    (13);
+      String city           = rs.getString    (14);
+      String postalcode     = rs.getString    (15);
+      String country        = rs.getString    (16);
+      String institution    = rs.getString    (17);
+      String faculty        = rs.getString    (18);
+      String department     = rs.getString    (19);
+      String institute      = rs.getString    (20);
+      String telephone      = rs.getString    (21);
+      String fax            = rs.getString    (22);
+      String email          = rs.getString    (23);
+      String cellphone      = rs.getString    (24);
+      String primaryGroupID = rs.getString    (25);
 
       rs.close();
 
       // Now lookup the groups this user is a member of
-      select = "SELECT GID FROM " + DB2GroupMembersTable + " WHERE UID = '" + userID + "'";
+      select = "SELECT GID FROM " + DB2GroupMembersTable + " WHERE USERID = '" + userID + "'";
       Vector groups = getSelectResult(select);
 
+      // set some boolean values
+      boolean id_enabled = (idEnabled.equals("true")) ? true : false;
+      boolean update_allowed = (updateAllowed.equals("true")) ? true : false;
+
       // We create the user object
-      MCRUser user = new MCRUser(userID, passwd, idEnabled, updateAllowed, creator,
-        created, modified, description, salutation, firstname, lastname, street,
-        city, postalcode, country, institution, faculty, department, institute,
-        telephone, fax, email, cellphone, primaryGroup, groups, "");
+      MCRUser user = new MCRUser(numID, userID, id_enabled, update_allowed, creator, created,
+        modified, description, passwd, salutation, firstname, lastname, street, city, postalcode,
+        country, institution, faculty, department, institute, telephone, fax, email, cellphone,
+        primaryGroupID, groups, "");
 
       rs.close();
       return user;
     }
-
     finally{ connection.release(); }
   }
 
@@ -430,7 +513,7 @@ public class MCRUserStoreDB2 implements MCRUserStore
 
       if(!rs.next())
       {
-        String msg = "There is no group with ID = " + groupID;
+        String msg = "MCRUserStoreDB2.retrieveGroup(): There is no group with ID = " + groupID;
         throw new MCRException(msg);
       }
 
@@ -444,17 +527,25 @@ public class MCRUserStoreDB2 implements MCRUserStore
       // Now lookup the lists of admin users, admin groups, users (members)
       // and privileges
 
-      select = "SELECT ADMINID FROM " + DB2GroupAdminsTable
-             + " WHERE GID = '" + groupID + "' AND TYPE = 'user'";
-      Vector adminUsers = getSelectResult(select);
+      select = "SELECT USERID FROM " + DB2GroupAdminsTable
+             + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL";
+      Vector admUserIDs = getSelectResult(select);
 
-      select = "SELECT ADMINID FROM " + DB2GroupAdminsTable
-             + " WHERE GID = '" + groupID + "' AND TYPE = 'group'";
-      Vector adminGroups = getSelectResult(select);
+      select = "SELECT GROUPID FROM " + DB2GroupAdminsTable
+             + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL";
+      Vector admGroupIDs = getSelectResult(select);
 
-      select = "SELECT UID FROM " + DB2GroupMembersTable
-             + " WHERE GID = '" + groupID + "'";
-      Vector users = getSelectResult(select);
+      select = "SELECT USERID FROM " + DB2GroupMembersTable
+             + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL";
+      Vector mbrUserIDs = getSelectResult(select);
+
+      select = "SELECT GROUPID FROM " + DB2GroupMembersTable
+             + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL";
+      Vector mbrGroupIDs = getSelectResult(select);
+
+      select = "SELECT GID FROM " + DB2GroupMembersTable
+             + " WHERE GROUPID = '" + groupID + "'";
+      Vector groupIDs = getSelectResult(select);
 
       select = "SELECT NAME FROM " + DB2PrivsLookupTable
              + " WHERE GID = '" + groupID + "'";
@@ -462,7 +553,7 @@ public class MCRUserStoreDB2 implements MCRUserStore
 
       // We create the group object
       MCRGroup group = new MCRGroup(groupID, creator, created, modified, description,
-        adminUsers, adminGroups, users, privs, "");
+        admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs, privs, "");
 
       return group;
     }
@@ -501,92 +592,55 @@ public class MCRUserStoreDB2 implements MCRUserStore
    */
   public synchronized void updateUser(MCRUser updUser) throws Exception
   {
-    String idEnabled = (updUser.isEnabled()) ? "true" : "false";
-    String updateAllowed = (updUser.isUpdateAllowed()) ? "true" : "false";
-    MCRUserAddress userAddress = updUser.getAddressObject();
+    MCRUserContact userContact = updUser.getContactInfo();
     MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
 
     try
     {
+      String idEnabled = (updUser.isEnabled()) ? "true" : "false";
+      String updateAllowed = (updUser.isUpdateAllowed()) ? "true" : "false";
+
       connection.getJDBCConnection().setAutoCommit(false);
       String update = "UPDATE " + DB2UsersTable
-                    + " SET PASSWD = ? ,ENABLED = ? ,UPDATE = ? ,CREATOR = ? "
-                    + " ,CREATIONDATE = ? ,LASTCHANGES = ? ,DESCRIPTION = ? "
-                    + " ,SALUTATION = ? ,FIRSTNAME = ? ,LASTNAME = ? ,STREET = ? "
-                    + " ,CITY = ? ,POSTALCODE = ? ,COUNTRY = ? ,INSTITUTION = ? "
-                    + " ,FACULTY = ? ,DEPARTMENT = ? ,INSTITUTE = ? ,TELEPHONE = ? "
-                    + " ,FAX = ? ,EMAIL = ? ,CELLPHONE = ? ,PRIMGROUP = ? "
+                    + " SET CREATOR = ? ,CREATIONDATE = ? ,MODIFIEDDATE = ? ,DESCRIPTION = ? "
+                    + " ,PASSWD = ? ,ENABLED = ? ,UPD = ? ,SALUTATION = ? ,FIRSTNAME = ? "
+                    + " ,LASTNAME = ? ,STREET = ? ,CITY = ? ,POSTALCODE = ? ,COUNTRY = ? "
+                    + " ,INSTITUTION = ? ,FACULTY = ? ,DEPARTMENT = ? ,INSTITUTE = ? "
+                    + " ,TELEPHONE = ? ,FAX = ? ,EMAIL = ? ,CELLPHONE = ? ,PRIMGROUP = ? "
                     + " WHERE UID = ?";
 
       PreparedStatement statement = connection.getJDBCConnection().prepareStatement(update);
 
-      statement.setString    ( 1, updUser.getPassword()        );
-      statement.setString    ( 2, idEnabled                    );
-      statement.setString    ( 3, updateAllowed                );
-      statement.setString    ( 4, updUser.getCreator()         );
-      statement.setTimestamp ( 5, updUser.getCreationDate()    );
-      statement.setTimestamp ( 6, updUser.getLastChangesDate() );
-      statement.setString    ( 7, updUser.getDescription()     );
-      statement.setString    ( 8, userAddress.getSalutation()  );
-      statement.setString    ( 9, userAddress.getFirstName()   );
-      statement.setString    (10, userAddress.getLastName()    );
-      statement.setString    (11, userAddress.getStreet()      );
-      statement.setString    (12, userAddress.getCity()        );
-      statement.setString    (13, userAddress.getPostalCode()  );
-      statement.setString    (14, userAddress.getCountry()     );
-      statement.setString    (15, userAddress.getInstitution() );
-      statement.setString    (16, userAddress.getFaculty()     );
-      statement.setString    (17, userAddress.getDepartment()  );
-      statement.setString    (18, userAddress.getInstitute()   );
-      statement.setString    (19, userAddress.getTelephone()   );
-      statement.setString    (20, userAddress.getFax()         );
-      statement.setString    (21, userAddress.getEmail()       );
-      statement.setString    (22, userAddress.getCellphone()   );
-      statement.setString    (23, updUser.getPrimaryGroup()    );
-      statement.setString    (24, updUser.getID()              );
+      statement.setString    ( 1, updUser.getCreator()        );
+      statement.setTimestamp ( 2, updUser.getCreationDate()   );
+      statement.setTimestamp ( 3, updUser.getModifiedDate()   );
+      statement.setString    ( 4, updUser.getDescription()    );
+      statement.setString    ( 5, updUser.getPassword()       );
+      statement.setString    ( 6, idEnabled                   );
+      statement.setString    ( 7, updateAllowed               );
+      statement.setString    ( 8, userContact.getSalutation() );
+      statement.setString    ( 9, userContact.getFirstName()  );
+      statement.setString    (10, userContact.getLastName()   );
+      statement.setString    (11, userContact.getStreet()     );
+      statement.setString    (12, userContact.getCity()       );
+      statement.setString    (13, userContact.getPostalCode() );
+      statement.setString    (14, userContact.getCountry()    );
+      statement.setString    (15, userContact.getInstitution());
+      statement.setString    (16, userContact.getFaculty()    );
+      statement.setString    (17, userContact.getDepartment() );
+      statement.setString    (18, userContact.getInstitute()  );
+      statement.setString    (19, userContact.getTelephone()  );
+      statement.setString    (20, userContact.getFax()        );
+      statement.setString    (21, userContact.getEmail()      );
+      statement.setString    (22, userContact.getCellphone()  );
+      statement.setString    (23, updUser.getPrimaryGroupID() );
+      statement.setString    (24, updUser.getID()             );
 
       statement.execute();
       statement.close();
 
-      // Now we update the member lookup table. First we collect information about
-      // which groups have been added or removed. Therefore we compare the list of
-      // groups this user is a member of before and after the update.
-
-      String select = "SELECT GID FROM " + DB2GroupMembersTable
-                    + " WHERE UID = '" + updUser.getID() + "'";
-      Vector oldGroups = getSelectResult(select);
-      Vector newGroups = updUser.getGroups();
-
-      // We search for the groups where this user is a new member and insert
-      // the new user into the member lookup table
-
-      String insert = "INSERT INTO " + DB2GroupMembersTable + " VALUES (?,?)";
-      statement = connection.getJDBCConnection().prepareStatement(insert);
-      for (int i=0; i<newGroups.size(); i++)
-      {
-        if (!oldGroups.contains((String)newGroups.elementAt(i))) {
-          statement.setString ( 1, updUser.getID() );
-          statement.setString ( 2, (String)newGroups.elementAt(i) );
-          statement.execute();
-          statement.clearParameters();
-        }
-      }
-      statement.close();
       connection.getJDBCConnection().commit();
       connection.getJDBCConnection().setAutoCommit(true);
-
-      // We search for the groups where this user has been removed from and
-      // delete the entries from the member lookup table
-
-      for (int i=0; i<oldGroups.size(); i++)
-      {
-        if (!newGroups.contains((String)oldGroups.elementAt(i))) {
-          String sql = "DELETE FROM " + DB2GroupMembersTable
-                     + " WHERE UID = '" + updUser.getID()
-                     + "' AND GID = '" + (String)oldGroups.elementAt(i) + "'";
-          MCRSQLConnection.justDoUpdate(sql);
-        }
-      }
     }
 
     catch(Exception ex)
@@ -602,11 +656,47 @@ public class MCRUserStoreDB2 implements MCRUserStore
 
   /**
    * This method updates a MyCoRe privilege set object in the persistent datastore.
+   * At the moment we only insert *new* privileges, we do not overwrite existent
+   * privileges and we do not delete any privilege.
+   *
    * @param privilegeSet the privilege set object to be updated
    */
   public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) throws Exception
   {
-    System.out.println("*** MCRUserStoreDB2.updatePrivilegeSet() is not yet implemented! ***");
+    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+    MCRPrivilege thePrivilege;
+    Vector privileges = privilegeSet.getPrivileges();
+
+    try
+    {
+      connection.getJDBCConnection().setAutoCommit(false);
+      String insert = "INSERT INTO " + DB2PrivilegesTable + " VALUES (?,?)";
+      PreparedStatement statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<privileges.size(); i++) {
+        thePrivilege = (MCRPrivilege)privileges.elementAt(i);
+        if (!existsPrivilege(thePrivilege.getName())) {
+          statement.setString ( 1, (String)thePrivilege.getName() );
+          statement.setString ( 2, (String)thePrivilege.getDescription() );
+          statement.execute();
+          statement.clearParameters();
+        }
+      }
+      statement.close();
+
+      connection.getJDBCConnection().commit();
+      connection.getJDBCConnection().setAutoCommit(true);
+    }
+
+    catch(Exception ex)
+    {
+      try{ connection.getJDBCConnection().rollback(); }
+      catch(SQLException ignored){}
+      throw ex;
+    }
+
+    finally
+    { connection.release(); }
   }
 
   /**
@@ -620,80 +710,172 @@ public class MCRUserStoreDB2 implements MCRUserStore
     {
       connection.getJDBCConnection().setAutoCommit(false);
       String update = "UPDATE " + DB2GroupsTable
-                    + " SET CREATOR = ? ,CREATIONDATE = ? "
-                    + " ,LASTCHANGES = ? ,DESCRIPTION = ? "
+                    + " SET CREATOR = ? ,CREATIONDATE = ? ,MODIFIEDDATE = ? , DESCRIPTION = ? "
                     + " WHERE GID = ?";
 
       PreparedStatement statement = connection.getJDBCConnection().prepareStatement(update);
 
-      statement.setString    ( 1, group.getCreator()         );
-      statement.setTimestamp ( 2, group.getCreationDate()    );
-      statement.setTimestamp ( 3, group.getLastChangesDate() );
-      statement.setString    ( 4, group.getDescription()     );
-      statement.setString    ( 5, group.getID()              );
+      statement.setString    ( 1, group.getCreator()      );
+      statement.setTimestamp ( 2, group.getCreationDate() );
+      statement.setTimestamp ( 3, group.getModifiedDate() );
+      statement.setString    ( 4, group.getDescription()  );
+      statement.setString    ( 5, group.getID()           );
 
       statement.execute();
       statement.close();
 
-      // Now we update the group admins table. First the admin users and
-      // thereafter the admin groups. But first we collect information about
-      // which admins have been added or removed from the list. In order to do
-      // so we compare the lists of admins before and after the update.
+      // Now we update the group admins table. First the admin users and thereafter the admin
+      // groups. But first we collect information about which admins have been added or removed
+      // from the list. In order to do so we compare the lists of admins before and after the update.
 
-      String select = "SELECT ADMINID FROM " + DB2GroupAdminsTable
-                    + " WHERE GID = '" + group.getID() + "' AND TYPE = 'user'";
-      Vector oldAdminUsers = getSelectResult(select);
-      Vector newAdminUsers = group.getAdminUsers();
+      String select = "SELECT USERID FROM " + DB2GroupAdminsTable
+                    + " WHERE GID = '" + group.getID() + "' AND USERID IS NOT NULL";
+      Vector oldAdminUserIDs = getSelectResult(select);
+      Vector newAdminUserIDs = group.getAdminUserIDs();
 
-      select = "SELECT ADMINID FROM " + DB2GroupAdminsTable
-             + " WHERE GID = '" + group.getID() + "' AND TYPE = 'group'";
-      Vector oldAdminGroups = getSelectResult(select);
-      Vector newAdminGroups = group.getAdminGroups();
+      select = "SELECT GROUPID FROM " + DB2GroupAdminsTable
+             + " WHERE GID = '" + group.getID() + "' AND GROUPID IS NOT NULL";
+      Vector oldAdminGroupIDs = getSelectResult(select);
+      Vector newAdminGroupIDs = group.getAdminGroupIDs();
 
       // We search for the newly added admins and insert them into the table
-      String insert = "INSERT INTO " + DB2GroupAdminsTable + " VALUES (?,?,?)";
+      String insert = "INSERT INTO " + DB2GroupAdminsTable + "(GID, USERID) VALUES (?,?)";
       statement = connection.getJDBCConnection().prepareStatement(insert);
 
-      for (int i=0; i<newAdminUsers.size(); i++)
+      for (int i=0; i<newAdminUserIDs.size(); i++)
       {
-        if (!oldAdminUsers.contains((String)newAdminUsers.elementAt(i))) {
+        if (!oldAdminUserIDs.contains((String)newAdminUserIDs.elementAt(i))) {
           statement.setString ( 1, group.getID() );
-          statement.setString ( 2, (String)newAdminUsers.elementAt(i) );
-          statement.setString ( 3, "user" );
+          statement.setString ( 2, (String)newAdminUserIDs.elementAt(i) );
           statement.execute();
           statement.clearParameters();
         }
       }
 
-      for (int i=0; i<newAdminGroups.size(); i++)
+      statement.close();
+      insert = "INSERT INTO " + DB2GroupAdminsTable + "(GID, GROUPID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newAdminGroupIDs.size(); i++)
       {
-        if (!oldAdminGroups.contains((String)newAdminGroups.elementAt(i))) {
+        if (!oldAdminGroupIDs.contains((String)newAdminGroupIDs.elementAt(i))) {
           statement.setString ( 1, group.getID() );
-          statement.setString ( 2, (String)newAdminGroups.elementAt(i) );
-          statement.setString ( 3, "group" );
+          statement.setString ( 2, (String)newAdminGroupIDs.elementAt(i) );
           statement.execute();
           statement.clearParameters();
         }
       }
       statement.close();
 
-      // We do not need to update the membership lookup table. This is done
-      // while creating/updating a user.
+      // We search for the recently removed admins and remove them from the table
+      for (int i=0; i<oldAdminUserIDs.size(); i++)
+      {
+        if (!newAdminUserIDs.contains((String)oldAdminUserIDs.elementAt(i))) {
+          String sql = "DELETE FROM " + DB2GroupAdminsTable
+                     + " WHERE GID = '" + group.getID()
+                     + "' AND USERID = '" + (String)oldAdminUserIDs.elementAt(i) + "'";
+          MCRSQLConnection.justDoUpdate(sql);
+        }
+      }
 
-      // Now we update the privileges lookup table. First we collect information about
-      // which privileges have been added or removed. Therefore we compare the list of
-      // privileges this group has before and after the update.
+      for (int i=0; i<oldAdminGroupIDs.size(); i++)
+      {
+        if (!newAdminGroupIDs.contains((String)oldAdminGroupIDs.elementAt(i))) {
+          String sql = "DELETE FROM " + DB2GroupAdminsTable
+                     + " WHERE GID = '" + group.getID()
+                     + "' AND GROUPID = '" + (String)oldAdminGroupIDs.elementAt(i) + "'";
+          MCRSQLConnection.justDoUpdate(sql);
+        }
+      }
+
+      // Now we update the membership lookup table. First we collect information about
+      // which users have been added or removed. Therefore we compare the list of users
+      // this group has as members before and after the update.
+
+      select = "SELECT USERID FROM " + DB2GroupMembersTable
+             + " WHERE GID = '" + group.getID() + "' AND USERID IS NOT NULL";
+      Vector oldUserIDs = getSelectResult(select);
+      Vector newUserIDs = group.getMemberUserIDs();
+
+      // We search for the new members and insert them into the lookup table
+      insert = "INSERT INTO " + DB2GroupMembersTable + "(GID, USERID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newUserIDs.size(); i++)
+      {
+        if (!oldUserIDs.contains((String)newUserIDs.elementAt(i))) {
+          statement.setString ( 1, group.getID() );
+          statement.setString ( 2, (String)newUserIDs.elementAt(i) );
+          statement.execute();
+          statement.clearParameters();
+        }
+      }
+      statement.close();
+
+      // We search for the users which have been removed from this group and delete the
+      // entries from the member lookup table
+
+      for (int i=0; i<oldUserIDs.size(); i++)
+      {
+        if (!newUserIDs.contains((String)oldUserIDs.elementAt(i))) {
+          String sql = "DELETE FROM " + DB2GroupMembersTable
+                     + " WHERE GID = '" + group.getID()
+                     + "' AND USERID = '" + (String)oldUserIDs.elementAt(i) + "'";
+          MCRSQLConnection.justDoUpdate(sql);
+        }
+      }
+
+      // Now we collect information about which groups have been added or removed.
+      // Therefore we compare the list of groups this group has as members before and
+      // after the update.
+
+      select = "SELECT GROUPID FROM " + DB2GroupMembersTable
+             + " WHERE GID = '" + group.getID() + "' AND GROUPID IS NOT NULL";
+      Vector oldGroupIDs = getSelectResult(select);
+      Vector newGroupIDs = group.getMemberGroupIDs();
+
+      // We search for the new members and insert them into the lookup table
+      insert = "INSERT INTO " + DB2GroupMembersTable + "(GID, GROUPID) VALUES (?,?)";
+      statement = connection.getJDBCConnection().prepareStatement(insert);
+
+      for (int i=0; i<newGroupIDs.size(); i++)
+      {
+        if (!oldGroupIDs.contains((String)newGroupIDs.elementAt(i))) {
+          statement.setString ( 1, group.getID() );
+          statement.setString ( 2, (String)newGroupIDs.elementAt(i) );
+          statement.execute();
+          statement.clearParameters();
+        }
+      }
+      statement.close();
+
+      // We search for the groups which have been removed from this group and delete the
+      // entries from the member lookup table
+
+      for (int i=0; i<oldGroupIDs.size(); i++)
+      {
+        if (!newGroupIDs.contains((String)oldGroupIDs.elementAt(i))) {
+          String sql = "DELETE FROM " + DB2GroupMembersTable
+                     + " WHERE GID = '" + group.getID()
+                     + "' AND GROUPID = '" + (String)oldGroupIDs.elementAt(i) + "'";
+          MCRSQLConnection.justDoUpdate(sql);
+        }
+      }
+
+      // Now we collect information about which privileges have been added or removed.
+      // Therefor we compare the list of privileges this group has before and after
+      // the update.
 
       select = "SELECT NAME FROM " + DB2PrivsLookupTable
              + " WHERE GID = '" + group.getID() + "'";
       Vector oldPrivs = getSelectResult(select);
       Vector newPrivs = group.getPrivileges();
 
-      // We search for the newly added privileges and insert them into the table
+      // We search for new privileges and insert them into the lookup table
       insert = "INSERT INTO " + DB2PrivsLookupTable + " VALUES (?,?)";
       statement = connection.getJDBCConnection().prepareStatement(insert);
-      for (int i=0; i<newPrivs.size(); i++)
-      {
+
+      for (int i=0; i<newPrivs.size(); i++) {
         if (!oldPrivs.contains((String)newPrivs.elementAt(i))) {
           statement.setString ( 1, group.getID() );
           statement.setString ( 2, (String)newPrivs.elementAt(i) );
@@ -702,33 +884,10 @@ public class MCRUserStoreDB2 implements MCRUserStore
         }
       }
       statement.close();
-      connection.getJDBCConnection().commit();
-      connection.getJDBCConnection().setAutoCommit(true);
 
-      // We search for the recently removed admins and remove them from the table
-      for (int i=0; i<oldAdminUsers.size(); i++)
-      {
-        if (!newAdminUsers.contains((String)oldAdminUsers.elementAt(i))) {
-          String sql = "DELETE FROM " + DB2GroupAdminsTable
-                     + " WHERE GID = '" + group.getID()
-                     + "' AND ADMINID = '" + (String)oldAdminUsers.elementAt(i)
-                     + "' AND TYPE = 'user'";
-          MCRSQLConnection.justDoUpdate(sql);
-        }
-      }
+      // We search for the privileges which have been removed from this group and delete the
+      // entries from the privilege lookup table
 
-      for (int i=0; i<oldAdminGroups.size(); i++)
-      {
-        if (!newAdminGroups.contains((String)oldAdminGroups.elementAt(i))) {
-          String sql = "DELETE FROM " + DB2GroupAdminsTable
-                     + " WHERE GID = '" + group.getID()
-                     + "' AND ADMINID = '" + (String)oldAdminGroups.elementAt(i)
-                     + "' AND TYPE = 'group'";
-          MCRSQLConnection.justDoUpdate(sql);
-        }
-      }
-
-      // We search for the recently removed privileges and remove them from the table
       for (int i=0; i<oldPrivs.size(); i++)
       {
         if (!newPrivs.contains((String)oldPrivs.elementAt(i))) {
@@ -738,6 +897,9 @@ public class MCRUserStoreDB2 implements MCRUserStore
           MCRSQLConnection.justDoUpdate(sql);
         }
       }
+
+      connection.getJDBCConnection().commit();
+      connection.getJDBCConnection().setAutoCommit(true);
     }
 
     catch(Exception ex)
@@ -760,11 +922,52 @@ public class MCRUserStoreDB2 implements MCRUserStore
     int number = MCRSQLConnection.justCountRows(
       "SYSCAT.TABLES WHERE TABNAME = '" + DB2UsersTable +
       "' OR TABNAME = '" + DB2GroupsTable +
-      "' OR TABNAME = '" + DB2GroupMembersTable +
       "' OR TABNAME = '" + DB2GroupAdminsTable +
+      "' OR TABNAME = '" + DB2GroupMembersTable +
       "' OR TABNAME = '" + DB2PrivilegesTable +
       "' OR TABNAME = '" + DB2PrivsLookupTable + "'");
     return (number == 6);
+/*
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try
+    {
+      // At the moment this is a workaround. Since MySQL does not provide certain
+      // SQL system information like SYSCAT.TABLES we have to produce an SQL error
+      // in order to find out if the table exists or not. Therefore we simply produce
+      // an SQLException if the table does not yet exist.
+
+      String select = "SELECT COUNT(*) FROM " + DB2UsersTable;
+      Statement statement = c.getJDBCConnection().createStatement();
+      ResultSet rs = statement.executeQuery(select);
+      rs.close();
+
+      select = "SELECT COUNT(*) FROM " + DB2GroupsTable;
+      statement = c.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+      rs.close();
+
+      select = "SELECT COUNT(*) FROM " + DB2GroupAdminsTable;
+      statement = c.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+      rs.close();
+
+      select = "SELECT COUNT(*) FROM " + DB2GroupMembersTable;
+      statement = c.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+      rs.close();
+
+      select = "SELECT COUNT(*) FROM " + DB2PrivilegesTable;
+      statement = c.getJDBCConnection().createStatement();
+      rs = statement.executeQuery(select);
+      rs.close();
+
+      return true;  // ok, obviously the tables exists (there is no SQLException)
+
+    }
+
+    catch (SQLException e) { return false; } // the table does not exist!
+    finally { c.release(); }
+*/
   }
 
   /**
@@ -777,14 +980,15 @@ public class MCRUserStoreDB2 implements MCRUserStore
     try
     {
       c.doUpdate (new MCRSQLStatement(DB2UsersTable)
+       .addColumn("NUMID INTEGER NOT NULL")
        .addColumn("UID VARCHAR(20) NOT NULL")
-       .addColumn("PASSWD VARCHAR(20) NOT NULL")
-       .addColumn("ENABLED VARCHAR(8) NOT NULL")
-       .addColumn("UPDATE VARCHAR(8) NOT NULL")
        .addColumn("CREATOR VARCHAR(20) NOT NULL")
        .addColumn("CREATIONDATE TIMESTAMP")
-       .addColumn("LASTCHANGES TIMESTAMP")
+       .addColumn("MODIFIEDDATE TIMESTAMP")
        .addColumn("DESCRIPTION VARCHAR(200)")
+       .addColumn("PASSWD VARCHAR(20) NOT NULL")
+       .addColumn("ENABLED VARCHAR(8) NOT NULL")
+       .addColumn("UPD VARCHAR(8) NOT NULL")
        .addColumn("SALUTATION VARCHAR(25) NOT NULL")
        .addColumn("FIRSTNAME VARCHAR(25) NOT NULL")
        .addColumn("LASTNAME VARCHAR(25) NOT NULL")
@@ -802,34 +1006,34 @@ public class MCRUserStoreDB2 implements MCRUserStore
        .addColumn("CELLPHONE VARCHAR(20)")
        .addColumn("PRIMGROUP VARCHAR(20) NOT NULL")
        .addColumn("PRIMARY KEY(UID)")
+       .addColumn("UNIQUE (NUMID)")
        .toCreateTableStatement());
 
       c.doUpdate (new MCRSQLStatement(DB2GroupsTable)
        .addColumn("GID VARCHAR(20) NOT NULL")
        .addColumn("CREATOR VARCHAR(20) NOT NULL")
        .addColumn("CREATIONDATE TIMESTAMP")
-       .addColumn("LASTCHANGES TIMESTAMP")
+       .addColumn("MODIFIEDDATE TIMESTAMP")
        .addColumn("DESCRIPTION VARCHAR(200)")
        .addColumn("PRIMARY KEY(GID)")
        .toCreateTableStatement());
 
-      c.doUpdate (new MCRSQLStatement(DB2GroupMembersTable)
-       .addColumn("UID VARCHAR(20) NOT NULL")
+       c.doUpdate (new MCRSQLStatement(DB2GroupAdminsTable)
        .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("FOREIGN KEY (UID) REFERENCES "+ DB2UsersTable +" (UID) ON DELETE CASCADE")
-       .addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID) ON DELETE CASCADE")
+       .addColumn("USERID VARCHAR(20)")
+       .addColumn("GROUPID VARCHAR(20)")
+       //.addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID)")
+       //.addColumn("FOREIGN KEY (USERID) REFERENCES "+ DB2UsersTable +" (UID)")
        .toCreateTableStatement());
 
-      c.doUpdate (new MCRSQLStatement(DB2GroupAdminsTable)
+      c.doUpdate (new MCRSQLStatement(DB2GroupMembersTable)
        .addColumn("GID VARCHAR(20) NOT NULL")
-       .addColumn("ADMINID VARCHAR(20) NOT NULL")
-       .addColumn("TYPE VARCHAR(6) NOT NULL")
-       .addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID) ON DELETE CASCADE")
-       //.addColumn("FOREIGN KEY (MEMBERID) REFERENCES "+ DB2UsersTable +" (UID) ON DELETE CASCADE")
+       .addColumn("USERID VARCHAR(20)")
+       .addColumn("GROUPID VARCHAR(20)")
        .toCreateTableStatement());
 
       c.doUpdate (new MCRSQLStatement(DB2PrivilegesTable)
-       .addColumn("NAME VARCHAR(32) NOT NULL")
+       .addColumn("NAME VARCHAR(64) NOT NULL")
        .addColumn("DESCRIPTION VARCHAR(200)")
        .addColumn("PRIMARY KEY(NAME)")
        .toCreateTableStatement());
@@ -837,9 +1041,12 @@ public class MCRUserStoreDB2 implements MCRUserStore
       c.doUpdate (new MCRSQLStatement(DB2PrivsLookupTable)
        .addColumn("GID VARCHAR(20) NOT NULL")
        .addColumn("NAME VARCHAR(32) NOT NULL")
-       .addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID) ON DELETE CASCADE")
-       .addColumn("FOREIGN KEY (NAME) REFERENCES "+ DB2PrivilegesTable +" (NAME) ON DELETE CASCADE")
+       .addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID)")
+       .addColumn("FOREIGN KEY (NAME) REFERENCES "+ DB2PrivilegesTable +" (NAME)")
+       //.addColumn("FOREIGN KEY (GID) REFERENCES "+ DB2GroupsTable +" (GID) ON DELETE CASCADE")
+       //.addColumn("FOREIGN KEY (NAME) REFERENCES "+ DB2PrivilegesTable +" (NAME) ON DELETE CASCADE")
        .toCreateTableStatement());
+
     }
     finally {c.release();}
   }

@@ -77,10 +77,25 @@ public interface MCRUserStore
   public boolean existsUser(String userID) throws Exception;
 
   /**
+   * This method tests if a MyCoRe user object is available in the persistent datastore. The
+   * numerical userID is taken into account, too.
+   *
+   * @param numID         (int) numerical userID of the MyCoRe user object
+   * @param userID  a String representing the MyCoRe user object which is to be looked for
+   */
+  public boolean existsUser(int numID, String userID) throws Exception;
+
+  /**
    * This method tests if a MyCoRe group object is available in the persistent datastore.
    * @param groupID  a String representing the MyCoRe group object which is to be looked for
    */
   public boolean existsGroup(String groupID) throws Exception;
+
+  /**
+   * This method tests if a MyCoRe privilege object is available in the persistent datastore.
+   * @param privName  a String representing the MyCoRe privilege object which is to be looked for
+   */
+  public boolean existsPrivilege(String privName) throws Exception;
 
   /**
    * This method tests if a MyCoRe privilege set object is available in the persistent datastore.
@@ -98,6 +113,26 @@ public interface MCRUserStore
    * @return  Vector of strings including the group IDs of the system
    */
   public Vector getAllGroupIDs() throws Exception;
+
+  /**
+   * This method gets all group IDs where a given user ID can manage the group (i.e. is
+   * in the administrator user IDs list) as a vector of strings.
+   *
+   * @param userID   a String representing the administrative user
+   * @return         Vector of strings including the group IDs of the system which
+   *                 have userID in their administrators list
+   */
+  public Vector getGroupIDsWithAdminUser(String userID) throws Exception;
+
+  /**
+   * This method gets all user IDs with a given primary group and returns them as a
+   * Vector of strings.
+   *
+   * @param groupID  a String representing a primary Group
+   * @return         Vector of strings including the user IDs of the system which
+   *                 have groupID as primary group
+   */
+  public Vector getUserIDsWithPrimaryGroup(String groupID) throws Exception;
 
   /**
    * This method retrieves a MyCoRe user object from the persistent datastore.
@@ -137,5 +172,3 @@ public interface MCRUserStore
    */
   public void updateUser(MCRUser user) throws Exception;
 }
-
-
