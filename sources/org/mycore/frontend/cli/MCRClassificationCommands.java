@@ -44,7 +44,7 @@ import mycore.classifications.MCRClassification;
  **/
 
 public class MCRClassificationCommands
-{
+  {
   private static String SLASH = System.getProperty( "file.separator" );
 
  /**
@@ -54,11 +54,12 @@ public class MCRClassificationCommands
   **/
   public static void delete( String ID )
     throws Exception
-  {
+    {
+    MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
-    cl.delete( ID );
-    System.out.println( ID + " deleted." );
-  }
+    cl.delete( mcr_id.getId() );
+    System.out.println( mcr_id.getId() + " deleted." );
+    }
 
  /**
   * Loads MCRClassification from all XML files in a directory.
@@ -66,7 +67,7 @@ public class MCRClassificationCommands
   * @param directory the directory containing the XML files
   **/
   public static void loadFromDirectory( String directory )
-  { processFromDirectory( directory, false ); }
+    { processFromDirectory( directory, false ); }
 
  /**
   * Updates MCRClassification from all XML files in a directory.
@@ -74,7 +75,7 @@ public class MCRClassificationCommands
   * @param directory the directory containing the XML files
   **/
   public static void updateFromDirectory( String directory )
-  { processFromDirectory( directory, true ); }
+    { processFromDirectory( directory, true ); }
 
  /**
   * Loads or updates MCRClassification from all XML files in a directory.
@@ -84,32 +85,30 @@ public class MCRClassificationCommands
   * is created
   **/
   private static void processFromDirectory( String directory, boolean update )
-  {
+    {
     File dir = new File( directory );
 
-    if( ! dir.isDirectory() )
-    {
+    if( ! dir.isDirectory() ) {
       System.out.println( directory + " ignored, is not a directory." );
       return;
-    }
+      }
 
     String[] list = dir.list();
 
-    if( list.length == 0)
-    {
+    if( list.length == 0) {
       System.out.println( "No files found in directory " + directory );
       return;
-    }
+      }
 
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
-	if ( ! list[ i ].endsWith(".xml") ) continue;
-	if( processFromFile( directory + SLASH + list[ i ], update ) )
+      if ( ! list[ i ].endsWith(".xml") ) { continue; }
+      if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
-    }
+      }
 
     System.out.println( "Processed " + numProcessed + " files." );
-  }
+    }
 
  /**
   * Loads an MCRClassification from an XML file.
@@ -117,7 +116,7 @@ public class MCRClassificationCommands
   * @param filename the location of the xml file
   **/
   public static boolean loadFromFile( String file )
-  { return processFromFile( file, false ); }
+    { return processFromFile( file, false ); }
 
  /**
   * Updates an MCRClassification from an XML file.
@@ -125,7 +124,7 @@ public class MCRClassificationCommands
   * @param filename the location of the xml file
   **/
   public static boolean updateFromFile( String file )
-  { return processFromFile( file, true ); }
+    { return processFromFile( file, true ); }
 
  /**
   * Loads or updates an MCRClassification from an XML file.
@@ -167,7 +166,7 @@ public class MCRClassificationCommands
     }
     catch( Exception ex )
     {
-      System.out.println( ex );
+      System.out.println( ex.getMessage() );
       System.out.println();
       System.out.println( "Exception while loading from file " + file );
       return false;
@@ -182,19 +181,21 @@ public class MCRClassificationCommands
   **/
   public static void save( String ID, String filename )
   {
+    MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
-    byte[] xml = cl.receiveClassificationAsXML(ID);
+    byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());
     try {
       FileOutputStream out = new FileOutputStream(filename);
       out.write(xml);
       out.flush();
       }
     catch (IOException ex) {
-      System.out.println( ex );
+      System.out.println( ex.getMessage() );
       System.out.println();
       System.out.println( "Exception while store to file " + filename );
       }
-    System.out.println( "Classification "+ID+" stored under "+filename+".\n" );
+    System.out.println( "Classification "+mcr_id.getId()+" stored under "
+      +filename+".\n" );
   }
 
 }

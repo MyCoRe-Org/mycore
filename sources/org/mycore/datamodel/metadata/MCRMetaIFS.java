@@ -33,7 +33,7 @@ import mycore.ifs.*;
  * derivates to the IFS. 
  * <p>
  * &lt;tag class="MCRMetaIFS" &gt;<br>
- * &lt;subtag sourcepath="..." maindoc="..." /&gt;<br>
+ * &lt;subtag sourcepath="..." maindoc="..." ifsid="..." /&gt;<br>
  * &lt;/tag&gt;<br>
  *
  * @author Jens Kupferschmidt

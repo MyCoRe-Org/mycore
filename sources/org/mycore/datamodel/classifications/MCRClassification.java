@@ -62,7 +62,7 @@ public class MCRClassification
     org.jdom.Element root = jdom.getRootElement();
     String ID = (String)root.getAttribute("ID").getValue();
     MCRObjectID mcr_id = new MCRObjectID(ID);
-    cl = new MCRClassificationItem(ID);
+    cl = new MCRClassificationItem(mcr_id.getId());
     List element_list = root.getChildren();
     org.jdom.Element categories = null;
     int len = element_list.size();
@@ -198,7 +198,7 @@ public class MCRClassification
     org.jdom.Element root = jdom.getRootElement();
     String ID = (String)root.getAttribute("ID").getValue();
     MCRObjectID mcr_id = new MCRObjectID(ID);
-    cl = new MCRClassificationItem(ID);
+    cl = new MCRClassificationItem(mcr_id.getId());
     cl.delete(cl.getClassificationID());
     setFromJDOM(jdom);
     cl.create();

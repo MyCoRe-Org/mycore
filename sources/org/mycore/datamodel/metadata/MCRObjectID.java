@@ -120,7 +120,20 @@ public void setNextId(String base_id) throws MCRUsageException
   }
 
 /**
- * This methode get the string with <em>project_id</em>. 
+ * This method set a new number in a existing MCRObjectID.
+ *
+ * @param number the new number
+ **/
+public final boolean setNumber(int num)
+  {
+  if (!mcr_valid_id) { return false; }
+  if (num < 0) { return false; }
+  mcr_number = Integer.toString(num);
+  return true;
+  }
+
+/**
+ * This method get the string with <em>project_id</em>. 
  * If the Id is not valid, an empty string was returned.
  *
  * @return the string of the project id
@@ -210,7 +223,8 @@ public final boolean isValid()
   { return mcr_valid_id; }
 
 /**
- * This methode return the validation value of a MCRObjectId.
+ * This method return the validation value of a MCRObjectId and store the
+ * components in this class. The <em>type_id</em> was set to lower case.
  * The MCRObjectId is valid if:
  * <ul>
  * <li> The argument is not null.
@@ -236,12 +250,13 @@ public final boolean isValid(String id)
   mcr_project_id = mcr_id.substring(0,i);
   int j = mcr_id.indexOf("_",i+1);
   if (j==-1) { return false; }
-  mcr_type_id = mcr_id.substring(i+1,j);
+  mcr_type_id = mcr_id.substring(i+1,j).toLowerCase();
   if (!conf.getBoolean("MCR.type_"+mcr_type_id.toLowerCase(),false)) { 
     return false; }
   mcr_number = mcr_id.substring(j+1,len);
   try { j = (new Integer(mcr_number)).intValue(); }
   catch (NumberFormatException e) { return false; }
+  if ((new Integer(mcr_number)).intValue() < 0) { return false; }
   mcr_valid_id = true;
   return mcr_valid_id; 
   }

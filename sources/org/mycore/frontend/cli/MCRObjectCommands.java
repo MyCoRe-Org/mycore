@@ -60,6 +60,24 @@ public class MCRObjectCommands
   }
 
  /**
+  * Delete MCRObjects form ID to ID from the datastore.
+  *
+  * @param IDfrom the start ID for deleting the MCRObjects
+  * @param IDto   the stop ID for deleting the MCRObjects
+  **/
+  public static void delete( String IDfrom, String IDto )
+    throws Exception
+  {
+  MCRObjectID from = new MCRObjectID(IDfrom);
+  MCRObjectID to = new MCRObjectID(IDto);
+  MCRObjectID now = new MCRObjectID(IDfrom);
+  for (int i=from.getNumberAsInteger();i<to.getNumberAsInteger()+1;i++) {
+    now.setNumber(i);
+    delete(now.getId());
+    }
+  }
+
+ /**
   * Loads MCRObjects from all XML files in a directory.
   *
   * @param directory the directory containing the XML files

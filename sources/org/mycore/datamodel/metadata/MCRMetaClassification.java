@@ -123,10 +123,10 @@ public final void setValue(String set_classid, String set_categid)
   if (set_classid.length() > MAX_CLASSID_LENGTH) {
     throw new MCRException("The classid is too long."); }
   try {
-    MCRObjectID mid = new MCRObjectID(set_classid); }
+    MCRObjectID mid = new MCRObjectID(set_classid); 
+    classid = mid.getId(); }
   catch (Exception e) {
     throw new MCRException("The classid is not MCRObjectID."); }
-  classid = set_classid;
   if (set_categid.length() > MAX_CATEGID_LENGTH) {
     throw new MCRException("The categid is too long."); }
   categid = set_categid;

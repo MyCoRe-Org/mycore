@@ -48,7 +48,7 @@ public class MCRDerivateCommands
   private static String SLASH = System.getProperty( "file.separator" );
 
  /**
-  * Deletes an MCRDerivate from the datastore.
+  * Delete an MCRDerivate from the datastore.
   * 
   * @param ID the ID of the MCRDerivate that should be deleted
   **/
@@ -58,6 +58,24 @@ public class MCRDerivateCommands
     MCRDerivate mycore_obj = new MCRDerivate();
     mycore_obj.deleteFromDatastore( ID );
     System.out.println( mycore_obj.getId().getId() + " deleted." );
+  }
+
+ /**
+  * Delete MCRDerivates form ID to ID from the datastore.
+  * 
+  * @param IDfrom the start ID for deleting the MCRDerivate 
+  * @param IDto   the stop ID for deleting the MCRDerivate 
+  **/
+  public static void delete( String IDfrom, String IDto )
+    throws Exception
+  {
+  MCRObjectID from = new MCRObjectID(IDfrom);
+  MCRObjectID to = new MCRObjectID(IDto);
+  MCRObjectID now = new MCRObjectID(IDfrom);
+  for (int i=from.getNumberAsInteger();i<to.getNumberAsInteger()+1;i++) {
+    now.setNumber(i);
+    delete(now.getId());
+    }
   }
 
  /**

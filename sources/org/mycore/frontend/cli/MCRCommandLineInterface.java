@@ -96,6 +96,9 @@ public class MCRCommandLineInterface
       "delete object {0}",
       "mycore.commandline.MCRObjectCommands.delete String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete object from {0} to {1}",
+      "mycore.commandline.MCRObjectCommands.delete String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "load object from file {0}",
       "mycore.commandline.MCRObjectCommands.loadFromFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -124,6 +127,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "delete derivate {0}",
       "mycore.commandline.MCRDerivateCommands.delete String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete derivate from {0} to {1}",
+      "mycore.commandline.MCRObjectCommands.delete String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "load derivate from file {0}",
       "mycore.commandline.MCRDerivateCommands.loadFromFile String" );

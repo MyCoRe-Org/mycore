@@ -83,9 +83,10 @@ public MCRMetaLinkID(String set_datapart, String set_subtag,
 public final void setReference(String set_href, String set_label, 
   String set_title) throws MCRException
   {
-  super.setReference(set_href,set_label,set_title);
   try {
-    MCRObjectID hrefid = new MCRObjectID(set_href); }
+    MCRObjectID hrefid = new MCRObjectID(set_href); 
+    super.setReference(hrefid.getId(),set_label,set_title); 
+    }
   catch (Exception e) {
     throw new MCRException("The href value is not a MCRObjectID."); }
   }
@@ -102,10 +103,11 @@ public final void setReference(String set_href, String set_label,
 public final void setBiLink(String set_from, String set_to, String set_title)
   throws MCRException
   {
-  super.setBiLink(set_from,set_to,set_title);
   try {
     MCRObjectID fromid = new MCRObjectID(set_from); 
-    MCRObjectID toid = new MCRObjectID(set_to); }
+    MCRObjectID toid = new MCRObjectID(set_to); 
+    super.setBiLink(fromid.getId(),toid.getId(),set_title); 
+    }
   catch (Exception e) { 
     linktype = null;
     throw new MCRException("The from/to value is not a MCRObjectID."); }
@@ -148,17 +150,23 @@ public final void setFromDOM(org.jdom.Element element)
   super.setFromDOM(element);
   if (linktype.equals("locator")) {
     try {
-      MCRObjectID hrefid = new MCRObjectID(href); }
+      MCRObjectID hrefid = new MCRObjectID(href); 
+      href = hrefid.getId();
+      }
     catch (Exception e) {
       throw new MCRException("The xlink:href is not a MCRObjectID."); }
     }
   else {
     try {
-      MCRObjectID fromid = new MCRObjectID(from); }
+      MCRObjectID fromid = new MCRObjectID(from); 
+      from = fromid.getId();
+      }
     catch (Exception e) {
       throw new MCRException("The xlink:from is not a MCRObjectID."); }
     try {
-      MCRObjectID toid = new MCRObjectID(to); }
+      MCRObjectID toid = new MCRObjectID(to); 
+      to = toid.getId();
+      }
     catch (Exception e) {
       throw new MCRException("The xlink:to is not a MCRObjectID."); }
     }

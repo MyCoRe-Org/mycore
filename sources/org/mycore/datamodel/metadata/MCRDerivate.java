@@ -341,7 +341,10 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
  **/
 public final static boolean existInDatastore(String id) 
   throws MCRPersistenceException
-  { return mcr_persist.exist(new MCRObjectID(id)); }
+  { 
+  MCRObjectID mcr_id = new MCRObjectID(id);
+  return mcr_persist.exist(new MCRObjectID(mcr_id.getId())); 
+  }
 
 /**
  * The methode receive the object for the given MCRObjectID and stored
