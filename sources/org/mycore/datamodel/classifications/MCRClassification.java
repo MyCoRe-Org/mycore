@@ -416,8 +416,11 @@ private ArrayList cat;
    * @param labeltext the text of a categoy label
    * @return the correspondig category ID
    **/
-  public static final String getCategoyID(MCRObjectID classid, String labeltext)
+  public static final String getCategoryID(MCRObjectID classid, 
+    String labeltext)
     {
+    if (labeltext == null) { return ""; }
+    if (labeltext.length() == 0) { return ""; }
     MCRClassificationItem cl = new MCRClassificationItem(classid);
     MCRCategoryItem cat = cl.getCategoryItemForLabelText(labeltext);
     if (cat == null) { return ""; }
