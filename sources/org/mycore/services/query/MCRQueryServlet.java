@@ -117,7 +117,8 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     String mode  = request.getParameter( "mode"  );
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
-    String host  = request.getParameter( "hosts" );
+    //multiple host are allowed
+    String[] hosts  = request.getParameterValues( "hosts" );
     String lang  = request.getParameter( "lang" );
     String view  = request.getParameter( "view");
     String ref   = request.getParameter( "ref");
@@ -129,10 +130,28 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
         request.getParameter(InOrderParam).toLowerCase().equals("false"))
     	inOrder = false;
     else inOrder = true;
+    String host="";
+    if (hosts!=null && hosts.length>0){
+		// find a Instance of the local one
+		String ServerName = request.getServerName();
+		logger.info("MCRQueryServlet: Try to map remote request to local one!");
+		logger.info("MCRQueryServlet: Local Server Name="+ServerName);
+		StringBuffer hostBf=new StringBuffer();
+   		for (int i=0;i<hosts.length;i++){
+   			if (!hosts[i].equals("local"))
+   				//the following replaces a remote request with "local" if needed
+				hosts[i]= (isInstanceOfLocal(hosts[i],request)) ? "local" : hosts[i];
+			//make a comma seperated list of all hosts
+   			hostBf.append(",").append(hosts[i]);
+		}
+		host=hostBf.deleteCharAt(0).toString();
+		if (host.indexOf("local")!=host.lastIndexOf("local")){
+			logger.info("MCRQueryServlet: multiple \"local\" will be removed by MCRQueryResult!");
+		}
+	}
     	
     if (SortKey != null) customSort = true;
     else customSort = false;
-    logger.info(SortKey+":"+inOrder+"("+request.getParameter(InOrderParam)+")"+":"+customSort);
     int status=0;
 
     String att_mode  = (String) request.getAttribute( "mode"  );
@@ -142,7 +161,8 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     String att_type  = (String) request.getAttribute( "type"  );
     if (att_type!=null) { type = att_type; }
     String att_host  = (String) request.getAttribute( "hosts" );
-    if (att_host!=null) { host = att_host; }
+    //dont't overwrite host if getParameter("hosts") was successful 
+    if (att_host!=null && (hosts.length==0)) { host = att_host; }
 	String att_lang  = (String) request.getAttribute( "lang" );
 	if (att_lang!=null) { lang = att_lang; }
 	String att_view  = (String) request.getAttribute( "view" );
@@ -157,8 +177,8 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     if( mode  == null ) { mode  = "ResultList"; }
     if( mode.equals("") ) { mode  = "ResultList"; }
-    if( host  == null ) { host  = "local"; }
-    if( host.equals("") ) { host  = "local"; }
+    if( host  == null ) { host = "local"; }
+    if( host.equals("") ) { host = "local"; }
     if( query == null ) { query = ""; }
     if( type  == null ) { return; }
     if( type.equals("") ) { return; }
@@ -173,7 +193,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     logger.info("MCRQueryServlet : mode = "+mode);
     logger.info("MCRQueryServlet : type = "+type);
-    logger.info("MCRQueryServlet : hosts = "+host);
+    logger.info("MCRQueryServlet : hosts = "+ host);
     logger.info("MCRQueryServlet : lang = "+lang);
     logger.info("MCRQueryServlet : query = "+query);
 
@@ -521,6 +541,20 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
                              .setAttribute("offset",""+offset)
                              .setAttribute("size",""+size);
      return returns;
+  }
+  
+  private boolean isInstanceOfLocal(String host, HttpServletRequest request){
+  	String ServletHost=request.getServerName();
+  	String RemoteHost= conf.getString("MCR.remoteaccess_"+host+"_host");
+  	String ServletPath=request.getServletPath().substring(0,
+  	                   request.getServletPath().lastIndexOf("/"))+
+                       "/MCRQueryServlet";
+	String RemotePath= conf.getString("MCR.remoteaccess_"+host+"_query_servlet");
+  	int ServletPort=request.getServerPort();
+  	int RemotePort=	 Integer.parseInt(conf.getString("MCR.remoteaccess_"+host+"_port"));
+  	return ((RemoteHost.equals(ServletHost)) &&
+  	        (RemotePath.equals(ServletPath)) && 
+  	        (ServletPort==RemotePort)) ? true : false;
   }
   
 }
