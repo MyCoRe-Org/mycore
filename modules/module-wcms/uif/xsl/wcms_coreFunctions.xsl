@@ -77,29 +77,40 @@ These strategies are embarked on:
                   <xsl:when test=" $browserAddress_dynamicContentBinding != '' " >
                         <xsl:value-of select="$browserAddress_dynamicContentBinding" />
                   </xsl:when>
-                  <xsl:otherwise>
-                        <xsl:value-of select="'nichts'" />                        
-                  </xsl:otherwise>
             </xsl:choose>
             <!-- END OF: assign right browser address -->
 
       </xsl:template>
       <!-- =================================================================================================== -->
       <xsl:template name="wcms.getTemplate">
-           
             <xsl:param name="browserAddress" />            
+            <xsl:param name="navigationBase" />                        
            
-            <!-- point to rigth item -->
-            <xsl:for-each select="document($navigationBase) /navigation//item[@href = $browserAddress]" >
-                  <!-- collect @template !='' entries along the choosen axis -->
-                  <xsl:for-each select="ancestor-or-self::*[  @template != '' ]">
-                        <xsl:if test="position()=last()" >
-                              <xsl:value-of select="@template" />
-                        </xsl:if>
-                  </xsl:for-each>
-                  <!-- END OF: collect @template !='' entries along the choosen axis -->
-            </xsl:for-each>
-            <!-- END OF: point to rigth item -->
+           <xsl:variable name="template_tmp">
+	            <!-- point to rigth item -->
+	            <xsl:for-each select="document($navigationBase) /navigation//item[@href = $browserAddress]" >
+	                  <!-- collect @template !='' entries along the choosen axis -->
+	                  <xsl:for-each select="ancestor-or-self::*[  @template != '' ]">
+	                        <xsl:if test="position()=last()" >
+	                              <xsl:value-of select="@template" />
+	                        </xsl:if>
+	                  </xsl:for-each>
+	                  <!-- END OF: collect @template !='' entries along the choosen axis -->
+	            </xsl:for-each>
+	            <!-- END OF: point to rigth item -->
+            </xsl:variable>
+	            
+		<xsl:choose>
+                  <!-- assign appropriate template -->
+                  <xsl:when test="$template_tmp != ''">
+                  	<xsl:value-of select="$template_tmp" />                        
+                  </xsl:when>
+                  <!-- default template -->
+                  <xsl:otherwise>
+                        <xsl:value-of select="'template_mycoresample-1'" />
+                  </xsl:otherwise>
+            </xsl:choose>
+            
       </xsl:template>
       <!-- =================================================================================================== -->
 </xsl:stylesheet>
