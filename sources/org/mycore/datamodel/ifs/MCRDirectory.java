@@ -57,7 +57,18 @@ public class MCRDirectory extends MCRFilesystemNode
   MCRDirectory( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date )
   { super( ID, parentID, ownerID, name, size, date ); }
   
-  protected void addChild( MCRFilesystemNode child )
+  public static MCRDirectory getRootDirectory( String ownerID )
+  {
+    MCRArgumentChecker.ensureNotEmpty( ownerID, "ownerID" );
+    MCRFilesystemNode[] nodes = manager.retrieveRootNodes( ownerID );
+
+    if( ( nodes == null ) || ( nodes.length == 0 ) ) 
+      return null;
+    else
+      return (MCRDirectory)( nodes[ 0 ] );
+  }
+
+   protected void addChild( MCRFilesystemNode child )
   {
     if( childrenIDs != null )
       childrenIDs.addElement( child.getID() );
@@ -202,7 +213,7 @@ public class MCRDirectory extends MCRFilesystemNode
   {
     ensureNotDeleted();
 
-    for( int i = 0; i < getNumChildren(); i++ )
+    for( int i = getNumChildren() - 1; i >= 0; i-- )
       getChild( i ).delete();
     
     super.delete();
