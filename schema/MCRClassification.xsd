@@ -43,6 +43,7 @@
      name="category"/>
  </xsd:sequence>
  <xsd:attribute use="required" type="xsd:string" name="ID"/>
+ <xsd:attribute use="optional" type="xsd:integer" name="counter"/>
 </xsd:complexType>
 
 </xsd:schema>
