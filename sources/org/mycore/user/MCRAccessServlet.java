@@ -27,6 +27,8 @@ package org.mycore.user;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 
@@ -68,30 +70,40 @@ public class MCRAccessServlet extends MCRServlet
     boolean result = false;
 
     // read the parameter
+    // mode parameter 'reader' or 'editor'
     String mode = getProperty(job.getRequest(), "mode");
     if (mode == null) { mode = "reader"; }
     mode.trim().toLowerCase();
     if ((!mode.equals("reader")) && (!mode.equals("editor"))) { mode = "reader"; }
+    // ip parameter 'ip' or 'ipmask/subnetmask'
     String ip = getProperty(job.getRequest(), "ip");
     if (ip == null) { ip = ""; }
     ip.trim();
     if (ip.length()==0) { retip = true; }
+    // privilege parameter
     String privilege = getProperty(job.getRequest(), "privilege");
     if (privilege == null) { privilege = ""; }
     privilege.trim();
     if (privilege.length()==0) { retpriv = true; }
+    // list of user parameter
+    String userlist = getProperty(job.getRequest(), "userlist");
+    if (userlist == null) { userlist = ""; }
+    userlist.trim();
+    if (userlist.length()==0) { retuser = true; }
+    HashSet userset = new HashSet();
+    StringTokenizer st = new StringTokenizer(userlist,"_");
+    while (st.hasMoreTokens()) { userset.add(st.nextToken()); }
+
+    // get the MCRSession for the current thread from the session manager.
+    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    String userid = mcrSession.getCurrentUserID();
+    LOGGER.debug("Access check for user "+userid);
 
     // check for mode reader
     if (mode.equals("reader")) {
       StringBuffer sb = new StringBuffer(1024);
       sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("] and privilege [").append(privilege).append(']');
       LOGGER.debug(sb.toString());
-
-      // get the MCRSession object for the current thread from the session manager.
-      MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-      String userid = mcrSession.getCurrentUserID();
-      LOGGER.debug("Access check for user "+userid);
-
       // check the data
       if (retip && retpriv) { 
         result = false; }
@@ -102,6 +114,22 @@ public class MCRAccessServlet extends MCRServlet
         }
       }
     
+    // check for mode editor
+    if (mode.equals("editor")) {
+      StringBuffer sb = new StringBuffer(1024);
+      sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("] and users [").append(userlist).append("] and privilege [").append(privilege).append(']');
+      LOGGER.debug(sb.toString());
+      // check the data
+      if (retip && retpriv) { 
+        result = false; }
+      else {
+        if (!retip) { retip = checkIP(ip,job); }
+        if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
+        if (!retuser) { retuser = checkGroupMember(userid,userset); }
+        result = retip && retpriv && retuser;
+        }
+      }
+
     // prepare the document
     org.jdom.Element root = new org.jdom.Element("mycoreaccess");
     org.jdom.Document jdom = new org.jdom.Document(root);
@@ -152,5 +180,17 @@ public class MCRAccessServlet extends MCRServlet
    **/
   boolean checkPrivileg(String privilege, String userid)
     { return MCRAccessChecker.hasUserThePrivilege(privilege,userid); }
+
+  /**
+   * The method check that the given user is in the same group or in a
+   * group that is a member of the users group.
+   *
+   * @param user the user which should be checked
+   * @param list the list of group users in which the user should be a member of himself group.
+   * return true if the user is in the same group or subgroup like one of the li
+st
+   **/
+  boolean checkGroupMember(String user,HashSet list)
+    { return MCRAccessChecker.isUserLikeListedUsers(user,list); }
 
   }

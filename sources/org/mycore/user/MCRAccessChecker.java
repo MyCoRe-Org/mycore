@@ -27,6 +27,8 @@ package org.mycore.user;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * This class holds a lot of static check methods to test some access
@@ -93,4 +95,43 @@ public class MCRAccessChecker
     return privs.contains(privilege);
     }
 
+  /**
+   * The method check that the given user is in the same group or in a
+   * group that is a member of the users group.
+   *
+   * @param user the user which should be checked
+   * @param list the list of group users in which the user should be a member of himself group.
+   * return true if the user is in the same group or subgroup like one of the list
+   **/
+  public static final boolean isUserLikeListedUsers(String user,HashSet list)
+    {
+    // true if the user is the administrator
+    if (user.equals("administrator")) { return true; }
+    // true if the user is in the owner list
+    if (list.contains(user)) { return true; }
+    // all other users must have the 'editor' privilege
+    if (!hasUserThePrivilege("editor",user)) { return false; }
+    // Determine the list of all groups the current user is a member of,
+    // including the implicit ones.
+    MCRUser currentUser = MCRUserMgr.instance().retrieveUser(user);
+    ArrayList allCurrentUserGroupIDs = currentUser.getAllGroupIDs();
+    // For all authors (users in the object servflags) we now check if the current
+    // user directly is a member of the primary group of the author or implicitly
+    // is a member of a group which itself is a member of the primary group of
+    // the author.
+    for (Iterator it = list.iterator(); it.hasNext();) {
+      String primaryGroupID = MCRUserMgr.instance().
+        getPrimaryGroupIDOfUser((String)it.next());
+      MCRGroup primaryGroup = MCRUserMgr.instance().
+        retrieveGroup(primaryGroupID);
+      if (primaryGroup.hasMember(currentUser)) { return true; }
+      ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup.getMemberGroupIDs();
+      for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
+        if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) {
+          return true; }
+        }
+      }
+    // access deny
+    return false;
+    }
   }
