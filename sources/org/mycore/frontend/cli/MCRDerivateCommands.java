@@ -32,6 +32,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import mycore.common.*;
 import mycore.datamodel.*;
+import mycore.ifs.*;
 
 /**
  * Provides static methods that implement commands for the
@@ -204,10 +205,11 @@ public class MCRDerivateCommands
   * @param ID the ID of the MCRDerivate to be save.
   * @param filename the filename to store the derivate
   **/
-  public static void save( String ID, String filename )
+  public static void save( String ID, String dirname )
   {
     MCRDerivate obj = new MCRDerivate();
     byte[] xml = obj.receiveXMLFromDatastore(ID);
+    String filename = dirname+".xml";
     try {
       FileOutputStream out = new FileOutputStream(filename);
       out.write(xml);
@@ -218,7 +220,16 @@ public class MCRDerivateCommands
       System.out.println();
       System.out.println( "Exception while store to file " + filename );
       }
-    System.out.println( "Derivate "+ID+" stored under "+filename+".\n" );
+    File f = new File(dirname);
+    try {
+      MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(ID),f); }
+    catch (IOException ex) {
+      System.out.println( ex );
+      System.out.println();
+      System.out.println( "Exception while store to object in " + dirname );
+      }
+    System.out.println( "Derivate "+ID+" stored under "+dirname+" and "+
+      filename+".\n" );
   }
 
 }
