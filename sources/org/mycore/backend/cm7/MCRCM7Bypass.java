@@ -27,6 +27,7 @@ package mycore.cm7;
 import java.util.*;
 import java.sql.*;
 import mycore.common.*;
+import mycore.sql.*;
 
 /**
  * This class provides methods to get the names of the tables and columns
@@ -68,7 +69,7 @@ public class MCRCM7Bypass
                      ".SBTCLASSDEFS WHERE CLASSID = " + code;
 
       String name = null;
-      Connection conn = MCRCM7ConnectionPoolDB2.getConnection();
+      Connection conn = MCRSQLConnectionPool.instance().getConnection();
 
       try
       {
@@ -86,7 +87,7 @@ public class MCRCM7Bypass
         ( "Error while retrieving DB2 table name for index class " + indexClassName, ex ); 
       }
       finally
-      { MCRCM7ConnectionPoolDB2.releaseConnection( conn ); }
+      { MCRSQLConnectionPool.instance().releaseConnection( conn ); }
 
       if( name == null )
       {
@@ -132,7 +133,7 @@ public class MCRCM7Bypass
                    "KEYWORDCLASSFI = " + keywordClass;
  
     int keywordCode = -1;
-    Connection conn = MCRCM7ConnectionPoolDB2.getConnection();
+    Connection conn = MCRSQLConnectionPool.instance().getConnection();
 
     try
     {
@@ -150,7 +151,7 @@ public class MCRCM7Bypass
       ( "Error while retrieving keyword code from SBTNLSKEYWORDS table for field " + fieldName, ex );
     }
     finally
-    { MCRCM7ConnectionPoolDB2.releaseConnection( conn ); }
+    { MCRSQLConnectionPool.instance().releaseConnection( conn ); }
 
     if( keywordCode == -1 )
     {

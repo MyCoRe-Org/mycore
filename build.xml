@@ -22,6 +22,7 @@
   <property name="mycore.source.common" value="./sources/mycore/common"/>
   <property name="mycore.source.datamodel" value="./sources/mycore/datamodel"/>
   <property name="mycore.source.cm7" value="./sources/mycore/cm7"/>
+  <property name="mycore.source.sql" value="./sources/mycore/sql"/>
   <property name="mycore.source.command" value="./sources/mycore/commandline"/>
   <property name="mycore.class" value="./classes"/>
   <property name="mycore.javadoc" value="./javadocs"/>
@@ -71,7 +72,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_datamodel,compile_cm7,compile_commandline,compile_demo_dublin_core">
+  <target name="compile" depends="init,compile_common,compile_datamodel,compile_sql,compile_cm7,compile_commandline,compile_demo_dublin_core">
   </target>
   
   <target name="compile_common">
@@ -86,6 +87,15 @@
   <target name="compile_cm7">
     <!-- compiles the Content Manager 7 source classes -->
     <javac srcdir="${mycore.source.cm7}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_sql">
+    <!-- compiles the JDBC SQL source classes -->
+    <javac srcdir="${mycore.source.sql}"
            destdir="${mycore.class}"
            debug="${debug}"
            optimize="${optimize}">
