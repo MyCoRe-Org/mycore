@@ -39,7 +39,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  **/
 
-public class MCRCM8ViewItemType
+public class MCRCM8ViewItem
 {
 
 // The configuration

@@ -230,7 +230,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
 
     // create the item
     item.create();
-    logger.info("Item was created.");
+    logger.info("Item "+mcr_id.getId()+" was created.");
     }
   catch (Exception e) {
     throw new MCRPersistenceException(
@@ -284,7 +284,7 @@ public final void delete(MCRObjectID mcr_id)
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
         " does not exist."); }
-    logger.info("Item was deleted.");
+    logger.info("Item "+mcr_id.getId()+" was deleted.");
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }

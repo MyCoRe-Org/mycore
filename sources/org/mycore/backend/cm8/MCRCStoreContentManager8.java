@@ -92,8 +92,6 @@ public String storeContent( MCRFile file, MCRContentInputStream source )
       ddo = (DKLobICM)connection.createDDO(itemTypeName,DK_CM_DOCUMENT); 
       }
     logger.debug("A new DKLobICM was created.");
-    String itemID = ddo.getPidObject().getPrimaryId();
-    logger.debug("Item ID = "+itemID);
     logger.debug("OwnerID = "+file.getOwnerID());
     short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,"ifsowner");
     ((DKDDO)ddo).setData(dataId,file.getOwnerID());
@@ -108,8 +106,10 @@ public String storeContent( MCRFile file, MCRContentInputStream source )
       +source.available()+".");
     ddo.add((InputStream)source,source.available());
     logger.debug("Add the DKLobICM.");
+    String storageID = ddo.getPidObject().pidString();
+    logger.debug("StorageID = "+storageID);
     logger.debug("The file was stored under CM8 Ressource Manager.");
-    return itemID;
+    return storageID;
     }
   catch (Exception ex) {
     ex.printStackTrace();
@@ -127,10 +127,8 @@ public void deleteContent( String storageID )
   logger.debug("StorageID = "+storageID);
   DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
   try {
-/*
-    MCRCM8Item item = new MCRCM8Item(connection,itemTypeName,storageID);
-    item.delete();
-*/
+    DKLobICM ddo = (DKLobICM)connection.createDDO(storageID);
+    ddo.del();
     logger.debug("The file was deleted from CM8 Ressource Manager.");
     }
   catch(Exception ex) {
@@ -145,11 +143,17 @@ public void retrieveContent( MCRFile file, OutputStream target )
   {
   Logger logger = MCRCM8ConnectionPool.getLogger(); 
   logger.debug("StorageID = "+file.getStorageID());
-
   DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
   try {
-    byte[] content = (new String("abc")).getBytes();
-    target.write( content, 0, content.length );
+    DKLobICM ddo = (DKLobICM)connection.createDDO(file.getStorageID());
+    ddo.retrieve(DK_CM_CONTENT_YES);
+    InputStream is = ddo.getInputStream(-1,-1,-1);
+    int bufsize = 8192;
+    byte [] buf = new byte[bufsize];
+    int inread;
+    while ((inread = is.read(buf,0,bufsize)) != -1) { 
+      logger.debug("Read length = "+inread);
+      target.write(buf,0,inread); }
     logger.debug("The file was retrieved from CM8 Ressource Manager.");
     }
   catch( Exception ex ) {
@@ -191,10 +195,13 @@ private void createStore(DKDatastoreICM connection) throws Exception
   attr.setNullable(false);
   attr.setUnique(false);
   item_type.addAttr(attr);
-  //item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_DOC_MODEL);
   item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_RESOURCE_ITEM);
   item_type.setXDOClassName(DK_ICM_XDO_LOB_CLASS_NAME);
   item_type.setXDOClassID(DK_ICM_XDO_LOB_CLASS_ID);
+  short rmcode = 1;
+  item_type.setDefaultRMCode(rmcode);
+  short smscode = 1;
+  item_type.setDefaultCollCode(smscode);
   item_type.add();
   logger.info("The ItemType "+itemTypeName+" for IFS CM8 store is created."); 
   }
