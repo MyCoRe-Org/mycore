@@ -65,6 +65,7 @@ public class MCRFileMetadataManager
   void storeNode( MCRFilesystemNode node )
     throws MCRPersistenceException
   {
+    System.out.println( "IFS StoreNode " + node.getName() );
     store.storeNode( node );
     cache.put( node.getID(), node );
   }
@@ -72,6 +73,7 @@ public class MCRFileMetadataManager
   MCRFilesystemNode retrieveNode( String ID )
     throws MCRPersistenceException
   {
+    System.out.println( "IFS RetrieveNode " + ID );
     MCRFilesystemNode n = (MCRFilesystemNode)( cache.get( ID ) );
     if( n != null ) 
       return n;  
@@ -118,6 +120,7 @@ public class MCRFileMetadataManager
   void deleteNode( String ID )
     throws MCRPersistenceException
   {
+    System.out.println( "IFS DeleteNode " + ID );
     cache.remove( ID );
     store.deleteNode( ID );
   }
