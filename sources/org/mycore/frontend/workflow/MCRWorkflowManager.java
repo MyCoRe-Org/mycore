@@ -59,8 +59,12 @@ private static MCRConfiguration config = null;
 // logger
 static Logger logger=Logger.getLogger(MCRWorkflowManager.class.getName());
  
-// table of workflow directories
+// The mail sender address
+static String sender = "";
+
+// table of workflow directories mail addresses
 private Hashtable ht = null;
+private Hashtable mt = null;
 
 // The file slash
 private static String SLASH = System.getProperty("file.separator");;
@@ -82,7 +86,11 @@ protected MCRWorkflowManager()
   config = MCRConfiguration.instance();
   // set the logger property
   PropertyConfigurator.configure(config.getLoggingProperties());
+  // read mail sender address
+  sender = config.getString("MCR.editor_mail_sender","mcradmin@localhost");
+  // int tables
   ht = new Hashtable();
+  mt = new Hashtable();
   }
 
 /**
@@ -103,6 +111,33 @@ public String getDirectoryPath(String type)
   ht.put(type,dirname);
   return dirname;
   }
+
+/**
+ * The method return the information mail address for a given MCRObjectID type.
+ *
+ * @param type the MCRObjectID type
+ * @return the string of the information mail address
+ **/
+public String getMailAddress(String type)
+  {
+  if (mt.containsKey(type)) { return (String)mt.get(type); }
+  String mailaddr = config.getString("MCR.editor_"+type+"_mail",null);
+  if (mailaddr == null) {
+    mt.put(type,"mcradmin@localhost");
+    logger.warn("No mail address for "+type+" is in the configuration.");
+    return "mcradmin@localhost";
+    }
+  mt.put(type,mailaddr);
+  return mailaddr;
+  }
+
+/**
+ * The method return the mail sender adress form the configuration.
+ *
+ * @return the mail sender adress
+ **/
+public String getMailSender()
+  { return sender; }
 
 /**
  * The method return a ArrayList of file names from objects they are under .../workflow/<em>type/...type...</em>.
