@@ -39,6 +39,7 @@ import org.mycore.common.*;
 import org.mycore.frontend.cli.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.common.xml.*;
+import org.mycore.services.query.*;
 
 /**
  * This class is a very simple GUI for handling MyCoRe objects. 

@@ -48,6 +48,7 @@ import javax.servlet.http.HttpUtils;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

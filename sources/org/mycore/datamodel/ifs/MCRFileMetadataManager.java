@@ -32,7 +32,7 @@ public class MCRFileMetadataManager
 {
   private static MCRFileMetadataManager manager;
   
-  static synchronized MCRFileMetadataManager instance()
+  public static synchronized MCRFileMetadataManager instance()
   {
     if( manager == null ) manager = new MCRFileMetadataManager();
     return manager;

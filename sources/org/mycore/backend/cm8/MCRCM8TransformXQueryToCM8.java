@@ -32,7 +32,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
