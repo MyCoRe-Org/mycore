@@ -30,8 +30,8 @@ import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.common.MCRUtils;
-import mycore.datamodel.MCRQueryInterface;
 import mycore.datamodel.MCRObjectID;
+import mycore.xml.MCRQueryInterface;
 
 /**
  * This is the basic tranformer implementation for CM 7 search text strings

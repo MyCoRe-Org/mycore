@@ -30,9 +30,9 @@ import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.common.MCRUtils;
-import mycore.datamodel.MCRQueryInterface;
 import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRQueryResultArray;
+import mycore.xml.MCRQueryInterface;
+import mycore.xml.MCRQueryResultArray;
 
 /**
  * This is the tranformer implementation for CM 7 from XQuery language

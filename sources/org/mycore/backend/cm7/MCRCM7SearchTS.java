@@ -28,7 +28,7 @@ import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRQueryResultArray;
+import mycore.xml.MCRQueryResultArray;
 
 /**
  * This is the search class for the IBM Content Manager 7 Text Search Engine.

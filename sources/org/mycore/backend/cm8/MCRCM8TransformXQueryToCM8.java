@@ -31,9 +31,9 @@ import com.ibm.mm.sdk.common.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRQueryInterface;
 import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRQueryResultArray;
+import mycore.xml.MCRQueryInterface;
+import mycore.xml.MCRQueryResultArray;
 
 /**
  * This is the tranformer implementation for CM 8 from XQuery language
