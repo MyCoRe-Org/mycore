@@ -23,21 +23,18 @@
  **/
 package org.mycore.services.query;
 
-import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.backend.remote.MCRRemoteAccessInterface;
-import org.mycore.backend.remote.MCRServletCommunication;
-import org.jdom.Document;
-import org.jdom.Element;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.mycore.backend.remote.MCRRemoteAccessInterface;
+import org.mycore.backend.remote.MCRServletCommunication;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
- * @author Thomas Scheffler (yagee)
- * 
  * This class makes use of the MCRCache functionality and implements
  * the MCRQueryInterface if someone need this.
  * configure options:
@@ -45,6 +42,8 @@ import org.apache.log4j.PropertyConfigurator;
  * MCR.query_cache_capacitity_other: integer of amount of other objects stored in cache
  * MCR.query_cache_time: time a "other" object is valid in cache in minutes
  * MCR.query_cache_time_class: time a classification stays valid in cache
+ * 
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryCache {
 	
@@ -136,10 +135,8 @@ public class MCRQueryCache {
 		if (type.equalsIgnoreCase("class")) {
 			return getClass(host,query);			
 		}
-		else {
-			//no classification, so we see the other cache
-			return getOther(host,query,type,maxresults);
-		}
+		//no classification, so we see the other cache
+		return getOther(host,query,type,maxresults);
 	}
 	
 	/**
@@ -149,15 +146,12 @@ public class MCRQueryCache {
 	 * @see org.mycore.datamodel.classifications.MCRClassification#search(java.lang.String)
 	 */
 	public final static MCRXMLContainer getClass(String query){
-		if (!isInitialized())
-			return null;
-		else
+		if (isInitialized())
 			return getClass("local", query);
+		return null;
 	}
 	private final static MCRXMLContainer getClass(String host, String query){
-		if (!isInitialized())
-			return null;
-		else{
+		if (isInitialized()){
 			MCRXMLContainer returns=new MCRXMLContainer();
 			Object cacheObject;
 			String key=host+"$"+query;
@@ -191,27 +185,16 @@ public class MCRQueryCache {
 				}
 			return returns;
 		}
+		return null; //isInitialised()==false
 	}
 
-	private final static MCRXMLContainer getOther(
-		String query, 
-		String type, 
-		int maxresults)
-	{
-		if (!isInitialized())
-			return null;
-		else
-			return getOther("local",query, type,maxresults);
-	}
 	private final static MCRXMLContainer getOther(
 		String host,
 		String query,
 		String type,
 		int maxresults)
 	{
-		if (!isInitialized())
-			return null;
-		else{
+		if (isInitialized()){
 			MCRXMLContainer returns=new MCRXMLContainer();
 			Object cacheObject;
 			String key=host+"$"+type+"$"+query;
@@ -237,6 +220,7 @@ public class MCRQueryCache {
 			}
 			return returns;
 		}
+		return null; //isInitialized()==false
 	}
 	
 	
