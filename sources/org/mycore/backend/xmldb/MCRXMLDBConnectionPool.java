@@ -24,18 +24,18 @@
 
 package org.mycore.backend.xmldb;
 
-import java.util.Vector;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-
-import org.xmldb.api.*;
-import org.xmldb.api.base.*;
-import org.xmldb.api.modules.*;
+import org.xmldb.api.DatabaseManager;
+import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.Database;
+import org.xmldb.api.base.XMLDBException;
+import org.xmldb.api.modules.CollectionManagementService;
 
 
 /**
@@ -54,8 +54,7 @@ public class MCRXMLDBConnectionPool
   protected static MCRXMLDBConnectionPool singleton;
 
   /** The internal list of connections */
-  protected Vector connections     = new Vector();
-  protected Vector connectionsName = new Vector();
+  protected Hashtable connections = new Hashtable();
  
   /** The logger */
   private static Logger logger=Logger.getLogger("org.mycore.backend.XMLDB");
@@ -63,208 +62,170 @@ public class MCRXMLDBConnectionPool
   private static String conf_prefix = "MCR.persistence_xmldb_";
   private static String driver      = "";
   private static String connString  = "";
-//  private static String database    = "";
   private  Database database;
   
   /**
    * Returns the connection pool singleton.
-   *
-   * @throws MCRPersistenceException if connect to XMLDB was not successful
-   **/
-  public static synchronized MCRXMLDBConnectionPool instance()
-    { 
-    if( singleton == null ) singleton = new MCRXMLDBConnectionPool();
-    return singleton; 
-    }
+   * 
+   * @throws MCRPersistenceException
+   *             if connect to XMLDB was not successful
+   */
+	public static synchronized MCRXMLDBConnectionPool instance() {
+		if (singleton == null)
+			singleton = new MCRXMLDBConnectionPool();
+		return singleton;
+	}
 
   /**
    * Builds the connection pool singleton.
-   *
-   * @throws MCRPersistenceException if connect to XMLDB was not successful
-   **/
-  protected MCRXMLDBConnectionPool() throws MCRPersistenceException
-    {
-     MCRConfiguration config = MCRConfiguration.instance();
-     PropertyConfigurator.configure(config.getLoggingProperties());
-     logger.info( "Building connection to XML:DB..." );
-     driver     = config.getString( conf_prefix + "driver" );
-     logger.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_driver      : " + driver); 
-     connString = config.getString( conf_prefix + "database_url" , "");
-     logger.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: " + connString); 
-     try
-     {
-      Class driverclass = Class.forName( driver );
-      database = (Database)driverclass.newInstance();
-      DatabaseManager.registerDatabase( database );
-      
-      // try to create database
-      if ( config.getString( conf_prefix + "database_create", "true").equals( "true" ) )
-      {
-        Collection col = DatabaseManager.getCollection( connString );
-        if( col == null ) 
-        {
-          int i = connString.lastIndexOf("/");
-          if ( -1 != i )
-          {
-            String uri  = connString.substring(0,i); 
-            String coll =  connString.substring(i+1);
-            createCollection( uri, coll ); 
-          }
-        }
-        else
-         col.close();
-      }
-    }
-    catch( Exception e ) 
-    {
-     throw new MCRPersistenceException( e.getMessage(), e );
-    }
-   }
+   * 
+   * @throws MCRPersistenceException
+   *             if connect to XMLDB was not successful
+   */
+	protected MCRXMLDBConnectionPool() throws MCRPersistenceException {
+		MCRConfiguration config = MCRConfiguration.instance();
+		PropertyConfigurator.configure(config.getLoggingProperties());
+		logger.info("Building connection to XML:DB...");
+		driver = config.getString(conf_prefix + "driver");
+		logger
+				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_driver      : "
+						+ driver);
+		connString = config.getString(conf_prefix + "database_url", "");
+		logger
+				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: "
+						+ connString);
+		try {
+			Class driverclass = Class.forName(driver);
+			database = (Database) driverclass.newInstance();
+			DatabaseManager.registerDatabase(database);
+
+			// try to create database
+			if (config.getString(conf_prefix + "database_create", "true")
+					.equals("true")) {
+				Collection col = DatabaseManager.getCollection(connString);
+				int i = connString.lastIndexOf("/");
+				String uri,collname;
+				if (i != -1) {
+					uri = connString.substring(0, i);
+					collname = connString.substring(i + 1);
+					if (col==null)
+						createCollection(uri, collname);
+					else
+						connections.put(collname,col);
+				}
+			}
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
   
   /**
    * Creates a collection in an XML:DB collection
-   *
-   * @throws MCRPersistenceException if create fails
-   **/
-  private void createCollection( String uri, String collection ) throws MCRPersistenceException
-  {
-     try
-     {
-      Collection col;
-   
-      logger.info( "try to create collection in XML:DB: " + collection );
-      Collection root = DatabaseManager.getCollection( uri );
-      if ( null == root ) 
-      {
-       String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: " + uri;
-       throw new MCRPersistenceException( msg );
-      }
-   
-      CollectionManagementService mgtService = 
-                (CollectionManagementService)root.getService("CollectionManagementService", "1.0");
-      col = mgtService.createCollection( collection );
-      if ( null == col )
-      {
-       String msg = "MCRXMLDBConnectionPool: Could not create collection in XML:DB: " + collection;
-       throw new MCRPersistenceException( msg );
-      }
-      else
-      {    
-       logger.info( "...done and successful" );
-       col.close();   
-      } 
-     }
-    catch( Exception e ) 
-    {
-     throw new MCRPersistenceException( e.getMessage(), e );
-    }
-  }
+   * 
+   * @throws MCRPersistenceException
+   *             if create fails
+   */
+	private void createCollection(String uri, String collection)
+			throws MCRPersistenceException {
+		try {
+			Collection col;
+
+			logger.info("try to create collection in XML:DB: " + collection);
+			Collection root = DatabaseManager.getCollection(uri);
+			if (root==null) {
+				String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: "
+						+ uri;
+				throw new MCRPersistenceException(msg);
+			}
+
+			CollectionManagementService mgtService = (CollectionManagementService) root
+					.getService("CollectionManagementService", "1.0");
+			col = mgtService.createCollection(collection);
+			if (col==null) {
+				String msg = "MCRXMLDBConnectionPool: Could not create collection in XML:DB: "
+						+ collection;
+				throw new MCRPersistenceException(msg);
+			}
+			logger.info("...done and successful");
+			synchronized(connections){
+				connections.put(collection,col);
+			}
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
   
   /**
    * Creates a connection to an XML:DB collection
-   *
-   * @throws MCRPersistenceException if connect to XML:DB
-   **/
-  protected Collection buildConnection( String collection )  
-    {
-     Collection connection = null;
-     String con = connString + "/" + collection;
-     logger.debug( "MCRXMLDBConnectionPool: Building connection to: " + con );
-     try
-     {
-      connection = DatabaseManager.getCollection( con );
-      if ( null == connection )
-      {
-       createCollection( connString, collection );    
-       connection = DatabaseManager.getCollection( con );
-      }
-      return connection;
-     }
-     catch( Exception ex ) 
-     {
-      String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: " + con;
-      throw new MCRPersistenceException( msg, ex );
-     }
-    }
+   * 
+   * @throws XMLDBException
+   */
+	protected Collection buildConnection(String collection)
+			throws XMLDBException {
+		String con = connString + "/" + collection;
+		logger.debug("MCRXMLDBConnectionPool: Building connection to: " + con);
+		Collection connection = DatabaseManager.getCollection(con);
+		if (connection == null) {
+			createCollection(connString, collection);
+			connection = DatabaseManager.getCollection(con);
+		}
+		return connection;
+	}
   
   /**
-   * Gets a free connection from the pool. When this
-   * connection is not used any more by the invoker, he is
-   * responsible for returning it into the pool by invoking
-   * the <code>releaseConnection()</code> method.
-   *
+   * Gets a free connection from the pool. When this connection is not used any
+   * more by the invoker, he is responsible for returning it into the pool by
+   * invoking the <code>releaseConnection()</code> method.
+   * 
    * @return a free connection to the Content Manager library server datastore
-   * @throws MCRPersistenceException if there was a problem connecting to XML:DB
-   **/
-  public synchronized Collection getConnection( String collection )
-    throws MCRPersistenceException
-    {
-     collection = collection.toLowerCase();   
-     // Do we have to build a connection or is there already one?
-     int i = connectionsName.indexOf( collection );
-     if( i >= 0 )
-       return (Collection)connections.elementAt( i );  
-     
-     Collection connection;
-     try {
-       connection = buildConnection( collection ); 
-       connections.addElement( connection );
-       connectionsName.addElement( collection );
-     }
-     catch( Exception e ) {
-       throw new MCRPersistenceException( e.getMessage(), e );
-     }
-     
-     if ( null == connection )
-     {
-      String msg = "MCRXMLDBConnectionPool: Collection not available: " + collection;
-      throw new MCRPersistenceException( msg );
-     }
-     return connection;
-    }
-
-  /**
-   * Releases a connection, indicating that it is not used any more 
-   * and should be returned to to pool of free connections.
-   *
-   * @param connection the Content Manager connection that has been used
-   **/
-  public synchronized void releaseConnection( Collection connection )
-    {
-    if( connection == null ) return;
+   * @throws MCRPersistenceException
+   *             if there was a problem connecting to XML:DB
+   */
+  public Collection getConnection(String collection)
+    throws MCRPersistenceException{
+  	// Do we have to build a connection or is there already one?
+    if(connections.containsKey(collection))
+    	return (Collection)connections.get(collection);  
+    
+    Collection connection;
     try {
-//      connection.close();
-     }
-     catch( Exception e ) {
-       throw new MCRPersistenceException( e.getMessage(), e );
-     }
-/*    
-    if( connections.contains( connection ) )
-    {    
-      connections.removeElement( connection );
-    }  
- */
+    	connection = buildConnection(collection);
+    	synchronized(connections){
+    		connections.put(collection, connection);
+    	}
+    	if (null == connection){
+    		String msg = "MCRXMLDBConnectionPool: Collection not available: " + collection;
+    		throw new NullPointerException(msg);
+    	}
     }
+    catch( Exception ex ) 
+		{
+    	String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: " + collection;
+    	throw new MCRPersistenceException( msg, ex );
+		}
+    return connection;
+  }
 
   /**
    * Finalizer, closes all connections in this connection pool
-   **/
-  public void finalize()
-    {
-    try {
-      for( int i = 0; i < connections.size(); i++ )
-        ( (Collection)( connections.elementAt( i ) ) ).close();
-      }
-    catch( Exception ignored ){}
-    }
+   */
+  public void finalize(){
+  	try {
+  		Enumeration enum = connections.elements();
+  		while(enum.hasMoreElements())
+  			((Collection)enum.nextElement()).close();
+  	}
+  	catch(Exception ignored){}
+  }
 
   /**
    * The method return the logger for org.mycore.backend.xmldb.
-   *
+   * 
    * @return the logger.
-   **/
-  static final Logger getLogger()
-    { return logger; }
-
+   */
+  static final Logger getLogger(){
+  	return logger;
   }
+
+}
 

@@ -71,16 +71,20 @@ public MCRXMLDBTransformXPathToeXist() {
   logger.debug("MCR.persistence_xmldb_database    : " + database);
   }
 
-/**
- * This method start the Query over the XML:DB persitence layer for one 
- * object type and and return the query result as HashSet of MCRObjectIDs.
- *
- * @param root                  the query root
- * @param query                 the metadata queries
- * @param type                  the MCRObject type
- * @param maxresults            the maximum of results
- * @return                      a result list as MCRXMLContainer
- **/
+	/**
+	 * This method start the Query over the XML:DB persitence layer for one
+	 * object type and and return the query result as HashSet of MCRObjectIDs.
+	 * 
+	 * @param root
+	 *            the query root
+	 * @param query
+	 *            the metadata queries
+	 * @param type
+	 *            the MCRObject type
+	 * @param maxresults
+	 *            the maximum of results
+	 * @return a result list as MCRXMLContainer
+	 */
 	public final HashSet getResultIDs(String root, String query, String type,
 			int maxresults) {
 		// prepare the query over the rest of the metadata
@@ -107,7 +111,6 @@ public MCRXMLDBTransformXPathToeXist() {
 				XPathQueryService xps = (XPathQueryService) collection
 						.getService("XPathQueryService", "1.0");
 
-				MCRXMLDBConnectionPool.instance().releaseConnection(collection);
 				ResourceSet resultset = xps.query(newquery);
 				logger.debug("Results: "
 						+ Integer.toString((int) resultset.getSize()));
@@ -115,19 +118,17 @@ public MCRXMLDBTransformXPathToeXist() {
 				ResourceIterator ri = resultset.getIterator();
 				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
 				long start = System.currentTimeMillis();
-				for (int i=0;(ri.hasMoreResources()) && (i < maxresults);i++) {
+				for (int i = 0; (ri.hasMoreResources()) && (i < maxresults); i++) {
 					//doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
 					//OK we simply asume that all docs are well in exist
 					//and their ID is our ObjectID :o)
 					//ID=ObjectID+"_1" we remove the "_1" now
-					StringTokenizer tok=new StringTokenizer(ri.nextResource().getId(),"_");
-					idmeta.add(new MCRObjectID(new StringBuffer(tok.nextToken())
-							.append('_')
-							.append(tok.nextToken())
-							.append('_')
-							.append(tok.nextToken())
-							.toString()
-							));
+					StringTokenizer tok = new StringTokenizer(ri.nextResource()
+							.getId(), "_");
+					idmeta.add(new MCRObjectID(
+							new StringBuffer(tok.nextToken()).append('_')
+									.append(tok.nextToken()).append('_')
+									.append(tok.nextToken()).toString()));
 				}
 				long end = System.currentTimeMillis();
 				logger.debug("converting Res2Doc took: " + (end - start));

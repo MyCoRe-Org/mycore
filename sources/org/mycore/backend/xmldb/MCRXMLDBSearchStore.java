@@ -94,8 +94,6 @@ public final class MCRXMLDBSearchStore
 			collection.storeResource(res);
 		} catch (Exception e) {
 			throw new MCRPersistenceException(e.getMessage(), e);
-		} finally {
-			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
 		}
 	}
 
@@ -154,8 +152,6 @@ public final class MCRXMLDBSearchStore
 			collection.storeResource(res);
 		} catch (Exception e) {
 			throw new MCRPersistenceException(e.getMessage(), e);
-		} finally {
-			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
 		}
 	}
 
@@ -183,8 +179,6 @@ public final class MCRXMLDBSearchStore
 			}
 		} catch (Exception e) {
 			throw new MCRPersistenceException(e.getMessage(), e);
-		} finally {
-			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
 		}
 	}
 
