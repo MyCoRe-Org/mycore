@@ -30,8 +30,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRConfiguration;
 
 /**
- * Instances of this class collect information kept during a session like the login
- * user currently active.
+ * Instances of this class collect information kept during a session like the currently
+ * active user, the preferred language etc.
  *
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
@@ -39,38 +39,55 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRSession
 {
+  /** the logger */
+  private static Logger logger = Logger.getLogger(MCRSession.class.getName());
 
-/** the logger */
-private static Logger logger = Logger.getLogger(MCRSession.class.getName());
+  /** The user ID of the session */
+  private String userID = null;
 
-/** The user ID of the session */
-private String userID = null;
+  /** The language for this session */
+  private String language = null;
 
-/**
- * The constructor of a MCRSession. As default the user ID was set to the value
- * of the property variable named 'MCR.users_guestuser_username'.
- **/
-public MCRSession()
+  /**
+   * The constructor of a MCRSession. As default the user ID is set to the value
+   * of the property variable named 'MCR.users_guestuser_username'.
+   **/
+  public MCRSession()
   {
-  MCRConfiguration config = MCRConfiguration.instance();
-  userID = config.getString("MCR.users_guestuser_username","gast");
+    reset();
+    //MCRConfiguration config = MCRConfiguration.instance();
+    //userID = config.getString("MCR.users_guestuser_username","gast");
   }
 
-/** returns the current user ID */
-public final String getCurrentUserID()
-  { return userID; }
+  /** returns the current user ID */
+  public final String getCurrentUserID()
+  { return userID.trim(); }
 
-/** sets the current user ID */
-public final void setCurrentUserID(String userID)
+  /** sets the current user ID */
+  public final void setCurrentUserID(String userID)
   { this.userID = userID; }
 
-/** Put the data to the logger to debug this class */
-public final void debug()
+  /** returns the current language */
+  public final String getCurrentLanguage()
+  { return language.trim(); }
+
+  /** sets the current language */
+  public final void setCurrentLanguage(String language)
+  { this.language = language; }
+
+  /** Write data to the logger for debugging purposes */
+  public final void debug()
   {
-  MCRConfiguration config = MCRConfiguration.instance();
-  PropertyConfigurator.configure(config.getLoggingProperties()); 
-  logger.debug("UserID             = "+userID);
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    logger.debug("UserID             = "+userID);
   }
 
+  /** Resets the session to the default values */
+  public final void reset()
+  {
+    MCRConfiguration config = MCRConfiguration.instance();
+    userID = config.getString("MCR.users_guestuser_username","gast");
+    language = "DE";
+  }
 }
-
