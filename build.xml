@@ -18,7 +18,7 @@
   <property name="classes"      value="./classes"/>
   <property name="javadocs"     value="./javadocs"/>
   <property name="lib"          value="./lib"/>
-  <property name="persistency"  value="cm7"/>
+  <property name="persistency"  value="xmldb"/>
     
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -180,17 +180,48 @@
       ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
     </echo>
     <javadoc
-      packagenames = "mycore.*"
-      sourcepath   = "${sources}"
-      destdir      = "${javadocs}"
-      classpath    = "${lib}/ftp.jar"
-      author       = "true"
-      version      = "true"
-      use          = "true"
-      access       = "package"
-      splitindex   = "true"
-      windowtitle  = "MyCoRe JavaDoc Documentation"
-      doctitle     = "MyCoRe Source Code JavaDoc Documentation"
+      packagenames        = "mycore.classifications.*,mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*"
+      sourcepath          = "${sources}"
+      destdir             = "${javadocs}"
+      classpath           = "${lib}/ftp.jar"
+      author              = "true"
+      version             = "true"
+      use                 = "true"
+      access              = "package"
+      splitindex          = "true"
+      windowtitle         = "MyCoRe JavaDoc Documentation"
+      doctitle            = "MyCoRe Source Code JavaDoc Documentation"
+    >
+      <group title="MyCoRe Packages" packages="mycore.*"/>
+      <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
+      <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
+      <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
+      <link href="http://www.mycore.de/library/jaxp/docs/api"/>
+      <link href="http://www.jdom.org/docs/apidocs"/>
+      <link href="http://www.xmldb.org/xapi/api"/>
+    </javadoc>
+  </target>
+
+  <target name="javadocs_persistency" depends="init">
+    <echo>
+
+      Building the MyCoRe source code JavaDoc documentation for ${persistency} package...
+
+      NOTE: Under AIX, you have to do the following to make this work:
+      ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
+    </echo>
+    <javadoc
+      packagenames        = "mycore.${persistency}.*"
+      sourcepath          = "${sources}"
+      destdir             = "${javadocs}"
+      classpath           = "${lib}/ftp.jar"
+      author              = "true"
+      version             = "true"
+      use                 = "true"
+      access              = "package"
+      splitindex          = "true"
+      windowtitle         = "MyCoRe JavaDoc Documentation"
+      doctitle            = "MyCoRe Source Code JavaDoc Documentation"
     >
       <group title="MyCoRe Packages" packages="mycore.*"/>
       <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
