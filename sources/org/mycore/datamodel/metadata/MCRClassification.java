@@ -295,15 +295,96 @@ public class MCRClassification
   /**
    * The method return the classification as XML byte array.
    *
-   * @param ID the classification ID to delete
+   * @param classID the classification ID 
    * @return the classification as XML
    **/
-  public final byte[] receiveClassificationAsXML(String ID)
+  public final byte[] receiveClassificationAsXML(String classID)
     {
-    org.jdom.Document doc = receiveClassificationAsJDOM(ID);
+    org.jdom.Document doc = receiveClassificationAsJDOM(classID);
     byte[] xml = MCRUtils.getByteArray(doc);
     return xml;
     }
 
+  /**
+   * The method return the category as XML byte array.
+   *
+   * @param classID the classification ID
+   * @param categID the category ID
+   * @return the classification as XML
+   **/
+  public final org.jdom.Document receiveCategoryAsJDOM(String classID, 
+    String categID)
+    {
+    org.jdom.Element elm = new org.jdom.Element("mycoreclass");
+    org.jdom.Document doc = new org.jdom.Document(elm);
+    elm.setAttribute("ID",classID);
+    // get the classification
+    try {
+      cl = MCRClassificationItem.getClassificationItem(classID); }
+    catch (Exception e) { return doc; }
+    for (int i=0;i<cl.getSize();i++) {
+      elm.addContent(cl.getJDOMElement(i)); }
+    // get the category
+    MCRCategoryItem ci = cl.getCategoryItem(categID);
+    org.jdom.Element cats = new org.jdom.Element("categories");
+    org.jdom.Element cat = new org.jdom.Element("category");
+    cat.setAttribute("ID",ci.getID());
+    for (int i=0;i<ci.getSize();i++) {
+      cat.addContent(ci.getJDOMElement(i)); }
+    cats.addContent(cat);
+    elm.addContent(cats);
+    return doc;
+    }
+
+  /**
+   * The method return the category as XML byte array.
+   *
+   * @param classID the classification ID
+   * @param categID the category ID
+   * @return the classification as XML
+   **/
+  public final byte[] receiveCategoryAsXML(String classID, String categID)
+    {
+    org.jdom.Document doc = receiveCategoryAsJDOM(classID,categID);
+    byte[] xml = MCRUtils.getByteArray(doc);
+    return xml;
+    }
+
+  /**
+   * The method get a XQuery and responds a JDOM document.
+   *
+   * @param query the query string
+   * @return a JDOM document
+   **/
+  public final org.jdom.Document search(String query)
+    {
+    // classification ID
+    boolean cat = false;
+    String classname = "";
+    String categname = "";
+    int classstart = query.indexOf("@ID");
+    if (classstart == -1) { return null; }
+    classstart = query.indexOf("\"",classstart);
+    if (classstart == -1) { return null; }
+    int classstop = query.indexOf("\"",classstart+1);
+    if (classstop == -1) { return null; }
+    classname = query.substring(classstart+1,classstop);
+    // category ID
+    int categstart = query.indexOf("@ID",classstop+1);
+    int categstop = -1;
+    if (categstart != -1) {
+      categstart = query.indexOf("\"",categstart);
+      if (categstart == -1) { return null; }
+      categstop = query.indexOf("\"",categstart+1);
+      if (categstop == -1) { return null; }
+      categname = query.substring(categstart+1,categstop);
+      cat = true;
+      }
+    System.out.println(classname+"   "+categname);
+    if (cat) {
+      return receiveCategoryAsJDOM(classname,categname); }
+    else {
+      return receiveClassificationAsJDOM(classname); }
+    }
   }
 

@@ -32,6 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
 import mycore.datamodel.MCRQueryResult;
 import mycore.datamodel.MCRQueryResultArray;
+import mycore.datamodel. MCRClassification;
 
 /**
  * This class implements the query command to start a query to a local
@@ -65,7 +66,7 @@ final public class MCRQueryCommands
   **/
   public static void query( String host, String type, String query )
     throws Exception
-  {
+    {
     if (host==null) host = "local";
     if (type==null) { return; }
     type  = type .toLowerCase();
@@ -76,38 +77,52 @@ final public class MCRQueryCommands
     System.out.println( "Query    : " + query );
     System.out.println();
 
+    // classifications
+    if (type.equals("class")) {
+      MCRClassification cl = new MCRClassification();
+      org.jdom.Document jdom = cl.search(query);
+      if (jdom==null) { 
+        System.out.println("No answer was found.\n"); return; }
+      // Configuration
+      MCRConfiguration config = MCRConfiguration.instance();
+      String applpath = config.getString("MCR.appl_path");
+      String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
+        "class.xsl";
+      // Transformation
+      TransformerFactory transfakt = TransformerFactory.newInstance();
+      Transformer trans =
+        transfakt.newTransformer(new StreamSource(xslfile));
+      StreamResult sr = new StreamResult((OutputStream) System.out); 
+      trans.transform(new javax.xml.transform.dom.DOMSource(
+        (new org.jdom.output.DOMOutputter()).output(jdom)),sr);
+      System.out.println();
+      System.out.println("Ready.");
+      System.out.println();
+      return;
+      }
+
+    // other types
     MCRQueryResult result = new MCRQueryResult();
     MCRQueryResultArray resarray = result.setFromQuery(host,type,query);
 
-    printResult(resarray, type);
+    // Configuration
+    MCRConfiguration config = MCRConfiguration.instance();
+    String applpath = config.getString("MCR.appl_path");
+    String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
+      type.toLowerCase()+".xsl";
+    TransformerFactory transfakt = TransformerFactory.newInstance();
+    // Indexlist
+    Transformer trans =
+      transfakt.newTransformer(new StreamSource(xslfile));
+    StreamResult sr = new StreamResult((OutputStream) System.out); 
+    trans.transform(new javax.xml.transform.dom.DOMSource(
+        (new org.jdom.output.DOMOutputter())
+        .output(resarray.exportAllToDocument())),sr);
+    System.out.println();
 
     System.out.println("Ready.");
     System.out.println();
-  }
-
-/**
- * This methode transform the XML result collection to an ASCII output.
- *
- * @param results the XML result collection
- **/
-private static final void printResult(MCRQueryResultArray results,
-  String type)
-  throws Exception
-  {
-  // Configuration
-  MCRConfiguration config = MCRConfiguration.instance();
-  String applpath = config.getString("MCR.appl_path");
-  String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
-    type.toLowerCase()+".xsl";
-  TransformerFactory transfakt = TransformerFactory.newInstance();
-  // Indexlist
-  byte [] mcrxmlall = results.exportAllToByteArray();
-  Transformer trans =
-    transfakt.newTransformer(new StreamSource(xslfile));
-  StreamResult sr = new StreamResult((OutputStream) System.out); 
-  trans.transform(new StreamSource(new ByteArrayInputStream(mcrxmlall)),sr);
-  System.out.println();
-  }
+    }
 
 }
 
