@@ -316,12 +316,14 @@ public class MCRUserMgr
 
         // now update the groups
         Vector groupIDs = user.getGroupIDs();
+
         if (groupIDs != null) { // well, actually this cannot be since there is always the primary group...
           for (int i=0; i<groupIDs.size(); i++) {
             MCRGroup currentGroup = this.retrieveGroup((String)groupIDs.elementAt(i), true);
             currentGroup.addMemberUserID(user.getID());
           }
         }
+
       }
       catch (MCRException ex)
       {
@@ -385,7 +387,6 @@ public class MCRUserMgr
           currentGroup.removeMemberGroupID(groupID);
         }
       }
-
       mcrUserStore.deleteGroup(groupID);
       groupCache.remove(groupID);
     }
@@ -703,6 +704,7 @@ public class MCRUserMgr
 
       // Now we really update the group object in the datastore
       mcrUserStore.updateGroup(group);
+
       groupCache.remove(groupID);
       groupCache.put(groupID, group);
     }
