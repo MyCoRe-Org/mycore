@@ -1032,7 +1032,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    if (set != null) {
 	    	buildMappings();
 	    	logger.info("Set: " + set[0]);
-	    	if (mappings.containsValue(set[0])) {
+	    	if (mappings != null && mappings.containsValue(set[0])) {
 	    		Set keys = mappings.keySet();
 	    		Iterator keyIterator = keys.iterator();
 	    		while (keyIterator.hasNext()) {
@@ -1044,10 +1044,10 @@ public class MCROAIDataProvider extends HttpServlet {
 	    				mappedSets.add(mappedSet);
 	    			}
 	    		}
-	    	}
-	    } else {
-	    	mappedSets.add(set);
-	    }
+	    	} else {
+		    	mappedSets.add(set);
+		    }
+	    } 
 	    
 	    List sets = new ArrayList();
 	    try {
