@@ -90,6 +90,7 @@ public class MCRCStoreContentManager8
 
 	/** Table which holds infos about how many documents are indexed **/
 	protected static final String TIEINDEX_TABLE = "DB2EXT.TEXTINDEXES";
+	protected static final String ICMDB=config.getString("MCR.persistence_cm8_library_server");
 	protected static String TIEREF_TABLE;
 	//TODO: Get this CollumnName from the Database somehow
 	protected static final String DerivateAttribute = "ATTR0000001088";
@@ -133,9 +134,13 @@ public class MCRCStoreContentManager8
 	}
 
 	private boolean storeTieRefTable() {
+		String driver=config.getString("MCR.persistence_cm8_library_server_driver");
+		String url=config.getString("MCR.persistence_cm8_library_server_url");
+		String user=config.getString("MCR.persistence_cm8_user_id");
+		String passwd=config.getString("MCR.persistence_cm8_password");
 		logger.debug("Getting TIEREF Table name...");
 		MCRSQLRowReader row =
-			MCRSQLConnection.justDoQuery(
+			new MCRSQLConnection(driver,url,user,passwd).doQuery(
 				new MCRSQLStatement(TIEINDEX_TABLE)
 					.setCondition("COLNAME", "TIEREF")
 					.toSelectStatement("TABSCHEMA,TABNAME"));
@@ -506,9 +511,13 @@ public class MCRCStoreContentManager8
 	 */
 	protected int countDerivateContents(String derivateID) {
 		logger.debug("DerivateID = " + derivateID);
+		String driver=config.getString("MCR.persistence_cm8_library_server_driver");
+		String url=config.getString("MCR.persistence_cm8_library_server_url");
+		String user=config.getString("MCR.persistence_cm8_user_id");
+		String passwd=config.getString("MCR.persistence_cm8_password");
 		if (TIEREF_TABLE == null && !storeTieRefTable())
 				throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
-		return MCRSQLConnection.justCountRows(
+		return new MCRSQLConnection(driver,url,user,passwd).countRows(
 			new MCRSQLStatement(TIEREF_TABLE)
 				.setCondition(DerivateAttribute, derivateID)
 				.toSelectStatement());
