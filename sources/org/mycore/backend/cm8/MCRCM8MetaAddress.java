@@ -52,12 +52,13 @@ public class MCRCM8MetaAddress implements DKConstantICM, MCRCM8MetaInterface
  * @param dsDefICM the datastore definition
  * @param prefix the prefix name for the item type
  * @param textindex the definition of the text search index
+ * @param textserach the flag to use textsearch as string
  * @return a DKComponentTypeDefICM for the MCR datamodel element
  * @exception MCRPersistenceException general Exception of MyCoRe
  **/
 public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex) throws MCRPersistenceException
+  DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
@@ -69,14 +70,10 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   catch (NumberFormatException e) {
     throw new MCRPersistenceException(e.getMessage(),e); }
   // Text search option
-  String subtagtextsearch = "no";
-  try {
-    subtagtextsearch = (String)element.getAttribute("textsearch").getValue();
-    if (subtagtextsearch == null) { subtagtextsearch = "no"; }
-    }
-  catch (Exception e) { }
   boolean ts = false;
-  if (subtagtextsearch.toLowerCase().equals("yes")) { ts = true; }
+  try {
+    if (textsearch.toLowerCase().equals("true")) { ts = true; } }
+  catch (Exception e) { }
   logger.debug("Set TextSearch for "+subtagname+" to "+ts);
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);

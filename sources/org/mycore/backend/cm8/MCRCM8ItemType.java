@@ -246,7 +246,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix,mcr_item_text_index);
+              mcr_item_type_prefix,mcr_item_text_index,"false");
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -313,7 +313,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix,mcr_item_text_index);
+              mcr_item_type_prefix,mcr_item_text_index,textsearch);
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -376,7 +376,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
             obj = Class.forName(stb.toString()).newInstance();
             DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
               createItemType(mcr_subtag,connection,dsDefICM,
-              mcr_item_type_prefix,mcr_item_text_index);
+              mcr_item_type_prefix,mcr_item_text_index,textsearch);
             item_tag.addSubEntity(item_subtag);
             }
           catch (ClassNotFoundException e) {
@@ -435,7 +435,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
           obj = Class.forName(stb.toString()).newInstance();
           DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
             createItemType(mcr_subtag,connection,dsDefICM,mcr_item_type_prefix,
-            mcr_item_text_index);
+            mcr_item_text_index,textsearch);
           item_tag.addSubEntity(item_subtag);
           }
         catch (ClassNotFoundException e) {

@@ -332,13 +332,21 @@ private final String traceOneCondition(String cond, String itemtypename,
     if (tag[i].endsWith("@href")) { 
       tag[i] = tag[i].substring(0,tag[i].length()-5)+"@xlinkhref"; }
     if (op[i].equals("contains")) {
-      if (tag[i].equals("*")) {
-        sbout.append(" contains-text(@").append(itemtypeprefix)
-          .append("ts, \"\'").append(value[i]).append("\'\")=1");
-        }
-      else {
-        sbout.append(" contains-text(").append(convPath(tag[i],itemtypeprefix))
-          .append(", \"\'").append(value[i]).append("\'\")=1");
+      StringTokenizer st = new StringTokenizer(value[i]);
+      int stcount = st.countTokens();
+      while (st.hasMoreTokens()) {
+        if (tag[i].equals("*")) {
+          sbout.append(" contains-text(@").append(itemtypeprefix)
+            .append("ts, \"THESAURUS \'deu\' EXPAND \'SYNONYM_OF\' TERM OF \'")
+            .append(st.nextToken()).append("\'\")=1");
+          }
+        else {
+          sbout.append(" contains-text(")
+            .append(convPath(tag[i],itemtypeprefix))
+            .append(", \"THESAURUS \'deu\' EXPAND \'SYNONYM_OF\' TERM OF \'")
+            .append(st.nextToken()).append("\'\")=1");
+          }
+        if ((stcount > 1) && (st.countTokens()>0)) { sbout.append(" and "); }
         }
       continue;
       }

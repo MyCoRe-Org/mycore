@@ -53,12 +53,14 @@ public class MCRCM8MetaClassification implements DKConstantICM,
  * @param dsDefICM the datastore definition
  * @param prefix the prefix name for the item type
  * @param textindex the definition of the text search index
+ * @param textserach the flag to use textsearch as string
+ *                   (the value has no effect for this class)
  * @return a DKComponentTypeDefICM for the MCR datamodel element
  * @exception MCRPersistenceException general Exception of MyCoRe CM8
  **/
 public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex) throws MCRPersistenceException
+  DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
