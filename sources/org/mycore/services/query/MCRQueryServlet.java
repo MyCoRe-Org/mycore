@@ -56,6 +56,8 @@ private MCRConfiguration conf = null;
 
 // Default Language (as UpperCase)
 private String defaultLang = "";
+private static final String MCRSorterConfPrefix="MCR.XMLSorter";
+private static final String MCRSorterConfDelim="\"+lang+\"";
 
  /**
   * The initialization method for this servlet. This read the default
@@ -391,8 +393,28 @@ private String defaultLang = "";
   	/*maybe here should be a propertie used
   	 * XPath Expression can be relative to mcr_result
   	 */
-  	sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
+  	// sorter.addSortKey("./*/*/*/title[lang('"+lang+"')]");
+  	int keynum=Integer.parseInt(conf.getString(this.MCRSorterConfPrefix+".keys.count","0"));
+  	boolean inorder=true;
+  	for (int key=1; key<=keynum; key++){
+  		// get XPATH Expression and hope it's good, if not exist sort for title
+  		inorder=conf.getBoolean(this.MCRSorterConfPrefix+".keys."+key+".inorder",true);
+		sorter.addSortKey(replString(conf.getString(this.MCRSorterConfPrefix+".keys."+key,"./*/*/*/title[lang('"+lang+"')]"),this.MCRSorterConfDelim,lang),inorder);
+  	}
   	xmlcont.sort(sorter);
   	return xmlcont;
   }
+  private static String replString(String parse, String from, String to){
+  StringBuffer result= new StringBuffer(parse);
+  if ((result.charAt(0)=='\"') && (result.charAt(result.length()-1)=='\"')){
+  result.deleteCharAt(result.length()-1).deleteCharAt(0);
+	  for (int i=result.toString().indexOf(from);i!=-1;i=result.toString().indexOf(from)){
+		  result.replace(i,i+from.length(),to);
+	  }
+	  return result.toString();
+  }
+  else
+	  return null;
+  }
+
 }

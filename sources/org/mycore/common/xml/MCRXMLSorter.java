@@ -74,6 +74,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 		finally {
 			if (StrSortKey==null) return null;
 		}
+		System.out.println("MCRXMLSorter: adding sort key: "+StrSortKey+ (order? " ascending":" descending"));
 		sortKeys.add(StrSortKey);
 		orderList.add(new Boolean(order));
 		return this;
@@ -135,8 +136,12 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	public Object[] sort(boolean reversed) throws MCRException {
 		if (ObjectPool.size()==0)
 			throw new MCRException("ObjectPool is empty!\n What should I sort?");
-		if ((orderList.size()==0) || (sortKeys.size()==0))
-			throw new MCRException("List of sorting keys is empty!\n How should I sort?");
+		if ((orderList.size()==0) || (sortKeys.size()==0)){
+			//throw new MCRException("List of sorting keys is empty!\n How should I sort?");
+			//maybe the list should returned unsorted here?
+			System.err.println("MCRXMSorter: List of sorting keys is empty!\n How should I sort?");
+			return ObjectPool.toArray();
+		}
 		if (orderList.size()!=sortKeys.size())
 			throw new MCRException("List of sorting keys is incorrect!\n"+
 			          "Sizes of orderList("+orderList.size()+
