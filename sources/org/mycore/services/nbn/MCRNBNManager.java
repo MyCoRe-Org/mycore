@@ -72,6 +72,27 @@ public interface MCRNBNManager
   **/
   public String getURL( MCRNBN urn );
 
+	/**
+	 * Method getAuthor. Gets the Author for the NBN URN given.
+	 * @param urn the NBN URN that represents a URL
+	 * @return String the author
+	 */
+	public String getAuthor(MCRNBN urn);
+
+	/**
+	 * Method getComment. Gets the Comment for the NBN URN given.
+	 * @param urn the NBN URN that represents a URL
+	 * @return String the Comment
+	 */
+	public String getComment(MCRNBN urn);
+	
+	/**
+	 * Method getDate. Gets the timestamp for the NBN
+	 * @param urn the NBN
+	 * @return GregorianCalendar the date
+	 */
+	public GregorianCalendar getDate(MCRNBN urn);
+
  /**
   * Removes a stored NBN URN from the persistent datastore.
   *

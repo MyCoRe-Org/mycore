@@ -198,6 +198,9 @@ public class MCRNBN {
   
 	protected String  urn;
 	protected Boolean valid;
+	
+	protected String author;
+	protected String comment = null;
   
 	/**
 	 * Creates a new local NBN and calculates a unique NISS
@@ -206,6 +209,7 @@ public class MCRNBN {
 	 * length that is derived from the current time measured
 	 * in seconds. The constructor guarantees uniqueness and therefore
 	 * will block to produce only one NBN per second.
+	 * This is only left for compability and should be deprecated!
 	 */
 	public MCRNBN() {
 		StringBuffer buffer = new StringBuffer(prefix);
@@ -214,6 +218,19 @@ public class MCRNBN {
 		urn = buffer.toString();
 
 		valid = Boolean.TRUE;
+		author = new String("");
+		manager.reserveURN(this);
+	}
+  
+	public MCRNBN(String author, String comment) {
+		StringBuffer buffer = new StringBuffer(prefix);
+		buffer.append(produceNISS());
+		buffer.append(buildChecksum(buffer.toString()));
+		urn = buffer.toString();
+
+		valid = Boolean.TRUE;
+		this.author = author;
+		this.comment = comment;
 		manager.reserveURN(this);
 	}
   
@@ -231,10 +248,37 @@ public class MCRNBN {
 			HashMap map = (HashMap) manager.listURNs(getNISSandChecksum());
 			if (map.isEmpty()) {
 				manager.reserveURN(this);
+			} else {
+				author = manager.getAuthor(this);
+				comment = manager.getComment(this);
 			}
 		}
 	}
   
+	/**
+	 * Method getAuthor. Returns the author data from the reservation.
+	 * @return String
+	 */
+	public String getAuthor() {
+		return author;
+	}
+	
+	/**
+	 * Method getComment. Returns the comment data from the reservation.
+	 * @return String
+	 */
+	public String getComment() {
+		return comment;
+	}
+	
+	/**
+	 * Method getDate. Returns the reservation date.
+	 * @return GregorianCalendar the reservation date.
+	 */
+	public GregorianCalendar getDate() {
+		return manager.getDate(this);
+	}
+	
 	/**
 	 * Method delete. Removes a URN from the store and makes frees the 
 	 * non-static resources.
