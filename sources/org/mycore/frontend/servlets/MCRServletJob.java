@@ -26,27 +26,18 @@ package org.mycore.frontend.servlets;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-//import java.io.*;
-//import java.net.*;
-//import java.util.*;
-//import org.jdom.*;
 import org.mycore.common.*;
 
 /**
- * This class simply is a container for objects needed during a Servlet session like
- * an MCRSession object, the HttpServletRequest etc.
- *
- * ??? The class provids only get-methods
- *     to return the objects set while constructing the job object. ???
+ * This class simply is a container for objects needed during a Servlet session
+ * like the HttpServletRequest and HttpServeltResponse. The class provids only
+ * get-methods to return the objects set while constructing the job object.
  *
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  **/
 public class MCRServletJob
 {
-  /** The session object */
-  private MCRSession theSession = null;
-
   /** The HttpServletRequest object */
   private HttpServletRequest theRequest= null;
 
@@ -56,22 +47,15 @@ public class MCRServletJob
   /**
    * The constructor takes the given objects and stores them in private objects.
    *
-   * @param theSession  the MCRSession object for this servlet job
    * @param theRequest  the HttpServletRequest object for this servlet job
    * @param theResponse the HttpServletResponse object for this servlet job
    */
-  public MCRServletJob(MCRSession theSession,
-                       HttpServletRequest theRequest,
+  public MCRServletJob(HttpServletRequest theRequest,
                        HttpServletResponse theResponse)
   {
-    this.theSession  = theSession;
     this.theRequest  = theRequest;
     this.theResponse = theResponse;
   }
-
-  /** returns the session object */
-  public MCRSession getSession()
-  { return theSession; }
 
   /** returns the HttpServletRequest object */
   public HttpServletRequest getRequest()

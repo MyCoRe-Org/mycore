@@ -36,18 +36,18 @@ import org.mycore.common.*;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been taken
- * from MilessServlet.java by Frank Lützenkirchen.
+ * from MilessServlet.java written by Frank Lützenkirchen.
  *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-
 public class MCRServlet extends HttpServlet
 {
   // Some configuration details
   private static MCRConfiguration config = null;
   private static Logger logger=Logger.getLogger(MCRServlet.class);
+  private static String baseURL, servletURL;
 
   // These values serve to remember if we have a GET or POST request
   private final static boolean GET  = true;
@@ -61,15 +61,19 @@ public class MCRServlet extends HttpServlet
     PropertyConfigurator.configure(config.getLoggingProperties());
   }
 
-  private static String baseURL, servletURL;
-
+  /** returns the base URL of the mycore system */
   public static String getBaseURL()
   { return baseURL; }
 
+  /** returns the servlet base URL of the mycore system */
   public static String getServletBaseURL()
   { return servletURL; }
 
-  private static synchronized void prepareURLs( HttpServletRequest req )
+  /**
+   * Initialisation of the static values for the base URL and servlet URL of
+   * the mycore system.
+   */
+  private static synchronized void prepareURLs(HttpServletRequest req)
     throws ServletException, IOException
   {
     String contextPath = req.getContextPath();
@@ -83,26 +87,33 @@ public class MCRServlet extends HttpServlet
     servletURL = baseURL + "servlets/";
   }
 
-  //
   // The methods doGet() and doPost() simply call the private method doGetPost(),
   // i.e. GET- and POST requests are handled by one method only.
-  //
 
   public void doGet(HttpServletRequest  req,
                     HttpServletResponse res )
                     throws ServletException, IOException
   { doGetPost(req, res, GET); }
 
+  protected void doGet(MCRServletJob job) throws Exception
+  { doGetPost(job); }
+
   public void doPost(HttpServletRequest  req,
                      HttpServletResponse res )
                      throws ServletException, IOException
   { doGetPost(req, res, POST); }
 
+  protected void doPost(MCRServletJob job) throws Exception
+  { doGetPost(job); }
+
   /**
+   * This private method handles both GET and POST requests and is invoked by doGet()
+   * and doPost().
    *
    * @param req the HTTP request instance
    * @param res the HTTP response instance
    * @param GETorPOST boolean value to remember if we have a GET or POST request
+   *
    * @exception IOException for java I/O errors.
    * @exception ServletException for errors from the servlet engine.
    */
@@ -119,29 +130,25 @@ public class MCRServlet extends HttpServlet
     {
       HttpSession theSession = req.getSession();
 
-      // Get MCRSession object from the session or create it
-      MCRSession mcrSession = (MCRSession)(theSession.getAttribute("MCRSession"));
-      if (mcrSession == null)
-      {
-        mcrSession = new MCRSession();
-        theSession.setAttribute("MCRSession", mcrSession);
-      }
+      // Get the MCRSession object for the current thread from the session manager.
+      MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
       String s = (theSession.isNew() ? "new" : "old" ) + " session " + theSession.getId();
       String u = mcrSession.getCurrentUserID();
       String h = req.getRemoteHost();
 
-      if((h == null) || (h.trim().length() == 0))
+      if ((h == null) || (h.trim().length() == 0))
       {
         h = req.getRemoteAddr();
         h = InetAddress.getByName(h).getHostName();
       }
       h = h.toLowerCase();
-
       logger.info(c + " request from " + h + " : " + s + " user " + u);
 
-      // enthält req, res, MCRSession, am besten auch Servlet Context usw.
-      MCRServletJob job = new MCRServletJob(mcrSession, req, res);
+      MCRServletJob job = new MCRServletJob(req, res);
+      String lang = getStringParameter(job, "lang");
+      if (lang.trim().length() != 0)
+        mcrSession.setCurrentLanguage(lang.trim().toUpperCase());
 
       if(GETorPOST == GET)
         doGet(job);
@@ -159,16 +166,12 @@ public class MCRServlet extends HttpServlet
     }
   }
 
+  /**
+   * This method should be overwritten by other servlets. As a default response we
+   * indicate the HTTP 1.1 status code 501 (Not Implemented).
+   */
   protected void doGetPost(MCRServletJob job) throws Exception
-  {
-    // default: send HTTP response code that indicates unsupported service
-  }
-
-  protected void doGet(MCRServletJob job) throws Exception
-  { doGetPost(job); }
-
-  protected void doPost(MCRServletJob job) throws Exception
-  { doGetPost(job); }
+  { job.getResponse().sendError(job.getResponse().SC_NOT_IMPLEMENTED); }
 
   /**
    * This method gets a string parameter defined by parameterName out of the request.
@@ -186,13 +189,10 @@ public class MCRServlet extends HttpServlet
     return param;
   }
 
-  /**
-   * Handles an exception by reporting it and its embedded exception
-   */
+  /** Handles an exception by reporting it and its embedded exception */
   protected void handleException(Exception ex)
   {
-    try
-    {
+    try {
       reportException(ex);
       if(ex instanceof MCRException)
       {
@@ -201,16 +201,13 @@ public class MCRServlet extends HttpServlet
       }
     }
 
-    catch(Exception ex2)
-    {
+    catch(Exception ex2) {
       try{ reportException(ex2); }
       catch(Exception ignored){}
     }
   }
 
-  /**
-   * Reports an exception to the log (stdout) and to the browser
-   */
+  /** Reports an exception to the log (stdout) and to the browser */
   protected void reportException(Exception ex) throws Exception
   {
     String msg     = (ex.getMessage() == null ? "" : ex.getMessage());
