@@ -441,40 +441,36 @@
 					<xsl:choose>
 						<xsl:when test="$subRootNode = ''" >
 							<td colspan="{ ($depth - count(ancestor::item)) + 1 }">
-								<wbr>
-									<xsl:choose>
-										<xsl:when test="$linkKind = 'current' or $linkKind = 'current_popedUp'" >
-											<span class="marked">
-												<xsl:call-template name="addLink">
-													<xsl:with-param name="linkKind" select="$linkKind" />
-												</xsl:call-template>
-											</span>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:call-template name="addLink" >
+   								<xsl:choose>
+   									<xsl:when test="$linkKind = 'current' or $linkKind = 'current_popedUp'" >
+										<span class="marked">
+											<xsl:call-template name="addLink">
+												<xsl:with-param name="linkKind" select="$linkKind" />
 											</xsl:call-template>
-										</xsl:otherwise>
-									</xsl:choose>
-								</wbr>
+										</span>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:call-template name="addLink" >
+										</xsl:call-template>
+									</xsl:otherwise>
+								</xsl:choose>
 							</td>
 						</xsl:when>
 						<xsl:otherwise>
 							<td colspan="{ ($depth - count(ancestor::item)) + $depthSubRootNode + 1 }">
-								<wbr>
-									<xsl:choose>
-										<xsl:when test="$linkKind = 'current' or $linkKind = 'current_popedUp'" >
-											<span class="marked">
-												<xsl:call-template name="addLink">
-													<xsl:with-param name="linkKind" select="$linkKind" />
-												</xsl:call-template>
-											</span>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:call-template name="addLink" >
+								<xsl:choose>
+									<xsl:when test="$linkKind = 'current' or $linkKind = 'current_popedUp'" >
+										<span class="marked">
+											<xsl:call-template name="addLink">
+												<xsl:with-param name="linkKind" select="$linkKind" />
 											</xsl:call-template>
-										</xsl:otherwise>
-									</xsl:choose>
-								</wbr>
+										</span>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:call-template name="addLink" >
+										</xsl:call-template>
+									</xsl:otherwise>
+								</xsl:choose>
 							</td>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -654,10 +650,10 @@
                      <xsl:choose>
                         <!-- in case of $href_temp contains 'servlet' append 'lang=$currentlang' -->
                         <xsl:when test=" contains($href_temp,'/servlets/') ">
-										<xsl:call-template name="UrlSetParam">
-										  <xsl:with-param name="url" select="$href_temp"/>
-										  <xsl:with-param name="par" select="'lang'"/>
-										  <xsl:with-param name="value" select="$CurrentLang"/>
+                                        <xsl:call-template name="UrlSetParam">
+                                          <xsl:with-param name="url" select="$href_temp"/>
+                                          <xsl:with-param name="par" select="'lang'"/>
+                                          <xsl:with-param name="value" select="$CurrentLang"/>
                               </xsl:call-template>
                         </xsl:when>
                         <xsl:otherwise>
@@ -665,7 +661,7 @@
                         </xsl:otherwise>
                      </xsl:choose>                  	
                </xsl:attribute>
-					<!-- end: set attribute @href -->
+                    <!-- end: set attribute @href -->
 					<xsl:choose>
 						<xsl:when test="@style = 'bold'">
 							<span style="font-weight:bold;">
@@ -751,7 +747,7 @@
 			</xsl:attribute>
 			<xsl:copy-of select="$flag" />
 		</a>
-	</xsl:template>			
+	</xsl:template>            
 	
 	<!-- ================================================================================= -->	
 </xsl:stylesheet>
