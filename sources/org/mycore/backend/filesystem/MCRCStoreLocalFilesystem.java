@@ -80,7 +80,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     }
   }
 
-  public String storeContent( MCRFile file, MCRContentInputStream source )
+  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
     throws MCRPersistenceException
   {
     try
@@ -103,7 +103,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
       }
       
       String fileID = buildNextID();
-      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
+      if( extension.length() > 0 ) fileID += "." + extension;
       
       storageID.append( fileID );
       
@@ -116,7 +116,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     }
     catch( Exception exc )
     {
-      String msg = "Could not store content of file: " + file.getPath();
+      String msg = "Could not store content of file: " + filename;
       throw new MCRPersistenceException( msg, exc );
     }
   }

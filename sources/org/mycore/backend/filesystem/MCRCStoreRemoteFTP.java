@@ -88,7 +88,7 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String storeContent( MCRFile file, MCRContentInputStream source )
+  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
     throws MCRPersistenceException
   {
     FTPClient connection = connect();
@@ -106,7 +106,7 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
       }
       
       String fileID = buildNextID();
-      if( file.getExtension().length() > 0 ) fileID += "." + file.getExtension();
+      if( extension.length() > 0 ) fileID += "." + extension;
       
       connection.put( source, fileID );
       storageID.append( fileID );
@@ -115,7 +115,7 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
     }
     catch( Exception exc )
     {
-      String msg = "Could not store content of file: " + file.getPath();
+      String msg = "Could not store content of file: " + filename;
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ disconnect( connection ); }
