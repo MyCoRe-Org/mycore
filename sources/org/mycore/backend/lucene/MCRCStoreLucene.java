@@ -59,6 +59,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileReader;
+import org.mycore.services.plugins.FilterPluginTransformException;
 import org.mycore.services.plugins.TextFilterPluginManager;
 import org.mycore.services.query.MCRTextSearchInterface;
 
@@ -297,8 +298,6 @@ public class MCRCStoreLucene
 		throws IOException {
 		Document returns = new Document();
 		//filter here
-		BufferedReader in =
-			new BufferedReader(pMan.transform(reader.getContentType(), stream));
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
 		if (reader instanceof MCRFile) {
@@ -306,19 +305,27 @@ public class MCRCStoreLucene
 			Field derivateID =
 				new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
 			Field fileID = new Field("FileID", file.getID(), true, true, false);
-			/* since file is stored elsewhere 
-			 * we only index the file and do not store
-			 */
-			Field content = Field.Text("content", in);
 			logger.debug("adding fields to document");
 			returns.add(derivateID);
 			returns.add(fileID);
-			returns.add(content);
-			//in.close();fin.close();tmp.delete();
-			logger.debug("returning document");
-			return returns;
 		}
-		return null;
+		try{
+				BufferedReader in=
+				    new BufferedReader(pMan.transform(reader.getContentType(), stream));
+				/* since file is stored elsewhere 
+				 * we only index the file and do not store
+				 */
+				Field content = Field.Text("content", in);
+				returns.add(content);
+		} 
+		catch (FilterPluginTransformException fe){
+		    logger.error("Error while transforming document.",fe);
+		}
+		catch (NullPointerException ne){
+		    logger.error("Error while transforming document.",ne);
+		}
+		logger.debug("returning document");
+		return returns;
 	}
 
 	private final boolean containsExclusiveClause(BooleanQuery query) {
