@@ -19,7 +19,7 @@
         &lt;schema . . .>
          . . .
          &lt;import namespace="http://www.w3.org/XML/1998/namespace"
-                    schemaLocation="../schema/xml-2001.xsd"/>
+                    schemaLocation="xml-2001.xsd"/>
 
         Subsequently, qualified reference to either of the attributes
         or the group defined below will have the desired effect, e.g.
