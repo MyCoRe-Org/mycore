@@ -207,6 +207,35 @@ public class MCRConfiguration
       while( st.hasMoreTokens() ) loadFromFile( st.nextToken() );
     }
   }
+
+  /**
+   * Returns all the properties
+   *
+   * @return the list of properties
+   */
+  public Properties getProperties() {
+      return properties;
+  }
+  
+  /**
+   * Returns all the properties beginning with the specified string
+   *
+   * @param startsWith the string all the returned properties start with
+   * @return the list of properties
+   */
+  public Properties getProperties(String startsWith) {
+      Properties properties = new Properties();
+      
+      Enumeration names = this.properties.propertyNames();      
+      while (names.hasMoreElements()) {
+          String name = (String) (names.nextElement());
+          if (name.startsWith(startsWith)) {
+              String value = this.properties.getProperty(name);
+              properties.setProperty(name, value);
+          }
+      }
+      return properties;
+  }
   
 /**
  * Returns a new instance of the class specified in the configuration property
