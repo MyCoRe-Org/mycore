@@ -58,7 +58,7 @@
 		<xsl:param name="browserAddress" />
             -->
 		<!-- table navigation row -->
-		<table class="{$CSSLayoutClass}" border="0" cellspacing="0" cellpadding="0" align="center">
+		<table class="{$CSSLayoutClass}" cellspacing="0" cellpadding="0">
 			<tr>
 				<!-- read xml item entries and create the link bar -->
 				<xsl:for-each select="$rootNode/item">
@@ -76,28 +76,26 @@
 					</td>
 					<xsl:if test="position() != last()">
 						<td>
-							<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="{number($spaceBetweenLinks) div 2}" height="1" 
-								border="0" alt=""></img>
+							<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:{number($spaceBetweenLinks) div 2}px; height:1px;" alt=""></img>
 						</td>
 						<td>|</td>
 						<td>
-							<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="{number($spaceBetweenLinks) div 2}" height="1" 
-								border="0" alt=""></img>
+							<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:{number($spaceBetweenLinks) div 2}px; height:1px;" alt=""></img>
 						</td>
 					</xsl:if>
 				</xsl:for-each>
 				<!-- END OF: read xml item entries and create the link bar -->
 				<td>
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="{number($spaceBetweenLinks) div 2}" height="1" border="0" alt=""></img>
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:{number($spaceBetweenLinks) div 2}px; height:1px;" alt=""></img>
 				</td>
 				<td>|</td>
 				<td>
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="{number($spaceBetweenLinks) div 2}" height="1" border="0" alt=""></img>
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:{number($spaceBetweenLinks) div 2}px; height:1px;" alt=""></img>
 				</td>
 				<td>
 					<xsl:call-template name="generateFlagButton"/>
 				</td>
-				<td width="10px"></td>
+				<td style="width:10px;"></td>
 			</tr>
 		</table>
 		<!-- END OF: table navigation row -->
@@ -143,12 +141,12 @@
 		</xsl:variable>
 		<!-- END OF: look for appropriate replaceMenu entry and assign -->
 		<!-- general table -->
-		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="{$CSSLayoutClass}">
+		<table cellspacing="0" cellpadding="0" class="{$CSSLayoutClass}">
 			<!-- initialise columns -->
 			<tr>
 				<!-- border left -->
-				<td width="{$borderWidthSides}%" height="1">
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+				<td style="height:1px; width:{$borderWidthSides}%;">
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 				</td>
 				<!-- END OF: border left -->
 				<!-- create columns to give space for the icons -->
@@ -159,21 +157,21 @@
 				</xsl:call-template>
 				<!-- END OF: create columns to give space for the icons -->
 				<!-- fill rest -->
-				<td width="{ 100 - (2*$borderWidthSides) - ($columnWidthIcon*($depth - 1)) }%">
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+				<td style="width:{ 100 - (2*$borderWidthSides) - ($columnWidthIcon*($depth - 1)) }%px;">
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 				</td>
 				<!-- END OF: fill rest -->
 				<!-- border right -->
-				<td width="{$borderWidthSides}%">
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+				<td style="width:{$borderWidthSides}%;">
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 				</td>
 				<!-- END OF: border right -->
 			</tr>
 			<!-- END OF: initialise columns -->
 			<!-- borderWidthTop -->
 			<tr>
-				<td height="{$borderWidthTopDown}" colspan="{$depth + 2}">
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+				<td style="height:{$borderWidthTopDown}px;" colspan="{$depth + 2}">
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 				</td>
 			</tr>
 			<!-- END OF: borderWidthTop -->
@@ -185,10 +183,10 @@
 						<!-- main link -->
 						<xsl:for-each select="item[@href]">
 							<tr>
-								<td height="{$menuPointHeigth}">
-									<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+								<td style="height:{$menuPointHeigth}px;">
+									<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 								</td>
-								<th colspan="{$depth + 1}" align="left">
+								<th colspan="{$depth + 1}" style="text-align:left">
 									<xsl:call-template name="addLink" />
 								</th>
 							</tr>
@@ -211,8 +209,8 @@
 							<!-- place holder between main links -->
 							<xsl:if test="count(following-sibling::item) &gt; 0">
 								<tr>
-									<td height="{$spaceBetweenMainLinks}" colspan="{$depth + 2}">
-										<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+									<td style="height:{$spaceBetweenMainLinks}px;" colspan="{$depth + 2}">
+										<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 									</td>
 								</tr>
 							</xsl:if>
@@ -226,8 +224,8 @@
 					<!-- main link -->
 					<xsl:for-each select="$rootNode/item[@href]">
 						<tr>
-							<td height="{$menuPointHeigth}">
-								<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+							<td style="height:{$menuPointHeigth}px;">
+								<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 							</td>
 							<th colspan="{$depth + 1}" align="left">
 								<xsl:call-template name="addLink" />
@@ -252,8 +250,8 @@
 						<!-- place holder between main links -->
 						<xsl:if test="count(following-sibling::item) &gt; 0">
 							<tr>
-								<td height="{$spaceBetweenMainLinks}" colspan="{$depth + 2}">
-									<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+								<td style="height:{$spaceBetweenMainLinks}px;" colspan="{$depth + 2}">
+									<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 								</td>
 							</tr>
 						</xsl:if>
@@ -265,8 +263,8 @@
 			<!-- END OF: navigation tree -->
 			<!-- borderWidthDown -->
 			<tr>
-				<td height="{$borderWidthTopDown}" colspan="{$depth + 2}">
-					<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+				<td style="height:{$borderWidthTopDown}px;" colspan="{$depth + 2}">
+					<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 				</td>
 			</tr>
 			<!-- END OF: borderWidthDown -->
@@ -281,8 +279,8 @@
 		<xsl:param name="count"/>
 		<xsl:param name="columnWidthIcon"/>
 		<xsl:if test="$i &lt;= $count">
-			<td width="{$columnWidthIcon}%">
-				<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="1" border="0" alt="" title=""></img>
+			<td style="width:{$columnWidthIcon}%;">
+				<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:1px" alt="" title=""></img>
 			</td>
 		</xsl:if>
 		<xsl:if test="$i &lt;= $count">
@@ -399,8 +397,8 @@
 		<xsl:choose>
 			<xsl:when test="$linkKind != 'hide'">
 				<tr>
-					<td height="{$menuPointHeigth}">
-						<img src="{$ImageBaseURL}emtyDot1Pix.gif" width="1" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+					<td style="height:{$menuPointHeigth}px;">
+						<img src="{$ImageBaseURL}emtyDot1Pix.gif" style="width:1px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</td>
 					<!-- draw lines before icon and link -->
 					<xsl:for-each select="ancestor::item">
@@ -498,37 +496,46 @@
 				<xsl:choose>
 					<xsl:when test="$linkKind = 'line'" >
 						<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/empty-ri.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'normal'" >
 						<img 
 							src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/line-with-element_end.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'current'" >
 						<img 
 							src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/line-with-element-selected_end.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'current_popedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img 
 								src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/minus-selected_end.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 						</a>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'popedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img 
 								src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/minus_end.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 						</a>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'notPopedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img 
 								src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/plus_end.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title="" />
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title="" />
 						</a>
 					</xsl:when>
 				</xsl:choose>
@@ -539,35 +546,44 @@
 				<xsl:choose>
 					<xsl:when test="$linkKind = 'line'" >
 						<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/line.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'normal'" >
 						<img 
 							src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/line-with-element.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'current'" >
 						<img 
 							src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/line-with-element-selected.gif" 
-							width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+							style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'current_popedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img 
 								src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/minus-selected.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 						</a>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'popedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after((parent::node()/@href),'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/minus.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title=""></img>
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title=""></img>
 						</a>
 					</xsl:when>
 					<xsl:when test="$linkKind = 'notPopedUp'" >
-						<a href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}" target="{@target}">
+						<a href="{concat($WebApplicationBaseURL,substring-after(@href,'/'))}">
+                            <xsl:if test="$wcms.useTargets = 'yes'">
+                                <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                            </xsl:if>
 							<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/plus.gif" 
-								width="{$columnWidthIcon}" height="{$menuPointHeigth}" border="0" alt="" title="" />
+								style="width:{$columnWidthIcon}px; height:{$menuPointHeigth}px;" alt="" title="" />
 						</a>
 					</xsl:when>
 				</xsl:choose>
@@ -582,13 +598,16 @@
 		<xsl:choose>
 			<!-- item @type is "intern" -> add the web application path before the link -->
 			<xsl:when test="@type = 'intern'">
-				<a target="{@target}">
+				<a>
+                    <xsl:if test="$wcms.useTargets = 'yes'">
+                       <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                    </xsl:if>
 					<xsl:attribute name="href">
 						<xsl:value-of select="concat($WebApplicationBaseURL,substring-after(@href,'/'))" />
 					</xsl:attribute>
 					<xsl:choose>
 						<xsl:when test="@style = 'bold'">
-							<b>
+							<span style="font-weight:bold;">
 								<xsl:choose>
 									<xsl:when test="./label[lang($CurrentLang)] != ''">
 										<xsl:value-of select="./label[lang($CurrentLang)]" />
@@ -597,7 +616,7 @@
 										<xsl:value-of select="./label[lang($DefaultLang)]" />
 									</xsl:otherwise>
 								</xsl:choose>
-							</b>
+							</span>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
@@ -614,7 +633,10 @@
 			</xsl:when>
 			<!-- item @type is extern-->
 			<xsl:otherwise>
-				<a target="{@target}">
+				<a>
+                    <xsl:if test="$wcms.useTargets = 'yes'">
+                      <xsl:attribute name="target"><xsl:value-of select="@target"/></xsl:attribute>
+                    </xsl:if>
 					<!-- set attribute @href -->
 					<xsl:variable name="href_temp">
                      <xsl:choose>
@@ -646,7 +668,7 @@
 					<!-- end: set attribute @href -->
 					<xsl:choose>
 						<xsl:when test="@style = 'bold'">
-							<b>
+							<span style="font-weight:bold;">
 								<xsl:choose>
 									<xsl:when test="./label[lang($CurrentLang)] != ''">
 										<xsl:value-of select="./label[lang($CurrentLang)]" />
@@ -655,7 +677,7 @@
 										<xsl:value-of select="./label[lang($DefaultLang)]" />
 									</xsl:otherwise>
 								</xsl:choose>
-							</b>
+							</span>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
@@ -709,7 +731,7 @@
 		<xsl:param name="lang"/>
 		<xsl:param name="url"/>
 		<xsl:param name="alternative"/>
-		<a href="{$ServletsBaseURL}MCRSearchMaskServlet?lang={$lang}&amp;type=document&amp;mode=CreateSearchMask">
+		<a>
 			<xsl:attribute name="href">
 				<xsl:variable name="newurl">
 					<xsl:call-template name="UrlSetParam">

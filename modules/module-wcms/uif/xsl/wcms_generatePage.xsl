@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.7 $ $Date: 2004-12-28 23:38:20 $ -->
+<!-- $Revision: 1.8 $ $Date: 2004-12-29 20:23:18 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" 
@@ -28,7 +28,15 @@
                   <xsl:with-param name="browserAddress" select="$browserAddress"/>
                   <xsl:with-param name="navigationBase" select="$navigationBase"/>                  
             </xsl:call-template>
-      </xsl:param>      
+      </xsl:param>
+      <!-- set useTarget to 'yes' if you want the target attribute to appear in links
+        the wcms controls. This would break HTML 4.01 strict compatiblity but allows
+        the browser to open new windows when clicking on certain links.
+        To keep standard compliance it's default turned of, as it may annoy some
+        people, too.
+      -->
+      <xsl:variable name="wcms.useTargets" select="'no'" />
+            
   
       
 	<!-- ================== get some wcms required global variables ===================================== -->      
