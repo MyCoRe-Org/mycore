@@ -24,38 +24,32 @@
 
 package org.mycore.backend.xmldb;
 
-import java.io.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.jdom.Document;
 
-import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
 
 
-import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * This class is the persistence layer for XML:DB databases.
  *
  * @author Harald Richter
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
 public final class MCRXMLDBPersistence 
     implements MCRObjectPersistenceInterface {
-    static Logger logger = Logger.getLogger( MCRXMLDBPersistence.class.getName() );
-    static private MCRConfiguration config = MCRConfiguration.instance();  
-    static private String def_enc = config.getString( "MCR.metadata_default_encoding" );
-    static private String store_enc = config.getString( "MCR.persistence_xmldb_encoding" );
-    static private SAXBuilder builder = new SAXBuilder();
+    static final private Logger logger = Logger.getLogger( MCRXMLDBPersistence.class.getName() );
+    static final private MCRConfiguration config = MCRConfiguration.instance();  
 
     /**
      * Creates a new MCRXMLDBPersistence.
@@ -98,9 +92,8 @@ public final class MCRXMLDBPersistence
             // create a new item
             res = (XMLResource)collection.createResource( mcr_id.getNumberAsString(),
                 XMLResource.RESOURCE_TYPE );
-            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
-            org.w3c.dom.Document dom = outputter.output( doc );
-            res.setContentAsDOM( dom );
+            SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
+            outputter.output(doc);
             collection.storeResource( res );
 	}
 	catch( Exception e ) {
@@ -162,9 +155,8 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
             // create the new item
             res = (XMLResource)collection.createResource( mcr_id.getNumberAsString(),
                 XMLResource.RESOURCE_TYPE );
-            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
-            org.w3c.dom.Document dom = outputter.output( doc );
-            res.setContentAsDOM( dom );
+     		SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
+	    	outputter.output(doc);
             collection.storeResource( res );
 	}
 	catch( Exception e ) {
@@ -238,9 +230,9 @@ public final byte[] receive( MCRObjectID mcr_id )
 public static org.jdom.Document convertResToDoc( XMLResource res )
   {
   try {
-    String xml = (String)res.getContent();
-    xml = new String( xml.getBytes( store_enc ), def_enc );
-    return  builder.build( new StringReader( xml ) );
+  	SAXHandler handler=new SAXHandler();
+  	res.getContentAsSAX(handler);
+  	return handler.getDocument();
     }
   catch( Exception e ) {
     throw new MCRPersistenceException( e.getMessage(), e ); }
