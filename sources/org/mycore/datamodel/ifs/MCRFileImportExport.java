@@ -108,7 +108,7 @@ public class MCRFileImportExport
   }
   
   public static void exportFiles( MCRDirectory dir, File local )
-    throws IOException
+    throws MCRException
   {
     MCRArgumentChecker.ensureNotNull( dir,   "internal directory" );
     MCRArgumentChecker.ensureNotNull( local, "local file"         );
@@ -127,7 +127,10 @@ public class MCRFileImportExport
         String name = internalFile.getName();
         
         File localFile = new File( local, name );
-        internalFile.getContentTo( localFile ); 
+        try {
+          internalFile.getContentTo( localFile ); }
+        catch ( Exception ex ) {
+          throw new MCRException("Can't get file content.",ex); }
       }
       else
       {
