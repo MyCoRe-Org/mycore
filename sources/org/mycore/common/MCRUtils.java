@@ -185,15 +185,26 @@ public static final GregorianCalendar covertDateToGregorianCalendar(
   {
   if ((indate == null) || ((indate = indate.trim()).length() ==0)) {
     return null; }
+  boolean era = true; int start = 0;
+  if (indate.substring(0,2).equals("AD")) { era = true; start= 2; }
+  if (indate.substring(0,2).equals("BC")) { era = false; start= 2; }
   GregorianCalendar calendar = new GregorianCalendar();
   boolean test = false;
   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-  try { calendar.setTime(formatter.parse(indate)); test = true; }
+  try { 
+    calendar.setTime(formatter.parse(indate.substring(start,indate.length()))); 
+    if (!era) { calendar.set(Calendar.ERA,GregorianCalendar.BC); }
+    test = true; 
+    }
   catch (ParseException e) { }
   if (!test) { 
     for (int i=0;i<SUPPORTED_LANG.length;i++) {
       DateFormat df =  getDateFormat(SUPPORTED_LANG[i]);
-      try { calendar.setTime(df.parse(indate)); test = true; }
+      try { 
+        calendar.setTime(df.parse(indate.substring(start,indate.length()))); 
+        if (!era) { calendar.set(Calendar.ERA,GregorianCalendar.BC); }
+        test = true; 
+        }
       catch (ParseException e) { }
       if (test) { break; }
       }
