@@ -292,12 +292,14 @@ public final int getNextFreeIdInt( String project, String type )
   String prefix     = project + "_" + type;
   int offset = prefix.length() + 2;
   String query = new StringBuffer()
-        .append( "SELECT MAX( INTEGER( SUBSTR( MCRID,  " )
-        .append( offset )
-        .append( " ))) FROM " )
+        .append( "SELECT MAX(MCRID) FROM " )
         .append( tableName ).toString();
-  int storedID = Integer.parseInt(MCRSQLConnection.justGetSingleValue(query));
-  return storedID;
+  try {
+    return (new MCRObjectID(MCRSQLConnection.justGetSingleValue(query)))
+      .getNumberAsInteger() + 1;
+    }
+  catch(Exception e) { }
+  return 1;
   }
 
 /**

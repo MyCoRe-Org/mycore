@@ -192,37 +192,6 @@ public void delete( MCRObjectID mcr_id )
   }
 
 /**
- * Retrieves the object with the given ID from the datastore.
- *
- * @param mcr_id object id whose data shall be received
- *
- * @return the content as a JDOM document
- * @throws MCRPersistenceException
- **/
-/*
-public final byte[] receive( MCRObjectID mcr_id )
-  throws MCRConfigurationException 
-  {
-  logger.debug("MCRXMLDBPersistence receive: "+mcr_id.getId());    
-  Collection collection = null;
-  org.jdom.Document doc;
-  try {
-    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
-    XMLResource res = (XMLResource)collection.getResource( mcr_id.getNumberAsString() );
-    if (res == null) {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
-        " does not exist."); }
-    doc = convertResToDoc( res );
-    }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
-    MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
-  return MCRUtils.getByteArray( doc );
-  }
-*/
-
-/**
  * A private method to convert the result in a dom tree.
  *
  * @param res the result
@@ -239,52 +208,5 @@ public static org.jdom.Document convertResToDoc( XMLResource res )
   catch( Exception e ) {
     throw new MCRPersistenceException( e.getMessage(), e ); }
   }
-    
-/**
- * This method returns the next free ID number for a given 
- * MCRObjectID base. This method ensures that any invocation
- * returns a new, exclusive ID by remembering the highest ID
- * ever returned and comparing it with the highest ID stored
- * in the related index class.
- * 
- * @param project_ID   the project ID part of the MCRObjectID base
- * @param type_ID      the type ID part of the MCRObjectID base
- *
- * @exception MCRPersistenceException if a persistence problem is occured
- *
- * @return the next free ID number as a String
- **/
-/*
-public synchronized String getNextFreeId( String project_ID, String type_ID )
-  throws MCRPersistenceException { 
-  logger.debug("MCRXMLDBPersistence: getNextFreeId");    
-  return "1";
-  }
-*/
-
-/**
- * Checks whether an object with the given object id exists in the
- * datastore.
- *
- * @param mcr_id id of the object to check exist
- * @return true if the item with the MCRObjectID exist, else false 
- **/
-/*
-public boolean exist( MCRObjectID mcr_id )
-  {
-  logger.debug("MCRXMLDBPersistence exist: "+mcr_id.getTypeId().toLowerCase()+
-    " "+mcr_id.getId() );    
-  Collection collection = null;
-  try {
-    collection = MCRXMLDBConnectionPool.instance().getConnection( 
-      mcr_id.getTypeId() );
-    Resource document = collection.getResource( mcr_id.getNumberAsString() ); 
-    MCRXMLDBConnectionPool.instance().releaseConnection( collection );
-    if ( null != document ) { return true; }
-    }
-  catch( Exception e ) { return false; }
-  return false;
-  }
-*/
 
 }
