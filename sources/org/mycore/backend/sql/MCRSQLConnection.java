@@ -270,4 +270,24 @@ public class MCRSQLConnection
     try{ return c.exists( condition ); }
     finally{ c.release(); }
   }
+  
+  /**
+   * Checks existence of table in MySQL
+   *
+   * @param tablename 
+   * @return true or false
+   **/  
+  public static boolean MySQLTableExist( String tablename )
+    throws MCRPersistenceException
+  {
+    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+    try{ 
+        String query = "SHOW TABLES LIKE '" + tablename + "'";
+        String count = c.getSingleValue( query );
+        System.out.println( "MCRSQLConnection getSingleValue: " + count + " query " + query );
+        return( count == null ? false : true );
+       }
+    finally{ c.release(); }
+  }
+
 }
