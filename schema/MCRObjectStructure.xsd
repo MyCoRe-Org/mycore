@@ -5,7 +5,7 @@
 
  <xsd:annotation>
   <xsd:documentation xml:lang="en">
-   This XML Schema file describe the data model of the MCRObjectStructure
+   This XML Schema file describes the data model of the MCRObjectStructure
    part of a MCRObject.
   </xsd:documentation>
  </xsd:annotation>
