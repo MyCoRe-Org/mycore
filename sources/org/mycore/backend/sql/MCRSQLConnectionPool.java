@@ -92,6 +92,7 @@ public class MCRSQLConnectionPool
     int initNumConnections = 
       config.getInt("MCR.persistence_sql_init_connections",maxNumConnections);
     String driver = config.getString("MCR.persistence_sql_driver");
+    logger.info( "MCR.persistence_sql_driver: " + driver );
     
     try{ Class.forName( driver ); } // Load the JDBC driver
     catch( Exception exc ) {
