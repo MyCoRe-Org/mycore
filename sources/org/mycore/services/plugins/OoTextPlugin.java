@@ -56,6 +56,8 @@ public class OoTextPlugin implements TextFilterPlugin {
 	private static final int MAJOR = 0;
 	private static final int MINOR = 4;
 	private static final EntityResolver OooResolver = new ResolveOfficeDTD();
+	private static final String SAXparser =
+		"org.apache.xerces.parsers.SAXParser";
 
 	private static HashSet contentTypes;
 	private static String info = null;
@@ -73,6 +75,25 @@ public class OoTextPlugin implements TextFilterPlugin {
 			contentTypes = new HashSet();
 			if (MCRFileContentTypeFactory.isTypeAvailable("sxw"))
 				contentTypes.add(MCRFileContentTypeFactory.getType("sxw"));
+		}
+		try {
+			Class.forName(SAXparser);
+		} catch (ClassNotFoundException e) {
+			throw new FilterPluginInstantiationException(
+				new StringBuffer("This Plugin is only tested with Xerces")
+					.append("(http://xml.apache.org/xerces2-j/index.html) and")
+					.append(" though requires it to be installed somewhere in")
+					.append(" CLASSPATH. Please ensure that a jar file ")
+					.append(" containing the class ")
+					.append(SAXparser)
+					.append(" is listed in a CLASSPATH before running your")
+					.append(" brandnew MyCoRe(tm)-Application.\n")
+					.append(" I as a developer of cause know that Xerces is")
+					.append(" bundled with every MyCoRe(tm) release and thus")
+					.append(" you will never read this message.\n")
+					.append(" But just in case, I thought it is a good idea to")
+					.append(" implement this message here.")
+					.toString());
 		}
 		if (info == null)
 			info =
@@ -122,7 +143,11 @@ public class OoTextPlugin implements TextFilterPlugin {
 			}
 		} else
 			throw new FilterPluginTransformException(
-				"ContentType " + ct + " is not supported by " + getName() + "!");
+				"ContentType "
+					+ ct
+					+ " is not supported by "
+					+ getName()
+					+ "!");
 	}
 
 	/**
@@ -170,7 +195,7 @@ public class OoTextPlugin implements TextFilterPlugin {
 	private Reader getTextReader(InputStream xml)
 		throws IOException, SAXException {
 		XMLReader reader =
-			XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+			XMLReaderFactory.createXMLReader(SAXparser);
 		StringBuffer buf = new StringBuffer();
 		reader.setContentHandler(new TextHandler(buf));
 		InputSource inp = new InputSource(xml);
@@ -196,16 +221,17 @@ public class OoTextPlugin implements TextFilterPlugin {
 		 * @see java.io.Reader#read(char[], int, int)
 		 */
 		public int read(char[] cbuf, int off, int len) throws IOException {
-			int charsRead = (buf.length() < (off + len)) ? (buf.length() - off) : len;
-			if (pos == buf.length() - 1)
+			if (pos == buf.length())
 				return -1;
 			else {
 				int start = pos + off;
+				int charsRead =
+					(buf.length() < (start + len)) ? (buf.length() - start) : len;
 				int end = start + charsRead;
 				buf.getChars(start, end, cbuf, 0);
-				pos = end - 1;
+				pos = end;
+				return charsRead;
 			}
-			return charsRead;
 		}
 
 	}
