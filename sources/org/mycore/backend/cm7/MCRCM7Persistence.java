@@ -441,8 +441,9 @@ private final String createTS(MCRTypedContent mcr_tc)
   StringBuffer sb = new StringBuffer(2048);
   MCRCM7TransformToText ttt = new MCRCM7TransformToText();
   int maxtag = 0;
-  int tagdiff = MCRTypedContent.TYPE_LASTTAG-MCRTypedContent.TYPE_MASTERTAG+1;
+  int tagdiff = MCRTypedContent.TYPE_LASTTAG-MCRTypedContent.TYPE_MASTERTAG+2;
   String  [] tag = new String [tagdiff];
+  tag[0] = new String("MYCOREOBJECT");
   // MCRObject data
   sb.append("XXX").append(mcr_tc.getNameElement(0).toUpperCase()).append("XXX")
     .append("XXX").append(mcr_tc.getNameElement(1).toUpperCase()).append("XXX")
@@ -455,7 +456,7 @@ private final String createTS(MCRTypedContent mcr_tc)
   int i = 3; 
   while (i<mcr_tc.getSize()) {
     if (mcr_tc.getTypeElement(i)>=MCRTypedContent.TYPE_MASTERTAG) {   
-      tagdiff = mcr_tc.getTypeElement(i) - MCRTypedContent.TYPE_MASTERTAG;
+      tagdiff = mcr_tc.getTypeElement(i) - MCRTypedContent.TYPE_MASTERTAG+1;
       tag[tagdiff] = ((String)mcr_tc.getNameElement(i)).toUpperCase();
       maxtag = tagdiff + 1;
       i++; continue; 

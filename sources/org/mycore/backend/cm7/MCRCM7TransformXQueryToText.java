@@ -169,14 +169,9 @@ private final String getNextCondition(int startpos,int stoppos,String query)
  * @param onecond  one single condition
  * @ return the transfromed query for CM7.
  **/
-private final String traceOneCondition(String condin)
+private final String traceOneCondition(String cond)
   {
   int i, j, k;
-  // remove /mycoreobject from the begin
-  i = 0;
-  if (condin.startsWith("(/MYCOREOBJECT")) { i = 14; }
-  if (condin.startsWith("(//MYCOREOBJECT")) { i = 15; }
-  String cond = "("+condin.substring(i,condin.length());
   StringBuffer sb = new StringBuffer(128);
   // search [..]
   int klammerauf = cond.indexOf("[");
@@ -185,7 +180,7 @@ private final String traceOneCondition(String condin)
   // cerate path to the data
   StringBuffer pt = new StringBuffer(128);
   boolean ispath = false;
-  String inpath = cond.substring(i,klammerauf);
+  String inpath = cond.substring(0,klammerauf);
   if ((inpath.equals("(")) || (inpath.equals("(.")) ||
       (inpath.equals("(*")) || (inpath.equals("(//*")) ||
       (inpath.equals("(/"))) { 
