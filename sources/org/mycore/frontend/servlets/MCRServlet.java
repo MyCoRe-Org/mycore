@@ -129,19 +129,32 @@ public class MCRServlet extends HttpServlet
     try
     {
       HttpSession theSession = req.getSession(true);
+      MCRSession  session    = null;    
 
-      // Get the MCRSession object for the current thread from the session manager.
-      MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+      String sessionID = req.getParameter( "MCRSessionID" );
+      MCRSession fromRequest = null;
+      if( sessionID != null ) fromRequest = MCRSession.getSession( sessionID );
+    
+      MCRSession fromHttpSession = (MCRSession)theSession.getAttribute( "mycore.session" );
+
+      // Choose: 
+      if( fromRequest != null )
+        session = fromRequest; // Take session from http request parameter MCRSessionID
+      else if ( fromHttpSession != null )
+        session = fromHttpSession; // Take session from HttpSession with servlets
+      else
+        session =  MCRSessionMgr.getCurrentSession(); // Create a new session
+
+      // Store current session in HttpSession
+      theSession.setAttribute( "mycore.session", session );
       
-      if (theSession.isNew()) {
-        theSession.setAttribute("mycore.session", mcrSession);
-      }
-      else {
-        mcrSession = (MCRSession)theSession.getAttribute("mycore.session");
-        MCRSessionMgr.setCurrentSession(mcrSession);
-      }
+      // Bind current session to this thread:
+      MCRSessionMgr.setCurrentSession(mcrSession);
 
-      String s = (theSession.isNew() ? "new" : "old" ) + " session " + theSession.getId();
+      // Forward MCRSessionID to XSL Stylesheets
+      req.setAttribute( "XSL.MCRSessionID", session.getID() );
+
+      String s = ( theSession.isNew() ? "new" : "old" ) + " HttpSession=" + theSession.getId() + " MCRSession=" + session.getID() ;
       String u = mcrSession.getCurrentUserID();
       String h = req.getRemoteHost();
 
