@@ -86,6 +86,8 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		//remove from index
 		Term term = new Term("StorageID", storageID);
 		int deleted = indexReader.delete(term);
+		indexReader.close();
+		loadIndexReader();
 		logger.debug("deleted " + deleted + " documents containing " + term);
 		//remove file
 		super.doDeleteContent(storageID);
@@ -138,39 +140,51 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		logger.debug("TextIndexDir: " + indexDir);
 		if (indexWriter == null) {
 			logger.debug("creating IndexWriter...");
-			boolean create = true;
-			if (IndexReader.indexExists(indexDir)) {
-				//reuse Index
-				create = false;
-			}
-			try {
-				indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
-			} catch (IOException e) {
-				throw new MCRPersistenceException(
-					"Cannot create index in "
-						+ indexDir.getAbsolutePath()
-						+ File.pathSeparatorChar
-						+ indexDir.getName(),
-					e);
-			}
-			indexWriter.mergeFactor = optimizeIntervall;
-			indexWriter.minMergeDocs = 1; //always write to local dir
+			loadIndexWriter();
 			logger.debug("IndexWriter created...");
 			docCount = indexWriter.docCount();
-		}
-		if (indexReader == null) {
 			try {
-				indexReader = IndexReader.open(indexDir);
+				indexWriter.close();
 			} catch (IOException e) {
-				throw new MCRPersistenceException(
-					"Cannot read index in "
-						+ indexDir.getAbsolutePath()
-						+ File.pathSeparatorChar
-						+ indexDir.getName(),
-					e);
+				logger.error("Setting indexWriter=null");
+				indexWriter=null;
 			}
 		}
+		if (indexReader == null) {
+			loadIndexReader();
+		}
 
+	}
+	private synchronized void loadIndexReader() {
+		try {
+			indexReader = IndexReader.open(indexDir);
+		} catch (IOException e) {
+			throw new MCRPersistenceException(
+				"Cannot read index in "
+					+ indexDir.getAbsolutePath()
+					+ File.pathSeparatorChar
+					+ indexDir.getName(),
+				e);
+		}
+	}
+	private synchronized void loadIndexWriter() {
+		boolean create = true;
+		if (IndexReader.indexExists(indexDir)) {
+			//reuse Index
+			create = false;
+		}
+		try {
+			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
+		} catch (IOException e) {
+			throw new MCRPersistenceException(
+				"Cannot create index in "
+					+ indexDir.getAbsolutePath()
+					+ File.pathSeparatorChar
+					+ indexDir.getName(),
+				e);
+		}
+		indexWriter.mergeFactor = optimizeIntervall;
+		indexWriter.minMergeDocs = 1; //always write to local dir
 	}
 
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
@@ -241,6 +255,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	}
 
 	private void indexDocument(Document doc) throws IOException {
+		loadIndexWriter();
 		logger.debug(
 			"Create index for storageID="
 				+ doc.getField("StorageID").stringValue());
@@ -250,6 +265,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 			logger.debug("Optimize index for searching...");
 			indexWriter.optimize();
 		}
+		indexWriter.close();
 	}
 	private static Analyzer getAnalyzer() {
 		//TODO: have to replace GermanAnalyzer by more generic
