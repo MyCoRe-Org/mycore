@@ -526,6 +526,7 @@ public class MCRCStoreLucene
 			//reuse Index
 			create = false;
 		}
+    LOGGER.debug("No previous index exists:("+create+")");
 		try {
 			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
 		} catch (IOException e) {
