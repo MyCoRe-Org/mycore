@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.82 $ $Date: 2004-05-28 14:21:58 $                      -->
+  <!-- $Revision: 1.83 $ $Date: 2004-06-25 11:46:16 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -64,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.82 $ $Date: 2004-05-28 14:21:58 $</echo>
+    <echo>Ant build file   : $Revision: 1.83 $ $Date: 2004-06-25 11:46:16 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -384,7 +384,9 @@
 
       <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
       <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
+<!--
       <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
+-->
       <link href="http://www.mycore.de/library/jaxp/docs/api"/>
       <link href="http://www.jdom.org/docs/apidocs"/>
       <link href="http://www.xmldb.org/xapi/api"/>

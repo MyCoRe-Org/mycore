@@ -24,7 +24,11 @@
 
 package org.mycore.backend.cm8;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -52,7 +56,7 @@ public static final String DEFAULT_QUERY = "";
 
 // the logger
 protected static Logger logger =
-  Logger.getLogger(MCRCM8TransformXPathToeXist.class.getName());
+  Logger.getLogger(MCRCM8TransformXPathToCM8.class.getName());
 private MCRConfiguration config = null;
 
 /**
@@ -71,9 +75,11 @@ public MCRCM8TransformXPathToCM8()
  * @param root                  the query root
  * @param query                 the metadata queries
  * @param type                  the MCRObject type
+ * @param maxresults            the maximum of results
  * @return                      a result list as MCRXMLContainer
  **/
-public final HashSet getResultIDs(String root, String query, String type)
+public final HashSet getResultIDs(String root, String query, String type, 
+  int maxresults)
   {
   // prepare the query over the rest of the metadata
   HashSet idmeta = new HashSet();
@@ -109,13 +115,18 @@ public final HashSet getResultIDs(String root, String query, String type)
   logger.debug("Codition transformation " + cond.toString());
 
   // build the query
-  if (cond.length() != 0) {
+  if (cond.toString().trim().length() != 0) {
     StringBuffer nq = new StringBuffer(1024);
     nq.append('/').append(itemtypename);
-    if (cond.toString().trim().length() > 0) {
-      nq.append('[').append(cond.toString()).append(']'); }
-    newuqery = nq.toString();
+    nq.append('[').append(cond.toString().trim()).append(']'); 
+    newquery = nq.toString();
     }
+  else {
+    StringBuffer nq = new StringBuffer(1024);
+    nq.append('/').append(itemtypename);
+    newquery = nq.toString();
+    }
+
   logger.debug("Transformed query " + newquery);
 
   // Start the search

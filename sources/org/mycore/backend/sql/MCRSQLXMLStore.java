@@ -268,6 +268,7 @@ public final byte[] retrieve(MCRObjectID mcrid, int version)
     return xml;
     }
   catch (Exception ex) {
+    ex.printStackTrace();
     throw new MCRException("Error in MCRXMLStore.",ex); }
   finally{ connection.release(); }
   }

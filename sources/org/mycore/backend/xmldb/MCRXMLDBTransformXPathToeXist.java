@@ -77,9 +77,11 @@ public MCRXMLDBTransformXPathToeXist() {
  * @param root                  the query root
  * @param query                 the metadata queries
  * @param type                  the MCRObject type
+ * @param maxresults            the maximum of results
  * @return                      a result list as MCRXMLContainer
  **/
-public final HashSet getResultIDs(String root, String query, String type)
+public final HashSet getResultIDs(String root, String query, String type,
+  int maxresults)
   {
   // prepare the query over the rest of the metadata
   HashSet idmeta = new HashSet();

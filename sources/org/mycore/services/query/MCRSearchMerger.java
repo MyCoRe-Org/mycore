@@ -49,7 +49,8 @@ private MCRMetaSearchInterface msif;
  **/
 public MCRSearchMerger() {
   super();
-  metaclassname = config.getString("MCR.persistence_xmldb_query_name");
+  String temp = config.getString("MCR.XMLStore.Type","");
+  metaclassname = config.getString("MCR.persistence_"+temp+"_query_name");
   logger.debug("Load the metadata search class "+metaclassname);
   try {
     msif = (MCRMetaSearchInterface)Class.forName(metaclassname).newInstance(); }
@@ -115,7 +116,7 @@ protected final MCRXMLContainer startQuery(String type) {
     logger.debug("Metadate query : " + metaquery);
     }
   if (hasmeta) {
-    idmeta = msif.getResultIDs(root,metaquery,type); }
+    idmeta = msif.getResultIDs(root,metaquery,type,maxresults); }
 
   // merge the results
   HashSet myresult = null;
