@@ -9,7 +9,23 @@ Dieser Abschnitt beschäftigt sich mit der Konfiguration der Beispielanwendung in
 \subsubsection{Allgemeines}
 %
 %
-In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter {\bf MCR.persistence\_type} fest, welchen Persitence Layer sie nutzen wollen. Mögliche Werte sind {\bf cm7}, {\bf cm8} oder {\bf xmldb}.
+In der Konfigurationsdatei {\it mycore.properties.privat} legen Sie im Parameter {\bf MCR.persistence\_type} fest, welchen Persitence Layer sie nutzen wollen. Mögliche Werte sind {\bf cm7}, {\bf cm8} oder {\bf xmldb}. Entfernen Sie einfach den entsprechenden Kommentar.
+\begin{verbatim}
+# The type of persistence layer (Content Manager 7 of IBM)
+#MCR.persistence_type=cm7
+
+# The type of persistence layer (Content Manager 8 of IBM)
+#MCR.persistence_type=cm8
+
+# The type of persistence layer (XML:DB)
+MCR.persistence_type=xmldb
+\end{verbatim}
+Weiterhin sind die allgemein gültigen Pfadvariablen für den MyCoRe-Kern und das MyCoRe-Sample anzupassen:
+\begin{verbatim}
+# The application root
+MCR.root_path=/home/mcradmin/mycore
+MCR.appl_path=/home/mcradmin/mycore-sample-application
+\end{verbatim}
 %
 %
 \subsubsection{JDBC-Treiber}
@@ -28,6 +44,6 @@ MCR.persistence_sql_driver=org.gjt.mm.mysql.Driver
 
 MCR.persistence_sql_init_connections=1
 MCR.persistence_sql_max_connections=5
-\end{verbatim} 
+\end{verbatim}
 
 

@@ -1,0 +1,37 @@
+%
+%
+\subsection{Das Metadatensystem}
+%
+%
+In diesem Abschnitt son nun beschrieben werden, welche Konfigurationen für die Speicherung der Metadaten zu bearbeiten sind. Als erstes müssen Sie einstellen, mit welchem Persistence-Store für die Metadaten Sie arbeiten wollen. Das hängt natürlich auch von den bisherigen Installationsschritten ab und wurde schon behandelt. Nun folgen die Einstellung für den konkreten Layer.
+\subsubsection{Die Nutzung von eXist als XML:DB Backend}
+Hierzu müssen Sie die folgenden Daten im Konfigurationsverzeichnis des Samples unter {\it \$MYCORE\_SAMPLE\_HOME/config/mycore.properties.private} entsprechend Ihren Gegebenheiten anpassen. Habe Sie die Standardvorgehensweise befolgt, sollte hier nichts zu tun sein.
+\begin{verbatim}
+MCR.persistence_xmldb_driver=org.exist.xmldb.DatabaseImpl
+MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/mycore
+MCR.persistence_xmldb_database=exist
+\end{verbatim}
+Weiterhin müssen die Files {\it exist.jar}, {\it xmldb.jar} und {\it xmlrpc-1.1.jar} nach {\it \$MYCORE\_HOME/lib} kopiert werden. Achten Sie darauf, dass es in diesem verzeichnis kein File namens {\it xindice.jar} oder ein *.jar File einer anderen XML:DB gibt.\\[2ex]
+Starten Sie nun den eXist-Client und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
+\begin{verbatim}
+mkcol mycore
+chown guest guest mycore
+cd mycore
+mkcol legalentity
+chown guest guest legalentity
+mkcol document
+chown guest guest document
+mkcol derivate
+chown guest guest
+quit
+\end{verbatim}
+Nun sollte das Sample zum Laden der Metadaten bereit sein.
+%
+%
+\subsubsection{Lade der Daten}
+habe Sie alles Vorbereitet, so können nun die Beispiel-Metadaten geladen werden. Dies geschieht mit
+\begin{itemize}
+\item {\tt ant legal} oder {\tt bin/build.sh legal} für die Legalentities und dann
+\item{\tt ant document} oder {\tt bin/build.sh document} für die Documents
+\end{itemize}
+
