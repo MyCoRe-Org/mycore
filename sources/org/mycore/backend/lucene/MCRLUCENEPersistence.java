@@ -74,7 +74,7 @@ public final class MCRLUCENEPersistence implements MCRObjectPersistenceInterface
     MCRConfiguration config = MCRConfiguration.instance();
     
     indexDir       = config.getString( "MCR.persistence_lucene_searchindexdir" );
-    System.out.println( "TextIndexDir: " + indexDir);
+    logger.info( "MCR.persistence_lucene_searchindexdir: " + indexDir);
   }
 
 private void item_setChild(int i, String s1, String s2, String s3, String s4, String s5)    
@@ -343,54 +343,67 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
   { /*MCRCM8ItemType.create(mcr_type,mcr_conf);*/ }
 
 /**
- * The methode delete an object from the data store. The index class
- * is determinated by the type of the object ID. This <b>must</b>
- * correspond with the lower case configuration name.<br>
- * As example: Document --> MCR.persistence_cm8_document
+ * The method deletes an object from the searchindex.
  *
  * @param mcr_id      the object id
- * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
 public final void delete(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
   {
-//  Logger logger = MCRCM8ConnectionPool.getLogger();
-  // Read the item type name from the configuration
-  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
-  sb.append(mcr_id.getTypeId().toLowerCase());
-  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
-  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
-  // delete data item
-/*  
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.instance().getConnection();
-    MCRCM8Item item = null;
-    try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
-        itemtypeprefix); 
-      item_delete();
-      logger.info("Item "+mcr_id.getId()+" was deleted.");
-      }
-    catch (MCRPersistenceException e) {
-      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
+  String id = mcr_id.getId();
+  
+  try
+  {
+    // does directory for text index exist, if not build it
+    if ( first )
+    {
+      first = false;
+      File file = new File( indexDir );
+	    
+      if ( !file.exists() ) 
+      {
+        Analyzer analyzer = new GermanAnalyzer();
+        logger.info( "Delete The Directory doesn't exist: " + indexDir );
+        IndexWriter writer2 = new IndexWriter( indexDir, analyzer, true );
+        writer2.close();
+      }   
+    } // if ( first
+    
+    IndexSearcher searcher = new IndexSearcher(indexDir);
+
+    Term  t  = new Term( "ID", id );
+    Query qu = new TermQuery( t );
+    logger.debug( "Searching for: " + qu.toString("") );
+
+    Hits hits = searcher.search( qu );
+      
+    logger.debug( "Number of documents found : " + hits.length() );
+    if ( 1 == hits.length() )
+    {    
+      logger.debug( "ID: " +  hits.doc(0).get("ID") );
+      if ( id.equals( hits.doc(0).get("ID") ) )
+      {    
+        IndexReader reader = IndexReader.open( indexDir );
+        reader.delete( hits.id(0) ); 
+        reader.close();
+      } 
+      else {
+        throw new MCRPersistenceException("An object with ID " + id + " does not exist."); }
     }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
- */
+    else {
+      throw new MCRPersistenceException("An object with ID " + id + " does not exist."); }
+  }  
+  catch( Exception e )
+  { 
+    throw new MCRPersistenceException( e.getMessage(), e ); 
   }
+}
 
 /**
- * The methode update an object in the data store. The index class
- * is determinated by the type of the object ID. This <b>must</b>
- * correspond with the lower case configuration name.<br>
- * As example: Document --> MCR.persistence_cm8_document
+ * The method updates an object in the searchindex.
  *
  * @param mcr_tc      the typed content array
- * @param xml         the XML stream from the object as JDOM
  * @param mcr_ts_in   the text search string
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
@@ -406,7 +419,11 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
       }
     }
   // delete the item with the MCRObjectID
-  delete(mcr_id);
+  try
+  {
+    delete(mcr_id);
+  } 
+  catch( Exception e ){}
   // create the item with the MCRObjectID
   create(mcr_tc,jdom,mcr_ts_in);
   }
