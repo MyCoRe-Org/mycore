@@ -28,6 +28,8 @@ import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.*;
 import org.mycore.frontend.servlets.*;
 
@@ -41,11 +43,14 @@ import org.mycore.frontend.servlets.*;
 public class MCRSearchMaskServlet extends MCRServlet 
 {
 
+// logger
+protected static Logger logger=Logger.getLogger(MCRSearchMaskServlet.class.getName());
+
 // The default mode for this class
 String mode = "CreateSearchMask";
 
 // Default Language (as UpperCase)
-private String defaultLang = "";
+String defaultLang = "";
 
 // The configuration XML files
 org.jdom.Document jdom = null;
@@ -57,6 +62,7 @@ org.jdom.Document jdom = null;
   public void init() throws MCRConfigurationException
   {
     super.init();
+  PropertyConfigurator.configure(config.getLoggingProperties());
   defaultLang = config.getString( "MCR.metadata_default_lang", "en" )
     .toUpperCase();
   }
@@ -91,7 +97,7 @@ org.jdom.Document jdom = null;
   * @exception IOException for java I/O errors.
   * @exception ServletException for errors from the servlet engine.
   **/
-  private void createSearchMask( HttpServletRequest  request, 
+  protected void createSearchMask( HttpServletRequest  request, 
                      HttpServletResponse response )
     throws IOException, ServletException
   {  
@@ -111,7 +117,7 @@ org.jdom.Document jdom = null;
     }
   catch (org.jdom.JDOMException e) {
     throw new MCRException("SearchMaskServlet : Can't read config file "+
-      smc+" or it has a parse error."); }
+      smc+" or it has a parse error.",e); }
 
   // prepare the stylesheet name
   String style = mode + "-" + layout+ "-" + lang;
@@ -133,18 +139,22 @@ org.jdom.Document jdom = null;
   * @exception IOException for java I/O errors.
   * @exception ServletException for errors from the servlet engine.
   **/
-  private void createQuery( HttpServletRequest  request, 
+  protected void createQuery( HttpServletRequest  request, 
                      HttpServletResponse response )
     throws IOException, ServletException
   {  
   String type  = request.getParameter( "type"  );
   String layout = request.getParameter( "layout"  );
-  String lang  = request.getParameter( "lang" );
-  String host  = request.getParameter( "hosts" );
-  if( host  == null ) host  = "local";
+  String hosts[] = request.getParameterValues( "hosts" );
+  StringBuffer hostsb = new StringBuffer("");
+  for (int i=0;i<hosts.length;i++) {
+    if (i != 0) hostsb.append(',');
+    hostsb.append(hosts[i]);
+    }
+  String host = hostsb.toString();
+  if( host.length() == 0 ) host  = "local";
   if( type  == null ) return;
   if( layout  == null ) layout = type;
-  if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
   StringBuffer query = new StringBuffer("");
 
   String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());
@@ -185,7 +195,7 @@ org.jdom.Document jdom = null;
     // check to all attributes for a line are filled
     int k = 0;
     for (int j=0;j<param.size();j++) {
-System.out.println(name+"   "+param.get(j)+"   "+varia.get(j));
+      logger.debug(name+"   "+param.get(j)+"   "+varia.get(j));
       if (param.get(j) == null) { k=1; break; }
       if (((String)param.get(j)).trim().length() ==0 ) { k=1; break; }
       }
@@ -208,12 +218,10 @@ System.out.println(name+"   "+param.get(j)+"   "+varia.get(j));
          .append(tempquery.substring(k+((String)varia.get(j)).length(),
          tempquery.length())); }
       tempquery = qsb.toString();
-System.out.println(tempquery);
       }
     if (query.length() != 0) { query.append(" and "); }
     query.append(tempquery);
     }
-  
 
   // start Query servlet
     request.removeAttribute( "mode" );
@@ -225,7 +233,6 @@ System.out.println(tempquery);
     request.removeAttribute( "hosts" );
     request.setAttribute( "hosts", host );
     request.removeAttribute( "lang" );
-    request.setAttribute( "lang", lang );
     request.removeAttribute( "query" );
     request.setAttribute( "query", query.toString() );
     RequestDispatcher rd = getServletContext()
