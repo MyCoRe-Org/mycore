@@ -36,12 +36,15 @@ import mycore.datamodel.MCRObjectService;
 import mycore.datamodel.MCRObjectPersistenceInterface;
 import mycore.cm7.MCRCM7ConnectionPool;
 import mycore.cm7.MCRCM7Item;
+import mycore.sql.MCRSQLConnection;
 
 /**
  * This class implements all methode for handling the data to the data store
  * based on IBM Content Manager 7.
  *
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ *
  * @version $Revision$ $Date$
  **/
 public final class MCRCM7Persistence implements MCRObjectPersistenceInterface
@@ -449,29 +452,61 @@ private final MCRCM7Item getItem(String id, String indexclass,
   return new MCRCM7Item(sb.toString(),mcr_index_class,connection );
   }
 
-private static int lastID = 1;
+ /**
+  * This method returns the next free ID number for a given 
+  * MCRObjectID base. This method ensures that any invocation
+  * returns a new, exclusive ID by remembering the highest ID
+  * ever returned and comparing it with the highest ID stored
+  * in the related index class.
+  * 
+  * @param project_ID   the project ID part of the MCRObjectID base
+  * @param type_ID      the type ID part of the MCRObjectID base
+  *
+  * @exception MCRPersistenceException if a persistence problem is occured
+  *
+  * @return the next free ID number as a String
+  **/
+  public synchronized String getNextFreeId( String project_ID, String type_ID ) 
+    throws MCRPersistenceException
+  { 
+    String prefix     = project_ID + "_" + type_ID;
+    String property   = "MCR.persistence_cm7_" + type_ID.toLowerCase().trim();
+    String indexclass = MCRConfiguration.instance().getString( property );
 
-/**
- * This methode return the next free number for a given MCRObjectId
- * base.
- * 
- * @param project_id   the project ID
- * @param type_id      the type ID
- * @exception MCRPersistenceException if a persistence problem is occured
- * @return the number a string
- **/
-public String getNextFreeId(String project_id, String type_id) 
-  throws MCRPersistenceException
-  { return getNextFreeIdInt(project_id,type_id); }
+    // What table and column name is this in DB2?
+    String table  = MCRCM7Bypass.getTableName ( indexclass  );
+    String column = MCRCM7Bypass.getColumnName( mcr_id_name );
 
-/**
- * This is the internal methode for getNextFreeId(...).
- **/
-private static synchronized String getNextFreeIdInt(String project_id, 
-  String type_id) throws MCRPersistenceException
-  {
-  return Integer.toString(lastID);
+    int storedID = 0;
+
+    // If there are any entries in the index class, get the highest ID stored:
+
+    if( MCRSQLConnection.justCheckExists( table ) )
+    {
+      int offset = prefix.length() + 2;
+      String query = new StringBuffer()
+        .append( "SELECT MAX( INTEGER( SUBSTR( " )
+        .append( column )
+        .append( ", " )
+        .append( offset )
+        .append( " ))) FROM " )
+        .append( table ).toString();
+      storedID = Integer.parseInt( MCRSQLConnection.justGetSingleValue( query ) );
+    }
+
+    // Build a new ID from the highest stored and the highest returned so far:
+
+    String ID = highestIDs.getProperty( prefix );
+    int memoryID = ( ID == null ? 0 : Integer.parseInt( ID ) );
+
+    ID = String.valueOf( Math.max( storedID, memoryID ) + 1 );
+    highestIDs.put( prefix, ID );
+
+    return ID;
   }
+
+  /** This table stores the highest IDs delivered by getNextFreeId() */
+  protected static Properties highestIDs = new Properties();
 
 /**
  * This methode let a system command run.
