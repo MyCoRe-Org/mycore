@@ -28,6 +28,10 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
+import org.jdom.Document;
+import org.jdom.output.SAXOutputter;
+import org.jdom.output.XMLOutputter;
+
 /**
  * This class represent a general set of external methods to support
  * the programming API.
@@ -240,6 +244,17 @@ public static final String stringToXML(String in)
     }
   return sb.toString();
   }
+  
+ /**
+  * transforms a JDOM-Document to a String
+  * 
+  * @param jdom document to transform
+  * @return String representation of XML-Document
+  */
+ public static final String xmlToString(Document jdom){
+ 	XMLOutputter out=new XMLOutputter("  ",true);
+ 	return out.outputString(jdom); 
+ }
 
 /**
  * This method convert a JDOM tree to a byte array.
