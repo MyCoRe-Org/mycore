@@ -24,8 +24,16 @@
 
 package org.mycore.common;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import org.apache.log4j.Logger;
 
 /**
  * Provides methods to manage and read all configuration properties from the
@@ -85,6 +93,8 @@ public class MCRConfiguration
  * The single instance of this class that will be used at runtime
  */    
   protected static MCRConfiguration singleton;
+	private static final Logger logger =
+			Logger.getLogger(MCRConfiguration.class);
 
 /**
  * Returns the single instance of this class that can be used to
@@ -280,11 +290,16 @@ public class MCRConfiguration
       ( "Configuration property " + name + " is not set!" );
     
     Class cl;
-    try
-    { cl = Class.forName( classname ); }
-    catch( Exception ex )
-    { throw new MCRConfigurationException( "Could not load class " + classname, ex ); }
-
+    //TODO:
+    //remove the following debug output, shouldn't be needed
+    logger.debug("Loading Class: "+classname);
+    try {
+        cl = Class.forName(classname);
+    }
+    catch (Exception ex) {
+        throw new MCRConfigurationException("Could not load class "
+                    + classname, ex);
+    }
     Object o;
     try
     { o = cl.newInstance(); }
@@ -296,8 +311,7 @@ public class MCRConfiguration
         Throwable t2 = ((ExceptionInInitializerError)t).getException();
         if( t2 instanceof Exception )
           throw new MCRConfigurationException( msg, (Exception)t2 );
-        else
-          throw new MCRConfigurationException( msg + ": " + t2.getClass().getName() + " - " + t2.getMessage() );
+        throw new MCRConfigurationException( msg + ": " + t2.getClass().getName() + " - " + t2.getMessage() );
       }
       else if( t instanceof Exception )
         throw new MCRConfigurationException( msg, (Exception)t ); 
@@ -324,8 +338,7 @@ public class MCRConfiguration
     String value = properties.getProperty( name );
     if( value == null )
       throw new MCRConfigurationException( "Configuration property " + name + " is not set" );
-    else
-      return value;
+    return value;
   }
 
 /**
