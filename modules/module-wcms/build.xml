@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.2 $ $Date: 2004-11-18 09:09:58 $ -->
+<!-- $Revision: 1.3 $ $Date: 2004-11-18 16:05:17 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -31,6 +31,9 @@
       Available targets for MyCoReWCMS are:
         docportal			plug MyCoReWCMS-Module into docportal application
         cleanDocportal		remove MyCoReWCMS-Module out of docportal application
+			
+	        standalone		install MyCoReWCMS-Module as standalone application
+	        cleanStandalone		remove MyCoReWCMS-Module 
 		</echo>
 	</target>
 
@@ -62,6 +65,36 @@
 	
 	<!-- ============================================== -->	
 	<!-- ============================================== -->	
+	
+
+	<!-- ============================================== -->
+	<!-- ============================================== -->
+	<target name="standalone">
+		<echo>
+           Execute installation procedure to install Module-WCMS as standalone application
+    </echo>
+
+		<subant target="standalone" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="appsSupport/standalone/build.xml" />
+		</subant>
+
+	</target>
+
+	<!-- ============================================== -->
+	
+	<target name="cleanStandalone">
+		<echo>
+           Execute installation procedure to remove Module-WCMS...
+	    </echo>
+
+		<subant target="clean" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="appsSupport/standalone/build.xml" />
+		</subant>
+
+	</target>	
+	
+	<!-- ============================================== -->	
+	<!-- ============================================== -->		
 </project>
 
 <!-- ============================================== -->
