@@ -1,8 +1,11 @@
 
 \section{Hinweise zur Installation freier und komerzieller Datenbanken, XML:DB's und Web--Komponenten}
-
+%
+%
 \subsection{Installation der Komponenten unter Linux}
-Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.2. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
+%
+%
+Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.2. Es ist besonders aus Sicherheitsgründen besonders zu empfehlen, auch die vom Distributor angebotenen Updates für die nachfolgenden Komponenten zu installieren. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
 
 
 \subsubsection{Vorbereitung}
@@ -29,6 +32,7 @@ in der Datei {\it /etc/profile.local}\footnote{Falls diese noch nicht
 Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin}) anlegen, unter welchem Sie dann Ihre Applikationen laufen lassen.
 
 \subsubsection{Die Installation von MySQL}
+
 \label{mysqlinstallation}
 MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicherung von Daten innerhalb des MyCoRe-Projektes benötigt wird. Sie besitzt eine JDBC Schnittstelle und ist SQL konform. Sie könnten MySQL auch durch eine andere verfügbare Datenbank mit gleicher Funktionalität ersetzen.
 \begin{enumerate}
@@ -87,9 +91,9 @@ quit
 \end{enumerate}
 
 Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei {\it /etc/hosts.allow} geschrieben werden.
-%
-%
+
 \subsubsection{Die Installation der freien XML:DB eXist}
+
 eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So ist die Nutzung von eXist direkt möglich.
 \paragraph*{Vorbedingungen} 
 Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, da es ansonsten zu einem Konflikt mit der hier vorgestellten Installtion kommt, weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. Den Port für Tomact ändern sie in der {\it tomcatinstalldir/conf/server.xml}. Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene MySQL-Installation vorausgesetzt. Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner in \$MYCORE\_HOME bzw. \$MYCORE\_SAMPLE\_HOME liegen. 
@@ -103,6 +107,37 @@ Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Se
 \item Wenn alles okay ist, starten Sie {\tt <eXist-installdir>/bin/server.sh }.
 \item Anschliessend können Sie auch den Client mit {\tt <eXist-installdir>/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
+
+\subsubsection{Die Installation von Apache 2}
+\label{sec:apchache2_installation}
+
+Im Linux-Umfeld kann der Apache-Webserver als Standard betrachtet werden. Er ist in allen gängigen Distributionen enthalten. Die allerneuesten Apache 2 Pakete sind zu finden unter \url{ftp://ftp.suse.com/pub/projects/apache/apache2/8.2-i386}. Installiern Sie folgende Komponenten:
+\begin{itemize}
+\item {\bf apache2-2.0.46-3} oder höher
+\item {\bf apache2-doc-2.0.46-3} oder höher, dieses Paket ist optional
+\item {\bf apache2-worker-2.0.46-3} oder höher
+\end{itemize}
+Mit \mcrcommand{rcapache2 start} wird der Server per default Einstellungen gestartet und sollte jetzt über \url{http://localhost} erreichbar sein. Etwaige Fehlermeldunge werden in \mcrfile{/var/log/apache2/error\_log} geschrieben.\\[2ex]
+Die zentrale Konfigurationsdatei des Apache2 ist die unter \mcrpath{/etc/apache2} liegende Datei \mcrfile{httpd.conf}. Bevor irgendwelche Änderungen vorgenommen werden bitte immer ein Sicherheitskopie anlegen. Der Befehl (als root) \mcrcommand{/usr/sbin/apache2ctl configtest} Überprüft die Syntax ihrer geänderten Einstellungen.
+Vorerst sollten jedoch die Standard Einstellungen genügen.
+Mit \mcrcommand{rcapache2 [start; stop; restart]} als root kann der Server gestartet gestoppt bzw neugestartet werden und über \mcrcommand{rcapache2 [status]} wird der aktuelle Staus abgefragt.
+
+\subsubsection{Die Installation von Tomcat 4}
+
+Wie Apache, dessen Installation im vorigen Abschnitt \ref{sec:apchache2_installation} beschrieben wurde,  ist auch Tomcat als Servlet-Engine im Linux-Umfeld ein Quasi-Standard. Für die Arbeit der Web-Anwendung des MyCoRe-Projektes wird dieses Tool zwingend benötigt. Installiern Sie folgende Komponenten:
+\begin{itemize}
+\item {\bf jakarta-tomcat-4.1.18-31} oder höher
+\item {\bf apache2-jakarta-tomcat-connectors-4.1.18-31} oder höher
+\end{itemize}
+Im File \mcrfile{/etc/profile.local} ist folgender Eintrag vorzunehmen, damit Tomcat auch von {\bf mcradmin} genutzt werden kann.
+\begin{verbatim}
+export CATALINA_HOME=/opt/jakarta/tomcat
+\end{verbatim}
+Weiterhin ist noch die richtige Gruppenzugehörigkeit für die Tomcat-Installation festzulegen.
+\begin{verbatim}
+chown wwwrun:nogroup -R /opt/jakarta/tomcat
+\end{verbatim}
+Mit \mcrcommand{rctomcat [start; stop; restart]} als root kann der Server gestartet gestoppt bzw neugestartet werden und über \mcrcommand{rctomcat [status]} wird der aktuelle Staus abgefragt. Nach erfolgreichem starten des Tomcat Servers sollte er unter der Standardadresse \url{http://localhost:8080/examples} erreichbar sein. Die Dokumentation steht unter \url{http://localhost:8080/tomcat-docs}.
 %
 %
 \subsection{Installation der Komponenten unter MS Windows}

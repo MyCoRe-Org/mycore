@@ -26,7 +26,15 @@ Sie verlassen das CommandLineInterface durch Eingabe von
 Nachdem Sie nun die Testdaten geladen haben, besteht schon einmal die Möglichkeit, zu testen, ob die geladenen Daten sich anfassen lassen. Hierzu können sie das ConnamdLineInterface benutzen. \\[2ex]
 Starten Sie {\tt bin/mycore.sh} (Unix) bzw.  {\tt bin/mycore.cmd} (Windows) und versuchen Sie zum Beispiel folgende Kommandos:
 \begin{verbatim}
-query local document /mycoreobject[@id="MyCoReDemoDc_document_1"]
+login gandalf
+alleswirdgut
+list all users
+list all groups
+list all privileges
 
-save derivate MyCoReDemoDC_derivate_2 to MyCoReDemoDC_derivate_2
+query local class /mycoreclass[@ID="MyCoReDemoDC_class_2"]
+
+query local document /mycoreobject[@ID="MyCoReDemoDc_document_1"]
+
+save derivate MyCoReDemoDC_derivate_2 to derivate_2
 \end{verbatim}
