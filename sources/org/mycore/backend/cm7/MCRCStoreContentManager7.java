@@ -72,15 +72,15 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     keyfieldPath  = config.getString( prefix + "Keyfield.Path"  );
   }
   
-  public String storeContent( MCRFile file, MCRContentInputStream source )
+  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
     throws MCRPersistenceException
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     try
     {
       MCRCM7Item item = new MCRCM7Item( connection, indexClass, DKConstant.DK_DOCUMENT );
-      item.setKeyfield( keyfieldOwner, file.getOwnerID() );
-      item.setKeyfield( keyfieldPath,  file.getPath()    );
+      item.setKeyfield( keyfieldOwner, owner    );
+      item.setKeyfield( keyfieldPath,  filename );
       item.create();
       String itemID = item.getItemId();
       
@@ -112,7 +112,7 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     }
     catch( Exception exc )
     {
-      String msg = "Could not store content in ContentManager for file " + file.getPath();
+      String msg = "Could not store content in ContentManager for file " + filename;
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
