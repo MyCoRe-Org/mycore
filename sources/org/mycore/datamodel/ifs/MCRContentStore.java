@@ -60,22 +60,18 @@ public interface MCRContentStore
    * Stores the content of an MCRFile by reading from an MCRContentInputStream.
    * Returns a StorageID to indentify the place where the content was stored.
    *
-   * @param filename the name of the MCRFile thats content is to be stored
-   * @param extension the filename extension of the MCRFile thats content is to be stored
-   * @param owner the owner of the MCRFile thats content is to be stored
-   * @param mime the mime type of the content that is to be stored
+   * @param file the MCRFile thats content is to be stored
    * @param source the ContentInputStream where the file content is read from
    * @return an ID that indentifies the place where the content was stored
    **/
-  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
+  public String storeContent( MCRFileReader file, MCRContentInputStream source )
     throws MCRPersistenceException;
 
   /**
-   * Deletes the content under the given StorageID set in the
-   * MCRFile object to indentify the place where the file content was stored
-   * in this store instance.
+   * Deletes the content of an MCRFile object that is stored under the given
+   * Storage ID in this store instance.
    *
-   * @param storageID the ID identifying where the content of a file was stored
+   * @param storageID the storage ID of the MCRFile object
    */
   public void deleteContent( String storageID )
     throws MCRPersistenceException;
@@ -85,10 +81,9 @@ public interface MCRContentStore
    * Uses the StorageID to indentify the place where the file content was 
    * stored in this store instance.
    *
-   * @param storageID the ID identifying where the content of a file was stored
-   * @param size the file's size
+   * @param file the MCRFile thats content should be retrieved
    * @param target the OutputStream to write the file content to
    */
-  public void retrieveContent( String storageID, long size, OutputStream target )
+  public void retrieveContent( MCRFileReader file, OutputStream target )
     throws MCRPersistenceException;
 }

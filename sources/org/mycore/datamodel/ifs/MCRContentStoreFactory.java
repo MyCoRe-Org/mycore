@@ -156,25 +156,23 @@ public class MCRContentStoreFactory
    * The instance that is returned is configured by the property
    * <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in mycore.properties.
    * 
-   * @param storeID the non-null ID of the MCRContentStore for that MCRFile
-   * @param storageID the non-null storage ID of that MCRFile
+   * @param file the non-null MCRFile that should get an MCRAudioVideoExtender
    * @return the MCRAudioVideoExtender for the MCRFile given, or null
    * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
    */
-  static MCRAudioVideoExtender buildExtender( String storeID, String storageID, String extension )
+  static MCRAudioVideoExtender buildExtender( MCRFileReader file )
   {
-    MCRArgumentChecker.ensureNotNull( storeID,   "store ID"   );
-    MCRArgumentChecker.ensureNotNull( storageID, "storage ID" );
+    MCRArgumentChecker.ensureNotNull( file, "file" );
 
-    if( ! providesAudioVideoExtender( storeID ) ) return null;
+    if( ! providesAudioVideoExtender( file.getStoreID() ) ) return null;
     
-    Class cl = getExtenderClass( storeID );
+    Class cl = getExtenderClass( file.getStoreID() );
     
     try
     { 
       Object obj = cl.newInstance();
       MCRAudioVideoExtender ext = (MCRAudioVideoExtender)obj;
-      ext.init( storageID, storeID, extension );
+      ext.init( file );
       return ext;
     }
     catch( Exception exc )
