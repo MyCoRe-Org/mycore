@@ -65,7 +65,7 @@ public class MCRRequestParameters
     tmpPath   = config.getString( prefix + "FileUpload.TempStoragePath" );
   }
   
-  MCRRequestParameters( HttpServletRequest req )
+  public MCRRequestParameters( HttpServletRequest req )
   {
     if( FileUpload.isMultipartContent( req ) )
     {
@@ -112,12 +112,13 @@ public class MCRRequestParameters
     }
   }
 
-  Enumeration getParameterNames()
+  public Enumeration getParameterNames()
   { return parameters.keys(); }
 
-  String getParameter( String name )
+  public String getParameter( String name )
   { return parameters.getProperty( name ); }
     
-  FileItem getFileItem( String name )
+  public FileItem getFileItem( String name )
   { return (FileItem)( files.get( name ) ); }
 }
+
