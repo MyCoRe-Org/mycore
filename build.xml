@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.46 $ $Date: 2003-08-05 15:51:55 $                       -->
+  <!-- $Revision: 1.47 $ $Date: 2003-08-05 15:57:13 $                       -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -300,10 +300,11 @@
 
   <target name="pdflatex">
     <echo>Processing ${TeXFile} to PDF...</echo>
-    <exec dir="documentation" executable="pdflatex"> <arg line="${TeXFile}" /> </exec>
+    <exec dir="documentation" executable="pdflatex" output="output.log"> <arg line="${TeXFile}" /> </exec>
+    <exec dir="documentation" executable="pdflatex" output="output.log"> <arg line="${TeXFile}" /> </exec>
     <exec dir="documentation" executable="pdflatex"> <arg line="${TeXFile}" /> </exec>
     <delete>
-      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log" />
+      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
     </delete>
   </target>
 
@@ -316,7 +317,7 @@
     <delete dir="${basedir}/javadocs" />
     <delete dir="${basedir}/classes"  />
     <delete includeEmptyDirs="true" >
-      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log" />
+      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
     </delete>
     <delete file="${basedir}/lib/mycore.jar" />
     <echo>---------------------------------------------------------</echo>
