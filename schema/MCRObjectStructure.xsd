@@ -17,9 +17,45 @@
 
  <xsd:complexType name="MCRObjectStructure" >
   <xsd:sequence>
+   <xsd:element name="linksTo" type="MCRStructureLinksTo" minOccurs='0' 
+     maxOccurs='1'/>
+   <xsd:element name="linksFrom" type="MCRStructureLinksFrom" minOccurs='0' 
+     maxOccurs='1'/>
+   <xsd:element name="children" type="MCRStructureChildren" minOccurs='0' 
+     maxOccurs='1'/>
+   <xsd:element name="parents" type="MCRStructureParents" minOccurs='0' 
+     maxOccurs='1'/>
    <xsd:element name="links" type="MCRStructureLinks" minOccurs='0' 
      maxOccurs='1'/>
    <xsd:element name="derivates" type="MCRStructureDerivates" minOccurs='0' 
+     maxOccurs='1'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRStructureLinksTo">
+  <xsd:sequence>
+   <xsd:element name="linkTo" type="MCRMetaLink" minOccurs='0' 
+     maxOccurs='unbounded'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRStructureLinksFrom">
+  <xsd:sequence>
+   <xsd:element name="linkFrom" type="MCRMetaLink" minOccurs='0' 
+     maxOccurs='unbounded'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRStructureChildren">
+  <xsd:sequence>
+   <xsd:element name="child" type="MCRMetaLink" minOccurs='0' 
+     maxOccurs='unbounded'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRStructureParents">
+  <xsd:sequence>
+   <xsd:element name="parent" type="MCRMetaLink" minOccurs='0' 
      maxOccurs='1'/>
   </xsd:sequence>
  </xsd:complexType>

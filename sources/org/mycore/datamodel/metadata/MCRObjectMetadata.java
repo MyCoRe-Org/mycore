@@ -39,6 +39,7 @@ import mycore.common.MCRUtils;
  * datamodel code of MyCoRe.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Hegner
  * @version $Revision$ $Date$
  **/
 public class MCRObjectMetadata
@@ -67,6 +68,43 @@ public MCRObjectMetadata() throws MCRConfigurationException
   meta_list = new ArrayList();
   tag_names = new ArrayList();
   }
+
+/**
+ * <em>size</em> returns the number of tag names in the ArrayList.
+ * 
+ * @return int  number of tags and meta elements
+ */
+public int size () { return tag_names.size(); }
+
+/**
+ * <em>tagName</em> returns the tag name at a given index.
+ * 
+ * @param i           given index
+ * @return String     the associated tag name
+ */
+public String tagName (int i) { return (String) tag_names.get(i); }
+
+/**
+ * <em>getHeritableMetadata</em> returns an instance of MCRObjectMetadata
+ * containing all the heritable MetaElement's of this object.
+ * 
+ * @return MCRObjectMetadata    the heritable part of this MCRObjectMetadata
+ * @exception MCRConfigurationException
+ */
+public MCRObjectMetadata getHeritableMetadata ()
+	throws MCRConfigurationException
+{
+	MCRObjectMetadata heritMeta = new MCRObjectMetadata ();
+	int i, n = size();
+	MCRMetaElement metaElem = null;
+	for (i = 0; i < n; ++i)
+	{
+		metaElem = (MCRMetaElement) meta_list.get(i);
+		if (metaElem.getHeritable())
+			heritMeta.setMetadataElement(metaElem, tagName(i));
+	}
+	return heritMeta;
+}
 
 /**
  * This methode return the MCRMetaElement selected by tag.

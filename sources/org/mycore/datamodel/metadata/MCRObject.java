@@ -24,6 +24,7 @@
 
 package mycore.datamodel;
 
+import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -43,8 +44,11 @@ import mycore.xml.MCRXMLHelper;
  * Methodes of this class can read the XML metadata by using a XML parser,
  * manipulate the data in the abstract persistence data store and return
  * the XML stream to the user application.
+ * Additionally, this class provides the public user interface for the
+ * linking of MCRObjects against other MCRObjects.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Hegner
  * @version $Revision$ $Date$
  **/
 final public class MCRObject
@@ -163,6 +167,49 @@ public final MCRObjectService getService()
  **/
 public final MCRObjectStructure getStructure()
   { return mcr_struct; }
+
+/**
+ * <em>addUniLinkTo</em> creates an unidirectional link to another object.
+ * 
+ * @param dest                  the link's destination MCRObject
+ * @param label                 the link's label
+ * @param title                 the link's title
+ */
+public final void addUniLinkTo (MCRObject dest, String label, String title)
+{
+	mcr_struct.addLinkTo(dest.mcr_id.getId(), label, title);
+}
+
+/**
+ * <em>addBiLinkTo</em> creates a bidirectional link to another object.
+ * 
+ * @param dest                  the link's destination MCRObject
+ * @param label                 the link's label
+ * @param title                 the link's title
+ */
+public final void addBiLinkTo (MCRObject dest, String label, String title)
+{
+	mcr_struct.addLinkTo(dest.mcr_id.getId(), label, title);
+	dest.mcr_struct.addLinkFrom(mcr_id.getId(), label, title);
+}
+
+/**
+ * <em>addChild</em> creates a (bidirectional) link to a child object.
+ * The child inherits the heritable metadata part.
+ * 
+ * @param child                 the child MCRObject
+ * @param label                 the link's label
+ * @param title                 the link's title
+ */
+public final void addChild (MCRObject child, String label, String title)
+{
+	mcr_struct.addChild(child.mcr_id.getId(), label, title);
+	Vector inh_metadata = new Vector();
+	inh_metadata.addElement(mcr_metadata.getHeritableMetadata());
+	//append the grand parent's heritable metadata here, to be done next time:
+	//#####
+	child.mcr_struct.addParent(mcr_id.getId(), label, title, inh_metadata);
+}
 
 /**
  * The given DOM was convert into an internal view of metadata. This are 
