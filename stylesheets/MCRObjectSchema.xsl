@@ -28,7 +28,6 @@
               schemaLocation='{$mycore_home}/schema/xml-2001.xsd'/> 
  <xsd:import namespace="http://www.w3.org/1999/xlink"
               schemaLocation="{$mycore_home}/schema/xlinks-2001.xsd" />
- <xsd:include schemaLocation='{$mycore_home}/schema/MCRObjectStructure.xsd'/>
 
  <xsl:variable name="var" select="/configuration/@type" />
  <xsl:choose>
@@ -63,6 +62,7 @@
     <xsd:attribute name="ID" type="xsd:string" use="required" />
     <xsd:attribute name="label" type="xsd:string" use="required" />
    </xsd:complexType>
+   <xsl:apply-templates select="/configuration/structure"/>
    <xsl:apply-templates select="/configuration/metadata"/>
    <xsl:apply-templates select="/configuration/service"/>
   </xsl:otherwise>
@@ -70,6 +70,34 @@
  </xsl:choose>
 
  </xsd:schema>
+
+</xsl:template>
+
+<!-- Template for the structure part -->
+
+<xsl:template match="/configuration/structure">
+
+ <xsd:complexType name="MCRObjectStructure">
+  <xsd:sequence>
+
+ <xsl:for-each select="element">
+  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+    <xsd:sequence>
+     <xsl:apply-templates select="*"/>
+    </xsd:sequence>
+    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
+   </xsd:complexType>
+  </xsd:element>
+ </xsl:for-each>
+
+   <xsl:value-of select="$newline"/>
+  </xsd:sequence>
+  <xsd:attribute ref="xml:lang" />
+ </xsd:complexType>
 
 </xsl:template>
 

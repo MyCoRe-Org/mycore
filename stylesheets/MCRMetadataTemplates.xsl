@@ -49,9 +49,9 @@
   </xsd:element>
 </xsl:template>
 
-<!-- Template for the metadata MCRMetaLinkMCRObject -->
+<!-- Template for the metadata MCRMetaLinkID -->
 
-<xsl:template match="mcrmetalinkmcrobject">
+<xsl:template match="mcrmetalinkid">
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute ref="xlink:type" />
