@@ -107,8 +107,7 @@ public class MCRUserPrivServlet extends MCRServlet
       // else has the user this privilege
       else {
         if (MCRUserMgr.instance().hasPrivilege(userid,searchpriv)) {
-          uelm.addContent(new org.jdom.Element("privilege").setAttribute("name",
-            searchpriv));
+          uelm.addContent(new org.jdom.Element("privilege").setText(searchpriv));
           }
         }
       root.addContent(uelm);
