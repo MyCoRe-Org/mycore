@@ -29,6 +29,7 @@ import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.MCRUtils;
@@ -102,9 +103,12 @@ public class MCRCM8TransformXPathToCM8
 		for (int i = 0; i < subqueries.size(); i++) {
 			if (((Boolean) flags.get(i)).booleanValue())
 				continue;
+                        try {
 			cond
 				.append(' ')
-				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix));
+				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix)); }
+                        catch (MCRException me) {
+				logger.error(me.getMessage()); }
                         boolean fl = false;
                         for (int j=i+1;j<subqueries.size();j++) {
                                 if (!((Boolean) flags.get(j)).booleanValue())
