@@ -70,11 +70,12 @@ public interface MCROAIQuery {
 	/**
 	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
 	 * @param id The id of the object.
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 * 				and a JDOM element with the metadata of the record
 	 */
-	public List getRecord(String id);
+	public List getRecord(String id, String instance);
 		
 }

@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.jdom.Element;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -215,6 +217,15 @@ public class MCROAIQueryService implements MCROAIQuery {
 		return list;
 	}
 	
+	/**
+	 * Method getHeader. Gets the header information from the MCRObject <i>object</i>.
+	 * @param object The MCRObject
+	 * @param objectId The objectId as String representation
+	 * @param repositoryId The repository id
+	 * @return String[] Array of three Strings:  the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 */
 	private String[] getHeader(MCRObject object, String objectId, String repositoryId) {
 	    Calendar calendar = object.getService().getDate("modifydate");
 	    // Format the date.
@@ -235,6 +246,7 @@ public class MCROAIQueryService implements MCROAIQuery {
                 if (element.getTag().equals("subjects")) {
    		            for (int k = 0; k < element.size(); k++) {
            		        MCRMetaClassification classification = (MCRMetaClassification) element.getElement(k);
+           		        String classificationId = classification.getClassId();
                         String categoryId = classification.getCategId();
                         MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
                         MCRCategoryItem parent;
@@ -257,22 +269,26 @@ public class MCROAIQueryService implements MCROAIQuery {
 	/**
 	 * Method getRecord. Gets a metadata record with the given <i>id</id>.
 	 * @param id The id of the object.
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the identifier,
 	 * 				a datestamp (modification date) and a string with a blank
 	 * 				separated list of categories the element is classified in
 	 * 				and a JDOM element with the metadata of the record
 	 */
-	public List getRecord(String id) {
+	public List getRecord(String id, String instance) {
 		List list = new ArrayList();
 
         MCRObject object = new MCRObject();
         try {
+        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
             object.receiveFromDatastore(id);
-        } catch(MCRException e) {
+	    } catch (MCRConfigurationException mcrx) {
+	    	return null;
+        } catch (MCRException e) {
             return null;
         }
 	 	
-   		String[] identifier = getHeader(object, objectId, repositoryId);
+   		String[] identifier = getHeader(object, id, repositoryId);
    		list.add(identifier);
 
         Element eMetadata = object.getMetadata().createXML();

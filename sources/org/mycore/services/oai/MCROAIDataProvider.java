@@ -952,7 +952,6 @@ public class MCROAIDataProvider extends HttpServlet {
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
         
-        Element eRoot = document.getRootElement();
         Element eRequest = eRoot.getChild("request", ns);
         eRequest.setAttribute("verb", "GetRecord");
         eRequest.setAttribute("identifier", identifier[0]);
@@ -989,7 +988,7 @@ public class MCROAIDataProvider extends HttpServlet {
             Element eGetRecord = new Element("GetRecord", ns);
             
 		    if (record != null) {
-		    	ListIterator iterator = sets.listIterator();
+		    	ListIterator iterator = record.listIterator();
 	    	
 	    		String[] array = (String[]) iterator.next();
 	    		
