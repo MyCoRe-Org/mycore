@@ -9,7 +9,7 @@ export CM7_HOME=/usr/lpp/cmb
 export JAVA_HOME=/usr/java_dev2/jre
 export MYCORE_HOME=/dlwww/mycore
 export XERCES_HOME=/usr/local/src/xerces-1_4_4
-#export XERCES_HOME=/usr/local/src/XML4J-3_2_1
+export XALAN_HOME=/usr/local/src/xalan-j_2_2_D11
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_HOME/bin:$JAVA_HOME/bin/classic
 export LIBPATH=$LIBPATH:$LD_LIBRARY_PATH
@@ -24,13 +24,14 @@ CLASSPATH=$CLASSPATH:$CM7_HOME/lib/cmbcm71.jar
 CLASSPATH=$CLASSPATH:$CM7_HOME/lib/cmbdl71.jar
 CLASSPATH=$CLASSPATH:$CM7_HOME/lib/cmbjdbc71.jar
 CLASSPATH=$CLASSPATH:$CM7_HOME/lib/cmbfed71.jar
-CLASSPATH=$CLASSPATH:$XERCES_HOME/xerces.jar
-CLASSPATH=$CLASSPATH:$XERCES_HOME/xercesSamples.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/ant.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/crimson.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/jaxp.jar
+CLASSPATH=$CLASSPATH:$XERCES_HOME/xerces.jar
+CLASSPATH=$CLASSPATH:$XERCES_HOME/xercesSamples.jar
+CLASSPATH=$CLASSPATH:$XALAN_HOME/bin/xalan.jar
+CLASSPATH=$CLASSPATH:$XALAN_HOME/bin/xalansamples.jar
 CLASSPATH=$CLASSPATH:$MYCORE_HOME/classes
-CLASSPATH=$CLASSPATH:$MYCORE_HOME/demo_dublin_core/classes
 export CLASSPATH
 
 # Print environment
