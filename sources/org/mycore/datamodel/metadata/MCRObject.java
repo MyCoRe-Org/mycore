@@ -124,12 +124,14 @@ private final void set() throws MCRException
     .getAttribute("noNamespaceSchemaLocation",
      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL)).getValue()
      .trim();
+  logger.debug("MCRObject set1 schemafile: " + mcr_schema );
   // generate schemafile without path
   int i=0;
   int j=0;
   while (j!=-1) {
     j = mcr_schema.indexOf("/",i+1); if (j!=-1) { i = j; } }
   mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
+  logger.debug("MCRObject set2 schemafile: " + mcr_schema );
   // get the structure data of the object
   org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
   mcr_struct.setFromDOM(jdom_element);
@@ -215,6 +217,7 @@ public final org.jdom.Document createXML() throws MCRException
     MCRDefaults.XSI_URL));
   elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
     MCRDefaults.XLINK_URL));
+  logger.debug("MCRObject createXML schemafile: " + mcr_schema_path + "/" + mcr_schema );
   elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+"/"+mcr_schema,
     org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
   elm.setAttribute("ID",mcr_id.getId());
