@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -109,6 +110,14 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace"; 
     private static final String STR_OAI_METADATA_SCHEMA = "MCR.oai.metadata.schema"; 
     
+    // Following the DINI recommendation for OAI repositories
+    // (http://www.dini.de/documents/OAI-Empfehlungen-Okt2003-de.pdf) there
+    // there should be some classifications/categories defined which are very
+    // restrictive in usage. So this client provides a possibility to map
+    // from a far more detailed classification system to the simplistic
+    // DINI specification.
+    private static final String STR_OAI_CATEGORY_MAPPING = "MCR.oai.dini-mapping";
+    
     // Some constants referring to metadata formats (must be known for dc)
     private static final String STR_DC_NAMESPACE = "http://www.openarchives.org/OAI/2.0/oai_dc/";
     private static final String STR_DC_SCHEMA = "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
@@ -133,6 +142,8 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String[] STR_VERBS = {"GetRecord", "Identify",
         "ListIdentifiers", "ListMetadataFormats", "ListRecords",
         "ListSets"};
+
+    private static Map mappings = null;
 
 	/**
 	 * Method init. Initializes the Servlet when first loaded
@@ -1426,6 +1437,51 @@ public class MCROAIDataProvider extends HttpServlet {
 		
 		String id = buffer.toString();
 		return id;
+	}
+	
+	/**
+	 * @param element the Header element
+	 * @param spec the set specs
+	 * @param ns the Namespace of <code>element</code>
+	 * @return the new header element
+	 */
+	private Element setSpec(Element element, String setSpec, Namespace ns) {
+		if (mappings == null) {
+	        MCRConfiguration config = 
+	        	MCRConfiguration.instance();
+			Properties mappingProperties = 
+				config.getProperties(STR_OAI_CATEGORY_MAPPING);
+			if (mappingProperties.size() > 0) {
+				mappings = new HashMap();
+				Enumeration enumeration = mappingProperties.keys();
+				while (enumeration.hasMoreElements()) {
+					String propertyKey = (String) enumeration.nextElement();
+					String value = mappingProperties.getProperty(propertyKey);
+					StringTokenizer tokenizer = new StringTokenizer(value, " ");
+					String shortKey = ((String) propertyKey).
+							substring(
+									STR_OAI_CATEGORY_MAPPING.
+									length() + 1).replace('.', ':');
+			    	while (tokenizer.hasMoreTokens()) {
+			    		String token = tokenizer.nextToken();
+			    		mappings.put(token, shortKey);
+			    	}
+				}
+			}
+		}
+        if ((setSpec != null) && (setSpec.length() > 0)) {
+    	    StringTokenizer tokenizer = new StringTokenizer(setSpec, " ");
+    	
+	    	while (tokenizer.hasMoreTokens()) {
+	    		String spec = tokenizer.nextToken();
+	    		if ((mappings != null) && mappings.containsKey(spec)) {
+	    			spec = (String) mappings.get(spec);
+	    		}
+	    		element.addContent(newElementWithContent("setSpec", ns, spec));
+	    	}
+    	
+        }
+		return element;
 	}
 	
 	class TokenFileFilter implements FilenameFilter {
