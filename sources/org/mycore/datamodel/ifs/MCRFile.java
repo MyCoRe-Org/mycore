@@ -273,12 +273,12 @@ public class MCRFile extends MCRFilesystemNode
       MessageDigest digest = MCRContentInputStream.buildMD5Digest();
 
       DigestOutputStream dos = new DigestOutputStream( target, digest );
-      getContentStore().retrieveContent( this, target ); 
+      getContentStore().retrieveContent( this, dos ); 
       
       String md5_new = MCRContentInputStream.getMD5String( digest );
       if( ! this.md5.equals( md5_new ) )
       {
-        String msg = "MD5 Checksum failure while retrieving file content";
+        String msg = "MD5 Checksum failure while retrieving file content for file " + ID;
         throw new MCRPersistenceException( msg );
       }
     }
