@@ -241,7 +241,16 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 					flags.set(o, Boolean.FALSE);
 				}
 			}
-			searchfulltext = false;
+			int isfull = 0;
+			for (int p = 0; p < subqueries.size();p++) {
+				if (((String)subqueries.get(p)).startsWith("doctext()")) {
+					isfull++;
+					}
+			}
+			if (subqueries.size()==isfull) {
+				searchfulltext = false; }
+			else {
+				searchfulltext = true; }
 		}
 		result.cutDownTo(maxresults);
 		return result;
