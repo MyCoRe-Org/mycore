@@ -89,7 +89,7 @@ public final void setReference(String set_href, String set_label,
     super.setReference(hrefid.getId(),set_label,set_title); 
     }
   catch (Exception e) {
-    throw new MCRException("The href value is not a MCRObjectID."); }
+    throw new MCRException("The href value is not a MCRObjectID: "+set_href,e); }
   }
 
 /**
