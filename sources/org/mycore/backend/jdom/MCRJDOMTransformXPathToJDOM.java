@@ -385,7 +385,14 @@ private final String traceOneCondition(String condstr)
       }
     // date
     String test = MCRUtils.covertDateToISO(value[i]);
-    if (test != null) { value[i] = test; }
+    if (test != null) { 
+      value[i] = test;
+      sbout.append("java:org.mycore.backend.jdom.MCRXalanExtensions.compareDates(");
+      if (pathin[i].length() != 0) {
+        sbout.append(pathin[i]).append('/'); }
+      sbout.append(newtag).append(",\'").append(value[i]).append("\',\'").append(op[i]).append("\') ") .append(bool[i]);
+      continue;
+      }
     // numerical
     if (op[i].equals("<") || op[i].equals(">") || op[i].equals("<=") || op[i].equals(">=")) {
       if (pathin[i].length() != 0) {

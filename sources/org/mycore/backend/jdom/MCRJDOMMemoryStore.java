@@ -118,8 +118,8 @@ public final org.jdom.Document getStylesheet(String query)
     foreach.removeAttribute("select");
     foreach.setAttribute("select",query);
     // debug
-    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-    outputter.output(xslfile, System.out);
+    //org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+    //outputter.output(xslfile, System.out);
     }
   catch (Exception e) {
     throw new MCRException("Error while show XML to file."); }
