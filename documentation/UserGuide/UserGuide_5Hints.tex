@@ -19,11 +19,18 @@
 \begin{enumerate}
 \item Stoppen Sie alle WebSphere Anwendungen, die den CM benutzen.
 \item \mcrcommand{su - db2inst1}
+\item \mcrcommand{db2text stop}
 \item \mcrcommand{db2 force application all}
 \item \mcrcommand{db2 drop database icmnlsdb}
+\item \mcrcommand{rm -rf /db2/db2inst1/sqllib/db2ext/<your indexes>}
 \item \mcrcommand{exit}
 \item \mcrcommand{su - db2fenc1}
 \item \mcrcommand{rm -Rf ICMNLSDB}
+\item \mcrcommand{exit}
+\item \mcrcommand{reboot}
+\item \mcrcommand{su - db2inst1}
+\item \mcrcommand{db2start}
+\item \mcrcommand{db2text start}
 \item \mcrcommand{exit}
 \item \mcrcommand{cd /usr/lpp/icm/config}
 \item \mcrcommand{./icmcreatelsdb}
@@ -35,7 +42,7 @@
 \item \mcrcommand{./icmcreatermdb}
 \item Sie werden nun nach einer Reihe von Angaben abgefragt, welche Sie den Aufzeichnungen Ihrer Erstinstallation entnehmen können. In \mcrfile{/tmp/icmcrrmdb.log} finden Sie das Protokoll des Rebuild.
 \end{enumerate}
-Nach dem Neuanlegen der Instanzen sollte jedesmal der Encryption Key neu generiert werden. Die geschieht wie folgend:
+Es ist jetzt sinnvoll, Ihr System zu rebooten und alle Komponenten wieder zu starten. Nach dem Neuanlegen der Instanzen sollte jedesmal der Encryption Key neu generiert werden. Die geschieht wie folgend:
 \begin{enumerate}
 \item Start des Sysadmin Client unter Windows
 \item LibraryServerParameters $\rightarrow$ Configurations $\rightarrow$ {\bf Refresh cncryption key}
