@@ -161,6 +161,7 @@ public class MCRLayoutServlet extends HttpServlet
   protected String chooseStylesheet( HttpServletRequest req, org.jdom.Document jdom )
   {
     String style = req.getParameter( "style" );
+    if( style == null ) style = (String)( req.getAttribute( "style" ) );
    
     // "style=XML" means output as XML, do not use a stylesheet
     if( "xml".equals( style ) ) return null;
