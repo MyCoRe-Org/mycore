@@ -36,13 +36,13 @@ import org.mycore.common.MCRUtils;
  * TextSearch or store in a parametric database and a text search. The
  * data are in an internal format that knows the data format of them. 
  * This is the different to the simple XML string.<p>
- * The XML data was stored in a table they has rows of <br>
+ * The XML data was stored in a table they has rows of <br />
  * <ul>
- * <li>type - the types MASTERTAG, TAG, SUBTAG, VALUE, ATTRIBUTE
- * <li>name - the name of this MASTERTAG, TAG, SUBTAG, ATTRIBUTE
- * <li>format - the data format of the VALUE or ATTRIBUTE
- * <li>value - the value of the VALUE or ATTRIBUTE
- * <li>tsflag - the flag for using this data in Text Search
+ * <li>type - the types MASTERTAG, TAG, SUBTAG, VALUE, ATTRIBUTE</li>
+ * <li>name - the name of this MASTERTAG, TAG, SUBTAG, ATTRIBUTE</li>
+ * <li>format - the data format of the VALUE or ATTRIBUTE</li>
+ * <li>value - the value of the VALUE or ATTRIBUTE</li>
+ * <li>tsflag - the flag for using this data in Text Search</li>
  * </ul>
  *
  * @author Jens Kupferschmidt
