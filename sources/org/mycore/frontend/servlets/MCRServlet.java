@@ -299,6 +299,9 @@ protected String getProperty(HttpServletRequest request, String name) {
 	//if Attribute not given try Parameter
 	if (value == null || value.length() == 0)
 		value = request.getParameter(name);
+	//this fixes NullPointerException with value.getBytes() below
+	if (value == null || value.length() == 0)
+		return value;
 	//fix encoding bug using solution of
 	//http://www.jguru.com/faq/view.jsp?EID=137281
 	try {
