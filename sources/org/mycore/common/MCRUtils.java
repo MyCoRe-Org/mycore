@@ -33,6 +33,8 @@ import java.text.*;
  * the programming API.
  *
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ *
  * @version $Revision$ $Date$
  **/
 public class MCRUtils
@@ -250,5 +252,25 @@ public static final byte [] getByteArray(org.jdom.Document jdom)
   return outb.toByteArray();
   }
 
+/**
+ * Copies all content read from the given input stream to the
+ * given output stream. Note that this method will NOT close the streams
+ * when finished copying.
+ *
+ * @param in the InputStream to read the bytes from
+ * @param out the OutputStream to write the bytes to
+ **/
+  public void copyStream( InputStream in, OutputStream out )
+    throws IOException
+  {
+    MCRArgumentChecker.ensureNotNull( in, "InputStream in"    );
+    MCRArgumentChecker.ensureNotNull( out, "OutputStream out" );
+    
+    byte[] buffer = new byte[ 65536 ] ;
+    int num;
+      
+    while( ( num = in.read( buffer ) ) != -1 )
+      out.write( buffer, 0, num );
+  }
 } 
 
