@@ -29,7 +29,6 @@ import javax.servlet.http.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jdom.DocType;
@@ -90,7 +89,7 @@ public class MCRServlet extends HttpServlet
     if( contextPath == null ) contextPath = "";
     contextPath += "/";
 
-    String requestURL = HttpUtils.getRequestURL( req ).toString();
+    String requestURL = req.getRequestURL().toString();
     int pos = requestURL.indexOf( contextPath, 9 );
     baseURL = requestURL.substring( 0, pos ) + contextPath;
 
@@ -131,6 +130,14 @@ public class MCRServlet extends HttpServlet
                          HttpServletResponse res, boolean GETorPOST)
                          throws ServletException, IOException
   {
+		// Try to set encoding of form values
+		ReqCharEncoding = req.getCharacterEncoding();
+		if (ReqCharEncoding == null) {
+			// Set default to UTF-8
+			ReqCharEncoding = config.getString("MCR.request_charencoding","UTF-8");
+			req.setCharacterEncoding(ReqCharEncoding);
+			logger.debug("Setting ReqCharEncoding to: "+ReqCharEncoding);
+		}
     String c = getClass().getName();
            c = c.substring(c.lastIndexOf( "." ) + 1);
 
@@ -182,12 +189,6 @@ public class MCRServlet extends HttpServlet
       String lang = getStringParameter(job, "lang");
       if (lang.trim().length() != 0)
         session.setCurrentLanguage(lang.trim().toUpperCase());
-			// Try to set encoding of form values
-			ReqCharEncoding = req.getCharacterEncoding();
-			if (ReqCharEncoding == null) {
-				// Set default to UTF-8
-				ReqCharEncoding = "UTF-8";
-			}
       if( GETorPOST == GET ) doGet( job ); else doPost( job );
     }
 
@@ -302,16 +303,6 @@ protected String getProperty(HttpServletRequest request, String name) {
 	//this fixes NullPointerException with value.getBytes() below
 	if (value == null || value.length() == 0)
 		return value;
-	//fix encoding bug using solution of
-	//http://www.jguru.com/faq/view.jsp?EID=137281
-	try {
-		logger.debug("Char encoding ("+ReqCharEncoding+"): "+value);
-		value = new String(value.getBytes(), ReqCharEncoding);
-		logger.debug(" - to: "+value);
-	} catch (UnsupportedEncodingException e) {
-		//OK, we tried it!!
-		logger.warn("Failed to convert bytes to String using ChracterEncoding: "+ReqCharEncoding,e);
-	}
 	return value;
 }
   
