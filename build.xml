@@ -198,7 +198,6 @@
         </uptodate>
       </not>
     </condition>
-    <echo>JavaDocs outdated: ${javadocs.outdated} ${basedir}</echo>
 
     <condition property="pdf.outdated">
       <not>
@@ -209,7 +208,6 @@
         </uptodate>
       </not>
     </condition>
-    <echo>PDF outdated: ${pdf.outdated}</echo>
 
   </target>
 
