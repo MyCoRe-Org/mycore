@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.1 $ $Date: 2004-11-17 16:49:04 $ -->
+<!-- $Revision: 1.2 $ $Date: 2004-11-18 09:09:58 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -35,7 +35,7 @@
 	</target>
 
 	<!-- ============================================== -->
-
+	<!-- ============================================== -->
 	<target name="docportal">
 		<echo>
            Execute installation procedure to plug Module-WCMS into DocPortal
@@ -48,24 +48,11 @@
 	</target>
 
 	<!-- ============================================== -->
-
-	<target name="webapp">
-		<echo>
-           Execute installation procedure to update Module-WCMS in DocPortal
-    </echo>
-
-		<subant target="webapp" inheritall="true" inheritrefs="true">
-			<fileset dir="." includes="appsSupport/DocPortal/build.xml" />
-		</subant>
-
-	</target>
 	
-	<!-- ============================================== -->
-
 	<target name="cleanDocportal">
 		<echo>
            Execute installation procedure to remove Module-WCMS out of DocPortal
-    </echo>
+	    </echo>
 
 		<subant target="clean" inheritall="true" inheritrefs="true">
 			<fileset dir="." includes="appsSupport/DocPortal/build.xml" />
@@ -74,7 +61,7 @@
 	</target>	
 	
 	<!-- ============================================== -->	
-	
+	<!-- ============================================== -->	
 </project>
 
 <!-- ============================================== -->
