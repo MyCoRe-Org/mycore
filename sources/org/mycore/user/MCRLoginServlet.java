@@ -27,7 +27,11 @@ package org.mycore.user;
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.jdom.*;
 import org.mycore.common.*;
+import org.mycore.frontend.servlets.*;
 import org.mycore.user.*;
 
 /**
@@ -37,159 +41,137 @@ import org.mycore.user.*;
  * @version $Revision$ $Date$
  */
 
-public class MCRLoginServlet extends HttpServlet
+public class MCRLoginServlet extends MCRServlet
 {
-  /**
-   * This method overrides doGet of HttpServlet. It is the most important method
-   * of this servlet.
-   */
-  public void doGet(HttpServletRequest request,
-                    HttpServletResponse response)
-                    throws IOException, ServletException
+  // The configuration
+  private static MCRConfiguration config;
+  private static Logger logger=Logger.getLogger(MCRLoginServlet.class);
+
+  // user ID and password of the guest user
+  private static String guestID  = null;
+  private static String guestPWD = null;
+
+  /** Initialisation of the servlet */
+  public void init()
+  {
+    MCRConfiguration.instance().reload(true);
+    config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+
+    guestID  = config.getString("MCR.users_guestuser_username","gast");
+    guestPWD = config.getString("MCR.users_guestuser_userpasswd","gast");
+  }
+
+  /** This method overrides doGetPost of MCRServlet. */
+  public void doGetPost(MCRServletJob job) throws Exception
   {
     try
     {
-      String userID;
-      HttpSession theSession;
+      boolean loginOk = false;
+      String uid = getStringParameter(job, "uid").trim();
+      String pwd = getStringParameter(job, "pwd").trim();
+      String url = getStringParameter(job, "url").trim();
 
-      // get the current session; create a new one if it doesn't exist
-      theSession = request.getSession(true);
-      response.setContentType("text/html");   // MIME type to return is HTML
-      PrintWriter out = response.getWriter(); // get a handle to the output stream
+      if (uid.length() == 0) uid = null;
+      if (pwd.length() == 0) pwd = null;
+      if( url.length() == 0 ) url = null;
 
-      // print out common html head data
-      out.println("<HTML><HEAD>");
-      out.println("<TITLE>" + "Login" + "</TITLE>");
-      out.println("</HEAD>");
-      out.println("<BODY bgcolor=\"#DCFFDC\">");
-      out.println("<P><BR><CENTER><H2>MyCoRe Login</H2></CENTER><P>");
-
-      // Test if a logoff request has been submitted. If yes, invalidate the session
-      // and create a new one.
-      String invalidate = request.getParameter("INVALIDATE");
-      if (invalidate != null) {
-        theSession.invalidate();
-        theSession = request.getSession(true);
+      // Do not change login, just redirect to given url:
+      if (job.getSession().getCurrentUserID().equals(uid) && (pwd == null) && (url != null)) {
+        job.getResponse().sendRedirect(url);
+        return;
       }
 
-      if (theSession.isNew()) {        // first time the client requests this page or
-        printAuthenticationForm(out);  // a previous session has been invalidated
-      }
-      else  // client has already established a session
-      {
-        if (theSession.getAttribute("XSL.CurrentUser") == null)
-        {
-          // client has submitted the previous login data form, but there is not yet
-          // an entry in the session data. We get the data and try to login to the system.
+      if (url == null) url = MCRServlet.getBaseURL();
 
-          userID = (String)request.getParameter("UserID").trim();  // get the userID from the request
-          String passwd = request.getParameter("Password").trim(); // get the password from the request
+      org.jdom.Element root = new org.jdom.Element("mcr_user");
+      org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-          if (MCRUserMgr.instance().retrieveUser(userID) == null)  // no such user available
-            printAuthenticationFailed(out, "Diese User ID ist nicht bekannt.");
-          else {
-            if (MCRUserMgr.instance().login(userID, passwd)) {
-              theSession.setAttribute("XSL.CurrentUser", userID);  // store the user ID in the session
-              printAuthenticationOK(out, userID);
-              printTaskList(out, userID);  // show all the possible tasks for this user
-            }
-            else { // user exists but wrong passowrd
-              printAuthenticationFailed(out, "Die User ID ist bekannt aber das Passwort ist falsch.");
-            }
-          }
+      root.addContent(new org.jdom.Element("guest_id").addContent(guestID));
+      root.addContent(new org.jdom.Element("guest_pwd").addContent(guestPWD));
+
+      try {
+        loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
+
+        // If the login attempt was successfull, change the user ID and redirect to target URL
+        if (loginOk) {
+          job.getSession().setCurrentUserID(uid);
+          job.getRequest().getSession().setAttribute( "XSL.CurrentUser", uid );
+          job.getResponse().sendRedirect(url);
+          return;
         }
         else {
-          // client has previously submitted the login data form and there is an
-          // entry in the session data
-          userID = (String)theSession.getAttribute("XSL.CurrentUser");
-          printAuthenticationOK(out, userID);
-          printTaskList(out, userID);  // show all the possible tasks for this user
+          if (uid != null)
+            root.setAttribute("invalid_password", "true");
         }
       }
-      out.println("</BODY></HTML>");
-      out.close();
-    }
-
-    catch (Exception e) {
-      throw new ServletException("Exception occured: " +e);
-    }
-  } // end of doGet()
-
-  /** Überschreiben der Methode doPost() */
-  public void doPost(HttpServletRequest request,
-                     HttpServletResponse response)
-                     throws IOException, ServletException
-  {
-    doGet(request, response);
-  }
-
-  /** HTML-Eingabeformular für die Login-Daten */
-  private void printAuthenticationForm(PrintWriter out)
-  {
-    // generate HTML form requesting login data
-    out.println("<P><CENTER>Sie sind nicht angemeldet. Bitte geben Sie Ihre Login-Daten ein:</CENTER><P>");
-    out.println("<P><HR><FORM METHOD=\"POST\">");
-    out.println("<CENTER><TABLE BORDER=\"0\">");
-    out.println("<TR>");
-    out.println("<TD>User ID : </TD>");
-    out.println("<TD><INPUT TYPE=\"TEXT\" SIZE=14 NAME=\"UserID\"></TD>");
-    out.println("</TR><TR>");
-    out.println("<TD>Passwort: </TD>");
-    out.println("<TD><INPUT TYPE=\"PASSWORD\" SIZE=14 NAME=\"Password\"></TD>");
-    out.println("</TR>");
-    out.println("</TABLE></CENTER><P>");
-    out.println("<CENTER><INPUT TYPE=\"SUBMIT\" NAME=\"USER\" VALUE=\"bitte anmelden\"></CENTER>");
-    out.println("</FORM><P><HR><P>");
-  }
-
-  /** HTML-Ausgabe für eine gelungene Anmeldung */
-  private void printAuthenticationOK(PrintWriter out, String userID)
-  {
-    out.println("<P><CENTER>Sie sind angemeldet als: <FONT COLOR=\"#FF0000\">"+userID+"</FONT></CENTER><P>");
-    out.println("<P><CENTER>Um eine andere User ID verwenden zu können, müssen");
-    out.println("Sie sich zunächst abmelden.</CENTER><P>");
-    out.println("<P><FORM METHOD=\"POST\">");
-    out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"INVALIDATE\" VALUE=\"TRUE\">");
-    out.println("<CENTER><INPUT TYPE=\"SUBMIT\" VALUE=\"abmelden\"></CENTER>");
-    out.println("</FORM><HR><P>");
-  }
-
-  /** HTML-Ausgabe für eine misslungene Anmeldung */
-  private void printAuthenticationFailed(PrintWriter out, String whatIsWrong)
-  {
-    out.println("<P><CENTER>Ihre Anmeldedaten sind nicht korrekt.</CENTER><BR>");
-    out.println("<CENTER><U>Fehler:</U> "+whatIsWrong+"</CENTER><BR>");
-    out.println("<CENTER>Bitte versuchen Sie es noch einmal!</CENTER><P>");
-    out.println("<P><FORM METHOD=\"POST\">");
-    out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"INVALIDATE\" VALUE=\"TRUE\">");
-    out.println("<CENTER><INPUT TYPE=\"SUBMIT\" VALUE=\"wiederholen\"></CENTER>");
-    out.println("</FORM><HR><P>");
-  }
-
-  /** HTML-Ausgabe für Aufgaben, die von der angemeldeten UserID ausgeführt werden können */
-  private void printTaskList(PrintWriter out, String userID) throws ServletException
-  {
-    try {
-      MCRUser theUser = MCRUserMgr.instance().retrieveUser(userID);
-      out.println("<P>Sie haben die Privilegien, die folgenden Tätigkeiten durchzuführen:<P>");
-      out.println("<UL>");
-      if (theUser.isUpdateAllowed()) {
-        out.println("<LI><A HREF=\"ChangePassword\">Passwortänderung (aktueller user)</A>");
-        out.println("<LI><A HREF=\"EditUser?userID="+userID+"\">Datenänderung (aktueller user)</A>");
+      catch (MCRException e) {
+        if (e.getMessage().equals("Unknown user.")) {
+          root.setAttribute("unknown_user", "true");
+          logger.info("MCRLoginServlet: unknown user:" + uid);
+        }
+        else if (e.getMessage().equals("Login denied. User is disabled.")) {
+          root.setAttribute("user_disabled", "true");
+          logger.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
+        }
+        else throw e;
       }
-      if (theUser.hasPrivilege("create user"))
-        out.println("<LI><A HREF=\"CreateUser\">Einrichten einer neuen User ID</A>");
-      if (theUser.hasPrivilege("modify user"))
-        out.println("<LI><A HREF=\"EditUser\">Ändern der Daten anderer User Accounts</A>");
-      if (theUser.hasPrivilege("list all users"))
-        out.println("<LI><A HREF=\"ListAllUsers\">Auflisten aller Benutzer/-innen</A>");
-      if (theUser.hasPrivilege("list all privileges"))
-        out.println("<LI><A HREF=\"ListPrivilegeSet\">Auflisten der vorhandenen Privilegien im System</A>");
-      out.println("</UL><P><HR>");
+
+      root.addContent(new org.jdom.Element("url").addContent(url));
+      doLayout(job, "login", jdomDoc);
     }
 
     catch (Exception e) {
-      throw new ServletException("Exception occured: " +e);
+      throw new Exception("Exception occured: " +e);
     }
+  }
+
+  /**
+   * Gather information about the XML document to be shown and the corresponding XSLT
+   * stylesheet and redirect the request to the LayoutServlet
+   *
+   * @param job
+   * @param styleBase
+   * @param jdomDoc
+   * @throws ServletException
+   * @throws IOException
+   */
+  protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc)
+                          throws ServletException, IOException
+  {
+    // We get the desired language either from the request or from the session and build
+    // the corresponding name for the XSLT stylesheet. If there is a language parameter
+    // in the request, this takes precedence over the session parameter (otherwise one
+    // would not be able to choose another language).
+
+    String language = job.getRequest().getParameter("lang");
+    String language_session = (String)job.getRequest().getSession().getAttribute("mycore.language");
+
+    // We try to determine the locale of the client from the request and set the default language
+    String language_locale = job.getRequest().getHeader("Accept-Language");
+
+    if (language_locale.toUpperCase().trim().equals("DE"))
+      language_locale = "DE";
+    else if (language_locale.toUpperCase().trim().equals("EN"))
+      language_locale = "EN";
+    else if (language_locale.toUpperCase().trim().equals("EN-US"))
+      language_locale = "EN";
+    else language_locale = "DE";
+
+    if (language == null) { // no language definition in the request
+      if (language_session != null) language = language_session;
+      else language = language_locale; // use the default language
+    }
+
+    language = language.toUpperCase();
+    job.getRequest().getSession().setAttribute("mycore.language", language );
+    job.getRequest().getSession().setAttribute("XSL.CurrentUser", job.getSession().getCurrentUserID());
+
+    String styleSheet = styleBase + "-" + language;
+    job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
+    job.getRequest().setAttribute("XSL.Style", styleSheet);
+
+    RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+    rd.forward(job.getRequest(), job.getResponse());
   }
 }
