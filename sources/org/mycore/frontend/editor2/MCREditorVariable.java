@@ -24,109 +24,71 @@
 
 package org.mycore.frontend.editor2;
 
-import org.mycore.common.*;
-
-import org.apache.log4j.*;
 import org.apache.commons.fileupload.*;
-
 import org.jdom.Element;
-
 import java.util.*;
 import java.text.*;
 
 /**
- * A single variable that was submitted from a MyCoRe
- * XML editor form.
+ * A single variable holding a value that was edited 
+ * in a MyCoRe XML editor form.
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-class MCREditorVariable implements Comparable
+public class MCREditorVariable implements Comparable
 {
-  protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
-
-  String   name;
-  String   value;
-  String   sortPattern;
-  String   attributeName;
-  String[] pathElements;
-  Element  component;
-  String   autofill;
-  FileItem file;
+  // Required attributes
+  private String path;
+  private String value;
   
-  MCREditorVariable( String name, String value, String sortNr, FileItem file, Element component )
+  // Auto-generated attributes
+  private String[] pathElements;
+  private String attributeName;
+  
+  // Optional attributes
+  private FileItem file = null;
+  private String sortPattern = "";
+  
+  MCREditorVariable( String path, String value )
   {
-    this.name      = name;
-    this.value     = value;
-    this.component = component;
-    this.file      = file;
-
-    if( component != null )
-    {
-      String attrib = component.getAttributeValue( "autofill" );
-      String elem   = component.getChildTextTrim( "autofill" );
-
-      if( ( attrib != null ) && ( attrib.trim().length() > 0 ) )
-        this.autofill = attrib.trim();
-      else if( ( attrib != null ) && ( attrib.trim().length() > 0 ) )
-        this.autofill = elem.trim();
-    }
-
-    buildSortPattern( sortNr );
-    buildPathElements( name );
-  }
-
-  MCREditorVariable( String name, String value )
-  {
-    this.name  = name;
+    this.path  = path;
     this.value = value;
+    
+    buildPathElements();
   }
 
-  public Element buildXML()
-  {
-    Element var = new Element( "var" );
-    var.setAttribute( "name", name );
-    var.setAttribute( "value", value );
-    return var;
-  }
-  
-  public String getName()
-  { return name; }
+  public String getPath()
+  { return path; }
   
   public String getValue()
   { return value; }
   
+  Element asInputElement()
+  {
+    Element var = new Element( "var" );
+    var.setAttribute( "name",  path  );
+    var.setAttribute( "value", value );
+    return var;
+  }
+  
+  void setFile( FileItem file )
+  { this.file = file; }
+
   public FileItem getFile()
   { return file; }
   
-  public int compareTo( Object o )
-  {
-    MCREditorVariable other = (MCREditorVariable)o;
-
-    int length = Math.min( other.sortPattern.length(), this.sortPattern.length() );
-    String spo = other.sortPattern.substring( 0, length );
-    String spt = this .sortPattern.substring( 0, length );
-    return spt.compareTo( spo );
-  }
+  public boolean isAttribute()
+  { return ( attributeName != null ); }
   
-  private static DecimalFormat df = new DecimalFormat( "0000" );
+  public String getAttributeName()
+  { return attributeName; }
 
-  private void buildSortPattern( String sortNr )
+  public String[] getPathElements()
+  { return pathElements; }
+  
+  private void buildPathElements()
   {
-    StringTokenizer st = new StringTokenizer( sortNr, "." );
-    StringBuffer sb = new StringBuffer();
-    while( st.hasMoreTokens() )
-    {
-      int number = Integer.parseInt( st.nextToken() );
-      sb.append( df.format( number ) );
-    }
-    this.sortPattern = sb.toString();
-  }
-
-  private void buildPathElements( String path )
-  {
-    this.attributeName = null;
-      
     ArrayList elements = new ArrayList();
     for( StringTokenizer st = new StringTokenizer( path, "/" ); st.hasMoreTokens(); )
     {
@@ -137,6 +99,30 @@ class MCREditorVariable implements Comparable
         elements.add( token ); 
     }
     pathElements = ( String[] )( elements.toArray( new String[ 0 ] ) );
+  }
+  
+  void setSortNr( String sortNr )
+  {
+    StringTokenizer st = new StringTokenizer( sortNr, "." );
+    StringBuffer sb = new StringBuffer();
+    while( st.hasMoreTokens() )
+    {
+      int number = Integer.parseInt( st.nextToken() );
+      sb.append( sortFormatter.format( number ) );
+    }
+    this.sortPattern = sb.toString();
+  }
+  
+  private static DecimalFormat sortFormatter = new DecimalFormat( "0000" );
+  
+  public int compareTo( Object o )
+  {
+    MCREditorVariable other = (MCREditorVariable)o;
+
+    int length = Math.min( other.sortPattern.length(), this.sortPattern.length() );
+    String spo = other.sortPattern.substring( 0, length );
+    String spt = this .sortPattern.substring( 0, length );
+    return spt.compareTo( spo );
   }
 }
 

@@ -25,15 +25,10 @@
 package org.mycore.frontend.editor2;
 
 import org.mycore.common.*;
-
 import org.apache.log4j.*;
 import org.apache.commons.fileupload.*;
-
-import java.net.*;
 import java.io.*;
 import java.util.*;
-
-import javax.servlet.*;
 import javax.servlet.http.*;
 
 /**

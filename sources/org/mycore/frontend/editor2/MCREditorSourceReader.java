@@ -25,14 +25,9 @@
 package org.mycore.frontend.editor2;
 
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-
 import org.mycore.common.*;
 import org.mycore.frontend.servlets.*;
-
 import org.jdom.Element;
-import org.jdom.Attribute;
 
 /**
  * This class contains the functionality to read XML input that
@@ -103,7 +98,7 @@ public class MCREditorSourceReader
 
       MCREditorServlet.logger.info( "Editor reading XML input from " + url );
       Element input = MCREditorResolver.readXML( url );
-      return new MCREditorSubmission( input ).buildSourceVarXML();
+      return new MCREditorSubmission( input ).buildInputElements();
     }
   }
 }

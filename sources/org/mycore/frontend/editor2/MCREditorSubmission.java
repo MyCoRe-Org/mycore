@@ -24,46 +24,45 @@
 
 package org.mycore.frontend.editor2;
 
-import org.mycore.common.*;
-
-import org.apache.log4j.*;
 import org.apache.commons.fileupload.*;
-
 import org.jdom.*;
-
 import java.util.*;
 
 /**
- * Container class that holds all data and files submitted
- * from an HTML page that contains a MyCoRe XML editor form.
+ * Container class that holds all data and files edited and
+ * submitted from an HTML page that contains a 
+ * MyCoRe XML editor form.
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
 public class MCREditorSubmission
 {
-  protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
-
   private List variables = new ArrayList();
   private List files     = new ArrayList();
   
-  private Document xml;
-  
   private Hashtable node2file = new Hashtable();
   private Hashtable file2node = new Hashtable();
-  
+ 
   private MCRRequestParameters parms;
+  
+  private Document xml;
+  
+  /**
+   * Set variables from source xml file that should be edited
+   * 
+   * @param input the root element of the XML input
+   */
+  MCREditorSubmission( Element input )
+  { setVariablesFromElement( input, "/", "" ); }
   
   MCREditorSubmission( MCRRequestParameters parms, Element editor )
   {
     this.parms = parms;
-    buildVariables( parms, editor );
+    
+    setVariablesFromSubmission( parms, editor );
     Collections.sort( variables );
-    buildXML();
   }
-
-  MCREditorSubmission( Element input )
-  { setVariablesFromElement( input, "/", "" ); }
 
   private void setVariablesFromElement( Element element, String prefix, String suffix )
   {
@@ -97,16 +96,75 @@ public class MCREditorSubmission
     }
   }
 
+  private void setVariablesFromSubmission( MCRRequestParameters parms, Element editor )
+  {
+    for( Enumeration e = parms.getParameterNames(); e.hasMoreElements(); )
+    {
+      String name = (String)( e.nextElement() );
+      if( name.startsWith( "_" ) ) continue; // Skip internal request params
+      
+      String[] values = parms.getParameterValues( name );
+      String sortNr   = parms.getParameter( "_sortnr-" + name );
+      String ID       = parms.getParameter( "_id@" + name );
+
+      // Skip files that should be deleted
+      String delete = parms.getParameter( "_delete-" + name );
+      if( "true".equals( delete ) && ( parms.getFileItem( name ) == null ) ) continue;
+
+      // Skip request params that are not input but target params
+      if( sortNr == null ) continue;
+
+      // For each value
+      for( int k = 0; ( values != null ) && ( k < values.length ); k++ )
+      {
+        String value = values[ k ];
+        if( ( value == null ) || ( value.trim().length() == 0 ) ) continue;
+        
+        // Handle multiple variables with same name: checkboxes & select multiple
+        String nname = ( k == 0 ? name : name + "[" + (k+1) + "]" );
+
+        MCREditorVariable var = new MCREditorVariable( nname, value );
+        var.setSortNr( sortNr );
+
+        // Add associated component from editor definition
+        if( ( ID != null ) && ( ID.trim().length() > 0 ) )
+        {
+          Element component = MCREditorDefReader.findElementByID( ID, editor );
+          if( component != null )
+          {
+            // Skip variables with values equal to autofill text
+            String attrib = component.getAttributeValue( "autofill" );
+            String elem   = component.getChildTextTrim( "autofill" );
+            String autofill = null;
+
+            if( ( attrib != null ) && ( attrib.trim().length() > 0 ) )
+              autofill = attrib.trim();
+            else if( ( attrib != null ) && ( attrib.trim().length() > 0 ) )
+              autofill = elem.trim();
+            
+            if( value.trim().equals( autofill.trim() ) ) continue;
+          }
+        }
+        
+        variables.add( var );
+        
+        FileItem file = parms.getFileItem( name ); 
+        if( file != null ) // Add associated uploaded file if it exists
+        {
+          var.setFile( file );
+          files.add( file );
+        }
+      }
+    }
+  }
+
   private void addVariable( String path, String text )
   {
     if( ( text == null ) || ( text.trim().length() == 0 ) ) return;
 
-    MCREditorServlet.logger.debug( "Editor XML input " + path + "=" + text );
+    MCREditorServlet.logger.debug( "Editor variable " + path + "=" + text );
     variables.add( new MCREditorVariable( path, text ) );
   }
-
-  public MCRRequestParameters getParameters()
-  { return parms; }
 
   public List getVariables()
   { return variables; }
@@ -114,93 +172,50 @@ public class MCREditorSubmission
   public List getFiles()
   { return files; }
   
-  public Document getXML()
-  { return xml; }
-  
   public FileItem getFile( Object xmlNode )
-  { return (FileItem)( node2file.get( xmlNode ) ); }
-
-  public Object getXMLNode( FileItem file )
-  { return file2node.get( file ); }
-
-  private void buildVariables( MCRRequestParameters parms, Element editor )
   {
-    for( Enumeration e = parms.getParameterNames(); e.hasMoreElements(); )
-    {
-      String name = (String)( e.nextElement() );
-      if( name.startsWith( "_" ) ) continue;
-      
-      String[] values = parms.getParameterValues( name );
-      String sortNr   = parms.getParameter( "_sortnr-" + name );
-      String ID       = parms.getParameter( "_id@" + name );
-      String delete   = parms.getParameter( "_delete-" + name );
-
-      if( "true".equals( delete ) && ( parms.getFileItem( name ) == null ) ) continue;
-      if( sortNr == null ) continue;
-      if( ( values == null ) || ( values.length == 0 ) ) continue;
-
-      for( int k = 0; k < values.length; k++ )
-      {
-        String value = values[ k ];
-        if( ( value == null ) || ( value.trim().length() == 0 ) ) continue;
-        String nname = ( k == 0 ? name : name + "[" + (k+1) + "]" );
-
-        Element component = resolveComponent( editor, ID );
-        FileItem file = parms.getFileItem( name );
-
-        MCREditorVariable var = new MCREditorVariable( nname, value, sortNr, file, component );
-        if( ! var.value.trim().equals( var.autofill ) )
-        { 
-          variables.add( var );
-          if( file != null ) files.add( file );
-        }
-      }
-    }
+    if( xml == null ) buildTargetXML();
+    return (FileItem)( node2file.get( xmlNode ) ); 
   }
 
-  Element buildSourceVarXML()
+  public Object getXMLNode( FileItem file )
+  { 
+    if( xml == null ) buildTargetXML();
+    return file2node.get( file ); 
+  }
+
+  public Document getXML()
+  { 
+    if( xml == null ) buildTargetXML();
+    return xml; 
+  }
+  
+  Element buildInputElements()
   {
     Element input = new Element( "input" );
     for( int i = 0; i < variables.size(); i++ )
     {
       MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
-      input.addContent( var.buildXML() );
+      input.addContent( var.asInputElement() );
     }
     return input;
   }
   
-  private Element resolveComponent( Element parent, String ID )
-  {
-    if( ( ID == null ) || ( ID.trim().length() == 0 ) ) return null;
-    
-    List children = parent.getChildren();
-    for( int i = 0; i < children.size(); i++ )
-    {
-      Element child = (Element)( children.get( i ) );
-      if( ID.equals( child.getAttributeValue( "id" ) ) )
-        return child;
-      else
-      {
-        Element found = resolveComponent( child, ID );
-        if( found != null ) return found;
-      }
-    }
-    return null;
-  }
+  public MCRRequestParameters getParameters()
+  { return parms; }
 
-  private void buildXML()
+  private void buildTargetXML()
   {
     MCREditorVariable first = (MCREditorVariable)( variables.get( 0 ) );  
-    Element root = new Element( first.pathElements[ 0 ] );
+    Element root = new Element( first.getPathElements()[ 0 ] );
 
     for( int i = 0; i < variables.size(); i++ )
     {
       MCREditorVariable var = (MCREditorVariable)( variables.get( i ) ); 
-      MCREditorServlet.logger.debug( var.getName() + "=" + var.getValue() );
 
       Element  parent   = root;
-      String[] elements = var.pathElements;
-
+      String[] elements = var.getPathElements();
+      
       for( int j = 1; j < elements.length; j++ )
       {
         String name = elements[ j ];
@@ -222,18 +237,18 @@ public class MCREditorSubmission
     
       Object node;
         
-      if( var.attributeName == null ) 
+      if( ! var.isAttribute() ) 
       {
-        parent.addContent( var.value );     
+        parent.addContent( var.getValue() );     
         node = parent;
       }
       else
       {
-        parent.setAttribute( var.attributeName, var.value );
-        node = parent.getAttribute( var.attributeName );
+        parent.setAttribute( var.getAttributeName(), var.getValue() );
+        node = parent.getAttribute( var.getAttributeName() );
       }
     
-      FileItem file = parms.getFileItem( var.name );
+      FileItem file = parms.getFileItem( var.getPath() );
       if( file != null )
       {
         file2node.put( file, node );

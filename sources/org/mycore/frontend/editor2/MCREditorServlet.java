@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
-import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -247,7 +246,7 @@ public class MCREditorServlet extends MCRServlet
     for( int i = 0; i < sub.getVariables().size(); i++ )
     {
       MCREditorVariable var = (MCREditorVariable)( sub.getVariables().get( i ) );
-      pw.println( var.getName() + " = " + var.getValue() );
+      pw.println( var.getPath() + " = " + var.getValue() );
       FileItem file = var.getFile();
       if( file != null )
       {
