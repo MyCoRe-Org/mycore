@@ -248,8 +248,7 @@ public final void createInDatastore() throws MCRPersistenceException
       throw new MCRPersistenceException("The File or Directory on "+
         getDerivate().getInternals().getSourcePath()+" was not found."); }
     try {
-      MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
-        mcr_id.getId());
+      MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId());
       getDerivate().getInternals().setIFSID(difs.getID());
       }
     catch (Exception e) { 
