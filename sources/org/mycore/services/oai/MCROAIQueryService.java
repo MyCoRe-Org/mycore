@@ -318,4 +318,85 @@ public class MCROAIQueryService implements MCROAIQuery {
         return list;
 	}
 		
+	/**
+	 * Method listRecords.Gets a list of metadata records
+	 * @param set the category (if known) is in the first element
+	 * @param from the date (if known) is in the first element
+	 * @param until the date (if known) is in the first element
+	 * @param instance the Servletinstance
+	 * @return List A list that contains an array of three Strings: the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 */
+	public List listRecords(String[] set, String[] from, String[] until, String instance) {
+		List list = new ArrayList();
+        StringBuffer query = new StringBuffer("");
+        String classificationId = null;
+        String repositoryId = null;
+
+		try {
+	        classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
+        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
+
+        	if (set == null) {
+            	query.append("/mycoreobject[metadata/*/*/@classid=\"").append(classificationId).append("\"]");
+    	    } else {
+	            String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
+            	query.append("/mycoreobject[@classid=\"").append(classificationId).
+        	        append("\" and @categid=\"").append(categoryId).append("\"]");
+    	    }
+	        if (from != null) {
+        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
+    	            "." + from[0].substring(0, 4);
+	            query.append(" and ").append("/mycoreobject[service.dates.date>=\"").append(date).
+            	    append("\" and service.dates.date/@type=\"modifydate\"]");
+        	}
+    	    if (until != null) {
+	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
+            	    "." + until[0].substring(0, 4);
+        	    query.append(" and ").append("/mycoreobject[service.dates.date<=\"").append(date).
+    	            append("\" and service.dates.date/@type=\"modifydate\"]");
+	        }
+	    } catch (MCRConfigurationException mcrx) {
+	    }
+        
+		try {
+			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
+			String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
+				
+			query.append(" and ").append("/mycoreobject[@classid=\"").append(restrictionClassification).
+                append("\" and @categid=\"").append(restrictionCategory).append("\"]");
+	    } catch (MCRConfigurationException mcrx) {
+	    }
+			    
+    	logger.debug("Die erzeugte Query ist: " + query.toString());
+    	
+        MCRQueryResult qr = new MCRQueryResult();
+   	    try {
+	        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
+   	    
+   	    	if (qra.size() == 0) {
+   	    		return null;
+   	    	}
+   	    	
+	   	    for (int i = 0; i < qra.size(); i++) {
+   		    	String objectId = qra.getId(i);
+   	    	
+	    	    MCRObject object = new MCRObject();
+    	        object.receiveFromDatastore(objectId);
+	 	
+        		String[] identifier = getHeader(object, objectId, repositoryId);
+        		list.add(identifier);
+
+    		    Element eMetadata = object.getMetadata().createXML();
+	        	list.add(eMetadata);
+	   	    }
+   	    } catch (MCRException mcrx) {
+   	    	logger.error("Die Query ist fehlgeschlagen.");
+   	    	return null;
+   	    }
+   	    
+		return list;
+	}
+	
 }

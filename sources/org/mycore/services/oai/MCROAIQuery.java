@@ -77,5 +77,17 @@ public interface MCROAIQuery {
 	 * 				and a JDOM element with the metadata of the record
 	 */
 	public List getRecord(String id, String instance);
+	
+	/**
+	 * Method listRecords.Gets a list of metadata records
+	 * @param set the category (if known) is in the first element
+	 * @param from the date (if known) is in the first element
+	 * @param until the date (if known) is in the first element
+	 * @param instance the Servletinstance
+	 * @return List A list that contains an array of three Strings: the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 */
+	public List listRecords(String[] set, String[] from, String[] until, String instance);
 		
 }

@@ -190,11 +190,7 @@ public class MCROAIDataProvider extends HttpServlet {
             eRoot.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/ "  + STR_OAI_NAMESPACE + "2.0/OAI-PMH.xsd", xsi);
             
             // add "responseDate"...
-            Date today = new Date();
-    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            
-            String sDate = dateFormat.format(today) + "T" + timeFormat.format(today) + "Z";
+       		String sDate = getUTCDate(0);
             Element eDate = new Element("responseDate", ns);
             eDate.setText(sDate);
             eRoot.addContent(eDate);
@@ -224,7 +220,7 @@ public class MCROAIDataProvider extends HttpServlet {
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[3])) {
                     document = listMetadataFormats(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[4])) {
-                    // document = listRecords(request, header, ns);
+                    document = listRecords(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[5])) {
                     document = listSets(request, header);
                 } else {
@@ -443,16 +439,8 @@ public class MCROAIDataProvider extends HttpServlet {
 				oos.close();
 				fos.close();
 					
-				Calendar calendar = new GregorianCalendar();
-				Date now = new Date();
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
-				calendar.setTime(now);
-				calendar.add(Calendar.HOUR, timeout);
-	            Date timeoutDate = calendar.getTime();
-	    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-       		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            
-           		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		String sDate = getUTCDate(timeout);
            		eResumptionToken.addContent(newResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 			}
@@ -472,6 +460,29 @@ public class MCROAIDataProvider extends HttpServlet {
         } finally {
         	return list;
 		}
+    }
+    
+	/**
+	 * Method getUTCDate. The actual date and time (GMT).
+	 * @param timeout. offset to add to get a future time.
+	 * @return String the date and time as string.
+	 */
+    private String getUTCDate(int timeout) {
+		Calendar calendar = new GregorianCalendar();
+		Date now = new Date();
+		calendar.setTime(now);
+        SimpleTimeZone tz = (SimpleTimeZone) timeFormat.getTimeZone();
+        // compute milliseconds to hours...
+        int offset = Math.abs(tz.getRawOffset() / 3600000);
+		calendar.add(Calendar.HOUR, offset);
+		calendar.add(Calendar.HOUR, timeout);
+        Date timeoutDate = calendar.getTime();
+   	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            
+   		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+   		
+   		return sDate;
     }
     
 	/**
@@ -790,16 +801,8 @@ public class MCROAIDataProvider extends HttpServlet {
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
 				
-				Calendar calendar = new GregorianCalendar();
-				Date now = new Date();
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
-				calendar.setTime(now);
-				calendar.add(Calendar.HOUR, timeout);
-	            Date timeoutDate = calendar.getTime();
-	    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-       		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            
-           		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		String sDate = getUTCDate(timeout);
            		eResumptionToken.addContent(sResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 	           	eListSets.addContent(eResumptionToken);
@@ -950,16 +953,8 @@ public class MCROAIDataProvider extends HttpServlet {
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
 				
-				Calendar calendar = new GregorianCalendar();
-				Date now = new Date();
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
-				calendar.setTime(now);
-				calendar.add(Calendar.HOUR, timeout);
-	            Date timeoutDate = calendar.getTime();
-	    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-       		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            
-           		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		String sDate = getUTCDate(timeout);
            		eResumptionToken.addContent(sResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 	           	eListIdentifiers.addContent(eResumptionToken);
@@ -1047,11 +1042,13 @@ public class MCROAIDataProvider extends HttpServlet {
     	    	
     	        }
             
-	            eGetRecord.addContent(eHeader);
+		        Element eRecord = new Element("record", ns);
+		        eRecord.addContent(eHeader);
 	            
 	            Element eMetadata = (Element) iterator.next();
-	            eGetRecord.addContent(eMetadata);
+	            eRecord.addContent(eMetadata);
 	            
+	            eGetRecord.addContent(eRecord);
 		    	eRoot.addContent(eGetRecord);
 		    	
             	org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
@@ -1071,6 +1068,183 @@ public class MCROAIDataProvider extends HttpServlet {
         return document;
     }
     
+	/**
+	 * Method listRecords. Implementation of the OAI Verb ListRecords.
+	 * @param request The servlet request.
+	 * @param header The document so far
+	 * @return Document The document with all new elements added.
+	 */
+    private org.jdom.Document listRecords(HttpServletRequest request, org.jdom.Document header) {
+        org.jdom.Document document = header;
+        Element eRoot = document.getRootElement();
+        Namespace ns = eRoot.getNamespace();
+        
+        deleteOutdatedTokenFiles();
+        
+        int maxArguments = 2; //verb and metadataPrefix are required!
+        
+        // Second: get the arguments from the request
+        String from[] = getParameter("from", request);
+        if (from != null) {
+            maxArguments++;
+        }
+        String until[] = getParameter("until", request); 
+        if (until != null) {
+            maxArguments++;
+        }
+        String set[] = getParameter("set", request); 
+        if (set != null) {
+            maxArguments++;
+        }
+        String resumptionToken[] = getParameter("resumptionToken", request); 
+        if (resumptionToken != null) {
+            maxArguments++;
+        }
+        String metadataPrefix[] = getParameter("metadataPrefix", request); 
+        if (metadataPrefix == null) {
+        	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        //The number of arguments must not exceed maxArguments
+        if (badArguments(request, maxArguments)) {
+        	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        
+        Element eRequest = eRoot.getChild("request", ns);
+        eRequest.setAttribute("verb", "ListRecords");
+        if (from != null) {
+            eRequest.setAttribute("from", from[0]);
+        }
+        if (until != null) {
+            eRequest.setAttribute("until", until[0]);
+        }
+        if (set != null) {
+            eRequest.setAttribute("set", set[0]);
+        }
+        if (resumptionToken != null) {
+            eRequest.setAttribute("resumptionToken", resumptionToken[0]);
+        }
+        eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
+        
+        MCRConfiguration config = MCRConfiguration.instance();
+        String format = null;
+        //Check, if the requested metadata format is supported
+	    try {
+	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	    } catch (MCRConfigurationException mcrx) {
+        	logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+            return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
+	    }
+	    
+        Element eListRecords = new Element("ListRecords", ns);
+        
+        if (resumptionToken != null) {
+		    try {
+				eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0]);
+		        eRoot.addContent(eListRecords);
+		    } catch (IOException e) { 	
+	            logger.error(e.getMessage());
+                return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
+            }
+            
+            org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
+            	getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+        	if (newDocument != null) {
+    	        document = newDocument;
+	        } else {
+	           	logger.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
+        	}
+        	
+            return document;
+        }
+        
+	    List sets = null;
+	    
+	    try {
+		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
+		    sets = new ArrayList(query.listRecords(set, from, until, getServletName()));
+	    } catch (MCRConfigurationException mcrx) {
+	    	logger.fatal(mcrx.getMessage());
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+	    }
+
+	    if (sets != null) {
+	    	int maxreturns = 0;
+	    	ListIterator iterator = sets.listIterator();
+	    	
+	        if (!iterator.hasNext()) {
+            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+        	}
+        
+			try {
+		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
+			} catch (NumberFormatException nfx) {
+				//do nothing, just let maxreturns be 0
+			}
+	    	
+	    	int elementCounter = 0;
+	    	
+	    	List tokenElements = new ArrayList();
+	    	
+	    	while (iterator.hasNext()) {
+	    		elementCounter++;
+	    		String[] array = (String[]) iterator.next();
+	    		
+		        Element eHeader = new Element("header", ns);
+    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
+            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+	            if ((array[2] != null) && (array[2].length() > 0)) {
+		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
+    	    	
+	    	    	while (tokenizer.hasMoreTokens()) {
+                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
+    		    	}
+    	    	
+    	        }
+		        Element eRecord = new Element("record", ns);
+		        eRecord.addContent(eHeader);
+	            
+	            Element eMetadata = (Element) iterator.next();
+	            eRecord.addContent(eMetadata);
+	            
+            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
+		            eListRecords.addContent(eRecord);
+            	} else {
+            		tokenElements.add(eRecord);
+            	}
+            	
+	    	}
+	    	
+	    	String sResumptionToken = listToResumptionToken(tokenElements);
+            if (sResumptionToken != null) {
+				Element eResumptionToken = new Element("resumptionToken", ns);
+				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("cursor", "0");
+				
+			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
+           		String sDate = getUTCDate(timeout);
+           		eResumptionToken.addContent(sResumptionToken);
+				eResumptionToken.setAttribute("expirationDate", sDate);
+	           	eListIdentifiers.addContent(eResumptionToken);
+			}
+				
+	    	eRoot.addContent(eListRecords);
+		    	
+            org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
+            	getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+        	if (newDocument != null) {
+    	        document = newDocument;
+	        } else {
+	           	logger.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
+        	}
+	    } else {
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+	    }
+	    
+        return document;
+    }
+
 	class TokenFileFilter implements FilenameFilter {
     	String filter = null;
     
