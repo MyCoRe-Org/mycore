@@ -383,7 +383,7 @@ public class WCMSChooseServlet extends WCMSServlet {
                     }
                     System.out.println(test);*/
                     StringWriter sw = new StringWriter();
-                    XMLOutputter contentOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                    XMLOutputter contentOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding(OUTPUT_ENCODING));
                     //1.Method: rootOut.addContent(new Element("content").setText(contentOut.output(defaultLangContentOutput, contentOut)));
                     contentOut.output(defaultLangContentOutput, sw);
                     //System.out.println("testoutput: "+sw.toString());

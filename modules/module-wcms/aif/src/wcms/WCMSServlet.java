@@ -40,6 +40,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *
  */
 public abstract class WCMSServlet extends MCRServlet {
+	protected static final String OUTPUT_ENCODING="UTF-8";
+	protected static final String VALIDATOR="cyberneko"; //possible values (cyberneko, jtidy);
 
   /*
 	 * (non-Javadoc)

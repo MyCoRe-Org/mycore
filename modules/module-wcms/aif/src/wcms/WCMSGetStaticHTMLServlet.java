@@ -109,10 +109,10 @@ public class WCMSGetStaticHTMLServlet extends WCMSServlet {
                 Element meta2=new Element("meta").setAttribute("http-equiv","Cache-Control").setAttribute("content","no-cache, must-revalidate");
                 root.addContent(new Element("head").addContent(meta1).addContent(meta2)).addContent(new Element("body").addContent(contentOutput));
                 doc.setRootElement(root);
-                XMLOutputter xmlout= new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
+                XMLOutputter xmlout= new XMLOutputter(Format.getRawFormat().setEncoding(OUTPUT_ENCODING));
                 ServletOutputStream sos = response.getOutputStream();
                                
-                response.setContentType( "text/html" );  
+                response.setContentType( "text/html; charset="+OUTPUT_ENCODING );
                 xmlout.output(doc,sos);
                 sos.flush();
                 sos.close();
