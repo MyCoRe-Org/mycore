@@ -248,6 +248,12 @@ public class MCRCommandLineInterface
       "create group data from file {0}",
       "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "import user data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.importUserFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "import group data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "update user data from file {0}",
       "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
@@ -307,6 +313,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "disable user {0}",
       "org.mycore.frontend.cli.MCRUserCommands.disableUser MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "encrypt passwords in user xml file {0} to file {1}",
+      "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile MCRSession String String" );
 
     // Read external commands
     String externals = config.getString("MCR.external_command_classes","");
@@ -348,7 +357,7 @@ public class MCRCommandLineInterface
     logger.info( "MyCoRe Command Line Interface. Type 'help' to get help!" );
     logger.info( "Initializing: " );
 
-    try{ 
+    try{
       initCommands(); }
     catch( MCRException ex ) {
       logger.debug( ex.getStackTraceAsString() );
@@ -365,7 +374,7 @@ public class MCRCommandLineInterface
         int j = args[ i ].indexOf(";;");
         if (j!=-1) {
           cmd.append( args[ i ].substring(0,j) ).append( " " );
-          commandQueue.addElement( cmd.toString().trim() ); 
+          commandQueue.addElement( cmd.toString().trim() );
           cmd = new StringBuffer();
           continue;
           }
@@ -412,19 +421,19 @@ public class MCRCommandLineInterface
   */
   protected static void processCommand( String command )
   {
-    try 
+    try
     {
-      for( int i = 0; i < numCommands; i++ ) 
+      for( int i = 0; i < numCommands; i++ )
       {
-        if( knownCommands[ i ].invoke( command ) ) return; 
+        if( knownCommands[ i ].invoke( command ) ) return;
       }
       logger.error( "Command not understood. Enter 'help' to get a list of commands." );
     }
-    catch( Throwable t1 ) 
+    catch( Throwable t1 )
     { t1.printStackTrace();
       if( t1 instanceof MCRException )
         logMCRException( (MCRException)t1 );
-      else if( ( t1 instanceof InvocationTargetException ) || ( t1 instanceof ExceptionInInitializerError ) ) 
+      else if( ( t1 instanceof InvocationTargetException ) || ( t1 instanceof ExceptionInInitializerError ) )
       {
         Throwable t2 = null;
         if( t1 instanceof InvocationTargetException )
@@ -456,25 +465,25 @@ public class MCRCommandLineInterface
     if( mex.getException() != null ) logException( mex.getException() );
   }
 
- /** 
-  * Outputs an Exception to the logger. 
+ /**
+  * Outputs an Exception to the logger.
   **/
   private static void logException( Exception ex )
   {
-    logger.error( ex.getClass().getName() ); 
-    logger.error( ex.getMessage () ); 
+    logger.error( ex.getClass().getName() );
+    logger.error( ex.getMessage () );
     logger.debug( MCRException.getStackTraceAsString( ex ) );
-    logger.error( "" );  
+    logger.error( "" );
   }
 
- /**  
-  * Outputs a Throwable to the logger.  
+ /**
+  * Outputs a Throwable to the logger.
   **/
   private static void logThrowable( Throwable t )
   {
-    logger.error( t.getClass().getName() );  
-    logger.error( t.getMessage () );  
-    logger.error( "" ); 
+    logger.error( t.getClass().getName() );
+    logger.error( t.getMessage () );
+    logger.error( "" );
   }
 
  /**
@@ -540,7 +549,7 @@ public class MCRCommandLineInterface
 
  /**
   * This command change the user of the session context to a new user.
-  * 
+  *
   * @param newuser the new user ID
   * @param password the password of the new user
   **/
@@ -548,7 +557,7 @@ public class MCRCommandLineInterface
     {
     logger.info("The old user is "+session.getCurrentUserID());
     if (org.mycore.user.MCRUserMgr.instance().login(user.trim(),password.trim())) {
-      session.setCurrentUserID(user); 
+      session.setCurrentUserID(user);
       logger.info("The new user is "+session.getCurrentUserID());
       }
     else {
@@ -557,7 +566,7 @@ public class MCRCommandLineInterface
 
  /**
   * This command change the user of the session context to a new user.
-  * 
+  *
   * @param newuser the new user ID
   **/
   public static void login( String user )

@@ -96,9 +96,9 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * the remaining attribute (parameter 'create').
    *
    * @param ID             the group ID
-   * @param creator        the user ID who created this user
-   * @param creationDate   timestamp of the creation of this user, if null the current date will be used
-   * @param modifiedDate   timestamp of the last modification of this user
+   * @param creator        the user ID who created this group
+   * @param creationDate   timestamp of the creation of this group, if null the current date will be used
+   * @param modifiedDate   timestamp of the last modification of this group
    * @param description    description of the group
    * @param admUserIDs     a ArrayList of user IDs which have administrative rights for the group
    * @param admGroupIDs    a ArrayList of groups which members have administrative rights for the group
@@ -151,20 +151,20 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   this();
   if (!elm.getName().equals("group")) { return; }
   super.ID = trim((String)elm.getAttributeValue("ID"),id_len);
-  this.creator = trim(elm.getChildTextTrim("user.creator"),id_len);
-  String tmp = elm.getChildTextTrim("user.creation_date");
+  this.creator = trim(elm.getChildTextTrim("group.creator"),id_len);
+  String tmp = elm.getChildTextTrim("group.creation_date");
   if (tmp != null) {
     try {
       super.creationDate = Timestamp.valueOf(tmp); }
     catch (Exception e) { }
     }
-  tmp = elm.getChildTextTrim("user.last_modified");
+  tmp = elm.getChildTextTrim("group.last_modified");
   if (tmp != null) {
     try {
       super.modifiedDate = Timestamp.valueOf(tmp); }
     catch (Exception e) { }
     }
-  this.description = trim(elm.getChildTextTrim("user.description"),
+  this.description = trim(elm.getChildTextTrim("group.description"),
     description_len);
   org.jdom.Element adminElement = elm.getChild("group.admins");
   if (adminElement != null) {

@@ -54,7 +54,7 @@ abstract class MCRUserObject
   public static final int id_len = 20;
 
   /** The maximum length of the password */
-  public static final int password_len = 20;
+  public static final int password_len = 128;
 
   /** The maximum length of the decription */
   public static final int description_len = 200;
@@ -96,10 +96,24 @@ abstract class MCRUserObject
   }
 
   /**
+   * This method sets the creationDate to the time provided as a parameter.
+   * @param time Timestamp to set the creation date
+   **/
+  public final void setCreationDate(Timestamp time)
+  { creationDate = time; }
+
+  /**
    * This method sets the creationDate to the time the method is called.
    **/
   public final void setCreationDate()
   { creationDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+
+  /**
+   * This method sets the modifiedDate to the time provided as a parameter.
+   * @param time Timestamp to set the modified date
+   **/
+  public final void setModifiedDate(Timestamp time)
+  { modifiedDate = time; }
 
   /**
    * This method sets the modifiedDate to the time the method is called.

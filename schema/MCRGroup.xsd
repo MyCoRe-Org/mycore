@@ -63,7 +63,7 @@
   <xsd:element maxOccurs="1" minOccurs="0" name="group.groups">
    <xsd:complexType>
     <xsd:sequence>
-     <xsd:element maxOccurs="unbounded" minOccurs="1" name="groups.groupID">
+     <xsd:element maxOccurs="unbounded" minOccurs="0" name="groups.groupID">
       <xsd:complexType>
        <xsd:simpleContent>
         <xsd:extension base="xsd:string"/>
@@ -76,7 +76,7 @@
   <xsd:element maxOccurs="1" minOccurs="0" name="group.privileges">
    <xsd:complexType>
     <xsd:sequence>
-     <xsd:element maxOccurs="unbounded" minOccurs="1" name="privileges.privilege">
+     <xsd:element maxOccurs="unbounded" minOccurs="0" name="privileges.privilege">
       <xsd:complexType>
        <xsd:simpleContent>
         <xsd:extension base="xsd:string"/>

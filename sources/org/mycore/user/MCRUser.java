@@ -103,7 +103,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    * @param idEnabled        (boolean) specifies whether the account is disabled or enabled
    * @param updateAllowed    (boolean) specifies whether the user may update his or her data
    * @param description      description of the user
-   * @param passwd           password of the user
+   * @param passwd           password of the user (encrypted or not encrypted, depending on property)
    * @param primaryGroupID   the ID of the primary group of the user
    * @param groupIDs         a ArrayList of groups (IDs) the user belongs to
    * @param salutation       contact information
@@ -159,9 +159,26 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   }
 
   /**
+   * It the passes the given JDOM element to a different constructor and after that encrypts
+   * the password if the flag useEncryption is true. This constructor must only be used if
+   * a cleartext password is provided in the JDOM element user data.
+   *
+   * @param elm JDOM Element defining a user 
+   * @param useEncryption flag to determine if the password has to be encrypted
+   **/
+  public MCRUser(org.jdom.Element elm, boolean useEncryption)
+  {
+    this(elm);
+    if (useEncryption) {
+      String cryptPwd = MCRCrypt.crypt(this.passwd);
+      this.passwd = cryptPwd;
+    } 
+  }
+  
+  /**
    * This constructor creates the data of this object from a given JDOM element.
    *
-   * @param the JDOM Element
+   * @param elm JDOM Element defining a user
    **/
   public MCRUser(org.jdom.Element elm)
   {
@@ -180,6 +197,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     this.updateAllowed = (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
     this.creator = trim(elm.getChildTextTrim("user.creator"), id_len);
     this.passwd = trim(elm.getChildTextTrim("user.password"), password_len);
+    
     String tmp = elm.getChildTextTrim("user.creation_date");
     if (tmp != null) {
       try {
@@ -448,10 +466,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     }
 
     // Aggregate user element
-    user.addContent(Passwd)
-        .addContent(Creator)
+    user.addContent(Creator)
         .addContent(CreationDate)
         .addContent(ModifiedDate)
+        .addContent(Passwd)
         .addContent(Description)
         .addContent(Primarygroup)
         .addContent(userContact.toJDOMElement())

@@ -58,6 +58,9 @@ public class MCRUserMgr
   /** flag that determines whether write access to the data is denied (true) or allowed */
   private boolean locked = false;
 
+  /** flag that determines whether we use password encryption */
+  private boolean useEncryption = false;
+
   /** the user cache */
   private MCRCache userCache;
 
@@ -79,9 +82,11 @@ public class MCRUserMgr
   private MCRUserMgr() throws MCRException
   {
     config = MCRConfiguration.instance();
-    String userStoreName =  config.getString("MCR.userstore_class_name");
+    String userStoreName = config.getString("MCR.userstore_class_name");
     PropertyConfigurator.configure(config.getLoggingProperties());
     root = config.getString("MCR.users_superuser_username","mcradmin");
+    String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
+    useEncryption = (useCrypt.trim().equals("true")) ? true : false;
 
     try {
       mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance(); }
@@ -444,7 +449,7 @@ public class MCRUserMgr
    * @param session the MCRSession object
    * @param user   The user object which will be created
    */
-  public final synchronized void createUser(MCRSession session,MCRUser user)
+  public final synchronized void createUser(MCRSession session, MCRUser user)
   throws MCRException
   {
     if (locked) {
@@ -455,7 +460,7 @@ public class MCRUserMgr
     MCRUser admin = retrieveUser(session.getCurrentUserID());
     if ((!admin.hasPrivilege("create user")) &&
       (!admin.hasPrivilege("user administrator"))) {
-      throw new MCRException("The session has no privilig to create user!"); }
+      throw new MCRException("The session does not have the privilege to create a user!"); }
 
     // Check if the user is not null
     if (user == null) {
@@ -518,6 +523,49 @@ public class MCRUserMgr
       // be resetted to the original state as well.
       try { deleteUser(session,user.getID()); } catch (Exception e) { }
       throw new MCRException("Can't create user.",ex);
+    }
+  }
+
+  /**
+   * This method imports a user or a group to the mycore system. Importing a user or a
+   * group is essentially the same as creating a user or a group. The only difference is
+   * that the values for the creator, creation date and modified date are taken from the
+   * given user or group object. This is important if the user or group is read from an
+   * xml file and was formerly created in a different system.
+   *
+   * @param session the MCRSession object
+   * @param userObject The user or group object which will be imported
+   */
+  public final synchronized void importUserObject(MCRSession session, MCRUserObject obj)
+  throws MCRException
+  {
+    if (locked) {
+      throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
+
+    try {
+      // backup up creator and dates
+      String creator = obj.getCreator();
+      java.sql.Timestamp created = obj.getCreationDate();
+      java.sql.Timestamp modified = obj.getModifiedDate();
+
+      // now create the user or group
+      if (obj instanceof MCRUser)
+        createUser(session, (MCRUser)obj);
+      else createGroup(session, (MCRGroup)obj);
+
+      // finally set the old values and update the user or group
+      obj.setCreator(creator);
+      obj.setCreationDate(created);
+      obj.setModifiedDate(modified);
+
+      if (obj instanceof MCRUser)
+        mcrUserStore.updateUser((MCRUser)obj);
+      else mcrUserStore.updateGroup((MCRGroup)obj);
+    }
+    catch (MCRException ex) {
+      setLock(false);
+      throw new MCRException("Can't import user or group.",ex);
     }
   }
 
@@ -885,7 +933,6 @@ public class MCRUserMgr
 
   /**
    * login to the system. This method just checks the password for a given user.
-   * For the moment we only support clear text passwords...
    *
    * @param userID   user ID for the login
    * @param passwd   password for the user
@@ -895,8 +942,14 @@ public class MCRUserMgr
   throws MCRException
   {
     MCRUser loginUser = retrieveUser(userID);
-    if (loginUser.isEnabled())
-      return (loginUser.getPassword().equals(passwd)) ? true : false;
+    if (loginUser.isEnabled()) {
+      if (useEncryption) {
+        String salt = loginUser.getPassword().substring(0, 3);
+        String newCrypt = MCRCrypt.crypt(salt, passwd);
+        return (loginUser.getPassword().equals(newCrypt)) ? true : false;
+      }
+      else return (loginUser.getPassword().equals(passwd)) ? true : false;
+    }
     else throw new MCRException("Login denied. User is disabled.");
   }
 
@@ -1140,7 +1193,11 @@ public class MCRUserMgr
     }
     if (!test) {
       throw new MCRException("You have no rights to change the users password!"); }
-    user.setPassword(password);
+
+    if (useEncryption)
+      user.setPassword(MCRCrypt.crypt(password));
+    else user.setPassword(password);
+
     userCache.remove(userID);
     mcrUserStore.updateUser(user);
   }
