@@ -25,9 +25,16 @@
 package org.mycore.backend.cm7;
 
 import java.util.*;
+
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import org.mycore.common.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * This class implements a pool of database connections to 
@@ -41,20 +48,9 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  **/
 public class MCRCM7ConnectionPool implements DKConstant
-{
+  {
   /** The connection pool singleton */
   protected static MCRCM7ConnectionPool singleton;
-
-  /**
-   * Returns the connection pool singleton.
-   *
-   * @throws MCRPersistenceException if connect to CM7 was not successful
-   **/
-  public static synchronized MCRCM7ConnectionPool instance()
-  { 
-    if( singleton == null ) singleton = new MCRCM7ConnectionPool();
-    return singleton; 
-  }
 
   /** The internal list of free connections */
   protected Vector freeConnections = new Vector();
@@ -74,29 +70,41 @@ public class MCRCM7ConnectionPool implements DKConstant
   /** The password to be used for connecting to the library server */
   protected String password;
   
+  /** The logger */
+  private static Logger logger=Logger.getLogger("org.mycore.backend.cm7");
+
+  /**
+   * Returns the connection pool singleton.
+   *
+   * @throws MCRPersistenceException if connect to CM7 was not successful
+   **/
+  public static synchronized MCRCM7ConnectionPool instance()
+    { 
+    if( singleton == null ) singleton = new MCRCM7ConnectionPool();
+    return singleton; 
+    }
+
   /**
    * Builds the connection pool singleton.
    *
    * @throws MCRPersistenceException if connect to CM7 was not successful
    **/
-  protected MCRCM7ConnectionPool()
-    throws MCRPersistenceException
-  {
-    System.out.println( "Building Content Manager connection pool..." );
-    
+  protected MCRCM7ConnectionPool() throws MCRPersistenceException
+    {
     MCRConfiguration config = MCRConfiguration.instance();
-    
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    logger.info( "Building Content Manager connection pool..." );
     serverName = config.getString( "MCR.persistence_cm7_library_server" );
     uid        = config.getString( "MCR.persistence_cm7_user_id"        );
     password   = config.getString( "MCR.persistence_cm7_password"       );
-
-    maxNumConnections = config.getInt( "MCR.persistence_cm7_max_connections", 1 );
-    int initNumConnections = config.getInt( "MCR.persistence_cm7_init_connections", maxNumConnections );
-
+    maxNumConnections = 
+      config.getInt( "MCR.persistence_cm7_max_connections", 1 );
+    int initNumConnections = 
+      config.getInt( "MCR.persistence_cm7_init_connections",maxNumConnections);
     // Build the initial number of JDBC connections
     for( int i = 0; i < initNumConnections; i++ )
       freeConnections.addElement( buildConnection() );
-  }
+    }
   
   /**
    * Creates a DKDatastoreDL connection to the Content Manager library server.
@@ -104,22 +112,19 @@ public class MCRCM7ConnectionPool implements DKConstant
    * @throws MCRPersistenceException if connect to Content Manager fails
    **/
   protected DKDatastoreDL buildConnection()  
-  {
-    System.out.println( "Building connection to Content Manager..." );
-
-    try 
     {
+    logger.info( "Building connection to Content Manager..." );
+    try {
       DKDatastoreDL connection = new DKDatastoreDL();
       connection.connect( serverName, uid, password, "" );
       connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_FALSE ) );
       return connection;
-    }
-    catch( Exception exc ) 
-    {
+      }
+    catch( Exception ex ) {
       String msg = "Could not connect to Content Manager library server";
-      throw new MCRPersistenceException( msg, exc );
+      throw new MCRPersistenceException( msg, ex );
+      }
     }
-  }
   
   /**
    * Gets a free connection from the pool. When this
@@ -132,25 +137,22 @@ public class MCRCM7ConnectionPool implements DKConstant
    **/
   public synchronized DKDatastoreDL getConnection()
     throws MCRPersistenceException
-  {
+    {
     // Wait for a free connection
     while( usedConnections.size() == maxNumConnections )
     try{ wait(); } catch( InterruptedException ignored ){}
 
     DKDatastoreDL connection;
-    
     // Do we have to build a connection or is there already one?
-    if( freeConnections.isEmpty() ) 
-      connection = buildConnection();
-    else
-    {
+    if( freeConnections.isEmpty() ) {
+      connection = buildConnection(); }
+    else {
       connection = (DKDatastoreDL)( freeConnections.firstElement() );
       freeConnections.removeElement( connection );
-    }
-    
+      }
     usedConnections.addElement( connection );
     return connection;
-  }
+    }
 
   /**
    * Releases a connection, indicating that it is not used any more 
@@ -159,30 +161,36 @@ public class MCRCM7ConnectionPool implements DKConstant
    * @param connection the Content Manager connection that has been used
    **/
   public synchronized void releaseConnection( DKDatastoreDL connection )
-  {
+    {
     if( connection == null ) return;
-    
     if( usedConnections.contains( connection ) )
       usedConnections.removeElement( connection );
     if( ! freeConnections.contains( connection ) ) 
       freeConnections.addElement( connection );
-    
     notifyAll();
-  }
+    }
 
   /**
    * Finalizer, closes all connections in this connection pool
    **/
   public void finalize()
-  {
-    try
     {
+    try {
       for( int i = 0; i < usedConnections.size(); i++ )
         ( (DKDatastoreDL)( usedConnections.elementAt( i ) ) ).disconnect();
       for( int i = 0; i < freeConnections.size(); i++ )
         ( (DKDatastoreDL)( freeConnections.elementAt( i ) ) ).disconnect();
-    }
+      }
     catch( Exception ignored ){}
+    }
+
+  /**
+   * The method return the logger for org.mycore.backend.cm8 .
+   *
+   * @return the logger.
+   **/
+  static final Logger getLogger()
+    { return logger; }
+
   }
-}
 

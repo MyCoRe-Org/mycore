@@ -26,8 +26,12 @@ package org.mycore.backend.cm7;
 
 import java.io.*;
 import java.util.*;
+
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.backend.sql.*;
@@ -105,6 +109,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   String mcr_ts_in)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM7ConnectionPool.getLogger();
   // convert the JDOM tree
   byte [] xml = MCRUtils.getByteArray(jdom);
   // extract index data from typed content
@@ -186,7 +191,8 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
 public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
   throws MCRConfigurationException, MCRPersistenceException
   { 
-  System.out.println("This feature comes in the future with CM8.");
+  Logger logger = MCRCM7ConnectionPool.getLogger();
+  logger.info("This feature comes in the future with CM8.");
   }
 
 /**
@@ -401,8 +407,8 @@ private final void updateTextIndexQueue(DKDatastoreDL connection,
   try {
     connection.invokeSearchEngine("SM",mcr_ts_server+"-"+mcr_ts_index); }
   catch( Exception ex ) {
-    System.out.println( "WARNING: Problem while calling TSE user exit:" );
-    System.out.println( "         " + ex.getMessage()                   );
+    Logger logger = MCRCM7ConnectionPool.getLogger();
+    logger.error( "Problem while calling TSE user exit." );
     }
   finally { 
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
@@ -418,9 +424,8 @@ private final void updateTextIndexQueue(DKDatastoreDL connection,
       administration.startUpdateIndex(mcr_ts_index);
     }
   catch( Exception ex ) { 
-    System.out.println( 
-      "WARNING: Problem while starting text search index update:" ); 
-    System.out.println( "         " + ex.getMessage()); 
+    Logger logger = MCRCM7ConnectionPool.getLogger();
+    logger.error("Problem while starting text search index update."); 
     }
   finally {
     if( connectionTSE != null ) 

@@ -26,6 +26,9 @@ package org.mycore.backend.cm7;
 
 import java.util.*;
 import java.text.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -48,9 +51,10 @@ implements MCRQueryInterface
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 private MCRConfiguration conf =  MCRConfiguration.instance();
-private  String ccsid = null;
-private  String lang = null;
-private  String langid = null;
+private String ccsid = null;
+private String lang = null;
+private String langid = null;
+private Logger logger = null;
 
 // 32 Bit
 protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
@@ -67,6 +71,7 @@ public MCRCM7TransformXQueryToText()
   ccsid = conf.getString("MCR.persistence_cm7_textsearch_ccsid","850");
   lang = conf.getString("MCR.persistence_cm7_textsearch_lang","DEU");
   langid = conf.getString("MCR.persistence_cm7_textsearch_langid","4841");
+  logger = MCRCM7ConnectionPool.getLogger();
   }
 
 /**
@@ -90,13 +95,11 @@ public final MCRXMLContainer getResultList(String query, String type,
     return result; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-System.out.println("================================");
-System.out.println("MCRCM7TransformXQueryToText : "+query);
-System.out.println("================================");
+  logger.debug("Incomming query = "+query);
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
-//System.out.println("Raw text :"+rawtext);
+  logger.debug("Raw text query = "+rawtext);
   int startpos = 0;
   int stoppos = rawtext.length();
   int operpos = -1;
@@ -105,7 +108,7 @@ System.out.println("================================");
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-//System.out.println("Next cond :"+onecond);
+    logger.debug("Next cond = "+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
     cond.append(traceOneCondition(onecond.trim()));
@@ -127,12 +130,11 @@ System.out.println("================================");
         }
       }
     }
-//System.out.println(cond.toString());
+  logger.debug("First transformation = "+cond.toString());
   if ((cond.length()==3)||(cond.length()==1)) { 
     cond = new StringBuffer("(( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
-System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-System.out.println("================================");
+  logger.debug("Transformed query = "+cond.toString());
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
@@ -144,11 +146,8 @@ System.out.println("================================");
   try {
     ts.search(cond.toString()); result = ts.getResult(); }
   catch (Exception e) {
-    System.out.println(e.getMessage());
-    e.printStackTrace();
-    throw new MCRPersistenceException("The text search error.");
+    throw new MCRPersistenceException("The text search error.",e);
     }
-//System.out.println("================================");
   return result;
   }
 
@@ -194,7 +193,7 @@ private final String traceOneCondition(String cond)
   if ((!cond.startsWith(ROOT_TAG_OBJECT)) && 
       (!cond.startsWith(ROOT_TAG_DERIVATE))) { return ""; } 
   String pretag = "XXXMYCOREOBJECT";
-//System.out.println("PRETAG="+pretag);
+  logger.debug("PRETAG="+pretag);
   // search operations
   String tag[] = new String[10];
   String op[] = new String[10];
@@ -309,14 +308,12 @@ private final String traceOneCondition(String cond)
     if (tag[i].endsWith("@CATEGID")) { value[i] = value[i]+"*"; }
     }
   
-/*
   for (i=0;i<counter;i++) {
-    System.out.println("TAG="+tag[i]);
-    System.out.println("OPER="+op[i]);
-    System.out.println("VALUE="+value[i]);
-    System.out.println();
+    logger.debug("TAG="+tag[i]);
+    logger.debug("OPER="+op[i]);
+    logger.debug("VALUE="+value[i]);
+    logger.debug("");
     }
-*/
 
   // search and prepare all attributes
   String attr[] = new String[10];
@@ -368,13 +365,6 @@ private final String traceOneCondition(String cond)
       attr[i] = sbtag.toString();
       }
     }
-/*
-  for (i=0;i<counter;i++) {
-    System.out.println("ATTR="+attr[i]);
-    System.out.println("ISATTR="+isattr[i]);
-    System.out.println();
-    }
-*/
 
   StringBuffer sbout = new StringBuffer(1024);
   if (isattr[0]) {

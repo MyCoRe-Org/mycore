@@ -159,7 +159,6 @@ public final void search(String cond) throws Exception, DKException
   // if parameters not set 
   if (mcr_tsindex == null) { return ; }
   if (mcr_indexclass == null) { return ; }
-//System.out.println(mcr_indexclass+"  "+mcr_tsindex);
   DKDatastoreDL connection = null;
   DKDatastoreTS dsTS = null;
   try {
