@@ -1047,7 +1047,9 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	} else {
 		    	mappedSets.add(set);
 		    }
-	    } 
+	    } else {
+	    	mappedSets.add(set);
+	    }
 	    
 	    List sets = new ArrayList();
 	    try {
