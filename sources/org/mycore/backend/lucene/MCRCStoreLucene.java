@@ -30,8 +30,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -50,11 +48,8 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 
 import org.mycore.backend.filesystem.MCRCStoreLocalFilesystem;
 import org.mycore.common.MCRConfiguration;
@@ -63,7 +58,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.services.plugins.TextFilterPluginManager;
 
@@ -140,9 +134,10 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	public void init(String storeID) {
 		super.init(storeID);
 		pMan.loadPlugins();
-		indexDir = new File(conf.getString("MCR.store_lucene_searchindexdir"));
+		indexDir = new File(conf.getString(prefix + "IndexDirectory"));
 		logger.debug("TextIndexDir: " + indexDir);
 		if (indexWriter == null) {
+			logger.debug("creating IndexWriter...");
 			boolean create = true;
 			if (IndexReader.indexExists(indexDir)) {
 				//reuse Index
@@ -159,6 +154,8 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 					e);
 			}
 			indexWriter.mergeFactor = optimizeIntervall;
+			indexWriter.minMergeDocs = 1; //always write to local dir
+			logger.debug("IndexWriter created...");
 			docCount = indexWriter.docCount();
 		}
 		if (indexReader == null) {
@@ -196,6 +193,10 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 			 * we only index the file and do not store
 			 */
 			Field content = Field.Text("content", in);
+			//closing stream, else indexDocument will hang
+			stream.close();
+			out.flush();
+			out.close();
 			returns.add(derivateID);
 			returns.add(fileID);
 			returns.add(content);
@@ -240,7 +241,9 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	}
 
 	private void indexDocument(Document doc) throws IOException {
-		logger.debug("Create index for storageID=" + doc.getField("StorageID"));
+		logger.debug(
+			"Create index for storageID="
+				+ doc.getField("StorageID").stringValue());
 		indexWriter.addDocument(doc);
 		docCount++;
 		if (docCount % optimizeIntervall == 0) {
@@ -321,6 +324,19 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 			throw new MCRPersistenceException(msg.toString(), e);
 		}
 		return hits;
+	}
+
+	protected void finalize() throws Throwable {
+		logger.debug("finalize() called on Lucenestore: shutting down...");
+		synchronized (indexReader) {
+			indexReader.close();
+			indexReader = null;
+		}
+		synchronized (indexWriter) {
+			indexWriter.close();
+			indexWriter = null;
+		}
+		logger.debug("shutting down... completed");
 	}
 
 }
