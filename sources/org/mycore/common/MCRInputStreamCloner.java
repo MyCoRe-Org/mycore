@@ -47,7 +47,7 @@ public class MCRInputStreamCloner {
 	 */
 	public MCRInputStreamCloner(InputStream source) throws IOException {
 		super();
-		File tmpdir = new File(System.getProperty("java.io.tmpdir"));
+		//File tmpdir = new File(System.getProperty("java.io.tmpdir"));
 		streamSource = File.createTempFile("JavaStream", ".mycore");
 		//File is new and created
 		FileOutputStream fout = new FileOutputStream(streamSource);
