@@ -103,7 +103,7 @@ public final class MCRXMLDBItem {
 	throws XMLDBException, 
 	       UnsupportedEncodingException {
 	XMLResource res =
-	    (XMLResource)collection.createResource( objectID.getNumber(),
+	    (XMLResource)collection.createResource( objectID.getNumberAsString(),
 						    XMLResource.RESOURCE_TYPE );
 	XMLOutputter xmlouter = new XMLOutputter();
 	xmlouter.setEncoding( store_enc );
@@ -126,7 +126,7 @@ public final class MCRXMLDBItem {
 // 	for( int i = 0; i < resIDs.length; i++ ) {
 // 	    XMLResource res = (XMLResource)collection.getResource( resIDs[i] );
 
-	XMLResource res = (XMLResource)collection.getResource( objectID.getNumber() );
+	XMLResource res = (XMLResource)collection.getResource( objectID.getNumberAsString() );
 	String xml = (String)res.getContent();
 	xml = new String( xml.getBytes( store_enc ), def_enc );
 	doc = builder.build( new StringReader( xml ) );
@@ -148,7 +148,7 @@ public final class MCRXMLDBItem {
 	throws XMLDBException, 
 	       UnsupportedEncodingException, 
 	       JDOMException {
-	XMLResource res = (XMLResource)collection.getResource( objectID.getNumber() );
+	XMLResource res = (XMLResource)collection.getResource( objectID.getNumberAsString() );
 	XMLOutputter xmlouter = new XMLOutputter();
 	xmlouter.setEncoding( store_enc );
 	res.setContent( xmlouter.outputString( doc ) );
