@@ -75,7 +75,7 @@ public class MCRBaseCommands
       throw new MCRException( "Configuration " + mcr_type + " does not end with .xml" ); 
 
     logger.info( "Reading file " + conf_filename + " ..." );
-    InputStream conf_file = MCRBaseCommands.class.getResourceAsStream( conf_filename );
+    InputStream conf_file = MCRBaseCommands.class.getResourceAsStream( "/" + conf_filename );
     if( conf_file == null )
       throw new MCRException( "Can't read configuration file " + conf_filename );
 
