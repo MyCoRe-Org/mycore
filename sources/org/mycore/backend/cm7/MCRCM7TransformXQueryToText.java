@@ -390,14 +390,13 @@ private final String traceOneCondition(String cond)
   boolean isnumber = false;
   long number = 0;
   // is value[0] a date
-  try {
-    DateFormat df = MCRUtils.getDateFormat("de");
-    date.setTime(df.parse(value[0]));
+  date = MCRUtils.covertDateToGregorianCalendar(value[0]);
+  if (date != null) {
     isdate = true;
     number = (long)(date.get(Calendar.YEAR)*10000 +
       date.get(Calendar.MONTH)*100 + date.get(Calendar.DAY_OF_MONTH));
     }
-  catch (ParseException e) { isdate = false; }
+  else { isdate = false; }
   // is value[0] a number
   try {
     String test = value[0].replace(',','.');

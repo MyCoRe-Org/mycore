@@ -144,6 +144,64 @@ public static final boolean isDateInEn_US(String date)
   }
 
 /**
+ * The methode convert the input date string to the ISO output string.
+ * If the input can't convert, the output is null.
+ *
+ * @param indate the date input
+ * @return the ISO output or null
+ **/
+public static final String covertDateToISO(String indate)
+  {
+  if ((indate == null) || ((indate = indate.trim()).length() ==0)) {
+    return null; }
+  GregorianCalendar calendar = new GregorianCalendar();
+  boolean test = false;
+  SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+  try { calendar.setTime(formatter.parse(indate)); test = true; }
+  catch (ParseException e) { }
+  if (!test) { 
+    for (int i=0;i<SUPPORTED_LANG.length;i++) {
+      DateFormat df =  getDateFormat(SUPPORTED_LANG[i]);
+      try { calendar.setTime(df.parse(indate)); test = true; }
+      catch (ParseException e) { }
+      if (test) { break; }
+      }
+    }
+  if (!test) { return null; }
+  formatter.setCalendar(calendar);
+  return formatter.format(calendar.getTime());
+  }
+
+/**
+ * The methode convert the input date string to the GregorianCalendar.
+ * If the input can't convert, the output is null.
+ *
+ * @param indate the date input
+ * @return the GregorianCalendar or null
+ **/
+public static final GregorianCalendar covertDateToGregorianCalendar(
+  String indate)
+  {
+  if ((indate == null) || ((indate = indate.trim()).length() ==0)) {
+    return null; }
+  GregorianCalendar calendar = new GregorianCalendar();
+  boolean test = false;
+  SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+  try { calendar.setTime(formatter.parse(indate)); test = true; }
+  catch (ParseException e) { }
+  if (!test) { 
+    for (int i=0;i<SUPPORTED_LANG.length;i++) {
+      DateFormat df =  getDateFormat(SUPPORTED_LANG[i]);
+      try { calendar.setTime(df.parse(indate)); test = true; }
+      catch (ParseException e) { }
+      if (test) { break; }
+      }
+    }
+  if (!test) { return null; }
+  return calendar;
+  }
+
+/**
  * This methode replace any characters to XML entity references.<p>
  * <ul>
  * <li> &lt; to &amp;lt;
