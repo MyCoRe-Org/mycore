@@ -251,7 +251,8 @@ public static final byte [] getByteArray(org.jdom.Document jdom)
   throws MCRPersistenceException
   {
   MCRConfiguration conf = MCRConfiguration.instance();
-  String mcr_encoding = conf.getString("MCR.metadata_default_encoding");
+  String mcr_encoding = conf.getString("MCR.metadata_default_encoding",
+    MCRDefaults.ENCODING);
   ByteArrayOutputStream outb = new ByteArrayOutputStream();
   try {
     org.jdom.output.XMLOutputter outp = new org.jdom.output.XMLOutputter();

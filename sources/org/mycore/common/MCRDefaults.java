@@ -32,7 +32,7 @@ package org.mycore.common;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRDefaults
+public interface MCRDefaults
 {
 
 /** The URL of the XLink */
