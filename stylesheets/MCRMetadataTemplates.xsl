@@ -49,6 +49,21 @@
   </xsd:element>
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaLinkMCRObject -->
+
+<xsl:template match="mcrmetalinkmcrobject">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:attribute ref="xlink:type" />
+     <xsd:attribute ref="xlink:href" use="optional"/>
+     <xsd:attribute ref="xlink:title" use="optional"/>
+     <xsd:attribute ref="xlink:label" use="optional"/>
+     <xsd:attribute ref="xlink:from" use="optional"/>
+     <xsd:attribute ref="xlink:to" use="optional"/>
+   </xsd:complexType>
+  </xsd:element>
+</xsl:template>
+
 <!-- Template for the metadata MCRMetaClassification -->
 
 <xsl:template match="mcrmetaclassification">
