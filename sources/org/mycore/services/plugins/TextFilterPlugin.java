@@ -28,19 +28,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRFileContentType;
+import org.mycore.datamodel.ifs.MCRFileReader;
+
 /**
  * The Plugin spec for filtering several documents for the fulltext search.
  * 
  * @author Thomas Scheffler (yagee)
  */
 public interface TextFilterPlugin {
-	
+
 	/**
 	 * should return a Name of the plugin
 	 * @return Plugin name
 	 */
 	public String getName();
-	
+
 	/**
 	 * may contain some additional Information on the plugin
 	 * @return further Informations on the plugin
@@ -48,33 +52,13 @@ public interface TextFilterPlugin {
 	public String getInfo();
 
 	/**
-	 * returns a list of all supported file extensions.
+	 * returns a list of all supported MCRFileContentTypes.
 	 * 
 	 * These file extensions must be delivered without the leading dot.
 	 * 
 	 * @return HashSet List of file extensions
- 	 */
-	public HashSet getSupportedExtensions();
-
-
-	/**
-	 * returns a list of all supported MIME Types.
-	 * 
-	 * They should be like "text/plain".
-	 * 
-	 * @return HashSet List of MIME types
-	 */
-	public HashSet getSupportedMimeTypes();
-
-	/**
-	 * converts a given Inputstream to Textstream which should contain
-	 * a textual representation of the source.
-	 * 
-	 * @param input	Inputstream in foreign format
- 	 * @param mime   MIME Type of InputStream
-	 * @return  InputStream textual representation of input
-	 */
-	public boolean transform(InputStream input, String mime, OutputStream output) throws FilterPluginTransformException;
+		 */
+	public HashSet getSupportedContentTypes();
 
 	/**
 	 * onverts a given Inputstream to Textstream which should contain
@@ -83,5 +67,9 @@ public interface TextFilterPlugin {
 	 * @param input  File in foreign format
 	 * @return Inputstream textual representation of input
 	 */
-	public boolean transform(File input, OutputStream output) throws FilterPluginTransformException;
+	public boolean transform(
+		MCRFileContentType ct,
+		MCRContentInputStream input,
+		OutputStream output)
+		throws FilterPluginTransformException;
 }

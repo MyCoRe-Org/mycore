@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -46,6 +47,8 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRFileContentType;
 
 /**
  * Loads and manages plugins
@@ -59,8 +62,7 @@ public class TextFilterPluginManager {
 	/** The configuration */
 	private static final MCRConfiguration conf = MCRConfiguration.instance();
 	/** Pluginbasket */
-	private static Hashtable MimePluginBag=null;
-	private static Hashtable FilePluginBag=null;
+	private static Hashtable ContentTypePluginBag=null;
 	private static Hashtable Plugins=null;
 	/** initialized */
 	private static TextFilterPluginManager instance;
@@ -78,8 +80,7 @@ public class TextFilterPluginManager {
 		return instance;
 	}
 	private void init(){
-		MimePluginBag=new Hashtable();
-		FilePluginBag=new Hashtable();
+		ContentTypePluginBag=new Hashtable();
 		Plugins=new Hashtable();
 		loadPlugins();
 	}
@@ -97,20 +98,18 @@ public class TextFilterPluginManager {
 			throw new MCRException("Failure getting URLs from plugins!",e);
 		}
 		TextFilterPlugin filter=null;
+		MCRFileContentType ct;
 		for (Iterator iter=getProviders(TextFilterPlugin.class, classLoader);
 		      iter.hasNext();){
 		    filter=(TextFilterPlugin)iter.next();
 			//logger.debug("Loading TextFilterPlugin: "+filter.getName());
 			System.err.println("Loading TextFilterPlugin: "+filter.getName());
-			for (Iterator mimeIterator=filter.getSupportedMimeTypes().iterator();
-			      mimeIterator.hasNext();){
+			for (Iterator CtIterator=filter.getSupportedContentTypes().iterator();
+			      CtIterator.hasNext();){
 				//Add MIME Type filters to the basket
-				MimePluginBag.put(mimeIterator.next(),filter);
-			}
-			for (Iterator fileIterator=filter.getSupportedExtensions().iterator();
-			      fileIterator.hasNext();){
-				//Add MIME Type filters to the basket
-				FilePluginBag.put(fileIterator.next(),filter);
+				ct=(MCRFileContentType) CtIterator.next();
+				if (ct!=null)
+					ContentTypePluginBag.put(ct,filter);
 			}
 			Plugins.put(filter.getClass().getName(),filter);
 		}
@@ -145,41 +144,27 @@ public class TextFilterPluginManager {
 	 * @param supported MIME type
 	 * @return corresponding TextFilterPlugin or null if MIME is emtpy or null
 	 */
-	public TextFilterPlugin getPlugin(String MIME){
-		return ((MIME==null) || (MIME.length()==0))?
-		            null : (TextFilterPlugin)MimePluginBag.get(MIME);
-	}
-	/**
-	 * returns TextFilterPlugin to corresponding File
-	 * @param supported File type
-	 * @return corresponding TextFilterPlugin or null if file has no extension
-	 */
-	public TextFilterPlugin getPlugin(File file){
-		int index=file.getName().lastIndexOf(".");
-		index++;
-		return (index==0)?
-		  null:(TextFilterPlugin)FilePluginBag.get(file.getName().substring(index));
+	public TextFilterPlugin getPlugin(MCRFileContentType ct){
+		return (ct==null)?
+		            null : (TextFilterPlugin)ContentTypePluginBag.get(ct);
 	}
 	/**
 	 * returns true if MIME type is supported
 	 * @param MIME of Inputstream
 	 * @return true if MIME type is supported, else false
 	 */
-	public boolean isSupported(String MIME){
-		return ((MIME==null) || (MIME.length()==0))?
-		            false : MimePluginBag.containsKey(MIME);
+	public boolean isSupported(MCRFileContentType ct){
+		return (ct==null)?
+		            false : ContentTypePluginBag.containsKey(ct);
 	}
-	/**
-	 * returns true if File type is supported
-	 * @param File to be converted
-	 * @return true if file type is supported and else false or if file has no extension
-	 */
-	public boolean isSupported(File file){
-		int index=file.getName().lastIndexOf(".");
-		index++;
-		return (index==0)?
-		  false:FilePluginBag.containsKey(file.getName().toLowerCase().substring(index));
+	
+	public boolean transform(MCRFileContentType ct,MCRContentInputStream input,	OutputStream output) throws FilterPluginTransformException{
+		if (isSupported(ct)){
+			return getPlugin(ct).transform(ct,input,output);
+		}
+		else return false;
 	}
+	
 	/**
 	 * returns the URLs of all plugins found in MCR.PluginDirectory
 	 * @return	Array of URL of plugin-JARs
