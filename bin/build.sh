@@ -15,11 +15,15 @@
 #
 #######################################################################
 
-# Directory where JDK is installed on your machine
-JAVA_HOME=/usr/java_dev2
+# Directory where JDK is installed on your machine, if not already set
+if [ "$JAVA_HOME" = "" ]; then
+  JAVA_HOME=/usr/java_dev2
+fi
 
-# Directory where Ant is installed on your machine
-ANT_HOME=/opt/jakarta-ant-1.5.1
+# Directory where Ant is installed on your machine, if not already set
+if [ "$ANT_HOME" = "" ]; then
+  ANT_HOME=/opt/jakarta-ant-1.5.1
+fi
 
 #######################################################################
 #
