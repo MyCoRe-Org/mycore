@@ -23,6 +23,7 @@
  **/
 package org.mycore.common;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,7 +51,7 @@ public class MCRInputStreamCloner {
 		//File tmpdir = new File(System.getProperty("java.io.tmpdir"));
 		streamSource = File.createTempFile("JavaStream", ".mycore");
 		//File is new and created
-		FileOutputStream fout = new FileOutputStream(streamSource);
+		BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(streamSource));
 		if (!MCRUtils.copyStream(source, fout)) {
 			source.close(); //you can't use it safely again
 			fout.close();
