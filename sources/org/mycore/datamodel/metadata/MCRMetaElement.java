@@ -547,6 +547,7 @@ public final void debug()
   logger.debug("NotInherit         = "+String.valueOf(notinherit));
   logger.debug("ParametricSearch   = "+String.valueOf(parasearch));
   logger.debug("TextSearch         = "+String.valueOf(textsearch));
+  logger.debug("Elements           = "+String.valueOf(list.size()));
   }
 
 }

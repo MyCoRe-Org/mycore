@@ -138,6 +138,7 @@ public void setFromDOM(org.jdom.Element element)
 public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
@@ -159,6 +160,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
+    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -211,6 +213,16 @@ public Object clone()
   MCRMetaLangText out = new MCRMetaLangText(datapart,subtag,lang,type,inherited,
     text);
   return (Object)out;
+  }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  logger.debug("Start Class : MCRMetaLangText");
+  super.debugDefault();
+  logger.debug("Text               = "+text);
   }
 
 }
