@@ -83,6 +83,8 @@ public MCRMetaNumber()
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_dimension    the optional dimension string
  * @param set_measurement  the optional measurement string
  * @param set_number       the number string
@@ -90,10 +92,10 @@ public MCRMetaNumber()
  *   the number string is not in a number format
  */
 public MCRMetaNumber(String set_datapart, String set_subtag, 
-  String default_lang, String set_dimension, String set_measurement, 
-  String set_number) throws MCRException
+  String default_lang, boolean set_inherted, String set_dimension, 
+  String set_measurement, String set_number) throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,"");
+  super(set_datapart,set_subtag,default_lang,"",set_inherted);
   set_number = set_number.trim();
   number = 0.;
   try {
@@ -125,15 +127,17 @@ public MCRMetaNumber(String set_datapart, String set_subtag,
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_dimension    the optional dimension string
  * @param set_number       the number value
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaNumber(String set_datapart, String set_subtag, 
-  String default_lang, String set_dimension,  String set_measurement,
-  double set_number) throws MCRException
+  String default_lang, boolean set_inherted, String set_dimension,
+  String set_measurement, double set_number) throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,"");
+  super(set_datapart,set_subtag,default_lang,"",set_inherted);
   number = set_number;
   dimension = "";
   if (set_dimension != null) { dimension = set_dimension; }
@@ -255,10 +259,13 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+    elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((dimension != null) && ((dimension = dimension.trim()).length() !=0)) {
     elm.setAttribute("dimension",dimension); }
   if ((measurement != null) && 
@@ -279,7 +286,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -325,16 +331,13 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaNumber class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaNumber debug start:");
-  super.debug();
-  System.out.println("<dimension>"+dimension+"</dimension>");
-  System.out.println("<measurement>"+measurement+"</measurement>");
-  System.out.println(number);
-  System.out.println("MCRMetaNumber debug end"+NL);
+  MCRMetaNumber out = new MCRMetaNumber(datapart,subtag,lang,inherited,
+    dimension,measurement,number);
+  return (Object) out;
   }
 
 }

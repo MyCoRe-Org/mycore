@@ -37,11 +37,70 @@ public interface MCRMetaInterface
 {
 
 /**
+ * This method get the inherited element.
+ *
+ * @return the inherited flag as boolean
+ **/
+public boolean getInherited();
+
+/**
+ * This method get the inherited element.
+ *
+ * @return the inherited flag as string
+ **/
+public String getInheritedToString();
+
+/**
+ * This method get the language element.
+ *
+ * @return the language
+ **/
+public String getLang();
+
+/**
+ * This method get the subtag element.
+ *
+ * @return the subtag
+ **/
+public String getSubTag();
+
+/**
+ * This method get the type element.
+ *
+ * @return the type
+ **/
+public String getType();
+
+/**
+ * This method set the inherited flag of true or false.
+ *
+ * @param flag a boolean value, true if the data are inherited, else false.
+ **/
+public void setInherited(boolean flag);
+
+/**
  * This methode set the default language to the class.
  *
  * @param default_lang           the default language
  **/
 public void setLang(String default_lang);
+
+/**
+ * This method set the subtag element. If the value of <em>set_subtag</em>
+ * is null or empty an exception was throwed.
+ *
+ * @param set_subtag             the subtag
+ * @exception MCRException if the set_subtag value is null or empty
+ **/
+public void setSubTag(String set_subtag) throws MCRException;
+
+/**
+ * This method set the type element. If the value of <em>set_type</em>
+ * is null or empty nothing was changed.
+ *
+ * @param set_type               the optional type
+ **/
+public void setType(String set_type);
 
 /**
  * This methode read the XML input stream part from a DOM part for the
@@ -86,9 +145,9 @@ public String createTextSearch(boolean textsearch)
 public boolean isValid();
 
 /**
- * This methode print all elements of the metadata class.
+ * This method make a clone of this class.
  **/
-public void debug();
+public Object clone();
 
 }
 

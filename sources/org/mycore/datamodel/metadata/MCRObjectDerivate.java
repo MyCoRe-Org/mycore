@@ -165,7 +165,6 @@ public final MCRMetaIFS getInternals()
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("derivate");
   if (linkmetas.size()!=0) {
@@ -209,7 +208,6 @@ public final org.jdom.Element createXML() throws MCRException
 public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"derivate");
@@ -241,20 +239,6 @@ public final boolean isValid()
     }
   if ((internals == null) && (externals.size() == 0)) { return false; }
   return true;
-  }
-
-/**
- * This metode print all data content from the internal data of this class.
- **/
-public final void debug()
-  {
-  System.out.println("MCRObjectDerivate debug start");
-  for (int i=0;i<linkmetas.size();i++) {
-    ((MCRMetaLinkID)linkmetas.get(i)).debug(); }
-  for (int i=0;i<externals.size();i++) {
-    ((MCRMetaLink)externals.get(i)).debug(); }
-  if (internals!=null) { internals.debug(); }
-  System.out.println("MCRObjectDerivate debug end"+NL);
   }
 
 }

@@ -24,6 +24,10 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -47,11 +51,16 @@ protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 protected static String DEFAULT_LANGUAGE = "en";
 protected static String DEFAULT_DATAPART = "metadata";
+protected static boolean DEFAULT_INHERITED = false;
+
+// logger
+static Logger logger=Logger.getLogger(MCRMetaDefault.class.getName());
 
 // MetaLangText data
 protected String subtag;
 protected String lang;
 protected String type;
+protected boolean inherited;
 protected String datapart;
 
 /**
@@ -59,12 +68,15 @@ protected String datapart;
  * The language element was set to <b>en</b>.
  * The datapart element was set to <b>metadata<b>
  * All other elemnts was set to an empty string.
+ * The inherited value is set to false!
  */
 public MCRMetaDefault()
   {
+  initLogger();
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
+  inherited = DEFAULT_INHERITED;
   datapart = DEFAULT_DATAPART;
   }
 
@@ -73,17 +85,20 @@ public MCRMetaDefault()
  * The language element was set. If the value of <em>default_lang</em>
  * is empty or false <b>en</b> was set. The datapart was set to default.
  * All other elemnts was set to an empty string.
+ * The inherited value is set to false!
  *
  * @param default_lang     the default language
  */
 public MCRMetaDefault(String default_lang)
   {
+  initLogger();
   lang = DEFAULT_LANGUAGE;
   if ((default_lang != null) && 
     ((default_lang = default_lang.trim()).length() !=0)) {
     lang = default_lang; }
   subtag = "";
   type = "";
+  inherited = DEFAULT_INHERITED;
   datapart = DEFAULT_DATAPART;
   }
 
@@ -96,20 +111,25 @@ public MCRMetaDefault(String default_lang)
  * the value of <em>set_type<em>, if it is null, an empty string was set 
  * to the type element. The datapart element was set. If the value of
  * <em>set_datapart,/em> is null or empty the default was set.
+ * The inherited value is set to false!
  *
  * @param set_datapart     the data part name
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaDefault(String set_datapart, String set_subtag, 
-  String default_lang, String set_type)
+  String default_lang, String set_type, boolean set_inherited)
   throws MCRException
   {
+  initLogger();
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
+  inherited = DEFAULT_INHERITED;
   if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() ==0)) {
     throw new MCRException("The set_subtag is null or empty."); }
   subtag = set_subtag;
@@ -121,7 +141,27 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
   if ((set_datapart != null) &&
     ((set_datapart = set_datapart.trim()).length() !=0)) {
     datapart = set_datapart; }
+  inherited = set_inherited;
   }
+
+/**
+ * The method initialized the Logger.
+ **/
+private void initLogger()
+  {
+  // get the instance of MCRConfiguration
+  MCRConfiguration config = MCRConfiguration.instance();
+  // set the logger property
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  }
+
+/**
+ * This method set the inherited flag of true or false.
+ * 
+ * @param flag a boolean value, true if the data are inherited, else false.
+ **/
+public final void setInherited(boolean flag)
+  { inherited = flag; }
 
 /**
  * This method set the language element. If the value of <em>default_lang</em>
@@ -180,6 +220,22 @@ public final void setDataPart(String set_datapart)
   }
 
 /**
+ * This method get the inherited element.
+ *
+ * @return the inherited flag as boolean
+ **/
+public final boolean getInherited()
+  { return inherited; }
+
+/**
+ * This method get the inherited element.
+ *
+ * @return the inherited flag as string
+ **/
+public final String getInheritedToString()
+  { return (new Boolean(inherited)).toString(); }
+
+/**
  * This method get the language element.
  *
  * @return the language
@@ -232,6 +288,9 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
   String temp_type = (String)element.getAttributeValue("type");
   if ((temp_type!=null) && ((temp_type = temp_type.trim()).length() !=0)) {
     type = temp_type; }
+  String temp_herit = (String)element.getAttributeValue("inherited");
+  if ((temp_herit!=null) && ((temp_herit = temp_herit.trim()).length() !=0)) {
+    inherited = Boolean.getBoolean(temp_herit); }
   }
 
 /**
@@ -281,14 +340,15 @@ public boolean isValid()
   }
 
 /**
- * This method print all data content from this class.
+ * This method put debug data to the logger (for the debug mode).
  **/
-public void debug()
+public final void debugDefault()
   {
-  System.out.println("<datapart>"+datapart+"</datapart>");
-  System.out.println("<subtag>"+subtag+"</subtag>");
-  System.out.println("<lang>"+lang+"</lang>");
-  System.out.println("<type>"+type+"</type>");
+  logger.debug("SubTag             = "+subtag);
+  logger.debug("Language           = "+lang);
+  logger.debug("Type               = "+type);
+  logger.debug("DataPart           = "+datapart);
+  logger.debug("Inhreited          = "+String.valueOf(inherited));
   }
 
 }

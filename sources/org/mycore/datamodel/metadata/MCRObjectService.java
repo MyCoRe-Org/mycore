@@ -77,10 +77,10 @@ public MCRObjectService()
   lang = DEFAULT_LANGUAGE;
   dates = new ArrayList();
   MCRMetaDate d = new MCRMetaDate("service","servdate",lang,"createdate",
-    new GregorianCalendar());
+    false,new GregorianCalendar());
   dates.add(d);
   d = new MCRMetaDate("service","servdate",lang,"modifydate",
-    new GregorianCalendar());
+    false,new GregorianCalendar());
   dates.add(d);
   flags = new ArrayList();
   }
@@ -187,7 +187,7 @@ public final void setDate(String type)
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
     MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,
-      new GregorianCalendar());
+      false,new GregorianCalendar());
     dates.add(d);
     }
   else {
@@ -213,7 +213,7 @@ public final void setDate(String type, GregorianCalendar date)
   for (int j=0;j<dates.size();j++) {
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
-    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,date);
+    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,false,date);
     dates.add(d);
     }
   else {
@@ -233,7 +233,7 @@ public final void addFlag(String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    value);
+    false,value);
   flags.add(flag);
   }
  
@@ -311,7 +311,7 @@ public final void replaceFlag(int index, String value)
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
   MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
-    value);
+    false,value);
   flags.set(index,flag);
   }
 
@@ -324,7 +324,6 @@ public final void replaceFlag(int index, String value)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("service");
   if (dates.size()!=0) {
@@ -359,7 +358,6 @@ public final org.jdom.Element createXML() throws MCRException
 public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"service");
@@ -395,20 +393,6 @@ public final boolean isValid()
   if (getDate("createdate") == null) { return false; }
   if (getDate("modifydate") == null) { return false; }
   return true;
-  }
-
-/**
- * This metode print all data content from the internal data of the
- * metadata class.
- **/
-public final void debug()
-  {
-  System.out.println("MCRMetaService debug start");
-  for (int i=0;i<dates.size();i++) {
-    ((MCRMetaDate)dates.get(i)).debug(); }
-  for (int i=0;i<flags.size();i++) {
-    ((MCRMetaLangText)flags.get(i)).debug(); }
-  System.out.println("MCRMetaService debug end"+NL);
   }
 
 }

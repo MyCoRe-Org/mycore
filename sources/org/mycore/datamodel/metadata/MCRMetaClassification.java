@@ -76,16 +76,18 @@ public MCRMetaClassification()
  * @param set_datapart     the global part of the elements like 'metadata'
  *                         or 'service'
  * @param set_subtag       the name of the subtag
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_classid      the classification ID
  * @param set_categid      the category ID
  * @exception MCRException if the set_subtag value, the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  */
 public MCRMetaClassification(String set_datapart, String set_subtag, 
-  String default_lang, String set_classid, String set_categid) 
+  boolean set_inherted, String set_classid, String set_categid) 
   throws MCRException
   {
-  super(set_datapart,set_subtag,"en","");
+  super(set_datapart,set_subtag,"en","",set_inherted);
   setValue(set_classid,set_categid);
   }
 
@@ -159,9 +161,10 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   elm.setAttribute("classid",classid); 
   elm.setAttribute("categid",categid); 
   return elm;
@@ -178,7 +181,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; } 
@@ -226,15 +228,13 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaClassification class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaClassification debug start:");
-  super.debug();
-  System.out.println("ClassificationID = "+classid);
-  System.out.println("CategoryID = "+categid);
-  System.out.println("MCRMetaClassification debug end"+NL);
+  MCRMetaClassification out = new MCRMetaClassification(datapart,subtag,
+    inherited,classid,categid);
+    return (Object)out;
   }
 
 }

@@ -168,7 +168,6 @@ public final void setDerivate(MCRObjectDerivate derivate)
 public final org.jdom.Document createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("mycorederivate");
   org.jdom.Document doc = new org.jdom.Document(elm);
@@ -193,7 +192,6 @@ public final org.jdom.Document createXML() throws MCRException
 public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");

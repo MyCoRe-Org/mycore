@@ -72,13 +72,16 @@ public MCRMetaBoolean()
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param set_type         the optional type string
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_value        the boolean value (true or false) as string
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaBoolean(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_value) throws MCRException
+  String default_lang, String set_type, boolean set_inherted, String set_value)
+  throws MCRException
   {
-  super(set_datapart,set_subtag,"en",set_type);
+  super(set_datapart,set_subtag,"en",set_type,set_inherted);
   if (set_value != null) { 
     set_value = set_value.toLowerCase().trim();
     if (set_value.equals("true")) { value = true; return; }
@@ -96,21 +99,24 @@ public MCRMetaBoolean(String set_datapart, String set_subtag,
  * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
  * is null or empty an exception was throwed. The type element was set to
  * the value of <em>set_type<em>, if it is null, an empty string was set
- * to the type element. The boolean element was set to the value of 
- * <em>set_value<em>, if it is null, false was set.
+ * to the type element. The boolean string <em>set_value<em>
+ * was set to a boolean element, if it is null, false was set.
  *
  * @param set_datapart     the global part of the elements like 'metadata'
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param set_type         the optional type string
- * @param set_value        the boolean value
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
+ * @param set_value        the boolean value (true or false)
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaBoolean(String set_datapart, String set_subtag, 
-  String set_type, boolean set_value) throws MCRException
+  String default_lang, String set_type, boolean set_inherted, boolean set_value)
+  throws MCRException
   {
-  super(set_datapart,set_subtag,"en",set_type);
-  value = set_value; 
+  super(set_datapart,set_subtag,"en",set_type,set_inherted);
+  value = set_value;
   }
 
 /**
@@ -179,12 +185,13 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   elm.addContent(getValueToString());
   return elm;
   }
@@ -200,7 +207,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -242,14 +248,13 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaBoolean class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaBoolean debug start:");
-  super.debug();
-  System.out.println(value);
-  System.out.println("MCRMetaBoolean debug end"+NL);
+  MCRMetaBoolean out = new MCRMetaBoolean(datapart,subtag,lang,type,inherited,
+    value);
+    return (Object)out;
   }
 
 }

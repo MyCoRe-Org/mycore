@@ -72,14 +72,16 @@ public MCRMetaDate()
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_date         the date as GregorianCalendar
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaDate(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, GregorianCalendar set_date) 
-  throws MCRException
+  String default_lang, String set_type, boolean set_inherted, 
+  GregorianCalendar set_date) throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   date = null;
   if (set_date != null) { date = set_date; }
   }
@@ -181,7 +183,6 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
@@ -189,6 +190,8 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   elm.addContent(getDateToString());
   return elm;
   }
@@ -204,7 +207,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -248,15 +250,12 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaDate class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaDate debug start:");
-  super.debug();
-  System.out.println("<date>"+getDateToString()+"</date>");
-  System.out.println("MCRMetaDate debug end"+NL);
+  MCRMetaDate out = new MCRMetaDate(datapart,subtag,lang,type,inherited,date);
+  return (Object) out;
   }
-
 }
 

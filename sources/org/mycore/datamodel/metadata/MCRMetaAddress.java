@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  **/
 final public class MCRMetaAddress extends MCRMetaDefault 
-  implements MCRMetaInterface 
+  implements MCRMetaInterface, Cloneable
 {
 
 // MetaAddress data
@@ -78,6 +78,8 @@ public MCRMetaAddress()
  * @param set_subtag      the name of the subtag
  * @param default_lang    the default language
  * @param set_type        the optional type string
+ * @param set_inherted    a boolean value, true if the data are inherited, 
+ *                        else false.
  * @param set_country     the country name
  * @param set_state       the state name
  * @param set_zipcode     the zipcode string
@@ -87,11 +89,12 @@ public MCRMetaAddress()
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaAddress(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_country, String set_state, 
+  String default_lang, String set_type, boolean set_inherted,
+  String set_country, String set_state, 
   String set_zipcode, String set_city, String set_street, String set_number) 
   throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   country   = "";
   state     = "";
   zipcode   = "";
@@ -217,6 +220,8 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((country = country  .trim()).length() !=0) {
     elm.addContent(new org.jdom.Element("country").addContent(country)); }
   if ((state   = state    .trim()).length() !=0) {
@@ -243,7 +248,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -319,19 +323,13 @@ public final boolean isValid()
   }
 
 /**
- * This metod prints all data content from the MCRMetaAddress class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaAddress debug start:");
-  super.debug();
-  System.out.println("<country>" +country+ "</country>" );
-  System.out.println("<state>"   +state  + "</state>"   );
-  System.out.println("<zipcode>" +zipcode+ "</zipcode>" );
-  System.out.println("<city>"    +city   + "</city>"    );
-  System.out.println("<street>"  +street + "</street>"  );
-  System.out.println("<number>"  +number + "</number>"  );
-  System.out.println("MCRMetaAddress debug end"+NL);
+  MCRMetaAddress out = new MCRMetaAddress(datapart,subtag,lang,type,inherited,
+    country,state,zipcode,city,street,number);
+    return (Object)out;
   }
 
 }

@@ -93,12 +93,15 @@ public MCRMetaLink()
  *                         or 'service' or so
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @exception MCRException if the set_datapart or set_subtag value is null or empty
  */
-public MCRMetaLink(String set_datapart, String set_subtag, String default_lang)
+public MCRMetaLink(String set_datapart, String set_subtag, String default_lang,
+  boolean set_inherted)
   throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,"");
+  super(set_datapart,set_subtag,default_lang,"",set_inherted);
   href = "";
   label = "";
   title = "";
@@ -275,6 +278,8 @@ public org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
     MCRObject.XLINK_URL));
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if (linktype.equals("locator")) {
     elm.setAttribute("href",href,org.jdom.Namespace.getNamespace("xlink",
       MCRObject.XLINK_URL));
@@ -369,24 +374,35 @@ public boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaLink class.
+ * This method make a clone of this class.
  **/
-public void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaLink debug start:");
-  super.debug();
-  System.out.println("<xlink:type>"+linktype+"</xlink:type>");
-  if (linktype.equals("locator")) {
-    System.out.println("<xlink:href>"+href+"</xlink:href>");
-    System.out.println("<xlink:label>"+label+"</xlink:label>");
-    System.out.println("<xlink:title>"+title+"</xlink:title>");
-    }
-  if (linktype.equals("arc")) {
-    System.out.println("<xlink:from>"+from+"</xlink:from>");
-    System.out.println("<xlink:to>"+to+"</xlink:to>");
-    System.out.println("<xlink:title>"+title+"</xlink:title>");
-    }
-  System.out.println("MCRMetaLink debug end"+NL);
+  MCRMetaLink out = new MCRMetaLink(datapart,subtag,lang,inherited);
+  out.linktype = linktype;
+  out.title = title;
+  out.type = type;
+  out.href = href;
+  out.to = to;
+  out.from = from;
+  return (Object)out;
+  }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  logger.debug("Start Class : MCRMetaLink");
+  super.debugDefault();
+  logger.debug("Link Type          = "+linktype);
+  logger.debug("Label              = "+label);
+  logger.debug("Title              = "+title);
+  logger.debug("HREF               = "+href);
+  logger.debug("FROM               = "+from);
+  logger.debug("TO                 = "+to);
+  logger.debug("Stop");
+  logger.debug("");
   }
 
 }

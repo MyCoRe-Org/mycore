@@ -76,6 +76,8 @@ public MCRMetaPerson()
  * @param set_subtag      the name of the subtag
  * @param default_lang    the default language
  * @param set_type        the optional type string
+ * @param set_inherted    a boolean value, true if the data are inherited,
+ *                        else false.
  * @param set_firstname   the first name
  * @param set_callname    the call name
  * @param set_surename    the sure name
@@ -84,11 +86,11 @@ public MCRMetaPerson()
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaPerson(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_firstname, 
-  String set_callname, String set_surename, String set_academic, 
-  String set_peerage) throws MCRException
+  String default_lang, String set_type, boolean set_inherted,
+  String set_firstname, String set_callname, String set_surename, 
+  String set_academic, String set_peerage) throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   firstname = "";
   callname  = "";
   surename  = "";
@@ -196,6 +198,8 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) { 
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((firstname = firstname.trim()).length() !=0) {
     elm.addContent(new org.jdom.Element("firstname").addContent(firstname)); }
   if ((callname  = callname .trim()).length() !=0) {
@@ -220,7 +224,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -297,18 +300,11 @@ public final boolean isValid()
   }
 
 /**
- * This metod prints all data content from the MCRMetaPerson class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaPerson debug start:");
-  super.debug();
-  System.out.println("<firstname>"+firstname+"</firstname>");
-  System.out.println("<callname>"+callname+"</callname>");
-  System.out.println("<surename>"+surename+"</surename>");
-  System.out.println("<academic>"+academic+"</academic>");
-  System.out.println("<peerage>"+peerage+"</peerage>");
-  System.out.println("MCRMetaPerson debug end"+NL);
+  return null;
   }
 
 }

@@ -74,6 +74,8 @@ public MCRMetaCorporation()
  * @param set_subtag      the name of the subtag
  * @param default_lang    the default language
  * @param set_type        the optional type string
+ * @param set_inherted    a boolean value, true if the data are inherited,
+ *                        else false.
  * @param set_name        the first name
  * @param set_nickname    the call name
  * @param set_parent      the sure name
@@ -81,10 +83,11 @@ public MCRMetaCorporation()
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaCorporation(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_name, String set_nickname,
-  String set_parent, String set_property) throws MCRException
+  String default_lang, String set_type, boolean set_inherted, String set_name, 
+  String set_nickname, String set_parent, String set_property) 
+  throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   name      = "";
   nickname  = "";
   parent    = "";
@@ -178,6 +181,8 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   if ((name      = name    .trim()).length()   !=0) {
     elm.addContent(new org.jdom.Element("name").addContent(name)); }
   if ((nickname  = nickname.trim()).length()   !=0) {
@@ -200,7 +205,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -264,17 +268,13 @@ public final boolean isValid()
   }
 
 /**
- * This metod prints all data content from the MCRMetaCorporation class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaCorporation debug start:");
-  super.debug();
-  System.out.println("<name>"+name+"</name>");
-  System.out.println("<nickname>"+nickname+"</nickname>");
-  System.out.println("<parent>"+parent+"</parent>");
-  System.out.println("<property>"+property+"</property>");
-  System.out.println("MCRMetaCorporation debug end"+NL);
+  MCRMetaCorporation out = new MCRMetaCorporation(datapart,subtag,lang,type,
+    inherited,name,nickname,parent,property);
+  return (Object) out;
   }
 
 }

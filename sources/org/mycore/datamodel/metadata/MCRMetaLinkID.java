@@ -64,17 +64,19 @@ public MCRMetaLinkID()
  *                         or 'service' or so
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @exception MCRException if the set_datapart or set_subtag value is null or 
  * empty
  */
 public MCRMetaLinkID(String set_datapart, String set_subtag, 
-  String default_lang) throws MCRException
-  { super(set_datapart,set_subtag,default_lang); }
+  String default_lang, boolean set_inherted) throws MCRException
+  { super(set_datapart,set_subtag,default_lang, set_inherted); }
 
 /**
  * This method set a reference with xlink:href, xlink:label and xlink:title. 
  *
- * @param set_href        the reference 
+ * @param set_href        the reference as MCRObjectID string
  * @param set_label       the new label string
  * @param set_title       the new title string
  * @exception MCRException if the set_href value is null, empty or not a 
@@ -92,11 +94,28 @@ public final void setReference(String set_href, String set_label,
   }
 
 /**
+ * This method set a reference with xlink:href, xlink:label and xlink:title. 
+ *
+ * @param set_href        the reference as MCRObjectID 
+ * @param set_label       the new label string
+ * @param set_title       the new title string
+ * @exception MCRException if the set_href value is null, empty or not a 
+ *   MCRObjectID
+ **/
+public final void setReference(MCRObjectID set_href, String set_label, 
+  String set_title) throws MCRException
+  {
+  if (set_href == null) {
+    throw new MCRException("The href value is null."); }
+  super.setReference(set_href.getId(),set_label,set_title); 
+  }
+
+/**
  * This method set a bidirectional link with xlink:from, xlink:to and 
  * xlink:title. 
  *
- * @param set_from        the source MCRObjectID
- * @param set_to          the target MCRObjectID
+ * @param set_from        the source MCRObjectID string
+ * @param set_to          the target MCRObjectID string
  * @param set_title       the new title string
  * @exception MCRException if the from or to element is not a MCRObjectId
  **/
@@ -111,6 +130,23 @@ public final void setBiLink(String set_from, String set_to, String set_title)
   catch (Exception e) { 
     linktype = null;
     throw new MCRException("The from/to value is not a MCRObjectID."); }
+  }
+
+/**
+ * This method set a bidirectional link with xlink:from, xlink:to and 
+ * xlink:title. 
+ *
+ * @param set_from        the source MCRObjectID
+ * @param set_to          the target MCRObjectID
+ * @param set_title       the new title string
+ * @exception MCRException if the from or to element is not a MCRObjectId
+ **/
+public final void setBiLink(MCRObjectID set_from, MCRObjectID set_to, 
+  String set_title) throws MCRException
+  {
+  if ((set_from == null) || (set_to == null)) {
+    throw new MCRException("The from/to value is null."); }
+  super.setBiLink(set_from.getId(),set_to.getId(),set_title); 
   }
 
 /**

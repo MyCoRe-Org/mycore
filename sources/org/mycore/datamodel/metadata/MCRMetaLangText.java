@@ -70,13 +70,16 @@ public MCRMetaLangText()
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
  * @param set_type         the optional type string
+ * @param set_inherted     a boolean value, true if the data are inherited,
+ *                         else false.
  * @param set_text         the text string
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaLangText(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, String set_text) throws MCRException
+  String default_lang, String set_type, boolean set_inherted, String set_text) 
+  throws MCRException
   {
-  super(set_datapart,set_subtag,default_lang,set_type);
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
   text = "";
   if (set_text != null) { text = set_text.trim(); }
   }
@@ -136,12 +139,13 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("xml:lang",lang);
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
+  if (inherited) {
+    elm.setAttribute("inherited",(new Boolean(inherited)).toString()); }
   elm.addContent(text);
   return elm;
   }
@@ -157,7 +161,6 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
@@ -203,14 +206,13 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaLangText class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaLangText debug start:");
-  super.debug();
-  if (text.trim().length()!=0) { System.out.println(text); }
-  System.out.println("MCRMetaLangText debug end"+NL);
+  MCRMetaLangText out = new MCRMetaLangText(datapart,subtag,lang,type,inherited,
+    text);
+  return (Object)out;
   }
 
 }

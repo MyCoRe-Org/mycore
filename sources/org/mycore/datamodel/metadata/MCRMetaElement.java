@@ -53,7 +53,6 @@ public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
 public static boolean DEFAULT_TEXT_SEARCH = false;
 public static boolean DEFAULT_HERITABLE = false;
 private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
-private static String LINK_CLASS_NAME = "MCRMetaLink";
 
 // MetaElement data
 private String lang = null;
@@ -99,6 +98,29 @@ public MCRMetaElement(String default_lang)
   textsearch = DEFAULT_TEXT_SEARCH;
   heritable = DEFAULT_HERITABLE;
   list = new ArrayList();
+  }
+
+/**
+ * This is the constructor of the MCRMetaElement class. 
+ *
+ * @param lang             the default language
+ * @param parasearch       the  parametric search as string
+ **/
+public MCRMetaElement(String set_lang, String set_classname, String set_tag,
+  boolean set_parasearch, boolean set_textsearch, boolean set_hreitable,
+  ArrayList set_list)
+  {
+  if ((set_lang != null) && ((set_lang = set_lang.trim()).length() !=0)) {
+    lang = set_lang; }
+  classname = ""; setClassName(set_classname);
+  tag = ""; setTag(set_tag);
+  parasearch = DEFAULT_PARAMETRIC_SEARCH; setParametricSearch(set_parasearch);
+  textsearch = DEFAULT_TEXT_SEARCH; setTextSearch(set_textsearch);
+  heritable = DEFAULT_HERITABLE; setHeritable(set_hreitable);
+  list = new ArrayList();
+  if (set_list != null) {
+    for (int i=0; i<set_list.size();i++) { list.add(set_list.get(i)); }
+    }
   }
 
 /**
@@ -170,8 +192,7 @@ public void setParametricSearch(String parasearch)
   this.parasearch = DEFAULT_PARAMETRIC_SEARCH;
   if ((parasearch == null) || ((parasearch = parasearch.trim()).length() ==0))
     { return; }
-  if (parasearch.equals("true")) { this.parasearch = true; return; }
-  this.parasearch = false;
+  if (parasearch.equals("true")) { this.parasearch = true; }
   }
 
 /**
@@ -192,8 +213,7 @@ public void setTextSearch(String textsearch)
   this.textsearch = DEFAULT_TEXT_SEARCH;
   if ((textsearch == null) || ((textsearch = textsearch.trim()).length() ==0))
     { return; }
-  if (textsearch.equals("true")) { this.textsearch = true; return; }
-  this.textsearch = false;
+  if (textsearch.equals("true")) { this.textsearch = true; }
   }
 
 /**
@@ -223,7 +243,6 @@ public void setHeritable(String heritable)
   if ((heritable == null) || ((heritable = heritable.trim()).length() ==0))
     { return; }
   if (heritable.equals("true")) { this.heritable = true; }
-  this.heritable = false;
   }
 
 /**
@@ -242,7 +261,7 @@ public void setTag(String tag)
  *
  * @param classname             the class name for the metadata elements
  */
-public void setClassName(String classname)
+public final void setClassName(String classname)
   {
   if ((classname == null) || ((classname = classname.trim()).length() ==0)) {
     return; }
@@ -254,126 +273,31 @@ public void setClassName(String classname)
  * 
  * @return int                  the size of "list"
  */
-public int size ()
+public final int size ()
 {
 	return list.size();
 }
 
 /**
- * <em>isLinkFolder</em> checks whether the class name is MCRMetaLink or not.
- * 
- * @return boolean              true, if the elements of this instance are links
- */
-public final boolean isLinkFolder ()
-{
-	if (classname == null) return false;
-	return classname.trim().equals(LINK_CLASS_NAME);
-}
+ * The method add a metadata object, that implements the MCRMetaInterface
+ * to this element.
+ *
+ * @param obj a metadata object
+ * @exception MCRException if the class name of the object is not the same 
+ * like the name of all store metadata in this element.
+ **/
+public final void addMetaObject(MCRMetaInterface obj) 
+  { list.add(obj); }
 
 /**
- * <em>addLink</em> adds an MCRMetaLink to the list if and only if the
- * classname of this MCRMetaElement is MCRMetaLink and the link to be added
- * is of type "locator".
- * 
- * @param link                  an MCRMetaLink to be added
- * @return boolean              true, if successfully completed
- */
-public final boolean addLink (MCRMetaLink link)
-{
-	if (size() == 0) setClassName(LINK_CLASS_NAME);
-	if (! isLinkFolder()) return false;
-	if (! link.getXLinkType().equals("locator")) return false;
-	return list.add(link);
-}
-
-/**
- * <em>indexOfLink</em> searches for a link with given href (and optionally
- * with given subtag and/or title) in the list starting from arbitrary position
- * and returns the index of its first occurrence, or -1 if not found.
- * 
- * @param str_href              the link's destination id
- * @param str_subtag            the subtag name to search for (or null)
- * @param str_title             the title to search for (or null)
- * @param start                 the start position
- * @return int                  the position of the link's first occurrence
- */
-public final int indexOfLink (String str_href, String str_subtag, String str_title,
-								int start)
-{
-	int i, k, n;
-	MCRMetaLink link = null;
-	for (i = start, k = -1, n = size(); i < n; ++i)
-	{
-		link = (MCRMetaLink) list.get(i);
-		if (! link.getXLinkHref().equals(str_href)) continue;
-		if (str_subtag != null)
-			if (! link.getSubTag().equals(str_subtag)) continue;
-		if (str_title != null)
-			if (! link.getXLinkTitle().equals(str_title)) continue;
-		k = i;
-		break;
-	}
-	return k;
-}
-
-/**
- * <em>indexOfLink</em> searches for a link with given href (and optionally
- * with given subtag and/or title) in the list and returns the index of its
- * first occurrence, or -1 if not found.
- * 
- * @param str_href              the link's destination id
- * @param str_subtag            the subtag name to search for (or null)
- * @param str_title             the title to search for (or null)
- * @return int                  the position of the link's first occurrence
- */
-public final int indexOfLink (String str_href, String str_subtag, String str_title)
-{
-	return indexOfLink(str_href, str_subtag, str_title, 0);
-}
-
-/**
- * <em>removeLink</em> removes an MCRMetaLink from the list if and only if the
- * classname of this MCRMetaElement is MCRMetaLink.
- * 
- * @param index                 the index of the link to be removed
- * @return boolean              true, if successfully completed
- */
-public final boolean removeLink (int index)
-{
-	if (! isLinkFolder()) return false;
-	if (index < 0 || index >= list.size()) return false;
-	list.remove(index);
-	return true;
-}
-
-/**
- * <em>removeLink</em> searches for a link with given href (and optionally
- * with given subtag and/or title) in the list and removes it if found
- * returning true. If not found it returns false.
- * 
- * @param str_href              the link's destination id
- * @param str_subtag            the subtag name to search for (or null)
- * @param str_title             the title to search for (or null)
- * @return boolean              true, if successfull removed
- */
-public final boolean removeLink (String str_href, String str_subtag, String str_title)
-{
-	return removeLink(indexOfLink(str_href, str_subtag, str_title));
-}
-
-/**
- * <em>removeAllLinks</em> removes all links from the list if and only if the
- * classname of this MCRMetaElement is MCRMetaLink.
- * 
- * @return boolean              true, if successfully completed
- */
-public final boolean removeAllLinks ()
-{
-	if (size() == 0) return true;
-	if (! isLinkFolder()) return false;
-	list.clear();
-	return true;
-}
+ * The method removes all inherited metadata objects of this MCRMetaElement.
+ **/
+public final void removeInheritedObject()
+  {
+  for (int i=0;i<size();i++) {
+    if (((MCRMetaInterface)list.get(i)).getInherited()) { list.remove(i); }
+    }
+  }
 
 /**
  * This methode read the XML input stream part from a DOM part for the
@@ -414,19 +338,27 @@ public final void setFromDOM(org.jdom.Element element) throws MCRException
  * This methode create a XML stream for all data in this class, defined
  * by the MyCoRe XML MCRLangText definition for the given subtag.
  *
+ * @param flag true if all inherited data should be include, else false
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Element with the XML Element part
  **/
-public final org.jdom.Element createXML() throws MCRException
+public final org.jdom.Element createXML(boolean flag) throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(tag);
+  int j = 0;
+  for (int i=0;i<list.size();i++) {
+    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    }
+  if ((j == 0) && (!flag)) { return elm; }
   elm.setAttribute("class",classname);
   elm.setAttribute("heritable",new Boolean(heritable).toString());
   elm.setAttribute("parasearch",new Boolean(parasearch).toString());
   elm.setAttribute("textsearch",new Boolean(textsearch).toString());
   for (int i=0;i<list.size();i++) {
+    if (!flag) {
+      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
     elm.addContent(((MCRMetaInterface)list.get(i)).createXML()); }
   return elm;
   }
@@ -434,19 +366,26 @@ public final org.jdom.Element createXML() throws MCRException
 /**
  * This methode create a typed content list for all data in this instance.
  *
- * @param parametric true if the data should parametric searchable
- * @param textsearch true if the data should text searchable
+ * @param flag true if all inherited data should be include, els false
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent() throws MCRException
+public final MCRTypedContent createTypedContent(boolean flag) 
+  throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if (!parasearch) { return tc; }
+  int j = 0;
+  for (int i=0;i<list.size();i++) {
+    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    }
+  if ((j == 0) && (!flag)) { return tc; }
   tc.addTagElement(tc.TYPE_TAG,tag);
   for (int i=0;i<list.size();i++) {
+    if (!flag) {
+      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
     tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
       .createTypedContent(parasearch)); }
   return tc;
@@ -455,16 +394,25 @@ public final MCRTypedContent createTypedContent() throws MCRException
 /**
  * This methode create a String for all text searchable data in this instance.
  *
+ * @param flag true if all inherited data should be include, els false
  * @exception MCRException if the content of this class is not valid
  * @return a String with the searchable text
  **/
-public final String createTextSearch()
+public final String createTextSearch(boolean flag)
   throws MCRException
   {
   if (!textsearch) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
+  int j = 0;
   for (int i=0;i<list.size();i++) {
-    sb.append(((MCRMetaInterface)list.get(i)).createTextSearch(textsearch)); }
+    if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
+    }
+  if ((j == 0) && (!flag)) { return sb.toString(); }
+  for (int i=0;i<list.size();i++) {
+    if (!flag) {
+      if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
+    sb.append(((MCRMetaInterface)list.get(i)).createTextSearch(textsearch))
+      .append(' '); }
   return sb.toString();
   }
 
@@ -493,21 +441,21 @@ public final boolean isValid()
   }
 
 /**
- * This methode print all elements of the metadata class.
+ * This method make a clone of this class.
  **/
-public final void debug()
+public final Object clone()
   {
-  System.out.println("MCRMetaElement debug start");
-  System.out.println("<classname>"+classname+"</classname>");
-  System.out.println("<lang>"+lang+"</lang>");
-  System.out.println("<tag>"+tag+"</tag>");
-  System.out.println("<heritable>"+heritable+"</heritable>");
-  System.out.println("<parasearch>"+parasearch+"</parasearch>");
-  System.out.println("<textsearch>"+parasearch+"</textsearch>");
-  for (int i=0;i<list.size();i++) {
-    ((MCRMetaInterface)list.get(i)).debug(); }
-  System.out.println("MCRMetaElement debug end"+NL);
+  MCRMetaElement out = new MCRMetaElement(lang);
+  out.setClassName(classname);
+  out.setTag(tag);
+  out.setParametricSearch(parasearch);
+  out.setTextSearch(textsearch);
+  out.setHeritable(heritable);
+  for (int i=0;i<size();i++) {
+    MCRMetaInterface mif = (MCRMetaInterface)(((MCRMetaInterface)list.get(i)).clone());
+    out.addMetaObject(mif);
+    }
+  return (Object)out;
   }
-
 }
 

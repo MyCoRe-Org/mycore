@@ -80,7 +80,7 @@ public MCRMetaIFS(String set_datapart, String set_subtag,
   String default_lang, String set_sourcepath) 
   throws MCRException
   {
-  super(set_datapart,set_subtag,"en","");
+  super(set_datapart,set_subtag,"en","",false);
   setSourcePath(set_sourcepath);
   maindoc = "";
   ifsid = "";
@@ -171,7 +171,6 @@ public final void setFromDOM(org.jdom.Element element)
 public final org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("sourcepath",sourcepath); 
@@ -225,17 +224,9 @@ public final boolean isValid()
   }
 
 /**
- * This method print all data content from the MCRMetaClassification class.
+ * This method make a NOT clone of this class. It is an empty method.
  **/
-public final void debug()
-  {
-  System.out.println("MCRMetaIFS debug start:");
-  super.debug();
-  System.out.println("IFS Source Path   = "+sourcepath);
-  System.out.println("IFS Main Document = "+maindoc);
-  System.out.println("IFS ID            = "+ifsid);
-  System.out.println("MCRMetaClassification debug end"+NL);
-  }
-
+public final Object clone()
+  { return null; }
 }
 

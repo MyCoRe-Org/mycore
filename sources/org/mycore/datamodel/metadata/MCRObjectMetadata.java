@@ -39,12 +39,14 @@ import org.mycore.common.MCRUtils;
  * @author Mathias Hegner
  * @version $Revision$ $Date$
  **/
-public class MCRObjectMetadata
+public class MCRObjectMetadata 
 {
 // common data
 private static String NL = 
   new String((System.getProperties()).getProperty("line.separator"));;
 private String default_lang = null;
+private boolean herited_xml = false;
+private boolean herited_search = false;
 
 // metadata list
 private ArrayList meta_list = null;
@@ -62,6 +64,10 @@ public MCRObjectMetadata() throws MCRConfigurationException
   {
   default_lang = MCRConfiguration.instance()
     .getString("MCR.metadata_default_lang");
+  herited_xml = MCRConfiguration.instance()
+    .getBoolean("MCR.metadata_herited_for_xml",false);
+  herited_search = MCRConfiguration.instance()
+    .getBoolean("MCR.metadata_herited_for_search",false);
   meta_list = new ArrayList();
   tag_names = new ArrayList();
   }
@@ -74,12 +80,13 @@ public MCRObjectMetadata() throws MCRConfigurationException
 public int size () { return tag_names.size(); }
 
 /**
- * <em>tagName</em> returns the tag name at a given index.
+ * The method returns the tag name at a given index.
  * 
  * @param i           given index
  * @return String     the associated tag name
  */
-public String tagName (int i) { return (String) tag_names.get(i); }
+public final String getMetadataTagName (int i) 
+  { return (String) tag_names.get(i); }
 
 /**
  * <em>getHeritableMetadata</em> returns an instance of MCRObjectMetadata
@@ -88,20 +95,53 @@ public String tagName (int i) { return (String) tag_names.get(i); }
  * @return MCRObjectMetadata    the heritable part of this MCRObjectMetadata
  * @exception MCRConfigurationException
  */
-public MCRObjectMetadata getHeritableMetadata ()
+public final MCRObjectMetadata getHeritableMetadata ()
 	throws MCRConfigurationException
-{
-	MCRObjectMetadata heritMeta = new MCRObjectMetadata ();
-	int i, n = size();
-	MCRMetaElement metaElem = null;
-	for (i = 0; i < n; ++i)
-	{
-		metaElem = (MCRMetaElement) meta_list.get(i);
-		if (metaElem.getHeritable())
-			heritMeta.setMetadataElement(metaElem, tagName(i));
-	}
-	return heritMeta;
-}
+  {
+  MCRObjectMetadata heritMeta = new MCRObjectMetadata ();
+  for (int i = 0; i < size(); ++i) {
+    MCRMetaElement me = (MCRMetaElement)meta_list.get(i);
+    if (me.getHeritable()) {
+      MCRMetaElement nme = (MCRMetaElement)me.clone();
+      for (int j=0;j<nme.size();j++) {
+        nme.getElement(j).setInherited(true); }
+      heritMeta.setMetadataElement(nme, getMetadataTagName(i)); 
+      }
+    }
+  return heritMeta;
+  }
+
+/**
+ * This method append MCRMetaElement's from a given MCRObjectMetadata to
+ * this data set.
+ * 
+ * @param input the MCRObjectMetadata, that should merged into this data set
+ **/
+public final void appendMetadata(MCRObjectMetadata input)
+  {
+  MCRMetaElement newelm = null;
+  String newtag = "";
+  for (int i=0;i<input.size();i++) {
+    newelm = input.getMetadataElement(i);
+    newtag = newelm.getTag();
+    int pos = -1;
+    for (int j = 0; j < size(); j++) {
+      if (((String)tag_names.get(j)).equals(newtag)) { pos = j; }
+      }
+    if (pos != -1) {
+      ((MCRMetaElement)meta_list.get(pos)).setHeritable(true);
+      for (int j=0;j < newelm.size();j++) {
+        MCRMetaInterface obj  = newelm.getElement(j);
+        ((MCRMetaElement)meta_list.get(pos)).addMetaObject(obj); 
+        }
+      }
+    else {
+      tag_names.add(newtag);
+      newelm.setHeritable(true);
+      meta_list.add(newelm);
+      }
+    }
+  }
 
 /**
  * This methode return the MCRMetaElement selected by tag.
@@ -178,6 +218,18 @@ public final boolean removeMetadataElement(String tag)
   }
 
 /**
+ * This methode remove the MCRMetaElement selected a index from the list.
+ *
+ * @return true if set was succesful, otherwise false
+ **/
+public final boolean removeMetadataElement(int index)
+  {
+  if ((index<0) || (index>size())) { return false; }
+  meta_list.remove(index);
+  return true; 
+  }
+
+/**
  * This methode read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
@@ -218,7 +270,7 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("xml:lang",default_lang);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    elm.addContent(((MCRMetaElement)meta_list.get(i)).createXML()); }
+    elm.addContent(((MCRMetaElement)meta_list.get(i)).createXML(herited_xml)); }
   return elm;
   }
 
@@ -238,7 +290,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
     tc.addMCRTypedContent(((MCRMetaElement)meta_list.get(i))
-      .createTypedContent()); }
+      .createTypedContent(herited_search)); }
   return tc;
   }
 
@@ -253,7 +305,8 @@ public final String createTextSearch() throws MCRException
   StringBuffer sb = new StringBuffer(4096);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
-    sb.append(((MCRMetaElement)meta_list.get(i)).createTextSearch()); }
+    sb.append(((MCRMetaElement)meta_list.get(i))
+      .createTextSearch(herited_search)); }
   return sb.toString();
   }
 
@@ -275,17 +328,4 @@ public final boolean isValid()
   return true;
   }
 
-/**
- * This metode print all data content from the internal data of the
- * metadata class.
- **/
-public final void debug()
-  {
-  System.out.println("MCRObjectMetadata debug start");
-  System.out.println("<lang>"+default_lang+"</lang>");
-  System.out.println();
-  for (int i = 0; i < meta_list.size(); i++) {
-    ((MCRMetaElement)meta_list.get(i)).debug(); }
-  System.out.println("MCRObjectMetadata debug end"+NL);
-  }
 }

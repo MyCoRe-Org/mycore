@@ -27,6 +27,10 @@ package org.mycore.datamodel.metadata;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -73,6 +77,9 @@ protected static String SLASH;
 public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
 public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
+// logger
+static Logger logger=Logger.getLogger(MCRBase.class.getPackage().getName());
+
 /**
  * Load static data for all MCRObjects
  **/
@@ -83,11 +90,15 @@ static
   try {
     // Load the configuration
     mcr_conf = MCRConfiguration.instance();
+    // set the logger property
+    PropertyConfigurator.configure(mcr_conf.getLoggingProperties());
     // Default Encoding
     mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
       "ISO_8859-1");
+    logger.debug("Encoding = "+mcr_encoding);
     // Path of XML schema
     mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
+    logger.debug("XMLSchema Path = "+mcr_schema_path);
     // Set persistence layer
     persist_type = mcr_conf.getString("MCR.persistence_type","cm7");
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
@@ -296,16 +307,4 @@ public boolean isValid()
   return true;
   }
 
-/**
- * This metode print the data content from this class.
- **/
-public void debug()
-  {
-  System.out.println();
-  System.out.println("The object content :");
-  System.out.println("  ID     = "+mcr_id.getId());
-  System.out.println("  label  = "+mcr_label);
-  System.out.println("  schema = "+mcr_schema);
-  System.out.println();
-  }
 }

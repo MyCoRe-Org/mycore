@@ -71,7 +71,7 @@ public MCRObject() throws MCRException, MCRConfigurationException
   // Metadata class
   mcr_metadata = new MCRObjectMetadata();
   // Structure class
-  mcr_struct = new MCRObjectStructure();
+  mcr_struct = new MCRObjectStructure(logger);
   }
 
 /**
@@ -100,49 +100,6 @@ public final MCRObjectMetadata getMetadata()
  **/
 public final MCRObjectStructure getStructure()
   { return mcr_struct; }
-
-/**
- * <em>addChild</em> creates a (bidirectional) link to a child object.
- * The child inherits the heritable metadata part of this object
- * and its forefathers.
- * Note: In order to prevent from multiple inheritance, a child link cannot
- *       occur twice with the same href string !
- * 
- * @param child                 the child MCRObject
- * @param label                 the link's label
- * @param titleChild            the child link's title
- * @param titleParent           the parent's title
- * @return                      true, if operation successfully completed
- * @exception MCRException      thrown for multiple inheritance request
- */
-public final boolean addChild (MCRObject child, String label,
-                               String titleChild, String titleParent)
-  throws MCRException
-{
-  boolean flag = mcr_struct.addChild(child.mcr_id.getId(), label, titleChild);
-  Vector inh_metadata = new Vector();
-  inh_metadata.addElement(mcr_metadata.getHeritableMetadata());
-  Vector inh_fore = mcr_struct.getInheritedMetadata();
-  if (inh_fore != null)
-  {
-    for (int i = 0; i < inh_fore.size(); ++i)
-      inh_metadata.addElement((MCRObjectMetadata) inh_fore.elementAt(i));
-  }
-  return flag &&
-    child.mcr_struct.setParent(mcr_id.getId(), label, titleParent, inh_metadata);
-}
-
-/** <em>removeChild</em> removes a child link. If the link was
- * found, a "true" will be returned, otherwise "false".
- *
- * @param dest                  the link's destination MCRObject
- * @return                      true, if operation successfully completed
- */
-public final boolean removeChild (MCRObject dest)
-{
-  return mcr_struct.removeChild(dest.mcr_id.getId())
-    && dest.mcr_struct.removeParent(mcr_id.getId());
-}
 
 /**
  * The given DOM was convert into an internal view of metadata. This are 
@@ -248,7 +205,6 @@ public final void setStructure(MCRObjectStructure structure)
 public final org.jdom.Document createXML() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("mycoreobject");
   org.jdom.Document doc = new org.jdom.Document(elm);
@@ -274,7 +230,6 @@ public final org.jdom.Document createXML() throws MCRException
 public final MCRTypedContent createTypedContent() throws MCRException
   {
   if (!isValid()) {
-    debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
@@ -313,12 +268,50 @@ public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
+  // create this object in datastore
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
+  // prepare this object with parent metadata
+  MCRObjectID parent_id = mcr_struct.getParentID();
+  MCRObject parent = new MCRObject();
+  if (parent_id != null) {
+    logger.debug("Parent ID = "+parent_id.getId());
+    try {
+      byte [] xmlarray = mcr_persist.receive(parent_id);
+      parent.setFromXML(xmlarray,false);
+      mcr_metadata.appendMetadata(parent.getMetadata()
+        .getHeritableMetadata());
+      }
+    catch (Exception e) {
+      logger.error(MCRException.getStackTraceAsString(e));
+      logger.error("Error while merging metadata in this object.");
+      return;
+      }
+    }
+  // build this object
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
   mcr_persist.create(mcr_tc,xml,mcr_ts);
+  // add the MCRObjectID to the child list in the parent object
+  if (parent_id != null) {
+    try {
+      parent.mcr_service.setDate("modifydate");
+      parent.mcr_struct.addChild(mcr_id,mcr_struct.getParent().getXLinkLabel(),
+        mcr_label);
+      org.jdom.Document parent_xml = parent.createXML();
+      MCRTypedContent parent_mcr_tc = parent.createTypedContent();
+      String parent_mcr_ts = parent.createTextSearch();
+      mcr_persist.update(parent_mcr_tc,parent_xml,parent_mcr_ts);
+      }
+    catch (Exception e) {
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error("Error while store child ID in parent object.");
+      deleteFromDatastore();
+      logger.error("Child object was removed.");
+      return;
+      }
+    }
   }
 
 /**
@@ -373,7 +366,7 @@ public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
   }
 
 /**
- * The methode delete the object in the data store.
+ * The methode delete the object for the given ID from the data store.
  *
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
@@ -381,18 +374,67 @@ public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
 public final void deleteFromDatastore(String id) throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
+  deleteFromDatastore();
+  }
+
+/**
+ * The methode delete the object from the data store.
+ *
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+private final void deleteFromDatastore() throws MCRPersistenceException
+  {
+  if (mcr_id == null) {
+    throw new MCRPersistenceException("The MCRObjectID is null."); }
   // get the Item
   byte [] xml = mcr_persist.receive(mcr_id);
   setFromXML(xml,false);
   // set the derivate data in structure
-  MCRDerivate der;
-  for (int i=0;i<getStructure().getDerivateSize();i++) {
+  MCRDerivate der = null;
+  for (int i=0;i<mcr_struct.getDerivateSize();i++) {
     der = new MCRDerivate();
     try {
       der.deleteFromDatastore(getStructure().getDerivate(i).getXLinkHref()); }
     catch (MCRException e) {
-      System.out.println(e.getMessage()); }
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error(e.getMessage());
+      logger.error("Error while deleting derivate.");
+      }
     }
+  // remove all children
+  MCRObject child = null;
+  for (int i=0;i<mcr_struct.getChildSize();i++) {
+    child = new MCRObject();
+    try {
+      child.deleteFromDatastore(getStructure().getChild(i).getXLinkHref()); }
+    catch (MCRException e) {
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error(e.getMessage());
+      logger.error("Error while deleting child.");
+      }
+    }
+  //
+  MCRObjectID parent_id = mcr_struct.getParentID();
+  if (parent_id != null) {
+    logger.debug("Parent ID = "+parent_id.getId());
+    try {
+      byte [] xmlarray = mcr_persist.receive(parent_id);
+      MCRObject parent = new MCRObject();
+      parent.setFromXML(xmlarray,false);
+      parent.mcr_service.setDate("modifydate");
+      parent.mcr_struct.removeChild(mcr_id);
+      org.jdom.Document parent_xml = parent.createXML();
+      MCRTypedContent parent_mcr_tc = parent.createTypedContent();
+      String parent_mcr_ts = parent.createTextSearch();
+      mcr_persist.update(parent_mcr_tc,parent_xml,parent_mcr_ts);
+      }
+    catch (Exception e) {
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error("Error while delete child ID in parent object.");
+      logger.warn("Attention, the parent "+parent_id+"is now inconsist.");
+      }
+    }
+  // remove him self
   mcr_persist.delete(mcr_id);
   }
 
@@ -426,6 +468,21 @@ public final void receiveFromDatastore(String id)
   }
 
 /**
+ * The methode receive the object for the given MCRObjectID and stored
+ * it in this MCRObject.
+ *
+ * @param id   the object ID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final void receiveFromDatastore(MCRObjectID id) 
+  throws MCRPersistenceException
+  {
+  mcr_id = id;
+  byte [] xml = mcr_persist.receive(mcr_id);
+  setFromXML(xml,false);
+  }
+
+/**
  * The methode receive the object for the given MCRObjectID and returned
  * it as XML stream.
  *
@@ -447,21 +504,97 @@ public final byte [] receiveXMLFromDatastore(String id)
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
+  // clean the structure
+  mcr_struct.clear();
   // get the old Item
   MCRObject old = new MCRObject();
-  old.receiveFromDatastore(mcr_id.getId());
+  old.receiveFromDatastore(mcr_id);
   // set the derivate data in structure
-  for (int i=0;i<old.getStructure().getDerivateSize();i++) {
-    getStructure().addDerivate(old.getStructure().getDerivate(i));
+  for (int i=0;i<old.mcr_struct.getDerivateSize();i++) {
+    mcr_struct.addDerivate(old.mcr_struct.getDerivate(i));
+    }
+  // set the parent from the original
+  if (old.mcr_struct.getParent() != null) {
+    mcr_struct.setParent(old.mcr_struct.getParent()); }
+  // set the children from the original
+  for (int i=0;i<old.mcr_struct.getChildSize();i++) {
+    mcr_struct.addChild(old.mcr_struct.getChild(i));
+    }
+  // import all herited matadata from the parent
+  MCRObjectID parent_id = mcr_struct.getParentID();
+  if (parent_id != null) {
+    logger.debug("Parent ID = "+parent_id.getId());
+    try {
+      MCRObject parent = new MCRObject();
+      parent.receiveFromDatastore(parent_id);
+      mcr_metadata.appendMetadata(parent.getMetadata()
+        .getHeritableMetadata());
+      }
+    catch (Exception e) {
+      logger.error(MCRException.getStackTraceAsString(e));
+      logger.error("Error while merging metadata in this object.");
+      }
     }
   // set the date
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");
-  // update all
+  // update this dataset
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
   mcr_persist.update(mcr_tc,xml,mcr_ts);
+  // update all children
+  for (int i=0;i<mcr_struct.getChildSize();i++) {
+    MCRObject child = new MCRObject();
+    child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+    }
+  }
+
+/**
+ * The method update the metadata of the stored dataset and replace the
+ * inherited data from the parent.
+ *
+ * @param child_id  the MCRObjectID of the parent as string
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+private final void updateMetadataInDatastore(MCRObjectID child_id)
+  throws MCRPersistenceException
+  {
+  logger.debug("Update metadata from Child "+child_id.getId());
+  // get the XML Stream for the child_id
+  receiveFromDatastore(child_id);
+  // delete the old inherited data from all metadata elements
+  for (int i= 0; i<mcr_metadata.size();i++) {
+    mcr_metadata.getMetadataElement(i).removeInheritedObject();
+    if (mcr_metadata.getMetadataElement(i).size() == 0) {
+      mcr_metadata.removeMetadataElement(i); }
+    }
+  // import all herited matadata from the parent
+  MCRObjectID parent_id = mcr_struct.getParentID();
+  if (parent_id != null) {
+    logger.debug("Parent ID = "+parent_id.getId());
+    try {
+      MCRObject parent = new MCRObject();
+      parent.receiveFromDatastore(parent_id);
+      mcr_metadata.appendMetadata(parent.getMetadata()
+        .getHeritableMetadata());
+      }
+    catch (Exception e) {
+      logger.error(MCRException.getStackTraceAsString(e));
+      logger.error("Error while merging metadata in this object.");
+      }
+    }
+  // update this dataset
+  mcr_service.setDate("modifydate");
+  org.jdom.Document xml = createXML();
+  MCRTypedContent mcr_tc = createTypedContent();
+  String mcr_ts = createTextSearch();
+  mcr_persist.update(mcr_tc,xml,mcr_ts);
+  // update all children
+  for (int i=0;i<mcr_struct.getChildSize();i++) {
+    MCRObject child = new MCRObject();
+    child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+    }
   }
 
 }

@@ -261,13 +261,17 @@ public final boolean isValid(String id)
   }
 
 /**
- * This method print all data content from the MCRObjectId class.
+ * This method check this data again the  input and retuns the result as
+ * boolean.
+ * @param in the MCRObjectID to check
+ * @return true if all parts are equal, else return false.
  **/
-public final void debug()
+public final boolean equals(MCRObjectID in)
   {
-  System.out.println("MCRObjectId debug start:");
-  System.out.println("<ID>"+getId()+"</ID>");
-  System.out.println("MCRObjectId debug end"+NL);
+  if (!mcr_project_id.equals(in.getProjectId())) { return false; }
+  if (!mcr_type_id.equals(in.getTypeId())) { return false; }
+  if (!mcr_number.equals(in.getNumber())) { return false; }
+  return true;
   }
 
 } 
