@@ -509,14 +509,13 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
      returns.getRootElement().removeChildren("mcr_result");
      List children = jdom.getRootElement().getChildren("mcr_result");
      if (size<=0){
-     	returns.getRootElement().setChildren(children);
+     	offset=0;
+     	size=children.size();
      }
-     else {
-        int amount=size;
-     	for (int i=offset;((amount>0) && (i<children.size()) && (i<(offset+size)));i++){
-        	returns.getRootElement().addContent((Element)((Element)children.get(i)).clone());
-        	amount--;
-     	}
+     int amount=size;
+     for (int i=offset;((amount>0) && (i<children.size()) && (i<(offset+size)));i++){
+       	returns.getRootElement().addContent((Element)((Element)children.get(i)).clone());
+       	amount--;
      }
      returns.getRootElement().setAttribute("count",""+children.size())
                              .setAttribute("offset",""+offset)
