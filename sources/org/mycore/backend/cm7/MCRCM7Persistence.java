@@ -296,18 +296,18 @@ public final byte [] receive(MCRObjectID mcr_id)
 
 /**
  * The methode receive an object from the data store and return the 
- * creation data the object. The index class is determinated by the type
+ * service date for the given type. The index class is determinated by the type
  * of the object ID. This <b>must</b> correspond with the lower case 
  * configuration name.<br>
- * As example: Document --> MCR.persistence_cm7_document
  *
  * @param mcr_id      the object id
- * @return the GregorianCalendar data of the object
+ * @param type     the type of the service date
+ * @return the date for the type or null
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
+public final GregorianCalendar receiveServiceDate(MCRObjectID mcr_id,
+  String type) throws MCRConfigurationException, MCRPersistenceException
   {
   // search the index class
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
@@ -315,12 +315,15 @@ public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   mcr_index_class = conf.getString(sb.toString()); 
   // make a connection
   DKDatastoreDL connection = null;
-  GregorianCalendar create = new GregorianCalendar();
+  GregorianCalendar cal = new GregorianCalendar();
   try {
     connection = MCRCM7ConnectionPool.instance().getConnection();
     try {
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
-      create = item.getKeyfieldToDate(mcr_create_name);
+      if (type.equals("createdate")) {
+        cal = item.getKeyfieldToDate(mcr_create_name); return cal; }
+      if (type.equals("modifydate")) {
+        cal = item.getKeyfieldToDate(mcr_modify_name); return cal; }
       }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
@@ -330,7 +333,7 @@ public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
     throw new MCRPersistenceException(e.getMessage(),e); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
-  return create;
+  return null;
   }
 
 /**

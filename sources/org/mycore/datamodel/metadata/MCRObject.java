@@ -496,7 +496,8 @@ public final byte [] receiveXMLFromDatastore(String id)
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
-  mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
+  mcr_service.setDate("createdate",
+    mcr_persist.receiveServiceDate(mcr_id,"createdate"));
   mcr_service.setDate("modifydate");
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
