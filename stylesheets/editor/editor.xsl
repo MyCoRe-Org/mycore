@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.29 $ $Date: 2004-12-30 08:47:35 $ -->
+<!-- $Revision: 1.30 $ $Date: 2004-12-30 09:41:06 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -739,7 +739,7 @@
     <xsl:when test="@descendants='true'">
       <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]">
         <input type="hidden" name="{@name}" value="{@value}" />
-        <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}.{position()}" />
+        <input type="hidden" name="{$editor.delimiter.internal}sortnr-{@name}" value="{$pos.new}.{position()}" />
       </xsl:for-each>
     </xsl:when>
     <!-- ======== copy single source value to hidden field ======== -->
