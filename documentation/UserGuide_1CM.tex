@@ -10,10 +10,11 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item Installieren Sie das AIX Betriebssystem mit dem Release 4.3.3 ML 10, 5.1 ML 01 oder 5.2.
 \item Sorgen Sie daf"ur, dass 'Cultural Conversion' und 'Language' auf English US eingestellt ist.
 \item Aktivieren Sie die Netzanbindung inklusive DNS.
-\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}. Wenn Sie auch das Paket {\bf Java131.ext.java3d } mit installieren wollen, müssen Sie vorher die Pakete {\bf OpenGL.OpenGL\_X.adt} und {\bf OpenGL.OpenGL\_X.rte} installiert haben.
+\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}. Wenn Sie auch das Paket {\bf Java131.ext.java3d } mit installieren wollen, m"ussen Sie vorher die Pakete {\bf OpenGL.OpenGL\_X.adt} und {\bf OpenGL.OpenGL\_X.rte} installiert haben.
 \item Installieren Sie den VAC Compiler Version 5.x oder 6.0 entsprechend der Anleitung und tragen Sie den Suchpfad unter {\it PATH} im File {\it /etc/environment } mit ein.
 \item Aktivieren Sie das Lizenzsystem {\bf ifor} und tragen Sie sie Compilerlizenzen ein.
 \end{enumerate}
+%
 \subsubsection{DB2}
 \begin{enumerate}
 \item Kopieren Sie das File {\it ese.sbcs.tar.Z} von der CD {\bf 'DB2 8.1 with FP1'} und entpacken Sie dieses.
@@ -26,7 +27,7 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item Auswahl 'Install DB2 UDB Enterprise Server Edition on this computer' $\rightarrow$ {\bf Next}
 \item Standartwerte lassn, 'Appliction Development Tools' zus"atzlich ausw"ahlen
 \item Sprache 'Englisch' beibehalten $\rightarrow$ {\bf Next}
-\item DAS User : Standartwert {\bf db2as} wenn möglich beibehalten, Password setzen $\rightarrow$ {\bf Next}
+\item DAS User : Standartwert {\bf db2as} wenn m"oglich beibehalten, Password setzen $\rightarrow$ {\bf Next}
 \item Erzeugen der DB2 Instanz durch Auswahl 'Create a DB2 instance - 32 bit' $\rightarrow$ {\bf Next}
 \item Auswahl 'Single-partition instance' $\rightarrow$ {\bf Next}
 \item Eintrag des DB2 Instance owner : Standartwert ({\bf db2inst1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
@@ -41,14 +42,95 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item Setup complete $\rightarrow$ {\bf Finish}
 \end{itemize}
 \item Test der Installation:\\
-\qquad\qquad{\tt su - db2inst1} \\
-\qquad\qquad{\tt db2stop} \\
-\qquad\qquad{\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.}\\
-\qquad\qquad{\tt db2level} \\
+{\tt su - db2inst1} $\rightarrow$ {\tt db2stop} $\rightarrow$ {\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.} $\rightarrow$ {\tt db2level} $\rightarrow$ {\tt exit}
 \end{enumerate}
-\subsubsection{NSE}
 %
-
+\subsubsection{NSE}
+\begin{enumerate}
+\item Legen Sie die CD {\bf 'DB2 Net Search Extender Version 8.1'} ein und mounten Sie diese.
+\item {\tt su - db2inst1} $\rightarrow$ {\tt db2stop} $\rightarrow$ {\tt exit}
+\item {\tt slibclean}
+\item {\tt cd /cdrom/aix} $\rightarrow$ {\tt ./nsesetup.sh}
+\begin{itemize}
+\item Auswahl 1 f"ur Englisch $\rightarrow$ {\bf Enter}
+\item Auswahl 1 f"ur 'Accept the license areement'
+\end{itemize}
+\item {\tt cd /usr/opt/db2\_08\_01/instance}
+\item {\tt ./db2iupdt -u db2fenc1 db2inst1}
+\item Test der Installation:\\
+{\tt su - db2inst1} $\rightarrow$ {\tt db2start} $\rightarrow$ {\tt db2text start} $\rightarrow$ {\tt db2licm -l}\footnote{Pr"uft Ihren Lizenzeintrag} $\rightarrow$ {\tt exit}
+\end{enumerate}
+%
+\subsubsection{WebSphere 5}
+%
+{\bf Installation WebSphere 5}\\[1ex]
+\begin{enumerate}
+\item Legen Sie die CD {\bf 'WebSphere Application Server 5.0 for AIX'} ein und mounten Sie diese.
+\item {\tt cd /cdrom/aix} $\rightarrow$ {\tt ./install}
+\begin{itemize}
+\item Auswahl {\bf 'English'}
+\item Auswahl {\bf Next}
+\item Auswahl 'Accept the license areement'
+\item Auswahl {\bf Next}\footnote{Die Warnung "uber fehlende Voraussetzunge kann ignoriert werden.}
+\item Auswahl {\bf 'Costum'} $\rightarrow$ {\bf Next}
+\item Schauen Sie die Optionsliste durch, wir empfehlen {\bf 'Embedded Messaging'} und {\bf 'Tivoli Performance Viewer'} aus der Auswahl zu entfernen.
+\item Auswahl der Installationsverzeichnisse {\it /usr/WebSphere/AppServer} und {\it /usr/IBMHttpServer}. Behalten Sie die Vorgaben bei!
+\item Node name $\rightarrow$ Nehmen Sie Ihren Hostnamen.
+\item Hostname $\rightarrow$ Nehmen Sie Ihren voll qualifizierten Hostnamen.
+\item Zusammenfassung $\rightarrow$ {\bf Next}
+\item Warten Sie kurz.
+\item Entfernen Sie die Auswahl {\bf 'Register this product now'} $\rightarrow$ {\bf Next}
+\item {\bf Finish}
+\item Nach einigen Sekunden "offnet sich das {\bf 'WebSphere First Steps'} Fenster, bitte schiessen sie dieses.
+\end{itemize}
+\end{enumerate}
+%
+{\bf Installation WebSphere Fix pack 5.0.1}\\[1ex]
+\begin{enumerate}
+\item Holen Sie sich das Fixpack von {\bf ftp.software.ibm.com}.
+\item {\tt cd <fixpack\_dir>}
+\item {\tt ./usr/WebSphere/AppServer/bin/setupCmdLine.sh}
+\item {\tt ./updateWizard.sh}
+\begin{itemize}
+\item Update Installation Wizard $\rightarrow$ {\tt Next}
+\item Auswahl {\bf 'IBM WebSphere Application Server 5.0.0'} $\rightarrow$ {\tt Next}
+\item Auswahl {\bf 'Install Fix packs'} $\rightarrow$ {\tt Next}
+\item Fixpack Verzeichnis beibehalten $\rightarrow$ {\tt Next}
+\item Auswahl {\bf 'was50\/fp1\_aix'} $\rightarrow$ {\tt Next}
+\item Auswahl {\bf 'Update the IBM HTTP Server'} $\rightarrow$ {\tt Next}
+\item Zusammenfassung $\rightarrow$ {\tt Next}
+\item Wenn Installation erfolgreich war $\rightarrow$ {\tt Finish}
+\end{itemize}
+\end{enumerate}
+%
+{\bf Test der WebSphere Installation}\\[1ex]
+\begin{enumerate}
+\item Starten Sie den WebSphere Administrations-Server
+\begin{itemize}
+\item {\tt cd /usr/WebSphere/AppServer/bin}
+\item {\tt ./startServer.sh server1}\footnote{Warten Sie auf die Nachricht {\bf 'Server 1 open for e-business'}}
+\end{itemize}
+\item Im Browser {\tt http://<hostname>:9090/admin}
+\begin{itemize}
+\item Eingabe {\bf icmadmin} als UserID $\rightarrow$ {\tt OK}
+\item {\bf 'Environment'}
+\item Auswahl {\bf 'Virtual hosts`}
+\item Auswahl {\bf 'default\_hosts`}
+\item Auswahl {\bf 'Host Aliases'}
+\item Auswahl {\bf 'New'} $\rightarrow$ Hostname : * $\rightarrow$ Port : 443 $\rightarrow$ {\tt Apply}
+\item {\tt Save}\footnote{Den Text finden Sie im Bild oben.}
+\item {\tt Save}
+\item Im linken Baum {\bf 'Update Web Server Plugin'} ausw"ahlen
+\item {\tt OK}
+\item {\tt Logout}
+\end{itemize}
+\item Starten Sie den Web-Server
+\begin{itemize}
+\item {\tt cd /usr/IBMHttpServer/bin}
+\item {\tt ./apachectl start}
+\end{itemize}
+\item Im Browser {\tt http://<hostname>/snoop}
+\end{enumerate}
 %
 %
 \subsection{Der IBM Content Manager unter Solaris}
