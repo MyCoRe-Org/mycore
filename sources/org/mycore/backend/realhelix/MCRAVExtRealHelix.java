@@ -107,17 +107,33 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
       durationMinutes = durationMinutes - ( durationHours * 60 );
       
       if( sType.indexOf( "MPEG Layer 3" ) >= 0 )
+      {
         contentTypeID = "mp3";
+        mediaType     = AUDIO;
+      }
       else if( sType.indexOf( "MPEG" ) >= 0 )
+      {
         contentTypeID = "mpeg1";
+        mediaType     = VIDEO;
+      }
       else if( sType.indexOf( "RealVideo" ) >= 0 )
         contentTypeID = "realvid";
       else if( sType.indexOf( "RealAudio" ) >= 0 )
         contentTypeID = "realaud";
       else if( sType.indexOf( "Wave File" ) >= 0 )
+      {
         contentTypeID = "wav";
-      else
+        mediaType     = AUDIO;
+      }
+      else // should be one of "wma" "wmv" "asf"
+      {
         contentTypeID = file.getContentType().getID();
+        
+        if( contentTypeID.equals( "wma" ) )
+          mediaType = AUDIO;
+        else
+          mediaType = VIDEO;
+      }
       
       if( " wma wmv asf asx ".indexOf( " " + contentTypeID + " " ) != -1 )
       {
