@@ -92,32 +92,6 @@ public final class MCRXMLDBItem {
     }
 
     /**
-     * This method creates the item in the datastore.
-     *
-     * @throws XMLDBException a XMLDBException
-     * @throws UnsupportedEncodingException thrown if an uncorrect 
-     * encoding is to be used. Should never occur.
-     **/
-    public final void create() 
-	throws XMLDBException,
-               MCRPersistenceException,
-	       UnsupportedEncodingException {
-	XMLResource res =
-	    (XMLResource)collection.createResource( objectID.getNumberAsString(),
-						    XMLResource.RESOURCE_TYPE );
-        try {
-            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
-            org.w3c.dom.Document dom = outputter.output( doc );
-            res.setContentAsDOM( dom );
-        }
-        catch ( Exception e )
-        {
-            throw new MCRPersistenceException( e.getMessage(), e );
-        }
-	collection.storeResource( res );
-    }
-    
-    /**
      * This methode retrievs the item from the datastore.
      *
      * @throws XMLDBException Exceptions of XML:DB API
@@ -132,75 +106,6 @@ public final class MCRXMLDBItem {
 	xml = new String( xml.getBytes( store_enc ), def_enc );
 	doc = builder.build( new StringReader( xml ) );
 
-    }
-
-    /**
-     * This methode updates the item in the datastore.
-     *
-     * @throws XMLDBException a XMLDBException
-     * @throws UnsupportedEncodingException thrown if an uncorrect 
-     * encoding is to be used. Should never occur.
-     **/
-    public final void update()
-	throws XMLDBException, 
-               MCRPersistenceException,
-	       UnsupportedEncodingException, 
-	       JDOMException {
-	XMLResource res = (XMLResource)collection.getResource( objectID.getNumberAsString() );
-//	XMLOutputter xmlouter = new XMLOutputter();
-//	xmlouter.setEncoding( store_enc );
-//	res.setContent( xmlouter.outputString( doc ) );
-        try {
-            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
-            org.w3c.dom.Document dom = outputter.output( doc );
-            res.setContentAsDOM( dom );
-        }
-        catch ( Exception e )
-        {
-            throw new MCRPersistenceException( e.getMessage(), e );
-        }
-	collection.storeResource( res );
-    }
-
-    /**
-     * This methode updates the item in the datastore with an option.
-     *
-     * @param option The update option
-     *
-     * @throws XMLDBException  a XMLDBException
-     * @throws UnsupportedEncodingException thrown if an uncorrect 
-     * encoding is to be used. Should never occur.
-     **/
-    public final void update( short option ) 
-  	throws XMLDBException, UnsupportedEncodingException, JDOMException { 
-	delete();
-	create();
-    }
-    
-    /**
-     * This methode deletes the item from the datastore.
-     *
-     * @throws XMLDBException a XMLDBException
-     **/
-    public final void delete() 
-	throws XMLDBException,
-	       UnsupportedEncodingException,
-	       JDOMException {
-	CollectionManagementService cms;
-
-	// Get all resources in the collection
-	String[] resIDs = collection.listResources();
-	// Looking for the correct XMLResource
-	for( int i = 0; i < resIDs.length; i++ ) {
-	    XMLResource res = (XMLResource)collection.getResource( resIDs[i] );
-	    String xml = (String)res.getContent();
-	    xml = new String( xml.getBytes( store_enc ), def_enc );
-	    doc = builder.build( new StringReader( xml ) );
-	    if( objectID.getId().equals( doc.getRootElement().getAttribute( "ID" ).getValue() ) ) {
-		collection.removeResource( res );
-		break;
-	    }
-	}
     }
 
     /**

@@ -24,8 +24,6 @@
 
 package org.mycore.backend.xmldb;
 
-import java.util.GregorianCalendar;
-import java.util.StringTokenizer;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.jdom.Document;
@@ -43,19 +41,14 @@ public final class MCRXMLDBPersistence
     implements MCRObjectPersistenceInterface {
     static Logger logger = Logger.getLogger( MCRXMLDBPersistence.class.getName() );
     private MCRConfiguration config = MCRConfiguration.instance();  
-    private Collection rootCollection;
+    private String def_enc = config.getString( "MCR.metadata_default_encoding" );
+    private String store_enc = config.getString( "MCR.persistence_xmldb_encoding" );
 
     /**
      * Creates a new MCRXMLDBPersistence.
      **/
     public MCRXMLDBPersistence() throws MCRPersistenceException {
-	try {
-	    rootCollection = MCRXMLDBTools.getRootCollection( MCRXMLDBTools.getDriverName(), 
-							      MCRXMLDBTools.getConnectString() );
-	}
-	catch( Exception e ) {
-	    throw new MCRPersistenceException( e.getMessage(), e );
-	}
+        MCRXMLDBConnectionPool.instance();
     }
     /**
      * This method creates and stores the data from MCRTypedContent and
@@ -80,10 +73,14 @@ public final class MCRXMLDBPersistence
 		    mcr_id = new MCRObjectID( (String)mcr_tc.getValueElement( i ) ); 
 		    mcr_label = (String)mcr_tc.getValueElement( i+1 ); }
 	    }
-            logger.debug("MCRXMLDBPersistence create: " + "typeCollection: " + mcr_id.getTypeId().toLowerCase());
-	    Collection typeCollection = rootCollection.getChildCollection( mcr_id.getTypeId().toLowerCase() );
-	    MCRXMLDBItem item = new MCRXMLDBItem( typeCollection, mcr_id, doc );
-	    item.create();
+	    Collection collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId().toLowerCase() );
+            XMLResource res =
+               (XMLResource)collection.createResource( mcr_id.getNumberAsString(),
+                XMLResource.RESOURCE_TYPE );
+            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
+            org.w3c.dom.Document dom = outputter.output( doc );
+            res.setContentAsDOM( dom );
+            collection.storeResource( res );
 	}
 	catch( Exception e ) {
 	    throw new MCRPersistenceException( e.getMessage(), e );
@@ -104,11 +101,13 @@ public final class MCRXMLDBPersistence
 	throws MCRConfigurationException, 
 	       MCRPersistenceException {
 	try {
+/*            
 	    CollectionManagementService cms = 
 		(CollectionManagementService)
 		rootCollection.getService( "CollectionManagementService",
 					   "1.0" );
 	    cms.createCollection( mcr_type.toLowerCase() );
+ */
 	}
 	catch( Exception e ) {
 	    throw new MCRPersistenceException( e.getMessage(), e );
@@ -137,13 +136,18 @@ public final class MCRXMLDBPersistence
     public void delete( MCRObjectID mcr_id ) 
 	throws MCRPersistenceException {
 	Collection typeCollection = null;
+        System.out.println("DELETE " + mcr_id.getNumberAsString()); 
 	try {
-	    typeCollection = 
-		rootCollection.getChildCollection( mcr_id.getTypeId().toLowerCase() );
+	    typeCollection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId().toLowerCase() );
+            Resource document = typeCollection.getResource( mcr_id.getNumberAsString() );
+            if ( null != document )
+              typeCollection.removeResource(document);
+/*            
 	    MCRXMLDBItem item = new MCRXMLDBItem( typeCollection, 
 						  mcr_id, 
 						  null );
 	    item.delete();
+ */
 	}
 	catch( Exception e ) {
 	    throw new MCRPersistenceException( e.getMessage(), e );
@@ -166,7 +170,25 @@ public final class MCRXMLDBPersistence
         logger.debug("MCRXMLDBPersistence create: " +  "receive");    
 	return MCRUtils.getByteArray( getItem( mcr_id ).getContent() );
     }
-
+ /*
+    public final byte[] receive( MCRObjectID mcr_id )
+	throws MCRConfigurationException, 
+	MCRPersistenceException {
+        logger.debug("MCRXMLDBPersistence create: " +  "receive");    
+	Collection typeCollection = null;
+	try {
+	    typeCollection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId().toLowerCase() );
+            Resource document = typeCollection.getResource( mcr_id.getNumberAsString() );
+            String xml = (String)resource.getContent();
+            xml = new String( xml.getBytes( store_enc ), def_enc );
+	}
+	catch( Exception e ) {
+	    throw new MCRPersistenceException( e.getMessage(), e );
+	}
+    }
+	return MCRUtils.getByteArray( getItem( mcr_id ).getContent() );
+    }
+*/
     /**
      * Retrieves a MCRXMLDBItem with given MCRObjectID from datastore.
      *
@@ -176,12 +198,12 @@ public final class MCRXMLDBPersistence
      **/
     protected MCRXMLDBItem getItem( MCRObjectID mcr_id ) 
 	throws MCRPersistenceException {
-	Collection typeCollection = null;
 	MCRXMLDBItem item = null;
         logger.debug("MCRXMLDBPersistence: " + "getItem with: " + mcr_id.getTypeId().toLowerCase() + " " + mcr_id.getId());    
+
 	try {
-	    typeCollection = 
-		rootCollection.getChildCollection( mcr_id.getTypeId().toLowerCase() );
+	    Collection typeCollection = 
+	        MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId().toLowerCase() );
 
 	    item = new MCRXMLDBItem( typeCollection, mcr_id, null );
 	    item.retrieve();
@@ -189,29 +211,10 @@ public final class MCRXMLDBPersistence
 	catch( Exception e ) {
 	    throw new MCRPersistenceException( e.getMessage(), e );
 	}
+        
 	return item;
     }
-    
-    /**
-     * This method returns the date of creation of the object with the
-     * given ID. Currently not implemented.
-     *
-     * @param mcr_id the id of the object whose date of creation
-     * should be returned
-     * @return null
-     * @throws MCRConfigurtionException
-     * @throws MCRPersistenceException
-     **/
-    public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
-	throws MCRConfigurationException, MCRPersistenceException {
-	return null;
-    }
-
-    public final String receiveLabel(MCRObjectID mcr_id)
-	throws MCRConfigurationException, MCRPersistenceException {
-	return "";
-    }
-
+ 
     public synchronized String getNextFreeId( String project_ID, String type_ID )
 	throws MCRPersistenceException { 
         logger.debug("MCRXMLDBPersistence: " + "getNextFreeId");    
@@ -226,39 +229,9 @@ public final class MCRXMLDBPersistence
      * @param mcr_id id of the object to delete
      *
      * @throws MCRPersistenceException something goes wrong during delete
-     **/     
+     **/
     public boolean exist( MCRObjectID mcr_id ) 
 	throws MCRConfigurationException, MCRPersistenceException {
-//  	Database database = null;
-//  	Collection rootCollection = null;
-//  	Collection typeCollection = null;
-//  	try {
-//  	    String connString = MCRXMLDBTools.buildConnectString( vendor, 
-//  								  hostname, 
-//  								  port, 
-//  								  root );
-//  	    rootCollection = MCRXMLDBTools.getRootCollection( driver, 
-//  							    connString );
-//  	    typeCollection = 
-//  		rootCollection.getChildCollection( mcr_id.getProjectId().toLowerCase() ).getChildCollection( mcr_id.getTypeId().toLowerCase() );
-	    
-//  	    MCRXMLDBItem item = new MCRXMLDBItem( typeCollection, 
-//  						  mcr_id, 
-//  						  null );
-//  	    item.delete();
-//  	}
-//  	catch( Exception e ) {
-//  	    throw new MCRPersistenceException( e.getMessage(), e );
-//  	}
-//  	finally {
-//  	    try {
-//  		MCRXMLDBTools.safelyClose( rootCollection );
-//  		if (database != null)
-//  		    DatabaseManager.deregisterDatabase( database );
-//  	    }
-//  	    catch( Exception e ) {
-//  		throw new MCRPersistenceException( e.getMessage(), e );
-//  	    }
         logger.debug("MCRXMLDBPersistence exist: " + mcr_id.getTypeId().toLowerCase() + " " + mcr_id.getId() );    
 	return false;
     }

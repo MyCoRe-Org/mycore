@@ -41,10 +41,6 @@ import org.apache.log4j.PropertyConfigurator;
  * @version $Revision$ $Date$
  **/
 public class MCRXMLDBQuery implements MCRQueryInterface {
-    // common data
-//      protected static String NL =
-//  	new String( (System.getProperties()).getProperty( "line.separator" )
-//  		    );
 
     static Logger logger = Logger.getLogger( MCRXMLDBQuery.class.getName() );
 
@@ -53,9 +49,7 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
     // private data
     private int maxres = 0;
     private MCRConfiguration config = null;
-    private Collection rootCollection = null;
-    private Collection typeCollection = null;
-    private Database database = null;
+    private String database    = "";
 
     /**
      * The constructor.
@@ -64,6 +58,9 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	config = MCRConfiguration.instance();
 	PropertyConfigurator.configure( config.getLoggingProperties() );
 	maxres = config.getInt( "MCR.query_max_results", MAX_RESULTS );
+        MCRXMLDBConnectionPool.instance();
+        database   = config.getString( "MCR.persistence_xmldb_database" , "");
+        logger.info("MCRXMLDBQuery MCR.persistence_xmldb_database    : " + database); 
     }
 
     /**
@@ -89,16 +86,9 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	    return result;
 	if( query.trim().equals( "" ) )
 	    query = "/*";
-        query = MCRXMLDBTools.handleQueryString( query, type);
+        query = handleQueryString( query, type);
 	try {
-	    Class driverclass = Class.forName( MCRXMLDBTools.getDriverName() );
-	    database = (Database)driverclass.newInstance();
-	    DatabaseManager.registerDatabase( database );
-
-	    String connString = MCRXMLDBTools.getConnectString();
-
-	    rootCollection = DatabaseManager.getCollection( connString );
-	    typeCollection = rootCollection.getChildCollection( type.toLowerCase() );
+	    Collection typeCollection = MCRXMLDBConnectionPool.instance().getConnection( type.toLowerCase() );
 	    XPathQueryService xps =
 		(XPathQueryService)typeCollection.getService(
 							     "XPathQueryService", "1.0" );
@@ -121,16 +111,57 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	}
 	finally {
 	    try {
-		MCRXMLDBTools.safelyClose( typeCollection );
-		MCRXMLDBTools.safelyClose( rootCollection );
-		if (database != null)
-		    DatabaseManager.deregisterDatabase( database );
   	    }
 	    catch( Exception e ) {
 		throw new MCRPersistenceException( e.getMessage(), e );
 	    }
 	}
 	return result;
+    }
+    /**
+     * Handle query string for XML:DB database
+     **/
+    private String handleQueryString( String query, String type ) {
+        logger.debug("MCRXMLDBQuery handlequerstring   (old)  : " + query + " type : " + type); 
+        
+        if ( database.equals( "xindice" ) )
+          query = handleQueryStringXindice( query, type );
+        else if ( database.equals( "exist" ) )
+          query = handleQueryStringExist( query, type );
+        
+        logger.debug("MCRXMLDBQuery handlequerstring   (new)  : " + query); 
+	return query;
+    }
+    
+    /**
+     * Handle query string for Xindice
+     **/
+    private String handleQueryStringXindice( String query, String type ) {
+	return query;
+    }
+    
+    /**
+     * Handle query string for exist
+     **/
+    private String handleQueryStringExist( String query, String type ) {
+// with exist dev version from 03/07/03 no longer needed        
+//        if ( query.equals( "/*" ))
+//          query = "xcollection('/db/mycore/" + type + "')/mycoreobject";
+//        query = MCRUtils.replaceString(query, "like", "=");
+// a lot of queries of mycore sample (document and legal entity) work!!
+        query = MCRUtils.replaceString(query, "like", "&=");
+//        query = MCRUtils.replaceString(query, "contains(", "contains(.,");
+        query = MCRUtils.replaceString(query, ")", "");
+        query = MCRUtils.replaceString(query, "contains(", ".&=");
+        query = MCRUtils.replaceString(query, "metadata/*/*/@href=", "metadata//*/@xlink:href=");
+        if ( -1 != query.indexOf("] and") )
+        {
+          query = MCRUtils.replaceString(query, "[", "/");
+          query = MCRUtils.replaceString(query, "] and", " and");
+          query = "//*[" + query; 
+        }
+        query = MCRUtils.replaceString(query, "/mycoreobject/", "/");
+	return query;
     }
 }
 
