@@ -46,6 +46,8 @@ public final class MCRObjectID {
 
 	protected static MCRConfiguration CONFIG;
 	private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+	private static int lastnumber = -1;
+
 	/**
 	 * constant value for the object id length
 	 **/
@@ -110,18 +112,18 @@ public final class MCRObjectID {
 	 * @param base_id         the basic ID 
 	 * @exception MCRUsageException if the given string is not valid.
 	 **/
-	public void setNextFreeId(String base_id) throws MCRUsageException {
+	public synchronized void setNextFreeId(String base_id) throws MCRUsageException {
 		mcr_valid_id = false;
 		StringBuffer mcrid = new StringBuffer(base_id).append('_').append(1);
 		MCRObjectID test = new MCRObjectID(mcrid.toString());
 		mcrid.deleteCharAt(mcrid.length() - 1);
 		try {
 			MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-			mcrid.append(
-				xmltable.getNextFreeIdInt(
-					test.mcr_type_id,
-					test.mcr_project_id,
-					test.mcr_type_id));
+			int i = xmltable.getNextFreeIdInt( test.mcr_type_id, test.mcr_project_id, test.mcr_type_id);
+			if (lastnumber < i) {
+				mcrid.append(i); lastnumber = i; }
+			else {
+				mcrid.append(lastnumber+1); lastnumber += 1; }
 			test=null;
 			if (!setID(mcrid.toString()))
 				throw new MCRException("Error setting to new ID:" + mcrid);
