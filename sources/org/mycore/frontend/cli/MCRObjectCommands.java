@@ -28,6 +28,8 @@ import java.io.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+import org.jdom.input.SAXBuilder;
+import org.jdom.Document;
 import mycore.common.*;
 import mycore.datamodel.*;
 
@@ -199,17 +201,36 @@ public class MCRObjectCommands
   **/
   public static boolean createDataBase ( String mcr_type )
     {
-    String conf_item = "MCR.persistence_config_"+mcr_type;
+    MCRConfiguration conf = MCRConfiguration.instance();
+    // Application pathes
+    String mycore_appl = "";
+    try {
+      mycore_appl = conf.getString("MCR.appl_path"); }
+    catch ( Exception e ) {
+      throw new MCRException("Can't find configuration for MCR.appl_path." ); }
+    String SLASH = System.getProperty("file.separator");
+    // Read config file
+    String conf_home = mycore_appl+SLASH+"config";
     String conf_filename = "";
     try {
-      conf_filename = MCRConfiguration.instance().getString(conf_item); }
+      conf_filename = conf.getString("MCR.persistence_config_"+mcr_type); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for "+mcr_type ); }
     if(!conf_filename.endsWith(".xml")) {
-      throw new MCRException("Can't read configuration for "+mcr_type ); }
-    if(! new File(conf_filename).isFile()) {
+      throw new MCRException("Configuration "+mcr_type+" ends not with .xml"); }
+    File conf_file = new File(conf_home,conf_filename);
+    if(! conf_file.isFile()) {
       throw new MCRException("Can't read configuration for "+mcr_type ); }
     System.out.println( "Reading file " + conf_filename + " ...\n" );
+    org.jdom.Document confdoc = null;
+    try {
+      SAXBuilder builder = new SAXBuilder();
+      confdoc = builder.build(conf_file); }
+    catch ( Exception e ) {
+      throw new MCRException("Can't parse configuration for "+mcr_type ); }
+    // create the database
+    MCRObject obj = new MCRObject();
+    obj.createDataBase(mcr_type,confdoc);
     return true;
     }
 
@@ -242,7 +263,7 @@ public class MCRObjectCommands
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for "+mcr_type ); }
     if(!conf_filename.endsWith(".xml")) {
-      throw new MCRException("Configuration "+mcr_type+" ends not with .xml" ); }
+      throw new MCRException("Configuration "+mcr_type+" ends not with .xml"); }
     File conf_file = new File(conf_home,conf_filename);
     if(! conf_file.isFile()) {
       throw new MCRException("Can't read configuration for "+mcr_type ); }

@@ -65,6 +65,7 @@ public final static String XML_HEADER =
   "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 
 // from configuration
+MCRConfiguration mcr_conf = null;
 private String parser_name;
 private String persist_name;
 private String persist_type;
@@ -111,9 +112,9 @@ public MCRObject() throws MCRException, MCRConfigurationException
   persist_type = new String("");
   mcr_persist = null;
   try {
+    mcr_conf = MCRConfiguration.instance();
   // Path of XML schema
-    mcr_schema_path = MCRConfiguration.instance()
-      .getString("MCR.parser_schema_path");
+    mcr_schema_path = mcr_conf.getString("MCR.parser_schema_path");
   // Metadata class
     mcr_metadata = new MCRObjectMetadata();
   // Structure class
@@ -327,10 +328,10 @@ private final void setPersistence() throws MCRException
     throw new MCRException("The ObjectId is not valid."); }
   String proptype = "MCR.persistence_type_"+mcr_id.getTypeId().toLowerCase();
   try {
-    persist_type = MCRConfiguration.instance().getString(proptype);
+    persist_type = mcr_conf.getString(proptype);
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
-    persist_name = MCRConfiguration.instance().getString(proppers);
+    persist_name = mcr_conf.getString(proppers);
     mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
       .newInstance(); 
     }
@@ -477,10 +478,10 @@ public final MCRTypedContent createTypedContent() throws MCRException
  * The methode create a new datastore based of given data. It create
  * a new data table for storing MCRObjects with the same MCRObjectID type.
  **/
-public void createDataBase()
+public void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
+  setId(new MCRObjectID("Template_"+mcr_type+"_1"));
   if (mcr_persist==null) { setPersistence(); }
-  MCRTypedContent mcr_tc = createTypedContent();
   System.out.println("This feature comes in the future.");
   //mcr_persist.createDataBase(mcr_tc);
   }
