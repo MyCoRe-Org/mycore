@@ -75,6 +75,20 @@ class MCREditorVariable implements Comparable
     buildSortPattern( sortNr );
     buildPathElements( name );
   }
+
+  MCREditorVariable( String name, String value )
+  {
+    this.name  = name;
+    this.value = value;
+  }
+
+  public Element buildXML()
+  {
+    Element var = new Element( "source-variable" );
+    var.setAttribute( "name", name );
+    var.setAttribute( "value", value );
+    return var;
+  }
   
   public String getName()
   { return name; }

@@ -103,59 +103,8 @@ public class MCREditorSourceReader
 
       MCREditorServlet.logger.info( "Editor reading XML input from " + url );
       Element input = MCREditorResolver.readXML( url );
-      return buildVariables( input );
+      return new MCREditorSubmission( input ).buildSourceVarXML();
     }
-  }
-
-  private static List buildVariables( Element input )
-  { 
-    List variables = new ArrayList();
-    setVariablesFromElement( variables, input, "/", "" );
-    return variables;
-  }
-
-  private static void setVariablesFromElement( List variables, Element element, String prefix, String suffix )
-  {
-    String path = prefix + element.getName() + suffix;
-    String text = element.getText();
-
-    addVariable( variables, path, text );  
- 
-    List attributes = element.getAttributes();
-    for( int i = 0; i < attributes.size(); i++ )
-    {
-      Attribute attribute = (Attribute)( attributes.get( i ) );
-      addVariable( variables, path + "/@" + attribute.getName(), attribute.getValue() );
-    }
-
-    List children = element.getChildren();
-    suffix = "";
-
-    for( int i = 0, nr = 1; i < children.size(); i++ )
-    {
-      Element child = (Element)( children.get( i ) );
-      if( i > 0 )
-      {
-        Element before = (Element)( children.get( i - 1 ) ); 
-        if( child.getName().equals( before.getName() ) )
-          suffix = "[" + String.valueOf( ++nr ) + "]";  
-        else 
-          nr = 1;
-      }
-      setVariablesFromElement( variables, child, path + "/", suffix );
-    }
-  }
-
-  private static void addVariable( List variables, String path, String text )
-  {
-    if( ( text == null ) || ( text.trim().length() == 0 ) ) return;
-
-    MCREditorServlet.logger.debug( "Editor XML input " + path + "=" + text );
-
-    Element var = new Element( "source-variable" );
-    var.setAttribute( "name", path );
-    var.setAttribute( "value", text );
-    variables.add( var );
   }
 }
 

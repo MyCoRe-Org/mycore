@@ -62,6 +62,49 @@ public class MCREditorSubmission
     buildXML();
   }
 
+  MCREditorSubmission( Element input )
+  { setVariablesFromElement( input, "/", "" ); }
+
+  private void setVariablesFromElement( Element element, String prefix, String suffix )
+  {
+    String path = prefix + element.getName() + suffix;
+    String text = element.getText();
+
+    addVariable( path, text );  
+ 
+    List attributes = element.getAttributes();
+    for( int i = 0; i < attributes.size(); i++ )
+    {
+      Attribute attribute = (Attribute)( attributes.get( i ) );
+      addVariable( path + "/@" + attribute.getName(), attribute.getValue() );
+    }
+
+    List children = element.getChildren();
+    suffix = "";
+
+    for( int i = 0, nr = 1; i < children.size(); i++ )
+    {
+      Element child = (Element)( children.get( i ) );
+      if( i > 0 )
+      {
+        Element before = (Element)( children.get( i - 1 ) ); 
+        if( child.getName().equals( before.getName() ) )
+          suffix = "[" + String.valueOf( ++nr ) + "]";  
+        else 
+          nr = 1;
+      }
+      setVariablesFromElement( child, path + "/", suffix );
+    }
+  }
+
+  private void addVariable( String path, String text )
+  {
+    if( ( text == null ) || ( text.trim().length() == 0 ) ) return;
+
+    MCREditorServlet.logger.debug( "Editor XML input " + path + "=" + text );
+    variables.add( new MCREditorVariable( path, text ) );
+  }
+
   public MCRRequestParameters getParameters()
   { return parms; }
 
@@ -113,6 +156,17 @@ public class MCREditorSubmission
         }
       }
     }
+  }
+
+  List buildSourceVarXML()
+  {
+    List vars = new ArrayList();
+    for( int i = 0; i < variables.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
+      vars.add( var.buildXML() );
+    }
+    return vars;
   }
   
   private Element resolveComponent( Element parent, String ID )
