@@ -36,7 +36,21 @@ import mycore.common.MCRException;
 /**
  * This class implements all methode for handling one document service data.
  * The service data are to use to handel the database with batch jobs
- * automatical changes.
+ * automatical changes.<p>
+ *
+ * The following data fields are in this class:
+ * <ul>
+ * <li>createdate - for the creating date of the object, this was set
+ *                  only one time</li>
+ * <li>submitdate - for the submiting date of the object</li>
+ * <li>acceptdate - for the accepting date of the object</li>
+ * <li>modifydate - for the accepting date of the object, this was set
+ *                  at every changes</li>
+ * <li>validfromdate - for the date of the object, at this the object is valid 
+ *                     to use</li>
+ * <li>validtodate - for the date of the object, at this the object is no 
+ *                   more valid to use</li>
+ * </ul>
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -48,6 +62,8 @@ private GregorianCalendar createdate;
 private GregorianCalendar submitdate;
 private GregorianCalendar acceptdate;
 private GregorianCalendar modifydate;
+private GregorianCalendar validfromdate;
+private GregorianCalendar validtodate;
 private Vector flag;
 private int vec_max_length = 1;
 
@@ -55,7 +71,8 @@ private static DateFormat df =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
 
 /**
- * This is the constructor of the MCRObjectService class.
+ * This is the constructor of the MCRObjectService class. All data
+ * are set to null.
  */
 public MCRObjectService()
   {
@@ -64,6 +81,8 @@ public MCRObjectService()
   submitdate = null;
   acceptdate = null;
   modifydate = null;
+  validfromdate = null;
+  validtodate = null;
   vec_max_length = MCRConfiguration.instance()
     .getInt("MCR.metadata_service_vec_max_length",1);
   flag = new Vector(vec_max_length);
@@ -106,6 +125,16 @@ public final void setFromDOM(NodeList dom_element_list)
     if (date_list.getLength() != 0) {
       textelement = (Node)(date_list.item(0)).getFirstChild();
       setModifyDate(((Text)textelement).getData().trim());
+      }
+    date_list = dates_element.getElementsByTagName("validfromdate");
+    if (date_list.getLength() != 0) {
+      textelement = (Node)(date_list.item(0)).getFirstChild();
+      setValidFromDate(((Text)textelement).getData().trim());
+      }
+    date_list = dates_element.getElementsByTagName("validtodate");
+    if (date_list.getLength() != 0) {
+      textelement = (Node)(date_list.item(0)).getFirstChild();
+      setValidToDate(((Text)textelement).getData().trim());
       }
     }
   NodeList service_flags_list =
@@ -198,23 +227,62 @@ public final String getModifyString()
   }
 
 /**
- * This methode return the value of the flag with index number.
+ * This methode return the validfrom date as GregorianCalendar.
+ *
+ * @return the validfrom date
+ **/
+public final GregorianCalendar getValidFromDate()
+  { return validfromdate; }
+
+/**
+ * This methode return the validfrom date as string.
+ *
+ * @return the validfrom date
+ **/
+public final String getValidFromString()
+  {
+  if (validfromdate == null) { return null; }
+  return df.format(validfromdate.getTime());
+  }
+
+/**
+ * This methode return the validto date as GregorianCalendar.
+ *
+ * @return the validto date
+ **/
+public final GregorianCalendar getValidToDate()
+  { return validtodate; }
+
+/**
+ * This methode return the validto date as string.
+ *
+ * @return the validto date
+ **/
+public final String getValidToString()
+  {
+  if (validtodate == null) { return null; }
+  return df.format(validtodate.getTime());
+  }
+
+/**
+ * This methode return the value of the single flag with index number.
  *
  * @return the string of flag from index
  **/
-public final String getSingleFlag(int index)
+public final String getFlag(int index)
   { return (String)flag.elementAt(index); }
 
 /**
- * This methode return the values of the flags as a XML string.
+ * This methode return the values of the flag list as string.
+ * each element begins with the <em>XXXFLAGXXX</em> string.
  *
- * @return the xml string of the flags
+ * @return the string of the flags
  **/
 public final String getFlags()
   { 
   StringBuffer sb = new StringBuffer(256);
   for (int i=0;i<flag.size();i++) {
-    sb.append("<flag>").append(flag.elementAt(i)).append("</flag>"); }
+    sb.append("XXXFLAGXXX ").append(flag.elementAt(i)).append(' '); }
   return sb.toString();
   }
 
@@ -223,6 +291,15 @@ public final String getFlags()
  **/
 public final void setCreateDate()
   { createdate = new GregorianCalendar(); }
+
+/**
+ * This methode set the create date to the given date.
+ **/
+public final void setCreateDate(GregorianCalendar date)
+  { 
+  createdate = null;
+  if (date != null) { createdate = date; }
+  }
 
 /**
  * This methode set the create date to the given date.
@@ -249,6 +326,15 @@ public final void setSubmitDate()
 
 /**
  * This methode set the submit date to the given date.
+ **/
+public final void setSubmitDate(GregorianCalendar date)
+  { 
+  submitdate = null;
+  if (date != null) { submitdate = date; }
+  }
+
+/**
+ * This methode set the submit date to the given date.
  *
  * @param date               a date string
  * @exception MCRException   if the date is bad
@@ -269,6 +355,15 @@ public final void setSubmitDate(String date) throws MCRException
  **/
 public final void setAcceptDate()
   { acceptdate = new GregorianCalendar(); }
+
+/**
+ * This methode set the accept date to the given date.
+ **/
+public final void setAcceptDate(GregorianCalendar date)
+  { 
+  acceptdate = null;
+  if (date != null) { acceptdate = date; }
+  }
 
 /**
  * This methode set the accept date to the given date.
@@ -295,6 +390,15 @@ public final void setModifyDate()
 
 /**
  * This methode set the modify date to the given date.
+ **/
+public final void setModifyDate(GregorianCalendar date)
+  { 
+  modifydate = null;
+  if (date != null) { modifydate = date; }
+  }
+
+/**
+ * This methode set the modify date to the given date.
  *
  * @param date               a date string
  * @exception MCRException   if the date is bad
@@ -311,6 +415,157 @@ public final void setModifyDate(String date) throws MCRException
   }
 
 /**
+ * This methode set the validfrom date to the actual date.
+ **/
+public final void setValidFromDate()
+  { validfromdate = new GregorianCalendar(); }
+
+/**
+ * This methode set the validfrom date to the given date.
+ **/
+public final void setValidFromDate(GregorianCalendar date)
+  { 
+  validfromdate = null;
+  if (date != null) { validfromdate = date; }
+  }
+
+/**
+ * This methode set the validfrom date to the given date.
+ *
+ * @param date               a date string
+ * @exception MCRException   if the date is bad
+ **/
+public final void setValidFromDate(String date) throws MCRException
+  {
+  validfromdate = null;
+  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
+  try {
+    validfromdate = new GregorianCalendar();
+    validfromdate.setTime(df.parse(date)); }
+  catch (ParseException e) {
+    throw new MCRException( "Can't parse validfrom date."); }
+  }
+
+/**
+ * This methode set the validto date to the actual date.
+ **/
+public final void setValidToDate()
+  { validtodate = new GregorianCalendar(); }
+
+/**
+ * This methode set the validto date to the given date.
+ **/
+public final void setValidToDate(GregorianCalendar date)
+  { 
+  validtodate = null;
+  if (date != null) { validtodate = date; }
+  }
+
+/**
+ * This methode set the validto date to the given date.
+ *
+ * @param date               a date string
+ * @exception MCRException   if the date is bad
+ **/
+public final void setValidToDate(String date) throws MCRException
+  {
+  validtodate = null;
+  if ((date == null) || ((date = date.trim()).length() ==0)) { return; }
+  try {
+    validtodate = new GregorianCalendar();
+    validtodate.setTime(df.parse(date)); }
+  catch (ParseException e) {
+    throw new MCRException( "Can't parse validto date."); }
+  }
+
+/**
+ * This methode add a flag to the flag list.
+ *
+ * @param value          - the new flag as string
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the vector is full
+ **/
+public final void addFlag(String value) throws IndexOutOfBoundsException
+  {
+  if (flag.size()>=vec_max_length) {
+    throw new IndexOutOfBoundsException("Index error in addFlag."); }
+  if ((value == null) || ((value = value.trim()).length() ==0)) {
+    return; }
+  flag.addElement(value);
+  }
+ 
+/**
+ * This methode return a boolean value if the given flag is set or not.
+ *
+ * @param value                 a searched flag
+ * @return true if the flag was found in the list
+ **/
+public final boolean isFlagSet(String value)
+  {
+  if ((value == null) || ((value = value.trim()).length() ==0)) {
+    return false; }
+  for (int i=0;i<flag.size();i++) {
+    if (flag.elementAt(i).equals(value)) { return true; } }
+  return false;
+  }
+ 
+/**
+ * This methode remove a flag from the flag list.
+ *
+ * @param index                 a index in the list
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the index is false
+ **/
+public final void removeFlag(int index) throws IndexOutOfBoundsException
+  {
+  if ((index<0)||(index>flag.size())) {
+    throw new IndexOutOfBoundsException("Index error in removeFlag."); }
+  flag.removeElementAt(index);
+  }
+
+/**
+ * This methode replace a flag in the flag list.
+ *
+ * @param index                 a index in the list
+ * @param value                 the value of a flag as string
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the index is false
+ **/
+public final void replaceFlag(int index, String value) 
+  throws IndexOutOfBoundsException
+  {
+  if ((index<0)||(index>flag.size())) {
+    throw new IndexOutOfBoundsException("Index error in replaceFlag."); }
+  if ((value == null) || ((value = value.trim()).length() ==0)) {
+    return; }
+  flag.setElementAt(value,index);
+  }
+
+/**
+ * This methode sets the new flag vector from a given string.
+ * Each new flag begins with XXXFLAGXXX in the string.
+ *
+ * @param value                 the flag string
+ **/
+public final void setFlags(String value)
+  {
+  if (value == null) { return; }
+  int len = 0;
+  value = value.trim();
+  len = value.length();
+  if (len == 0) { return; }
+  int i = value.indexOf("XXXFLAGXXX");
+  if ( i== -1) { return; }
+  while (i+11<=len) {
+    int j = value.indexOf("XXXFLAGXXX",i+11);
+    if (j == -1) {
+      addFlag(value.substring(i+11,len)); i = len; }
+    else {
+      addFlag(value.substring(i+11,j)); i = j; }
+    }
+  }
+
+/**
  * This methode create a XML stream for all structure data.
  *
  * @return a XML string with the XML data of the structure data part
@@ -320,7 +575,8 @@ public final String createXML()
   StringBuffer sb = new StringBuffer(2048);
   sb.append("<service>").append(NL);
   if ((createdate != null) || (submitdate != null) || 
-      (acceptdate != null) || (modifydate != null)) {
+      (acceptdate != null) || (modifydate != null) ||
+      (validfromdate != null) || (validtodate != null)) {
     sb.append("<dates>").append(NL);
     if (createdate != null) {
       sb.append("<createdate>").append(getCreateString())
@@ -334,6 +590,12 @@ public final String createXML()
     if (modifydate != null) {
       sb.append("<modifydate>").append(getModifyString())
         .append("</modifydate>").append(NL); }
+    if (validfromdate != null) {
+      sb.append("<validfromdate>").append(getValidFromString())
+        .append("</validfromdate>").append(NL); }
+    if (validtodate != null) {
+      sb.append("<validtodate>").append(getValidToString())
+        .append("</validtodate>").append(NL); }
     sb.append("</dates>").append(NL);
     }
   if (flag.size()!=0) {
@@ -360,32 +622,12 @@ public final String createTS(String type)
   {
   if (type.equals("CM7")) {
     StringBuffer sb = new StringBuffer(2048);
-    sb.append("<service>").append(NL);
-    if ((createdate != null) || (submitdate != null) || 
-        (acceptdate != null) || (modifydate != null)) {
-      sb.append("<dates>").append(NL);
-      if (createdate != null) {
-        sb.append("<createdate>").append(getCreateString())
-          .append("</createdate>").append(NL); }
-      if (submitdate != null) {
-        sb.append("<submitdate>").append(getSubmitString())
-          .append("</submitdate>").append(NL); }
-      if (acceptdate != null) {
-        sb.append("<acceptdate>").append(getAcceptString())
-          .append("</acceptdate>").append(NL); }
-      if (modifydate != null) {
-        sb.append("<modifydate>").append(getModifyString())
-          .append("</modifydate>").append(NL); }
-      sb.append("</dates>").append(NL);
-      }
     if (flag.size()!=0) {
-      sb.append("<flags>").append(NL);
       for (int i=0;i<flag.size();i++) {
-        sb.append("<flag>").append(flag.elementAt(i)).append("</flag>")
-          .append(NL); }
-      sb.append("</flags>").append(NL);
+        sb.append("XXFLAGXX ").append(flag.elementAt(i)).append(NL); }
       }
-    sb.append("</service>").append(NL);
+    else {
+      sb.append("").append(NL); }
     return sb.toString();
     }
   return "";
@@ -406,6 +648,10 @@ public final void debug()
     System.out.println("accept date          = "+getAcceptString()); }
   if (modifydate != null) {
     System.out.println("modify date          = "+getModifyString()); }
+  if (validfromdate != null) {
+    System.out.println("validfrom date       = "+getValidFromString()); }
+  if (validtodate != null) {
+    System.out.println("validto date         = "+getValidToString()); }
   for (int i=0;i<flag.size();i++) {
     System.out.println("flag                 = "+flag.elementAt(i)); }
   System.out.println();

@@ -74,6 +74,17 @@ public String receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
+ * The methode receive a object from the data store.
+ *
+ * @param mcr_id   the MyCoRe object ID
+ * @return the instance of the MCRObjectService class of the object
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public MCRObjectService receiveService(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException;
+
+/**
  * The methode update a object in the data store.
  *
  * @param mcr_id      the object id

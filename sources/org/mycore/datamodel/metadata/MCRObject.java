@@ -55,13 +55,13 @@ final public class MCRObject
 public final int MAX_LABEL_LENGTH = 256;
 
 // from configuration
-private static String parser_name;
-private static String persist_name;
-private static String persist_type;
+private String parser_name;
+private String persist_name;
+private String persist_type;
 
 // interface classes
-private static MCRParserInterface mcr_parser;
-private static MCRObjectPersistenceInterface mcr_persist;
+private MCRParserInterface mcr_parser;
+private MCRObjectPersistenceInterface mcr_persist;
 
 // the DOM document
 private Document mcr_document = null;
@@ -335,13 +335,9 @@ public final String createTS()
   {
   if (persist_type.equals("CM7")) {
     StringBuffer sb = new StringBuffer(4096);
-    sb.append("<mycoreobject ")
-      .append("ID=\"").append(mcr_id.getId()).append("\" ")
-      .append("label=\"").append(mcr_label).append("\">").append(NL);
     sb.append(mcr_struct.createTS(persist_type));
     sb.append(mcr_metadata.createTS(persist_type));
     sb.append(mcr_service.createTS(persist_type));
-    sb.append("</mycoreobject>").append(NL);
     return sb.toString(); }
   return "";
   }
@@ -398,6 +394,10 @@ public final void receiveFromDatastore(String id) throws MCRPersistenceException
 public final void updateInDatastore() throws MCRPersistenceException
   {
   if (mcr_persist==null) { setPersistence(); }
+  if (mcr_service.getCreateString()==null) {
+    MCRObjectService service = mcr_persist.receiveService(mcr_id); 
+    mcr_service.setCreateDate(service.getCreateDate());
+    }
   mcr_service.setModifyDate();
   String xml = createXML();
   String ts = createTS();
