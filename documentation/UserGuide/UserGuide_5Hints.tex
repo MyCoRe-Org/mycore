@@ -5,9 +5,39 @@
 %
 \section{Nach dem Einspielen eines DB2/NSE bringt der CM Fehler}
 {\bf Fehlerbild: } Nach dem Einspielen eines DB2/NSE FixPack fehlen die ICM-Umgebungsvariablen.\\
-{\bf Ursache: } Im File {\it \$DB2INST/sqllib/db2profile} fehlt nach dem Update der per Hand eingetragene Aufruf des Scripts zum setzten der CM Umgebungsvariablen. Dieser Aufruf muss wieder eingefügt werden.
+{\bf Ursache: } Im File {\it \$DB2INST/sqllib/db2profile} fehlt nach dem Update der per Hand eingetragene Aufruf des Scripts zum setzten der CM Umgebungsvariablen. \\
+{\bf Maßnahme: } Dieser Aufruf muss wieder eingefügt werden.
 %
 \section{Fehler bei der Kommunikation der Servlets untereinander}
 {\bf Fehlerbild: } Die Servlets verlieren in der Abfolge ihrer Nutzung Informationen über den Zustand der Session.\\
-{\bf Ursache: } Sie haben die Nutzung von Coockies komplett abgeschaltet. Gestatten Sie wenigstens Coockies von den eigenen WEB-Seiten in der Konfiguration Ihres WEB-Browsers.
+{\bf Ursache: } Sie haben die Nutzung von Coockies komplett abgeschaltet. \\
+{\bf Maßnahme: } Gestatten Sie wenigstens Coockies von den eigenen WEB-Seiten in der Konfiguration Ihres WEB-Browsers.
+%
+\section{Erneutes Anlegen des Library-Servers und des Ressource-Managers unter ICM Content Manager 8.x}
+{\bf Fehlerbild: } Aus verschiedenen Gründen kann es erforderlich sein, den Library-Server und/oder den Ressource-Manager neu anlegen zu müssen. {\bf Achtung, alle gespeicherten Daten gehen dabei verloren!!!}\\
+{\bf Maßnahme: } Rebuild des Library-Servers
+\begin{enumerate}
+\item Stoppen Sie alle WebSphere Anwendungen, die den CM benutzen.
+\item \mcrcommand{su - db2inst1}
+\item \mcrcommand{db2 force application all}
+\item \mcrcommand{db2 drop database icmnlsdb}
+\item \mcrcommand{exit}
+\item \mcrcommand{su - db2fenc1}
+\item \mcrcommand{rm -Rf ICMNLSDB}
+\item \mcrcommand{exit}
+\item \mcrcommand{cd /usr/lpp/icm/config}
+\item \mcrcommand{./icmcreatelsdb}
+\item Sie werden nun nach einer Reihe von Angaben abgefragt, welche Sie den Aufzeichnungen Ihrer Erstinstallation entnehmen können. In \mcrfile{/tmp/icmcrlsdb.log} finden Sie das Protokoll des Rebuild.
+\end{enumerate}
+{\bf Maßnahme: } Rebuild des Ressource-Managers
+\begin{enumerate}
+\item \mcrcommand{cd /usr/lpp/icm/config}
+\item \mcrcommand{./icmcreatermdb}
+\item Sie werden nun nach einer Reihe von Angaben abgefragt, welche Sie den Aufzeichnungen Ihrer Erstinstallation entnehmen können. In \mcrfile{/tmp/icmcrrmdb.log} finden Sie das Protokoll des Rebuild.
+\end{enumerate}
+Nach dem Neuanlegen der Instanzen sollte jedesmal der Encryption Key neu generiert werden. Die geschieht wie folgend:
+\begin{enumerate}
+\item Start des Sysadmin Client unter Windows
+\item LibraryServerParameters $\rightarrow$ Configurations $\rightarrow$ {\bf Refresh cncryption key}
+\end{enumerate}
 
