@@ -40,19 +40,18 @@ import mycore.common.*;
 */
 public class MCRQueryServlet extends HttpServlet 
 {
-
-  /**
-   * The methode get a request and resolve them to a output.
-   *
-   * @param request the HTTP request instance
-   * @param response the HTTP response instance
-   * @exception IOException for java I/O errors.
-   * @exception ServletException for errors from the servlet engine.
-   **/
+ /**
+  * This method handles HTTP GET requests and resolves them to output.
+  *
+  * @param request the HTTP request instance
+  * @param response the HTTP response instance
+  * @exception IOException for java I/O errors.
+  * @exception ServletException for errors from the servlet engine.
+  **/
   public void doGet( HttpServletRequest  request, 
                      HttpServletResponse response )
     throws IOException, ServletException
-    {  
+  {  
     String mode  = request.getParameter( "mode"  );
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
@@ -78,10 +77,12 @@ public class MCRQueryServlet extends HttpServlet
       org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
       org.jdom.Document jdom = builder.build( in );
 
-      request.setAttribute( "jdom",  jdom  );
-      request.setAttribute( "style", style );
+      request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+      request.setAttribute( "XSL.Style", style );
+
       RequestDispatcher rd = getServletContext()
         .getNamedDispatcher( "MCRLayoutServlet" );
+
       rd.forward( request, response );
     }
     catch( Exception ex )
