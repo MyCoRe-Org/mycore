@@ -1092,9 +1092,11 @@
       <xsl:apply-templates select="*" mode="read.items" />
     </xsl:variable>
 
-    <xsl:apply-templates select="xalan:nodeset($items)" mode="editor.list">
-      <xsl:with-param name="value" select="$value" />
-    </xsl:apply-templates>
+    <xsl:for-each select="xalan:nodeset($items)/item">
+      <xsl:apply-templates select="." mode="editor.list">
+        <xsl:with-param name="value" select="$value" />
+      </xsl:apply-templates>
+    </xsl:for-each>
   </select>
 </xsl:template>
 
