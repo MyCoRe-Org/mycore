@@ -48,6 +48,7 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRStaticXMLFileServlet extends MCRServlet
 {
   protected final static Logger LOGGER = Logger.getLogger(  MCRStaticXMLFileServlet.class );
+  private Random random = new Random();
 
   public void doGetPost( MCRServletJob job )
     throws ServletException, java.io.IOException
@@ -83,15 +84,14 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     job.getRequest().setAttribute( "XSL.FilePath", file.getPath() );
     job.getRequest().setAttribute( "MCRLayoutServlet.Input.FILE", file );
 
-    // Set XSL Style to current language if not XSL.Style=xml in request:
-    if( ! "xml".equals( job.getRequest().getParameter( "XSL.Style" ) ) )  
-      job.getRequest().setAttribute( "XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage() );
+    // Set XSL Style to current language if no XSL.Style present in request:
+    if( (job.getRequest().getParameter("XSL.Style")== null)
+            || (job.getRequest().getParameter("XSL.Style").length()==0))  
+      job.getRequest().setAttribute("XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
     rd.forward( job.getRequest(), job.getResponse() );
   }
-
-  private Random random = new Random();
 
   /** Helper method to build a unique key for caching http request params **/
   private synchronized String buildRequestParamKey()
@@ -103,4 +103,3 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     return sb.toString();
   }
 }
-
