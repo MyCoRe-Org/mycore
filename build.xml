@@ -20,6 +20,7 @@
   <!-- file system -->
   <property name="mycore.source" value="./sources"/>
   <property name="mycore.source.common" value="./sources/mycore/common"/>
+  <property name="mycore.source.xml" value="./sources/mycore/xml"/>
   <property name="mycore.source.datamodel" value="./sources/mycore/datamodel"/>
   <property name="mycore.source.classifications" value="./sources/mycore/classifications"/>
   <property name="mycore.source.communication" value="./sources/mycore/communication"/>
@@ -75,7 +76,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_communication,compile_user,compile_commandline,compile_demo_dublin_core">
+  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_communication,compile_user,compile_commandline,compile_demo_dublin_core">
   </target>
   
   <target name="compile_common">
@@ -117,6 +118,15 @@
   <target name="compile_communication">
     <!-- compiles the communication source classes -->
     <javac srcdir="${mycore.source.communication}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_xml">
+    <!-- compiles the xml source classes -->
+    <javac srcdir="${mycore.source.xml}"
            destdir="${mycore.class}"
            debug="${debug}"
            optimize="${optimize}">
@@ -174,6 +184,7 @@
            doctitle="MyCoRe"
            >
       <group title="MyCoRe Common" packages="mycore.common.*"/>
+      <group title="MyCoRe XML" packages="mycore.xml.*"/>
       <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
       <group title="MyCoRe SQL" packages="mycore.sql.*"/>
       <group title="MyCoRe Content Manager 7" packages="mycore.cm7.*"/>

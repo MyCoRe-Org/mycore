@@ -37,6 +37,7 @@ import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectStructure;
 import mycore.datamodel.MCRObjectService;
 import mycore.datamodel.MCRQueryInterface;
+import mycore.xml.MCRParserInterface;
 
 /**
  * This class implements all methode for handling one metadata object.

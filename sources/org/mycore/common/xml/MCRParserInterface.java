@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.datamodel;
+package mycore.xml;
 
 import org.w3c.dom.Document;
 import mycore.common.MCRException;

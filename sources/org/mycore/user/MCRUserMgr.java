@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 import mycore.common.MCRCache;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
-import mycore.datamodel.MCRParserInterface;
+import mycore.xml.MCRParserInterface;
 
 /**
  * This class is the user (and group) manager of the MyCoRe system. It is implemented
