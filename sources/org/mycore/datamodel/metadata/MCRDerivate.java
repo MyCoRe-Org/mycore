@@ -388,7 +388,8 @@ public final byte [] receiveXMLFromDatastore(String id)
   mcr_id = new MCRObjectID(id);
   byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
   if (xml == null) {
-    logger.warn("The XML file for ID "+mcr_id.getId()+" was not retrieved.");
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
     }
   return xml;
   }
