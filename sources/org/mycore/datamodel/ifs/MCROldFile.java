@@ -31,9 +31,9 @@ import javax.servlet.http.*;
 
 /**
  * Represents a stored file with its metadata and content.
+ * USED BY MILESS 1.3 ONLY!
  *
  * @author Frank Lützenkirchen 
- * @deprecated USED BY MILESS 1.3 ONLY!
  * @version $Revision$ $Date$
  */
 public class MCROldFile implements MCRFileReader
