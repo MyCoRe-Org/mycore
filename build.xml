@@ -30,9 +30,6 @@
   <property name="mycore.source.command" value="./sources/mycore/commandline"/>
   <property name="mycore.class" value="./classes"/>
   <property name="mycore.javadoc" value="./javadocs"/>
-  <property name="demo_dc.source" value="./demo_dublin_core/sources"/>
-  <property name="demo_dc.class" value="./demo_dublin_core/classes"/>
-  <property name="demo_dc.javadoc" value="./demo_dublin_core/javadocs"/>
     
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -63,8 +60,6 @@
   <target name="init" >
    <mkdir dir="${mycore.class}"/>
    <mkdir dir="${mycore.javadoc}"/>
-   <mkdir dir="${demo_dc.class}"/>
-   <mkdir dir="${demo_dc.javadoc}"/>
   </target>
   
   <!-- =================================================================== -->
@@ -76,7 +71,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_communication,compile_user,compile_commandline,compile_demo_dublin_core">
+  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_communication,compile_user,compile_commandline">
   </target>
   
   <target name="compile_common">
@@ -160,15 +155,6 @@
     </javac>
   </target>
 
-  <target name="compile_demo_dublin_core">
-    <!-- compiles the demo for Dublin Core source classes -->
-    <javac srcdir="${demo_dc.source}"
-           destdir="${demo_dc.class}"
-           debug="${debug}"
-           optimize="${optimize}">
-    </javac>
-  </target>
-
   <!-- =================================================================== -->
   <!-- Create the JavaDoc for all source trees                             -->
   <!-- =================================================================== -->
@@ -193,17 +179,6 @@
       <group title="MyCoRe User Management" packages="mycore.user.*"/>
       <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
     </javadoc>
-    <!-- create the project java documentation -->
-    <javadoc packagenames="demo_dublin_core.*"
-           sourcepath="${demo_dc.source}"
-           destdir="${demo_dc.javadoc}"
-           package="true"
-           version="true"
-           author="true"
-           doctitle="MyCoRe"
-           >
-      <group title="MyCoRe Dublin Core Demo" packages="demo_dublin_core.*"/>
-    </javadoc>
   </target>
 
   <!-- =================================================================== -->
@@ -213,8 +188,6 @@
     <delete includeEmptyDirs="true" >
       <fileset dir="${mycore.javadoc}" />
       <fileset dir="${mycore.class}" />
-      <fileset dir="${demo_dc.javadoc}" />
-      <fileset dir="${demo_dc.class}" />
     </delete>
   </target>
 
