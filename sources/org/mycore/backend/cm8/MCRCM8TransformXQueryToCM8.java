@@ -155,7 +155,7 @@ System.out.println("ID :"+id);
       qs.append(query.substring(i,k)).append(itemtypename);
       i = i + k + mo.length();
       }
-    String nquery = qs.toString();
+    String nquery = qs.toString().replace('\'','\"');
     return nquery;
     }
 
