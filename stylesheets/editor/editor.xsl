@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.11 $ $Date: 2004-03-18 13:31:22 $ -->
+<!-- $Revision: 1.12 $ $Date: 2004-07-22 13:51:57 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -20,6 +20,7 @@
 <xsl:param name="ServletsBaseURL"           />
 <xsl:param name="DefaultLang"               />
 <xsl:param name="Lang"                      />
+<xsl:param name="MCRSessionID"              />
 
 <!-- ======== http request parameters ======== -->
 <xsl:param name="editor.source.new" select="'false'" /> <!-- if true, empty source -->
@@ -48,7 +49,7 @@
 
 <xsl:template match="editor">
 
-  <xsl:variable name="url" select="concat($WebApplicationBaseURL,'editor/editor-',@ref,'.xml?XSL.Style=xml')" />
+  <xsl:variable name="url" select="concat($WebApplicationBaseURL,'editor/editor-',@ref,'.xml?XSL.Style=xml&amp;MCRSessionID=',$MCRSessionID)" />
 
   <xsl:variable name="combined">
     <editor>
@@ -93,7 +94,7 @@
 <!-- ======== import parts of editor definition from another file ======== -->
 <xsl:template match="import" mode="copy-editor">
   <xsl:variable name="filename" select="concat('imports-',@ref,'.xml')" />
-  <xsl:variable name="imp-url"  select="concat($WebApplicationBaseURL,'editor/',$filename,'?XSL.Style=xml')" />
+  <xsl:variable name="imp-url"  select="concat($WebApplicationBaseURL,'editor/',$filename,'?XSL.Style=xml&amp;MCRSessionID=',$MCRSessionID)" />
   <xsl:apply-templates select="document($imp-url,.)/editor/components/*" mode="copy-editor">
     <xsl:with-param name="filename" select="$filename" />
   </xsl:apply-templates>
@@ -1228,6 +1229,19 @@
       <xsl:value-of select="concat($WebApplicationBaseURL,$url)" />
     </xsl:otherwise>
   </xsl:choose>
+
+  <!-- append MCRSessionID if not already exists in URL -->
+  <xsl:if test="contains($url, 'MCRSessionID=') != true">
+    <xsl:choose>
+      <xsl:when test="contains($url,'?')"> <!-- there are other http get style parameters in url -->
+        <xsl:value-of select="'&amp;'" />  <!-- append new parameter -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'?'" />      <!-- this is the only parameter -->
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:value-of select="concat('MCRSessionID=',$MCRSessionID)" />
+  </xsl:if>
 </xsl:template>
 
 <!-- ======== html select list option ======== -->
