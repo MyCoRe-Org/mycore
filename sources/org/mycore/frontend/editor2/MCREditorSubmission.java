@@ -158,15 +158,15 @@ public class MCREditorSubmission
     }
   }
 
-  List buildSourceVarXML()
+  Element buildSourceVarXML()
   {
-    List vars = new ArrayList();
+    Element input = new Element( "input" );
     for( int i = 0; i < variables.size(); i++ )
     {
       MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
-      vars.add( var.buildXML() );
+      input.addContent( var.buildXML() );
     }
-    return vars;
+    return input;
   }
   
   private Element resolveComponent( Element parent, String ID )

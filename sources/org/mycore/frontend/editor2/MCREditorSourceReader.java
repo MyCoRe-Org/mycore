@@ -46,7 +46,7 @@ public class MCREditorSourceReader
    * Reads XML input from an url and returns a list of source variable elements
    * that can be processed by editor.xsl
    **/
-  static List readSource( Element editor, Map parameters )
+  static Element readSource( Element editor, Map parameters )
   {
     Element source = editor.getChild( "source" );
     String[] urlFromRequest   = (String[])( parameters.get( "XSL.editor.source.url" ) );

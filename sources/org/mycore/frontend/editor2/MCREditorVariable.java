@@ -84,7 +84,7 @@ class MCREditorVariable implements Comparable
 
   public Element buildXML()
   {
-    Element var = new Element( "source-variable" );
+    Element var = new Element( "var" );
     var.setAttribute( "name", name );
     var.setAttribute( "value", value );
     return var;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.23 $ $Date: 2004-12-23 10:00:16 $ -->
+<!-- $Revision: 1.24 $ $Date: 2004-12-23 10:15:43 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -545,7 +545,7 @@
 
   <!-- ======== select matching nodes from source xml ======== -->  
   <xsl:variable name="selected.source.values" 
-    select="ancestor::editor/source-variable[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]"
+    select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]"
   />
   <xsl:choose>
     <!-- ======== if there are nodes, copy values to hidden fields ======== -->
@@ -583,7 +583,7 @@
   <!-- ======== get the value of this field from xml source ======== -->
   <span style="{$editor.font}">
     <xsl:variable name="selected.cell" 
-      select="ancestor::editor/source-variable[@name=$var.new]" 
+      select="ancestor::editor/input/var[@name=$var.new]" 
     />
     <xsl:choose>
       <xsl:when test="$selected.cell">
@@ -605,7 +605,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
 
   <!-- ======== build the value to display ======== -->
@@ -648,7 +648,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
@@ -682,7 +682,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
 
   <input type="password" size="{@width}" value="{$source}" name="{$var}"
@@ -782,7 +782,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
 
   <!-- ======== build the value to display ======== -->
@@ -930,7 +930,7 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/source-variable[@name=$var]/@value" />  
+    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
 
   <input type="checkbox" name="{$var}" value="{@value}">

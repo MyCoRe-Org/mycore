@@ -114,11 +114,11 @@ public class MCREditorServlet extends MCRServlet
     logger.info( "Editor start editor session from " + ref + "@" + uri );
 
     Map requestParameters = getRequestParameters( key );
-    Element param = getTargetParameters( requestParameters );
+    Element param  = getTargetParameters( requestParameters );
     Element editor = MCREditorDefReader.readDef( uri, ref );
+    Element input  = MCREditorSourceReader.readSource( editor, requestParameters );
     if( param != null ) editor.addContent( param );
-    List variables = MCREditorSourceReader.readSource( editor, requestParameters );
-    editor.addContent( variables );
+    editor.addContent( input );
 
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );
