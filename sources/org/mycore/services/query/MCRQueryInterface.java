@@ -38,6 +38,10 @@ import org.mycore.common.xml.MCRXMLContainer;
 public interface MCRQueryInterface
 {
 
+public final static char COMMAND_OR='O';
+public final static char COMMAND_AND='A';
+public final static char COMMAND_XOR='X';
+
 /**
  * This method parse the XQuery string and return the result as
  * MCRXMLContainer. If the type is null or empty or maxresults
@@ -64,5 +68,20 @@ public String getObjectID(String DerivateID);
  * @return
  */
 public MCRXMLContainer getObjectForDerivate(String DerivateID);
+
+/**
+ * merges to XMLContainer after specific rules
+ * @see #COMMAND_OR
+ * @see #COMMAND_AND
+ * @see #COMMAND_XOR
+ * @param result1 1st MCRXMLContainer to be merged
+ * @param result2 2nd MCRXMLContainer to be merged
+ * @param operation available COMMAND_XYZ
+ * @return merged ResultSet
+ */
+public MCRXMLContainer mergeResults(
+	MCRXMLContainer result1,
+	MCRXMLContainer result2,
+	char operation);
 }
 

@@ -53,6 +53,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	public final static int MAX_RESULTS = 1000;
 	/** The node name for a search in all document texts */
 	public final static String XPATH_ATTRIBUTE_DOCTEXT = "doctext()";
+
 	protected static String NL =
 		new String((System.getProperties()).getProperty("line.separator"));
 	// protected data
@@ -219,9 +220,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	 */
 	public String getObjectID(String DerivateID) {
 		StringBuffer query =
-			new StringBuffer("/mycorederivate[@ID=\"")
-				.append(DerivateID)
-				.append("\"]");
+			new StringBuffer("/mycorederivate[@ID=\"").append(
+				DerivateID).append(
+				"\"]");
 		MCRXMLContainer derivate =
 			getResultList(query.toString(), "derivate", 1);
 		//<mycorederivate
@@ -249,12 +250,82 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		String ObjectID = getObjectID(DerivateID);
 		if (ObjectID != null) {
 			StringBuffer query =
-				new StringBuffer("/mycoreobject[@ID=\"")
-					.append(ObjectID)
-					.append("\"]");
+				new StringBuffer("/mycoreobject[@ID=\"").append(
+					ObjectID).append(
+					"\"]");
 			return getResultList(query.toString(), "document", 1);
 		}
 		return null;
+	}
+
+	/**
+	 * merges to XMLContainer after specific rules
+	 * @see #COMMAND_OR
+	 * @see #COMMAND_AND
+	 * @see #COMMAND_XOR
+	 * @param result1 1st MCRXMLContainer to be merged
+	 * @param result2 2nd MCRXMLContainer to be merged
+	 * @param operation available COMMAND_XYZ
+	 * @return merged ResultSet
+	 */
+	public MCRXMLContainer mergeResults(
+		MCRXMLContainer result1,
+		MCRXMLContainer result2,
+		char operation) {
+		MCRXMLContainer merged = new MCRXMLContainer();
+		Hashtable contents1 = new Hashtable(), contents2 = new Hashtable();
+		for (int i = 0; i < result1.size(); i++)
+			contents1.put(
+				result1.getId(i),
+				result1.exportElementToContainer(i));
+		for (int i = 0; i < result2.size(); i++)
+			contents2.put(
+				result2.getId(i),
+				result2.exportElementToContainer(i));
+		String id;
+		Hashtable mergedT;
+		switch (operation) {
+			case COMMAND_OR :
+				mergedT = new Hashtable();
+				mergedT.putAll((Map) result1);
+				mergedT.putAll((Map) result2);
+				for (Iterator it = mergedT.values().iterator(); it.hasNext();)
+					merged.importElements((MCRXMLContainer) it.next());
+				break;
+			case COMMAND_AND :
+				for (Enumeration enum = contents1.keys();
+					enum.hasMoreElements();
+					) {
+					id = (String) enum.nextElement();
+					if (contents2.containsKey(id))
+						merged.importElements(
+							(MCRXMLContainer) contents2.get(id));
+				}
+				break;
+			case COMMAND_XOR :
+				mergedT = new Hashtable();
+				for (Enumeration enum = contents1.keys();
+					enum.hasMoreElements();
+					) {
+					id = (String) enum.nextElement();
+					if (!contents2.containsKey(id))
+						mergedT.put(id, contents1.get(id));
+				}
+				for (Enumeration enum = contents2.keys();
+					enum.hasMoreElements();
+					) {
+					id = (String) enum.nextElement();
+					if (!contents1.containsKey(id) && !mergedT.contains(id))
+						mergedT.put(id, contents2.get(id));
+				}
+				for (Iterator it = mergedT.values().iterator(); it.hasNext();)
+					merged.importElements((MCRXMLContainer) it.next());
+				break;
+			default :
+				throw new IllegalArgumentException(
+					"operation not permited: " + operation);
+		}
+		return merged;
 	}
 
 	/**
