@@ -27,7 +27,6 @@ package mycore.datamodel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
-//import java.util.Vector;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
@@ -52,27 +51,27 @@ public abstract class MCRBase
 public final static int MAX_LABEL_LENGTH = 256;
 
 // from configuration
-private static MCRConfiguration mcr_conf = null;
-private static String mcr_encoding = null;
-private static String mcr_schema_path = null;
-private static String persist_name;
+protected static MCRConfiguration mcr_conf = null;
+protected static String mcr_encoding = null;
+protected static String mcr_schema_path = null;
+protected static String persist_name;
 private static String persist_type;
 
 // interface classes
-private static MCRObjectPersistenceInterface mcr_persist;
+protected static MCRObjectPersistenceInterface mcr_persist;
 
 // the DOM document
-private org.jdom.Document jdom_document = null;
+protected org.jdom.Document jdom_document = null;
 
 // the object content
-private MCRObjectID mcr_id = null;
-private String mcr_label = null;
-private String mcr_schema = null;
-private MCRObjectService mcr_service = null;
+protected MCRObjectID mcr_id = null;
+protected String mcr_label = null;
+protected String mcr_schema = null;
+protected MCRObjectService mcr_service = null;
 
 // other
-private static String NL;
-private static String SLASH;
+protected static String NL;
+protected static String SLASH;
 public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
 public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
@@ -144,37 +143,6 @@ public final String getLabel()
  **/
 public final MCRObjectService getService()
   { return mcr_service; }
-
-/**
- * The given DOM was convert into an internal view of metadata. This are 
- * the object ID and the object label, also the blocks structure, flags and 
- * metadata.
- *
- * @exception MCRException      general Exception of MyCoRe
- **/
-private void set() throws MCRException
-  {
-  if (jdom_document == null) {
-    throw new MCRException("The JDOM document is null or empty."); }
-  // get object ID from DOM
-  org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-  mcr_id = new MCRObjectID((String)jdom_element_root.getAttribute("ID")
-    .getValue());
-  mcr_label = (String)jdom_element_root.getAttribute("label").getValue().trim();
-  if (mcr_label.length()>MAX_LABEL_LENGTH) {
-    mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
-  mcr_schema = (String)jdom_element_root
-    .getAttribute("noNamespaceSchemaLocation",
-     org.jdom.Namespace.getNamespace("xsi",XSI_URL)).getValue().trim();
-  int i=0;
-  int j=0;
-  while (j!=-1) {
-    j = mcr_schema.indexOf(SLASH,i+1); if (j!=-1) { i = j; } }
-  mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
-  // get the service data of the object
-  org.jdom.Element jdom_element = jdom_element_root.getChild("service");
-  mcr_service.setFromDOM(jdom_element);
-  }
 
 /**
  * This methode read the XML input stream from an URI into a temporary DOM 
@@ -276,8 +244,10 @@ public abstract void deleteFromDatastore(String id)
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
+/*
 public abstract boolean existInDatastore(String id) 
   throws MCRPersistenceException;
+*/
 
 /**
  * The methode receive the object for the given MCRObjectID and stored

@@ -44,66 +44,15 @@ import mycore.xml.MCRXMLHelper;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRDerivate
+final public class MCRDerivate extends MCRBase
 {
 
 /**
  * constant value for the object id length
  **/
-public final static int MAX_LABEL_LENGTH = 256;
-
-// from configuration
-private static MCRConfiguration mcr_conf = null;
-private static String mcr_encoding = null;
-private static String mcr_schema_path = null;
-private static String persist_name;
-private static String persist_type;
-
-// interface classes
-private static MCRObjectPersistenceInterface mcr_persist;
-
-// the DOM document
-private org.jdom.Document jdom_document = null;
 
 // the object content
-private MCRObjectID mcr_id = null;
-private String mcr_label = null;
-private String mcr_schema = null;
 private MCRObjectDerivate mcr_derivate = null;
-private MCRObjectService mcr_service = null;
-
-// other
-private static String NL;
-private static String SLASH;
-public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
-public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
-
-/**
- * Load static data for all MCRDerivates
- **/
-static
-  {
-  NL = System.getProperty("line.separator");
-  SLASH = System.getProperty("file.separator");
-  try {
-    // Load the configuration
-    mcr_conf = MCRConfiguration.instance();
-    // Default Encoding
-    mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
-      "ISO_8859-1");
-    // Path of XML schema
-    mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
-    // Set persistence layer
-    persist_type = mcr_conf.getString("MCR.persistence_type","cm7");
-    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-      "_class_name";
-    persist_name = mcr_conf.getString(proppers);
-    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
-      .newInstance(); 
-    }
-  catch (Exception e) {
-     throw new MCRException(e.getMessage(),e); }
-  }
 
 /**
  * This is the constructor of the MCRDerivate class. It make an
@@ -115,30 +64,10 @@ static
  */
 public MCRDerivate() throws MCRException, MCRConfigurationException
   {
-  mcr_id = new MCRObjectID();
-  mcr_label = new String("");
-  mcr_schema = new String("");
+  super();
   // Derivate class
   mcr_derivate = new MCRObjectDerivate();
-  // Service class
-  mcr_service = new MCRObjectService();
   }
-
-/**
- * This methode return the derivate id. If this is not set, null was returned.
- *
- * @return the id as MCRObjectID
- **/
-public final MCRObjectID getId()
-  { return mcr_id; }
-
-/**
- * This methode return the derivate label. If this is not set, null was returned.
- *
- * @return the lable as a string
- **/
-public final String getLabel()
-  { return mcr_label; }
 
 /**
  * This methode return the instance of the MCRObjectDerivate class.
@@ -148,15 +77,6 @@ public final String getLabel()
  **/
 public final MCRObjectDerivate getDerivate()
   { return mcr_derivate; }
-
-/**
- * This methode return the instance of the MCRObjectService class.
- * If this was not found, null was returned.
- *
- * @return the instance of the MCRObjectService class
- **/
-public final MCRObjectService getService()
-  { return mcr_service; }
 
 /**
  * The given DOM was convert into an internal view of metadata. This are 
@@ -230,40 +150,12 @@ public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   }
 
 /**
- * This methode set the object ID.
- *
- * @param id   the object ID
- **/
-public final void setId(MCRObjectID id)
-  { if (id.isValid()) { mcr_id = id; } }
-
-/**
- * This methode set the object label.
- *
- * @param label   the object label
- **/
-public final void setLabel(String label)
-  { 
-  mcr_label = label.trim();
-  if (mcr_label.length()>MAX_LABEL_LENGTH) {
-   mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
-  }
-
-/**
  * This methode set the object MCRObjectDerivate.
  *
  * @param service   the object MCRObjectDerivate part
  **/
 public final void setDerivate(MCRObjectDerivate derivate)
   { if (derivate != null) { mcr_derivate = derivate; } }
-
-/**
- * This methode set the object MCRObjectService.
- *
- * @param service   the object MCRObjectService part
- **/
-public final void setService(MCRObjectService service)
-  { if (service != null) { mcr_service = service; } }
 
 /**
  * This methode create a XML stream for all object data.
@@ -326,7 +218,7 @@ public final String createTextSearch()
  *
  * @param confdoc the configuration XML document
  **/
-public final void createDataBase(org.jdom.Document confdoc)
+public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
   setId(new MCRObjectID("Template_derivate_1"));
   mcr_persist.createDataBase("derivate", confdoc);
@@ -477,37 +369,4 @@ public final void updateInDatastore() throws MCRPersistenceException
     }
   }
 
-/**
- * This method check the validation of the content of this class.
- * The method returns <em>true</em> if
- * <ul>
- * <li> the mcr_id value is valid
- * <li> the label value is not null or empty
- * </ul>
- * otherwise the method return <em>false</em>
- *
- * @return a boolean value
- **/
-public final boolean isValid()
-  {
-  if (!mcr_id.isValid()) { return false; }
-  if ((mcr_label == null) || ((mcr_label = mcr_label.trim()).length() ==0)) {
-    return false; }
-  if ((mcr_schema == null) || ((mcr_schema = mcr_schema.trim()).length() ==0)) {
-    return false; }
-  return true;
-  }
-
-/**
- * This metode print the data content from this class.
- **/
-public final void debug()
-  {
-  System.out.println();
-  System.out.println("The object content :");
-  System.out.println("  ID     = "+mcr_id.getId());
-  System.out.println("  label  = "+mcr_label);
-  System.out.println("  schema = "+mcr_schema);
-  System.out.println();
-  }
 }
