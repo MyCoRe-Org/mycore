@@ -134,6 +134,30 @@ static final boolean createAttributeVarChar(DKDatastoreICM connection,
   }
 
 /**
+ * This methode is internal and create a DK_CM_BOOLEAN attribute.
+ *
+ * @param connection the connection to the database
+ * @param name the name of the attribute
+ * @return If the attribute exists, false was returned, else true.
+ **/
+static final boolean createAttributeBoolean(DKDatastoreICM connection,
+  String name) throws Exception
+  {
+  DKAttrDefICM attr = new DKAttrDefICM(connection);
+  try {
+    attr.setName(name);
+    attr.setType(DK_CM_VARCHAR);
+    attr.setStringType(DK_CM_ATTR_VAR_ALPHANUM_EXT);
+    attr.setSize(10);
+    attr.setTextSearchable(false);
+    attr.setNullable(true);
+    attr.setUnique(false);
+    attr.add(); }
+  catch (DKException e) { return false; }
+  return true;
+  }
+
+/**
  * This methode is internal and create a DK_CM_DATE attribute.
  *
  * @param connection the connection to the database

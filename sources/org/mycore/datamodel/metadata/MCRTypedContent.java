@@ -170,7 +170,7 @@ public final boolean addBooleanElement(boolean invalue)
   type.add(new Integer(TYPE_VALUE));
   name.add("");
   format.add(new Integer(FORMAT_BOOLEAN));
-  value.add(new Boolean(invalue));
+  if (invalue) { value.add("true"); } else { value.add("false"); }
   return true;
   }
 

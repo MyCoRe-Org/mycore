@@ -186,6 +186,11 @@ public final void create(MCRBase obj) throws MCRConfigurationException, MCRPersi
           logger.debug("Attribute : "+sb+"  "+elname+"  "+
             (String)mcr_tc.getValueElement(i));
           break;
+        case MCRTypedContent.FORMAT_BOOLEAN :
+          valueobject = mcr_tc.getValueElement(i);
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            (String)mcr_tc.getValueElement(i));
+          break;
         case MCRTypedContent.FORMAT_DATE :
           GregorianCalendar cal = (GregorianCalendar)mcr_tc.getValueElement(i);
           int number = 0;
