@@ -90,8 +90,8 @@ public class MCRLoginServlet extends MCRServlet
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent((Content)new org.jdom.Element("guest_id").addContent(GUEST_ID));
-    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
+    root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
+    root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
 
     try {
       loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
@@ -129,10 +129,8 @@ public class MCRLoginServlet extends MCRServlet
         rd.forward(job.getRequest(), job.getResponse());
         return;
       }
-      else {
-        if (uid != null)
-          root.setAttribute("invalid_password", "true");
-      }
+      if (uid != null)
+        root.setAttribute("invalid_password", "true");
     }
     catch (MCRException e) {
       if (e.getMessage().equals("Error in UserStore.")) {
@@ -149,7 +147,7 @@ public class MCRLoginServlet extends MCRServlet
       }
     }
 
-    root.addContent((Content)new org.jdom.Element("backto_url").addContent(backto_url));
+    root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
     doLayout(job, "login", jdomDoc); // use the stylesheet mcr_user-login-*.xsl
   }
 
