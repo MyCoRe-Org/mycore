@@ -187,14 +187,16 @@ public class MCROAIQueryService implements MCROAIQuery {
         	        append("\" and @categid=\"").append(categoryId).append("\"]");
     	    }
 	        if (from != null) {
-        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
-    	            "." + from[0].substring(0, 4);
+/*        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
+    	            "." + from[0].substring(0, 4); */
+    	        String date = from[0];
 	            query.append(" and ").append("/mycoreobject[service.dates.date>=\"").append(date).
             	    append("\" and service.dates.date/@type=\"modifydate\"]");
         	}
     	    if (until != null) {
-	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
-            	    "." + until[0].substring(0, 4);
+/*	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
+            	    "." + until[0].substring(0, 4); */
+            	String date = until[0];
         	    query.append(" and ").append("/mycoreobject[service.dates.date<=\"").append(date).
     	            append("\" and service.dates.date/@type=\"modifydate\"]");
 	        }
@@ -346,14 +348,16 @@ public class MCROAIQueryService implements MCROAIQuery {
         	        append("\" and @categid=\"").append(categoryId).append("\"]");
     	    }
 	        if (from != null) {
-        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
-    	            "." + from[0].substring(0, 4);
+/*        	    String date = from[0].substring(8) + "." + from[0].substring(5, 7) +
+    	            "." + from[0].substring(0, 4); */
+    	        String date = from[0];
 	            query.append(" and ").append("/mycoreobject[service.dates.date>=\"").append(date).
             	    append("\" and service.dates.date/@type=\"modifydate\"]");
         	}
     	    if (until != null) {
-	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
-            	    "." + until[0].substring(0, 4);
+/*	            String date = until[0].substring(8) + "." + until[0].substring(5, 7) +
+            	    "." + until[0].substring(0, 4); */
+    	        String date = until[0];
         	    query.append(" and ").append("/mycoreobject[service.dates.date<=\"").append(date).
     	            append("\" and service.dates.date/@type=\"modifydate\"]");
 	        }
