@@ -64,7 +64,7 @@
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
     <xsd:sequence>
-      <xsl:apply-templates select="data"/>
+     <xsl:apply-templates select="*"/>
     </xsd:sequence>
     <xsd:attribute name="class" type="xsd:string" use="required" />
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
@@ -76,12 +76,6 @@
   <xsd:attribute ref="xml:lang" />
  </xsd:complexType>
 
-</xsl:template>
-
-<!-- Call templates for each metadata -->
-
-<xsl:template match="data">
- <xsl:apply-templates select="*"/>
 </xsl:template>
 
 </xsl:stylesheet>
