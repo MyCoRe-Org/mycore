@@ -30,6 +30,7 @@ import com.ibm.mm.sdk.common.*;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRMetaNumber;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -81,8 +82,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     lt.addAttr(attr);
     // create the dimension attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,dimname,128,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,dimname,
+      MCRMetaNumber.MAX_DIMENSION_LENGTH,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         dimname+" already exists."); }
     // add the value attribute
@@ -91,8 +92,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the measurement attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,measname,64,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,measname,
+      MCRMetaNumber.MAX_MEASUREMENT_LENGTH,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         measname+" already exists."); }
     // add the value attribute
