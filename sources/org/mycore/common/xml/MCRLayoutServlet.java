@@ -84,6 +84,7 @@ public class MCRLayoutServlet extends HttpServlet
     }
     
     final Properties detected = new Properties();
+    final String forcedInterrupt = "forcedInterrupt";
     
     DefaultHandler handler = new DefaultHandler()
     {
@@ -92,16 +93,23 @@ public class MCRLayoutServlet extends HttpServlet
         throws SAXException
       {
         detected.setProperty( "rootElementName", qName );
-        throw new MCRException( "we force an interrupt with this exception" );
+        throw new MCRException( forcedInterrupt );
       }
     };
     
     try{ parser.parse( new InputSource( in ), handler ); }
-    catch( MCRException weKnowThatThisWillHappen ){}
     catch( Exception ex )
     {
-      String msg = "Error while detecting XML document type from input source";
-      throw new MCRException( msg, ex );
+      if( ex instanceof MCRException )
+      {
+        if( ! ex.getMessage().equals( forcedInterrupt ) )
+          throw (MCRException)ex; // Pass MCRException to invoker
+      } 
+      else
+      {
+        String msg = "Error while detecting XML document type from input source";
+        throw new MCRException( msg, ex );
+      }
     }
     
     return detected.getProperty( "rootElementName" );
