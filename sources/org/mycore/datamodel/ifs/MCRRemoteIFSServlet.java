@@ -120,17 +120,17 @@ System.out.println("MCRRemoteIFSServlet : hosts = "+host);
 
     String ownerID = st.nextToken();
     
-    MCRFilesystemNode[] roots = MCRFilesystemNode.getRootNodes( ownerID );
-    if( roots.length == 0 )
-    {
-      String msg = "Error: No root node found for owner ID " + ownerID;
-      System.out.println( msg );
-      res.sendError( res.SC_NOT_FOUND, msg );
-      return;
-    }
-    
     if (host.equals("local"))
     {
+      MCRFilesystemNode[] roots = MCRFilesystemNode.getRootNodes( ownerID );
+      if( roots.length == 0 )
+      {
+        String msg = "Error: No root node found for owner ID " + ownerID;
+        System.out.println( msg );
+        res.sendError( res.SC_NOT_FOUND, msg );
+        return;
+      }
+    
       MCRFilesystemNode root = roots[ 0 ];
     
       if( root instanceof MCRFile )
