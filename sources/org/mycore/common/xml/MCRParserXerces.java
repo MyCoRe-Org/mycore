@@ -94,7 +94,7 @@ public class MCRParserXerces
 	builderValid.setErrorHandler  ( this );
 
 	builder.setEntityResolver( entityResolver );
-	builder.setEntityResolver( entityResolver );
+	builderValid.setEntityResolver( entityResolver );
   }
 
   /**
