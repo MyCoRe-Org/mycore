@@ -1,14 +1,18 @@
+%
+%
 \chapter{Download und Installation des MyCoRe Kerns}
 %
+%
 \section{Download des MyCoRe Kerns}
+%
+%
 Das MyCoRe Projekt wird f"ur alle unterst"utzten Systeme "uber das CVS Repository
 ausgeliefert. Das Holen der aktuellen Version erfolgt mit dem Kommando 
 \begin{center}
 {\bf cvs -d :pserver:anoncvs@server.mycore.de:/cvs checkout mycore} 
 \end{center}
-Nach dem checkout finden Sie folgende Dateistruktur vor:
-\begin{center}
-\begin{tabular}{ll}
+Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[1ex]
+\begin{tabular*}{150mm}{ll}
 {\bf mycore} &  Das Root-Verzeichnis des MyCoRe-Kerns \\
 \quad {\bf bin} & Das Verzeichnis der Shellscripte \\
 \qquad build.sh & Shellscript zum Compilieren unter einem UNIX-System \\
@@ -24,8 +28,56 @@ Nach dem checkout finden Sie folgende Dateistruktur vor:
 \quad {\bf documentation} & Dokumentationen zu MyCoRe \\
 \quad {\bf lib} & Noterndige zus"atzliche Java-Bibliotheken \\
 \quad {\bf schema} & XMLSchema Dateien, die anwendungsunabh"angig sind \\
-\end{tabular}
-\end{center}
+\quad {\bf sources/org/mycore} & Die Wurzel des MyCoRe-Source-Baumes \\
+\qquad {\bf datamodel} & Klassen zum Datenmodell \\
+\quad \qquad {\bf classifications} & Klassen zur Arbeit mit den Klassifikationen \\
+\quad \qquad {\bf ifs} & Klassen zur Arbeit mit dem Internal File System \\
+\quad \qquad {\bf metadata} & Klassen zur Arbeit mit den Metdaten \\
+\qquad {\bf common} & Klassen, die im gesamten Projekt benötigt werden \\
+\quad \qquad {\bf xml} & Allgemeine Klassen zur XML Verarbeitung \\
+\qquad {\bf backend} & Klassen f"ur die verschiedenen Data Stores \\
+\quad \qquad {\bf cm7} & Klassen zur Nutzung des IBM Content Manager 7 \footnote{Die Klassen für den IBM Content Manager 7 werden nicht merh weiterentwickelt!} \\
+\quad \qquad {\bf cm8} & Klassen zur Nutzung des IBM Content Manager 8.2 \\
+\quad \qquad {\bf filesystem} & Klassen zum Content Store im lokalen Filesystem \\
+\quad \qquad {\bf realhelix} & Klassen zum Content Store in einem Helix-Server \\
+\quad \qquad {\bf remote} & Klassen zum Zugriff auf Remote-MyCoRe-Daten \\
+\quad \qquad {\bf sql} & Klassen zum Zugriff auf relationale Datenbanken mittels SQL-Standart \\
+\quad \qquad {\bf videocharger} & Klassen zum Content Store in einen IBM Videocharger \\
+\qquad {\bf frontend} & Klassen f"ur die Frontends des MyCoRe-Systems \\
+\quad \qquad {\bf cli} & Klassen des Commandline-Tools \\
+\quad \qquad {\bf editor} & Klassen zug Gestaltung von Editoren \\
+\quad \qquad {\bf servlets} & Klassen zu Gestaltung von Servlets \\
+\qquad {\bf services} & Klassen f"ur weiterf"uhrende Services des MyCoRe-Projektes \\
+\quad \qquad {\bf nbn} & Klassen zur Arbeit mit NBN's \\
+\quad \qquad {\bf oai} & Klassen zur Arbeit mit OAI Komponenten \\
+\quad \qquad {\bf query} & Klassen zur Arbeit mit dem MyCoRe internen Query-System \\
+\qquad {\bf user} & Klassen des User- und Rechteverwaltungssystems \\
+\quad build.xml & Konfigurations-File für die Arbeit mit ANT \\
+\quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen.
+\end{tabular*}
 %
-\section{Konfiguration zum "Ubersetzten des Kerns}
-\section{Compile}
+%
+\section{Konfiguration und "Ubersetzten des Kerns}
+%
+%
+Nach dem checkout der Files muss als erstes dieses Paket "ubersetzt werden. Die Arbeit erfolgt in den unten angegebenen Schritten.\\
+\begin{enumerate} 
+\item Zur Anpassung der erforderlichen Umgebung gibt es zwei Wege. Entweder alle notwendigen Variablen wie CLASSPATH usw. werden in den entsprechenden Nutzer-Profile gesetzt oder ({\bf empfohlen}) sie setzen an dieser Stelle nur die Environment-Variable {\bf MYCORE\_HOME} in Ihrer Systemumgebung und kopieren das entsprechende Template {\it setup\_....sh} (bzw. {\it setup\_....cmd}) im Verzeichnis {\it bin} dort nach {\it setup.sh} (bzw. {\it setup.cmd} f"ur die Windows Plattform) F"ur die unterst"utzten Systeme stehen jeweils entsprechende Files bereit. Passen Sie nun das Setup-Script an die eigene Konfiguration hinsichtlich der ben"otigten Software (Pfade zu ANT, Java usw.) an. 
+\item Als n"achstes ist im File {\it \$MYCORE\_HOME/build.xml} die Zeile \\
+\begin{center}
+{\tt <property name="`persistency"`  value="`cm7"` />} 
+\end{center}
+entsprechend des gew"ahlten Persistence-Layers anzupassen. M"ogliche Werte sind {\it cm7}, {\it cm8} und {\it xmldb}.
+\item Starten Sie nun die "Ubersetzung mit einem Aufruf von {\it ant} oder ({\bf empfohlen}) der Ausf"uhrung des Shell-Scripts {\it bin/build.sh} (bzw. {\it bin/build.cmd}). Bei der Abarbeitung des Kommandos ohne Parameter wird Ihnen eine Auswahl an m"oglichen Parametern angeboten. So k"onnen Sie hier zum Beispiel alle Klassen kompilieren oder nur die Javadoc-Dokumentation bzw. diese Dokumentation erstellen. 
+\item Um die f"ur die MyCoRe-Anwendung ben"otigten Java-Klassen zu erzeugen starten Sie einfach \\
+\begin{center}
+{\it \$MYCORE\_HOME/bin/build.sh jar }
+\end{center} 
+\end{enumerate} 
+Abh"angig von Ihrer Wahl beim build werden weitere Unterverzeichnisse im Verzeichnisbaum unter {\it \$MYCORE\_HOME} erstellt: 
+\begin{itemize} 
+\item mycore/classes $\longrightarrow$ enth"alt die Java Klassen 
+\item mycore/javsadocs $\longrightarrow$  enth"alt die Java Dokumentation 
+\end{itemize} 
+%
+%
