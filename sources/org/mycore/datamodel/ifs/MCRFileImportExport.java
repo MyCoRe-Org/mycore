@@ -83,6 +83,43 @@ public class MCRFileImportExport
 
   /**
    * Imports the contents of a local file or directory into
+   * an existing MCRDirectory that is owned by the given 
+   * owner ID. The new MCRDirectory will have the same name 
+   * as the owner ID.
+   * 
+   * If the local object is
+   * a file, a MCRFile with the same name will be created or
+   * updated in that MCRDirectory. If the local object is
+   * a directory, all contained subdirectories and files will 
+   * be imported into the newly created MCRDirectory. 
+   * That means that after finishing this method, the
+   * complete directory structure will have been imported and
+   * mapped from the local filesystem's structure. The method
+   * checks the contents of each local file to be imported. If
+   * the file's content has not changed for existing files,
+   * the internal MCRFile will not be updated. If there is any
+   * exception while importing the local contents, the system will
+   * stop with the last state and break the work.
+   *
+   * @param local the local file or directory to be imported
+   * @param ownerID the ID of the logical owner of the content that will be stored
+   * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
+   **/  
+  public static MCRDirectory addFiles( File local, String ownerID )
+  {
+    MCRArgumentChecker.ensureNotEmpty( ownerID, "owner ID" );
+
+    // Get the existing parent directory    
+    MCRDirectory dir = MCRDirectory.getRootDirectory( ownerID );
+    try // Try to import local content into this new directory
+    { importFiles( local, dir ); }
+    catch( MCRException mex ) // If anything goes wrong
+    { throw mex; }
+    return dir;
+  }
+
+  /**
+   * Imports the contents of a local file or directory into
    * the MyCoRe Internal Filesystem. If the local object is
    * a file, a MCRFile with the same name will be created or
    * updated in the given MCRDirectory. If the local object is
