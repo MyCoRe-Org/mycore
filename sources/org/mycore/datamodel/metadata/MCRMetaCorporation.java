@@ -205,41 +205,24 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,textsearch);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
   if ((name = name.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"name");
     tc.addStringElement(tc.TYPE_VALUE,null,name,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((nickname = nickname.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"nickname");
     tc.addStringElement(tc.TYPE_VALUE,null,nickname,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((parent = parent.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"parent");
     tc.addStringElement(tc.TYPE_VALUE,null,parent,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((property = property.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"property");
     tc.addStringElement(tc.TYPE_VALUE,null,property,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   return tc;
   }

@@ -248,59 +248,32 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,textsearch);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
   if ((country = country.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"country");
     tc.addStringElement(tc.TYPE_VALUE,null,country,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((state = state.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"state");
     tc.addStringElement(tc.TYPE_VALUE,null,state,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((zipcode = zipcode.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"zipcode");
     tc.addStringElement(tc.TYPE_VALUE,null,zipcode,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((city = city.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"city");
     tc.addStringElement(tc.TYPE_VALUE,null,city,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((street = street.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"street");
     tc.addStringElement(tc.TYPE_VALUE,null,street,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   if ((number = number.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"number");
     tc.addStringElement(tc.TYPE_VALUE,null,number,parametric,textsearch);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,
-      textsearch);
-    if ((type = type.trim()).length() !=0) {
-      tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,
-        textsearch); }
     }
   return tc;
   }
