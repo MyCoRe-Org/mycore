@@ -48,6 +48,8 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 
@@ -140,10 +142,16 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		logger.debug("TextIndexDir: " + indexDir);
 		if (indexWriter == null) {
 			logger.debug("creating IndexWriter...");
+			try {
+			if (indexDir.exists()){
+				//do some hardcore...
+				Directory index=FSDirectory.getDirectory(indexDir,false);
+				if (IndexReader.isLocked(indexDir.getAbsolutePath()))
+					IndexReader.unlock(index);
+			}
 			loadIndexWriter();
 			logger.debug("IndexWriter created...");
 			docCount = indexWriter.docCount();
-			try {
 				indexWriter.close();
 			} catch (IOException e) {
 				logger.error("Setting indexWriter=null");
