@@ -45,8 +45,7 @@ public class MCRClassificationItem extends MCRClassificationObject
    **/
   public MCRClassificationItem( String classID ) 
     { 
-    super ( classID );
-    MCRObjectID mcr_id = new MCRObjectID(classID);
+    	super ( classID );
     }
   
   /**

@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs;
 
 import java.io.*;
 import java.util.*;
-import java.net.*;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import javax.servlet.*;
@@ -67,9 +66,6 @@ public class MCRFileNodeServlet extends MCRServlet
   {
     super.init();
  
-    // read the default language
-    String defaultLang = config.getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
-    
     // read host list from configuration
     String hostconf = config.getString( "MCR.remoteaccess_hostaliases", "local" );
     

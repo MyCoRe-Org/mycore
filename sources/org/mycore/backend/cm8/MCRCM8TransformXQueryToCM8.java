@@ -25,7 +25,6 @@
 package org.mycore.backend.cm8;
 
 import java.util.*;
-import java.text.*;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
@@ -33,9 +32,7 @@ import com.ibm.mm.sdk.common.*;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.common.xml.MCRXMLContainer;
 
@@ -100,7 +97,6 @@ public final MCRXMLContainer getResultList(String query, String type,
   int stoppos = query.length();
   int operpos = -1;
   String onecond = "";
-  String oper = "";
   StringBuffer cond = new StringBuffer("/mycoreobject[");
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,query);
@@ -203,8 +199,7 @@ private final String getNextCondition(int startpos,int stoppos,String query)
 private final String traceOneCondition(String cond, String itemtypename,
   String itemtypeprefix)
   {
-  int i, j, k,l ,m, n;
-  StringBuffer sb = new StringBuffer(128);
+  int i;
   // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
@@ -225,9 +220,7 @@ private final String traceOneCondition(String cond, String itemtypename,
   int tippelauf1 = 0;
   int tippelauf2 = 0;
   int tagstart = klammerauf+1;
-  int tagstop = 0;
   int opstart = 0;
-  int opstop = 0;
   while ((tippelauf!=-1)&&(tippelzu!=-1)) {
     tippelauf1 = cond.indexOf("\"",tippelzu+1);
     tippelauf2 = cond.indexOf("'",tippelzu+1);
@@ -372,8 +365,6 @@ private final String convPath(String inpath, String itemtypeprefix)
   StringBuffer sbout = new StringBuffer(256);
   int j = 0;
   int k = inpath.length();
-  int m = 0;
-  int n = 0;
   while( j < k) {
     int l = inpath.indexOf("/",j);
     if (l == -1) { 
@@ -389,7 +380,6 @@ private final String convPath(String inpath, String itemtypeprefix)
     if (!inpath.substring(j,l).equals("*")) {
       sbout.append(itemtypeprefix); }
     sbout.append(inpath.substring(j,l)).append('/');
-    m = j; n = l;
     j = l+1; 
     }
   return sbout.toString();

@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -263,8 +262,6 @@ private ArrayList cat;
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
       MCRDefaults.XSI_URL));
-    String SLASH = System.getProperty("file.separator");
-    MCRConfiguration mcr_conf = MCRConfiguration.instance();
     String mcr_schema_path = "MCRClassification.xsd";
     elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
       org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
