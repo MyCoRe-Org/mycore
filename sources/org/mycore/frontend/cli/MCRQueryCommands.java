@@ -67,24 +67,39 @@ final public class MCRQueryCommands
   public static void query( String host, String type, String query )
     throws Exception
     {
+    // input parameters
     if (host==null) host = "local";
     if (type==null) { return; }
     type  = type .toLowerCase();
     if (query==null) query = "";
-
     System.out.println( "Host(s)  : " + host  );
     System.out.println( "Type     : " + type  );
     System.out.println( "Query    : " + query );
     System.out.println();
 
+    // Configuration
+    MCRConfiguration config = MCRConfiguration.instance();
+
     // classifications
     if (type.equals("class")) {
-      MCRClassification cl = new MCRClassification();
-      org.jdom.Document jdom = cl.search(query);
-      if (jdom==null) { 
-        System.out.println("No answer was found.\n"); return; }
-      // Configuration
-      MCRConfiguration config = MCRConfiguration.instance();
+      MCRQueryResult result = new MCRQueryResult();
+      String squence = config.getString("MCR.classifications_search_sequence",
+        "remote-local");
+      MCRQueryResultArray resarray = new MCRQueryResultArray();
+      if (squence.equalsIgnoreCase("local-remote")) {
+        resarray = result.setFromQuery("local",type,query );
+        if (resarray.size()==0) {
+          resarray = result.setFromQuery(host,type,query ); }
+        }
+      else {
+        resarray = result.setFromQuery(host,type,query );
+        if (resarray.size()==0) {
+          resarray = result.setFromQuery("local",type,query ); }
+        }
+      if (resarray.size()==0) {
+        throw new MCRException(
+          "No classification or category exists" ); }
+      // Stylesheet transforming
       String applpath = config.getString("MCR.appl_path");
       String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
         "class.xsl";
@@ -94,7 +109,8 @@ final public class MCRQueryCommands
         transfakt.newTransformer(new StreamSource(xslfile));
       StreamResult sr = new StreamResult((OutputStream) System.out); 
       trans.transform(new javax.xml.transform.dom.DOMSource(
-        (new org.jdom.output.DOMOutputter()).output(jdom)),sr);
+        (new org.jdom.output.DOMOutputter())
+        .output(resarray.exportAllToDocument())),sr);
       System.out.println();
       System.out.println("Ready.");
       System.out.println();
@@ -106,7 +122,6 @@ final public class MCRQueryCommands
     MCRQueryResultArray resarray = result.setFromQuery(host,type,query);
 
     // Configuration
-    MCRConfiguration config = MCRConfiguration.instance();
     String applpath = config.getString("MCR.appl_path");
     String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
       type.toLowerCase()+".xsl";

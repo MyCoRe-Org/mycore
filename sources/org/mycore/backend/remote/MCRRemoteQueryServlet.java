@@ -28,8 +28,10 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import mycore.common.*;
+import mycore.classifications.MCRClassification;
 import mycore.xml.MCRQueryInterface;
 import mycore.xml.MCRQueryResultArray;
+
 
 /**
  * This class provides a Servlet for remote Querying for distributed
@@ -61,13 +63,29 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
   if (hosts == null) hosts = request.getServerName();
   String query = request.getParameter("query");
   try {
-    // start the local query
-    MCRConfiguration config = MCRConfiguration.instance();
-    int vec_length = config.getInt("MCR.query_max_results",10);
-    String persist_type = config.getString("MCR.persistence_type","cm7");
-    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+"_query_name";
-    MCRQueryInterface mcr_query = (MCRQueryInterface)config.getInstanceOf(proppers);
-    MCRQueryResultArray result = mcr_query.getResultList(query,type,vec_length);
+    // start the local query 
+    MCRQueryResultArray result = new MCRQueryResultArray();
+    if (type.equalsIgnoreCase("class")) {
+      MCRClassification cl = new MCRClassification();
+      org.jdom.Document jdom = cl.search(query);
+      if (jdom != null) {
+        org.jdom.Element el = jdom.getRootElement();
+        String id = el.getAttributeValue("ID");
+        MCRQueryResultArray res = new MCRQueryResultArray();
+        res.add("local",id,1,el);
+        result.importElements(res);
+        }
+      }
+    else {
+      MCRConfiguration config = MCRConfiguration.instance();
+      int vec_length = config.getInt("MCR.query_max_results",10);
+      String persist_type = config.getString("MCR.persistence_type","cm7");
+      String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
+        "_query_name";
+      MCRQueryInterface mcr_query = 
+        (MCRQueryInterface)config.getInstanceOf(proppers);
+      result = mcr_query.getResultList(query,type,vec_length);
+      }
     for (int i=0; i<result.size();i++) { result.setHost(i,hosts); }
     try {
       queryResult = result.exportAllToByteArray(); }

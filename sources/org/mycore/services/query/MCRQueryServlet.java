@@ -117,12 +117,25 @@ private String defaultLang = "";
     if (type.toLowerCase().equals("class")) {
       Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
       String style = parameters.getProperty("Style",mode+"-class-"+lang);
-      System.out.println("Style = "+style);
-      MCRClassification cl = new MCRClassification();
-      jdom = cl.search(query);
-      if (jdom==null) {
+//System.out.println("Style = "+style);
+      MCRQueryResult result = new MCRQueryResult();
+      String squence = conf.getString("MCR.classifications_search_sequence",
+        "remote-local");
+      MCRQueryResultArray resarray = new MCRQueryResultArray();
+      if (squence.equalsIgnoreCase("local-remote")) { 
+        resarray = result.setFromQuery("local",type,query );
+        if (resarray.size()==0) {
+          resarray = result.setFromQuery(host,type,query ); }
+        }
+      else {
+        resarray = result.setFromQuery(host,type,query ); 
+        if (resarray.size()==0) {
+          resarray = result.setFromQuery("local",type,query ); }
+        } 
+      if (resarray.size()==0) {
         throw new MCRException( 
           "No classification or category exists" ); }
+      jdom = resarray.exportAllToDocument();
 //System.out.println(new String(MCRUtils.getByteArray(jdom)));
       try {
         if (style.equals("xml")) {

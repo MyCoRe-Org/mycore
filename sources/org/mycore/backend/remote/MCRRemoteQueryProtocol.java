@@ -27,6 +27,7 @@ package mycore.communication;
 import java.net.*;
 import java.io.*;
 import mycore.common.*;
+import mycore.classifications.MCRClassification;
 import mycore.xml.MCRQueryResultArray;
 import mycore.xml.MCRQueryInterface;
 
@@ -105,20 +106,32 @@ public class MCRRemoteQueryProtocol {
             if (theInput.length() == bytes) {
               try {
                 if (queryInputSyntaxIsCorrect(theInput)) {
-                  // start the local query
-                  MCRConfiguration config = MCRConfiguration.instance();
-                  int vec_length = config.getInt("MCR.query_max_results",10);
-
                   String type = extractType(theInput);
                   String query = extractQuery(theInput);
-                  String persist_type = config
-                    .getString("MCR.persistence_type","cm7");
-                  String proppers = "MCR.persistence_"+persist_type
-                    .toLowerCase()+"_query_name";
-                  MCRQueryInterface mcr_query = (MCRQueryInterface)config
-                    .getInstanceOf(proppers);
-                  MCRQueryResultArray result = mcr_query
-                    .getResultList(query,type,vec_length);
+                  // start the local query
+                  MCRQueryResultArray result = new MCRQueryResultArray();
+                  if (type.equalsIgnoreCase("class")) {
+                    MCRClassification cl = new MCRClassification();
+                    org.jdom.Document jdom = cl.search(query);
+                    if (jdom != null) {
+                      org.jdom.Element el = jdom.getRootElement();
+                      String id = el.getAttributeValue("ID");
+                      MCRQueryResultArray res = new MCRQueryResultArray();
+                      res.add("local",id,1,el);
+                      result.importElements(res);
+                      }
+                    }
+                  else {
+                    MCRConfiguration config = MCRConfiguration.instance();
+                    int vec_length = config.getInt("MCR.query_max_results",10);
+                    String persist_type = config
+                      .getString("MCR.persistence_type","cm7");
+                    String proppers = "MCR.persistence_"+persist_type
+                      .toLowerCase()+"_query_name";
+                    MCRQueryInterface mcr_query = (MCRQueryInterface)config
+                      .getInstanceOf(proppers);
+                    result = mcr_query.getResultList(query,type,vec_length);
+                    }
                   for (int i=0; i<result.size();i++)
                     result.setHost(i,host);
                   try {

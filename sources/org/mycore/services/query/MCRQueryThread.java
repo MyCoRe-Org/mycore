@@ -27,6 +27,7 @@ package mycore.xml;
 import mycore.datamodel.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
+import mycore.classifications.MCRClassification;
 import java.net.*;
 import java.io.*;
 
@@ -62,12 +63,25 @@ public class MCRQueryThread extends Thread {
 public void run() {
   if (hostAlias.equalsIgnoreCase("local")) {
     try {
-      String persist_type = config.getString("MCR.persistence_type","cm7");
-      String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-        "_query_name";
-      mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);
-      mcr_result.importElements(mcr_queryint.getResultList(mcr_query,mcr_type,
-        vec_max_length));
+      if (mcr_type.equalsIgnoreCase("class")) {
+        MCRClassification cl = new MCRClassification();
+        org.jdom.Document jdom = cl.search(mcr_query);
+        if (jdom != null) {
+          org.jdom.Element el = jdom.getRootElement();
+          String id = el.getAttributeValue("ID");
+          MCRQueryResultArray res = new MCRQueryResultArray();
+          res.add("local",id,1,el);
+          mcr_result.importElements(res);
+          }
+        }
+      else {
+        String persist_type = config.getString("MCR.persistence_type","cm7");
+        String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
+          "_query_name";
+        mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);
+        mcr_result.importElements(mcr_queryint.getResultList(mcr_query,mcr_type,
+          vec_max_length));
+        }
     }
     catch (Exception e) {
        throw new MCRException(e.getMessage(),e); }
