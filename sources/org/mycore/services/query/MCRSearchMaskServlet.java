@@ -47,11 +47,14 @@ String mode = "CreateSearchMask";
 private String defaultLang = "";
 // Default application path
 private String applicationPath = "";
-// Default search configuration file
-private String searchConfig = "";
+// Slash for pathes
+private String slash = "/";
 
-// The configuration XML file
-private org.jdom.Document jdom = null;
+// An instance of the MCRConfiguration
+MCRConfiguration conf = null;
+
+// The configuration XML files
+org.jdom.Document jdom = null;
 
  /**
   * The initialization method for this servlet. This read the default
@@ -59,19 +62,11 @@ private org.jdom.Document jdom = null;
   **/
   public void init() throws MCRConfigurationException
   {
-  MCRConfiguration conf = MCRConfiguration.instance();
-  String defaultLang = conf.getString( "MCR.metadata_default_lang", "en" )
+  conf = MCRConfiguration.instance();
+  defaultLang = conf.getString( "MCR.metadata_default_lang", "en" )
     .toUpperCase();
-  String applicationPath = conf.getString( "MCR.appl_path", "" );
-  String searchConfig = conf.getString( "MCR.searchmask_config", 
-    "config/searchmask.xml" );
-  try {
-    File file = new File(applicationPath,searchConfig);
-    jdom = new org.jdom.input.SAXBuilder().build(file);
-    }
-  catch (org.jdom.JDOMException e) {
-    throw new MCRException("SearchMaskServlet : Can't read config file "+
-      applicationPath+searchConfig); }
+  applicationPath = conf.getString( "MCR.appl_path", "" );
+  slash = System.getProperty("file.separator");
   }
 
  /**
@@ -113,6 +108,17 @@ private org.jdom.Document jdom = null;
   if( type  == null ) return;
   if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
 
+  StringBuffer sb = new StringBuffer(128);
+  sb.append(applicationPath).append(slash).append("config").append(slash)
+    .append(conf.getString( "MCR.searchmask_config_"+type.toLowerCase()));
+  try {
+    File file = new File(sb.toString());
+    jdom = new org.jdom.input.SAXBuilder().build(file);
+    }
+  catch (org.jdom.JDOMException e) {
+    throw new MCRException("SearchMaskServlet : Can't read config file "+
+      sb.toString()+" or it has a parse error."); }
+
   // prepare the stylesheet name
   String style = mode + "-" + type+ "-" + lang;
 
@@ -145,12 +151,73 @@ private org.jdom.Document jdom = null;
   {  
   String type  = request.getParameter( "type"  );
   String lang  = request.getParameter( "lang" );
-  String query = request.getParameter( "query" );
   String host  = request.getParameter( "hosts" );
   if( host  == null ) host  = "local";
-  if( query == null ) query = "";
   if( type  == null ) return;
   if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
+  StringBuffer query = new StringBuffer("");
+
+  StringBuffer sb = new StringBuffer(128);
+  sb.append(applicationPath).append(slash).append("config").append(slash)
+    .append(conf.getString( "MCR.searchmask_config_"+type.toLowerCase()));
+  try {
+    File file = new File(sb.toString());
+    jdom = new org.jdom.input.SAXBuilder().build(file);
+    }
+  catch (org.jdom.JDOMException e) {
+    throw new MCRException("SearchMaskServlet : Can't read config file "+
+      sb.toString()+" or it has a parse error."); }
+  org.jdom.Element searchpage = jdom.getRootElement().getChild("searchpage");
+  List element_list = searchpage.getChildren();
+  int len = element_list.size();
+  for (int i=0;i<len;i++) {
+    org.jdom.Element element = (org.jdom.Element)element_list.get(i);
+    if (!element.getName().equals("element")) { continue; }
+    if (!element.getAttributeValue("type").equals("query")) { continue; }
+    String name = element.getAttributeValue("name");
+    String tempquery = element.getAttributeValue("query");
+    int tempfields = 1;
+    try {
+      tempfields = (new Integer((String)element.getAttributeValue("fields")))
+        .intValue();
+      }
+    catch (NumberFormatException e) {
+      throw new MCRException("SearchMaskServlet : The field attribute is "+
+        "not a number.");
+      }
+    ArrayList param = new ArrayList();
+    ArrayList varia = new ArrayList();
+    for (int j=0;j<tempfields;j++) {
+      sb = (new StringBuffer(name)).append(j+1);
+      param.add(request.getParameter(sb.toString()));
+      sb = (new StringBuffer("$")).append(j+1);
+      varia.add(sb.toString());
+      }
+    int k = 0;
+    for (int j=0;j<param.size();j++) {
+System.out.println(name+"   "+param.get(j)+"   "+varia.get(j));
+      if (param.get(j) == null) { k=1; break; }
+      if (((String)param.get(j)).trim().length() ==0 ) { k=1; break; }
+      }
+    if (k != 0) { continue; }
+    for (int j=0;j<param.size();j++) {
+      k = tempquery.indexOf(((String)varia.get(j)));
+      if (k == -1) {
+        throw new MCRException("SearchMaskServlet : The query attribute "+
+        "has not the elemnt "+((String)varia.get(j)));
+        }
+      StringBuffer qsb = new StringBuffer(128);
+      qsb.append(tempquery.substring(0,k)).append("\"")
+         .append(((String)param.get(j))).append("\"")
+         .append(tempquery.substring(k+((String)varia.get(j)).length(),
+         tempquery.length()));
+      tempquery = qsb.toString();
+System.out.println(tempquery);
+      }
+    if (query.length() != 0) { query.append(" and "); }
+    query.append(tempquery);
+    }
+  
 
   // start Query servlet
   try {
@@ -163,7 +230,7 @@ private org.jdom.Document jdom = null;
     request.removeAttribute( "lang" );
     request.setAttribute( "lang", lang );
     request.removeAttribute( "query" );
-    request.setAttribute( "query", query );
+    request.setAttribute( "query", query.toString() );
     RequestDispatcher rd = getServletContext()
       .getNamedDispatcher( "MCRQueryServlet" );
     rd.forward( request, response );
