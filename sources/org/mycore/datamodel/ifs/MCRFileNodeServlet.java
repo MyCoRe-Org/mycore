@@ -310,14 +310,14 @@ public class MCRFileNodeServlet extends HttpServlet
     Element ncHere = new Element( "here" );
     numChildren.addContent( ncHere );
     
-    addString( ncHere, "directories", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.HERE ) ) );
-    addString( ncHere, "files",       String.valueOf( dir.getNumChildren( dir.FILES,       dir.HERE ) ) );
+    addString( ncHere, "directories", String.valueOf( dir.getNumChildren( MCRDirectory.DIRECTORIES, MCRDirectory.HERE ) ) );
+    addString( ncHere, "files",       String.valueOf( dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.HERE ) ) );
     
     Element ncTotal = new Element( "total" );
     numChildren.addContent( ncTotal );
     
-    addString( ncTotal, "directories", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.TOTAL ) ) );
-    addString( ncTotal, "files",       String.valueOf( dir.getNumChildren( dir.FILES,       dir.TOTAL ) ) );
+    addString( ncTotal, "directories", String.valueOf( dir.getNumChildren( MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL ) ) );
+    addString( ncTotal, "files",       String.valueOf( dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.TOTAL ) ) );
 
     Element nodes = new Element( "children" );
     root.addContent( nodes );
