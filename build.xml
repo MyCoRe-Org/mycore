@@ -32,6 +32,7 @@
   <property name="mycore.source.nbn" value="./sources/mycore/nbn"/>
   <property name="mycore.class" value="./classes"/>
   <property name="mycore.javadoc" value="./javadocs"/>
+  <property name="mycore.lib" value="./lib"/>
     
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -63,6 +64,7 @@
   <target name="init" >
    <mkdir dir="${mycore.class}"/>
    <mkdir dir="${mycore.javadoc}"/>
+   <mkdir dir="${mycore.lib}"/>
   </target>
   
   <!-- =================================================================== -->
@@ -75,7 +77,7 @@
   <!-- Creates a mycore.jar file containing all compiled MyCoRe classes    -->
   <!-- =================================================================== -->
   <target name="jar" depends="compile">
-    <jar jarfile="mycore.jar" basedir="${mycore.class}"/>
+    <jar jarfile="${mycore.lib}/mycore.jar" basedir="${mycore.class}"/>
   </target>
   
   <!-- =================================================================== -->
@@ -219,10 +221,10 @@
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
   <target name="clean">
-    <delete file="./mycore.jar" />
     <delete includeEmptyDirs="true" >
       <fileset dir="${mycore.javadoc}" />
       <fileset dir="${mycore.class}" />
+      <fileset dir="${mycore.lib}" />
     </delete>
   </target>
 
