@@ -34,5 +34,5 @@ fi
 export JAVA_HOME
 export ANT_HOME
 
-$ANT_HOME/bin/ant -find build.xml $*
+$ANT_HOME/bin/ant -logger org.apache.tools.ant.NoBannerLogger -find build.xml $*
 

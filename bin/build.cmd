@@ -26,4 +26,4 @@ rem # Do not change the rest of this script!
 rem #
 rem #######################################################################
 
-%ANT_HOME%\bin\ant -find build.xml %1 %2 %3 %4 %5 %6 %7 %8 %9
+%ANT_HOME%\bin\ant -logger org.apache.tools.ant.NoBannerLogger -find build.xml %1 %2 %3 %4 %5 %6 %7 %8 %9
