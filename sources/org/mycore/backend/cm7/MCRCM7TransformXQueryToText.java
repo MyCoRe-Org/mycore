@@ -78,9 +78,9 @@ public final Vector getResultList(String query, String type, int maxresults)
   Vector result = new Vector(maxresults);
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-  System.out.println("================================");
-  System.out.println("MCRCM7TransformXQueryToText : "+query);
-  System.out.println("================================");
+  //System.out.println("================================");
+  //System.out.println("MCRCM7TransformXQueryToText : "+query);
+  //System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
@@ -106,8 +106,8 @@ public final Vector getResultList(String query, String type, int maxresults)
     }
   if (cond.length()==1) { cond.append("(XXXMYCOREOBJECTXXXIDXXX)"); }
   cond.append(')');
-  System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-  System.out.println("================================");
+  //System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
+  //System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(MCRConfiguration.instance()
@@ -160,7 +160,7 @@ private final String traceOneCondition(String cond)
   {
   int i, j, k;
   StringBuffer sb = new StringBuffer(128);
-System.out.println("ONECOND="+cond);
+  // System.out.println("ONECOND="+cond);
   // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
@@ -259,6 +259,7 @@ System.out.println("ONECOND="+cond);
       }
     }
 
+/*
   System.out.println("PRETAG="+pretag);
   for (i=0;i<counter;i++) {
     System.out.println("VALUE="+value[i]);
@@ -266,6 +267,7 @@ System.out.println("ONECOND="+cond);
     System.out.println("TAG="+tag[i]);
     System.out.println();
     }
+*/
 
   // Check for value as date or number or  MCRObjectID
   GregorianCalendar date = new GregorianCalendar();
