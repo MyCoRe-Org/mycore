@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.57 $ $Date: 2003-08-11 07:50:26 $                      -->
+  <!-- $Revision: 1.58 $ $Date: 2003-08-11 12:01:50 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -44,7 +44,7 @@
         jar           --> Creates file lib/mycore-for-*.jar containing all compiled classes
         compile       --> Compiles all source code to directory classes
         compile_[pkg] --> Compiles only a certain package (see build.xml for details)
-        javadocs      --> Generates JavaDoc API documentation as HTML in directory javadocs
+        javadocs      --> Generates JavaDoc API documentation as HTML in directory documentation/html
         clean         --> Removes all compiled classes and javadocs, cleaning up
 
       Please do not use any of the other targets, they are internal.
@@ -62,7 +62,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.57 $ $Date: 2003-08-11 07:50:26 $</echo>
+    <echo>Ant build file   : $Revision: 1.58 $ $Date: 2003-08-11 12:01:50 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -78,8 +78,9 @@
   <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2" >
     <echo>Initializing directories and classpath...</echo>
 
-    <mkdir dir="${basedir}/classes"  />
-    <mkdir dir="${basedir}/javadocs" />
+    <mkdir dir="${basedir}/classes" />
+    <mkdir dir="${basedir}/documentation/html" />
+    <mkdir dir="${basedir}/documentation/pdf"  /> 
 
     <!-- Fail if environment variables are not set -->
     <fail message="Environment variable JAVA_HOME is not set!" unless="env.JAVA_HOME" />
@@ -270,7 +271,7 @@
         <uptodate>
           <srcfiles dir="${basedir}/sources" includes="**/*.java" />
           <srcfiles dir="${basedir}/sources" includes="**/*.html" />
-          <mapper type="merge" to="${basedir}/javadocs/overview-tree.html"/>
+          <mapper type="merge" to="${basedir}/documentation/html/overview-tree.html"/>
         </uptodate>
       </not>
     </condition>
@@ -280,7 +281,7 @@
         <uptodate>
           <srcfiles dir="${basedir}/sources" includes="**/*.java" />
           <srcfiles dir="${doclets}" includes="pdfdoclet-mycore.properties" />
-          <mapper type="merge" to="${basedir}/javadocs/javadocs.pdf"/>
+          <mapper type="merge" to="${basedir}/documentation/pdf/javadocs.pdf"/>
         </uptodate>
       </not>
     </condition>
@@ -305,7 +306,7 @@
       packagenames        = "org.mycore.*"
       excludepackagenames = "${exclude.cm7},${exclude.cm8}"
       sourcepath          = "${basedir}/sources"
-      destdir             = "${basedir}/javadocs"
+      destdir             = "${basedir}/documentation/html"
       classpathref        = "mycore.classpath"
       author              = "true"
       version             = "true"
@@ -339,6 +340,8 @@
 
   <target name="java2pdf" depends="init,up2date" if="pdf.outdated">
     <echo> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
+
+    <mkdir dir="${basedir}/documentation/pdf" />
     <javadoc
       packagenames        = "org.mycore.*"
       excludepackagenames = "${exclude.cm7},${exclude.cm8}"
@@ -351,7 +354,7 @@
       <doclet 
         name = "com.tarsec.javadoc.pdfdoclet.PDFDoclet"
         path = "${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar" >                                                                                         
-        <param name="-pdf"    value="${basedir}/javadocs/javadocs.pdf" />             
+        <param name="-pdf"    value="${basedir}/documentation/pdf/javadocs.pdf" />             
         <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />  
       </doclet>             
  
@@ -362,29 +365,41 @@
   <!-- Create the PDF documentation from LaTeX sources                     --> 
   <!-- =================================================================== --> 
     
-  <target name="tex2pdf"> 
+  <target name="tex2pdf" depends="init"> 
     <echo>Building the MyCoRe documentation as PDF from LaTeX sources... </echo> 
 
-    <antcall target="pdflatex"> <param name="TeXFile" value="Overview.tex" /></antcall> 
-    <antcall target="pdflatex"> <param name="TeXFile" value="UserGuide.tex" /></antcall>
-    <antcall target="pdflatex"> <param name="TeXFile" value="ProgGuide.tex" /></antcall>
-    <antcall target="pdflatex"> <param name="TeXFile" value="HowToWriteTheManual.tex" /></antcall>
+    <property name="tmpdir" value="${basedir}/documentation/tmp" />
+
+    <delete dir="${tmpdir}" />
+    <mkdir  dir="${tmpdir}" />
+    <copy toDir="${tmpdir}"> <fileset dir="${basedir}/documentation/include" /> </copy>
+
+    <antcall target="pdflatex"> <param name="TeXFile" value="Overview" /></antcall> 
+    <antcall target="pdflatex"> <param name="TeXFile" value="UserGuide" /></antcall>
+    <antcall target="pdflatex"> <param name="TeXFile" value="ProgGuide" /></antcall>
+    <antcall target="pdflatex"> <param name="TeXFile" value="HowToWriteTheManual" /></antcall>
+
+    <move toDir="${basedir}/documentation/pdf"><fileset dir="${tmpdir}" includes="*.pdf" /></move>
+    <delete dir="${tmpdir}" />   
   </target> 
 
   <target name="pdflatex">
     <echo>Processing ${TeXFile} to PDF...</echo>
-    <exec dir="documentation" executable="pdflatex" output="documentation/output.log"> 
+
+    <copy toDir="${tmpdir}"> <fileset dir="${basedir}/documentation/${TeXFile}" /> </copy>
+
+    <echo>First run...</echo>
+    <exec dir="${tmpdir}" executable="pdflatex" output="${tmpdir}/output.log"> 
       <arg line="--interaction nonstopmode ${TeXFile}" /> 
     </exec>
-    <exec dir="documentation" executable="pdflatex" output="documentation/output.log"> 
+    <echo>Second run...</echo>
+    <exec dir="${tmpdir}" executable="pdflatex" output="${tmpdir}/output.log"> 
       <arg line="--interaction nonstopmode ${TeXFile}" /> 
     </exec>
-    <exec dir="documentation" executable="pdflatex"> 
+    <echo>Third run...</echo>
+    <exec dir="${tmpdir}" executable="pdflatex"> 
       <arg line="--interaction nonstopmode ${TeXFile}" /> 
     </exec>
-    <delete>
-      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
-    </delete>
   </target>
 
   <!-- =================================================================== -->
@@ -393,10 +408,10 @@
 
   <target name="clean" description="Removes all files generated by this build file">
     <echo>Cleaning up...</echo>
-    <delete dir="${basedir}/javadocs" />
     <delete dir="${basedir}/classes"  />
+    <delete dir="${basedir}/documentation/html" />
+    <delete dir="${basedir}/documentation/pdf" />
     <delete includeEmptyDirs="true" >
-      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
       <fileset dir="${basedir}/lib" includes="mycore*.jar" />
     </delete>
     <echo>---------------------------------------------------------</echo>
@@ -432,9 +447,10 @@
   <target name="do-log" depends="init">
     <echo>Logging changes of the year ${changelog-year}...</echo>
 
+    <mkdir dir="${basedir}/documentation/changelogs" />
     <cvschangelog 
       dir      = "."
-      destfile = "${basedir}/javadocs/changelog-${changelog-year}.xml" 
+      destfile = "${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" 
       start    = "1 Jan ${changelog-year}"
       end      = "31 Dec ${changelog-year}"
     >
@@ -455,8 +471,8 @@
     </cvschangelog>
 
     <style 
-      in           = "${basedir}/javadocs/changelog-${changelog-year}.xml" 
-      out          = "${basedir}/javadocs/changelog-${changelog-year}.html" 
+      in           = "${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" 
+      out          = "${basedir}/documentation/changelogs/changelog-${changelog-year}.html" 
       style        = "${ant.home}/etc/changelog.xsl"
       classpathref = "mycore.classpath"
     >
@@ -465,7 +481,7 @@
       <param name="cvsweb" expression="http://www.mycore.de/repository/cgi-bin/viewcvs.cgi/" />
     </style>
 
-    <delete file="${basedir}/javadocs/changelog-${changelog-year}.xml" />
+    <delete file="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
   </target>
 
   <!-- =================================================================== -->
