@@ -25,7 +25,6 @@
 package org.mycore.backend.cm7;
 
 import java.util.*;
-import java.text.*;
 
 import org.apache.log4j.Logger;
 
@@ -181,8 +180,7 @@ private final String getNextCondition(int startpos,int stoppos,String query)
  **/
 private final String traceOneCondition(String cond)
   {
-  int i, j, k,l ,m, n;
-  StringBuffer sb = new StringBuffer(128);
+  int i, j, k, l;
   // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
@@ -204,9 +202,7 @@ private final String traceOneCondition(String cond)
   int tippelauf1 = 0;
   int tippelauf2 = 0;
   int tagstart = klammerauf+1;
-  int tagstop = 0;
   int opstart = 0;
-  int opstop = 0;
   while ((tippelauf!=-1)&&(tippelzu!=-1)) {
     tippelauf1 = cond.indexOf("\"",tippelzu+1);
     tippelauf2 = cond.indexOf("'",tippelzu+1);

@@ -25,7 +25,6 @@
 package org.mycore.backend.cm8;
 
 import java.util.*;
-import java.io.File;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
@@ -324,7 +323,6 @@ final class MCRCM8Item implements DKConstantICM
     // search for returnable data
     int pos = 0;
     short dataId;
-    String temptype;
     while (pos < ddopath.size()) {
       if (((String)ddopath.get(pos)).equals(pathname)) {
         dataId = ((DKDDO)ddolist.get(pos)).dataId(DK_CM_NAMESPACE_ATTR,
@@ -358,7 +356,6 @@ final class MCRCM8Item implements DKConstantICM
     // search for returnable data
     int pos = 0;
     short dataId;
-    String temptype;
     while (pos < ddopath.size()) {
       if (((String)ddopath.get(pos)).equals(pathname)) {
         dataId = ((DKDDO)ddolist.get(pos)).dataId(DK_CM_NAMESPACE_ATTR,
