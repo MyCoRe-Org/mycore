@@ -10,5 +10,5 @@ mcr4=$4
 cd $MYCORE_HOME
 . bin/setup.sh
 
-java mycore.commandline.MCRCommandLineInterface $mcr1 $mcr2 $mcr3 $mcr4 $5 $6 $7 $8 $9
+java org.mycore.frontend.cli.MCRCommandLineInterface $mcr1 $mcr2 $mcr3 $mcr4 $5 $6 $7 $8 $9
 
