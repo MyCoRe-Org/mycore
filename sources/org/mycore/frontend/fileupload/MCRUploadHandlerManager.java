@@ -45,8 +45,14 @@ public class MCRUploadHandlerManager
   /** The manager singleton */
   protected static MCRUploadHandlerManager singleton;
 
+  /** The table of handle ID's */
+  private ArrayList ids = null;
+
   /** The table of MCRUploadHandlerInterfaces */
-  private static Hashtable upl = null;
+  private ArrayList upl = null;
+
+  /** The tabel of the date values */
+  private ArrayList dat = null;
 
   /** The class name of the handler from the configuration */
   String handlename = null;
@@ -57,15 +63,20 @@ public class MCRUploadHandlerManager
   /** The logger */
   private static Logger logger=Logger.getLogger("org.mycore.frontend.fileupload");
 
+  /** The configuration */
+  private  MCRConfiguration config = null;
+
   /**
    * Builds the manager singleton.
    **/
   protected MCRUploadHandlerManager ()
     {
-    MCRConfiguration config = MCRConfiguration.instance();
+    config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
     generator = new Random();
-    upl = new Hashtable();
+    ids = new ArrayList();
+    upl = new ArrayList();
+    dat = new ArrayList();
     handlename = config.getString("MCR.Editor.FileUpload.Handler",
       "org.mycore.frontend.fileupload.MCRUploadHandler");
     }
@@ -100,21 +111,31 @@ public class MCRUploadHandlerManager
     }
   
   /**
-   * The method return a new instance of the file upload handler
+   * The method return a new instance of the file upload handler. The
+   * used class is the default class from the configuration.
    * 
    * @return a new instance of a file upload handler as MCRUploadHandlerInterface implementation
    **/
   public final MCRUploadHandlerInterface getNewHandle() throws MCRException
+    { return getNewHandle(handlename); }
+
+  /**
+   * The method return a new instance of the file upload handler for the
+   * given handler class name.
+   * 
+   * @return a new instance of a file upload handler as MCRUploadHandlerInterface implementation
+   **/
+  public final MCRUploadHandlerInterface getNewHandle( String name ) throws MCRException
     {
     Object obj = null;
     try {
-      obj = Class.forName(handlename).newInstance(); }
+      obj = Class.forName(name).newInstance(); }
     catch (ClassNotFoundException e) {
-      throw new MCRException(handlename+" ClassNotFoundException"); }
+      throw new MCRException(name+" ClassNotFoundException"); }
     catch (IllegalAccessException e) {
-      throw new MCRException(handlename+" IllegalAccessException"); }
+      throw new MCRException(name+" IllegalAccessException"); }
     catch (InstantiationException e) {
-      throw new MCRException(handlename+" InstantiationException"); }
+      throw new MCRException(name+" InstantiationException"); }
     ((MCRUploadHandlerInterface)obj).setLogger(logger);
     String uploadID = getRandomID();
     ((MCRUploadHandlerInterface)obj).setId(uploadID);
@@ -129,14 +150,38 @@ public class MCRUploadHandlerManager
    **/
   public final String register(MCRUploadHandlerInterface handle)
     {
+    checkRegister();
     String uploadID = ((MCRUploadHandlerInterface)handle).getId();
     if (uploadID.length()==0) { 
       uploadID = getRandomID();
       ((MCRUploadHandlerInterface)handle).setId(uploadID);
       }
-    upl.put(uploadID,handle);
+    ids.add(uploadID);
+    upl.add(handle);
+    dat.add(new GregorianCalendar());
     logger.debug(handlename+" with ID "+uploadID+" rgistered.");
     return uploadID;
+    }
+
+  /**
+   * The method check all registered handler and remove all they are older
+   * than 24 hours.
+   **/
+  private final void checkRegister()
+    {
+    GregorianCalendar today = new GregorianCalendar();
+    int day = today.get(Calendar.DAY_OF_YEAR);
+    int year = today.get(Calendar.YEAR);
+    int j = dat.size();
+    for (int i=0;i<j;i++) {
+      GregorianCalendar test = (GregorianCalendar)dat.get(i);
+      int testday = test.get(Calendar.DAY_OF_YEAR);
+      int testyear = test.get(Calendar.YEAR);
+      if (testyear < year) {
+        unregister(i); j--; continue; }
+      if (testday < day-1) {
+        unregister(i); j--; continue; }
+      }
     }
 
   /**
@@ -146,16 +191,30 @@ public class MCRUploadHandlerManager
    * @return a file upload handle as instance of MCRUploadHandlerInterface
    **/
   public final MCRUploadHandlerInterface getHandle(String uploadID)
-    { return (MCRUploadHandlerInterface)upl.get(uploadID); }
+    { return (MCRUploadHandlerInterface)upl.get(ids.indexOf(uploadID)); }
 
   /**
    * The method unregister the hanlde for the given ID.
    *
    * @param the handle ID
    **/
-  public void unregister( String uploadID )
+  public final void unregister( String uploadID )
     { 
-    upl.remove( uploadID ); 
+    int i = ids.indexOf(uploadID);
+    unregister(i);
+    }
+
+  /**
+   * The method unregister the hanlde for the given ID.
+   *
+   * @param the handle ID
+   **/
+  private final void unregister( int i )
+    { 
+    String uploadID = (String)ids.get(i);
+    ids.remove(i); 
+    upl.remove(i); 
+    dat.remove(i); 
     logger.debug(handlename+" with ID "+uploadID+" unrgistered.");
     }
 }
