@@ -298,5 +298,42 @@ public static final byte [] getByteArray(org.jdom.Document jdom)
     while( ( num = in.read( buffer ) ) != -1 )
       if( out != null ) out.write( buffer, 0, num );
   }
+  
+/**
+ * <p>
+ * Returns String in with newStr substituted for find String.
+ * @param in String to edit
+ * @param find string to match
+ * @param newStr string to substitude for find
+*/
+
+ public static String replaceString(String in, String find, String newStr){
+
+    char[] working = in.toCharArray();
+    StringBuffer sb = new StringBuffer();
+
+	int startindex = in.indexOf(find);
+	if (startindex<0) return in;
+
+
+	int currindex=0;
+
+	while (startindex > -1) {
+		for(int i = currindex; i < startindex; i++){
+			sb.append(working[i]);
+		}//for
+	 	currindex = startindex;
+		sb.append(newStr);
+		currindex += find.length();
+		startindex = in.indexOf(find,currindex);
+	}//while
+
+	for (int i = currindex; i < working.length; i++){
+		sb.append(working[i]);
+	}//for
+
+	return sb.toString();
+
+  }
 } 
 
