@@ -300,12 +300,25 @@ public class MCRFileNodeServlet extends MCRServlet
   {
     logger.info( "MCRFileNodeServlet: Sending file " + file.getName() );
     
-    res.setContentType( file.getContentType().getMimeType() );
-    res.setContentLength( (int)( file.getSize() ) );
+    if( file.hasAudioVideoExtender() )
+    { 
+      MCRAudioVideoExtender ext = file.getAudioVideoExtender();
+
+      String startPos = req.getParameter( "StartPos" );
+      String stopPos  = req.getParameter( "StopPos"  );
+
+      res.setContentType( ext.getPlayerStarterContentType() );
+      ext.getPlayerStarterTo( res.getOutputStream(), startPos, stopPos );
+    }
+    else
+    {
+      res.setContentType( file.getContentType().getMimeType() );
+      res.setContentLength( (int)( file.getSize() ) );
     
-    OutputStream out = new BufferedOutputStream( res.getOutputStream() );
-    file.getContentTo( out );
-    out.close();
+      OutputStream out = new BufferedOutputStream( res.getOutputStream() );
+      file.getContentTo( out );
+      out.close();
+    }
   }
   
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, 
