@@ -193,6 +193,7 @@ org.jdom.Document jdom = null;
       sb = (new StringBuffer("$")).append(j+1);
       varia.add(sb.toString());
       }
+    // check to all attributes for a line are filled
     int k = 0;
     for (int j=0;j<param.size();j++) {
 System.out.println(name+"   "+param.get(j)+"   "+varia.get(j));
@@ -207,10 +208,16 @@ System.out.println(name+"   "+param.get(j)+"   "+varia.get(j));
         "has not the elemnt "+((String)varia.get(j)));
         }
       StringBuffer qsb = new StringBuffer(128);
-      qsb.append(tempquery.substring(0,k)).append("\"")
+      if (tempquery.charAt(k-1)=='\'') {
+        qsb.append(tempquery.substring(0,k-1)).append("\"")
          .append(((String)param.get(j))).append("\"")
+         .append(tempquery.substring(k+1+((String)varia.get(j)).length(),
+         tempquery.length())); }
+      else {
+        qsb.append(tempquery.substring(0,k))
+         .append(((String)param.get(j)))
          .append(tempquery.substring(k+((String)varia.get(j)).length(),
-         tempquery.length()));
+         tempquery.length())); }
       tempquery = qsb.toString();
 System.out.println(tempquery);
       }
