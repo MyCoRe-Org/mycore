@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.7 $ $Date: 2004-03-16 10:05:08 $ -->
+<!-- $Revision: 1.8 $ $Date: 2004-03-17 12:43:25 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -189,14 +189,9 @@
 
   <!-- ======== If necessary, make relative url absolute ======== -->
   <xsl:variable name="url">
-    <xsl:choose>
-      <xsl:when test="starts-with($url.relative,'http://') or starts-with($url.relative,'https://')">
-        <xsl:value-of select="$url.relative" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="concat($WebApplicationBaseURL,$url.relative)" />
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:call-template name="build.url">
+      <xsl:with-param name="url" select="$url.relative" />
+    </xsl:call-template>
   </xsl:variable>
 
   <!-- ======== if not empty new document, transform source to name=value ======== -->
@@ -1199,15 +1194,25 @@
 </xsl:template>
 
 <xsl:template match="loadfrom" mode="read.items">
+  <xsl:variable name="url">
+    <xsl:call-template name="build.url">
+      <xsl:with-param name="url" select="@url" />
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:apply-templates select="document($url)/items" mode="read.items" />
+</xsl:template>
+
+<!-- ======== If url is relative, add WebApplicationBaseURL and make it absolute ======== -->
+<xsl:template name="build.url">
+  <xsl:param name="url" />
+  
   <xsl:choose>
-    <xsl:when test="starts-with(@url,'http://')">
-      <xsl:apply-templates select="document(@url)/items" mode="read.items" />
-    </xsl:when>
-    <xsl:when test="starts-with(@url,'https://')">
-      <xsl:apply-templates select="document(@url)/items" mode="read.items" />
+    <xsl:when test="starts-with($url,'http://') or starts-with(@url,'https://')">
+      <xsl:value-of select="$url" />
     </xsl:when>
     <xsl:otherwise>
-      <xsl:apply-templates select="document(concat($WebApplicationBaseURL,@url))/items" mode="read.items" />
+      <xsl:value-of select="concat($WebApplicationBaseURL,$url)" />
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
