@@ -1100,12 +1100,17 @@ public class MCROAIDataProvider extends HttpServlet {
 				    	listToResumptionToken(tokenElements, prefix, oos);
 					}
 				} while (query.hasMore());
+				oos.close();
+				fos.close();
 				int docs = elementCounter - maxreturns;
 				if (docs > 0) {
 					sResumptionToken += docs;
 					File newFile = new File(resumptionTokenDir +
 							sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
 					resumptionTokenFile.renameTo(newFile);
+				} else {
+					resumptionTokenFile.delete();
+					sResumptionToken = null;
 				}
 		    }
 	    } catch (MCRConfigurationException e) {
@@ -1434,12 +1439,17 @@ public class MCROAIDataProvider extends HttpServlet {
 				    	listToResumptionToken(tokenElements, prefix, oos);
 					}
 				} while (query.hasMore());
+				oos.close();
+				fos.close();
 				int docs = elementCounter - maxreturns;
 				if (docs > 0) {
 					sResumptionToken += docs;
 					File newFile = new File(resumptionTokenDir +
 							sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
 					resumptionTokenFile.renameTo(newFile);
+				} else {
+					resumptionTokenFile.delete();
+					sResumptionToken = null;
 				}
 		    }
 	    } catch (MCRConfigurationException e) {
