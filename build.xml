@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.78 $ $Date: 2004-05-13 13:41:30 $                      -->
+  <!-- $Revision: 1.79 $ $Date: 2004-05-19 12:37:50 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -12,11 +12,9 @@
   <!-- =================================================================== -->
 
   <!-- Javac properties -->
-  <property name="debug"          value="on" />
-  <property name="optimize"       value="on" />
-  <property name="deprecation"    value="on" />
-  <property name="javatarget"     value="1.3" />
-  <property name="sourceencoding" value="ISO-8859-15" />
+  <property name="debug"       value="on"  />
+  <property name="optimize"    value="on"  />
+  <property name="deprecation" value="on" />
 
   <!-- Read in all environment variables -->
   <property environment="env" />
@@ -64,7 +62,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.78 $ $Date: 2004-05-13 13:41:30 $</echo>
+    <echo>Ant build file   : $Revision: 1.79 $ $Date: 2004-05-19 12:37:50 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -135,11 +133,6 @@
       <param name="provider" value="org.mycore.services.plugins.PdfPlugin"/>
       <param name="append" value="true"/>
     </antcall>
-    <antcall target="create_service">
-      <param name="service" value="org.mycore.services.plugins.TextFilterPlugin"/>
-      <param name="provider" value="org.mycore.services.plugins.OoTextPlugin"/>
-      <param name="append" value="true"/>
-    </antcall>
   
     <jar 
       destfile="${basedir}/lib/mycore-for-${MCR.XMLStore.Type}.jar"
@@ -164,8 +157,6 @@
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
-	   target="${javatarget}"
-	   encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
     <echo>---------------------------------------------------------</echo>
@@ -519,6 +510,57 @@
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
     <antcall target="do-log"><param name="changelog-year" value="2004" /></antcall>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Build downloadable distribution from CVS                            -->
+  <!-- =================================================================== -->
+
+  <target name="distribution">
+    <antcall target="distribution.module">
+      <param name="Distrib.Module" value="mycore" />
+    </antcall>
+    <antcall target="distribution.module">
+      <param name="Distrib.Module" value="mycore-sample-application" />
+    </antcall>
+  </target>
+
+  <target name="distribution.module">
+    <property name="Distrib.TmpDir"     value="tmp"      />
+    <property name="Distrib.TargetDir"  value="/mcr/www/download" />
+    <property name="Distrib.CVSRoot"    value=":pserver:anoncvs@server.mycore.de:/cvs" />
+    <property name="Distrib.ReleaseTag" value="release_0_9" />
+    <property name="Distrib.ReleaseNr"  value="0.9" />
+
+    <delete dir="${Distrib.TmpDir}" />
+
+    <mkdir dir="${Distrib.TmpDir}"    />
+    <mkdir dir="${Distrib.TargetDir}" />
+
+    <cvs
+      cvsroot="${Distrib.CVSRoot}"
+      command="checkout -r ${Distrib.ReleaseTag} ${Distrib.Module}"
+      dest="${Distrib.TmpDir}"
+    />
+
+    <zip destfile="${Distrib.TargetDir}/${Distrib.Module}-${Distrib.ReleaseNr}.zip"
+      basedir="${Distrib.TmpDir}"
+      includes="${Distrib.Module}/**"
+      encoding="ISO_8859_1"
+    />
+
+    <tar tarfile="${Distrib.TmpDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar"
+      basedir="${Distrib.TmpDir}"
+      includes="${Distrib.Module}/**"
+      longfile="gnu"
+    />
+
+    <gzip src="${Distrib.TmpDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar" zipfile="${Distrib.TargetDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar.gz" />
+
+    <delete dir="${Distrib.TmpDir}" />
+
+    <chmod dir="${Distrib.TargetDir}" includes="${Distrib.Module}*.*" perm="a+r" />
+
   </target>
 
 </project>
