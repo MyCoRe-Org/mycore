@@ -152,11 +152,29 @@ public final MCRQueryResultArray setFromQuery(String host, String type,
 
   ThreadGroup threadGroup = new ThreadGroup("threadGroup");
   MCRQueryResultArray result = new MCRQueryResultArray();
-  for (i=0; i<hostAliasList.size() ;i++)
-    new MCRQueryThread(threadGroup,(String)hostAliasList.get(i),
-      query,type,result).start();
-  // wait until all threads have finished
-  do {} while(threadGroup.activeCount() > 0);
+  MCRQueryThread[] thr = new MCRQueryThread[hostAliasList.size()];
+  boolean threadsRunning = false;
+  try {
+      for (i=0; i<hostAliasList.size() ;i++){
+	  thr[i] = new MCRQueryThread( threadGroup,
+				       (String)hostAliasList.get( i ),
+				       query,
+				       type,
+				       result );
+          thr[i].start();
+	  threadsRunning = true;
+      }
+      // wait until all threads have finished
+      while( threadsRunning ) {
+	  threadsRunning = false;
+	  for( i = 0; i < thr.length; i++ )
+	      if( thr[i].isAlive() )
+		  threadsRunning = true;
+      }
+  }
+  catch( Exception e ) {
+      throw new MCRException( e.getMessage(), e );
+  }
   return result;
   }
 
