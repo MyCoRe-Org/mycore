@@ -218,31 +218,13 @@ public class MCRObjectCommands
   }
 
  /**
-  * Shows an MCRObjects.
-  *
-  * @param ID the ID of the MCRObject to be shown.
-  **/
-  public static void show( String ID )
-  {
-    MCRObject mycore_obj = new MCRObject();
-    mycore_obj.receiveFromDatastore( ID );
-    mycore_obj.debug();
-    MCRObjectStructure st = mycore_obj.getStructure();
-    if (st != null) { st.debug(); }
-    MCRMetaElement me = mycore_obj.getMetadataElement( "titles" );
-    if (me != null) {me.debug(); }
-    MCRObjectService se = mycore_obj.getService();
-    if (se != null) { se.debug(); }
-  }
-
- /**
   * Shows a list of next MCRObjectIDs.
   */
   public static void getid( String base )
   { 
     MCRObjectID mcr_id = new MCRObjectID();
     mcr_id.setNextId( base );
-    mcr_id.debug();
+    logger.info(mcr_id.getId());
   }
 
  /**

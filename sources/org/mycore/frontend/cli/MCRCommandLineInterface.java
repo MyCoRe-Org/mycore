@@ -119,9 +119,6 @@ public class MCRCommandLineInterface
       "update all objects from directory {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "show object {0}",
-      "org.mycore.frontend.cli.MCRObjectCommands.show String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
       "save object {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.save String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -150,9 +147,6 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "update all derivates from directory {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "show derivate {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.show String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "save derivate {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.save String" );

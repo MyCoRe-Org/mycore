@@ -217,27 +217,13 @@ public class MCRDerivateCommands
     }
 
  /**
-  * Shows an MCRDerivates.
-  *
-  * @param ID the ID of the MCRDerivate to be shown.
-  **/
-  public static void show( String ID )
-    {
-    MCRDerivate mycore_obj = new MCRDerivate();
-    mycore_obj.receiveFromDatastore( ID );
-    mycore_obj.debug();
-    MCRObjectService se = mycore_obj.getService();
-    if (se != null) { se.debug(); }
-    }
-
- /**
   * Shows a list of next MCRObjectIDs.
   */
   public static void getid( String base )
     { 
     MCRObjectID mcr_id = new MCRObjectID();
     mcr_id.setNextId( base );
-    mcr_id.debug();
+    logger.info(mcr_id.getId());
     }
 
  /**
