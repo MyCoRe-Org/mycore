@@ -46,5 +46,13 @@ function refreshClose()
 	window.opener.location.reload(true);
 	window.close();
 }
+
+function switchKupuToHTML()
+{
+	if (kupu.getDocument().getEditable().style.display != 'none') {
+		alert("Das Dokument kann im Moment noch nicht im WYSIWYG-Modus gespeichert werden. Deshalb vor dem Speichern in den HTML-Modus wechseln.")
+	}
+	else document.editContent.submit()
+}
 /* END OF: WCMS ------------------------------------------------------------------------------------ */
 

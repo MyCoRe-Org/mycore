@@ -60,7 +60,7 @@
 <xsl:param name="href"/>    
 <xsl:param name="labelPath"/>        
     
-<form name="editContent" action="{$ServletsBaseURL}WCMSActionServlet" method="post" onSubmit="return chkFormular()" > 
+<form name="editContent" action="{$ServletsBaseURL}WCMSActionServlet" method="post" onSubmit="switchKupuToHTML()" > 
  <input type="hidden" name="labelPath" value="{$labelPath}" />
     
  <table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
@@ -213,7 +213,7 @@
 			    <img src="{$ImageBaseURL}naviGeneral/box_left.gif" width="11" height="22" border="0" alt="" title="" />
 			  </td>				   
 				 <td align="right" class="button_green">
-				   <a href="javascript:document.editContent.submit()"><b>Änderungen speichern</b></a>
+				   <a href="javascript:switchKupuToHTML()"><b>Änderungen speichern</b></a>
 				 </td>
 			  <td align="right">
 			    <img src="{$ImageBaseURL}naviGeneral/box_right.gif" width="11" height="22" border="0" alt="" title="" />
