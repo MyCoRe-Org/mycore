@@ -46,7 +46,7 @@ final public class MCRMetaClassification extends MCRMetaDefault
 
 /** The length of the classification ID **/
 public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
-public static final int MAX_CATEGID_LENGTH = 32;
+public static final int MAX_CATEGID_LENGTH = 128;
 
 // MCRMetaClassification data
 private String classid;
