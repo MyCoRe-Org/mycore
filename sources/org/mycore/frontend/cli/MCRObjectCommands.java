@@ -219,7 +219,7 @@ public class MCRObjectCommands
     { 
     MCRObjectID mcr_id = new MCRObjectID();
     try {
-      mcr_id.setNextId( base );
+      mcr_id.setNextFreeId( base );
       logger.info("The next free ID  is "+mcr_id.getId());
       }
     catch (MCRException ex) {
@@ -235,7 +235,7 @@ public class MCRObjectCommands
     { 
     MCRObjectID mcr_id = new MCRObjectID();
     try {
-      mcr_id.setNextId( base );
+      mcr_id.setNextFreeId( base );
       mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
       logger.info("The last used ID  is "+mcr_id.getId());
       }
@@ -279,7 +279,7 @@ public class MCRObjectCommands
     {
     MCRObjectID id = new MCRObjectID();
     try {
-      id.setNextId(base);
+      id.setNextFreeId(base);
       logger.info(id.getId());
       }
     catch (MCRException ex) {
@@ -297,7 +297,7 @@ public class MCRObjectCommands
     {
     MCRObjectID mcr_id = new MCRObjectID();
     try {
-      mcr_id.setNextId(base);
+      mcr_id.setNextFreeId(base);
       mcr_id.setNumber(mcr_id.getNumberAsInteger()-1);
       logger.info(mcr_id.getId());
       }

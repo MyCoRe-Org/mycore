@@ -84,6 +84,7 @@ public class MCRSQLStatement
   protected final String getSQLValue( String key )
   {
     String value = values.getProperty( key );
+    if (value.equals("?")) { return value; }
     return ( value == NULL ? "NULL" : "'" + value + "'" );
   }
   
@@ -142,6 +143,7 @@ public class MCRSQLStatement
     statement.append( columnList.toString() ).append( " ) VALUES (" );
     statement.append( valueList .toString() ).append( " )" );
     
+System.out.println(statement.toString());
     return statement.toString();
   }
   

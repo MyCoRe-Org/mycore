@@ -229,7 +229,7 @@ public class MCRDerivateCommands
   public static void getid( String base )
     { 
     MCRObjectID mcr_id = new MCRObjectID();
-    mcr_id.setNextId( base );
+    mcr_id.setNextFreeId( base );
     logger.info(mcr_id.getId());
     }
 
