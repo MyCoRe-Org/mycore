@@ -25,6 +25,7 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
+import org.mycore.common.xml.*;
 import org.jdom.*;
 import org.jdom.input.*;
 import java.io.*;
@@ -59,7 +60,10 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
     
     try
     {
-      Document xml = new SAXBuilder().build( in );
+      SAXBuilder builder = new SAXBuilder();
+      builder.setEntityResolver( new MCREntityResolver() );
+
+      Document xml = builder.build( in );
       // TODO: Validate and provide a DTD/Schema file
       
       table = new Hashtable();
