@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.26 $ $Date: 2004-12-27 15:06:53 $ -->
+<!-- $Revision: 1.27 $ $Date: 2004-12-28 09:08:47 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -263,8 +263,18 @@
       <xsl:otherwise>1</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
+  <xsl:variable name="num.visible">
+    <xsl:choose>
+      <xsl:when test="@min and ($num &lt; @min)">
+        <xsl:value-of select="@min" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$num" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
-  <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num}" />
+  <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num.visible}" />
 
   <table border="0" cellspacing="0" cellpadding="0">
   
@@ -308,16 +318,16 @@
   </xsl:variable>
 
   <tr>
-    <xsl:call-template name="repeated.component">
-      <xsl:with-param name="var"    select="$var" />
-      <xsl:with-param name="pos"    select="$pos" />
-      <xsl:with-param name="row.nr" select="$row.nr" />
-    </xsl:call-template>
     <xsl:call-template name="repeater.pmud">
       <xsl:with-param name="var"    select="$var" />
       <xsl:with-param name="num"    select="$num" />
       <xsl:with-param name="min"    select="$min" />
       <xsl:with-param name="max"    select="$max" />
+      <xsl:with-param name="row.nr" select="$row.nr" />
+    </xsl:call-template>
+    <xsl:call-template name="repeated.component">
+      <xsl:with-param name="var"    select="$var" />
+      <xsl:with-param name="pos"    select="$pos" />
       <xsl:with-param name="row.nr" select="$row.nr" />
     </xsl:call-template>
   </tr>
