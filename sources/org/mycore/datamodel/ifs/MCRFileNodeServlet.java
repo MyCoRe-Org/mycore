@@ -121,9 +121,8 @@ public class MCRFileNodeServlet extends HttpServlet
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, MCRDirectory dir )
     throws IOException, ServletException
   {
-    Document doc = new org.jdom.Document();
     Element root = new Element( "DirectoryListing" );
-    doc.setRootElement( root );
+    Document doc = new org.jdom.Document( root );
     
     root.setAttribute( "ID", dir.getID() );
     
