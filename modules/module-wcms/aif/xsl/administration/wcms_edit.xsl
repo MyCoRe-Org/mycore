@@ -746,7 +746,6 @@
 <xsl:template name="buildInterface.general.content.getContent">
 
 <xsl:if test="/cms/action[@mode = 'intern'] ">
-   
     <xsl:choose>
         
         <xsl:when test="/cms/action = 'translate'">
@@ -760,47 +759,24 @@
             </th>
             <th align="right" valign="top">                
                 übersetzter Inhalt (<xsl:value-of select="$CurrentLang" />):<br/>
-		    
 	          <input type="checkbox" name="codeValidation" value="true" />autom. Korrektur des XHTML-Codes
-		     		    
                 <textarea name="content_currentLang" rows="30" cols="80" wrap="off">
                        <xsl:value-of select="/cms/content_currentLang"/>                                  
                 </textarea>        
             </th>                
         </xsl:when>
         
-        <xsl:otherwise>
-                <span style="text-decoration:underline;">Statischer Inhalt:</span><br/>
-		    
-	           <input type="checkbox" name="codeValidation" value="true" />autom. Korrektur des XHTML-Codes
-		     
-                <xsl:call-template name="buildInterface.general.content.validateXHTML"/>
-
-                <textarea name="content" rows="30" cols="140" wrap="off">
-                   <xsl:choose>
-                       <xsl:when test="/cms/action = 'add'">
-                        	<table align="center" width="90%" border="0" cellspacing="0" cellpadding="0">
-                        		<tr>
-                        			<td colspan="2">
-                        				Hier können sie den Text der Seite einfügen...
-                        			</td>
-                        		</tr>
-                        	</table>                                           
-                       </xsl:when>
-                       <xsl:otherwise>
-                           <xsl:value-of select="/cms/content"/>                                         
-                       </xsl:otherwise>
-                   </xsl:choose>
-                </textarea>
-
-		 <!--
-            <xsl:call-template name="kupu"/>
-		-->
-				    
-        </xsl:otherwise>
+		<xsl:otherwise> 
+			<span style="text-decoration:underline;">Statischer Inhalt:</span><br/>
+			
+			<input type="checkbox" 
+			name="codeValidationDisable" value="true" />autom. Codekorrektur deaktivieren (Vorsicht, Seite könnte nicht abgespeichert 
+			werden!) 
+			
+			<xsl:call-template name="buildInterface.general.content.validateXHTML"/> <xsl:call-template name="kupu"/> 
+		</xsl:otherwise>
         
     </xsl:choose>
-    
 </xsl:if>        
     
 </xsl:template>    

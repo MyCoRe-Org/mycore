@@ -182,20 +182,12 @@ public class WCMSActionServlet extends HttpServlet {
         System.out.println("first in content value:"+content+"-----------------------------------------------------------------------------------------------");
         contentCurrentLang = request.getParameter("content_currentLang");
 
+        System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
         /* code validation by JTidy */
-        if ( request.getParameter("codeValidation") != null && request.getParameter("codeValidation").toString().equals("true") ) {
-        	System.out.println("ich der JTIDY bei der Arbeit..................................................................................................");
+        if ( request.getParameter("codeValidationDisable") == null ) {
+        	System.out.println("JTIDY bei der Arbeit..................................................................................................");
             Tidy tidy = new Tidy();
-            /*String encoding = request.getCharacterEncoding();
-            if (encoding == null) tidy.setCharEncoding(org.w3c.tidy.Configuration.UTF8);
-            else {
-                if (encoding.toLowerCase().equals("iso-8859-1")) {
-                    tidy.setCharEncoding(org.w3c.tidy.Configuration.LATIN1);
-                }
-                else {
-                    tidy.setCharEncoding(org.w3c.tidy.Configuration.UTF8);
-                }
-            }*/
+            
             tidy.setXHTML(true);
             tidy.setInputEncoding("UTF-8");
             tidy.setOutputEncoding("UTF-8");
