@@ -24,12 +24,16 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.common.*;
-import com.ibm.mm.sdk.server.*;
-import java.io.*;
-
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
+
+import com.ibm.mm.sdk.common.DKConstant;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDDO;
+import com.ibm.mm.sdk.common.DKException;
+import com.ibm.mm.sdk.common.DKNVPair;
+import com.ibm.mm.sdk.common.DKResults;
+import com.ibm.mm.sdk.common.dkIterator;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements a main program to show the CM8 content of an item.

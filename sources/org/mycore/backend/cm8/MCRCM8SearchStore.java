@@ -24,22 +24,20 @@
 
 package org.mycore.backend.cm8;
 
-import java.text.*;
-import java.util.*;
-
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
 import org.mycore.datamodel.metadata.MCRTypedContent;
+
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements all methode for handling the data to the data store

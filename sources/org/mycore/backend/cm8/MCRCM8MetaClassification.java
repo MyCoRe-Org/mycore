@@ -24,13 +24,15 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRMetaDefault;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -78,20 +80,16 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     DKAttrDefICM attr;
     // create the classid attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,classname,
-      clalen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        classname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,classname,
+      clalen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(classname);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the categid attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,categname,
-      catlen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        categname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,categname,
+      catlen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(categname);
     attr.setNullable(true);

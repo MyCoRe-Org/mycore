@@ -24,12 +24,15 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -79,9 +82,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     lt.addAttr(attr);
     // create the attribute for the data content in date form
-    if (!MCRCM8ItemTypeCommon.createAttributeInteger(connection,subtagname)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        subtagname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeInteger(connection,subtagname);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
     attr.setNullable(true);

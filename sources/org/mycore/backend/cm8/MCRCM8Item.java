@@ -24,14 +24,18 @@
 
 package org.mycore.backend.cm8;
 
-import java.util.*;
-
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.common.DKChildCollection;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDDO;
+import com.ibm.mm.sdk.common.DKException;
+import com.ibm.mm.sdk.common.DKResults;
+import com.ibm.mm.sdk.common.dkIterator;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * <B>This class implements the access routines for a IBM Content Manager 8

@@ -24,9 +24,12 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This interface is designed to choose the datamodel classes for the

@@ -24,23 +24,44 @@
 
 package org.mycore.backend.cm8;
 
-import java.io.*;
-import java.net.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.backend.sql.MCRSQLStatement;
-import org.mycore.common.*;
-import org.mycore.datamodel.ifs.*;
-import org.mycore.services.query.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRContentStore;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileReader;
+import org.mycore.services.query.MCRTextSearchInterface;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKConstant;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDDO;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKItemTypeDefICM;
+import com.ibm.mm.sdk.common.DKNVPair;
+import com.ibm.mm.sdk.common.DKResults;
+import com.ibm.mm.sdk.common.DKTextICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.common.dkIterator;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the MCRContentStore interface to store the content of

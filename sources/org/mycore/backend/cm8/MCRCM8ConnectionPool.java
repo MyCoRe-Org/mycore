@@ -24,17 +24,14 @@
 
 package org.mycore.backend.cm8;
 
-import java.util.*;
-
-import com.ibm.mm.sdk.common.*;
-import com.ibm.mm.sdk.server.*;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements a pool of database connections to

@@ -24,13 +24,16 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -97,9 +100,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     DKComponentTypeDefICM it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        name+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
@@ -113,9 +114,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        name+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
@@ -129,9 +128,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        name+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);
@@ -145,9 +142,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        name+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
     attr.setNullable(true);
     attr.setUnique(false);

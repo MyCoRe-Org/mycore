@@ -24,13 +24,15 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRMetaDefault;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -39,6 +41,7 @@ import org.mycore.datamodel.metadata.MCRMetaDefault;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
+//DO NOT DELETE THIS. This class is needed for automatic class invocation!!
 
 public class MCRCM8MetaLink implements DKConstantICM, MCRCM8MetaInterface
 {
@@ -83,60 +86,48 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     DKAttrDefICM attr;
     // create the type attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,typename,
-      typelen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        typename+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,typename,
+      typelen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(typename);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the href attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,hrefname,
-      hreflen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        hrefname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,hrefname,
+      hreflen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(hrefname);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the label attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,labelname,
-      labellen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        labelname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,labelname,
+      labellen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(labelname);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the title attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,titlename,
-      titlelen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        titlename+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,titlename,
+      titlelen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(titlename);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the from attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,fromname,
-      fromlen,false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        fromname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,fromname,
+      fromlen,false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(fromname);
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the to attribute for the data content
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,toname,tolen,
-      false)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        toname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,toname,tolen,
+      false);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(toname);
     attr.setNullable(true);

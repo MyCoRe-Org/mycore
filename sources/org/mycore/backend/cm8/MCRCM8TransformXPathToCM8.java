@@ -32,14 +32,20 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.query.MCRMetaSearchInterface;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.services.query.*;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDDO;
+import com.ibm.mm.sdk.common.DKNVPair;
+import com.ibm.mm.sdk.common.DKResults;
+import com.ibm.mm.sdk.common.dkIterator;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This is the tranformer implementation for CM 8 from XPath language

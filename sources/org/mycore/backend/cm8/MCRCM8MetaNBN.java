@@ -24,13 +24,16 @@
 
 package org.mycore.backend.cm8;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
-
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
+
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -93,10 +96,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.addAttr(attr);
     // create the attribute for the data content in string form
     // with given textsearch flag
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,subtagname,len,
-      ts)) {
-      logger.warn( "CM8 Datastore Creation attribute "+
-        subtagname+" already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,subtagname,len,
+      ts);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
     attr.setNullable(true);

@@ -24,27 +24,32 @@
 
 package org.mycore.backend.cm8;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
 
-import com.ibm.mm.sdk.server.*;
-import com.ibm.mm.sdk.common.*;
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRMetaDefault;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRTypedContent;
-import org.mycore.datamodel.metadata.MCRMetaDefault;
 
-import org.apache.log4j.Logger;
+import com.ibm.mm.sdk.common.DKAttrDefICM;
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKConstantICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKException;
+import com.ibm.mm.sdk.common.DKItemTypeDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements all methode for handling the ItemType for a
  * MCRObjectID type on IBM Content Manager 8.
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
@@ -80,37 +85,28 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
   String mcr_item_type_prefix = conf.getString(sb+"_prefix"); 
   // connect to server
   DKDatastoreICM connection = null;
+  DKDatastoreDefICM dsDefICM = null;
   try {
     connection = MCRCM8ConnectionPool.instance().getConnection();
+    dsDefICM= (DKDatastoreDefICM) connection.datastoreDef();
     logger.info("CM8 Datastore Creation connected.");
     // create the Attribute for MCRObjectID
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(
-      connection,mcr_item_type_prefix+"ID",MCRObjectID.MAX_LENGTH,false)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"ID already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(
+      connection,mcr_item_type_prefix+"ID",MCRObjectID.MAX_LENGTH,false);
     // create the Attribute for MCR_Label
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
-      mcr_item_type_prefix+"label",MCRObject.MAX_LABEL_LENGTH,false)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"label already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
+      mcr_item_type_prefix+"label",MCRObject.MAX_LABEL_LENGTH,false);
     // create the Attribut for the TS byte array
-    if (!MCRCM8ItemTypeCommon.createAttributeClob(connection,
-      mcr_item_type_prefix+"ts",100*1024,true)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"ts already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeClob(connection,
+      mcr_item_type_prefix+"ts",100*1024,true);
     // create the default attribute type
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
-      mcr_item_type_prefix+"type",MCRMetaDefault.DEFAULT_TYPE_LENGTH,false)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"type already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
+      mcr_item_type_prefix+"type",MCRMetaDefault.DEFAULT_TYPE_LENGTH,false);
     // create the default attribute lang
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
-      mcr_item_type_prefix+"lang",MCRMetaDefault.DEFAULT_LANG_LENGTH,false)) {
-      logger.warn("CM8 Datastore Creation attribute "+
-        mcr_item_type_prefix+"lang already exists."); }
+    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,
+      mcr_item_type_prefix+"lang",MCRMetaDefault.DEFAULT_LANG_LENGTH,false);
     // check for the root itemtype
     try {
-      DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
       DKItemTypeDefICM isitemTypeDef = (DKItemTypeDefICM) dsDefICM
         .retrieveEntity(mcr_item_type_name);
       if (isitemTypeDef != null) {
@@ -134,7 +130,6 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
     item_type.setDescription(mcr_item_type_name);
     item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_DOC_MODEL);
     item_type.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
     DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(
       mcr_item_type_prefix+"ID");
     attr.setNullable(false);
@@ -410,4 +405,3 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
   }
 
 }
-
