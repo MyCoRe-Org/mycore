@@ -490,7 +490,7 @@ public final void add(
 			add(curElem.getAttributeValue(ATTR_HOST),
 					curElem.getAttributeValue(ATTR_ID),
 					irank,
-					curElem.getChild(TAG_OBJECT));
+					(Element)curElem.getChildren().get(0));
 		}
 	}
 
