@@ -117,6 +117,12 @@ public class MCRUserCommands implements MCRExternalCommandInterface
     // remove a group as member of an other group
     command.add("remove group {0} as member from group {1}");
     command.add("org.mycore.frontend.cli.MCRUserCommands.removeMemberGroupFromGroup MCRSession String String");
+    // add a new privilege to this group
+    command.add("add to group {0} the privilege {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.addPrivilegeToGroup MCRSession String String");
+    // remove a  privilege from this group
+    command.add("remove from group {0} the privilege {1}");
+    command.add("org.mycore.frontend.cli.MCRUserCommands.removePrivilegeFromGroup MCRSession String String");
     // create new user from data of a file
     command.add("create user data from file {0}");
     command.add("org.mycore.frontend.cli.MCRUserCommands.createUserFromFile MCRSession String");
@@ -986,6 +992,56 @@ public class MCRUserCommands implements MCRExternalCommandInterface
     }
   }
 
+  /**
+   * The method add a new privilege to a group.
+   *
+   * @param groupID the group name
+   * @param priv the privilege String
+   **/
+  public static final void addPrivilegeToGroup(MCRSession session, 
+    String groupID, String priv)
+    {
+    init();
+    try {
+      MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+      ArrayList ar = MCRUserMgr.instance().getAllPrivileges();
+      boolean test = false;
+      for (int i=0;i<ar.size();i++) {
+        if(((MCRPrivilege)ar.get(i)).getName().equals(priv)) { test=true; break; } }
+      if (!test) {
+        throw new MCRException("The privilege "+priv+" to add does not exist!"); }
+      group.addPrivilege(priv);
+      MCRUserMgr.instance().updateGroup(group);
+      } 
+    catch (Exception e) {
+      throw new MCRException("Error while adding privilege "+priv+
+        " to group "+groupID+".", e);
+      }
+    }
+ 
+  /**
+   * The method remove a  privilege from a group.
+   *
+   * @param group the group name
+   * @param priv the privilege String
+   **/
+  public static final void removePrivilegeFromGroup(MCRSession session,
+    String groupID, String priv)
+    {
+    init();
+    try {
+      MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+      if (!group.hasPrivilege(priv)) {
+        throw new MCRException("The group "+groupID+" has not the privilege "+priv+"!"); }
+      group.removePrivilege(priv);
+      MCRUserMgr.instance().updateGroup(group);
+      } 
+    catch (Exception e) {
+      throw new MCRException("Error while adding privilege "+priv+
+        " to group "+groupID+".", e);
+      }
+    }
+ 
   /**
    * This method adds a user as a member to a group
    *
