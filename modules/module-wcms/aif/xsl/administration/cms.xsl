@@ -10,9 +10,7 @@
 	<xsl:include href="wcms_edit.xsl" />
 	<xsl:include href="wcms_final.xsl" />
 	<xsl:include href="wcms_fileUpload.xsl" />
-	<!--
 	<xsl:include href="wcms_kupu.xsl" />
-	-->
 	<!-- ================================================================================= -->
 	<xsl:template match="cms">
 		<span class="wcms">
