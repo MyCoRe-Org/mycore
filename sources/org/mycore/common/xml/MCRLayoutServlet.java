@@ -262,21 +262,8 @@ public class MCRLayoutServlet extends HttpServlet
   public static final String getCompleteURL( HttpServletRequest request )
   {
     StringBuffer buffer = HttpUtils.getRequestURL( request );
-
     String queryString = request.getQueryString();
-
-    if( queryString != null )
-    {
-      buffer.append( "?" );
-      StringTokenizer tokenizer = new StringTokenizer( queryString, "&" );
-      while( tokenizer.hasMoreTokens() )
-      {
-        String token = tokenizer.nextToken();
-        String encoded =  URLEncoder.encode( token );
-        buffer.append( encoded );
-        if( tokenizer.hasMoreTokens() ) buffer.append( "&" );
-      }
-    }
+    if( queryString != null ) buffer.append( "?" ).append( queryString );
     return buffer.toString();
   }
   
