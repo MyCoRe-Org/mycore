@@ -285,7 +285,7 @@ public class MCROAIQueryService implements MCROAIQuery {
    		list.add(identifier);
    		logger.debug("Identifier hinzugefügt");
    		
-        Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
+   		Element eMetadata = (Element) object.createXML().getRootElement().clone();
              
         list.add(eMetadata);
    		logger.debug("Metadaten hinzugefügt");
@@ -386,7 +386,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 				list.add(identifier);
 				
 				if (listRecords) {
-					Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
+					Element eMetadata = (Element) object.createXML().getRootElement().clone();
 					list.add(eMetadata);
 				}
 		    }
@@ -491,44 +491,14 @@ public class MCROAIQueryService implements MCROAIQuery {
 			list.add(identifier);
 			
 			if (listRecords) {
-				Element eMetadata = collectMetadataWithLinks(object.getMetadata().createXML());
+				Element eMetadata = (Element) object.createXML().getRootElement().clone();
 				list.add(eMetadata);
 			}
 		}
 		
 		return list;
 	}
-	
-	/**
-	 * Method collectMetadataWithLinks
-	 * @param documentMetadata the metadata of the given document
-	 * @return an Element with the metadata in collections like author and institution, 
-	 *                that were linked in the documentMetadata via MCRMetaLinkID and xlink:href
-	 */
-	public Element collectMetadataWithLinks(Element documentMetadata) {
-		// Element result = (Element) documentMetadata.clone();
-        Iterator it = documentMetadata.getChildren().iterator() ;
-        while (it.hasNext()) {
-        	Element elm = (Element) it.next() ;
-        	if (elm.getAttribute("class").getValue().equals("MCRMetaLinkID")) {
-        		Iterator metalinkIterator = elm.getChildren().iterator();
-        		while(metalinkIterator.hasNext()) {
-        			Element linkElm = (Element) metalinkIterator.next() ;
-        			MCRObject linkObj = new MCRObject();
-        			linkObj.receiveFromDatastore(linkElm.getAttribute("href",
-        			    org.jdom.Namespace.getNamespace("xlink", 
-        			        org.mycore.common.MCRDefaults.XLINK_URL)).getValue());
-        			linkElm.addContent(linkObj.getMetadata().createXML()) ;
-        		}
-        	}
-        }
-        // debug 
-        //org.jdom.Document myDoc = object.createXML() ;
-        //org.jdom.output.XMLOutputter myOut = new org.jdom.output.XMLOutputter();
-        //logger.debug("eMetadata:" + myOut.outputString(eMetadata));
-        //end debug
-		return documentMetadata;
-	}
+
 	/**
 	 * Method hasMore.
 	 * @return true, if more results for the last query exists, else false
