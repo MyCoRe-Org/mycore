@@ -620,7 +620,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		try {
 	        String friends = MCRConfiguration.instance()
     	        .getString(STR_OAI_FRIENDS + "." + getServletName());
-    	    StringTokenizer tokenizer = new StringTokenizer(friends, ":");
+    	    StringTokenizer tokenizer = new StringTokenizer(friends, " ");
     	    if (tokenizer.countTokens() > 0) {
 		        Element eFriendsDescription = new Element("description", ns);
     	    	Namespace frns = Namespace.getNamespace(STR_OAI_NAMESPACE + "2.0/friends/");

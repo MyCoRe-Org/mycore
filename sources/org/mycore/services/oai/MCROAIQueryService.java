@@ -97,6 +97,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	public List listSets(String instance) {
     	String classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
 	    logger.debug("Suche in Klassifikation: " + classificationId);
+	    
 		List list = new ArrayList();
         MCRClassificationItem repository = MCRClassificationItem.
             getClassificationItem(classificationId);
