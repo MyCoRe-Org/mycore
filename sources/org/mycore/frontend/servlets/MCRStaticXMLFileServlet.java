@@ -30,6 +30,7 @@ import org.apache.log4j.*;
 
 import java.net.*;
 import java.io.*;
+import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -64,8 +65,17 @@ public class MCRStaticXMLFileServlet extends MCRServlet
 
     String path = getServletContext().getRealPath( requestedPath );
     File file = new File( path );
-
     String documentBaseURL = file.getParent() + File.separator;
+
+    // Store http request parameters into session, for later use
+    if( "true".equals( job.getRequest().getParameter( "storeReqParam" ) ) )
+    {
+      logger.debug( "Storing http request parameters in MCRSession for later use" );
+      Map map = new HashMap();
+      map.putAll( job.getRequest().getParameterMap() );
+      MCRSessionMgr.getCurrentSession().put( "StoredRequestParameters", map );
+    }
+
     job.getRequest().setAttribute( "XSL.StaticFilePath", requestedPath );
     job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
     job.getRequest().setAttribute( "XSL.FileName", file.getName() );
@@ -76,3 +86,4 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     rd.forward( job.getRequest(), job.getResponse() );
   }
 }
+

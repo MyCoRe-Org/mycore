@@ -29,6 +29,8 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
+import java.util.Map;
+import java.util.Iterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,7 +45,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.common.MCRCache;
+import org.mycore.common.*;
 
 /**
  * This servlet handles form submissions from
@@ -68,6 +70,8 @@ public class MCREditorServlet extends MCRServlet
   public void doGetPost( MCRServletJob job )
 	throws ServletException, java.io.IOException
   {
+    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
+
     HttpServletRequest  req = job.getRequest();
     HttpServletResponse res = job.getResponse();
   
@@ -104,12 +108,14 @@ public class MCREditorServlet extends MCRServlet
                                       HttpServletResponse res )
   throws ServletException, java.io.IOException
   {
+    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
     String uri = req.getParameter( "_uri" );
     String ref = req.getParameter( "_ref" );
 
     logger.info( "Editor load editor definition from " + ref + "@" + uri );
-
     Element editor = MCREditorDefReader.readDef( uri, ref );
+    addTargetParameters( editor );
+
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );
     editor.setAttribute( "session", sessionID );
@@ -118,6 +124,36 @@ public class MCREditorServlet extends MCRServlet
 
     req.setAttribute( "XSL.Style", "xml" );
     sendToDisplay( req, res, new Document( editor ) );
+  }
+
+  private void addTargetParameters( Element editor )
+  { 
+    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
+    String key = "StoredRequestParameters";
+    Map parameters = (Map)( MCRSessionMgr.getCurrentSession().get( key ) );
+    System.out.println( "parameters is null? " + ( parameters == null ));
+    System.out.println( MCRSessionMgr.getCurrentSession().getID() );
+    if( parameters == null ) return;
+
+    Element tps = new Element( "target-parameters" );
+    editor.addContent( tps );
+    
+    Iterator keys = parameters.keySet().iterator();
+    while( keys.hasNext() )
+    {
+      key = (String)( keys.next() );
+      String[] values = (String[])( parameters.get( key ) );
+      for( int i = 0; ( values != null ) && ( i < values.length ); i++ )
+      {
+        Element tp = new Element( "target-parameter" );
+        tp.setAttribute( "name", key );
+        tp.addContent( values[ i ] );
+        tps.addContent( tp );
+      }
+    }
+
+    XMLOutputter outputter = new XMLOutputter();
+    System.out.println( outputter.outputString( tps ) );
   }
 
   private static Random random = new Random();
