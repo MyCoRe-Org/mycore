@@ -24,6 +24,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.*;
+
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -42,18 +44,17 @@ public class MCRMetaXML extends MCRMetaDefault
   implements MCRMetaInterface 
 {
 
-// XML data
-protected String xmlstream;
+// XML data list
+protected ArrayList xmllist = null;
 
 /**
  * This is the constructor. <br>
- * The language element was set to <b>en</b>.
- * All other elemnts was set to null;
+ * Set the java.util.ArrayList of child elements to new.
  */
 public MCRMetaXML()
   {
   super();
-  xmlstream = "";
+  xmllist = new ArrayList();
   }
 
 /**
@@ -72,32 +73,52 @@ public MCRMetaXML()
  * @param default_lang     the default language
  * @param set_type         the optional type string
  * @param set_inherted     a value >= 0
- * @param set_xml          the XML stream as byte array
+ * @param set_xml          a java.util.ArrayList of org.jdom.Element
  * @exception MCRException if the set_subtag value is null or empty
  */
 public MCRMetaXML(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, int set_inherted, String set_xml) 
+  String default_lang, String set_type, int set_inherted, 
+  ArrayList set_xml) 
   throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
-  if (set_xml != null) xmlstream = set_xml;
+  if (set_xml != null) xmllist = set_xml;
   }
 
 /**
- * This method set the XML stream. 
+ * This method set the java.util.List of org.jdom.Element
  *
- * @param set_xml         the XML stream as String
+ * @param set_xml         the java.util.ArrayList of org.jdom.Element
  **/
-public final void setXML(String set_xml)
-  { xmlstream = set_xml; }
+public final void set(ArrayList set_xml)
+  { if (set_xml != null) xmllist = set_xml; }
 
 /**
- * This method get the XML stream element.
+ * This method get the ArrayList of org.jdom.Element.
  *
- * @return the XML as String
+ * @return the ArrayList of org.jdom.Element
  **/
-public final String getXML()
-  { return xmlstream; }
+public final ArrayList get()
+  { return xmllist; }
+
+/**
+ * This method add a org.jdom.Element to the java.util.ArrayList.
+ *
+ * @param set_xml         the XML stream as org.jdom.Element
+ **/
+public final void addElement(org.jdom.Element set_xml)
+  { if (set_xml != null) xmllist.add(set_xml.detach()); }
+
+/**
+ * This method get org.jdom.Element with index i from the ArrayList.
+ *
+ * @return the XML as org.jdom.Element
+ **/
+public final org.jdom.Element getElement(int i)
+  { 
+  if ((i<0) || (i>xmllist.size())) return null;
+  return ((org.jdom.Element)xmllist.get(i)); 
+  }
 
 /**
  * This method read the XML input stream part from a DOM part for the
@@ -108,9 +129,10 @@ public final String getXML()
 public void setFromDOM(org.jdom.Element element)
   {
   super.setFromDOM(element);
-  String temp = (element.getText()).trim();
-  if (temp==null) { temp = ""; }
-  xmlstream = temp;
+  List temp = element.getChildren();
+  if (temp==null) { return; }
+  for (int i=0;i<temp.size();i++) {
+    xmllist.add(((org.jdom.Element)temp.get(i)).detach()); }
   }
 
 /**
@@ -130,7 +152,8 @@ public org.jdom.Element createXML() throws MCRException
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
-  elm.addContent(xmlstream);
+  for (int i=0;i<xmllist.size();i++) {
+    elm.addContent(((org.jdom.Element)xmllist.get(i))); }
   return elm;
   }
 
@@ -148,12 +171,6 @@ public MCRTypedContent createTypedContent(boolean parasearch)
     debug();
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  if(!parasearch) { return tc; }
-  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
-  tc.addXMLElement(MCRTypedContent.TYPE_VALUE,null,xmlstream);
-  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
-  if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   return tc;
   }
 
@@ -182,7 +199,7 @@ public String createTextSearch(boolean textsearch)
 public boolean isValid()
   {
   if (!super.isValid()) { return false; }
-  if (xmlstream == null) { return false; }
+  if (xmllist == null) { return false; }
   return true;
   }
 
@@ -192,7 +209,7 @@ public boolean isValid()
 public Object clone()
   {
   MCRMetaXML out = new MCRMetaXML(datapart,subtag,lang,type,inherited,
-    xmlstream);
+    xmllist);
   return (Object)out;
   }
 
@@ -201,9 +218,9 @@ public Object clone()
  **/
 public final void debug()
   {
-  logger.debug("Start Class : MCRMetaLangText");
+  logger.debug("Start Class : MCRMetaXML");
   super.debugDefault();
-  logger.debug("XML                = \n"+xmlstream);
+  logger.debug("ArrayList size()   = \n"+xmllist.size());
   }
 
 }
