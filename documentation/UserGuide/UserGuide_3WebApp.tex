@@ -73,6 +73,9 @@ Da die Anwendung als {\bf mcradmin} ausgeführt wird, kommt es zu einem Schreibfe
 \begin{enumerate}
 \item \mcrcommand{chown -R mcradmin:mcr /usr/WebSphere/AppServer/logs/mycoresample}
 \item \mcrcommand{chmod 666 /usr/WebSphere/AppServer/logs/activity.log}
+\item \mcrcommand{cd /usr/WebSphere/AppServer/temp/<hostname>}
+\item \mcrcommand{mkdir mycoresample}
+\item \mcrcommand{chown -R mcradmin:mcr mycoresample}
 \end{enumerate}
 Danach ist der Server nocheinmal zu stoppen und neu zu starten:
 \begin{center}
