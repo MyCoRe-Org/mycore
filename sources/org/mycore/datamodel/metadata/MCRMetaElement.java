@@ -192,7 +192,10 @@ public void setParametricSearch(String parasearch)
   this.parasearch = DEFAULT_PARAMETRIC_SEARCH;
   if ((parasearch == null) || ((parasearch = parasearch.trim()).length() ==0))
     { return; }
-  if (parasearch.equals("true")) { this.parasearch = true; }
+  if (parasearch.toLowerCase().equals("true")) { 
+    this.parasearch = true; return; }
+  if (parasearch.toLowerCase().equals("false")) { 
+    this.parasearch = false; return; }
   }
 
 /**
@@ -213,7 +216,10 @@ public void setTextSearch(String textsearch)
   this.textsearch = DEFAULT_TEXT_SEARCH;
   if ((textsearch == null) || ((textsearch = textsearch.trim()).length() ==0))
     { return; }
-  if (textsearch.equals("true")) { this.textsearch = true; }
+  if (textsearch.toLowerCase().equals("true")) { 
+    this.textsearch = true; return; }
+  if (textsearch.toLowerCase().equals("false")) { 
+    this.textsearch = false; return; }
   }
 
 /**
@@ -242,7 +248,10 @@ public void setHeritable(String heritable)
   this.heritable = DEFAULT_HERITABLE;
   if ((heritable == null) || ((heritable = heritable.trim()).length() ==0))
     { return; }
-  if (heritable.equals("true")) { this.heritable = true; }
+  if (heritable.toLowerCase().equals("true")) { 
+    this.heritable = true; return; }
+  if (heritable.toLowerCase().equals("false")) { 
+    this.heritable = false; return; }
   }
 
 /**
