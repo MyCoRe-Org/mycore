@@ -158,7 +158,7 @@ public final void setFromURI(String uri) throws MCRException
 public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
   try {
-    jdom_document = MCRXMLHelper.parseXML(xml,false);
+    jdom_document = MCRXMLHelper.parseXML(xml,valid);
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }
