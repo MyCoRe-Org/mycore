@@ -7,9 +7,9 @@ export ANT_HOME=/usr/local/src/jakarta-ant-1.4
 export DB2_HOME=/db2admin/sqllib
 export CM7_HOME=/usr/lpp/cmb
 export JAVA_HOME=/usr/java_dev2/jre
+export JDOM_HOME=/usr/local/src/jdom-1.0beta8
 export MYCORE_HOME=/dlwww/mycore
-export XERCES_HOME=/usr/local/src/xerces-1_4_4
-export XALAN_HOME=/usr/local/src/xalan-j_2_2_D11
+export SERVLET_HOME=/usr/local/src/JSDK-2.0
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_HOME/bin:$JAVA_HOME/bin/classic
 export LIBPATH=$LIBPATH:$LD_LIBRARY_PATH
@@ -27,10 +27,10 @@ CLASSPATH=$CLASSPATH:$CM7_HOME/lib/cmbfed71.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/ant.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/crimson.jar
 CLASSPATH=$CLASSPATH:$ANT_HOME/lib/jaxp.jar
-CLASSPATH=$CLASSPATH:$XERCES_HOME/xerces.jar
-CLASSPATH=$CLASSPATH:$XERCES_HOME/xercesSamples.jar
-CLASSPATH=$CLASSPATH:$XALAN_HOME/bin/xalan.jar
-CLASSPATH=$CLASSPATH:$XALAN_HOME/bin/xalansamples.jar
+CLASSPATH=$CLASSPATH:$JDOM_HOME/lib/xerces.jar
+CLASSPATH=$CLASSPATH:$JDOM_HOME/lib/xalan.jar
+CLASSPATH=$CLASSPATH:$JDOM_HOME/build/jdom.jar
+CLASSPATH=$CLASSPATH:$SERVLET_HOME/lib/jsdk.jar
 CLASSPATH=$CLASSPATH:$MYCORE_HOME/classes
 export CLASSPATH
 
