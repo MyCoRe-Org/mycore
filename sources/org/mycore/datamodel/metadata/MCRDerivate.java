@@ -234,6 +234,10 @@ public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
+  // exist the derivate?
+  if (existInDatastore(mcr_id.getId())) {
+    throw new MCRPersistenceException("The derivate "+mcr_id.getId()+
+      " allready exists."); }
   // prepare the derivate metadata
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");

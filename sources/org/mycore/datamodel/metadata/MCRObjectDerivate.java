@@ -172,12 +172,22 @@ public final org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element("derivate");
   if (linkmetas.size()!=0) {
     org.jdom.Element elmm = new org.jdom.Element("linkmetas");
-    elmm.setAttribute("class","MCRMetaLinkMCRObject");
+    elmm.setAttribute("class","MCRMetaLinkID");
     elmm.setAttribute("heritable","false");
     elmm.setAttribute("parasearch","true");
     elmm.setAttribute("textsearch","false");
     for (int i=0;i<linkmetas.size();i++) {
       elmm.addContent(((MCRMetaLinkID)linkmetas.get(i)).createXML()); }
+    elm.addContent(elmm); 
+    }
+  if (externals.size()!=0) {
+    org.jdom.Element elmm = new org.jdom.Element("externals");
+    elmm.setAttribute("class","MCRMetaLink");
+    elmm.setAttribute("heritable","false");
+    elmm.setAttribute("parasearch","true");
+    elmm.setAttribute("textsearch","false");
+    for (int i=0;i<externals.size();i++) {
+      elmm.addContent(((MCRMetaLink)externals.get(i)).createXML()); }
     elm.addContent(elmm); 
     }
   if (internals!=null) {
