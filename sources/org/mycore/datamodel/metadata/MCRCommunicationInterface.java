@@ -33,6 +33,7 @@ import mycore.datamodel.MCRQueryResultArray;
  * for the connection between MCRClient and MCRServer.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 
@@ -43,14 +44,14 @@ public interface MCRCommunicationInterface
  * This methode represide the query request methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
- * @param hostlist the list of hostnames as string they should requested.
+ * @param hostAlias the host alias as string that shall be requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void requestQuery(Vector hostlist, String mcrtype, String query)
+public void requestQuery(String hostAlias, String mcrtype, String query)
   throws MCRException;
- 
+
 /**
  * This methode represide the response methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
@@ -59,5 +60,5 @@ public void requestQuery(Vector hostlist, String mcrtype, String query)
  * @exception MCRException general Exception of MyCoRe
  **/
 public MCRQueryResultArray responseQuery() throws MCRException;
- 
+
 }

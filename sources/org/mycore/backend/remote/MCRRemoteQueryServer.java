@@ -45,8 +45,8 @@ public class MCRRemoteQueryServer {
 
   protected static void init() {
     MCRConfiguration config = MCRConfiguration.instance();
-    queryPort = config.getInt("MCR.communication_rqs_port");
-    semaphoreLocation = config.getString("MCR.communication_rqs_workdir") + "/runSemaphore";
+    queryPort = config.getInt("MCR.communication_rqs_socket_port");
+    semaphoreLocation = config.getString("MCR.communication_rqs_socket_workdir") + "/runSemaphore";
     runSemaphore = new File(semaphoreLocation);
   }
 

@@ -35,6 +35,7 @@ import mycore.datamodel.MCRCommunicationInterface;
  * dummy implementation without functionallity and returns empty data.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 
@@ -57,27 +58,25 @@ public MCRCommunicationDummy()
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public final void requestQuery(Vector hostlist, String mcrtype, String query)
+public final void requestQuery(String hostAlias, String mcrtype, String query)
   throws MCRException
   {
-  for (int i=0;i<hostlist.size();i++) {
-    System.out.println("Hostname : "+hostlist.elementAt(i));
-    }
+  System.out.println("Hostname : "+hostAlias);
   System.out.println("MCR type : "+mcrtype);
   System.out.println("Query    : "+query);
   System.out.println();
   }
- 
+
 /**
  * This methode represide the query response methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
  *
- * @return an empty MCRQueryResultArray as the response. 
+ * @return an empty MCRQueryResultArray as the response.
  * @exception MCRException general Exception of MyCoRe
  **/
 public final MCRQueryResultArray responseQuery() throws MCRException
   {
   return new MCRQueryResultArray() ;
   }
- 
+
 }

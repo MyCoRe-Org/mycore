@@ -45,7 +45,7 @@ public class MCRServletCommunication implements MCRCommunicationInterface
 {
 
 private String reqtype;
-private Vector hostlist;
+private String hostAlias;
 private String mcrtype;
 private String query;
 private String reqstream = "";
@@ -65,17 +65,15 @@ public MCRServletCommunication()
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void requestQuery(Vector hostlist, String mcrtype, String query)
+public void requestQuery(String hostAlias, String mcrtype, String query)
   throws MCRException
   {
-  for (int i=0;i<hostlist.size();i++) {
-    System.out.println("Hostname : "+hostlist.elementAt(i));
-    }
+  System.out.println("Hostname : "+hostAlias);
   System.out.println("MCR type : "+mcrtype);
   System.out.println("Query    : "+query);
   System.out.println();
 
-  this.hostlist = hostlist;
+  this.hostAlias = hostAlias;
   this.mcrtype = mcrtype;
   this.query = query;
   reqstream = mcrtype+"***"+query;
@@ -92,15 +90,12 @@ public MCRQueryResultArray responseQuery() throws MCRException
 {
   String NL = System.getProperty("line.separator");
   URL currentURL;
-  String host;
   MCRConfiguration config = MCRConfiguration.instance();
-  String protocol = config.getString("MCR.communication_protocol");
-  int port = config.getInt("MCR.communication_default_port");
-  String location = config.getString("MCR.communication_servlet_location");
-  String errors = "";
+  String protocol = config.getString("MCR.communication_"+hostAlias+"_protocol");
+  String host = config.getString("MCR.communication_"+hostAlias+"_host");
+  int port = config.getInt("MCR.communication_"+hostAlias+"_port");
+  String location = config.getString("MCR.communication_"+hostAlias+"_servlet_location");
   MCRQueryResultArray result = new MCRQueryResultArray();
-  for (int i=0;i<hostlist.size();i++) {
-    host = (String)hostlist.elementAt(i);
   try {
     currentURL = new URL(protocol,host,port,location);
     HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();
@@ -108,7 +103,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
     urlCon.setRequestMethod("POST");
     PrintWriter out = new PrintWriter(urlCon.getOutputStream());
     out.println("request=" + URLEncoder.encode(reqstream)
-                + "&host=" + URLEncoder.encode(host));
+                + "&host=" + URLEncoder.encode(hostAlias));
     out.close();
     BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
     String fromServer="";
@@ -117,16 +112,14 @@ public MCRQueryResultArray responseQuery() throws MCRException
     result.importElements(fromServer);
   }
   catch(UnknownHostException uhe) {
-    errors = errors + "Don't know about host: " + host +". ";
+    System.err.println("Don't know about host: " + host +". ");
   }
   catch(IOException ioe) {
-    errors = errors + "Couldn't get I/O for the connection to: " + host + ". ";
+    System.err.println("Couldn't get I/O for the connection to: " + host + ". ");
   }
   catch(Exception e) {
     e.printStackTrace(System.err);
   }
-  }
-  System.err.println(errors);
   return result;
 }
 

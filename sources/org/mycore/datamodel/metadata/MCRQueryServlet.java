@@ -24,10 +24,11 @@
 
 package mycore.datamodel;
 
-import mycore.common.*;
+import java.io.*;
+import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
-import java.io.*;
+import mycore.common.*;
 
 /**
  * This servlet provides a web interface to query
@@ -54,10 +55,16 @@ public class MCRQueryServlet extends HttpServlet
     if( query == null ) query = "";
     if( type  == null ) return; 
 
+    MCRConfiguration config = MCRConfiguration.instance();
+
+    ArrayList hostAliasList = new ArrayList(config
+      .getInt("MCR.communication_max_hosts",3));
+    hostAliasList.add(where);
+
     try
     {
       MCRQueryResult result = new MCRQueryResult( type );
-      result.setFromQuery( where, query );
+      result.setFromQuery( hostAliasList, query );
 
       String xml = result.getResultArray().exportAll();
 

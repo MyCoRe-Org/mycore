@@ -46,7 +46,7 @@ public class MCRSocketCommunication implements MCRCommunicationInterface
 {
 
 private String reqtype;
-private Vector hostlist;
+private String hostAlias;
 private String mcrtype;
 private String query;
 private String reqstream = "";
@@ -66,17 +66,15 @@ public MCRSocketCommunication()
  * @param query    the query as a stream
  * @exception MCRException general Exception of MyCoRe
  **/
-public void requestQuery(Vector hostlist, String mcrtype, String query)
+public void requestQuery(String hostAlias, String mcrtype, String query)
   throws MCRException
   {
-  for (int i=0;i<hostlist.size();i++) {
-    System.out.println("Hostname : "+hostlist.elementAt(i));
-    }
+  System.out.println("Hostname : "+hostAlias);
   System.out.println("MCR type : "+mcrtype);
   System.out.println("Query    : "+query);
   System.out.println();
 
-  this.hostlist = hostlist;
+  this.hostAlias = hostAlias;
   this.mcrtype = mcrtype;
   this.query = query;
   reqstream = mcrtype+"***"+query;
@@ -91,23 +89,14 @@ public void requestQuery(Vector hostlist, String mcrtype, String query)
  **/
 public MCRQueryResultArray responseQuery() throws MCRException
   {
-  String NL = System.getProperty("line.separator");
-  String currentHost;     // in this format: server.domain.de:12345
-  String host;            // in this format: server.domain.de
-  int port;               // the port: 12345
-  MCRQueryResultArray result = new MCRQueryResultArray();
-  for (int i=0;i<hostlist.size();i++) {
-    currentHost = (String)hostlist.elementAt(i);
-    if ( currentHost.indexOf(':') > -1 ) {
-      host = currentHost.substring(0,currentHost.indexOf(':'));
-      port = Integer.parseInt(currentHost
-        .substring(currentHost.indexOf(':')+1));
-      }
-    else {
-      MCRConfiguration config = MCRConfiguration.instance();
-      host = currentHost;
-      port = config.getInt("MCR.communication_default_port");
-      }
+    String NL = System.getProperty("line.separator");
+    String host;            // in this format: server.domain.de
+    int port;               // the port: 12345
+    MCRQueryResultArray result = new MCRQueryResultArray();
+    MCRConfiguration config = MCRConfiguration.instance();
+    host = config.getString("MCR.communication_"+hostAlias+"_host");
+    port = config.getInt("MCR.communication_"+hostAlias+"_port");
+
     MCRSocketCommunicator sc = null;
     try {
       sc = new MCRSocketCommunicator(new Socket(host, port)); }
@@ -174,9 +163,8 @@ public MCRQueryResultArray responseQuery() throws MCRException
       sc.close();
       }
     catch (Exception e) { e.printStackTrace(System.err);}
-    }
+
   return result;
   }
 
 }
-

@@ -115,7 +115,7 @@ public final String getHost(int index)
   }
 
 /**
- * This method sets an host element at a specified position.
+ * This method sets a host element at a specified position.
  *
  * @param index   the index in the list
  * @param newhost the new value in the list
@@ -361,6 +361,16 @@ public final void importElements(String in)
     itagresults = in.indexOf("<"+TAG_RESULT,itagresulte);
     }
 
+  }
+
+/**
+ * This method imports another MCRQueryResultArray to the
+ * EXISTing list.
+ * @param the other list as input
+ **/
+public final void importElements(MCRQueryResultArray in)
+  { for (int i=0; i<in.size(); i++)
+      this.add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));
   }
 
 }
