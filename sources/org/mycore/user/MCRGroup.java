@@ -25,16 +25,15 @@
 package mycore.user;
 
 import java.util.Vector;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mycore.common.*;
 import mycore.xml.MCRXMLHelper;
 
 /**
- * Instances of this class represent MyCoRe groups. MCRGroup is part of the MyCoRe user
- * component and must not be used directly by other components. All group objects are
- * managed by the user manager (the instance of the singleton MCRUserMgr), which
- * is the only class of the MyCoRe user component that other components should use.
+ * Instances of this class represent MyCoRe groups.
  * <p>
  * In the MyCoRe user component the privileges of a user (e.g. the privilege to create
  * a new user or a new group, to delete users etc.) are determined by the belonging
@@ -60,12 +59,44 @@ public class MCRGroup
   /** A list of other groups which are members of the group */
   private Vector groups = null;
 
+  /** Specify whether the UserManager must be notified about the creation of this object */
+  private boolean bCreateInMgr = true;
+
+  /**
+   * Creates a group object from a XML string which must be passed as a parameter.
+   *
+   * @param groupXML     XML string containing all neccessary information to create a group object.
+   * @param bCreateInMgr boolean value which specifies whether the MCRUserMgr must be notified
+   *                     about the creation of this object
+   */
+  public MCRGroup(String groupXML) throws Exception
+  { this(groupXML, true); }
+
+  public MCRGroup(String groupXML, boolean bCreateInMgr) throws Exception
+  {
+    MCRArgumentChecker.ensureNotNull(groupXML, "groupXML");
+    this.bCreateInMgr = bCreateInMgr;
+
+    // Parse the XML-string of the group and get a DOM representation
+
+    Document mcrDocument = MCRXMLHelper.parseXML(groupXML);
+    NodeList domGroupList = mcrDocument.getElementsByTagName("group");
+    Element domGroup = (Element)domGroupList.item(0);
+
+    create(domGroup, bCreateInMgr);
+  }
+
   /**
    * Creates a group object from a DOM element which must be passed as a parameter.
    *
-   * @param domGroup DOM element containing all neccessary information to create a group.
+   * @param domGroup     DOM element containing all neccessary information to create a group object.
+   * @param bCreateInMgr boolean value which specifies whether the MCRUserMgr must be notified
+   *                     about the creation of this object
    */
   public MCRGroup(Element domGroup) throws Exception
+  { create(domGroup, true); }
+
+  private final void create(Element domGroup, boolean bCreateInMgr) throws Exception
   {
     groupID = MCRXMLHelper.getElementText("groupID", domGroup);
 
@@ -85,6 +116,10 @@ public class MCRGroup
     NodeList memberElements = memberList.item(0).getChildNodes();
     users  = new Vector(MCRXMLHelper.getAllElementTexts("userID", memberElements));
     groups = new Vector(MCRXMLHelper.getAllElementTexts("groupID", memberElements));
+
+    // Notify the User Manager
+    if (bCreateInMgr)
+      MCRUserMgr.instance().createGroup(this);
   }
 
   /**
@@ -154,4 +189,29 @@ public class MCRGroup
    */
   public Vector getUsers()
   { return users; }
+
+  /**
+   * This method returns the group information as a formatted string.
+   *
+   * @return group information, all in one string
+   */
+  public String getFormattedInfo() throws Exception
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append("group ID         : ").append(groupID);
+    sb.append("\n").append("privileges       : ");
+    for (int i=0; i<privileges.size(); i++) {
+      sb.append(privileges.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("members [groups] : ");
+    for (int i=0; i<groups.size(); i++) {
+      sb.append(groups.elementAt(i)).append(",");
+    }
+    sb.append("\n").append("members [users]  : ");
+    for (int i=0; i<users.size(); i++) {
+      sb.append(users.elementAt(i)).append(",");
+    }
+    sb.append("\n");
+    return sb.toString();
+  }
 }

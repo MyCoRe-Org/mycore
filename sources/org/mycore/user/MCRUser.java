@@ -28,16 +28,15 @@ import java.io.*;
 import java.util.Date;
 import java.util.Vector;
 import java.text.DateFormat;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mycore.common.*;
 import mycore.xml.MCRXMLHelper;
 
 /**
- * Instances of this class represent MyCoRe users. MCRUser is part of the MyCoRe user
- * component and must not be used directly by other components. All user objects are
- * managed by the user manager (the instance of the singleton MCRUserMgr), which
- * is the only class of the MyCoRe user component that other components should use.
+ * Instances of this class represent MyCoRe users.
  *
  * @see mycore.user.MCRUserMgr
  *
@@ -52,6 +51,9 @@ public class MCRUser
   /** The password of the MyCoRe user */
   private String passwd = "";
 
+  /** Specify whether the UserManager must be notified about the creation of this object */
+  private boolean bCreateInMgr = true;
+
   /** The date of creation of the user object in the MyCoRe system */
   private Date creationDate = null;
 
@@ -62,11 +64,40 @@ public class MCRUser
   private MCRUserAddress userAddress;
 
   /**
+   * Creates a user object from a XML string which must be passed as a parameter.
+   *
+   * @param userXML      XML string containing all neccessary information to create a user object.
+   * @param bCreateInMgr boolean value which specifies whether the MCRUserMgr must be notified
+   *                     about the creation of this object
+   */
+  public MCRUser(String userXML) throws Exception
+  { this(userXML, true); }
+
+  public MCRUser(String userXML, boolean bCreateInMgr) throws Exception
+  {
+    MCRArgumentChecker.ensureNotNull(userXML, "userXML");
+    this.bCreateInMgr = bCreateInMgr;
+
+    // Parse the XML-string of the user and get a DOM representation
+
+    Document mcrDocument = MCRXMLHelper.parseXML(userXML);
+    NodeList domUserList = mcrDocument.getElementsByTagName("user");
+    Element domUser = (Element)domUserList.item(0);
+
+    create(domUser, bCreateInMgr);
+  }
+
+  /**
    * Creates a user object from a DOM element which must be passed as a parameter.
    *
-   * @param domUser DOM element containing all neccessary information to create a user object.
+   * @param domUser      DOM element containing all neccessary information to create a user object.
+   * @param bCreateInMgr boolean value which specifies whether the MCRUserMgr must be notified
+   *                     about the creation of this object
    */
   public MCRUser(Element domUser) throws Exception
+  { create(domUser, true); }
+
+  private final void create(Element domUser, boolean bCreateInMgr) throws Exception
   {
     // In a later stage of the software development we expect that users may have
     // more than one account. Therefore we use the following NodeList even though
@@ -97,6 +128,10 @@ public class MCRUser
     NodeList groupList = domUser.getElementsByTagName("groups");
     NodeList groupElements = groupList.item(0).getChildNodes();
     groups = new Vector(MCRXMLHelper.getAllElementTexts("group", groupElements));
+
+    // Notify the User Manager
+    if (bCreateInMgr)
+      MCRUserMgr.instance().createUser(this);
   }
 
   /**
@@ -189,9 +224,31 @@ public class MCRUser
    * sets the password of the user
    * @param newPassword the new password of the user
    */
-  public void setPassword(String newPassword)
+  public void setPassword(String newPassword) throws Exception
   {
     // At the moment, the permission to do this is not checked...
     passwd = newPassword;
+    MCRUserMgr.instance().updateUser(this);
+  }
+
+  /**
+   * This method returns the user information as a formatted string.
+   * The password will not be returned.
+   *
+   * @return user information, all in one string
+   */
+  public String getFormattedInfo() throws Exception
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append("user ID       : ").append(userID).append("\n");
+    sb.append("creation date : ").append(getCreationDateAsString()).append("\n");
+    sb.append(getAddress()).append("\n");
+    sb.append("groups        : ");
+
+    for (int i=0; i<groups.size(); i++) {
+      sb.append(groups.elementAt(i)).append(",");
+    }
+    sb.append("\n");
+    return sb.toString();
   }
 }
