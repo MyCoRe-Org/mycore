@@ -173,6 +173,8 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 		logger.debug("Incomming condition : " + qsb.toString());
 		if (database.equals("exist") && (qsb.length() != 0))
 			return handleQueryStringExist(qsb.toString().trim(), type);
+    if ( database.equals("tamino") && (qsb.length() != 0))
+      return handleQueryStringTamino( qsb.toString().trim(), type );    
 		return qsb.toString();
 	}
 
@@ -189,4 +191,24 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 		query = root + "[" + query + "]";
 		return query;
 	}
+  
+  /**
+    * Handle query string for Tamino
+   **/
+  private String handleQueryStringTamino( String query, String type ) {
+
+    query = MCRUtils.replaceString(query, "like", "~=");    // 030919
+    query = MCRUtils.replaceString(query, ")", "");
+    query = MCRUtils.replaceString(query, "\"", "'");
+    query = MCRUtils.replaceString(query, "contains(", "~=");
+    query = MCRUtils.replaceString(query, "metadata/*/*/@href=", "metadata//@xlink:href=");
+
+    if ( -1 != query.indexOf("] and") )
+    {
+      query = MCRUtils.replaceString(query, "] and /mycoreobject[", " and /mycoreobject/");  // 031002
+    }
+
+		query = root + "[" + query + "]";
+    return query;
+  }
 }

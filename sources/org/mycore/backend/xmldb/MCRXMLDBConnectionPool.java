@@ -96,20 +96,25 @@ public class MCRXMLDBConnectionPool
       Class driverclass = Class.forName( driver );
       database = (Database)driverclass.newInstance();
       DatabaseManager.registerDatabase( database );
-      Collection col = DatabaseManager.getCollection( connString );
-      if( col == null ) 
+      
+      // try to create database
+      if ( config.getString( conf_prefix + "database_create", "true").equals( "true" ) )
       {
-       int i = connString.lastIndexOf("/");
-       if ( -1 != i )
-       {
-        String uri  = connString.substring(0,i); 
-        String coll =  connString.substring(i+1);
-        createCollection( uri, coll ); 
-       }
+        Collection col = DatabaseManager.getCollection( connString );
+        if( col == null ) 
+        {
+          int i = connString.lastIndexOf("/");
+          if ( -1 != i )
+          {
+            String uri  = connString.substring(0,i); 
+            String coll =  connString.substring(i+1);
+            createCollection( uri, coll ); 
+          }
+        }
+        else
+         col.close();
       }
-      else
-       col.close();
-     }
+    }
     catch( Exception e ) 
     {
      throw new MCRPersistenceException( e.getMessage(), e );
