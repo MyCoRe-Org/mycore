@@ -25,6 +25,9 @@
 package mycore.commandline;
 
 import java.io.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
 import mycore.datamodel.*;
 
@@ -189,33 +192,83 @@ public class MCRObjectCommands
   }
 
  /**
-  * Create a new data base based of the MCRObject template.
+  * Create a new data base file for the MCRObjectId type.
+  *
+  * @param mcr_type the MCRObjectId type
+  * @return true if all is okay, else false
   **/
   public static boolean createDataBase ( String mcr_type )
     {
-    String conf_item = "MCR.persistence_template_"+mcr_type;
-    String file = "";
+    String conf_item = "MCR.persistence_config_"+mcr_type;
+    String conf_filename = "";
     try {
-      file = MCRConfiguration.instance().getString(conf_item); }
+      conf_filename = MCRConfiguration.instance().getString(conf_item); }
     catch ( Exception e ) {
-      throw new MCRException(e.getMessage(),e); }
-    if(!file.endsWith(".xml")) {
-      System.out.println( file + " ignored, does not end with *.xml" );
-      return false; }
-    if(! new File(file).isFile()) {
-      System.out.println( file + " ignored, is not a file." );
-      return false; }
-    System.out.println( "Reading file " + file + " ...\n" );
+      throw new MCRException("Can't find configuration for "+mcr_type ); }
+    if(!conf_filename.endsWith(".xml")) {
+      throw new MCRException("Can't read configuration for "+mcr_type ); }
+    if(! new File(conf_filename).isFile()) {
+      throw new MCRException("Can't read configuration for "+mcr_type ); }
+    System.out.println( "Reading file " + conf_filename + " ...\n" );
+    return true;
+    }
+
+ /**
+  * Create a new XML Schema file for the MCRObjectId type.
+  *
+  * @param mcr_type the MCRObjectId type
+  * @return true if all is okay, else false
+  **/
+  public static boolean createXMLSchema ( String mcr_type )
+    {
+    MCRConfiguration conf = MCRConfiguration.instance();
+    // Root pathes
+    String mycore_root = "";
     try {
-      MCRObject mycore_obj = new MCRObject();
-      mycore_obj.setFromURI( file );
-      System.out.println( "Label --> " + mycore_obj.getLabel() );
-      mycore_obj.createDataBase();
-      System.out.println( "Database for "+mcr_type+" created.\n" );
-      }
-    catch (Exception e) {
-      System.out.println( "Database for "+mcr_type+" was not created.\n" );
-      return false; }
+      mycore_root = conf.getString("MCR.root_path"); }
+    catch ( Exception e ) {
+      throw new MCRException("Can't find configuration for MCR.root_path." ); }
+    String mycore_appl = "";
+    try {
+      mycore_appl = conf.getString("MCR.appl_path"); }
+    catch ( Exception e ) {
+      throw new MCRException("Can't find configuration for MCR.appl_path." ); }
+    String SLASH = System.getProperty("file.separator");
+    // Read config file
+    String conf_home = mycore_appl+SLASH+"config";
+    String conf_filename = "";
+    try {
+      conf_filename = conf.getString("MCR.persistence_config_"+mcr_type); }
+    catch ( Exception e ) {
+      throw new MCRException("Can't find configuration for "+mcr_type ); }
+    if(!conf_filename.endsWith(".xml")) {
+      throw new MCRException("Configuration "+mcr_type+" ends not with .xml" ); }
+    File conf_file = new File(conf_home,conf_filename);
+    if(! conf_file.isFile()) {
+      throw new MCRException("Can't read configuration for "+mcr_type ); }
+    System.out.println( "Reading file " + conf_filename + " ...\n" );
+    // Set schema file
+    String schema_home = mycore_appl+SLASH+"schema";
+    String schema_filename = conf_filename.substring(0,conf_filename.length()-4)
+      +".xsd";
+    // Read transformer file
+    String xslt_home = mycore_root+SLASH+"stylesheets";
+    String xslt_filename = "MCRObjectSchema.xsl";
+    File xslt_file = new File(xslt_home,xslt_filename);
+    if(! xslt_file.isFile()) {
+      throw new MCRException("Can't read schema from MCRSchema.xsl"); }
+    System.out.println( "Reading file " + xslt_filename + " ...\n" );
+    // Transform
+    try {
+    TransformerFactory transfakt = TransformerFactory.newInstance();
+    Transformer trans = transfakt.newTransformer(new StreamSource(xslt_file));
+    trans.setParameter("mycore_home",mycore_root);
+    trans.setParameter("mycore_appl",mycore_appl);
+    trans.transform(new StreamSource(conf_file),new StreamResult(schema_home+
+      System.getProperty("file.separator")+schema_filename));
+    System.out.println( "Write file " + schema_filename + " ...\n" ); }
+    catch ( Exception e ) {
+      throw new MCRException(e.getMessage()); }
     return true;
     }
 

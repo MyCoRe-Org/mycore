@@ -112,9 +112,17 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
+
+    // *************************************
+    // Commands for executing configurations
+    // *************************************
+
     knownCommands[ numCommands++ ] = new MCRCommand(
       "create database for {0}",
       "mycore.commandline.MCRObjectCommands.createDataBase String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "create schema for {0}",
+      "mycore.commandline.MCRObjectCommands.createXMLSchema String" );
 
     // ******************************
     // Commands for executing queries
