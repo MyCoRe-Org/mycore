@@ -36,7 +36,7 @@ import org.jdom.*;
 import mycore.editor.*;
 
 /**
- * This class is a simple basic mailer class for the miless system.
+ * This class is a simple basic mailer class for mycore.
  *
  * @author marc schluepmann
  * @version $Revision$ $Date$
@@ -48,7 +48,7 @@ public class MCRMailer {
 
     public MCRMailer() {
 	sysProps.setProperty( "mail.smtp.host", 
-			      milConfig.getString( "MCR.mail.server", "mailout.uni-essen.de" ) 
+			      milConfig.getString( "MCR.mail.server" ) 
 			      );
 	sysProps.setProperty( "mail.transport.protocol", 
 			      milConfig.getString( "MCR.mail.protocol", "smtp" ) 
@@ -62,7 +62,7 @@ public class MCRMailer {
      *
      * @return the current mail session
      **/
-    protected Session getSession() {
+    protected javax.mail.Session getSession() {
 	return mailsess;
     }
 
@@ -72,7 +72,7 @@ public class MCRMailer {
      * @param msg the message to be sent
      * @throws Exception a problem occured
      **/
-    protected void send( Message msg ) throws Exception {
+    protected void send( javax.mail.Message msg ) throws Exception {
 	getSession().getTransport().send( msg );
     }
 
