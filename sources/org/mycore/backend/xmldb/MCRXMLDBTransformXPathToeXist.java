@@ -23,16 +23,11 @@
  **/
 package org.mycore.backend.xmldb;
 
-import java.io.*;
-import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.services.query.*;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.jdom.*;
 import org.jdom.input.*;
@@ -44,6 +39,7 @@ import org.jdom.output.*;
  * @author Marc Schluepmann
  * @author Harald Richter
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
@@ -96,8 +92,7 @@ protected final MCRXMLContainer startQuery( String type ) {
       XMLResource xmldoc = (XMLResource)ri.nextResource();
       doc = MCRXMLDBPersistence.convertResToDoc( xmldoc );
       objid      =  doc.getRootElement().getAttribute( "ID" ).getValue();
-      byte[] xml = MCRUtils.getByteArray( doc );
-      result.add( "local", objid, 0, xml );
+      result.add( "local", objid, 0, doc.getRootElement());
       }
     }
   catch( Exception e ) {
