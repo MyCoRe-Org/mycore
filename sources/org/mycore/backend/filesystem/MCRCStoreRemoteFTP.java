@@ -88,8 +88,8 @@ public class MCRCStoreRemoteFTP extends MCRContentStore
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException
+  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception
   {
     FTPClient connection = connect();
     try
@@ -111,16 +111,11 @@ public class MCRCStoreRemoteFTP extends MCRContentStore
       
       return storageID.toString();
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not store content of file: " + file.getPath();
-      throw new MCRPersistenceException( msg, exc );
-    }
     finally{ disconnect( connection ); }
   }
 
-  public void deleteContent( String storageID )
-    throws MCRPersistenceException
+  protected void doDeleteContent( String storageID )
+    throws Exception
   {
     FTPClient connection = connect();
     try
@@ -141,29 +136,15 @@ public class MCRCStoreRemoteFTP extends MCRContentStore
       for( int i = numDirs; i > 0; i-- )
       { connection.quote( "RMD " + dirs[ i - 1 ], rmdirOK ); }
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not delete content of stored file: " + storageID;
-      throw new MCRPersistenceException( msg, exc );
-    }
     finally{ disconnect( connection ); }
   }
 
-  public void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException
+  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception
   {
     FTPClient connection = connect();
     try
     { connection.get( target, file.getStorageID() );  }
-    catch( Exception exc )
-    {
-      if( ! ( exc instanceof MCRPersistenceException ) )
-      {
-        String msg = "Could not get content of stored file to output stream";
-        throw new MCRPersistenceException( msg, exc );
-      }
-      else throw (MCRPersistenceException)exc;
-    }
     finally{ disconnect( connection ); }
   }
   

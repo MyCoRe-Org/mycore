@@ -80,92 +80,68 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
     }
   }
 
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException
+  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception
   {
-    try
+    StringBuffer storageID = new StringBuffer();  
+    String[] slots = buildSlotPath();
+      
+    for( int i = 0; i < slots.length; i++ )
+      storageID.append( slots[ i ] ).append( File.separator );
+      
+    File dir = new File( baseDir, storageID.toString() );
+    if( ! dir.exists() )
     {
-      StringBuffer storageID = new StringBuffer();  
-      String[] slots = buildSlotPath();
-      
-      for( int i = 0; i < slots.length; i++ )
-        storageID.append( slots[ i ] ).append( File.separator );
-      
-      File dir = new File( baseDir, storageID.toString() );
-      if( ! dir.exists() )
+      boolean success = dir.mkdirs();
+      if( ! success )
       {
-        boolean success = dir.mkdirs();
-        if( ! success )
-        {
-          String msg = "Could not create content store slot directory: " + dir.getPath();
-          throw new MCRPersistenceException( msg );
-        }
+        String msg = "Could not create content store slot directory: " + dir.getPath();
+        throw new MCRPersistenceException( msg );
       }
-      
-      String fileID = buildNextID( file );
-      storageID.append( fileID );
-      
-      File local = new File( dir, fileID );
-      OutputStream out = new BufferedOutputStream( new FileOutputStream( local ) );
-      MCRUtils.copyStream( source, out );
-      out.close();
-      
-      return storageID.toString();
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not store content of file: " + file.getPath();
-      throw new MCRPersistenceException( msg, exc );
-    }
+      
+    String fileID = buildNextID( file );
+    storageID.append( fileID );
+      
+    File local = new File( dir, fileID );
+    OutputStream out = new BufferedOutputStream( new FileOutputStream( local ) );
+    MCRUtils.copyStream( source, out );
+    out.close();
+      
+    return storageID.toString();
   }
   
-  public void deleteContent( String storageID )
-    throws MCRPersistenceException
+  protected void doDeleteContent( String storageID )
+    throws Exception
   {
-    try
-    { 
-      File local = new File( baseDir, storageID );
-      local.delete();
+    File local = new File( baseDir, storageID );
+    local.delete();
       
-      // Recursively remove all directories that have been created, if empty:
-      StringTokenizer st = new StringTokenizer( storageID, File.separator );
-      int numDirs = st.countTokens() - 1;
-      String[] dirs = new String[ numDirs ];
+    // Recursively remove all directories that have been created, if empty:
+    StringTokenizer st = new StringTokenizer( storageID, File.separator );
+    int numDirs = st.countTokens() - 1;
+    String[] dirs = new String[ numDirs ];
       
-      for( int i = 0; i < numDirs; i++ )
-      {
-        dirs[ i ] = st.nextToken();  
-        if( i > 0 ) dirs[ i ] = dirs[ i - 1 ] + File.separator + dirs[ i ];  
-      }
-      
-      for( int i = numDirs; i > 0; i-- )
-      { 
-        File dir = new File( baseDir, dirs[ i - 1 ] ); 
-        if( dir.listFiles().length > 0 ) break;
-        dir.delete();
-      }
-    }
-    catch( Exception exc )
+    for( int i = 0; i < numDirs; i++ )
     {
-      String msg = "Could not delete content of stored file: " + storageID;
-      throw new MCRPersistenceException( msg, exc );
+      dirs[ i ] = st.nextToken();  
+      if( i > 0 ) dirs[ i ] = dirs[ i - 1 ] + File.separator + dirs[ i ];  
+    }
+      
+    for( int i = numDirs; i > 0; i-- )
+    { 
+      File dir = new File( baseDir, dirs[ i - 1 ] ); 
+      if( dir.listFiles().length > 0 ) break;
+      dir.delete();
     }
   }
 
-  public void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException
+  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception
   {
-    try
-    { 
-      File local = new File( baseDir, file.getStorageID() );
-      InputStream in = new BufferedInputStream( new FileInputStream( local ) );
-      MCRUtils.copyStream( in, target );
-    }
-    catch( Exception exc )
-    {
-      String msg = "Could not get content of stored file to output stream: " + file.getStorageID();
-      throw new MCRPersistenceException( msg, exc );
-    }
+    File local = new File( baseDir, file.getStorageID() );
+    InputStream in = new BufferedInputStream( new FileInputStream( local ) );
+    MCRUtils.copyStream( in, target );
   }
 }
 

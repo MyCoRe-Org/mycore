@@ -72,8 +72,8 @@ public class MCRCStoreContentManager7 extends MCRContentStore
     keyfieldTime = config.getString( prefix + "Keyfield.Time" );
   }
   
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException
+  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     try
@@ -110,16 +110,11 @@ public class MCRCStoreContentManager7 extends MCRContentStore
       
       return itemID;
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not store content in ContentManager for file " + file.getPath();
-      throw new MCRPersistenceException( msg, exc );
-    }
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-  public void deleteContent( String storageID )
-    throws MCRPersistenceException
+  protected void doDeleteContent( String storageID )
+    throws Exception
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     try
@@ -127,16 +122,11 @@ public class MCRCStoreContentManager7 extends MCRContentStore
       MCRCM7Item item = new MCRCM7Item ( connection, indexClass, storageID );
       item.delete();
     }
-    catch( Exception exc )
-    {
-      String msg = "Error deleting parts of ContentManager item " + storageID;
-      throw new MCRPersistenceException( msg, exc );
-    }
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-  public void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException
+  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     

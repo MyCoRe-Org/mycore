@@ -80,8 +80,27 @@ public abstract class MCRContentStore
    * @param source the ContentInputStream where the file content is read from
    * @return an ID that indentifies the place where the content was stored
    **/
-  public abstract String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException;
+  public String storeContent( MCRFileReader file, MCRContentInputStream source )
+    throws MCRPersistenceException
+  {
+    try
+    { return doStoreContent( file, source ); }
+    catch( Exception exc )
+    {
+      if( ! ( exc instanceof MCRException ) )
+      {
+        StringBuffer msg = new StringBuffer();
+        msg.append( "Could not store content of file [" );
+        msg.append( file.getPath() ).append( "] in store [" );
+        msg.append( storeID ).append( "]" );
+        throw new MCRPersistenceException( msg.toString(), exc );
+      }
+      else throw (MCRException)exc;
+    }
+  }
+  
+  protected abstract String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception;
 
   /**
    * Deletes the content of an MCRFile object that is stored under the given
@@ -89,8 +108,27 @@ public abstract class MCRContentStore
    *
    * @param storageID the storage ID of the MCRFile object
    */
-  public abstract void deleteContent( String storageID )
-    throws MCRPersistenceException;
+  public void deleteContent( String storageID )
+    throws MCRException
+  {
+    try
+    { doDeleteContent( storageID ); }
+    catch( Exception exc )
+    {
+      if( ! ( exc instanceof MCRException ) )
+      {
+        StringBuffer msg = new StringBuffer();
+        msg.append( "Could not delete content of file with storage ID [" );
+        msg.append( storageID ).append( "] in store [" );
+        msg.append( storeID ).append( "]" );
+        throw new MCRPersistenceException( msg.toString(), exc );
+      }
+      else throw (MCRException)exc;
+    }
+  }
+    
+  protected abstract void doDeleteContent( String storageID )
+    throws Exception;
 
   /**
    * Retrieves the content of an MCRFile to an OutputStream. 
@@ -100,9 +138,28 @@ public abstract class MCRContentStore
    * @param file the MCRFile thats content should be retrieved
    * @param target the OutputStream to write the file content to
    */
-  public abstract void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException;
+  public void retrieveContent( MCRFileReader file, OutputStream target )
+    throws MCRException
+  {
+    try
+    { doRetrieveContent( file, target ); }
+    catch( Exception exc )
+    {
+      if( ! ( exc instanceof MCRException ) )
+      {
+        StringBuffer msg = new StringBuffer();
+        msg.append( "Could not retrieve content of file with storage ID [" );
+        msg.append( file.getStorageID() ).append( "] in store [" );
+        msg.append( storeID ).append( "]" );
+        throw new MCRPersistenceException( msg.toString(), exc );
+      }
+      else throw (MCRException)exc;
+    }
+  }
   
+  protected abstract void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception;
+
   /** DateFormat used to construct new unique IDs based on timecode */
   protected static DateFormat formatter = new SimpleDateFormat( "yyMMdd-HHmmss-SSS" );
 

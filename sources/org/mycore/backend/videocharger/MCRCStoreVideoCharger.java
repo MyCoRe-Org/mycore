@@ -90,8 +90,8 @@ public class MCRCStoreVideoCharger extends MCRContentStore
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException
+  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception
   {
     String storageID = buildNextID( file );
 
@@ -102,47 +102,26 @@ public class MCRCStoreVideoCharger extends MCRContentStore
       connection.put( source, storageID );
       return storageID;
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not store content of file: " + file.getPath();
-      throw new MCRPersistenceException( msg, exc );
-    }
     finally{ disconnect( connection ); }
   }
 
-  public void deleteContent( String storageID )
-    throws MCRPersistenceException
+  protected void doDeleteContent( String storageID )
+    throws Exception
   {
     FTPClient connection = connect();
-    try
-    { connection.delete( storageID ); }
-    catch( Exception exc )
-    {
-      String msg = "Could not delete content of stored file: " + storageID;
-      throw new MCRPersistenceException( msg, exc );
-    }
+    try{ connection.delete( storageID ); }
     finally{ disconnect( connection ); }
   }
 
-  public void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException
+  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception
   { retrieveContent( file.getStorageID(), target ); }
   
   protected void retrieveContent( String assetID, OutputStream target )
-    throws MCRPersistenceException
+    throws Exception
   {
     FTPClient connection = connect();
-    try
-    { connection.get( target, assetID );  }
-    catch( Exception exc )
-    {
-      if( ! ( exc instanceof MCRPersistenceException ) )
-      {
-        String msg = "Could not get stored content to output stream: " + assetID;
-        throw new MCRPersistenceException( msg, exc );
-      }
-      else throw (MCRPersistenceException)exc;
-    }
+    try{ connection.get( target, assetID ); }
     finally{ disconnect( connection ); }
   }
   
@@ -155,7 +134,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore
    * @param directory the local directory to write the assets to
    **/
   public static void backupContentTo( String storeID, String directory )
-    throws MCRPersistenceException, IOException
+    throws MCRPersistenceException, Exception
   {
     MCRAVExtVideoCharger extender = new MCRAVExtVideoCharger();
     extender.readConfig( storeID );

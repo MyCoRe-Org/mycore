@@ -74,8 +74,8 @@ public class MCRCStoreContentManager8
     attributeFile  = config.getString( prefix + "Attribute.Time" );
   }
 
-  public String storeContent( MCRFileReader file, MCRContentInputStream source )
-    throws MCRPersistenceException
+  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
+    throws Exception
   {
     Logger logger = MCRCM8ConnectionPool.getLogger(); 
     DKDatastoreICM connection = null;
@@ -113,16 +113,11 @@ public class MCRCStoreContentManager8
       logger.debug("The file was stored under CM8 Ressource Manager.");
       return storageID;
     }
-    catch (Exception ex) 
-    {
-      String msg = "Error while storing data in IFS CM8 store.";
-      throw new MCRPersistenceException( msg, ex );
-    }
     finally{ MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   }
 
-  public void deleteContent( String storageID )
-    throws MCRPersistenceException
+  protected void doDeleteContent( String storageID )
+    throws Exception
   {
     Logger logger = MCRCM8ConnectionPool.getLogger(); 
     logger.debug("StorageID = "+storageID);
@@ -134,16 +129,11 @@ public class MCRCStoreContentManager8
       ddo.del();
       logger.debug("The file was deleted from CM8 Ressource Manager.");
     }
-    catch(Exception ex) 
-    {
-      String msg = "Error deleting parts of ContentManager item " + storageID;
-      throw new MCRPersistenceException(msg,ex);
-    }
     finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-  public void retrieveContent( MCRFileReader file, OutputStream target )
-    throws MCRPersistenceException
+  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
+    throws Exception
   {
     Logger logger = MCRCM8ConnectionPool.getLogger(); 
     logger.debug("StorageID = "+ file.getStorageID() );
@@ -160,11 +150,6 @@ public class MCRCStoreContentManager8
       MCRUtils.copyStream( is, target );
       
       logger.debug("The file was retrieved from CM8 Ressource Manager.");
-    }
-    catch( Exception ex ) 
-    {
-      String msg = "Error while retrieving data from CM8 item " + file.getStorageID();
-      throw new MCRPersistenceException( msg, ex );
     }
     finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
   }
