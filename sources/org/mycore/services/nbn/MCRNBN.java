@@ -314,6 +314,16 @@ public class MCRNBN {
 	}
 	
 	/**
+	 * Method setURL. Returns the URL which has been locally attached with the URN
+	 * @param the url which should be set for the URN.
+	 */
+	public void setURL(String url) {
+		if (isLocal()) {
+			manager.setURL(this, url);
+		}
+	}
+	
+	/**
 	 * Returns the namespace of this URN, that is the part
 	 * between "urn:" and the last "-" in the URN. Returns null
 	 * if this NBN is not valid.
