@@ -160,7 +160,7 @@ public abstract class MCRFilesystemNode
     if( ! hasParent() ) 
       return null;
     else
-      return MCRDirectory.getDirectory( ID );
+      return MCRDirectory.getDirectory( parentID );
   }
   
   public boolean hasParent()
