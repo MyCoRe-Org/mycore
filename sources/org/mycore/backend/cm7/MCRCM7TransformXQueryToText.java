@@ -395,6 +395,7 @@ private final String traceOneCondition(String cond)
       number = (4000-date.get(Calendar.YEAR))*10000 +
                      date.get(Calendar.MONTH)*100 +
                      date.get(Calendar.DAY_OF_MONTH); }
+    logger.debug("Date "+value[0]+" as number = "+Long.toString(number));
     }
   else { isdate = false; }
   // is value[0] a number
