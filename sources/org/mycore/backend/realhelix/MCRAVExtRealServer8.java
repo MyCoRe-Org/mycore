@@ -52,21 +52,21 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
   public MCRAVExtRealServer8()
   {}
 
-  public void init( String storageID, String storeID, String extension )
+  public void init( MCRFileReader file )
     throws MCRPersistenceException
   {
-    super.init( storageID, storeID, extension );
+    super.init( file );
     
     MCRConfiguration config = MCRConfiguration.instance();  
-    String prefix = "MCR.IFS.AVExtender." + storeID + ".";
+    String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
       
     basePlayerStarter = config.getString( prefix + "RamGenBaseURL"     );
     baseMetadata      = config.getString( prefix + "ViewSourceBaseURL" );
     playerDownloadURL = config.getString( prefix + "PlayerURL"         ); 
     
-    String data = getMetadata( baseMetadata + storageID );
+    String data = getMetadata( baseMetadata + file.getStorageID() );
     
-    URLConnection con = getConnection( basePlayerStarter + storageID );
+    URLConnection con = getConnection( basePlayerStarter + file.getStorageID() );
     playerStarterCT = con.getContentType();
 
     try
@@ -120,7 +120,7 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
     }
     catch( Exception exc )
     { 
-      String msg = "Error parsing metadata from RealServer ViewSource: " + storageID;  
+      String msg = "Error parsing metadata from RealServer ViewSource: " + file.getStorageID();  
       throw new MCRPersistenceException( msg, exc );
     }
   }
@@ -131,7 +131,7 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
     try
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
-      cgi.append( storageID );
+      cgi.append( file.getStorageID() );
       if( queryString != null ) cgi.append( "?" ).append( queryString );
     
       URLConnection connection = getConnection( cgi.toString() );

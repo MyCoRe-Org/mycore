@@ -63,14 +63,14 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     playerDownloadURL = config.getString( prefix + "PlayerURL"   ); 
   }
 
-  public void init( String storageID, String storeID, String extension )
+  public void init( MCRFileReader file )
     throws MCRPersistenceException
   {
-    super.init( storageID, storeID, extension );
+    super.init( file );
       
-    readConfig( storeID );
+    readConfig( file.getStoreID() );
     
-    String assetID = URLEncoder.encode( storageID );
+    String assetID = URLEncoder.encode( file.getStorageID() );
     String data1 = getMetadata( baseMetadata      + "?"         + assetID );
     String data2 = getMetadata( basePlayerStarter + "?VIDEOID=" + assetID );
     
@@ -103,7 +103,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
         if( frameRate > 0 )
           contentTypeID = "mpegvid";
         else
-          if( extension.toLowerCase().equals( "mp3" ) )
+          if( file.getExtension().toLowerCase().equals( "mp3" ) )
             contentTypeID = "mp3";
           else
             contentTypeID = "mpegaud";
@@ -118,7 +118,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     }
     catch( Exception exc )
     { 
-      String msg = "Error parsing metadata from VideoCharger asset " + storageID;  
+      String msg = "Error parsing metadata from VideoCharger asset " + file.getStorageID();  
       throw new MCRPersistenceException( msg, exc );
     }
   }
@@ -130,7 +130,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
       cgi.append( "?VIDEOID=" );
-      cgi.append( URLEncoder.encode( storageID ) );
+      cgi.append( URLEncoder.encode( file.getStorageID() ) );
       if( queryString != null ) cgi.append( "&" ).append( queryString );
     
       URLConnection connection = getConnection( cgi.toString() );

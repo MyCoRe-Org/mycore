@@ -90,11 +90,11 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     debugFTP = config.getBoolean( prefix + "DebugFTP", false );
   }
 
-  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
+  public String storeContent( MCRFileReader file, MCRContentInputStream source )
     throws MCRPersistenceException
   {
     String storageID = buildNextID();
-    if( extension.length() > 0 ) storageID += "." + extension;
+    if( file.getExtension().length() > 0 ) storageID += "." + file.getExtension();
 
     FTPClient connection = connect();
     try
@@ -105,7 +105,7 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     }
     catch( Exception exc )
     {
-      String msg = "Could not store content of file: " + filename;
+      String msg = "Could not store content of file: " + file.getPath();
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ disconnect( connection ); }
@@ -125,9 +125,9 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     finally{ disconnect( connection ); }
   }
 
-  public void retrieveContent( String storageID, long size, OutputStream target )
+  public void retrieveContent( MCRFileReader file, OutputStream target )
     throws MCRPersistenceException
-  { retrieveContent( storageID, target ); }
+  { retrieveContent( file.getStorageID(), target ); }
   
   protected void retrieveContent( String assetID, OutputStream target )
     throws MCRPersistenceException

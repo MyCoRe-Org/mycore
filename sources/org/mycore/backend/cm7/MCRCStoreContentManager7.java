@@ -72,15 +72,15 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     keyfieldPath  = config.getString( prefix + "Keyfield.Path"  );
   }
   
-  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
+  public String storeContent( MCRFileReader file, MCRContentInputStream source )
     throws MCRPersistenceException
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     try
     {
       MCRCM7Item item = new MCRCM7Item( connection, indexClass, DKConstant.DK_DOCUMENT );
-      item.setKeyfield( keyfieldOwner, owner    );
-      item.setKeyfield( keyfieldPath,  filename );
+      item.setKeyfield( keyfieldOwner, file.getOwnerID() );
+      item.setKeyfield( keyfieldPath,  file.getPath() );
       item.create();
       String itemID = item.getItemId();
       
@@ -112,7 +112,7 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     }
     catch( Exception exc )
     {
-      String msg = "Could not store content in ContentManager for file " + filename;
+      String msg = "Could not store content in ContentManager for file " + file.getPath();
       throw new MCRPersistenceException( msg, exc );
     }
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
@@ -135,18 +135,18 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
     finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-  public void retrieveContent( String storageID, long size, OutputStream target )
+  public void retrieveContent( MCRFileReader file, OutputStream target )
     throws MCRPersistenceException
   {
     DKDatastoreDL connection = MCRCM7ConnectionPool.instance().getConnection();
     
-    for( int partID = 1, sum = 0; sum < size; partID++ )
+    for( int partID = 1, sum = 0; sum < file.getSize(); partID++ )
     {
       try
       {
         DKPidXDODL pID = new DKPidXDODL();
-        pID.setPartId   ( partID    );
-        pID.setPrimaryId( storageID );
+        pID.setPartId( partID );
+        pID.setPrimaryId( file.getStorageID() );
 
         DKBlobDL xdo = new DKBlobDL( connection );
         xdo.setPidObject( pID );
@@ -159,7 +159,7 @@ public class MCRCStoreContentManager7 extends MCRContentStoreBase implements MCR
       catch( Exception exc )
       {
         String msg = "Error while retrieving part " + partID +  
-                     " from CM item " + storageID;
+                     " from CM item " + file.getStorageID();
         throw new MCRPersistenceException( msg, exc );
       }
       finally{ MCRCM7ConnectionPool.instance().releaseConnection( connection ); }
