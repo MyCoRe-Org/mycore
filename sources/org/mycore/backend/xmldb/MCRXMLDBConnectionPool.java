@@ -51,19 +51,19 @@ import org.xmldb.api.modules.CollectionManagementService;
 public class MCRXMLDBConnectionPool
   {
   /** The connection pool singleton */
-  protected static MCRXMLDBConnectionPool singleton;
+  protected static MCRXMLDBConnectionPool SINGLETON;
 
   /** The internal list of connections */
   protected Hashtable connections = new Hashtable();
  
   /** The logger */
-  private static Logger logger=Logger.getLogger("org.mycore.backend.XMLDB");
+  private static Logger LOGGER=Logger.getLogger("org.mycore.backend.XMLDB");
 
-  private static String conf_prefix = "MCR.persistence_xmldb_";
-  private static String driver      = "";
-  private static String connString  = "";
-  private static String user;
-  private static String passwd;
+  private static String CONF_PREFIX = "MCR.persistence_xmldb_";
+  private static String DRIVER      = "";
+  private static String CONNECTION_STRING  = "";
+  private static String USER;
+  private static String PASSWD;
   private  Database database;
   
   /**
@@ -73,9 +73,9 @@ public class MCRXMLDBConnectionPool
    *             if connect to XMLDB was not successful
    */
 	public static synchronized MCRXMLDBConnectionPool instance() {
-		if (singleton == null)
-			singleton = new MCRXMLDBConnectionPool();
-		return singleton;
+		if (SINGLETON == null)
+			SINGLETON = new MCRXMLDBConnectionPool();
+		return SINGLETON;
 	}
 
   /**
@@ -87,34 +87,34 @@ public class MCRXMLDBConnectionPool
 	protected MCRXMLDBConnectionPool() throws MCRPersistenceException {
 		MCRConfiguration config = MCRConfiguration.instance();
 		PropertyConfigurator.configure(config.getLoggingProperties());
-		logger.info("Building connection to XML:DB...");
-		driver = config.getString(conf_prefix + "driver");
-		logger
+		LOGGER.info("Building connection to XML:DB...");
+		DRIVER = config.getString(CONF_PREFIX + "driver");
+		LOGGER
 				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_driver      : "
-						+ driver);
-		connString = config.getString(conf_prefix + "database_url", "");
-		logger
+						+ DRIVER);
+		CONNECTION_STRING = config.getString(CONF_PREFIX + "database_url", "");
+		LOGGER
 				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: "
-						+ connString);
-		user = config.getString(conf_prefix + "user", null);
-		logger
+						+ CONNECTION_STRING);
+		USER = config.getString(CONF_PREFIX + "user", null);
+		LOGGER
 				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_user      : "
-						+ user);
-		passwd = config.getString(conf_prefix + "passwd", null);
+						+ USER);
+		PASSWD = config.getString(CONF_PREFIX + "passwd", null);
 		try {
-			Class driverclass = Class.forName(driver);
+			Class driverclass = Class.forName(DRIVER);
 			database = (Database) driverclass.newInstance();
 			DatabaseManager.registerDatabase(database);
 
 			// try to create database
-			if (config.getString(conf_prefix + "database_create", "true")
+			if (config.getString(CONF_PREFIX + "database_create", "true")
 					.equals("true")) {
-				Collection col = DatabaseManager.getCollection(connString);
-				int i = connString.lastIndexOf("/");
+				Collection col = DatabaseManager.getCollection(CONNECTION_STRING);
+				int i = CONNECTION_STRING.lastIndexOf("/");
 				String uri,collname;
 				if (i != -1) {
-					uri = connString.substring(0, i);
-					collname = connString.substring(i + 1);
+					uri = CONNECTION_STRING.substring(0, i);
+					collname = CONNECTION_STRING.substring(i + 1);
 					if (col==null)
 						createCollection(uri, collname);
 					else
@@ -137,7 +137,7 @@ public class MCRXMLDBConnectionPool
 		try {
 			Collection col;
 
-			logger.info("try to create collection in XML:DB: " + collection);
+			LOGGER.info("try to create collection in XML:DB: " + collection);
 			Collection root = getCollection(uri);
 			if (root==null) {
 				String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: "
@@ -153,7 +153,7 @@ public class MCRXMLDBConnectionPool
 						+ collection;
 				throw new MCRPersistenceException(msg);
 			}
-			logger.info("...done and successful");
+			LOGGER.info("...done and successful");
 			synchronized(connections){
 				connections.put(collection,col);
 			}
@@ -169,11 +169,11 @@ public class MCRXMLDBConnectionPool
    */
 	protected Collection buildConnection(String collection)
 			throws XMLDBException {
-		String con = connString + "/" + collection;
-		logger.debug("MCRXMLDBConnectionPool: Building connection to: " + con);
+		String con = CONNECTION_STRING + "/" + collection;
+		LOGGER.debug("MCRXMLDBConnectionPool: Building connection to: " + con);
 		Collection connection = getCollection(con);
 		if (connection == null) {
-			createCollection(connString, collection);
+			createCollection(CONNECTION_STRING, collection);
 			connection = getCollection(con);
 		}
 		return connection;
@@ -187,10 +187,10 @@ public class MCRXMLDBConnectionPool
  */
 private Collection getCollection(String collection) throws XMLDBException {
 	Collection connection;
-	if (user==null)
+	if (USER==null)
 		connection = DatabaseManager.getCollection(collection);
 	else
-		connection = DatabaseManager.getCollection(collection, user, passwd);
+		connection = DatabaseManager.getCollection(collection, USER, PASSWD);
 	return connection;
 }
 
@@ -233,9 +233,9 @@ private Collection getCollection(String collection) throws XMLDBException {
    */
   public void finalize(){
   	try {
-  		Enumeration enum = connections.elements();
-  		while(enum.hasMoreElements())
-  			((Collection)enum.nextElement()).close();
+  		Enumeration e = connections.elements();
+  		while(e.hasMoreElements())
+  			((Collection)e.nextElement()).close();
   	}
   	catch(Exception ignored){}
   }
@@ -246,7 +246,7 @@ private Collection getCollection(String collection) throws XMLDBException {
    * @return the logger.
    */
   static final Logger getLogger(){
-  	return logger;
+  	return LOGGER;
   }
 
 }
