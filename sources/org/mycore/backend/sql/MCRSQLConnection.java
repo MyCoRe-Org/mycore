@@ -54,267 +54,308 @@ import org.mycore.common.*;
  *@author Johannes Buehler
   * @version $Revision$ $Date$
  */
-public class MCRSQLConnection
-{
-  /** The wrapped JDBC connection */
-  protected Connection connection;
+public class MCRSQLConnection {
+	/** The wrapped JDBC connection */
+	protected Connection connection;
 
-  /** 
-   * Creates a new connection. This constructor is used by the connection pool 
-   * class.
-   * 
-   * @see MCRSQLConnectionPool#getConnection()
-   **/
-  MCRSQLConnection() throws MCRPersistenceException, MCRConfigurationException
-  {
-    Logger logger = MCRSQLConnectionPool.getLogger();
+	private boolean inPool;
 
-    String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
-	      
-    logger.debug( "MCRSQLConnection: Building connection to JDBC datastore... with " + url);
-    
-    Connection connection = null;
-    try{
-		try  {
-			String userid = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_userid" );
-			String passwd = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_passwd" );
-			connection = DriverManager.getConnection( url, userid, passwd );
-		  	} 
-        catch(Exception MCRConfigurationException) {
-        	connection = DriverManager.getConnection( url );
+	/** 
+	 * Creates a new connection. This constructor is used by the connection pool 
+	 * class.
+	 * 
+	 * @see MCRSQLConnectionPool#getConnection()
+	 **/
+	MCRSQLConnection()
+		throws MCRPersistenceException, MCRConfigurationException {
+		Logger logger = MCRSQLConnectionPool.getLogger();
+
+		String url =
+			MCRConfiguration.instance().getString(
+				"MCR.persistence_sql_database_url");
+
+		logger.debug(
+			"MCRSQLConnection: Building connection to JDBC datastore... with "
+				+ url);
+
+		Connection connection = null;
+		try {
+			try {
+				String userid =
+					MCRConfiguration.instance().getString(
+						"MCR.persistence_sql_database_userid");
+				String passwd =
+					MCRConfiguration.instance().getString(
+						"MCR.persistence_sql_database_passwd");
+				connection = DriverManager.getConnection(url, userid, passwd);
+			} catch (Exception MCRConfigurationException) {
+				connection = DriverManager.getConnection(url);
+			}
+		} catch (Exception exc) {
+			throw new MCRPersistenceException(
+				"Could not build a JDBC connection using url " + url,
+				exc);
 		}
-    }
-    catch( Exception exc )
-    {
-      throw new MCRPersistenceException
-      ( "Could not build a JDBC connection using url " + url, exc );
-    }
-    
-    this.connection = connection;
-  }
 
-  /**
-   * Releases this connection back to the connection pool, indicating that it is
-   * no longer needed by the current task.
-   *
-   * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
-   **/  
-  public void release()
-  { MCRSQLConnectionPool.instance().releaseConnection( this ); }
-  
-  /**
-   * Closes this connection to the underlying JDBC datastore.
-   * This is called when the connection pool is finalized.
-   *
-   * @see MCRSQLConnectionPool#finalize()
-   **/  
-  void close() throws MCRPersistenceException
-  {
-    try{ connection.close(); }
-    catch( Exception exc )
-    { throw new MCRPersistenceException( "Error while closing JDBC connection", exc ); }
-  }
+		this.connection = connection;
+		inPool = true;
+	}
 
-  /**
-   * Returns the underlying JDBC java.sql.Connection object
-   *
-   * @return the underlying JDBC java.sql.Connection object
-   **/
-  public Connection getJDBCConnection()
-  { return connection; }
-  
-  /**
-   * Executes an SQL select statement on this connection. The results of the query
-   * are returned as MCRSQLRowReader instance.
-   *
-   * @param query the SQL select statement to be executed
-   * @return the MCRSQLRowReader that can be used for reading the result rows
-   **/  
-  public MCRSQLRowReader doQuery( String query )
-    throws MCRPersistenceException
-  {
-    MCRArgumentChecker.ensureNotEmpty( query, "query" );
-    
-    try
-    {
-      ResultSet rs = connection.createStatement().executeQuery( query );
-      return new MCRSQLRowReader( rs );
-    }
-    catch( Exception ex )
-    { 
-      throw new MCRPersistenceException 
-      ( "Error while executing SQL select statement: " + query, ex ); 
-    }
-  }
-  
-  /**
-   * Executes an SQL update statement on this connection.
-   *
-   * @param statement the SQL create, insert or delete statement to be executed
-   **/  
-  public void doUpdate( String statement )
-    throws MCRPersistenceException
-  {
-    MCRArgumentChecker.ensureNotEmpty( statement, "statement" );
-    try
-    { 
-      Statement stmt = connection.createStatement();
-      stmt.executeUpdate( statement ); 
-      stmt.close();
-    }
-    catch( SQLException ex )
-    { 
-      Logger logger = MCRSQLConnectionPool.getLogger();
-      logger.info("MCRSQLConnection doUpdate: " + statement);
-      logger.error(ex.getMessage());
-      throw new MCRPersistenceException 
-      ( "Error while executing SQL update statement: " + statement, ex ); 
-    }
-  }
-  
-  /**
-   * Executes an SQL select statement on this connection, where the expected result
-   * is just a single value of a row.
-   *
-   * @param query the SQL select statement to be executed
-   * @return the value of the first column of the first result row as a String
-   **/  
-  public String getSingleValue( String query )
-    throws MCRPersistenceException
-  {
-    MCRSQLRowReader r = doQuery( query );
-    String value = r.next() ? r.getString( 1 ) : null;
-    r.close();
-    return value;
-  }
+	public MCRSQLConnection(String url, String user, String passwd)
+		throws MCRPersistenceException, MCRConfigurationException {
+		Logger logger = MCRSQLConnectionPool.getLogger();
 
-  /**
-   * Executes an SQL "SELECT COUNT(*) FROM" statement on this connection, returning
-   * the number of rows that match the condition.
-   *
-   * @param condition the SQL select statement to be executed, beginning at the SQL "FROM" keyword 
-   * @return the number of matching rows, or 0 if no rows match
-   **/  
-  public int countRows( String condition )
-    throws MCRPersistenceException
-  {
-    String query = "SELECT count(*) FROM " + condition;
-    String count = getSingleValue( query );
-    return( count == null ? 0 : Integer.parseInt( count ) );
-  }
+		logger.debug(
+			"MCRSQLConnection: Building connection to JDBC datastore... with "
+				+ url);
 
-  /**
-   * Checks if there are any matching rows for a given SQL condition by
-   * executing an SQL select statement on this connection.
-   *
-   * @param condition the condition of an SQL select statement to be executed, beginning at the SQL "FROM" keyword 
-   * @return true, if there are any rows matching this condition
-   **/  
-  public boolean exists( String condition )
-    throws MCRPersistenceException
-  { return ( countRows( condition ) > 0 ); }
+		Connection connection = null;
+		try {
+			try {
+				connection = DriverManager.getConnection(url, user, passwd);
+			} catch (Exception MCRConfigurationException) {
+				connection = DriverManager.getConnection(url);
+			}
+		} catch (Exception exc) {
+			throw new MCRPersistenceException(
+				"Could not build a JDBC connection using url " + url,
+				exc);
+		}
 
-  /**
-   * Executes an SQL select statement, using any currently free connection 
-   * from the pool. The results of the query are returned as MCRSQLRowReader 
-   * instance.
-   *
-   * @param query the SQL select statement to be executed
-   * @return the MCRSQLRowReader that can be used for reading the result rows
-   **/  
-  public static MCRSQLRowReader justDoQuery( String query )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ return c.doQuery( query ); }
-    finally{ c.release(); }
-  }
-  
-  /**
-   * Executes an SQL update statement, using any currently free connection 
-   * from the pool. 
-   *
-   * @param statement the SQL create, insert or delete statement to be executed
-   **/  
-  public static void justDoUpdate( String statement )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ c.doUpdate( statement ); }
-    finally{ c.release(); }
-  }
+		this.connection = connection;
+		inPool = false;
+	}
 
-  /**
-   * Executes an SQL select statement where the expected result
-   * is just a single value of a row, using any currently free connection from the pool. 
-   *
-   * @param query the SQL select statement to be executed
-   * @return the value of the first column of the first result row as a String
-   **/  
-  public static String justGetSingleValue( String query )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ return c.getSingleValue( query ); }
-    finally{ c.release(); }
-  }
-  
-  /**
-   * Executes an SQL "SELECT COUNT(*) FROM" statement, returning
-   * the number of rows that match the condition, using any currently free connection from the pool. 
-   *
-   * @param condition the SQL select statement to be executed, beginning at the SQL "FROM" keyword 
-   * @return the number of matching rows, or 0 if no rows match
-   **/  
-  public static int justCountRows( String condition )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ return c.countRows( condition ); }
-    finally{ c.release(); }
-  }
-  
-  /**
-   * Checks if there are any matching rows for a given SQL condition by
-   * executing an SQL select statement, using any currently free connection from the pool. 
-   *
-   * @param condition the condition of an SQL select statement to be executed, beginning at the SQL "FROM" keyword 
-   * @return true, if there are any rows matching this condition
-   **/  
-  public static boolean justCheckExists( String condition )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ return c.exists( condition ); }
-    finally{ c.release(); }
-  }
-  
-  /**
-   * Checks existence of table
-   *
-   * @param tablename 
-   * @throws MCRPersistenceException if the JDBC driver could not be loaded or
-   *   initial connections could not be created or can not get a connection
-   * @return true or false
-   **/  
-  public static boolean doesTableExist( String tablename )
-    throws MCRPersistenceException
-    {
-    boolean ret = false;
-    MCRSQLConnection c  = MCRSQLConnectionPool.instance().getConnection(); 
-    try { 
-      String [] tableTypes  = { "TABLE" };
-      DatabaseMetaData dbmd = c.getJDBCConnection().getMetaData();
-      ResultSet resultSet   = dbmd.getTables(null, null, tablename, tableTypes); 
-      int recordCount = 0;
-      while (resultSet.next()) { ++recordCount; } 
-      if( recordCount != 0 ) { ret = true; }
-      }
-    catch( Exception exc )
-      { }
-    finally
-      { c.release(); }
-    return ret;
-    }
+	/**
+	 * Releases this connection back to the connection pool, indicating that it is
+	 * no longer needed by the current task.
+	 *
+	 * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
+	 **/
+	public void release() {
+		if (inPool)
+			MCRSQLConnectionPool.instance().releaseConnection(this);
+	}
+
+	/**
+	 * Closes this connection to the underlying JDBC datastore.
+	 * This is called when the connection pool is finalized.
+	 *
+	 * @see MCRSQLConnectionPool#finalize()
+	 **/
+	void close() throws MCRPersistenceException {
+		try {
+			connection.close();
+		} catch (Exception exc) {
+			throw new MCRPersistenceException(
+				"Error while closing JDBC connection",
+				exc);
+		}
+	}
+
+	/**
+	 * Returns the underlying JDBC java.sql.Connection object
+	 *
+	 * @return the underlying JDBC java.sql.Connection object
+	 **/
+	public Connection getJDBCConnection() {
+		return connection;
+	}
+
+	/**
+	 * Executes an SQL select statement on this connection. The results of the query
+	 * are returned as MCRSQLRowReader instance.
+	 *
+	 * @param query the SQL select statement to be executed
+	 * @return the MCRSQLRowReader that can be used for reading the result rows
+	 **/
+	public MCRSQLRowReader doQuery(String query)
+		throws MCRPersistenceException {
+		MCRArgumentChecker.ensureNotEmpty(query, "query");
+
+		try {
+			ResultSet rs = connection.createStatement().executeQuery(query);
+			return new MCRSQLRowReader(rs);
+		} catch (Exception ex) {
+			throw new MCRPersistenceException(
+				"Error while executing SQL select statement: " + query,
+				ex);
+		}
+	}
+
+	/**
+	 * Executes an SQL update statement on this connection.
+	 *
+	 * @param statement the SQL create, insert or delete statement to be executed
+	 **/
+	public void doUpdate(String statement) throws MCRPersistenceException {
+		MCRArgumentChecker.ensureNotEmpty(statement, "statement");
+		try {
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate(statement);
+			stmt.close();
+		} catch (SQLException ex) {
+			Logger logger = MCRSQLConnectionPool.getLogger();
+			logger.info("MCRSQLConnection doUpdate: " + statement);
+			logger.error(ex.getMessage());
+			throw new MCRPersistenceException(
+				"Error while executing SQL update statement: " + statement,
+				ex);
+		}
+	}
+
+	/**
+	 * Executes an SQL select statement on this connection, where the expected result
+	 * is just a single value of a row.
+	 *
+	 * @param query the SQL select statement to be executed
+	 * @return the value of the first column of the first result row as a String
+	 **/
+	public String getSingleValue(String query) throws MCRPersistenceException {
+		MCRSQLRowReader r = doQuery(query);
+		String value = r.next() ? r.getString(1) : null;
+		r.close();
+		return value;
+	}
+
+	/**
+	 * Executes an SQL "SELECT COUNT(*) FROM" statement on this connection, returning
+	 * the number of rows that match the condition.
+	 *
+	 * @param condition the SQL select statement to be executed, beginning at the SQL "FROM" keyword 
+	 * @return the number of matching rows, or 0 if no rows match
+	 **/
+	public int countRows(String condition) throws MCRPersistenceException {
+		String query = "SELECT count(*) FROM " + condition;
+		String count = getSingleValue(query);
+		return (count == null ? 0 : Integer.parseInt(count));
+	}
+
+	/**
+	 * Checks if there are any matching rows for a given SQL condition by
+	 * executing an SQL select statement on this connection.
+	 *
+	 * @param condition the condition of an SQL select statement to be executed, beginning at the SQL "FROM" keyword 
+	 * @return true, if there are any rows matching this condition
+	 **/
+	public boolean exists(String condition) throws MCRPersistenceException {
+		return (countRows(condition) > 0);
+	}
+
+	/**
+	 * Executes an SQL select statement, using any currently free connection 
+	 * from the pool. The results of the query are returned as MCRSQLRowReader 
+	 * instance.
+	 *
+	 * @param query the SQL select statement to be executed
+	 * @return the MCRSQLRowReader that can be used for reading the result rows
+	 **/
+	public static MCRSQLRowReader justDoQuery(String query)
+		throws MCRPersistenceException {
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			return c.doQuery(query);
+		} finally {
+			c.release();
+		}
+	}
+
+	/**
+	 * Executes an SQL update statement, using any currently free connection 
+	 * from the pool. 
+	 *
+	 * @param statement the SQL create, insert or delete statement to be executed
+	 **/
+	public static void justDoUpdate(String statement)
+		throws MCRPersistenceException {
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			c.doUpdate(statement);
+		} finally {
+			c.release();
+		}
+	}
+
+	/**
+	 * Executes an SQL select statement where the expected result
+	 * is just a single value of a row, using any currently free connection from the pool. 
+	 *
+	 * @param query the SQL select statement to be executed
+	 * @return the value of the first column of the first result row as a String
+	 **/
+	public static String justGetSingleValue(String query)
+		throws MCRPersistenceException {
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			return c.getSingleValue(query);
+		} finally {
+			c.release();
+		}
+	}
+
+	/**
+	 * Executes an SQL "SELECT COUNT(*) FROM" statement, returning
+	 * the number of rows that match the condition, using any currently free connection from the pool. 
+	 *
+	 * @param condition the SQL select statement to be executed, beginning at the SQL "FROM" keyword 
+	 * @return the number of matching rows, or 0 if no rows match
+	 **/
+	public static int justCountRows(String condition)
+		throws MCRPersistenceException {
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			return c.countRows(condition);
+		} finally {
+			c.release();
+		}
+	}
+
+	/**
+	 * Checks if there are any matching rows for a given SQL condition by
+	 * executing an SQL select statement, using any currently free connection from the pool. 
+	 *
+	 * @param condition the condition of an SQL select statement to be executed, beginning at the SQL "FROM" keyword 
+	 * @return true, if there are any rows matching this condition
+	 **/
+	public static boolean justCheckExists(String condition)
+		throws MCRPersistenceException {
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			return c.exists(condition);
+		} finally {
+			c.release();
+		}
+	}
+
+	/**
+	 * Checks existence of table
+	 *
+	 * @param tablename 
+	 * @throws MCRPersistenceException if the JDBC driver could not be loaded or
+	 *   initial connections could not be created or can not get a connection
+	 * @return true or false
+	 **/
+	public static boolean doesTableExist(String tablename)
+		throws MCRPersistenceException {
+		boolean ret = false;
+		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+		try {
+			String[] tableTypes = { "TABLE" };
+			DatabaseMetaData dbmd = c.getJDBCConnection().getMetaData();
+			ResultSet resultSet =
+				dbmd.getTables(null, null, tablename, tableTypes);
+			int recordCount = 0;
+			while (resultSet.next()) {
+				++recordCount;
+			}
+			if (recordCount != 0) {
+				ret = true;
+			}
+		} catch (Exception exc) {
+		} finally {
+			c.release();
+		}
+		return ret;
+	}
 
 }
