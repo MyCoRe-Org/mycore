@@ -25,22 +25,14 @@
 package org.mycore.services.query;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 
 import javax.servlet.http.*;
 import javax.servlet.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import org.jdom.transform.*;
 import org.jdom.*;
 import org.mycore.common.*;
-import org.mycore.datamodel.classifications.*;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.common.xml.MCRXMLSorter;
 import org.mycore.common.xml.MCRXMLSortInterface;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
