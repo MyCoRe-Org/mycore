@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Properties;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
 
@@ -459,7 +460,7 @@ public class MCROAIDataProvider extends HttpServlet {
             logger.error(e.getMessage());
 			return list;
 	    } catch (IOException e) { 	
-	    	throw new IOException(e);
+	    	throw new IOException(e.getMessage());
         } finally {
         	return list;
 		}
@@ -480,11 +481,12 @@ public class MCROAIDataProvider extends HttpServlet {
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
+	    MCRConfiguration config = MCRConfiguration.instance();
+	    String repositoryIdentifier = new String();
+	    String repositoryName = new String();
 		try {
-	        String repositoryIdentifier = MCRConfiguration.instance()
-    	        .getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
-	        String repositoryName = MCRConfiguration.instance()
-	        	.getString(STR_OAI_REPOSITORY_NAME + "." + getServletName());
+	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+	        repositoryName = config.getString(STR_OAI_REPOSITORY_NAME + "." + getServletName());
 		} catch (MCRConfigurationException mcrx) {
 			logger.fatal("Missing configuration item: either " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
 				+ " or " + STR_OAI_REPOSITORY_NAME + "." + getServletName() + " is missing.");
@@ -533,8 +535,8 @@ public class MCROAIDataProvider extends HttpServlet {
     	    	Namespace frns = Namespace.getNamespace(STR_OAI_NAMESPACE + "2.0/friends/");
     	    	Element eFriends = new Element("friends", frns);
     	    	eFriends.addNamespaceDeclaration(xsi);
-    	    	eFriends
-    	    		.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/friends/ "  + STR_OAI_NAMESPACE + "2.0/friends.xsd", xsi);
+    	    	eFriends.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/friends/ "  
+    	    		+ STR_OAI_NAMESPACE + "2.0/friends.xsd", xsi);
     	    	
     	    	while (tokenizer.hasMoreTokens()) {
     	    		eFriends.addContent(newElementWithContent("baseURL", frns, tokenizer.nextToken()));	
@@ -602,7 +604,7 @@ public class MCROAIDataProvider extends HttpServlet {
         Element dcMetadataFormat = new Element("metadataFormat", ns);
         dcMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, "oai_dc"));
         dcMetadataFormat.addContent(newElementWithContent("schema", ns, STR_DC_SCHEMA));
-        dcMetadataFormat.addContent(newJDOMElementWithContent("metadataNamespace", ns, STR_DC_NAMESPACE));
+        dcMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, STR_DC_NAMESPACE));
         eListMetadataFormats.addContent(dcMetadataFormat);
         
         Properties properties = MCRConfiguration.instance().
