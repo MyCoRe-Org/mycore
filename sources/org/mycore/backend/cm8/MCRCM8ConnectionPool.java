@@ -25,9 +25,15 @@
 package org.mycore.backend.cm8;
 
 import java.util.*;
+
 import com.ibm.mm.sdk.common.*;
 import com.ibm.mm.sdk.server.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 /**
  * This class handle the connection pool to the IBM Content Manager 8.
@@ -36,20 +42,22 @@ import org.mycore.common.MCRConfiguration;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRCM8ConnectionPool
+class MCRCM8ConnectionPool
   {
-  protected static Vector freeConnections;
-  protected static Vector usedConnections;
-  protected static int    maxConnections;
+  private static Vector freeConnections;
+  private static Vector usedConnections;
+  private static int    maxConnections;
+  private static Logger logger=Logger.getLogger("org.mycore.backend.cm8");
 
   static
     {
     try {
       MCRConfiguration conf = MCRConfiguration.instance();
+      PropertyConfigurator.configure(conf.getLoggingProperties());
       maxConnections  = conf.getInt("MCR.persistence_cm8_max_connections",1);
       freeConnections = new Vector(maxConnections);
       usedConnections = new Vector(maxConnections);
-      System.out.print( "Connecting to ContentManager8: " );
+      logger.info( "Connecting to ContentManager8: " );
       String servername = conf.getString("MCR.persistence_cm8_library_server");
       String serveruid = conf.getString("MCR.persistence_cm8_user_id");
       String serverpw = conf.getString("MCR.persistence_cm8_password");
@@ -58,12 +66,13 @@ public class MCRCM8ConnectionPool
         connection.connect(servername,serveruid,serverpw,"");
 //      connection.setOption(DK_OPT_DL_WAKEUPSRV,new Integer(DK_TRUE));
         freeConnections.addElement(connection);
-        System.out.print( "#" );
+        logger.info( "  one connection created." );
         }
-      System.out.println( " created " + maxConnections + " connections" );
+      logger.info( " now are " + maxConnections + " connection(s) created." );
       }
     catch( Exception ex ) {
-      System.out.println( ex.getClass().getName() + ":" + ex.getMessage() ); }
+      throw new MCRException("Error while instanciate CM8 connection pool.",
+        ex ); }
     }
   
   /**
@@ -71,7 +80,7 @@ public class MCRCM8ConnectionPool
    *
    * @return a connected datastore
    **/
-  public static synchronized DKDatastoreICM getConnection()
+  static synchronized DKDatastoreICM getConnection()
     {
     if( usedConnections.size() == maxConnections ) {
       try{ MCRCM8ConnectionPool.class.wait(); }
@@ -92,7 +101,7 @@ public class MCRCM8ConnectionPool
    *
    * @param connection            the datastor connection
    **/
-  public static synchronized void releaseConnection( DKDatastoreICM connection )
+  static synchronized void releaseConnection( DKDatastoreICM connection )
     {
     if((!freeConnections.contains(connection))
       && (usedConnections.contains(connection))) {
@@ -101,5 +110,14 @@ public class MCRCM8ConnectionPool
       MCRCM8ConnectionPool.class.notifyAll();
       }
     }
+
+  /**
+   * The method return the logger for org.mycore.backend.cm8 .
+   *
+   * @return the logger.
+   **/
+  static final Logger getLogger()
+    { return logger; }
+
   }
 

@@ -26,6 +26,9 @@ package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
 
@@ -57,11 +60,14 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
   DKTextIndexDefICM textindex) throws MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
   String classname = prefix+"classid";
   String categname = prefix+"categid";
-  int clalen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CLASSID_LENGTH;
-  int catlen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CATEGID_LENGTH;
+  int clalen = 
+    org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CLASSID_LENGTH;
+  int catlen = 
+    org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CATEGID_LENGTH;
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {
@@ -72,7 +78,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the classid attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,classname,clalen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         classname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(classname);
@@ -82,7 +88,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the categid attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,categname,catlen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         categname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(categname);

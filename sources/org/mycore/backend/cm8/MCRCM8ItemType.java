@@ -26,6 +26,7 @@ package org.mycore.backend.cm8;
 
 import java.io.*;
 import java.util.*;
+
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import org.mycore.common.MCRConfiguration;
@@ -36,6 +37,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRTypedContent;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
+
+import org.apache.log4j.Logger;
 
 /**
  * This class implements all methode for handling the ItemType for a
@@ -71,6 +74,7 @@ MCRCM8ItemType()
 static void create(String mcr_type, org.jdom.Document mcr_conf)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   try {
   // read the configuration
   MCRConfiguration conf = MCRConfiguration.instance();
@@ -81,36 +85,36 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
-    System.out.println("Info CM8 Datastore Creation: connected.");
+    logger.info("CM8 Datastore Creation connected.");
     // create the Attribute for MCRObjectID
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"ID",
       MCRObjectID.MAX_LENGTH,false)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"ID already exists."); }
     // create the Attribute for MCR_Label
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"label",
       MCRObject.MAX_LABEL_LENGTH,false)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"label already exists."); }
     // create the Attribut for the XML byte array
     if (!createAttributeBlob(connection,mcr_item_type_prefix+"xml",
       100*1024,false)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"xml already exists."); }
     // create the Attribut for the XML byte array
     if (!createAttributeClob(connection,mcr_item_type_prefix+"ts",
       100*1024,true)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"ts already exists."); }
     // create the default attribute type
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"type",
       MCRMetaDefault.DEFAULT_TYPE_LENGTH,false)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"type already exists."); }
     // create the default attribute lang
     if (!createAttributeVarChar(connection,mcr_item_type_prefix+"lang",
       MCRMetaDefault.DEFAULT_LANG_LENGTH,false)) {
-      System.out.println("Warning CM8 Datastore Creation: attribute "+
+      logger.warn("CM8 Datastore Creation attribute "+
         mcr_item_type_prefix+"lang already exists."); }
     // check for the root itemtype
     try {
@@ -118,12 +122,12 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
       DKItemTypeDefICM isitemTypeDef = (DKItemTypeDefICM) dsDefICM
         .retrieveEntity(mcr_item_type_name);
       if (isitemTypeDef != null) {
-        System.out.println("Warning CM8 Datastore Creation: itemtype "
+        logger.error("CM8 Datastore Creation itemtype "
           +mcr_item_type_name+" exist.");
         return; }
       }
     catch (DKException e) { 
-      System.out.println("Warning CM8 Datastore Creation: itemtype "
+      logger.error("CM8 Datastore Creation itemtype "
         +mcr_item_type_name+" exist.");
       return; }
 
@@ -152,26 +156,26 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
        .getString("MCR.persistence_cm8_textsearch_workingdir",
        "/home/icmadmin/work");
     mcr_item_text_index.setWorkingDir(text_workingdir);
-    System.out.println(mcr_item_type_name+" - TextSearch - CommitCount = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - CommitCount = "+
       mcr_item_text_index.getCommitCount());
-    System.out.println(mcr_item_type_name+" - TextSearch - Format = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - Format = "+
       mcr_item_text_index.getFormat());
-    System.out.println(mcr_item_type_name+" - TextSearch - CCSID = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - CCSID = "+
       mcr_item_text_index.getIndexCCSID());
-    System.out.println(mcr_item_type_name+" - TextSearch - IndexDir = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - IndexDir = "+
       mcr_item_text_index.getIndexDir());
-    System.out.println(mcr_item_type_name+" - TextSearch - Lang = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - Lang = "+
       mcr_item_text_index.getIndexLangCode());
-    System.out.println(mcr_item_type_name+" - TextSearch - MinChanges = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - MinChanges = "+
       mcr_item_text_index.getMinChanges());
-    System.out.println(mcr_item_type_name+" - TextSearch - UpdateFreq = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - UpdateFreq = "+
       mcr_item_text_index.getUpdateFrequency());
-    System.out.println(mcr_item_type_name+" - TextSearch - WorkingDir = "+
+    logger.debug(mcr_item_type_name+" - TextSearch - WorkingDir = "+
       mcr_item_text_index.getWorkingDir());
 
     // create the root itemtype
     DKItemTypeDefICM item_type = new DKItemTypeDefICM(connection);
-    System.out.println("Info CM8 Datastore Creation: "+mcr_item_type_name);
+    logger.info("CM8 Datastore Creation "+mcr_item_type_name);
     item_type.setName(mcr_item_type_name);
     item_type.setDescription(mcr_item_type_name);
     item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_DOC_MODEL);
@@ -235,8 +239,8 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
           StringBuffer stb = new StringBuffer(128);
           stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
             substring(3,classname.length()));
-          System.out.println("Info CM8 Datastore Creation: "+tagname+
-            " with class "+stb.toString());
+          logger.debug("CM8 Datastore Creation: "+tagname+ " with class "+
+            stb.toString());
           Object obj = new Object();
           try {
             obj = Class.forName(stb.toString()).newInstance();
@@ -302,8 +306,8 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
           StringBuffer stb = new StringBuffer(128);
           stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
             substring(3,classname.length()));
-          System.out.println("Info CM8 Datastore Creation: "+tagname+
-            " with class "+stb.toString());
+          logger.debug("CM8 Datastore Creation: "+tagname+ " with class "+
+            stb.toString());
           Object obj = new Object();
           try {
             obj = Class.forName(stb.toString()).newInstance();
@@ -365,8 +369,8 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
           StringBuffer stb = new StringBuffer(128);
           stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
             substring(3,classname.length()));
-          System.out.println("Info CM8 Datastore Creation: "+tagname+
-            " with class "+stb.toString());
+          logger.debug("CM8 Datastore Creation: "+tagname+ " with class "+
+            stb.toString());
           Object obj = new Object();
           try {
             obj = Class.forName(stb.toString()).newInstance();
@@ -424,8 +428,8 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
         StringBuffer stb = new StringBuffer(128);
         stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
           substring(3,classname.length()));
-        System.out.println("Info CM8 Datastore Creation: "+tagname+
-          " with class "+stb.toString());
+        logger.debug("CM8 Datastore Creation: "+tagname+ " with class "+
+          stb.toString());
         Object obj = new Object();
         try {
           obj = Class.forName(stb.toString()).newInstance();
@@ -446,8 +450,7 @@ static void create(String mcr_type, org.jdom.Document mcr_conf)
     item_type.addSubEntity(item_service);
 
     item_type.add(); 
-    System.out.println("Info CM8 Datastore Creation: "+mcr_item_type_name+
-      " is created.");
+    logger.info("CM8 Datastore Creation: "+mcr_item_type_name+" is created.");
     }
   finally {
     MCRCM8ConnectionPool.releaseConnection(connection); }

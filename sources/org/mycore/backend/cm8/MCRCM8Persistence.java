@@ -27,8 +27,12 @@ package org.mycore.backend.cm8;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
@@ -77,6 +81,7 @@ public MCRCM8Persistence()
 public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   String mcr_ts_in) throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   // convert the JDOM tree
   byte [] xml = MCRUtils.getByteArray(jdom);
   // get root data
@@ -111,10 +116,8 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
     item.setAttribute("/",itemtypeprefix+"xml",xml);
-System.out.println(mcr_ts_in);
+    logger.debug(mcr_ts_in);
     item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
-
-//mcr_tc.debug();
 
     String [] xmlpath = new String[mcr_tc.TYPE_LASTTAG+1];
     int lastpath = 0;
@@ -172,9 +175,6 @@ System.out.println(mcr_ts_in);
         item.setChild(connection,xmlpath[lastpath-1],xmlpath[lastpath],
           sb.toString(),
           sb.append(xmlpath[lastpath]).append('/').toString());
-//System.out.println("SetChild : "+xmlpath[lastpath-1]+"   "+xmlpath[lastpath]+
-//  "   "+sb.toString()+"   "+
-//  sb.append(xmlpath[lastpath]).append('/').toString());
         continue; 
         }
       // set a  attribute or value
@@ -194,34 +194,35 @@ System.out.println(mcr_ts_in);
       switch (mcr_tc.getFormatElement(i)) {
         case MCRTypedContent.FORMAT_STRING :
           valueobject = mcr_tc.getValueElement(i);
-System.out.println("Attribute : "+sb+"  "+elname+"  "+
-(String)mcr_tc.getValueElement(i));
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_DATE :
           GregorianCalendar cal = (GregorianCalendar)mcr_tc.getValueElement(i);
           valueobject = new java.sql.Date(((Date)cal.getTime()).getTime());
-Calendar calendar = (GregorianCalendar)mcr_tc.getValueElement(i);
-SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
-formatter.setCalendar(calendar);
-String datestamp = formatter.format(calendar.getTime());
-System.out.println("Attribute : "+sb+"  "+elname+"  "+
-datestamp);
+          // begin for debug
+          Calendar calendar = (GregorianCalendar)mcr_tc.getValueElement(i);
+          SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
+          formatter.setCalendar(calendar);
+          String datestamp = formatter.format(calendar.getTime());
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+datestamp);
+          // end debug
           break;
         case MCRTypedContent.FORMAT_LINK :
           valueobject = mcr_tc.getValueElement(i);
           elname = itemtypeprefix+"xlink"+elname.substring(2,elname.length());
-System.out.println("Attribute : "+sb+"  "+elname+"  "+
-(String)mcr_tc.getValueElement(i));
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_CLASSID :
           valueobject = mcr_tc.getValueElement(i);
-System.out.println("Attribute : "+sb+"  "+elname+"  "+
-(String)mcr_tc.getValueElement(i));
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_CATEGID :
           valueobject = mcr_tc.getValueElement(i);
-System.out.println("Attribute : "+sb+"  "+elname+"  "+
-(String)mcr_tc.getValueElement(i));
+          logger.debug("Attribute : "+sb+"  "+elname+"  "+
+            (String)mcr_tc.getValueElement(i));
           break;
         }
       item.setAttribute(sb.toString(),elname,valueobject);
@@ -229,11 +230,11 @@ System.out.println("Attribute : "+sb+"  "+elname+"  "+
 
     // create the item
     item.create();
-    System.out.println("Item was created.");
+    logger.info("Item was created.");
     }
   catch (Exception e) {
-    System.out.println(e.getMessage());
-    throw new MCRPersistenceException(e.getMessage()); }
+    throw new MCRPersistenceException(
+      "Error while creating data in CM8 store,e"); }
   finally {
     MCRCM8ConnectionPool.releaseConnection(connection); }
   }
@@ -264,6 +265,7 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
 public final void delete(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   // Read the item type name from the configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
@@ -282,7 +284,7 @@ public final void delete(MCRObjectID mcr_id)
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
         " does not exist."); }
-    System.out.println("Item was deleted.");
+    logger.info("Item was deleted.");
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }

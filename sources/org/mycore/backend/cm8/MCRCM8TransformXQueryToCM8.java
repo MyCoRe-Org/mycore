@@ -26,8 +26,12 @@ package org.mycore.backend.cm8;
 
 import java.util.*;
 import java.text.*;
+
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -53,6 +57,8 @@ private final int MAX_RESULTS = 1000;
 // private data
 private MCRConfiguration conf = null;
 private int maxres = 0;
+private Logger logger = null;
+
 protected static String ROOT_TAG = "/mycoreobject";
 
 /**
@@ -62,6 +68,7 @@ public MCRCM8TransformXQueryToCM8()
   { 
   conf = MCRConfiguration.instance();
   maxres = conf.getInt("MCR.query_max_results",MAX_RESULTS);
+  logger = MCRCM8ConnectionPool.getLogger();
   }
 
 /**
@@ -88,9 +95,7 @@ public final MCRXMLContainer getResultList(String query, String type,
   String itemtypename = conf.getString(sb); 
   String itemtypeprefix = conf.getString(sb+"_prefix");
   // prepare query
-System.out.println("================================");
-System.out.println("MCRCM8TransformXQueryToCM8 : "+query);
-System.out.println("================================");
+  logger.debug("Incomming query "+query);
   int startpos = 0;
   int stoppos = query.length();
   int operpos = -1;
@@ -120,15 +125,13 @@ System.out.println("================================");
       }
     }
   cond.append(']');
-System.out.println("MCRCM8TransformXQueryToCM8 : "+cond.toString());
-System.out.println("================================");
+  logger.debug("First transformation "+cond.toString());
   if (cond.toString().equals("/mycoreobject[]")) { 
     query = ""; }
   else {
     query = traceOneCondition(cond.toString(),itemtypename,itemtypeprefix); }
   if (query.length()==0) { query = "/"+itemtypename; }
-System.out.println("MCRCM8TransformXQueryToCM8 : "+query);
-System.out.println("================================");
+  logger.debug("Transformed query "+query);
   // Start the search
   DKDatastoreICM connection = null;
   try {
@@ -143,7 +146,7 @@ System.out.println("================================");
     DKResults rsc = (DKResults)connection.evaluate(query,
       DK_CM_XQPE_QL_TYPE,parms);
     dkIterator iter = rsc.createIterator();
-System.out.println("Results :"+rsc.cardinality());
+    logger.debug("Results :"+rsc.cardinality());
     String id = "";
     int rank = 0;
     byte [] xml = null;
@@ -153,7 +156,7 @@ System.out.println("Results :"+rsc.cardinality());
       resitem.retrieve();
       dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
       id = (String) resitem.getData(dataId);
-System.out.println(itemtypeprefix+"ID :"+id);
+      logger.debug(itemtypeprefix+"ID :"+id);
       dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");     
       xml = (byte []) resitem.getData(dataId);
       result.add("local",id,rank,xml);
@@ -209,7 +212,7 @@ private final String traceOneCondition(String cond, String itemtypename,
   if (klammerauf!=ROOT_TAG.length()) { return ""; }
   if (!cond.startsWith(ROOT_TAG)) { return ""; }
   String pretag = "/"+itemtypename;
-//System.out.println("PRETAG="+pretag);
+  logger.debug("PRETAG="+pretag);
   // search operations
   String tag[] = new String[10];
   String op[] = new String[10];
@@ -314,11 +317,11 @@ private final String traceOneCondition(String cond, String itemtypename,
 
 
   for (i=0;i<counter;i++) {
-    System.out.println("TAG="+tag[i]);
-    System.out.println("OPER="+op[i]);
-    System.out.println("VALUE="+value[i]);
-    System.out.println("BOOLEAN="+bool[i]);
-    System.out.println();
+    logger.debug("TAG="+tag[i]);
+    logger.debug("OPER="+op[i]);
+    logger.debug("VALUE="+value[i]);
+    logger.debug("BOOLEAN="+bool[i]);
+    logger.debug("");
     }
 
 

@@ -26,6 +26,9 @@ package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRPersistenceException;
 
 /**
@@ -55,6 +58,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
   DKTextIndexDefICM textindex) throws MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
@@ -74,7 +78,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.addAttr(attr);
     // create the attribute for the data content in date form
     if (!MCRCM8ItemType.createAttributeDate(connection,subtagname)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         subtagname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);

@@ -26,6 +26,9 @@ package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
 
@@ -56,6 +59,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
   DKTextIndexDefICM textindex) throws MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
   // String length
   String subtaglen = (String)element.getAttribute("length").getValue();
@@ -73,6 +77,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   catch (Exception e) { }
   boolean ts = false;
   if (subtagtextsearch.toLowerCase().equals("yes")) { ts = true; }
+  logger.debug("Set TextSearch for "+subtagname+" to "+ts);
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {
@@ -92,7 +97,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the attribute for the data content in string form
     // with given textsearch flag
     if (!MCRCM8ItemType.createAttributeVarChar(connection,subtagname,len,ts)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         subtagname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);

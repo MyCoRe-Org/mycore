@@ -26,6 +26,9 @@ package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
 
@@ -56,6 +59,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
   DKTextIndexDefICM textindex) throws MCRPersistenceException
   {
+  Logger logger = MCRCM8ConnectionPool.getLogger();
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
   String typename = prefix+"xlinktype";
   String hrefname = prefix+"xlinkhref";
@@ -79,7 +83,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the type attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,typename,typelen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         typename+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(typename);
@@ -89,7 +93,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the href attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,hrefname,hreflen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         hrefname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(hrefname);
@@ -99,7 +103,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the label attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,labelname,labellen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         labelname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(labelname);
@@ -109,7 +113,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the title attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,titlename,titlelen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         titlename+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(titlename);
@@ -119,7 +123,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the from attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,fromname,fromlen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         fromname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(fromname);
@@ -129,7 +133,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the to attribute for the data content
     if (!MCRCM8ItemType.createAttributeVarChar(connection,toname,tolen,
       false)) {
-      System.out.println( "Warning CM8 Datastore Creation: attribute "+
+      logger.warn( "CM8 Datastore Creation attribute "+
         toname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(toname);
