@@ -38,17 +38,13 @@ public interface MCRFileMetadataStore
   public MCRFilesystemNode retrieveChild( String parentID, String name )
     throws MCRPersistenceException;
   
-  public Vector retrieveRootNodes( String ownerID )
+  public String retrieveRootNodeID( String ownerID )
     throws MCRPersistenceException;
   
   public Vector retrieveChildrenIDs( String parentID )
     throws MCRPersistenceException;
   
-  public int retrieveNumberOfChildren( String parentID )
-    throws MCRPersistenceException;
-  
   public void deleteNode( String ID )
     throws MCRPersistenceException;
 }
-
 

@@ -45,12 +45,12 @@ public abstract class MCRFilesystemNode
     return manager.retrieveNode( ID );
   }
   
-  public static MCRFilesystemNode[] getRootNodes( String ownerID )
-  { 
+  public static MCRFilesystemNode getRootNode( String ownerID )
+  {
     MCRArgumentChecker.ensureNotEmpty( ownerID, "ownerID" );
-    return manager.retrieveRootNodes( ownerID );
+    return manager.retrieveRootNode( ownerID );
   }
-  
+
   protected String ID;
   
   /** The ID of the node owner, e .g. a MILESS derivate ID */
@@ -106,7 +106,7 @@ public abstract class MCRFilesystemNode
     this.lastModified = date;
     this.deleted      = false;
   }
-    
+
   protected void storeNew()
   {
     manager.storeNode( this );

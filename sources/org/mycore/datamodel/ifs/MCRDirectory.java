@@ -39,8 +39,10 @@ public class MCRDirectory extends MCRFilesystemNode
 {
   private Vector childrenIDs;
   
-  static MCRDirectory getDirectory( String ID )
-  { return (MCRDirectory)( MCRFilesystemNode.getNode( ID ) ); }
+  private int numChildDirsHere   = 0;
+  private int numChildDirsTotal  = 0;
+  private int numChildFilesHere  = 0;
+  private int numChildFilesTotal = 0;
   
   public MCRDirectory( String name, String ownerID )
   { 
@@ -54,34 +56,70 @@ public class MCRDirectory extends MCRFilesystemNode
     storeNew();
   }
   
-  MCRDirectory( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date )
-  { super( ID, parentID, ownerID, name, label, size, date ); }
+  MCRDirectory( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd, int numchdf, int numchtd, int numchtf )
+  { 
+    super( ID, parentID, ownerID, name, label, size, date ); 
+    
+    this.numChildDirsHere   = numchdd;
+    this.numChildFilesHere  = numchdf;
+    this.numChildFilesTotal = numchtf;
+    this.numChildDirsTotal  = numchtd;
+  }
+  
+  public static MCRDirectory getDirectory( String ID )
+  { return (MCRDirectory)( MCRFilesystemNode.getNode( ID ) ); }
   
   public static MCRDirectory getRootDirectory( String ownerID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( ownerID, "ownerID" );
-    MCRFilesystemNode[] nodes = manager.retrieveRootNodes( ownerID );
+  { return (MCRDirectory)( MCRFilesystemNode.getRootNode( ownerID ) ); }
 
-    if( ( nodes == null ) || ( nodes.length == 0 ) ) 
-      return null;
-    else
-      return (MCRDirectory)( nodes[ 0 ] );
-  }
-
-   protected void addChild( MCRFilesystemNode child )
+  protected void addChild( MCRFilesystemNode child )
   {
-    if( childrenIDs != null )
-      childrenIDs.addElement( child.getID() );
+    if( child.parentID.equals( this.ID ) )
+    {
+      if( child instanceof MCRFile )
+        this.numChildFilesHere++;
+      else
+        this.numChildDirsHere++;
+      
+      if( childrenIDs != null )
+        childrenIDs.addElement( child.getID() );
+    }
     
-    touch(); 
+    if( child instanceof MCRFile )
+      this.numChildFilesTotal++;
+    else
+      this.numChildDirsTotal++;
+    
+    this.lastModified = new GregorianCalendar();
+    
+    manager.storeNode( this );
+    
+    if( hasParent() ) getParent().addChild( child );
   }
   
   protected void removeChild( MCRFilesystemNode child )
-  { 
-    if( childrenIDs != null )
-      childrenIDs.removeElement( child.getID() );
+  {
+    if( child.parentID.equals( this.ID ) )
+    {
+      if( child instanceof MCRFile )
+        this.numChildFilesHere--;
+      else
+        this.numChildDirsHere--;
+      
+      if( childrenIDs != null )
+        childrenIDs.removeElement( child.getID() );
+    }
     
-    sizeOfChildChanged( child.size, 0 ); 
+    if( child instanceof MCRFile )
+      this.numChildFilesTotal--;
+    else
+      this.numChildDirsTotal--;
+    
+    this.lastModified = new GregorianCalendar();
+    
+    manager.storeNode( this );
+    
+    if( hasParent() ) getParent().removeChild( child );
   }
   
   public MCRFilesystemNode[] getChildren()
@@ -110,12 +148,6 @@ public class MCRDirectory extends MCRFilesystemNode
     MCRFilesystemNode[] array = getChildren();
     Arrays.sort( array, sortOrder );
     return array;
-  }
-  
-  public boolean hasChildren()
-  {
-    ensureNotDeleted();
-    return ( getNumChildren() > 0 ); 
   }
   
   public boolean hasChild( String name )
@@ -175,14 +207,44 @@ public class MCRDirectory extends MCRFilesystemNode
     return dir.getChildByPath( path.substring( end + 1 ) ); // Look in child dir
   }
   
-  public int getNumChildren()
+  public boolean hasChildren()
   {
     ensureNotDeleted();
-    
-    if( childrenIDs != null )
-      return childrenIDs.size();
+    return ( getNumChildren( NODES, HERE ) > 0 ); 
+  }
+  
+  public final static int FILES       = 1;
+  public final static int DIRECTORIES = 2;
+  public final static int NODES       = 3;
+  public final static int HERE        = 1;
+  public final static int TOTAL       = 2;
+
+  public int getNumChildren( int nodetype, int where )
+  {
+    ensureNotDeleted();
+
+    if( ( where & TOTAL ) > 0 )
+    {
+      if( nodetype == FILES )
+        return this.numChildFilesTotal;
+      else if( nodetype == DIRECTORIES )
+        return this.numChildDirsTotal;
+      else if( nodetype == ( DIRECTORIES + FILES ) )
+        return this.numChildDirsTotal + this.numChildFilesTotal;
+      else
+        return 0;
+    }
     else
-      return manager.retrieveNumberOfChildren( ID );
+    {
+      if( nodetype == FILES )
+        return this.numChildFilesHere;
+      else if( nodetype == DIRECTORIES )
+        return this.numChildDirsHere;
+      else if( nodetype == ( DIRECTORIES + FILES ) )
+        return this.numChildDirsHere + this.numChildFilesHere;
+      else
+        return 0;
+    }
   }
 
   protected void sizeOfChildChanged( long oldSize, long newSize )
@@ -199,9 +261,7 @@ public class MCRDirectory extends MCRFilesystemNode
   protected void touch()
   {
     this.lastModified = new GregorianCalendar();
-    
     manager.storeNode( this );
-    
     if( hasParent() ) getParent().touch();
   }
   
@@ -213,12 +273,16 @@ public class MCRDirectory extends MCRFilesystemNode
   {
     ensureNotDeleted();
 
-    for( int i = getNumChildren() - 1; i >= 0; i-- )
+    for( int i = getNumChildren( NODES, HERE ) - 1; i >= 0; i-- )
       getChild( i ).delete();
     
     super.delete();
     
-    this.childrenIDs = null;
+    this.childrenIDs        = null;
+    this.numChildDirsHere   = 0;
+    this.numChildDirsTotal  = 0;
+    this.numChildFilesHere  = 0;
+    this.numChildFilesTotal = 0;
   }
 
   public final static Comparator SORT_BY_NAME_IGNORECASE = new Comparator()
@@ -289,8 +353,10 @@ public class MCRDirectory extends MCRFilesystemNode
   {
     StringBuffer sb = new StringBuffer();
     sb.append( super.toString() );
-    sb.append( "NumChildren = " ).append( this.getNumChildren() );
+    sb.append( "NumChildDirectoriesHere  = " ).append( this.numChildDirsHere   );
+    sb.append( "NumChildFilesHere        = " ).append( this.numChildFilesHere  );
+    sb.append( "NumChildDirectoriesTotal = " ).append( this.numChildDirsTotal  );
+    sb.append( "NumChildFilesTotal       = " ).append( this.numChildFilesTotal );
     return sb.toString();
   }
 }
-

@@ -77,6 +77,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     this.md5           = md5;
   }
   
+  public static MCRFile getFile( String ID )
+  { return (MCRFile)( MCRFilesystemNode.getNode( ID ) ); }
+  
+  public static MCRFile getRootFile( String ownerID )
+  { return (MCRFile)( MCRFilesystemNode.getRootNode( ownerID ) ); }
+
   private void initContentFields()
   {
     storageID     = "";

@@ -158,16 +158,14 @@ private ArrayList remoteAliasList = null;
     
     if (hostAlias.equals("local"))
     {
-      MCRFilesystemNode[] roots = MCRFilesystemNode.getRootNodes( ownerID );
-      if( roots.length == 0 )
+      MCRFilesystemNode root = MCRFilesystemNode.getRootNode( ownerID );
+      if( root == null )
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
         logger.error( msg );
         res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
         return;
       }
-    
-      MCRFilesystemNode root = roots[ 0 ];
     
       if( root instanceof MCRFile )
       {
@@ -315,7 +313,7 @@ private ArrayList remoteAliasList = null;
     addString( root, "path",         dir.getPath() );
     addString( root, "ownerID",      dir.getOwnerID() );
     addDate  ( root, "lastModified", dir.getLastModified() );
-    addString( root, "numChildren",  String.valueOf( dir.getNumChildren() ) );
+    addString( root, "numChildren",  String.valueOf( dir.getNumChildren( dir.NODES, dir.HERE ) ) );
     addString( root, "size",         String.valueOf( dir.getSize() ) );
 
     Element nodes = new Element( "children" );

@@ -100,33 +100,28 @@ public class MCRFileMetadataManager
   {
     logger.debug( "IFS RetrieveNode " + ID );
     MCRFilesystemNode n = (MCRFilesystemNode)( cache.get( ID ) );
-    if( n != null ) 
-      return n;  
-    else
-      return store.retrieveNode( ID );
+    return ( n != null ? n : store.retrieveNode( ID ) );
   }
   
-  MCRFilesystemNode[] retrieveRootNodes( String ownerID )
+  MCRFilesystemNode retrieveRootNode( String ownerID )
     throws MCRPersistenceException
   {
-    Vector v = store.retrieveRootNodes( ownerID );
-    MCRFilesystemNode[] nodes = new MCRFilesystemNode[ v.size() ];
-    v.copyInto( nodes );
-    return nodes;
+    String ID = store.retrieveRootNodeID( ownerID );
+    return ( ID == null ? null : retrieveNode( ID ) );
   }
   
   MCRFilesystemNode retrieveChild( String parentID, String name )
     throws MCRPersistenceException
   { return store.retrieveChild( parentID, name ); }
-  
-  public MCRFilesystemNode buildNode( String type, String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
+
+  public MCRFilesystemNode buildNode( String type, String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf, int numchtd, int numchtf )
     throws MCRPersistenceException
   {
     MCRFilesystemNode n = (MCRFilesystemNode)( cache.get( ID ) );
     if( n != null ) return n;
     
     if( type.equals( "D" ) )
-      n = new MCRDirectory( ID, parentID, ownerID, name, label, size, date );
+      n = new MCRDirectory( ID, parentID, ownerID, name, label, size, date, numchdd, numchdf, numchtd, numchtf );
     else
       n = new MCRFile( ID, parentID, ownerID, name, label, size, date, storeID, storageID, fctID, md5 );
     
@@ -138,10 +133,6 @@ public class MCRFileMetadataManager
     throws MCRPersistenceException
   { return store.retrieveChildrenIDs( ID ); }
   
-  int retrieveNumberOfChildren( String parentID )
-    throws MCRPersistenceException
-  { return store.retrieveNumberOfChildren( parentID ); }
-  
   void deleteNode( String ID )
     throws MCRPersistenceException
   {
@@ -150,5 +141,3 @@ public class MCRFileMetadataManager
     store.deleteNode( ID );
   }
 }
-
-
