@@ -24,8 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
 import mycore.datamodel.MCRTypedContent;
@@ -214,20 +212,21 @@ public final String getDataPart()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param dom_metadata_node      a relevant DOM element for the metadata
+ * @param element      a relevant DOM element for the metadata
  * @exception MCRException if the set_subtag value is null or empty
  **/
-public void setFromDOM(Node dom_metadata_node) throws MCRException
+public void setFromDOM(org.jdom.Element element) throws MCRException
   {
-  String temp_subtag = dom_metadata_node.getNodeName(); 
+  if (element==null) { return; }
+  String temp_subtag = element.getName(); 
   if ((temp_subtag == null) ||
       ((temp_subtag = temp_subtag.trim()).length() ==0)) {
     throw new MCRException("The subtag is null or empty."); }
   subtag = temp_subtag;
-  String temp_lang = ((Element)dom_metadata_node).getAttribute("xml:lang");
+  String temp_lang = element.getAttributeValue("lang");
   if ((temp_lang!=null) && ((temp_lang = temp_lang.trim()).length() !=0)) {
     lang = temp_lang; }
-  String temp_type = ((Element)dom_metadata_node).getAttribute("type");
+  String temp_type = (String)element.getAttributeValue("type");
   if ((temp_type!=null) && ((temp_type = temp_type.trim()).length() !=0)) {
     type = temp_type; }
   }

@@ -24,10 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import mycore.common.MCRException;
 
 /**
@@ -148,43 +144,24 @@ public final String getParent()
 public final String getProperty()
   { return property; }
 
-
 /**
  * This method reads the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_corporation_node       a relevant DOM element for the metadata
+ * @param element a relevant DOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_corporation_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(metadata_corporation_node);
-  NodeList childs_name_nodelist = metadata_corporation_node.getChildNodes();
-  name      = seekElementText("name",      childs_name_nodelist);
-  nickname  = seekElementText("nickname",  childs_name_nodelist);
-  parent    = seekElementText("parent",    childs_name_nodelist);
-  property  = seekElementText("property",  childs_name_nodelist);
+  super.setFromDOM(element);
+  name      = element.getChildTextTrim("name");
+  if (name == null) { name = ""; }
+  nickname  = element.getChildTextTrim("nickname");
+  if (nickname == null) { nickname = ""; }
+  parent    = element.getChildTextTrim("parent");
+  if (parent == null) { parent = ""; }
+  property  = element.getChildTextTrim("property");
+  if (property == null) { property = ""; }
   }
-
-private final String seekElementText(String seek_element, 
-  NodeList childs_nodelist)
-  {
-  String temp_child_node_name;
-  String seek_element_text = "";
-  int length_childs_nodelist = childs_nodelist.getLength();
-  for (int i = 0; i < length_childs_nodelist; i++) {
-    temp_child_node_name = childs_nodelist.item(i).getNodeName();
-    if ( temp_child_node_name.equals(seek_element) ) {
-      Node seek_node  = childs_nodelist.item(i);
-      NodeList seek_childs_nodelist = seek_node.getChildNodes();
-      Node text_node  = seek_childs_nodelist.item(0);
-      int text_node_type   = text_node.getNodeType();
-      if ( text_node_type  == Node.TEXT_NODE ) {
-        seek_element_text = text_node.getNodeValue().trim();
-        return seek_element_text.trim(); }
-      }
-    }
-  return seek_element_text;
-  } 
 
 /**
  * This method creates a XML stream for all data in this class, defined

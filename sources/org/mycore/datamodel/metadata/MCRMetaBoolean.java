@@ -24,9 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import mycore.common.MCRException;
 
 /**
@@ -162,13 +159,12 @@ public final String getValueToString()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_boolean_node a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_boolean_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(metadata_boolean_node);
-  Node boolean_textelement = metadata_boolean_node.getFirstChild();
-  String temp_value = ((Text)boolean_textelement).getData().trim();
+  super.setFromDOM(element);
+  String temp_value = (element.getText()).trim();
   if (temp_value==null) { value = false; return; }
   setValue(temp_value);
   }

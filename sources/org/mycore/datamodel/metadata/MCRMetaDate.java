@@ -26,9 +26,6 @@ package mycore.datamodel;
 
 import java.text.*;
 import java.util.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
 
@@ -164,13 +161,12 @@ public final String getDateToString()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_langtext_node a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_date_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(metadata_date_node);
-  Node date_textelement = metadata_date_node.getFirstChild();
-  String temp_date = ((Text)date_textelement).getData().trim();
+  super.setFromDOM(element);
+  String temp_date = (element.getText()).trim();
   if (temp_date==null) { temp_date = ""; }
   setDate(temp_date);
   }

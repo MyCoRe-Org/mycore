@@ -25,9 +25,6 @@
 package mycore.datamodel;
 
 import java.util.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
@@ -170,32 +167,29 @@ public final boolean removeMetadataElement(String tag)
  * This methode read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param dom_element_list       a list of relevant DOM elements for
- *                               the metadata
+ * @param element a list of relevant DOM elements for the metadata
  * @exception MCRException       if a problem is occured
  **/
-public final void setFromDOM(NodeList dom_element_list) throws MCRException
+public final void setFromDOM(org.jdom.Element element) throws MCRException
   {
-  Element metadata_root = (Element)dom_element_list.item(0);
-  String temp_lang = metadata_root.getAttribute("xml:lang");
+  String temp_lang = element.getAttributeValue("lang");
   if ((temp_lang != null) && ((temp_lang = temp_lang.trim()).length() !=0)) {
     default_lang = temp_lang; }
-  NodeList metadata_elements = metadata_root.getChildNodes();
-  int len = metadata_elements.getLength();
+  List elements_list = element.getChildren();
+  int len = elements_list.size();
   String temp_tag = "";
   for (int i=0;i<len;i++) {
-    Node metadata_item = metadata_elements.item(i);
-    if (metadata_item.getNodeType() != Node.ELEMENT_NODE) { continue; }
-    temp_tag = metadata_item.getNodeName();
+    org.jdom.Element subtag = (org.jdom.Element)elements_list.get(i);
+    temp_tag = subtag.getName();
     if ((temp_tag == null) || ((temp_tag = temp_tag.trim()).length() ==0)) {
       throw new MCRException("MCRObjectMetadata : The tag is null or empty."); }
     tag_names.add(temp_tag);
     MCRMetaElement obj = new MCRMetaElement(default_lang);
-    obj.setFromDOM(metadata_item);
+    obj.setFromDOM(subtag);
     meta_list.add(obj);
     }
   }
-    
+
 /**
  * This methode create a XML stream for all metadata.
  *
@@ -259,11 +253,11 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("The document matadata content :");
-  System.out.println("default language               = "+default_lang);
+  System.out.println("MCRObjectMetadata debug start");
+  System.out.println("<lang>"+default_lang+"</lang>");
   System.out.println();
-  int len = meta_list.size();
-  for (int i = 0; i < len; i++) {
+  for (int i = 0; i < meta_list.size(); i++) {
     ((MCRMetaElement)meta_list.get(i)).debug(); }
+  System.out.println("MCRObjectMetadata debug end"+NL);
   }
 }

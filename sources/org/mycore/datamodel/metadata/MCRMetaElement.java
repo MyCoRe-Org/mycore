@@ -25,9 +25,6 @@
 package mycore.datamodel;
 
 import java.util.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
 
@@ -315,26 +312,24 @@ public final boolean removeAllLinks ()
  * This methode read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_element_node     a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  * @exception MCRException if the class can't loaded
  **/
-public final void setFromDOM(Node metadata_element_node) throws MCRException
+public final void setFromDOM(org.jdom.Element element) throws MCRException
   {
-  tag = metadata_element_node.getNodeName(); 
-  classname = ((Element)metadata_element_node).getAttribute("class");
+  tag = element.getName();
+  classname = element.getAttributeValue("class");
   String fullname = META_PACKAGE_NAME+classname;
-  setHeritable((String)((Element)metadata_element_node)
-    .getAttribute("heritable"));
-  NodeList metadata_elements = metadata_element_node.getChildNodes();
-  int len = metadata_elements.getLength();
+  setHeritable(element.getAttributeValue("heritable"));
+  List element_list = element.getChildren();
+  int len = element_list.size();
   for (int i=0;i<len;i++) {
-    Node metadata_item = metadata_elements.item(i);
-    if (metadata_item.getNodeType() != Node.ELEMENT_NODE) { continue; }
+    org.jdom.Element subtag = (org.jdom.Element)element_list.get(i);
     Object obj = new Object();
     try {
       obj = Class.forName(fullname).newInstance();
       ((MCRMetaInterface)obj).setLang(lang);
-      ((MCRMetaInterface)obj).setFromDOM(metadata_item);
+      ((MCRMetaInterface)obj).setFromDOM(subtag);
       }
     catch (ClassNotFoundException e) {
       throw new MCRException(classname+" ClassNotFoundException"); }
@@ -415,7 +410,7 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("MCRMetaElement debug start:");
+  System.out.println("MCRMetaElement debug start");
   System.out.println("<classname>"+classname+"</classname>");
   System.out.println("<lang>"+lang+"</lang>");
   System.out.println("<tag>"+tag+"</tag>");

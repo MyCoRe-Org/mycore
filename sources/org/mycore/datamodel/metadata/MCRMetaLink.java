@@ -24,8 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
 import mycore.datamodel.MCRObjectID;
@@ -263,14 +261,15 @@ public final boolean getIsMCRObjectID()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param dom_metadata_node a relevant DOM element for the metadata
+ * @param element a relevant DOM element for the metadata
  * @exception MCRException if the xlink:type is not locator or arc or if 
  * the from or to element is not a MCRObjectId
  **/
-public final void setFromDOM(Node dom_metadata_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(dom_metadata_node);
-  String temp = ((Element)dom_metadata_node).getAttribute("xlink:type");
+  super.setFromDOM(element);
+  super.type = "";
+  String temp = element.getAttributeValue("type");
   if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
     if ((temp.equals("locator"))||(temp.equals("arc"))) {
       linktype = temp; }
@@ -282,34 +281,34 @@ public final void setFromDOM(Node dom_metadata_node)
     linktype = null;
     throw new MCRException("The xlink:type is not locator or arc."); }
   if (linktype.equals("locator")) {
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:href");
+    temp = element.getAttributeValue("href");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       try {
         MCRObjectID id = new MCRObjectID(temp); ismcrobjectid = true; }
       catch (Exception e) { ismcrobjectid = false; }
       href = temp;
       }
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:label");
+    temp = (String)element.getAttributeValue("label");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       label = temp; }
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:title");
+    temp = (String)element.getAttributeValue("title");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       title = temp; }
     }
   else {
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:from");
+    temp = (String)element.getAttributeValue("from");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       try { from = new MCRObjectID(temp); }
       catch (Exception e) { 
         throw new MCRException("The from/to value is not a MCRObjectID."); }
       }
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:to");
+    temp = (String)element.getAttributeValue("to");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       try { to = new MCRObjectID(temp); }
       catch (Exception e) { 
         throw new MCRException("The from/to value is not a MCRObjectID."); }
       }
-    temp = ((Element)dom_metadata_node).getAttribute("xlink:title");
+    temp = (String)element.getAttributeValue("title");
     if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
       title = temp; }
     }

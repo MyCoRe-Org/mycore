@@ -24,9 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import mycore.common.MCRException;
 
 /**
@@ -232,21 +229,18 @@ public final String getNumberToString()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_number_node a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_number_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(metadata_number_node);
-  String temp_meas = ((Element)metadata_number_node)
-    .getAttribute("measurement");
+  super.setFromDOM(element);
+  String temp_meas = (String)element.getAttribute("measurement").getValue();
   if ((temp_meas!=null) && ((temp_meas = temp_meas.trim()).length() !=0)) {
     measurement = temp_meas; }
-  String temp_dim = ((Element)metadata_number_node)
-    .getAttribute("dimension");
+  String temp_dim = (String)element.getAttribute("dimension").getValue();
   if ((temp_dim!=null) && ((temp_dim = temp_dim.trim()).length() !=0)) {
     dimension = temp_dim; }
-  Node number_textelement = metadata_number_node.getFirstChild();
-  String temp_value = ((Text)number_textelement).getData().trim();
+  String temp_value = (element.getText()).trim();
   if (temp_value==null) { number = 0.; return; }
   setNumber(temp_value);
   }

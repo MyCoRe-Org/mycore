@@ -24,10 +24,8 @@
 
 package mycore.datamodel;
 
+import java.util.List;
 import java.util.Vector;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import mycore.common.MCRException;
 
 /**
@@ -323,74 +321,52 @@ public class MCRObjectStructure
   }
 
   /**
-   * While the preceding methods dealt with the structure's copy
-   * in memory only, the following three will affect the operations
-   * to or from datastore too. Thereby <em>setFromDOM</em> will read
-   * the structure data from an XML input stream (the "structure" entry).
+   * While the preceding methods dealt with the structure's copy in memory only,
+   * the following three will affect the operations to or from datastore too.
+   * Thereby <em>setFromDOM</em> will read the structure data from an XML
+   * input stream (the "structure" entry).
    *
-   * @param dom_element_list        the structure node list
+   * @param element the structure node list
    */
-  public final void setFromDOM (NodeList dom_element_list)
+  public final void setFromDOM (org.jdom.Element element)
   {
     removeAll();
-    Node link_element, der_element;
-    NodeList link_list, der_list;
-    Element struct_element = (Element)dom_element_list.item(0);
-    // Structure link part
-    NodeList struct_links_list = null;
-    struct_links_list = struct_element.getElementsByTagName("children");
-    if (struct_links_list.getLength()>0)
-	{
-      Node struct_links_element = struct_links_list.item(0);
-      NodeList struct_link_list = struct_links_element.getChildNodes();
-      int link_len = struct_link_list.getLength();
-      for (int i=0;i<link_len;i++)
-	  {  
-        link_element = struct_link_list.item(i);
-        if (link_element.getNodeType() != Node.ELEMENT_NODE)
-			continue;
+    org.jdom.Element struct_element = element.getChild("children");
+    if (struct_element != null) {
+      List struct_links_list = struct_element.getChildren();
+      for (int i=0;i<struct_links_list.size();i++) {  
+        org.jdom.Element link_element = 
+          (org.jdom.Element)struct_links_list.get(i);
         MCRMetaLink link = new MCRMetaLink();
         link.setDataPart("structure");
         link.setFromDOM(link_element);
         children.addElement(link);
+        }
       }
-    }
-    struct_links_list = struct_element.getElementsByTagName("parents");
-    if (struct_links_list.getLength()>0)
-	{
-      Node struct_links_element = struct_links_list.item(0);
-      NodeList struct_link_list = struct_links_element.getChildNodes();
-      int link_len = struct_link_list.getLength();
-      for (int i=0;i<link_len;i++)
-	  {  
-        link_element = struct_link_list.item(i);
-        if (link_element.getNodeType() != Node.ELEMENT_NODE)
-			continue;
-        MCRMetaLink link = new MCRMetaLink();
-        link.setDataPart("structure");
-        link.setFromDOM(link_element);
-        parent = link;
+    struct_element = element.getChild("parents");
+    if (struct_element != null) {
+      List struct_links_list = struct_element.getChildren();
+      for (int i=0;i<struct_links_list.size();i++) {  
+        org.jdom.Element link_element = 
+          (org.jdom.Element)struct_links_list.get(i);
+        parent = new MCRMetaLink();
+        parent.setDataPart("structure");
+        parent.setFromDOM(link_element);
+        }
       }
-    }
     // Structure derivate part
-    NodeList struct_ders_list =
-      struct_element.getElementsByTagName("derivates");
-    if (struct_ders_list.getLength()>0)
-	{
-      Node struct_ders_element = struct_ders_list.item(0);
-      NodeList struct_der_list = struct_ders_element.getChildNodes();
-      int der_len = struct_der_list.getLength();
-      for (int i=0;i<der_len;i++)
-	  {  
-        der_element = struct_der_list.item(i);
-        if (der_element.getNodeType() != Node.ELEMENT_NODE)
-			continue;
+    struct_element = element.getChild("derivates");
+    if (struct_element != null) {
+      List struct_links_list = struct_element.getChildren();
+      for (int i=0;i<struct_links_list.size();i++) {  
+        org.jdom.Element der_element = 
+          (org.jdom.Element)struct_links_list.get(i);
         MCRMetaLink der = new MCRMetaLink();
         der.setDataPart("structure");
         der.setFromDOM(der_element);
         addDerivate(der);
+        }
       }
-    }
   }
 
   /**
@@ -401,30 +377,29 @@ public class MCRObjectStructure
    * @return org.jdom.Element    the structure XML string
    */
   public final org.jdom.Element createXML () throws MCRException
-  {
-    if (!isValid())
-	{
-      debug();
-      throw new MCRException("The content is not valid.");
-	}
+    {
+    if (!isValid()) {
+      debug(); throw new MCRException("The content is not valid."); }
     int i;
     org.jdom.Element elm = new org.jdom.Element("structure");
-    org.jdom.Element elmm = new org.jdom.Element("children");
-    for (i = 0; i < children.size(); ++i)
-      elmm.addContent(((MCRMetaLink) children.elementAt(i)).
-						createXML());
-    elm.addContent(elmm);
-    elmm = new org.jdom.Element("parents");
-    if (parent != null)
+    if (children.size() > 0) {
+      org.jdom.Element elmm = new org.jdom.Element("children");
+      for (i = 0; i < children.size(); ++i){
+        elmm.addContent(((MCRMetaLink) children.elementAt(i)). createXML()); }
+      elm.addContent(elmm); }
+    if (parent != null) {
+      org.jdom.Element elmm = new org.jdom.Element("parents");
       elmm.addContent(parent.createXML());
-    elm.addContent(elmm);
-    elmm = new org.jdom.Element("derivates");
-    for (i = 0; i < the_derivates.size(); ++i)
-      elmm.addContent(((MCRMetaLink) the_derivates.elementAt(i)).
-						createXML());
-    elm.addContent(elmm);
+      elm.addContent(elmm); }
+    if (the_derivates.size() > 0) {
+      org.jdom.Element elmm = new org.jdom.Element("derivates");
+      for (i = 0; i < the_derivates.size(); ++i) {
+        elmm.addContent(((MCRMetaLink) the_derivates.elementAt(i))
+          .createXML()); }
+      elm.addContent(elmm);
+      }
     return elm;
-  }
+    }
 
   /**
    * This methode create a typed content list for all data in this
@@ -434,41 +409,40 @@ public class MCRObjectStructure
    * @return a MCRTypedContent with the data of the MCRObject data
    **/
   public final MCRTypedContent createTypedContent() throws MCRException
-  {
-    if (!isValid())
     {
-      debug();
-      throw new MCRException("The content is not valid.");
-    }
+    if (!isValid()) {
+      debug(); throw new MCRException("The content is not valid."); }
     MCRTypedContent tc = new MCRTypedContent();
     tc.addTagElement(tc.TYPE_MASTERTAG,"structure");
-    tc.addTagElement(tc.TYPE_TAG,"children");
-    for (int i=0;i<children.size();i++)
-      tc.addMCRTypedContent(((MCRMetaLink) children.elementAt(i))
-        .createTypedContent(true,true));
-    if (parent != null)
-    {
+    if (children.size() > 0) {
+      tc.addTagElement(tc.TYPE_TAG,"children");
+      for (int i=0;i<children.size();i++)
+        tc.addMCRTypedContent(((MCRMetaLink) children.elementAt(i))
+          .createTypedContent(true,true));
+      }
+    if (parent != null) {
       tc.addTagElement(tc.TYPE_TAG,"parents");
       tc.addMCRTypedContent(parent
         .createTypedContent(true,true));
       if (inherited_metadata == null)
         collectInheritedMetadata();
       tc.addTagElement(tc.TYPE_TAG, "parents_metadata");
-      for (int i = 0; i < inherited_metadata.size(); ++i)
-      {
+      for (int i = 0; i < inherited_metadata.size(); ++i) {
         MCRObjectMetadata meta = (MCRObjectMetadata)
-								  inherited_metadata.elementAt(i);
+	  inherited_metadata.elementAt(i);
         for (int j = 0; j < meta.size(); ++j)
           tc.addMCRTypedContent(meta.getMetadataElement(meta.tagName(j))
             .createTypedContent());
+        }
       }
-    }
-    tc.addTagElement(tc.TYPE_TAG,"derivates");
-    for (int i=0;i<the_derivates.size();i++)
-      tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
-        .createTypedContent(true,true));
+    if (the_derivates.size() > 0) {
+      tc.addTagElement(tc.TYPE_TAG,"derivates");
+      for (int i=0;i<the_derivates.size();i++)
+        tc.addMCRTypedContent(((MCRMetaLink) the_derivates.elementAt(i))
+          .createTypedContent(true,true));
+      }
     return tc;
-  }
+    }
 
   /**
    * <em>isValid</em> checks whether all of the MCRMetaLink's in the
@@ -477,7 +451,7 @@ public class MCRObjectStructure
    * @return boolean             true, if structure is valid
    */
   public final boolean isValid ()
-  {
+    {
     for (int i = 0; i < children.size(); ++i) {
       if (! ((MCRMetaLink) children.elementAt(i)).isValid())
         return false;
@@ -491,49 +465,40 @@ public class MCRObjectStructure
         return false;
       }
     return true;
-  }
+    }
 
   /**
    * <em>debug</em> prints all information about the structure of the
    * document (contained in the link vectors).
    */
   public final void debug ()
-  {
-    System.out.println("The document's structure data :");
+    {
+    System.out.println("MCRObjectStructure debug start");
     int i, n;
     MCRMetaLink link = null;
     n = children.size();
-    System.out.println("The outer structure contains " + n +
-					   " children :");
-    for (i = 0; i < n; ++i)
-    {
+    System.out.println("The structure contains "+n+" children :");
+    for (i = 0; i < n; ++i) {
       link = (MCRMetaLink) children.elementAt(i);
-      System.out.println("-->"+i+"<--");
-      link.debug();
-    }
+      link.debug(); }
     n = 0;
     if (parent != null) n = 1;
-    System.out.println("The outer structure contains " + n +
-					   " parents :");
-    if (parent != null)
-    {
-      System.out.println("-->parent<--");
+    System.out.println("The structure contains "+n+" parents :");
+    if (parent != null) {
       parent.debug();
       if (inherited_metadata == null)
         collectInheritedMetadata();
       n = inherited_metadata.size();
       System.out.println("The object inherits metadata from " + n +
 						 " forefather(s) :");
-      for (i = 0; i < n; ++i)
-      {
+      for (i = 0; i < n; ++i) {
         System.out.println("-->" + i + "<--");
         MCRObjectMetadata meta = (MCRObjectMetadata)
-								  inherited_metadata.elementAt(i);
+	  inherited_metadata.elementAt(i);
         int j, m = meta.size();
         System.out.println("From this forefather the object inherits " +
-						   m + " metadata :");
-        for (j = 0; j < m; ++j)
-        {
+          m + " metadata :");
+        for (j = 0; j < m; ++j) {
           System.out.println("->" + j + "<-");
           System.out.println(meta.tagName(j) + " :");
           meta.getMetadataElement(meta.tagName(j)).debug();
@@ -541,16 +506,11 @@ public class MCRObjectStructure
       }
     }
     n = the_derivates.size();
-    System.out.println("The outer structure contains " + n +
-					   " derivates :");
-    for (i = 0; i < n; ++i)
-    {
+    System.out.println("The structure contains "+n+" derivates :");
+    for (i = 0; i < n; ++i) {
       link = (MCRMetaLink) the_derivates.elementAt(i);
-      System.out.println("-->"+i+"<--");
-      link.debug();
+      link.debug(); }
+    System.out.println("MCRObjectStructure debug end"+NL);
     }
-    System.out.println("The end of the document's structure " +
-					   "data is reached.");
   }
-}
 

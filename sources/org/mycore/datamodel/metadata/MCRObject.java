@@ -26,11 +26,6 @@ package mycore.datamodel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Vector;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
@@ -71,7 +66,8 @@ private String persist_type;
 private MCRObjectPersistenceInterface mcr_persist;
 
 // the DOM document
-private Document mcr_document = null;
+private org.w3c.dom.Document mcr_document = null;
+private org.jdom.Document jdom_document = null;
 
 // the object content
 private MCRObjectID mcr_id = null;
@@ -231,30 +227,32 @@ public final boolean removeChild (MCRObject dest)
  **/
 private final void set() throws MCRException
   {
-  if (mcr_document == null) {
-    throw new MCRException("The DOM is null or empty."); }
+  if (jdom_document == null) {
+    throw new MCRException("The JDOM document is null or empty."); }
   // get object ID from DOM
-  NodeList dom_element_list = mcr_document.getElementsByTagName("mycoreobject");
-  Element dom_element = (Element)dom_element_list.item(0);
-  mcr_id = new MCRObjectID(dom_element.getAttribute("ID"));
-  mcr_label = dom_element.getAttribute("label").trim();
+  org.jdom.Element jdom_element_root = jdom_document.getRootElement();
+  mcr_id = new MCRObjectID((String)jdom_element_root.getAttribute("ID")
+    .getValue());
+  mcr_label = (String)jdom_element_root.getAttribute("label").getValue().trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
     mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
-  mcr_schema = dom_element.getAttribute("xsi:noNamespaceSchemaLocation").trim();
+  mcr_schema = (String)jdom_element_root
+    .getAttribute("noNamespaceSchemaLocation",
+     org.jdom.Namespace.getNamespace("xsi",XSI_URL)).getValue().trim();
   int i=0;
   int j=0;
   while (j!=-1) {
     j = mcr_schema.indexOf(SLASH,i+1); if (j!=-1) { i = j; } }
   mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
   // get the structure data of the object
-  dom_element_list = mcr_document.getElementsByTagName("structure");
-  mcr_struct.setFromDOM(dom_element_list);
+  org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
+  mcr_struct.setFromDOM(jdom_element);
   // get the metadata of the object
-  dom_element_list = mcr_document.getElementsByTagName("metadata");
-  mcr_metadata.setFromDOM(dom_element_list);
+  jdom_element = jdom_element_root.getChild("metadata");
+  mcr_metadata.setFromDOM(jdom_element);
   // get the service data of the object
-  dom_element_list = mcr_document.getElementsByTagName("service");
-  mcr_service.setFromDOM(dom_element_list);
+  jdom_element = jdom_element_root.getChild("service");
+  mcr_service.setFromDOM(jdom_element);
   }
 
 /**
@@ -293,10 +291,14 @@ public final void setFromURI(String uri) throws MCRException
   {
   try {
     mcr_document = MCRXMLHelper.parseURI(uri);
-    set();
+    if (mcr_document == null) {
+      throw new MCRException("The DOM is null or empty."); }
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    jdom_document = bulli.build(mcr_document);
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }
+  set();
   }
 
 /**
@@ -310,11 +312,15 @@ public final void setFromXML(String xml) throws MCRException
   {
   try {
     mcr_document = MCRXMLHelper.parseXML(xml);
-    set();
+    if (mcr_document == null) {
+      throw new MCRException("The DOM is null or empty."); }
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    jdom_document = bulli.build(mcr_document);
     }
   catch (Exception e) {
     System.out.println(e.getMessage());
     throw new MCRException(e.getMessage()); }
+  set();
   }
 
 /**

@@ -26,10 +26,6 @@ package mycore.datamodel;
 
 import java.text.*;
 import java.util.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRException;
 import mycore.datamodel.MCRMetaDate;
@@ -99,21 +95,18 @@ public MCRObjectService()
  * @param dom_element_list       a list of relevant DOM elements for
  *                               the metadata
  **/
-public final void setFromDOM(NodeList dom_element_list)
+public final void setFromDOM(org.jdom.Element service_element)
   {
-  Node date_element, flag_element;
-  NodeList date_list, flag_list;
-  Element service_element = (Element)dom_element_list.item(0);
   // Date part
-  NodeList service_dates_list =
-    service_element.getElementsByTagName("dates");
-  if (service_dates_list.getLength()>0) {
-    Node service_dates_element = service_dates_list.item(0);
-    NodeList service_date_list = service_dates_element.getChildNodes();
-    int date_len = service_date_list.getLength();
+  org.jdom.Element dates_element = service_element.getChild("dates");
+  if (dates_element!=null) {
+    List date_element_list = dates_element.getChildren();
+    int date_len = date_element_list.size();
     for (int i=0;i<date_len;i++) {  
-      date_element = service_date_list.item(i);
-      if (date_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+      org.jdom.Element date_element = (org.jdom.Element)
+        date_element_list.get(i);
+      String date_element_name = date_element.getName();
+      if (!date_element_name.equals("date")) { continue; }
       MCRMetaDate date = new MCRMetaDate();
       date.setDataPart("service");
       date.setLang(lang);
@@ -129,15 +122,15 @@ public final void setFromDOM(NodeList dom_element_list)
       }
     }
   // Flag part
-  NodeList service_flags_list =
-    service_element.getElementsByTagName("flags");
-  if (service_flags_list.getLength()>0) {
-    Node service_flags_element = service_flags_list.item(0);
-    NodeList service_flag_list = service_flags_element.getChildNodes();
-    int flag_len = service_flag_list.getLength();
-    for (int i=0;i<flag_len;i++) {
-      flag_element = service_flag_list.item(i);
-      if (flag_element.getNodeType() != Node.ELEMENT_NODE) { continue; }
+  org.jdom.Element flags_element = service_element.getChild("flags");
+  if (flags_element!=null) {
+    List flag_element_list = flags_element.getChildren();
+    int flag_len = flag_element_list.size();
+    for (int i=0;i<flag_len;i++) {  
+      org.jdom.Element flag_element = (org.jdom.Element)
+        flag_element_list.get(i);
+      String flag_element_name = flag_element.getName();
+      if (!flag_element_name.equals("flag")) { continue; }
       MCRMetaLangText flag = new MCRMetaLangText();
       flag.setLang(lang);
       flag.setDataPart("service");
@@ -403,7 +396,7 @@ public final boolean isValid()
  **/
 public final void debug()
   {
-  System.out.println("MCRMetaService debug start:");
+  System.out.println("MCRMetaService debug start");
   for (int i=0;i<dates.size();i++) {
     ((MCRMetaDate)dates.get(i)).debug(); }
   for (int i=0;i<flags.size();i++) {

@@ -24,9 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
 
@@ -119,13 +116,12 @@ public final String getText()
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param metadata_langtext_node a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  **/
-public final void setFromDOM(Node metadata_langtext_node)
+public final void setFromDOM(org.jdom.Element element)
   {
-  super.setFromDOM(metadata_langtext_node);
-  Node langtext_textelement = metadata_langtext_node.getFirstChild();
-  String temp_text = ((Text)langtext_textelement).getData().trim();
+  super.setFromDOM(element);
+  String temp_text = (element.getText()).trim();
   if (temp_text==null) { temp_text = ""; }
   text = temp_text;
   }

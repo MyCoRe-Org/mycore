@@ -24,7 +24,6 @@
 
 package mycore.datamodel;
 
-import org.w3c.dom.Node;
 import mycore.common.MCRException;
 
 /**
@@ -48,9 +47,9 @@ public void setLang(String default_lang);
  * This methode read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
- * @param dom_element_list       a relevant DOM element for the metadata
+ * @param element a relevant JDOM element for the metadata
  **/
-public void setFromDOM(Node metadata_langtext_node);
+public void setFromDOM(org.jdom.Element element);
 
 /**
  * This methode create a XML stream for a metadata part.
