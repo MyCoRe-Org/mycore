@@ -54,11 +54,11 @@ public class MCRCStoreContentManager7 extends MCRContentStore
   /** The index class to use to store content */
   protected String indexClass;
   
-  /** The name of the keyfield that stores the MCRFile.getOwnerID() */
-  protected String keyfieldOwner;
+  /** The name of the keyfield that stores the MCRFile.getID() */
+  protected String keyfieldFile;
   
-  /** The name of the keyfield that stores the MCRFile.getPath() */
-  protected String keyfieldPath;
+  /** The name of the keyfield that stores the creation timestamp */
+  protected String keyfieldTime;
   
   public void init( String storeID )
   {
@@ -66,10 +66,10 @@ public class MCRCStoreContentManager7 extends MCRContentStore
       
     MCRConfiguration config = MCRConfiguration.instance();  
       
-    segmentSize   = config.getInt   ( prefix + "SegmentSize", 1024 * 1024 );
-    indexClass    = config.getString( prefix + "IndexClass"     ); 
-    keyfieldOwner = config.getString( prefix + "Keyfield.Owner" );
-    keyfieldPath  = config.getString( prefix + "Keyfield.Path"  );
+    segmentSize  = config.getInt   ( prefix + "SegmentSize", 1024 * 1024 );
+    indexClass   = config.getString( prefix + "IndexClass"    ); 
+    keyfieldFile = config.getString( prefix + "Keyfield.File" );
+    keyfieldTime = config.getString( prefix + "Keyfield.Time" );
   }
   
   public String storeContent( MCRFileReader file, MCRContentInputStream source )
@@ -79,8 +79,8 @@ public class MCRCStoreContentManager7 extends MCRContentStore
     try
     {
       MCRCM7Item item = new MCRCM7Item( connection, indexClass, DKConstant.DK_DOCUMENT );
-      item.setKeyfield( keyfieldOwner, file.getOwnerID() );
-      item.setKeyfield( keyfieldPath,  file.getPath() );
+      item.setKeyfield( keyfieldFile, file.getID()         );
+      item.setKeyfield( keyfieldTime, buildNextTimestamp() );
       item.create();
       String itemID = item.getItemId();
       
