@@ -369,18 +369,21 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    *
    * @param group     The group to be checked
    * @param matchID   ID of the group to check if 'group' is a member of it
-   * @return          returns true if 'group' is an implicit member of the group with ID 'matchID'.
+   * @return          returns true if 'group' is an implicit member of the group
+   *                  with ID 'matchID'.
    */
   public static boolean isImplicitMemberOf(MCRGroup group, String matchID)
   throws MCRException
   {
-    ArrayList memberGroupIDs = group.getMemberGroupIDs();
-    if (memberGroupIDs.contains(matchID)) {
-      return true; }
+    MCRGroup matchGroup = MCRUserMgr.instance().retrieveGroup(matchID, true);
+    ArrayList matchMemberGroupIDs = matchGroup.getMemberGroupIDs();
+    if (matchMemberGroupIDs.contains(group.getID())) {
+      return true;
+    }
     else {
-      for (int i=0; i<memberGroupIDs.size(); i++) {
-        MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)memberGroupIDs.get(i), true);
-        if (MCRGroup.isImplicitMemberOf(nextGroup, matchID)) { return true; }
+      for (int i=0; i<matchMemberGroupIDs.size(); i++) {
+        if (MCRGroup.isImplicitMemberOf(group, (String)matchMemberGroupIDs.get(i)))
+          { return true; }
       }
     }
     return false;
