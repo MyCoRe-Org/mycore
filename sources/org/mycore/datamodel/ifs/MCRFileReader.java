@@ -73,4 +73,9 @@ public interface MCRFileReader
    * Returns the content type of the content of this file
    **/
   public String getContentTypeID();
+  
+  /**
+   * Returns the content type of this file
+   **/
+  public MCRFileContentType getContentType();
 }
