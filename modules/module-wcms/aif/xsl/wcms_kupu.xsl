@@ -151,15 +151,15 @@
 				</select>
 			</div>
 			<div xmlns="" class="kupu-toolboxes">
+                        <h1  xmlns:i18n="http://xml.zope.org/namespaces/i18n" >HTML-Codekorrektur</h1>
+				<input type="checkbox" name="codeValidationDisable" value="true"><text></text></input>
+                        Codekorrektur ausschalten 
+                        <br/>
 				<div class="kupu-toolbox" id="kupu-toolbox-properties">
-					<h1>Properties</h1>
-					<div class="kupu-toolbox-label">Title</div>
-					<input id="kupu-properties-title"/>
-					<div class="kupu-toolbox-label">Description</div>
-					<textarea style="width: 90%" id="kupu-properties-description">
-																<xsl:text>
-										</xsl:text>
-					</textarea>
+					<div class="kupu-toolbox-label"></div>
+					<input id="kupu-properties-title" type="hidden"/>
+					<div class="kupu-toolbox-label"></div>
+					<input id="kupu-properties-description" type="hidden"/>
 				</div>
 				<div class="kupu-toolbox" id="kupu-toolbox-links">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="links">Links</h1>
@@ -222,7 +222,7 @@
 				</div>
 				<div class="kupu-toolbox" id="kupu-toolbox-debug">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="debug-log">Debug Log</h1>
-					<div id="kupu-toolbox-debuglog" class="kupu-toolbox-label" style="height: 150px;">
+					<div id="kupu-toolbox-debuglog" class="kupu-toolbox-label" style="height: 10px;">
 					</div>
 				</div>
 			</div>
