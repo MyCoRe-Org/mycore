@@ -138,7 +138,7 @@ private String defaultLang = "";
     if( query == null ) query = "";
     if( type  == null ) return;
     if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
-
+if (lang.equals("")) lang = "DE";
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
     String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
@@ -150,6 +150,7 @@ private String defaultLang = "";
       MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
       jdom = resarray.exportAllToDocument();
+if (type.equals("Document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
 
       // create a new session if not already alive and encache result list
       if (mode.equals("ResultList"))
@@ -222,7 +223,10 @@ private String defaultLang = "";
    */
   private static String buildSortingStylesheet (String attr)
   {
-    String stylesheet = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+    String stylesheet = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n";
+
+    stylesheet += "<!-- This file is machine generated and can be safely removed -->\n\n";
+
     stylesheet += "<xsl:stylesheet version=\"1.0\"\n" +
       "  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n\n";
 
@@ -260,14 +264,14 @@ private String defaultLang = "";
    * @return org.jdom.Document            the sorted list as a JDOM
    * @exception MCRException              thrown if JDOM could not be transformed via XSLT
    */
-  private static org.jdom.Document sortList (org.jdom.Document inp, String attr)
+  private static synchronized org.jdom.Document sortList (org.jdom.Document inp, String attr)
     throws Exception
   {
     String stylesheet = buildSortingStylesheet(attr);
-    BufferedWriter wr = new BufferedWriter(new FileWriter("sort.xsl"));
+    BufferedWriter wr = new BufferedWriter(new FileWriter("machine-generated-sort.xsl"));
     wr.write(stylesheet);
     wr.close();
-    return transform(inp, "sort.xsl");
+    return transform(inp, "machine-generated-sort.xsl");
   }
 
   /**
