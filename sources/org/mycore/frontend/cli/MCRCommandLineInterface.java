@@ -201,9 +201,6 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "create database for {0}",
       "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "create schema for {0}",
-      "org.mycore.frontend.cli.MCRBaseCommands.createXMLSchema String" );
 
     // ******************************
     // Commands for executing queries
