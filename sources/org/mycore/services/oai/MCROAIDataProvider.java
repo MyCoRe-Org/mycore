@@ -1044,9 +1044,13 @@ public class MCROAIDataProvider extends HttpServlet {
 	    				mappedSets.add(mappedSet);
 	    			}
 	    		}
-		    }
+		    } else {
+				//Add the given set to make the query work 
+		    	//when the given set is not configured by STR_OAI_CATEGORY_MAPPING
+		    	mappedSets.add(set);
+		    } 
     	} else {
-			//Add a null set to make the query work when no set was queried
+			//Add a null set to make the query work when no set was queried 
 	    	mappedSets.add(set);
 	    } 
 	    
