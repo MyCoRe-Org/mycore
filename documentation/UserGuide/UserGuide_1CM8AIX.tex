@@ -28,7 +28,7 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item {\tt ./db2setup}
 \item W"ahlen Sie {\bf Install Products} $\rightarrow$ {\bf DB2 UDB Enterprise Server Edition}. Folgen Sie den Schritten:
 \begin{itemize}
-\item {\bf Netx}
+\item {\bf Next}
 \item {\bf Accept License}
 \item Auswahl 'Custom' $\rightarrow$ {\bf Next}
 \item Auswahl 'Install DB2 UDB Enterprise Server Edition on this computer' $\rightarrow$ {\bf Next}
@@ -50,10 +50,11 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \end{itemize}
 \item Test der Installation:\\
 {\tt su - db2inst1} $\rightarrow$ {\tt db2stop} $\rightarrow$ {\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.} $\rightarrow$ {\tt db2level} $\rightarrow$ {\tt exit}
-\item Installieren Sie nun den FixPack 2 gemäß der Anleitung. Bezugsquelle für den Fix ist:\\
+\item Installieren Sie nun den FixPack 4 gemäß der Anleitung. Bezugsquelle für den Fix ist:\\
 \url{http://www-3.ibm.com/cgi-bin/db2www/data/db2/udb/winos2unix/support/download.d2w/report}\\[2ex]
 Die wichtigsten Schritte sind:
 \begin{itemize}
+\item Zuerst müßen sie die Schritte durchführen, die im Readme des Fixpaks beschreiben sind um die Datenbank zu beenden.
 \item Auspacken des FixPack's
 \item {\tt ./installFixPak -a}
 \item Aktualisieren von Exemplaren zur Verwendung der neuen Stufe von DB2
@@ -61,8 +62,11 @@ Die wichtigsten Schritte sind:
 \item Neubinden der DB2 UDB Datenbanken
 \end{itemize}
 Eine vollständige Beschriebung befindet sich in der mitgelieferten Readme-Datei.
+
 \end{enumerate}
+
 %
+
 \subsubsection{NSE}
 \begin{enumerate}
 \item Legen Sie die CD {\bf 'DB2 Net Search Extender Version 8.1'} ein und mounten Sie diese.
@@ -74,16 +78,18 @@ Eine vollständige Beschriebung befindet sich in der mitgelieferten Readme-Datei.
 \item Auswahl 1 f"ur 'Accept the license areement'
 \end{itemize}
 \item {\tt cd /usr/opt/db2\_08\_01/instance}
-\item {\tt ./db2iupdt -u db2fenc1 db2inst1}
-\item Test der Installation:\\
-{\tt su - db2inst1} $\rightarrow$ {\tt db2start} $\rightarrow$ {\tt db2text start} $\rightarrow$ {\tt db2licm -l}\footnote{Pr"uft Ihren Lizenzeintrag} $\rightarrow$ {\tt exit}
-\item Installieren Sie nun den FixPack 2 gemäß der Anleitung. Dieses Update ist sehr einfach zu bewerkstelligen.\\[2ex]
+\item Installieren Sie nun den FixPack 4 gemäß der Anleitung. Dieses Update ist sehr einfach zu bewerkstelligen.\\[2ex]
 Die wichtigsten Schritte sind:
 \begin{itemize}
 \item  Auspacken des FixPack's
 \item {\tt ./nsesetup.sh}
 \item {\tt cd /usr/opt/db2\_08\_01/instance ; ./db2iupdt db2inst1}
 \end{itemize}
+
+\item {\tt ./db2iupdt -u db2fenc1 db2inst1}
+\item Test der Installation:\\
+{\tt su - db2inst1} $\rightarrow$ {\tt db2start} $\rightarrow$ {\tt db2text start} $\rightarrow$ {\tt db2licm -l}\footnote{Pr"uft Ihren Lizenzeintrag} $\rightarrow$ {\tt exit}
+
 \end{enumerate}
 %
 \subsubsection{WebSphere 5}
@@ -115,8 +121,10 @@ Die wichtigsten Schritte sind:
 \begin{enumerate}
 \item Holen Sie sich das Fixpack von \url{ftp.software.ibm.com}.
 \item {\tt cd <fixpack\_dir>}
-\item {\tt ./usr/WebSphere/AppServer/bin/setupCmdLine.sh}
-\item {\tt ./updateWizard.sh}
+\item {\tt . /usr/WebSphere/AppServer/bin/setupCmdLine.sh} Wichtig ist das Leerzeichen zwischen dem Punkt und dem Pfad.
+\item {\tt ./updateWizard.sh}\footnote{bei AIX 5.2 kommt es zu einem Fehler dass die Bibliothek \mcrfile{libjvm.a} fehlt. Dann muss 
+man sich einen aktuellen installer von \url{http://www-1.ibm.com/support/docview.wss?rs=180&tc=SSEQTP&uid=swg24001908} herunterladen und entpacken. Das Verzeichnis  
+\mcrpath{fixpacks} des Fixpaks in das Verzeichnis des Installers kopiert werden.  Dann den \mcrcommand{updateWizard.sh} starten.
 \begin{itemize}
 \item Update Installation Wizard $\rightarrow$ {\tt Next}
 \item Auswahl {\bf 'IBM WebSphere Application Server 5.0.0'} $\rightarrow$ {\tt Next}
@@ -184,11 +192,11 @@ If some environments there have been problems running ikeyman because there migh
 {\bf Activate the HTTPD for SSL}
 \begin{enumerate}
 \item \mcrcommand{cd /usr/IBMHttpServer}
-\item \mcrcommand{cd bin/setupadm}
+\item \mcrcommand{./bin/setupadm}
 \begin{itemize}
 \item User ID = {\bf httpadm} $\rightarrow$ Group Name = {\bf httpadm} $\rightarrow$ \mcrcommand{<enter>} $\rightarrow$ {\bf 1} $\rightarrow$ {\bf 1} $\rightarrow$ {\bf 2}
 \end{itemize}
-\item \mcrcommand{/bin/htpasswd -c conf/admin.passwd admin}
+\item \mcrcommand{./bin/htpasswd -c conf/admin.passwd admin}
 \begin{itemize}
 \item \mcrcommand{<password>} $\rightarrow$ \mcrcommand{<password>}
 \end{itemize}
@@ -346,12 +354,12 @@ DB2AUTOSTART='YES'
 \end{itemize}
 \item Installation options for resource manager database
 \begin{itemize}
-\item Mount point $\rightarrow$ /mcrfile{</home/rmadmin/storage>}
-\item Path $\rightarrow$ /mcrfile{</home/rmadmin/staging>}
+\item Mount point $\rightarrow$ \mcrfile{</home/rmadmin/storage>}
+\item Path $\rightarrow$ \mcrfile{</home/rmadmin/staging>}
 \end{itemize}
 \item Resource Manager with WebSphere Application Server
 \begin{itemize}
-\item WebSphere home $\rightarrow$ /mcrfile{/usrWebSphere/AppServer}
+\item WebSphere home $\rightarrow$ \mcrfile{/usr/WebSphere/AppServer}
 \item Web application path $\rightarrow$ {\bf /icmrm}
 \item Web application name $\rightarrow$ {\bf icmrm}
 \item Service Port $\rightarrow$ {\bf 7500}
@@ -382,7 +390,7 @@ DB2AUTOSTART='YES'
 \end{enumerate}
 \item Verify the log file \mcrfile{/usr/lpp/icm/logs/icm82install.log}.
 \item Start the Resource Manager as root \mcrcommand{/usr/WebSphere/AppServer/bin/startServer.sh icmrm}.
-\item Test the Resource Manager in a web browser $\rightarrow$ \mcrcommand{https://<your full qualified hostname>/icmrm/ICMResourceManager}\footnote{The response is : No order found to prcess, that is okay.}
+\item Test the Resource Manager in a web browser $\rightarrow$ \mcrcommand{https://<your full qualified hostname>/icmrm/ICMResourceManager}\footnote{The response is : No order found to process, that is okay.}
 \end{enumerate}
 %
 {\bf Installation of the FixPack 2}
