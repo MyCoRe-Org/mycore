@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WCMS build file for use with ANT        -->
+<!-- $Revision$ $Date$ -->
+<!-- ============================================== -->
+
+<project name="MyCoReModule - WCMS" default="usage" basedir=".">
+
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo>
+      All targets are internal!
+	  Use $MYCORESAMPLE_HOME/build.xml
+		</echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="webapp">
+		<echo>
+           Calling MyCoRe-WCMS installation script...
+    </echo>
+
+		<subant target="webapp" inheritall="false" inheritrefs="false">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms" includes="appsSupport/DocPortal/build.xml" />
+		</subant>
+
+	</target>
+	
+</project>
+
+<!-- ============================================== -->
+

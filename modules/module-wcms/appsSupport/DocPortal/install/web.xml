@@ -1,0 +1,44 @@
+<!-- wcms -->
+	<servlet id="WCMSLoginServlet">
+		<servlet-name> WCMSLoginServlet </servlet-name>
+		<servlet-class> wcms.WCMSLoginServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSChooseServlet">
+		<servlet-name> WCMSChooseServlet </servlet-name>
+		<servlet-class> wcms.WCMSChooseServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSActionServlet">
+		<servlet-name> WCMSActionServlet </servlet-name>
+		<servlet-class> wcms.WCMSActionServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSAdminServlet">
+		<servlet-name> WCMSAdminServlet </servlet-name>
+		<servlet-class> wcms.WCMSAdminServlet </servlet-class>
+	</servlet>
+	<servlet id="WCMSFileUploadServlet">
+		<servlet-name> WCMSFileUploadServlet </servlet-name>
+		<servlet-class> wcms.WCMSFileUploadServlet </servlet-class>
+	</servlet>
+<!-- end of: wcms -->
+<!-- wcms -->
+	<servlet-mapping>
+		<servlet-name> WCMSLoginServlet </servlet-name>
+		<url-pattern> /servlets/WCMSLoginServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSChooseServlet </servlet-name>
+		<url-pattern> /servlets/WCMSChooseServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSActionServlet </servlet-name>
+		<url-pattern> /servlets/WCMSActionServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSAdminServlet </servlet-name>
+		<url-pattern> /servlets/WCMSAdminServlet </url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name> WCMSFileUploadServlet </servlet-name>
+		<url-pattern> /servlets/WCMSFileUploadServlet </url-pattern>
+	</servlet-mapping>
+<!-- end of: wcms -->

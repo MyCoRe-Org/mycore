@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage title="DB Thüringen">
+	<section title="Start" xml:lang="de"><table align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td> MyCoRe ist ein Open Source Projekt zur Entwicklung eines Systems für Digitale Bibliotheken und 
+					Archivlösungen (oder allgemeiner "Content Repositories" &gt;&gt; CoRe). Im MyCoRe Projekt arbeitet eine Gruppe von 
+					Universitäten daran, für derartige Anwendungen einen gemeinsamen Software-Kern ("core") zu erstellen, der sich an 
+					die eigenen Bedürfnisse anpassen und erweitern lässt (daher das "My" für die lokale Adaption). Auf der Basis 
+					dieses Kerns, der als Open Source unter der GNU General Public License verfügbar sein wird, sollen spezifische 
+					Anwendungen an den jeweiligen Standorten entstehen. Die technische Basis des Systems bilden 
+					Java-Klassenbibliotheken, XML-Techniken und unterschiedliche Datenbank-Backends wie IBM Content Manager und IBM 
+					DB2, sowie MySQL und XMLDB kompatible Datenbanken. </td>
+			</tr>
+		</table></section>
+	<section xml:lang="en" title="Home"><table align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td>
+MyCoRe is an Open Source project for the development of Digital Library and archive solutions (or, put more generally, "Content Repositories" &gt;&gt; CoRe). In the MyCoRe project a group of universities is working on the development of a shared software core for such applications. This core is adjustable to local requirements and easy to modify. This is expressed by the "My" in MyCoRe, which represents the local adaptability. On the basis of this core which is available under the open source GNU General Public License, specific local applications will emerge at the participating institutes. The technical base of the system is formed of Java class libraries, XML technology and implementations for various database backends, both commercial like IBM Content Manager and IBM DB2 or Open Source solutions like MySQL and XML:DB databases. 
+</td>
+			</tr>
+		</table></section>
+	<meta>
+		<log date="2004-10-07" time="09:38" labelPath="Menü unten &gt; Startseite" lastEditor="Andreas Trappe" />
+	</meta>
+</MyCoReWebPage>

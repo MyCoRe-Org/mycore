@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage title="DB Thüringen">
+	<section xml:lang="de" title="Fehler">
+		<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<th align="left"> MyCoRe-WCMS :: Fehler aufgetreten </th>
+			</tr>
+			<tr>
+				<td>
+					<br/>
+					<br/>
+				</td>
+			</tr>
+			<tr>
+				<td class="red"> <b>Fehler: Nicht angemeldet oder Sitzung abgelaufen</b> <br/><br/> Sie sind entweder nicht korrekt 
+					angemeldet oder ihre Sitzung ist abgelaufen. Bitte melden sie sich neu an, um im MyCoRe-WCMS zu 
+					arbeiten.<br/><br/> </td>
+			</tr>
+		</table>
+	</section>
+	<section xml:lang="en" title="Error">
+		<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<th align="left"> MyCoRe-WCMS :: Error occured</th>
+			</tr>
+			<tr>
+				<td>
+					<br/>
+					<br/>
+				</td>
+			</tr>
+			<tr>
+				<td class="red"> <b>Error: Not logged in or session expired.</b> <br/><br/> <br/><br/> </td>
+			</tr>
+		</table>
+	</section>	
+</MyCoReWebPage>

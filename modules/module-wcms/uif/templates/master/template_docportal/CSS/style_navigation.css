@@ -1,0 +1,90 @@
+/* =================================================================================== */
+/* Navigation below */
+/* =================================================================================== */
+.navi_below th, .navi_below td, .navi_below a
+{
+	color: #15516E;
+	font-size: 11px;
+	font-family: Verdana, Geneva, Arial, SansSerif;	
+}
+.navi_below a
+{
+		color: #15516E;
+		text-decoration: none;
+} 
+.navi_below a:hover
+{
+		text-decoration: underline;
+}		
+.navi_below .marked a
+{
+		text-decoration: underline;
+}	
+
+/* =================================================================================== */
+/* General Main navigation column */
+/* =================================================================================== */
+.navi_history
+{
+	background : #CAD9E0;
+	font-size: 12px;
+	font-weight : bold;		
+	font-family: Verdana, Geneva, Arial, SansSerif;	
+	border-style: solid solid solid solid;
+	border-width: 1px;
+	border-color: #0C374C;
+}
+
+/* =================================================================================== */
+/* General Main navigation column */
+/* =================================================================================== */
+.navi_column
+{
+	background : #FBA6AB;
+	font-size: 12px;
+	font-weight : bold;		
+	font-family: Verdana, Geneva, Arial, SansSerif;	
+	border-style: solid solid solid solid;
+	border-width: 1px;
+	border-color: #0C374C;
+}
+
+/* =================================================================================== */
+/* Main navigation menu  */
+/* =================================================================================== */
+.navi_main
+{
+	background : #FBA6AB;
+	font-size: 12px;
+	font-weight : bold;		
+	font-family: Verdana, Geneva, Arial, SansSerif;	
+	border-style: none;
+	border-width: 0px;
+}
+.navi_main tr, .navi_main td
+{
+	font-size: 11px;
+}
+.navi_main th a:hover
+{
+	text-decoration: underline;
+}
+.navi_main th a
+{
+	color: 		 #031822;	
+	font-weight : bold;	
+}
+.navi_main a
+{
+		color: #031822;
+		font-weight : normal;			
+		text-decoration: none;
+}
+.navi_main a:hover
+{
+		text-decoration: underline;
+}
+.navi_main .marked a
+{
+		text-decoration: none;		
+}

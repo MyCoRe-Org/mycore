@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WCMS build file for use with ANT        -->
+<!-- $Revision: 1.1 $ $Date: 2004-11-17 16:49:04 $ -->
+<!-- ============================================== -->
+
+<project name="MyCoReModule - WCMS" default="usage" basedir=".">
+
+	<!-- ============================================== -->
+
+	<property name="build.sysclasspath" value="last" />
+
+	<!-- ============================================== -->
+
+	<target name="version">
+		<echo>
+           Ant version: ${ant.version}
+      Java JDK version: ${java.version} 
+      Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
+    </echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo>
+      Use the ant tool to plug in MyCoReWCMS-Module:
+      Usage: ant [target] [target] [target] ...
+
+      Available targets for MyCoReWCMS are:
+        docportal			plug MyCoReWCMS-Module into docportal application
+        cleanDocportal		remove MyCoReWCMS-Module out of docportal application
+		</echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="docportal">
+		<echo>
+           Execute installation procedure to plug Module-WCMS into DocPortal
+    </echo>
+
+		<subant target="docportal" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="appsSupport/DocPortal/build.xml" />
+		</subant>
+
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="webapp">
+		<echo>
+           Execute installation procedure to update Module-WCMS in DocPortal
+    </echo>
+
+		<subant target="webapp" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="appsSupport/DocPortal/build.xml" />
+		</subant>
+
+	</target>
+	
+	<!-- ============================================== -->
+
+	<target name="cleanDocportal">
+		<echo>
+           Execute installation procedure to remove Module-WCMS out of DocPortal
+    </echo>
+
+		<subant target="clean" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="appsSupport/DocPortal/build.xml" />
+		</subant>
+
+	</target>	
+	
+	<!-- ============================================== -->	
+	
+</project>
+
+<!-- ============================================== -->
+

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WCMS build file for use with ANT        -->
+<!-- $Revision$ $Date$ -->
+<!-- ============================================== -->
+
+<project name="MyCoReWCMS" default="usage" basedir="../..">
+
+	<!-- ============================================== -->
+
+	<property name="build.sysclasspath" value="last" />
+
+	<!-- Provide a default value for MYCORE_HOME if not set in env -->
+	<property name="env.MYCORE_HOME" value="/home/mcrclient/workspace/mycore" />
+
+	<!-- Provide a default value for DOCPORTAL_HOME if not set in env -->
+	<property name="env.DOCPORTAL_HOME" value="/home/mcrclient/workspace/docportal" />
+
+	<!-- Provide a default value for MYCORESAMPLE_HOME if not set -->
+	<property name="env.MYCORESAMPLE_HOME" value="/home/mcrclient/workspace/mycoresample" />
+
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo>
+      All targets are internal!
+	  Use $MYCORE_HOME/modules/module-wcms/build.xml
+		</echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="docportal">
+		<echo>
+	           Building directories in DocPortal for MyCoReWCMS-Module  ...
+	    </echo>			
+		<mkdir dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms" />
+		<mkdir dir="${env.DOCPORTAL_HOME}/stylesheets/modules/module-wcms" />					
+
+		<echo>
+	           Pluging MyCoReWCMS-Module into DocPortal...
+	    </echo>
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/archive" preservelastmodified="yes">
+	        	<fileset dir="aif/archive" />
+   		</copy>			
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/config" preservelastmodified="yes">
+	        	<fileset dir="aif/config" />
+   		</copy>			
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/web/admin" preservelastmodified="yes">
+	        	<fileset dir="aif/web/admin" />
+   		</copy>			
+		
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif" preservelastmodified="yes">
+	        	<fileset dir="uif"  />
+   		</copy>					
+	    <delete dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/templates"    />		
+		
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/templates" preservelastmodified="yes">
+	        	<fileset dir="uif/templates" />
+   		</copy>							
+		<copy todir="${env.DOCPORTAL_HOME}/stylesheets/modules/module-wcms" preservelastmodified="yes">
+	        	<fileset dir="appsSupport/DocPortal/uif/xsl" includes="*.xsl" />
+   		</copy>					
+
+		<copy todir="${env.MYCORESAMPLE_HOME}/modules/module-wcms" preservelastmodified="yes">
+	        	<fileset dir="appsSupport/DocPortal/install" >
+	                <include name="build.xml"/>
+	              </fileset>			
+   		</copy>									
+		
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="clean" >
+		<echo>
+	           Removing MyCoReWCMS-Module out of DocPortal...
+	    </echo>
+	
+	    <delete dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms"    />
+	    <delete dir="${env.DOCPORTAL_HOME}/stylesheets/modules/module-wcms"   />
+
+	</target>
+
+	<!-- ============================================== -->
+	<!-- ============================================== -->	
+
+	<target name="compile">
+		<echo>
+
+      Compiling MyCoReWCMS-Module classes from source code to directory classes ...
+    </echo>
+
+		<path id="compiling.classpath">
+			<fileset dir="${env.MYCORE_HOME}/lib">
+				<include name="*.jar" />
+			</fileset>
+				<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/lib">
+					<include name="*.jar" />
+				</fileset>			
+		</path>
+
+		<path id="running.classpath">
+			<path refid="compiling.classpath" />
+			<pathelement location="classes" />
+			<!--
+			<pathelement location="config" />
+			-->
+		</path>
+		
+		<mkdir dir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" />			
+		<javac srcdir="${env.MYCORE_HOME}/modules/module-wcms/aif/src" 
+			destdir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" classpathref="compiling.classpath" debug="on" optimize="on" deprecation="off" />
+
+	</target>
+
+	<!-- ============================================== -->	
+	
+	<target name="webapp" depends="docportal,compile">
+		<echo>
+	           Updating MyCoReWCMS-Module ...
+	    </echo>
+
+		<!-- copy java sources -->
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/classes" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" />
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/config">
+				<include name="mycore.properties.wcms" />
+			</fileset>
+		</copy>		
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/lib" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/lib">
+				<include name="jtidy.jar" />
+			</fileset>
+		</copy>		
+		
+		<!-- ===================== copy right xsl ========================== -->
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReLayout.xsl" />
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReLayout-de.xsl" />
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReLayout-en.xsl" />
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReWebPage.xsl" />
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReWebPage-de.xsl" />
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets/MyCoReWebPage-en.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReLayout.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReLayout-de.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReLayout-en.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReWebPage.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReWebPage-de.xsl" />
+		<delete file="${env.DOCPORTAL_HOME}/stylesheets/MyCoReWebPage-en.xsl" />
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets" preservelastmodified="yes" flatten="true">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/templates/master">
+				<include name="**/*.xsl" />
+			</fileset>
+				<fileset dir="${env.DOCPORTAL_HOME}/stylesheets/modules/module-wcms">
+					<include name="**/*.xsl" />
+				</fileset>			
+		</copy>		
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/WEB-INF/stylesheets" preservelastmodified="yes" flatten="true">
+			<!-- aif -->			
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/xsl">
+				<include name="**/*.xsl" />
+			</fileset>
+			<!-- uif -->
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/xsl">
+				<include name="**/*.xsl" />
+			</fileset>			
+		</copy>		
+		
+		<!-- get templates -->
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/templates" preservelastmodified="yes">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/templates" />
+		</copy>		
+		
+		<!-- =========== get default content ============ -->
+		<!-- web pages -->
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/content" preservelastmodified="yes" >
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/web/content">
+			</fileset>
+		</copy>				
+		<delete file="${env.MYCORESAMPLE_HOME}/webapps/index.html" />		
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps" preservelastmodified="yes">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/web" >
+				<include name="index.html" />
+			</fileset>
+		</copy>		
+		<!-- aif used web stuff -->
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/aif/admin" preservelastmodified="yes">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/aif/web/admin" />
+		</copy>
+		<!-- uif used web stuff -->		
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/uif/common" preservelastmodified="yes">
+			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/web/common" />
+		</copy>		
+		
+	</target>	
+
+	<!-- ============================================== -->
+
+</project>
+
+<!-- ============================================== -->
+
