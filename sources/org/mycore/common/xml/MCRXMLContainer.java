@@ -49,6 +49,7 @@ private ArrayList host;
 private ArrayList mcr_id;
 private ArrayList rank;
 private ArrayList xml;
+private ArrayList status;
 private String default_encoding;
 
 /** The tag for the result collection **/
@@ -61,6 +62,8 @@ public static final String ATTR_HOST = "host";
 public static final String ATTR_ID = "id";
 /** The attribute of the rank **/
 public static final String ATTR_RANK = "rank";
+/** The attribute of the neighbour status **/
+public static final String ATTR_STATUS = "status";
 
 /**
  * This constructor create the MCRXMLContainer class with an empty
@@ -74,6 +77,7 @@ public MCRXMLContainer()
   mcr_id = new ArrayList();
   rank = new ArrayList();
   xml = new ArrayList();
+  status = new ArrayList();
   }
 
 /**
@@ -90,12 +94,15 @@ public MCRXMLContainer(MCRXMLContainer in)
   mcr_id = new ArrayList();
   rank = new ArrayList();
   xml = new ArrayList();
+  status = new ArrayList();
+
   for (int i=0;i<in.size();i++) {
     host.add(in.getHost(i));
     mcr_id.add(in.getId(i));
     rank.add(new Integer(in.getRank(i)));
     xml.add(in.getXML(i));
     }
+  fillStatus();
   }
 
 /**
@@ -156,6 +163,28 @@ public final int getRank(int index)
   }
 
 /**
+ * This method returns the neighbour status of an element index.
+ *
+ * @param index   the index in the list
+ * @return -1 if the index is outside the border, else return the rank
+ **/
+public final int getStatus(int index)
+  {
+  if ((index<0)||(index>status.size())) { return -1; }
+  return ((Integer)status.get(index)).intValue();
+  }
+/**
+ * This method sets the neighbour status of an element index.
+ *
+ * @param index   the index in the list
+ * @param status  the new value in the list
+ **/
+public final void setStatus(int index,int instatus)
+  {
+  status.set(index, new Integer(instatus));
+  }
+
+/**
  * This methode return the mycoreobject as JDOM Element of an element index.
  *
  * @param index   the index in the list
@@ -183,6 +212,14 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
   mcr_id.add(in_id);
   rank.add(new Integer(in_rank));
   xml.add(in_xml);
+  int in_status=0;
+  for (int i=0; i < size(); i++){
+	if (status.size()>0){
+	  status.set((status.size()-1), new Integer(((Integer)status.get(status.size()-1)).intValue()+1));
+	  in_status=2;
+	}
+  }
+  status.add(new Integer(in_status));
   }
 
 /**
@@ -228,6 +265,7 @@ public final org.jdom.Document exportAllToDocument()
     res.setAttribute(ATTR_HOST,((String)host.get(i)).trim());
     res.setAttribute(ATTR_ID,((String)mcr_id.get(i)).trim());
     res.setAttribute(ATTR_RANK,rank.get(i).toString());
+    res.setAttribute(ATTR_STATUS,status.get(i).toString());
     org.jdom.Element tmp = 
       (org.jdom.Element)((org.jdom.Element)xml.get(i)).clone();
     res.addContent(tmp);
@@ -287,6 +325,7 @@ public final org.jdom.Document exportElementToDocument(int index)
     res.setAttribute(ATTR_HOST,((String)host.get(index)).trim());
     res.setAttribute(ATTR_ID,((String)mcr_id.get(index)).trim());
     res.setAttribute(ATTR_RANK,rank.get(index).toString());
+	res.setAttribute(ATTR_STATUS,status.get(index).toString());
     org.jdom.Element tmp = 
       (org.jdom.Element)((org.jdom.Element)xml.get(index)).clone();
     res.addContent(tmp);
@@ -354,12 +393,17 @@ public final synchronized void importElements(byte [] in)
     throw new MCRException("The input is not an MCRXMLContainer."); }
   List list = root.getChildren(TAG_RESULT);
   int irank = 0;
+  int istatus = 0;
   for (int i=0;i<list.size();i++) {
     org.jdom.Element res = (org.jdom.Element) list.get(i);
     String inhost = res.getAttributeValue(ATTR_HOST);
     String inid = res.getAttributeValue(ATTR_ID);
     String inrank = res.getAttributeValue(ATTR_RANK);
+    String instatus = res.getAttributeValue(ATTR_STATUS);
     try { irank = Integer.parseInt(inrank); }
+    catch (NumberFormatException e) {
+      throw new MCRException(ERRORTEXT); }
+    try { istatus = Integer.parseInt(instatus); }
     catch (NumberFormatException e) {
       throw new MCRException(ERRORTEXT); }
     List childlist = res.getChildren();
@@ -367,6 +411,8 @@ public final synchronized void importElements(byte [] in)
     host.add(inhost);
     mcr_id.add(inid);
     rank.add(new Integer(irank));
+    status.add(new Integer(istatus));
+    System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
     xml.add(inxml);
     }
   }
@@ -379,7 +425,7 @@ public final synchronized void importElements(byte [] in)
 public final synchronized void importElements(MCRXMLContainer in)
   { 
   for (int i=0; i<in.size(); i++) {
-    add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i)); }
+    add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));}
   }
 
 /**
@@ -395,6 +441,24 @@ public final void debug() throws IOException
   System.out.println("Size = "+size()); 
   System.out.println(new String(exportAllToByteArray())); 
   }
-  
+
+private final void fillStatus()
+  {
+    if (size() != status.size()){
+      System.out.print("MCRXMLContainer: refreshing status :");
+      int in_status=0;
+	  status.clear();
+	  for (int i=0; i < size(); i++){
+	    if (status.size()>0){
+		  status.set((status.size()-1), new Integer(((Integer)status.get(status.size()-1)).intValue()+1));
+		  in_status=2;
+		}
+	  status.add(new Integer(in_status));
+	  System.out.print(" "+in_status);
+	  }
+	  System.out.print("\n");
+  	}
+  }
+
 }
 

@@ -100,6 +100,7 @@ private String defaultLang = "";
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
     String lang  = request.getParameter( "lang" );
+    int status=0;
 
     String att_mode  = (String) request.getAttribute( "mode"  );
     if (att_mode!=null) { mode = att_mode; }
@@ -131,6 +132,15 @@ private String defaultLang = "";
     System.out.println("MCRQueryServlet : lang = "+lang);
     System.out.println("MCRQueryServlet : query = "+query);
 
+	if (type.equals("document")){
+		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
+		boolean predecessor = ((status % 2) == 1) ? true : false;
+		boolean successor   = (((status>>1) % 2) == 1) ? true : false;
+		System.out.println("MCRQueryServlet : status = "+status);
+		System.out.println("MCRQueryServlet : predecessor = "+predecessor);
+		System.out.println("MCRQueryServlet : successor = "+successor);
+	}
+
     // query for classifications
     if (type.equals("class")) {
       Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
@@ -141,14 +151,14 @@ private String defaultLang = "";
         "remote-local");
       MCRXMLContainer resarray = new MCRXMLContainer();
       if (squence.equalsIgnoreCase("local-remote")) { 
-        resarray = result.setFromQuery("local",type,query );
+        resarray = result.setFromQuery("local",type, query );
         if (resarray.size()==0) {
-          resarray = result.setFromQuery(host,type,query ); }
+          resarray = result.setFromQuery(host,type, query ); }
         }
       else {
-        resarray = result.setFromQuery(host,type,query ); 
+        resarray = result.setFromQuery(host,type, query ); 
         if (resarray.size()==0) {
-          resarray = result.setFromQuery("local",type,query ); }
+          resarray = result.setFromQuery("local",type, query ); }
         } 
       if (resarray.size()==0) {
         throw new MCRException( 
@@ -220,7 +230,11 @@ private String defaultLang = "";
     {
       MCRQueryResult result = new MCRQueryResult();
       MCRXMLContainer resarray = result.setFromQuery(host, type, query );
-
+	  if (type.equals("document")){
+		/** Status setzen für Dokumente **/
+    	if (resarray.size()==1)
+    	  resarray.setStatus(0,status);  
+	  }
       jdom = resarray.exportAllToDocument();
 if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
 
@@ -238,6 +252,7 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
           System.out.println("session for setAttribute is null");
       }
     }
+    
 
     try {
       if (style.equals("xml")) {
