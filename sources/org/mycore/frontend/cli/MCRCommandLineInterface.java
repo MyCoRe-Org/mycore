@@ -209,6 +209,18 @@ public class MCRCommandLineInterface
     // **************************************
 
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "check user data consistency",
+      "mycore.commandline.MCRUserCommands.checkConsistency" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "create user data from file or directory {0}",
+      "mycore.commandline.MCRUserCommands.createFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "import user data from file or directory {0}",
+      "mycore.commandline.MCRUserCommands.importFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update user data from file or directory {0}",
+      "mycore.commandline.MCRUserCommands.updateFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "delete user {0}",
       "mycore.commandline.MCRUserCommands.deleteUser String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -224,32 +236,35 @@ public class MCRCommandLineInterface
       "list all privileges",
       "mycore.commandline.MCRUserCommands.listAllPrivileges" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "load users/groups/privileges from file or directory {0}",
-      "mycore.commandline.MCRUserCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
       "save all users to file {0}",
       "mycore.commandline.MCRUserCommands.saveAllUsersToFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "save all groups to file {0}",
       "mycore.commandline.MCRUserCommands.saveAllGroupsToFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "save all privileges to file {0}",
+      "mycore.commandline.MCRUserCommands.saveAllPrivilegesToFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "save user {0} to file {1}",
+      "mycore.commandline.MCRUserCommands.saveUserToFile String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "save group {0} to file {1}",
+      "mycore.commandline.MCRUserCommands.saveGroupToFile String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "set password for user {0} to {1}",
       "mycore.commandline.MCRUserCommands.setPassword String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "show group cache info",
-      "mycore.commandline.MCRUserCommands.showGroupCacheInfo" );
+      "set user management to read only mode",
+      "mycore.commandline.MCRUserCommands.setLock" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "show group {0} info",
-      "mycore.commandline.MCRUserCommands.showGroupInfo String" );
+      "set user management to read/write mode",
+      "mycore.commandline.MCRUserCommands.unLock" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "show user cache info",
-      "mycore.commandline.MCRUserCommands.showUserCacheInfo" );
+      "show user {0}",
+      "mycore.commandline.MCRUserCommands.showUser String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "show user {0} info",
-      "mycore.commandline.MCRUserCommands.showUserInfo String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "update users/groups/privileges from file or directory {0}",
-      "mycore.commandline.MCRUserCommands.updateFromFile String" );
+      "show group {0}",
+      "mycore.commandline.MCRUserCommands.showGroup String" );
   }
 
  /**
@@ -430,61 +445,3 @@ public class MCRCommandLineInterface
     System.exit( 0 );
   }
 }
-
-/*
-   These are the original help text from Detlev's MCRUserTest class.
-   They will be included in the help system in the near future.
-
-      System.out.println("\n syntax: checkConsistency");
-      System.out.println("\n This command checks the consistency between the user and group objects.");
-      System.out.println(" MCRUserMgr.checkUserGroupConsistency(). is invoked.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: deleteGroup [groupID]");
-      System.out.println("\n This command takes a group ID as a parameter and passes this to ");
-      System.out.println(" MCRUserMgr.deleteGroup(). See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: deleteUser [userID]");
-      System.out.println("\n This command takes a user ID as a parameter and passes this to ");
-      System.out.println(" MCRUserMgr.deleteUser(). See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: listAllUsers");
-      System.out.println("\n This command invokes MCRUserMgr.getAllUserIDs() and lists all");
-      System.out.println(" user IDs of the system. See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: listAllGroups");
-      System.out.println("\n This command invokes MCRUserMgr.getAllGroupIDs() and lists all");
-      System.out.println(" group IDs of the system. See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: loadFromFile [file|directory]");
-      System.out.println("\n This command takes a filename or a directory as a parameter and passes");
-      System.out.println(" this to MCRUserMgr.loadUsersOrGroupsFromFile(). See the javadoc documentation ");
-      System.out.println(" of MCRUserMgr.");
-      System.out.println("\n syntax: login");
-      System.out.println("\n This command asks for a userID and a password and passes this to");
-      System.out.println(" MCRUserMgr.login(). It returns information whether the login attempt");
-      System.out.println(" was successful or not. See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printGroupAsXML [groupID]");
-      System.out.println("\n This command prints out all group information as xml representation");
-      System.out.println(" MCRUserMgr.getGroupAsXML() is invoked.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printGroupCacheInfo");
-      System.out.println("\n This command prints out information about the group cache.");
-      System.out.println(" MCRUserMgr.getGroupCacheInfo() is invoked.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printGroupInfo [groupID]");
-      System.out.println("\n This command takes a groupID as a parameter and passes this to");
-      System.out.println(" MCRUserMgr.getGroupInfo(). It then prints out the returned information.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printUserAsXML [userID]");
-      System.out.println("\n This command prints out all user information as xml representation");
-      System.out.println(" MCRUserMgr.getUserAsXML() is invoked.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printUserCacheInfo");
-      System.out.println("\n This command prints out information about the user cache.");
-      System.out.println(" MCRUserMgr.getUserCacheInfo() is invoked.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: printUserInfo [userID]");
-      System.out.println("\n This command takes a userID as a parameter and passes this to");
-      System.out.println(" MCRUserMgr.getUserInfo(). It then prints out the returned information.");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-      System.out.println("\n syntax: setPassword [userID]");
-      System.out.println("\n This command takes a userID as a parameter and asks for a password.");
-      System.out.println(" It then passes the information to MCRUserMgr.setPassword().");
-      System.out.println(" See the javadoc documentation of MCRUserMgr.");
-*/
