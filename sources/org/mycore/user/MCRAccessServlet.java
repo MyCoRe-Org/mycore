@@ -64,8 +64,14 @@ public class MCRAccessServlet extends MCRServlet
     {
     boolean retpriv = false;
     boolean retip = false;
+    boolean retuser = false;
+    boolean result = false;
 
     // read the parameter
+    String mode = getProperty(job.getRequest(), "mode");
+    if (mode == null) { mode = "reader"; }
+    mode.trim().toLowerCase();
+    if ((!mode.equals("reader")) && (!mode.equals("editor"))) { mode = "reader"; }
     String ip = getProperty(job.getRequest(), "ip");
     if (ip == null) { ip = ""; }
     ip.trim();
@@ -74,24 +80,26 @@ public class MCRAccessServlet extends MCRServlet
     if (privilege == null) { privilege = ""; }
     privilege.trim();
     if (privilege.length()==0) { retpriv = true; }
-    StringBuffer sb = new StringBuffer(1024);
-    sb.append("Access check for ip [").append(ip).append("] and privilege [")
-      .append(privilege).append(']');
-    LOGGER.debug(sb.toString());
 
-    // get the MCRSession object for the current thread from the session manager.
-    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-    String userid = mcrSession.getCurrentUserID();
-    LOGGER.debug("Access check for user "+userid);
+    // check for mode reader
+    if (mode.equals("reader")) {
+      StringBuffer sb = new StringBuffer(1024);
+      sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("] and privilege [").append(privilege).append(']');
+      LOGGER.debug(sb.toString());
 
-    // check the data
-    boolean result = false;
-    if (retip && retpriv) { 
-      result = false; }
-    else {
-      if (!retip) { retip = checkIP(ip,job); }
-      if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
-      result = retip && retpriv;
+      // get the MCRSession object for the current thread from the session manager.
+      MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+      String userid = mcrSession.getCurrentUserID();
+      LOGGER.debug("Access check for user "+userid);
+
+      // check the data
+      if (retip && retpriv) { 
+        result = false; }
+      else {
+        if (!retip) { retip = checkIP(ip,job); }
+        if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
+        result = retip && retpriv;
+        }
       }
     
     // prepare the document
@@ -128,38 +136,13 @@ public class MCRAccessServlet extends MCRServlet
 		}
 		String remAddr = getRemoteAddr(job.getRequest());
 		try {
-			return isInetAddressInSubnet(remAddr, ipAddr, subNet);
+			return MCRAccessChecker.isInetAddressInSubnet(remAddr, ipAddr, subNet);
 		} catch (UnknownHostException e) {
 			LOGGER.info("Unknown Host while checking ip : " + ip, e);
 			return false;
 		}
 	}
   
-  private boolean isInetAddressInSubnet(String ip, String ipSub,
-			String subnetMask) throws UnknownHostException {
-		InetAddress ipAddr = InetAddress.getByName(ip);
-		InetAddress ipSubAddr = InetAddress.getByName(ipSub);
-		InetAddress subnetMaskAddr = InetAddress.getByName(subnetMask);
-		int length = (ipAddr.getAddress().length
-				+ ipSubAddr.getAddress().length + subnetMaskAddr.getAddress().length) / 3;
-		if (length == 4) {
-			// subnet1 is the subnet of ipSub and subnet2 is the subnet of ip
-			// assigned to the subnetMask
-			byte[] subnet1 = new byte[] { 0, 0, 0, 0 };
-			byte[] subnet2 = new byte[] { 0, 0, 0, 0 };
-			for (int i = 0; i < 4; i++) {
-				subnet1[i] = (byte) (ipSubAddr.getAddress()[i] & subnetMaskAddr
-						.getAddress()[i]);
-				subnet2[i] = (byte) (ipAddr.getAddress()[i] & subnetMaskAddr
-						.getAddress()[i]);
-				if (subnet1[i] != subnet2[i])
-					return false;
-			}
-			return true; //ip is in subnet ipSub/subnetMask
-		}
-		return false;
-	}
-
   /**
    * The method check the given privilege against the privilege of the user.
    *
@@ -168,13 +151,6 @@ public class MCRAccessServlet extends MCRServlet
    * @return true if the user has the privilege, else false
    **/
   boolean checkPrivileg(String privilege, String userid)
-    {
-    if ((privilege == null) || ((privilege = privilege.trim()).length() ==0)) {
-      return false; }
-    if ((userid == null) || ((userid = userid.trim()).length() ==0)) {
-      return false; }
-    ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-    return privs.contains(privilege);
-    }
+    { return MCRAccessChecker.hasUserThePrivilege(privilege,userid); }
 
   }
