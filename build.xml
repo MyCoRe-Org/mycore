@@ -191,7 +191,7 @@
       </not>
     </condition>
 
-    <condition property="pdf.outdated">
+    <condition property="javapdf.outdated">
       <not>
         <uptodate>
           <srcfiles dir="${basedir}/sources" includes="**/*.java" />
@@ -250,7 +250,7 @@
   <!-- Create the PDF JavaDocs from sources                                -->
   <!-- =================================================================== -->
 
-  <target name="pdf" depends="up2date" if="pdf.outdated">
+  <target name="java2pdf" depends="up2date" if="javapdf.outdated">
     <echo>
 
       Building the MyCoRe source code documentation as PDF...
@@ -278,6 +278,22 @@
   </target>
 
   <!-- =================================================================== -->
+  <!-- Create the PDF documentation from LaTeX sources                     -->
+  <!-- =================================================================== -->
+
+  <target name="tex2pdf">
+    <echo>
+
+      Building the MyCoRe documentation from LaTeX sources...
+    </echo>
+
+    <exec dir="documentation" executable="pdflatex"> <arg line="Overview.tex"  /> </exec>
+    <exec dir="documentation" executable="pdflatex"> <arg line="UserGuide.tex" /> </exec>
+    <exec dir="documentation" executable="pdflatex"> <arg line="ProgGuide.tex" /> </exec>
+
+  </target>
+
+  <!-- =================================================================== -->
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
 
@@ -285,6 +301,7 @@
     <delete includeEmptyDirs="true" >
       <fileset dir="${basedir}/javadocs" />
       <fileset dir="${basedir}/classes"  />
+      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log" />
     </delete>
     <delete file="${basedir}/lib/mycore.jar" />
   </target>
@@ -357,7 +374,7 @@
   <!-- Do work after a CVS commit...                                       -->
   <!-- =================================================================== -->
 
-  <target name="postcommit" depends="update, javadocs, pdf">
+  <target name="postcommit" depends="update, javadocs, java2pdf, tex2pdf">
     <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
   </target>
 
