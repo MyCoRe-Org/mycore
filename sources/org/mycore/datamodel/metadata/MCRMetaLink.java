@@ -48,6 +48,19 @@ final public class MCRMetaLink extends MCRMetaDefault
   implements MCRMetaInterface 
 {
 
+/** The length of XLink:type **/
+public static final int MAX_XLINK_TYPE_LENGTH = 8;
+/** The length of XLink:href **/
+public static final int MAX_XLINK_HREF_LENGTH = 128;
+/** The length of XLink:label **/
+public static final int MAX_XLINK_LABEL_LENGTH = 64;
+/** The length of XLink:title **/
+public static final int MAX_XLINK_TITLE_LENGTH = 64;
+/** The length of XLink:from **/
+public static final int MAX_XLINK_FROM_LENGTH = MCRObjectID.MAX_LENGTH;
+/** The length of XLink:to **/
+public static final int MAX_XLINK_TO_LENGTH = MCRObjectID.MAX_LENGTH;
+
 // MetaLink data
 private String href;
 private String label;
@@ -367,17 +380,16 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addLinkElement();
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",linktype);
+  tc.addLinkElement("type",linktype);
   if (linktype.equals("locator")) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"href",href);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",label);
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title);
+    tc.addLinkElement("href",href);
+    tc.addLinkElement("label",label);
+    tc.addLinkElement("title",title);
     }
   else {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"from",from.getId());
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"to",to.getId());
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"title",title);
+    tc.addLinkElement("from",from.getId());
+    tc.addLinkElement("to",to.getId());
+    tc.addLinkElement("title",title);
     }
   return tc;
   }

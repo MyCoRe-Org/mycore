@@ -239,14 +239,16 @@ public final boolean addDoubleElement(double invalue)
 /**
  * This method add a Link value to this list.
  *
+ * @param inname     the name as an String
+ * @param invalue    the value as an String
  * @return false if an error was occured, else return true
  **/
-public final boolean addLinkElement()
+public final boolean addLinkElement(String inname, String invalue)
   {
-  type.add(new Integer(TYPE_VALUE));
-  name.add("");
+  type.add(new Integer(TYPE_ATTRIBUTE));
+  name.add(inname);
   format.add(new Integer(FORMAT_LINK));
-  value.add("");
+  value.add(invalue);
   return true;
   }
 
