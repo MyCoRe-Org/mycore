@@ -26,12 +26,17 @@ package org.mycore.backend.cm8;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.backend.sql.MCRSQLConnection;
+import org.mycore.backend.sql.MCRSQLRowReader;
+import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
 import org.mycore.services.query.*;
@@ -49,315 +54,509 @@ import org.mycore.services.query.*;
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public class MCRCStoreContentManager8 
-  extends MCRContentStore implements DKConstantICM, MCRTextSearchInterface
-{
-  /** The ItemType name to store the content */
-  protected String itemTypeName;
+public class MCRCStoreContentManager8
+	extends MCRContentStore
+	implements DKConstantICM, MCRTextSearchInterface {
+	/** The ItemType name to store the content */
+	protected String itemTypeName;
 
-  /** The name of the attribute that stores the MCRFile.getID() */
-  protected String attributeFile;
-  protected final int MAX_ATTRIBUTE_FILE_LENGTH = 128;
+	/** The name of the attribute that stores the MCRFile.getID() */
+	protected String attributeFile;
+	protected final static int MAX_ATTRIBUTE_FILE_LENGTH = 128;
 
-  /** The name of the attribute that stores the MCRFile.getOwnerID() */
-  protected String attributeOwner;
-  protected final int MAX_ATTRIBUTE_OWNER_LENGTH = 128;
+	/** The name of the attribute that stores the MCRFile.getOwnerID() */
+	protected String attributeOwner;
+	protected final static int MAX_ATTRIBUTE_OWNER_LENGTH = 128;
 
-  /** The name of the attribute that stores the creation timestamp */
-  protected String attributeTime;
-  protected final int MAX_ATTRIBUTE_TIME_LENGTH = 128;
+	/** The name of the attribute that stores the creation timestamp */
+	protected String attributeTime;
+	protected final static int MAX_ATTRIBUTE_TIME_LENGTH = 128;
 
-  /** The temporary store of the files **/
-  protected String [] STORE_TYPE_LIST = { "none","memory" };
-  protected String storeTempType = "";
-  protected int storeTempSize = 4;
-  protected String storeTempDir = "";
+	/** The temporary store of the files **/
+	protected String[] STORE_TYPE_LIST = { "none", "memory" };
+	protected String storeTempType = "";
+	protected int storeTempSize = 4;
+	protected String storeTempDir = "";
 
-  /**
-   * The method initialized the CM8 content store with data of the
-   * property files.
-   * If StoreTemp.Type is not set, "none" was set.
-   * The following types are nessesary:<br />
-   * <ul>
-   * <li> none - it use the InputStream.available() method to get the
-   *      length of the stream.</li>
-   * <li> memory - it write the InputStream in the memory to get the
-   *      length of the stream. Attention, this is only fo short files with
-   *      maximal size in MB of the StoreTemp.MemSize value! Files they
-   *      are bigger was temporary stored in a directory that is defined
-   *      in the prperty variable StoreTemp.Dir. </li>
-   * </ul>
-   *
-   * @param storeID the IFS store ID
-   **/
-  public void init( String storeID )
-  {
-    super.init( storeID );
-    MCRConfiguration config = MCRConfiguration.instance();
-    itemTypeName   = config.getString( prefix + "ItemType"       );
-    attributeTime  = config.getString( prefix + "Attribute.File" );
-    attributeOwner = config.getString( prefix + "Attribute.Owner" );
-    attributeFile  = config.getString( prefix + "Attribute.Time" );
-    storeTempType  = config.getString( prefix + "StoreTemp.Type", "none" );
-    storeTempSize  = config.getInt( prefix + "StoreTemp.MemSize", 4 );
-    storeTempDir   = config.getString( prefix + "StoreTemp.Dir", "/tmp" );
-    for (int i=0;i<STORE_TYPE_LIST.length;i++) {
-      if (storeTempType.equals(STORE_TYPE_LIST[i])) { return; } }
-    storeTempType = "none";
-  }
+	private static final Logger logger = MCRCM8ConnectionPool.getLogger();
+	private static final MCRConfiguration config = MCRConfiguration.instance();
 
-  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
-    throws Exception
-  {
-    Logger logger = MCRCM8ConnectionPool.getLogger(); 
-    DKDatastoreICM connection = null;
-    try 
-    {
-      logger.debug( "Get a connection to CM8 connection pool." );
-      connection = MCRCM8ConnectionPool.instance().getConnection();
-      
-      DKTextICM ddo = null;
-      try{ ddo = (DKTextICM)connection.createDDO(itemTypeName,DK_CM_ITEM); }
-      catch( Exception ex ) 
-      {
-        createStore( connection ); 
-        ddo = (DKTextICM)connection.createDDO(itemTypeName,DK_CM_ITEM); 
-      }
-      logger.debug("A new DKTextICM was created.");
-      
-      logger.debug("MCRFile ID = "+ file.getID() );
-      short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeFile);
-      ((DKDDO)ddo).setData(dataId, file.getID() );
-      
-      logger.debug("MCRFile OwnerID = "+ ((MCRFile)file).getOwnerID() );
-      dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeOwner);
-      ((DKDDO)ddo).setData(dataId, ((MCRFile)file).getOwnerID() );
-      
-      String timestamp = buildNextTimestamp();
-      dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeTime);
-      ((DKDDO)ddo).setData(dataId,timestamp);
-      
-      logger.debug("MimeType = "+file.getContentType().getMimeType());
-      ddo.setMimeType(file.getContentType().getMimeType());
-      ddo.setTextSearchableFlag(true);
-      
-      int filesize = 0;
-      if (storeTempType.equals("none")) {
-        filesize = source.available(); 
-        logger.debug("Set the MCRContentInputStream with available() length "
-          +filesize+".");
-        ddo.add((InputStream)source,filesize);
-        }
-      if (storeTempType.equals("memory")) {
-        byte [] buffer = new byte[storeTempSize*1024*1024+16];
-        try {
-          filesize = source.read(buffer,0,storeTempSize*1024*1024+16); }
-        catch (IOException e) {
-          throw new MCRException("Cant read File with ID "+file.getID(),e); }
-        if (filesize <= storeTempSize*1024*1024) {
-          logger.debug("Set the MCRContentInputStream with memory length "
-            +filesize+".");
-          ddo.add((InputStream)(new ByteArrayInputStream(buffer)),filesize);
-          }
-        else {
-          int si = filesize;
-          File tmp = new File(storeTempDir,file.getID());
-          FileOutputStream ftmp = new FileOutputStream(tmp);
-          try {
-            ftmp.write(buffer,0,filesize);
-            }
-          catch (IOException e) {
-            throw new MCRException("Cant write File with ID "+file.getID()+
-              " to "+storeTempDir,e); 
-            }
-          while (true) {
-            try {
-              si = source.read(buffer,0,storeTempSize*1024*1024+16); }
-            catch (IOException e) {
-              throw new MCRException("Cant read File with ID "+file.getID(),
-                e);
-              }
-            if (si == -1) { break; }
-            filesize += si;
-            try {
-              ftmp.write(buffer,0,si); }
-            catch (IOException e) {
-              throw new MCRException("Cant write File with ID "+file.getID()+
-                " to "+storeTempDir,e); 
-              }
-            }
-          ftmp.close();
-          logger.debug("Set the MCRContentInputStream with stream length "
-            +filesize+".");
-          ddo.add((InputStream)(new FileInputStream(tmp)),filesize);
-          try { tmp.delete(); } catch (SecurityException e) { }
-          }
-        }
-      logger.debug("Add the DKTextICM.");
-      
-      String storageID = ddo.getPidObject().pidString();
-      logger.debug("StorageID = "+storageID);
-      logger.debug("The file was stored under CM8 Ressource Manager.");
-      return storageID;
-    }
-    finally{ MCRCM8ConnectionPool.instance().releaseConnection(connection); }
-  }
+	/** Table which holds infos about where files are stored **/
+	protected static final String METAIFSTABLE =
+		config.getString("MCR.IFS.FileMetadataStore.SQL.TableName");
 
-  /**
-   * the method removes the content for the given IFS storageID.
-   *
-   * @param storageID the IFS storage ID
-   * @exception if an error was occured.
-   **/
-  protected void doDeleteContent( String storageID )
-    throws Exception
-  {
-    Logger logger = MCRCM8ConnectionPool.getLogger(); 
-    logger.debug("StorageID = "+storageID);
-  
-    DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
-    try 
-    {
-      DKTextICM ddo = (DKTextICM)connection.createDDO(storageID);
-      ddo.del();
-      logger.debug("The file was deleted from CM8 Ressource Manager.");
-    }
-    finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
-  }
+	/** Table which holds infos about how many documents are indexed **/
+	protected static final String TIEINDEX_TABLE = "DB2EXT.TEXTINDEXES";
+	protected static String TIEREF_TABLE;
+	//TODO: Get this CollumnName from the Database somehow
+	protected static final String DerivateAttribute = "ATTR0000001088";
 
-  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
-    throws Exception
-  {
-    Logger logger = MCRCM8ConnectionPool.getLogger(); 
-    logger.debug("StorageID = "+ file.getStorageID() );
-    
-    DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
-    try 
-    {
-      DKTextICM ddo = (DKTextICM)connection.createDDO( file.getStorageID() );
-      ddo.retrieve(DK_CM_CONTENT_NO);
-      
-      String url[] = ddo.getContentURLs(DK_CM_RETRIEVE,DK_CM_CHECKOUT,-1,-1,
-        DK_ICM_GETINITIALRMURL);
-      logger.debug("URL = "+url[0]);
-      InputStream is = new URL( url[0] ).openStream();
-      MCRUtils.copyStream( is, target );
-      
-      logger.debug("The file was retrieved from CM8 Ressource Manager.");
-    }
-    finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
-  }
+	/**
+	* The method initialized the CM8 content store with data of the
+	* property files.
+	* If StoreTemp.Type is not set, "none" was set.
+	* The following types are nessesary:<br />
+	* <ul>
+	* <li> none - it use the InputStream.available() method to get the
+	*      length of the stream.</li>
+	* <li> memory - it write the InputStream in the memory to get the
+	*      length of the stream. Attention, this is only fo short files with
+	*      maximal size in MB of the StoreTemp.MemSize value! Files they
+	*      are bigger was temporary stored in a directory that is defined
+	*      in the prperty variable StoreTemp.Dir. </li>
+	* </ul>
+	*
+	* @param storeID the IFS store ID
+	**/
+	public void init(String storeID) {
+		super.init(storeID);
+		itemTypeName = config.getString(prefix + "ItemType");
+		attributeTime = config.getString(prefix + "Attribute.File");
+		attributeOwner = config.getString(prefix + "Attribute.Owner");
+		attributeFile = config.getString(prefix + "Attribute.Time");
+		storeTempType = config.getString(prefix + "StoreTemp.Type", "none");
+		storeTempSize = config.getInt(prefix + "StoreTemp.MemSize", 4);
+		storeTempDir = config.getString(prefix + "StoreTemp.Dir", "/tmp");
+		for (int i = 0; i < STORE_TYPE_LIST.length; i++) {
+			if (storeTempType.equals(STORE_TYPE_LIST[i])) {
+				return;
+			}
+		}
+		storeTempType = "none";
+		if (TIEREF_TABLE == null) {
+			//TIEREF_TABLE=MCRSQLConnection.justGetSingleValue(new MCRSQLStatement(TIEINDEX_TABLE).setCondition("COLNAME","TIEREF").toSelectStatement("TABSCHEMA"));
+			MCRSQLRowReader row =
+				MCRSQLConnection.justDoQuery(
+					new MCRSQLStatement(TIEINDEX_TABLE)
+						.setCondition("COLNAME", "TIEREF")
+						.toSelectStatement("TABSCHEMA,TABNAME"));
+			if (row.next()) {
+				TIEREF_TABLE =
+					new StringBuffer(row.getString(1))
+						.append('.')
+						.append(row.getString(2))
+						.toString();
+			} else {
+				logger.warn(
+					"Failure getting TIEREF Index from "
+						+ TIEINDEX_TABLE
+						+ "!");
+			}
+		}
+	}
 
- /**
-  * This method creates a new ItemType to store ressource data under CM8.
-  *
-  * @param connection the DKDatastoreICM connection
-  **/
-  private void createStore(DKDatastoreICM connection) throws Exception
-  {
-    Logger logger = MCRCM8ConnectionPool.getLogger(); 
-    // create the Attribute for IFS File ID
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeFile, 
-      MAX_ATTRIBUTE_FILE_LENGTH,false))
-      logger.warn("CM8 Datastore Creation attribute "+attributeFile+
-        " already exists.");
-    // create the Attribute for IFS File OwnerID
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeOwner, 
-      MAX_ATTRIBUTE_OWNER_LENGTH,false))
-      logger.warn("CM8 Datastore Creation attribute "+attributeOwner+
-        " already exists.");
-    // create the Attribute for IFS Time 
-    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeTime, 
-      MAX_ATTRIBUTE_TIME_LENGTH,false))
-      logger.warn("CM8 Datastore Creation attribute "+attributeTime+
-        " already exists.");
+	protected String doStoreContent(
+		MCRFileReader file,
+		MCRContentInputStream source)
+		throws Exception {
+		Logger logger = MCRCM8ConnectionPool.getLogger();
+		DKDatastoreICM connection = null;
+		try {
+			logger.debug("Get a connection to CM8 connection pool.");
+			connection = MCRCM8ConnectionPool.instance().getConnection();
 
-    // create a text search definition
-    DKTextIndexDefICM mcr_item_text_index = 
-      MCRCM8ItemTypeCommon.getTextDefinition();
-    mcr_item_text_index.setUDFName("ICMfetchFilter");
-    mcr_item_text_index.setUDFSchema("ICMADMIN");
+			DKTextICM ddo = null;
+			try {
+				ddo =
+					(DKTextICM) connection.createDDO(itemTypeName, DK_CM_ITEM);
+			} catch (Exception ex) {
+				createStore(connection);
+				ddo =
+					(DKTextICM) connection.createDDO(itemTypeName, DK_CM_ITEM);
+			}
+			logger.debug("A new DKTextICM was created.");
 
-    // create the root itemtype
-    logger.info("Create the ItemType "+itemTypeName);
-    DKItemTypeDefICM item_type = new DKItemTypeDefICM(connection);
-    item_type.setName(itemTypeName);
-    item_type.setDescription(itemTypeName);
-    item_type.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_RESOURCE_ITEM);
-    item_type.setXDOClassName(DK_ICM_XDO_TEXT_CLASS_NAME);
-    item_type.setXDOClassID(DK_ICM_XDO_TEXT_CLASS_ID);
-    item_type.setTextIndexDef(mcr_item_text_index);
-    item_type.setTextSearchable(true);
-    DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
-    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeFile);
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeOwner);
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeTime);
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
-    short rmcode = 1; // the default
-    item_type.setDefaultRMCode(rmcode);
-    short smscode = 1; // the default
-    item_type.setDefaultCollCode(smscode);
-    item_type.add();
-    logger.info("The ItemType "+itemTypeName+" for IFS CM8 store is created."); 
-  }
+			logger.debug("MCRFile ID = " + file.getID());
+			short dataId =
+				((DKDDO) ddo).dataId(DK_CM_NAMESPACE_ATTR, attributeFile);
+			((DKDDO) ddo).setData(dataId, file.getID());
 
- /**
-  *
-  **/
-  public String[] getDerivateIDs(String doctext)
-    {
-    Logger logger = MCRCM8ConnectionPool.getLogger(); 
-    logger.debug("TS incoming query "+doctext);
-    if (doctext==null) { return (new String[0]); }
+			logger.debug("MCRFile OwnerID = " + ((MCRFile) file).getOwnerID());
+			dataId = ((DKDDO) ddo).dataId(DK_CM_NAMESPACE_ATTR, attributeOwner);
+			((DKDDO) ddo).setData(dataId, ((MCRFile) file).getOwnerID());
 
-    // transform query
-    String query=parseQuery(doctext);
-    StringBuffer sb = new StringBuffer(1024);
-    sb.append('/').append(itemTypeName).append("[contains-text-basic (@TIEREF,\"")
-      .append(query).append("\")=1]");
-    logger.debug("TS outgoing query "+sb.toString());
-    
-    // start the query
-    String [] outgo = new String[0];
-    DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
-    try {
-      DKNVPair options[] = new DKNVPair[3];
-      options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0"); // No Maximum (Default)
-      options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,new Integer(DKConstant.DK_CM_CONTENT_YES));
-      options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END,null);
-      DKResults results = (DKResults)connection.evaluate(sb.toString(),
-        DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
-      dkIterator iter = results.createIterator();
-      logger.debug("Number of Results:  "+results.cardinality());
-      outgo = new String[results.cardinality()];
-      int i = 0;
-      while (iter.more()) {
-        DKDDO resitem = (DKDDO)iter.next();
-        resitem.retrieve();
-        short dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,attributeOwner);
-        outgo[i] = (String) resitem.getData(dataId);
-        logger.debug("MCRDerivateID :"+outgo[i]);
-        i++;
-        }
-      }
-    catch (Exception e) { }
-    finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
+			String timestamp = buildNextTimestamp();
+			dataId = ((DKDDO) ddo).dataId(DK_CM_NAMESPACE_ATTR, attributeTime);
+			((DKDDO) ddo).setData(dataId, timestamp);
 
-    return outgo;
-    }
-    
-	protected static String parseQuery(String query) {
+			logger.debug("MimeType = " + file.getContentType().getMimeType());
+			ddo.setMimeType(file.getContentType().getMimeType());
+			ddo.setTextSearchableFlag(true);
+
+			int filesize = 0;
+			if (storeTempType.equals("none")) {
+				filesize = source.available();
+				logger.debug(
+					"Set the MCRContentInputStream with available() length "
+						+ filesize
+						+ ".");
+				ddo.add((InputStream) source, filesize);
+			}
+			if (storeTempType.equals("memory")) {
+				byte[] buffer = new byte[storeTempSize * 1024 * 1024 + 16];
+				try {
+					filesize =
+						source.read(
+							buffer,
+							0,
+							storeTempSize * 1024 * 1024 + 16);
+				} catch (IOException e) {
+					throw new MCRException(
+						"Cant read File with ID " + file.getID(),
+						e);
+				}
+				if (filesize <= storeTempSize * 1024 * 1024) {
+					logger.debug(
+						"Set the MCRContentInputStream with memory length "
+							+ filesize
+							+ ".");
+					ddo.add(
+						(InputStream) (new ByteArrayInputStream(buffer)),
+						filesize);
+				} else {
+					int si = filesize;
+					File tmp = new File(storeTempDir, file.getID());
+					FileOutputStream ftmp = new FileOutputStream(tmp);
+					try {
+						ftmp.write(buffer, 0, filesize);
+					} catch (IOException e) {
+						throw new MCRException(
+							"Cant write File with ID "
+								+ file.getID()
+								+ " to "
+								+ storeTempDir,
+							e);
+					}
+					while (true) {
+						try {
+							si =
+								source.read(
+									buffer,
+									0,
+									storeTempSize * 1024 * 1024 + 16);
+						} catch (IOException e) {
+							throw new MCRException(
+								"Cant read File with ID " + file.getID(),
+								e);
+						}
+						if (si == -1) {
+							break;
+						}
+						filesize += si;
+						try {
+							ftmp.write(buffer, 0, si);
+						} catch (IOException e) {
+							throw new MCRException(
+								"Cant write File with ID "
+									+ file.getID()
+									+ " to "
+									+ storeTempDir,
+								e);
+						}
+					}
+					ftmp.close();
+					logger.debug(
+						"Set the MCRContentInputStream with stream length "
+							+ filesize
+							+ ".");
+					ddo.add((InputStream) (new FileInputStream(tmp)), filesize);
+					try {
+						tmp.delete();
+					} catch (SecurityException e) {
+					}
+				}
+			}
+			logger.debug("Add the DKTextICM.");
+
+			String storageID = ddo.getPidObject().pidString();
+			logger.debug("StorageID = " + storageID);
+			logger.debug("The file was stored under CM8 Ressource Manager.");
+			return storageID;
+		} finally {
+			MCRCM8ConnectionPool.instance().releaseConnection(connection);
+		}
+	}
+
+	/**
+	 * the method removes the content for the given IFS storageID.
+	 *
+	 * @param storageID the IFS storage ID
+	 * @exception if an error was occured.
+	 **/
+	protected void doDeleteContent(String storageID) throws Exception {
+		Logger logger = MCRCM8ConnectionPool.getLogger();
+		logger.debug("StorageID = " + storageID);
+
+		DKDatastoreICM connection =
+			MCRCM8ConnectionPool.instance().getConnection();
+		try {
+			DKTextICM ddo = (DKTextICM) connection.createDDO(storageID);
+			ddo.del();
+			logger.debug("The file was deleted from CM8 Ressource Manager.");
+		} finally {
+			MCRCM8ConnectionPool.instance().releaseConnection(connection);
+		}
+	}
+
+	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
+		throws Exception {
+		Logger logger = MCRCM8ConnectionPool.getLogger();
+		logger.debug("StorageID = " + file.getStorageID());
+
+		DKDatastoreICM connection =
+			MCRCM8ConnectionPool.instance().getConnection();
+		try {
+			DKTextICM ddo =
+				(DKTextICM) connection.createDDO(file.getStorageID());
+			ddo.retrieve(DK_CM_CONTENT_NO);
+
+			String url[] =
+				ddo.getContentURLs(
+					DK_CM_RETRIEVE,
+					DK_CM_CHECKOUT,
+					-1,
+					-1,
+					DK_ICM_GETINITIALRMURL);
+			logger.debug("URL = " + url[0]);
+			InputStream is = new URL(url[0]).openStream();
+			MCRUtils.copyStream(is, target);
+
+			logger.debug("The file was retrieved from CM8 Ressource Manager.");
+		} finally {
+			MCRCM8ConnectionPool.instance().releaseConnection(connection);
+		}
+	}
+
+	/**
+	 * This method creates a new ItemType to store ressource data under CM8.
+	 *
+	 * @param connection the DKDatastoreICM connection
+	 **/
+	private void createStore(DKDatastoreICM connection) throws Exception {
+		Logger logger = MCRCM8ConnectionPool.getLogger();
+		// create the Attribute for IFS File ID
+		if (!MCRCM8ItemTypeCommon
+			.createAttributeVarChar(
+				connection,
+				attributeFile,
+				MAX_ATTRIBUTE_FILE_LENGTH,
+				false))
+			logger.warn(
+				"CM8 Datastore Creation attribute "
+					+ attributeFile
+					+ " already exists.");
+		// create the Attribute for IFS File OwnerID
+		if (!MCRCM8ItemTypeCommon
+			.createAttributeVarChar(
+				connection,
+				attributeOwner,
+				MAX_ATTRIBUTE_OWNER_LENGTH,
+				false))
+			logger.warn(
+				"CM8 Datastore Creation attribute "
+					+ attributeOwner
+					+ " already exists.");
+		// create the Attribute for IFS Time 
+		if (!MCRCM8ItemTypeCommon
+			.createAttributeVarChar(
+				connection,
+				attributeTime,
+				MAX_ATTRIBUTE_TIME_LENGTH,
+				false))
+			logger.warn(
+				"CM8 Datastore Creation attribute "
+					+ attributeTime
+					+ " already exists.");
+
+		// create a text search definition
+		DKTextIndexDefICM mcr_item_text_index =
+			MCRCM8ItemTypeCommon.getTextDefinition();
+		mcr_item_text_index.setUDFName("ICMfetchFilter");
+		mcr_item_text_index.setUDFSchema("ICMADMIN");
+
+		// create the root itemtype
+		logger.info("Create the ItemType " + itemTypeName);
+		DKItemTypeDefICM item_type = new DKItemTypeDefICM(connection);
+		item_type.setName(itemTypeName);
+		item_type.setDescription(itemTypeName);
+		item_type.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+		item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_RESOURCE_ITEM);
+		item_type.setXDOClassName(DK_ICM_XDO_TEXT_CLASS_NAME);
+		item_type.setXDOClassID(DK_ICM_XDO_TEXT_CLASS_ID);
+		item_type.setTextIndexDef(mcr_item_text_index);
+		item_type.setTextSearchable(true);
+		DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
+		DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeFile);
+		attr.setNullable(false);
+		attr.setUnique(false);
+		item_type.addAttr(attr);
+		attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeOwner);
+		attr.setNullable(false);
+		attr.setUnique(false);
+		item_type.addAttr(attr);
+		attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeTime);
+		attr.setNullable(false);
+		attr.setUnique(false);
+		item_type.addAttr(attr);
+		short rmcode = 1; // the default
+		item_type.setDefaultRMCode(rmcode);
+		short smscode = 1; // the default
+		item_type.setDefaultCollCode(smscode);
+		item_type.add();
+		logger.info(
+			"The ItemType " + itemTypeName + " for IFS CM8 store is created.");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mycore.services.query.MCRTextSearchInterface#getDerivateIDs(java.lang.String)
+	 */
+	public String[] getDerivateIDs(String doctext) {
+		logger.debug("TS incoming query " + doctext);
+		//toggles contains-text-basic:contains-text
+		boolean basicquery = true;
+		if (doctext == null) {
+			return (new String[0]);
+		}
+
+		// transform query
+		HashSet results = new HashSet();
+		HashSet queries = CM8QueryParser.parse(doctext);
+		HashSet tempSet;
+		String[] temp;
+		boolean first = true;
+		for (Iterator it = queries.iterator(); it.hasNext();) {
+			//convert StringArray to HashSet for merging
+			temp = queryIndex((CM8Query) it.next(), basicquery);
+			tempSet = new HashSet();
+			for (int i = 0; i < temp.length; i++) {
+				tempSet.add(temp[i]);
+			}
+			if (first) {
+				results = tempSet;
+				first = false;
+			} else
+				results =
+					MCRUtils.mergeHashSets(
+						results,
+						tempSet,
+						MCRUtils.COMMAND_AND);
+		}
+		// we have all results linked with and
+		// we need to check if an prohibited clause is in the query
+		HashSet negative = containNegativeClause(queries);
+		if (negative.size() > 0) {
+			//have to check that all documents of a derivate
+			//get hit by those queries
+			for (Iterator it = results.iterator(); it.hasNext();) {
+				String derivateID = (String) it.next();
+				int derCount = countDerivateContents(derivateID);
+				//check every query that all documents in store match it
+				for (Iterator neg = negative.iterator(); neg.hasNext();) {
+					CM8Query query = (CM8Query) neg.next();
+					int cqr = queryIndex(query, basicquery).length;
+					if (derCount != cqr) {
+						StringBuffer msg =
+							new StringBuffer("Query (")
+								.append(
+									basicquery
+										? query.containstextbasic()
+										: query.containstext())
+								.append(") gets ")
+								.append(cqr)
+								.append(" of exact ")
+								.append(derCount)
+								.append("  needed results!");
+						logger.debug(msg.toString());
+						logger.debug("Removing from results:" + derivateID);
+						results.remove(derivateID);
+						break;
+					}
+				}
+			}
+		}
+		return MCRUtils.getStringArray(results.toArray());
+	}
+
+	private static HashSet containNegativeClause(HashSet queries) {
+		HashSet returns = new HashSet();
+		for (Iterator it = queries.iterator(); it.hasNext();) {
+			CM8Query query = (CM8Query) it.next();
+			if (query.prohibited)
+				returns.add(query);
+		}
+		//return all negative Queries...
+		return returns;
+	}
+
+	/**
+	 * returns the number of indexed documents
+	 * @param derivateID
+	 * @return number of index documents
+	 */
+	protected int countDerivateContents(String derivateID) {
+		logger.debug("DerivateID = " + derivateID);
+		if (TIEREF_TABLE == null)
+			throw new MCRException("Result of SQL query: \"SELECT TABSCHEMA,TABNAME FROM DB2EXT.TEXTINDEXES WHERE COLNAME='TIEREF'\" was empty!");
+		return MCRSQLConnection.justCountRows(
+			new MCRSQLStatement(TIEREF_TABLE)
+				.setCondition(DerivateAttribute, derivateID)
+				.toSelectStatement());
+	}
+
+	private String[] queryIndex(CM8Query query, boolean basic) {
+		StringBuffer sb = new StringBuffer();
+		sb
+			.append('/')
+			.append(itemTypeName)
+			.append("[")
+			.append(basic ? "contains-text-basic" : "contains-text")
+			.append(" (@TIEREF,\"")
+			.append(basic ? query.containstextbasic() : query.containstext())
+			.append("\")=1]");
+		logger.debug("TS outgoing query " + sb.toString());
+
+		// start the query
+		String[] outgo = new String[0];
+		DKDatastoreICM connection =
+			MCRCM8ConnectionPool.instance().getConnection();
+		try {
+			DKNVPair options[] = new DKNVPair[3];
+			options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0");
+			// No Maximum (Default)
+			options[1] =
+				new DKNVPair(
+					DKConstant.DK_CM_PARM_RETRIEVE,
+					new Integer(DKConstant.DK_CM_CONTENT_YES));
+			options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END, null);
+			DKResults results =
+				(DKResults) connection.evaluate(
+					sb.toString(),
+					DKConstantICM.DK_CM_XQPE_QL_TYPE,
+					options);
+			dkIterator iter = results.createIterator();
+			logger.debug("Number of Results:  " + results.cardinality());
+			outgo = new String[results.cardinality()];
+			int i = 0;
+			while (iter.more()) {
+				DKDDO resitem = (DKDDO) iter.next();
+				resitem.retrieve();
+				short dataId =
+					resitem.dataId(DK_CM_NAMESPACE_ATTR, attributeOwner);
+				outgo[i] = (String) resitem.getData(dataId);
+				logger.debug("MCRDerivateID :" + outgo[i]);
+			}
+		} catch (Exception e) {
+		} finally {
+			MCRCM8ConnectionPool.instance().releaseConnection(connection);
+		}
+
+		return outgo;
+	}
+
+	protected static String parseQueryBasic(String query) {
 		int i = query.indexOf('\"');
 		i++;
 		if (i == 0)
@@ -365,19 +564,210 @@ public class MCRCStoreContentManager8
 		int j = query.lastIndexOf('\"');
 		if (j == -1)
 			return "";
-		StringBuffer tmp=new StringBuffer(query.substring(i, j));
-		for (int x=0;x<tmp.length();x++){
-			switch (tmp.charAt(x)){
-				case '\"':
-					//replace double quotes by quotes
-					tmp.setCharAt(x,'\'');
+		StringBuffer tmp = new StringBuffer(query.substring(i, j));
+		for (int x = 0; x < tmp.length(); x++) {
+			switch (tmp.charAt(x)) {
+				case '\'' :
+					//replace quotes by two quotes
+					tmp.insert(x, '\'');
+					x++;
 					break;
-				default:
+				case '\"' :
+					//replace double quotes by quotes
+					tmp.setCharAt(x, '\'');
+					break;
+				default :
 					break;
 			}
 		}
 		return tmp.toString();
 	}
 
-}
+	protected static String parseQuery(String query) {
+		String tmp = parseQueryBasic(query);
+		if (tmp.length() == 0)
+			return tmp;
+		StringBuffer result = new StringBuffer();
+		int begin = 0;
+		for (int i = 0; i < tmp.length(); i++) {
+			while (i < tmp.length() && tmp.charAt(i) == ' ') {
+				i++;
+			}
+			if (tmp.charAt(i) == '-') {
+				result.append("NOT ");
+				i++;
+			}
+			begin = i;
+			if (tmp.charAt(i) == '\'') {
+				//at the beginning of a new word this marks a phrase
+				i++;
+				while (i + 1 < tmp.length()
+					&& (tmp.charAt(i) != '\'' && tmp.charAt(i + 1) != ' ')) {
+					//a space character after a quote marks the end of the phrase
+					i++;
+				}
+				i++; //stop at space character
+				result.append(tmp.substring(begin, i));
+			} else {
+				//a single word
+				result.append('\'');
+				while (i < tmp.length() && tmp.charAt(i) != ' ') {
+					//a space character after a quote marks the end of the phrase
+					i++;
+				}
+				result.append(tmp.substring(begin, i)).append('\'');
+			}
+			result.append(" & ");
+		}
+		result.delete(result.length() - 3, result.length());
+		//remove last space
+		return result.toString();
+	}
+	private static final class CM8QueryParser {
+		public static HashSet parse(String query) {
+			return getQueries(query);
+		}
 
+		protected static String preParse(String query) {
+			int i = query.indexOf('\"');
+			i++;
+			if (i == 0)
+				return "";
+			int j = query.lastIndexOf('\"');
+			if (j == -1)
+				return "";
+			StringBuffer tmp = new StringBuffer(query.substring(i, j));
+			for (int x = 0; x < tmp.length(); x++) {
+				switch (tmp.charAt(x)) {
+					case '\'' :
+						//replace quotes by two quotes
+						tmp.insert(x, '\'');
+						x++;
+						break;
+					case '\"' :
+						//replace double quotes by quotes
+						tmp.setCharAt(x, '\'');
+						break;
+					default :
+						break;
+				}
+			}
+			return tmp.toString();
+		}
+
+		protected static HashSet getQueries(String query) {
+			String tmp = preParse(query);
+			HashSet queries = new HashSet();
+			if (tmp.length() == 0)
+				return queries;
+			int begin = 0;
+			for (int i = 0; i < tmp.length(); i++) {
+				boolean prohibited = false;
+				boolean required = true;
+				while (i < tmp.length() && tmp.charAt(i) == ' ') {
+					i++;
+				}
+				if (tmp.charAt(i) == '-') {
+					prohibited = true;
+					required = false;
+					i++;
+				}
+				begin = i;
+				if (tmp.charAt(i) == '\'') {
+					//at the beginning of a new word this marks a phrase
+					i++;
+					while (i + 1 < tmp.length()
+						&& (tmp.charAt(i) != '\'' && tmp.charAt(i + 1) != ' ')) {
+						//a space character after a quote marks the end of the phrase
+						i++;
+					}
+					i++; //stop at space character
+					queries.add(
+						new CM8Query(
+							tmp.substring(begin, i),
+							required,
+							prohibited));
+				} else {
+					//a single word
+					while (i < tmp.length() && tmp.charAt(i) != ' ') {
+						//a space character after a quote marks the end of the phrase
+						i++;
+					}
+					queries.add(
+						new CM8Query(
+							tmp.substring(begin, i),
+							required,
+							prohibited));
+				}
+			}
+			return queries;
+		}
+	}
+	private static final class CM8Query {
+		public boolean required;
+		public boolean prohibited;
+		public String Query;
+
+		public CM8Query(String query, boolean required, boolean prohibited) {
+			this.prohibited = prohibited;
+			this.required = required;
+			if (query.charAt(0) == '\''
+				&& query.charAt(query.length() - 1) == '\'')
+				this.Query = query;
+			else if (
+				query.charAt(0) != '\''
+					&& query.charAt(query.length() - 1) != '\'')
+				this.Query = '\'' + query + '\'';
+			else if (query.charAt(0) != '\'')
+				this.Query = '\'' + query;
+			else if (query.charAt(query.length() - 1) != '\'')
+				this.Query = query + '\'';
+		}
+		public CM8Query(String query) {
+			this(query, true, false);
+		}
+
+		public String containstext() {
+			if (prohibited && required)
+				return "";
+			else if (prohibited) {
+				return "NOT " + Query;
+			} else
+				return Query;
+		}
+		public String containstextbasic() {
+			if (prohibited && required)
+				return "";
+			else if (prohibited) {
+				return "-" + Query;
+			} else if (required) {
+				return "+" + Query;
+			} else
+				return Query;
+		}
+		public boolean equals(Object o) {
+			if (o instanceof CM8Query) {
+				CM8Query c = (CM8Query) o;
+				return (
+					(prohibited == c.prohibited)
+						&& (required == c.required)
+						&& (Query.equals(c.Query)));
+			} else
+				return false;
+		}
+		public int hashCode() {
+			int ext = prohibited ? pow(31, Query.length()) : 0;
+			return Query.hashCode() + ext;
+		}
+		private int pow(int a, int b) {
+			int c = a;
+			if (b == 0)
+				return 1;
+			else
+				while (b > 1)
+					c *= a;
+			return c;
+		}
+	}
+
+}
