@@ -174,12 +174,20 @@ public final void delete( String from )
  * @param to the object ID as String, they was referenced
  * @return the number of references
  **/
-public final int countTo( String to )
+  public final int countTo( String to )
   {
-    return MCRSQLConnection.justCountRows(                                                                                                                       
-    new MCRSQLStatement( tableName )
-    .setCondition( "MCRTO", to )
-    .toCountStatement() );
+    String sql = new MCRSQLStatement( tableName ).setCondition( "MCRTO", to ).toCountStatement();
+    MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( sql );
+    int num = 0;
+    try
+    {
+      if( reader.next() ) num = reader.getInt( "NUMBER" );
+      return num;   
+    }   
+    catch( Exception e ) 
+    { throw new MCRException("SQL counter error",e); } 
+    finally
+    { reader.close(); }
   }
 }
 
