@@ -1,0 +1,160 @@
+/**
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, normally in the file license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
+ **/
+
+package mycore.xml;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.http.*;
+import javax.servlet.*;
+import mycore.common.*;
+
+/**
+ * This servlet provides a web interface to create a search mask and
+ * analyze the output of them to create a XQuery and start the MCRQueryServlet
+ *
+ * @author Jens Kupferschmidt
+ * @version $Revision$ $Date$
+*/
+public class MCRSearchMaskServlet extends HttpServlet 
+{
+
+String mode = "CreateSearchMask";
+// Default Language (as UpperCase)
+private String defaultLang = "";
+
+ /**
+  * The initialization method for this servlet. This read the default
+  * language from the configuration.
+  **/
+  public void init() throws MCRConfigurationException
+  {
+  String defaultLang = MCRConfiguration.instance()
+    .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+  }
+
+ /**
+  * This method handles HTTP GET requests and resolves them to output.
+  * The method can get two modi : 'CreateSearchMask' to generate a new
+  * search mask or 'CreateQuery' to read the data from the search mask
+  * and start the MCRQueryServlet.
+  *
+  * @param request the HTTP request instance
+  * @param response the HTTP response instance
+  * @exception IOException for java I/O errors.
+  * @exception ServletException for errors from the servlet engine.
+  **/
+  public void doGet( HttpServletRequest  request, 
+                     HttpServletResponse response )
+    throws IOException, ServletException
+  {  
+  mode  = request.getParameter( "mode"  );
+  if( mode  == null ) mode  = "CreateSearchMask";
+  if (mode.equals("CreateSearchMask")) { createSearchMask(request,response); }
+  if (mode.equals("CreateQuery")) { createQuery(request,response); }
+  }
+
+ /**
+  * This method handles the CreateSearchMask mode.
+  * It create the request for MCRLayoutServlet and starts them.
+  *
+  * @param request the HTTP request instance
+  * @param response the HTTP response instance
+  * @exception IOException for java I/O errors.
+  * @exception ServletException for errors from the servlet engine.
+  **/
+  private void createSearchMask( HttpServletRequest  request, 
+                     HttpServletResponse response )
+    throws IOException, ServletException
+  {  
+  String type  = request.getParameter( "type"  );
+  String lang  = request.getParameter( "lang" );
+  if( type  == null ) return;
+  if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
+
+  // prepare the stylesheet name
+  String style = mode + "-" + type+ "-" + lang;
+
+  org.jdom.Element root = new org.jdom.Element("mcr_search");
+  org.jdom.Document jdom = new org.jdom.Document(root);
+
+  // start Layout servlet
+  try {
+    request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+    request.setAttribute( "XSL.Style", style );
+    RequestDispatcher rd = getServletContext()
+      .getNamedDispatcher( "MCRLayoutServlet" );
+    rd.forward( request, response );
+    }
+  catch( Exception ex ) {
+      System.out.println( ex.getClass().getName() );
+      System.out.println( ex ); }
+
+  }
+
+ /**
+  * This method handles the CreateQuery mode.
+  * It create the request for MCRQueryServlet and starts them.
+  *
+  * @param request the HTTP request instance
+  * @param response the HTTP response instance
+  * @exception IOException for java I/O errors.
+  * @exception ServletException for errors from the servlet engine.
+  **/
+  private void createQuery( HttpServletRequest  request, 
+                     HttpServletResponse response )
+    throws IOException, ServletException
+  {  
+  String type  = request.getParameter( "type"  );
+  String lang  = request.getParameter( "lang" );
+  String query = request.getParameter( "query" );
+  String host  = request.getParameter( "hosts" );
+  if( host  == null ) host  = "local";
+  if( query == null ) query = "";
+  if( type  == null ) return;
+  if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
+
+  // start Query servlet
+  try {
+    request.removeAttribute( "mode" );
+    request.setAttribute( "mode", "ResultList" );
+    request.removeAttribute( "type" );
+    request.setAttribute( "type", type );
+    request.removeAttribute( "hosts" );
+    request.setAttribute( "hosts", host );
+    request.removeAttribute( "lang" );
+    request.setAttribute( "lang", lang );
+    request.removeAttribute( "query" );
+    request.setAttribute( "query", query );
+    RequestDispatcher rd = getServletContext()
+      .getNamedDispatcher( "MCRQueryServlet" );
+    rd.forward( request, response );
+    }
+  catch( Exception ex ) {
+      System.out.println( ex.getClass().getName() );
+      System.out.println( ex ); }
+  }
+}
+
+
