@@ -135,8 +135,15 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
                 ServletOutputStream sos = response.getOutputStream();
 
                 String completeOutput = new String();
-                completeOutput = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head></head><body>"
-                							+ sw.toString()+"</body></html>";
+                completeOutput = 
+//               	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+				"<html>\n<head>\n" +
+				"<meta http-equiv=\"content-type\" content=\"text/html;charset=ISO-8859-1\"/>" +
+				"</head>\n"+
+//                		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"+
+						"<body>\n"+
+                		sw.toString() +
+						"</body>\n</html>\n";
                 
                 sos.println(completeOutput);
                 
