@@ -42,6 +42,7 @@ import mycore.common.*;
  * @see MCRCommand
  *
  * @author Frank Lützenkirchen
+ * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
 public class MCRCommandLineInterface
@@ -143,9 +144,6 @@ public class MCRCommandLineInterface
     // **************************************
 
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "load users or groups from file {0}",
-      "mycore.commandline.MCRUserCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
       "delete user {0}",
       "mycore.commandline.MCRUserCommands.deleteUser String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
@@ -158,26 +156,35 @@ public class MCRCommandLineInterface
       "list all groups",
       "mycore.commandline.MCRUserCommands.listAllGroups" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "print group {0} as xml",
-      "mycore.commandline.MCRUserCommands.printGroupAsXML String" );
+      "list all privileges",
+      "mycore.commandline.MCRUserCommands.listAllPrivileges" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "print group cache info",
-      "mycore.commandline.MCRUserCommands.printGroupCacheInfo" );
+      "load users/groups/privileges from file or directory {0}",
+      "mycore.commandline.MCRUserCommands.loadFromFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "print group {0} info",
-      "mycore.commandline.MCRUserCommands.printGroupInfo String" );
+      "save all users to file {0}",
+      "mycore.commandline.MCRUserCommands.saveAllUsersToFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
-      "print user {0} as xml",
-      "mycore.commandline.MCRUserCommands.printUserAsXML String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "print user cache info",
-      "mycore.commandline.MCRUserCommands.printUserCacheInfo" );
-    knownCommands[ numCommands++ ] = new MCRCommand(
-      "print user {0} info",
-      "mycore.commandline.MCRUserCommands.printUserInfo String" );
+      "save all groups to file {0}",
+      "mycore.commandline.MCRUserCommands.saveAllGroupsToFile String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
       "set password for user {0} to {1}",
       "mycore.commandline.MCRUserCommands.setPassword String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show group cache info",
+      "mycore.commandline.MCRUserCommands.showGroupCacheInfo" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show group {0} info",
+      "mycore.commandline.MCRUserCommands.showGroupInfo String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show user cache info",
+      "mycore.commandline.MCRUserCommands.showUserCacheInfo" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show user {0} info",
+      "mycore.commandline.MCRUserCommands.showUserInfo String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update users/groups/privileges from file or directory {0}",
+      "mycore.commandline.MCRUserCommands.updateFromFile String" );
   }
 
  /**
