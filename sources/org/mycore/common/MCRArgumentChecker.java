@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 /**
  * This class provides some static utility methods for checking
@@ -97,4 +97,3 @@ public abstract class MCRArgumentChecker
   */    
   public static void ensureNotNegative( double value, String argumentName )
   { ensureIsTrue( value >= 0, argumentName + " is negative" ); }
-}

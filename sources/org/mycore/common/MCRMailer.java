@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 import java.io.*;
 import java.lang.*;
@@ -33,7 +33,7 @@ import javax.mail.internet.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.jdom.*;
-import mycore.editor.*;
+import org.mycore.frontend.editor.*;
 
 /**
  * This class is a simple basic mailer class for mycore.

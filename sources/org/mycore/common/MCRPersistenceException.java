@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 /**
  * Instances of this class represent a general exception thrown by the persistency layer of the 

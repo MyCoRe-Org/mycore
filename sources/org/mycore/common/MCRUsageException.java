@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 /**
  * Instances of MCRUsageException are thrown when the MyCoRe API is used in an 

@@ -22,12 +22,11 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
-import mycore.common.MCRArgumentChecker;
 
 /**
  * This class represent a general set of external methods to support

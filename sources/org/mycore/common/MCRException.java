@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.common;
+package org.mycore.common;
 
 import java.io.*;
 import java.util.*;

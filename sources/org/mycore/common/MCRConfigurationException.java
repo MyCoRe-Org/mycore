@@ -22,9 +22,7 @@
  *
  **/
 
-package mycore.common;
-
-import mycore.common.MCRException;
+package org.mycore.common;
 
 /**
  * Instances of this class represent an exception thrown because of an error in the MyCoRe 
