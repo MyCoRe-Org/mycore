@@ -67,10 +67,11 @@ public String createXML() throws MCRException;
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param type   the type of the persistece system
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a Text Search string with the data of the metadata part
  **/
-public String createTS(Object mcr_query) throws MCRException;
+public String createTS(Object mcr_query,String tag) throws MCRException;
 
 /**
  * This methode check the validation of the content of this class.

@@ -220,10 +220,11 @@ public final String createXML() throws MCRException
  * configuration.
  *
  * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a TS string with the TS MCRMetaCorporation part
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final String createTS(Object mcr_query, String tag) throws MCRException
   {
   if (!isValid()) {
     debug();
@@ -237,16 +238,16 @@ public final String createTS(Object mcr_query) throws MCRException
     }
   if (name     .trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"name",    null,null,name    )); }
+      tag,subtag,sattrib,svalue,"name",    null,null,name    )); }
   if (parent   .trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"parent",  null,null,parent  )); }
+      tag,subtag,sattrib,svalue,"parent",  null,null,parent  )); }
   if (nickname .trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"nickname",null,null,nickname)); }
+      tag,subtag,sattrib,svalue,"nickname",null,null,nickname)); }
   if (property    .trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"property",   null,null,property   )); }
+      tag,subtag,sattrib,svalue,"property",   null,null,property   )); }
   return sb.toString();
   }
 

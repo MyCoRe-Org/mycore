@@ -250,7 +250,7 @@ public final String createTS(Object mcr_query) throws MCRException
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
   for (int i=0;i<list.size();i++) {
-    sb.append(((MCRMetaInterface)list.get(i)).createTS(mcr_query)); }
+    sb.append(((MCRMetaInterface)list.get(i)).createTS(mcr_query,tag)); }
   sb.append("");
   return sb.toString();
   }

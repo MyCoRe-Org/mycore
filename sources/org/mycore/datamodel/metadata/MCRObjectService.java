@@ -362,13 +362,13 @@ public final String createTS(Object mcr_query)  throws MCRException
   StringBuffer sb = new StringBuffer(2048);
   if (dates.size()!=0) {
     for (int i=0;i<dates.size();i++) {
-      sb.append(((MCRMetaDate)dates.get(i)).createTS(mcr_query)); }
+      sb.append(((MCRMetaDate)dates.get(i)).createTS(mcr_query,"dates")); }
     }
   else {
     sb.append(""); }
   if (flags.size()!=0) {
     for (int i=0;i<flags.size();i++) {
-      sb.append(((MCRMetaLangText)flags.get(i)).createTS(mcr_query)); }
+      sb.append(((MCRMetaLangText)flags.get(i)).createTS(mcr_query,"flags")); }
     }
   else {
     sb.append(""); }

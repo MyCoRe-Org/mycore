@@ -356,9 +356,9 @@ public final String createTS() throws MCRException, MCRConfigurationException
     }
   StringBuffer sb = new StringBuffer(4096);
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    "ID",null,null,null,null,null,mcr_id.getId()));
+    null,"ID",null,null,null,null,null,mcr_id.getId()));
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    "Label",null,null,null,null,null,mcr_label));
+    null,"Label",null,null,null,null,null,mcr_label));
   sb.append(mcr_struct.createTS(mcr_query));
   sb.append(mcr_metadata.createTS(mcr_query));
   sb.append(mcr_service.createTS(mcr_query));

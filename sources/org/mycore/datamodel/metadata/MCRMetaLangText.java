@@ -160,10 +160,11 @@ public final String createXML() throws MCRException
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a TS string with the TS MCRMetaLangText part
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final String createTS(Object mcr_query, String tag) throws MCRException
   {
   if (!isValid()) {
     debug();
@@ -176,7 +177,7 @@ public final String createTS(Object mcr_query) throws MCRException
     }
   StringBuffer sb = new StringBuffer(1024);
   sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-    subtag,sattrib,svalue,null,null,null,text));
+    tag,subtag,sattrib,svalue,null,null,null,text));
   return sb.toString();
   }
 

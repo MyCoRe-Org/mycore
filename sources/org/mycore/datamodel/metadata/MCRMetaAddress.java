@@ -267,10 +267,11 @@ public final String createXML() throws MCRException
  * configuration.
  *
  * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a TS string with the TS MCRMetaAddress part
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final String createTS(Object mcr_query,String tag) throws MCRException
   {
 
   if (!isValid()) {
@@ -287,27 +288,27 @@ public final String createTS(Object mcr_query) throws MCRException
 
   if (country.trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"country",null,null,country )); }
+      tag,subtag,sattrib,svalue,"country",null,null,country )); }
 
   if (state  .trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"state"  ,null,null,state   )); }
+      tag,subtag,sattrib,svalue,"state"  ,null,null,state   )); }
 
   if (zipcode.trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"zipcode",null,null,zipcode )); }
+      tag,subtag,sattrib,svalue,"zipcode",null,null,zipcode )); }
 
   if (city   .trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"city"   ,null,null,city    )); }
+      tag,subtag,sattrib,svalue,"city"   ,null,null,city    )); }
 
   if (street .trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"street" ,null,null,street  )); }
+      tag,subtag,sattrib,svalue,"street" ,null,null,street  )); }
 
   if (number .trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"number ",null,null,number  )); }
+      tag,subtag,sattrib,svalue,"number ",null,null,number  )); }
 
   return sb.toString();
   }

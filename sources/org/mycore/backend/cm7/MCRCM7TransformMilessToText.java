@@ -40,7 +40,8 @@ import mycore.datamodel.MCRObjectID;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRCM7TransformMilessToText implements MCRQueryInterface
+public class MCRCM7TransformMilessToText extends MCRCM7TransformToText 
+implements MCRQueryInterface
 {
 // common data
 protected static String NL =
@@ -204,14 +205,15 @@ private final String setContainsCondition(String condition)
   if (i==-1) {
     sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
   else {
+    i = -1;
+    sb.append("$MC=*$ *XXX");
     j = tag.indexOf(".",i+1);
-    if (j==-1) {
-      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
-    else {
-      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,j)).append("XXX")
-        .append(tag.substring(j+1,tag.length())).append("XXX* }"); }
+    while (j!=-1) {
+      sb.append(tag.substring(i+1,j)).append("XXX");
+      i = j;
+      j = tag.indexOf(".",i+1);
+      }
+    sb.append(tag.substring(i+1,tag.length())).append("XXX* }");
     }
   sb.append(')');
   return sb.toString();
@@ -266,10 +268,15 @@ private final String setLinkLabelCondition(String condition)
   if (i==-1) {
     sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
   else {
+    i = -1;
+    sb.append("$MC=*$ *XXX");
     j = tag.indexOf(".",i+1);
-    if (j==-1) {
-      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
+    while (j!=-1) {
+      sb.append(tag.substring(i+1,j)).append("XXX");
+      i = j;
+      j = tag.indexOf(".",i+1);
+      }
+    sb.append(tag.substring(i+1,tag.length())).append("XXX* }");
     }
   sb.append(')');
   return sb.toString();
@@ -324,10 +331,15 @@ private final String setLinkIdCondition(String condition)
   if (i==-1) {
     sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
   else {
+    i = -1;
+    sb.append("$MC=*$ *XXX");
     j = tag.indexOf(".",i+1);
-    if (j==-1) {
-      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
+    while (j!=-1) {
+      sb.append(tag.substring(i+1,j)).append("XXX");
+      i = j;
+      j = tag.indexOf(".",i+1);
+      }
+    sb.append(tag.substring(i+1,tag.length())).append("XXX* }");
     }
   sb.append(')');
   return sb.toString();
@@ -387,14 +399,15 @@ private final String setDateCondition(String condition)
   if (i==-1) {
     sbtag.append("XXX").append(tag).append("XXX"); }
   else {
+    i = -1;
+    sbtag.append("XXX");
     j = tag.indexOf(".",i+1);
-    if (j==-1) {
-      sbtag.append("XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,tag.length())).append("XXX"); }
-    else {
-      sbtag.append("XXX").append(tag.substring(0,i)).append("XXX")
-        .append(tag.substring(i+1,j)).append("XXX")
-        .append(tag.substring(j+1,tag.length())).append("XXX"); }
+    while (j!=-1) {
+      sbtag.append(tag.substring(i+1,j)).append("XXX");
+      i = j;
+      j = tag.indexOf(".",i+1);
+      }
+    sbtag.append(tag.substring(i+1,tag.length())).append("XXX");
     }
   int l = stop;
   while(true) {
@@ -436,148 +449,6 @@ private final String setDateCondition(String condition)
     k=stdate.indexOf("0",k+1);
     if (k==-1) break;
     }
-  return sb.toString();
-  }
-
-/**
- * The method returns the search string for a XML text field for
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue"&gt;<br>
- * &lt;innertag iattrib="ivalue"&gt;<br>
- * text<br>
- * &lt;/innertag&gt;<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param innertag           the optional inner tag of a subtag element
- * @param iattrib            the optional attribute vector of a innertag
- * @param ivalue             the optional value vector of iattrib
- * @param text               the text value of this element
- * @return the search string for the CM7 text search engine
- **/
-public final String createSearchStringText(String part, String subtag, 
-  String [] sattrib, String [] svalue, String innertag, String [] iattrib, 
-  String [] ivalue, String text)
-  {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX").
-     append(subtag.toUpperCase()).append("XXX");
-  if ((innertag != null) && ((innertag = innertag.trim()).length() !=0)) {
-    sb.append(innertag.toUpperCase()).append("XXX"); }
-  sb.append(' ');
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
-      }
-    }
-  if (iattrib != null) {
-    for (int i=0;i<iattrib.length;i++) {
-      sb.append("XXX").append(iattrib[i].toUpperCase()).append("XXX")
-        .append(ivalue[i].toUpperCase()).append("XXX ");
-      }
-    }
-  if ((text != null) && ((text = text.trim()).length() !=0)) {
-    sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); }
-  sb.append(NL);
-  return sb.toString();
-  }
-
-/**
- * The method returns the search string for a XML date field for
- * The date was transformed to a bit string with 
- * <em>10000*year+100*month+day</em>.
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag sattrib="svalue" ... &gt;<br>
- * date<br>
- * &lt;/subtag&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param date               the date value of this element
- * @return the search string for the CM7 text search engine
- **/
-public final String createSearchStringDate(String part, String subtag,
-  String [] sattrib, String [] svalue, GregorianCalendar date)
-  {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  if (date == null) { return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX").
-     append(subtag.toUpperCase()).append("XXX");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX");
-      }
-    }
-  int idate = date.get(Calendar.YEAR)*10000 +
-              date.get(Calendar.MONTH)*100 +
-              date.get(Calendar.DAY_OF_MONTH);
-  String binstr = Integer.toBinaryString(idate);
-  String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
-  int lenstr = binstr.length();
-  int lenstrmax = binstrmax.length();
-  for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
-  sb.append(binstr);
-  sb.append(NL);
-  return sb.toString();
-  }
-
-/**
- * The method returns the search string for a XML link field for
- * the IBM Content Manager 7 persistence system.<p>
- * A full XML tag element shows like<br>
- * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
- *
- * @param part               the global part of the elements like 'metadata'
- *                           or 'service'
- * @param subtag             the tagname of an element from the list in a tag
- * @param sattrib            the optional attribute vector of a subtag
- * @param svalue             the optional value vector of sattrib
- * @param href               the reference value of this element
- * @return the search string for the CM7 text search engine
- **/
-public final String createSearchStringHref(String part, String subtag,
-  String [] sattrib, String [] svalue, MCRObjectID href)
-  {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  if (href == null) { return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX").
-     append(subtag.toUpperCase()).append("XXX ");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
-      }
-    }
-  MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
-  String label = mcr_pers.receiveLabel(href);
-  sb.append(label.toUpperCase()).append(NL);
-  sb.append("XXX").append(part.toUpperCase()).append("XXX").
-     append(subtag.toUpperCase()).append("XXX ");
-  if (sattrib != null) {
-    for (int i=0;i<sattrib.length;i++) {
-      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
-      }
-    }
-  sb.append(href.getId().replace('_','X').toUpperCase()).append(NL);
   return sb.toString();
   }
 

@@ -238,10 +238,11 @@ public final String createXML() throws MCRException
  * configuration.
  *
  * @param mcr_query   a class implementing the <b>MCRQueryInterface</b>
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a TS string with the TS MCRMetaPerson part
  **/
-public final String createTS(Object mcr_query) throws MCRException
+public final String createTS(Object mcr_query,String tag) throws MCRException
   {
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
@@ -254,19 +255,19 @@ public final String createTS(Object mcr_query) throws MCRException
     }
   if (firstname.trim().length()!=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"firstname",null,null,firstname)); }
+      tag,subtag,sattrib,svalue,"firstname",null,null,firstname)); }
   if (surename.trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"surename",null,null,surename)); }
+      tag,subtag,sattrib,svalue,"surename",null,null,surename)); }
   if (callname.trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"callname",null,null,callname)); }
+      tag,subtag,sattrib,svalue,"callname",null,null,callname)); }
   if (academic.trim().length() !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"academic",null,null,academic)); }
+      tag,subtag,sattrib,svalue,"academic",null,null,academic)); }
   if (peerage.trim().length()  !=0) {
     sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(datapart,
-      subtag,sattrib,svalue,"peerage",null,null,peerage)); }
+      tag,subtag,sattrib,svalue,"peerage",null,null,peerage)); }
   return sb.toString();
   }
 

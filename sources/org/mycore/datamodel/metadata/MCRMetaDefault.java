@@ -248,10 +248,11 @@ public abstract String createXML() throws MCRException;
  * <em>MCR.persistence_type</em> configuration.
  *
  * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
+ * @param tag                the tagname of an element list
  * @exception MCRException if the content of this class is not valid
  * @return a TS string with the TS MCRMeta... part
  **/
-public abstract String createTS(Object mcr_query) throws MCRException;
+public abstract String createTS(Object mcr_query,String tag) throws MCRException;
 
 /**
  * This method check the validation of the content of this class.
