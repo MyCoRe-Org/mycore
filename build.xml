@@ -53,6 +53,16 @@
   </target>
 
   <!-- =================================================================== -->
+  <!-- The initalization for all                                           -->
+  <!-- =================================================================== -->
+  <target name="init" >
+   <mkdir dir="${mycore.class}"/>
+   <mkdir dir="${mycore.javadoc}"/>
+   <mkdir dir="${demo_dc.class}"/>
+   <mkdir dir="${demo_dc.javadoc}"/>
+  </target>
+  
+  <!-- =================================================================== -->
   <!-- Creates the class package                                           -->
   <!-- =================================================================== -->
   <target name="package" depends="compile,javadoc">
@@ -61,7 +71,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="compile_common,compile_datamodel,compile_cm7,compile_commandline,compile_demo_dublin_core">
+  <target name="compile" depends="init,compile_common,compile_datamodel,compile_cm7,compile_commandline,compile_demo_dublin_core">
   </target>
   
   <target name="compile_common">
@@ -112,37 +122,37 @@
   <!-- =================================================================== -->
   <!-- Create the JavaDoc for all source trees                             -->
   <!-- =================================================================== -->
-  <target name="javadoc">
+  <target name="javadoc" depends="init">
     <!-- create the common java documentation -->
     <javadoc packagenames="mycore.*"
            sourcepath="${mycore.source}"
            destdir="${mycore.javadoc}"
-           Verbose="true"
-           Package="true"
-           Version="true"
-           Author="true"
+           verbose="true"
+           package="true"
+           version="true"
+           author="true"
            doctitle="MyCoRe"
            >
       <group title="MyCoRe Common" packages="mycore.common.*"/>
       <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
       <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
+      <group title="MyCoRe Content Manager 7" packages="mycore.cm7.*"/>
     </javadoc>
     <!-- create the project java documentation -->
     <javadoc packagenames="demo_dublin_core.*"
            sourcepath="${demo_dc.source}"
            destdir="${demo_dc.javadoc}"
-           Package="true"
-           Version="true"
-           Author="true"
+           package="true"
+           version="true"
+           author="true"
            doctitle="MyCoRe"
            >
       <group title="MyCoRe Common" packages="demo_dublin_core.*"/>
     </javadoc>
-    <!-- copy to the web Server -->
   </target>
 
   <!-- =================================================================== -->
-  <!-- Creates the class package                                           -->
+  <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
   <target name="clean">
     <delete includeEmptyDirs="true" >
