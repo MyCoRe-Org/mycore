@@ -24,7 +24,7 @@
 package org.mycore.services.plugins;
 
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashSet;
 
 import org.mycore.datamodel.ifs.MCRFileContentType;
@@ -79,6 +79,6 @@ public interface TextFilterPlugin {
 	public boolean transform(
 		MCRFileContentType ct,
 		InputStream input,
-		OutputStream output)
+		Writer output)
 		throws FilterPluginTransformException;
 }

@@ -23,18 +23,20 @@
  **/
 package org.mycore.services.plugins;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.mycore.common.MCRInputStreamCloner;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -55,7 +57,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class OoTextPlugin implements TextFilterPlugin {
 
 	private static final int MAJOR = 0;
-	private static final int MINOR = 1;
+	private static final int MINOR = 2;
 	private static final EntityResolver OooResolver = new ResolveOfficeDTD();
 
 	private static HashSet contentTypes;
@@ -109,22 +111,17 @@ public class OoTextPlugin implements TextFilterPlugin {
 	public boolean transform(
 		MCRFileContentType ct,
 		InputStream input,
-		OutputStream output)
+		Writer output)
 		throws FilterPluginTransformException {
 		if (getSupportedContentTypes().contains(ct)) {
 			try {
 				System.out.println("Reading Oo-Document");
-				MCRInputStreamCloner mic =
-					new MCRInputStreamCloner(
-						getTextStream(getXMLStream(input)));
-				System.out.println("Saving to textfile /tmp/oo.sxw.txt");
-				FileOutputStream fout = new FileOutputStream("/tmp/oo.sxw.txt");
-				MCRUtils.copyStream(mic.getNewInputStream(), fout);
-				System.out.println("...done");
-				return MCRUtils.copyStream(mic.getNewInputStream(), output);
-				//				return MCRUtils.copyStream(
-				//					getTextStream(getXMLStream(input)),
-				//					output);
+//				CharArrayWriter cw=new CharArrayWriter();
+//				MCRUtils.copyReader(new BufferedReader(getTextReader(getXMLStream(input))),cw);
+//				System.out.print(cw.toCharArray());
+//				return MCRUtils.copyReader(new BufferedReader(new CharArrayReader(cw.toCharArray())), output);
+				
+				return MCRUtils.copyReader(new BufferedReader(getTextReader(getXMLStream(input))), output);
 			} catch (SAXException e) {
 				throw new FilterPluginTransformException(
 					"Error while parsing OpenOffice document.",
@@ -176,26 +173,27 @@ public class OoTextPlugin implements TextFilterPlugin {
 		return new ByteArrayInputStream(bos.toByteArray());
 	}
 
-	private InputStream getTextStream(InputStream xml)
+	private CharArrayReader getTextReader(InputStream xml)
 		throws IOException, SAXException {
 		XMLReader reader =
 			XMLReaderFactory.createXMLReader(
 				"org.apache.xerces.parsers.SAXParser");
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		reader.setContentHandler(new TextHandler(bos));
+		CharArrayWriter cos=new CharArrayWriter();
+		BufferedWriter out=new BufferedWriter(cos);
+		reader.setContentHandler(new TextHandler(out));
 		InputSource inp = new InputSource(xml);
 		reader.setEntityResolver(OooResolver);
 		reader.parse(inp);
-		System.out.println(new String(bos.toByteArray()));
-		return new ByteArrayInputStream(bos.toByteArray());
+		return new CharArrayReader(cos.toCharArray());
 	}
 
 	private static class TextHandler extends DefaultHandler {
 		private static final String textNS = "http://openoffice.org/2000/text";
-		private final OutputStream out;
+		private final Writer out;
 		private boolean textElement = false;
+		private static final char[] space= new char[]{' '};
 
-		private TextHandler(OutputStream out) {
+		private TextHandler(Writer out) {
 			this.out = out;
 		}
 
@@ -207,25 +205,14 @@ public class OoTextPlugin implements TextFilterPlugin {
 			if (textElement) {
 				try {
 					//write text to the stream
-					out.write(bytes(ch, start, length));
+					out.write(ch, start, length);
+					out.write(space,0,1);
 				} catch (IOException e) {
 					throw new FilterPluginTransformException(
 						"Error while getting text Elements.",
 						e);
 				}
 			}
-		}
-
-		private byte[] bytes(char[] ch, int start, int length) {
-			byte[] bytes = new byte[length * 2+2];
-			for (int i = 0; i < length; i++) {
-				bytes[i * 2] = (byte) (ch[start + i] & 0xff);
-				bytes[i * 2 + 1] = (byte) (ch[start + i] >> 8 & 0xff);
-			}
-			//write a space character to the stream
-			bytes[length*2]=32;
-			bytes[length*2+1]=0;
-			return bytes;
 		}
 
 		/* (non-Javadoc)

@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -391,7 +393,7 @@ public class MCRUtils {
 						MCRUtils.class.getName()
 							+ ".copyStream(): "
 							+ bytesRead
-							+ "bytes read");
+							+ " bytes read");
 				}
 				if (bytesRead > 0) {
 					if (target != null)
@@ -410,6 +412,51 @@ public class MCRUtils {
 		return true;
 	} // end copy
 
+
+	/**
+	 * Copies all content read from the given input stream to the
+	 * given output stream. Note that this method will NOT close the streams
+	 * when finished copying.
+	 * 
+	 * @param source the InputStream to read the bytes from
+	 * @param target out the OutputStream to write the bytes to, may be null
+	 * @return true if Inputstream copied successfully to OutputStream
+	 */
+	public static boolean copyReader(Reader source, Writer target) {
+		MCRArgumentChecker.ensureNotNull(source, "Reader source");
+		try {
+			// R E A D / W R I T E by chunks
+			int chunkSize = 63 * 1024;
+			// code will work even when chunkSize = 0 or chunks = 0;
+			// Even for small files, we allocate a big buffer, since we
+			// don't know the size ahead of time.
+			char[] ca = new char[chunkSize];
+			// keep reading till hit eof
+			while (true) {
+				int charsRead = readBlocking(source, ca, 0, chunkSize);
+				if (logger.isDebugEnabled()) {
+					logger.debug(
+						MCRUtils.class.getName()
+							+ ".copyReader(): "
+							+ charsRead
+							+ " characters read");
+				}
+				if (charsRead > 0) {
+					if (target != null)
+						target.write(ca, 0 /* offset in ba */
+						, charsRead /* bytes to write */
+						);
+				} else {
+					break; // hit eof
+				}
+			} // end while
+			// C L O S E, done by caller if wanted.
+		} catch (IOException e) {
+			return false;
+		}
+		// all was ok
+		return true;
+	} // end copy
 
 	/**
 	 * merges to HashSets of MyCoreIDs after specific rules
@@ -501,6 +548,44 @@ public class MCRUtils {
 		return totalBytesRead;
 	} // end readBlocking
 
+
+	/**
+	 * Reads exactly <code>len</code> bytes from the input stream
+	 * into the byte array. This method reads repeatedly from the
+	 * underlying stream until all the bytes are read.
+	 * InputStream.read is often documented to block like this, but in actuality it
+	 * does not always do so, and returns early with just a few bytes.
+	 * readBlockiyng blocks until all the bytes are read,
+	 * the end of the stream is detected,
+	 * or an exception is thrown. You will always get as many bytes as you
+	 * asked for unless you get an eof or other exception.
+	 * Unlike readFully, you find out how many bytes you did get.
+	 *
+	 * @param      b     the buffer into which the data is read.
+	 * @param      off   the start offset of the data.
+	 * @param      len   the number of bytes to read.
+	 * @return     number of bytes actually read.
+	 * @exception  IOException   if an I/O error occurs.
+	 *
+	 */
+	private static final int readBlocking(
+		Reader in,
+		char c[],
+		int off,
+		int len)
+		throws IOException {
+		int totalCharsRead = 0;
+	
+		while (totalCharsRead < len) {
+			int charsRead =
+				in.read(c, off + totalCharsRead, len - totalCharsRead);
+			if (charsRead < 0) {
+				break;
+			}
+			totalCharsRead += charsRead;
+		}
+		return totalCharsRead;
+	} // end readBlocking
 	/**
 	 * <p>
 	 * Returns String in with newStr substituted for find String.

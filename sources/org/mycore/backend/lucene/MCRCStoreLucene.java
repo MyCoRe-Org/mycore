@@ -24,12 +24,12 @@
 package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedWriter;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -280,14 +280,15 @@ public class MCRCStoreLucene
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
 		throws IOException {
 		Document returns = new Document();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		CharArrayWriter cout = new CharArrayWriter();
+		BufferedWriter out=new BufferedWriter(cout);
 		//filter here
 		pMan.transform(reader.getContentType(), stream, out);
 		out.flush();
-		byte[] temp = out.toByteArray();
+		char[] temp = cout.toCharArray();
+		logger.debug("indexing "+temp.length+" charcters!");
 		out.close();
-		ByteArrayInputStream bin = new ByteArrayInputStream(temp);
-		BufferedReader in = new BufferedReader(new InputStreamReader(bin));
+		BufferedReader in = new BufferedReader(new CharArrayReader(temp));
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
 		if (reader instanceof MCRFile) {

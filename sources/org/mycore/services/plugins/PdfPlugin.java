@@ -31,15 +31,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashSet;
 
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.services.plugins.FilterPluginTransformException;
-import org.mycore.services.plugins.TextFilterPlugin;
 
 /**
  * Provide some info about your class!
@@ -49,10 +47,11 @@ import org.mycore.services.plugins.TextFilterPlugin;
 public class PdfPlugin implements TextFilterPlugin {
 	private static HashSet contentTypes = null;
 	private static String name = "Yagee's amazing PDF Filter";
-	private static final int MAJOR=0;
-	private static final int MINOR=4;
+	private static final int MAJOR = 0;
+	private static final int MINOR = 5;
 	private static String info = null;
 	private static String p2t_info = null;
+	private static final String textencoding = "UTF-8";
 
 	/**
 	 * 
@@ -64,7 +63,7 @@ public class PdfPlugin implements TextFilterPlugin {
 			if (MCRFileContentTypeFactory.isTypeAvailable("pdf"))
 				contentTypes.add(MCRFileContentTypeFactory.getType("pdf"));
 		}
-		if (p2t_info==null)
+		if (p2t_info == null)
 			pdftotext();
 		if (info == null)
 			info =
@@ -88,54 +87,81 @@ public class PdfPlugin implements TextFilterPlugin {
 	public String getInfo() {
 		return info;
 	}
-	
-	private boolean pdftotext(){
+
+	private boolean pdftotext() {
 		int rc;
-		final String[] testcommand={"pdftotext","-v"};
+		final String[] testcommand = { "pdftotext", "-v" };
 		String s;
-		StringBuffer infofetch=new StringBuffer();
+		StringBuffer infofetch = new StringBuffer();
 		try {
-			Process p=Runtime.getRuntime().exec(testcommand);
-			BufferedReader stdError = new BufferedReader(new
-			InputStreamReader(p.getErrorStream()));
+			Process p = Runtime.getRuntime().exec(testcommand);
+			BufferedReader stdError =
+				new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			while ((s = stdError.readLine()) != null) {
 				infofetch.append(s).append(", ");
 			}
 			rc = p.waitFor();
-			p2t_info=infofetch.deleteCharAt(infofetch.length()-2).toString();		
+			p2t_info =
+				infofetch.deleteCharAt(infofetch.length() - 2).toString();
 		} catch (IOException e) {
-			if (e.getMessage().indexOf("not found")>0)
-				throw new MCRConfigurationException(testcommand[0]+" is not installed or in search path!",e);
+			if (e.getMessage().indexOf("not found") > 0)
+				throw new MCRConfigurationException(
+					testcommand[0] + " is not installed or in search path!",
+					e);
 			else
-				throw new MCRConfigurationException("Error while excuting "+testcommand,e);
+				throw new MCRConfigurationException(
+					"Error while excuting " + testcommand,
+					e);
 		} catch (InterruptedException e) {
-			throw new MCRConfigurationException("Error while excuting "+testcommand,e);
+			throw new MCRConfigurationException(
+				"Error while excuting " + testcommand,
+				e);
 		}
-		return (rc==99);
+		return (rc == 99);
 	}
 
-	private boolean pdftotext(File pdffile,File txtfile){
+	private boolean pdftotext(File pdffile, File txtfile) {
 		int rc;
-		final String[] testcommand={"pdftotext","-raw",pdffile.getAbsolutePath(),txtfile.getAbsolutePath()};
+		final String[] testcommand =
+			{
+				"pdftotext",
+				"-enc",
+				textencoding,
+				"-raw",
+				pdffile.getAbsolutePath(),
+				txtfile.getAbsolutePath()};
 		String s;
 		try {
-			System.err.println(testcommand[0]+" "+testcommand[1]+" "+testcommand[2]+" "+testcommand[3]);
-			Process p=Runtime.getRuntime().exec(testcommand);
-			BufferedReader stdError = new BufferedReader(new
-			InputStreamReader(p.getErrorStream()));
+			System.err.println(
+				testcommand[0]
+					+ " "
+					+ testcommand[1]
+					+ " "
+					+ testcommand[2]
+					+ " "
+					+ testcommand[3]);
+			Process p = Runtime.getRuntime().exec(testcommand);
+			BufferedReader stdError =
+				new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			while ((s = stdError.readLine()) != null) {
 				System.err.println(s);
 			}
 			rc = p.waitFor();
 		} catch (IOException e) {
-			if (e.getMessage().indexOf("not found")>0)
-				throw new MCRConfigurationException(testcommand[0]+" is not installed or in search path!",e);
+			if (e.getMessage().indexOf("not found") > 0)
+				throw new MCRConfigurationException(
+					testcommand[0] + " is not installed or in search path!",
+					e);
 			else
-				throw new MCRConfigurationException("Error while excuting "+testcommand,e);
+				throw new MCRConfigurationException(
+					"Error while excuting " + testcommand,
+					e);
 		} catch (InterruptedException e) {
-			throw new MCRConfigurationException("Error while excuting "+testcommand,e);
+			throw new MCRConfigurationException(
+				"Error while excuting " + testcommand,
+				e);
 		}
-		return (rc==00);
+		return (rc == 00);
 	}
 
 	/* (non-Javadoc)
@@ -148,67 +174,72 @@ public class PdfPlugin implements TextFilterPlugin {
 	/* (non-Javadoc)
 	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType, org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
 	 */
-//	public boolean transform(
-//		MCRFileContentType ct,
-//		InputStream input,
-//		OutputStream output)
-//		throws FilterPluginTransformException {
-//		if (!getSupportedContentTypes().contains(ct))
-//			throw new FilterPluginTransformException(
-//				"ContentType "
-//					+ ct
-//					+ " is not supported by "
-//					+ getName()
-//					+ "!");
-//		boolean success = true;
-//		try {
-//			stripText(input, output);
-//		} catch (IOException e) {
-//			success = false;
-//			StringBuffer msg =
-//				new StringBuffer("Error while transforming Inputstream: I/O Error");
-//			throw new FilterPluginTransformException(msg.toString(), e);
-//		} finally {
-//			return success;
-//		}
-//	}
-	
+	//	public boolean transform(
+	//		MCRFileContentType ct,
+	//		InputStream input,
+	//		OutputStream output)
+	//		throws FilterPluginTransformException {
+	//		if (!getSupportedContentTypes().contains(ct))
+	//			throw new FilterPluginTransformException(
+	//				"ContentType "
+	//					+ ct
+	//					+ " is not supported by "
+	//					+ getName()
+	//					+ "!");
+	//		boolean success = true;
+	//		try {
+	//			stripText(input, output);
+	//		} catch (IOException e) {
+	//			success = false;
+	//			StringBuffer msg =
+	//				new StringBuffer("Error while transforming Inputstream: I/O Error");
+	//			throw new FilterPluginTransformException(msg.toString(), e);
+	//		} finally {
+	//			return success;
+	//		}
+	//	}
+
 	public boolean transform(
 		MCRFileContentType ct,
 		InputStream input,
-		OutputStream output)
+		Writer output)
 		throws FilterPluginTransformException {
-			if (!getSupportedContentTypes().contains(ct))
-				throw new FilterPluginTransformException(
-					"ContentType "
-						+ ct
-						+ " is not supported by "
-						+ getName()
-						+ "!");
-			boolean success = false;
-			try {
-				System.err.println("===== PDF decoding starts ====");
-				File pdffile=File.createTempFile("inp",".pdf");
-				FileOutputStream fout=new FileOutputStream(pdffile);
-				pdffile.deleteOnExit();
-				MCRUtils.copyStream(input,fout);
-				fout.flush(); fout.close();
-				File txtfile=File.createTempFile("out",".txt");
-				txtfile.deleteOnExit();
-				success=pdftotext(pdffile,txtfile);
-				pdffile.delete();
-				FileInputStream fin=new FileInputStream(txtfile);
-				System.err.println("[0]");
-				if (MCRUtils.copyStream(fin,output)){
-					System.err.println("[1]");
-					txtfile.delete();
-					System.err.println("[2]");
-				}
-			} catch (FileNotFoundException e) {
-				throw new FilterPluginTransformException("File was not found!",e);
-			} catch (IOException e) {
-				throw new FilterPluginTransformException("General I/O Exception occured",e);
+		if (!getSupportedContentTypes().contains(ct))
+			throw new FilterPluginTransformException(
+				"ContentType "
+					+ ct
+					+ " is not supported by "
+					+ getName()
+					+ "!");
+		boolean success = false;
+		try {
+			System.err.println("===== PDF decoding starts ====");
+			File pdffile = File.createTempFile("inp", ".pdf");
+			FileOutputStream fout = new FileOutputStream(pdffile);
+			pdffile.deleteOnExit();
+			MCRUtils.copyStream(input, fout);
+			fout.flush();
+			fout.close();
+			File txtfile = File.createTempFile("out", ".txt");
+			txtfile.deleteOnExit();
+			success = pdftotext(pdffile, txtfile);
+			pdffile.delete();
+			FileInputStream fin = new FileInputStream(txtfile);
+			BufferedReader in =
+				new BufferedReader(new InputStreamReader(fin, textencoding));
+			System.err.println("[0]");
+			if (MCRUtils.copyReader(in, output)) {
+				System.err.println("[1]");
+				txtfile.delete();
+				System.err.println("[2]");
 			}
+		} catch (FileNotFoundException e) {
+			throw new FilterPluginTransformException("File was not found!", e);
+		} catch (IOException e) {
+			throw new FilterPluginTransformException(
+				"General I/O Exception occured",
+				e);
+		}
 		return success;
 	}
 
