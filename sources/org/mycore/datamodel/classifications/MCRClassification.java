@@ -33,6 +33,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
@@ -256,6 +257,8 @@ private ArrayList cat;
    **/
   public final org.jdom.Document receiveClassificationAsJDOM(String ID)
     {
+    MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
+    // create the XML tree
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
@@ -289,6 +292,8 @@ private ArrayList cat;
       MCRCategoryItem ci = catlist[deep][pos[deep]];
       list[deep+1] = new org.jdom.Element("category");
       list[deep+1].setAttribute("ID",ci.getID());
+      int cou = mcr_linktable.countCategoryReferencesFuzzy(ID,ci.getID());
+      list[deep+1].setAttribute("counter",Integer.toString(cou));
       for (int i=0;i<ci.getSize();i++) {
         list[deep+1].addContent(ci.getJDOMElement(i)); }
       list[deep].addContent(list[deep+1]);
@@ -328,6 +333,7 @@ private ArrayList cat;
   public final org.jdom.Document receiveCategoryAsJDOM(String classID, 
     String categID)
     {
+    MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.setAttribute("ID",classID);
@@ -342,6 +348,8 @@ private ArrayList cat;
     org.jdom.Element cats = new org.jdom.Element("categories");
     org.jdom.Element cat = new org.jdom.Element("category");
     cat.setAttribute("ID",ci.getID());
+    int cou = mcr_linktable.countCategoryReferencesFuzzy(classID, categID);
+    cat.setAttribute("counter",Integer.toString(cou));
     for (int i=0;i<ci.getSize();i++) {
       cat.addContent(ci.getJDOMElement(i)); }
     cats.addContent(cat);
