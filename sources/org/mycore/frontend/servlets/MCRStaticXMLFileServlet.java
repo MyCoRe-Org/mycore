@@ -68,14 +68,12 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     String documentBaseURL = file.getParent() + File.separator;
 
     // Store http request parameters into session, for later use
-    if( "true".equals( job.getRequest().getParameter( "storeReqParam" ) ) )
-    {
-      logger.debug( "Storing http request parameters in MCRSession for later use" );
-      Map map = new HashMap();
-      map.putAll( job.getRequest().getParameterMap() );
-      MCRSessionMgr.getCurrentSession().put( "StoredRequestParameters", map );
-    }
+    Map map = new HashMap();
+    map.putAll( job.getRequest().getParameterMap() );
+    String key = buildRequestParamKey();
+    MCRSessionMgr.getCurrentSession().requestParamCache.put( key, map );
 
+    job.getRequest().setAttribute( "XSL.RequestParamKey", key );
     job.getRequest().setAttribute( "XSL.StaticFilePath", requestedPath );
     job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
     job.getRequest().setAttribute( "XSL.FileName", file.getName() );
@@ -84,6 +82,18 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
     rd.forward( job.getRequest(), job.getResponse() );
+  }
+
+  private Random random = new Random();
+
+  /** Helper method to build a unique key for caching http request params **/
+  private synchronized String buildRequestParamKey()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append( Long.toString( System.currentTimeMillis(), 36 ) );
+    sb.append( Long.toString( random.nextLong(), 36 ) );
+    sb.reverse();
+    return sb.toString();
   }
 }
 
