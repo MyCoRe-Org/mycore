@@ -80,7 +80,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common,compile_datamodel,compile_nbn,compile_xml,compile_classifications,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_user,compile_persistency,compile_gui"/>
+  <target name="compile" depends="compile_common,compile_datamodel,compile_nbn,compile_xml,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_webservice,compile_user,compile_persistency,compile_gui"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -101,9 +101,9 @@
     </antcall>
   </target>
 
-  <target name="compile_classifications">
+  <target name="compile_webservice">
     <antcall target="javac">
-      <param name="packages" value="mycore/classifications/**"/>
+      <param name="packages" value="mycore/webservice/**"/>
     </antcall>
   </target>
 
@@ -186,7 +186,7 @@
       ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
     </echo>
     <javadoc
-      packagenames        = "mycore.classifications.*,mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.gui.*"
+      packagenames        = "mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.gui.*,mycore.webservice.*"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
       classpath           = "${lib}/ftp.jar"
