@@ -421,12 +421,13 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
       .setAttribute("ID", ID)
       .setAttribute("id_enabled", (idEnabled) ? "true" : "false")
       .setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
-    org.jdom.Element Passwd = new org.jdom.Element("user.password").setText(passwd);
     org.jdom.Element Creator = new org.jdom.Element("user.creator").setText(super.creator);
     org.jdom.Element CreationDate = new org.jdom.Element("user.creation_date")
       .setText(super.creationDate.toString());
     org.jdom.Element ModifiedDate = new org.jdom.Element("user.last_modified")
       .setText(super.modifiedDate.toString());
+    org.jdom.Element Passwd = new org.jdom.Element("user.password")
+      .setText(passwd);
     org.jdom.Element Description  = new org.jdom.Element("user.description")
       .setText(super.description);
     org.jdom.Element Primarygroup = new org.jdom.Element("user.primary_group")
