@@ -37,6 +37,7 @@ import mycore.common.*;
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
+ * @author Mathias Hegner
  * @version $Revision$ $Date$
 */
 public class MCRQueryServlet extends HttpServlet 
@@ -53,6 +54,11 @@ public class MCRQueryServlet extends HttpServlet
                      HttpServletResponse response )
     throws IOException, ServletException
   {  
+
+    boolean cachedFlag = false;
+    HttpSession session = null;
+    org.jdom.Document jdom = null;
+
     String mode  = request.getParameter( "mode"  );
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
@@ -60,9 +66,43 @@ public class MCRQueryServlet extends HttpServlet
     String lang  = request.getParameter( "lang" );
 
     if( mode  == null ) mode  = "ResultList";
+
+    if (mode.equals("CachedResultList"))
+    {
+      cachedFlag = true;
+      mode = "ResultList";
+    }
+
+    if (mode.equals("ResultList"))
+      session = request.getSession(false);
+
+    if (cachedFlag)
+    {
+      // retrieve result list from session cache
+      try
+      {
+        if (session != null)
+        {
+          jdom = (org.jdom.Document) session.getValue("CachedList");
+          type = (String) session.getValue("CachedType");
+        }
+        else
+          System.out.println("session for getValue is null");
+        if (jdom == null)
+          System.out.println("jdom could not be retrieved from session cache");
+        if (type == null)
+          System.out.println("type could not be retrieved from session cache");
+      }
+      catch (Exception exc)
+      {
+        System.out.println(exc.getClass().getName());
+        System.out.println(exc);
+      }
+    }
+
     if( host  == null ) host  = "local";
     if( query == null ) query = "";
-    if( type  == null ) return; 
+    if( type  == null ) return;
     if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
 
     // prepare the stylesheet name
@@ -70,10 +110,27 @@ public class MCRQueryServlet extends HttpServlet
 
     try
     {
-      MCRQueryResult result = new MCRQueryResult();
-      MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
+      if (! cachedFlag)
+      {
+        MCRQueryResult result = new MCRQueryResult();
+        MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
-      org.jdom.Document jdom = resarray.exportAllToDocument();
+        jdom = resarray.exportAllToDocument();
+
+        // create a new session if not already alive and encache result list
+        if (mode.equals("ResultList"))
+        {
+          if (session == null)
+            session = request.getSession(true);
+          if (session != null)
+          {
+            session.putValue("CachedList", jdom);
+            session.putValue("CachedType", type);
+          }
+          else
+            System.out.println("session for putValue is null");
+        }
+      }
 
       request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
       request.setAttribute( "XSL.Style", style );
