@@ -38,8 +38,8 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public abstract class MCRUploadHandlerBase
 {
-  /** New line */
-  public static String NL = System.getProperty("file.separator");
+  /** File separator */
+  public static String SLASH = System.getProperty("file.separator");
 
   /** The logger */
   protected Logger logger = null;

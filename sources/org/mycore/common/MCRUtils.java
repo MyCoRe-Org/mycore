@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -63,6 +64,9 @@ import org.jdom.output.XMLOutputter;
  * @version $Revision$ $Date$
  **/
 public class MCRUtils {
+
+// The file slash
+private static String SLASH = System.getProperty("file.separator");;
 
 	public final static char COMMAND_OR='O';
 	public final static char COMMAND_AND='A';
@@ -790,4 +794,89 @@ public class MCRUtils {
 	    xout.output(jdom,out);
 	    out.close();
 	}
+
+/**
+ * The method return a list of all file names under the given
+ * directory and subdirectories of itself.
+ *
+ * @param basedir the File instance of the basic directory
+ * @return an ArrayList with file names as pathes
+ **/
+public static ArrayList getAllFileNames(File basedir) 
+  {
+  ArrayList out = new ArrayList();
+  File [] stage = basedir.listFiles();
+  for (int i=0; i<stage.length;i++) {
+    if (stage[i].isFile()) {
+      out.add(stage[i].getName()); }
+    if (stage[i].isDirectory()) {
+      out.addAll(getAllFileNames(stage[i],stage[i].getName()+SLASH));
+      }
+    }
+  return out;
+  }
+
+/**
+ * The method return a list of all file names under the given
+ * directory and subdirectories of itself.
+ *
+ * @param basedir the File instance of the basic directory
+ * @param path the part of directory path
+ * @return an ArrayList with file names as pathes
+ **/
+public static ArrayList getAllFileNames(File basedir, String path) 
+  {
+  ArrayList out = new ArrayList();
+  File [] stage = basedir.listFiles();
+  for (int i=0; i<stage.length;i++) {
+    if (stage[i].isFile()) {
+      out.add(path+stage[i].getName()); }
+    if (stage[i].isDirectory()) {
+      out.addAll(getAllFileNames(stage[i],path+stage[i].getName()+SLASH));
+      }
+    }
+  return out;
+  }
+
+/**
+ * The method return a list of all directory names under the given
+ * directory and subdirectories of itself.
+ *
+ * @param basedir the File instance of the basic directory
+ * @return an ArrayList with directory names as pathes
+ **/
+public static ArrayList getAllDirectoryNames(File basedir) 
+  {
+  ArrayList out = new ArrayList();
+  File [] stage = basedir.listFiles();
+  for (int i=0; i<stage.length;i++) {
+    if (stage[i].isDirectory()) {
+      out.add(stage[i].getName());
+      out.addAll(getAllDirectoryNames(stage[i],stage[i].getName()+SLASH));
+      }
+    }
+  return out;
+  }
+
+/**
+ * The method return a list of all directory names under the given
+ * directory and subdirectories of itself.
+ *
+ * @param basedir the File instance of the basic directory
+ * @param path the part of directory path
+ * @return an ArrayList with directory names as pathes
+ **/
+public static ArrayList getAllDirectoryNames(File basedir, String path) 
+  {
+  ArrayList out = new ArrayList();
+  File [] stage = basedir.listFiles();
+  for (int i=0; i<stage.length;i++) {
+    if (stage[i].isDirectory()) {
+      out.add(path+stage[i].getName());
+      out.addAll(getAllDirectoryNames(stage[i],path+stage[i].getName()+SLASH));
+      }
+    }
+  return out;
+  }
+
 }

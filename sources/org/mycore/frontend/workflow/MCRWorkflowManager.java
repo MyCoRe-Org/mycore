@@ -264,7 +264,7 @@ public final void deleteMetadataObject(String type, String ID)
     String dername = (String)derifiles.get(i);
     logger.debug("Check the derivate file "+dername);
     if (isDerivateOfObject(type,dername,ID)) {
-      deleteDerivateObject(type,ID,dername);
+      deleteDerivateObject(type,dername.substring(0,dername.length()-4));
       }
     }
   }
@@ -273,34 +273,53 @@ public final void deleteMetadataObject(String type, String ID)
  * The method removes a derivate object from the workflow.
  *
  * @param type the MCRObjectID type of the metadata object
- * @param ID the ID of the metadata object
+ * @param ID the MCRObjectID of the derivate object as String
  **/
-public final void deleteDerivateObject(String type, String ID, String dername)
+public final void deleteDerivateObject(String type, String DD)
   {
-  logger.debug("Delete the derivate "+dername);
-  String fn = getDirectoryPath(type)+SLASH+dername;
+  logger.debug("Delete the derivate "+DD);
+  // remove the XML file
+  String fn = getDirectoryPath(type)+SLASH+DD;
   try {
-    File fi = new File(fn);
+    File fi = new File(fn+".xml");
     if (fi.isFile() && fi.canWrite()) {
-      fi.delete(); logger.debug("File "+fn+" removed."); }
+      fi.delete(); logger.debug("File "+fn+".xml removed."); }
     else {
-      logger.error("Can't remove file "+fn); }
+      logger.error("Can't remove file "+fn+".xml"); }
     }
   catch (Exception ex) {
-    logger.error("Can't remove file "+fn); }
+    logger.error("Can't remove file "+fn+".xml"); }
+  // remove all derivate objects
   try {
-    File fi = new File(fn.substring(0,fn.length()-4));
+    File fi = new File(fn);
     if (fi.isDirectory() && fi.canWrite()) {
-      File [] fl = fi.listFiles();
-      for (int j=0;j<fl.length;j++) {
-        String na = fl[j].getName();
-        fl[j].delete(); logger.debug("File "+na+" removed.");
+      // delete files
+      ArrayList dellist = MCRUtils.getAllFileNames(fi);
+      for (int j=0;j<dellist.size();j++) {
+        String na = (String)dellist.get(j);
+        File fl = new File(fn+SLASH+na);
+        if (fl.delete()) {
+          logger.debug("File "+na+" removed."); }
+        else {
+          logger.error("Can't remove file "+na); }
         }
-      fi.delete();
-      logger.debug("Directory "+fn.substring(0,fn.length()-4)+" removed.");
+      // delete subirectories
+      dellist = MCRUtils.getAllDirectoryNames(fi);
+      for (int j=dellist.size()-1;j>-1;j--) {
+        String na = (String)dellist.get(j);
+        File fl = new File(fn+SLASH+na);
+        if (fl.delete()) {
+          logger.debug("Directory "+na+" removed."); }
+        else {
+          logger.error("Can't remove directory "+na); }
+        }
+      if (fi.delete()) {
+        logger.debug("Directory "+fn+" removed."); }
+      else {
+        logger.error("Can't remove directory "+fn); }
       }
     else {
-      logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
+      logger.error("Can't remove directory "+fn); }
     }
   catch (Exception ex) {
     logger.error("Can't remove directory "+fn.substring(0,fn.length()-4)); }
