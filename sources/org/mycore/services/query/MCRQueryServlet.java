@@ -598,48 +598,4 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   	        (RemotePath.equals(ServletPath)) && 
   	        (ServletPort==RemotePort)) ? true : false;
   }
-  
-  private String getProperty(HttpServletRequest request, String name){
-	String value  = (String) request.getAttribute(name);
-	//if Attribute not given try Parameter
-  	if (value == null || value.length()==0)
-		value = request.getParameter(name);
-  	return value;
-  }
-    
-  private void generateErrorPage(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 int error,
-                                 String msg,
-                                 Exception ex,
-                                 boolean xmlstyle)
-               throws IOException, ServletException{
-	logger.error("MCRQueryServlet: Error "+
-				 error+ " occured. The following message was given: "+
-				 msg,ex);
-    String rootname="mcr_error";
-    String lang= (getProperty(request,"lang")!=null)?
-                  getProperty(request,"lang"):defaultLang;
-    String style=(xmlstyle)? "xml":("query-"+lang.toUpperCase());
-	Element root=new Element(rootname);
-	Element exception= new Element("exception");
-	Document errorDoc=new Document(root,new DocType(rootname));
-	root.setAttribute("HttpError",Integer.toString(error))
-	    .setText(msg);
-	if (ex != null){
-		Element trace=new Element("trace");
-		Element message=new Element("message");
-		trace.setText(MCRException.getStackTraceAsString(ex));
-		message.setText(ex.getMessage());
-		exception.addContent(message)
-		         .addContent(trace);
-	}
-	root.addContent(exception);
-	request.setAttribute( MCRLayoutServlet.JDOM_ATTR,  errorDoc );
-	request.setAttribute( "XSL.Style", style );
-	RequestDispatcher rd = getServletContext()
-	                       .getNamedDispatcher( "MCRLayoutServlet" );
-	logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
-	rd.forward( request, response );
-  }
 }

@@ -26,12 +26,17 @@ package org.mycore.frontend.servlets;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jdom.DocType;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.*;
+import org.mycore.common.xml.MCRLayoutServlet;
 
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
@@ -40,6 +45,8 @@ import org.mycore.common.*;
  *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
+ * 
  * @version $Revision$ $Date$
  **/
 public class MCRServlet extends HttpServlet
@@ -246,5 +253,45 @@ public class MCRServlet extends HttpServlet
     logger.info( "Exception type      : " + type    );
     logger.info( "Exception message   : " + msg     );
     logger.debug( trace ); 
+  }
+
+protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle) throws IOException, ServletException {
+	logger.error(getClass().getName()+": Error "+
+				 error+ " occured. The following message was given: "+
+				 msg,ex);
+    String rootname="mcr_error";
+	String defaultLang = config
+	  .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    String lang= (getProperty(request,"lang")!=null)?
+                  getProperty(request,"lang"):defaultLang;
+    String style=(xmlstyle)? "xml":("query-"+lang.toUpperCase());
+	Element root=new Element(rootname);
+	Element exception= new Element("exception");
+	Document errorDoc=new Document(root,new DocType(rootname));
+	root.setAttribute("HttpError",Integer.toString(error))
+	    .setText(msg);
+	if (ex != null){
+		Element trace=new Element("trace");
+		Element message=new Element("message");
+		trace.setText(MCRException.getStackTraceAsString(ex));
+		message.setText(ex.getMessage());
+		exception.addContent(message)
+		         .addContent(trace);
+	}
+	root.addContent(exception);
+	request.setAttribute( MCRLayoutServlet.JDOM_ATTR,  errorDoc );
+	request.setAttribute( "XSL.Style", style );
+	RequestDispatcher rd = getServletContext()
+	                       .getNamedDispatcher( "MCRLayoutServlet" );
+	logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
+	rd.forward( request, response );
+  }
+
+protected String getProperty(HttpServletRequest request, String name) {
+	String value  = (String) request.getAttribute(name);
+	//if Attribute not given try Parameter
+  	if (value == null || value.length()==0)
+		value = request.getParameter(name);
+  	return value;
   }
 }
