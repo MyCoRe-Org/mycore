@@ -43,7 +43,7 @@ import org.mycore.common.xml.MCRXMLContainer;
  *
  * @author Mathias Zarick
  * @author Jens Kupferschmidt
- * @author Thomas Scheffler
+ * @
  * @version $Revision$ $Date$
  **/
 public class MCRServletCommunication implements MCRRemoteAccessInterface
@@ -152,10 +152,8 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
               + "&query=" + URLEncoder.encode(query));
     out.close();
     BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
-    StringBuffer fromServer= new StringBuffer();
-    int inread;
-    while ((inread = in.read()) != -1) fromServer.append((char) inread);
-    result.importElements(fromServer.toString().getBytes());
+    result.importElements(in);
+    in.close();
     for (int i=0;i<result.size();i++) { result.setHost(i,hostAlias); }
     }
   catch(MCRException mcre) {
