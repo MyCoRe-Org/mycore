@@ -389,7 +389,7 @@ public class MCRClassification
       categstop = query.indexOf("\"",categstart+1);
       if (categstop == -1) { return null; }
       categname = query.substring(categstart+1,categstop);
-      cat = true;
+      if (categname.equals("*")) { cat = false; } else { cat = true; }
       }
     if (cat) {
       return receiveCategoryAsJDOM(classname,categname); }
