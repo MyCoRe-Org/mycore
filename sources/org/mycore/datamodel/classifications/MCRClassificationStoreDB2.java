@@ -28,15 +28,25 @@ import java.util.Vector;
 import mycore.common.*;
 import mycore.sql.*;
 
-public class MCRClassificationStoreDB2 
+public class MCRClassificationStoreDB2 implements MCRClassificationStore
 {
+  protected String tableClassif;
+  protected String tableCateg;
+
   public MCRClassificationStoreDB2()
-  { if( ! tablesExist() ) createTables(); }
+  { 
+    MCRConfiguration config = MCRConfiguration.instance();
+    tableClassif = config.getString( "MCR.classifications_store_db2_table_classifications" );
+    tableCateg   = config.getString( "MCR.classifications_store_db2_table_categories" );
+
+    if( ! tablesExist() ) createTables(); 
+  }
   
   protected boolean tablesExist()
   {
-    int number = MCRSQLConnection.justCountRows
-      ( "SYSCAT.TABLES WHERE TABNAME = 'CLASSIF' OR TABNAME = 'CATEG'" );
+    int number = MCRSQLConnection.justCountRows(
+      "SYSCAT.TABLES WHERE TABNAME = '" + tableClassif +
+      "' OR TABNAME = '" + tableCateg + "'" );
     return ( number == 2 );
   }
 
@@ -45,29 +55,29 @@ public class MCRClassificationStoreDB2
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try
     { 
-      c.doUpdate( "DROP TABLE CLASSIF" );
-      c.doUpdate( "DROP TABLE CATEG"   );
+      c.doUpdate( "DROP TABLE " + tableClassif );
+      c.doUpdate( "DROP TABLE " + tableCateg   );
     }
     finally{ c.release(); }
   }
 
-  protected static void createTables()
+  protected void createTables()
   {
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try
     { 
-      c.doUpdate( new MCRSQLStatement( "CLASSIF" )
+      c.doUpdate( new MCRSQLStatement( tableClassif )
         .addColumn( "ID VARCHAR(32) NOT NULL PRIMARY KEY" )
         .addColumn( "LABEL VARCHAR(250) NOT NULL" )
         .toCreateTableStatement() );
-      c.doUpdate( new MCRSQLStatement( "CATEG" )
+      c.doUpdate( new MCRSQLStatement( tableCateg )
         .addColumn( "ID VARCHAR(32) NOT NULL" )
         .addColumn( "CLID VARCHAR(32) NOT NULL" )
         .addColumn( "LABEL VARCHAR(250) NOT NULL" )
         .addColumn( "PID VARCHAR(32)" )
         .addColumn( "PRIMARY KEY ( CLID, ID )" )
-        .addColumn( "CONSTRAINT CATEG2CLASSIF FOREIGN KEY ( CLID ) REFERENCES CLASSIF ON DELETE CASCADE" )
-        .addColumn( "CONSTRAINT CATEG2PARENT FOREIGN KEY ( CLID, PID ) REFERENCES CATEG ON DELETE CASCADE" )
+        .addColumn( "CONSTRAINT CATEG2CLASSIF FOREIGN KEY ( CLID ) REFERENCES " + tableClassif + " ON DELETE CASCADE" )
+        .addColumn( "CONSTRAINT CATEG2PARENT FOREIGN KEY ( CLID, PID ) REFERENCES " + tableCateg + " ON DELETE CASCADE" )
         .toCreateTableStatement() );
     }
     finally{ c.release(); }
@@ -75,7 +85,7 @@ public class MCRClassificationStoreDB2
     
   public void createClassification( MCRClassification classification )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( "CLASSIF" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableClassif )
       .setValue( "ID",    classification.getID()    )
       .setValue( "LABEL", classification.getLabel() )
       .toInsertStatement() );
@@ -83,7 +93,7 @@ public class MCRClassificationStoreDB2
   
   public void updateClassification( MCRClassification classification )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement(  "CLASSIF" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement(  tableClassif )
       .setValue    ( "LABEL", classification.getLabel() )
       .setCondition( "ID",    classification.getID()    )
       .toUpdateStatement() );
@@ -91,7 +101,7 @@ public class MCRClassificationStoreDB2
   
   public void createCategory( MCRCategory category )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( "CATEG" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
       .setValue( "ID",    category.getID()               )
       .setValue( "LABEL", category.getLabel()            )
       .setValue( "CLID",  category.getClassificationID() )
@@ -101,7 +111,7 @@ public class MCRClassificationStoreDB2
     
   public void updateCategory( MCRCategory category )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( "CATEG" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
       .setValue    ( "LABEL", category.getLabel()            )
       .setValue    ( "PID",   category.getParentID()         )
       .setCondition( "ID",    category.getID()               )
@@ -112,7 +122,7 @@ public class MCRClassificationStoreDB2
   public MCRClassification retrieveClassification( String ID )
   {
     MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
-      new MCRSQLStatement( "CLASSIF" )
+      new MCRSQLStatement( tableClassif )
       .setCondition( "ID", ID )
       .toSelectStatement() );
     
@@ -126,7 +136,7 @@ public class MCRClassificationStoreDB2
   public MCRCategory retrieveCategory( String classifID, String categID )
   {
     MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
-      new MCRSQLStatement( "CATEG" )
+      new MCRSQLStatement( tableCateg )
       .setCondition( "ID",   categID   )
       .setCondition( "CLID", classifID )
       .toSelectStatement() );
@@ -142,7 +152,7 @@ public class MCRClassificationStoreDB2
   public Vector retrieveChildren( String classifID, String parentID )
   {
     MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
-      new MCRSQLStatement( "CATEG" )
+      new MCRSQLStatement( tableCateg )
       .setCondition( "PID",  parentID  )
       .setCondition( "CLID", classifID )
       .toSelectStatement() );
@@ -163,7 +173,7 @@ public class MCRClassificationStoreDB2
   
   public int retrieveNumberOfChildren( String classifID, String parentID )
   {
-    return MCRSQLConnection.justCountRows( new MCRSQLStatement( "CATEG" )
+    return MCRSQLConnection.justCountRows( new MCRSQLStatement( tableCateg )
       .setCondition( "PID",  parentID  )
       .setCondition( "CLID", classifID )
       .toRowSelector() );
@@ -171,14 +181,14 @@ public class MCRClassificationStoreDB2
   
   public boolean classificationExists( String classifID )
   {
-    return MCRSQLConnection.justCheckExists( new MCRSQLStatement( "CLASSIF" )
+    return MCRSQLConnection.justCheckExists( new MCRSQLStatement( tableClassif )
       .setCondition( "ID", classifID )
       .toRowSelector() );
   }
   
   public boolean categoryExists( String classifID, String categID )
   {
-    return MCRSQLConnection.justCheckExists( new MCRSQLStatement( "CATEG" )
+    return MCRSQLConnection.justCheckExists( new MCRSQLStatement( tableCateg )
       .setCondition( "ID",   categID   )
       .setCondition( "CLID", classifID )
       .toRowSelector() );
@@ -186,14 +196,14 @@ public class MCRClassificationStoreDB2
   
   public void deleteClassification( String classifID )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( "CLASSIF" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableClassif )
       .setCondition( "ID", classifID )
       .toDeleteStatement() );
   }
   
   public void deleteCategory( String classifID, String categID )
   {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( "CATEG" )
+    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableCateg )
       .setCondition( "CLID", classifID )
       .setCondition( "ID",   categID   )
       .toDeleteStatement() );
