@@ -35,6 +35,7 @@ import org.mycore.common.*;
  * MCRSimpleContentStoreSelector that decides based on the file content type.
  *
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public interface MCRContentStoreSelector
@@ -46,4 +47,11 @@ public interface MCRContentStoreSelector
    * system configuration.
    **/
   public String selectStore( MCRFile file ) throws MCRException;
+  
+  /**
+   * Returns the IDs of all ContentStores available to MyCoRe
+   * 
+   * @return Array of StoreIDs
+   */
+  public String[] getAvailableStoreIDs();
 }
