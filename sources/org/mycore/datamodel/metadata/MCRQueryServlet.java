@@ -43,23 +43,28 @@ public class MCRQueryServlet extends HttpServlet
                      HttpServletResponse response )
     throws IOException, ServletException
   {  
+    String mode  = request.getParameter( "mode"  );
     String query = request.getParameter( "query" );
     String type  = request.getParameter( "type"  );
     String where = request.getParameter( "where" );
 
+    System.out.println( "mode  = " + mode  );
     System.out.println( "query = " + query );
     System.out.println( "type  = " + type  );
     System.out.println( "where = " + where );
 
+    if( mode  == null ) mode  = "ResultList";
     if( where == null ) where = "local";
     if( query == null ) query = "";
     if( type  == null ) return; 
 
     MCRConfiguration config = MCRConfiguration.instance();
 
-    ArrayList hostAliasList = new ArrayList(config
-      .getInt("MCR.communication_max_hosts",3));
-    hostAliasList.add(where);
+    ArrayList hostAliasList = new ArrayList
+      ( config.getInt( "MCR.communication_max_hosts", 3 ) );
+    hostAliasList.add( where );
+
+    String style = mode + "-" + type;
 
     try
     {
@@ -73,8 +78,9 @@ public class MCRQueryServlet extends HttpServlet
       org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
       org.jdom.Document jdom = builder.build( in );
 
-      request.setAttribute( "jdom", jdom );
-      RequestDispatcher rd = getServletContext().getNamedDispatcher( "LayoutServlet" );
+      request.setAttribute( "jdom",  jdom  );
+      request.setAttribute( "style", style );
+      RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
       rd.forward( request, response );
     }
     catch( Exception ex )
