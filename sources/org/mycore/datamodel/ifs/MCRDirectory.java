@@ -37,42 +37,57 @@ import javax.servlet.http.*;
  */
 public class MCRDirectory extends MCRFilesystemNode
 {
-  protected Vector children = new Vector();
+  private Vector childrenIDs;
+  
+  static MCRDirectory getDirectory( String ID )
+  { return (MCRDirectory)( MCRFilesystemNode.getNode( ID ) ); }
   
   public MCRDirectory( String name, String ownerID )
   { 
-    super( name, ownerID ); 
-    // create
+    super( name, ownerID );
+    storeNew();
   }
   
   public MCRDirectory( String name, MCRDirectory parent )
   { 
-    super( name, parent ); 
-    // create
+    super( name, parent );
+    storeNew();
   }
+  
+  MCRDirectory( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date )
+  { super( ID, parentID, ownerID, name, size, date ); }
   
   protected void addChild( MCRFilesystemNode child )
   {
-    // retrieve children
-    children.addElement( child ); 
-    touch();
-    // update
+    if( childrenIDs != null )
+      childrenIDs.addElement( child.getID() );
+    
+    touch(); 
   }
   
   protected void removeChild( MCRFilesystemNode child )
-  {
-    // retrieve children
-    children.removeElement( child ); 
-    sizeOfChildChanged( child.size, 0 );
+  { 
+    if( childrenIDs != null )
+      childrenIDs.removeElement( child.getID() );
+    
+    sizeOfChildChanged( child.size, 0 ); 
   }
   
   public MCRFilesystemNode[] getChildren()
   {
     ensureNotDeleted();
-    // retrieve children
-    MCRFilesystemNode[] array = new MCRFilesystemNode[ getNumChildren() ];
-    children.copyInto( array );
-    return array;
+    
+    if( childrenIDs == null )
+      childrenIDs = manager.retrieveChildrenIDs( ID );
+    
+    MCRFilesystemNode[] children = new MCRFilesystemNode[ childrenIDs.size() ];
+    for( int i = 0; i < childrenIDs.size(); i++ )
+    {
+      String childID = (String)( childrenIDs.get( i ) );
+      children[ i ] = manager.retrieveNode( childID );
+    }
+    
+    return children;
   }
   
   public MCRFilesystemNode[] getChildren( Comparator sortOrder )
@@ -89,46 +104,51 @@ public class MCRDirectory extends MCRFilesystemNode
   public boolean hasChildren()
   {
     ensureNotDeleted();
-    // retrieve children
-    return ( children.size() > 0 ); 
+    return ( getNumChildren() > 0 ); 
   }
   
   public boolean hasChild( String name )
   {
     ensureNotDeleted();
     MCRFilesystemNode child = getChild( name );
-    return ( child == null );
+    return ( child != null );
   }
   
   public MCRFilesystemNode getChild( int index )
   {
     ensureNotDeleted();
-    // retrieve children
-    return (MCRFilesystemNode)( children.get( index ) ); 
+    
+    if( childrenIDs == null )
+      return getChildren()[ index ];
+    else
+      return manager.retrieveNode( (String)( childrenIDs.get( index ) ) );  
   }
   
   public MCRFilesystemNode getChild( String name )
   {
     ensureNotDeleted();
-    // retrieve children
-    for( int i = 0; i < getNumChildren(); i++ )
-    {
-      MCRFilesystemNode child = getChild( i );
-      if( child.getName().equals( name ) ) return child;
-    }
-    return null;
+    
+    if( name.equals( "." ) ) 
+      return this;
+    else if( name.equals( ".." ) )
+      return( hasParent() ? getParent() : null );
+    else
+      return manager.retrieveChild( ID, name );
   }
   
   public MCRFilesystemNode getChildByPath( String path )
   {
     ensureNotDeleted();
-    // retrieve children 
+    
     MCRDirectory base = this;
     
     if( path.startsWith( "/" ) )
     {  
       base = getRootDirectory();
-      path = path.substring( 1 );
+      if( path.equals( "/" ) ) 
+        return base;
+      else
+        path = path.substring( 1 );
     }
     
     int index = path.indexOf( "/" );
@@ -147,8 +167,11 @@ public class MCRDirectory extends MCRFilesystemNode
   public int getNumChildren()
   {
     ensureNotDeleted();
-    // retrieve children
-    return children.size(); 
+    
+    if( childrenIDs != null )
+      return childrenIDs.size();
+    else
+      return manager.retrieveNumberOfChildren( ID );
   }
 
   protected void sizeOfChildChanged( long oldSize, long newSize )
@@ -156,15 +179,19 @@ public class MCRDirectory extends MCRFilesystemNode
     this.size -= oldSize;
     this.size += newSize;
     this.lastModified = new GregorianCalendar();
-    // update
-    if( parent != null ) parent.sizeOfChildChanged( oldSize, newSize );
+    
+    manager.storeNode( this );
+    
+    if( hasParent() ) getParent().sizeOfChildChanged( oldSize, newSize );
   }
   
   protected void touch()
   {
     this.lastModified = new GregorianCalendar();
-    // update
-    if( parent != null ) parent.touch();
+    
+    manager.storeNode( this );
+    
+    if( hasParent() ) getParent().touch();
   }
   
   /**
@@ -175,13 +202,12 @@ public class MCRDirectory extends MCRFilesystemNode
   {
     ensureNotDeleted();
 
-    MCRFilesystemNode[] array = getChildren();
-    for( int i = 0; i < array.length; i++ )
-      array[ i ].delete();
+    for( int i = 0; i < getNumChildren(); i++ )
+      getChild( i ).delete();
     
     super.delete();
     
-    this.children = null;
+    this.childrenIDs = null;
   }
 
   public final static Comparator SORT_BY_NAME_IGNORECASE = new Comparator()

@@ -57,12 +57,24 @@ public class MCRFile extends MCRFilesystemNode
   {
     super( name, ownerID );
     initContentFields();
+    storeNew();
   }
   
   public MCRFile( String name, MCRDirectory parent )
   { 
     super( name, parent );
     initContentFields();
+    storeNew();
+  }
+  
+  MCRFile( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
+  {
+    super( ID, parentID, ownerID, name, size, date );
+    
+    this.storageID     = storageID;
+    this.storeID       = storeID;
+    this.contentTypeID = fctID;
+    this.md5           = md5;
   }
   
   private void initContentFields()
@@ -194,16 +206,14 @@ public class MCRFile extends MCRFilesystemNode
     throws MCRPersistenceException, IOException
   { 
     ensureNotDeleted();
-    
     MCRArgumentChecker.ensureNotNull( source, "source input stream" );
-    String md5_old = this.md5;
-    long size_old = this.size;
     
-    if( storageID.length() != 0 ) // delete old content of file
-    {
-      getContentStore().deleteContent( this );
-      initContentFields();
-    }  
+    String          old_md5       = this.md5;
+    long            old_size      = this.size;
+    String          old_storageID = this.storageID;
+    MCRContentStore old_store     = getContentStore(); 
+    
+    initContentFields();
     
     MCRContentInputStream cis = new MCRContentInputStream( source );
     byte[] header = cis.getHeader();
@@ -221,12 +231,15 @@ public class MCRFile extends MCRFilesystemNode
     
     size = cis.getLength();
     md5  = cis.getMD5String();
-
-    if( ( size != size_old ) || ( ! md5.equals( md5_old ) ) )
-    {
-      lastModified = new GregorianCalendar();
-      if( parent != null ) parent.sizeOfChildChanged( size_old, size );
-    }
+    
+    boolean changed = ( ( size != old_size ) || ( ! md5.equals( old_md5 ) ) );
+    if( changed ) lastModified = new GregorianCalendar();
+    
+    manager.storeNode( this );
+    
+    if( changed && hasParent() ) getParent().sizeOfChildChanged( old_size, size );
+    
+    if( old_storageID.length() != 0 ) old_store.deleteContent( old_storageID );
   }
 
   /**
@@ -237,7 +250,7 @@ public class MCRFile extends MCRFilesystemNode
   {
     ensureNotDeleted();
     
-    if( storageID.length() != 0 ) getContentStore().deleteContent( this );
+    if( storageID.length() != 0 ) getContentStore().deleteContent( storageID );
     super.delete();
     
     this.contentTypeID = null;
@@ -353,5 +366,16 @@ public class MCRFile extends MCRFilesystemNode
   { 
     ensureNotDeleted();
     return MCRFileContentTypeFactory.getType( contentTypeID ); 
+  }
+  
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append( super.toString() );
+    sb.append( "ContentType = " ).append( this.contentTypeID ).append( "\n" );
+    sb.append( "MD5         = " ).append( this.md5           ).append( "\n" );
+    sb.append( "StoreID     = " ).append( this.storeID       ).append( "\n" );
+    sb.append( "StorageID   = " ).append( this.storageID     );
+    return sb.toString();
   }
 }

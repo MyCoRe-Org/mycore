@@ -25,7 +25,8 @@
 package mycore.ifs;
 
 import java.io.File;
-import java.util.GregorianCalendar;
+import java.util.*;
+import java.text.*;
 import mycore.common.*;
 
 /**
@@ -36,11 +37,27 @@ import mycore.common.*;
  */
 public abstract class MCRFilesystemNode 
 {
+  protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
+  
+  public static MCRFilesystemNode getNode( String ID )
+  { 
+    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
+    return manager.retrieveNode( ID );
+  }
+  
+  public static MCRFilesystemNode[] getRootNodes( String ownerID )
+  { 
+    MCRArgumentChecker.ensureNotEmpty( ownerID, "ownerID" );
+    return manager.retrieveRootNodes( ownerID );
+  }
+  
+  protected String ID;
+  
   /** The ID of the node owner, e .g. a MILESS derivate ID */
   protected String ownerID;
   
-  /** The parent directory, if any */
-  protected MCRDirectory parent;
+  /** The ID of the parent directory, if any */
+  protected String parentID;
   
   /** The name of this node */
   protected String name;
@@ -55,22 +72,17 @@ public abstract class MCRFilesystemNode
   protected boolean deleted = false;
   
   protected MCRFilesystemNode( String name, String ownerID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( ownerID, "owner ID" );
-    init( name, null, ownerID );
-  }
+  { this( name, null, ownerID ); }
   
   protected MCRFilesystemNode( String name, MCRDirectory parent )
-  {
-    MCRArgumentChecker.ensureNotNull( parent, "parent directory" );
-    MCRArgumentChecker.ensureIsFalse( parent.deleted, "parent directory is deleted!" );
-    init( name, parent, parent.ownerID );
-    parent.addChild( this );
-  }
+  { this( name, parent.ID, parent.ownerID ); }
   
-  private void init( String name, MCRDirectory parent, String ownerID )
+  private MCRFilesystemNode( String name, String parentID, String ownerID )
   {
-    this.parent       = parent;
+    MCRArgumentChecker.ensureNotEmpty( ownerID, "owner ID" );
+    
+    this.ID           = manager.createNodeID();
+    this.parentID     = parentID;
     this.ownerID      = ownerID;
     this.size         = 0;
     this.lastModified = new GregorianCalendar();
@@ -78,16 +90,36 @@ public abstract class MCRFilesystemNode
     checkName( name );
     this.name = name;
   }
+  
+  protected MCRFilesystemNode( String ID, String parentID, String ownerID, String name, long size, GregorianCalendar date )
+  {
+    this.ID           = ID;
+    this.parentID     = parentID;
+    this.ownerID      = ownerID;
+    this.name         = name;
+    this.size         = size;
+    this.lastModified = date;
+    this.deleted      = false;
+  }
     
+  protected void storeNew()
+  {
+    manager.storeNode( this );
+    if( hasParent() ) getParent().addChild( this );
+  }
+  
   public void delete()
   {
-    if( parent != null ) parent.removeChild( this );
+    manager.deleteNode( ID );
     
+    if( parentID != null ) getParent().removeChild( this );
+    
+    this.ID           = null;
     this.ownerID      = null;
     this.name         = null;
     this.size         = 0;
     this.lastModified = null;
-    this.parent       = null;
+    this.parentID     = null;
     this.deleted      = true;
   }
   
@@ -101,11 +133,14 @@ public abstract class MCRFilesystemNode
     
     if( hasParent() )
     {  
-      boolean exists = parent.hasChild( name );
+      boolean exists = getParent().hasChild( name );
       String existsMsg = "A node with this name already exists: " + name;
       MCRArgumentChecker.ensureIsFalse( exists, existsMsg );
     }
   }
+  
+  public String getID()
+  { return ID; }
 
   /**
    * Returns the ID of the owner of this node
@@ -121,13 +156,17 @@ public abstract class MCRFilesystemNode
   public MCRDirectory getParent()
   { 
     ensureNotDeleted();
-    return parent; 
+    
+    if( ! hasParent() ) 
+      return null;
+    else
+      return MCRDirectory.getDirectory( ID );
   }
   
   public boolean hasParent()
   { 
     ensureNotDeleted();
-    return ( parent != null ); 
+    return ( parentID != null ); 
   }
   
   public MCRDirectory getRootDirectory()
@@ -135,7 +174,7 @@ public abstract class MCRFilesystemNode
     ensureNotDeleted();
 
     if( hasParent() )
-      return parent.getRootDirectory();
+      return getParent().getRootDirectory();
     else if ( this instanceof MCRDirectory )
       return (MCRDirectory)this;
     else
@@ -156,10 +195,11 @@ public abstract class MCRFilesystemNode
     
     checkName( name );
     this.name = name;
-    
     this.lastModified = new GregorianCalendar();
     
-    if( parent != null ) parent.touch();
+    manager.storeNode( this );
+    
+    if( parentID != null ) getParent().touch();
   }
   
   /**
@@ -178,7 +218,7 @@ public abstract class MCRFilesystemNode
     ensureNotDeleted();
 
     if( hasParent() )
-      return parent.getPath() + "/" + name;
+      return getParent().getPath() + "/" + name;
     else
       return name; 
   }
@@ -188,9 +228,12 @@ public abstract class MCRFilesystemNode
     ensureNotDeleted();
 
     if( hasParent() )
-      return parent.getPath() + "/" + name;
-    else
-      return ""; 
+    {  
+      String path = getParent().getAbsolutePath();
+      if( ! path.endsWith( "/" ) ) path += "/";
+      return path + name;
+    }  
+    else return "/"; 
   }
   
   /**
@@ -253,5 +296,22 @@ public abstract class MCRFilesystemNode
   { 
     ensureNotDeleted();
     return lastModified; 
+  }
+  
+  protected static DateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss_SSS" );
+  
+  public String toString()
+  {
+    String date = formatter.format( lastModified.getTime() );
+    
+    StringBuffer sb = new StringBuffer();
+    sb.append( "ID          = " ).append( this.ID                   ).append( "\n" );
+    sb.append( "Name        = " ).append( this.name                 ).append( "\n" );
+    sb.append( "Type        = " ).append( this.getClass().getName() ).append( "\n" );
+    sb.append( "ParentID    = " ).append( this.parentID             ).append( "\n" );
+    sb.append( "OwnerID     = " ).append( this.ownerID              ).append( "\n" );
+    sb.append( "Size        = " ).append( this.size                 ).append( "\n" );
+    sb.append( "Modified    = " ).append( date                      ).append( "\n" );
+    return sb.toString();
   }
 }
