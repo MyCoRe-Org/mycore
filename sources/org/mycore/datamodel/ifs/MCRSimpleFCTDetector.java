@@ -28,6 +28,19 @@ import org.mycore.common.*;
 import org.jdom.*;
 import java.util.*;
 
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import org.apache.log4j.Logger;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+
 /** 
  * A simple implementation of an MCRFileContentTypeDetector, detects
  * the file type based on the filename extension and a magic bytes
@@ -53,6 +66,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
   
   /** Creates a new detector */
   public MCRSimpleFCTDetector(){}
+  
+  private static Logger logger = Logger.getLogger( MCRSimpleFCTDetector.class );
   
   /**
    * Adds a detection rule from the file content type definition XML file.
@@ -239,14 +254,30 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
     
     double getScore( String filename, byte[] header )
     {
+      String pat  = new String( pattern );
+      String head = new String( header );
+      
       if ( -1 == offset )                    // pattern in header?
       {
-        String pat  = new String( pattern );
-        String head = new String( header );
         if ( -1 != head.indexOf( pat ) )
           return score;
         else
           return 0;
+      }
+      
+      if ( -2 == offset )                    // xml mit doctype?
+      {
+        if ( ! head.startsWith( "<?xml" ) )
+          return 0;
+        try
+        {
+          String doctype = parseDocumentType( new ByteArrayInputStream( header ) );
+          if ( doctype.equals( pat ) )
+            return score;
+          else
+            return 0;
+        }
+        catch( Exception exc ) { return 0; }
       }
       
       boolean matches = ( header.length >= ( pattern.length + offset ) );
@@ -257,4 +288,60 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
       return( matches ? score : 0 );
     }
   }
+
+  /**
+   * Copy from MCRLayoutServlet, messages changed from MCRLayoutServlet to MCRSimpleFCTDetector
+   * Try to detect doctype of xml data
+   *
+   * @param in xml data 
+   *
+   * @return detected doctype
+   */
+  protected String parseDocumentType( InputStream in )
+  {
+    SAXParser parser = null;
+    try{ parser = SAXParserFactory.newInstance().newSAXParser(); }
+    catch( Exception ex )
+    {
+      String msg = "Could not build a SAX Parser for processing XML input";
+      throw new MCRConfigurationException( msg, ex );
+    }
+    
+    final Properties detected = new Properties();
+    final String forcedInterrupt = "mcr.forced.interrupt";
+    
+    DefaultHandler handler = new DefaultHandler()
+    {
+      public void startElement( String uri, String localName, String qName,
+                                Attributes attributes )
+        throws SAXException
+      {
+        logger.debug( "MCRSimpleFCTDetector detected root element = " + qName );
+        detected.setProperty( "docType", qName );
+        throw new MCRException( forcedInterrupt );
+      }
+     
+      // We would need SAX 2.0 to be able to do this, for later use:
+      public void startDTD( String name, String publicId, String systemId )
+        throws SAXException
+      {
+        logger.debug( "MCRSimpleFCTDetector detected DOCTYPE declaration = " + name );
+        detected.setProperty( "docType", name );
+        throw new MCRException( forcedInterrupt );
+      }
+    };
+    
+    try{ parser.parse( new InputSource( in ), handler ); }
+    catch( Exception ex )
+    {
+      if( ! forcedInterrupt.equals( ex.getMessage() ) )
+      {
+        String msg = "Error while detecting XML document type from input source";
+        throw new MCRException( msg, ex );
+      }
+    }
+    
+    return detected.getProperty( "docType" );
+  }
+
 }
