@@ -104,7 +104,7 @@ public class MCRCM8TransformXPathToCM8
 				continue;
 			cond
 				.append(' ')
-				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix))
+				.append(traceOneCondition((String) subqueries.get(i), itemtypeprefix));
                         boolean fl = false;
                         for (int j=i+1;j<subqueries.size();j++) {
                                 if (!((Boolean) flags.get(j)).booleanValue())
