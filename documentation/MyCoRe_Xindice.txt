@@ -36,6 +36,9 @@ mycore-directory from
 8. now set in mycore.properties.private
 
    MCR.persistence_type=xmldb
+   MCR.persistence_xmldb_driver=org.apache.xindice.client.xmldb.DatabaseImpl
+   MCR.persistence_xmldb_database_url=xmldb:xindice:///db/mycore
+   MCR.persistence_xmldb_database=xindice
 
    make sure that the cm7 and cm8 persistence types are deactivated, add # at the beginning
    of the line
