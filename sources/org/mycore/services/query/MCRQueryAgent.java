@@ -35,10 +35,10 @@ import org.mycore.common.xml.MCRXMLContainer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryAgent {
-	private final int nThreads;
-	private final PoolWorker[] threads;
-	private final LinkedList queue;
-	private final MCRConfiguration conf;
+	private int nThreads;
+	private PoolWorker[] threads;
+	private LinkedList queue;
+	private MCRConfiguration conf;
 	private static int vec_max_length;  
 	public MCRQueryAgent(int nThreads, MCRConfiguration conf)
 	{

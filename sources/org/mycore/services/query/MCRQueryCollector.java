@@ -41,10 +41,10 @@ import org.mycore.common.xml.MCRXMLContainer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryCollector {
-	private final int nThreads;
-	private final PoolWorker[] threads;
-	private final LinkedList queue;
-	private final MCRQueryAgent agent;
+	private int nThreads;
+	private PoolWorker[] threads;
+	private LinkedList queue;
+	private MCRQueryAgent agent;
 
 	//	The list of hosts from the configuration
  	private HashSet remoteAliasList = null;
