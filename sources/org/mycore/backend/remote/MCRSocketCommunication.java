@@ -25,19 +25,27 @@
 package mycore.communication;
 
 import java.util.*;
+import java.io.*;
+import java.net.*;
 import mycore.common.MCRException;
+import mycore.common.MCRConfiguration;
 import mycore.datamodel.MCRQueryResult;
+import mycore.datamodel.MCRObject;
 
 /**
  * This class implements the interface to choose the communication methodes
  * for the connection between MCRClient and MCRServer.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 
 public class MCRSocketCommunication implements MCRCommunicationInterface
 {
+
+private Vector hostlist;
+private String reqstream;
 
 /**
  * This is the constructor for the MCRSocketCommunication.
@@ -63,8 +71,11 @@ public void request(Vector hostlist, String reqstream)
     }
   System.out.println("Request  : "+reqstream);
   System.out.println();
+
+  this.hostlist = hostlist;
+  this.reqstream = reqstream;
   }
- 
+
 /**
  * This methode represide the response methode for the communication.
  * For the connection parameter would the MCRConfiguration used.
@@ -75,7 +86,100 @@ public void request(Vector hostlist, String reqstream)
  **/
 public String response() throws MCRException
   {
-  return MCRQueryResult.TAG_RESULTS_S+MCRQueryResult.TAG_RESULTS_E;
+  String NL = System.getProperty("line.separator");
+  String currentHost;     // in this format: server.domain.de:12345
+  String host;            // in this format: server.domain.de
+  int port;               // the port: 12345
+  String result = "";
+  for (int i=0;i<hostlist.size();i++) {
+    currentHost = (String)hostlist.elementAt(i);
+    if ( currentHost.indexOf(':') > -1 ) {
+      host = currentHost.substring(0,currentHost.indexOf(':'));
+      port = Integer.parseInt(currentHost.substring(currentHost.indexOf(':')+1));
+    }
+    else {
+      MCRConfiguration config = MCRConfiguration.instance();
+      host = currentHost;
+      port = config.getInt("MCR.communication_default_port");
+    }
+    result = result + "<mcr_archive host=\"" + host + "\" port=\"" + port + "\">" + NL;
+    MCRSocketCommunicator sc = null;
+    try {
+      sc = new MCRSocketCommunicator(new Socket(host, port));
+    } catch (UnknownHostException e) {
+      result = result + "<error type=\"UnknownHost\"/>" + NL;
+      // throw new MCRException("Don't know about host: " + host +".");
+    } catch (IOException e) {
+      result = result + "<error type=\"IO\"/>" + NL;
+      // throw new MCRException("Couldn't get I/O for the connection to: " + host + ".");
+    }
+    if (sc != null)
+    try {
+      int state = 0;
+      int resultSize = 0;
+      String toServer ="";
+      String fromServer = sc.read();
+
+      while ( ! fromServer.equals("bye") ) {
+        if (state == 0) {
+          if (fromServer.equals("connected")) {
+            toServer = "query in bytes:" + reqstream.length();
+            state = 1;
+          }
+        }
+        else if (state == 1) {
+          if (fromServer.equals("ok expecting query")) {
+            toServer = reqstream;
+            state = 2;
+          }
+        }
+        else if (state == 2) {
+          try {
+            if ( (fromServer.substring(0,15).equals("received bytes:")) &&
+                 (reqstream.length() == Integer.parseInt(fromServer.substring(15))) ) {
+              toServer = "ok expecting result size";
+              state = 3;
+            }
+          }
+          catch (NumberFormatException nfe) {
+          }
+          catch (IndexOutOfBoundsException ioobe) {
+          }
+        }
+        else if (state == 3) {
+          try {
+            if ((fromServer.substring(0,16).equals("result in bytes:"))) {
+              resultSize = Integer.parseInt(fromServer.substring(16));
+              toServer = "ok expecting result";
+              state = 4;
+            }
+          }
+          catch (NumberFormatException nfe) {
+          }
+          catch (IndexOutOfBoundsException ioobe) {
+          }
+        }
+        else if (state == 4) {
+          if (fromServer.length() == resultSize) {
+            if (fromServer.startsWith(MCRObject.XML_HEADER))
+              fromServer = fromServer.substring(MCRObject.XML_HEADER.length());
+            result = result + fromServer;
+            toServer = "received bytes:"+resultSize;
+            state = 5;
+          }
+        }
+        sc.write(toServer);
+        if (state == 4) fromServer = sc.read(resultSize);
+        else fromServer = sc.read();
+      }
+      sc.close();
+    }
+    catch (Exception e) { e.printStackTrace(System.err);}
+  result = result + "</mcr_archive>" + NL;
   }
- 
+
+  //return MCRQueryResult.TAG_RESULTS_S+'\n'+result+MCRQueryResult.TAG_RESULTS_E;
+  return MCRObject.XML_HEADER+NL+"<mcr_global_results>"+NL+result+"</mcr_global_results>";
+  }
+
 }
