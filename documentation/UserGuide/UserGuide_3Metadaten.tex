@@ -8,33 +8,30 @@ Um die Metadaten besser auf unterschiedlichen Datenspiechern ablegen zu können, 
 Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstrukturen und Standard-Metadaten-Typen werden seitens MyCoRe bereits XMLSchema-Dateien mitgeliefert.
 %
 %
-\subsubsection{Konkreter Aufbau eines Matadaten-Objektes}
+\subsubsection{XML-Syntax eines Matadaten-Objektes}
 \begin{center}
-%\begin{boxedminipage}[t]{13cm}
-%\bottomcaption{Allgemeiner Aufbau des Metadaten-Objektes}
-
+\bottomcaption{XML-Syntax eines Metadaten-Objektes}
 \lstset{language=XML,fancyvrb=true,breaklines}
 \begin{lstlisting}[frame=single]
-<?xml version="1.0" cncoding="iso-8859" ?>
-<mycoreobject
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="....xsd"
- xmlns:xlink="http://www.w3.org/1999/xlink"
- ID="..."
- label="..."
- >
- <structure>
-  ...
- </structure>
- <metadata xml:lang="de">
-  ...
- </metadata>
- <service>
-  ...
- </service>
-</mycoreobject>
+ <?xml version="1.0" cncoding="iso-8859" ?>
+ <mycoreobject
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="....xsd"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  ID="..."
+  label="..."
+  >
+  <structure>
+   ...
+  </structure>
+  <metadata xml:lang="de">
+   ...
+  </metadata>
+  <service>
+   ...
+  </service>
+ </mycoreobject>
 \end{lstlisting}
-%\end{boxedminipage}
 \end{center}
 
 Für {\bf xsi:noNamespaceSchemaLocation} ist das entsprechende XMLSchema-File des Metadaten-Types anzugeben (z. B. \mcrfile{Document.xsd})\\[2ex]
@@ -43,31 +40,141 @@ Der {\bf label} ist ein kurzer Text-String, der bei administrativen Arbeiten an 
 Innerhalb der XML-Datenstruktur gibt es die Abschnitte {\bf structure}, {\bf metadata} und {\bf service} zur Trennung von Struktur-, Beschreibungs- und Wartungsdaten. Diese Tag-Namen sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!}\\[2ex]
 %
 %
-\subsubsection{Aufbau des XML-Knotens structure}
+\subsubsection{XML-Synatx des structure XML-Knotens}
 Im XML-Knoten {\bf structure} sind alle Informationen über die Beziehung des Metadaten-Objektes zu anderen Objekten abgelegt. Es werden derzeit die folgenden XML-Daten unter diesem Knoten abgelegt. Die Tag-Namen {\bf parents/parent}, {\bf children/child} und {\bf derobjects/derobject} sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!} Alle Sub-Knoten haben einen Aufbau wie für MCRMetaLinkID beschieben.\\[2ex]
 In {\bf parents} wird ein Link zu einem Eltern-Objekt gespeichert, sofern das referentierende Objekt Eltern hat. Ob dies der Fall ist, bestimmt die Anwendung. Das Tag dient der getsaltung von Vererbungsbäumen und kann durch den Anweder festgelegt werden. Siehe auch 'Programmers Guide', Abschnitt Vererbung. Die Werte für {\it xlink:title} und {\it xlink:label} werden beim Laden der Daten automatisch ergänzt.\\[2ex]
 Die Informationen über die {\bf children} hingegen werden durch das MyCoRe-System beim Laden der Daten {\bf automatisch} erzeugt und {\bf dürfen nicht per Hand geändert werden}, das sonst das Gesamtsystem nicht mehr konsistent ist. Werden die Metadaten eines Kindes oder eines Baumes von Kindern gelöscht, so wird in diesem Teil des XML-Knotens der Eintrag durch die Software entfernt.\\[2ex]
 Das selbe gilt auch für den XML-Unterknoten {\bf derobjects}. In diesem Bereich werden alle Verweise auf die an das Metadaten-Objekt angehangenen digitalen Objekte gespeichert. Jeder Eintrag verweist mittels einer Referenz auf ein Datenobjekt vom Typ {\it mycorederivate}, wie es im nachfolgenden Abschnitt {\bf 'IFS und Content Store'} näher erläutert ist.
 \begin{center}
-%\begin{boxedminipage}[t]{13cm}
-%\bottomcaption{Allgemeiner Aufbau des structure XML-Knotens}
+\bottomcaption{XML-Syntax des structure XML-Knotens}
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}{frame=single}
-<structure>
- <parents class="MCRMetaLinkID">
-  <parent xlink:type="locator" xlink:href="...mcr_id..." />
- </parents>
- <children class="MCRMetaLinkID">
-  <child xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
-  ...
- </children>
- <derobjects class="MCRMetaLinkID">
-  <derobject xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
-  ...
- </derobjects>
-</structure>
+ <structure>
+  <parents class="MCRMetaLinkID">
+   <parent xlink:type="locator" xlink:href="...mcr_id..." />
+  </parents>
+  <children class="MCRMetaLinkID">
+   <child xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+   ...
+  </children>
+  <derobjects class="MCRMetaLinkID">
+   <derobject xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+   ...
+  </derobjects>
+ </structure>
 \end{lstlisting}
-%\end{boxedminipage}
 \end{center}
+%
+%
+\subsubsection{XML-Synatx des metadata XML-Knotens}
+Der Abschnitt {\bf metadata} des MyCoRe-Metadaten-Objektes nimmt alle Beschreibungsdaten des eigentlichen Datenmodells auf. Diese werden ihrerseits in vordefinierten Datentyp-Strukturen mit festgelegtem Sysntax abgelegt. Die Liste der Einzelelemente und die Reihenfolge der Typen ist dabei quasi beliebig in Anordnung und Länge. Wichtig ist nur, dass alle Datentypen bestimmte gemeinsame eigenschaften haben. Es ist auch jeder Zeit möglich, weitere Typen den Projekten der Anwender hinzuzufügen (siehe dazu das Programmer Guide).
+\begin{center}
+\bottomcaption{XML-Syntax des structure XML-Knotens}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
+ <metadata xml:lang="...">
+  <... class="MCRMeta..." heritabel="..." parasearch="..." textsearch="...">
+   ...
+  </...>
+  ...
+ </metadata>
+\end{lstlisting}
+\end{center}
+Die Metadaten bestehen aus einer Ansammlung von Informationen rund um das multimediale Objekt und sind hauptsächlicher der Teil, welcher in der Suche abgefragt wird. Jedes Metadatum (auch Metadaten-Tag) enthält im {\it class} Attribut den Namen des MCRMeta-Types bzw. der gleichnamigen MCRMeta-Java Klasse. Daneben gibt es noch ein Attribut {\it heritable}, in dem festgelegt wird, ob diese Metadaten vererbbar seinen sollen. Weiterhin können noch die Attribute {\it papasearch} für die Einbindung in die parametrische Suche und {\it textsearch} für die Volltext-Suche angegeben werden. Es sind jeweils die boolschen Werte {\bf true} oder {\bf false} möglich. Die mit der vererbung verbundenen Mechanismen sind in dieser Dokumentation weiter hinten beschrieben. \\[2ex]
+Für MyCoRe  wurden einige Basis-Metadaten-Typen festgelegt, mit denen die Mehrzahl der bisher in Betracht kommenden Anwendungen gelöst werden können. Die einzelnen Daten treten dabei als Liste auf, in denen mehrere Elemente des gleichen Types erscheinen können, beispielsweise ein Titel in verschiedenen Sprachen. Jedes Listenelement hat wiederum per Default ein {\it type} Attribut und eine gemäß W3C spezifizierte Sprache im Attribut {\it xml:lang}. Derzeit sind für MyCoRe folgende Sprachkürzel nach ISO-Norm nutzbar: \\
+\begin{center}
+\{tt 'de' 'en' 'en_uk' 'en_us' 'all'}
+\end{center}\\
+Für interne Zwecke wurde ein weiteres Attribut {\it inherited'} eingeführt. Dieses ist NICHT durch den Anwender zu verändern! Es wird gesetzt, wenn das betreffende Metadatum von einem Elternteil geerbt wurde (siehe Vererbung). Diese Information ist für die Datenpräsentation sehr hilfreich. \\[2ex]
+Für das MyCoRe-Beispiel mit einem Dublin Core Datenmodell werden bereits einige Metadaten-Typen verwendet, welche dem MyCoRe-Kern beigefügt sind. Die Syntax der einzelnen Typen wird in den nachfolgenden Absätzen genau beschrieben.\\[2ex] 
+\small
+\bottomcaption{MyCoRe Metadaten-Basistypen}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{4cm}|p{11cm}|}
+\hline
+{\bf Typ} & {\bf Kurzbeschreibung} \\ \hline
+MCRMetaAddress & Dieser XML-Part enthält alle zu einer Liste von postalischen Adressen zugehörigen Daten. \\ \hline
+MCRMetaBoolean & Dieser XML-Part enthält die optional mit einem Typ versehenen Wahrheitswerte.\\ \hline
+MCRMetaClass & Dieser XML-Part enthält Links auf Kategorien von Klassifikationen.\\ \hline
+MCRMetaCorporation & Dieser XML-Part enthält alle zu einer Liste von Institutionen zugehörigen Daten. \\ \hline
+MCRMetaDate & Dieser XML-Part enthält eine Liste von typisierten Datumsangaben. \\ \hline
+MCRMetaLangText & Dies ist ein XML-Part, welcher ein Datenpaar aus einem Text-String und der dazugehörigen Sprache darstellt.\\ \hline
+MCRMetaLink & Dieser XML-Part enthält Links auf andere Objekte. Basis der Gestaltung dieses Parts ist die Spezifikation für XLink des W3C. \\ \hline
+MCRMetaLinkID & Der Part ist ananlog zu MCRMetaLink, es können aber nur MCRObjectID's als Referenz angegeben werden.\\ \hline
+MCRMetaNumber & Dieser XML-Part enthält alle zu einer Liste von Zahlenwerten gehörenden Daten wie Dimension und Maßeinheit.\\ \hline
+MCRMetaPerson & Dieser XML-Part enthält alle zu einer Liste von natürlichen personen und deren zugehörigen Daten. \\ \hline
+\end{supertabular}
+\normalsize
+%
+%
+\subsubsection{XML-Synatx des Metadaten-Types MCRMetaAddress}
+Der Basistype MCRMetaAddress beinhaltet eine Liste von postalischen Anschriften in der Ausprägung eines XML-Abschnittes. Dabei wird berücksichtigt, dass die Anschrift in verschiedenen Sprachen und in international gängigen Formen gespeichert werden soll. Die einzelnen Subtags sind dabei selbsterklärend. Die Angaben zu {\it type} und {\it xml:lang} sind optional, ebenso die unter {\it subtag} liegenden Tags, jedoch muss mindestens eines ausgefüllt sein. Alle Werte wenden als Text betrachtet. Das Attribut {\it textsearch} hat keinen Effekt bei diesem Typ.\\[2ex]
+\begin{center}
+\bottomcaption{XML-Syntax des Metadaten-Basistypes MCRMetaAddress}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
+ <tag class="MCRMetaAddress" heritable="..." parasearch="...">
+  <subtag type="..." xml:lang="...">
+   <country>...</country>
+   <state>...</state>
+   <zipcode>...</zipcode>
+   <city>...</city>
+   <street>...</street>
+   <number>...</number>
+  </subtab>
+  ...
+ </tag>
+\end{lstlisting}
+\end{center}
+\begin{center}
+\bottomcaption{Beispiel des Metadaten-Basistypes MCRMetaAddress}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
+ <addresses class="MCRMetaAddress" heritable="false" parasearch="true">
+  <address type="Work" xml:lang="de">
+   <country>Deutschland</country>
+   <state>Sachsen</state>
+   <zipcode>04109</zipcode>
+   <city>Leipzig</city>
+   <street>Augustuspaltz</street>
+   <number>10/11</number>
+  </address>
+  ...
+ </addresses>
+\end{lstlisting}
+\end{center}
+%
+%
+\subsubsection{XML-Synatx des Metadaten-Types MCRMetaBoolean}
+Der Basistyp MCRMetaBoolean beinhaltet eine Liste von Wahrheitswerten mit zugehörigen {\it type} Attributen. Das Attribut {\it textsearch} hat keinen Effekt bei diesem Typ. Folgende Werte sind zulässig:\\
+\begin{itemize}
+\item für {\bf true} - 'true', 'yes', 'wahr' und 'ja'
+\item für {\bf false} - 'false', 'no', 'falsch' und 'nein'
+\end{itemize}
+\begin{center}
+\bottomcaption{XML-Syntax des Metadaten-Basistypes MCRMetaBollean}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
+ <tag class="MCRMetaBoolean" heritable="..." parasearch="...">
+  <subtag type="..." xml:lang="...">
+   ...
+  </subtab>
+  ...
+ </tag>
+\end{lstlisting}
+\end{center}
+\begin{center}
+\bottomcaption{XML-Syntax des Metadaten-Basistypes MCRMetaBollean}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
+ <publishes class="MCRMetaBoolean" heritable="true" parasearch="true">
+  <publish type="Ausgabe_1" xml:lang="de">ja</publish>
+  <publish type="Ausgabe_2" xml:lang="de">nein</publish>
+  ...
+ </publishes>
+\end{lstlisting}
+\end{center}
+
 
 
