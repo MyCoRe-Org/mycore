@@ -24,6 +24,7 @@
 
 package mycore.common;
 
+import java.io.*;
 import java.util.*;
 import java.text.*;
 import mycore.common.MCRArgumentChecker;
@@ -167,6 +168,28 @@ public static final String stringToXML(String in)
     sb.append(in.charAt(i));
     }
   return sb.toString();
+  }
+
+/**
+ * This method convert a JDOM tree to a byte array.
+ *
+ * @param jdom_in the JDOM tree
+ * @return a byte array of the JDOM tree
+ **/
+public static final byte [] getByteArray(org.jdom.Document jdom)
+  throws MCRPersistenceException
+  {
+  MCRConfiguration conf = MCRConfiguration.instance();
+  String mcr_encoding = conf.getString("MCR.metadata_default_encoding");
+  ByteArrayOutputStream outb = new ByteArrayOutputStream();
+  try {
+    org.jdom.output.XMLOutputter outp = new org.jdom.output.XMLOutputter();
+    outp.setEncoding(mcr_encoding);
+    outp.setNewlines(true);
+    outp.output(jdom,outb); }
+  catch (Exception e) {
+    throw new MCRPersistenceException("Can't produce byte array."); }
+  return outb.toByteArray();
   }
 
 } 
