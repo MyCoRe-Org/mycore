@@ -127,7 +127,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
       }
       else // should be one of "wma" "wmv" "asf"
       {
-        contentTypeID = file.getContentType().getID();
+        contentTypeID = file.getContentTypeID();
         
         if( contentTypeID.equals( "wma" ) )
           mediaType = AUDIO;
