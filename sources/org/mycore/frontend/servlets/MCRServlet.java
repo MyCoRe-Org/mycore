@@ -207,7 +207,7 @@ public class MCRServlet extends HttpServlet {
 			// Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal nur als Test!!!
 			String lang = getStringParameter(job, "lang");
 			if (lang.trim().length() != 0)
-				session.setCurrentLanguage(lang.trim().toUpperCase());
+				session.setCurrentLanguage(lang.trim());
 			if (GETorPOST == GET)
 				doGet(job);
 			else
@@ -296,12 +296,12 @@ public class MCRServlet extends HttpServlet {
 			ex);
 		String rootname = "mcr_error";
 		String defaultLang =
-			config.getString("MCR.metadata_default_lang", "en").toUpperCase();
+			config.getString("MCR.metadata_default_lang", "de");
 		String lang =
 			(getProperty(request, "lang") != null)
 				? getProperty(request, "lang")
 				: defaultLang;
-		String style = (xmlstyle) ? "xml" : ("query-" + lang.toUpperCase());
+		String style = (xmlstyle) ? "xml" : ("query-" + lang);
 		Element root = new Element(rootname);
 		Element exception = new Element("exception");
 		Document errorDoc = new Document(root, new DocType(rootname));

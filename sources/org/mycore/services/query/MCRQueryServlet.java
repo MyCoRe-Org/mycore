@@ -54,7 +54,7 @@ public class MCRQueryServlet extends MCRServlet {
 	private MCRConfiguration conf = null;
 	private MCRQueryCollector collector;
 
-	// Default Language (as UpperCase)
+	// Default Language 
 	private String defaultLang = "";
 	private static final String MCRSorterConfPrefix = "MCR.XMLSorter";
 	private static final String MCRSorterConfDelim = "\"+lang+\"";
@@ -99,7 +99,7 @@ public class MCRQueryServlet extends MCRServlet {
 		this.getServletContext().setAttribute("QueryCollector", collector);
 		PropertyConfigurator.configure(conf.getLoggingProperties());
 		defaultLang =
-			conf.getString("MCR.metadata_default_lang", "en").toUpperCase();
+			conf.getString("MCR.metadata_default_lang", "de");
 	}
 
 	/**
@@ -638,7 +638,6 @@ public class MCRQueryServlet extends MCRServlet {
 			lang = defaultLang;
 		}
 		type = type.toLowerCase();
-		lang = lang.toUpperCase();
 
 		if (view == null)
 			view = "";

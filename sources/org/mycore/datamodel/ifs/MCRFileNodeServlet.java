@@ -84,7 +84,7 @@ public class MCRFileNodeServlet extends MCRServlet
   // The Log4J logger
   private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
-  // Default language toUpperCase()
+  // Default language
   private String defaultLang = "";
 
   // The list of hosts from the configuration
@@ -125,8 +125,6 @@ public class MCRFileNodeServlet extends MCRServlet
       lang = att_lang;
     if( ( lang  == null ) || ( lang.trim().length() == 0 ) ) 
       lang  = defaultLang;
-    
-    lang = lang.toUpperCase();
     
     logger.debug( "MCRFileNodeServlet: lang = " + lang );
 

@@ -50,7 +50,7 @@ protected static Logger logger=Logger.getLogger(MCRSearchMaskServlet.class.getNa
 // The default mode for this class
 String mode = "CreateSearchMask";
 
-// Default Language (as UpperCase)
+// Default Language 
 String defaultLang = "";
 
 // The configuration XML files
@@ -64,8 +64,7 @@ org.jdom.Document jdom = null;
   {
     super.init();
   PropertyConfigurator.configure(config.getLoggingProperties());
-  defaultLang = config.getString( "MCR.metadata_default_lang", "en" )
-    .toUpperCase();
+  defaultLang = config.getString( "MCR.metadata_default_lang", "de" );
   }
 
  /**
@@ -107,7 +106,7 @@ org.jdom.Document jdom = null;
   String lang  = request.getParameter( "lang" );
   if( type  == null ) return;
   if( layout  == null ) layout = type;
-  if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
+  if( lang  == null ) lang  = defaultLang; 
   type = type.toLowerCase();
 
   String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());

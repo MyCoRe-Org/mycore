@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2004-09-29 13:46:56 $ -->
+<!-- $Revision: 1.2 $ $Date: 2004-10-04 07:50:40 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -19,7 +19,7 @@
 <xsl:param name="WebApplicationBaseURL"     />
 <xsl:param name="ServletsBaseURL"           />
 <xsl:param name="DefaultLang"               />
-<xsl:param name="Lang"                      />
+<xsl:param name="CurrentLang"               />
 <xsl:param name="MCRSessionID"              />
 
 <!-- ========= multi-language label ======== -->
@@ -35,8 +35,8 @@
   <xsl:choose>
 
     <!-- If there is a label with xml:lang = selected lang, output it -->
-    <xsl:when test="label[lang($Lang)]">
-      <xsl:for-each select="label[lang($Lang)]">
+    <xsl:when test="label[lang($CurrentLang)]">
+      <xsl:for-each select="label[lang($CurrentLang)]">
         <xsl:copy-of select="*|text()" />
       </xsl:for-each>
     </xsl:when>
