@@ -28,6 +28,9 @@ import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
+import org.jdom.transform.*;
 import org.jdom.*;
 import mycore.common.*;
 import mycore.xml.MCRLayoutServlet;
@@ -182,6 +185,103 @@ private String defaultLang = "";
       System.out.println( ex.getClass().getName() );
       System.out.println( ex );
     }
+  }
+
+  /**
+   * <em>transform</em> transforms a JDOM via XSLT giving a result JDOM.
+   *
+   * @param inp                              the input list as JDOM
+   * @param stylesheet                       the transforming stylesheet
+   * @return org.jdom.Document               the result
+   * @exception MCRException                 thrown if XSLT transformation fails
+   */
+  private static org.jdom.Document transform (org.jdom.Document inp, String stylesheet)
+    throws MCRException
+  {
+    try
+    {
+      Transformer transformer = TransformerFactory.newInstance().
+        newTransformer(new StreamSource(stylesheet));
+      JDOMResult out = new JDOMResult();
+      transformer.transform(new JDOMSource(inp), out);
+      return out.getDocument();
+    }
+    catch (TransformerException exc)
+    {
+      throw new MCRException("Could not transform JDOM via XSLT", exc);
+    }
+  }
+
+  /**
+   * <em>buildSortingStylesheet</em> creates an XSL stylesheet which can sort a list
+   * of documents according to a given attribute in ascending order.
+   *
+   * @param attr                          the name of the attribute for which the list
+   *                                      should be sorted
+   * @return String                       the resulting stylesheet
+   */
+  private static String buildSortingStylesheet (String attr)
+  {
+    String stylesheet = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+    stylesheet += "<xsl:stylesheet version=\"1.0\"\n" +
+      "  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n\n";
+
+    stylesheet += "<xsl:output\n" +
+      "  method=\"xml\"\n" +
+  //    "  encoding=\"ISO-8859-1\"\n" +
+  //    "  media-type=\"text/xml\"\n" +
+  //    "  doctype-public=\"\"\n" +
+      "/>\n\n";
+
+    stylesheet += "<xsl:template match=\"/mcr_results\">\n\n";
+
+    stylesheet += "<xsl:element name=\"mcr_results\">\n\n";
+
+    stylesheet += "<xsl:for-each select=\"//mcr_result\">\n" +
+      "  <xsl:sort order=\"ascending\" select=\"mycoreobject/metadata/" +
+      attr + "s/" + attr + "/text()\"/>\n" +
+      "  <xsl:copy-of select=\".\"/>\n" +
+      "</xsl:for-each>\n\n";
+
+    stylesheet += "</xsl:element>\n\n";
+
+    stylesheet += "</xsl:template>\n\n";
+
+    stylesheet += "</xsl:stylesheet>\n";
+
+    return stylesheet;
+  }
+
+  /**
+   * <em>sortList</em> takes a list of documents and sorts them according to a given attribute.
+   *
+   * @param inp                           the input list as a JDOM
+   * @param attr                          the sorting attribute
+   * @return org.jdom.Document            the sorted list as a JDOM
+   * @exception MCRException              thrown if JDOM could not be transformed via XSLT
+   */
+  private static org.jdom.Document sortList (org.jdom.Document inp, String attr)
+    throws Exception
+  {
+    String stylesheet = buildSortingStylesheet(attr);
+    BufferedWriter wr = new BufferedWriter(new FileWriter("sort.xsl"));
+    wr.write(stylesheet);
+    wr.close();
+    return transform(inp, "sort.xsl");
+  }
+
+  /**
+   * <em>getStructure</em> retrieves all links outgoing from a single input document
+   * and gives the result as a vector of link lists (link folders).
+   *
+   * @param inp                              the single input object as JDOM
+   * @return Vector                          the vector of JDOM's each of which is
+   *                                         a link folder
+   */
+  private static Vector getStructure (org.jdom.Document inp)
+  {
+    Vector inpStruct = new Vector ();
+    return inpStruct;
   }
 }
 
