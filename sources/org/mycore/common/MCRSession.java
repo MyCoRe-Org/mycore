@@ -26,7 +26,8 @@ package org.mycore.common;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
+import java.util.Map;
+import java.util.HashMap;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 
 
@@ -42,6 +43,8 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
  */
 public class MCRSession implements Cloneable
 {
+  /** A map storing arbitrary session data **/
+  private Map map = new HashMap();
 
   /** the logger */
   private static Logger logger = Logger.getLogger(MCRSession.class.getName());
@@ -137,5 +140,13 @@ public class MCRSession implements Cloneable
     logger.debug("UserID             = "+userID);
     logger.debug("language           = "+language);
   }
+
+  /** Stores an object under the given key within the session **/
+  public Object put( Object key, Object value )
+  { return map.put( key, value ); }
+
+  /** Returns the object that was stored in the session under the given key **/
+  public Object get( Object key )
+  { return map.get( key ); }
 }
 
