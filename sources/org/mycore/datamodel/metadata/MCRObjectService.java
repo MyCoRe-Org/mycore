@@ -79,10 +79,10 @@ public MCRObjectService()
   NL = new String((System.getProperties()).getProperty("line.separator"));
   lang = DEFAULT_LANGUAGE;
   dates = new ArrayList();
-  MCRMetaDate d = new MCRMetaDate("service","date",lang,"createdate",
+  MCRMetaDate d = new MCRMetaDate("service","servdate",lang,"createdate",
     new GregorianCalendar());
   dates.add(d);
-  d = new MCRMetaDate("service","date",lang,"modifydate",
+  d = new MCRMetaDate("service","servdate",lang,"modifydate",
     new GregorianCalendar());
   dates.add(d);
   flags = new ArrayList();
@@ -98,7 +98,7 @@ public MCRObjectService()
 public final void setFromDOM(org.jdom.Element service_element)
   {
   // Date part
-  org.jdom.Element dates_element = service_element.getChild("dates");
+  org.jdom.Element dates_element = service_element.getChild("servdates");
   if (dates_element!=null) {
     List date_element_list = dates_element.getChildren();
     int date_len = date_element_list.size();
@@ -106,7 +106,7 @@ public final void setFromDOM(org.jdom.Element service_element)
       org.jdom.Element date_element = (org.jdom.Element)
         date_element_list.get(i);
       String date_element_name = date_element.getName();
-      if (!date_element_name.equals("date")) { continue; }
+      if (!date_element_name.equals("servdate")) { continue; }
       MCRMetaDate date = new MCRMetaDate();
       date.setDataPart("service");
       date.setLang(lang);
@@ -122,7 +122,7 @@ public final void setFromDOM(org.jdom.Element service_element)
       }
     }
   // Flag part
-  org.jdom.Element flags_element = service_element.getChild("flags");
+  org.jdom.Element flags_element = service_element.getChild("servflags");
   if (flags_element!=null) {
     List flag_element_list = flags_element.getChildren();
     int flag_len = flag_element_list.size();
@@ -130,7 +130,7 @@ public final void setFromDOM(org.jdom.Element service_element)
       org.jdom.Element flag_element = (org.jdom.Element)
         flag_element_list.get(i);
       String flag_element_name = flag_element.getName();
-      if (!flag_element_name.equals("flag")) { continue; }
+      if (!flag_element_name.equals("servflag")) { continue; }
       MCRMetaLangText flag = new MCRMetaLangText();
       flag.setLang(lang);
       flag.setDataPart("service");
@@ -189,7 +189,7 @@ public final void setDate(String type)
   for (int j=0;j<dates.size();j++) {
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
-    MCRMetaDate d = new MCRMetaDate("service","date",null,type,
+    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,
       new GregorianCalendar());
     dates.add(d);
     }
@@ -216,7 +216,7 @@ public final void setDate(String type, GregorianCalendar date)
   for (int j=0;j<dates.size();j++) {
     if (((MCRMetaDate)dates.get(j)).getType().equals(type)) { i = j; } }
   if (i==-1) {
-    MCRMetaDate d = new MCRMetaDate("service","date",null,type,date);
+    MCRMetaDate d = new MCRMetaDate("service","servdate",null,type,date);
     dates.add(d);
     }
   else {
@@ -235,7 +235,8 @@ public final void addFlag(String value)
   {
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
-  MCRMetaLangText flag = new MCRMetaLangText("service","flag",null,null,value);
+  MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
+    value);
   flags.add(flag);
   }
  
@@ -312,7 +313,8 @@ public final void replaceFlag(int index, String value)
     throw new IndexOutOfBoundsException("Index error in replaceFlag."); }
   if ((value == null) || ((value = value.trim()).length() ==0)) {
     return; }
-  MCRMetaLangText flag = new MCRMetaLangText("service","flag",null,null,value);
+  MCRMetaLangText flag = new MCRMetaLangText("service","servflag",null,null,
+    value);
   flags.set(index,flag);
   }
 
@@ -329,13 +331,13 @@ public final org.jdom.Element createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("service");
   if (dates.size()!=0) {
-    org.jdom.Element elmm = new org.jdom.Element("dates");
+    org.jdom.Element elmm = new org.jdom.Element("servdates");
     for (int i=0;i<dates.size();i++) {
       elmm.addContent(((MCRMetaDate)dates.get(i)).createXML()); }
     elm.addContent(elmm); 
     }
   if (flags.size()!=0) {
-    org.jdom.Element elmm = new org.jdom.Element("flags");
+    org.jdom.Element elmm = new org.jdom.Element("servflags");
     for (int i=0;i<flags.size();i++) {
       elmm.addContent(((MCRMetaLangText)flags.get(i)).createXML()); }
     elm.addContent(elmm); 
@@ -357,14 +359,14 @@ public final MCRTypedContent createTypedContent() throws MCRException
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"service");
   if (dates.size()!=0) {
-    tc.addTagElement(tc.TYPE_TAG,"dates");
+    tc.addTagElement(tc.TYPE_TAG,"servdates");
     for (int i=0;i<dates.size();i++) {
       tc.addMCRTypedContent(((MCRMetaDate)dates.get(i))
         .createTypedContent(true,false));
       }
     }
   if (flags.size()!=0) {
-    tc.addTagElement(tc.TYPE_TAG,"flags");
+    tc.addTagElement(tc.TYPE_TAG,"servflags");
     for (int i=0;i<flags.size();i++) {
       tc.addMCRTypedContent(((MCRMetaLangText)flags.get(i))
         .createTypedContent(true,false)); }
