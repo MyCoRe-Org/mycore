@@ -65,6 +65,29 @@ public class MCRCStoreContentManager8
   protected String attributeTime;
   protected final int MAX_ATTRIBUTE_TIME_LENGTH = 32;
 
+  /** The temporary store of the files **/
+  protected String [] STORE_TYPE_LIST = { "none","memory" };
+  protected String storeTempType = "";
+  protected int storeTempSize = 4;
+  protected String storeTempDir = "";
+
+  /**
+   * The method initialized the CM8 content store with data of the
+   * property files.
+   * If StoreTemp.Type is not set, "none" was set.
+   * The following types are nessesary:<br />
+   * <ul>
+   * <li> none - it use the InputStream.available() method to get the
+   *      length of the stream.</li>
+   * <li> memory - it write the InputStream in the memory to get the
+   *      length of the stream. Attention, this is only fo short files with
+   *      maximal size in MB of the StoreTemp.MemSize value! Files they
+   *      are bigger was temporary stored in a directory that is defined
+   *      in the prperty variable StoreTemp.Dir. </li>
+   * </ul>
+   *
+   * @param storeID the IFS store ID
+   **/
   public void init( String storeID )
   {
     super.init( storeID );
@@ -72,6 +95,12 @@ public class MCRCStoreContentManager8
     itemTypeName   = config.getString( prefix + "ItemType"       );
     attributeTime  = config.getString( prefix + "Attribute.File" );
     attributeFile  = config.getString( prefix + "Attribute.Time" );
+    storeTempType  = config.getString( prefix + "StoreTemp.Type", "none" );
+    storeTempSize  = config.getInt( prefix + "StoreTemp.MemSize", 4 );
+    storeTempDir   = config.getString( prefix + "StoreTemp.Dir", "/tmp" );
+    for (int i=0;i<STORE_TYPE_LIST.length;i++) {
+      if (storeTempType.equals(STORE_TYPE_LIST[i])) { return; } }
+    storeTempType = "none";
   }
 
   protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
@@ -94,18 +123,68 @@ public class MCRCStoreContentManager8
       logger.debug("A new DKLobICM was created.");
       
       logger.debug("MCRFile ID = "+ file.getID() );
-      short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,"ifsfile");
+      short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeFile);
       ((DKDDO)ddo).setData(dataId, file.getID() );
       
       String timestamp = buildNextTimestamp();
-      dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,"ifstime");
+      dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeTime);
       ((DKDDO)ddo).setData(dataId,timestamp);
       
       logger.debug("MimeType = "+file.getContentType().getMimeType());
       ddo.setMimeType(file.getContentType().getMimeType());
       
-      logger.debug("Set the MCRContentInputStream with length "+source.available()+".");
-      ddo.add((InputStream)source,source.available());
+      int filesize = 0;
+      if (storeTempType.equals("none")) {
+        filesize = source.available(); 
+        logger.debug("Set the MCRContentInputStream with available() length "
+          +filesize+".");
+        ddo.add((InputStream)source,filesize);
+        }
+      if (storeTempType.equals("memory")) {
+        byte [] buffer = new byte[storeTempSize*1024*1024+16];
+        try {
+          filesize = source.read(buffer,0,storeTempSize*1024*1024+16); }
+        catch (IOException e) {
+          throw new MCRException("Cant read File with ID "+file.getID(),e); }
+        if (filesize <= storeTempSize*1024*1024) {
+          logger.debug("Set the MCRContentInputStream with memory length "
+            +filesize+".");
+          ddo.add((InputStream)(new ByteArrayInputStream(buffer)),filesize);
+          }
+        else {
+          int si = filesize;
+          File tmp = new File(storeTempDir,file.getID());
+          FileOutputStream ftmp = new FileOutputStream(tmp);
+          try {
+            ftmp.write(buffer,0,filesize);
+            }
+          catch (IOException e) {
+            throw new MCRException("Cant write File with ID "+file.getID()+
+              " to "+storeTempDir,e); 
+            }
+          while (true) {
+            try {
+              si = source.read(buffer,0,storeTempSize*1024*1024+16); }
+            catch (IOException e) {
+              throw new MCRException("Cant read File with ID "+file.getID(),
+                e);
+              }
+            if (si == -1) { break; }
+            filesize += si;
+            try {
+              ftmp.write(buffer,0,si); }
+            catch (IOException e) {
+              throw new MCRException("Cant write File with ID "+file.getID()+
+                " to "+storeTempDir,e); 
+              }
+            }
+          ftmp.close();
+          logger.debug("Set the MCRContentInputStream with stream length "
+            +filesize+".");
+          ddo.add((InputStream)(new FileInputStream(tmp)),filesize);
+          try { tmp.delete(); } catch (SecurityException e) { }
+          }
+        }
       logger.debug("Add the DKLobICM.");
       
       String storageID = ddo.getPidObject().pidString();
@@ -116,6 +195,12 @@ public class MCRCStoreContentManager8
     finally{ MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   }
 
+  /**
+   * the method removes the content for the given IFS storageID.
+   *
+   * @param storageID the IFS storage ID
+   * @exception if an error was occured.
+   **/
   protected void doDeleteContent( String storageID )
     throws Exception
   {
