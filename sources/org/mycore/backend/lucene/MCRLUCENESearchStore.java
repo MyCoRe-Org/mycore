@@ -80,6 +80,19 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
     
     indexDir       = config.getString( "MCR.persistence_lucene_searchindexdir" );
     logger.info( "MCR.persistence_lucene_searchindexdir: " + indexDir);
+    String lockDir = config.getString( "MCR.persistence_lucene_lockdir", "" );
+    logger.info( "MCR.persistence_lucene_lockdir: " + lockDir);
+    File file = new File( lockDir );
+	    
+    if ( !file.exists() ) 
+    {
+      logger.info( "Lock Directory for Lucene doesn't exist: \"" + lockDir +
+                          "\" use " + System.getProperty("java.io.tmpdir") );
+    }
+    else if (file.isDirectory() )
+    {
+      System.setProperty("org.apache.lucene.lockdir", lockDir );    
+    }
   }
   
   Vector fieldType;
@@ -251,8 +264,8 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
   {
     Document doc = new Document();
     
-    doc.add( Field.Keyword( "key", key ) );
-    doc.add( Field.Keyword( "typeId", typeId ) );
+    doc.add( Field.Keyword( "mcr_ID", key ) );
+    doc.add( Field.Keyword( "mcr_type", typeId ) );
     
     for( int i = 0; i < fields.size(); i++ )
     {
@@ -336,15 +349,15 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
    * @param type string name of textindex
    * 
    **/
-    private void deleteLuceneDocument(String id, String typeId) throws Exception
+    private void deleteLuceneDocument(String id, String type) throws Exception
   {
 
     IndexSearcher searcher = new IndexSearcher(indexDir);
 
     if (null == searcher )
       return;
-    Term      te1 = new Term("key", id);
-    Term      te2 = new Term("typeId", typeId);
+    Term      te1 = new Term("mcr_ID", id);
+    Term      te2 = new Term("mcr_type", type);
     
     BooleanQuery bq = new BooleanQuery();
     TermQuery qu = new TermQuery(te1);
@@ -360,8 +373,8 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
     if (1 == hits.length())
     {
       logger.info(" id: " + hits.id(0) + " score: " + hits.score(0) + " key: "
-          + hits.doc(0).get("key"));
-      if (id.equals(hits.doc(0).get("key")))
+          + hits.doc(0).get("mcr_ID"));
+      if (id.equals(hits.doc(0).get("mcr_ID")))
       {
         IndexReader reader = IndexReader.open(indexDir);
         reader.delete(hits.id(0));
