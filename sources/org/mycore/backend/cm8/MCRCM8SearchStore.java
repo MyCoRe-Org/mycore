@@ -36,8 +36,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectPersistenceInterface;
+import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
 import org.mycore.datamodel.metadata.MCRTypedContent;
 
 /**
@@ -49,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRTypedContent;
  *
  * @version $Revision$ $Date$
  **/
-public final class MCRCM8SearchStore implements MCRObjectPersistenceInterface
+public final class MCRCM8SearchStore implements MCRObjectSearchStoreInterface
 {
 
 // from configuration
@@ -78,7 +79,7 @@ public final void create(MCRBase obj) throws MCRConfigurationException, MCRPersi
   MCRObjectID mcr_id = obj.getId();
   String mcr_label = obj.getLabel();
   MCRTypedContent mcr_tc = obj.createTypedContent();
-  String mcr_ts = createTextSearch();
+  String mcr_ts = obj.createTextSearch();
   int mcr_tc_counter = 0;
   for (int i=0;i<mcr_tc.getSize();i++) {
     if (mcr_tc.getNameElement(i).equals("ID")) {
@@ -105,19 +106,7 @@ public final void create(MCRBase obj) throws MCRConfigurationException, MCRPersi
     MCRCM8Item item = new MCRCM8Item(connection,itemtypename);
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
-    // set xml only if the attribute exist (for old versions)
-    try {
-      DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
-      DKAttrDefICM attr = (DKAttrDefICM) dsDefICM
-        .retrieveAttr(itemtypeprefix+"xml");
-      if (attr != null) {
-        byte [] xml = MCRUtils.getByteArray(jdom);
-        item.setAttribute("/",itemtypeprefix+"xml",xml);
-        }
-      }
-    catch(Exception e) { }
-    logger.debug(mcr_ts_in);
-    item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
+    item.setAttribute("/",itemtypeprefix+"ts",mcr_ts);
 
     String [] xmlpath = new String[MCRTypedContent.TYPE_LASTTAG+1];
     int lastpath = 0;
