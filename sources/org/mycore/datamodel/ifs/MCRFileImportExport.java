@@ -29,30 +29,79 @@ import java.util.*;
 import java.io.*;
 
 /**
- * 
+ * Imports or exports complete directory trees with all 
+ * contained files and subdirectories between the local
+ * host's filesystem and the internal MCRDirectory structures.
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRFileImportExport
 {
+  /**
+   * Imports the contents of a local file or directory into
+   * a newly created MCRDirectory that is owned by the given 
+   * owner ID. The new MCRDirectory will have the same name 
+   * as the owner ID.
+   * 
+   * If the local object is
+   * a file, a MCRFile with the same name will be created or
+   * updated in that MCRDirectory. If the local object is
+   * a directory, all contained subdirectories and files will 
+   * be imported into the newly created MCRDirectory. 
+   * That means that after finishing this method, the
+   * complete directory structure will have been imported and
+   * mapped from the local filesystem's structure. The method
+   * checks the contents of each local file to be imported. If
+   * the file's content has not changed for existing files,
+   * the internal MCRFile will not be updated. If there is any
+   * exception while importing the local contents, the system will
+   * try to undo this operation by completely deleting all
+   * content that was imported so far.
+   *
+   * @param local the local file or directory to be imported
+   * @param ownerID the ID of the logical owner of the content that will be stored
+   * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
+   **/  
   public static MCRDirectory importFiles( File local, String ownerID )
   {
     MCRArgumentChecker.ensureNotEmpty( ownerID, "owner ID" );
-    
+
+    // Create new parent directory    
     MCRDirectory dir = new MCRDirectory( ownerID, ownerID );
-    try
+    try // Try to import local content into this new directory
     { importFiles( local, dir ); }
-    catch( MCRException mex )
+    catch( MCRException mex ) // If anything goes wrong
     {
-      try{ dir.delete(); }  // try to delete all content stored so far
+      try{ dir.delete(); }  // Try to delete all content stored so far
       catch( Exception ignored ){}
       
       throw mex;
     }
     return dir;
   }
-  
+
+  /**
+   * Imports the contents of a local file or directory into
+   * the MyCoRe Internal Filesystem. If the local object is
+   * a file, a MCRFile with the same name will be created or
+   * updated in the given MCRDirectory. If the local object is
+   * a directory, all contained subdirectories and files will 
+   * be imported into the given MCRDirectory. 
+   * That means that after finishing this method, the
+   * complete directory structure will have been imported and
+   * mapped from the local filesystem's structure. The method
+   * checks the contents of each local file to be imported. If
+   * the file's content has not changed for existing files,
+   * the internal MCRFile will not be updated. If an internal
+   * directory is updated from a local directory, new files will
+   * be added, existing files will be updated if necessary, but
+   * files that already exist in the given MCRDirectory but not
+   * in the local filesystem will be kept and will not be deleted.
+   *
+   * @param local the local file or directory
+   * @param dir an existing MCRDirectory where to store the imported contents of the local filesystem.
+   **/  
   public static void importFiles( File local, MCRDirectory dir )
   {
     MCRArgumentChecker.ensureNotNull( local, "local file" );
@@ -63,23 +112,25 @@ public class MCRFileImportExport
     MCRArgumentChecker.ensureIsTrue( local.exists(),  "Not found: "    + path );
     MCRArgumentChecker.ensureIsTrue( local.canRead(), "Not readable: " + path );
         
-    if( local.isFile() )
+    if( local.isFile() ) // Import a local file
     {
       MCRFilesystemNode existing = dir.getChild( name );
       MCRFile file = null;
       
+      // If internal directory with same name exists
       if( existing instanceof MCRDirectory )      
-      {
-        existing.delete();
+      { 
+        existing.delete(); // delete it
         existing = null;
       }  
       
-      if( existing == null )
+      if( existing == null ) // Create new, empty MCRFile 
         file = new MCRFile( name, dir );
       else 
       {  
-        file = (MCRFile)existing;
-        
+        file = (MCRFile)existing; // Update existing MCRFile
+
+        // Determine MD5 checksum of local file 
         FileInputStream fin = null;
         try{ fin = new FileInputStream( local ); }
         catch( FileNotFoundException willNotBeThrown ){}
@@ -99,12 +150,14 @@ public class MCRFileImportExport
         if( file.getMD5().equals( local_md5 ) ) return;
       }
       
+      // Store file content
       file.setContentFrom( local );
     }
     else
     {
       File[] files = local.listFiles();
       
+      // For each local child node
       for( int i = 0; i < files.length; i++ )
       {
         local = files[ i ];
@@ -116,22 +169,31 @@ public class MCRFileImportExport
         {
           MCRFilesystemNode existing = dir.getChild( name );
           if( existing instanceof MCRFile )
-          {
-            existing.delete();
+          { // If there is an existing MCRFile with same name
+            existing.delete(); // delete that existing MCRFile
             existing = null;
           }
           
-          if( existing == null )
+          if( existing == null ) // Create new directory
             internalDir = new MCRDirectory( name, dir );
-          else
+          else 
             internalDir = (MCRDirectory)existing;
         }  
         
-        importFiles( local, internalDir );
+        importFiles( local, internalDir ); // Recursively import
       }
     }
   }
-  
+
+  /**
+   * Exports all contents of the given MCRDirectory to the
+   * local filesystem, including all subdirectories and stored
+   * files. If the local object is a file, the parent directory
+   * of that file will be used for exporting.
+   *
+   * @param local the local directory where to export the contents to
+   * @param dir the directory thats contents should be exported
+   **/  
   public static void exportFiles( MCRDirectory dir, File local )
     throws MCRException
   {
@@ -141,6 +203,7 @@ public class MCRFileImportExport
     String path = local.getPath();
     MCRArgumentChecker.ensureIsTrue( local.canWrite(), "Not writeable: " + path );
     
+    // If local is file, use its parent instead
     if( local.isFile() ) local = local.getParentFile();
     
     MCRFilesystemNode[] children = dir.getChildren();

@@ -29,13 +29,19 @@ import org.jdom.*;
 import java.util.*;
 
 /** 
- * A simple implementation of an MCRFileContentTypeDetector.
+ * A simple implementation of an MCRFileContentTypeDetector, detects
+ * the file type based on the filename extension and a magic bytes
+ * pattern at some offset in the header of the file's content.
+ * The rules for detecting each file type are embedded in the
+ * &lt;rules&gt; element of the file content types 
+ * definition XML file.
  *
  * @see MCRFileContentTypeDetector
  * @see MCRFileContentType
  * @see MCRFileContentTypeFactory
  *
  * @author Frank Lützenkirchen
+ * @version $Revision$ $Date$
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
 {
@@ -48,6 +54,14 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector
   /** Creates a new detector */
   public MCRSimpleFCTDetector(){}
   
+  /**
+   * Adds a detection rule from the file content type definition XML file.
+   * The detector parses the &lt;rules&gt; element provided
+   * with each content type in the file content types XML definition.
+   *
+   * @param type the file content type the rule is for
+   * @param rules the rules XML element containing the rules for detecting that type
+   */
   public void addRule( MCRFileContentType type, Element xRules )
   {
     Vector rules = new Vector();

@@ -53,6 +53,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   /** The optional extender for streaming audio/video files */
   protected MCRAudioVideoExtender avExtender;
 
+  /** 
+   * Creates a new and empty root MCRFile with the given filename,
+   * belonging to the given ownerID. The file is assumed to be
+   * a standalone "root file" that has no parent directory. 
+   *
+   * @param name the filename of the new MCRFile
+   * @param ownerID any ID String of the logical owner of this file
+   **/
   public MCRFile( String name, String ownerID )
   {
     super( name, ownerID );
@@ -60,13 +68,25 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     storeNew();
   }
   
+  /**
+   * Creates a new, empty MCRFile with the given filename
+   * in the parent MCRDirectory. 
+   *
+   * @param name the filename of the new MCRFile
+   * @param parent the parent directory that will contain the new child
+   *
+   * @throws MCRUsageException if that directory already contains a child with that name
+   **/
   public MCRFile( String name, MCRDirectory parent )
   { 
     super( name, parent );
     initContentFields();
     storeNew();
   }
-  
+
+  /**
+   * Internal constructor, do not use on your own.
+   **/  
   MCRFile( String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5 )
   {
     super( ID, parentID, ownerID, name, label, size, date );
@@ -76,13 +96,29 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     this.contentTypeID = fctID;
     this.md5           = md5;
   }
-  
+
+  /**
+   * Returns the MCRFile with the given ID.
+   *
+   * @param ID the unique ID of the MCRFile to return
+   * @return the MCRFile with the given ID, or null if no such file exists
+   **/  
   public static MCRFile getFile( String ID )
   { return (MCRFile)( MCRFilesystemNode.getNode( ID ) ); }
   
+  /**
+   * Returns the root MCRFile that has no parent and
+   * is logically owned by the object with the given ID.
+   *
+   * @param ownerID the ID of the logical owner of that file
+   * @return the root MCRFile stored for that owner ID, or null if no such file exists
+   **/  
   public static MCRFile getRootFile( String ownerID )
   { return (MCRFile)( MCRFilesystemNode.getRootNode( ownerID ) ); }
 
+  /**
+   * Sets initial values for the fields of a new, empty MCRFile
+   **/
   private void initContentFields()
   {
     storageID     = "";
@@ -94,8 +130,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   }
   
   /**
-   * Returns the file extension of this file, or an empty string if
-   * the file has no extension
+   * Returns the file extension of this file's name
+   *
+   * @return the file extension, or an empty string if the file has no extension
    **/
   public String getExtension()
   {
@@ -138,6 +175,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   
   /**
    * Returns the MCRContentStore instance that holds the content of this file
+   * 
+   * @return the MCRContentStore instance that holds the content of this file, or null if no content is stored
    **/
   protected MCRContentStore getContentStore()
   {
@@ -151,6 +190,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * Reads the content of this file from a java.lang.String and
    * stores its text as bytes, encoded in the default encoding of the
    * platform where this is running.
+   *
+   * @param source the String that is the file's content
    **/
   public void setContentFrom( String source )
     throws MCRPersistenceException
@@ -165,6 +206,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * Reads the content of this file from a java.lang.String and
    * stores its text as bytes, encoded in the encoding given, 
    * in an MCRContentStore.
+   *
+   * @param source the String that is the file's content
+   * @param encoding the character encoding to use to store the String as bytes
    **/
   public void setContentFrom( String source, String encoding )
     throws MCRPersistenceException, UnsupportedEncodingException
@@ -179,6 +223,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   /**
    * Reads the content of this file from a source file in the local
    * filesystem and stores it in an MCRContentStore.
+   *
+   * @param source the file in the local host's filesystem thats content should be imported
    **/
   public void setContentFrom( File source )
     throws MCRPersistenceException
@@ -198,6 +244,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   /**
    * Reads the content of this file from a byte array and
    * stores it in an MCRContentStore.
+   *
+   * @param source the file's content
    **/
   public void setContentFrom( byte[] source )
     throws MCRPersistenceException
@@ -210,6 +258,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   /**
    * Reads the content of this file from the source InputStream and
    * stores it in an MCRContentStore.
+   *
+   * @param source the source for the file's content bytes
    **/
   public void setContentFrom( InputStream source )
     throws MCRPersistenceException
@@ -252,7 +302,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   }
 
   /**
-   * Deletes this file and its content stored in the system
+   * Deletes this file and its content stored in the system.
+   * Note that after calling this method, the file object is
+   * deleted and invalid and can not be used any more.
    **/
   public void delete()
     throws MCRPersistenceException
@@ -275,7 +327,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   }
 
   /**
-   * Writes the content of this file to a target output stream
+   * Writes the content of this file to a target output stream.
+   *
+   * @param target the output stream to write the content to
    **/
   public void getContentTo( OutputStream target )
     throws MCRPersistenceException
@@ -300,6 +354,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   
   /**
    * Writes the content of this file to a file on the local filesystem
+   *
+   * @param target the local file to write the content to
    **/
   public void getContentTo( File target )
     throws MCRPersistenceException, IOException
@@ -307,6 +363,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
 
   /**
    * Gets the content of this file as a byte array
+   *
+   * @return the content of this file as a byte array
    **/
   public byte[] getContentAsByteArray()
     throws MCRPersistenceException
@@ -324,6 +382,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   /**
    * Gets the content of this file as a string, using the default encoding
    * of the system environment
+   *
+   * @return the file's content as a String
    **/
   public String getContentAsString()
     throws MCRPersistenceException
@@ -331,6 +391,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   
   /**
    * Gets the content of this file as a string, using the given encoding
+   *
+   * @param encoding the character encoding to use
+   * @return the file's content as a String
    **/
   public String getContentAsString( String encoding )
     throws MCRPersistenceException, UnsupportedEncodingException

@@ -27,7 +27,11 @@ package org.mycore.datamodel.ifs;
 import org.mycore.common.*;
 
 /**
- * Represents a read-only view of MCRFile metadata.
+ * Represents a read-only view of MCRFile metadata. This interface
+ * was introduced as a mechanism to be able to use the same code
+ * with MyCoRe Sample that uses the new class MCRFile 
+ * and current MILESS code that still uses the class MCROldFile.
+ * The interface will be obsolete in the future.
  *
  * @author Frank Lützenkirchen 
  * @version $Revision$ $Date$

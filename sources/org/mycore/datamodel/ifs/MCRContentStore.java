@@ -48,6 +48,7 @@ public abstract class MCRContentStore
   /** The prefix of all properties in mycore.properties for this store */
   protected String prefix;
 
+  /** Default constructor **/
   public MCRContentStore(){}
   
   /** 
@@ -99,6 +100,14 @@ public abstract class MCRContentStore
     }
   }
   
+  /**
+   * Stores the content of an MCRFile by reading from an MCRContentInputStream.
+   * Returns a StorageID to indentify the place where the content was stored.
+   *
+   * @param file the MCRFile thats content is to be stored
+   * @param source the ContentInputStream where the file content is read from
+   * @return an ID that indentifies the place where the content was stored
+   **/
   protected abstract String doStoreContent( MCRFileReader file, MCRContentInputStream source )
     throws Exception;
 
@@ -127,6 +136,12 @@ public abstract class MCRContentStore
     }
   }
     
+  /**
+   * Deletes the content of an MCRFile object that is stored under the given
+   * Storage ID in this store instance.
+   *
+   * @param storageID the storage ID of the MCRFile object
+   */
   protected abstract void doDeleteContent( String storageID )
     throws Exception;
 
@@ -157,6 +172,14 @@ public abstract class MCRContentStore
     }
   }
   
+  /**
+   * Retrieves the content of an MCRFile to an OutputStream. 
+   * Uses the StorageID to indentify the place where the file content was 
+   * stored in this store instance.
+   *
+   * @param file the MCRFile thats content should be retrieved
+   * @param target the OutputStream to write the file content to
+   */
   protected abstract void doRetrieveContent( MCRFileReader file, OutputStream target )
     throws Exception;
 
@@ -181,6 +204,10 @@ public abstract class MCRContentStore
   /** The last timestamp that was constructed */
   protected static String lastTimestamp = null;
   
+  /** 
+   * Helper method for constructing a unique storage ID 
+   * from a timestamp.
+   **/
   protected static synchronized String buildNextTimestamp()
   {
     String ts = null;
@@ -189,6 +216,21 @@ public abstract class MCRContentStore
     return ( lastTimestamp = ts );
   }
   
+  /**
+   * Some content store implementations store the file's 
+   * content in a hierarchical directory structure of the 
+   * server's filesystem. Such stores use a directory that
+   * contains 100 subdirectories with each 100 
+   * subsubdirectories, so that the internal directory
+   * operations will scale well for large file collections.
+   *
+   * This helper method randomly chooses the "slot directory" 
+   * to be used for the next storage.
+   * 
+   * @return two directory names between "00" and "99" that
+   * are the "slot" where to store the file's content in the
+   * filesystem.
+   **/
   protected String[] buildSlotPath()
   {
     Random random = new Random();

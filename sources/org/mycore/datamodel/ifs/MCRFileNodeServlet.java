@@ -40,8 +40,14 @@ import org.mycore.backend.remote.*;
 import org.mycore.frontend.servlets.*;
 
 /**
- * This class implements the connection to the IFS database via HTTP/HTTPS
- * protocol as servlet.
+ * This servlet delivers the contents of an MCRFilesystemNode 
+ * to the client browser. If the node is a ordinary MCRFile, 
+ * the contents of that file will be sent to the browser. If the
+ * node is an MCRFile with a MCRAudioVideoExtender, the message
+ * that starts the associated streaming player will be delivered.
+ * If the node is a MCRDirectory, the contents of that directory
+ * will be forwareded to MCRLayoutServlet as XML data to display
+ * a detailed directory listing.
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt 
@@ -51,6 +57,15 @@ import org.mycore.frontend.servlets.*;
  **/
 public class MCRFileNodeServlet extends MCRServlet
 {
+  /*
+   * Die folgenden Dinge will ich hier unbedingt raus haben:
+   * - language und damit verbundene Stylesheet Auswahl
+   *   -> gehört ins MCRLayoutServlet und/oder MCRServlet
+   * - remote handling
+   *   -> muss das so kompliziert sein?
+   */
+  
+  // The Log4J logger
   private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
   // Default language toUpperCase()
@@ -77,6 +92,9 @@ public class MCRFileNodeServlet extends MCRServlet
     while( st.hasMoreTokens() ) remoteAliasList.add( st.nextToken() );
   }
 
+  /**
+   * Handles the HTTP request
+   **/
   public void doGetPost( MCRServletJob job )
     throws IOException, ServletException
   {
@@ -294,13 +312,21 @@ public class MCRFileNodeServlet extends MCRServlet
       }
     }
   }
-  
+
+  /**
+   * Sends the contents of an MCRFile to the client. If the
+   * MCRFile provides an MCRAudioVideoExtender, the file's content
+   * is NOT sended to the client, instead the stream that starts
+   * the associated streaming player is sended to the client.
+   * The HTTP request may then contain StartPos and StopPos parameters
+   * that contain the timecodes where to start and/or stop streaming.
+   **/  
   private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
     throws IOException, ServletException
   {
     logger.info( "MCRFileNodeServlet: Sending file " + file.getName() );
     
-    if( file.hasAudioVideoExtender() )
+    if( file.hasAudioVideoExtender() ) // Start streaming player
     { 
       MCRAudioVideoExtender ext = file.getAudioVideoExtender();
 
@@ -310,7 +336,7 @@ public class MCRFileNodeServlet extends MCRServlet
       res.setContentType( ext.getPlayerStarterContentType() );
       ext.getPlayerStarterTo( res.getOutputStream(), startPos, stopPos );
     }
-    else
+    else // Send contents of ordinary file
     {
       res.setContentType( file.getContentType().getMimeType() );
       res.setContentLength( (int)( file.getSize() ) );
@@ -320,7 +346,10 @@ public class MCRFileNodeServlet extends MCRServlet
       out.close();
     }
   }
-  
+
+  /**
+   * Sends the contents of an MCRDirectory as XML data to the client
+   **/  
   private void sendDirectory( HttpServletRequest req, HttpServletResponse res, 
                               MCRDirectory dir, String lang ) 
     throws IOException, ServletException

@@ -34,6 +34,7 @@ import org.jdom.Element;
  * @see MCRSimpleFCTDetector
  *
  * @author Frank Lützenkirchen
+ * @version $Revision$ $Date$
  */
 public interface MCRFileContentTypeDetector
 {
