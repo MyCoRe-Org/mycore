@@ -12,7 +12,9 @@ Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstruk
 \begin{center}
 %\begin{boxedminipage}[t]{13cm}
 %\bottomcaption{Allgemeiner Aufbau des Metadaten-Objektes}
-\begin{verbatim}
+
+\lstset{language=XML,fancyvrb=true,breaklines}
+\begin{lstlisting}[frame=single]
 <?xml version="1.0" cncoding="iso-8859" ?>
 <mycoreobject
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -31,7 +33,7 @@ Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstruk
   ...
  </service>
 </mycoreobject>
-\end{verbatim}
+\end{lstlisting}
 %\end{boxedminipage}
 \end{center}
 
@@ -49,7 +51,8 @@ Das selbe gilt auch für den XML-Unterknoten {\bf derobjects}. In diesem Bereich 
 \begin{center}
 %\begin{boxedminipage}[t]{13cm}
 %\bottomcaption{Allgemeiner Aufbau des structure XML-Knotens}
-\begin{verbatim}
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}{frame=single}
 <structure>
  <parents class="MCRMetaLinkID">
   <parent xlink:type="locator" xlink:href="...mcr_id..." />
@@ -63,7 +66,7 @@ Das selbe gilt auch für den XML-Unterknoten {\bf derobjects}. In diesem Bereich 
   ...
  </derobjects>
 </structure>
-\end{verbatim}
+\end{lstlisting}
 %\end{boxedminipage}
 \end{center}
 
