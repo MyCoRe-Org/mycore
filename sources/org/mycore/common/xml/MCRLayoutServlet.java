@@ -24,29 +24,22 @@
 
 package org.mycore.common.xml;
 
+import org.mycore.common.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
+
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
-import org.mycore.common.*;
-// JDOM imports
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
-import org.jdom.transform.JDOMResult;
-// XSLT imports
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -57,237 +50,248 @@ import org.apache.log4j.PropertyConfigurator;
  *
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler
+ *
  * @version $Revision$ $Date$
  */
 public class MCRLayoutServlet extends HttpServlet 
 {
-  // The configuration
-  private MCRConfiguration conf = null;
-
-  protected SAXTransformerFactory factory;  
-  protected MCRCache stylesheetCache;
-  protected MCRCache staticFileCache;
-  private static Logger logger=Logger.getLogger(MCRLayoutServlet.class);
-  public static final String JDOM_ATTR="MCRLayoutServlet.Input.JDOM";
-  public static final String DOM_ATTR="MCRLayoutServlet.Input.DOM";
-
+  private static MCRCache cache;
+  
+  private static Logger logger = Logger.getLogger( MCRLayoutServlet.class );
+  
+  public static final String DOM_ATTR    = "MCRLayoutServlet.Input.DOM";
+  public static final String JDOM_ATTR   = "MCRLayoutServlet.Input.JDOM";
+  public static final String BYTE_ATTR   = "MCRLayoutServlet.Input.BYTES";
+  public static final String FILE_ATTR   = "MCRLayoutServlet.Input.FILE";
+  public static final String STREAM_ATTR = "MCRLayoutServlet.Input.STREAM";
+  
   public void init()
   {
-    // Get SAX transformer factory
-    TransformerFactory tf = TransformerFactory.newInstance();
-    conf = MCRConfiguration.instance();
-   	PropertyConfigurator.configure(conf.getLoggingProperties());
-  
-    if( ! tf.getFeature( SAXTransformerFactory.FEATURE ) )
-      throw new MCRConfigurationException
-      ( "Could not load a SAXTransformerFactory for use with XSLT" );
-      
-    factory = (SAXTransformerFactory)( tf );
-    
-    // Create caches
-    stylesheetCache = new MCRCache( 50 );
-    staticFileCache = new MCRCache( 50 );
+    MCRConfiguration config = MCRConfiguration.instance();
+   	PropertyConfigurator.configure( config.getLoggingProperties() );
+    buildTransformerFactory();
+    cache = new MCRCache( 100 );
   }
-
- /**
-  * Reads the input XML from a file or from the invoking servlet,
-  * chooses a stylesheet and does the layout by applying the XSL
-  * stylesheet. This method handles HTTP POST requests.
-  */
-  public void doPost( HttpServletRequest  request,
-                      HttpServletResponse response )
-    throws IOException, ServletException
-  { doGet( request, response ) ; }
+  
+  protected String parseDocumentType( InputStream in )
+  {
+    SAXParser parser = null;
+    try{ parser = SAXParserFactory.newInstance().newSAXParser(); }
+    catch( Exception ex )
+    {
+      String msg = "Could not build a SAX Parser for processing XML input";
+      throw new MCRConfigurationException( msg, ex );
+    }
     
- /**
-  * Reads the input XML from a file or from the invoking servlet,
-  * chooses a stylesheet and does the layout by applying the XSL
-  * stylesheet. This method handles HTTP GET requests.
-  */
-  public void doGet( HttpServletRequest  request, 
-                     HttpServletResponse response ) 
+    final Properties detected = new Properties();
+    
+    DefaultHandler handler = new DefaultHandler()
+    {
+      public void startElement( String uri, String localName, String qName,
+                                Attributes attributes )
+        throws SAXException
+      {
+        detected.setProperty( "rootElementName", qName + " / " + localName );
+        throw new MCRException( "we force an interrupt with this exception" );
+      }
+    };
+    
+    try{ parser.parse( new InputSource( in ), handler ); }
+    catch( MCRException weKnowThatThisWillHappen ){}
+    catch( Exception ex )
+    {
+      String msg = "Error while detecting XML document type from input source";
+      throw new MCRException( msg, ex );
+    }
+    
+    return detected.getProperty( "rootElementName" );
+  }
+  
+  protected void forwardXML( HttpServletRequest  request,
+                             HttpServletResponse response )
     throws IOException, ServletException
   {
-    Properties parameters = buildXSLParameters( request );
+    response.setContentType( "text/xml" );
+    OutputStream out = response.getOutputStream();
+
+    if( request.getAttribute( JDOM_ATTR ) != null )
+    {
+      org.jdom.Document jdom = 
+        (org.jdom.Document)( request.getAttribute( JDOM_ATTR ) );
+      new org.jdom.output.XMLOutputter().output( jdom, out );
+    }
+    else if( request.getAttribute( DOM_ATTR ) != null )
+    {
+      org.w3c.dom.Document dom = 
+        (org.w3c.dom.Document)( request.getAttribute( DOM_ATTR ) );
+      org.jdom.Document jdom = new org.jdom.input.DOMBuilder().build( dom );
+      new org.jdom.output.XMLOutputter().output( jdom, out );
+    }
+    else if( request.getAttribute( STREAM_ATTR ) != null )
+    {
+      InputStream in = (InputStream)( request.getAttribute( STREAM_ATTR ) );
+      MCRUtils.copyStream( in, out );
+    }
+    else if( request.getAttribute( BYTE_ATTR ) != null )
+    {
+      byte[] bytes = (byte[])( request.getAttribute( BYTE_ATTR ) );
+      MCRUtils.copyStream( new ByteArrayInputStream( bytes ), out );
+    }
+    else if( request.getAttribute( FILE_ATTR ) != null )
+    {
+      File file = (File)( request.getAttribute( FILE_ATTR ) );
+      FileInputStream fis = new FileInputStream( file );
+      MCRUtils.copyStream( fis, out );
+      fis.close();
+    }
     
-    org.jdom.Document xml;  
+    out.close();
+  }
+
+  protected void processRequest( HttpServletRequest  request, 
+                                 HttpServletResponse response ) 
+    throws IOException, ServletException
+  {
+    Source sourceXML = null;   
+    String docType   = null;
+    
+    if( request.getAttribute( JDOM_ATTR ) != null )
+    {
+      org.jdom.Document jdom = 
+        (org.jdom.Document)( request.getAttribute( JDOM_ATTR ) );
+      sourceXML = new org.jdom.transform.JDOMSource( jdom );
       
-    if( invokedByServlet( request ) )  
-      xml = getXMLInputFromServlet( request );
-    else
-      xml = getXMLInputFromFile( request, parameters );
+      if( jdom.getDocType() != null ) 
+        docType = jdom.getDocType().getElementName();
+      else
+        docType = jdom.getRootElement().getName();
+    }
+    else if( request.getAttribute( DOM_ATTR ) != null )
+    {
+      org.w3c.dom.Document dom = 
+        (org.w3c.dom.Document)( request.getAttribute( DOM_ATTR ) );
+      sourceXML = new DOMSource( dom );
+      
+      if( dom.getDoctype() != null ) 
+        docType = dom.getDoctype().getName();
+      else
+        docType = dom.getDocumentElement().getTagName();
+    }
+    else if( request.getAttribute( STREAM_ATTR ) != null )
+    {
+      int bufferSize = 1000;
+      InputStream is = (InputStream)( request.getAttribute( STREAM_ATTR ) );
+      PushbackInputStream pis = new PushbackInputStream( is, bufferSize );
+      pis.mark( bufferSize );
+      docType = parseDocumentType( pis );
+      pis.reset();
+      sourceXML = new StreamSource( pis );   
+    }
+    else if( request.getAttribute( BYTE_ATTR ) != null )
+    {
+      byte[] bytes = (byte[])( request.getAttribute( BYTE_ATTR ) );
+      docType = parseDocumentType( new ByteArrayInputStream( bytes ) );
+      sourceXML = new StreamSource( new ByteArrayInputStream( bytes ) );
+    }
+    else if( request.getAttribute( FILE_ATTR ) != null )
+    {
+      File file = (File)( request.getAttribute( FILE_ATTR ) );
+      FileInputStream fis = new FileInputStream( file );
+      docType = parseDocumentType( fis );
+      fis.close();
+      sourceXML = new StreamSource( file );
+    }
     
+    Properties parameters = buildXSLParameters( request );
     String style = parameters.getProperty( "Style", "default" );
     logger.debug( "MCRLayoutServlet using style " + style );
 
-    if( "xml".equals( style ) )
+    if( "xml".equals( style ) ) 
     {
-      renderAsXML( xml, response );
+      forwardXML( request, response );
     }
     else
     {
-      String documentType = getDocumentType( xml );
-      String styleName    = buildStylesheetName( style, documentType );
-      String styleDir     = "/WEB-INF/stylesheets/";
-      
-      File styleFile = getStylesheetFile( styleDir, styleName );
+      String styleName = buildStylesheetName( style, docType );
+      String styleDir  = "/WEB-INF/stylesheets/";
+      File styleFile   = getStylesheetFile( styleDir, styleName );
 
       if( styleFile == null ) 
-        renderAsXML( xml, response );
+        forwardXML( request, response );
       else
       {
-        Templates stylesheet = getCompiledStylesheet( factory, styleFile );
-        TransformerHandler handler = getHandler( stylesheet );
-        setXSLParameters( handler, parameters );
-        try {
-			transform( xml, stylesheet, handler, response );
-		} catch (IOException e) {
-			logger.error("IO Error while transforming Document",e);
-		}
+        Templates stylesheet = buildCompiledStylesheet( styleFile );
+        Transformer transformer = buildTransformer( stylesheet );
+        setXSLParameters( transformer, parameters );
+        try 
+        { transform( sourceXML, stylesheet, transformer, response ); } 
+        catch( IOException ex ) 
+        {	logger.error("IO Error while XSL transforming XML Document", ex ); }
       }
     }
   }
 
- /**
-  * Returns true, if LayoutServlet was invoked by another servlet, or false
-  * otherwise, meaning it was invoked by a direct static "*.xml" mapping.
-  */
-  protected boolean invokedByServlet( HttpServletRequest request )
-  { 
-    return ( request.getAttribute( JDOM_ATTR ) != null ) ||
-           ( request.getAttribute( DOM_ATTR  ) != null );
-  }
-  
- /**
-  * Assuming that LayoutServlet was invoked by another servlet by 
-  * request dispatching, gets XML input as JDOM or DOM document from
-  * the request attributesc that the invoking servlet has set.
-  */
-  protected org.jdom.Document getXMLInputFromServlet( HttpServletRequest request )
+  public static final Properties buildXSLParameters( HttpServletRequest request )
   {
-    org.jdom.Document jdom = (org.jdom.Document)
-      request.getAttribute( JDOM_ATTR );
-    if( jdom != null) return jdom;
+  	Properties parameters = new Properties();
+	  String user = null;
     
-    org.w3c.dom.Document dom = (org.w3c.dom.Document)
-      request.getAttribute( DOM_ATTR );
-
-    try{ return new org.jdom.input.DOMBuilder().build( dom ); }
-    catch( Exception exc )
+  	// Read all *.xsl attributes that are stored in the browser session
+	  HttpSession session = request.getSession( false );
+  	if( session != null )
     {
-      String msg = "LayoutServlet could not transform DOM input to JDOM";
-      throw new MCRException( msg, exc );
-    }
-  }
-  
-  /**
-   * Assuming that LayoutServlet was invoked by a static "*.xml" url mapping,
-   * reads a static xml file from disk and parses it to a JDOM document as
-   * input.
-   */
-  protected org.jdom.Document getXMLInputFromFile( HttpServletRequest request,
-                                                   Properties parameters )
-  {
-    String requestedPath = request.getServletPath();
-    URL url = null;
-    
-    try{ url = getServletContext().getResource( requestedPath ); }
-    catch( MalformedURLException willNeverBeThrown ){}
-    
-    if( url == null )
-    {
-      String msg = "LayoutServlet could not find file " + requestedPath;
-      throw new MCRException( msg );
-    }
-
-    String path = getServletContext().getRealPath( requestedPath );
-    File   file = new File( path );
-    long   time = file.lastModified();
-
-    String documentBaseURL = file.getParent() + File.separator;
-    parameters.put( "DocumentBaseURL", documentBaseURL );
-
-    org.jdom.Document input = (org.jdom.Document)
-      ( staticFileCache.getIfUpToDate( path, time ) );
-   
-    if( input == null )
-    {
-      try{ input = new org.jdom.input.SAXBuilder().build( url ); }
-      catch( Exception exc )
+		  for( Enumeration e = session.getAttributeNames(); e.hasMoreElements(); )		
       {
-        String msg = "LayoutServlet could not parse XML input from " + path;
-        throw new MCRException( msg, exc );
-      }
-
-      staticFileCache.put( path, input );
-    }
-
-    return input;
-  }
-  
-  public static final Properties buildXSLParameters(HttpServletRequest request)
-  {
-	Properties parameters = new Properties();
-	String name=null;
-	String user=null;
-    
-	// Read all *.xsl attributes that are stored in the browser session
-	HttpSession session = request.getSession(false);
-	if (session != null){
-		for( Enumeration e = session.getAttributeNames(); e.hasMoreElements(); )		{
-	  		name = (String)( e.nextElement() );
-	  		if( name.startsWith( "XSL." ) ){
+	  		String name = (String)( e.nextElement() );
+	  		if( name.startsWith( "XSL." ) )
 	  			parameters.put( name.substring( 4 ), session.getAttribute( name ) );
-	  		}
-		}
-		user = (String)( session.getAttribute( "XSL.CurrentUser" ) );
-	}
-    
-	// Read all *.xsl attributes provided by the invoking servlet
-	for( Enumeration e = request.getAttributeNames(); e.hasMoreElements(); )
-	{
-	  name = (String)( e.nextElement() );
-	  if( name.startsWith( "XSL." ) )
+	  	}
+  		user = (String)( session.getAttribute( "XSL.CurrentUser" ) );
+    }
+	    
+	  // Read all *.xsl attributes provided by the invoking servlet
+	  for( Enumeration e = request.getAttributeNames(); e.hasMoreElements(); )
 	  {
-		parameters.put( name.substring( 4 ), request.getAttribute( name ) );
+	    String name = (String)( e.nextElement() );
+	    if( name.startsWith( "XSL." ) )
+        parameters.put( name.substring( 4 ), request.getAttribute( name ) );
 	  }
-	}
       
-	// Read all *.xsl attributes from the client HTTP request parameters
-	for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); )
-	{
-	  name = (String)( e.nextElement() );
-	  if( name.startsWith( "XSL." ) )
+    // Read all *.xsl attributes from the client HTTP request parameters
+	  for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); )
 	  {
-		parameters.put( name.substring( 4 ), request.getParameter( name ) );
+	    String name = (String)( e.nextElement() );
+	    if( name.startsWith( "XSL." ) )
+	    {
+		    parameters.put( name.substring( 4 ), request.getParameter( name ) );
+	    }
 	  }
-	}
 
-	// Set some predefined XSL parameters:
+	  // Set some predefined XSL parameters:
 
-	if( user == null ) user = "gast";
+	  if( user == null ) user = "gast";
     
-	String contextPath = request.getContextPath() + "/";
-	String requestURL  = getCompleteURL( request );
+	  String contextPath = request.getContextPath() + "/";
+  	String requestURL  = getCompleteURL( request );
     
-	int pos = requestURL.indexOf( contextPath, 9 );
-	String applicationBaseURL = requestURL.substring( 0, pos ) + contextPath;
+	  int pos = requestURL.indexOf( contextPath, 9 );
+	  String applicationBaseURL = requestURL.substring( 0, pos ) + contextPath;
 
-	String servletsBaseURL = applicationBaseURL + "servlets/";
+	  String servletsBaseURL = applicationBaseURL + "servlets/";
 
-	String defaultLang = MCRConfiguration.instance()
-	  .getString( "MCR.metadata_default_lang", "en" );
+	  String defaultLang = MCRConfiguration.instance()
+	    .getString( "MCR.metadata_default_lang", "en" );
 
-	parameters.put( "CurrentUser",           user               );
-	parameters.put( "RequestURL",            requestURL         );
-	parameters.put( "WebApplicationBaseURL", applicationBaseURL );
-	parameters.put( "ServletsBaseURL",       servletsBaseURL    );
-	parameters.put( "DefaultLang",           defaultLang        );
+	  parameters.put( "CurrentUser",           user               );
+	  parameters.put( "RequestURL",            requestURL         );
+	  parameters.put( "WebApplicationBaseURL", applicationBaseURL );
+	  parameters.put( "ServletsBaseURL",       servletsBaseURL    );
+	  parameters.put( "DefaultLang",           defaultLang        );
     
     return parameters;
   }
 
-  public static final String getCompleteURL( HttpServletRequest request )
+  protected static final String getCompleteURL( HttpServletRequest request )
   {
     StringBuffer buffer = HttpUtils.getRequestURL( request );
     String queryString = request.getQueryString();
@@ -295,31 +299,9 @@ public class MCRLayoutServlet extends HttpServlet
     return buffer.toString();
   }
   
-  protected void renderAsXML( org.jdom.Document xml,
-                              HttpServletResponse response )
-    throws IOException
-  {
-    response.setContentType( "text/xml" );
-    OutputStream out = response.getOutputStream();
-    new org.jdom.output.XMLOutputter( "  ", true ).output( xml, out );
-    out.close();
-  }
-  
-  /**
-   * Returns the XML document type name as declared in the XML input document,
-   * or otherwise returns the name of the root element instead.
-   */
-  protected String getDocumentType( org.jdom.Document xml )
-  {
-    if( xml.getDocType() != null ) 
-      return xml.getDocType().getElementName();
-    else
-      return xml.getRootElement().getName();
-  }
-
  /**
   * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
-  */
+  **/
   protected String buildStylesheetName( String style, String docType )
   {
     StringBuffer filename = new StringBuffer( docType );
@@ -332,14 +314,21 @@ public class MCRLayoutServlet extends HttpServlet
     
     return filename.toString();
   }
-  
+
+ /**
+  * Gets a File object for the given filename and directory,
+  * or returns null if no such file exists.
+  **/
   protected File getStylesheetFile( String dir, String name )
   {
     String path = getServletContext().getRealPath( dir + name );
     File file = new File( path );
-    logger.debug( "MCRLayoutServlet using stylesheet " + file.getPath() );
     
-    if( ! file.exists() ) return null;
+    if( ! file.exists() )
+    {
+      logger.debug( "MCRLayoutServlet did not find stylesheet " + name );
+      return null;
+    }
 
     if( ! file.canRead() )
     {
@@ -350,46 +339,91 @@ public class MCRLayoutServlet extends HttpServlet
     return file;
   }
   
-  protected Templates getCompiledStylesheet( TransformerFactory factory,
-                                             File file )
+  /** The XSL transformer factory to use */
+  protected SAXTransformerFactory factory;  
+  
+  /** 
+   * Builds a SAX transformer factory for later use 
+   *
+   * @throws MCRConfigurationException if no SAXTransformerFactory was found
+   **/
+  protected void buildTransformerFactory()
+  {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    
+    if( ! tf.getFeature( SAXTransformerFactory.FEATURE ) )
+      throw new MCRConfigurationException
+      ( "Could not load a SAXTransformerFactory for use with XSLT" );
+      
+    factory = (SAXTransformerFactory)( tf );
+  }
+  
+  /**
+   * Reads an XSL stylesheet from the given file and returns it as compiled
+   * XSL Templates object.
+   *
+   * @param file the File that contains the XSL stylesheet
+   * @return the compiled stylesheet
+   **/
+  protected Templates buildCompiledStylesheet( File file )
   {
     String path = file.getPath();
     long   time = file.lastModified();
     
-    Templates stylesheet = (Templates)( stylesheetCache.getIfUpToDate( path, time ) );
+    Templates stylesheet = (Templates)( cache.getIfUpToDate( path, time ) );
     
     if( stylesheet == null )
     {
       try
-      { stylesheet = factory.newTemplates( new StreamSource( file ) ); }
+      { 
+        stylesheet = factory.newTemplates( new StreamSource( file ) ); 
+        logger.debug( "MCRLayoutServlet compiled stylesheet " + file.getName() );
+      }
       catch( TransformerConfigurationException exc )
       {
-        String msg = "Error while compiling XSL stylesheet " + file.getName() +":\n"+exc.getMessageAndLocation();
+        String msg = "Error while compiling XSL stylesheet " + file.getName() 
+                     + ": " + exc.getMessageAndLocation();
         throw new MCRConfigurationException( msg, exc );
       }
       
-      stylesheetCache.put( path, stylesheet );
+      cache.put( path, stylesheet );
+    }
+    else
+    {
+      logger.debug( "MCRLayoutServlet using cached stylesheet " + file.getName() );
     }
     
     return stylesheet;
   }
 
-  protected TransformerHandler getHandler( Templates stylesheet )
+  /**
+   * Builds a XSL transformer that uses the given XSL stylesheet 
+   *
+   * @param stylesheet the compiled XSL stylesheet to use
+   * @return the XSL transformer that can be used to do the XSL transformation
+   **/
+  protected Transformer buildTransformer( Templates stylesheet )
   {
     try
-    { return factory.newTransformerHandler( stylesheet ); }
+    { return factory.newTransformerHandler( stylesheet ).getTransformer(); }
     catch( TransformerConfigurationException exc )
     {
-      String msg = "Error while compiling XSL stylesheet:\n"+exc.getMessageAndLocation();
+      String msg = "Error while building XSL transformer: " + exc.getMessageAndLocation();
       throw new MCRConfigurationException( msg, exc );
     }
   }  
     
-  protected void setXSLParameters( TransformerHandler handler,
-                                   Properties         parameters )
+  /**
+   * Sets XSL parameters for the given transformer by taking them from
+   * the properties object provided.
+   *
+   * @param transformer the Transformer object thats parameters should be set
+   * @param parameters the XSL parameters as name-value pairs
+   **/
+  protected void setXSLParameters( Transformer transformer,
+                                   Properties  parameters )
   {
-    Transformer transformer = handler.getTransformer();
-    Enumeration names       = parameters.propertyNames();
+    Enumeration names = parameters.propertyNames();
     
     while( names.hasMoreElements() )
     {
@@ -399,33 +433,37 @@ public class MCRLayoutServlet extends HttpServlet
       transformer.setParameter( name, value );
     }
   }
-  
-  protected void transform( org.jdom.Document   xml,
-                            Templates           xsl,
-                            TransformerHandler  handler,
+
+  /**
+   * Transforms XML input with the given XSL stylesheet and sends
+   * the output as HTTP Servlet Response to the client browser.
+   *
+   * @param xml the XML input document
+   * @param xsl the compiled XSL stylesheet
+   * @param transformer the XSL transformer to use
+   * @param response the response object to send the result to
+   **/
+  protected void transform( Source       xml,
+                            Templates    xsl,
+                            Transformer  transformer,
                             HttpServletResponse response )
     throws IOException
   {
     // Set content type  from "<xsl:output media-type = "...">
     // Set char encoding from "<xsl:output encoding   = "...">
-
     String ct  = xsl.getOutputProperties().getProperty( "media-type" );
     String enc = xsl.getOutputProperties().getProperty( "encoding"   );
     response.setContentType( ct + "; charset=" + enc );
+    logger.debug( "MCRLayoutServlet starts to output " + ct + "; charset=" + enc );
 
     OutputStream out = response.getOutputStream();
-    handler.setResult( new StreamResult( out ) );
     
-    try
-    {  
-    	new org.jdom.output.SAXOutputter( handler ).output( xml );
-    }
-    catch( org.jdom.JDOMException ex )
+    try{ transformer.transform( xml, new StreamResult( out ) ); }
+    catch( TransformerException ex )
     {
-      String msg = "Error while transforming XML using XSL stylesheet";
+      String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
       throw new MCRException( msg, ex );
     }
-    finally
-    { out.close(); }
+    finally{ out.close(); }
   }
 }
