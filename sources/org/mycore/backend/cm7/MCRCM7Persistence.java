@@ -300,6 +300,8 @@ public final byte [] receive(MCRObjectID mcr_id)
  * @return the GregorianCalendar data of the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
+ * @exception DKException if an error in the CM7 is occured
+ * @exception Exception if an general error is occured
  **/
 public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
@@ -584,6 +586,24 @@ private final String createTS(MCRTypedContent mcr_tc)
             .getValueElement(i)).doubleValue()));
         sb.append(NL);
         i += k; continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_CLASSID) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        sb.append("XXX")
+          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
+          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
+            .replace('.','X').replace('_','X'))
+          .append("XXX"); 
+        i++;
+        sb.append("XXX")
+          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
+          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
+            .replace('.','X').replace('_','X'))
+          .append("XXX"); 
+        i++;
+        sb.append(NL);
+        continue;
         }
       if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_STRING) {
         sb.append("XXX");

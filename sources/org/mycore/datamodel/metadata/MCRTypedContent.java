@@ -68,7 +68,9 @@ public final static int FORMAT_DATE = 2;
 public final static int FORMAT_NUMBER = 3;
 public final static int FORMAT_BOOLEAN = 4;
 public final static int FORMAT_LINK = 5;
-private final static int FORMAT_LAST = 5;
+public final static int FORMAT_CLASSID = 6;
+public final static int FORMAT_CATEGID = 7;
+private final static int FORMAT_LAST = 7;
 
 // static 
 private static String default_lang;
@@ -183,6 +185,48 @@ public final boolean addBooleanElement(boolean invalue, boolean inparaflag,
   name.add("");
   format.add(new Integer(FORMAT_BOOLEAN));
   value.add(new Boolean(invalue));
+  paraflag.add(new Boolean(inparaflag));
+  tsflag.add(new Boolean(intsflag));
+  return true;
+  }
+
+/**
+ * This method add a ClassificationID value to this list.
+ *
+ * @param invalue    the value as an String
+ * @param inparaflag is true if the value should use for parametric search
+ * @param intsflag   is true if the value should use for text search
+ * @return false if an error was occured, else return true
+ **/
+public final boolean addClassElement( String invalue, boolean inparaflag,
+  boolean intsflag)
+  {
+  if (invalue==null) { return false; }
+  type.add(new Integer(TYPE_VALUE));
+  name.add("classid");
+  format.add(new Integer(FORMAT_CLASSID));
+  value.add(invalue);
+  paraflag.add(new Boolean(inparaflag));
+  tsflag.add(new Boolean(intsflag));
+  return true;
+  }
+
+/**
+ * This method add a CategoryID value to this list.
+ *
+ * @param invalue    the value as an String
+ * @param inparaflag is true if the value should use for parametric search
+ * @param intsflag   is true if the value should use for text search
+ * @return false if an error was occured, else return true
+ **/
+public final boolean addCategElement( String invalue, boolean inparaflag,
+  boolean intsflag)
+  {
+  if (invalue==null) { return false; }
+  type.add(new Integer(TYPE_VALUE));
+  name.add("categid");
+  format.add(new Integer(FORMAT_CATEGID));
+  value.add(invalue);
   paraflag.add(new Boolean(inparaflag));
   tsflag.add(new Boolean(intsflag));
   return true;

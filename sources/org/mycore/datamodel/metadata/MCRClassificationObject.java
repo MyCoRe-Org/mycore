@@ -127,6 +127,24 @@ public abstract class MCRClassificationObject
     { ensureNotDeleted(); return ((String)label.get(index)); }
   
   /**
+   * The method return the label String for a given language.
+   *
+   * @param index a language
+   * @exception MCRUsageException if the classification is deleted.
+   **/
+  public String getLabel(String lang) throws MCRUsageException
+    { 
+    ensureNotDeleted(); 
+    if (this.lang.size()==0) { return ""; }
+    if (this.lang==null) { return ((String)this.label.get(0)); }
+    for (int i=0;i<this.lang.size();i++) {
+      if (((String)this.lang.get(i)).equals(lang)) {
+        return (String)this.lang.get(i); }
+      }
+    return "";
+    }
+  
+  /**
    * The method return the lang ArrayList.
    * @exception MCRUsageException if the classification is deleted.
    **/
@@ -214,7 +232,6 @@ public abstract class MCRClassificationObject
     this.description.add(description);
     }
   
-
   /**
    * The method return the size of the lang/label/description triple.
    *
