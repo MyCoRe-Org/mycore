@@ -125,5 +125,12 @@ public interface MCRClassificationInterface
    **/
   public int retrieveNumberOfChildren(String CLID, String PID);
   
+  /**
+   * The method returns all availiable classification ID's they are loaded.
+   *
+   * @return a list of classification ID's as String array
+   **/
+  public String [] getAllClassificationID();
+
 }
 

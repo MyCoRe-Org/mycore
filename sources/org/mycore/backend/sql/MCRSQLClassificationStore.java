@@ -465,5 +465,29 @@ public final int retrieveNumberOfChildren( String CLID, String PID )
     .toRowSelector() );
   }
   
+/**
+ * The method returns all availiable classification ID's they are loaded.
+ * 
+ * @return a list of classification ID's as String array 
+ **/
+public final String [] getAllClassificationID()
+  {
+  int len = MCRSQLConnection.justCountRows( new MCRSQLStatement( tableClass )
+    .setCondition( "ID",  "*"  )
+    .toRowSelector() );
+  logger.debug("Number of classifications = "+Integer.toString(len));
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+    new MCRSQLStatement( tableClass )
+    .setCondition( "ID",  "*"  )
+    .toSelectStatement() );
+  String ID [] = new String[len];
+  int i = 0;
+  while( reader.next() ) {
+    ID[i] = reader.getString( "ID" );
+    logger.debug("ID of classifications["+Integer.toString(i)+"] = "+ID[i]);
+    i++;
+    }
+  return ID;
+  }
 }
 
