@@ -200,29 +200,41 @@ public class MCRDerivateCommands
   }
 
  /**
-  * Save an MCRDerivate.
+  * Save an MCRDerivate with the ID under the dirname and store the derivate
+  * metadata under dirname.xml.
   *
   * @param ID the ID of the MCRDerivate to be save.
-  * @param filename the filename to store the derivate
+  * @param dirname the dirname to store the derivate
   **/
   public static void save( String ID, String dirname )
-  {
+    {
+    // check dirname
+    File dir = new File(dirname);
+    if (dir.isFile()) {
+      System.out.println(dirname+" is not a dirctory."); return; }
+    if (dir.isDirectory()) {
+      System.out.println(dirname+" is an existing dirctory."); return; }
+    if (!dir.mkdir()) {
+      System.out.println("Can not create dirctory "+dirname+"."); return; }
+    // checkID
+    MCRObjectID mcr_id = new MCRObjectID(ID);
+    // store the derivate metadata in dirname.xml
     MCRDerivate obj = new MCRDerivate();
-    byte[] xml = obj.receiveXMLFromDatastore(ID);
     String filename = dirname+".xml";
     try {
+      byte[] xml = obj.receiveXMLFromDatastore(ID);
       FileOutputStream out = new FileOutputStream(filename);
       out.write(xml);
       out.flush();
       }
     catch (IOException ex) {
-      System.out.println( ex );
+      System.out.println( ex.getMessage() );
       System.out.println();
       System.out.println( "Exception while store to file " + filename );
       }
-    File f = new File(dirname);
+    // store the derivate file under dirname
     try {
-      MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(ID),f); }
+      MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(ID),dir); }
     catch (IOException ex) {
       System.out.println( ex );
       System.out.println();
@@ -231,5 +243,14 @@ public class MCRDerivateCommands
     System.out.println( "Derivate "+ID+" stored under "+dirname+" and "+
       filename+".\n" );
   }
+
+ /**
+  * Save an MCRDerivate with the ID under the ID as name and store the 
+  * derivate metadata under ID_name.xml.
+  *
+  * @param ID the ID of the MCRDerivate to be save.
+  **/
+  public static void save( String ID )
+    { save(ID,ID); }
 
 }

@@ -234,26 +234,39 @@ public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
-  // create data in IFS
-  if (getDerivate().getInternals() != null) {
-    File f = new File(getDerivate().getInternals().getSourcePath());
-    if ((!f.isDirectory()) && (!f.isFile())) {
-      throw new MCRPersistenceException("The File or Directory on "+
-      getDerivate().getInternals().getSourcePath()+" was not found."); }
-    try {
-      MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
-        mcr_id.getId());
-      getDerivate().getInternals().setIFSID(difs.getID());
-      }
-    catch (Exception e) { e.printStackTrace(); }
-    }
-  // create the derivate
+  // prepare the derivate metadata
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
-  mcr_persist.create(mcr_tc,xml,mcr_ts);
+  // create data in IFS
+  if (getDerivate().getInternals() != null) {
+    File f = new File(getDerivate().getInternals().getSourcePath());
+    if ((!f.isDirectory()) && (!f.isFile())) {
+      throw new MCRPersistenceException("The File or Directory on "+
+        getDerivate().getInternals().getSourcePath()+" was not found."); }
+    try {
+      MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
+        mcr_id.getId());
+      getDerivate().getInternals().setIFSID(difs.getID());
+      }
+    catch (Exception e) { 
+      e.printStackTrace(); // for debug
+      throw new MCRPersistenceException("Error while creating "+
+        getDerivate().getInternals().getSourcePath()+" in the IFS."); }
+    }
+  // create the derivate
+  try {
+    mcr_persist.create(mcr_tc,xml,mcr_ts); }
+  catch (Exception e) { 
+    e.printStackTrace(); // for debug
+    // delete from IFS
+    MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+    difs.delete();
+    // throw final exception
+    throw new MCRPersistenceException("Error while creating derivate in"+
+      " datastore."); }
   // add the link to metadata
   MCRObject obj;
   for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
@@ -264,9 +277,9 @@ public final void createInDatastore() throws MCRPersistenceException
     try {
       obj = new MCRObject();
       obj.addDerivateInDatastore(meta.getXLinkHref(),der); }
-    catch (MCRException e) {
-      throw new MCRPersistenceException("The MCRObject "+meta.getXLinkHref()+
-        " was not found."); }
+    catch (Exception e) {
+      System.out.println("Error while create link to MCRObject "
+        +meta.getXLinkHref()+"."); }
     }
   }
 
@@ -279,9 +292,16 @@ public final void createInDatastore() throws MCRPersistenceException
 public final void deleteFromDatastore(String id) throws MCRPersistenceException
   {
   // get the derivate
-  mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_persist.receive(mcr_id);
-  setFromXML(xml,false);
+  try {
+    mcr_id = new MCRObjectID(id);
+    byte [] xml = mcr_persist.receive(mcr_id);
+    setFromXML(xml,false);
+    }
+  catch (Exception e) {
+    e.printStackTrace(); // for debug
+    throw new MCRPersistenceException("Error while receiving derivate with "+
+      "ID "+id+" from datastore.");
+    }
   // remove the link to metadata
   MCRObject obj;
   for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
@@ -293,12 +313,20 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
       obj = new MCRObject();
       obj.removeDerivateInDatastore(meta.getXLinkHref(),der); }
     catch (MCRException e) {
-      System.out.println(e.getMessage()); }
+      e.printStackTrace(); // for debug
+      System.out.println("Error while delete link from MCRObject "
+        +meta.getXLinkHref()+"."); }
     }
   // delete data from IFS
   if (getDerivate().getInternals() != null) {
-    MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
-    difs.delete();
+    try {
+      MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+      difs.delete();
+      }
+    catch (Exception e) {
+      System.out.println("Can't remove data from IFS for ID "+getDerivate()
+        .getInternals().getIFSID());
+      System.out.println(e.getMessage()); }
     }
   // delete derivate
   mcr_persist.delete(mcr_id);
@@ -356,8 +384,15 @@ public final byte [] receiveXMLFromDatastore(String id)
 public final MCRDirectory receiveDirectoryFromIFS(String id) 
   throws MCRPersistenceException
   {
+  // check the ID
   mcr_id = new MCRObjectID(id);
-  return MCRDirectory.getRootDirectory(mcr_id.getId());
+  // receive the IFS informations
+  MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+  if (difs == null) {
+    throw new MCRPersistenceException("Error while receiving derivate with "+
+      "ID "+mcr_id.getId()+" from IFS.");
+    }
+  return difs;
   }
 
 /**

@@ -140,6 +140,9 @@ public class MCRCommandLineInterface
       "show derivate {0}",
       "mycore.commandline.MCRDerivateCommands.show String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "save derivate {0}",
+      "mycore.commandline.MCRDerivateCommands.save String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "save derivate {0} to {1}",
       "mycore.commandline.MCRDerivateCommands.save String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(

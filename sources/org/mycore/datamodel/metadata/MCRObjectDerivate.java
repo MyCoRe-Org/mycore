@@ -99,12 +99,12 @@ public final void setFromDOM(org.jdom.Element derivate_element)
   // Internal part
   org.jdom.Element internals_element = derivate_element.getChild("internals");
   if (internals_element!=null) {
-    List internal_element_list = internals_element.getChildren();
-    org.jdom.Element internal_element = (org.jdom.Element)
-      internal_element_list.get(0);
-    internals = new MCRMetaIFS();
-    internals.setDataPart("internal");
-    internals.setFromDOM(internal_element);
+    org.jdom.Element internal_element = internals_element.getChild("internal");
+    if (internal_element != null) {
+      internals = new MCRMetaIFS();
+      internals.setDataPart("internal");
+      internals.setFromDOM(internal_element);
+      }
     }
   }
 
@@ -218,6 +218,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
  * The method returns <em>true</em> if<br>
  * <ul>
  * <li>the linkmeta exist and the XLink type of linkmeta is not "arc"</li>
+ * <li>no information in the external AND internal tags</li>
  * </ul>
  *
  * @return a boolean value
@@ -230,6 +231,7 @@ public final boolean isValid()
         return false; }
       }
     }
+  if ((internals == null) && (externals.size() == 0)) { return false; }
   return true;
   }
 
