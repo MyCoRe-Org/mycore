@@ -11,8 +11,12 @@ ausgeliefert. Das Holen der aktuellen Version erfolgt mit dem Kommando
 \begin{center}
 {\bf cvs -d :pserver:anoncvs@server.mycore.de:/cvs checkout mycore} 
 \end{center}
-Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[1ex]
-\begin{tabular*}{150mm}{ll}
+Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
+\bottomcaption{Dateistruktur des MyCoRe Kernes}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{5cm}|p{10cm}|}
+\hline
 {\bf mycore} &  Das Root-Verzeichnis des MyCoRe-Kerns \\
 \quad {\bf bin} & Das Verzeichnis der Shellscripte \\
 \qquad build.sh & Shellscript zum Compilieren unter einem UNIX-System \\
@@ -53,8 +57,9 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[1ex]
 \quad \qquad {\bf query} & Klassen zur Arbeit mit dem MyCoRe internen Query-System \\
 \qquad {\bf user} & Klassen des User- und Rechteverwaltungssystems \\
 \quad build.xml & Konfigurations-File für die Arbeit mit ANT \\
-\quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen.
-\end{tabular*}
+\quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen. \\
+\hline
+\end{supertabular}
 %
 %
 \section{Konfiguration und "Ubersetzten des Kerns}
@@ -65,7 +70,7 @@ Nach dem checkout der Files muss als erstes dieses Paket "ubersetzt werden. Die 
 \item Zur Anpassung der erforderlichen Umgebung gibt es zwei Wege. Entweder alle notwendigen Variablen wie CLASSPATH usw. werden in den entsprechenden Nutzer-Profile gesetzt oder ({\bf empfohlen}) sie setzen an dieser Stelle nur die Environment-Variable {\bf MYCORE\_HOME} in Ihrer Systemumgebung und kopieren das entsprechende Template {\it setup\_....sh} (bzw. {\it setup\_....cmd}) im Verzeichnis {\it bin} dort nach {\it setup.sh} (bzw. {\it setup.cmd} f"ur die Windows Plattform) F"ur die unterst"utzten Systeme stehen jeweils entsprechende Files bereit. Passen Sie nun das Setup-Script an die eigene Konfiguration hinsichtlich der ben"otigten Software (Pfade zu ANT, Java usw.) an. 
 \item Als n"achstes ist im File {\it \$MYCORE\_HOME/build.xml} die Zeile \\
 \begin{center}
-{\tt <property name="`persistency"`  value="`cm7"` />} 
+{\tt <property name=\grq\grq persistency\grq\grq  value=\grq\grq cm7\grq\grq />} 
 \end{center}
 entsprechend des gew"ahlten Persistence-Layers anzupassen. M"ogliche Werte sind {\it cm7}, {\it cm8} und {\it xmldb}.
 \item Starten Sie nun die "Ubersetzung mit einem Aufruf von {\it ant} oder ({\bf empfohlen}) der Ausf"uhrung des Shell-Scripts {\it bin/build.sh} (bzw. {\it bin/build.cmd}). Bei der Abarbeitung des Kommandos ohne Parameter wird Ihnen eine Auswahl an m"oglichen Parametern angeboten. So k"onnen Sie hier zum Beispiel alle Klassen kompilieren oder nur die Javadoc-Dokumentation bzw. diese Dokumentation erstellen. 
