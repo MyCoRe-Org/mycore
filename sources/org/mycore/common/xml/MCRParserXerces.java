@@ -215,7 +215,7 @@ public class MCRParserXerces
   public void error( SAXParseException ex )
   { 
     logger.error( getSAXErrorMessage( ex ), ex );
-    throw new MCRException( "Error parsing XML document", ex );
+    throw new MCRException( "Error parsing XML document: "+ex.getMessage(), ex );
   }
 
   /**
@@ -224,7 +224,7 @@ public class MCRParserXerces
   public void fatalError( SAXParseException ex )
   { 
     logger.fatal( getSAXErrorMessage( ex ) );
-    throw new MCRException( "Error parsing XML document", ex );
+    throw new MCRException( "Error parsing XML document: "+ex.getMessage(), ex );
   }
 
  /** 
