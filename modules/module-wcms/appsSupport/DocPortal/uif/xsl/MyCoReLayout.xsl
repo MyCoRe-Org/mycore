@@ -22,6 +22,8 @@
 	<xsl:param name="Lang" />		
 
 	<!-- wcms -->	
+	<xsl:variable name="Empty.Derivate"  select="'Leeres Derivate'" />	
+	
 	<xsl:param name="navigationBase" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/common/navigation.xml')" />	
 	<xsl:param name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/common/images/') " />	
 	<xsl:variable name="privcall" 

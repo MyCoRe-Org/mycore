@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>	
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2004-11-18 15:10:48 $ -->
+<!-- $Revision: 1.2 $ $Date: 2004-11-30 15:37:50 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -22,6 +22,7 @@
 	<xsl:param name="Lang" />		
 
 	<!-- wcms -->	
+	<xsl:variable name="Empty.Derivate"  select="'Leeres Derivate'" />	
 	<xsl:param name="navigationBase" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/common/navigation.xml')" />	
 	<xsl:param name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/common/images/') " />	
 	<xsl:variable name="privcall" 
