@@ -94,7 +94,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_persistency"/>
+  <target name="compile" depends="compile_common, compile_servlets, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_persistency"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -163,6 +163,12 @@
     </antcall>
   </target>
 
+  <target name="compile_servlets">
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/frontend/servlets/**"/>
+    </antcall>
+  </target>
+
   <target name="compile_nbn">
     <antcall target="javac">
       <param name="packages" value="org/mycore/services/nbn/**"/>
@@ -191,7 +197,7 @@
       </not>
     </condition>
 
-    <condition property="javapdf.outdated">
+    <condition property="pdf.outdated">
       <not>
         <uptodate>
           <srcfiles dir="${basedir}/sources" includes="**/*.java" />
@@ -250,7 +256,7 @@
   <!-- Create the PDF JavaDocs from sources                                -->
   <!-- =================================================================== -->
 
-  <target name="java2pdf" depends="up2date" if="javapdf.outdated">
+  <target name="pdf" depends="up2date" if="pdf.outdated">
     <echo>
 
       Building the MyCoRe source code documentation as PDF...
@@ -278,22 +284,6 @@
   </target>
 
   <!-- =================================================================== -->
-  <!-- Create the PDF documentation from LaTeX sources                     -->
-  <!-- =================================================================== -->
-
-  <target name="tex2pdf">
-    <echo>
-
-      Building the MyCoRe documentation from LaTeX sources...
-    </echo>
-
-    <exec dir="documentation" executable="pdflatex"> <arg line="Overview.tex"  /> </exec>
-    <exec dir="documentation" executable="pdflatex"> <arg line="UserGuide.tex" /> </exec>
-    <exec dir="documentation" executable="pdflatex"> <arg line="ProgGuide.tex" /> </exec>
-
-  </target>
-
-  <!-- =================================================================== -->
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
 
@@ -301,7 +291,6 @@
     <delete includeEmptyDirs="true" >
       <fileset dir="${basedir}/javadocs" />
       <fileset dir="${basedir}/classes"  />
-      <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log" />
     </delete>
     <delete file="${basedir}/lib/mycore.jar" />
   </target>
@@ -374,7 +363,7 @@
   <!-- Do work after a CVS commit...                                       -->
   <!-- =================================================================== -->
 
-  <target name="postcommit" depends="update, javadocs, java2pdf, tex2pdf">
+  <target name="postcommit" depends="update, javadocs, pdf">
     <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
   </target>
 
