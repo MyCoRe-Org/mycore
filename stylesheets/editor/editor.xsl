@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.31 $ $Date: 2004-12-30 13:03:12 $ -->
+<!-- $Revision: 1.32 $ $Date: 2005-02-04 17:04:36 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -56,17 +56,14 @@
 
   <!-- ======== import editor definition ======== -->
   <xsl:variable name="uri" select="concat('webapp:', $StaticFilePath)" />
-  <xsl:variable name="url">
-    <xsl:value-of select="$ServletsBaseURL" />
-    <xsl:text>XMLEditor?MCRSessionID=</xsl:text>
-    <xsl:value-of select="$MCRSessionID" />
+  <xsl:variable name="query">
     <xsl:choose>
       <xsl:when test="string-length($editor.session.id) &gt; 0">
-        <xsl:text>&amp;_action=load.session&amp;_session=</xsl:text>
+        <xsl:text>?_action=load.session&amp;_session=</xsl:text>
         <xsl:value-of select="$editor.session.id" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>&amp;_requestParamKey=</xsl:text>
+        <xsl:text>?_requestParamKey=</xsl:text>
         <xsl:value-of select="$RequestParamKey" />
         <xsl:text>&amp;_ref=</xsl:text>
         <xsl:value-of select="@id" />
@@ -75,9 +72,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
+  <xsl:variable name="url">
+    <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor',$JSessionID,$query)" />
+  </xsl:variable>
 
   <!-- ======== build nested panel structure ======== -->
-  <xsl:apply-templates select="document($url,.)/editor/components" />
+  <xsl:apply-templates select="document($url)/editor/components" />
 </xsl:template>
 
 <!-- ========================================================================= -->
@@ -117,8 +117,7 @@
 
   <!-- ======== action ======== -->
   <xsl:attribute name="action">
-    <xsl:value-of select="$ServletsBaseURL" />
-    <xsl:text>XMLEditor</xsl:text>
+    <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor',$HttpSession)"/>
   </xsl:attribute>
 
   <!-- ======== method ======== -->
@@ -159,7 +158,12 @@
 
   <!-- ======== target url ======== -->
   <xsl:if test="../target/@url">
-    <input type="hidden" name="{$editor.delimiter.internal}target-url" value="{../target/@url}" />
+    <xsl:variable name="url">
+        <xsl:call-template name="UrlAddSession">
+            <xsl:with-param name="url" select="../target/@url" />
+        </xsl:call-template>
+    </xsl:variable>
+    <input type="hidden" name="{$editor.delimiter.internal}target-url" value="{$url}" />
   </xsl:if>
 
   <!-- ======== target servlet name ======== -->
@@ -691,7 +695,7 @@
 
 <!-- ======== helpPopup ======== -->
 <xsl:template match="helpPopup">
-  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=show.popup&amp;_session=',ancestor::editor/@session,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID)" />
+  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor',$HttpSession,'?_action=show.popup&amp;_session=',ancestor::editor/@session,'&amp;_ref=',@id)" />
 
   <xsl:variable name="properties">
     <xsl:text>width=</xsl:text>
@@ -931,8 +935,13 @@
 
 <!-- ======== button ======== -->
 <xsl:template match="button">
+  <xsl:variable name="url">
+    <xsl:call-template name="UrlAddSession">
+      <xsl:with-param name="url" select="@url" />
+    </xsl:call-template>
+  </xsl:variable>
   <xsl:call-template name="editor.button">
-    <xsl:with-param name="url"   select="@url"   />
+    <xsl:with-param name="url"   select="$url"   />
     <xsl:with-param name="width" select="@width" />
   </xsl:call-template>
 </xsl:template>
@@ -1193,28 +1202,19 @@
 <!-- ======== If url is relative, add WebApplicationBaseURL and make it absolute ======== -->
 <xsl:template name="build.url">
   <xsl:param name="url" />
-  
-  <xsl:choose>
-    <xsl:when test="starts-with($url,'http://') or starts-with($url,'https://') or starts-with($url,'file://')">
-      <xsl:value-of select="$url" />
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:value-of select="concat($WebApplicationBaseURL,$url)" />
-    </xsl:otherwise>
-  </xsl:choose>
-
-  <!-- append MCRSessionID if not already exists in URL -->
-  <xsl:if test="not(contains($url, 'MCRSessionID='))">
+  <xsl:variable name="return">
     <xsl:choose>
-      <xsl:when test="contains($url,'?')"> <!-- there are other http get style parameters in url -->
-        <xsl:value-of select="'&amp;'" />  <!-- append new parameter -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="'?'" />      <!-- this is the only parameter -->
-      </xsl:otherwise>
+        <xsl:when test="starts-with($url,'http://') or starts-with($url,'https://') or starts-with($url,'file://')">
+            <xsl:value-of select="$url" />
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="concat($WebApplicationBaseURL,$url)" />
+        </xsl:otherwise>
     </xsl:choose>
-    <xsl:value-of select="concat('MCRSessionID=',$MCRSessionID)" />
-  </xsl:if>
+  </xsl:variable>
+  <xsl:call-template name="UrlAddSession">
+    <xsl:with-param name="url" select="$return"/>
+  </xsl:call-template>
 </xsl:template>
 
 <!-- ======== html select list option ======== -->

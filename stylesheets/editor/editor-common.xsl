@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2004-10-04 07:50:40 $ -->
+<!-- $Revision: 1.3 $ $Date: 2005-02-04 17:04:36 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -21,6 +21,8 @@
 <xsl:param name="DefaultLang"               />
 <xsl:param name="CurrentLang"               />
 <xsl:param name="MCRSessionID"              />
+<xsl:param name="HttpSession" />
+<xsl:param name="JSessionID" />
 
 <!-- ========= multi-language label ======== -->
 <xsl:template name="output.label">
