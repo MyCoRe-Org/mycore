@@ -102,8 +102,7 @@ private static final void printResult(MCRQueryResultArray results,
   String outpath = config.getString("MCR.out_path_"+type);
   TransformerFactory transfakt = TransformerFactory.newInstance();
   // Indexlist
-  String mcrxmlall = results.exportAll();
-  //System.out.println(mcrxmlall);
+  byte [] mcrxmlall = results.exportAllToByteArray();
   Transformer trans =
     transfakt.newTransformer(new StreamSource(xsltallresult));
   StreamResult sr = null;
@@ -114,13 +113,13 @@ private static final void printResult(MCRQueryResultArray results,
       type+"_index."+outtype);
     sr = new StreamResult(outpath+System.getProperty("file.separator")+
       type+"_index."+outtype); }
-  trans.transform(new StreamSource((Reader)new StringReader(mcrxmlall)),sr);
+  trans.transform(new StreamSource(new ByteArrayInputStream(mcrxmlall)),sr);
   System.out.println();
   // All data
   trans = transfakt.newTransformer(new StreamSource(xsltoneresult));
   for (int l=0;l<results.size();l++) {
     String mcrid = results.getId(l);
-    String mcrxml = results.getXML(l);
+    byte [] mcrxml = results.exportElementToByteArray(l);
     sr = null;
     if (outpath.equals("SYSOUT")) {
       sr = new StreamResult((OutputStream) System.out); }
@@ -129,7 +128,7 @@ private static final void printResult(MCRQueryResultArray results,
         mcrid+"."+outtype);
       sr = new StreamResult(outpath+System.getProperty("file.separator")+
         mcrid+"."+outtype); }
-    trans.transform(new StreamSource((Reader)new StringReader(mcrxml)),sr);
+    trans.transform(new StreamSource(new ByteArrayInputStream(mcrxml)),sr);
     System.out.println();
     }
   System.out.println();

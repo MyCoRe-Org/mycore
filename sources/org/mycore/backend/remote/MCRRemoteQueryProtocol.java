@@ -53,7 +53,7 @@ public class MCRRemoteQueryProtocol {
 // first it is waiting
     private int state = WAITING;
     private int bytes = 0;
-    private String queryResult;
+    private byte [] queryResult;
     private String host;
 
     private boolean queryInputSyntaxIsCorrect(String input) {
@@ -121,13 +121,15 @@ public class MCRRemoteQueryProtocol {
                     .getResultList(query,type,vec_length);
                   for (int i=0; i<result.size();i++)
                     result.setHost(i,host);
-                  queryResult = result.exportAll();
+                  try {
+                    queryResult = result.exportAllToByteArray(); }
+                  catch (IOException e) {}
                   }
-                else queryResult="";
+                else queryResult=(new String("")).getBytes();
               }
               catch (MCRException mcre) {
                      mcre.printStackTrace(System.err);
-                     queryResult="<ERROR/>";
+                     queryResult=(new String("<ERROR/>")).getBytes();
               }
               theOutput = "received bytes:" + bytes;
               state = SENT_RECEIVED_QUERY;
@@ -135,20 +137,20 @@ public class MCRRemoteQueryProtocol {
             else throw new ProtocolException("Communication Error! Error Code 4");
         } else if (state == SENT_RECEIVED_QUERY) {
             if (theInput.equals("ok expecting result size")) {
-              theOutput = "result in bytes:" + queryResult.length();
+              theOutput = "result in bytes:" + queryResult.length;
               state = SENT_RESULT_SIZE;
             }
             else throw new ProtocolException("Communication Error! Error Code 5");
         } else if (state == SENT_RESULT_SIZE) {
             if (theInput.equals("ok expecting result")) {
-              theOutput = queryResult;
+              theOutput = new String(queryResult);
               state = SENT_RESULT;
             }
             else throw new ProtocolException("Communication Error! Error Code 6");
         } else if (state == SENT_RESULT) {
             try {
               if ( (theInput.substring(0,15).equals("received bytes:")) &&
-                   (queryResult.length() == Integer.parseInt(theInput.substring(15))) ) {
+                   (queryResult.length == Integer.parseInt(theInput.substring(15))) ) {
                 theOutput = "bye";
                 state = WAITING;
               }

@@ -55,7 +55,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
   {  
   response.setContentType("text/xml");
   PrintWriter out = response.getWriter();
-  String queryResult="";
+  byte [] queryResult=(new String("")).getBytes();
   String type = request.getParameter("type");
   String hosts = request.getParameter("hosts");
   if (hosts == null) hosts = request.getServerName();
@@ -70,12 +70,14 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
     MCRQueryInterface mcr_query = (MCRQueryInterface)config.getInstanceOf(proppers);
     MCRQueryResultArray result = mcr_query.getResultList(query,type,vec_length);
     for (int i=0; i<result.size();i++) { result.setHost(i,hosts); }
-    queryResult = result.exportAll();
+    try {
+      queryResult = result.exportAllToByteArray(); }
+    catch(IOException e) {}
     }
   catch (MCRException mcre) {
        mcre.printStackTrace(System.err);
-       queryResult="<mcr_results></mcr_results>"; }
-  out.print(queryResult);
+       queryResult=(new String("<mcr_results></mcr_results>")).getBytes(); }
+  out.print(new String(queryResult));
   out.close();
   }
 

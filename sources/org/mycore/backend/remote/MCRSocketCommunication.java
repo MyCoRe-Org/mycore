@@ -151,7 +151,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
           if (fromServer.length() == resultSize) {
             if (fromServer.startsWith(MCRObject.XML_HEADER))
               fromServer = fromServer.substring(MCRObject.XML_HEADER.length());
-            result.importElements(fromServer);
+            result.importElements(fromServer.getBytes());
             toServer = "received bytes:"+resultSize;
             state = 6;
           }

@@ -24,15 +24,18 @@
 
 package mycore.datamodel;
 
+import java.io.*;
 import java.util.*;
 import mycore.common.MCRException;
+import mycore.common.MCRConfiguration;
+import mycore.common.MCRConfigurationException;
 import mycore.datamodel.MCRObject;
 
 /**
  * This class is the cache of one result list included all XML files
  * as result of one query. They holds informations about host, rank and
- * the XML files. You can get the complete result or elements of them
- * as XML file for transforming with XSLT.
+ * the XML byte stream. You can get the complete result or elements of them
+ * as XML JDOM Document for transforming with XSLT.
  *
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
@@ -46,12 +49,14 @@ private ArrayList host;
 private ArrayList mcr_id;
 private ArrayList rank;
 private ArrayList xml;
-private static String NL;
+private String default_encoding;
 
 /** The tag for the result collection **/
 public static final String TAG_RESULTS = "mcr_results";
 /** The tag for one result **/
 public static final String TAG_RESULT = "mcr_result";
+/** The tag for one mycoreobject **/
+public static final String TAG_MYCORE = "mycoreobject";
 /** The attribute of the host name **/
 public static final String ATTR_HOST = "host";
 /** The attribute of the MCRObjectId **/
@@ -65,7 +70,8 @@ public static final String ATTR_RANK = "rank";
  **/
 public MCRQueryResultArray()
   {
-  NL = System.getProperty("line.separator");
+  MCRConfiguration config = MCRConfiguration.instance();
+  default_encoding = config.getString("MCR.metadata_default_encoding","UTF-8");
   host = new ArrayList();
   mcr_id = new ArrayList();
   rank = new ArrayList();
@@ -80,7 +86,8 @@ public MCRQueryResultArray()
  **/
 public MCRQueryResultArray(MCRQueryResultArray in)
   {
-  NL = System.getProperty("line.separator");
+  MCRConfiguration config = MCRConfiguration.instance();
+  default_encoding = config.getString("MCR.metadata_default_encoding","UTF-8");
   host = new ArrayList();
   mcr_id = new ArrayList();
   rank = new ArrayList();
@@ -119,8 +126,6 @@ public final String getHost(int index)
  *
  * @param index   the index in the list
  * @param newhost the new value in the list
- * @return an empty string if the index is outside the border, else return
- * the host name
  **/
 public final void setHost(int index,String newhost)
   {
@@ -153,32 +158,16 @@ public final int getRank(int index)
   }
 
 /**
- * This methode return the XML stream without header of an element index.
+ * This methode return the mycoreobject as JDOM Element of an element index.
  *
  * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return
- * the NON well formed XML without header
+ * @return an null if the index is outside the border, else return
+ * the mycoreobject as JDOM Element
  **/
-public final String getXMLBody(int index)
+public final org.jdom.Element getXML(int index)
   {
-  if ((index<0)||(index>host.size())) { return ""; }
-  return (String) xml.get(index);
-  }
-
-/**
- * This methode return the well formed XML stream of an element index.
- *
- * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return
- * the well formed XML without header
- **/
-public final String getXML(int index)
-  {
-  if ((index<0)||(index>host.size())) { return ""; }
-  StringBuffer sb = new StringBuffer(2048);
-  sb.append(MCRObject.XML_HEADER).append(NL);
-  sb.append((String)xml.get(index));
-  return sb.toString();
+  if ((index<0)||(index>host.size())) { return null; }
+  return (org.jdom.Element) xml.get(index);
   }
 
 /**
@@ -187,15 +176,15 @@ public final String getXML(int index)
  * @param in_host    the host input as a string
  * @param in_id      the MCRObjectId input as a string
  * @param in_rank    the rank input as an integer
- * @param in_xml     the well formed XML stream as a string
+ * @param in_xml     the JDOM Element of a mycoreobject
  **/
-public final void add(String in_host, String in_id, int in_rank, String in_xml)
+public final synchronized void add(String in_host, String in_id, int in_rank,
+  org.jdom.Element in_xml)
   {
   host.add(in_host);
   mcr_id.add(in_id);
   rank.add(new Integer(in_rank));
-  int i = in_xml.indexOf(NL);
-  xml.add(in_xml.substring(i+NL.length(),in_xml.length()).trim());
+  xml.add(in_xml);
   }
 
 /**
@@ -205,16 +194,22 @@ public final void add(String in_host, String in_id, int in_rank, String in_xml)
  * @param in_id      the MCRObjectId input as a string
  * @param in_rank    the rank input as an integer
  * @param in_xml     the well formed XML stream as a byte array
+ * @exception org.jdom.JDOMException if a JDOm error was occured
  **/
-public final void add(String in_host, String in_id, int in_rank, byte[] in_xml)
+public final synchronized void add(String in_host, String in_id, int in_rank, 
+  byte[] in_xml) throws org.jdom.JDOMException
   {
-  add(in_host,in_id,in_rank,new String(in_xml));
+  ByteArrayInputStream bin = new ByteArrayInputStream(in_xml);
+  org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+  org.jdom.Document jdom = builder.build(bin);
+  org.jdom.Element root = jdom.getRootElement();
+  add(in_host,in_id,in_rank,root);
   }
 
 /**
  * This methode return a well formed XML stream of the result collection
- * in form of<br>
- * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
+ * as a JDOM document.<br>
+ * &lt;?xml version="1.0" encoding="..."?&gt;<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
@@ -222,32 +217,31 @@ public final void add(String in_host, String in_id, int in_rank, byte[] in_xml)
  * ...<br>
  * &lt;/mcrobject&gt;<br>
  * &lt;/mcr_result&gt;<br>
- * ...<br>
  * &lt;/mcr_results&gt;<br>
  *
- * @return the result collection as an XML stream.
+ * @return the result collection as a JDOM document.
  **/
-public final String exportAll()
+public final org.jdom.Document exportAllToDocument()
   {
-  StringBuffer sb = new StringBuffer(204800);
-  sb.append(MCRObject.XML_HEADER).append(NL);
-  sb.append('<').append(TAG_RESULTS).append('>').append(NL);
+  org.jdom.Element root = new org.jdom.Element(TAG_RESULTS);
+  org.jdom.Document doc = new org.jdom.Document(root);
   for (int i=0;i<rank.size();i++) {
-    sb.append('<').append(TAG_RESULT).append(' ').append(ATTR_HOST)
-      .append("=\"").append(((String)host.get(i)).trim()).append("\" ").append(ATTR_ID)
-      .append("=\"").append(((String)mcr_id.get(i)).trim()).append("\" ").append(ATTR_RANK)
-      .append("=\"").append(rank.get(i)).append("\" >").append(NL);
-    sb.append(xml.get(i)).append(NL);
-    sb.append("</").append(TAG_RESULT).append('>').append(NL);
+    org.jdom.Element res = new org.jdom.Element(TAG_RESULT);
+    res.setAttribute(ATTR_HOST,((String)host.get(i)).trim());
+    res.setAttribute(ATTR_ID,((String)mcr_id.get(i)).trim());
+    res.setAttribute(ATTR_RANK,rank.get(i).toString());
+    org.jdom.Element tmp = 
+      (org.jdom.Element)((org.jdom.Element)xml.get(i)).clone();
+    res.addContent(tmp);
+    root.addContent(res);
     }
-  sb.append("</").append(TAG_RESULTS).append('>').append(NL);
-  return sb.toString();
+  return doc;
   }
 
 /**
- * This methode return a well formed XML stream of one result
- * in form of<br>
- * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
+ * This methode return a well formed XML stream of the result collection
+ * as a JDOM document.<br>
+ * &lt;?xml version="1.0" encoding="..."?&gt;<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
@@ -257,34 +251,87 @@ public final String exportAll()
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
- * @return one result as an XML stream. If index is out of border an
- * empty XML file was returned.
+ * @return the result collection as a JDOM document.
+ * @exception IOException if an error in the XMLOutputter was occured
  **/
-public final String exportElement(int index)
+public final byte [] exportAllToByteArray() throws IOException
   {
-  StringBuffer sb = new StringBuffer(204800);
-  sb.append(MCRObject.XML_HEADER).append(NL);
-  sb.append('<').append(TAG_RESULTS).append('>').append(NL);
-  if ((index>=0)&&(index<=host.size())) {
-    sb.append('<').append(TAG_RESULT).append(' ').append(ATTR_HOST)
-      .append("=\"").append(((String)host.get(index)).trim()).append("\" ").append(ATTR_ID)
-      .append("=\"").append(((String)mcr_id.get(index)).trim()).append("\" ").append(ATTR_RANK)
-      .append("=\"").append(rank.get(index)).append("\" >").append(NL);
-    sb.append(xml.get(index)).append(NL);
-    sb.append("</").append(TAG_RESULT).append('>').append(NL);
+  org.jdom.Document doc = exportAllToDocument();
+  ByteArrayOutputStream os = new ByteArrayOutputStream();
+  org.jdom.output.XMLOutputter op = new org.jdom.output.XMLOutputter();
+  op.setEncoding(default_encoding);
+  op.output(doc,os);
+  return os.toByteArray();
+  }
+
+/**
+ * This methode return a well formed XML stream as a JDOM document.<br>
+ * &lt;?xml version="1.0" encoding="..."?&gt;<br>
+ * &lt;mcr_results&gt;<br>
+ * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
+ *  rank="<em>rank</em>" &gt;<br>
+ * &lt;mcrobject&gt;<br>
+ * ...<br>
+ * &lt;/mcrobject&gt;<br>
+ * &lt;/mcr_result&gt;<br>
+ * &lt;/mcr_results&gt;<br>
+ *
+ * @param index the index number of the element
+ * @return one result as a JDOM document. If index is out of border an
+ * empty body was returned.
+ **/
+public final org.jdom.Document exportElementToDocument(int index)
+  {
+  org.jdom.Element root = new org.jdom.Element(TAG_RESULTS);
+  org.jdom.Document doc = new org.jdom.Document(root);
+  if ((index>=0)&&(index<=rank.size())) {
+    org.jdom.Element res = new org.jdom.Element(TAG_RESULT);
+    res.setAttribute(ATTR_HOST,((String)host.get(index)).trim());
+    res.setAttribute(ATTR_ID,((String)mcr_id.get(index)).trim());
+    res.setAttribute(ATTR_RANK,rank.get(index).toString());
+    org.jdom.Element tmp = 
+      (org.jdom.Element)((org.jdom.Element)xml.get(index)).clone();
+    res.addContent(tmp);
+    root.addContent(res);
     }
-  sb.append("</").append(TAG_RESULTS).append('>').append(NL);
-  return sb.toString();
+  return doc;
+  }
+
+/**
+ * This methode return a well formed XML stream as a byte array.<br>
+ * &lt;?xml version="1.0" encoding="..."?&gt;<br>
+ * &lt;mcr_results&gt;<br>
+ * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
+ *  rank="<em>rank</em>" &gt;<br>
+ * &lt;mcrobject&gt;<br>
+ * ...<br>
+ * &lt;/mcrobject&gt;<br>
+ * &lt;/mcr_result&gt;<br>
+ * &lt;/mcr_results&gt;<br>
+ *
+ * @param index the index number of the element
+ * @exception IOException if an error in the XMLOutputter was occured
+ * @return one result as a JDOM document. If index is out of border an
+ * empty body was returned.
+ **/
+public final byte [] exportElementToByteArray(int index) throws IOException
+  {
+  org.jdom.Document doc = exportElementToDocument(index);
+  ByteArrayOutputStream os = new ByteArrayOutputStream();
+  org.jdom.output.XMLOutputter op = new org.jdom.output.XMLOutputter();
+  op.setEncoding(default_encoding);
+  op.output(doc,os);
+  return os.toByteArray();
   }
 
 private static String ERRORTEXT =
   "The stream for the MCRQueryResultArray import is false.";
 
 /**
- * This methode import a well formed XML stream of results and add it
- * to a NEW list.
+ * This methode import a well formed XML stream of results as byte array and add it to an
+ * existing list.
  * in form of<br>
- * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
+ * &lt;?xml version="1.0" encoding="..."?&gt;<br>
  * &lt;mcr_results&gt;<br>
  * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
  *  rank="<em>rank</em>" &gt;<br>
@@ -294,104 +341,57 @@ private static String ERRORTEXT =
  * &lt;/mcr_result&gt;<br>
  * &lt;/mcr_results&gt;<br>
  *
- * @param the XML input stream
+ * @param the XML input stream as byte array
+ * @exception org.jdom.JDOMException if an error in the JDOM builder was occured
  **/
-public final void importAll(String in)
+public final synchronized void importElements(byte [] in) 
+  throws org.jdom.JDOMException
   {
-  host = new ArrayList();
-  mcr_id = new ArrayList();
-  rank = new ArrayList();
-  xml = new ArrayList();
-  importElements(in);
-  }
-
-/**
- * This methode import a well formed XML stream of results and add it to an
- * EXIST list.
- * in form of<br>
- * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
- * &lt;mcr_results&gt;<br>
- * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
- *  rank="<em>rank</em>" &gt;<br>
- * &lt;mcrobject&gt;<br>
- * ...<br>
- * &lt;/mcrobject&gt;<br>
- * &lt;/mcr_result&gt;<br>
- * &lt;/mcr_results&gt;<br>
- *
- * @param the XML input stream
- **/
-public final void importElements(String in)
-  {
-  int itagresultss = in.indexOf("<"+TAG_RESULTS+">");
-  if (itagresultss == -1) { throw new MCRException(ERRORTEXT); }
-  itagresultss = itagresultss+TAG_RESULTS.length()+2;
-  int itagresultse = in.indexOf("</"+TAG_RESULTS+">",itagresultss);
-  if (itagresultse == -1) { throw new MCRException(ERRORTEXT); }
-  int itagresults = in.indexOf("<"+TAG_RESULT,itagresultss);
-  if (itagresults == -1) { return; }
-  int itagresulte = 0;
-  int iattrstart = 0;
-  int iattrend = 0;
-  while (itagresults != -1) {
-    itagresulte = in.indexOf(">",itagresults);
-    if (itagresulte == -1) { throw new MCRException(ERRORTEXT); }
-    iattrstart = in.indexOf(ATTR_HOST+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    iattrstart += ATTR_HOST.length()+2;
-    iattrend = in.indexOf("\"",iattrstart);
-    if ((iattrend == -1) || (iattrend>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    String inhost = in.substring(iattrstart,iattrend);
-    iattrstart = in.indexOf(ATTR_ID+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    iattrstart += ATTR_ID.length()+2;
-    iattrend = in.indexOf("\"",iattrstart);
-    if ((iattrend == -1) || (iattrend>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    String inid = in.substring(iattrstart,iattrend);
-    iattrstart = in.indexOf(ATTR_RANK+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    iattrstart += ATTR_RANK.length()+2;
-    iattrend = in.indexOf("\"",iattrstart+1);
-    if ((iattrend == -1) || (iattrend>itagresulte)) {
-      throw new MCRException(ERRORTEXT); }
-    Integer inrank = null;
-    try {
-      inrank = new Integer(in.substring(iattrstart,iattrend)); }
+  ByteArrayInputStream bin = new ByteArrayInputStream(in);
+  org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+  org.jdom.Document jdom = builder.build(bin);
+  org.jdom.Element root = jdom.getRootElement();
+  List list = root.getChildren(TAG_RESULT);
+  int irank = 0;
+  for (int i=0;i<list.size();i++) {
+    org.jdom.Element res = (org.jdom.Element) list.get(i);
+    String inhost = res.getAttributeValue(ATTR_HOST);
+    String inid = res.getAttributeValue(ATTR_ID);
+    String inrank = res.getAttributeValue(ATTR_RANK);
+    try { irank = Integer.parseInt(inrank); }
     catch (NumberFormatException e) {
       throw new MCRException(ERRORTEXT); }
-    itagresults = itagresulte+1;
-    itagresulte = in.indexOf("</"+TAG_RESULT+">",itagresulte);
-    String inxml = in.substring(itagresults,itagresulte).trim();
+    org.jdom.Element inxml = res.getChild(TAG_MYCORE);
     host.add(inhost);
     mcr_id.add(inid);
-    rank.add(inrank);
+    rank.add(new Integer(irank));
     xml.add(inxml);
-    itagresults = in.indexOf("<"+TAG_RESULT,itagresulte);
     }
-
   }
 
 /**
- * This method imports another MCRQueryResultArray to the
- * EXISTing list.
+ * This method imports another MCRQueryResultArray and add it to the existing list.
+ *
  * @param the other list as input
  **/
-public final void importElements(MCRQueryResultArray in)
-  { for (int i=0; i<in.size(); i++)
-      this.add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));
+public final synchronized void importElements(MCRQueryResultArray in)
+  { 
+  for (int i=0; i<in.size(); i++) {
+    add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i)); }
   }
 
 /**
  * This methode print the content of this MCRQueryResultArray as
  * an XML String.
+ *
+ * @exception IOException if an error in the XMLOutputter was occured
  **/
-public final void debug()
-  { System.out.println(exportAll()); }
+public final void debug() throws IOException
+  { 
+  System.out.println("Debug of MCRQueryResultArray");
+  System.out.println("============================");
+  System.out.println(new String(exportAllToByteArray())); 
+  }
   
 }
 

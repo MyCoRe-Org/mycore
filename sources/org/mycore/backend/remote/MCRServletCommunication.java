@@ -104,7 +104,7 @@ public MCRQueryResultArray responseQuery() throws MCRException
     String fromServer="";
     int inread;
     while ((inread = in.read()) != -1) fromServer = fromServer + (char) inread;
-    result.importElements(fromServer);
+    result.importElements(fromServer.getBytes());
   }
   catch(MCRException mcre) {
     System.err.println("Can't use the response from host:"+host+"."); }

@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
+import org.jdom.*;
 import mycore.common.*;
 
 /**
@@ -70,12 +71,7 @@ public class MCRQueryServlet extends HttpServlet
       MCRQueryResult result = new MCRQueryResult();
       MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
-      String xml = resarray.exportAll();
-
-      Reader in = new StringReader( xml );
-
-      org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-      org.jdom.Document jdom = builder.build( in );
+      org.jdom.Document jdom = resarray.exportAllToDocument();
 
       request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
       request.setAttribute( "XSL.Style", style );
