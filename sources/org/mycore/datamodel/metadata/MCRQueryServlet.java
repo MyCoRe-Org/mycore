@@ -78,6 +78,17 @@ private String defaultLang = "";
     String host  = request.getParameter( "hosts" );
     String lang  = request.getParameter( "lang" );
 
+    String att_mode  = (String) request.getAttribute( "mode"  );
+    if (att_mode!=null) { mode = att_mode; }
+    String att_query = (String) request.getAttribute( "query" );
+    if (att_query!=null) { query = att_query; }
+    String att_type  = (String) request.getAttribute( "type"  );
+    if (att_type!=null) { type = att_type; }
+    String att_host  = (String) request.getAttribute( "hosts" );
+    if (att_host!=null) { host = att_host; }
+    String att_lang  = (String) request.getAttribute( "lang" );
+    if (att_lang!=null) { lang = att_lang; }
+
     System.out.println("MCRQueryServlet : mode = "+mode);
     System.out.println("MCRQueryServlet : type = "+type);
     System.out.println("MCRQueryServlet : hosts = "+host);
