@@ -403,21 +403,27 @@ public class MCRCStoreLucene
 			|| fieldName.length() == 0
 			|| query.length() == 0)
 			return collector;
-		StringTokenizer tok = new StringTokenizer(query, " ");
 		int size = 0;
 		String biggestSub = null, temp;
+		StringTokenizer tok = new StringTokenizer(query, " ");
 		while (tok.hasMoreTokens()) {
 			temp = tok.nextToken();
 			if (biggestSub == null) {
+				//remove leading quote
+				if (temp.charAt(0) == '\"'){
+					temp = temp.substring(1);
+				}
+				//remove leading quote of a negative clause
+				if ((temp.charAt(0) == '-') && (temp.charAt(1) == '\"')){
+					temp = '-'+temp.substring(2);
+				}
 				biggestSub = temp;
 				size = temp.length();
 			} else {
 				if (temp.length() > size && !(temp.charAt(0) == '-')) {
 					//Subquery is not negative and bigger then current
-					if (temp.charAt(0) == '\"')
-						temp = temp.substring(1);
 					if (temp.charAt(temp.length() - 1) == '\"')
-						temp = temp.substring(0, temp.length() - 2);
+						temp = temp.substring(0, temp.length() - 1);
 					//removed double quotes
 					biggestSub = temp;
 					size = temp.length();
