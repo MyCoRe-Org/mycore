@@ -126,7 +126,9 @@ System.out.println("================================");
         }
       }
     }
-  if (cond.length()==1) { cond.append("( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
+//System.out.println(cond.toString());
+  if (cond.length()==3) { 
+    cond = new StringBuffer("(( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
 System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
 System.out.println("================================");

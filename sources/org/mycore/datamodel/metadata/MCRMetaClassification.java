@@ -176,6 +176,14 @@ public final MCRTypedContent createTypedContent(boolean parametric,
 public final boolean isValid()
   {
   if (!super.isValid()) { return false; }
+  try {
+    MCRClassificationItem cl = 
+      MCRClassificationItem.getClassificationItem(classid);
+    if (cl==null) { return false; }
+    MCRCategoryItem ci = cl.getCategoryItem(categid);
+    if (ci==null) { return false; }
+    }
+  catch (Exception e) { return false; }
   return true;
   }
 
