@@ -71,8 +71,9 @@ public class MCRUserPrivServlet extends MCRServlet
    * &lt;mycoreuserpriv<br />
    * ...&gt;<br />
    * &lt;user ID="..."&gt;<br />
-   * &lt;privilege name="..."&gt;<br />
+   * &lt;privilege&gt;<br />
    * ...<br />
+   * &lt;/privilege&gt;<br />
    * &lt;/user&gt;<br />
    * &lt;/mycoreuserpriv&gt;<br />
    */
@@ -99,7 +100,7 @@ public class MCRUserPrivServlet extends MCRServlet
       if (searchpriv.length() == 0) {
         ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
         for (int i=0;i<privs.size();i++) {
-          uelm.addContent(new org.jdom.Element("privilege").setAttribute("name",
+          uelm.addContent(new org.jdom.Element("privilege").setText(
             (String)privs.get(i)));
           }
         }
