@@ -24,7 +24,6 @@
 
 package org.mycore.backend.cm8;
 
-import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -37,11 +36,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
-import org.mycore.datamodel.metadata.MCRObjectMetadata;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.metadata.MCRObjectPersistenceInterface;
 import org.mycore.datamodel.metadata.MCRTypedContent;
 
@@ -105,9 +100,9 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     connection = MCRCM8ConnectionPool.instance().getConnection();
     boolean test = false;
     try {
-      MCRCM8Item checkitem = new MCRCM8Item(mcr_id.getId(),connection,
-        itemtypename,itemtypeprefix); 
-      test = true; }
+      if (new MCRCM8Item(mcr_id.getId(),connection,itemtypename,itemtypeprefix) != null) 
+      	test = true;
+    }
     catch (MCRPersistenceException e) { }
     if (test) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
@@ -317,8 +312,8 @@ public final boolean exist(MCRObjectID mcr_id)
   try {
     connection = MCRCM8ConnectionPool.instance().getConnection();
     try {
-      MCRCM8Item item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
-        itemtypeprefix); }
+      new MCRCM8Item(mcr_id.getId(),connection,itemtypename,itemtypeprefix);
+    }
     catch (MCRPersistenceException e) {  return false; }
     }
   catch (Exception e) {
