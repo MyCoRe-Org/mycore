@@ -103,12 +103,6 @@ private final void set() throws MCRException
     .getAttribute("noNamespaceSchemaLocation",
      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL)).getValue()
      .trim();
-  // generate schemafile without path
-  int i=0;
-  int j=0;
-  while (j!=-1) {
-    j = mcr_schema.indexOf("/",i+1); if (j!=-1) { i = j; } }
-  mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
   org.jdom.Element jdom_element;
   // get the derivate data of the object
   jdom_element = jdom_element_root.getChild("derivate");

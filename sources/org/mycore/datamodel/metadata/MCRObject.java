@@ -124,14 +124,7 @@ private final void set() throws MCRException
     .getAttribute("noNamespaceSchemaLocation",
      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL)).getValue()
      .trim();
-  logger.debug("MCRObject set1 schemafile: " + mcr_schema );
-  // generate schemafile without path
-  int i=0;
-  int j=0;
-  while (j!=-1) {
-    j = mcr_schema.indexOf("/",i+1); if (j!=-1) { i = j; } }
-  mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
-  logger.debug("MCRObject set2 schemafile: " + mcr_schema );
+  logger.debug("MCRObject set schemafile: " + mcr_schema );
   // get the structure data of the object
   org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
   mcr_struct.setFromDOM(jdom_element);
