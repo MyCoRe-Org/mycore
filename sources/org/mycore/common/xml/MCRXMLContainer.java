@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jdom.JDOMException;
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -275,6 +276,10 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
 public final org.jdom.Document exportAllToDocument()
   {
   org.jdom.Element root = new org.jdom.Element(TAG_RESULTS);
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
   org.jdom.Document doc = new org.jdom.Document(root);
   for (int i=0;i<rank.size();i++) {
     org.jdom.Element res = new org.jdom.Element(TAG_RESULT);
@@ -336,6 +341,10 @@ public final byte [] exportAllToByteArray() throws IOException
 public final org.jdom.Document exportElementToDocument(int index)
   {
   org.jdom.Element root = new org.jdom.Element(TAG_RESULTS);
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
   org.jdom.Document doc = new org.jdom.Document(root);
   if ((index>=0)&&(index<=rank.size())) {
     org.jdom.Element res = new org.jdom.Element(TAG_RESULT);

@@ -86,11 +86,11 @@ public final class MCRXMLDBPersistence
             // open the collection
 	    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
             // check that the item not exist
-            XMLResource res = (XMLResource)collection.getResource( mcr_id.getNumberAsString() );
+            XMLResource res = (XMLResource)collection.getResource( mcr_id.getId() );
             if (res != null) {
               throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" exists."); }
             // create a new item
-            res = (XMLResource)collection.createResource( mcr_id.getNumberAsString(),
+            res = (XMLResource)collection.createResource( mcr_id.getId(),
                 XMLResource.RESOURCE_TYPE );
             SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
             outputter.output(doc);
@@ -147,13 +147,13 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
             // open the collection
 	    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
             // check that the item exist
-            XMLResource res = (XMLResource)collection.getResource( mcr_id.getNumberAsString() );
+            XMLResource res = (XMLResource)collection.getResource( mcr_id.getId() );
             if (res == null) {
               throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" does not exist."); }
             // delete the old item
             delete(mcr_id);
             // create the new item
-            res = (XMLResource)collection.createResource( mcr_id.getNumberAsString(),
+            res = (XMLResource)collection.createResource( mcr_id.getId(),
                 XMLResource.RESOURCE_TYPE );
      		SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
 	    	outputter.output(doc);
@@ -179,7 +179,7 @@ public void delete( MCRObjectID mcr_id )
   logger.debug("MCRXMLDBPersistence delete: MCRObjectID    : " + mcr_id.getId());
   try {
     collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
-    Resource document = collection.getResource( mcr_id.getNumberAsString() ); 
+    Resource document = collection.getResource( mcr_id.getId() ); 
     if ( null != document ) {
       collection.removeResource(document); }
     else {
