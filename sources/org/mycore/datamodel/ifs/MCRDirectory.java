@@ -273,4 +273,13 @@ public class MCRDirectory extends MCRFilesystemNode
     try{ return s.getBytes( "UTF-8" ); }
     catch( UnsupportedEncodingException shouldNeverBeThrown ){ return null; }
   }
+
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append( super.toString() );
+    sb.append( "NumChildren = " ).append( this.getNumChildren() );
+    return sb.toString();
+  }
 }
+
