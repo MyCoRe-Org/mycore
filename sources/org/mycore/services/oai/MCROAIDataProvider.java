@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.21 $ $Date: 2003/01/31 11:58:25 $
+ * $Revision: 1.22 $ $Date: 2003/01/31 12:24:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.21 $ $Date: 2003/01/31 11:58:25 $
+ * @version $Revision: 1.22 $ $Date: 2003/01/31 12:24:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -733,7 +733,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    sets = new ArrayList(query.listSets(classificationIdentifier));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
-	    	return document;
+            return addError(document, "badResumptionToken", mcrx.getMessage());
 	    }
 	    
 	    if (sets != null) {
@@ -877,7 +877,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    sets = new ArrayList(query.listIdentifiers(set, from, until, getServletName()));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
-	    	return document;
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	    }
 
 	    if (sets != null) {
