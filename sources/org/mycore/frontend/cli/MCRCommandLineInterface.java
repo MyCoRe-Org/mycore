@@ -111,6 +111,9 @@ public class MCRCommandLineInterface
       "show object {0}",
       "mycore.commandline.MCRObjectCommands.show String" );
     knownCommands[ numCommands++ ] = new MCRCommand(
+      "save object {0} to {1}",
+      "mycore.commandline.MCRObjectCommands.save String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
 

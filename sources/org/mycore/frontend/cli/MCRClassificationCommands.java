@@ -194,7 +194,7 @@ public class MCRClassificationCommands
       System.out.println();
       System.out.println( "Exception while store to file " + filename );
       }
-    System.out.println( "Classification "+ID+" stored under"+filename+".\n" );
+    System.out.println( "Classification "+ID+" stored under "+filename+".\n" );
   }
 
 }

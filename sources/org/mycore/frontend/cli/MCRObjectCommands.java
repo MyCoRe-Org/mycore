@@ -301,4 +301,28 @@ public class MCRObjectCommands
     mcr_id.setNextId( base );
     mcr_id.debug();
   }
+
+ /**
+  * Save an MCRObject.
+  *
+  * @param ID the ID of the MCRObject to be save.
+  * @param filename the filename to store the object
+  **/
+  public static void save( String ID, String filename )
+  {
+    MCRObject obj = new MCRObject();
+    byte[] xml = obj.receiveXMLFromDatastore(ID);
+    try {
+      FileOutputStream out = new FileOutputStream(filename);
+      out.write(xml);
+      out.flush();
+      }
+    catch (IOException ex) {
+      System.out.println( ex );
+      System.out.println();
+      System.out.println( "Exception while store to file " + filename );
+      }
+    System.out.println( "Object "+ID+" stored under "+filename+".\n" );
+  }
+
 }
