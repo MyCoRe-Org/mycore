@@ -63,7 +63,17 @@ public static final String ATTR_ID = "id";
 /** The attribute of the rank **/
 public static final String ATTR_RANK = "rank";
 /** The attribute of the neighbour status **/
-public static final String ATTR_STATUS = "status";
+public static final String ATTR_PRED = "hasPred";
+/** The attribute of the neighbour status **/
+public static final String ATTR_SUCC = "hasSucc";
+/** The value for status when Doc is single */
+public static final int	SINGLE_DOC = 0;
+/** The value for status when Doc is first */
+public static final int	FIRST_DOC = 1;
+/** The value for status when Doc is last */
+public static final int	LAST_DOC   = 2;
+/** The value for status when Doc is in between */
+public static final int	MIDDLE_DOC = 3;
 
 /**
  * This constructor create the MCRXMLContainer class with an empty
@@ -265,7 +275,8 @@ public final org.jdom.Document exportAllToDocument()
     res.setAttribute(ATTR_HOST,((String)host.get(i)).trim());
     res.setAttribute(ATTR_ID,((String)mcr_id.get(i)).trim());
     res.setAttribute(ATTR_RANK,rank.get(i).toString());
-    res.setAttribute(ATTR_STATUS,status.get(i).toString());
+	res.setAttribute(ATTR_PRED, (((((getStatus(i)>>1))%2)==1) ? "true":"false"));
+	res.setAttribute(ATTR_SUCC, ((( (getStatus(i)    )%2)==1) ? "true":"false"));
     org.jdom.Element tmp = 
       (org.jdom.Element)((org.jdom.Element)xml.get(i)).clone();
     res.addContent(tmp);
@@ -325,7 +336,8 @@ public final org.jdom.Document exportElementToDocument(int index)
     res.setAttribute(ATTR_HOST,((String)host.get(index)).trim());
     res.setAttribute(ATTR_ID,((String)mcr_id.get(index)).trim());
     res.setAttribute(ATTR_RANK,rank.get(index).toString());
-	res.setAttribute(ATTR_STATUS,status.get(index).toString());
+	res.setAttribute(ATTR_PRED, (((((getStatus(index)>>1))%2)==1) ? "true":"false"));
+	res.setAttribute(ATTR_SUCC, ((( (getStatus(index)    )%2)==1) ? "true":"false"));
     org.jdom.Element tmp = 
       (org.jdom.Element)((org.jdom.Element)xml.get(index)).clone();
     res.addContent(tmp);
@@ -399,13 +411,11 @@ public final synchronized void importElements(byte [] in)
     String inhost = res.getAttributeValue(ATTR_HOST);
     String inid = res.getAttributeValue(ATTR_ID);
     String inrank = res.getAttributeValue(ATTR_RANK);
-    String instatus = res.getAttributeValue(ATTR_STATUS);
     try { irank = Integer.parseInt(inrank); }
     catch (NumberFormatException e) {
       throw new MCRException(ERRORTEXT); }
-    try { istatus = Integer.parseInt(instatus); }
-    catch (NumberFormatException e) {
-      throw new MCRException(ERRORTEXT); }
+    istatus = ((res.getAttributeValue(ATTR_SUCC).equals("true"))?1:0)
+             +((res.getAttributeValue(ATTR_PRED).equals("true"))?2:0);
     List childlist = res.getChildren();
     org.jdom.Element inxml = (org.jdom.Element)childlist.get(0);
     host.add(inhost);

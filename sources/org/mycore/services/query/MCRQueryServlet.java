@@ -463,13 +463,13 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
 	
 	if (search==null)
 		throw new ServletException("MCRQueryServlet: Sorry doesn't found searched document");
-	String status=search.getAttributeValue("status");
+	int status = ((search.getAttributeValue(MCRXMLContainer.ATTR_SUCC).equals("true"))?1:0)
+	            +((search.getAttributeValue(MCRXMLContainer.ATTR_PRED).equals("true"))?2:0);
 	id=search.getAttributeValue("id");
 	host=search.getAttributeValue("host");
-	String result=new StringBuffer(status).append('@').append(id)
+	String result=new StringBuffer().append(status).append('@').append(id)
 	.append('@').append(host).toString();
 	System.out.println("MCRQueryServlet: getBrowseElementID() returns: "+result);
-	new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, System.out );
   	return result;
   }
 }
