@@ -26,15 +26,9 @@ package org.mycore.frontend.cli;
 
 import java.io.*;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.input.SAXBuilder;
-import org.jdom.Document;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
@@ -288,9 +282,8 @@ public class MCRObjectCommands
       return false;
       }
     logger.info( "Reading file " + file + " ..." );
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document jdom_document = bulli.build(MCRXMLHelper.parseURI(file));
-    logger.info( "The file has no XML errors." );
+    if (new org.jdom.input.DOMBuilder(false).build(MCRXMLHelper.parseURI(file))!=null)
+    	logger.info( "The file has no XML errors." );
     return true;
     }
   }
