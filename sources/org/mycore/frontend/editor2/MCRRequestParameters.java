@@ -67,6 +67,8 @@ public class MCRRequestParameters
   
   public MCRRequestParameters( HttpServletRequest req )
   {
+    logger.debug( "Request character encoding = " + req.getCharacterEncoding() );
+
     if( FileUpload.isMultipartContent( req ) )
     {
       DiskFileUpload parser = new DiskFileUpload();
@@ -90,7 +92,21 @@ public class MCRRequestParameters
         String value;
         
         if( item.isFormField() )
-          value = item.getString();
+        {
+          String enc = req.getCharacterEncoding();
+          if( enc == null )
+            value = item.getString();
+          else
+          {         
+            try
+            { value = item.getString( enc ); }
+            catch( UnsupportedEncodingException ex )
+            { 
+              logger.warn( "Unsupported character encoding " + enc + ", using default" );
+              value = item.getString(); 
+            }
+          }
+        }
         else
           value = item.getName();
 
