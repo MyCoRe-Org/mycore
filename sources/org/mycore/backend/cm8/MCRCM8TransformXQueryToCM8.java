@@ -323,8 +323,11 @@ private final String traceOneCondition(String cond, String itemtypename,
   StringBuffer sbout = new StringBuffer();
   sbout.append(pretag).append('[');
   for (i=0;i<counter;i++) {
-    if (tag[i].endsWith("@href")) { 
-      tag[i] = tag[i].substring(0,tag[i].length()-5)+"@xlinkhref"; }
+    int x = tag[i].indexOf("@xlink:");
+    if (x != -1) { 
+      tag[i] = tag[i].substring(0,x)+"@xlink"+
+        tag[i].substring(x+7,tag[i].length());
+      }
     if (op[i].equals("contains")) {
       StringTokenizer st = new StringTokenizer(value[i]);
       int stcount = st.countTokens();
