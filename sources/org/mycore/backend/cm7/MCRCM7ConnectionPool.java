@@ -111,7 +111,7 @@ public class MCRCM7ConnectionPool implements DKConstant
     {
       DKDatastoreDL connection = new DKDatastoreDL();
       connection.connect( serverName, uid, password, "" );
-      connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_TRUE ) );
+      connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_FALSE ) );
       return connection;
     }
     catch( Exception exc ) 
