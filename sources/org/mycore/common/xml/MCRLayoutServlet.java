@@ -251,14 +251,15 @@ public class MCRLayoutServlet extends MCRServlet
     String style = parameters.getProperty( "Style", "default" );
     logger.debug( "MCRLayoutServlet using style " + style );
 
-    String styleName = buildStylesheetName( style, docType );
+	String type= getProperty(request, "type"  );
+    String styleName = buildStylesheetName( style, docType, type );
     String styleDir  = "/WEB-INF/stylesheets/";
     File styleFile   = getStylesheetFile( styleDir, styleName );
     /*
      * if there is no stylesheet present forward as xml instead
      * you can transform xml-code using "doctype"-xml.xsl now
      */
-    if( (styleFile == null) && (style.equals("xml"))) 
+    if( (styleFile == null) && ( (style.equals("xml") || (style.equals("default")) ))) 
       forwardXML( request, response );
     else {
       if (styleFile==null){
@@ -268,13 +269,12 @@ public class MCRLayoutServlet extends MCRServlet
       	 * We should stop that now and forever and go to lunch!
       	 */
 		String mode = getProperty(request, "mode"  );
-		String type = getProperty(request, "type"  );
 		String layout = getProperty(request, "layout"  );
 		String lang = getProperty(request, "lang" );
-		if( layout == null ) { layout = type; }
-		if( layout.equals("") ) { layout = type; }
+		if((layout == null) || (layout.equals("")))
+		  layout = type;
       	style = mode+"-"+layout+"-"+lang;
-      	styleName=buildStylesheetName(style,docType);
+      	styleName=buildStylesheetName(style,docType,type);
       	styleFile=getStylesheetFile( styleDir, styleName );
       }
       Templates stylesheet = buildCompiledStylesheet( styleFile );
@@ -377,11 +377,13 @@ public class MCRLayoutServlet extends MCRServlet
  /**
   * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
   **/
-  protected String buildStylesheetName( String style, String docType )
+  protected String buildStylesheetName( String style, String docType, String type )
   {
     StringBuffer filename = new StringBuffer( docType );
     if( ! "default".equals( style ) )
     {
+      if (("xml".equals(style)) && (type != null) && (type.length()>0))
+        filename.append("-").append(type);
       filename.append( "-"   );
       filename.append( style );
     }
