@@ -109,9 +109,9 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
                      HttpServletResponse response )
     throws IOException, ServletException
   {  
-
     boolean cachedFlag = false;
-    HttpSession session = null;
+    HttpSession session = request.getSession(false); //if session exists;
+
     org.jdom.Document jdom = null;
 
     String mode  = request.getParameter( "mode"  );
@@ -162,7 +162,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     if (att_type!=null) { type = att_type; }
     String att_host  = (String) request.getAttribute( "hosts" );
     //dont't overwrite host if getParameter("hosts") was successful 
-    if (att_host!=null && (hosts.length==0)) { host = att_host; }
+    if (att_host!=null && (hosts == null ||hosts.length==0)) { host = att_host; }
 	String att_lang  = (String) request.getAttribute( "lang" );
 	if (att_lang!=null) { lang = att_lang; }
 	String att_view  = (String) request.getAttribute( "view" );
@@ -196,6 +196,23 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     logger.info("MCRQueryServlet : hosts = "+ host);
     logger.info("MCRQueryServlet : lang = "+lang);
     logger.info("MCRQueryServlet : query = "+query);
+
+	// check for valid session
+	if (mode.equals("CachedResultList"))
+	{
+	  String sId= (session != null)? session.getId(): "null";
+	  if (!request.isRequestedSessionIdValid()){
+		//page session timed out
+		StringBuffer msg=new StringBuffer("Requested session is invalid, maybe it was timed out!<br/>\n");
+		msg.append("requested session was: ").append(request.getRequestedSessionId()).append("!<br/>\n")
+		   .append("actual session is: ").append(sId).append("!<br/>\n");
+		generateErrorPage(response,HttpServletResponse.SC_REQUEST_TIMEOUT,msg.toString());
+		return;
+      	
+	  }
+	  cachedFlag = true;
+	  mode = "ResultList";
+	}
 
 	if (type.equals(sortType)){
 		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
@@ -253,168 +270,120 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
       return;
       }
 
-    // all other document types
-    if (mode.equals("CachedResultList"))
-    {
-      cachedFlag = true;
-      mode = "ResultList";
-    }
-
-    if (mode.equals("ResultList"))
-      session = request.getSession(false);
+	// prepare the stylesheet name
+	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
+	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
+	logger.info("Style = "+style);
 
     if (cachedFlag)
     {
-      // retrieve result list from session cache
-      try
-      {
-        if (session != null)
-        {
-          jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
-          type = (String)            session.getAttribute( "CachedType" );
-        }
-        else
-          logger.warn("session for getAttribute is null");
-        if (jdom == null)
-          logger.warn("jdom could not be retrieved from session cache");
-        if (type == null)
-          logger.warn("type could not be retrieved from session cache");
-      }
-      catch (Exception exc)
-      {
-        logger.fatal(exc.getClass().getName());
-        logger.fatal(exc.getMessage(), exc);
-      }
-    }
-
-    // prepare the stylesheet name
-    Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
-    String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
-    logger.info("Style = "+style);
-
-    if (! cachedFlag)
-    {
-      MCRQueryResult result = new MCRQueryResult();
-      MCRXMLContainer resarray = result.setFromQuery(host, type, query );
-	  if (type.equals(sortType)){
-		/** Status setzen für Dokumente **/
-    	if (resarray.size()==1)
-    	  resarray.setStatus(0,status);
-    	else if (maxresults>0)
-    	  resarray.cutDownTo(maxresults);
-	  }
-	  
-      // create a new session if not already alive and encache result list
-      if (mode.equals("ResultList"))
-      {
-        if (session == null)
-          session = request.getSession(true);
-        if (session != null)
-        {
-		  if (type.equals(sortType))
-		  	jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
-		  else
-		    jdom = resarray.exportAllToDocument(); // no Resultlist for documents: why sort?
-          session.setAttribute( "CachedList", jdom );
-          session.setAttribute( "CachedType", type );
-        }
-        else
-          logger.warn("session for setAttribute is null");
-      }
-      else
-      	jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
-    }
-    
-    if (customSort && cachedFlag && type.equals(sortType)){
-    	// when I'm in here a ResultList exists and I have to resort it.
-    	MCRXMLContainer resarray = new MCRXMLContainer();
+    	// retrieve result list from session cache
     	try {
-			resarray.importElements(jdom);
-		} catch (JDOMException e) {
-			throw new MCRException("Error while RE-sorting JDOM.", e);
+    		//session at this point is valid, load objects
+    		jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
+    		type = (String)            session.getAttribute( "CachedType" );
+    		if (jdom == null || type == null)
+    			throw new MCRException("Failed to get jdom and type out of session cache!");
+      	}
+		catch (Exception exc){
+			logger.error(exc.getClass().getName());
+			logger.error(exc.getMessage(), exc);
+			generateErrorPage(response,HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		                      "Failed to get jdom and type out of session cache!");
+			return;
 		}
-		if (resarray.size()>0){
-			if (session == null)
-			  session = request.getSession(true);
-			if (session != null)
-			{
+
+		if (customSort && type.equals(sortType)){
+			// when I'm in here a ResultList exists and I have to resort it.
+			MCRXMLContainer resarray = new MCRXMLContainer();
+			try {
+				resarray.importElements(jdom);
+			}
+			catch (JDOMException e) {
+				throw new MCRException("Error while RE-sorting JDOM.", e);
+			}
+			if (resarray.size()>0){
 				//let's do resorting.
 				jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
 				session.setAttribute( "CachedList", jdom );
 				session.setAttribute( "CachedType", type );
 			}
-			else {
-				logger.warn("session for setAttribute is null");
-			}
+			else 
+				logger.fatal("MCRQueryServlet: Error while RE-sorting JDOM:" +
+				             "After import Containersize was ZERO!");
+		}
+		if ((view.equals("prev") || view.equals("next")) && (ref != null)){
+			/* change generate new query */
+			StringTokenizer refGet = 
+			   new StringTokenizer(this.getBrowseElementID(jdom,ref,view.equals("next")),"@");
+			if (refGet.countTokens() < 3)
+				throw new ServletException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: "+refGet);
+			String StrStatus=refGet.nextToken();
+			query=new StringBuffer("/mycoreobject[@ID='")
+					  .append(refGet.nextToken()).append("']").toString();
+			host=refGet.nextToken();
+			mode="ObjectMetadata";
+			type=sortType;
+			request.setAttribute("mode",mode);
+			request.removeAttribute("status");
+			request.setAttribute("status",StrStatus);
+			request.setAttribute("type",type);
+			request.setAttribute("hosts",host);
+			request.setAttribute("lang",lang);
+			request.setAttribute("query",query);
+			request.setAttribute("view","done");
+			logger.info("MCRQueryServlet: sending to myself:" +
+			   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
+			   "&lang="+lang+"&query="+query );
+			doGet(request,response);
+		}
+    }
+    else {
+    	//cachedFlag==false
+    	MCRQueryResult result = new MCRQueryResult();
+    	MCRXMLContainer resarray = result.setFromQuery(host, type, query );
+    	if (type.equals(sortType)){
+    		// Status setzen für Dokumente
+    		if (resarray.size()==1)
+    			resarray.setStatus(0,status);
+    		else if (maxresults>0)
+    			resarray.cutDownTo(maxresults);
+    	}
+    	// create a new session if not already alive and encache result list
+    	if (mode.equals("ResultList")){
+    		session = request.getSession(true);
+    		if (type.equals(sortType))
+    			jdom = sort(resarray, lang.toLowerCase()).exportAllToDocument();
+    		else
+    			jdom = resarray.exportAllToDocument(); // no Resultlist for documents: why sort?
+    		session.setAttribute( "CachedList", jdom );
+    		session.setAttribute( "CachedType", type );
+    	}
+    	else
+    		jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
+    }
+	try {
+		if (style.equals("xml")) {
+			response.setContentType( "text/xml" );
+			OutputStream out = response.getOutputStream();
+			new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+			out.close();
 		}
 		else {
-			logger.fatal("MCRQueryServlet: Error while RE-sorting JDOM:" +
-				"After import Containersize was ZERO!");
+			if (mode.equals("ResultList"))
+				request.setAttribute( "MCRLayoutServlet.Input.JDOM", cutJDOM(jdom,offset,size));
+			else
+				request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom );
+			request.setAttribute( "XSL.Style", style );
+			RequestDispatcher rd = getServletContext()
+			                       .getNamedDispatcher( "MCRLayoutServlet" );
+			logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
+			rd.forward( request, response );
 		}
-    }
-    
-    if ((view.equals("prev") || view.equals("next")) && (ref != null)){
-    	if (request.getRequestedSessionId()!=session.getId()){
-    		cachedFlag=false;
-    		logger.info("Session timed out for request: "+request.getQueryString()+" from "+request.getHeader("referer"));
-    		//return to last site
-    		if (request.getHeader("referer")!=null && request.getHeader("referer").indexOf("view")==-1)
-    			response.sendRedirect(request.getHeader("referer"));
-    		else
-    			response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,"Session timed out, no referer aviable!");
-    		response.flushBuffer();
-    		return;
-    	}
-    	/* change generate new query */
-    	if (cachedFlag){
-    		StringTokenizer refGet = 
-    		   new StringTokenizer(this.getBrowseElementID(jdom,ref,view.equals("next")),"@");
-    		if (refGet.countTokens() < 3)
-    			throw new ServletException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: "+refGet);
-    		String StrStatus=refGet.nextToken();
-    		query=new StringBuffer("/mycoreobject[@ID='")
-    		          .append(refGet.nextToken()).append("']").toString();
-    		host=refGet.nextToken();
-    		mode="ObjectMetadata";
-    		type=sortType;
-    		request.setAttribute("mode",mode);
-    		request.removeAttribute("status");
-    		request.setAttribute("status",StrStatus);
-    		request.setAttribute("type",type);
-    		request.setAttribute("hosts",host);
-    		request.setAttribute("lang",lang);
-    		request.setAttribute("query",query);
-    		request.setAttribute("view","done");
-    		logger.info("MCRQueryServlet: sending to myself:" +
-    		   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
-    		   "&lang="+lang+"&query="+query );
-    		doGet(request,response);
-    	}
-    }
-	else {
-		try {
-			if (style.equals("xml")) {
-				response.setContentType( "text/xml" );
-				OutputStream out = response.getOutputStream();
-				new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
-				out.close();
-			}
-			else {
-				if (mode.equals("ResultList"))
-					request.setAttribute( "MCRLayoutServlet.Input.JDOM",  cutJDOM(jdom,offset,size) );
-				else
-					request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom );
-				request.setAttribute( "XSL.Style", style );
-				RequestDispatcher rd = getServletContext()
-				                       .getNamedDispatcher( "MCRLayoutServlet" );
-				logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
-        		rd.forward( request, response );
-        	}
-      	}
-    	catch( Exception ex ) {
-      		logger.fatal( ex.getClass().getName() );
-      		logger.fatal( ex.getMessage(), ex );
-    	}
+	}
+	catch( Exception ex ) {
+		logger.fatal( ex.getClass().getName() );
+		logger.fatal( ex.getMessage(), ex );
 	}
   }
   
@@ -566,6 +535,18 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   	return ((RemoteHost.equals(ServletHost)) &&
   	        (RemotePath.equals(ServletPath)) && 
   	        (ServletPort==RemotePort)) ? true : false;
+  }
+  
+  // TODO: Make errorpage more customizable!!!
+  private void generateErrorPage(HttpServletResponse response,
+                                 int error,
+                                 String msg) throws IOException{
+	response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,msg);
+	StringBuffer back=new StringBuffer("Go back to ");
+	String url="MCRSearchMaskServlet?lang=DE&type=document&mode=CreateSearchMask";
+	back.append("<a href=\"").append(url).append("\">main Search-Page</a>!");
+	response.getOutputStream().println(back.toString());
+	response.flushBuffer();
   }
   
 }
