@@ -45,13 +45,24 @@ public final class MCRObjectID
  **/
 public static final int MAX_LENGTH = 64;
 public static final String [] NO_NUMBER_TYPE = { "classification","category" };
-protected static final String NL =
+
+// constant definitions
+private static final String NL =
   new String((System.getProperties()).getProperty("line.separator"));
+private static MCRConfiguration conf = null;
 
 private String mcr_project_id = null;
 private String mcr_type_id = null;
 private String mcr_number = null;
 private boolean mcr_valid_id;
+
+/**
+ * Static mthode to load the configuration.
+ **/
+static
+  {
+  conf = MCRConfiguration.instance();
+  }
 
 /**
  * The constructor for an empty MCRObjectId.
@@ -94,19 +105,18 @@ public void setNextId(String base_id) throws MCRUsageException
   sb.append(base_id).append("_1");
   boolean is = isValid(sb.toString());
   if (!is) { throw new MCRException("The ID is not valid"); }
-  String proptype = "MCR.persistence_type_"+mcr_type_id.toLowerCase();
   MCRObjectPersistenceInterface mcr_persist;
   try {
-    String persist_type = MCRConfiguration.instance().getString(proptype);
+    String persist_type = conf.getString("MCR.persistence_type");
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
-    String persist_name = MCRConfiguration.instance().getString(proppers);
+    String persist_name = conf.getString(proppers);
     mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
       .newInstance(); 
+    mcr_number = mcr_persist.getNextFreeId(mcr_project_id,mcr_type_id);
     }
   catch (Exception e) {
      throw new MCRUsageException(e.getMessage(),e); }
-  mcr_number = mcr_persist.getNextFreeId(mcr_project_id,mcr_type_id);
   mcr_valid_id = true;
   }
 
@@ -236,6 +246,8 @@ public final boolean isValid(String id)
   int j = mcr_id.indexOf("_",i+1);
   if (j==-1) { return false; }
   mcr_type_id = mcr_id.substring(i+1,j);
+  if (!conf.getBoolean("MCR.type_"+mcr_type_id.toLowerCase(),false)) { 
+    return false; }
   mcr_number = mcr_id.substring(j+1,len);
   i = -1;
   for (j=0;j<NO_NUMBER_TYPE.length;j++) {

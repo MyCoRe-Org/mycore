@@ -46,6 +46,9 @@ import mycore.xml.MCRLayoutServlet;
 */
 public class MCRQueryServlet extends HttpServlet 
 {
+// The configuration
+private MCRConfiguration conf = null;
+
 // Default Language (as UpperCase)
 private String defaultLang = "";
 
@@ -55,7 +58,8 @@ private String defaultLang = "";
   **/
   public void init() throws MCRConfigurationException
     {
-    String defaultLang = MCRConfiguration.instance()
+    conf = MCRConfiguration.instance();
+    String defaultLang = conf
       .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
     }
 
@@ -93,13 +97,20 @@ private String defaultLang = "";
     String att_lang  = (String) request.getAttribute( "lang" );
     if (att_lang!=null) { lang = att_lang; }
 
+    if( mode  == null ) mode  = "ResultList";
+    if( host  == null ) host  = "local";
+    if( query == null ) query = "";
+    if( type  == null ) return;
+    if (!conf.getBoolean("MCR.type_"+type.toLowerCase(),false)) { return; }
+    if( lang  == null ) { lang  = defaultLang; }
+    if (lang.equals("")) { lang = defaultLang; }
+    lang = lang.toUpperCase();
+
     System.out.println("MCRQueryServlet : mode = "+mode);
     System.out.println("MCRQueryServlet : type = "+type);
     System.out.println("MCRQueryServlet : hosts = "+host);
     System.out.println("MCRQueryServlet : lang = "+lang);
     System.out.println("MCRQueryServlet : query = "+query);
-
-    if( mode  == null ) mode  = "ResultList";
 
     if (mode.equals("CachedResultList"))
     {
@@ -134,11 +145,6 @@ private String defaultLang = "";
       }
     }
 
-    if( host  == null ) host  = "local";
-    if( query == null ) query = "";
-    if( type  == null ) return;
-    if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
-if (lang.equals("")) lang = "DE";
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
     String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);

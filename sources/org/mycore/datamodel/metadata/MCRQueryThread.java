@@ -62,8 +62,7 @@ public class MCRQueryThread extends Thread {
 public void run() {
   if (hostAlias.equalsIgnoreCase("local")) {
     try {
-      String proptype = "MCR.persistence_type_"+mcr_type.toLowerCase();
-      String persist_type = config.getString(proptype);
+      String persist_type = config.getString("MCR.persistence_type","cm7");
       String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
         "_query_name";
       mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);

@@ -73,6 +73,18 @@ public void delete(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
+ * The methode return true if a object exits in the data store, else return
+ * false.
+ *
+ * @param mcr_id   the MyCoRe object ID
+ * @return true if the object exists, else false
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public boolean exist(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException;
+
+/**
  * The methode receive a object as XML stream from the data store.
  *
  * @param mcr_id   the MyCoRe object ID

@@ -24,7 +24,9 @@
 
 package mycore.datamodel;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
@@ -56,33 +58,58 @@ final public class MCRObject
 public final static int MAX_LABEL_LENGTH = 256;
 
 // from configuration
-private MCRConfiguration mcr_conf = null;
-private String mcr_encoding = null;
-private String parser_name;
-private String persist_name;
-private String persist_type;
+private static MCRConfiguration mcr_conf = null;
+private static String mcr_encoding = null;
+private static String mcr_schema_path = null;
+private static String persist_name;
+private static String persist_type;
 
 // interface classes
-private MCRObjectPersistenceInterface mcr_persist;
+private static MCRObjectPersistenceInterface mcr_persist;
 
 // the DOM document
-private org.w3c.dom.Document mcr_document = null;
 private org.jdom.Document jdom_document = null;
 
 // the object content
 private MCRObjectID mcr_id = null;
 private String mcr_label = null;
 private String mcr_schema = null;
-private String mcr_schema_path = null;
 private MCRObjectStructure mcr_struct = null;
 private MCRObjectService mcr_service = null;
 private MCRObjectMetadata mcr_metadata = null;
 
 // other
-private String NL;
-private String SLASH;
+private static String NL;
+private static String SLASH;
 public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
 public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+
+/**
+ * Load static data for all MCRObjects
+ **/
+static
+  {
+  NL = System.getProperty("line.separator");
+  SLASH = System.getProperty("file.separator");
+  try {
+    // Load the configuration
+    mcr_conf = MCRConfiguration.instance();
+    // Default Encoding
+    mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
+      "ISO_8859-1");
+    // Path of XML schema
+    mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
+    // Set persistence layer
+    persist_type = mcr_conf.getString("MCR.persistence_type","cm7");
+    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
+      "_class_name";
+    persist_name = mcr_conf.getString(proppers);
+    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
+      .newInstance(); 
+    }
+  catch (Exception e) {
+     throw new MCRException(e.getMessage(),e); }
+  }
 
 /**
  * This is the constructor of the MCRObject class. It make an
@@ -98,29 +125,15 @@ public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance"
  */
 public MCRObject() throws MCRException, MCRConfigurationException
   {
-  NL = System.getProperty("line.separator");
-  SLASH = System.getProperty("file.separator");
   mcr_id = new MCRObjectID();
   mcr_label = new String("");
   mcr_schema = new String("");
-  mcr_schema_path = new String("");
-  persist_type = new String("");
-  mcr_persist = null;
-  try {
-    mcr_conf = MCRConfiguration.instance();
-  // Default Encoding
-    mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding");
-  // Path of XML schema
-    mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
   // Metadata class
-    mcr_metadata = new MCRObjectMetadata();
+  mcr_metadata = new MCRObjectMetadata();
   // Structure class
-    mcr_struct = new MCRObjectStructure();
+  mcr_struct = new MCRObjectStructure();
   // Service class
-    mcr_service = new MCRObjectService();
-    }
-  catch (Exception e) {
-     throw new MCRException(e.getMessage(),e); }
+  mcr_service = new MCRObjectService();
   }
 
 /**
@@ -256,31 +269,6 @@ private final void set() throws MCRException
   }
 
 /**
- * This methode set the persistence depended of the ObjectId type part.
- * It search the <em>MCR.persistence_type_...</em> information of
- * the property file. The it will load the coresponding persistence class.
- *
- * @exception MCRException was throw if the ObjectId is null or empty or 
- * the class was not found
- **/
-private final void setPersistence() throws MCRException
-  {
-  if (!mcr_id.isValid()) { 
-    throw new MCRException("The ObjectId is not valid."); }
-  String proptype = "MCR.persistence_type_"+mcr_id.getTypeId().toLowerCase();
-  try {
-    persist_type = mcr_conf.getString(proptype);
-    String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-      "_class_name";
-    persist_name = mcr_conf.getString(proppers);
-    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
-      .newInstance(); 
-    }
-  catch (Exception e) {
-     throw new MCRException(e.getMessage(),e); }
-  }
-
-/**
  * This methode read the XML input stream from an URI into a temporary DOM 
  * and check it with XSchema file.
  *
@@ -290,11 +278,8 @@ private final void setPersistence() throws MCRException
 public final void setFromURI(String uri) throws MCRException
   {
   try {
-    mcr_document = MCRXMLHelper.parseURI(uri);
-    if (mcr_document == null) {
-      throw new MCRException("The DOM is null or empty."); }
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(mcr_document);
+    jdom_document = bulli.build(MCRXMLHelper.parseURI(uri));
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }
@@ -302,23 +287,19 @@ public final void setFromURI(String uri) throws MCRException
   }
 
 /**
- * This methode read the XML input stream from a string into a temporary DOM 
+ * This methode read the XML input stream from a byte array into JDOM 
  * and check it with XSchema file.
  *
  * @param xml                   a XML string
  * @exception MCRException      general Exception of MyCoRe
  **/
-public final void setFromXML(String xml) throws MCRException
+public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
   try {
-    mcr_document = MCRXMLHelper.parseXML(xml);
-    if (mcr_document == null) {
-      throw new MCRException("The DOM is null or empty."); }
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(mcr_document);
+    org.jdom.input.SAXBuilder bulli = new org.jdom.input.SAXBuilder(false);
+    jdom_document = bulli.build(new ByteArrayInputStream(xml));
     }
   catch (Exception e) {
-    System.out.println(e.getMessage());
     throw new MCRException(e.getMessage()); }
   set();
   }
@@ -435,7 +416,6 @@ public final MCRTypedContent createTypedContent() throws MCRException
 public void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
   setId(new MCRObjectID("Template_"+mcr_type+"_1"));
-  if (mcr_persist==null) { setPersistence(); }
   mcr_persist.createDataBase(mcr_type, confdoc);
   }
 
@@ -446,7 +426,6 @@ public void createDataBase(String mcr_type, org.jdom.Document confdoc)
  **/
 public final void createInDatastore() throws MCRPersistenceException
   {
-  if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
   byte [] xml = createXML();
@@ -463,9 +442,19 @@ public final void createInDatastore() throws MCRPersistenceException
 public final void deleteFromDatastore(String id) throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  if (mcr_persist==null) { setPersistence(); }
   mcr_persist.delete(mcr_id);
   }
+
+/**
+ * The methode return true if the object is in the data store, else return 
+ * false.
+ *
+ * @param id   the object ID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final static boolean existInDatastore(String id) 
+  throws MCRPersistenceException
+  { return mcr_persist.exist(new MCRObjectID(id)); }
 
 /**
  * The methode receive the object for the given MCRObjectID and stored
@@ -478,9 +467,8 @@ public final void receiveFromDatastore(String id)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  if (mcr_persist==null) { setPersistence(); }
   byte [] xml = mcr_persist.receive(mcr_id);
-  setFromXML(new String(xml));
+  setFromXML(xml,false);
   }
 
 /**
@@ -495,7 +483,6 @@ public final byte [] receiveXMLFromDatastore(String id)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  if (mcr_persist==null) { setPersistence(); }
   return mcr_persist.receive(mcr_id);
   }
 
@@ -506,7 +493,6 @@ public final byte [] receiveXMLFromDatastore(String id)
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
-  if (mcr_persist==null) { setPersistence(); }
   mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
   mcr_service.setDate("modifydate");
   byte [] xml = createXML();

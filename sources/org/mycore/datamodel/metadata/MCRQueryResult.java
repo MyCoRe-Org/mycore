@@ -93,9 +93,9 @@ public final MCRQueryResultArray setFromQuery(String host, String type,
   System.out.println( "query = " + query );
 
   // check the type
-  type  = type .toLowerCase();
+  type  = type.toLowerCase();
   try {
-    String test = conf.getString("MCR.persistence_type_"+type); }
+    String test = conf.getString("MCR.type_"+type); }
   catch (MCRConfigurationException e) {
     throw new MCRException("The MCRObjectID type is false for search."); }
 
