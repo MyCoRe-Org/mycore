@@ -30,6 +30,9 @@ import java.net.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.*;
 
 /**
@@ -45,61 +48,63 @@ import org.mycore.common.*;
  */
 public class MCRNBNResolver extends HttpServlet
 {
-  /** The URL of the non-local URN resolver script */
-  protected String resolver;
+	/** Logger */
+	static Logger logger = Logger.getLogger(MCRNBNResolver.class);
+	
+	/** The URL of the non-local URN resolver script */
+	protected String resolver;
 
-  /** The object that implements the URN persistency functions */
-  protected MCRNBNManager manager;
+	/** Initializes the URN Resolver */    
+	public void init() {
+		MCRConfiguration.instance().reload(true);
+		MCRConfiguration config = MCRConfiguration.instance();
+    	PropertyConfigurator.configure(config.getLoggingProperties());
+    
+		resolver = config.getString( "MCR.NBN.TopLevelResolver" );  
+	}
 
-  /** Initializes the URN Resolver */    
-  public void init()
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    
-    resolver = config.getString( "MCR.NBN.TopLevelResolver" );  
+	/** Handles HTTP GET requests to resolve a given URN */    
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
+		String path = req.getPathInfo();
+		String param = req.getQueryString();
 
-    Object object = config.getInstanceOf( "MCR.NBN.ManagerImplementation" );  
-    manager = (MCRNBNManager)object;
-  }
-
-  /** Handles HTTP GET requests to resolve a given URN */    
-  public void doGet( HttpServletRequest req, HttpServletResponse res )
-    throws ServletException, IOException
-  {
-    String path  = req.getPathInfo();
-    String param = req.getQueryString();
-
-    System.out.println( path  );
-    System.out.println( param );
+		logger.info("The servlet path: " + path);
+		logger.info("The servlet's parameters: " + param);
     
-    MCRNBN urn;
+		MCRNBN urn = null;
     
-    if( path != null )
-      urn = new MCRNBN( path.substring( 1 ) ); 
-    else if( param != null )
-      urn = new MCRNBN( param );
-    else
-    {    
-      res.sendError( HttpServletResponse.SC_BAD_REQUEST );
-      return;
-    }
+		if (path != null) {
+			urn = new MCRNBN(path.substring(1));
+		} else {
+			if (param != null) {
+				urn = new MCRNBN(param);
+			} else {    
+				logger.info("No information given to extract URN information.");
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				return;
+			}
+		}
     
-    if( ! urn.isValid() )
-    {    
-      res.sendError( HttpServletResponse.SC_BAD_REQUEST );
-      return;
-    }
+		if (!urn.isValid()) {    
+			logger.info("The URN " + urn.toString() + "is not valid.");
+			res.sendError( HttpServletResponse.SC_BAD_REQUEST );
+			return;
+		}
     
-    if( ! urn.isLocal() )
-    {    
-      res.sendRedirect( resolver + urn.getNBN() );
-      return;
-    }
+		if (!urn.isLocal()) {
+			logger.info("The URN " + urn.toString() + "is not local.");
+			res.sendRedirect(resolver + urn.getNBN());
+			return;
+		}
     
-    String url = manager.getURL( urn );
-    if( url == null )
-      res.sendError( HttpServletResponse.SC_NOT_FOUND );
-    else
-      res.sendRedirect( url );
-  }
+		String url = urn.getURL();
+		if (url == null) {
+			logger.info("No URL found in store for the URN " + urn.toString() + ".");
+			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} else {
+			res.sendRedirect(url);
+		}
+	}
+	
 }
