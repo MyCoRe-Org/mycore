@@ -1,0 +1,47 @@
+Use MySQL with MyCoRe-Sample under Windows XP Professional       16.06.2003
+
+1. download MySQL from http://www.mysql.com/ (http://www.mysql.com/downloads/mysql-4.0.html)
+
+2. install MySQL, you need administrator privileges, my installation directory is c:\mysql
+
+3. install MySQL-Server, follow the instructions in mysql\Docs\manual.html
+   I did it by typing 
+
+   C:\mysql\bin> mysqld-max-nt --install
+
+   If you don't want MySQL installed as a service use  
+
+   C:\mysql\bin\mysqld-max-nt --standalone
+
+4. To check if all is ok I started the WinMySQLAdmin tool. You find it in c:\mysql\bin  
+   The icon of this programm is a traffic light. If it shows green all is ok.
+   You can use this tool, to view the databases and the table- and columnnames.
+   Note: if you create a new table restart WinMySQLAdmin
+
+5. Now create the database for MyCoRe. I started MySQL by typing mysql on the
+   commandline. 
+
+   mysql> create database mycore;
+   
+   you can quit the command by typing quit
+
+   this database can be deleted by typing
+
+   c:\mysql\bin>mysqladmin drop mycore
+
+6. next change in the jdbc-section of config\mycore.properties.private
+
+   MCR.persistence_sql_database_url=jdbc:mysql://localhost/mycore?user=user
+
+   may be, that you have to take another user
+
+7. in config\mycore.properties.jdbc you have to use the following database driver:
+
+   MCR.persistence_sql_driver=org.gjt.mm.mysql.Driver
+
+8. now you can load the classifications into the database mycore
+   this is done by running ant class in the mycore-sample-application directory
+
+
+
+      
