@@ -81,13 +81,13 @@ public class MCRCStoreLucene
 	private static final int OPTIMIZE_INTERVALL = 10;
 	private static final TextFilterPluginManager PLUGIN_MANAGER =
 		TextFilterPluginManager.getInstance();
-	private static int docCount;
-	private static File indexDir = null;
-	private static long lastModified;
+	private static int DOC_COUNT;
+	private static File INDEX_DIR = null;
+	private static long LAST_MODIFIED;
 
-	private static IndexReader indexReader;
-	private static Searcher indexSearcher;
-	private static IndexWriter indexWriter = null;
+	private static IndexReader INDEX_READER;
+	private static Searcher INDEX_SEARCHER;
+	private static IndexWriter INDEX_WRITER = null;
 	/**
 	 * searches on the index and delivers derivate ids matching the search
 	 * 
@@ -164,34 +164,34 @@ public class MCRCStoreLucene
 	public void init(String storeID) {
 		super.init(storeID);
 		PLUGIN_MANAGER.loadPlugins();
-		indexDir = new File(CONF.getString(prefix + "IndexDirectory"));
-		LOGGER.debug("TextIndexDir: " + indexDir);
-		if (indexWriter == null) {
+		INDEX_DIR = new File(CONF.getString(prefix + "IndexDirectory"));
+		LOGGER.debug("TextIndexDir: " + INDEX_DIR);
+		if (INDEX_WRITER == null) {
 			LOGGER.debug("creating IndexWriter...");
 			try {
-				if (indexDir.exists()) {
+				if (INDEX_DIR.exists()) {
 					//do some hardcore...
-					Directory index = FSDirectory.getDirectory(indexDir, false);
-					if (IndexReader.isLocked(indexDir.getAbsolutePath()))
+					Directory index = FSDirectory.getDirectory(INDEX_DIR, false);
+					if (IndexReader.isLocked(INDEX_DIR.getAbsolutePath()))
 						IndexReader.unlock(index);
 				}
 				loadIndexWriter();
 				LOGGER.debug("IndexWriter created...");
-				docCount = indexWriter.docCount();
-				indexWriter.close();
+				DOC_COUNT = INDEX_WRITER.docCount();
+				INDEX_WRITER.close();
 			} catch (IOException e) {
 				LOGGER.error("Setting indexWriter=null");
-				indexWriter = null;
+				INDEX_WRITER = null;
 			}
 		}
-		if (indexReader == null) {
+		if (INDEX_READER == null) {
 			loadIndexReader();
 		}
-		if (indexSearcher == null) {
+		if (INDEX_SEARCHER == null) {
 			loadIndexSearcher();
 		}
 		try {
-			lastModified=IndexReader.getCurrentVersion(indexDir);
+			LAST_MODIFIED=IndexReader.getCurrentVersion(INDEX_DIR);
 		} catch (IOException e) {
 			LOGGER.error("Error while getting last modified info from IndexDir",e);
 		}
@@ -215,17 +215,17 @@ public class MCRCStoreLucene
 	protected void doDeleteContent(String storageID) throws Exception {
 		//remove from index
 		Term term = new Term(STORAGE_FIELD, storageID);
-		int deleted = indexReader.delete(term);
-		indexSearcher.close();
-		indexReader.close();
-		indexReader = null;
-		docCount--;
+		int deleted = INDEX_READER.delete(term);
+		INDEX_SEARCHER.close();
+		INDEX_READER.close();
+		INDEX_READER = null;
+		DOC_COUNT--;
 		LOGGER.debug("deleted " + deleted + " documents containing " + term);
-		if (docCount % OPTIMIZE_INTERVALL == 0) {
+		if (DOC_COUNT % OPTIMIZE_INTERVALL == 0) {
 			loadIndexWriter();
 			LOGGER.debug("Optimize index for searching...");
-			indexWriter.optimize();
-			indexWriter.close();
+			INDEX_WRITER.optimize();
+			INDEX_WRITER.close();
 		}
 		loadIndexReader();
 		loadIndexSearcher();
@@ -288,14 +288,14 @@ public class MCRCStoreLucene
 
 	protected void finalize() throws Throwable {
 		LOGGER.debug("finalize() called on Lucenestore: shutting down...");
-		synchronized (indexReader) {
-			indexReader.close();
-			indexReader = null;
+		synchronized (INDEX_READER) {
+			INDEX_READER.close();
+			INDEX_READER = null;
 		}
-		synchronized (indexWriter) {
-			indexWriter.optimize();
-			indexWriter.close();
-			indexWriter = null;
+		synchronized (INDEX_WRITER) {
+			INDEX_WRITER.optimize();
+			INDEX_WRITER.close();
+			INDEX_WRITER = null;
 		}
 		LOGGER.debug("shutting down... completed");
 	}
@@ -371,11 +371,11 @@ public class MCRCStoreLucene
 			for (int i = 0; i < queries.length; i++) {
 				LOGGER.debug(
 					"  -Searching for: " + queries[i].toString("content"));
-				hits[i] = indexSearcher.search(queries[i]);
+				hits[i] = INDEX_SEARCHER.search(queries[i]);
 				if (containsExclusiveClause(queries[i])) {
 					//check that all documents meets negative clause
 					Hits test =
-						indexSearcher.search(
+						INDEX_SEARCHER.search(
 							QueryParser.parse(
 								derivateID,
 								DERIVATE_FIELD,
@@ -448,7 +448,7 @@ public class MCRCStoreLucene
 		LOGGER.debug("Start a presearch for subquery:" + biggestSub);
 		try {
 			Hits hits =
-				indexSearcher.search(
+				INDEX_SEARCHER.search(
 					QueryParser.parse(biggestSub, "content", getAnalyzer()));
 			String[] values;
 			for (int i = 0; i < hits.length(); i++) {
@@ -482,65 +482,65 @@ public class MCRCStoreLucene
 	}
 
 	private void indexDocument(Document doc) throws IOException {
-		indexSearcher.close();
+		INDEX_SEARCHER.close();
 		loadIndexWriter();
 		LOGGER.debug(
 			"Create index for storageID="
 				+ doc.getField(STORAGE_FIELD).stringValue());
-		indexWriter.addDocument(doc);
-		docCount++;
-		if (docCount % OPTIMIZE_INTERVALL == 0) {
+		INDEX_WRITER.addDocument(doc);
+		DOC_COUNT++;
+		if (DOC_COUNT % OPTIMIZE_INTERVALL == 0) {
 			LOGGER.debug("Optimize index for searching...");
-			indexWriter.optimize();
+			INDEX_WRITER.optimize();
 		}
-		indexWriter.close();
+		INDEX_WRITER.close();
 		loadIndexSearcher();
 	}
 
 	private synchronized void loadIndexReader() {
 		try {
-			indexReader = IndexReader.open(indexDir);
+			INDEX_READER = IndexReader.open(INDEX_DIR);
 		} catch (IOException e) {
 			throw new MCRPersistenceException(
 				"Cannot read index in "
-					+ indexDir.getAbsolutePath()
+					+ INDEX_DIR.getAbsolutePath()
 					+ File.pathSeparatorChar
-					+ indexDir.getName(),
+					+ INDEX_DIR.getName(),
 				e);
 		}
 	}
 	private synchronized void loadIndexSearcher() {
-		if (indexReader == null) {
+		if (INDEX_READER == null) {
 			loadIndexReader();
 		}
 		try {
-			lastModified=IndexReader.getCurrentVersion(indexDir);
+			LAST_MODIFIED=IndexReader.getCurrentVersion(INDEX_DIR);
 		} catch (IOException e) {
 			LOGGER.warn("Cannot get current Version of IndexDir",e);
 		}
-		indexSearcher = new IndexSearcher(indexReader);
+		INDEX_SEARCHER = new IndexSearcher(INDEX_READER);
 	}
 	private synchronized void loadIndexWriter() {
 		boolean create = true;
-		if (IndexReader.indexExists(indexDir)) {
+		if (IndexReader.indexExists(INDEX_DIR)) {
 			//reuse Index
 			create = false;
 		}
     LOGGER.debug("No previous index exists:("+create+")");
 		try {
-			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
+			INDEX_WRITER = new IndexWriter(INDEX_DIR, getAnalyzer(), create);
 		} catch (IOException e) {
 			throw new MCRPersistenceException(
-				"Cannot create index in " + indexDir.getAbsolutePath(),
+				"Cannot create index in " + INDEX_DIR.getAbsolutePath(),
 				e);
 		}
-		indexWriter.mergeFactor = OPTIMIZE_INTERVALL;
-		indexWriter.minMergeDocs = 1; //always write to local dir
+		INDEX_WRITER.mergeFactor = OPTIMIZE_INTERVALL;
+		INDEX_WRITER.minMergeDocs = 1; //always write to local dir
 	}
 	private void refreshIndexSearcher(){
 		try {
-			if(lastModified!=IndexReader.getCurrentVersion(indexDir)){
-				indexSearcher.close();
+			if(LAST_MODIFIED!=IndexReader.getCurrentVersion(INDEX_DIR)){
+				INDEX_SEARCHER.close();
 				loadIndexSearcher();
 			}
 		} catch (IOException e) {

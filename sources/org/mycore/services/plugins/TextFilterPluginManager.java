@@ -49,15 +49,15 @@ import org.mycore.datamodel.ifs.MCRFileContentType;
 public class TextFilterPluginManager {
 
 	/** The logger */
-	private static final Logger logger =
+	private static final Logger LOGGER =
 		Logger.getLogger(TextFilterPluginManager.class);
 	/** The configuration */
-	private static final MCRConfiguration conf = MCRConfiguration.instance();
+	private static final MCRConfiguration CONF = MCRConfiguration.instance();
 	/** Pluginbasket */
-	private static Hashtable ContentTypePluginBag = null;
-	private static Hashtable Plugins = null;
+	private static Hashtable CONTENT_TYPE_PLUGIN_BAG = null;
+	private static Hashtable PLUGINS = null;
 	/** initialized */
-	private static TextFilterPluginManager instance;
+	private static TextFilterPluginManager SINGLETON;
 
 	/**
 	 * 
@@ -66,15 +66,15 @@ public class TextFilterPluginManager {
 		init();
 	}
 	public static TextFilterPluginManager getInstance() {
-		if (instance == null) {
-			instance = new TextFilterPluginManager();
+		if (SINGLETON == null) {
+			SINGLETON = new TextFilterPluginManager();
 		}
-		return instance;
+		return SINGLETON;
 	}
 	private void init() {
-		ContentTypePluginBag = new Hashtable();
-		PropertyConfigurator.configure(conf.getLoggingProperties());
-		Plugins = new Hashtable();
+		CONTENT_TYPE_PLUGIN_BAG = new Hashtable();
+		PropertyConfigurator.configure(CONF.getLoggingProperties());
+		PLUGINS = new Hashtable();
 		loadPlugins();
 	}
 	/**
@@ -98,7 +98,7 @@ public class TextFilterPluginManager {
 			iter.hasNext();
 			) {
 			filter = (TextFilterPlugin) iter.next();
-			logger.info(
+			LOGGER.info(
 				new StringBuffer("Loading TextFilterPlugin: ")
 					.append(filter.getName())
 					.append(" v:")
@@ -112,9 +112,9 @@ public class TextFilterPluginManager {
 				//Add MIME Type filters to the basket
 				ct = (MCRFileContentType) CtIterator.next();
 				if (ct != null)
-					ContentTypePluginBag.put(ct, filter);
+					CONTENT_TYPE_PLUGIN_BAG.put(ct, filter);
 			}
-			Plugins.put(filter.getClass().getName(), filter);
+			PLUGINS.put(filter.getClass().getName(), filter);
 		}
 	}
 	/**
@@ -140,7 +140,7 @@ public class TextFilterPluginManager {
 	 * @return a Collection of Plugins
 	 */
 	public Collection getPlugins() {
-		return Plugins.values();
+		return PLUGINS.values();
 	}
 	/**
 	 * returns TextFilterPlugin to corresponding MIME type
@@ -150,7 +150,7 @@ public class TextFilterPluginManager {
 	public TextFilterPlugin getPlugin(MCRFileContentType ct) {
 		return (ct == null)
 			? null
-			: (TextFilterPlugin) ContentTypePluginBag.get(ct);
+			: (TextFilterPlugin) CONTENT_TYPE_PLUGIN_BAG.get(ct);
 	}
 	/**
 	 * returns true if MIME type is supported
@@ -158,7 +158,7 @@ public class TextFilterPluginManager {
 	 * @return true if MIME type is supported, else false
 	 */
 	public boolean isSupported(MCRFileContentType ct) {
-		return (ct == null) ? false : ContentTypePluginBag.containsKey(ct);
+		return (ct == null) ? false : CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);
 	}
 	
 	/**
@@ -185,9 +185,9 @@ public class TextFilterPluginManager {
 	 */
 	private final URL[] getPluginURLs() throws MalformedURLException {
 		HashSet returnS = new HashSet();
-		File pluginDir = new File(conf.getString("MCR.PluginDirectory"));
+		File pluginDir = new File(CONF.getString("MCR.PluginDirectory"));
 		if (pluginDir == null || !pluginDir.isDirectory()){
-		    logger.error("PluginDirectory does not exist! "+pluginDir.getAbsolutePath());
+		    LOGGER.info("PluginDirectory does not exist! "+pluginDir.getAbsolutePath());
 		    return new URL[0];
 		}
 		File[] plugins = pluginDir.listFiles();
