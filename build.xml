@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.60 $ $Date: 2003-08-20 10:07:40 $                      -->
+  <!-- $Revision: 1.61 $ $Date: 2003-10-20 12:41:19 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -63,7 +63,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.60 $ $Date: 2003-08-20 10:07:40 $</echo>
+    <echo>Ant build file   : $Revision: 1.61 $ $Date: 2003-10-20 12:41:19 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -470,17 +470,17 @@
       <user displayname = "Johannes Bühler / Greifswald" userid = "mcrjbueh" />
       <user displayname = "Maik Bunschkowski / Rostock"  userid = "mcrldbis" /> 
     </cvschangelog>
-
-    <style 
-      in           = "${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" 
-      out          = "${basedir}/documentation/changelogs/changelog-${changelog-year}.html" 
-      style        = "${ant.home}/etc/changelog.xsl"
-      classpathref = "mycore.classpath"
-    >
-      <param name="title"  expression="MyCoRe CVS ChangeLog for the year ${changelog-year}" />
-      <param name="module" expression="mycore" />
-      <param name="cvsweb" expression="http://www.mycore.de/repository/cgi-bin/viewcvs.cgi/" />
-    </style>
+ 
+    <java classname="org.apache.xalan.xslt.Process"
+      dir="${basedir}" fork="yes" classpathref="mycore.classpath" >
+      <arg value="-IN"  /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
+      <arg value="-XSL" /><arg value="${ant.home}/etc/changelog.xsl" />
+      <arg value="-OUT" /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.html" />
+      <arg value="-HTML"/>
+      <arg value="-PARAM" /><arg value="title"  /><arg value="MyCoRe CVS ChangeLog for the year ${changelog-year}" />
+      <arg value="-PARAM" /><arg value="module" /><arg value="mycore" />
+      <arg value="-PARAM" /><arg value="cvsweb" /><arg value="http://www.mycore.de/repository/cgi-bin/viewcvs.cgi/" />
+    </java>
 
     <delete file="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
   </target>
