@@ -78,7 +78,7 @@ public void run()
           }
         }
       else {
-        String persist_type = config.getString("MCR.persistence_type","cm7");
+        String persist_type = config.getString( "MCR.XMLStore.Type" );
         String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
           "_query_name";
         mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);

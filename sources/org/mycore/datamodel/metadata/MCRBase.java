@@ -98,7 +98,7 @@ static
       MCRDefaults.ENCODING);
     logger.debug("Encoding = "+mcr_encoding);
     // Set persistence layer
-    persist_type = mcr_conf.getString("MCR.persistence_type","cm7");
+    persist_type = mcr_conf.getString( "MCR.XMLStore.Type" );
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
     persist_name = mcr_conf.getString(proppers);

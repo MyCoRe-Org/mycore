@@ -117,7 +117,7 @@ public void setNextId(String base_id) throws MCRUsageException
   if (!is) { throw new MCRException("The ID is not valid"); }
   MCRObjectPersistenceInterface mcr_persist;
   try {
-    String persist_type = conf.getString("MCR.persistence_type");
+    String persist_type = conf.getString( "MCR.XMLStore.Type" );
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
     String persist_name = conf.getString(proppers);

@@ -117,10 +117,10 @@ public class MCRSQLConnectionPool
   {
     try
     {
-      String label = "MCR.persistence_type"; 
+      String label = "MCR.XMLStore.Type"; 
       String value = MCRConfiguration.instance().getString( label, "" );
       
-      if( value.equals( "CM7" ) ) 
+      if( value.equalsIgnoreCase( "cm7" ) ) 
       {
         // Call method org.mycore.backend.cm7.MCRCM7ConnectionPool.instance()
           
