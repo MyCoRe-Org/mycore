@@ -24,15 +24,32 @@
 
 package wcms;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.jdom.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.jdom.Comment;
+import org.jdom.DocType;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.*;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRSession;
 
 public class WCMSGetStaticHTMLServlet extends HttpServlet {
     MCRConfiguration mcrConf = MCRConfiguration.instance();
@@ -108,7 +125,7 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
             while (contentElementsIterator.hasNext()) {
                 Element content = (Element)contentElementsIterator.next();
                 if (content.getAttributeValue("lang", ns) != null) {
-                    //System.out.println("Übergebene Sprache: "+ lang + "    gefundene Sprache " + content.getAttributeValue("lang", ns));
+                    //System.out.println("ï¿½bergebene Sprache: "+ lang + "    gefundene Sprache " + content.getAttributeValue("lang", ns));
                     contentList = content.getContent();
                     validXHTML = true;
                     if (content.getAttributeValue("lang", ns).equals(lang)) {
@@ -128,33 +145,20 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
                 contentList.clear();
             }
             if (contentOutput != null && validXHTML) {
-                StringWriter sw = new StringWriter();
-                               
-                XMLOutputter contentOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                contentOut.output(contentOutput, sw);
+                Document doc=new Document();
+                doc.setDocType(new DocType("html","-//W3C//DTD XHTML 1.0 Transitional//EN","http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"));
+                Element root=new Element("html");
+                Element meta1=new Element("meta").setAttribute("http-equiv","Pragma").setAttribute("content","no-cache");
+                Element meta2=new Element("meta").setAttribute("http-equiv","Cache-Control").setAttribute("content","no-cache, must-revalidate");
+                root.addContent(new Element("head").addContent(meta1).addContent(meta2)).addContent(new Element("body").addContent(contentOutput));
+                doc.setRootElement(root);
+                XMLOutputter xmlout= new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
                 ServletOutputStream sos = response.getOutputStream();
-
-                String completeOutput = new String();
-                completeOutput = 
-                	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
-                    "<meta http-equiv=\"Content-Type\" content=\"text/html; \"/>"		+
-					"<html>\n<head>\n" +
-					" <meta http-equiv=\"Pragma\" content=\"no-cache\" />\n " +
-					"<meta http-equiv=\"Cache-Control\" content=\"no-cache, must-revalidate\" />\n"	+
-					"</head>\n"	+
-					"<body>\n"		+
-                	sw.toString() +
-					"</body>\n</html>\n";
-                
+                               
                 response.setContentType( "text/html" );  
-                sos.println(completeOutput);
-
-                //System.out.println("WCMSGetStaticHTMLServlet-Output: "+completeOutput);
-                
+                xmlout.output(doc,sos);
                 sos.flush();
                 sos.close();
-                sw.flush();
-                sw.close();
             }
         }
         catch (Exception e) {
