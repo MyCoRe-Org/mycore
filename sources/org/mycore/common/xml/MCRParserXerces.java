@@ -49,7 +49,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  **/
 public class MCRParserXerces 
-  implements MCRParserInterface, ErrorHandler, EntityResolver
+  implements MCRParserInterface, ErrorHandler
 {
   // the Xerces parser to be used
   DOMParser parser = new DOMParser();
@@ -93,7 +93,7 @@ public class MCRParserXerces
       throw new MCRConfigurationException( msg, ex ); 
     }
     parser.setErrorHandler  ( this );
-    parser.setEntityResolver( this );
+    parser.setEntityResolver( new MCREntityResolver() );
   }
 
   /**
@@ -251,14 +251,5 @@ public class MCRParserXerces
     str.append( " : message=" );
     str.append( ex.getLocalizedMessage() );
     return str.toString();
-  }
-
-  /** Implements the SAX EntityResolver interface */
-  public InputSource resolveEntity( String publicId, String systemId ) 
-    throws org.xml.sax.SAXException, java.io.IOException
-  {
-    logger.debug( "MCREntityResolver publicID = " + publicId );
-    logger.debug( "MCREntityResolver systemID = " + systemId );
-    return null;
   }
 }
