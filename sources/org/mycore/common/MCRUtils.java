@@ -24,8 +24,12 @@
 
 package org.mycore.common;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +41,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -46,8 +49,11 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
+import com.sun.corba.se.internal.iiop.BufferManagerWriteStream;
 
 /**
  * This class represent a general set of external methods to support
@@ -490,8 +496,8 @@ public class MCRUtils {
 		Object id;
 		switch (operation) {
 			case COMMAND_OR :
-				merged.addAll((Collection)set1);
-				merged.addAll((Collection)set2);
+				merged.addAll(set1);
+				merged.addAll(set2);
 				break;
 			case COMMAND_AND :
 				for (Iterator it = set1.iterator();
@@ -537,10 +543,9 @@ public class MCRUtils {
 	MCRArgumentChecker.ensureNotNull(hashin,"Input HashSet");
 	if (maxitems < 1) { logger.warn("The maximum items are lower then 1."); }
 	HashSet hashout = new HashSet();
-	Object id;
 	int i = 0;
 	for (Iterator it = hashin.iterator(); it.hasNext() && (i < maxitems); i++) {
-		hashout.add((Object)it.next()); }
+		hashout.add(it.next()); }
 	return hashout;
 	}
 
@@ -781,5 +786,11 @@ public class MCRUtils {
 			}
 		}
 		return classMap.values().iterator();
+	}
+	public static final void saveJDOM(Document jdom,File xml) throws IOException{
+	    XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
+	    BufferedOutputStream out=new BufferedOutputStream(new FileOutputStream(xml));
+	    xout.output(jdom,out);
+	    out.close();
 	}
 }
