@@ -212,8 +212,8 @@ public final String createSearchStringBoolean(String part, String tag,
  * The method returns the search string for a XML field with numbers for
  * the IBM Content Manager 7 persistence system.<p>
  * The number was transformed to a string to cut the number of the third decimal
- * position and tronspose it then in a integer number by multiply with 1000.
- * the number must be in range of 10^6 to -10^6.
+ * position and transpose it then in a integer number by multiply with 1000.
+ * The number must be in range of 10^6 to 0.
  * A full XML tag element shows like<br>
  * &lt;subtag sattrib="svalue" ... &gt;<br>
  * number<br>
@@ -233,7 +233,7 @@ public final String createSearchStringDouble(String part, String tag,
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return ""; }
-  if ((number < -10.e10) || (number > 10.e10)) { return ""; }
+  if ((number < 0.) || (number > 10.e6)) { return ""; }
   StringBuffer sb = new StringBuffer(1024);
   sb.append("XXX").append(part.toUpperCase()).append("XXX")
     .append(tag.toUpperCase()).append("XXX")
@@ -246,8 +246,10 @@ public final String createSearchStringDouble(String part, String tag,
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
-  //long a = (Math.round(number*1000.))/10; 
-  long a = (Math.round(number*10.))/10; 
+  // non numbers after decimal point
+  //long a = (Math.round(number*10.))/10; 
+  // 3 numbers after decimal point
+  long a = (Math.round(number*10000.))/10; 
   String binstr = Long.toBinaryString(a);
   String binstrmax = Integer.toBinaryString(MAX_BIN_STRING_LENGTH);
   int lenstr = binstr.length();

@@ -46,8 +46,9 @@ implements MCRQueryInterface
 // common data
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
-// 31 Bit
+// 32 Bit
 protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
+protected static int MAX_NUMBER_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
 
 /**
  * The constructor.
@@ -93,7 +94,7 @@ public final Vector getResultList(String query, String type, int maxresults)
     onecond = getNextCondition(startpos,stoppos,rawtext);
 //    System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
-    cond.append(traceOneCondition(onecond));
+    cond.append('(').append(traceOneCondition(onecond)).append(')');
     if (startpos<stoppos) {
       operpos = rawtext.indexOf("(",startpos);
       if (operpos != -1) {
@@ -103,7 +104,7 @@ public final Vector getResultList(String query, String type, int maxresults)
         }
       }
     }
-  if (cond.length()==1) { cond.append("(XXXOBJECTXXXIDXXX)"); }
+  if (cond.length()==1) { cond.append("(XXXMYCOREOBJECTXXXIDXXX)"); }
   cond.append(')');
   System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
   System.out.println("================================");
@@ -157,23 +158,35 @@ private final String getNextCondition(int startpos,int stoppos,String query)
  **/
 private final String traceOneCondition(String cond)
   {
+  int i, j, k;
   StringBuffer sb = new StringBuffer(128);
-  System.out.println("ONECOND="+cond);
+System.out.println("ONECOND="+cond);
+  // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
   if ((klammerauf==-1)||(klammerzu==-1)) { return ""; }
-  int i = 1;
-  int j = 0;
+  // cerate path to the data
   StringBuffer pt = new StringBuffer(128);
-  while (j!=-1) {
-    j=cond.indexOf("/",i);
-    if (j!=-1) { 
-      pt.append("XXX").append(cond.substring(i,j)); 
-      i = j+1;
+  boolean ispath = false;
+  String inpath = cond.substring(0,klammerauf);
+  if ((inpath.equals("(")) || (inpath.equals("(.")) ||
+      (inpath.equals("(*")) || (inpath.equals("(//*"))) { 
+    pt.append(""); ispath = true; }
+  if (!ispath) {
+    i = 1;
+    if (inpath.substring(0,3).equals("(//")) { i = 3; }
+    if (!inpath.substring(0,2).equals("(/")) { pt.append('*'); }
+    if (inpath.substring(0,3).equals("(./")) { i = 3; }
+    j = 0;
+    while ((j!=-1)&&(j<klammerauf)) {
+      j=cond.indexOf("/",i);
+      if (j!=-1) { 
+        pt.append("XXX").append(cond.substring(i,j)); i = j+1; }
       }
+    pt.append("XXX").append(cond.substring(i,klammerauf));
     }
-  pt.append("XXX").append(cond.substring(i,klammerauf));
   String pretag = pt.toString();
+  // search operations
   String tag[] = new String[10];
   String op[] = new String[10];
   String value[] = new String[10];
@@ -251,110 +264,176 @@ private final String traceOneCondition(String cond)
     System.out.println("VALUE="+value[i]);
     System.out.println("OPER="+op[i]);
     System.out.println("TAG="+tag[i]);
+    System.out.println();
     }
 
-  // Check for value as date
+  // Check for value as date or number or  MCRObjectID
   GregorianCalendar date = new GregorianCalendar();
   boolean isdate = false;
+  boolean isnumber = false;
+  boolean ismcrid = false;
+  long number = 0;
   try {
     DateFormat df = MCRUtils.getDateFormat("de");
     date.setTime(df.parse(value[0]));
     isdate = true;
+    number = (long)(date.get(Calendar.YEAR)*10000 +
+      date.get(Calendar.MONTH)*100 + date.get(Calendar.DAY_OF_MONTH));
     }
-  catch (ParseException e) {
-    isdate = false; }
-  // date search
-  if (isdate) {
-    int idate = date.get(Calendar.YEAR)*10000 +
-                date.get(Calendar.MONTH)*100 +
-                date.get(Calendar.DAY_OF_MONTH);
-    int ioper = 0;
-    if (op[0].indexOf("<=")>=0) { idate += 1; ioper = 3; }
-    else if (op[0].indexOf(">=")>=0) { ioper = 2; }
-      else if (op[0].indexOf(">")>=0) { idate += 1; ioper = 2; }
-        else if (op[0].indexOf("<")>=0) { ioper = 3; }
-          else if (op[0].indexOf("!=")>=0) { ioper = 4; }
-            else if (op[0].indexOf("=")>=0) { ioper = 1; }
-              else { return ""; }
-    String binstr = Integer.toBinaryString(idate);
-    String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
-    int lenstr = binstr.length();
-    int lenstrmax = binstrmax.length();
-    StringBuffer sbdate = new StringBuffer(32);
-    for (int k=0;k<(lenstrmax-lenstr);k++) { sbdate.append('2'); }
-    sbdate.append(binstr);
-    String stdate = sbdate.toString();
-    StringBuffer sbstag = new StringBuffer(64);
-    sbstag.append(pretag).append("XXX").append(tag[0]).append("XXX")
-       .append(tag[1].substring(1,tag[1].length())).append("XXX")
-       .append(value[1]).append("XXX");
-    String stag = sbstag.toString();
-    if ((ioper==1) || (ioper==4)) {
-      stdate = stdate.replace('2','0');
-      if (ioper==4) { 
-        sb.append("(NOT "); }
-      else {
-        sb.append("("); }
-      sb.append(stag).append(stdate).append(")").append(NL);
-      return sb.toString(); 
-      }
-    String standor = "";
-    String stnot = "(";
-    if (ioper==3) { stnot = "(NOT "; }
-    stdate = stdate.replace('2','?');
-    int k=stdate.indexOf("0");
-    while(k<stdate.length())
-      {
-      sb.append(standor).append(stnot).append("$SC=?$ ").append(stag);
-      StringBuffer sbtemp = new StringBuffer(32);
-      sbtemp.append(stdate.substring(0,k)).append('1');
-      for (int l=k+1;l<stdate.length();l++) { sbtemp.append('?'); }
-      sb.append(sbtemp.toString()).append(")");
-      if (ioper==2) { standor = " OR "; } else { standor = " AND "; }
-      k=stdate.indexOf("0",k+1);
-      if (k==-1) break;
-      }
-    return sb.toString();
+  catch (ParseException e) { isdate = false; }
+  try {
+    String test = value[0].replace(',','.');
+    double dnumber = (new Double(test)).doubleValue();
+    // non numbers after decimal point
+    //number = (Math.round(dnumber*10.))/10;
+    // 3 numbers after decimal point
+    number = (Math.round(dnumber*10000.))/10;
+    if (number<0.) { number *= -1.; }
+    isnumber = true;
     }
-  // check value of MCRObjectID
+  catch (NumberFormatException e) { isnumber = false; }
   try {
     MCRObjectID mid = new MCRObjectID(value[0]);
     if (mid.isValid()) {
       value[0] = mid.getId().replace('_','X'); }
+    ismcrid = true;
     }
-  catch (MCRException e) { }
-  // text search
-  sb.append("($PARA$ {");
-  for (i=0;i<counter;i++) {
-    if (tag[i].charAt(0)=='@') {
-      sb.append(" XXX").append(tag[i].substring(1,tag[i].length()))
-        .append("XXX").append(value[i]).append("XXX");
-      continue;
+  catch (MCRException e) { ismcrid = false; }
+  // set the path and attribute tags
+  StringBuffer sbatag = new StringBuffer(128);
+  if ((!tag[0].equals(".")) && (!tag[0].equals("*"))) {
+    sbatag.append(pretag).append("XXX").append(tag[0]).append("XXX*"); }
+  else { sbatag.append(""); }
+  for (i=1;i<counter;i++) {
+    sbatag.append("XXX").append(tag[i].substring(1,tag[i].length()))
+          .append("XXX").append(value[i]).append("XXX*"); 
+    }
+  String atttag = sbatag.toString();
+  // number search
+  if ((isnumber)||(isdate)) {
+    String stag = "( ";
+    String etag = " )";
+    int ioper = 0;
+    if (op[0].indexOf("<=")>=0) { ioper = 6; }
+    else if (op[0].indexOf(">=")>=0) { ioper = 5; }
+      else if (op[0].indexOf(">")>=0) { ioper = 4; }
+        else if (op[0].indexOf("<")>=0) { ioper = 3; }
+          else if (op[0].indexOf("!=")>=0) { ioper = 2; }
+            else if (op[0].indexOf("=")>=0) { ioper = 1; }
+              else { return ""; }
+    String binstr = Long.toBinaryString(number);
+    String binstrmax = Integer.toBinaryString(MAX_NUMBER_STRING_LENGTH);
+    int lenstr = binstr.length();
+    int lenstrmax = binstrmax.length();
+    if ((ioper==1)||(ioper==5)||(ioper==6)) {
+      sb.append(stag).append("$MC=*$ ").append(atttag);
+      for (i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
+        sb.append(binstr);
+      sb.append(etag); }
+    if ((ioper==5)||(ioper==6)) { sb.append(" OR "); }
+    if (ioper==2) {
+      for (j=0;j<(lenstrmax-lenstr);j++) {
+        sb.append(stag).append("$SC=?,MC=*$ ").append(atttag);
+        for (k=0;k<j;k++) { sb.append('?'); }
+        sb.append('1');
+        for (k=j+1;k<lenstrmax;k++) { sb.append('?'); }
+        sb.append(" ").append(etag); 
+        sb.append(" OR "); 
+        }
+      for (j=0;j<lenstr;j++) {
+        sb.append(stag).append("$SC=?,MC=*$ ").append(atttag);
+        for (i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
+        for (k=0;k<lenstr;k++) {
+          if (k==j) {
+            if (binstr.charAt(k)=='0') {
+              sb.append('1'); }
+            else {
+              sb.append('0'); }
+            }
+          else {
+            sb.append('?'); }
+          }
+        sb.append(" ").append(etag); 
+        if (j!=lenstr-1) { sb.append(" OR "); }
+        }
       }
-    int valuestart = 0;
-    int valuestop = 0;
-    String word = "";
-    while (valuestop!=-1) {
-      valuestop = value[i].indexOf(" ",valuestart+1);
-      if (valuestop!=-1) {
-        word = value[i].substring(valuestart,valuestop); }
-      else {
-        word = value[i].substring(valuestart,value[i].length()); }
-      if (word.indexOf("*")==-1) {
-        sb.append(word).append(' '); }
-      else {
-        sb.append(" $MC=*$ ").append(word).append(' '); }
-      if (i+1 != counter) { sb.append(", "); }
-      valuestart = valuestop+1;
+    if ((ioper==4)||(ioper==5)) { 
+      StringBuffer sbetag = new StringBuffer(32);
+      for (k=0;k<lenstr;k++) { sbetag.append('?'); }
+      for (i=0;i<(lenstrmax-lenstr);i++) {
+        sb.append(stag).append("$SC=?,MC=*$ ").append(atttag);
+        for (j=0;j<(lenstrmax-lenstr);j++) {
+          if (i==j) { sb.append('1'); }
+          else { sb.append('?'); }
+          }
+        sb.append(sbetag.toString()).append(etag);
+        if (i!=lenstrmax-lenstr-1) { sb.append(" OR "); }
+        }
+      sbetag = new StringBuffer(32);
+      for (i=0;i<(lenstrmax-lenstr);i++) { sbetag.append('?'); }
+      if (binstr.indexOf("0")!=-1) { sb.append(" OR "); }
+      for (j=0;j<lenstr;j++) {
+        if (binstr.charAt(j)=='0') {
+          sb.append(stag).append("$SC=?,MC=*$ ").append(atttag)
+            .append(sbetag.toString());
+          for (k=0;k<lenstr;k++) {
+            if (k<j) { 
+              sb.append(binstr.charAt(k)); }
+            else {
+              if (k==j) { sb.append('1'); }
+              else { sb.append('?'); }
+              }
+            }
+          sb.append(etag);
+          if (binstr.indexOf("0",j+1)!=-1) { sb.append(" OR "); }
+          }
+        }
       }
-    if (counter > 0) { sb.append(", "); }
-    sb.append(" $MC=*$ *").append(pretag).append("XXX");
-    if (tag[i].charAt(0)!='.') { 
-      sb.append(tag[i]).append("XXX*"); }
+    if (((ioper==3)||(ioper==6))&&(number!=0.)) { 
+      StringBuffer sbetag = new StringBuffer(32);
+      for (k=0;k<(lenstrmax-lenstr);k++) { sbetag.append('0'); }
+      sb.append(stag).append("$SC=?,MC=*$ ").append(atttag)
+        .append(sbetag.toString()).append('0');
+      for (k=0;k<lenstr-1;k++) { sb.append('?'); }
+      sb.append(etag);
+      if (number > 1) {
+        sb.append(" OR ");  
+        for (j=1;j<lenstr;j++) {
+          if (binstr.charAt(j)=='0') { continue; }
+          sb.append(stag).append("$SC=?,MC=*$ ").append(atttag)
+            .append(sbetag.toString()).append('1');
+          for (k=1;k<lenstr;k++) {
+            if (k<j) { 
+              sb.append(binstr.charAt(k)); }
+            else {
+              if (k==j) { sb.append('0'); }
+              else { sb.append('?'); }
+              }
+            }
+          sb.append(etag);
+          if (binstr.indexOf("1",j+1)!=-1) { sb.append(" OR "); }
+          }
+        }
+      }
+    return sb.toString();
+    }
+  // freetext
+  if (atttag.length()==0) {
+    if (value[0].indexOf("*")!=-1) {
+      sb.append("( $MC=*$ ").append(value[0]).append(" )"); }
     else {
-      sb.append('*'); }
+      sb.append("( ").append(value[0]).append(" )"); }
+    return sb.toString();
     }
-  sb.append(" })"); 
+  // text in tag
+  if (atttag.indexOf("*")!=-1) {
+    sb.append("($PARA$ { $MC=*$ ").append(atttag).append(" "); }
+  else {
+    sb.append("($PARA$ { ").append(atttag).append(" "); }
+  if (value[0].indexOf("*")!=-1) {
+    sb.append(" $MC=*$ ").append(value[0]).append(" } )"); }
+  else {
+    sb.append(value[0]).append(" } )"); }
   return sb.toString();
   }
 
