@@ -349,18 +349,17 @@ public class MCRCommandLineInterface
         }
       logger.error( "Command not understood. Enter 'help' to get a list of commands." );
       }
-    catch( MCRException ex ) {
-      logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "" );
-      }
     catch( Exception ex ) {
       if( ex instanceof InvocationTargetException ) {
         Throwable t = ( (InvocationTargetException)ex ).getTargetException();
-        logger.error(t.toString());
+        logger.error(t.getMessage());
+        logger.debug( MCRException.getStackTraceAsString((Exception)t));
+        logger.error( "" );
         }
       else {
         logger.error( ex.getMessage() );
+        logger.debug( MCRException.getStackTraceAsString(ex));
+        logger.error( "" );
         }
       }
     }

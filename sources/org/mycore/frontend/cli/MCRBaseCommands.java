@@ -81,6 +81,10 @@ public class MCRBaseCommands
     String SLASH = System.getProperty("file.separator");
     // Read config file
     String conf_home = mycore_appl+SLASH+"config";
+    File conf_dir = new File(conf_home);
+    if(! conf_dir.isDirectory()) {
+      throw new MCRException("Can't find the configuration directory "+
+        conf_home ); }
     String conf_filename = "";
     try {
       conf_filename = config.getString("MCR.persistence_config_"+mcr_type); }
@@ -131,6 +135,10 @@ public class MCRBaseCommands
     String SLASH = System.getProperty("file.separator");
     // Read config file
     String conf_home = mycore_appl+SLASH+"config";
+    File conf_dir = new File(conf_home);
+    if(! conf_dir.isDirectory()) {
+      throw new MCRException("Can't find the configuration directory "+
+        conf_home ); }
     String conf_filename = "";
     try {
       conf_filename = config.getString("MCR.persistence_config_"+mcr_type); }
