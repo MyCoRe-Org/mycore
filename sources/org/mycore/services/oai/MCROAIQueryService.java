@@ -101,7 +101,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         for (int i = 0; i < categories.length; i++) { 
            	String[] set = new String[3];
    	        set[0] = new String(parentSpec + categories[i].getID());
-       	    set[1] = new String(categories[i].getLabel("en"));
+       	    set[1] = new String(categories[i].getText("en"));
           	set[2] = new String(categories[i].getDescription("en"));
           	
 	    	// logger.debug("Suche nach Kategorie: " + set[0]);    
