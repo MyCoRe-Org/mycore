@@ -268,7 +268,7 @@ public class MCRLayoutServlet extends MCRServlet {
 			try {
 				if (styleFile == null) {
 					throw new MCRException(
-						"Stylesheetfile: " + styleFile + " not found!");
+						"Stylesheetfile: " + styleName + " not found!");
 				}
 				transform(sourceXML, stylesheet, transformer, response);
 			} catch (IOException ex) {
