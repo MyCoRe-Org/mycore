@@ -301,13 +301,12 @@ public class MCRLayoutServlet extends HttpServlet
 	  String defaultLang = MCRConfiguration.instance()
 	    .getString( "MCR.metadata_default_lang", "en" );
 
-  String user = MCRConfiguration.instance().getString( "MCR.users_guestuser_username" );
-  String mcrSessionID = parameters.getProperty( "MCRSessionID" );
-  if( mcrSessionID != null )
-  {
-     MCRSession mcrSession = MCRSession.getSession( mcrSessionID );
-     if( mcrSession != null ) user = mcrSession.getCurrentUserID();
-  }
+          String user = MCRConfiguration.instance().getString( "MCR.users_guestuser_username" );
+          if( session != null )
+          {
+            MCRSession mcrSession = (MCRSession)( session.getAttribute( "mycore.session" ) );
+            if( mcrSession != null ) user = mcrSession.getCurrentUserID();
+          }
 
 	  parameters.put( "CurrentUser",           user               );
 	  parameters.put( "RequestURL",            requestURL         );
