@@ -29,7 +29,7 @@ import java.io.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.common.xml.MCRQueryResultArray;
-import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.services.query.MCRQueryInterface;
 
 /**
  * This class realizes the RemoteQueryProtocol in the view

@@ -29,9 +29,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.common.xml.MCRQueryResultArray;
-
 
 /**
  * This class provides a Servlet for remote Querying for distributed

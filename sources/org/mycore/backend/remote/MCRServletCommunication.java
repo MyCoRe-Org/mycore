@@ -30,7 +30,7 @@ import java.net.*;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRQueryResultArray;
-import org.mycore.common.xml.MCRCommunicationInterface;
+import org.mycore.services.query.MCRCommunicationInterface;
 
 /**
  * This class implements the interface to choose the communication methodes

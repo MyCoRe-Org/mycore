@@ -26,6 +26,7 @@ package org.mycore.services.query;
 
 import java.util.*;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
  * This interface is designed to choose the communication methodes

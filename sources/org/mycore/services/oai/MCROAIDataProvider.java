@@ -393,7 +393,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			int tokenNo = Integer.valueOf(resumptionToken
                 .substring(resumptionToken.indexOf('x') + 1, 
-                .resumptionToken.lastIndexOf('x'))).intValue();
+                resumptionToken.lastIndexOf('x'))).intValue();
 			int objectsInFile = Integer.valueOf(resumptionToken
                 .substring(resumptionToken.lastIndexOf('x')+1)).intValue();
 		

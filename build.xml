@@ -221,6 +221,7 @@
     </echo>
     <javadoc
       packagenames        = "org.mycore.*"
+      excludepackagenames = "org.mycore.backend.cm8"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
       classpathref        = "mycore.classpath"

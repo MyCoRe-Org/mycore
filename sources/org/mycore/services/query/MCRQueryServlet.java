@@ -34,7 +34,8 @@ import org.jdom.transform.*;
 import org.jdom.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.classifications.*;
-import org.org.mycore.common.xml.MCRLayoutServlet;
+import org.mycore.common.xml.MCRLayoutServlet;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
  * This servlet provides a web interface to query

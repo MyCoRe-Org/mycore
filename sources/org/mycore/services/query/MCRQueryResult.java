@@ -28,6 +28,7 @@ import java.util.*;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
  * This class is the result list of a XQuery question to the persistence

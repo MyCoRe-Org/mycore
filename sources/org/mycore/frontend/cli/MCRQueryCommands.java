@@ -30,7 +30,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import org.mycore.common.*;
-import org.mycore.common.xml.MCRQueryResult;
+import org.mycore.services.query.MCRQueryResult;
 import org.mycore.common.xml.MCRQueryResultArray;
 import org.mycore.datamodel.classifications.MCRClassification;
 

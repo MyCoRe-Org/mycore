@@ -27,6 +27,7 @@ package org.mycore.services.query;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRQueryResultArray;
 import org.mycore.datamodel.classifications.MCRClassification;
 import java.net.*;
 import java.io.*;

@@ -31,7 +31,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.services.query.MCRQueryInterface;
 
 /**
  * This is the basic tranformer implementation for CM 7 search text strings
