@@ -300,8 +300,6 @@ public final byte [] receive(MCRObjectID mcr_id)
  * @return the GregorianCalendar data of the object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
- * @exception DKException if an error in the CM7 is occured
- * @exception Exception if an general error is occured
  **/
 public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
