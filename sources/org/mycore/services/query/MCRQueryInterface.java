@@ -45,7 +45,7 @@ public interface MCRQueryInterface
  *
  * @param query                 the XQuery string
  * @param maxresults            the maximum of results
- * @param type                  the MCRObject type
+ * @param type                  a list of the MCRObject types seperated by ,
  * @return                      a result list as MCRXMLContainer
  **/
 public MCRXMLContainer getResultList(String query, String type,
