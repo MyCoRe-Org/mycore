@@ -357,20 +357,33 @@ public final static boolean existInDatastore(String id)
 
 /**
  * The methode receive the object for the given MCRObjectID and stored
- * it in this MCRObject.
+ * it in this MCRDerivate
  *
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
 public final void receiveFromDatastore(String id) 
   throws MCRPersistenceException
+  { receiveFromDatastore(new MCRObjectID(id)); }
+
+/**
+ * The methode receive the object for the given MCRObjectID and stored
+ * it in this MCRDerivate
+ *
+ * @param id   the object ID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final void receiveFromDatastore(MCRObjectID id) 
+  throws MCRPersistenceException
   {
-  mcr_id = new MCRObjectID(id);
+  mcr_id = id;
   byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
   if (xml != null) {
     setFromXML(xml,false); }
   else {
-    logger.warn("The XML file for ID "+mcr_id.getId()+" was not retrieved.");
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
+    //logger.warn("The XML file for ID "+mcr_id.getId()+" was not retrieved.");
     }
   }
 
@@ -425,7 +438,9 @@ public final void updateInDatastore() throws MCRPersistenceException
   {
   // get the old Item
   MCRDerivate old = new MCRDerivate();
-  old.receiveFromDatastore(mcr_id.getId());
+  try {
+    old.receiveFromDatastore(mcr_id.getId()); }
+  catch (MCRException e) { createInDatastore(); }
   // remove the old link to metadata
   MCRObject obj;
   for (int i=0;i<old.getDerivate().getLinkMetaSize();i++) {
