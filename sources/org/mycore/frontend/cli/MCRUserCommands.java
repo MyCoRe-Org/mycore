@@ -96,7 +96,7 @@ public class MCRUserCommands
   public static void printGroupAsXML(String groupID) throws Exception
   {
     MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
-    System.out.println("\n"+group.getGroupAsXML("\n"));
+    System.out.println("\n"+group.toXML("\n"));
   }
 
   /**
@@ -124,7 +124,7 @@ public class MCRUserCommands
   public static void printUserAsXML(String userID) throws Exception
   {
     MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-    System.out.println("\n"+user.getUserAsXML("\n"));
+    System.out.println("\n"+user.toXML("\n"));
   }
 
   /**
@@ -143,6 +143,25 @@ public class MCRUserCommands
   public static void printUserCacheInfo() throws Exception
   { System.out.println("\n"+MCRUserMgr.instance().getUserCacheInfo()); }
 
+  /**
+   * This method invokes MCRUserMgr.saveAllGroupsToXMLFile() and saves all groups
+   * in XML representation to the given file.
+   *
+   * @param fileName Name of the file the groups will be saved to
+   */
+  public static void saveAllGroupsToXMLFile(String fileName)
+                     throws IOException, Exception
+  { MCRUserMgr.instance().saveAllGroupsToXMLFile(fileName); }
+
+  /**
+   * This method invokes MCRUserMgr.saveAllUsersToXMLFile() and saves all users
+   * in XML representation to the given file.
+   *
+   * @param fileName Name of the file the users will be saved to
+   */
+  public static void saveAllUsersToXMLFile(String fileName)
+                     throws IOException, Exception
+  { MCRUserMgr.instance().saveAllUsersToXMLFile(fileName); }
   /**
    * This method invokes MCRUserMgr.retrieveUser() and then works with the
    * retrieved user object to change the password.
