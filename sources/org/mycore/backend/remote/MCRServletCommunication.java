@@ -24,277 +24,220 @@
 
 package org.mycore.backend.remote;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpRecoverableException;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mycore.common.MCRConfiguration;
+
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLContainer;
 
 /**
- * This class implements the interface for communication between the local
- * MCRClient and a remote MCRServer via HTTP/HTTPS. <br>
+ * This class implements the interface for communication between the
+ * local MCRClient and a remote MCRServer via HTTP/HTTPS.<br>
  * This class use org.apache.log4j for logging.
- * 
+ *
  * @author Mathias Zarick
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler
  * @version $Revision$ $Date$
- */
-public class MCRServletCommunication implements MCRRemoteAccessInterface {
+ **/
+public class MCRServletCommunication implements MCRRemoteAccessInterface
+{
 
-	// logger
-	static Logger logger = Logger.getLogger(MCRServletCommunication.class
-			.getName());
+// logger
+static Logger logger=Logger.getLogger(MCRServletCommunication.class.getName());
 
-	// HttpClient
-	static HttpClient client = new HttpClient();
-	static {
-		int timeout = 5000;
-		logger.info("Setting timout to " + timeout + " ms!");
-		client.setTimeout(timeout);
-	}
+// internal data
+private String realhost;
+private String protocol;
+private int port;
+private String location;
+private String headercontext;
+private boolean hasifsdata;
+private MCRConfiguration config = MCRConfiguration.instance();
 
-	// internal data
-	private String realhost;
-	private String protocol;
-	private int port;
-	private String location;
-	private String headercontext;
-	private boolean hasifsdata;
+/**
+ * This is the constructor for the MCRSocketCommunication.
+ **/
+public MCRServletCommunication()
+  { 
+  // get the instance of MCRConfiguration
+  config = MCRConfiguration.instance();
+  // set the logger property
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  // set the defaults
+  headercontext = ""; hasifsdata = false; 
+  }
 
-	private MCRConfiguration config = MCRConfiguration.instance();
+/**
+ * This method read the connection configuration from the property file.
+ *
+ * @param hostAlias the alias name of the called host
+ * @return true if no error was occure, else return false
+ **/
+private final boolean readConnectionData(String hostAlias)
+  {
+  realhost = config.getString("MCR.remoteaccess_"+hostAlias+"_host","");
+  if (realhost.length()==0) {
+    logger.error("Connection data for host "+hostAlias+" not found.");
+    return false;
+    }
+  protocol = config.getString("MCR.remoteaccess_"+hostAlias+"_protocol","");
+  if (protocol.length()==0) {
+    logger.error("Connection data for host "+hostAlias+" not found.");
+    return false;
+    }
+  protocol = protocol.toLowerCase();
+  if (!protocol.equals("http")) {
+    logger.error("Connection protocol for host "+hostAlias+" is not HTTP.");
+    return false;
+    }
+  port = config.getInt("MCR.remoteaccess_"+hostAlias+"_port",0);
+  if (port==0) {
+    logger.error("Connection port for host "+hostAlias+" is false.");
+    return false;
+    }
+  return true;
+  }
 
-	/**
-	 * This is the constructor for the MCRSocketCommunication.
-	 */
-	public MCRServletCommunication() {
-		// get the instance of MCRConfiguration
-		config = MCRConfiguration.instance();
-		// set the logger property
-		PropertyConfigurator.configure(config.getLoggingProperties());
-		// set the defaults
-		headercontext = "";
-		hasifsdata = false;
-	}
+/**
+ * This methode represide the query request methode for the communication.
+ * For the connection parameter would the MCRConfiguration used.
+ *
+ * @param hostAlias the list of hostnames as string they should requested.
+ * @param reqtype   the type value of the MCRObjectId
+ * @param query     the query as a stream
+ * @exception MCRException general Exception of MyCoRe
+ * @return the result of the query as MCRXMLContainer
+ **/
+public MCRXMLContainer requestQuery(String hostAlias, String reqtype, 
+  String query) throws MCRException
+  {
+  MCRXMLContainer result = new MCRXMLContainer();
+  hasifsdata = false;
 
-	/**
-	 * This method read the connection configuration from the property file.
-	 * 
-	 * @param hostAlias
-	 *            the alias name of the called host
-	 * @return true if no error was occure, else return false
-	 */
-	private final boolean readConnectionData(String hostAlias) {
-		realhost = config.getString("MCR.remoteaccess_" + hostAlias + "_host",
-				"");
-		if (realhost.length() == 0) {
-			logger.error("Connection data for host " + hostAlias
-					+ " not found.");
-			return false;
-		}
-		protocol = config.getString("MCR.remoteaccess_" + hostAlias
-				+ "_protocol", "");
-		if (protocol.length() == 0) {
-			logger.error("Connection data for host " + hostAlias
-					+ " not found.");
-			return false;
-		}
-		protocol = protocol.toLowerCase();
-		if (!protocol.equals("http")) {
-			logger.error("Connection protocol for host " + hostAlias
-					+ " is not HTTP.");
-			return false;
-		}
-		port = config.getInt("MCR.remoteaccess_" + hostAlias + "_port", 0);
-		if (port == 0) {
-			logger
-					.error("Connection port for host " + hostAlias
-							+ " is false.");
-			return false;
-		}
-		return true;
-	}
+  logger.debug("HostAlias        = "+hostAlias);
+  logger.debug("MCRObjectID Type = "+reqtype);
+  logger.debug("Query            = "+query);
 
-	/**
-	 * This methode represide the query request methode for the communication.
-	 * For the connection parameter would the MCRConfiguration used.
-	 * 
-	 * @param hostAlias
-	 *            the list of hostnames as string they should requested.
-	 * @param reqtype
-	 *            the type value of the MCRObjectId
-	 * @param query
-	 *            the query as a stream
-	 * @exception MCRException
-	 *               general Exception of MyCoRe
-	 * @return the result of the query as MCRXMLContainer
-	 */
-	public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
-			String query) throws MCRException {
-		MCRXMLContainer result = new MCRXMLContainer();
-		hasifsdata = false;
+  if (!readConnectionData(hostAlias)) { return result; }
+  location = config.getString("MCR.remoteaccess_"+hostAlias
+    +"_query_servlet");
+  if (location.length()==0) {
+    logger.error("Connection location for host "+hostAlias+" not found.");
+    return result;
+    }
+  StringBuffer sb = new StringBuffer(256);
+  sb.append("Connecting to ").append(protocol).append("://")
+    .append(realhost).append(':').append(port).append(location).append('?')
+    .append("type=").append(URLEncoder.encode(reqtype))
+    .append("&hosts=local").append("&XSL.Style=xml").append("&query=").append(URLEncoder.encode(query));
+  logger.debug(sb.toString());
 
-		logger.debug("HostAlias        = " + hostAlias);
-		logger.debug("MCRObjectID Type = " + reqtype);
-		logger.debug("Query            = " + query);
+  URL currentURL;
+  try {
+    currentURL = new URL(protocol,realhost,port,location);
+    HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();
+    urlCon.setDoOutput(true);
+    urlCon.setRequestMethod("POST");
+    PrintWriter out = new PrintWriter(urlCon.getOutputStream());
+    out.print("type=" + URLEncoder.encode(reqtype)
+              + "&hosts=local"
+              + "&XSL.Style=xml"
+              + "&query=" + URLEncoder.encode(query));
+    out.close();
+    BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
+    result.importElements(in);
+    in.close();
+    urlCon.disconnect();
+    currentURL=null;
+    for (int i=0;i<result.size();i++) { result.setHost(i,hostAlias); }
+    }
+  catch(MCRException mcre) {
+    logger.error("Can't use the response from host:"+realhost+"."); }
+  catch(UnknownHostException uhe) {
+    logger.error("Don't know about host: "+realhost+"."); }
+  catch(IOException ioe) {
+    logger.error("Couldn't get I/O for the connection to: "+realhost+".");
+    }
+  catch(Exception e) {
+    e.printStackTrace(System.err); }
+  return result;
+  }
 
-		if (!readConnectionData(hostAlias)) {
-			return result;
-		}
-		location = config.getString("MCR.remoteaccess_" + hostAlias
-				+ "_query_servlet");
-		if (location.length() == 0) {
-			logger.error("Connection location for host " + hostAlias
-					+ " not found.");
-			return result;
-		}
-		URL currentURL;
-		try {
-			currentURL = new URL(protocol, realhost, port, location);
-			PostMethod method = new PostMethod(currentURL.toExternalForm());
-			method.addParameter("type", reqtype);
-			method.addParameter("host", "local");
-			method.addParameter("XSL.Style", "xml");
-			method.addParameter("query", query);
-			// Check that we didn't run out of retries.
-			if (getConnectionStatus(method) == -1) {
-				logger.error("Failed to recover from exception.");
-			} else {
-				BufferedInputStream in = new BufferedInputStream(method
-						.getResponseBodyAsStream());
-				result.importElements(in);
-				method.releaseConnection();
-				in.close();
-			}
-			currentURL = null;
-			for (int i = 0; i < result.size(); i++) {
-				result.setHost(i, hostAlias);
-			}
-		} catch (MCRException mcre) {
-			logger.error("Can't use the response from host:" + realhost + ".");
-		} catch (UnknownHostException uhe) {
-			logger.error("Don't know about host: " + realhost + ".");
-		} catch (IOException ioe) {
-			logger.error("Couldn't get I/O for the connection to: " + realhost
-					+ ".");
-		} catch (Exception e) {
-			logger.error("Error while getting result of remote query!", e);
-		}
-		return result;
-	}
+/**
+ * This methode represide the IFS request methode for the communication.
+ * For the connection parameter would the MCRConfiguration used.
+ *
+ * @param hostAlias the list of hostnames as string they should requested.
+ * @param path      the path to the IFS data
+ * @exception MCRException general Exception of MyCoRe
+ * @return the result of the query as MCRXMLContainer
+ **/
+public final BufferedInputStream requestIFS(String hostAlias, String path) 
+  throws MCRException
+  {
+  BufferedInputStream in = null;
+  hasifsdata = false;
+  logger.debug("HostAlias        = "+hostAlias);
+  logger.debug("Path             = "+path);
 
-	/**
-	 * @param executes
-	 *            the method and returning the status code
-	 * @return @throws
-	 *        URIException, IOException
-	 */
-	private int getConnectionStatus(PostMethod method) throws URIException,
-			IOException {
-		int statusCode = -1;
-		logger.debug("Connecting to " + method.getURI().toString());
-		logger.debug("RequestBody:\n" + method.getRequestBodyAsString());
-		// We will retry up to 3 times.
-		for (int attempt = 0; statusCode == -1 && attempt < 3; attempt++) {
-			try {
-				// execute the method.
-				logger.debug("Connection Attempt: " + (attempt + 1));
-				statusCode = client.executeMethod(method);
-			} catch (HttpRecoverableException e) {
-				logger.warn("A recoverable exception occurred, retrying.  "
-						+ e.getMessage());
-			} catch (IOException e) {
-				logger.error("Failed to download file.", e);
-			}
-		}
-		return statusCode;
-	}
+  if (!readConnectionData(hostAlias)) { return in; }
+  location = config.getString("MCR.remoteaccess_"+hostAlias
+    +"_ifs_servlet");
+  if (location.length()==0) {
+    logger.error("Connection location for host "+hostAlias+" not found.");
+    return in;
+    }
+  if (path.length()==0) {
+    logger.error("Connection path for host "+hostAlias+" is empty.");
+    return in;
+    }
+  StringBuffer sb = new StringBuffer(256);
+  sb.append("Connecting to ").append(protocol).append("://")
+    .append(realhost).append(':').append(port).append(location).append(path)
+    .append('?');
+  if(path.endsWith("/")) { sb.append("XSL.Style=xml&"); }
+  sb.append("hosts=local");
+  logger.debug(sb.toString());
 
-	/**
-	 * This methode represide the IFS request methode for the communication. For
-	 * the connection parameter would the MCRConfiguration used.
-	 * 
-	 * @param hostAlias
-	 *            the list of hostnames as string they should requested.
-	 * @param path
-	 *            the path to the IFS data
-	 * @exception MCRException
-	 *               general Exception of MyCoRe
-	 * @return the result of the query as MCRXMLContainer
-	 */
-	public final BufferedInputStream requestIFS(String hostAlias, String path)
-			throws MCRException {
-		BufferedInputStream in = null;
-		hasifsdata = false;
-		logger.debug("HostAlias        = " + hostAlias);
-		logger.debug("Path             = " + path);
+  URL currentURL;
+  try {
+    currentURL = new URL(protocol,realhost,port,location+path);
+    HttpURLConnection urlCon = (HttpURLConnection) currentURL.openConnection();
+    urlCon.setDoOutput(true);
+    urlCon.setRequestMethod("POST");
+    PrintWriter out = new PrintWriter(urlCon.getOutputStream());
+    if(path.endsWith("/")) { out.print("XSL.Style=xml&"); }
+    out.print("hosts=local");
+    out.close();
+    headercontext = urlCon.getContentType();
+    hasifsdata = true;
+    return new BufferedInputStream(urlCon.getInputStream());
+    }
+  catch(MCRException mcre) {
+    logger.error("Can't use the response from host:"+realhost+"."); }
+  catch(UnknownHostException uhe) {
+    logger.error("Don't know about host: "+realhost+"."); }
+  catch(IOException ioe) {
+    logger.error("Couldn't get I/O for the connection to: "+realhost+".");
+    }
+  catch(Exception e) {
+    logger.error(System.err); }
+  return null;
+  }
 
-		if (!readConnectionData(hostAlias)) {
-			return in;
-		}
-		location = config.getString("MCR.remoteaccess_" + hostAlias
-				+ "_ifs_servlet");
-		if (location.length() == 0) {
-			logger.error("Connection location for host " + hostAlias
-					+ " not found.");
-			return in;
-		}
-		if (path.length() == 0) {
-			logger
-					.error("Connection path for host " + hostAlias
-							+ " is empty.");
-			return in;
-		}
-
-		URL currentURL;
-		try {
-			currentURL = new URL(protocol, realhost, port, location + path);
-			PostMethod method = new PostMethod(currentURL.toExternalForm());
-			method.addParameter("host", "local");
-			if (path.endsWith("/"))
-				method.addParameter("XSL.Style", "xml");
-			if (getConnectionStatus(method) ==-1){
-				logger.error("Failed to recover from exception.");
-			} else {
-				headercontext=method.getResponseHeader("Content-Type").getValue();
-				hasifsdata=true;
-				return new BufferedInputStream(method.getResponseBodyAsStream());
-			}
-		} catch (MCRException mcre) {
-			logger.error("Can't use the response from host:" + realhost + ".");
-		} catch (UnknownHostException uhe) {
-			logger.error("Don't know about host: " + realhost + ".");
-		} catch (IOException ioe) {
-			logger.error("Couldn't get I/O for the connection to: " + realhost
-					+ ".");
-		} catch (Exception e) {
-			logger.error(System.err);
-		}
-		return null;
-	}
-
-	/**
-	 * This method returns the HPPT header content string, if a requestIFS was
-	 * successful running.
-	 * 
-	 * @return HPPT header content string
-	 */
-	public final String getHeaderContent() {
-		if (hasifsdata) {
-			return headercontext;
-		} else {
-			return "";
-		}
-	}
+/**
+ * This method returns the HPPT header content string, if a requestIFS was 
+ * successful running.
+ *
+ * @return HPPT header content string
+ **/
+public final String getHeaderContent()
+  { if (hasifsdata) { return headercontext; } else { return ""; } }
 
 }
 
