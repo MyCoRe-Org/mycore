@@ -45,6 +45,14 @@ public interface MCRNBNManager
   public void reserveURN( MCRNBN urn );
 
  /**
+  * Gets an URN for a given URL
+  *
+  * @param url the URL of the given document
+  * @return the NBN URN fot the given URL, or null
+  **/ 
+  public MCRNBN getURN( String url );
+
+ /**
   * Sets the URL for the NBN URN given. This is the URL that
   * the NBN points to. The NBN has to be already reserved.
   *
