@@ -84,7 +84,7 @@ public class MCRLayoutServlet extends HttpServlet
     }
     
     final Properties detected = new Properties();
-    final String forcedInterrupt = "forcedInterrupt";
+    final String forcedInterrupt = "mcr.forced.interrupt";
     
     DefaultHandler handler = new DefaultHandler()
     {
@@ -110,12 +110,7 @@ public class MCRLayoutServlet extends HttpServlet
     try{ parser.parse( new InputSource( in ), handler ); }
     catch( Exception ex )
     {
-      if( ex instanceof MCRException )
-      {
-        if( ! ex.getMessage().equals( forcedInterrupt ) )
-          throw (MCRException)ex; // Pass MCRException to invoker
-      } 
-      else
+      if( ! forcedInterrupt.equals( ex.getMessage() ) )
       {
         String msg = "Error while detecting XML document type from input source";
         throw new MCRException( msg, ex );
