@@ -295,37 +295,39 @@ public class MCRCStoreLucene
 	}
 
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
-		throws IOException {
+			throws IOException {
 		Document returns = new Document();
 		//filter here
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
 		if (reader instanceof MCRFile) {
 			MCRFile file = (MCRFile) reader;
-			Field derivateID =
-				new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
+			Field derivateID = new Field(DERIVATE_FIELD, file.getOwnerID(),
+					true, true, false);
 			Field fileID = new Field("FileID", file.getID(), true, true, false);
 			logger.debug("adding fields to document");
 			returns.add(derivateID);
 			returns.add(fileID);
 		}
-		try{
-				BufferedReader in=
-				    new BufferedReader(pMan.transform(reader.getContentType(), stream));
-				/* since file is stored elsewhere 
-				 * we only index the file and do not store
-				 */
-				Field content = Field.Text("content", in);
-				returns.add(content);
-		} 
-		catch (FilterPluginTransformException fe){
-		    logger.error("Error while transforming document.",fe);
+		try {
+			BufferedReader in = new BufferedReader(pMan.transform(reader
+					.getContentType(), stream));
+			/*
+			 * since file is stored elsewhere we only index the file and do not
+			 * store
+			 */
+			Field content = Field.Text("content", in);
+			returns.add(content);
+		} catch (FilterPluginTransformException fe) {
+			//no transformation was done because of an error
+			logger.error("Error while transforming document.", fe);
+		} catch (NullPointerException ne) {
+			//maybe ContentType is unsupported?
+			logger.error("Error while transforming document.", ne);
+		} finally {
+			logger.debug("returning document");
+			return returns;
 		}
-		catch (NullPointerException ne){
-		    logger.error("Error while transforming document.",ne);
-		}
-		logger.debug("returning document");
-		return returns;
 	}
 
 	private final boolean containsExclusiveClause(BooleanQuery query) {
