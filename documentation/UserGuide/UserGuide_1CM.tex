@@ -10,7 +10,8 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item Installieren Sie das AIX Betriebssystem mit dem Release 4.3.3 ML 10, 5.1 ML 01 oder 5.2.
 \item Sorgen Sie daf"ur, dass 'Cultural Conversion' und 'Language' auf English US eingestellt ist.
 \item Aktivieren Sie die Netzanbindung inklusive DNS.
-\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}. Wenn Sie auch das Paket {\bf Java131.ext.java3d } mit installieren wollen, m"ussen Sie vorher die Pakete {\bf OpenGL.OpenGL\_X.adt} und {\bf OpenGL.OpenGL\_X.rte} installiert haben.
+\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}. Wenn Sie auch das Paket {\bf Java131.ext.java3d } mit installieren wollen, m"ussen Sie vorher die Pakete \linebreak[4]
+{\bf OpenGL.OpenGL\_X.adt} und {\bf OpenGL.OpenGL\_X.rte} installiert haben.
 \item Installieren Sie den VAC Compiler Version 5.x oder 6.0 entsprechend der Anleitung und tragen Sie den Suchpfad unter {\it PATH} im File {\it /etc/environment } mit ein.
 \item Aktivieren Sie das Lizenzsystem {\bf ifor} und tragen Sie sie Compilerlizenzen ein.
 \end{enumerate}
@@ -30,8 +31,8 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item DAS User : Standartwert {\bf db2as} wenn m"oglich beibehalten, Password setzen $\rightarrow$ {\bf Next}
 \item Erzeugen der DB2 Instanz durch Auswahl 'Create a DB2 instance - 32 bit' $\rightarrow$ {\bf Next}
 \item Auswahl 'Single-partition instance' $\rightarrow$ {\bf Next}
-\item Eintrag des DB2 Instance owner : Standartwert ({\bf db2inst1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
-\item Eintrag des DB2 Fenced users : Standartwert ({\bf db2fenc1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
+\item Eintrag des DB2 Instance owner : Standartwert ({\bf db2inst1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{\label{fn1} Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
+\item Eintrag des DB2 Fenced users : Standartwert ({\bf db2fenc1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} %\footnotemark[\ref{fn1}]
 \item Instance TCPIP : Auswahl 'Configure' $\rightarrow$ Service Name : db2c\_dv2inst1 $\rightarrow$ Port 50000 $\rightarrow$ {\bf Next}
 \item Instance properties $\rightarrow$ Authentication Type : Server $\rightarrow$ beibehalten 'Autostart the instance at system startup' $\rightarrow$ {\bf Next}
 \item Prepare the DB2 tools catalog  beibehalten 'Do not prepare the DB2 tools catalog on this computer' $\rightarrow$ {\bf Next}
@@ -44,7 +45,7 @@ An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Man
 \item Test der Installation:\\
 {\tt su - db2inst1} $\rightarrow$ {\tt db2stop} $\rightarrow$ {\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.} $\rightarrow$ {\tt db2level} $\rightarrow$ {\tt exit}
 \item Installieren Sie nun den FixPack 2 gemäß der Anleitung. Bezugsquelle für den Fix ist:\\
-{\tt http://www-3.ibm.com/cgi-bin/db2www/data/db2/udb/winos2unix/support/download.d2w/report}\\[2ex]
+\url{http://www-3.ibm.com/cgi-bin/db2www/data/db2/udb/winos2unix/support/download.d2w/report}\\[2ex]
 Die wichtigsten Schritte sind:
 \begin{itemize}
 \item Auspacken des FixPack's
@@ -92,7 +93,8 @@ Die wichtigsten Schritte sind:
 \item Auswahl {\bf Next}\footnote{Die Warnung "uber fehlende Voraussetzunge kann ignoriert werden.}
 \item Auswahl {\bf 'Costum'} $\rightarrow$ {\bf Next}
 \item Schauen Sie die Optionsliste durch, wir empfehlen {\bf 'Embedded Messaging'} und {\bf 'Tivoli Performance Viewer'} aus der Auswahl zu entfernen.
-\item Auswahl der Installationsverzeichnisse {\it /usr/WebSphere/AppServer} und {\it /usr/IBMHttpServer}. Behalten Sie die Vorgaben bei!
+\item Auswahl der Installationsverzeichnisse {\it /usr/WebSphere/AppServer} und \linebreak[4]
+{\it /usr/IBMHttpServer}. Behalten Sie die Vorgaben bei!
 \item Node name $\rightarrow$ Nehmen Sie Ihren Hostnamen.
 \item Hostname $\rightarrow$ Nehmen Sie Ihren voll qualifizierten Hostnamen.
 \item Zusammenfassung $\rightarrow$ {\bf Next}
@@ -105,7 +107,7 @@ Die wichtigsten Schritte sind:
 %
 {\bf Installation WebSphere Fix pack 5.0.1}\\[1ex]
 \begin{enumerate}
-\item Holen Sie sich das Fixpack von {\bf ftp.software.ibm.com}.
+\item Holen Sie sich das Fixpack von \url{ftp.software.ibm.com}.
 \item {\tt cd <fixpack\_dir>}
 \item {\tt ./usr/WebSphere/AppServer/bin/setupCmdLine.sh}
 \item {\tt ./updateWizard.sh}

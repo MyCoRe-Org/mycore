@@ -91,8 +91,8 @@ Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen kön
 %
 \subsubsection{Die Installation der freien XML:DB eXist}
 eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So ist die Nutzung von eXist direkt möglich.
-\paragraph{Vorbedingungen} 
-Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, da es ansonsten zu einem Konflikt mit der hier vorgestellten Installtion kommt, weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. Den Port für Tomact ändern sie in der \mcrfile{<tomcat-installdir>/conf/server.xml}. Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene Installation vorausgesetzt. Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner in \&MYCORE\_HOME bzw. \&MYCORE\_SAMPLE\_HOME liegen. 
+\paragraph*{Vorbedingungen} 
+Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, da es ansonsten zu einem Konflikt mit der hier vorgestellten Installtion kommt, weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. Den Port für Tomact ändern sie in der {\it tomcatinstalldir/conf/server.xml}. Ebenfalls wird die in Kapitel \ref{mysqlinstallation} beschriebene Installation vorausgesetzt. Desweiteren sollte die aktuellste Version von MyCoRe und dem MyCoRe Sample auf ihrem Rechner in \$MYCORE\_HOME bzw. \$MYCORE\_SAMPLE\_HOME liegen. 
 
 \begin{enumerate}
 \item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses Produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden (cvs). Zum Test kam Version eXist-0.9.2.
@@ -130,29 +130,27 @@ folgendermaßen ändern.
 MCR.root_path=/var/lib/mycore-cvs/mycore
 MCR.appl_path=/var/lib/mycore-cvs/mycore-sample-application
 MCR.persistence_sql_database_url=jdbc:mysql://localhost/mycore?
-                                        user=user&password=password
-
+											user=user&password=password
 \end{verbatim}   
-\end{enumerate}
-
-\begin{enumerate}
-\item Im Verzeichnis \mcrpath{\$MYCORE\_SAMPLE\_HOME} den Befehl
-  \mcrcommand{ant class} ausführen. Dieser Befehl läd die Classifiactions in die MySQL--Datenbank.
+\item Im Verzeichnis \mcrpath{\$MYCORE\_SAMPLE\_HOME} den Befehl \mcrcommand{ant class} ausführen. Dieser Befehl läd
+die Classifiactions in die MySQL--Datenbank.
 \item \mcrcommand{ant legal} $\longrightarrow$ Personen werden eingefügt
 \item \mcrcommand{ant document} $\longrightarrow$ Dokumente werden eingestellt..
 \item \mcrcommand{ant derivates} ... und ihre zugehörigen Derivate
 \item \mcrcommand{ant webapps} Tomcat Installation vorbereiten
+
 \item MyCoRe in den Tomcat Servlet Container installieren. Dazu einfach die soeben erzeugte \mcrfile{mycore.war} Datei nach \verb+<tomcat-installdir>/webapps+ kopieren und den Tomcat--Server neu starten. Unter SuSE einfach als root \mcrcommand{rctomcat restart}. Bei einer anderen Distribution im Verzeichnis \verb+<tomcat-installdir>/bin+ das Skript \mcrcommand{startup.sh} ausführen.
+
 \item Tomcat starten und URL \url{http://localhost:<tomcatport>/mycore} sollte den MyCoRe-Startbildschirm bringen
 
 \end{enumerate}
 
 Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei {\it /etc/hosts.allow} geschrieben werden.
-
-
+%
+%
 \subsection{Installation der Komponenten unter MS Windows}
-
-
+%
+%
 \subsubsection{Die Installation der freien XML:DB eXist}
 eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persistence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
 \begin{enumerate}
@@ -162,6 +160,11 @@ eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces impl
 \item Starten Sie {\tt <installdir>\\eXist-0.9.2\\bin\\server.bat }.
 \item Anschließend können Sie auch den Client mit {\tt <installdir>\\eXist-0.9.2\\bin\\client.bat } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
+%
+%
+
+%
+%
 
 %%% Local Variables: 
 %%% mode: latex
