@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * This interface is designed to choose the datamodel classes for the

@@ -22,15 +22,15 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.common.*;
 import com.ibm.mm.sdk.server.*;
 import java.io.*;
 
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
-import mycore.datamodel.MCRObjectID;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class implements a main program to show the CM8 content of an item.

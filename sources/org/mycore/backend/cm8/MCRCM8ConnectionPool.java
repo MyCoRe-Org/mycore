@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import java.util.*;
 import com.ibm.mm.sdk.common.*;
 import com.ibm.mm.sdk.server.*;
-import mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * This class handle the connection pool to the IBM Content Manager 8.

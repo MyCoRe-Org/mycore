@@ -22,18 +22,18 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import java.util.*;
 import java.text.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObjectID;
-import mycore.xml.MCRQueryInterface;
-import mycore.xml.MCRQueryResultArray;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.xml.MCRQueryInterface;
+import org.mycore.common.xml.MCRQueryResultArray;
 
 /**
  * This is the tranformer implementation for CM 8 from XQuery language

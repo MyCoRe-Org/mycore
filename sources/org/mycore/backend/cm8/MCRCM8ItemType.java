@@ -22,22 +22,20 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import java.io.*;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObject;
-import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRTypedContent;
-import mycore.datamodel.MCRMetaDefault;
-import mycore.cm8.MCRCM8ConnectionPool;
-import mycore.cm8.MCRCM8MetaInterface;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRTypedContent;
+import org.mycore.datamodel.metadata.MCRMetaDefault;
 
 /**
  * This class implements all methode for handling the ItemType for a

@@ -22,13 +22,12 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRMetaDefault;
-import mycore.cm8.MCRCM8ItemType;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRMetaDefault;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -61,8 +60,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
   String classname = prefix+"classid";
   String categname = prefix+"categid";
-  int clalen = mycore.datamodel.MCRMetaClassification.MAX_CLASSID_LENGTH;
-  int catlen = mycore.datamodel.MCRMetaClassification.MAX_CATEGID_LENGTH;
+  int clalen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CLASSID_LENGTH;
+  int catlen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CATEGID_LENGTH;
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {

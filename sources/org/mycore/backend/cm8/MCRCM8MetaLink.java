@@ -22,13 +22,12 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRMetaDefault;
-import mycore.cm8.MCRCM8ItemType;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRMetaDefault;
 
 /**
  * This class implements the interface for the CM8 persistence layer for
@@ -64,12 +63,12 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   String titlename = prefix+"xlinktitle";
   String fromname = prefix+"xlinkfrom";
   String toname = prefix+"xlinkto";
-  int typelen = mycore.datamodel.MCRMetaLink.MAX_XLINK_TYPE_LENGTH;
-  int hreflen = mycore.datamodel.MCRMetaLink.MAX_XLINK_HREF_LENGTH;
-  int labellen = mycore.datamodel.MCRMetaLink.MAX_XLINK_LABEL_LENGTH;
-  int titlelen = mycore.datamodel.MCRMetaLink.MAX_XLINK_TITLE_LENGTH;
-  int fromlen = mycore.datamodel.MCRMetaLink.MAX_XLINK_FROM_LENGTH;
-  int tolen = mycore.datamodel.MCRMetaLink.MAX_XLINK_TO_LENGTH;
+  int typelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TYPE_LENGTH;
+  int hreflen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_HREF_LENGTH;
+  int labellen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_LABEL_LENGTH;
+  int titlelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TITLE_LENGTH;
+  int fromlen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_FROM_LENGTH;
+  int tolen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TO_LENGTH;
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {

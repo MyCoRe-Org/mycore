@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 /**
  * This class implements the interface for the CM8 persistence layer for

@@ -22,25 +22,24 @@
  *
  **/
 
-package mycore.cm8;
+package org.mycore.backend.cm8;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRPersistenceException;
-import mycore.common.MCRUtils;
-import mycore.datamodel.MCRObject;
-import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRObjectStructure;
-import mycore.datamodel.MCRObjectMetadata;
-import mycore.datamodel.MCRObjectService;
-import mycore.datamodel.MCRObjectPersistenceInterface;
-import mycore.datamodel.MCRTypedContent;
-import mycore.cm8.MCRCM8ConnectionPool;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObjectPersistenceInterface;
+import org.mycore.datamodel.metadata.MCRTypedContent;
 
 /**
  * This class implements all methode for handling the data to the data store
