@@ -81,8 +81,14 @@ public abstract class MCRAudioVideoExtender
   /** The base URL of a cgi that provides technical metadata about the asset */
   protected String baseMetadata;
 
-  /** The asset file this extender belongs to */
-  protected MCRFile file;
+  /** The storage ID of the asset file this extender belongs to */
+  protected String storageID;
+
+  /** The store ID of the asset file this extender belongs to */
+  protected String storeID;
+
+  /** The filename extension of the asset file this extender belongs to */
+  protected String extension;
 
   /** 
    * Creates a new MCRAudioVideoExtender. The instance has to be initialized 
@@ -93,12 +99,19 @@ public abstract class MCRAudioVideoExtender
   
   /**
    * Initializes this AudioVideoExtender and gets technical metadata from
-   * the server that holds the streaming asset.
+   * the server that holds the streaming asset. Subclasses must override this
+   * method!
    *
-   * @param file the MCRFile that this extender belongs to
+   * @param storageID the storage ID of the MCRFile that this extender belongs to
+   * @param storeID the store ID of the MCRFile that this extender belongs to
    **/
-  public abstract void init( MCRFile file )
-    throws MCRException;
+  public void init( String storageID, String storeID, String extension )
+    throws MCRException
+  {
+    this.storageID = storageID;
+    this.storeID   = storeID;
+    this.extension = extension;
+  }
   
   /**
    * Returns the maximum number of bits per seconds when asset is streamed
@@ -273,7 +286,7 @@ public abstract class MCRAudioVideoExtender
    * @return the asset size, formatted as a String
    **/
   public String getSizeFormatted()
-  { return MCRFile.getSizeFormatted( size ); }
+  { return MCRFilesystemNode.getSizeFormatted( size ); }
   
   /**
    * Returns the ID of the content type of this asset

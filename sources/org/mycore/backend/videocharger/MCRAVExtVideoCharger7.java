@@ -53,7 +53,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
   public MCRAVExtVideoCharger7()
   {}
   
-  protected void readConfig( String storeID )
+  public void readConfig( String storeID )
   {
     MCRConfiguration config = MCRConfiguration.instance();  
     String prefix = "MCR.IFS.AVExtender."+ storeID + ".";
@@ -63,14 +63,14 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     playerDownloadURL = config.getString( prefix + "PlayerURL"   ); 
   }
 
-  public void init( MCRFile file )
+  public void init( String storageID, String storeID, String extension )
     throws MCRPersistenceException
   {
-    this.file = file;
+    super.init( storageID, storeID, extension );
       
-    readConfig( file.getStoreID() );
+    readConfig( storeID );
     
-    String assetID = URLEncoder.encode( file.getStorageID() );
+    String assetID = URLEncoder.encode( storageID );
     String data1 = getMetadata( baseMetadata      + "?"         + assetID );
     String data2 = getMetadata( basePlayerStarter + "?VIDEOID=" + assetID );
     
@@ -103,7 +103,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
         if( frameRate > 0 )
           contentTypeID = "mpegvid";
         else
-          if( file.getExtension().toLowerCase().equals( "mp3" ) )
+          if( extension.toLowerCase().equals( "mp3" ) )
             contentTypeID = "mp3";
           else
             contentTypeID = "mpegaud";
@@ -118,8 +118,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     }
     catch( Exception exc )
     { 
-      String msg = "Error parsing metadata from VideoCharger asset " 
-                   + file.getStorageID();  
+      String msg = "Error parsing metadata from VideoCharger asset " + storageID;  
       throw new MCRPersistenceException( msg, exc );
     }
   }
@@ -131,7 +130,7 @@ public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
       cgi.append( "?VIDEOID=" );
-      cgi.append( URLEncoder.encode( file.getStorageID() ) );
+      cgi.append( URLEncoder.encode( storageID ) );
       if( queryString != null ) cgi.append( "&" ).append( queryString );
     
       URLConnection connection = getConnection( cgi.toString() );

@@ -52,21 +52,21 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
   public MCRAVExtRealServer8()
   {}
 
-  public void init( MCRFile file )
+  public void init( String storageID, String storeID, String extension )
     throws MCRPersistenceException
   {
-    this.file = file;
+    super.init( storageID, storeID, extension );
     
     MCRConfiguration config = MCRConfiguration.instance();  
-    String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
+    String prefix = "MCR.IFS.AVExtender." + storeID + ".";
       
     basePlayerStarter = config.getString( prefix + "RamGenBaseURL"     );
     baseMetadata      = config.getString( prefix + "ViewSourceBaseURL" );
     playerDownloadURL = config.getString( prefix + "PlayerURL"         ); 
     
-    String data = getMetadata( baseMetadata + file.getStorageID() );
+    String data = getMetadata( baseMetadata + storageID );
     
-    URLConnection con = getConnection( basePlayerStarter + file.getStorageID() );
+    URLConnection con = getConnection( basePlayerStarter + storageID );
     playerStarterCT = con.getContentType();
 
     try
@@ -112,16 +112,15 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
       if( sType.indexOf( "MPEG Layer 3" ) >= 0 )
         contentTypeID = "mp3";
       else if( sType.indexOf( "RealVideo" ) >= 0 )
-        contentTypeID = "real";
+        contentTypeID = "realvid";
       else if( sType.indexOf( "RealAudio" ) >= 0 )
-        contentTypeID = "real";
+        contentTypeID = "realaud";
       else if( sType.indexOf( "Wave File" ) >= 0 )
         contentTypeID = "wav";
     }
     catch( Exception exc )
     { 
-      String msg = "Error parsing metadata from RealServer ViewSource: " 
-                   + file.getStorageID();  
+      String msg = "Error parsing metadata from RealServer ViewSource: " + storageID;  
       throw new MCRPersistenceException( msg, exc );
     }
   }
@@ -132,7 +131,7 @@ public class MCRAVExtRealServer8 extends MCRAudioVideoExtender
     try
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
-      cgi.append( file.getStorageID() );
+      cgi.append( storageID );
       if( queryString != null ) cgi.append( "?" ).append( queryString );
     
       URLConnection connection = getConnection( cgi.toString() );
