@@ -39,18 +39,15 @@ import org.mycore.common.*;
 public abstract class MCRClassificationObject
   {
   /** The number of the languages **/
-  public static final int MAX_CLASSIFICATION_LANG = 2;
+  public static final int MAX_CLASSIFICATION_LANG = 8;
   /** The length of the text **/
-  public static final int MAX_CLASSIFICATION_TEXT = 64;
+  public static final int MAX_CLASSIFICATION_TEXT = 256;
   /** The length of the description **/
-  public static final int MAX_CLASSIFICATION_DESCRIPTION = 156;
-  /** The length of the tag **/
-  public static final int MAX_CLASSIFICATION_TAG = MAX_CLASSIFICATION_LANG *
-    (MAX_CLASSIFICATION_TEXT+MAX_CLASSIFICATION_DESCRIPTION+30);
+  public static final int MAX_CLASSIFICATION_DESCRIPTION = 256;
 
   protected String    ID;
-  protected ArrayList label;
   protected ArrayList lang;
+  protected ArrayList text;
   protected ArrayList description;
   protected String [] childrenIDs;
   
@@ -64,7 +61,7 @@ public abstract class MCRClassificationObject
   static 
     { 
     default_lang = MCRConfiguration.instance()
-      .getString("MCR.metadata_default_lang","en");
+      .getString("MCR.metadata_default_lang",default_lang);
     }
   
   /**
@@ -84,7 +81,7 @@ public abstract class MCRClassificationObject
     {
     MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
     this.ID    = ID;
-    this.label = new ArrayList(); 
+    this.text = new ArrayList(); 
     this.lang = new ArrayList(); 
     this.description = new ArrayList();
     this.childrenIDs = null; 
@@ -116,38 +113,42 @@ public abstract class MCRClassificationObject
   protected abstract String getClassificationID();
 
   /**
-   * The method return the label ArrayList.
+   * The method return the text ArrayList.
    * @exception MCRUsageException if the classification is deleted.
    **/
-  public ArrayList getLabelArray() throws MCRUsageException
-    { ensureNotDeleted(); return label; }
+  public ArrayList getTextArray() throws MCRUsageException
+    { ensureNotDeleted(); return text; }
   
   /**
-   * The method return the label String for a given index.
+   * The method return the text String for a given index.
    *
    * @param index a index in the ArrayList
    * @exception MCRUsageException if the classification is deleted.
    **/
-  public String getLabel(int index) throws MCRUsageException
-    { ensureNotDeleted(); return ((String)label.get(index)); }
+  public String getText(int index) throws MCRUsageException
+    { 
+    ensureNotDeleted(); 
+    if ((index<0)||(index>text.size())) { return ""; }
+    return ((String)text.get(index)); 
+    }
   
   /**
-   * The method returns the label String for a given language.
+   * The method returns the text String for a given language.
    *
    * @param index a language
    * @exception MCRUsageException if the classification is deleted.
    **/
-  public String getLabel(String lang) throws MCRUsageException
+  public String getText(String lang) throws MCRUsageException
     { 
     ensureNotDeleted(); 
-    if (this.lang.size()==0) { return ""; }
+    if (this.text.size()==0) { return ""; }
     if (!MCRUtils.isSupportedLang(lang)) {
-      return (String)this.label.get(0); }
+      return (String)this.text.get(0); }
     for (int i=0;i<this.lang.size();i++) {
       if (((String)this.lang.get(i)).equals(lang)) {
-        return (String)this.label.get(i); }
+        return (String)this.text.get(i); }
       }
-    return (String)this.label.get(0);
+    return (String)this.text.get(0);
     }
   
   /**
@@ -164,7 +165,11 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getLang(int index) throws MCRUsageException
-    { ensureNotDeleted(); return ((String)lang.get(index)); }
+    { 
+    ensureNotDeleted(); 
+    if ((index<0)||(index>text.size())) { return default_lang; }
+    return ((String)lang.get(index)); 
+    }
   
   /**
    * The method return the description ArrayList.
@@ -180,7 +185,11 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getDescription(int index) throws MCRUsageException
-    { ensureNotDeleted(); return ((String)description.get(index)); }
+    { 
+    ensureNotDeleted(); 
+    if ((index<0)||(index>text.size())) { return ""; }
+    return ((String)description.get(index)); 
+    }
   
   /**
    * The method returns the description String for a given language.
@@ -191,7 +200,7 @@ public abstract class MCRClassificationObject
   public String getDescription(String lang) throws MCRUsageException
     { 
     ensureNotDeleted(); 
-    if (this.lang.size()==0) { return ""; }
+    if (this.description.size()==0) { return ""; }
     if (!MCRUtils.isSupportedLang(lang)) { 
       return (String)this.description.get(0); }
     for (int i=0;i<this.lang.size();i++) {
@@ -203,42 +212,42 @@ public abstract class MCRClassificationObject
   
   /**
    * The method add a triple of a lang with a lable and a description
-   * to the object. The label and the description can be an empty string.
+   * to the object. The text and the description can be an empty string.
    *
    * @param lang a language in form of a 'xml:lang' attribute
-   * @param label a label String
+   * @param text a text String
    * @param description a description String
    **/
-  public void addData( String lang, String label, String description )
+  public void addData( String lang, String text, String description )
     {
     ensureNotDeleted();
     if (lang==null) { lang = default_lang; }
-    if (label==null) { label = ""; }
-    if (label.length() > MAX_CLASSIFICATION_TEXT) {
-      label = label.substring(0,MAX_CLASSIFICATION_TEXT); }
+    if (text==null) { text = ""; }
+    if (text.length() > MAX_CLASSIFICATION_TEXT) {
+      text = text.substring(0,MAX_CLASSIFICATION_TEXT); }
     if (description==null) { description = ""; }
     if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
       description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
-    this.label.add(label);
+    this.text.add(text);
     this.lang.add(lang);
     this.description.add(description);
     }
   
   /**
    * The method set a triple of a lang with a lable and a description
-   * to the object. The label and the description can be an empty string.
+   * to the object. The text and the description can be an empty string.
    *
    * @param lang a language in form of a 'xml:lang' attribute
-   * @param label a label String
+   * @param text a text String
    * @param description a description String
    **/
-  public void setData( String lang, String label, String description )
+  public void setData( String lang, String text, String description )
     {
     ensureNotDeleted();
     if (lang==null) { lang = default_lang; }
-    if (label==null) { label = ""; }
-    if (label.length() > MAX_CLASSIFICATION_TEXT) {
-      label = label.substring(0,MAX_CLASSIFICATION_TEXT); }
+    if (text==null) { text = ""; }
+    if (text.length() > MAX_CLASSIFICATION_TEXT) {
+      text = text.substring(0,MAX_CLASSIFICATION_TEXT); }
     if (description==null) { description = ""; }
     if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
       description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
@@ -247,85 +256,36 @@ public abstract class MCRClassificationObject
       if (((String)this.lang.get(i)).equals(lang)) { i = j; break; }
       }
     if (i != -1) { 
-      this.label.add(i,label);
+      this.text.add(i,text);
       this.lang.add(i,lang);
       this.description.add(i,description);
       return;
       }
-    this.label.add(label);
+    this.text.add(text);
     this.lang.add(lang);
     this.description.add(description);
     }
   
   /**
-   * The method return the size of the lang/label/description triple.
+   * The method return the size of the lang/text/description triple.
    *
    * @return the size
    **/
   public int getSize()
-    { return label.size(); }
+    { return text.size(); }
 
   /**
-   * The method create an internal tag string for the data values
+   * The method return the text tag as an JDOM element
    *
-   * @return an internal data string
-   **/
-  public String getTag()
-    {
-    StringBuffer sb = new StringBuffer(MAX_CLASSIFICATION_TAG);
-    for (int i=0;i<getSize();i++) {
-      StringBuffer sbb = new StringBuffer(2*MAX_CLASSIFICATION_DESCRIPTION);
-      sbb.append("<label xml:lang=\"").append(lang.get(i)).append("\" text=\"")
-        .append(label.get(i)).append("\" description=\"")
-        .append(description.get(i)).append("\" />");
-      if (sbb.length()+sb.length() > MAX_CLASSIFICATION_TAG) { break; }
-      sb.append(sbb);
-      }
-    return sb.toString();
-    }
-
-  /**
-   * The method store the internal tag string to the data.
-   *
-   * @param the tag sting
-   **/
-  public void setTag(String tag)
-    {
-    int i = 0;
-    int j = tag.length();
-    int k = 0, l = 0;
-    while (i<j) {
-      k = tag.indexOf("<label",i);
-      if (k == -1) { break; }
-      i = k+6;
-      k = tag.indexOf("xml:lang=",i);
-      l = tag.indexOf("\"",k+10);
-      String tlang = tag.substring(k+10,l);
-      i = l+1;
-      k = tag.indexOf("text=",i);
-      l = tag.indexOf("\"",k+6);
-      String ttext = tag.substring(k+6,l);
-      i = l+1;
-      k = tag.indexOf("description=",i);
-      l = tag.indexOf("\"",k+13);
-      String tdescription = tag.substring(k+13,l);
-      i = l+1;
-      addData(tlang,ttext,tdescription);
-      }
-    }
-
-  /**
-   * The method return the label tag as an JDOM element
-   *
-   * @param index the index of the label
-   * @return the label as JDOM element
+   * @param index the index of the text
+   * @return the text as JDOM element
    **/
   public final org.jdom.Element getJDOMElement(int index)
     {
     if ((index<0) || (index>getSize())) return null;
     org.jdom.Element elm = new org.jdom.Element("label");
     elm.setAttribute("xml:lang",getLang(index));
-    elm.setAttribute("text",getLabel(index));
+    elm.setAttribute("text",getText(index));
     elm.setAttribute("description",getDescription(index));
     return elm;
     }
@@ -400,10 +360,10 @@ public abstract class MCRClassificationObject
   {
     StringBuffer sb = new StringBuffer( getClass().getName() ).append( "\n" );
     sb.append( "ID:             " ).append( ID    ).append( "\n" );
-    for (int i=0;i<label.size();i++) {
+    for (int i=0;i<text.size();i++) {
       sb.append( "Lang:           " ).append( ((String)lang.get(i)) )
         .append( "\n" )
-        .append( "Label:          " ).append( ((String)label.get(i)) ) 
+        .append( "Text:          " ).append( ((String)text.get(i)) ) 
         .append( "\n" )
         .append( "Description:    " ).append( ((String)description.get(i)) ) 
         .append( "\n" );

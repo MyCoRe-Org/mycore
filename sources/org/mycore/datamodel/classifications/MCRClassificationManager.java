@@ -24,8 +24,9 @@
  
 package org.mycore.datamodel.classifications;
 
+import java.util.ArrayList;
+
 import org.mycore.common.*;
-import java.util.Vector;
 
 /**
  * This class is the manangement class for the whole classification system
@@ -75,9 +76,9 @@ class MCRClassificationManager
 
   void updateClassificationItem( MCRClassificationItem classification )
     {
-    store.updateClassificationItem( classification );
-    classificationCache.remove( classification.getID() );
-    classificationCache.put   ( classification.getID(), classification );
+    //store.updateClassificationItem( classification );
+    //classificationCache.remove( classification.getID() );
+    //classificationCache.put   ( classification.getID(), classification );
     }
   
   void createCategoryItem( MCRCategoryItem category )
@@ -92,9 +93,9 @@ class MCRClassificationManager
   
   void updateCategoryItem( MCRCategoryItem category )
     {
-    store.updateCategoryItem( category );
-    categoryCache.remove( getCachingID( category ) );
-    categoryCache.put   ( getCachingID( category ), category );
+    //store.updateCategoryItem( category );
+    //categoryCache.remove( getCachingID( category ) );
+    //categoryCache.put   ( getCachingID( category ), category );
     }
 
   MCRClassificationItem retrieveClassificationItem( String ID )
@@ -121,10 +122,10 @@ class MCRClassificationManager
   
   MCRCategoryItem[] retrieveChildren( String classifID, String parentID )
     {
-    Vector retrieved = store.retrieveChildren( classifID, parentID );
+    ArrayList retrieved = store.retrieveChildren( classifID, parentID );
     MCRCategoryItem[] children = new MCRCategoryItem[ retrieved.size() ];
     for( int i = 0; i < children.length; i++ ) {
-      MCRCategoryItem cRetrieved = (MCRCategoryItem)(retrieved.elementAt(i));
+      MCRCategoryItem cRetrieved = (MCRCategoryItem)(retrieved.get(i));
       String cachingID = getCachingID( cRetrieved );
       MCRCategoryItem cFromCache = (MCRCategoryItem)
         ( categoryCache.get( cachingID ) );

@@ -26,6 +26,10 @@ package org.mycore.datamodel.classifications;
 
 import java.io.*;
 import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -42,15 +46,23 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCRClassification 
   {
 
-  private static int MAX_CATEGORY_DEEP = 15;
-  private MCRClassificationItem cl;
-  private ArrayList cat;
+// logger
+static Logger logger=Logger.getLogger(MCRClassification.class.getName());
+
+// internal data
+private static int MAX_CATEGORY_DEEP = 15;
+private MCRClassificationItem cl;
+private ArrayList cat;
 
   /**
    * The constructor
    **/
   public MCRClassification()
-    { }
+    { 
+    MCRConfiguration config = MCRConfiguration.instance();
+    // set the logger property
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    }
 
   /**
    * The method fill the instance of this class with a given JODM tree.
@@ -77,8 +89,8 @@ public class MCRClassification
       else {
         categories = (org.jdom.Element)tag.clone(); }
       }
-//System.out.println(cl.toString());
-//System.out.println(categories.getName());
+    logger.debug(cl.toString());
+    logger.debug("Element name = "+categories.getName());
     cat = new ArrayList();
     MCRClassificationObject [] pid = new 
       MCRClassificationObject[MAX_CATEGORY_DEEP];
@@ -94,11 +106,9 @@ public class MCRClassification
         pos[deep]++; continue; }
       org.jdom.Element cattag = (org.jdom.Element)list[deep].get(pos[deep]);
       String name = cattag.getName();
-//System.out.println(name);
       if (name.equals("label")) { pos[deep]++; continue; }
       if (!name.equals("category")) { pos[deep]++; continue; }
       String theID = cattag.getAttribute("ID").getValue();
-//System.out.println(theID);
       MCRCategoryItem ci = new MCRCategoryItem(theID,pid[deep]);
       List catlist = cattag.getChildren();
       int catlen = catlist.size();
@@ -115,7 +125,6 @@ public class MCRClassification
           catflag = true; }
         }
       cat.add(ci);
-//System.out.println(ci.toString());
       if (catflag) {
         pos[deep+1] = 0;
         pid[deep+1] = ci;
@@ -124,9 +133,7 @@ public class MCRClassification
         }
       else {
         pos[deep]++; }
-//System.out.println("deep="+deep+"  pos="+pos[deep]);
       }
-//System.out.println("fertsch");
     }
    
   /**
@@ -263,7 +270,6 @@ public class MCRClassification
     try {
       cl = MCRClassificationItem.getClassificationItem(ID); }
     catch (Exception e) { return doc; }
-//System.out.println(cl.toString());
     for (int i=0;i<cl.getSize();i++) {
       elm.addContent(cl.getJDOMElement(i)); }
     // get all categories
@@ -281,14 +287,12 @@ public class MCRClassification
         deep--; if(deep < 0) {break;}
         pos[deep]++; continue; }
       MCRCategoryItem ci = catlist[deep][pos[deep]];
-//System.out.println(ci.toString());
       list[deep+1] = new org.jdom.Element("category");
       list[deep+1].setAttribute("ID",ci.getID());
       for (int i=0;i<ci.getSize();i++) {
         list[deep+1].addContent(ci.getJDOMElement(i)); }
       list[deep].addContent(list[deep+1]);
       if (ci.hasChildren()) {
-//System.out.println(ci.getNumChildren());
         catlist [deep+1] = ci.getChildren();
         len [deep+1] = ci.getNumChildren();
         pos[deep+1] = 0;
@@ -298,7 +302,6 @@ public class MCRClassification
         pos[deep]++; }
       }
     elm.addContent(list[0]);
-
     return doc;
     }
 

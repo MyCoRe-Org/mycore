@@ -24,7 +24,7 @@
 
 package org.mycore.datamodel.classifications;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * This is an interface to store classifications an categories in the
@@ -45,33 +45,26 @@ public interface MCRClassificationInterface
   public void createClassificationItem(MCRClassificationItem classification);  
 
   /**
-   * The method update a MCRClassificationItem in the datastore.
-   *
-   * @param classification an instance of a MCRClassificationItem
-   **/
-  public void updateClassificationItem(MCRClassificationItem classification);  
-  
-  /**
    * The method remove a MCRClassificationItem from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
+   * @param ID the ID of the MCRClassificationItem
    **/
-  public void deleteClassificationItem(String classifID);
+  public void deleteClassificationItem(String ID);
 
   /**
    * The method return a MCRClassificationItem from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
+   * @param ID the ID of the MCRClassificationItem
    **/
-  public MCRClassificationItem retrieveClassificationItem(String classifID);
+  public MCRClassificationItem retrieveClassificationItem(String ID);
 
   /**
    * The method return if the MCRClassificationItem is in the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
+   * @param ID the ID of the MCRClassificationItem
    * @return true if the MCRClassificationItem was found, else false
    **/
-  public boolean classificationItemExists(String classifID);
+  public boolean classificationItemExists(String ID);
 
   /**
    * The method create a new MCRCategoryItem in the datastore.
@@ -81,54 +74,47 @@ public interface MCRClassificationInterface
   public void createCategoryItem(MCRCategoryItem category);
     
   /**
-   * The method update a MCRCategoryItem in the datastore.
-   *
-   * @param category an instance of a MCRCategoryItem
-   **/
-  public void updateCategoryItem(MCRCategoryItem category);
-
-  /**
    * The method remove a MCRCategoryItem from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
-   * @param categID the ID of the MCRCategoryItem
+   * @param CLID the ID of the MCRClassificationItem
+   * @param ID   the ID of the MCRCategoryItem
    **/
-  public void deleteCategoryItem(String classifID, String categID);
+  public void deleteCategoryItem(String CLID, String ID);
 
   /**
    * The method return a MCRCategoryItem from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
-   * @param categID the ID of the MCRCategoryItem
+   * @param CLID the ID of the MCRClassificationItem
+   * @param ID   the ID of the MCRCategoryItem
    **/
-  public MCRCategoryItem retrieveCategoryItem(String classifID, String categID);
+  public MCRCategoryItem retrieveCategoryItem(String CLID, String ID);
   
   /**
    * The method return if the MCRCategoryItem is in the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
-   * @param categID the ID of the MCRCategoryItem
+   * @param CLID the ID of the MCRClassificationItem
+   * @param ID   the ID of the MCRCategoryItem
    * @return true if the MCRCategoryItem was found, else false
    **/
-  public boolean categoryItemExists(String classifID, String categID);
+  public boolean categoryItemExists(String CLID, String ID);
 
   /**
    * The method return an ArrayList of MCRCategoryItems from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
-   * @param categID the ID of the MCRCategoryItem
+   * @param CLID the ID of the MCRClassificationItem
+   * @param PID  the parent ID of the MCRCategoryItem
    * @return a list of MCRCategoryItem children
    **/
-  public Vector retrieveChildren(String classifID, String parentID);
+  public ArrayList retrieveChildren(String CLID, String PID);
   
   /**
    * The method return the number of MCRCategoryItems from the datastore.
    *
-   * @param classifID the ID of the MCRClassificationItem
-   * @param categID the ID of the MCRCategoryItem
+   * @param CLID the ID of the MCRClassificationItem
+   * @param PID  the parent ID of the MCRCategoryItem
    * @return the number of MCRCategoryItem children
    **/
-  public int retrieveNumberOfChildren(String classifID, String parentID);
+  public int retrieveNumberOfChildren(String CLID, String PID);
   
 }
 
