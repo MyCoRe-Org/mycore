@@ -91,6 +91,19 @@ Sie sollten zunächst prüfen, ob ihre Systemumgebung korrekt eingerichtet ist, in
 ausführen. Das Ant Build Tool zeigt Ihnen daraufhin die verwendeten JDK- und Ant-Software-Versionen und den
 generierten CLASSPATH und LIBPATH (für Unix Systeme) an.
 
+\item Sollten Sie festgestellt haben, dass Ihr JDK ab 1.4.x eine andere
+Xalan-Version benutzt, führen Sie bitte folgende Kommandos aus und prüfen Sie danach Ihr System erneut.
+
+{\tt
+cd $JAVA_HOME/jre/lib \newline
+mkdir endorsed \newline
+cd endorsed \newline
+cp MYCORE_INSTALL_HOME/lib/xerces* . \newline
+cp MYCORE_INSTALL_HOME/lib/xalan* . \newline
+cd $JAVA_HOME/lib \newline
+ln -s ../jre/lib/endorsed endorsed
+}
+
 \item 
 Eine Übersicht über alle wesentlichen Build-Ziele erhalten Sie mit
 \begin{center}

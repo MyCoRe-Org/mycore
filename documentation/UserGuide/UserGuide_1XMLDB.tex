@@ -24,7 +24,16 @@ nach {\it /usr/local} anschließend mit {\tt chmod +x
   j2sdk-1.4.1-01-linux-<ARCH>.bin} ausführbar machen und ausführen {\tt
   ./j2sdk-1.4.1-01-linux-<ARCH>.bin}.  Damit die Pfad Variablen alle richtig
 gesetzt werden eine Vorlage unter {\it/etc/java} entsprechend editieren und
-mit {\tt setDefaultJava} als root die Links richtig setzten. Zudem sollte man
+mit {\tt setDefaultJava} als root die Links richtig setzten. 
+
+Nun prüfen sie bitte bei Verwendung von JDK 1.4.x noch, mit welcher 
+XALAN-Version sie arbeiten. Diese muss gleich der von MyCoRe mitgelieferten 
+Version sein, damit Inkonstitenzen vermieden werden! {\bf Ist dies nicht der
+Fall, beachten Sie bitte die Hinweise unter Punkt 2.2.} Der Test geschieht mit 
+
+{\tt java org.apache.xalan.xslt.EnvironmentCheck}
+
+Zudem sollte man
 in der Datei {\it /etc/profile.local}\footnote{Falls diese noch nicht
   existiert einfach anlegen} noch die Variable {\it ANT\_HOME}\footnote{export
   ANT\_HOME=/opt/jakarta/ant} gesetzt werden. 
@@ -42,7 +51,7 @@ MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicher
 \item {\bf mysql-shared-3.23.52-83} oder höher
 \item {\bf mysql-client-3.23.52-83} oder höher
 \item {\bf mysql-devel-3.23.52-83} oder höher
-\item {\bf mysql-bench-3.23.52-83} oder höher
+\item {\bf mysql-lcc-3.23.52-83} oder höher
 \end{itemize}
 \item Die Dokumentation steht nun unter {\it /usr/share/doc/packages/mysql}.
 \item Führen Sie das Kommando {\tt rcmysql start} als root aus. 

@@ -22,15 +22,20 @@ Hinweise in der Ausgabe beim Erzeugen der Web Application.
 \subsection{Konfiguration des Web Application Server}
 
 \subsubsection{ Tomcat}
-Die grundlegende Installation von Tomcat wurde bereits beschrieben. Nun soll auf dieser Basis das die WEB-Anwendung des MyCoRe-Samples installiert werden. Dabei ist an dieser Stelle nur ein einfaches Szenario auf der Basis der Tomcat-Grundinstallation beschrieben. Für die Konfiguration komplexerer Modelle, z. B. mehrere Applikationen nebeneinander, gibt es weiter hinten in diesem Dokument eine ausführliche Anleitung.\\[2ex]
+Die grundlegende Installation von Tomcat wurde bereits beschrieben. Nun soll 
+auf dieser Basis das die WEB-Anwendung des MyCoRe-Samples installiert werden. 
+Dabei ist an dieser Stelle nur ein einfaches Szenario auf der Basis der 
+Tomcat-Grundinstallation beschrieben. Für die Konfiguration komplexerer 
+Modelle, z. B. mehrere Applikationen nebeneinander, gibt es weiter hinten in 
+diesem Dokument eine ausführliche Anleitung. {\bf Achtung, auch Tomcat bringt
+eigene Xeces/Xalan Archive mit sich. Sollten Sie diese IM JDK bereits ersetzt
+haben, so müssen Sie die Mit MyCoRe gelieferte Version auch unter
+TOMCAT\_HOME/common/endorsed stellen und die alten Dateien löschen.} \\[2ex]
 Folgende Schritte sind auszuführen:
 \begin{enumerate}
 \item \mcrcommand{su -}
 \item \mcrcommand{cd \$CATALINA\_HOME/webapps}
 \item \mcrcommand{cp \$MYCORE\_SAMPLE\_HOME/mycoresample.war .}
-\item \mcrcommand{rctomcat restart}
-\item \mcrcommand{rm mycoresample/WEB-INF/lib/xerces*}
-\item \mcrcommand{rm mycoresample/WEB-INF/lib/xalan*}
 \item \mcrcommand{rctomcat restart}
 \end{enumerate}
 Nun sollten Sie auf die Beispielanwendung mit der URL \url{http://localhost:8080/mycoresample} zugreifen können. Testen Sie nun die Anwendung!
