@@ -54,6 +54,8 @@ private String mcr_create_name = null;
 private String mcr_submit_name = null;
 private String mcr_accept_name = null;
 private String mcr_modify_name = null;
+private String mcr_validfrom_name = null;
+private String mcr_validto_name = null;
 private String mcr_index_class = null;
 private String mcr_ts_server = null;
 private String mcr_ts_index = null;
@@ -80,6 +82,10 @@ public MCRCM7Persistence()
     .getString("MCR.persistence_cm7_field_dateaccept");
   mcr_modify_name = MCRConfiguration.instance()
     .getString("MCR.persistence_cm7_field_datemodify");
+  mcr_validfrom_name = MCRConfiguration.instance()
+    .getString("MCR.persistence_cm7_field_datevalidfrom");
+  mcr_validto_name = MCRConfiguration.instance()
+    .getString("MCR.persistence_cm7_field_datevalidto");
   mcr_ts_part = MCRConfiguration.instance()
     .getInt("MCR.persistence_cm7_part_ts");
   mcr_xml_part = MCRConfiguration.instance()
@@ -131,13 +137,20 @@ public final void create(MCRObjectID mcr_id, String mcr_label,
  * @param mcr_service the service class for the object
  * @param xml         the XML stream from the object
  * @param ts          the text search stream from the object
+ * @exception MCRConfigurationException if the configuration is not correct
  * @exception DKException if an error in the CM7 is occured
  * @exception Exception if an general error is occured
  **/
 private final void createCM7(MCRObjectID mcr_id, String mcr_label,
   MCRObjectService mcr_service, String xml, String ts) 
-  throws DKException, Exception
+  throws MCRConfigurationException, DKException, Exception
   {
+  if ((mcr_id_name == null) || (mcr_label_name == null) || 
+      (mcr_flag_name == null) ||
+      (mcr_create_name == null) || (mcr_submit_name == null) ||
+      (mcr_accept_name == null) || (mcr_modify_name == null) ||
+      (mcr_validfrom_name == null) || (mcr_validto_name == null)) {
+    throw new MCRConfigurationException("A indexclass field name is false."); }
   DKDatastoreDL connection = null;
   try {
     connection = MCRCM7ConnectionPool.getConnection();
@@ -156,6 +169,8 @@ private final void createCM7(MCRObjectID mcr_id, String mcr_label,
     item.setKeyfield(mcr_submit_name,mcr_service.getSubmitDate());
     item.setKeyfield(mcr_accept_name,mcr_service.getAcceptDate());
     item.setKeyfield(mcr_modify_name,mcr_service.getModifyDate());
+    item.setKeyfield(mcr_validfrom_name,mcr_service.getValidFromDate());
+    item.setKeyfield(mcr_validto_name,mcr_service.getValidToDate());
     item.setPart(mcr_xml_part,xml);
     item.setPart(mcr_ts_part,ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
     item.create();
@@ -273,6 +288,66 @@ private final String receiveCM7(MCRObjectID mcr_id)
   }
 
 /**
+ * The methode receive an object from the data store and return the 
+ * MCRObjectService data the object. The index class
+ * is determinated by the type of the object ID. This <b>must</b>
+ * correspond with the lower case configuration name.<br>
+ * As example: Document --> MCR.persistence_cm7_document
+ *
+ * @param mcr_id      the object id
+ * @return the MCRObjectService data of the object
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final MCRObjectService receiveService(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException
+  {
+  StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
+  sb.append(mcr_id.getTypeId().toLowerCase());
+  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  if (mcr_index_class == null) {
+    throw new MCRConfigurationException("Index class name is false."); }
+  try {
+    return receiveServiceCM7(mcr_id); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
+  }
+
+/**
+ * The methode receive internal MCRObjectService a object from the data store.
+ *
+ * @param mcr_id      the object id
+ * @return the MCRObjectService data of the object
+ * @exception DKException if an error in the CM7 is occured
+ * @exception Exception if an general error is occured
+ **/
+private final MCRObjectService receiveServiceCM7(MCRObjectID mcr_id)
+  throws DKException, Exception
+  {
+  DKDatastoreDL connection = null;
+  MCRObjectService service = new MCRObjectService();
+  try {
+    connection = MCRCM7ConnectionPool.getConnection();
+    try {
+      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
+      service.setCreateDate(item.getKeyfieldToDate(mcr_create_name));
+      service.setSubmitDate(item.getKeyfieldToDate(mcr_submit_name));
+      service.setAcceptDate(item.getKeyfieldToDate(mcr_accept_name));
+      service.setModifyDate(item.getKeyfieldToDate(mcr_modify_name));
+      service.setValidFromDate(item.getKeyfieldToDate(mcr_validfrom_name));
+      service.setValidToDate(item.getKeyfieldToDate(mcr_validto_name));
+      service.setFlags(item.getKeyfieldToString(mcr_flag_name));
+      }
+    catch (MCRCM7PersistenceException e) {
+      throw new MCRPersistenceException(
+        "A object with ID "+mcr_id.getId()+"does not exists."); }
+    }
+  finally {
+    MCRCM7ConnectionPool.releaseConnection(connection); }
+  return service;
+  }
+
+/**
  * The methode update an object in the data store. The index class
  * is determinated by the type of the object ID. This <b>must</b>
  * correspond with the lower case configuration name.<br>
@@ -313,14 +388,21 @@ public final void update(MCRObjectID mcr_id, String mcr_label,
  * @param mcr_service the service class for the object
  * @param xml         the XML stream from the object
  * @param ts          the text search stream from the object
+ * @exception MCRConfigurationException if the configuration is not correct
  * @exception DKException if an error in the CM7 is occured
  * @exception Exception if an general error is occured
  **/
 private final void updateCM7(MCRObjectID mcr_id, String mcr_label,
   MCRObjectService mcr_service, String xml, String ts) 
-  throws DKException, Exception
+  throws  MCRConfigurationException, DKException, Exception
   {
   DKDatastoreDL connection = null;
+  if ((mcr_id_name == null) || (mcr_label_name == null) || 
+      (mcr_flag_name == null) ||
+      (mcr_create_name == null) || (mcr_submit_name == null) ||
+      (mcr_accept_name == null) || (mcr_modify_name == null) ||
+      (mcr_validfrom_name == null) || (mcr_validto_name == null)) {
+    throw new MCRConfigurationException("A indexclass field name is false."); }
   try {
     connection = MCRCM7ConnectionPool.getConnection();
     try {
@@ -332,6 +414,8 @@ private final void updateCM7(MCRObjectID mcr_id, String mcr_label,
       item.setKeyfield(mcr_submit_name,mcr_service.getSubmitDate());
       item.setKeyfield(mcr_accept_name,mcr_service.getAcceptDate());
       item.setKeyfield(mcr_modify_name,mcr_service.getModifyDate());
+      item.setKeyfield(mcr_validfrom_name,mcr_service.getValidFromDate());
+      item.setKeyfield(mcr_validto_name,mcr_service.getValidToDate());
       item.setPart(mcr_xml_part,xml);
       item.setPart(mcr_ts_part,ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
       item.update();
