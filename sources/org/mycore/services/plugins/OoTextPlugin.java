@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -38,6 +39,8 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -53,6 +56,7 @@ public class OoTextPlugin implements TextFilterPlugin {
 
 	private static final int MAJOR = 0;
 	private static final int MINOR = 1;
+	private static final EntityResolver OooResolver = new ResolveOfficeDTD();
 
 	private static HashSet contentTypes;
 	private static String info = null;
@@ -110,15 +114,17 @@ public class OoTextPlugin implements TextFilterPlugin {
 		if (getSupportedContentTypes().contains(ct)) {
 			try {
 				System.out.println("Reading Oo-Document");
-				MCRInputStreamCloner mic=new MCRInputStreamCloner(getTextStream(getXMLStream(input)));
+				MCRInputStreamCloner mic =
+					new MCRInputStreamCloner(
+						getTextStream(getXMLStream(input)));
 				System.out.println("Saving to textfile /tmp/oo.sxw.txt");
-				FileOutputStream fout=new FileOutputStream("/tmp/oo.sxw.txt");
-				MCRUtils.copyStream(mic.getNewInputStream(),fout);
+				FileOutputStream fout = new FileOutputStream("/tmp/oo.sxw.txt");
+				MCRUtils.copyStream(mic.getNewInputStream(), fout);
 				System.out.println("...done");
-				return MCRUtils.copyStream(mic.getNewInputStream(),output);
-//				return MCRUtils.copyStream(
-//					getTextStream(getXMLStream(input)),
-//					output);
+				return MCRUtils.copyStream(mic.getNewInputStream(), output);
+				//				return MCRUtils.copyStream(
+				//					getTextStream(getXMLStream(input)),
+				//					output);
 			} catch (SAXException e) {
 				throw new FilterPluginTransformException(
 					"Error while parsing OpenOffice document.",
@@ -170,16 +176,21 @@ public class OoTextPlugin implements TextFilterPlugin {
 		return new ByteArrayInputStream(bos.toByteArray());
 	}
 
-	private InputStream getTextStream(InputStream xml) throws SAXException {
+	private InputStream getTextStream(InputStream xml)
+		throws IOException, SAXException {
 		XMLReader reader =
 			XMLReaderFactory.createXMLReader(
 				"org.apache.xerces.parsers.SAXParser");
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		reader.setContentHandler(new TextHandler(bos));
+		InputSource inp = new InputSource(xml);
+		reader.setEntityResolver(OooResolver);
+		reader.parse(inp);
+		System.out.println(new String(bos.toByteArray()));
 		return new ByteArrayInputStream(bos.toByteArray());
 	}
 
-	private class TextHandler extends DefaultHandler {
+	private static class TextHandler extends DefaultHandler {
 		private static final String textNS = "http://openoffice.org/2000/text";
 		private final OutputStream out;
 		private boolean textElement = false;
@@ -197,8 +208,6 @@ public class OoTextPlugin implements TextFilterPlugin {
 				try {
 					//write text to the stream
 					out.write(bytes(ch, start, length));
-					//write a space character to the stream
-					out.write(bytes(new char[] { ' ' }, 0, 1));
 				} catch (IOException e) {
 					throw new FilterPluginTransformException(
 						"Error while getting text Elements.",
@@ -208,11 +217,14 @@ public class OoTextPlugin implements TextFilterPlugin {
 		}
 
 		private byte[] bytes(char[] ch, int start, int length) {
-			byte[] bytes = new byte[length * 2];
-			for (int i = 0; i <= length; i++) {
+			byte[] bytes = new byte[length * 2+2];
+			for (int i = 0; i < length; i++) {
 				bytes[i * 2] = (byte) (ch[start + i] & 0xff);
 				bytes[i * 2 + 1] = (byte) (ch[start + i] >> 8 & 0xff);
 			}
+			//write a space character to the stream
+			bytes[length*2]=32;
+			bytes[length*2+1]=0;
 			return bytes;
 		}
 
@@ -225,12 +237,26 @@ public class OoTextPlugin implements TextFilterPlugin {
 			String qName,
 			Attributes attributes)
 			throws SAXException {
-			if (uri.equals(textNS))
+			if (uri.equals(textNS)) {
 				textElement = true;
-			else
+			} else
 				textElement = false;
 		}
 
+	}
+	public static class ResolveOfficeDTD implements EntityResolver {
+		/**
+		 * returns an empty dtd to parse Ooo documents
+		 * we don't need them, since we validate them either
+		 */
+		public InputSource resolveEntity(String publicId, String systemId) {
+			if (systemId.endsWith(".dtd")) {
+				StringReader stringInput = new StringReader(" ");
+				return new InputSource(stringInput);
+			} else {
+				return null; // default behavior
+			}
+		}
 	}
 
 }
