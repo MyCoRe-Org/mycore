@@ -1,7 +1,20 @@
-MyCoRe ist ein Kernsystem, das alle Grundfunktionen einer digitalen Bibliothek abdeckt.
-Es kann als Basis f"ur eigene Implementierungen verwendet werden, so dass
-eigene spezialisierte L"osungen insbesondere hinsichtlich der Datenmodellierung
-relativ schnell und einfach realisiert werden k"onnen.
+%
+\section{Allgemeines}
+
+MyCoRe ist ein Kernsystem, das alle Grundfunktionen von digitalen Bibliotheken und Sammlungen abdeckt.
+Es kann als Basis für eigene Bibliotheksanwendung, aber auch für die Implementierungen einer ganz anderen Applikation zur Verwaltung multimedialer Objekte verwendet werden.
+Dabei sollen eigene spezialisierte Lösungen insbesondere hinsichtlich der 
+Datenmodellierung relativ schnell und einfach realisiert werden können. MyCoRe gestattet auch die Kopplung einzelner Installationen zu einem Verbund, was die Attraktivität erheblich erhöht. Beispiele dafür sind u. a. das MyCoRe-Sample oder das Papyrus-Projekt der Universitäten Halle, Jena und Leipzig\footnote{\url{http://papyri.uni-leipzig.de}}.
+
+\begin{figure}[h]
+\begin{center}
+\fbox{\includegraphics[scale=.8]{overview_kern_pic01.jpg}}
+\label{overview_kern_pic01}
+\caption{Grobes Schichtenmodell von MyCoRe}
+\end{center}
+\end{figure}
+
+Auf dem obigen Bild ist dargestellt, wie MyCoRe-Anwendungen innerhalb eines Betreibers und aus der Sicht mehrerer Betreiber angelegt sind. In einer Einrichtung {\bf X} gibt es {\bf einen} MyCoRe-Kern pro Server, auf welchen mehrere Applikationen aufsetzen können. Dabei ist es auch möglich, dass mehrere physische Anwendungen eine gemeinsame logische Anwendung (virtuelle datenbasis) darstellen. Dies ermöglicht gemeinsame Projekte verschiedener Einrichtungen auf der gleichen Basis.
 
 Nachfolgend werden die Kernkomponenten mit einer Kurzbeschreibung der jeweiligen
 Funktionalit"aten aufgef"uhrt.
