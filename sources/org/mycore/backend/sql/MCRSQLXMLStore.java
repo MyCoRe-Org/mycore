@@ -255,7 +255,7 @@ public final byte[] retrieve(MCRObjectID mcrid, int version)
   try {
     StringBuffer sb = new StringBuffer("SELECT MCRXML FROM ").append(tableName)
       .append(" WHERE ( MCRID = '").append(mcrid.getId()).append("'")
-      .append(" AND MCRVERSION = '").append(version).append("' )");
+      .append(" AND MCRVERSION = ").append(version).append(" )");
     Statement statement = connection.getJDBCConnection().createStatement();
     ResultSet rs = statement.executeQuery(sb.toString());
     if(!rs.next()) {
@@ -289,8 +289,6 @@ public final byte[] retrieve(MCRObjectID mcrid, int version)
 public final int getNextFreeIdInt( String project, String type )
   throws MCRPersistenceException
   {
-  String prefix     = project + "_" + type;
-  int offset = prefix.length() + 2;
   String query = new StringBuffer()
         .append( "SELECT MAX(MCRID) FROM " )
         .append( tableName ).toString();
@@ -317,7 +315,7 @@ public final boolean exist(MCRObjectID mcrid, int version)
   try {
     StringBuffer sb = new StringBuffer("SELECT MCRID FROM ").append(tableName)
       .append(" WHERE ( MCRID = '").append(mcrid.getId()).append("'")
-      .append(" AND MCRVERSION = '").append(version).append("' )");
+      .append(" AND MCRVERSION = ").append(version).append(" )");
     Statement statement = connection.getJDBCConnection().createStatement();
     ResultSet rs = statement.executeQuery(sb.toString());
     if(rs.next()) { test = true; } 
