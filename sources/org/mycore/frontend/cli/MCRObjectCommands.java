@@ -25,6 +25,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -51,13 +52,14 @@ public class MCRObjectCommands
   private static String SLASH = System.getProperty( "file.separator" );
   private static Logger logger =
     Logger.getLogger(MCRClassificationCommands.class.getName());
+  private static MCRConfiguration config = null;
 
  /**
   * Initialize common data.
   **/
   private static void init()
     {
-    MCRConfiguration config = MCRConfiguration.instance();
+    config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
     }
 
@@ -440,4 +442,34 @@ public class MCRObjectCommands
     	logger.info( "The file has no XML errors." );
     return true;
     }
+
+ /**
+  * The method start the repair aof the metadata search for a given
+  * MCRObjectID type.
+  *
+  * @param type the MCRObjectID type
+  **/
+  public static void repairMetadataSearch(String type)
+    {
+    init();
+    logger.info("Start the repair for type "+type);
+    String typetest = config.getString("MCR.type_"+type,"");
+    if (typetest.length()==0) {
+      logger.error("The type "+type+" was not found.");
+      logger.info(" ");
+      return;
+      }
+    // XML table manager
+    MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+    ArrayList ar = mcr_xml.retrieveAllIDs(type);
+    MCRObject obj = new MCRObject();
+    String stid = null;
+    for (int i=0;i<ar.size();i++) { 
+      stid = (String)ar.get(i);
+      obj.repairPersitenceDatastore(stid);
+      logger.info("Repaired "+(String)ar.get(i)); 
+      }
+    logger.info(" ");
+    }
+
   }

@@ -25,6 +25,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -410,6 +411,26 @@ xml,false)),sr);
       return;
       }
     logger.info( k + " Object's stored under "+dirname+"." );
+    }
+
+ /**
+  * The method start the repair aof the derivate search 
+  **/
+  public static void repairDerivateSearch()
+    {
+    init();
+    logger.info("Start the repair for type derivate");
+    // XML table manager
+    MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+    ArrayList ar = mcr_xml.retrieveAllIDs("derivate");
+    MCRDerivate der = new MCRDerivate();
+    String stid = null;
+    for (int i=0;i<ar.size();i++) {
+      stid = (String)ar.get(i);
+      der.repairPersitenceDatastore(stid);
+      logger.info("Repaired "+(String)ar.get(i));
+      }
+    logger.info(" ");
     }
 
   }

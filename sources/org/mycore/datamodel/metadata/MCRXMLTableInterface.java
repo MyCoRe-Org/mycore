@@ -116,5 +116,14 @@ public int getNextFreeIdInt( String project, String type )
  **/
 public boolean exist(MCRObjectID mcrid, int version);
 
+/**
+ * The method return a Array list with all stored MCRObjectID's of the
+ * XML table of a MCRObjectID type.
+ *
+ * @param type a MCRObjectID type string
+ * @return a ArrayList of MCRObjectID's
+ **/
+public ArrayList retrieveAllIDs(String type);
+
 }
 

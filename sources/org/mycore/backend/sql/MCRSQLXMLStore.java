@@ -25,6 +25,7 @@
 package org.mycore.backend.sql;
 
 import java.sql.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -328,6 +329,34 @@ public final boolean exist(MCRObjectID mcrid, int version)
     throw new MCRException("Error in MCRXMLStore.",ex); }
   finally{ connection.release(); }
   return test;
+  }
+
+/**
+ * The method return a Array list with all stored MCRObjectID's of the
+ * XML table of a MCRObjectID type.
+ *
+ * @param type a MCRObjectID type string
+ * @return a ArrayList of MCRObjectID's
+ **/
+public ArrayList retrieveAllIDs(String type)
+  {
+  if ((type == null) || ((type = type.trim()).length() ==0)) {
+    throw new MCRPersistenceException("The type is null or empty."); }
+  ArrayList ar = new ArrayList();
+  MCRSQLConnection connection = MCRSQLConnectionPool.instance()
+    .getConnection();
+  try {
+    StringBuffer sb = new StringBuffer("SELECT MCRID FROM ").append(tableName);
+    Statement statement = connection.getJDBCConnection().createStatement();
+    ResultSet rs = statement.executeQuery(sb.toString());
+    while(rs.next()) { ar.add(rs.getString(1)); }
+    rs.close();
+    return ar;
+    }
+  catch (Exception ex) {
+    ex.printStackTrace();
+    throw new MCRException("Error in MCRXMLStore.",ex); }
+  finally{ connection.release(); }
   }
 
 }

@@ -152,6 +152,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "check file {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "repair metadata search of type {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String" );
 
     // *************************************************
     // Commands for derivate management
@@ -184,6 +187,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next derivate ID for base {0}",
       "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "repair derivate search",
+      "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch" );
 
     // **************************************
     // Commands for classification management

@@ -205,5 +205,15 @@ public final int getNextFreeIdInt( String type, String idproject, String idtype 
 public final boolean exist( String type, MCRObjectID mcrid)
   { return checkType(type).exist(mcrid,1); }
 
+/**
+ * The method return a Array list with all stored MCRObjectID's of the
+ * XML table of a MCRObjectID type.
+ *
+ * @param type a MCRObjectID type string
+ * @return a ArrayList of MCRObjectID's
+ **/
+public ArrayList retrieveAllIDs(String type)
+  { return checkType(type).retrieveAllIDs(type); }
+
 }
 

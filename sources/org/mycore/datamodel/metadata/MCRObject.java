@@ -669,6 +669,36 @@ private void deleteLinksFromTable()
   }
 
 /**
+ * The method updates the persistence layer with the data from the XLM store.
+ *
+ * @param id the MCRObjectID as string
+ **/
+public final void repairPersitenceDatastore(String id)
+  throws MCRPersistenceException
+  { repairPersitenceDatastore(new MCRObjectID(id)); }
+
+/**
+ * The method updates the persistence layer with the data from the XLM store.
+ *
+ * @param id the MCRObjectID
+ **/
+public final void repairPersitenceDatastore(MCRObjectID id)
+  throws MCRPersistenceException
+  {
+  mcr_id = id;
+  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  if (xml != null) {
+    setFromXML(xml,false); }
+  else {
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
+    }
+  mcr_persist.update(this);
+  deleteLinksFromTable();
+  addLinksToTable();
+  }
+
+/**
  * The method print all informations about this MCRObject.
  **/
 public final void debug()
