@@ -143,6 +143,7 @@ protected final org.jdom.Element retrieveType(String type)
     store = (org.jdom.Element)trees.get(type); }
   if (store != null) { return store; }
   ts = new Date();
+  trees.remove(type);
   // fill the store form the SQL store of the type
   org.jdom.Element root = new org.jdom.Element("root");
   // read the SQL data
