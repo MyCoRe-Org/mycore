@@ -122,12 +122,15 @@ private final void set() throws MCRException
   logger.debug("MCRObject set schemafile: " + mcr_schema );
   // get the structure data of the object
   org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
+  mcr_struct = new MCRObjectStructure(logger);
   mcr_struct.setFromDOM(jdom_element);
   // get the metadata of the object
   jdom_element = jdom_element_root.getChild("metadata");
+  mcr_metadata = new MCRObjectMetadata();
   mcr_metadata.setFromDOM(jdom_element);
   // get the service data of the object
   jdom_element = jdom_element_root.getChild("service");
+  mcr_service = new MCRObjectService();
   mcr_service.setFromDOM(jdom_element);
   }
 
