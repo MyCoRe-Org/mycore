@@ -48,6 +48,9 @@ implements MCRQueryInterface
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 private MCRConfiguration conf =  MCRConfiguration.instance();
+private  String ccsid = null;
+private  String lang = null;
+private  String langid = null;
 
 // 32 Bit
 protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
@@ -57,7 +60,12 @@ protected static int MAX_NUMBER_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
  * The constructor.
  **/
 public MCRCM7TransformXQueryToText()
-  {}
+  {
+  conf =  MCRConfiguration.instance();
+  ccsid = conf.getString("MCR.persistence_cm7_textsearch_ccsid","850");
+  lang = conf.getString("MCR.persistence_cm7_textsearch_lang","DEU");
+  langid = conf.getString("MCR.persistence_cm7_textsearch_langid","4841");
+  }
 
 /**
  * This method parse the XQuery string and return the result as
@@ -484,13 +492,17 @@ private final String traceOneCondition(String cond)
     }
   // text in tag
   if (atttag.indexOf("*")!=-1) {
-    sb.append("($PARA$ { $MC=*$ ").append(atttag).append(" "); }
+    sb.append("($PARA$ { $CCSID=").append(ccsid).append(",LANG=").append(langid).append(",MC=*$ ")
+      .append(atttag).append(" "); }
   else {
-    sb.append("($PARA$ { ").append(atttag).append(" "); }
+    sb.append("($PARA$ { $CCSID=").append(ccsid).append(",LANG=").append(langid).append("$ ")
+      .append(atttag).append(" "); }
   if (value[0].indexOf("*")!=-1) {
-    sb.append(" $MC=*$ ").append(value[0]).append(" } )"); }
+    sb.append(" $CCSID=").append(ccsid).append(",LANG=").append(langid).append(",MC=*$ ")
+      .append(value[0]).append(" } )"); }
   else {
-    sb.append(value[0]).append(" } )"); }
+    sb.append(" $CCSID=").append(ccsid).append(",LANG=").append(langid).append("$ ")
+      .append(value[0]).append(" } )"); }
   return sb.toString();
   }
 
