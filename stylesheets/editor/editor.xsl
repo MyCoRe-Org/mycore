@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.17 $ $Date: 2004-10-04 12:14:31 $ -->
+<!-- $Revision: 1.18 $ $Date: 2004-12-13 12:43:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -774,11 +774,17 @@
   </xsl:if>
   <xsl:if test="local-name() = 'textarea'">
     <xsl:variable name="wrap" select="''" />
+ 
+    <xsl:text disable-output-escaping="yes">&lt;textarea </xsl:text>
+      <xsl:text>cols="</xsl:text><xsl:value-of select="@width"/><xsl:text>" </xsl:text>
+      <xsl:text>rows="</xsl:text><xsl:value-of select="@height"/><xsl:text>" </xsl:text>
+      <xsl:text>wrap="</xsl:text><xsl:value-of select="$wrap"/><xsl:text>" </xsl:text>
+      <xsl:text>name="</xsl:text><xsl:value-of select="$var"/><xsl:text>" </xsl:text>
+      <xsl:text>style="</xsl:text><xsl:value-of select="concat($editor.font,' border: ',$editor.textinput.border)"/><xsl:text>" </xsl:text>
+      <xsl:text disable-output-escaping="yes">&gt;</xsl:text>
 
-    <textarea cols="{@width}" rows="{@height}" wrap="$wrap" name="{$var}"
-      style="{$editor.font} border: {$editor.textinput.border};">
       <xsl:value-of select="$value" disable-output-escaping="yes" />
-    </textarea>
+    <xsl:text disable-output-escaping="yes">&lt;/textarea&gt;</xsl:text>
   </xsl:if>
 </xsl:template>
 
