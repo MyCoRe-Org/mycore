@@ -596,7 +596,6 @@ private final String createTS(MCRTypedContent mcr_tc)
         i++;
         sb.append("XXX")
           .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
-          .append('0')
           .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
             .replace('.','X').replace('_','X'))
           .append("XXX"); 

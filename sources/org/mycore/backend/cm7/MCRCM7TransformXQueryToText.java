@@ -127,7 +127,7 @@ System.out.println("================================");
       }
     }
 //System.out.println(cond.toString());
-  if (cond.length()==3) { 
+  if ((cond.length()==3)||(cond.length()==1)) { 
     cond = new StringBuffer("(( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
 System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
@@ -303,7 +303,7 @@ private final String traceOneCondition(String cond)
     }
   // prepare categid
   for (i=0;i<counter;i++) {
-    if (tag[i].endsWith("@CATEGID")) { value[i] = "0"+value[i]+"*"; }
+    if (tag[i].endsWith("@CATEGID")) { value[i] = value[i]+"*"; }
     }
 /*
   for (i=0;i<counter;i++) {
