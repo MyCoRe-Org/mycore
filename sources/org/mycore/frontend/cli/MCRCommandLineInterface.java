@@ -137,6 +137,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get next object ID for base {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.getID String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "check file {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String" );
 
     // *************************************************
     // Commands for derivate management

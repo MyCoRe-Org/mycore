@@ -36,6 +36,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.mycore.common.*;
+import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
 
 /**
@@ -270,4 +271,26 @@ public class MCRObjectCommands
       }
     }
 
+ /**
+  * The method parse and check an XML file.
+  *
+  * @param filename the location of the xml file
+  **/
+  public static boolean checkXMLFile( String file )
+    {
+    init();
+    if( ! file.endsWith( ".xml" ) ) {
+      logger.warn( file + " ignored, does not end with *.xml" );
+      return false;
+      }
+    if( ! new File( file ).isFile() ) {
+      logger.warn( file + " ignored, is not a file." );
+      return false;
+      }
+    logger.info( "Reading file " + file + " ..." );
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document jdom_document = bulli.build(MCRXMLHelper.parseURI(file));
+    logger.info( "The file has no XML errors." );
+    return true;
+    }
   }
