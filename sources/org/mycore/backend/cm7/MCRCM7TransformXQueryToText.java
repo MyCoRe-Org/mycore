@@ -81,13 +81,13 @@ public final MCRQueryResultArray getResultList(String query, String type,
   if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-System.out.println("================================");
-System.out.println("MCRCM7TransformXQueryToText : "+query);
-System.out.println("================================");
+//System.out.println("================================");
+//System.out.println("MCRCM7TransformXQueryToText : "+query);
+//System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
-System.out.println("Raw text :"+rawtext);
+//System.out.println("Raw text :"+rawtext);
   int startpos = 0;
   int stoppos = rawtext.length();
   int operpos = -1;
@@ -96,7 +96,7 @@ System.out.println("Raw text :"+rawtext);
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-System.out.println("Next cond :"+onecond);
+//System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     if (onecond.length()>1) { cond.append('('); }
     cond.append(traceOneCondition("("+onecond.trim()+")"));
@@ -120,8 +120,8 @@ System.out.println("Next cond :"+onecond);
     }
   if (cond.length()==1) { cond.append("( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
-System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-System.out.println("================================");
+//System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
+//System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
@@ -208,15 +208,28 @@ private final String traceOneCondition(String cond)
   int counter = 0;
   int tippelauf = 0;
   int tippelzu = 0;
+  int tippelauf1 = 0;
+  int tippelauf2 = 0;
   int tagstart = klammerauf+1;
   int tagstop = 0;
   int opstart = 0;
   int opstop = 0;
   while ((tippelauf!=-1)&&(tippelzu!=-1)) {
-    tippelauf = cond.indexOf("\"",tippelzu+1);
-    if (tippelauf==-1) { break; }
-    tippelzu = cond.indexOf("\"",tippelauf+1);
-    if (tippelzu==-1) { break; }
+    tippelauf1 = cond.indexOf("\"",tippelzu+1);
+    tippelauf2 = cond.indexOf("'",tippelzu+1);
+    if (tippelauf1!=-1) {
+      tippelauf = tippelauf1;
+      tippelzu = cond.indexOf("\"",tippelauf+1);
+      if (tippelzu==-1) { break; }
+      }
+    else {
+      if (tippelauf2!=-1) {
+        tippelauf = tippelauf2;
+        tippelzu = cond.indexOf("'",tippelauf+1);
+        if (tippelzu==-1) { break; }
+        }
+      else { break; }
+      }
     value[counter] = new String(cond.substring(tippelauf+1,tippelzu).trim());
     boolean opset = false;
     if (!opset) {
