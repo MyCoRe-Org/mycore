@@ -294,6 +294,16 @@ public class MCRCache
   { return ( gets == 0 ? 1.0 : (double)hits / (double)gets ); }
 
   /**
+   * Clears the cache by removing all entries from the cache 
+   **/
+  public synchronized void clear()
+  {
+    index = new Hashtable();
+    size  = 0;
+    mru = lru = null;
+  }
+
+  /**
    * Returns a String containing information about cache capacity, size,
    * current fill rate and hit rate. Useful for testing and debugging.
    **/
