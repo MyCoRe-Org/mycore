@@ -33,27 +33,27 @@ import java.util.*;
  * singleton pattern. Using this class is very easy, here is an example:
  * <PRE>
  * // Get a configuration property as a String:
- * String driver = MCRConfiguration.instance().getString( "mcr.jdbc.driver" );
+ * String driver = MCRConfiguration.instance().getString( "MCR.jdbc.driver" );
  *
  * // Get a configuration property as an int, use 500 as default if not set:
- * int max = MCRConfiguration.instance().getInt( "mcr.cache.size", 500 );
+ * int max = MCRConfiguration.instance().getInt( "MCR.cache.size", 500 );
  * </PRE>
  * As you see, the class provides methods to get configuration properties
  * as different data types and allows you to specify defaults. All MyCoRe
- * configuration properties should start with "<CODE>mcr.</CODE>" When
+ * configuration properties should start with "<CODE>MCR.</CODE>" When
  * <CODE>instance()</CODE> is called first, the file 
  * <B><CODE>mycore.properties</CODE></B> is read. It can be located somewhere 
  * in the <CODE>CLASSPATH</CODE>, even in a jar or zip file. The properties 
- * file may have a property called <B><CODE>mcr.configuration.include</CODE></B> 
+ * file may have a property called <B><CODE>MCR.configuration.include</CODE></B> 
  * that contains a comma-separated list of other configuration files to read
  * subsequently. The class also reads any Java <B>system properties</B> that 
- * start with "<CODE>mcr.</CODE>" and that are set when the application starts. 
+ * start with "<CODE>MCR.</CODE>" and that are set when the application starts. 
  * System properties will override properties read from the configuration files. 
  * Furthermore, the name of the main configuration file can be altered by 
- * specifying the system property <B><CODE>mcr.configuration.file</CODE></B>. 
+ * specifying the system property <B><CODE>MCR.configuration.file</CODE></B>. 
  * Here is an example:
  * <PRE>
- * java -Dmcr.configuration.file=some_other.properties -Dmcr.foo=bar MyCoReSample
+ * java -DMCR.configuration.file=some_other.properties -DMCR.foo=bar MyCoReSample
  * </PRE>
  * The class also provides methods for <B>listing or saving</B> all properties
  * to an <CODE>OutputStream</CODE> and for <B>reloading</B> all configuration 
@@ -66,9 +66,9 @@ import java.util.*;
  * of this class. This is transparent for client code, they would still use 
  * <CODE>MCRConfiguration.instance()</CODE> to get the subclass instance. 
  * To use a subclass instead of <CODE>MCRConfiguration</CODE> itself, specify 
- * the system property <CODE>mcr.configuration.class</CODE>, e. g.
+ * the system property <CODE>MCR.configuration.class</CODE>, e. g.
  * <PRE>
- * java -Dmcr.configuration.class=MCRConfigurationSubclass MyCoReSample
+ * java -DMCR.configuration.class=MCRConfigurationSubclass MyCoReSample
  * </PRE>
  *
  * @see #loadFromFile
@@ -100,7 +100,7 @@ public class MCRConfiguration
     
 /**
  * Instantiates the singleton by calling the protected constructor. If the
- * system property <CODE>mcr.configuration.class</CODE> is set when the
+ * system property <CODE>MCR.configuration.class</CODE> is set when the
  * system starts, the class specified in that property will be instantiated
  * instead. This allows for subclassing <CODE>MCRConfiguration</CODE> to
  * change behaviour and use the subclass instead of
@@ -108,7 +108,7 @@ public class MCRConfiguration
  */  
   protected static void createSingleton()
   {
-    String name = System.getProperty( "mcr.configuration.class" );
+    String name = System.getProperty( "MCR.configuration.class" );
     if( name != null )
     {
       try
@@ -118,7 +118,7 @@ public class MCRConfiguration
       catch( Exception exc )
       {
         throw new MCRConfigurationException
-        ( "Could not create mcr.configuration.class singleton \"" + name + "\"", exc );
+        ( "Could not create MCR.configuration.class singleton \"" + name + "\"", exc );
       }
     }
     else singleton = new MCRConfiguration();
@@ -142,7 +142,7 @@ public class MCRConfiguration
     while( names.hasMoreElements() )
     {
       String name = (String)( names.nextElement() );
-      if( name.startsWith( "mcr." ) )
+      if( name.startsWith( "MCR." ) )
       {
         String value = System.getProperty( name );
         if( value != null ) set( name, value );
@@ -152,7 +152,7 @@ public class MCRConfiguration
     
 /**
  * Reloads all properties from the configuration files.
- * If the system property <CODE>mcr.configuration.file</CODE> is set,
+ * If the system property <CODE>MCR.configuration.file</CODE> is set,
  * the file specified in this property will be used as main configuration
  * file, otherwise the default file <CODE>mycore.properties</CODE> will
  * be read. If the parameter <CODE>clear</CODE> is <CODE>true</CODE>,
@@ -167,7 +167,7 @@ public class MCRConfiguration
   public void reload( boolean clear )
   { 
     if( clear ) properties.clear();
-    String fn = System.getProperty( "mcr.configuration.file", "mycore.properties" );
+    String fn = System.getProperty( "MCR.configuration.file", "mycore.properties" );
     loadFromFile( fn ); 
   }
 
@@ -176,7 +176,7 @@ public class MCRConfiguration
  * them to the properties currently set. This method scans the
  * <CODE>CLASSPATH</CODE> for the properties file, it may be a plain file,
  * but may also be located in a zip or jar file. If the properties file
- * contains a property called <CODE>mcr.configuration.include</CODE>, the
+ * contains a property called <CODE>MCR.configuration.include</CODE>, the
  * files specified in that property will also be read. Multiple include
  * files have to be separated by spaces or colons.
  *
@@ -199,11 +199,11 @@ public class MCRConfiguration
       ( "Could not load configuration file " + filename, exc );
     }
 
-    String include = getString( "mcr.configuration.include", null );
+    String include = getString( "MCR.configuration.include", null );
     if( include != null )
     {
       StringTokenizer st = new StringTokenizer( include, ", " );
-      set( "mcr.configuration.include", null );
+      set( "MCR.configuration.include", null );
       while( st.hasMoreTokens() ) loadFromFile( st.nextToken() );
     }
   }
