@@ -67,6 +67,8 @@
     </xsd:sequence>
     <xsd:attribute name="class" type="xsd:string" use="required" />
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
@@ -93,6 +95,8 @@
     </xsd:sequence>
     <xsd:attribute name="class" type="xsd:string" use="required" />
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
