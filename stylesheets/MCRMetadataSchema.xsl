@@ -52,14 +52,14 @@
   <xsl:otherwise>
    <xsd:element name="mycoreobject" type="MCRObject"/>
    <xsd:complexType name="MCRObject">
-    <xsd:sequence>
+    <xsd:all>
      <xsd:element name="structure" type="MCRObjectStructure"  minOccurs='1' 
       maxOccurs='1' />
     <xsd:element name="metadata" type="MCRObjectMetadata" minOccurs='1' 
       maxOccurs='1' />
     <xsd:element name="service"  type="MCRObjectService" minOccurs='1' 
       maxOccurs='1' />
-    </xsd:sequence>
+    </xsd:all>
     <xsd:attribute name="ID" type="xsd:string" use="required" />
     <xsd:attribute name="label" type="xsd:string" use="required" />
    </xsd:complexType>
