@@ -193,7 +193,7 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
   throws MCRConfigurationException, MCRPersistenceException
   { 
   Logger logger = MCRCM7ConnectionPool.getLogger();
-  logger.info("This feature comes in the future with CM8.");
+  logger.info("This feature exist not for this store.");
   }
 
 /**

@@ -109,32 +109,20 @@ public final class MCRXMLDBPersistence
             MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
     }
 
-    /**
-     * Creates an empty database from the given configuration
-     * file. Currently not used in this persistence layer.
-     *
-     * @param mcr_type
-     * @param mcr_conf
-     *
-     * @throws MCRConfigurationException 
-     * @throws MCRPersistenceException
-     **/
-    public void createDataBase( String mcr_type, org.jdom.Document mcr_conf )
-	throws MCRConfigurationException, 
-	       MCRPersistenceException {
-	try {
-/*            
-	    CollectionManagementService cms = 
-		(CollectionManagementService)
-		rootCollection.getService( "CollectionManagementService",
-					   "1.0" );
-	    cms.createCollection( mcr_type.toLowerCase() );
- */
-	}
-	catch( Exception e ) {
-	    throw new MCRPersistenceException( e.getMessage(), e );
-	}
-    }
+/**
+ * The methode create a new datastore based of given configuration. It create
+ * a new data table for storing MCRObjects with the same MCRObjectID type.
+ *
+ * @param mcr_type    the MCRObjectID type as string
+ * @param mcr_conf    the configuration XML stream as JDOM tree
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
+  throws MCRConfigurationException, MCRPersistenceException
+  {
+  logger.info("This feature exist not for this store.");
+  }
 
     /**
      * Updates the content in the database. Currently the same as
@@ -145,6 +133,7 @@ public final class MCRXMLDBPersistence
      * @param mct_ts the string for the text search
      * @exception MCRPersistenceException if an error was occured
      **/    
+
     public void update( MCRTypedContent mcr_tc, Document doc, String mcr_ts ) 
 	throws MCRPersistenceException {
         Collection collection = null;
