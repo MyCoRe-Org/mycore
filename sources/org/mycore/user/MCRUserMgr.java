@@ -82,9 +82,7 @@ public class MCRUserMgr
   {
     config = MCRConfiguration.instance();
     String userStoreName = config.getString("MCR.userstore_class_name");
-    PropertyConfigurator.configure(config.getLoggingProperties());
-    String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
-    useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+    useEncryption = config.getBoolean("MCR.users_use_password_encryption", false);
 
     try {
       mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance(); }
