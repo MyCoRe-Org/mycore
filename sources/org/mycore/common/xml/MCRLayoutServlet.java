@@ -69,7 +69,7 @@ public class MCRLayoutServlet extends HttpServlet
       res.sendError( res.SC_NOT_FOUND, "No XML input to layout" );
       return;
     }
-    
+
     String stylesheetName = chooseStylesheet( req, jdom );
     
     // Just output as plain XML?
@@ -80,8 +80,9 @@ public class MCRLayoutServlet extends HttpServlet
     }
     
     // Use a stylesheet for output
+    setAttributes( req );
     Templates stylesheet = getCompiledStylesheet( stylesheetName );
-    transform( stylesheet, jdom, res );
+    transform( stylesheet, jdom, req, res );
   }
   
   protected org.jdom.Document getInputXMLasJDOM( HttpServletRequest  req,
@@ -103,7 +104,7 @@ public class MCRLayoutServlet extends HttpServlet
       URL url = null;
 
       try
-      { url = getServletContext().getResource( req.getServletPath() ); }
+      { url = getServletContext().getResource( path ); }
       catch( MalformedURLException ignored ){}
 
       if( url == null )
@@ -111,13 +112,40 @@ public class MCRLayoutServlet extends HttpServlet
         res.sendError( res.SC_NOT_FOUND, path );
         return null;
       }
-      else return new org.jdom.input.SAXBuilder().build( url );    
+
+      String realPath = getServletContext().getRealPath( path );
+      String realDir  = new File( realPath ).getParent() + File.separator;
+
+      req.setAttribute( "xsl.DocumentBase", realDir );
+
+      return new org.jdom.input.SAXBuilder().build( url );
     }
     catch( org.jdom.JDOMException ex )
-    { 
+    {
       String msg = "Error while parsing XML input for layout";
       throw new MCRException( msg, ex );
     }
+  }
+
+  protected void setAttributes( HttpServletRequest req )
+  {
+    String user = (String)( req.getSession().getAttribute( "xsl.LoginUser" ) );
+    if( ( user == null ) || ( user.length() == 0 ) ) user = "gast";
+
+    String contextPath = req.getContextPath();
+    if( contextPath == null ) contextPath = "";
+    contextPath += "/";
+
+    String requestURL = HttpUtils.getRequestURL( req ).toString();
+    int pos = requestURL.indexOf( contextPath, 9 );
+    String baseURL = requestURL.substring( 0, pos ) + contextPath;
+
+    String servletURL = baseURL + "servlets/";
+
+    req.setAttribute( "xsl.LoginUser",       user       );
+    req.setAttribute( "xsl.RequestURL",      requestURL );
+    req.setAttribute( "xsl.ApplicationBase", baseURL    );
+    req.setAttribute( "xsl.ServletBase",     servletURL );
   }
   
   protected String getDocumentType( org.jdom.Document doc )
@@ -137,11 +165,11 @@ public class MCRLayoutServlet extends HttpServlet
     // "style=XML" means output as XML, do not use a stylesheet
     if( "xml".equals( style ) ) return null;
 
-    // No style parameter means "style=default"
-    if( style == null ) style = "default"; 
+    // No style parameter means default stylesheet
+    if( style == null ) style = ""; else style = "-" + style;
 
-    // Build stylesheet name, e. g. "storyboard-default.xsl"
-    return getDocumentType( jdom ) + "-" + style + ".xsl";
+    // Build stylesheet name, e. g. "storyboard-simple.xsl"
+    return getDocumentType( jdom ) + style + ".xsl";
   }
 
   protected void renderAsXML( org.jdom.Document doc, HttpServletResponse res )
@@ -177,6 +205,7 @@ public class MCRLayoutServlet extends HttpServlet
 
   protected void transform( Templates xsl, 
                             org.jdom.Document jdom, 
+                            HttpServletRequest req,
                             HttpServletResponse res )
     throws IOException
   {
@@ -192,6 +221,16 @@ public class MCRLayoutServlet extends HttpServlet
       // Output JDOM via SAXOutputter should result in best performance
       SAXTransformerFactory f = (SAXTransformerFactory)factory;
       TransformerHandler h = f.newTransformerHandler( xsl );
+
+      Transformer t = h.getTransformer();
+      for( Enumeration names = req.getAttributeNames(); names.hasMoreElements(); )
+      {
+        String name = (String)( names.nextElement() );
+        if( ! name.startsWith( "xsl." ) ) continue;
+ 
+        String value = (String)( req.getAttribute( name ) );
+        t.setParameter( name.substring( 4 ), value );
+      }
     
       OutputStream out = res.getOutputStream();
       h.setResult( new StreamResult( out ) );
