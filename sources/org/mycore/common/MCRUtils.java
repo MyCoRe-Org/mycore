@@ -39,6 +39,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
