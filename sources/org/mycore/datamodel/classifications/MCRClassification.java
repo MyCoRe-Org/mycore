@@ -182,7 +182,7 @@ private ArrayList cat;
       return createFromJDOM(jdom);
       }
     catch (Exception e) {
-      throw new MCRException(e.getMessage()); }
+      throw new MCRException(e.getMessage(),e); }
     }
   
   /**
