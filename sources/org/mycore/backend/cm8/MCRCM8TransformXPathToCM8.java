@@ -96,6 +96,7 @@ public final HashSet getResultIDs(String root, String query, String type,
 
   // Select the query strings
   StringBuffer cond = new StringBuffer(1024);
+  String ss = "";
   int i = 0;
   int j = 0;
   int l = query.length();
@@ -107,9 +108,18 @@ public final HashSet getResultIDs(String root, String query, String type,
       catch (MCRException me) { logger.error(me.getMessage()); }
       break;
       }
-    try {
-      cond.append(' ') .append(traceOneCondition(query.substring(i,j), itemtypeprefix)); }
-    catch (MCRException me) { cond.append(' ').append(query.substring(i,j)); }
+    ss = query.substring(i,j);
+    if (ss.equals(" and ")) { 
+      cond.append(ss); }
+    else {
+      if (ss.equals(" or ")) { 
+        cond.append(ss); }
+      else {
+        try {
+          cond.append(' ') .append(traceOneCondition(ss, itemtypeprefix)); }
+        catch (MCRException me) { cond.append(' '); }
+        }
+      }
     i = j+5;
     }
   logger.debug("Codition transformation " + cond.toString());
