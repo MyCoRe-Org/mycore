@@ -37,6 +37,17 @@ import javax.xml.transform.sax.*;
 import mycore.common.*;
 
 /**
+ * Handles a single layout request
+ */
+class MCRLayoutJob
+{
+  HttpServletRequest  request;
+  HttpServletResponse response;
+  ServletContext      context;
+  org.jdom.Document   jdom; 
+}
+
+/**
  * Does the layout for other MyCoRe servlets by transforming XML 
  * input to various output formats, using XSL stylesheets.
  *
@@ -63,6 +74,11 @@ public class MCRLayoutServlet extends HttpServlet
   public void doGet( HttpServletRequest req, HttpServletResponse res ) 
     throws IOException, ServletException
   {
+    MCRLayoutJob job = new MCRLayoutJob();
+    job.request  = req;
+    job.response = res;
+    job.context  = getServletContext();
+
     org.jdom.Document jdom = getInputXMLasJDOM( req, res );
     if( jdom == null ) 
     {
