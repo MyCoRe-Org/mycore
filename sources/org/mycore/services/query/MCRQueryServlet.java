@@ -205,7 +205,7 @@ private String defaultLang = "";
       MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
       jdom = resarray.exportAllToDocument();
-if (type.equals("Document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
+if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exception exc) { System.out.println(exc); }
 
       // create a new session if not already alive and encache result list
       if (mode.equals("ResultList"))

@@ -59,6 +59,8 @@ public static final String TAG_RESULT = "mcr_result";
 public static final String TAG_MYCORE_OBJECT = "mycoreobject";
 /** The tag for one mycoreclass **/
 public static final String TAG_MYCORE_CLASS = "mycoreclass";
+/** The tag for one mycorederivate **/
+public static final String TAG_MYCORE_DERIVATE = "mycorederivate";
 /** The attribute of the host name **/
 public static final String ATTR_HOST = "host";
 /** The attribute of the MCRObjectId **/
@@ -365,6 +367,7 @@ public final synchronized void importElements(byte [] in)
       throw new MCRException(ERRORTEXT); }
     org.jdom.Element inxml = res.getChild(TAG_MYCORE_OBJECT);
     if (inxml==null) { inxml = res.getChild(TAG_MYCORE_CLASS); }
+    if (inxml==null) { inxml = res.getChild(TAG_MYCORE_DERIVATE); }
     host.add(inhost);
     mcr_id.add(inid);
     rank.add(new Integer(irank));
