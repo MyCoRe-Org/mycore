@@ -33,6 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -109,6 +110,9 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String STR_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
     private static final String STR_RESUMPTIONTOKEN_SUFFIX = ".token";
+    
+    private static final String STR_GRANULARITY = "yyyy-MM-dd";
+    private static final String STR_FIRST_DATE = "2000-01-01";
     
     private static final String ERR_FAULTY_VERB = "No verb or too much verbs";
     private static final String ERR_ILLEGAL_VERB = "Illegal verb";
@@ -320,33 +324,6 @@ public class MCROAIDataProvider extends HttpServlet {
     }
 
 	/**
-	 * Method checkIdentifier. Check for conformance with the rules and the existence of the given <i>identifier</i>.
-	 * @param identifier Identifier to be checked.
-	 * @param repositoryIdentifier The repository identifier (from .properties file)
-	 * @return boolean
-	 */
-    private boolean checkIdentifier(String identifier, String repositoryIdentifier) {
-		// First, check if the identifier starts with "oai"
-		if (!identifier.toUpperCase().startsWith("OAI:")) {
-		    return false;
-		} else {
-	    	int lastColon = identifier.lastIndexOf(":");
-	    
-	    	if ((lastColon == 3) || !identifier.substring(4, lastColon).equals(repositoryIdentifier)) {
-				return false;
-	    	}
-		    MCRConfiguration config = MCRConfiguration.instance();
-		    try {
-			    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
-			    return query.exists(identifier.substring(lastColon + 1));
-		    } catch (MCRConfigurationException mcrx) {
-		    	logger.fatal("Die OAIQuery-Klasse ist nicht konfiguriert.");
-		    	return false;
-		    }
-		} 
-    }
-
-	/**
 	 * Method deleteOutdatedTokenFiles. Helper function to delete outdated resumption token files
 	 */
     private void deleteOutdatedTokenFiles() {
@@ -398,6 +375,9 @@ public class MCROAIDataProvider extends HttpServlet {
 		   	int maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 			File objectFile = new File(resumptionTokenDir +
                 resumptionToken + STR_RESUMPTIONTOKEN_SUFFIX);
+			if (!objectFile.exists()) {
+				return null;
+			}
 			FileInputStream fis = new FileInputStream(objectFile);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			int tokenNo = Integer.valueOf(resumptionToken
@@ -463,6 +443,26 @@ public class MCROAIDataProvider extends HttpServlet {
     }
     
 	/**
+	 * Method getDate. Gets the date from an ISO8601 string or null
+	 * @param date a ISO8601 conformant date string
+	 * @return Date the date or null
+	 */
+    private Date getDate(String date) {
+   	    SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
+   	    if (date.length() > STR_GRANULARITY.length()) {
+   	    	return null;
+   	    }
+		ParsePosition pos = new ParsePosition(0);
+		Date firstDate = dateFormat.parse(STR_FIRST_DATE, pos);
+		Date currentDate = dateFormat.parse(date, pos);
+		if (currentDate.before(firstDate)) {
+			return null;
+		}
+
+    	return currentDate;
+    }
+    
+	/**
 	 * Method getUTCDate. The actual date and time (GMT).
 	 * @param timeout. offset to add to get a future time.
 	 * @return String the date and time as string.
@@ -471,7 +471,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		Calendar calendar = new GregorianCalendar();
 		Date now = new Date();
 		calendar.setTime(now);
-   	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+   	    SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
 	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         SimpleTimeZone tz = (SimpleTimeZone) timeFormat.getTimeZone();
         // compute milliseconds to hours...
@@ -568,7 +568,7 @@ public class MCROAIDataProvider extends HttpServlet {
         eIdentify.addContent(newElementWithContent("protocolVersion", ns, STR_OAI_VERSION));
         String adminEmail = MCRConfiguration.instance().getString(STR_OAI_ADMIN_EMAIL);
         eIdentify.addContent(newElementWithContent("adminEmail", ns, adminEmail));
-        eIdentify.addContent(newElementWithContent("earliestDatestamp", ns, "2000-01-01"));
+        eIdentify.addContent(newElementWithContent("earliestDatestamp", ns, STR_FIRST_DATE));
         eIdentify.addContent(newElementWithContent("deletedRecord", ns, "no"));
         eIdentify.addContent(newElementWithContent("granularity", ns, "YYYY-MM-DD"));
         // If we don't support compression, this SHOULD NOT be mentioned, so it is outmarked
@@ -632,12 +632,14 @@ public class MCROAIDataProvider extends HttpServlet {
         Namespace ns = eRoot.getNamespace();
         String repositoryIdentifier = new String();
 	    MCRConfiguration config = MCRConfiguration.instance();
-        
+		MCROAIQuery query = null;
+		        
 		try {
 	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+			query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		} catch (MCRConfigurationException mcrx) {
 			logger.fatal("Missing configuration item: " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
-				+ " is missing.");
+				+ " or OAIQuery-Class is missing.");
 			return null;
 		}
         
@@ -655,10 +657,18 @@ public class MCROAIDataProvider extends HttpServlet {
           	logger.info("Anfrage 'listMetadataFormats' wurde wegen zu vieler Parameter abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         } else {
+	        String id;
+    	    try {
+        		id = legalOAIIdentifier(identifier[0]);
+	        } catch (MCRException mcrx) {
+    	        logger.info("Anfrage 'getRecord' wurde wegen fehlerhaftem Identifier abgebrochen.");
+        	    return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+	        }
+	        
             Element eRequest = eRoot.getChild("request", ns);
             eRequest.setAttribute("verb", "ListMetadataFormats");
             eRequest.setAttribute("identifier", identifier[0]);
-            if (!checkIdentifier(identifier[0], repositoryIdentifier)) {
+            if (!query.exists(id)) {
             	logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
             }
@@ -729,6 +739,10 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
 		    try {
 				eListSets = listFromResumptionToken(eListSets, resumptionToken[0]);
+				if (eListSets == null) {
+        			logger.info("Anfrage 'listSets' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+				}
 		        eRoot.addContent(eListSets);
 		    } catch (IOException e) { 	
 	            logger.error(e.getMessage());
@@ -841,14 +855,19 @@ public class MCROAIDataProvider extends HttpServlet {
         if (set != null) {
             maxArguments++;
         }
+        String metadataPrefix[] = getParameter("metadataPrefix", request); 
         String resumptionToken[] = getParameter("resumptionToken", request); 
         if (resumptionToken != null) {
             maxArguments++;
-        }
-        String metadataPrefix[] = getParameter("metadataPrefix", request); 
-        if (metadataPrefix == null) {
-        	logger.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
-            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+            if ((from != null) || (until != null) || (set != null) || (metadataPrefix != null)) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+            }
+        } else {
+        	if (metadataPrefix == null) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
         }
         //The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
@@ -886,6 +905,10 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
 		    try {
 				eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0]);
+				if (eListIdentifiers == null) {
+        			logger.info("Anfrage 'listIdentifiers' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+				}
 		        eRoot.addContent(eListIdentifiers);
 		    } catch (IOException e) { 	
 	            logger.error(e.getMessage());
@@ -989,16 +1012,18 @@ public class MCROAIDataProvider extends HttpServlet {
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
         
+        String id;
+        try {
+        	id = legalOAIIdentifier(identifier[0]);
+        } catch (MCRException mcrx) {
+            logger.info("Anfrage 'getRecord' wurde wegen fehlerhaftem Identifier abgebrochen.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        
         Element eRequest = eRoot.getChild("request", ns);
         eRequest.setAttribute("verb", "GetRecord");
         eRequest.setAttribute("identifier", identifier[0]);
         eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
-        
-        //Search for the last delimiter (a colon)...
-		int lastDelimiter = identifier[0].lastIndexOf(":");
-		//...and use the characters behind as id
-        String id = identifier[0].substring(lastDelimiter + 1);
-        //We don't look at the begginning of the identifier!!
         
         MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
@@ -1084,25 +1109,48 @@ public class MCROAIDataProvider extends HttpServlet {
         
         // Second: get the arguments from the request
         String from[] = getParameter("from", request);
+        Date fromDate = null;
         if (from != null) {
+        	fromDate = getDate(from[0]);
+        	if (fromDate == null) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
             maxArguments++;
         }
         String until[] = getParameter("until", request); 
+        Date untilDate = null;
         if (until != null) {
+        	untilDate = getDate(until[0]);
+        	if (untilDate == null) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
+        	if (fromDate != null) {
+        		if (!fromDate.before(untilDate)) {
+    		    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        		}
+        	}
             maxArguments++;
         }
         String set[] = getParameter("set", request); 
         if (set != null) {
             maxArguments++;
         }
+        String metadataPrefix[] = getParameter("metadataPrefix", request); 
         String resumptionToken[] = getParameter("resumptionToken", request); 
         if (resumptionToken != null) {
             maxArguments++;
-        }
-        String metadataPrefix[] = getParameter("metadataPrefix", request); 
-        if (metadataPrefix == null) {
-        	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
-            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+            if ((from != null) || (until != null) || (set != null) || (metadataPrefix != null)) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+            }
+        } else {
+        	if (metadataPrefix == null) {
+    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
         }
         //The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
@@ -1141,6 +1189,10 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
 		    try {
 				eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0]);
+				if (eListRecords == null) {
+        			logger.info("Anfrage 'listRecords' enthält fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+				}
 		        eRoot.addContent(eListRecords);
 		    } catch (IOException e) { 	
 	            logger.error(e.getMessage());
@@ -1244,6 +1296,51 @@ public class MCROAIDataProvider extends HttpServlet {
         return document;
     }
 
+	/**
+	 * Method legalOAIIdentifier. Extract the identifier from a legal OAI identifier or throw a MCRException.
+	 * @param identifier a legal MCRException
+	 * @return String the MyCoRe-/Miless-Identifier
+	 * @throws MCRException
+	 */
+	private String legalOAIIdentifier(String identifier) throws MCRException {
+		StringTokenizer tokenizer = new StringTokenizer(identifier, ":");
+		
+		if (tokenizer.countTokens() < 3) {
+			throw new MCRException("Error in legalOAIIdentifier");
+		}
+		String scheme = tokenizer.nextToken();
+		String repositoryIdentifierFromIdentifier = tokenizer.nextToken();
+	    MCRConfiguration config = MCRConfiguration.instance();
+	    String repositoryIdentifier = new String();
+		try {
+	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
+		} catch (MCRConfigurationException mcrx) {
+			logger.fatal("Missing configuration item: either " + STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName()
+				+ " is missing.");
+			throw new MCRException("Error in legalOAIIdentifier");
+		}
+		if (!"oai".equals(scheme) || !repositoryIdentifierFromIdentifier.equals(repositoryIdentifier)) {
+			throw new MCRException("Error in legalOAIIdentifier");
+		}
+		
+		String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*´()");
+		StringBuffer buffer = new StringBuffer(tokenizer.nextToken());
+		while (tokenizer.hasMoreTokens()) {
+			buffer.append(":")
+				  .append(tokenizer.nextToken());
+		}
+		
+		for (int i = 0; i < buffer.length(); i++) {
+			char c = buffer.charAt(i);
+			if (allowed.indexOf(c) == -1) {
+				throw new MCRException("Error in legalOAIIdentifier");
+			}
+		}
+		
+		String id = buffer.toString();
+		return id;
+	}
+	
 	class TokenFileFilter implements FilenameFilter {
     	String filter = null;
     
