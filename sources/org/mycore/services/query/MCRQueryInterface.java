@@ -38,10 +38,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public interface MCRQueryInterface
 {
 
-public final static char COMMAND_OR='O';
-public final static char COMMAND_AND='A';
-public final static char COMMAND_XOR='X';
-
 /**
  * This method parse the XQuery string and return the result as
  * MCRXMLContainer. If the type is null or empty or maxresults

@@ -38,12 +38,15 @@ import org.jdom.output.XMLOutputter;
  * the programming API.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
 public class MCRUtils {
+	public final static char COMMAND_OR='O';
+	public final static char COMMAND_AND='A';
+	public final static char COMMAND_XOR='X';
 	// public constant data
 	public static String[] SUPPORTED_LANG = { "de", "en", "en_uk", "en_us" };
 	private static final Logger logger = Logger.getLogger(MCRUtils.class);
@@ -402,6 +405,59 @@ public class MCRUtils {
 		return true;
 	} // end copy
 
+
+	/**
+	 * merges to HashSets of MyCoreIDs after specific rules
+	 * @see #COMMAND_OR
+	 * @see #COMMAND_AND
+	 * @see #COMMAND_XOR
+	 * @param set1 1st HashSet to be merged
+	 * @param set2 2nd HashSet to be merged
+	 * @param operation available COMMAND_XYZ
+	 * @return merged HashSet
+	 */
+	public static final HashSet mergeHashSets(
+		HashSet set1,
+		HashSet set2,
+		char operation) {
+		HashSet merged = new HashSet();
+		Object id;
+		switch (operation) {
+			case COMMAND_OR :
+				merged.addAll((Collection)set1);
+				merged.addAll((Collection)set2);
+				break;
+			case COMMAND_AND :
+				for (Iterator it = set1.iterator();
+					it.hasNext();
+					) {
+					id = it.next();
+					if (set2.contains(id))
+						merged.add(id);
+				}
+				break;
+			case COMMAND_XOR :
+				for (Iterator it = set1.iterator();
+					it.hasNext();
+					) {
+					id = it.next();
+					if (!set2.contains(id))
+						merged.add(id);
+				}
+			for (Iterator it = set2.iterator();
+				it.hasNext();
+					) {
+					id = it.next();
+					if (!set1.contains(id) && !merged.contains(id))
+						merged.add(id);
+				}
+				break;
+			default :
+				throw new IllegalArgumentException(
+					"operation not permited: " + operation);
+		}
+		return merged;
+	}
 	/**
 	 * Reads exactly <code>len</code> bytes from the input stream
 	 * into the byte array. This method reads repeatedly from the
