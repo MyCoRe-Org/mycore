@@ -104,19 +104,28 @@ public class MCRCStoreLucene
 	 */
 	public String[] getDerivateIDs(String docTextQuery) {
 		String[] returns = null;
-		//maybe transform query here
+		//transform query here
 		String queryText = parseQuery(docTextQuery);
 		logger.debug("TS transformed query:" + queryText);
 		if (queryText.length() == 0)
 			return new String[0];
+		//Start a filtering query for the largest word in the query
+		HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD,queryText);
+		//if it's a simple query we have the results already
+		if (queryText.indexOf(" ")==-1){
+			//only one word in the query!
+			//results are in derivateIDs
+			return MCRUtils.getStringArray(derivateIDs.toArray());
+		}
+		//for all derivates matching the filtering query
+		//we apply the complete query now
+		Iterator it = derivateIDs.iterator();
+		Hits[] hits;
+		Document doc;
+		String derivateID;
+		HashSet collector = new HashSet();
+		int i = 0;
 		try {
-			HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD,queryText);
-			Iterator it = derivateIDs.iterator();
-			Hits[] hits;
-			Document doc;
-			String derivateID;
-			HashSet collector = new HashSet();
-			int i = 0;
 			while (it.hasNext()) {
 				hits = getHitsForDerivate((String) it.next(), queryText);
 				//we have an array of hits each should contain only
@@ -192,7 +201,7 @@ public class MCRCStoreLucene
 		int j = query.lastIndexOf('\"');
 		if (j == -1)
 			return "";
-		return query.substring(i, j);
+		return query.substring(i, j).trim();
 	}
 
 	/* (non-Javadoc)
@@ -359,33 +368,6 @@ public class MCRCStoreLucene
 			throw new MCRPersistenceException(msg.toString(), e);
 		}
 		return hits;
-	}
-
-	private HashSet getUniqueFieldValues(String fieldName) {
-		HashSet collector = new HashSet();
-		if (fieldName == null || fieldName.length() == 0)
-			return collector;
-		TermEnum enum = null;
-		try {
-			try {
-				enum = indexReader.terms(new Term(fieldName, ""));
-				while (fieldName.equals(enum.term().field())) {
-					//... collect enum.term().text() ...
-					collector.add(enum.term().text());
-					if (!enum.next())
-						break;
-				}
-			} finally {
-				enum.close();
-			}
-		} catch (IOException e) {
-			StringBuffer msg =
-				new StringBuffer("Error while fetching unique values of field ")
-					.append(fieldName)
-					.append("!");
-			throw new MCRPersistenceException(msg.toString(), e);
-		}
-		return collector;
 	}
 
 	/**
