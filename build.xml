@@ -81,7 +81,7 @@
   <!-- =================================================================== -->
   <!-- Compiles all source directory                                       -->
   <!-- =================================================================== -->
-  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_ifs,compile_communication,compile_user,compile_commandline,compile_nbn">
+  <target name="compile" depends="init,compile_common,compile_xml,compile_datamodel,compile_sql,compile_cm7,compile_classifications,compile_ifs,compile_user,compile_communication,compile_commandline">
   </target>
   
   <target name="compile_common">
@@ -219,6 +219,7 @@
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
   <target name="clean">
+    <delete file="./mycore.jar" />
     <delete includeEmptyDirs="true" >
       <fileset dir="${mycore.javadoc}" />
       <fileset dir="${mycore.class}" />
