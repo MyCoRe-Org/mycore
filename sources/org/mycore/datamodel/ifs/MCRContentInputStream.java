@@ -49,7 +49,7 @@ public class MCRContentInputStream extends FilterInputStream
   protected MessageDigest digest = null;
 
   /** The total number of bytes read so far */
-  protected int length;
+  protected long length;
 
   /** The header of the file read */
   protected byte[] header;
@@ -119,7 +119,7 @@ public class MCRContentInputStream extends FilterInputStream
    *
    * @return the number of bytes read 
    */
-  public int getLength()
+  public long getLength()
   { return length; }
 
   /** 
