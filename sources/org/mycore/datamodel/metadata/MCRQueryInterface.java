@@ -26,6 +26,7 @@ package mycore.datamodel;
 
 import java.util.*;
 import mycore.common.MCRException;
+import mycore.datamodel.MCRObjectID;
 
 /**
  * This interface is designed to choose the tranformer from XQuery to
@@ -92,6 +93,23 @@ public String createSearchStringText(String part, String subtag,
  **/
 public String createSearchStringDate(String part, String subtag,
   String [] sattrib, String [] svalue, GregorianCalendar date);
+
+/**
+ * The method returns the search string for a XML link field for
+ * the IBM Content Manager 7 persistence system.<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
+ *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
+ * @param subtag             the tagname of an element from the list in a tag
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param href               the reference value of this element
+ * @return the search string for the CM7 text search engine
+ **/
+public String createSearchStringHref(String part, String subtag,
+  String [] sattrib, String [] svalue, MCRObjectID href);
 
 }
 

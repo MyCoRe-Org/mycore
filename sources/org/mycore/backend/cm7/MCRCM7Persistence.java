@@ -325,6 +325,60 @@ private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
   }
 
 /**
+ * The methode receive an object from the data store and return the 
+ * label of the object. The index class is determinated by the type
+ * of the object ID. This <b>must</b> correspond with the lower case 
+ * configuration name.<br>
+ * As example: Document --> MCR.persistence_cm7_document
+ *
+ * @param mcr_id      the object id
+ * @return the label of the object
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final String receiveLabel(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException
+  {
+  StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
+  sb.append(mcr_id.getTypeId().toLowerCase());
+  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  if (mcr_index_class == null) {
+    throw new MCRConfigurationException("Index class name is false."); }
+  try {
+    return receiveLabelCM7(mcr_id); }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
+  }
+
+/**
+ * The methode receive internal a Label of an object from the data store.
+ *
+ * @param mcr_id      the object id
+ * @return the label of the object
+ * @exception DKException if an error in the CM7 is occured
+ * @exception Exception if an general error is occured
+ **/
+private final String receiveLabelCM7(MCRObjectID mcr_id)
+  throws DKException, Exception
+  {
+  DKDatastoreDL connection = null;
+  String label = new String();
+  try {
+    connection = MCRCM7ConnectionPool.getConnection();
+    try {
+      MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
+      label = item.getKeyfieldToString(mcr_label_name);
+      }
+    catch (MCRCM7PersistenceException e) {
+      throw new MCRPersistenceException(
+        "A object with ID "+mcr_id.getId()+"does not exists."); }
+    }
+  finally {
+    MCRCM7ConnectionPool.releaseConnection(connection); }
+  return label;
+  }
+
+/**
  * The methode update an object in the data store. The index class
  * is determinated by the type of the object ID. This <b>must</b>
  * correspond with the lower case configuration name.<br>

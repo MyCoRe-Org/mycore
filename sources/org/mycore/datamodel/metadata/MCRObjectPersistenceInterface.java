@@ -64,7 +64,7 @@ public void delete(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
- * The methode receive a object from the data store.
+ * The methode receive a object as XML stream from the data store.
  *
  * @param mcr_id   the MyCoRe object ID
  * @return the XML stream of the object as string
@@ -75,14 +75,25 @@ public String receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
- * The methode receive a object from the data store.
+ * The methode receive the creation date of a object from the data store.
  *
  * @param mcr_id   the MyCoRe object ID
- * @return the instance of the GregorianCalendar class of the object
+ * @return the creation date
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
 public GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException;
+
+/**
+ * The methode receive the label of object from the data store.
+ *
+ * @param mcr_id   the MyCoRe object ID
+ * @return the label
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public String receiveLabel(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**

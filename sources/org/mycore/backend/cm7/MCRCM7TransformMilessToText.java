@@ -31,6 +31,7 @@ import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.common.MCRUtils;
 import mycore.datamodel.MCRQueryInterface;
+import mycore.datamodel.MCRObjectID;
 
 /**
  * This is the tranformer implementation for CM 7 from  Miless Query language
@@ -95,6 +96,10 @@ public final Vector getResultList(String query, String type, int maxresults)
       cond.append(setContainsCondition(onecond)); }
     if (onecond.indexOf("DD.MM.YYYY") != -1) {
       cond.append(setDateCondition(onecond)); }
+    if (onecond.indexOf("LINKLABEL") != -1) {
+      cond.append(setLinkLabelCondition(onecond)); }
+    if (onecond.indexOf("LINKID") != -1) {
+      cond.append(setLinkIdCondition(onecond)); }
     if (startpos<stoppos) {
       operpos = rawtext.indexOf("(",startpos);
       if (operpos != -1) {
@@ -214,6 +219,122 @@ private final String setContainsCondition(String condition)
 
 /**
  * This private method set the part of the CM7 search string for the
+ * 'LINKLABEL' condition.
+ *
+ * @param condition   a single condition
+ * @return the CM7 query substring
+ **/
+private final String setLinkLabelCondition(String condition)
+  {
+  StringBuffer sb = new StringBuffer(128);
+  int i = condition.indexOf("LINKLABEL");
+  if (i==-1) { return ""; }
+  String tag = condition.substring(1,i).trim();
+  int start = condition.indexOf("\"",i);
+  if (start==-1) { return ""; }
+  int stop = condition.indexOf("\"",start+1);
+  if (stop==-1) { return ""; }
+  String value = condition.substring(start+1,stop);
+  int l = stop;
+  value = value.replace('"',' ').trim();
+  sb.append("($PARA$ {"); 
+  int j = 0;
+  String word = "";
+  while (j<value.length()) {
+    int k = value.indexOf(" ",j);
+    if (k==-1) { k= value.length(); }
+    word = value.substring(j,k); 
+    if (word.indexOf("*")!=-1) {
+      sb.append("$MC=*$ ").append(word).append(' '); }
+    else {
+      sb.append(word).append(' '); }
+    j = k+1;
+    }
+  while(true) {
+    i = condition.indexOf("WITH",l);
+    if (i==-1) { break; }
+    start = condition.indexOf("\"",i+4);
+    if (start==-1) { return ""; }
+    stop = condition.indexOf("\"",start+1);
+    if (stop==-1) { return ""; }
+    int k = condition.indexOf("=",start+1);
+    sb.append("XXX").append(condition.substring(start+1,k)).append("XXX")
+      .append(condition.substring(k+1,stop)).append("XXX ");
+    l = stop;
+    }
+  i = tag.indexOf(".");
+  if (i==-1) {
+    sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
+  else {
+    j = tag.indexOf(".",i+1);
+    if (j==-1) {
+      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
+    }
+  sb.append(')');
+  return sb.toString();
+  }
+
+/**
+ * This private method set the part of the CM7 search string for the
+ * 'LINKID' condition.
+ *
+ * @param condition   a single condition
+ * @return the CM7 query substring
+ **/
+private final String setLinkIdCondition(String condition)
+  {
+  StringBuffer sb = new StringBuffer(128);
+  int i = condition.indexOf("LINKID");
+  if (i==-1) { return ""; }
+  String tag = condition.substring(1,i).trim();
+  int start = condition.indexOf("\"",i);
+  if (start==-1) { return ""; }
+  int stop = condition.indexOf("\"",start+1);
+  if (stop==-1) { return ""; }
+  String value = condition.substring(start+1,stop);
+  int l = stop;
+  value = value.replace('"',' ').replace('_','X').trim();
+  sb.append("($PARA$ {"); 
+  int j = 0;
+  String word = "";
+  while (j<value.length()) {
+    int k = value.indexOf(" ",j);
+    if (k==-1) { k= value.length(); }
+    word = value.substring(j,k); 
+    if (word.indexOf("*")!=-1) {
+      sb.append("$MC=*$ ").append(word).append(' '); }
+    else {
+      sb.append(word).append(' '); }
+    j = k+1;
+    }
+  while(true) {
+    i = condition.indexOf("WITH",l);
+    if (i==-1) { break; }
+    start = condition.indexOf("\"",i+4);
+    if (start==-1) { return ""; }
+    stop = condition.indexOf("\"",start+1);
+    if (stop==-1) { return ""; }
+    int k = condition.indexOf("=",start+1);
+    sb.append("XXX").append(condition.substring(start+1,k)).append("XXX")
+      .append(condition.substring(k+1,stop)).append("XXX ");
+    l = stop;
+    }
+  i = tag.indexOf(".");
+  if (i==-1) {
+    sb.append("$MC=*$ *XXX").append(tag).append("XXX* }"); }
+  else {
+    j = tag.indexOf(".",i+1);
+    if (j==-1) {
+      sb.append("$MC=*$ *XXX").append(tag.substring(0,i)).append("XXX")
+        .append(tag.substring(i+1,tag.length())).append("XXX* }"); }
+    }
+  sb.append(')');
+  return sb.toString();
+  }
+
+/**
+ * This private method set the part of the CM7 search string for the
  * 'DD.MM.YYYY' condition.
  *
  * @param condition   a single condition
@@ -248,8 +369,9 @@ private final String setDateCondition(String condition)
   else if (oper.indexOf(">=")>=0) { ioper = 2; }
     else if (oper.indexOf(">")>=0) { idate += 1; ioper = 2; }
       else if (oper.indexOf("<")>=0) { ioper = 3; }
-        else if (oper.indexOf("=")>=0) { ioper = 1; }
-          else { return ""; }
+        else if (oper.indexOf("!=")>=0) { ioper = 4; }
+          else if (oper.indexOf("=")>=0) { ioper = 1; }
+            else { return ""; }
   String binstr = Integer.toBinaryString(idate);
   String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
   int lenstr = binstr.length();
@@ -290,9 +412,13 @@ private final String setDateCondition(String condition)
     }
   String sttag = sbtag.toString();
   // build the search string
-  if (ioper==1) {
+  if ((ioper==1) || (ioper==4)) {
     stdate = stdate.replace('2','0');
-    sb.append("(").append(sttag).append(stdate).append(")").append(NL);
+    if (ioper==4) { 
+      sb.append("(NOT "); }
+    else {
+      sb.append("("); }
+    sb.append(sttag).append(stdate).append(")").append(NL);
     return sb.toString(); }
   String standor = "";
   String stnot = "(";
@@ -408,7 +534,50 @@ public final String createSearchStringDate(String part, String subtag,
   for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
   sb.append(binstr);
   sb.append(NL);
-System.out.println(sb.toString());
+  return sb.toString();
+  }
+
+/**
+ * The method returns the search string for a XML link field for
+ * the IBM Content Manager 7 persistence system.<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag xlink:href="href" xlink:sattrib="svalue" ... /&gt;
+ *
+ * @param part               the global part of the elements like 'metadata'
+ *                           or 'service'
+ * @param subtag             the tagname of an element from the list in a tag
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param href               the reference value of this element
+ * @return the search string for the CM7 text search engine
+ **/
+public final String createSearchStringHref(String part, String subtag,
+  String [] sattrib, String [] svalue, MCRObjectID href)
+  {
+  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
+    return ""; }
+  if (href == null) { return ""; }
+  StringBuffer sb = new StringBuffer(1024);
+  sb.append("XXX").append(part.toUpperCase()).append("XXX").
+     append(subtag.toUpperCase()).append("XXX ");
+  if (sattrib != null) {
+    for (int i=0;i<sattrib.length;i++) {
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
+        .append(svalue[i].toUpperCase()).append("XXX ");
+      }
+    }
+  MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
+  String label = mcr_pers.receiveLabel(href);
+  sb.append(label.toUpperCase()).append(NL);
+  sb.append("XXX").append(part.toUpperCase()).append("XXX").
+     append(subtag.toUpperCase()).append("XXX ");
+  if (sattrib != null) {
+    for (int i=0;i<sattrib.length;i++) {
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
+        .append(svalue[i].toUpperCase()).append("XXX ");
+      }
+    }
+  sb.append(href.getId().replace('_','X').toUpperCase()).append(NL);
   return sb.toString();
   }
 
