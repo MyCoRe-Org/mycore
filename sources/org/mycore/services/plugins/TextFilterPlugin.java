@@ -69,7 +69,7 @@ public interface TextFilterPlugin {
 	 */
 	public boolean transform(
 		MCRFileContentType ct,
-		MCRContentInputStream input,
+		InputStream input,
 		OutputStream output)
 		throws FilterPluginTransformException;
 }
