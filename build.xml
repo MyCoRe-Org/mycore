@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.54 $ $Date: 2003-08-08 09:35:19 $                      -->
+  <!-- $Revision: 1.55 $ $Date: 2003-08-08 10:52:25 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -63,7 +63,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.54 $ $Date: 2003-08-08 09:35:19 $</echo>
+    <echo>Ant build file   : $Revision: 1.55 $ $Date: 2003-08-08 10:52:25 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -102,11 +102,11 @@
 
   <target name="jdbcstore.path.1" if="MCR.JDBCStore.BaseDir">
     <path id="jdbc.classpath">
-      <fileset dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.Jars}"        />
-      <dirset  dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.ClassesDirs}" />
+      <fileset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.Jars}"        />
+      <dirset  dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.ClassesDirs}" />
     </path>
     <path id="jdbc.libpath">
-      <dirset dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.LibPath}" />
+      <dirset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.LibPath}" />
     </path>
   </target>
 
@@ -117,11 +117,11 @@
 
   <target name="xmlstore.path.1" if="MCR.XMLStore.BaseDir">
     <path id="xml.classpath">
-      <fileset dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.Jars}"        />
-      <dirset  dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.ClassesDirs}" /> 
+      <fileset dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.Jars}"        />
+      <dirset  dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.ClassesDirs}" /> 
     </path>
     <path id="xml.libpath">
-      <dirset dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.LibPath}" />
+      <dirset dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.LibPath}" />
     </path>
   </target>
 
