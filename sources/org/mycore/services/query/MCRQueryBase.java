@@ -169,6 +169,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			andor.add("");
 		}
 		// debug subqueries
+		logger.debug("QSubSize: "+Integer.toString(subqueries.size()));
 		for (i = 0; i < flags.size(); i++) {
 			logger.debug("Q: " + (String) subqueries.get(i) + " by "
 					+ (String) andor.get(i));
@@ -225,7 +226,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 					}
 				}
 			}
-			if (isid == subqueries.size()) {
+			if ((isid == subqueries.size()) && (isid != 0)) {
 				logger.debug("Retrieve the data direcly from XML database.");
 				for (int p = 0; p < subqueries.size();p++) {
 					try {
