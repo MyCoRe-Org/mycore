@@ -54,12 +54,14 @@ public class MCREditorSubmission
    * @param input the root element of the XML input
    */
   MCREditorSubmission( Element input )
-  { setVariablesFromElement( input, "/", "" ); }
+  { 
+    setVariablesFromElement( input, "/", "" );
+    setRepeatsFromVariables();
+  }
   
   MCREditorSubmission( MCRRequestParameters parms, Element editor )
   {
     this.parms = parms;
-    
     setVariablesFromSubmission( parms, editor );
     Collections.sort( variables );
   }
@@ -270,5 +272,52 @@ public class MCREditorSubmission
     List children = element.getChildren();
     for( int i = 0; i < children.size(); i++ )
       renameRepeatedElements( (Element)( children.get( i ) ) );
+  }
+  
+  private void setRepeatsFromVariables()
+  {
+    Hashtable maxtable = new Hashtable();
+     
+    for( int i = 0; i < variables.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
+      String[] path = var.getPathElements();
+      String prefix = path[ 0 ];
+        
+      for( int j = 1; j < path.length; j++ )
+      {
+        String name = path[ j ];
+        int pos1 = name.lastIndexOf( "[" );
+        int pos2 = name.lastIndexOf( "]" );
+          
+        if( pos1 != -1 )
+        {
+          String elem = name.substring( 0, pos1 );
+          String num  = name.substring( pos1 + 1, pos2 );
+          String key  = prefix + "/" + elem;
+          
+          int numNew = Integer.parseInt( num );
+        
+          if( maxtable.containsKey( key ) )
+          {
+            int numOld = Integer.parseInt( (String)( maxtable.get( key ) ) );
+            maxtable.remove( key );
+            numNew = Math.max( numOld, numNew );
+          }
+          
+          maxtable.put( key, String.valueOf( numNew ) );
+        }          
+        prefix = prefix + "/" + name;
+      }
+    }
+      
+    for( Enumeration e = maxtable.keys(); e.hasMoreElements(); )
+    {
+      String path  = (String)( e.nextElement() );
+      String value = (String)( maxtable.get( path ) );
+      
+      // repeats.addElement( new MCREditorVariable( path, value ) );
+      MCREditorServlet.logger.debug( "Editor get num " + path + " = " + value );
+    }
   }
 }
