@@ -74,7 +74,7 @@ public void doGetPost(MCRServletJob job) throws Exception
   boolean haspriv = false;
   MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
   String userid = mcrSession.getCurrentUserID();
-  userid = "administrator";
+  //userid = "administrator";
   LOGGER.debug("Curren user for list workflow = "+userid);
   ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
   if (privs.contains("modify-"+type)) { haspriv = true; }

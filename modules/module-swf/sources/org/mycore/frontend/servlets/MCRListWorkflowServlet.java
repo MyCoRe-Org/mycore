@@ -103,10 +103,10 @@ public void doGetPost(MCRServletJob job) throws Exception
   boolean haspriv = false;
   MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
   String userid = mcrSession.getCurrentUserID();
-  userid = "administrator";
+  //userid = "administrator";
   LOGGER.debug("Curren user for list workflow = "+userid);
   ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-  if (privs.contains("modify-"+type)) { haspriv = true; }
+  if (privs.contains("create-"+type)) { haspriv = true; }
 
   // read directory
   ArrayList workfiles = new ArrayList();
@@ -176,9 +176,10 @@ public void doGetPost(MCRServletJob job) throws Exception
           if (dir.isDirectory()) {
             ArrayList dirlist = MCRUtils.getAllFileNames(dir);
             for (int k=0; k< dirlist.size();k++) {
-System.out.println(dirlist.get(k));
               org.jdom.Element file = new org.jdom.Element("file");
               file.setText(derpath+SLASH+(String)dirlist.get(k));
+              File thisfile = new File(dir,(String)dirlist.get(k));
+              file.setAttribute("size",String.valueOf(thisfile.length()));
               deriv.addContent(file);
               }
             derifiles.remove(j); j--;
