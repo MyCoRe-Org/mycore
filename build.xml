@@ -70,7 +70,7 @@
   <target name="javac" depends="init">
     <javac srcdir="${sources}"
            destdir="${classes}"
-           includes="mycore/${package}/**"
+           includes="${packages}"
            classpath="${lib}/ftp.jar"
            debug="${debug}"
            optimize="${optimize}"
@@ -80,79 +80,79 @@
 
   <target name="compile">
     <antcall target="javac">
-      <param name="package" value="*"/>
+      <param name="packages" value="mycore/common/**,mycore/cm7/**,mycore/datamodel/**,mycore/nbn/**,mycore/xml/**,mycore/classifications/**,mycore/commandline/**,mycore/communication/**,mycore/ifs/**,mycore/sql/**,mycore/user/**" />
     </antcall>
   </target>
   
   <target name="compile_common">
     <antcall target="javac">
-      <param name="package" value="common"/>
+      <param name="packages" value="mycore/common/**"/>
     </antcall>
   </target>
 
   <target name="compile_cm7">
     <antcall target="javac">
-      <param name="package" value="cm7"/>
+      <param name="packages" value="mycore/cm7/**"/>
     </antcall>
   </target>
 
   <target name="compile_cm8">
     <antcall target="javac">
-      <param name="package" value="cm8"/>
+      <param name="packages" value="mycore/cm8/**"/>
     </antcall>
   </target>
 
   <target name="compile_sql">
     <antcall target="javac">
-      <param name="package" value="sql"/>
+      <param name="packages" value="mycore/sql/**"/>
     </antcall>
   </target>
 
   <target name="compile_classifications">
     <antcall target="javac">
-      <param name="package" value="classifications"/>
+      <param name="packages" value="mycore/classifications/**"/>
     </antcall>
   </target>
 
   <target name="compile_ifs">
     <antcall target="javac">
-      <param name="package" value="ifs"/>
+      <param name="packages" value="mycore/ifs/**"/>
     </antcall>
   </target>
 
   <target name="compile_communication">
     <antcall target="javac">
-      <param name="package" value="communication"/>
+      <param name="packages" value="mycore/communication/**"/>
     </antcall>
   </target>
 
   <target name="compile_xml">
     <antcall target="javac">
-      <param name="package" value="xml"/>
+      <param name="packages" value="mycore/xml/**"/>
     </antcall>
   </target>
 
   <target name="compile_datamodel">
     <antcall target="javac">
-      <param name="package" value="datamodel"/>
+      <param name="packages" value="mycore/datamodel/**"/>
     </antcall>
   </target>
 
   <target name="compile_user">
     <antcall target="javac">
-      <param name="package" value="user"/>
+      <param name="packages" value="mycore/user/**"/>
     </antcall>
   </target>
 
   <target name="compile_commandline">
     <antcall target="javac">
-      <param name="package" value="commandline"/>
+      <param name="packages" value="mycore/commandline/**"/>
     </antcall>
   </target>
 
   <target name="compile_nbn">
     <antcall target="javac">
-      <param name="package" value="nbn"/>
+      <param name="packages" value="mycore/nbn/**"/>
     </antcall>
   </target>
 
