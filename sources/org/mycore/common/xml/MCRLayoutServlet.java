@@ -325,15 +325,6 @@ public class MCRLayoutServlet extends MCRServlet {
         }
 
         // Set some predefined XSL parameters:
-        
-        String contextPath = request.getContextPath() + "/";
-        String requestURL = getCompleteURL(request);
-
-        int pos = requestURL.indexOf(contextPath, 9);
-        String applicationBaseURL = requestURL.substring(0, pos) + contextPath;
-
-        String servletsBaseURL = applicationBaseURL + "servlets/";
-
         String defaultLang = MCRConfiguration.instance().getString(
                 "MCR.metadata_default_lang", "en");
 
@@ -365,9 +356,9 @@ public class MCRLayoutServlet extends MCRServlet {
         LOGGER.debug("LayoutServlet RefererURL =" + referer);
 
         parameters.put("CurrentUser", user);
-        parameters.put("RequestURL", requestURL);
-        parameters.put("WebApplicationBaseURL", applicationBaseURL);
-        parameters.put("ServletsBaseURL", servletsBaseURL);
+        parameters.put("RequestURL", getCompleteURL(request));
+        parameters.put("WebApplicationBaseURL", getBaseURL());
+        parameters.put("ServletsBaseURL", getServletBaseURL());
         parameters.put("DefaultLang", defaultLang);
         parameters.put("CurrentLang", lang);
         parameters.put("Referer", referer);
