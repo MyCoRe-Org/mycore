@@ -3,7 +3,7 @@
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  *** 
- * see http://www.mycore.de/ for details.
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
@@ -117,8 +117,8 @@ public class MCRConfiguration
       }
       catch( Exception exc )
       {
-        throw new RuntimeException
-        ( "Could not create mcr.configuration.class singleton \"" + name + "\"" );
+        throw new MCRConfigurationException
+        ( "Could not create mcr.configuration.class singleton \"" + name + "\"", exc );
       }
     }
     else singleton = new MCRConfiguration();
@@ -162,6 +162,7 @@ public class MCRConfiguration
  * with the same name.
  *
  * @param clear if true, properties currently set will be deleted first
+ * @throws MCRConfigurationException if the config files can not be loaded
  */  
   public void reload( boolean clear )
   { 
@@ -180,12 +181,11 @@ public class MCRConfiguration
  * files have to be separated by spaces or colons.
  *
  * @param filename the properties file to be loaded
+ * @throws MCRConfigurationException if the file can not be loaded
  */  
   public void loadFromFile( String filename )
   {
-    if( ( filename == null ) || ( filename.trim().length() == 0 ) )
-      throw new IllegalArgumentException
-      ( "You specified an empty configuration file name" );
+    MCRArgumentChecker.ensureNotEmpty( filename, "filename" );  
 
     try
     {
@@ -195,11 +195,11 @@ public class MCRConfiguration
     }
     catch( Exception exc )
     { 
-      throw new RuntimeException
-      ( "Could not load configuration file " + filename );
+      throw new MCRConfigurationException
+      ( "Could not load configuration file " + filename, exc );
     }
 
-    String include = getString( "mcr.configuration.include" );
+    String include = getString( "mcr.configuration.include", null );
     if( include != null )
     {
       StringTokenizer st = new StringTokenizer( include, ", " );
@@ -209,18 +209,54 @@ public class MCRConfiguration
   }
   
 /**
+ * Returns a new instance of the class specified in the configuration property
+ * with the given name.
+ *
+ * @param name the non-null and non-empty name of the configuration property
+ * @return the value of the configuration property as a String, or null
+ * @throws MCRConfigurationException if the property is not set or the class can not be loaded or instantiated
+ */  
+  public Object getInstanceOf( String name )
+    throws MCRConfigurationException
+  {   
+    MCRArgumentChecker.ensureNotEmpty( name, "name" );  
+    
+    String classname = properties.getProperty( name );
+    if(  classname == null ) 
+      throw new MCRConfigurationException
+      ( "Configuration property " + name + " is not set!" );
+    
+    Class cl;
+    try
+    { cl = Class.forName( classname ); }
+    catch( Exception ex )
+    { throw new MCRConfigurationException( "Could not load class " + classname, ex ); }
+
+    Object o;
+    try
+    { o = cl.newInstance(); }
+    catch( Exception ex )
+    { throw new MCRConfigurationException( "Could not instantiate class " + classname, ex ); }
+    
+    return o;
+  }
+
+/**
  * Returns the configuration property with the specified name as a String,
  * or null if the property is not set.
  *
  * @param name the non-null and non-empty name of the configuration property
- * @return the value of the configuration property as a String, or null
+ * @return the value of the configuration property as a String
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public String getString( String name )
   {   
-    if( ( name == null ) || ( name.trim().length() == 0 ) )
-      throw new IllegalArgumentException
-      ( "You specified an empty configuration property name" );
-    return properties.getProperty( name );
+    MCRArgumentChecker.ensureNotEmpty( name, "name" );  
+    String value = properties.getProperty( name );
+    if( value == null )
+      throw new MCRConfigurationException( "Configuration property " + name + " is not set" );
+    else
+      return value;
   }
 
 /**
@@ -233,7 +269,8 @@ public class MCRConfiguration
  */  
   public String getString( String name, String defaultValue )
   {
-    String value = getString( name );
+    MCRArgumentChecker.ensureNotEmpty( name, "name" );  
+    String value = properties.getProperty( name );
     return ( value == null ? defaultValue : value );
   }
 
@@ -242,7 +279,8 @@ public class MCRConfiguration
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as an <CODE>int</CODE> value
- * @throws NumberFormatException if the configuration property is not set or is not an <CODE>int</CODE> value
+ * @throws NumberFormatException if the configuration property is not an <CODE>int</CODE> value
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public int getInt( String name )
     throws NumberFormatException
@@ -268,7 +306,7 @@ public class MCRConfiguration
   public int getInt( String name, int defaultValue )
     throws NumberFormatException
   {
-    String value = getString( name );
+    String value = getString( name, null );
     return ( value == null ? defaultValue : Integer.parseInt( value ) );
   }
 
@@ -278,7 +316,8 @@ public class MCRConfiguration
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as a <CODE>long</CODE> value
- * @throws NumberFormatException if the configuration property is not set or is not a <CODE>long</CODE> value
+ * @throws NumberFormatException if the configuration property is not a <CODE>long</CODE> value
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public long getLong( String name )
     throws NumberFormatException
@@ -297,7 +336,7 @@ public class MCRConfiguration
   public long getLong( String name, long defaultValue )
     throws NumberFormatException
   {
-    String value = getString( name );
+    String value = getString( name, null );
     return ( value == null ? defaultValue : Long.parseLong( value ) );
   }
 
@@ -307,7 +346,8 @@ public class MCRConfiguration
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as a <CODE>float</CODE> value
- * @throws NumberFormatException if the configuration property is not set or is not a <CODE>float</CODE> value
+ * @throws NumberFormatException if the configuration property is not a <CODE>float</CODE> value
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public float getFloat( String name )
     throws NumberFormatException
@@ -326,7 +366,7 @@ public class MCRConfiguration
   public float getFloat( String name, float defaultValue )
     throws NumberFormatException
   {
-    String value = getString( name );
+    String value = getString( name, null );
     return ( value == null ? defaultValue : Float.parseFloat( value ) );
   }
   
@@ -336,7 +376,8 @@ public class MCRConfiguration
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as a <CODE>double</CODE> value
- * @throws NumberFormatException if the configuration property is not set or is not a <CODE>double</CODE> value
+ * @throws NumberFormatException if the configuration property is not a <CODE>double</CODE> value
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public double getDouble( String name )
     throws NumberFormatException
@@ -355,7 +396,7 @@ public class MCRConfiguration
   public double getDouble( String name, double defaultValue )
     throws NumberFormatException
   {
-    String value = getString( name );
+    String value = getString( name, null );
     return ( value == null ? defaultValue : Double.parseDouble( value ) );
   }
 
@@ -365,9 +406,13 @@ public class MCRConfiguration
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return <CODE>true</CODE>, if and only if the specified property has the value <CODE>true</CODE>
+ * @throws MCRConfigurationException if the property with this name is not set
  */  
   public boolean getBoolean( String name )
-  { return getBoolean( name, false ); }
+  {
+    String value = getString( name );
+    return "true".equals( value.trim() );
+  }
 
 /**
  * Returns the configuration property with the specified name as a
@@ -381,7 +426,7 @@ public class MCRConfiguration
  */  
   public boolean getBoolean( String name, boolean defaultValue )
   {
-    String value = getString( name );
+    String value = getString( name, null );
     return ( value == null ? defaultValue : "true".equals( value.trim() ) );
   }
   
@@ -395,9 +440,7 @@ public class MCRConfiguration
  */  
   public void set( String name, String value )
   {
-    if( ( name == null ) || ( name.trim().length() == 0 ) )
-      throw new IllegalArgumentException
-      ( "You specified an empty configuration property name" );
+    MCRArgumentChecker.ensureNotEmpty( name, "name" );  
     
     if( value == null )
       properties.remove( name );
@@ -466,7 +509,10 @@ public class MCRConfiguration
  * @param out the PrintStream to list the configuration properties on
  */  
   public void list( PrintStream out )
-  { properties.list( out ); }
+  { 
+    MCRArgumentChecker.ensureNotNull( out, "out" );  
+    properties.list( out ); 
+  }
   
 /**
  * Lists all configuration properties currently set to a PrintWriter.
@@ -477,7 +523,10 @@ public class MCRConfiguration
  * @param out the PrintWriter to list the configuration properties on
  */  
   public void list( PrintWriter out )
-  { properties.list( out ); }
+  { 
+    MCRArgumentChecker.ensureNotNull( out, "out" );  
+    properties.list( out ); 
+  }
 
 /**
  * Stores all configuration properties currently set to an OutputStream.
@@ -490,7 +539,10 @@ public class MCRConfiguration
  */  
   public void store( OutputStream out, String header )
     throws IOException
-  { properties.store( out, header ); }
+  { 
+    MCRArgumentChecker.ensureNotNull( out, "out" );  
+    properties.store( out, header ); 
+  }
   
 /**
  * Returns a String containing the configuration properties currently set.
