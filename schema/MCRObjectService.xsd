@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+            targetNamespace="http://www.mycore.de"
+            xmlns="http://www.mycore.de" >
+
+ <xsd:annotation>
+  <xsd:documentation xml:lang="en">
+   This XML Schema file describe the data model of the MCRObjectService
+   part of a MCRObject.
+  </xsd:documentation>
+ </xsd:annotation>
+
+ <xsd:complexType name="MCRObjectService" >
+  <xsd:sequence>
+   <xsd:element name="dates" type="MCRServiceDates" minOccurs='0' 
+     maxOccurs='1'/>
+   <xsd:element name="flags" type="MCRServiceFlags" minOccurs='0' 
+     maxOccurs='1'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRServiceDates">
+  <xsd:sequence>
+   <xsd:element name="date" minOccurs='0' maxOccurs='unbounded'>
+    <xsd:complexType>
+     <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+       <xsd:attribute name="type" use="required">
+        <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="createdate"/>
+          <xsd:enumeration value="modifydate"/>
+          <xsd:enumeration value="submitdate"/>
+          <xsd:enumeration value="acceptdate"/>
+          <xsd:enumeration value="validfromdate"/>
+          <xsd:enumeration value="validtodate"/>
+         </xsd:restriction>
+        </xsd:simpleType>
+       </xsd:attribute>
+      </xsd:extension>
+     </xsd:simpleContent>
+    </xsd:complexType>
+   </xsd:element>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="MCRServiceFlags">
+  <xsd:sequence>
+   <xsd:element name="flag" type='xsd:string' minOccurs='1' 
+     maxOccurs='unbounded'/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+</xsd:schema>
+
+
