@@ -194,7 +194,17 @@ public class MCRDerivateCommands
     try {
       MCRDerivate mycore_obj = new MCRDerivate();
       mycore_obj.setFromURI( file );
+
+      // Replace relative path with absolute path of files
+      String path = mycore_obj.getDerivate().getInternals().getSourcePath();
+      path = path.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+      String prefix = new File( file ).getParent();
+      path = prefix + File.separator + path;
+      mycore_obj.getDerivate().getInternals().setSourcePath( path );
+
+      logger.info( "Source path --> " + path );
       logger.info( "Label --> " + mycore_obj.getLabel() );
+
       if( update ) {
         mycore_obj.updateInDatastore();
         logger.info( mycore_obj.getId().getId() + " updated." );
