@@ -1,24 +1,31 @@
-\documentclass[a4paper,12pt]{book}
-\usepackage{german}
-\usepackage{fancyheadings} 
-\pagestyle{fancyplain} 
-\addtolength{\headwidth}{\marginparsep} 
-\addtolength{\headwidth}{\marginparwidth} 
-\renewcommand{\chaptermark}[1]% 
-      {\markboth{#1}{}} 
-\renewcommand{\sectionmark}[1]% 
-      {\markright{\thesection\ #1}} 
-\lhead[\fancyplain{}{\bfseries\thepage}]% 
-      {\fancyplain{}{\bfseries\rightmark}} 
-\rhead[\fancyplain{}{\bfseries\leftmark}]% 
-      {\fancyplain{}{\bfseries\thepage}} 
-\cfoot{} 
+\documentclass[a4paper,12pt]{report}
+\usepackage{ngerman}
+
+%neue deutsche Rechtschreibung
+%\usepackage[english,ngerman]{babel}
+
+\usepackage[latin1]{inputenc} %für Linux
+%\usepackage[ansinew]{inputenc} %fuer Windows
+
+\usepackage{mycore}
+
 \begin{document}
 %-------   Vorspann
 \title{MyCoRe Internal Design Guilde}
-\maketitle{}
+\author{
+Johannes Bühler
+            }
+\maketitle
+
 \setcounter{secnumdepth}{10} 
+
+
 \chapter*{Vorwort} 
+
+\tableofcontents
+\listoffigures
+\listoftables
+
 \chapter{ Einf"uhrung und Grundprinzipien} 
 \section{XML/XSLT}
 \section{XPath/Queries}
