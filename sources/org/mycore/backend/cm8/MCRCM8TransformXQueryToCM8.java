@@ -89,7 +89,7 @@ public final MCRQueryResultArray getResultList(String query, String type,
   String itemtypeprefix = conf.getString(sb+"_prefix");
   // prepare query
 System.out.println("================================");
-System.out.println("MCRCM7TransformXQueryToCM8 : "+query);
+System.out.println("MCRCM8TransformXQueryToCM8 : "+query);
 System.out.println("================================");
   int startpos = 0;
   int stoppos = query.length();
@@ -120,12 +120,14 @@ System.out.println("================================");
       }
     }
   cond.append(']');
-System.out.println("MCRCM7TransformXQueryToCM8 : "+cond.toString());
+System.out.println("MCRCM8TransformXQueryToCM8 : "+cond.toString());
 System.out.println("================================");
-  query = traceOneCondition(cond.toString(),itemtypename,itemtypeprefix);
+  if (cond.toString().equals("/mycoreobject[]")) { 
+    query = ""; }
+  else {
+    query = traceOneCondition(cond.toString(),itemtypename,itemtypeprefix); }
   if (query.length()==0) { query = "/"+itemtypename; }
-  if (query.equals("/MCR_Demo_Legal[]")) { query = "/"+itemtypename; }
-System.out.println("MCRCM7TransformXQueryToCM8 : >>>"+query+"<<<");
+System.out.println("MCRCM8TransformXQueryToCM8 : "+query);
 System.out.println("================================");
   // Start the search
   DKDatastoreICM connection = null;
@@ -349,25 +351,6 @@ private final String traceOneCondition(String cond, String itemtypename,
       if (op[i].equals("like")) { 
         // replace * with %
         value[i] = value[i].replace('*','%'); 
-        // search all words
-        ArrayList list = new ArrayList();
-        j = 0;
-        k = value[0].length();
-        while (j < k) {
-          l = value[0].indexOf(" ",j);
-          if (l == -1) { list.add(value[0].substring(j,k)); break; }
-          list.add(value[0].substring(j,l));
-          j = l+1;
-          }
-        // set % to the begin and end
-        StringBuffer sbval = new StringBuffer(128);
-        for (j=0;j<list.size();j++) {
-          if (!((String)list.get(j)).startsWith("%")) { sbval.append('%'); }
-          sbval.append((String)list.get(j));
-          if (!((String)list.get(j)).endsWith("%")) { sbval.append('%'); }
-          sbval.append(' ');
-          }
-        value[i] = sbval.toString();
         } 
       sbout.append(' ').append(op[i]).append(" \"").append(value[i])
         .append("\"").append(bool[i]); }
