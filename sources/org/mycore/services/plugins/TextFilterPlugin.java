@@ -25,6 +25,7 @@ package org.mycore.services.plugins;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 
 /**
@@ -73,7 +74,7 @@ public interface TextFilterPlugin {
  	 * @param mime   MIME Type of InputStream
 	 * @return  InputStream textual representation of input
 	 */
-	public InputStream transform(InputStream input, String mime) throws FilterPluginTransformException;
+	public boolean transform(InputStream input, String mime, OutputStream output) throws FilterPluginTransformException;
 
 	/**
 	 * onverts a given Inputstream to Textstream which should contain
@@ -82,5 +83,5 @@ public interface TextFilterPlugin {
 	 * @param input  File in foreign format
 	 * @return Inputstream textual representation of input
 	 */
-	public InputStream transform(File input) throws FilterPluginTransformException;
+	public boolean transform(File input, OutputStream output) throws FilterPluginTransformException;
 }
