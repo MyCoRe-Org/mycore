@@ -71,96 +71,80 @@ public static void queryRemote( String type, String query )
  * @param type  the document type, "class" or "document" or ...
  * @param query the query expression
  **/
-public static void query( String host, String type, String query )
+  public static void query( String host, String type, String query )
   {
-  // Configuration
-  MCRConfiguration config = MCRConfiguration.instance();
-  // set the logger property
-  PropertyConfigurator.configure(config.getLoggingProperties());
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure( config.getLoggingProperties() );
 
-  // input parameters
-  if (host==null) host = "local";
-  if (type==null) { return; }
-  type  = type .toLowerCase();
-  if (query==null) query = "";
-  logger.info("Query Host  = "+host);
-  logger.info("Query Type  = "+type);
-  logger.info("Query       = "+query);
+    // input parameters
+    if( host  == null ) host = "local";
+    if( type  == null ) return; else type = type.toLowerCase();
+    if( query == null ) query = "";
 
-  // classifications
-  if (type.equals("class")) {
+    logger.info("Query Host = " + host  );
+    logger.info("Query Type = " + type  );
+    logger.info("Query      = " + query );
+
     MCRQueryResult result = new MCRQueryResult();
-    String squence = config.getString("MCR.classifications_search_sequence",
-      "remote-local");
-    MCRXMLContainer resarray = new MCRXMLContainer();
-    if (squence.equalsIgnoreCase("local-remote")) {
-      resarray = result.setFromQuery("local",type,query );
-      if (resarray.size()==0) {
-        resarray = result.setFromQuery(host,type,query ); }
+    MCRXMLContainer resarray = null;
+
+    if( type.equals( "class" ) ) // classifications
+    {
+      resarray = new MCRXMLContainer();
+
+      String squence = config.getString(
+        "MCR.classifications_search_sequence", "remote-local" );
+    
+      if( squence.equalsIgnoreCase( "local-remote" ) ) 
+      {
+        resarray = result.setFromQuery( "local", type, query );
+        if( resarray.size() == 0 ) 
+        {
+          resarray = result.setFromQuery( host, type, query ); 
+        }
       }
-    else {
-      resarray = result.setFromQuery(host,type,query );
-      if (resarray.size()==0) {
-        resarray = result.setFromQuery("local",type,query ); }
+      else 
+      {
+        resarray = result.setFromQuery( host, type, query );
+        if( resarray.size() == 0 ) 
+        {
+          resarray = result.setFromQuery( "local", type, query ); 
+        }
       }
-    if (resarray.size()==0) {
-      logger.error("No classification or category exists" ); }
-    // Stylesheet transforming
-    String applpath = config.getString("MCR.appl_path");
-    String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
-      "class.xsl";
-    // Transformation
-    try {
+
+      if( resarray.size() == 0 )
+        logger.error( "No classification or category exists" ); 
+    }
+    else // other types
+    {
+      resarray = result.setFromQuery( host, type, query );
+    }
+
+    String applpath = config.getString( "MCR.appl_path" );
+    String xslpath = applpath + "/stylesheets/mcr_results-PlainText-" + type + ".xsl";
+
+    try
+    {
+      StreamSource source = new StreamSource( xslpath );
       TransformerFactory transfakt = TransformerFactory.newInstance();
-      Transformer trans =
-        transfakt.newTransformer(new StreamSource(xslfile));
-      StreamResult sr = new StreamResult((OutputStream) System.out); 
-      trans.transform(new javax.xml.transform.dom.DOMSource(
+      Transformer trans = transfakt.newTransformer( source );
+      StreamResult sr = new StreamResult( (OutputStream)System.out );
+      trans.transform( new javax.xml.transform.dom.DOMSource( 
         (new org.jdom.output.DOMOutputter())
         .output(resarray.exportAllToDocument())),sr);
-      }
-    catch (Exception e) {
-      logger.error("Error while tranformation the XML Result via XSLT.");
-      logger.debug(e.getMessage());
-      logger.info("Stop.");
-      logger.info("");
+    }
+    catch( Exception ex )
+    {
+      logger.error( "Error while tranforming query result XML using XSLT" );
+      logger.debug( ex.getMessage() );
+      logger.info( "Stop." );
+      logger.info( "" );
       return;
-      }
-    logger.info("");
-    logger.info("Ready.");
-    logger.info("");
-    return;
     }
 
-  // other types
-  MCRQueryResult result = new MCRQueryResult();
-  MCRXMLContainer resarray = result.setFromQuery(host,type,query);
-
-  // Configuration
-  String applpath = config.getString("MCR.appl_path");
-  String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
-    type.toLowerCase()+".xsl";
-  try {
-    TransformerFactory transfakt = TransformerFactory.newInstance();
-    // Indexlist
-    Transformer trans =
-      transfakt.newTransformer(new StreamSource(xslfile));
-    StreamResult sr = new StreamResult((OutputStream) System.out); 
-    trans.transform(new javax.xml.transform.dom.DOMSource(
-      (new org.jdom.output.DOMOutputter())
-      .output(resarray.exportAllToDocument())),sr);
-    }
-  catch (Exception e) {
-    logger.error("Error while tranformation the XML Result via XSLT.");
-    logger.debug(e.getMessage());
-    logger.info("Stop.");
-    logger.info("");
-    return;
-    }
-  logger.info("");
-  logger.info("Ready.");
-  logger.info("");
+    logger.info( "" );
+    logger.info( "Ready." );
+    logger.info( "" );
   }
-
 }
 
