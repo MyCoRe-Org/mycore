@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.20 $ $Date: 2004-12-15 15:02:44 $ -->
+<!-- $Revision: 1.21 $ $Date: 2004-12-16 16:10:37 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -761,7 +761,7 @@
       <b><xsl:value-of select="$source" /></b>
       <br/>
       <input type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
-      <xsl:text> l÷schen </xsl:text>
+      <xsl:text> löschen </xsl:text>
       <input type="hidden" name="{$var}" value="{$source}" />
       und/oder ersetzen durch diese Datei: <xsl:text/>
       <br/>
