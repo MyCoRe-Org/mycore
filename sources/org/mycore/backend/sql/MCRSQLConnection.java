@@ -50,15 +50,13 @@ import org.mycore.common.*;
  * @see #justDoQuery( String )
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  *@author Johannes Buehler
   * @version $Revision$ $Date$
  */
 public class MCRSQLConnection {
 	/** The wrapped JDBC connection */
 	protected Connection connection;
-
-	private boolean inPool;
 
 	/** 
 	 * Creates a new connection. This constructor is used by the connection pool 
@@ -98,44 +96,6 @@ public class MCRSQLConnection {
 		}
 
 		this.connection = connection;
-		inPool = true;
-	}
-
-	public MCRSQLConnection(
-		String driver,
-		String url,
-		String user,
-		String passwd)
-		throws MCRPersistenceException, MCRConfigurationException {
-		Logger logger = MCRSQLConnectionPool.getLogger();
-
-		try {
-			Class.forName(driver);
-		} // Load the JDBC driver
-		catch (Exception exc) {
-			String msg = "Could not load JDBC driver class " + driver;
-			throw new MCRPersistenceException(msg, exc);
-		}
-
-		logger.debug(
-			"MCRSQLConnection: Building connection to JDBC datastore... with "
-				+ url);
-
-		Connection connection = null;
-		try {
-			try {
-				connection = DriverManager.getConnection(url, user, passwd);
-			} catch (Exception MCRConfigurationException) {
-				connection = DriverManager.getConnection(url);
-			}
-		} catch (Exception exc) {
-			throw new MCRPersistenceException(
-				"Could not build a JDBC connection using url " + url,
-				exc);
-		}
-
-		this.connection = connection;
-		inPool = false;
 	}
 
 	/**
@@ -145,7 +105,6 @@ public class MCRSQLConnection {
 	 * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
 	 **/
 	public void release() {
-		if (inPool)
 			MCRSQLConnectionPool.instance().releaseConnection(this);
 	}
 
