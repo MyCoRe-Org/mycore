@@ -48,15 +48,15 @@ public void init(String type);
 /**
  * The method create a new item in the datastore.
  *
- * @param from a string with the link ID FROM
- * @param to a string with the link ID TO
+ * @param from a string with the link ID MCRFROM
+ * @param to a string with the link ID MCRTO
  **/
 public void create(String from, String to);
 
 /**
  * The method remove a item for the from ID from the datastore.
  *
- * @param from a string with the link ID FROM
+ * @param from a string with the link ID MCRFROM
  **/
 public void delete( String from );
 
