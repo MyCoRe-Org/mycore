@@ -85,7 +85,7 @@ final class MCRCM8Item implements DKConstantICM
     {
     logger = MCRCM8ConnectionPool.getLogger();
     if (id==null) {
-      throw new MCRPersistenceException("MCRCM7Item constructor error."); }
+      throw new MCRPersistenceException("MCRCM8Item constructor error."); }
     ddolist = new ArrayList();
     ddopath = new ArrayList();
     ddocoll = new ArrayList();

@@ -182,7 +182,7 @@ public final HashSet getResultIDs(String root, String query, String type)
 	 *
 	 * @param onecond  one single condition
 	 * @param itemtypeprefix the prefix of the itme type
-	 * @ return the transfromed query for CM7.
+	 * @ return the transfromed query for CM8.
 	 **/
 	private final String traceOneCondition(
 		String condstr,
