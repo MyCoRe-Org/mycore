@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.68 $ $Date: 2004-01-07 07:30:02 $                      -->
+  <!-- $Revision: 1.69 $ $Date: 2004-01-22 13:01:41 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -67,7 +67,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.68 $ $Date: 2004-01-07 07:30:02 $</echo>
+    <echo>Ant build file   : $Revision: 1.69 $ $Date: 2004-01-22 13:01:41 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -128,12 +128,18 @@
 
   <target name="jar" depends="compile" description="creates lib/mycore-for-*.jar">
     <echo>Creating mycore-for-${MCR.XMLStore.Type}.jar containing all compiled classes...</echo>
+  <!--  <antcall target="create_service">
+      <param name="service" value="org.mycore.services.query.IndexableStore"/>
+      <param name="provider" value="org.mycore.backend.lucene.MCRCStoreLucene"/>
+    </antcall>
+  -->
     <jar 
       destfile="${basedir}/lib/mycore-for-${MCR.XMLStore.Type}.jar"
     >
-      <fileset dir="${basedir}/classes" includes="**/*.class"       />
-      <fileset dir="${basedir}/schema"  includes="*.xsd *.dtd"      />
-      <fileset dir="${basedir}/bin"     includes="build.properties" />
+      <fileset dir="${basedir}/classes" includes="**/*.class"          />
+    <!--  <fileset dir="${basedir}/classes" includes="META-INF/services/*" /> -->
+      <fileset dir="${basedir}/schema"  includes="*.xsd *.dtd"         />
+      <fileset dir="${basedir}/bin"     includes="build.properties"    />
     </jar>
     <echo>---------------------------------------------------------</echo>
   </target>
@@ -156,7 +162,7 @@
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-    depends="compile_common, compile_servlets, compile_user, compile_acl, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency"/>
+    depends="compile_common, compile_servlets, compile_user, compile_acl, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency"/>
 
   <target name="compile_common">
     <echo>Compiling common classes...</echo>
@@ -519,6 +525,20 @@
 
     <delete file="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
   </target>
+  
+  <!-- =================================================================== -->
+  <!-- Create Service Entries                                              -->
+  <!-- =================================================================== -->
+  <target name="create_service" depends="compile">
+    <mkdir dir="${basedir}"/>
+    <mkdir dir="${basedir}/classes"/>
+    <mkdir dir="${basedir}/classes/META-INF"/>
+    <mkdir dir="${basedir}/classes/META-INF/services"/>
+    <echo>Creating Service entry for ${provider}...</echo>
+    <echo file="${basedir}/classes/META-INF/services/${service}"
+     append="false">${provider}</echo>
+  </target>
+
 
   <!-- =================================================================== -->
   <!-- Do work after a CVS commit...                                       -->
