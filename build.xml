@@ -16,7 +16,6 @@
 
   <!-- persistency -->
   <property name="persistency"  value="cm7"/>
-  <property name="database"     value="db2"/>
 
   <!-- PDF generation -->
   <property name="doclets" value="/mycore/cvs/doclets" />
@@ -95,7 +94,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_persistency, compile_database"/>
+  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_persistency"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -107,13 +106,6 @@
     <echo>Compiling for persistence layer ${persistency}</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/backend/${persistency}/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_database">
-    <echo>Compiling for for database layer ${database}</echo>
-    <antcall target="javac">
-      <param name="packages" value="org/mycore/backend/${database}/**"/>
     </antcall>
   </target>
 
