@@ -24,6 +24,8 @@
 package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
@@ -31,14 +33,34 @@ import java.io.PipedOutputStream;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.io.PrintStream;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
+
 import org.mycore.backend.filesystem.MCRCStoreLocalFilesystem;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRInputStreamCloner;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.services.plugins.TextFilterPluginManager;
@@ -50,15 +72,26 @@ import org.mycore.services.plugins.TextFilterPluginManager;
  *
  */
 public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
-	private static final TextFilterPluginManager pMan=TextFilterPluginManager.getInstance();
-	private static final Logger logger=Logger.getLogger(MCRCStoreLucene.class);
-	private static final MCRConfiguration conf=MCRConfiguration.instance();
-	
+	private static final TextFilterPluginManager pMan =
+		TextFilterPluginManager.getInstance();
+	private static final Logger logger =
+		Logger.getLogger(MCRCStoreLucene.class);
+	private static final MCRConfiguration conf = MCRConfiguration.instance();
+	private static File indexDir = null;
+	private static IndexWriter indexWriter = null;
+	private static final int optimizeIntervall = 10;
+	private static int docCount;
+
+	private static IndexReader indexReader;
 	/* (non-Javadoc)
 	 * @see org.mycore.datamodel.ifs.MCRContentStore#doDeleteContent(java.lang.String)
 	 */
 	protected void doDeleteContent(String storageID) throws Exception {
-		// TODO Auto-generated method stub
+		//remove from index
+		Term term = new Term("StorageID", storageID);
+		int deleted = indexReader.delete(term);
+		logger.debug("deleted " + deleted + " documents containing " + term);
+		//remove file
 		super.doDeleteContent(storageID);
 	}
 
@@ -69,11 +102,33 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		MCRFileReader file,
 		MCRContentInputStream source)
 		throws Exception {
-			
-		MCRInputStreamCloner isc=new MCRInputStreamCloner(source);
-		source=new MCRContentInputStream(isc.getNewInputStream());
-		InputStream sourceStream=isc.getNewInputStream();
-		String returns=super.doStoreContent(file, source);
+		Document doc = null;
+		MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
+		source = new MCRContentInputStream(isc.getNewInputStream());
+		InputStream sourceStream = isc.getNewInputStream();
+		String returns = super.doStoreContent(file, source);
+		if (returns == null || returns.length() == 0)
+			throw new MCRPersistenceException(
+				"Failed to store file "
+					+ file.getID()
+					+ " to local file system!");
+		doc = getDocument(file, isc.getNewInputStream());
+		Field storageID = new Field("StorageID", returns, true, true, false);
+		doc.add(storageID);
+		try {
+			indexDocument(doc);
+		} catch (IOException io) {
+			//Document was not added
+			//remove file from local FileStore
+			super.deleteContent(returns);
+			//send Exception
+			throw new MCRPersistenceException(
+				"Failed to store file "
+					+ file.getID()
+					+ " to local file system!\n"
+					+ "Cannot index file content!",
+				io);
+		}
 		return returns;
 	}
 
@@ -81,24 +136,127 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	 * @see org.mycore.datamodel.ifs.MCRContentStore#init(java.lang.String)
 	 */
 	public void init(String storeID) {
-		// TODO Auto-generated method stub
 		super.init(storeID);
 		pMan.loadPlugins();
+		indexDir = new File(conf.getString("MCR.store_lucene_searchindexdir"));
+		logger.debug("TextIndexDir: " + indexDir);
+		if (indexWriter == null) {
+			boolean create = true;
+			if (IndexReader.indexExists(indexDir)) {
+				//reuse Index
+				create = false;
+			}
+			try {
+				indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
+			} catch (IOException e) {
+				throw new MCRPersistenceException(
+					"Cannot create index in "
+						+ indexDir.getAbsolutePath()
+						+ File.pathSeparatorChar
+						+ indexDir.getName(),
+					e);
+			}
+			indexWriter.mergeFactor = optimizeIntervall;
+			docCount = indexWriter.docCount();
+		}
+		if (indexReader == null) {
+			try {
+				indexReader = IndexReader.open(indexDir);
+			} catch (IOException e) {
+				throw new MCRPersistenceException(
+					"Cannot read index in "
+						+ indexDir.getAbsolutePath()
+						+ File.pathSeparatorChar
+						+ indexDir.getName(),
+					e);
+			}
+		}
+
 	}
-	
-	protected Document getDocument(MCRFileReader reader,MCRContentInputStream stream){
-		Document returns=new Document();
-		PipedInputStream pin=new PipedInputStream();
-		PipedOutputStream pout=new PipedOutputStream(pin);
-		PrintStream out=new PrintStream(pout);
-		BufferedReader in=new BufferedReader(new InputStreamReader(pin));
+
+	protected Document getDocument(MCRFileReader reader, InputStream stream)
+		throws IOException {
+		Document returns = new Document();
+		PipedInputStream pin = new PipedInputStream();
+		PipedOutputStream pout = new PipedOutputStream(pin);
+		PrintStream out = new PrintStream(pout);
+		BufferedReader in = new BufferedReader(new InputStreamReader(pin));
 		//filter here
-		
-		PrintWriter ps=new PrintStream(output,true);
-		Field derivateID=new Field("DerivateID","MCR_DEMO_XYZ",true,true,false);
-		Field content=Field.Text("content",);
-		returns.
-		return null;
+		pMan.transform(reader.getContentType(), stream, out);
+		//reader is instance of MCRFile
+		//ownerID is derivate ID for all mycore files
+		if (reader instanceof MCRFile) {
+			MCRFile file = (MCRFile) reader;
+			Field derivateID =
+				new Field("DerivateID", file.getOwnerID(), true, true, false);
+			Field fileID = new Field("FileID", file.getID(), true, true, false);
+			/* since file is stored elsewhere 
+			 * we only index the file and do not store
+			 */
+			Field content = Field.Text("content", in);
+			returns.add(derivateID);
+			returns.add(fileID);
+			returns.add(content);
+			return returns;
+		} else
+			return null;
+	}
+	protected String[] getDerivateID(String docTextQuery) {
+		String[] returns = null;
+		//maybe transform query here
+		String queryText = docTextQuery;
+		try {
+			Searcher searcher = new IndexSearcher(indexReader);
+
+			BufferedReader in =
+				new BufferedReader(new InputStreamReader(System.in));
+			logger.debug("Query: ");
+			Query query =
+				QueryParser.parse(queryText, "content", getAnalyzer());
+			logger.debug("Searching for: " + query.toString("content"));
+
+			Hits hits = searcher.search(query);
+			logger.debug(hits.length() + " total matching documents");
+			Document doc;
+			HashSet collector=new HashSet();
+			String derivateID;
+			for (int i=0;i<hits.length();i++){
+				doc = hits.doc(i);
+				derivateID = doc.get("DerivateID");
+				if (derivateID != null) {
+					logger.debug(i + ". " + derivateID);
+					collector.add(derivateID);
+				}
+				else {
+					logger.warn("Found Document containes no Field \"DerivateID\":"+doc);
+				}
+			}
+			searcher.close();
+			returns=MCRUtils.getStringArray(collector.toArray());
+		} catch (IOException e) {
+			throw new MCRPersistenceException(
+				"IOException while query:" + docTextQuery,
+				e);
+		} catch (ParseException e) {
+			throw new MCRPersistenceException(
+				"ParseException while query:" + docTextQuery,
+				e);
+		}
+		return returns;
+	}
+
+	private void indexDocument(Document doc) throws IOException {
+		logger.debug("Create index for storageID=" + doc.getField("StorageID"));
+		indexWriter.addDocument(doc);
+		docCount++;
+		if (docCount % optimizeIntervall == 0) {
+			logger.debug("Optimize index for searching...");
+			indexWriter.optimize();
+		}
+	}
+	private static Analyzer getAnalyzer() {
+		//TODO: have to replace GermanAnalyzer by more generic
+		return new GermanAnalyzer();
 	}
 
 }
