@@ -342,31 +342,68 @@ public class MCRCommandLineInterface
   * @param command The command string to be processed
   */
   protected static void processCommand( String command )
+  {
+    try 
     {
-    try {
-      for( int i = 0; i < numCommands; i++ ) {
-        if( knownCommands[ i ].invoke( command ) ) { return; } 
-        }
+      for( int i = 0; i < numCommands; i++ ) 
+      {
+        if( knownCommands[ i ].invoke( command ) ) return; 
+      }
       logger.error( "Command not understood. Enter 'help' to get a list of commands." );
-      }
-    catch( Exception ex ) {
-      if( ex instanceof InvocationTargetException ) {
-        Throwable t = ( (InvocationTargetException)ex ).getTargetException();
-        logger.error(t.getMessage());
-System.out.println("--------------------------------------");
-        t.printStackTrace();
-System.out.println("--------------------------------------");
-        logger.debug( MCRException.getStackTraceAsString((Exception)t));
-System.out.println("--------------------------------------");
-        logger.error( "" );
-        }
-      else {
-        logger.error( ex.getMessage() );
-        logger.debug( MCRException.getStackTraceAsString(ex));
-        logger.error( "" );
-        }
-      }
     }
+    catch( Exception ex ) 
+    {
+      if( ex instanceof InvocationTargetException ) 
+      {
+        Throwable t = ( (InvocationTargetException)ex ).getTargetException();
+
+        if( t instanceof MCRException )
+          logMCRException( (MCRException)t );
+        else if( t instanceof Exception )
+          logException( (Exception)t );
+        else // it is any other Throwable
+          logThrowable( t );
+      }
+      else if( ex instanceof MCRException )
+        logMCRException( (MCRException)ex );
+      else 
+        logException( ex );
+    }
+  }
+
+ /**
+  * Outputs an MCRException to the logger.
+  **/
+  private static void logMCRException( MCRException mex )
+  {
+    logger.error( mex.getClass().getName() );
+    logger.error( mex.getMessage () );
+    logger.debug( mex.getStackTraceAsString() );
+    logger.error( "" );
+
+    if( mex.getException() != null ) logException( mex.getException() );
+  }
+
+ /** 
+  * Outputs an Exception to the logger. 
+  **/
+  private static void logException( Exception ex )
+  {
+    logger.error( ex.getClass().getName() ); 
+    logger.error( ex.getMessage () ); 
+    logger.debug( MCRException.getStackTraceAsString( ex ) );
+    logger.error( "" );  
+  }
+
+ /**  
+  * Outputs a Throwable to the logger.  
+  **/
+  private static void logThrowable( Throwable t )
+  {
+    logger.error( t.getClass().getName() );  
+    logger.error( t.getMessage () );  
+    logger.error( "" ); 
+  }
 
  /**
   * Reads a file containing a list of commands to be executed and adds
