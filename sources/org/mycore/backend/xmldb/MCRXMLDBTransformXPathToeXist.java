@@ -23,16 +23,14 @@
  **/
 package org.mycore.backend.xmldb;
 
+import java.util.HashSet;
+
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.services.query.*;
-
-import org.jdom.*;
-import org.jdom.input.*;
-import org.jdom.output.*;
 
 /**
  * This is the implementation of the MCRQueryInterface for the XML:DB API
@@ -45,117 +43,132 @@ import org.jdom.output.*;
  **/
 public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 
-private String database    = "";
+	private String database = "";
 
-public static final String DEFAULT_QUERY = "/*";
+	public static final String DEFAULT_QUERY = "/*";
 
-/**
- * The constructor.
- **/
-public MCRXMLDBTransformXPathToeXist() {
-  super();
-  MCRXMLDBConnectionPool.instance();
-  database   = config.getString( "MCR.persistence_xmldb_database" , "");
-  logger.debug("MCRXMLDBQuery MCR.persistence_xmldb_database    : " + database); 
-  }
+	/**
+	 * The constructor.
+	 **/
+	public MCRXMLDBTransformXPathToeXist() {
+		super();
+		MCRXMLDBConnectionPool.instance();
+		database = config.getString("MCR.persistence_xmldb_database", "");
+		logger.debug(
+			"MCRXMLDBQuery MCR.persistence_xmldb_database    : " + database);
+	}
 
-/**
- * This method start the Query over one object type and return the 
- * result as MCRXMLContainer.
- *
- * @param type                  the MCRObject type
- * @return                      a result list as MCRXMLContainer
- **/
-protected final MCRXMLContainer startQuery( String type ) {
-  MCRXMLContainer result = new MCRXMLContainer();
-  boolean hasts = false;
-  boolean hasmeta = false;
+	/**
+	 * This method start the Query over one object type and return the 
+	 * result as MCRXMLContainer.
+	 *
+	 * @param type                  the MCRObject type
+	 * @return                      a result list as MCRXMLContainer
+	 **/
+	protected final MCRXMLContainer startQuery(String type) {
+		MCRXMLContainer result = new MCRXMLContainer();
+		boolean hasts = false;
+		boolean hasmeta = false;
 
-  // Make all document searches
-  java.util.ArrayList idts = new java.util.ArrayList();
-  for (int i=0;i<subqueries.size();i++) {
-    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
-      hasts = true;
-      flags.set(i,Boolean.TRUE);
-      logger.debug("TextSearch query : "+(String)subqueries.get(i));
-      // start the query against the textsearch
-      for (int j = 0; j<tsint.length;j++) {
-        String [] der = tsint[j].getDerivateIDs((String)subqueries.get(i));
-        for (int k=0;k<der.length;k++) { idts.add(getObjectID(der[k])); }
-        }
-      }
-    }
+		// Make all document searches
+		HashSet idts = new HashSet();
+		for (int i = 0; i < subqueries.size(); i++) {
+			if (((String) subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT)
+				!= -1) {
+				hasts = true;
+				flags.set(i, Boolean.TRUE);
+				logger.debug("TextSearch query : " + (String) subqueries.get(i));
+				// start the query against the textsearch
+				for (int j = 0; j < tsint.length; j++) {
+					String[] der = tsint[j].getDerivateIDs((String) subqueries.get(i));
+					for (int k = 0; k < der.length; k++) {
+						idts.add(getObjectID(der[k]));
+					}
+				}
+			}
+		}
 
-  // prepare the query over the rest of the metadata
-  java.util.ArrayList idmeta = new java.util.ArrayList();
-  String query = handleQueryString(type);
-  logger.debug("Transformed query : "+query);
-  // do it over the metadata
-  if (query.length()!=0) {
-    hasmeta = true;
-    try {
-     Collection collection = MCRXMLDBConnectionPool.instance().getConnection( type );
-      XPathQueryService xps =
-        (XPathQueryService)collection.getService( "XPathQueryService", "1.0" );
-	    
-      MCRXMLDBConnectionPool.instance().releaseConnection( collection );
-      ResourceSet resultset = xps.query( query );
-      logger.debug("Results: "+Integer.toString((int)resultset.getSize()));
+		// prepare the query over the rest of the metadata
+		HashSet idmeta = new HashSet();
+		String query = handleQueryString(type);
+		logger.debug("Transformed query : " + query);
+		// do it over the metadata
+		if (query.length() != 0) {
+			hasmeta = true;
+			try {
+				Collection collection =
+					MCRXMLDBConnectionPool.instance().getConnection(type);
+				XPathQueryService xps =
+					(XPathQueryService) collection.getService("XPathQueryService", "1.0");
 
-      org.jdom.Document doc;
-      ResourceIterator ri = resultset.getIterator();
-      MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-      while( ri.hasMoreResources() ) {
-        XMLResource xmldoc = (XMLResource)ri.nextResource();
-        doc = MCRXMLDBPersistence.convertResToDoc( xmldoc );
-        idmeta.add(new MCRObjectID(doc.getRootElement().getAttribute( "ID" ).getValue()));
-        }
-      }
-    catch( Exception e ) {
-      throw new MCRPersistenceException( e.getMessage(), e ); }
-    }
-  
-  // merge the results
-  java.util.ArrayList myresult = null;
-  if (!hasts) { myresult = idmeta; }
-  if (!hasmeta) { myresult = idts; }
-  if ((hasts) && (hasmeta)) { myresult = mergeWithAnd(idts,idmeta); }
+				MCRXMLDBConnectionPool.instance().releaseConnection(collection);
+				ResourceSet resultset = xps.query(query);
+				logger.debug("Results: " + Integer.toString((int) resultset.getSize()));
 
-  // put the XML files in the result container
-  result = createResultContainer(myresult);
-  return result;
-  }
+				org.jdom.Document doc;
+				ResourceIterator ri = resultset.getIterator();
+				MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+				while (ri.hasMoreResources()) {
+					XMLResource xmldoc = (XMLResource) ri.nextResource();
+					doc = MCRXMLDBPersistence.convertResToDoc(xmldoc);
+					idmeta.add(
+						new MCRObjectID(
+							doc.getRootElement().getAttribute("ID").getValue()));
+				}
+			} catch (Exception e) {
+				throw new MCRPersistenceException(e.getMessage(), e);
+			}
+		}
 
-/**
- * Handle query string for XML:DB database
- **/
-private String handleQueryString(String type) {
-  if (subqueries.size() == 0) { return DEFAULT_QUERY; }
-  StringBuffer qsb = new StringBuffer(1024);
-  for (int i=0;i<subqueries.size();i++) {
-    if (((Boolean)flags.get(i)).booleanValue()) continue;
-    qsb.append(' ').append((String)subqueries.get(i)).append(' ')
-      .append((String)andor.get(i));
-    flags.set(i,Boolean.TRUE);
-    }
-  logger.debug("Incomming condition : "+qsb.toString());
-  if ( database.equals( "exist" ) && (qsb.length()!=0) )
-    return handleQueryStringExist(qsb.toString().trim(),type);
-  return qsb.toString();
-  }
-    
-/**
- * Handle query string for exist
- **/
-private String handleQueryStringExist( String query, String type ) {
-  query = MCRUtils.replaceString(query, "like", "&=");
-  query = MCRUtils.replaceString(query, "text()", ".");
-  query = MCRUtils.replaceString(query, "ts()", ".");
-  query = MCRUtils.replaceString(query, "contains(", ".&=");
-  query = MCRUtils.replaceString(query, ")", "");
-  // combine the separated queries
-  query = root+ "[" + query +"]";
-  return query;
-  }
+		// merge the results
+		HashSet myresult = null;
+		if (!hasts) {
+			myresult = idmeta;
+		}
+		if (!hasmeta) {
+			myresult = idts;
+		}
+		if ((hasts) && (hasmeta)) {
+			myresult = MCRUtils.mergeHashSets(idts, idmeta, MCRUtils.COMMAND_AND);
+		}
+
+		// put the XML files in the result container
+		result = createResultContainer(myresult);
+		return result;
+	}
+
+	/**
+	 * Handle query string for XML:DB database
+	 **/
+	private String handleQueryString(String type) {
+		if (subqueries.size() == 0) {
+			return DEFAULT_QUERY;
+		}
+		StringBuffer qsb = new StringBuffer(1024);
+		for (int i = 0; i < subqueries.size(); i++) {
+			if (((Boolean) flags.get(i)).booleanValue())
+				continue;
+			qsb.append(' ').append((String) subqueries.get(i)).append(' ').append(
+				(String) andor.get(i));
+			flags.set(i, Boolean.TRUE);
+		}
+		logger.debug("Incomming condition : " + qsb.toString());
+		if (database.equals("exist") && (qsb.length() != 0))
+			return handleQueryStringExist(qsb.toString().trim(), type);
+		return qsb.toString();
+	}
+
+	/**
+	 * Handle query string for exist
+	 **/
+	private String handleQueryStringExist(String query, String type) {
+		query = MCRUtils.replaceString(query, "like", "&=");
+		query = MCRUtils.replaceString(query, "text()", ".");
+		query = MCRUtils.replaceString(query, "ts()", ".");
+		query = MCRUtils.replaceString(query, "contains(", ".&=");
+		query = MCRUtils.replaceString(query, ")", "");
+		// combine the separated queries
+		query = root + "[" + query + "]";
+		return query;
+	}
 }
-

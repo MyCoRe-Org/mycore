@@ -331,5 +331,16 @@ public final boolean equals(MCRObjectID in)
   return true;
   }
 
+/**
+ * This method check this data again the  input and retuns the result as
+ * boolean.
+ * @param in the MCRObjectID to check
+ * @return true if all parts are equal, else return false.
+ **/
+public boolean equals(Object in){
+	if (!(in instanceof MCRObjectID)) return false;
+	else return equals((MCRObjectID)in);
+}
+
 } 
 

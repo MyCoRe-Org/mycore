@@ -67,7 +67,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	protected ArrayList andor = null;
 	protected String root = null;
 	protected MCRXMLTableManager xmltable = null;
-	protected MCRTextSearchInterface [] tsint = null;
+	protected MCRTextSearchInterface[] tsint = null;
 
 	/**
 	 * The Constructor
@@ -76,8 +76,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		config = MCRConfiguration.instance();
 		PropertyConfigurator.configure(config.getLoggingProperties());
 		maxres = config.getInt("MCR.query_max_results", MAX_RESULTS);
-		logger.info(
-			"The maximum of the results is " + Integer.toString(maxres));
+		logger.info("The maximum of the results is " + Integer.toString(maxres));
 		xmltable = MCRXMLTableManager.instance();
 		tsint = MCRContentStoreFactory.getAllIndexables();
 	}
@@ -162,10 +161,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		// debug subqueries
 		for (i = 0; i < flags.size(); i++) {
 			logger.debug(
-				"Q: "
-					+ (String) subqueries.get(i)
-					+ " by "
-					+ (String) andor.get(i));
+				"Q: " + (String) subqueries.get(i) + " by " + (String) andor.get(i));
 		}
 		logger.debug("R: The root string is " + root);
 		// run over all types
@@ -181,8 +177,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 				onetype = type.substring(i, l);
 				i = l + 1;
 			}
-			if ((onetype == null)
-				|| ((onetype = onetype.trim()).length() == 0)) {
+			if ((onetype == null) || ((onetype = onetype.trim()).length() == 0)) {
 				break;
 			}
 			logger.debug("T: The separated query type is " + onetype);
@@ -224,10 +219,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	 * @return ObjectID if found, else null
 	 */
 	public MCRObjectID getObjectID(String DerivateID) {
-		ArrayList in = new ArrayList();
+		HashSet in = new HashSet();
 		in.add(new MCRObjectID(DerivateID));
-		MCRXMLContainer derivate =
-			createResultContainer(in);
+		MCRXMLContainer derivate = createResultContainer(in);
 		//<mycorederivate
 		if (derivate.size() > 0) {
 			Element derivateE = derivate.getXML(0);
@@ -245,44 +239,29 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	}
 
 	/**
-	 * This method merge two ArrayList of MCRObjectID's to one output based on AND.
-	 *
-	 * @param in1 a ArrayList of MCRObjectID
-	 * @param in2 a ArrayList of MCRObjectID
-	 * @return a with AND merged ArrayList
-	 **/
-	protected ArrayList mergeWithAnd(ArrayList in1, ArrayList in2)
-	  {
-	  ArrayList out = new ArrayList();
-	  for (int i=0;i<in1.size();i++) {
-	    if (in2.contains(in1.get(i))) { out.add(in1.get(i)); }
-	    }
-	  return out;
-	  }
-  
-	/**
 	 * This method take a n ArrayList of MCRObjectID's and put the coresponding XML in a
 	 * MCRResultContainer. If the method can not find a coresponding XML, nothing will be add
 	 * for this MCRObjectID.
 	 *
-	 * @param list	the list of MCRObjectID's
+	 * @param objectIDs	the set of MCRObjectID's
 	 * @return a MCRResultContainer
 	 **/
-	protected MCRXMLContainer createResultContainer(ArrayList list)
-	  {
-	  MCRXMLContainer result = new MCRXMLContainer();
-          if (list==null) { return result; }
-	  for (int i=0;i<list.size();i++) {
-	    try {
-	      MCRObjectID s = (MCRObjectID)list.get(i);
-	      byte[] xml = xmltable.retrieve(s.getTypeId(),s);
-	      result.add( "local", s.getId() , 0, xml);
-	      }
-	    catch (Exception e) { }
-	    }
-	  return result;
-	  }
-    
+	protected MCRXMLContainer createResultContainer(HashSet objectIDs) {
+		MCRXMLContainer result = new MCRXMLContainer();
+		if (objectIDs == null) {
+			return result;
+		}
+		for (Iterator it = objectIDs.iterator(); it.hasNext();) {
+			try {
+				MCRObjectID s = (MCRObjectID) it.next();
+				byte[] xml = xmltable.retrieve(s.getTypeId(), s);
+				result.add("local", s.getId(), 0, xml);
+			} catch (Exception e) {
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * This method start the Query over one object type and return the
 	 * result as MCRXMLContainer. This implementation must be overwrite with
