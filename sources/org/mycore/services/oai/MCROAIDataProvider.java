@@ -471,14 +471,14 @@ public class MCROAIDataProvider extends HttpServlet {
 		Calendar calendar = new GregorianCalendar();
 		Date now = new Date();
 		calendar.setTime(now);
+   	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         SimpleTimeZone tz = (SimpleTimeZone) timeFormat.getTimeZone();
         // compute milliseconds to hours...
         int offset = Math.abs(tz.getRawOffset() / 3600000);
 		calendar.add(Calendar.HOUR, offset);
 		calendar.add(Calendar.HOUR, timeout);
         Date timeoutDate = calendar.getTime();
-   	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             
    		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
    		
@@ -1226,7 +1226,7 @@ public class MCROAIDataProvider extends HttpServlet {
            		String sDate = getUTCDate(timeout);
            		eResumptionToken.addContent(sResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
-	           	eListIdentifiers.addContent(eResumptionToken);
+	           	eListRecords.addContent(eResumptionToken);
 			}
 				
 	    	eRoot.addContent(eListRecords);
