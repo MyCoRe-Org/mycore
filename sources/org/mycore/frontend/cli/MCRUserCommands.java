@@ -80,9 +80,10 @@ public static void initSuperuser(MCRSession session) throws MCRException
   String gpasswd = config.getString("MCR.users_guestuser_userpasswd","gast");
   String ggroup = config.getString("MCR.users_guestuser_groupname","mcrgast");
 
+  session.setCurrentUserID(suser);
   try {
-    MCRUser testu = MCRUserMgr.instance().retrieveUser(suser);
-    MCRGroup testg = MCRUserMgr.instance().retrieveGroup(sgroup);
+    MCRUser testu = MCRUserMgr.instance().retrieveUser(session,suser);
+    MCRGroup testg = MCRUserMgr.instance().retrieveGroup(session,sgroup);
     logger.info("The superuser already exist!");
     return;
     }
@@ -231,6 +232,34 @@ public static void deleteUser(MCRSession session, String userID) throws Exceptio
   init();
   MCRUserMgr.instance().deleteUser(session,userID);
   logger.info("User ID " + userID + " deleted!");
+  }
+
+/**
+ * This method invokes MCRUserMgr.enableUser() that enables a user
+ *
+ * @param session the MCRSession object
+ * @param userID the ID of the user which will be enabled
+ **/
+public static void enableUser(MCRSession session, String userID) 
+  throws Exception
+  {
+  init();
+  MCRUserMgr.instance().enableUser(session,userID);
+  logger.info("User ID " + userID + " enabled!");
+  }
+
+/**
+ * This method invokes MCRUserMgr.disableUser() that disables a user
+ *
+ * @param session the MCRSession object
+ * @param userID the ID of the user which will be enabled
+ **/
+public static void disableUser(MCRSession session, String userID) 
+  throws Exception
+  {
+  init();
+  MCRUserMgr.instance().disableUser(session,userID);
+  logger.info("User ID " + userID + " disabled!");
   }
 
 /**
@@ -391,9 +420,7 @@ public static void setPassword(MCRSession session,String userID,
   {
   if (password == null) return;
   init();
-  MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-  user.setPassword(password);
-  MCRUserMgr.instance().updateUser(session,user);
+  MCRUserMgr.instance().setPassword(session,userID,password);
   logger.info("The new password was set.");
   }
 
@@ -545,7 +572,7 @@ public static final void updateUserFromFile(MCRSession session,String filename)
       }
     }
   catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Error while update user form file.",e); }
   }
 
 /**
@@ -560,7 +587,7 @@ public static final void updateGroupFromFile(MCRSession session,String filename)
   logger.info( "Reading file " + filename + " ..." );
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename));
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getAttribute("type").getValue().equals("group")) {
       throw new MCRException("The data are not for group."); }
@@ -571,7 +598,7 @@ public static final void updateGroupFromFile(MCRSession session,String filename)
       }
     }
   catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Error while update group form file.",e); }
   }
 
 /**

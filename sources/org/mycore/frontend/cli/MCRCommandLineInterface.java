@@ -286,6 +286,12 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "show group {0}",
       "org.mycore.frontend.cli.MCRUserCommands.showGroup MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "enable user {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.enableUser MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "disable user {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.disableUser MCRSession String" );
 
     // Read external commands
     String externals = config.getString("MCR.external_command_classes","");
