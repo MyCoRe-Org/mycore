@@ -136,15 +136,18 @@ Der Ablauf in doGetPost() wird im folgenden Diagramm (Abbildung
 Der resultierende XML Output-Stream muss vom zugeh"origen Stylesheet verarbeitet
 werden und hat die folgende Syntax:
 
-\begin{verbatim}
-  <mcr_user unknown_user="true|false"
-            user_disabled="true|false"
-            invalid_password="true|false">
-    <guest_id>...</guest_id>
-    <guest_pwd>...</guest_pwd>
-    <url>...<url>
-  </mcr_user>
-\end{verbatim}
+\vspace{0.5cm}
+\lstset{language=XML, fancyvrb=true, frame=btlr, breaklines, prebreak={\space\McrHookSign}}
+\begin{lstlisting}[caption={[XML Output des Login Servlets]XML Output des Login Servlets},%
+                  captionpos=b, label=lst:XmlLoginServlet, frame=lines]
+<mcr_user unknown_user="true|false"
+          user_disabled="true|false"
+          invalid_password="true|false">
+  <guest_id>...</guest_id>
+  <guest_pwd>...</guest_pwd>
+  <url>...<url>
+</mcr_user>
+\end{lstlisting}
 
 Bei einer missgl"uckten Anmeldung wird der Grund daf"ur in Form eines Attributes
 auf true oder false gesetzt.
