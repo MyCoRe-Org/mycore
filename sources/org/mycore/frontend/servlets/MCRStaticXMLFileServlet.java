@@ -45,6 +45,12 @@ public class MCRStaticXMLFileServlet extends HttpServlet
 {
   protected final static Logger logger = Logger.getLogger(  MCRStaticXMLFileServlet.class );
 
+  public void init()
+  {
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure( config.getLoggingProperties() );
+  }
+
   public void doGet( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, java.io.IOException
   {
