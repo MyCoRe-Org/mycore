@@ -1,0 +1,26 @@
+#
+# The MyCoRe properties LOGGER file for the Dublin Core Demo
+#
+
+##############################################################################
+# Logging System                                                             #
+##############################################################################
+
+# define the stdout appender
+MCR.log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+MCR.log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+MCR.log4j.appender.stdout.layout.ConversionPattern=%-5p %m%n
+
+# define the stdlog appender
+MCR.log4j.appender.stdlog=org.apache.log4j.ConsoleAppender
+MCR.log4j.appender.stdlog.layout=org.apache.log4j.PatternLayout
+MCR.log4j.appender.stdlog.layout.ConversionPattern=%d [%t] %-5p (%F:%L) - %m%n
+
+# define the R appender
+MCR.log4j.appender.R=org.apache.log4j.RollingFileAppender
+MCR.log4j.appender.R.File=/var/log/mycore-sample-application.log
+MCR.log4j.appender.R.MaxFileSize=100KB
+MCR.log4j.appender.R.MaxBackupIndex=2
+MCR.log4j.appender.R.layout=org.apache.log4j.PatternLayout
+MCR.log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p (%F:%L) - %m%n
+

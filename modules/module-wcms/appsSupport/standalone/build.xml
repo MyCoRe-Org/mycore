@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WCMS build file for use with ANT        -->
+<!-- $Revision$ $Date$ -->
+<!-- ============================================== -->
+
+<project name="MyCoReWCMS" default="usage" basedir="../..">
+
+	<!-- ============================================== -->
+
+	<property name="build.sysclasspath" value="last" />
+
+  <!-- =================================================================== -->
+  <!-- Global properties                                                   -->
+  <!-- =================================================================== -->
+	
+	<!-- Provide a default value for MYCORE_HOME if not set in env -->
+	<property name="env.MYCORE_HOME" value="/home/mcrclient/workspace/mycore" />
+
+	<!-- Provide a default value for MYCOREWCMS_HOME if not set -->
+	<property name="env.MYCOREWCMS_HOME" value="/home/mcrclient/workspace/mycorewcms_new" />
+
+<!-- -->
+	  <!-- Javac properties -->
+<!--
+	<property name="debug"       value="on"  />
+	  <property name="optimize"    value="on"  />
+	  <property name="deprecation" value="on" />
+-->
+	  <!-- Maximum amount of memory to allocate to java VM when loading -->
+	<!--	
+	  <property name="java.maxmemory" value="256m" />
+-->
+	  <!-- Read in environment variables -->
+	  <property environment="env" />
+
+	  <!-- Provide a default value for JAVA_HOME if not set in env -->
+	<!--	
+	  <property name="env.JAVA_HOME" value="/usr/lib/SunJava2-1.4.2" />
+-->
+	  <!-- Provide a default value for MYCORE_HOME if not set in env -->
+	<!--	
+	  <property name="env.MYCORE_HOME" value="../mycore" />
+-->
+	  <!-- Read in properties from bin/build.properties 
+	  <property file="${env.MYCORE_HOME}/bin/build.properties" />
+-->
+	  <!-- Provide a default value for DOCPORTAL_HOME if not set in env -->
+	<!--	
+	  <property name="env.DOCPORTAL_HOME" value="../docportal" />
+-->
+	  <!-- MyCoRe CVS repository root -->
+	<!--	
+	  <property name="CVSRoot" value="/cvs" />
+-->
+	<!--
+	  <property name="docportal.bin"              value="${env.DOCPORTAL_HOME}/bin"/>
+	  <property name="docportal.classes"          value="${env.DOCPORTAL_HOME}/classes"/>
+	  <property name="docportal.config"           value="${env.DOCPORTAL_HOME}/config"/>
+	  <property name="docportal.content"          value="${env.DOCPORTAL_HOME}/content"/>
+	  <property name="docportal.doc"              value="${env.DOCPORTAL_HOME}/documentation"/>
+	  <property name="docportal.lib"              value="${env.DOCPORTAL_HOME}/lib"/>
+	  <property name="docportal.schema"           value="${env.DOCPORTAL_HOME}/schema"/>
+	  <property name="docportal.stylesheets"      value="${env.DOCPORTAL_HOME}/stylesheets"/>
+	  <property name="docportal.unixtools"        value="${env.DOCPORTAL_HOME}/unixtools"/>
+	  <property name="docportal.webpages"         value="${env.DOCPORTAL_HOME}/webpages"/>
+-->
+	<!--	
+	  <property name="this.bin"                   value="./bin"/>
+	  
+	  <property name="this.config"                value="./config"/>
+	  <property name="this.content"               value="./content"/>
+	  <property name="this.filestore"             value="./filestore"/>
+	  <property name="this.lucenestore"           value="./lucenestore"/>
+	  <property name="this.save"                  value="./save"/>
+	  -->
+	  <property name="this.unixtools"             value="${env.MYCOREWCMS_HOME}/unixtools"/>
+	  <property name="this.webapps"               value="${env.MYCOREWCMS_HOME}/webapps"/>
+	<!--
+	  <property name="this.webpages"              value="./webpages"/>
+	  <property name="this.workflow"              value="./workflow"/>	
+-->
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo>
+      All targets are internal!
+	  Use $MYCORE_HOME/modules/module-wcms/build.xml
+		</echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="standalone">
+		<echo>
+	           Building directories for MyCoReWCMS-Module  ...
+	    </echo>			
+		<mkdir dir="${env.MYCOREWCMS_HOME}/modules/module-wcms" />
+		<mkdir dir="${env.MYCOREWCMS_HOME}/stylesheets/modules/module-wcms" />					
+
+		<echo>
+	           Installing MyCoReWCMS-Module...
+	    </echo>
+		<copy todir="${env.MYCOREWCMS_HOME}/modules/module-wcms/aif/archive" preservelastmodified="yes">
+	        	<fileset dir="aif/archive" />
+   		</copy>			
+		<copy todir="${env.MYCOREWCMS_HOME}/modules/module-wcms/aif/config" preservelastmodified="yes">
+	        	<fileset dir="aif/config" />
+   		</copy>			
+		<copy todir="${env.MYCOREWCMS_HOME}/modules/module-wcms/aif/web/admin" preservelastmodified="yes">
+	        	<fileset dir="aif/web/admin" />
+   		</copy>			
+		
+		<copy todir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif" preservelastmodified="yes">
+	        	<fileset dir="uif"  />
+   		</copy>					
+	    <delete dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif/templates"    />		
+		
+		<copy todir="${env.MYCOREWCMS_HOME}/modules/module-wcms/templates" preservelastmodified="yes">
+	        	<fileset dir="uif/templates" />
+   		</copy>							
+
+		<!-- get docportal stylesheets -->
+		<copy todir="${env.MYCOREWCMS_HOME}/stylesheets/modules/module-wcms" preservelastmodified="yes">
+	        	<fileset dir="appsSupport/standalone/uif/xsl" includes="*.xsl" />
+   		</copy>					
+		<!-- get build file -->
+		<copy todir="${env.MYCOREWCMS_HOME}" preservelastmodified="yes">
+	        	<fileset dir="appsSupport/standalone/install" >
+	                <include name="build.xml"/>
+	              </fileset>			
+   		</copy>					
+		<!-- get config folder for private configuration -->
+		<copy todir="${env.MYCOREWCMS_HOME}/config" preservelastmodified="yes">
+	        	<fileset dir="appsSupport/standalone/install/config" />
+   		</copy>					
+	              	
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="clean" >
+		<echo>
+	           Removing MyCoReWCMS-Module...
+	    </echo>
+	
+	    <delete dir="${env.MYCOREWCMS_HOME}/webapps"    />
+
+	</target>
+
+	<!-- ============================================== -->
+	<!-- ============================================== -->	
+
+	<target name="compile">
+		<echo>
+
+      Compiling MyCoReWCMS-Module classes from source code to directory classes ...
+    </echo>
+
+		<path id="compiling.classpath">
+			<fileset dir="${env.MYCORE_HOME}/lib">
+				<include name="*.jar" />
+			</fileset>
+				<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/lib">
+					<include name="*.jar" />
+				</fileset>			
+		</path>
+
+		<path id="running.classpath">
+			<path refid="compiling.classpath" />
+			<pathelement location="classes" />
+		</path>
+		
+		<mkdir dir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" />			
+		<javac srcdir="${env.MYCORE_HOME}/modules/module-wcms/aif/src" 
+			destdir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" classpathref="compiling.classpath" debug="on" optimize="on" deprecation="off" />
+
+	</target>
+
+	<!-- ============================================== -->	
+	
+	<target name="webapp" depends="prepareMycoreBasics.webapp,standalone,compile">
+		<echo>
+	           Updating MyCoReWCMS-Module ...
+	    </echo>
+
+		<!-- copy java sources -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF/classes" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/classes" />
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/aif/config">
+				<include name="mycore.properties.wcms" />
+			</fileset>
+		</copy>		
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF/lib" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/lib">
+				<include name="jtidy.jar" />
+			</fileset>
+		</copy>		
+		
+		<!-- ===================== copy right xsl ========================== -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF/stylesheets" preservelastmodified="yes" flatten="true">
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/templates/master">
+				<include name="**/*.xsl" />
+			</fileset>
+				<fileset dir="${env.MYCOREWCMS_HOME}/stylesheets/modules/module-wcms">
+					<include name="**/*.xsl" />
+				</fileset>			
+		</copy>		
+			
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF/stylesheets" preservelastmodified="yes" flatten="true">
+			<!-- aif -->			
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/aif/xsl">
+				<include name="**/*.xsl" />
+			</fileset>
+			<!-- uif -->
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif/xsl">
+				<include name="**/*.xsl" />
+			</fileset>			
+		</copy>		
+
+		
+		<!-- get templates -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/modules/module-wcms/templates" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/templates" />
+		</copy>		
+		
+		<!-- =========== get default content ============ -->
+		<!-- web pages -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/content" preservelastmodified="yes" >
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif/web/content">
+			</fileset>
+		</copy>				
+		<delete file="${env.MYCOREWCMS_HOME}/webapps/index.html" />		
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif/web" >
+				<include name="index.html" />
+			</fileset>
+		</copy>		
+		<!-- aif used web stuff -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/modules/module-wcms/aif/admin" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/aif/web/admin" />
+		</copy>
+		<!-- uif used web stuff -->		
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/modules/module-wcms/uif/common" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/modules/module-wcms/uif/web/common" />
+		</copy>		
+		<!-- web stuff for template docportal support -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/css" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/webpages/css" />
+		</copy>			   	  		  	
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/images" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/webpages/images" />
+		</copy>			   	  		  	
+		
+	</target>	
+
+	<!-- ============================================== -->
+
+	  <target name="prepareMycoreBasics.init" >	
+<!--
+	  <target name="prepareMycoreBasics.init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2">
+
+	    <mkdir dir="/tmp/upload" />
+	    <mkdir dir="${this.filestore}" />
+	    <mkdir dir="${this.lucenestore}" />
+	    <mkdir dir="${this.save}"  />
+	    -->
+	    <mkdir dir="${this.unixtools}"  />
+	    <mkdir dir="${this.webapps}" />
+	  	<!--
+	  	<mkdir dir="${this.webpages}" />
+
+	    <mkdir dir="${this.workflow}" />
+	    <mkdir dir="${this.workflow}/institution" />
+	    <mkdir dir="${this.workflow}/author" />
+	    <mkdir dir="${this.workflow}/document" />
+-->
+	    <!-- Fail if environment variables are not set -->
+	    <fail message="Environment variable JAVA_HOME is not set!"   unless="env.JAVA_HOME"   />
+	    <fail message="Environment variable MYCORE_HOME is not set!" unless="env.MYCORE_HOME" />
+
+	    <path id="this.classpath">
+	    	<!--
+	      <pathelement location="${basedir}/config" />
+	      <pathelement location="${basedir}/stylesheets" />
+	      <pathelement location="${docportal.config}" />
+	      <pathelement location="${docportal.schema}" />
+	      <pathelement location="${docportal.stylesheets}" />
+	      <fileset dir="${env.DOCPORTAL_HOME}/lib" includes="*.jar"/>
+-->	      
+	      <fileset dir="${env.MYCORE_HOME}/lib" includes="*.jar"/>
+	    	<!--
+	    	<path refid="jdbc.classpath" />
+	      <path refid="xml.classpath"  />
+  
+	    </path>
+
+	    <path id="this.libpath">
+	      <dirset dir="${env.JAVA_HOME}" includes="bin bin/classic" />
+	    	<path refid="jdbc.libpath" />
+	      <path refid="xml.libpath"  />
+-->	      
+	    </path>
+
+	    <condition property="detected.os" value="unix"> <os family="unix"/> </condition>
+	    <condition property="detected.os" value="windows"> <os family="dos"/> </condition>
+	    <condition property="os.is.unix"> <os family="unix"/> </condition>
+	    <condition property="os.is.windows"> <os family="dos"/> </condition>
+	  	<!--
+	    <condition property="store.is.cm8">
+	      <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
+	    </condition>
+-->
+	    <pathconvert targetos="${detected.os}" property="this.classpath.translated" refid="this.classpath" />
+	  	<!--
+	  	<pathconvert targetos="${detected.os}" property="this.libpath.translated"   refid="this.libpath"   />
+	  	-->
+	  </target>
+
+	<!-- ============================================== -->
+
+	  <target name="prepareMycoreBasics.webapp" depends="prepareMycoreBasics.init">
+	    <echo>Preparing mycore web application...</echo>
+
+	    <!-- Create necessary directories  -->
+	    <mkdir dir="${this.webapps}"/>
+<!--	  	
+	    <mkdir dir="${this.webapps}/editor"/>
+	    <mkdir dir="${this.webapps}/WEB-INF"/>
+	    <mkdir dir="${this.webapps}/WEB-INF/classes"/>
+	    <mkdir dir="${this.webapps}/WEB-INF/lib"/>
+	    <mkdir dir="${this.webapps}/WEB-INF/stylesheets"/>
+-->
+	    <!-- Copy editor stylesheets from MyCoRe and the DocPortal Application -->
+	  	<!--	  	
+	    <copy file="${env.MYCORE_HOME}/stylesheets/editor/editor.xsl" todir="${this.webapps}/WEB-INF/stylesheets"/>
+	    <copy file="${env.MYCORE_HOME}/stylesheets/editor/editor-common.xsl" todir="${this.webapps}/WEB-INF/stylesheets"/>
+	    <copy file="${env.MYCORE_HOME}/stylesheets/editor/editor-help-popup.xsl" todir="${this.webapps}/WEB-INF/stylesheets"/>
+	    <copy file="${env.MYCORE_HOME}/stylesheets/editor/mcr_results-classif-to-items.xsl" todir="${this.webapps}/WEB-INF/stylesheets"/>
+	    <copy file="${docportal.stylesheets}/editor/editor-config.xsl" todir="${this.webapps}/WEB-INF/stylesheets"/>
+-->
+	    <!-- Copy the files from various directories to build the webapps -->
+	  	<!--
+	  	<copy todir="${this.webapps}">
+	  	  <fileset dir="${docportal.webpages}"/>
+	      <fileset dir="${docportal.config}" includes="FileContentTypes.xml" />
+	      <fileset dir="${docportal.doc}" includes="DokumentServer.*" />
+	      <fileset dir="${docportal.doc}" includes="Anleitung_Autor_Dokumente.*" />
+	      <fileset dir="${docportal.doc}" includes="Anleitung_Bearbeiter_Documente.*" />
+	    </copy>
+	    <copy todir="${this.webapps}" overwrite="true">
+	      <fileset dir="${this.webpages}" />
+	    </copy>
+	    <copy todir="${this.webapps}/editor">
+	      <fileset dir="${docportal.config}" includes="editor-*.xml" />
+	      <fileset dir="${docportal.config}" includes="imports-*.xml" />
+	    </copy>
+	    <copy todir="${this.webapps}/WEB-INF">
+	      <fileset dir="${docportal.config}" includes="web.xml ibm*.xmi" />
+	    </copy>
+	    -->	    
+	    <copy todir="${this.webapps}/WEB-INF/lib">
+	      <fileset dir="${env.MYCORE_HOME}/lib" includes="*.jar" excludes="servlet-api*" />
+	    </copy>
+	  	
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF/classes" preservelastmodified="yes">
+			<fileset dir="${env.MYCOREWCMS_HOME}/config" >
+				<include name="mycore.properties" />
+				<include name="mycore.properties.logger" />
+				<include name="mycore.properties.private" />
+			</fileset>
+		</copy>			    	
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/WEB-INF" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/appsSupport/standalone/install" >
+				<include name="web.xml" />
+			</fileset>				
+		</copy>			   	  	
+	  	
+		<copy todir="${env.MYCOREWCMS_HOME}/webpages/css" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/appsSupport/standalone/uif/web/css" />
+		</copy>			   	  		  	
+		<copy todir="${env.MYCOREWCMS_HOME}/webpages/images" preservelastmodified="yes">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/appsSupport/standalone/uif/web/images" />
+		</copy>			   	  		  	
+	  		  	
+<!--
+	    <copy todir="${this.webapps}/WEB-INF/classes">
+	      <fileset dir="${docportal.classes}" />
+	      <fileset dir="${docportal.config}" excludes="user/*" />
+	      <fileset dir="${docportal.schema}" />
+	      <fileset dir="${docportal.stylesheets}" includes="mycoreobject-*-to-workflow.xsl" />
+	    </copy>
+	    <copy todir="${this.webapps}/WEB-INF/classes" overwrite="true">
+	      <fileset dir="${this.config}" excludes="user/*" />
+	    </copy>
+	    <copy todir="${this.webapps}/WEB-INF/stylesheets" flatten="true">
+	      <fileset dir="${docportal.stylesheets}"   includes="**/*.xsl" />
+	      <fileset dir="${env.MYCORE_HOME}/stylesheets" includes="**/*.xsl" />
+	    </copy>
+
+	    <antcall target="copy.webapp.shared.jars" />
+	    <antcall target="webapp.info.shared.jars" />
+	    <antcall target="webapp.info.unix" />
+
+		<echo>
+	       Updating modules...
+		</echo>
+		<subant target="webapp" inheritall="true" inheritrefs="true">
+			<fileset dir="." includes="modules/module-*/build.xml" />
+		</subant>  	
+-->	  	
+	  </target>
+
+</project>
+
+<!-- ============================================== -->
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WCMS build file for use with ANT        -->
+<!-- $Revision$ $Date$ -->
+<!-- ============================================== -->
+
+<project name="MyCoReModule - WCMS" default="usage" basedir=".">
+
+  <!-- Provide a default value for MYCORE_HOME if not set in env -->
+  <property name="env.MYCORE_HOME" value="/home/mcrclient/workspace/mycore" />
+	
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo>
+      Use the ant tool to plug in MyCoReWCMS-Module:
+      Usage: ant [target] [target] [target] ...
+
+      Available targets for MyCoReWCMS are:
+
+		webapps		  	update MyCoReWCMS-Module as a standalone application
+		</echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="webapps">
+		<echo>
+           Calling MyCoRe-WCMS installation script...
+    </echo>
+
+		<subant target="webapp" inheritall="false" inheritrefs="false">
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms" includes="appsSupport/standalone/build.xml" />
+		</subant>
+
+	</target>
+	
+</project>
+
+<!-- ============================================== -->
+

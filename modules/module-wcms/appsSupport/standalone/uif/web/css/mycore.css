@@ -1,0 +1,499 @@
+/* used colors:
+light-blue: #CAD9E0;
+mid-blue:   #90B0BF;
+dark-blue:  #15516E;
+white:      #FFFFFF;
+black:      #000000;
+orange:     #F2CCA4;
+*/
+/* text sizes:
+small: 11px
+normal: 14px;
+*/
+
+/*
+========================
+NEW CSS-PART starts here
+========================
+*/
+
+/* general setup */
+
+a img {
+    border-style: none;
+}
+
+a:link, a:visited{
+    color: #15516E;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #FF9933;
+    background-color: transparent;
+}
+
+html, body, p {
+   background-color: #CAD9E0;
+   color: #000000;
+   margin: 0px;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   text-align: left;
+   vertical-align: middle;
+}
+
+p {
+   background-color: transparent;
+}
+
+.clearfix:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE-mac \*/
+ * html .clearfix {height: 1%;}
+ .clearfix {display: block;}
+/* End hide from IE-mac */
+
+
+/* Layout definition from MyCoReLayout.xsl */
+
+#NSMenu,#searchFor,#projectID,#MCRSessionID {
+    font-size: 0.7em;
+}
+#projectID, #MCRSessionID{
+    position: absolute;
+    font-weight: bold;
+    color: #ED8F2B;
+}
+#leftBanner {
+    /* This is the div lefthand side that includes a vertical banner image */
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 158px;
+    background-color: #90B0BF;
+}
+
+#leftBanner img {
+    position: relative;
+    top: 132px;
+}
+
+#menuBanner {
+    /* It's just used to draw the colored lines the background of the search menu */
+    position: absolute;
+    left: 0px;
+    top: 41px;
+    width: 100%;
+    height: 38px;
+    background-image: url('../images/menubannerbg.gif');
+}
+
+#logoSpace {
+    /* this is the room for the logo on the top left side */
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#logoSpace img{
+    display: block;
+}
+
+#projectID {
+    /* this is the setup for the project id print */
+    left: 90px;
+    top: 45px;
+}
+#MCRSessionID {
+    /* if set visible in stylesheet this is for the Session ID */
+    left: 30px;
+    top: 65px;
+    visibility: hidden;    
+}
+#NSMenu {
+    /* the menu with setup and navigation elements --> top right */
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: #15516E;
+    padding-right: 5px;
+    padding-top: 5px;
+    text-align: right;
+}
+
+#NSMenu img.flag {
+    /* this is the style info used for the national flags */
+    width: 24px;
+    height: 12px;
+    vertical-align:bottom;
+}
+
+#searchFor {
+    /* this is the setup for the $Layout.SearchFor string */
+    position: absolute;
+    left: 187px;
+    top: 23px;
+    width: 113px;
+    height: 20px;
+    border-style: solid;
+    border-color: #15516E;
+    border-width: 1px 1px 0px 0px;
+    color: #15516E;
+    text-align:center;
+}
+
+#searchMenu {
+    /* Menu with links to the search mask */
+    position: absolute;
+    left: 300px;
+    top: 42px;
+    margin-bottom: 25px;
+}
+
+#searchMenu table {
+    /* Table used in searchMenu */
+    width: 17em;
+}
+
+#searchMenu th {
+    /* Table head in searchMenu */
+    color: #FFFFFF;
+    background-color: #15516E;
+    height: 14px;
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+#searchMenu td {
+    /* other table cells in searchMenu */
+    color: #15516E;
+    background-color: #CAD9E0;
+    height:21px;
+    border-style:solid;
+    border-color:#15516E;
+    border-width:2px;
+    border-right-width: 0px;
+    text-align: center;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+#searchMenu th.empty, #searchMenu td.empty{
+    /* empty table cells used for seperation */
+    background-color: transparent;
+    border-width: 0px;
+    border-style: none;
+}
+/* END layout definition from MyCoReLayout.xsl */
+
+/* Layout definition from ???.xsl */
+
+/*
+======================
+NEW CSS-PART ends here
+======================
+*/
+div.help {
+	width:80%;
+	position:absolute; 
+	top:132px; 
+	left:55px;
+	background-color:#CAD9E0;
+	border-left-style:solid; 
+	border-left-width:1px;
+	border-left-color:#15516E;
+	}
+span.topmenu {
+	width: 100%;
+	color: #15516E;
+	background-color: transparent;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding-right: 5px;
+	}
+th.searchmenu, a.searchmenu {
+	color: #FFFFFF;
+	background-color: #15516E;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 14px;
+	text-align: center;
+	}
+a:hover.searchmenu {
+	color: #FF9933;
+	background-color: #15516E;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 14px;
+	text-align: center;
+	}
+a:visited.searchmenu{
+        color: #FFFFFF;
+        background-color: #15516E;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 14px;
+	text-align: center;
+        }
+span.search{
+	}
+span.topmenu {
+	width: 100%;
+	color: #15516E;
+	background-color: transparent;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding-right: 5px;
+	}
+
+td.inputcaption	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: right;
+	vertical-align: middle;
+	width: 130px;
+	color: #000000;
+	background-color: #F2CCA4;
+	padding: 5px 5px;
+	border-style: solid;
+	border-width: 1px 1px 0px 1px;
+	border-color:#05516E;
+	}
+td.inputfield	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: left;
+	vertical-align: middle;
+	width: 315px;
+	color: #000000;
+	background-color: #CAD9E0;
+	padding-left: 25px;
+	}
+td.errormain{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: left;
+	font-weight:bold;
+	vertical-align: middle;
+	width: 315px;
+	color: #000000;
+	background-color: #cc3333;
+	padding-left: 25px;
+	}
+td.errortrace{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: left;
+	vertical-align: middle;
+	width: 315px;
+	color: #000000;
+	background-color: transparent;
+	padding-left: 25px;
+	}
+td.logincaption	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: right;
+	vertical-align: middle;
+	width: 130px;
+	color: #000000;
+	background-color: #F2CCA4;
+	padding: 5px 5px;
+	border-style: solid;
+	border-width: 1px 1px 1px 1px;
+	border-color:#05516E;
+	}
+
+input.button, td.searchcmd, td.logincmd {
+	color: #FFFFFF; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 16px;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 16px;
+	background-color: #15516E;
+	}
+
+form input {
+	}
+
+select, textarea.text, input.text {
+	color: #000000; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 11px;
+	background-color: white;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #90B0BF;
+	padding-left: 5px;
+	}
+textarea.text, input.text {
+	width: 315px;
+	}
+input.check {
+	vertical-align: middle;
+	}
+
+input.button {
+	background-color:transparent;
+	border-style:none;
+	padding: 0px;
+	margin: 0px;
+	font-size:11px;
+	}
+	
+/* changes for result list */
+
+div.resultcmd a:link	{
+	color: #FFFFFF;
+	background-color: transparent;
+	text-decoration: none;
+	}
+div.resultcmd a:visited {
+	color: #FFFFFF;
+	background-color: transparent;
+	text-decoration: none;
+	}
+div.resultcmd a:hover {
+	color: #FF9933;
+	background-color: transparent;
+	}
+	
+span.curpage {
+	color: #FF9933;
+	}
+tr.result {
+    height:21px;
+    padding:0px;
+	}
+tr.result td.header{
+    background-color: #90B0BF;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    padding-right:5px;
+    }
+tr.result td.desc, span.desc{
+    background-color: transparent;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding-bottom: 10px;
+    padding-left:10px;
+    }
+div.resultcmd, td.resultcmd{
+	color: #FFFFFF; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+/*	height: 25px; */
+	text-align: left;
+	vertical-align: middle;
+	line-height: 25px;
+	background-color: #15516E;
+	}
+div.resultcmd input,select{
+	line-height: 11px;
+	}
+td.resultcmd input,select{
+	line-height: 11px;
+	}
+div.resultsub, td.resultsub {
+	color: #FFFFFF;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 20px;
+	text-align: left;
+	vertical-align: middle;
+	line-height: 16px;
+	background-color: #15516E;
+	}
+td.metaname, th.metaname{
+    background-color: #90B0BF;
+    color: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding: 3px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#15516E;
+    text-align:right;
+    }
+td.Submetaname, th.Submetaname{
+    background-color: transparent;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding: 3px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#15516E;
+    text-align:right;
+    }
+td.metanone{
+    background-color: transparent;
+    color: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding: 3px;
+    }
+td.metavalue,div.metavalue,span.metavalue{
+    background-color: transparent;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding-left: 10px;
+    }
+td.action{
+    background-color: #F2CCA4;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#15516E;
+    text-align:center;
+    }
+
+/* for Editor */
+
+span.editortitle, td.editortitle {
+    background-color: #90B0BF;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    padding-right:5px;
+    }
+
+span.editorlabel, td.editorlabel {
+    background-color: #F2CCA4;
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    width:200px;
+    }
+
+span.editorhints, td.editorhints {
+    color: #15516E;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    }
+
