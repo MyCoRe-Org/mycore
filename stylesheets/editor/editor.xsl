@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.25 $ $Date: 2004-12-27 10:41:08 $ -->
+<!-- $Revision: 1.26 $ $Date: 2004-12-27 15:06:53 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -18,6 +18,8 @@
 
 <xsl:param name="editor.cancel.url" /> <!-- if given, use this url for cancel button -->
 <xsl:param name="editor.cancel.id"  /> <!-- if given, substitute @@ID@@ in cancel/@url -->
+
+<xsl:param name="editor.session.id" /> <!-- reload session after plus minus up down button -->
 
 <xsl:param name="StaticFilePath"  /> <!-- path of static webpage including this editor -->
 <xsl:param name="RequestParamKey" /> <!-- key for accessing http request params in session -->
@@ -54,7 +56,25 @@
 
   <!-- ======== import editor definition ======== -->
   <xsl:variable name="uri" select="concat('webapp:', $StaticFilePath)" />
-  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=start.session&amp;_uri=',$uri,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID,'&amp;_requestParamKey=',$RequestParamKey)" />
+  <xsl:variable name="url">
+    <xsl:value-of select="$ServletsBaseURL" />
+    <xsl:text>XMLEditor?MCRSessionID=</xsl:text>
+    <xsl:value-of select="$MCRSessionID" />
+    <xsl:choose>
+      <xsl:when test="string-length($editor.session.id) &gt; 0">
+        <xsl:text>&amp;_action=load.session&amp;_session=</xsl:text>
+        <xsl:value-of select="$editor.session.id" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>&amp;_requestParamKey=</xsl:text>
+        <xsl:value-of select="$RequestParamKey" />
+        <xsl:text>&amp;_ref=</xsl:text>
+        <xsl:value-of select="@id" />
+        <xsl:text>&amp;_action=start.session&amp;_uri=</xsl:text>
+        <xsl:value-of select="$uri" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <!-- ======== build nested panel structure ======== -->
   <xsl:apply-templates select="document($url,.)/editor/components" />
@@ -156,7 +176,8 @@
 
   <!-- ======== send editor session ID to servlet ======== -->
   <input type="hidden" name="{$editor.delimiter.internal}session" value="{../@session}" />
-  <input type="hidden" name="{$editor.delimiter.internal}action" value="submit" />
+  <input type="hidden" name="{$editor.delimiter.internal}webpage" value="{$StaticFilePath}" />
+  <input type="hidden" name="{$editor.delimiter.internal}action"  value="submit" />
 
   <!-- ======== durchreichen der XSL.target.param.X=name=value parameter ======== -->
   <xsl:call-template name="handle.target.parameter">
@@ -243,6 +264,8 @@
     </xsl:choose>
   </xsl:variable>
 
+  <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num}" />
+
   <table border="0" cellspacing="0" cellpadding="0">
   
     <!-- If repeater is last component in parent panel, this table must be width 100% -->
@@ -266,14 +289,6 @@
   <xsl:param name="var" />
   <xsl:param name="pos" />
 
-  <tr>
-    <xsl:call-template name="repeated.component">
-      <xsl:with-param name="var"    select="$var" />
-      <xsl:with-param name="pos"    select="$pos" />
-      <xsl:with-param name="row.nr" select="$row.nr" />
-    </xsl:call-template>
-  </tr>
-
   <xsl:variable name="min">
     <xsl:choose>
       <xsl:when test="@min">
@@ -282,6 +297,30 @@
       <xsl:otherwise>1</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
+
+  <xsl:variable name="max">
+    <xsl:choose>
+      <xsl:when test="@max">
+        <xsl:value-of select="@max" />
+      </xsl:when>
+      <xsl:otherwise>1</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <tr>
+    <xsl:call-template name="repeated.component">
+      <xsl:with-param name="var"    select="$var" />
+      <xsl:with-param name="pos"    select="$pos" />
+      <xsl:with-param name="row.nr" select="$row.nr" />
+    </xsl:call-template>
+    <xsl:call-template name="repeater.pmud">
+      <xsl:with-param name="var"    select="$var" />
+      <xsl:with-param name="num"    select="$num" />
+      <xsl:with-param name="min"    select="$min" />
+      <xsl:with-param name="max"    select="$max" />
+      <xsl:with-param name="row.nr" select="$row.nr" />
+    </xsl:call-template>
+  </tr>
 
   <!-- ======== output another repeated row ======== -->
   <xsl:if test="($row.nr &lt; $min) or ($row.nr &lt; $num)">
@@ -325,6 +364,42 @@
       <xsl:with-param name="pos" select="$pos.new" />
       <xsl:with-param name="outer.border" select="@lines" />
     </xsl:call-template>
+  </td>
+</xsl:template>
+
+<!-- ======== repeater plus minus up down buttons ======== -->
+<xsl:template name="repeater.pmud">
+  <xsl:param name="var" />
+  <xsl:param name="num" />
+  <xsl:param name="min" />
+  <xsl:param name="max" />
+  <xsl:param name="row.nr" />
+
+  <td align="left" valign="bottom">
+    <xsl:if test="$num &lt; $max" >
+      <div style="margin-left:2px; margin-bottom:2px;">
+        <input type="image" name="{$editor.delimiter.internal}p-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
+      </div>
+    </xsl:if>
+  </td>
+  <td align="left" valign="bottom">
+      <div style="margin-left:2px;  margin-bottom:2px;">
+        <input type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+      </div>
+  </td>
+  <td align="left" valign="bottom">
+    <xsl:if test="($row.nr &lt; $num) or ($row.nr &lt; $min)" >
+      <div style="margin-left:2px;  margin-bottom:2px;">
+        <input type="image" name="{$editor.delimiter.internal}d-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
+      </div>
+    </xsl:if>
+  </td>
+  <td align="left" valign="bottom">
+    <xsl:if test="$row.nr &gt; 1" >
+      <div style="margin-left:2px;  margin-bottom:2px;">
+        <input type="image" name="{$editor.delimiter.internal}u-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
+      </div>
+    </xsl:if>
   </td>
 </xsl:template>
 
