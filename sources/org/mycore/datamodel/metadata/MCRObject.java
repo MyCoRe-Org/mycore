@@ -292,6 +292,8 @@ public final void createInDatastore() throws MCRPersistenceException
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
   mcr_persist.create(mcr_tc,xml,mcr_ts);
+  deleteLinksFromTable();
+  addLinksToTable(mcr_tc);
   // add the MCRObjectID to the child list in the parent object
   if (parent_id != null) {
     try {
@@ -429,6 +431,7 @@ private final void deleteFromDatastore() throws MCRPersistenceException
     }
   // remove him self
   mcr_persist.delete(mcr_id);
+  deleteLinksFromTable();
   }
 
 /**
@@ -550,6 +553,8 @@ private final void updateThisInDatastore()
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();
   mcr_persist.update(mcr_tc,xml,mcr_ts);
+  deleteLinksFromTable();
+  addLinksToTable(mcr_tc);
   }
 
 /**
@@ -593,6 +598,56 @@ private final void updateMetadataInDatastore(MCRObjectID child_id)
     MCRObject child = new MCRObject();
     child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
     }
+  }
+
+/**
+ * The method add all class and reference links of this instance to 
+ * the link table.
+ * 
+ * @param mcr_tc the typed content list
+ **/
+private void addLinksToTable(MCRTypedContent mcr_tc)
+  {
+  int i = 0;
+  while ((i<mcr_tc.getSize())&&(!mcr_tc.getNameElement(i).equals("metadata"))) {
+    i++; }
+  // add metadata links
+  i++;
+  while ((i<mcr_tc.getSize())&&(!mcr_tc.getNameElement(i).equals("service"))) {
+    if ((mcr_tc.getNameElement(i).equals("type")) && 
+       (mcr_tc.getFormatElement(i) == MCRTypedContent.FORMAT_LINK) &&
+       (mcr_tc.getValueElement(i).equals("locator"))) {
+      try {
+        MCRObjectID mcr_link = 
+          new MCRObjectID((String)mcr_tc.getValueElement(i+1));
+        mcr_linktable.addReferenceLink("href",mcr_id,mcr_link);
+        }
+      catch (MCRException e) { }
+      i++;
+      }
+    if ((mcr_tc.getNameElement(i).equals("classid")) && 
+       (mcr_tc.getFormatElement(i) == MCRTypedContent.FORMAT_CLASSID)) {
+      try {
+        MCRObjectID mcr_class = 
+          new MCRObjectID((String)mcr_tc.getValueElement(i));
+        mcr_linktable.addClassificationLink(mcr_id,mcr_class,
+          (String)mcr_tc.getValueElement(i+1));
+        }
+      catch (MCRException e) { }
+      i++;
+      }
+    i++;
+    }
+  }
+
+/**
+ * The method delete all class and reference links of this instance from
+ * the link table.
+ **/
+private void deleteLinksFromTable()
+  {
+  mcr_linktable.deleteReferenceLink("href",mcr_id);
+  mcr_linktable.deleteClassificationLink(mcr_id);
   }
 
 }

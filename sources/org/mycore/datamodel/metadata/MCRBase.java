@@ -58,6 +58,7 @@ protected static String mcr_encoding = null;
 protected static String mcr_schema_path = null;
 protected static String persist_name;
 private static String persist_type;
+protected static MCRLinkTableManager mcr_linktable = null;
 
 // interface classes
 protected static MCRObjectPersistenceInterface mcr_persist;
@@ -92,6 +93,8 @@ static
     mcr_conf = MCRConfiguration.instance();
     // set the logger property
     PropertyConfigurator.configure(mcr_conf.getLoggingProperties());
+    // Link table manager
+    mcr_linktable = MCRLinkTableManager.instance();
     // Default Encoding
     mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
       "ISO_8859-1");
