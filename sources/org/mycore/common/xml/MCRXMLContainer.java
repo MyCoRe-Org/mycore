@@ -213,11 +213,11 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
   rank.add(new Integer(in_rank));
   xml.add(in_xml);
   int in_status=0;
-  for (int i=0; i < size(); i++){
-	if (status.size()>0){
+  if (status.size()>0){
+	  System.out.print("MCRXMLContainer: set status at "+(status.size()-1)+" from "+((Integer)status.get(status.size()-1)).intValue());
 	  status.set((status.size()-1), new Integer(((Integer)status.get(status.size()-1)).intValue()+1));
+	  System.out.println(" to "+((Integer)status.get(status.size()-1)).intValue() + " Element: "+((org.jdom.Element)getXML(status.size()-1)).getAttributeValue("ID"));
 	  in_status=2;
-	}
   }
   status.add(new Integer(in_status));
   }
@@ -415,6 +415,7 @@ public final synchronized void importElements(byte [] in)
     System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
     xml.add(inxml);
     }
+   if (list.size()>1) fillStatus();
   }
 
 /**
@@ -426,6 +427,7 @@ public final synchronized void importElements(MCRXMLContainer in)
   { 
   for (int i=0; i<in.size(); i++) {
     add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));}
+  if (in.size()>1) fillStatus();
   }
 
 /**

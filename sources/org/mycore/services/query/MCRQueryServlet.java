@@ -26,6 +26,7 @@ package org.mycore.services.query;
 
 import java.io.*;
 import java.util.*;
+
 import javax.servlet.http.*;
 import javax.servlet.*;
 import javax.xml.transform.*;
@@ -100,6 +101,8 @@ private String defaultLang = "";
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
     String lang  = request.getParameter( "lang" );
+    String view  = request.getParameter( "view");
+    String ref   = request.getParameter( "ref");
     int status=0;
 
     String att_mode  = (String) request.getAttribute( "mode"  );
@@ -110,8 +113,10 @@ private String defaultLang = "";
     if (att_type!=null) { type = att_type; }
     String att_host  = (String) request.getAttribute( "hosts" );
     if (att_host!=null) { host = att_host; }
-    String att_lang  = (String) request.getAttribute( "lang" );
-    if (att_lang!=null) { lang = att_lang; }
+	String att_lang  = (String) request.getAttribute( "lang" );
+	if (att_lang!=null) { lang = att_lang; }
+	String att_view  = (String) request.getAttribute( "view" );
+	if (att_view!=null) { view = att_view; }
 
     if( mode  == null ) { mode  = "ResultList"; }
     if( mode.equals("") ) { mode  = "ResultList"; }
@@ -125,6 +130,9 @@ private String defaultLang = "";
     if (lang.equals("")) { lang = defaultLang; }
     type = type.toLowerCase();
     lang = lang.toUpperCase();
+    
+    if (view == null) view="";
+    else view=view.toLowerCase();
 
     System.out.println("MCRQueryServlet : mode = "+mode);
     System.out.println("MCRQueryServlet : type = "+type);
@@ -134,8 +142,10 @@ private String defaultLang = "";
 
 	if (type.equals("document")){
 		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
-		boolean predecessor = ((status % 2) == 1) ? true : false;
-		boolean successor   = (((status>>1) % 2) == 1) ? true : false;
+		String att_status  = (String) request.getAttribute( "status"  );
+		if (att_status!=null) { status = Integer.parseInt(att_status); }
+		boolean successor = ((status % 2) == 1) ? true : false;
+		boolean predecessor   = (((status>>1) % 2) == 1) ? true : false;
 		System.out.println("MCRQueryServlet : status = "+status);
 		System.out.println("MCRQueryServlet : predecessor = "+predecessor);
 		System.out.println("MCRQueryServlet : successor = "+successor);
@@ -253,26 +263,59 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
       }
     }
     
-
-    try {
-      if (style.equals("xml")) {
-        response.setContentType( "text/xml" );
-        OutputStream out = response.getOutputStream();
-        new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
-        out.close();
-        }
-      else {
-        request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
-        request.setAttribute( "XSL.Style", style );
-        RequestDispatcher rd = getServletContext()
-          .getNamedDispatcher( "MCRLayoutServlet" );
-        rd.forward( request, response );
-        }
-      }
-    catch( Exception ex ) {
-      System.out.println( ex.getClass().getName() );
-      System.out.println( ex );
+    if ((view.equals("prev") || view.equals("next")) && (ref != null)){
+    	/* change generate new query */
+    	if (cachedFlag){
+    		StringTokenizer refGet = 
+    		   new StringTokenizer(this.getBrowseElementID(jdom,ref,view.equals("next")),"@");
+    		if (refGet.countTokens() < 3)
+    			throw new ServletException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: "+refGet);
+    		String StrStatus=refGet.nextToken();
+    		query=new StringBuffer("/mycoreobject[@ID='")
+    		          .append(refGet.nextToken()).append("']").toString();
+    		host=refGet.nextToken();
+    		mode="ObjectMetadata";
+    		type="document";
+    		request.setAttribute("mode",mode);
+    		request.removeAttribute("status");
+    		request.setAttribute("status",StrStatus);
+    		request.setAttribute("type",type);
+    		request.setAttribute("hosts",host);
+    		request.setAttribute("lang",lang);
+    		request.setAttribute("query",query);
+    		request.setAttribute("view","done");
+    		System.out.println("MCRQueryServlet: sending to myself:" +
+    		   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
+    		   "&lang="+lang+"&query="+query );
+    		doGet(request,response);
+			/*
+			RequestDispatcher rd = getServletContext()
+			  .getNamedDispatcher( "MCRQueryServlet" );
+			rd.forward( request, response );
+			*/
+    	}
     }
+	else {
+		try {
+			if (style.equals("xml")) {
+				response.setContentType( "text/xml" );
+				OutputStream out = response.getOutputStream();
+				new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+				out.close();
+			}
+			else {
+				request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+				request.setAttribute( "XSL.Style", style );
+				RequestDispatcher rd = getServletContext()
+				                       .getNamedDispatcher( "MCRLayoutServlet" );
+        		rd.forward( request, response );
+        	}
+      	}
+    	catch( Exception ex ) {
+      		System.out.println( ex.getClass().getName() );
+      		System.out.println( ex );
+    	}
+	}
   }
 
   /**
@@ -373,6 +416,61 @@ if (type.equals("document")) try { jdom = sortList(jdom, "datum"); } catch (Exce
   {
     Vector inpStruct = new Vector ();
     return inpStruct;
+  }
+  
+  /**
+   * <em>getBrowseElementID</em> retrieves the previous or next element ID in
+   * the ResultList and gives it combined with the host back as a String in the
+   * following form:<br/>
+   * status@id@host
+   * @author Thomas Scheffler
+   * @param jdom					cached ResultList
+   * @param ref						the refering Document id@host
+   * @param next					true for next, false for previous Document
+   * @return String					String in the given form, representing the
+   * 								searched Document.
+   */
+  private String getBrowseElementID(org.jdom.Document jdom, String ref, boolean next)
+  	      throws ServletException, IOException{
+  	org.jdom.Document tempDoc = (org.jdom.Document)jdom.clone();
+    System.out.println("MCRQueryServlet: getBrowseElementID() got: "+ref);
+	StringTokenizer refGet = new StringTokenizer(ref,"@");
+	if (refGet.countTokens() < 2)
+		throw new ServletException("MCRQueryServlet: Sorry \"ref\" has not 2 Tokens: "+ref);
+	String id  =refGet.nextToken();
+	String host=refGet.nextToken();
+	List elements = tempDoc.getRootElement()
+	                      .getChildren(MCRXMLContainer.TAG_RESULT);
+	org.jdom.Element search=null;
+	org.jdom.Element prev=null;
+	while(!elements.isEmpty()){
+		search=(Element)elements.get(0);
+		if (((Element)search).getAttributeValue("id").equals(id) &&
+		    ((Element)search).getAttributeValue("host").equals(host))
+			if (next){
+				search=(Element)elements.get(1);
+				elements.clear();
+			}
+			else {
+				search=prev;
+				elements.clear();
+			}
+		else {
+			prev=search;
+			elements.remove(0);
+		}
+	}
+	
+	if (search==null)
+		throw new ServletException("MCRQueryServlet: Sorry doesn't found searched document");
+	String status=search.getAttributeValue("status");
+	id=search.getAttributeValue("id");
+	host=search.getAttributeValue("host");
+	String result=new StringBuffer(status).append('@').append(id)
+	.append('@').append(host).toString();
+	System.out.println("MCRQueryServlet: getBrowseElementID() returns: "+result);
+	new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, System.out );
+  	return result;
   }
 }
 
