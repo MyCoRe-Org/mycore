@@ -469,7 +469,14 @@ public class MCRCStoreContentManager8
 				//check every query that all documents in store match it
 				for (Iterator neg = negative.iterator(); neg.hasNext();) {
 					CM8Query query = (CM8Query) neg.next();
-					int cqr = queryIndex(query, basicquery).length;
+					int cqr=0;
+					String[] ders=queryIndex(query, basicquery);
+					//the array is full of derivateIDs check how many are
+					//equal to our derivateID
+					for (int i=0;i<ders.length;i++){
+						if (ders[i].equals(derivateID))
+							cqr++;
+					}
 					if (derCount != cqr) {
 						StringBuffer msg =
 							new StringBuffer("Query (")
