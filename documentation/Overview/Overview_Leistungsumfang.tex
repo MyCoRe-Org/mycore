@@ -1,4 +1,3 @@
-%
 MyCoRe ist ein Kernsystem, das alle Grundfunktionen einer digitalen Bibliothek abdeckt.
 Es kann als Basis f"ur eigene Implementierungen verwendet werden, so dass
 eigene spezialisierte L"osungen insbesondere hinsichtlich der Datenmodellierung
@@ -7,32 +6,50 @@ relativ schnell und einfach realisiert werden k"onnen.
 Nachfolgend werden die Kernkomponenten mit einer Kurzbeschreibung der jeweiligen
 Funktionalit"aten aufgef"uhrt.
 
-\section{Metadatenmodell}
+\section{Dokumenten- und Personenmetadaten}
 Das Metadatenmodell gew"ahrleistet die Mehrsprachigkeit aller relevanten Informationen.
 Eine Reihe von Grundtypen f"ur die Metadatenmodellierung sind bereits im Kernsystem
 implementiert.
 Zu den angebotenen Grundtypen geh"oren.....
 
-\section{Klassifikationssystem}
-\section{Logisches Dateisystem}
-\section{Suche}
-Eine verteilte Suche ist m"oglich...
+\section{Hierarchisches Klassifikationssystem}
+\section{Internes Dateisystem}
 
-\section{Schnittstellen}
-OAI, Z39.50, Webservices
+\section{Verteilte Suche und Schnittstellen}
+\subsection{Verteilte Suche}
+\subsection{Schnittstellen zu OAI, Z39.50, Webservices}
 
-\section{Benutzerverwaltung}
-\section{Verwaltung der Zugriffsrechte}
-\section{Workflow}
-Zur Zeit nicht implementiert.
+\section{Benutzer- und Zugriffsrechteverwaltung}
+\subsection{Benutzerverwaltung}
+\label{sec:LeistungsumfangUsermanagement} 
+Im Subsystem Benutzermanagement wird die Verwaltung derjenigen Personen geregelt,
+die mit dem System umgehen (zum Beispiel als Autoren Dokumente einstellen). 
+Dazu bietet die Benutzerverwaltung insbesondere die M"oglichkeit, dass sich Benutzer 
+und Benutzerinnen am System authentifizieren k"onnen.
 
+Die Gesch"aftsprozesse einer Benutzerverwaltung wie zum Beispiel das Anlegen neuer 
+Benutzer, das Setzen von Passw"ortern, das Deaktivieren von Benutzern usw. erfordern 
+unterschiedliche Privilegien. 
+Das Benutzerverwaltungs-Komponente des MyCoRe-Projekts erm"oglicht eine detaillierte 
+Vergabe von Privilegien auf der Basis von Benutzergruppen. 
+Zur Entlastung der Betreiber der digitalen Bibliothek ist es insbesondere m"oglich, 
+dediziert administrative Privilegien an Kunden zu delegieren. 
+Dies wird durch das Konzept von Gruppenadministratoren erm"oglicht, die besondere
+Rechte f"ur die Verwaltung der Gruppenmitglieder besitzen.
+Durch ein System von Regeln wird dabei gew"ahrleistet, dass sich ein Benutzer oder 
+eine Benutzerin nicht selbst h"ohere Privilegien zuweisen kann, als vom jeweils 
+"ubergeordneten Administrator festgelegt wurde.
 
-Dar"uber hinaus ist eine MyCoRe-Anwendung auf Basis des Dublin Core Datenmodells
-verf"ugbar.
+\subsection{Verwaltung von Zugriffsrechten}
+Dieses Subsystem ist derzeit noch nicht implementiert.
 
+\subsection{Digital Rights Management}
+Dieses Subsystem ist derzeit noch nicht implementiert.
 
-to be continued
+\section{Workflow- und Workbasketfunktionen}
+Dieses Subsystem ist derzeit noch nicht implementiert.
 
+\section{Benutzer- und Autoreninterface}
 
 
 

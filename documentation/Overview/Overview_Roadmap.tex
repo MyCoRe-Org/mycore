@@ -1,0 +1,97 @@
+\section{Releases}
+\subsection{Release 0.9, Januar 2004}
+
+\mcridentifier{Benutzerverwaltung}\\[0.1cm]
+Der in Abschnitt \ref{sec:LeistungsumfangUsermanagement} beschriebene Leistungsumfang wird
+von der Benutzerverwaltung voll unterst"utzt, also insbesondere die Funktionen
+
+\begin{itemize}
+\item Authentifizierung am System
+\item Rollen"ubernahme einzelner Personen auf Basis von Benutzergruppen, denen bestimmte
+      Privilegien zugewiesen werden k"onnen
+\item Freie Konfigurierbarkeit des Privilegiensystems (ein Satz grundlegender Privilegien
+      wird in der Dublin Core Beispielanwendung von MyCoRe mitgeliefert)
+\item Anlegen, L"oschen, Aktualisieren von Benutzern, Gruppen und Privilegien
+\item Import und Export von Benutzern, Gruppen und Privilegien aus/in XML Dateien
+\item Aktivierung/Deaktivierung einzelner Benutzer bzw. Benutzerinnen
+\end{itemize}
+
+Die Datenhaltung geschieht auf Basis einer SQL-Datenbank (z.B. IBM DB2, MySQL usw., je
+nachdem, in welcher Softwareumgebung das MyCoRe-System betrieben wird).
+Durch das Fehlen eines globalen grafischen User-Interfaces k"onnen alle Gesch"aftsprozesse
+(mit Ausnahme der Anmeldung) in diesem Release nur "uber die MyCoRe-Kommandozeile
+ausgef"uhrt werden.
+Die Anmeldung am System geschieht "uber ein Servlet (MCRLoginServlet), auf das von
+verschiedenen Stellen der Webanwendung hingewiesen werden kann. 
+Dabei ist "uber ein MyCoRe-internes Session-Management gew"ahrleistet, dass die
+Anmeldung "uber mehrere Transaktionen bzw. mehrere Anfragen an das System erhalten bleibt.
+(Detaillierte Informationen hierzu finden Sie im 'MyCoRe Internal Design Guide'.)
+
+F"ur die zuk"unftig geplanten Funktionen im Subsystem Benutzerverwaltung siehe Abschnitt
+\ref{sec:PlanungenUsermanagement}.
+
+\section{Planungen f"ur zuk"unftige Releases}
+
+\subsection{Benutzerverwaltung}
+\label{sec:PlanungenUsermanagement}
+\mcridentifier{Passwortverschl"usselung}\\[0.1cm]
+Derzeit werden die Passw"orter nur im Klartext in der jeweiligen SQL-Datenbank abgelegt.
+Ein Verschl"usselungsmechanismus wird eingearbeitet und ist f"ur das Release 1.0 geplant.
+
+\mcridentifier{Grafisches Verwaltungsinterface}\\[0.1cm]
+Mit Einf"uhrung der globalen grafischen Benutzerschnittstelle f"ur MyCoRe werden auch
+Editoren zur Durchf"uhrung der Gesch"aftsprozesse der Benutzerverwaltung zur
+Verf"ugung stehen. Planung: Release 1.0.
+
+\mcridentifier{Einbindung externer Benutzerverwaltungen}\\[0.1cm]
+"Ublicherweise gibt es in den Institutionen in denen eine Digitale Bibliothek zum Einsatz kommt 
+bereits bestehende Benutzerverwaltungen wie zum Beispiel zentrale LDAP-Server. 
+Die MyCoRe-Benutzerverwaltung soll zuk"unftig eine einfache Schnittstelle bieten, um diese 
+bereits bestehenden Verwaltungen zumindest f"ur die reine Authentifizierung mit einzubeziehen.
+Planung: Release $>$ 1.0.
+
+\mcridentifier{Benutzerprofile}\\[0.1cm]
+Das Benutzermanagement soll "uber die reinen administrativen Aufgaben hinaus auch die Verwaltung 
+von Benutzerprofilen erm"oglichen. 
+Damit soll es Anwendern der digitalen Bibliothek erm"oglicht werden, regelm"aßig wiederkehrende 
+Aufgaben direkt abzurufen, Zwischenergebnisse abzulegen usw.
+Planung: Release $>$ 1.0.
+
+\subsection{Verwaltung von Zugriffsrechten}
+\label{sec:PlanungenACL}
+Der Zugriffsschutz f"ur Objekte soll f"ur Benutzer, Gruppen und/oder IP/Host-Masken realisierbar 
+sein. 
+Objekte einer Digitalen Bibliothek bestehen aus Metadaten und einzelnen multimedialen Komponenten. 
+Die Zugriffskontrolle soll auf die kleinsten Granulen eines Objekts anwendbar sein. 
+So sollen also zum Beispiel die Metadaten frei zug"anglich sein, f"ur einzelne Teile aber 
+besondere Rechte erforderlich sein. 
+Zur Vereinfachung der Arbeit der Autoren soll es m"oglich sein, das Setzen von Zugriffsrechten 
+f"ur eine gr"oßere Anzahl von Objekten zu automatisieren bzw. sie projektspezifisch automatisch 
+zu setzen. 
+Dar"uber hinaus m"ussen Objekte zeitlich begrenzt mit besonderen Zugriffsrechten versehen werden 
+k"onnen. 
+Insbesondere muss es m"oglich sein, Dokumente wie zum Beispiel Dissertationen erst ab einem 
+bestimmten Zeitpunkt freizugeben.
+An der Implementierung dieser Komponente von MyCoRe wird gearbeitet.
+Planung: Release 1.0.
+
+\subsection{Digital Rights Management}
+\label{sec:PlanungenDRM}
+\mcridentifier{Wasserzeichen}\\[0.1cm]
+Durch die Verwaltung von Zugriffsrechten kann man das Retrieval von Objekten aus der Digitalen 
+Bibliothek kontrollieren, nicht aber die unberechtigte Weiterverwertung nach etwaigem 
+Herunterladen eines Objekts. 
+Um das Copyright der Autoren f"ur diesen Fall zu gew"ahrleisten, sollen Autoren w"ahlen k"onnen, 
+ob ihre Objekte zusammen mit einem digitalen Wasserzeichen ausgeliefert werden sollen. 
+Der Signiervorgang soll dabei funktional in den Auslieferungsmechanismus des Repositories 
+eingebunden sein, also ohne zus"atzlichen Arbeitsaufwand f"ur die Autoren geschehen.
+An der Implementierung dieser Komponente von MyCoRe wird gearbeitet.
+Planung: Release $>$ 1.0.
+
+
+
+
+
+
+
+
