@@ -86,7 +86,9 @@ These strategies are embarked on:
       </xsl:template>
       <!-- =================================================================================================== -->
       <xsl:template name="wcms.getTemplate">
+           
             <xsl:param name="browserAddress" />            
+           
             <!-- point to rigth item -->
             <xsl:for-each select="document($navigationBase) /navigation//item[@href = $browserAddress]" >
                   <!-- collect @template !='' entries along the choosen axis -->

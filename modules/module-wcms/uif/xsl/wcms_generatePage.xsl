@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<!--
+      <xsl:output method="html" encoding="UTF-8" media-type="text/html" doctype-public="-//W3C//DTD HTML 3.2 Final//EN" />
+-->      
 
-      <xsl:variable name="MainTitle">
-            <xsl:value-of select="document($navigationBase)/navigation/@mainTitle" />
-      </xsl:variable>
-      <xsl:param name="navigationBase" 
+      <xsl:output method="xml" indent="yes" encoding="UTF-8" media-type="text/html" 
+      doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" 
+      doctype-system="http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd" />
+
+	<!-- ================== get some wcms required global variables ===================================== -->      
+      <!-- assign right browser address -->
+      <xsl:param name="browserAddress" >
+            <xsl:call-template name="wcms.getBrowserAddress" />
+      </xsl:param>
+      <!-- look for appropriate template entry and assign -> $template -->
+      <xsl:param name="template" >
+            <xsl:call-template name="wcms.getTemplate" >
+                  <xsl:with-param name="browserAddress" select="$browserAddress"/>
+            </xsl:call-template>
+      </xsl:param>
+      <!-- location of navigation base -->
+      <xsl:variable name="navigationBase" 
             select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/navigation.xml')" />
-      <xsl:param name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/images/') " />
+      <!-- base image path -->
+      <xsl:variable name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/images/') " />
+	<!-- main title configured in mycore.properties.wcms -->
+      <xsl:param name="MCR.WCMS.nameOfProject"/>
+      <xsl:variable name="MainTitle">
+            <xsl:value-of select="$MCR.WCMS.nameOfProject"/>
+      </xsl:variable>
+	<!-- ================== get some wcms required global variables ===================================== -->      
 
-      <xsl:include href="wcms_coreFunctions.xsl" />      
+      <xsl:include href="wcms_coreFunctions.xsl" />
       <xsl:include href="wcms_common-used.xsl" />
       <xsl:include href="wcms_chooseTemplate.xsl" />
-      
+            
       <!-- =================================================================================================== -->
       <xsl:template name="wcms.generatePage">
-            
-		<!-- assign right browser address -->
-		<xsl:variable name="browserAddress" >
-	            <xsl:call-template name="wcms.getBrowserAddress" />
-		</xsl:variable>
-                  
-            <!-- look for appropriate template entry and assign -> $template -->
-            <xsl:variable name="template" >
-	            <xsl:call-template name="wcms.getTemplate" >
-                        <xsl:with-param name="browserAddress" select="$browserAddress"/>
-                  </xsl:call-template>
-            </xsl:variable>
-
             <!-- call the appropriate template -->
-            <xsl:call-template name="chooseTemplate">
-                  <xsl:with-param name="template" select="$template" />
-                  <xsl:with-param name="browserAddress" select="$browserAddress" />
-            </xsl:call-template>
-
+            <xsl:call-template name="chooseTemplate" />
       </xsl:template>
       <!-- ================================================================================= -->
-      
 </xsl:stylesheet>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2004-12-06 16:10:15 $ -->
+<!-- $Revision: 1.3 $ $Date: 2004-12-21 17:59:39 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	exclude-result-prefixes="xlink" >
@@ -22,9 +22,10 @@
 	<xsl:variable name="Servlet" select="'undefined'"/>
 	<!-- ================================================================================================================= -->
 	<xsl:template match="/MyCoReWebPage">
+            <!--
 	  <xsl:param name="browserAddress" />
 	  <xsl:param name="template"  />				
-	  
+	  -->
 		<xsl:choose>
 			<xsl:when test="$template = 'template_docportal' ">
 				<div id="help" class="help">
@@ -49,12 +50,16 @@
 						<xsl:choose>
 							<xsl:when test=" section[lang($CurrentLang)] != '' ">
 								<xsl:apply-templates select="section[lang($CurrentLang)] | section[lang('all')]">
+									<!--
 									<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                                      -->
 								</xsl:apply-templates>				
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates select="section[lang($DefaultLang)]">
+                                                      <!--
 									<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                                      -->
 								</xsl:apply-templates>								
 							</xsl:otherwise>
 						</xsl:choose>						
@@ -66,12 +71,16 @@
 				<xsl:choose>
 					<xsl:when test=" section[lang($CurrentLang)] != '' ">
 						<xsl:apply-templates select="section[lang($CurrentLang)] | section[lang('all')]">
+                                          <!--
 							<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                          -->
 						</xsl:apply-templates>				
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:apply-templates select="section[lang($DefaultLang)]">
+                                          <!--
 							<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                          -->
 						</xsl:apply-templates>								
 					</xsl:otherwise>
 				</xsl:choose>				
@@ -88,7 +97,9 @@
 	</xsl:template>
 	<!-- ================================================================================================================= -->
 	<xsl:template match="section">
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<xsl:for-each select="node()">
 			<xsl:choose>
 				<xsl:when test="name() = 'editor'">
@@ -111,7 +122,9 @@
 				<!-- added by wcms -->
 				<xsl:when test="name() = 'toc' or 'TOC'">
 					<xsl:apply-templates select="." >
+                                    <!--
 						<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                    -->
 					</xsl:apply-templates>
 				</xsl:when>
 				<!-- end: added by wcms -->

@@ -3,7 +3,9 @@
 	
 	<!-- ================================================================================= -->
 	<xsl:template match="TOC | toc">
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<xsl:for-each 
 			select="document($navigationBase)/navigation//item[@href=$browserAddress]">
 			<xsl:for-each select="child::item">
@@ -15,7 +17,9 @@
 	</xsl:template>
 	<!-- ================================================================================= -->
 	<xsl:template name="HistoryNavigationRow">
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<!-- get href of starting page -->
 		<xsl:variable name="hrefStartingPage" 
 			select="document($navigationBase)/navigation/@hrefStartingPage" />
@@ -50,7 +54,9 @@
 		<!-- use pixel values -->
 		<xsl:param name="spaceBetweenLinks" />
 		<!-- use pixel values -->
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<!-- table navigation row -->
 		<table class="{$CSSLayoutClass}" border="0" cellspacing="0" cellpadding="0" align="center">
 			<tr>
@@ -99,7 +105,9 @@
 	<!-- ================================================================================= -->
 	<xsl:template name="NavigationTree">
 		<xsl:param name="rootNode" />
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<xsl:param name="CSSLayoutClass" />
 		<xsl:param name="menuPointHeigth" />
 		<!-- use pixel values -->
@@ -189,7 +197,9 @@
 							<xsl:if test="current()[@href = $browserAddress ] or descendant::item[@href = $browserAddress ] ">
 								<xsl:call-template name="createTree">
 									<xsl:with-param name="depth" select="$depth" />
+                                                      <!--
 									<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                                      -->
 									<xsl:with-param name="menuPointHeigth" select="$menuPointHeigth" />
 									<xsl:with-param name="columnWidthIcon" select="$columnWidthIcon" />
 									<xsl:with-param name="subRootNode" select="$subRootNode" />
@@ -228,7 +238,9 @@
 						<xsl:if test="current()[@href = $browserAddress ] or descendant::item[@href = $browserAddress ] ">
 							<xsl:call-template name="createTree">
 								<xsl:with-param name="depth" select="$depth" />
+                                                <!--
 								<xsl:with-param name="browserAddress" select="$browserAddress" />
+                                                -->
 								<xsl:with-param name="menuPointHeigth" select="$menuPointHeigth" />
 								<xsl:with-param name="columnWidthIcon" select="$columnWidthIcon" />
 								<xsl:with-param name="subRootNode" select="$subRootNode" />
@@ -289,7 +301,9 @@
 	<!-- ================================================================================= -->
 	<!-- ================================================================================= -->
 	<xsl:template name="createTree">
+            <!--
 		<xsl:param name="browserAddress" />
+            -->
 		<xsl:param name="depth" />
 		<xsl:param name="menuPointHeigth" />
 		<xsl:param name="columnWidthIcon" />
