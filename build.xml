@@ -90,7 +90,7 @@
   </target>
 
   <target name="compile_persistency">
-    <echo>Compiling for for persistence layer ${persistency}</echo>
+    <echo>Compiling for persistence layer ${persistency}</echo>
     <antcall target="compile_${persistency}">
       <param name="packages" value="mycore/${persistency}/**"/>
     </antcall>
