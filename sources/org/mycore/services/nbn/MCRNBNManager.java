@@ -88,4 +88,10 @@ public interface MCRNBNManager
   * @return a Map containing the matched URNs as keys, and their URLs as values
   **/
   public Map listURNs( String pattern );
+  
+	/**
+	 * Method listReservedURNs. Returns all URNs that are reserved for later use with a document.
+	 * @return a Set containing the URNs
+	 */
+  public Set listReservedURNs();
 }
