@@ -25,7 +25,7 @@ ANT_HOME=/opt/jakarta-ant-1.5.1
 MCR_PERSISTENCE=cm7
 
 # If you use cm7 or cm8, directory where IBM Content Manager is installed
-CM_HOME=/usr/lpp/cmb/
+CM_HOME=/usr/lpp/cmb
 
 #######################################################################
 #
