@@ -30,23 +30,44 @@
               schemaLocation="{$mycore_home}/schema/xlinks-2001.xsd" />
  <xsd:include schemaLocation='{$mycore_home}/schema/MCRObjectStructure.xsd'/>
 
- <xsd:element name="mycoreobject" type="MCRObject"/>
+ <xsl:variable name="var" select="/configuration/@type" />
+ <xsl:choose>
 
- <xsd:complexType name="MCRObject">
-  <xsd:sequence>
-  <xsd:element name="structure" type="MCRObjectStructure"  minOccurs='1' 
-    maxOccurs='1' />
-  <xsd:element name="metadata" type="MCRObjectMetadata" minOccurs='1' 
-    maxOccurs='1' />
-  <xsd:element name="service"  type="MCRObjectService" minOccurs='1' 
-    maxOccurs='1' />
-  </xsd:sequence>
-  <xsd:attribute name="ID" type="xsd:string" use="required" />
-  <xsd:attribute name="label" type="xsd:string" use="required" />
- </xsd:complexType>
+  <xsl:when test="contains($var,'derivate')">
+   <xsd:element name="mycorederivate" type="MCRDerivate"/>
+   <xsd:complexType name="MCRDerivate">
+    <xsd:sequence>
+    <xsd:element name="derivate"  type="MCRObjectDerivate" minOccurs='1' 
+      maxOccurs='1' />
+    <xsd:element name="service"  type="MCRObjectService" minOccurs='1' 
+      maxOccurs='1' />
+    </xsd:sequence>
+    <xsd:attribute name="ID" type="xsd:string" use="required" />
+    <xsd:attribute name="label" type="xsd:string" use="required" />
+   </xsd:complexType>
+   <xsl:apply-templates select="/configuration/derivate"/>
+   <xsl:apply-templates select="/configuration/service"/>
+  </xsl:when>
 
- <xsl:apply-templates select="/configuration/metadata"/>
- <xsl:apply-templates select="/configuration/service"/>
+  <xsl:otherwise>
+   <xsd:element name="mycoreobject" type="MCRObject"/>
+   <xsd:complexType name="MCRObject">
+    <xsd:sequence>
+     <xsd:element name="structure" type="MCRObjectStructure"  minOccurs='1' 
+      maxOccurs='1' />
+    <xsd:element name="metadata" type="MCRObjectMetadata" minOccurs='1' 
+      maxOccurs='1' />
+    <xsd:element name="service"  type="MCRObjectService" minOccurs='1' 
+      maxOccurs='1' />
+    </xsd:sequence>
+    <xsd:attribute name="ID" type="xsd:string" use="required" />
+    <xsd:attribute name="label" type="xsd:string" use="required" />
+   </xsd:complexType>
+   <xsl:apply-templates select="/configuration/metadata"/>
+   <xsl:apply-templates select="/configuration/service"/>
+  </xsl:otherwise>
+
+ </xsl:choose>
 
  </xsd:schema>
 
@@ -85,6 +106,34 @@
       <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
      </xsl:otherwise>
     </xsl:choose>
+   </xsd:complexType>
+  </xsd:element>
+ </xsl:for-each>
+
+   <xsl:value-of select="$newline"/>
+  </xsd:sequence>
+  <xsd:attribute ref="xml:lang" />
+ </xsd:complexType>
+
+</xsl:template>
+
+<!-- Template for the derivate part -->
+
+<xsl:template match="/configuration/derivate">
+
+ <xsd:complexType name="MCRObjectDerivate">
+  <xsd:sequence>
+
+ <xsl:for-each select="element">
+  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+    <xsd:sequence>
+     <xsl:apply-templates select="*"/>
+    </xsd:sequence>
+    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
