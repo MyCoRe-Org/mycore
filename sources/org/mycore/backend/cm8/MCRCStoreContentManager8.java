@@ -520,7 +520,7 @@ public class MCRCStoreContentManager8
 		return new MCRSQLConnection(driver,url,user,passwd).countRows(
 			new MCRSQLStatement(TIEREF_TABLE)
 				.setCondition(DerivateAttribute, derivateID)
-				.toSelectStatement());
+				.toRowSelector());
 	}
 
 	private String[] queryIndex(CM8Query query, boolean basic) {
