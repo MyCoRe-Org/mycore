@@ -239,12 +239,12 @@ public class TextFilterPluginManager {
 				for (StringBuffer className =
 					new StringBuffer().append(reader.readLine());
 					(className.length() != 4
-						&& className.indexOf("null") == -1);
+						&& className.toString().indexOf("null") == -1);
 					className.delete(0, className.length()).append(
 						reader.readLine())) {
 					//System.out.println("processing String: "+className.toString());					               	
 					//remove any comments
-					int comPos = className.indexOf("#");
+					int comPos = className.toString().indexOf("#");
 					if (comPos != -1)
 						className.delete(comPos, className.length());
 					//trim String
@@ -258,7 +258,7 @@ public class TextFilterPluginManager {
 					className.delete(len + 1, sblen).delete(0, st);
 					//end trim String	 
 					//if space letter is included asume first word as class name
-					int spacePos = className.indexOf(" ");
+					int spacePos = className.toString().indexOf(" ");
 					if (spacePos != -1)
 						className =
 							className.delete(spacePos, className.length());
