@@ -72,7 +72,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Does the layout for other MyCoRe servlets by transforming XML 
  * input to various output formats, using XSL stylesheets.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
@@ -251,39 +251,52 @@ public class MCRLayoutServlet extends MCRServlet
     String style = parameters.getProperty( "Style", "default" );
     logger.debug( "MCRLayoutServlet using style " + style );
 
-    if( "xml".equals( style ) ) 
-    {
+    String styleName = buildStylesheetName( style, docType );
+    String styleDir  = "/WEB-INF/stylesheets/";
+    File styleFile   = getStylesheetFile( styleDir, styleName );
+    /*
+     * if there is no stylesheet present forward as xml instead
+     * you can transform xml-code using "doctype"-xml.xsl now
+     */
+    if( (styleFile == null) && (style.equals("xml"))) 
       forwardXML( request, response );
-    }
-    else
-    {
-      String styleName = buildStylesheetName( style, docType );
-      String styleDir  = "/WEB-INF/stylesheets/";
-      File styleFile   = getStylesheetFile( styleDir, styleName );
-
-      if( styleFile == null ) 
-        forwardXML( request, response );
-      else
-      {
-        Templates stylesheet = buildCompiledStylesheet( styleFile );
-        Transformer transformer = buildTransformer( stylesheet );
-        setXSLParameters( transformer, parameters );
-        try 
-        { transform( sourceXML, stylesheet, transformer, response ); } 
-        catch( IOException ex ) 
-        {	logger.error("IO Error while XSL transforming XML Document", ex ); }
-        catch( MCRException ex){
-        	if (errorPage)
-        		throw new MCRException("Error while genrating error page!",ex);
-        	else
-        		generateErrorPage(request,
-        	                           response,
-        	                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-        	                           ex.getMessage(),
-        	                           ex,
-        	                           false);
-        }
+    else {
+      if (styleFile==null){
+      	/*
+      	 * What's that? Maybe a kid wants to hack our mycore
+      	 * to get that complicated raw xml source code.
+      	 * We should stop that now and forever and go to lunch!
+      	 */
+		String mode = getProperty(request, "mode"  );
+		String type = getProperty(request, "type"  );
+		String layout = getProperty(request, "layout"  );
+		String lang = getProperty(request, "lang" );
+		if( layout == null ) { layout = type; }
+		if( layout.equals("") ) { layout = type; }
+      	style = mode+"-"+layout+"-"+lang;
+      	styleName=buildStylesheetName(style,docType);
+      	styleFile=getStylesheetFile( styleDir, styleName );
       }
+      Templates stylesheet = buildCompiledStylesheet( styleFile );
+      Transformer transformer = buildTransformer( stylesheet );
+      setXSLParameters( transformer, parameters );
+      try {
+      	transform( sourceXML, stylesheet, transformer, response ); 
+      } 
+      catch( IOException ex ) {	
+      	logger.error("IO Error while XSL transforming XML Document", ex ); 
+      }
+      catch( MCRException ex){
+      	if (errorPage)
+      		throw new MCRException("Error while genrating error page!",ex);
+        else
+        	generateErrorPage(request,
+                                   response,
+                                   HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                   ex.getMessage(),
+                                   ex,
+                                   false);
+       }
     }
   }
 
