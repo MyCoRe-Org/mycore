@@ -522,11 +522,11 @@ public class MCROAIQueryService implements MCROAIQuery {
         		}
         	}
         }
-          
+        // debug 
         //org.jdom.Document myDoc = object.createXML() ;
         //org.jdom.output.XMLOutputter myOut = new org.jdom.output.XMLOutputter();
-        //logger.debug("tempHH:" + myOut.outputString(eMetadata));
-        //end new  		
+        //logger.debug("eMetadata:" + myOut.outputString(eMetadata));
+        //end debug
 		return documentMetadata;
 	}
 	/**
