@@ -166,11 +166,10 @@ public MCRXMLContainer getResultList( String query, String type,
       }
     if (retdirect) {
       logger.debug("Retrieve the data direcly from XML database.");
-      byte[] xml = xmltable.retrieve(type,testid);
       try {
+        byte[] xml = xmltable.retrieve(type,testid);
         result.add( "local", testid.getId(), 0, xml); }
-      catch (Exception e) {
-        throw new MCRPersistenceException("",e); }
+      catch (Exception e) { }
       }
     else {
       result.importElements((MCRXMLContainer)startQuery(onetype)); }
