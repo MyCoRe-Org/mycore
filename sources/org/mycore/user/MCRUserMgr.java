@@ -379,7 +379,7 @@ public class MCRUserMgr
 
       // We have to notify the groups this group is a member of
       for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
-        String gid = (String)delGroup.getAdminGroupIDs().elementAt(i);
+        String gid = (String)delGroup.getGroupIDs().elementAt(i);
         if (mcrUserStore.existsGroup(gid)) { // this test must be!
           MCRGroup currentGroup = retrieveGroup(gid);
           currentGroup.removeMemberGroupID(groupID);
