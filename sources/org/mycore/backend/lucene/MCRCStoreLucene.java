@@ -24,13 +24,12 @@
 package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -232,6 +231,7 @@ public class MCRCStoreLucene
 		doc.add(storageID);
 		try {
 			indexDocument(doc);
+			doc=null;
 		} catch (IOException io) {
 			//Document was not added
 			//remove file from local FileStore
@@ -263,12 +263,14 @@ public class MCRCStoreLucene
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
 		throws IOException {
 		Document returns = new Document();
-		PipedInputStream pin = new PipedInputStream();
-		PipedOutputStream pout = new PipedOutputStream(pin);
-		PrintStream out = new PrintStream(pout);
-		BufferedReader in = new BufferedReader(new InputStreamReader(pin));
+		ByteArrayOutputStream out=new ByteArrayOutputStream();
 		//filter here
 		pMan.transform(reader.getContentType(), stream, out);
+		out.flush();
+		byte[] temp=out.toByteArray();
+		out.close();
+		ByteArrayInputStream bin=new ByteArrayInputStream(temp);
+		BufferedReader in = new BufferedReader(new InputStreamReader(bin));
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
 		if (reader instanceof MCRFile) {
@@ -284,9 +286,7 @@ public class MCRCStoreLucene
 			returns.add(derivateID);
 			returns.add(fileID);
 			returns.add(content);
-			logger.debug("closing stream, else indexDocument will hang");
-			out.flush();
-			out.close();
+			//in.close();fin.close();tmp.delete();
 			logger.debug("returning document");
 			return returns;
 		} else
