@@ -91,6 +91,22 @@ public MCRMetaClassification(String set_datapart, String set_subtag,
   }
 
 /**
+ * The method return the classification ID.
+ *
+ * @return the classId
+ **/
+public final String getClassId()
+  { return classid; }
+ 
+/**
+ * The method return the category ID.
+ *
+ * @return the categId
+ **/
+public final String getCategId()
+  { return categid; }
+ 
+/**
  * This method set values of classid and categid.
  *
  * @param set_classid      the classification ID
