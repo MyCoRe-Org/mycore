@@ -59,11 +59,11 @@ public class MCRCStoreContentManager8
 
   /** The name of the attribute that stores the MCRFile.getID() */
   protected String attributeFile;
-  protected final int MAX_ATTRIBUTE_FILE_LENGTH = 32;
+  protected final int MAX_ATTRIBUTE_FILE_LENGTH = 128;
 
   /** The name of the attribute that stores the creation timestamp */
   protected String attributeTime;
-  protected final int MAX_ATTRIBUTE_TIME_LENGTH = 32;
+  protected final int MAX_ATTRIBUTE_TIME_LENGTH = 128;
 
   /** The temporary store of the files **/
   protected String [] STORE_TYPE_LIST = { "none","memory" };
@@ -113,14 +113,14 @@ public class MCRCStoreContentManager8
       logger.debug( "Get a connection to CM8 connection pool." );
       connection = MCRCM8ConnectionPool.instance().getConnection();
       
-      DKLobICM ddo = null;
-      try{ ddo = (DKLobICM)connection.createDDO(itemTypeName,DK_CM_DOCUMENT); }
+      DKTextICM ddo = null;
+      try{ ddo = (DKTextICM)connection.createDDO(itemTypeName,DK_CM_ITEM); }
       catch( Exception ex ) 
       {
         createStore( connection ); 
-        ddo = (DKLobICM)connection.createDDO(itemTypeName,DK_CM_DOCUMENT); 
+        ddo = (DKTextICM)connection.createDDO(itemTypeName,DK_CM_ITEM); 
       }
-      logger.debug("A new DKLobICM was created.");
+      logger.debug("A new DKTextICM was created.");
       
       logger.debug("MCRFile ID = "+ file.getID() );
       short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeFile);
@@ -132,6 +132,7 @@ public class MCRCStoreContentManager8
       
       logger.debug("MimeType = "+file.getContentType().getMimeType());
       ddo.setMimeType(file.getContentType().getMimeType());
+      ddo.setTextSearchableFlag(true);
       
       int filesize = 0;
       if (storeTempType.equals("none")) {
@@ -185,7 +186,7 @@ public class MCRCStoreContentManager8
           try { tmp.delete(); } catch (SecurityException e) { }
           }
         }
-      logger.debug("Add the DKLobICM.");
+      logger.debug("Add the DKTextICM.");
       
       String storageID = ddo.getPidObject().pidString();
       logger.debug("StorageID = "+storageID);
@@ -210,7 +211,7 @@ public class MCRCStoreContentManager8
     DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
     try 
     {
-      DKLobICM ddo = (DKLobICM)connection.createDDO(storageID);
+      DKTextICM ddo = (DKTextICM)connection.createDDO(storageID);
       ddo.del();
       logger.debug("The file was deleted from CM8 Ressource Manager.");
     }
@@ -226,7 +227,7 @@ public class MCRCStoreContentManager8
     DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
     try 
     {
-      DKLobICM ddo = (DKLobICM)connection.createDDO( file.getStorageID() );
+      DKTextICM ddo = (DKTextICM)connection.createDDO( file.getStorageID() );
       ddo.retrieve(DK_CM_CONTENT_NO);
       
       String url = ddo.getContentURL(-1,-1,-1);
@@ -248,11 +249,21 @@ public class MCRCStoreContentManager8
   {
     Logger logger = MCRCM8ConnectionPool.getLogger(); 
     // create the Attribute for IFS File ID
-    if (!createAttributeVarChar(connection,"ifsfile", MAX_ATTRIBUTE_FILE_LENGTH))
-      logger.warn("CM8 Datastore Creation attribute ifsfile already exists.");
-    // create the Attribute for MCR_Label
-    if (!createAttributeVarChar(connection,"ifstime", MAX_ATTRIBUTE_TIME_LENGTH))
-      logger.warn("CM8 Datastore Creation attribute ifstime already exists.");
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeFile, 
+      MAX_ATTRIBUTE_FILE_LENGTH,false))
+      logger.warn("CM8 Datastore Creation attribute "+attributeFile+
+        " already exists.");
+    // create the Attribute for IFS Time 
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeTime, 
+      MAX_ATTRIBUTE_TIME_LENGTH,false))
+      logger.warn("CM8 Datastore Creation attribute "+attributeTime+
+        " already exists.");
+
+    // create a text search definition
+    DKTextIndexDefICM mcr_item_text_index = 
+      MCRCM8ItemTypeCommon.getTextDefinition();
+    mcr_item_text_index.setUDFName("ICMfetchFilter");
+    mcr_item_text_index.setUDFSchema("icmadmin");
 
     // create the root itemtype
     logger.info("Create the ItemType "+itemTypeName);
@@ -260,18 +271,20 @@ public class MCRCStoreContentManager8
     item_type.setName(itemTypeName);
     item_type.setDescription(itemTypeName);
     item_type.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
-    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr("ifsfile");
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr("ifstime");
-    attr.setNullable(false);
-    attr.setUnique(false);
-    item_type.addAttr(attr);
     item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_RESOURCE_ITEM);
-    item_type.setXDOClassName(DK_ICM_XDO_LOB_CLASS_NAME);
-    item_type.setXDOClassID(DK_ICM_XDO_LOB_CLASS_ID);
+    item_type.setXDOClassName(DK_ICM_XDO_TEXT_CLASS_NAME);
+    item_type.setXDOClassID(DK_ICM_XDO_TEXT_CLASS_ID);
+    item_type.setTextIndexDef(mcr_item_text_index);
+    item_type.setTextSearchable(true);
+    DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
+    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeFile);
+    attr.setNullable(false);
+    attr.setUnique(false);
+    item_type.addAttr(attr);
+    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeTime);
+    attr.setNullable(false);
+    attr.setUnique(false);
+    item_type.addAttr(attr);
     short rmcode = 1; // the default
     item_type.setDefaultRMCode(rmcode);
     short smscode = 1; // the default
@@ -280,32 +293,5 @@ public class MCRCStoreContentManager8
     logger.info("The ItemType "+itemTypeName+" for IFS CM8 store is created."); 
   }
 
-/**
- * This method is internal and creates a DK_CM_VARCHAR attribute.
- *
- * @param connection the connection to the database
- * @param name the name of the attribute
- * @param len the len of the character field
- * @param search ist true, if the attribute should text searchable
- * @return If the attribute exists, false was returned, else true.
- **/
-  public static final boolean createAttributeVarChar(DKDatastoreICM connection,
-    String name, int len) throws Exception
-  {
-    DKAttrDefICM attr = new DKAttrDefICM(connection);
-    try 
-    {
-      attr.setName(name);
-      attr.setType(DK_CM_VARCHAR);
-      attr.setStringType(DK_CM_ATTR_VAR_ALPHANUM_EXT);
-      attr.setSize(len);
-      attr.setTextSearchable(false);
-      attr.setNullable(true);
-      attr.setUnique(false);
-      attr.add(); 
-    }
-    catch (DKException e) { return false; }
-    return true;
-  }
 }
 

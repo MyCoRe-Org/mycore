@@ -83,8 +83,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     DKAttrDefICM attr;
     // create the type attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,typename,typelen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,typename,
+      typelen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         typename+" already exists."); }
     // add the value attribute
@@ -93,8 +93,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the href attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,hrefname,hreflen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,hrefname,
+      hreflen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         hrefname+" already exists."); }
     // add the value attribute
@@ -103,8 +103,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the label attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,labelname,labellen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,labelname,
+      labellen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         labelname+" already exists."); }
     // add the value attribute
@@ -113,8 +113,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the title attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,titlename,titlelen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,titlename,
+      titlelen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         titlename+" already exists."); }
     // add the value attribute
@@ -123,8 +123,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the from attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,fromname,fromlen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,fromname,
+      fromlen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         fromname+" already exists."); }
     // add the value attribute
@@ -133,7 +133,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the to attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,toname,tolen,
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,toname,tolen,
       false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         toname+" already exists."); }

@@ -97,7 +97,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     DKComponentTypeDefICM it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,name,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
@@ -113,7 +113,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,name,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
@@ -129,7 +129,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,name,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
@@ -145,7 +145,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,name,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
@@ -159,7 +159,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     it = new DKComponentTypeDefICM(connection);
     it.setName(name);
     it.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,name,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,name,len,ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);

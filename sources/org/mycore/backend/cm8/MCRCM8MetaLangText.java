@@ -93,7 +93,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.addAttr(attr);
     // create the attribute for the data content in string form
     // with given textsearch flag
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,subtagname,len,ts)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,subtagname,len,
+      ts)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         subtagname+" already exists."); }
     // add the value attribute

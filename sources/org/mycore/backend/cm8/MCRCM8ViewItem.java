@@ -54,7 +54,7 @@ static String userid = "";
 static String password = "";
 static String itemtype = "";
 static String prefix = "";
-static String ifsowner = "";
+static String ifsfile = "";
 static String query = "";
 static MCRObjectID mcrid = null;
 
@@ -84,8 +84,12 @@ public static void main(String argv[]) throws DKException, Exception
     }
   if (argv[0].equals("ifs")) {
     itemtype = conf.getString("MCR.IFS.ContentStore.CM8.ItemType");
-    ifsowner = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.Owner");
-    query = "/"+itemtype+"[@ifsowner=\""+mcrid.getId()+"\"]";
+    ifsfile = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.File");
+    //query = "/"+itemtype+"[@ifsfile=\""+mcrid.getId()+"\"]";
+    // show all items
+    query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
+    // show all items
+    //query = "/"+itemtype;
     }
 
   System.out.println(query);

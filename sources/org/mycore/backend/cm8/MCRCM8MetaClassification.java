@@ -78,8 +78,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     DKAttrDefICM attr;
     // create the classid attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,classname,clalen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,classname,
+      clalen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         classname+" already exists."); }
     // add the value attribute
@@ -88,8 +88,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the categid attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,categname,catlen,
-      false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,categname,
+      catlen,false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         categname+" already exists."); }
     // add the value attribute

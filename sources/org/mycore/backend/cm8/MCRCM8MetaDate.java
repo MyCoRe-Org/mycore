@@ -79,7 +79,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     lt.addAttr(attr);
     // create the attribute for the data content in date form
-    if (!MCRCM8ItemType.createAttributeInteger(connection,subtagname)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeInteger(connection,subtagname)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         subtagname+" already exists."); }
     // add the value attribute

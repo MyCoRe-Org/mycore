@@ -81,7 +81,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     lt.addAttr(attr);
     // create the dimension attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,dimname,128,false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,dimname,128,
+      false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         dimname+" already exists."); }
     // add the value attribute
@@ -90,7 +91,8 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the measurement attribute for the data content
-    if (!MCRCM8ItemType.createAttributeVarChar(connection,measname,64,false)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,measname,64,
+      false)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         measname+" already exists."); }
     // add the value attribute
@@ -99,7 +101,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     attr.setUnique(false);
     lt.addAttr(attr);
     // create the attribute for the data content in date form
-    if (!MCRCM8ItemType.createAttributeDouble(connection,subtagname)) {
+    if (!MCRCM8ItemTypeCommon.createAttributeDouble(connection,subtagname)) {
       logger.warn( "CM8 Datastore Creation attribute "+
         subtagname+" already exists."); }
     // add the value attribute
