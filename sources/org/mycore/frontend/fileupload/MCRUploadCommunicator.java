@@ -23,15 +23,31 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.util.*;
-import java.util.zip.*;
-import java.io.*;
-import java.net.*;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Stack;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.mycore.common.MCRConfiguration;
 
 
 /**
@@ -44,7 +60,7 @@ import java.security.MessageDigest;
  * some marshalling etc. and sends the request to the
  * MCRUploadServlet servlet that does the job.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -301,7 +317,9 @@ public final class MCRUploadCommunicator
   protected InputStream doPost( Hashtable parameters )
     throws IOException
   {
-    String data = encodeParameters( parameters );
+  	MCRConfiguration CONFIG = MCRConfiguration.instance();
+
+    String data = encodeParameters( parameters, CONFIG.getString("MCR.request_charencoding", "UTF-8"));
     String mime = "application/x-www-form-urlencoded";
 
     URLConnection connection = null;
@@ -323,7 +341,7 @@ public final class MCRUploadCommunicator
     return connection.getInputStream();
   }
   
-  protected String encodeParameters( Hashtable parameters )
+  protected String encodeParameters( Hashtable parameters, String encoding ) throws UnsupportedEncodingException
   {
     StringBuffer data = new StringBuffer();
     Enumeration  e    = parameters.keys();
@@ -333,12 +351,12 @@ public final class MCRUploadCommunicator
       String name  = (String) e.nextElement();
       String value = (String) parameters.get( name );
 
-      data.append( URLEncoder.encode( name ) )
+      data.append( URLEncoder.encode( name, encoding) )
           .append( "=" )
-          .append( URLEncoder.encode( value ) )
-          .append( "&" );
+          .append( URLEncoder.encode( value, encoding ) )
+          .append( "&amp;" );
     }
-    data.setLength( data.length() - 1 );
+    data.setLength( data.length() - 5 );
 
     return data.toString();
   }

@@ -25,11 +25,14 @@
 package org.mycore.datamodel.metadata;
 
 import java.text.*;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class holds all information an methode to handle the MyCoRe Object ID.
@@ -42,6 +45,8 @@ import org.mycore.common.MCRUsageException;
  **/
 public final class MCRObjectID {
 
+	protected static MCRConfiguration CONFIG;
+	private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
 	/**
 	 * constant value for the object id length
 	 **/
@@ -87,6 +92,11 @@ public final class MCRObjectID {
 			throw new MCRException("The ID is not valid: " + id);
 		}
 		mcr_valid_id = true;
+	}
+	
+	private void init(){
+		if (CONFIG==null)
+			CONFIG=MCRConfiguration.instance();
 	}
 
 	/**
@@ -282,7 +292,13 @@ public final class MCRObjectID {
 		if (id.length() > MAX_LENGTH) {
 			return false;
 		}
-		String mcr_id = URLEncoder.encode(id);
+		String mcr_id;
+		try {
+			mcr_id = URLEncoder.encode(id,CONFIG.getString("MCR.request_charencoding", "UTF-8"));
+		} catch (UnsupportedEncodingException e1) {
+			LOGGER.error("MCR.request_charencoding property does not contain a valid encoding:",e1);
+			return false;
+		}
 		if (!mcr_id.equals(id)) {
 			return false;
 		}

@@ -51,7 +51,7 @@ import org.mycore.common.xml.MCRLayoutServlet;
  **/
 public class MCRServlet extends HttpServlet {
 	// Some configuration details
-	protected static MCRConfiguration config;
+	protected static MCRConfiguration CONFIG;
 
 	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 	private static String BASE_URL, SERVLET_URL;
@@ -66,8 +66,8 @@ public class MCRServlet extends HttpServlet {
 	public void init() {
 		System.err.println("Initializing MCRServlet...");
 		MCRConfiguration.instance().reload(true);
-		config = MCRConfiguration.instance();
-		PropertyConfigurator.configure(config.getLoggingProperties());
+		CONFIG = MCRConfiguration.instance();
+		PropertyConfigurator.configure(CONFIG.getLoggingProperties());
 	}
 
 	/** returns the base URL of the mycore system */
@@ -135,7 +135,7 @@ public class MCRServlet extends HttpServlet {
 		HttpServletResponse res,
 		boolean GETorPOST)
 		throws ServletException, IOException {
-		if (config == null) {
+		if (CONFIG == null) {
 			//removes NullPointerException below, if somehow Servlet is not yet intialized
 			init();
 		}
@@ -144,7 +144,7 @@ public class MCRServlet extends HttpServlet {
 		if (ReqCharEncoding == null) {
 			// Set default to UTF-8
 			ReqCharEncoding =
-				config.getString("MCR.request_charencoding", "UTF-8");
+				CONFIG.getString("MCR.request_charencoding", "UTF-8");
 			req.setCharacterEncoding(ReqCharEncoding);
 			LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
 		}
@@ -296,7 +296,7 @@ public class MCRServlet extends HttpServlet {
 			ex);
 		String rootname = "mcr_error";
 		String defaultLang =
-			config.getString("MCR.metadata_default_lang", "de");
+			CONFIG.getString("MCR.metadata_default_lang", "de");
 		String lang =
 			(getProperty(request, "lang") != null)
 				? getProperty(request, "lang")

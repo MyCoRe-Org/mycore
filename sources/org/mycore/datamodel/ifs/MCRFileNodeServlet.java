@@ -65,7 +65,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * will be forwareded to MCRLayoutServlet as XML data to display
  * a detailed directory listing.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt 
  * @author Thomas Scheffler (yagee)
  *
@@ -76,13 +76,13 @@ public class MCRFileNodeServlet extends MCRServlet
   /*
    * Die folgenden Dinge will ich hier unbedingt raus haben:
    * - language und damit verbundene Stylesheet Auswahl
-   *   -> gehört ins MCRLayoutServlet und/oder MCRServlet
+   *   -> gehï¿½rt ins MCRLayoutServlet und/oder MCRServlet
    * - remote handling
    *   -> muss das so kompliziert sein?
    */
   
   // The Log4J logger
-  private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
+  private static Logger LOGGER = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
   // Default language
   private String defaultLang = "";
@@ -99,7 +99,7 @@ public class MCRFileNodeServlet extends MCRServlet
     super.init();
  
     // read host list from configuration
-    String hostconf = config.getString( "MCR.remoteaccess_hostaliases", "local" );
+    String hostconf = CONFIG.getString( "MCR.remoteaccess_hostaliases", "local" );
     
     remoteAliasList = new ArrayList();
     if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
@@ -126,7 +126,7 @@ public class MCRFileNodeServlet extends MCRServlet
     if( ( lang  == null ) || ( lang.trim().length() == 0 ) ) 
       lang  = defaultLang;
     
-    logger.debug( "MCRFileNodeServlet: lang = " + lang );
+    LOGGER.debug( "MCRFileNodeServlet: lang = " + lang );
 
     // get the host alias
     String hostAlias = req.getParameter( "hosts" );
@@ -137,12 +137,12 @@ public class MCRFileNodeServlet extends MCRServlet
     if( ( hostAlias == null ) || ( hostAlias.trim().length() == 0 ) )
       hostAlias = "local";
 
-    logger.debug( "MCRFileNodeServlet : host = " + hostAlias );
+    LOGGER.debug( "MCRFileNodeServlet : host = " + hostAlias );
     
     if( ! remoteAliasList.contains( hostAlias ) )
     {
       String msg = "Error: HTTP request host is not in the alias list";
-      logger.error( msg );
+      LOGGER.error( msg );
       generateErrorPage(req,
                                  res,
                                  HttpServletResponse.SC_BAD_REQUEST,msg,
@@ -152,12 +152,12 @@ public class MCRFileNodeServlet extends MCRServlet
     }
 
     String requestPath = req.getPathInfo();
-    logger.info( "MCRFileNodeServlet: request path = " + requestPath );
+    LOGGER.info( "MCRFileNodeServlet: request path = " + requestPath );
 
     if( requestPath == null ) 
     {
       String msg = "Error: HTTP request path is null";
-      logger.error( msg );
+      LOGGER.error( msg );
 	  generateErrorPage(req,
 								 res,
 								 HttpServletResponse.SC_BAD_REQUEST,msg,
@@ -170,7 +170,7 @@ public class MCRFileNodeServlet extends MCRServlet
     if( ! st.hasMoreTokens() ) 
     {
       String msg = "Error: HTTP request path is empty";
-      logger.error( msg );
+      LOGGER.error( msg );
 	  generateErrorPage(req,
 								 res,
 								 HttpServletResponse.SC_BAD_REQUEST,msg,
@@ -188,14 +188,14 @@ public class MCRFileNodeServlet extends MCRServlet
 		  root = MCRFilesystemNode.getRootNode(ownerID);
 	} catch (org.mycore.common.MCRPersistenceException e) {
 		// Could not get value from JDBC result set
-		logger.error("MCRFileNodeServlet: Error while getting root node!",e);
+		LOGGER.error("MCRFileNodeServlet: Error while getting root node!",e);
 		root = null;
 	} 
 	
       if( root == null )
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
-        logger.error( msg );
+        LOGGER.error( msg );
 		generateErrorPage(req,
 								   res,
 								   HttpServletResponse.SC_NOT_FOUND,msg,
@@ -209,7 +209,7 @@ public class MCRFileNodeServlet extends MCRServlet
         if( st.hasMoreTokens() ) // request path is too long
         {
           String msg = "Error: No such file or directory " + st.nextToken();
-          logger.error( msg );
+          LOGGER.error( msg );
 		  generateErrorPage(req,
 									 res,
 									 HttpServletResponse.SC_NOT_FOUND,msg,
@@ -234,7 +234,7 @@ public class MCRFileNodeServlet extends MCRServlet
         if( node == null )
         {
           String msg = "Error: No such file or directory " + path;
-          logger.error( msg );
+          LOGGER.error( msg );
 		  generateErrorPage(req,
 									 res,
 									 HttpServletResponse.SC_NOT_FOUND,msg,
@@ -258,7 +258,7 @@ public class MCRFileNodeServlet extends MCRServlet
     {
       String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
       MCRRemoteAccessInterface comm = 
-        (MCRRemoteAccessInterface)( config.getInstanceOf( prop ) );
+        (MCRRemoteAccessInterface)( CONFIG.getInstanceOf( prop ) );
 
       BufferedInputStream in = comm.requestIFS( hostAlias, requestPath );
       if( in == null ) return;
@@ -308,7 +308,7 @@ public class MCRFileNodeServlet extends MCRServlet
         jdom = resarray.exportAllToDocument();
         style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
       }
-      logger.debug( "Style = " + style );
+      LOGGER.debug( "Style = " + style );
 
       if( style.equals( "xml" ) ) 
       {
@@ -338,7 +338,7 @@ public class MCRFileNodeServlet extends MCRServlet
   private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
     throws IOException, ServletException
   {
-    logger.info( "MCRFileNodeServlet: Sending file " + file.getName() );
+    LOGGER.info( "MCRFileNodeServlet: Sending file " + file.getName() );
     
     if( file.hasAudioVideoExtender() ) // Start streaming player
     { 
@@ -368,7 +368,7 @@ public class MCRFileNodeServlet extends MCRServlet
                               MCRDirectory dir, String lang ) 
     throws IOException, ServletException
   {
-    logger.info( "MCRFileNodeServlet: Sending listing of directory " + dir.getName() );
+    LOGGER.info( "MCRFileNodeServlet: Sending listing of directory " + dir.getName() );
     
     Element root = new Element( "mcr_directory" );
     Document doc = new org.jdom.Document( root );
@@ -437,7 +437,7 @@ public class MCRFileNodeServlet extends MCRServlet
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
     String style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
-    logger.debug( "Style = " + style );
+    LOGGER.debug( "Style = " + style );
 
     if( style.equals( "xml" ) ) 
     {

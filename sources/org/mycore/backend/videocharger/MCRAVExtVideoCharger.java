@@ -24,8 +24,11 @@
 
 package org.mycore.backend.videocharger;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.*; 
 import org.mycore.datamodel.ifs.*;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -45,22 +48,25 @@ import java.text.*;
  *
  * This class also provides a method to list all assets in a VideoCharger store.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
 { 
-  public MCRAVExtVideoCharger()
-  {}
+	protected static MCRConfiguration CONFIG;
+	private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+  public MCRAVExtVideoCharger() {
+  	if (CONFIG==null)
+  		CONFIG=MCRConfiguration.instance();
+  }
   
   public void readConfig( String storeID )
   {
-    MCRConfiguration config = MCRConfiguration.instance();  
     String prefix = "MCR.IFS.AVExtender."+ storeID + ".";
       
-    baseMetadata      = config.getString( prefix + "VSListURL"   );
-    basePlayerStarter = config.getString( prefix + "ISCPFSelURL" );
-    playerDownloadURL = config.getString( prefix + "PlayerURL"   ); 
+    baseMetadata      = CONFIG.getString( prefix + "VSListURL"   );
+    basePlayerStarter = CONFIG.getString( prefix + "ISCPFSelURL" );
+    playerDownloadURL = CONFIG.getString( prefix + "PlayerURL"   ); 
   }
 
   public void init( MCRFileReader file )
@@ -70,8 +76,13 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
       
     readConfig( file.getStoreID() );
     
-    String assetID = URLEncoder.encode( file.getStorageID() );
-    String data1 = getMetadata( baseMetadata      + "?"         + assetID );
+    String assetID;
+	try {
+		assetID = URLEncoder.encode( file.getStorageID(), CONFIG.getString("MCR.request_charencoding", "UTF-8"));
+	} catch (UnsupportedEncodingException e) {
+		throw new MCRPersistenceException("MCR.request_charencoding property does not contain a valid encoding:",e);
+	}
+	String data1 = getMetadata( baseMetadata      + "?"         + assetID );
     String data2 = getMetadata( basePlayerStarter + "?VIDEOID=" + assetID );
     
     URLConnection con = getConnection( basePlayerStarter + "?VIDEOID=" + assetID );
@@ -130,7 +141,7 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
       cgi.append( "?VIDEOID=" );
-      cgi.append( URLEncoder.encode( file.getStorageID() ) );
+      cgi.append( URLEncoder.encode( file.getStorageID(), CONFIG.getString("MCR.request_charencoding", "UTF-8") ) );
 
       if( startPos != null ) cgi.append( "&StartPos=" ).append( startPos );
       if( stopPos  != null ) cgi.append( "&StopPos="  ).append( stopPos  );

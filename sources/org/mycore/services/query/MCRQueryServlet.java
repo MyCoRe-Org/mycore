@@ -114,7 +114,7 @@ public class MCRQueryServlet extends MCRServlet {
 	 */
 	public void init() throws MCRConfigurationException {
 		super.init();
-		MCR_CONFIG = super.config;
+		MCR_CONFIG = super.CONFIG;
 		collector = (MCRQueryCollector) this.getServletContext().getAttribute(
 				"QueryCollector");
 		if (collector == null)

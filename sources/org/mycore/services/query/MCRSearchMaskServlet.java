@@ -63,8 +63,8 @@ org.jdom.Document jdom = null;
   public void init() throws MCRConfigurationException
   {
     super.init();
-  PropertyConfigurator.configure(config.getLoggingProperties());
-  defaultLang = config.getString( "MCR.metadata_default_lang", "de" );
+  PropertyConfigurator.configure(CONFIG.getLoggingProperties());
+  defaultLang = CONFIG.getString( "MCR.metadata_default_lang", "de" );
   }
 
  /**
@@ -109,7 +109,7 @@ org.jdom.Document jdom = null;
   if( lang  == null ) lang  = defaultLang; 
   type = type.toLowerCase();
 
-  String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());
+  String smc = CONFIG.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
     InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
     if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );
@@ -160,7 +160,7 @@ org.jdom.Document jdom = null;
   if( layout  == null ) layout = type;
   StringBuffer query = new StringBuffer("");
 
-  String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());
+  String smc = CONFIG.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
     InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
     if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );

@@ -73,7 +73,7 @@ private static String SLASH = System.getProperty("file.separator");;
 	public final static char COMMAND_XOR='X';
 
 	// public constant data
-	private static final Logger logger = Logger.getLogger(MCRUtils.class);
+	private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
 
 	/**
 	 * This method check the language string base on RFC 1766 to the supported
@@ -409,8 +409,8 @@ private static String SLASH = System.getProperty("file.separator");;
 			// keep reading till hit eof
 			while (true) {
 				int bytesRead = readBlocking(source, ba, 0, chunkSize);
-				if (logger.isDebugEnabled()) {
-					logger.debug(
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(
 						MCRUtils.class.getName()
 							+ ".copyStream(): "
 							+ bytesRead
@@ -455,8 +455,8 @@ private static String SLASH = System.getProperty("file.separator");;
 			// keep reading till hit eof
 			while (true) {
 				int charsRead = readBlocking(source, ca, 0, chunkSize);
-				if (logger.isDebugEnabled()) {
-					logger.debug(
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(
 						MCRUtils.class.getName()
 							+ ".copyReader(): "
 							+ charsRead
@@ -542,7 +542,7 @@ private static String SLASH = System.getProperty("file.separator");;
 	public static final HashSet cutHashSet(HashSet hashin, int maxitems)
 	{
 	MCRArgumentChecker.ensureNotNull(hashin,"Input HashSet");
-	if (maxitems < 1) { logger.warn("The maximum items are lower then 1."); }
+	if (maxitems < 1) { LOGGER.warn("The maximum items are lower then 1."); }
 	HashSet hashout = new HashSet();
 	int i = 0;
 	for (Iterator it = hashin.iterator(); it.hasNext() && (i < maxitems); i++) {
@@ -683,7 +683,7 @@ private static String SLASH = System.getProperty("file.separator");;
 					? ClassLoader.getSystemResources(name)
 					: loader.getResources(name);
 		} catch (IOException ioe) {
-			logger.error("Service: cannot load " + name);
+			LOGGER.error("Service: cannot load " + name);
 			return classMap.values().iterator();
 		}
 		//Put all class names matching Service in nameSet
@@ -746,26 +746,26 @@ private static String SLASH = System.getProperty("file.separator");;
 									classInstance);
 							else {
 								classInstance = null;
-								logger.error(
+								LOGGER.error(
 									className.toString()
 										+ " does not implement "
 										+ service.getName()
 										+ "! Class instance will not be used.");
 							}
 						} catch (ClassNotFoundException e) {
-							logger.error(
+							LOGGER.error(
 								"Service: cannot find class: " + className);
 						} catch (InstantiationException e) {
-							logger.error(
+							LOGGER.error(
 								"Service: cannot instantiate: " + className);
 						} catch (IllegalAccessException e) {
-							logger.error(
+							LOGGER.error(
 								"Service: illegal access to: " + className);
 						} catch (NoClassDefFoundError e) {
-							logger.error(
+							LOGGER.error(
 								"Service: " + e + " for " + className);
 						} catch (Exception e) {
-							logger.error(
+							LOGGER.error(
 								"Service: exception for: "
 									+ className
 									+ " "
@@ -774,7 +774,7 @@ private static String SLASH = System.getProperty("file.separator");;
 					}
 				}
 			} catch (IOException ioe) {
-				logger.error("Service: problem with: " + url);
+				LOGGER.error("Service: problem with: " + url);
 			} finally {
 				try {
 					if (input != null)
@@ -782,7 +782,7 @@ private static String SLASH = System.getProperty("file.separator");;
 					if (reader != null)
 						reader.close();
 				} catch (IOException ioe2) {
-					logger.error("Service: problem with: " + url);
+					LOGGER.error("Service: problem with: " + url);
 				}
 			}
 		}
