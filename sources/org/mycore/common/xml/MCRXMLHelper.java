@@ -230,5 +230,18 @@ public class MCRXMLHelper
            break;
     }
   }
+
+  /**
+   * Convenience function to create a new JDOM-Element with some content
+   */
+  public static org.jdom.Element newJDOMElementWithContent( 
+    String             elementName, 
+    org.jdom.Namespace namespace, 
+    String             content )
+  {
+    org.jdom.Element element = new org.jdom.Element( elementName, namespace );
+    element.addContent( content );
+    return element;
+  }
 }
 
