@@ -24,13 +24,27 @@
 
 package org.mycore.common;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.*;
-import java.text.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -316,17 +330,6 @@ public class MCRUtils {
 	}
 
 	/**
-	 * transforms a JDOM-Document to a String
-	 * 
-	 * @param jdom document to transform
-	 * @return String representation of XML-Document
-	 */
-	public static final String xmlToString(Document jdom) {
-		XMLOutputter out = new XMLOutputter("  ", true);
-		return out.outputString(jdom);
-	}
-
-	/**
 	 * This method convert a JDOM tree to a byte array.
 	 *
 	 * @param jdom_in the JDOM tree
@@ -341,10 +344,7 @@ public class MCRUtils {
 				MCRDefaults.ENCODING);
 		ByteArrayOutputStream outb = new ByteArrayOutputStream();
 		try {
-			org.jdom.output.XMLOutputter outp =
-				new org.jdom.output.XMLOutputter();
-			outp.setEncoding(mcr_encoding);
-			outp.setNewlines(true);
+			XMLOutputter outp = new XMLOutputter(Format.getCompactFormat().setEncoding(mcr_encoding));
 			outp.output(jdom, outb);
 		} catch (Exception e) {
 			throw new MCRPersistenceException("Can't produce byte array.");

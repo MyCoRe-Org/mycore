@@ -26,11 +26,9 @@ package org.mycore.backend.xmldb;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
-import org.jdom.Document;
 
 import org.jdom.input.*;
 import org.jdom.output.*;
-
 
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
@@ -46,155 +44,164 @@ import org.apache.log4j.Logger;
  *
  * @version $Revision$ $Date$
  **/
-public final class MCRXMLDBSearchStore 
-  implements MCRObjectSearchStoreInterface {
-  static final private Logger logger = Logger.getLogger( MCRXMLDBSearchStore.class.getName() );
-  static final private MCRConfiguration config = MCRConfiguration.instance();  
+public final class MCRXMLDBSearchStore
+	implements MCRObjectSearchStoreInterface {
+	static final private Logger logger =
+		Logger.getLogger(MCRXMLDBSearchStore.class.getName());
+	static final private MCRConfiguration config = MCRConfiguration.instance();
 
-/**
- * Creates a new MCRXMLDBSearchStore.
- **/
-public MCRXMLDBSearchStore() throws MCRPersistenceException {
-  MCRXMLDBConnectionPool.instance();
-  }
+	/**
+	 * Creates a new MCRXMLDBSearchStore.
+	 **/
+	public MCRXMLDBSearchStore() throws MCRPersistenceException {
+		MCRXMLDBConnectionPool.instance();
+	}
 
-/**
- * This method creates and stores the searchable data from MCRObject in the XMLDB datastore.
- *
- * @param obj    the MCRObject to put in the search store
- * @exception MCRPersistenceException if an error was occured
- **/
-public final void create(MCRBase obj) throws MCRPersistenceException {
-  Collection collection = null;
-  try {
-    logger.debug("MCRXMLDBSearchStore create: MCRObjectID    : "+obj.getId().getId());
-    logger.debug("MCRXMLDBPersistence create: MCRLabel       : "+obj.getLabel());
-    // open the collection
-    collection = MCRXMLDBConnectionPool.instance().getConnection( obj.getId().getTypeId() );
-    // check that the item not exist
-    XMLResource res;
-    try {
-      res = (XMLResource)collection.getResource( obj.getId().getId() );
-      if (res != null) {
-        throw new MCRPersistenceException("A object with ID "+obj.getId().getId()+" exists."); }
-      }
-    catch ( Exception e ) { 
-      /* ignore tamino throws Exception, if resource does not exist */ 
-      }
-    // create a new item
-    res = (XMLResource)collection.createResource(obj.getId().getId(),XMLResource.RESOURCE_TYPE);
-    SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
-    outputter.output(obj.createXML());
-    collection.storeResource( res );
-    }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
-    MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
-  }
+	/**
+	 * This method creates and stores the searchable data from MCRObject in the XMLDB datastore.
+	 *
+	 * @param obj    the MCRObject to put in the search store
+	 * @exception MCRPersistenceException if an error was occured
+	 **/
+	public final void create(MCRBase obj) throws MCRPersistenceException {
+		Collection collection = null;
+		try {
+			logger.debug(
+				"MCRXMLDBSearchStore create: MCRObjectID    : "
+					+ obj.getId().getId());
+			logger.debug(
+				"MCRXMLDBPersistence create: MCRLabel       : "
+					+ obj.getLabel());
+			// open the collection
+			collection =
+				MCRXMLDBConnectionPool.instance().getConnection(
+					obj.getId().getTypeId());
+			// check that the item not exist
+			XMLResource res =
+				(XMLResource) collection.getResource(obj.getId().getId());
+			if (res != null) {
+				logger.debug("Check this!");
+				throw new MCRPersistenceException(
+					"A object with ID " + obj.getId().getId() + " exists.");
+			}
+			// create a new item
+			res =
+				(XMLResource) collection.createResource(
+					obj.getId().getId(),
+					XMLResource.RESOURCE_TYPE);
+			SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
+			outputter.output(obj.createXML());
+			collection.storeResource(res);
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		} finally {
+			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
+		}
+	}
 
-/**
- * The methode create a new datastore based of given configuration. It create
- * a new data table for storing MCRObjects with the same MCRObjectID type.
- *
- * @param mcr_type    the MCRObjectID type as string
- * @param mcr_conf    the configuration XML stream as JDOM tree
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
-  throws MCRConfigurationException, MCRPersistenceException
-  {
-  logger.info("This feature exist not for this store.");
-  }
+	/**
+	 * The methode create a new datastore based of given configuration. It create
+	 * a new data table for storing MCRObjects with the same MCRObjectID type.
+	 *
+	 * @param mcr_type    the MCRObjectID type as string
+	 * @param mcr_conf    the configuration XML stream as JDOM tree
+	 * @exception MCRConfigurationException if the configuration is not correct
+	 * @exception MCRPersistenceException if a persistence problem is occured
+	 **/
+	public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
+		throws MCRConfigurationException, MCRPersistenceException {
+		logger.info("This feature exist not for this store.");
+	}
 
-/**
- * Updates the searchable content in the database. Currently this is the same like
- * delete and then a new create. Should be made with XUpdate in the future.
- *
- * @param obj    the MCRObject to put in the search store
- * @exception MCRPersistenceException if an error was occured
- **/    
-public void update( MCRBase obj) throws MCRPersistenceException {
-  Collection collection = null;
-  try {
-    logger.debug("MCRXMLDBSearchStore create: MCRObjectID    : "+obj.getId().getId());
-    logger.debug("MCRXMLDBPersistence create: MCRLabel       : "+obj.getLabel());
-    // open the collection
-    collection = MCRXMLDBConnectionPool.instance().getConnection( obj.getId().getTypeId() );
-    // check that the item exist
-    XMLResource res;
-    try {
-      res = (XMLResource)collection.getResource( obj.getId().getId() );
-      if (res == null) {
-        throw new MCRPersistenceException("A object with ID "+obj.getId().getId()+" does not exist."); }
-      }
-    catch ( Exception e ) {
-      /* should only happen with tamino */
-      throw new MCRPersistenceException("A object with ID "+obj.getId().getId()+" does not exist."); 
-      }
-    // delete the old item
-    delete(obj.getId());
-    // create the new item
-    res = (XMLResource)collection.createResource(obj.getId().getId(),XMLResource.RESOURCE_TYPE);
-    SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
-    outputter.output(obj.createXML());
-    collection.storeResource( res );
-    }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
-     MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
-  }
+	/**
+	 * Updates the searchable content in the database. Currently this is the same like
+	 * delete and then a new create. Should be made with XUpdate in the future.
+	 *
+	 * @param obj    the MCRObject to put in the search store
+	 * @exception MCRPersistenceException if an error was occured
+	 **/
+	public void update(MCRBase obj) throws MCRPersistenceException {
+		Collection collection = null;
+		try {
+			logger.debug(
+				"MCRXMLDBSearchStore create: MCRObjectID    : "
+					+ obj.getId().getId());
+			logger.debug(
+				"MCRXMLDBPersistence create: MCRLabel       : "
+					+ obj.getLabel());
+			// open the collection
+			collection =
+				MCRXMLDBConnectionPool.instance().getConnection(
+					obj.getId().getTypeId());
+			// check that the item exist
+			XMLResource res =
+				(XMLResource) collection.getResource(obj.getId().getId());
+			if (res == null) {
+				throw new MCRPersistenceException(
+					"A object with ID "
+						+ obj.getId().getId()
+						+ " does not exist.");
+			}
+			// delete the old item
+			delete(obj.getId());
+			// create the new item
+			res =
+				(XMLResource) collection.createResource(
+					obj.getId().getId(),
+					XMLResource.RESOURCE_TYPE);
+			SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
+			outputter.output(obj.createXML());
+			collection.storeResource(res);
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		} finally {
+			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
+		}
+	}
 
-/**
- * Deletes the object with the given object id in the datastore.
- *
- * @param mcr_id id of the object to delete
- *
- * @throws MCRPersistenceException something goes wrong during delete
- **/     
-public void delete( MCRObjectID mcr_id ) throws MCRPersistenceException
-  {
-  Collection collection = null;
-  logger.debug("MCRXMLDBPersistence delete: MCRObjectID    : " + mcr_id.getId());
-  try {
-    collection = MCRXMLDBConnectionPool.instance().getConnection( mcr_id.getTypeId() );
-    Resource document;
-    try {
-      document = collection.getResource( mcr_id.getId() ); 
-      if ( null != document ) {
-        collection.removeResource(document); }
-      else {
-        logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
-    }
-    catch ( Exception e ) /* should only happen with tamino */
-    {
-      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); 
-    }
-    }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
-    MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
-  }
+	/**
+	 * Deletes the object with the given object id in the datastore.
+	 *
+	 * @param mcr_id id of the object to delete
+	 *
+	 * @throws MCRPersistenceException something goes wrong during delete
+	 **/
+	public void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
+		Collection collection = null;
+		logger.debug(
+			"MCRXMLDBPersistence delete: MCRObjectID    : " + mcr_id.getId());
+		try {
+			collection =
+				MCRXMLDBConnectionPool.instance().getConnection(
+					mcr_id.getTypeId());
+			Resource document = collection.getResource(mcr_id.getId());
+			if (null != document) {
+				collection.removeResource(document);
+			} else {
+				logger.warn(
+					"A object with ID " + mcr_id.getId() + " does not exist.");
+			}
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		} finally {
+			MCRXMLDBConnectionPool.instance().releaseConnection(collection);
+		}
+	}
 
-/**
- * A private method to convert the result in a dom tree.
- *
- * @param res the result
- * @exception MCRPersistenceException if an error was occured
- * @return the DOM tree
- **/
-public static org.jdom.Document convertResToDoc( XMLResource res )
-  {
-  try {
-  	SAXHandler handler=new SAXHandler();
-  	res.getContentAsSAX(handler);
-  	return handler.getDocument();
-    }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  }
-
+	/**
+	 * A private method to convert the result in a dom tree.
+	 *
+	 * @param res the result
+	 * @exception MCRPersistenceException if an error was occured
+	 * @return the DOM tree
+	 **/
+	public static org.jdom.Document convertResToDoc(XMLResource res) {
+		try {
+			SAXHandler handler = new SAXHandler();
+			res.getContentAsSAX(handler);
+			return handler.getDocument();
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
 }

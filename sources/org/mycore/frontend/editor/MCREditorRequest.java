@@ -24,18 +24,28 @@
 
 package org.mycore.frontend.editor;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import org.jdom.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
-import org.mycore.common.*;
+import org.jdom.Attribute;
+import org.jdom.DocType;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.mycore.common.MCRCache;
 
 /**
  * Represents a HTTP request to edit an XML document in EditorServlet.
@@ -630,7 +640,7 @@ class MCREditorRequest
     OutputStream out = new FileOutputStream( file );
 
     org.jdom.output.XMLOutputter outputter =
-      new org.jdom.output.XMLOutputter( "  ", true );
+      new org.jdom.output.XMLOutputter(Format.getPrettyFormat());
 
     outputter.output( doc, out );
     out.close();

@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -201,15 +202,15 @@ public final org.jdom.Element createXML() throws MCRException
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   if ((firstname = firstname.trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("firstname").addContent(firstname)); }
+    elm.addContent((Content)new org.jdom.Element("firstname").addContent(firstname)); }
   if ((callname  = callname .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("callname").addContent(callname)); }
+    elm.addContent((Content)new org.jdom.Element("callname").addContent(callname)); }
   if ((surname  = surname .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("surname").addContent(surname)); }
+    elm.addContent((Content)new org.jdom.Element("surname").addContent(surname)); }
   if ((academic  = academic .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("academic").addContent(academic)); }
+    elm.addContent((Content)new org.jdom.Element("academic").addContent(academic)); }
   if ((peerage   = peerage  .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("peerage").addContent(peerage)); }
+    elm.addContent((Content)new org.jdom.Element("peerage").addContent(peerage)); }
   return elm;
   }
 

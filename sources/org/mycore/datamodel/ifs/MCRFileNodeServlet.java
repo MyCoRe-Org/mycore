@@ -24,20 +24,36 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.*;
-import java.util.*;
-import java.text.SimpleDateFormat;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DateFormat;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
-import org.jdom.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
-
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.backend.remote.*;
-import org.mycore.frontend.servlets.*;
+import org.jdom.Content;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.mycore.backend.remote.MCRRemoteAccessInterface;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRLayoutServlet;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet delivers the contents of an MCRFilesystemNode 
@@ -300,7 +316,7 @@ public class MCRFileNodeServlet extends MCRServlet
       {
         res.setContentType( "text/xml" );
         OutputStream out = res.getOutputStream();
-        new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+        new XMLOutputter(Format.getPrettyFormat()).output( jdom, out );
         out.close();
       }
       else 
@@ -429,7 +445,7 @@ public class MCRFileNodeServlet extends MCRServlet
     {
       res.setContentType( "text/xml" );
       OutputStream out = res.getOutputStream();
-      new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+      new org.jdom.output.XMLOutputter(Format.getPrettyFormat()).output( jdom, out );
       out.close();
     }
     else 
@@ -475,7 +491,7 @@ public class MCRFileNodeServlet extends MCRServlet
   private void addString( Element parent, String itemName, String content )
   {
     if( ( content == null ) || ( content.trim().length() == 0 ) ) return;
-    parent.addContent( new Element( itemName ).addContent( content.trim() ) );
+    parent.addContent((Content) new Element( itemName ).addContent( content.trim() ) );
   }
   
   private void addExtenderData( Element parent, MCRAudioVideoExtender ext )

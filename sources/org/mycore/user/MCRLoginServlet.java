@@ -24,14 +24,21 @@
 
 package org.mycore.user;
 
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jdom.*;
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
+import org.jdom.Content;
+import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet is used to login a user to the mycore system.
@@ -88,8 +95,8 @@ public class MCRLoginServlet extends MCRServlet
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent(new org.jdom.Element("guest_id").addContent(guestID));
-    root.addContent(new org.jdom.Element("guest_pwd").addContent(guestPWD));
+    root.addContent((Content)new org.jdom.Element("guest_id").addContent(guestID));
+    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(guestPWD));
 
     try {
       loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
@@ -136,7 +143,7 @@ public class MCRLoginServlet extends MCRServlet
       }
     }
 
-    root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
+    root.addContent((Content)new org.jdom.Element("backto_url").addContent(backto_url));
     doLayout(job, "login", jdomDoc); // use the stylesheet mcr_user-login-*.xsl
   }
 

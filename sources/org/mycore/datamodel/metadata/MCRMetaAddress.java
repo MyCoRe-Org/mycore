@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -222,17 +223,17 @@ public final org.jdom.Element createXML() throws MCRException
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   if ((country = country  .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("country").addContent(country)); }
+    elm.addContent((Content)new org.jdom.Element("country").addContent(country)); }
   if ((state   = state    .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("state").addContent(state)); }
+    elm.addContent((Content)new org.jdom.Element("state").addContent(state)); }
   if ((zipcode = zipcode  .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("zipcode").addContent(zipcode)); }
+    elm.addContent((Content)new org.jdom.Element("zipcode").addContent(zipcode)); }
   if ((city    = city     .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("city").addContent(city)); }
+    elm.addContent((Content)new org.jdom.Element("city").addContent(city)); }
   if ((street  = street   .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("street").addContent(street)); }
+    elm.addContent((Content)new org.jdom.Element("street").addContent(street)); }
   if ((number  = number   .trim()).length() !=0) {
-    elm.addContent(new org.jdom.Element("number").addContent(number)); }
+    elm.addContent((Content)new org.jdom.Element("number").addContent(number)); }
   return elm;
   }
 

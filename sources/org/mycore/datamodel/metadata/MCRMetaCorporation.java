@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -183,13 +184,13 @@ public final org.jdom.Element createXML() throws MCRException
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   if ((name      = name    .trim()).length()   !=0) {
-    elm.addContent(new org.jdom.Element("name").addContent(name)); }
+    elm.addContent((Content)new org.jdom.Element("name").addContent(name)); }
   if ((nickname  = nickname.trim()).length()   !=0) {
-    elm.addContent(new org.jdom.Element("nickname").addContent(nickname)); }
+    elm.addContent((Content)new org.jdom.Element("nickname").addContent(nickname)); }
   if ((parent    = parent  .trim()).length()   !=0) {
-    elm.addContent(new org.jdom.Element("parent").addContent(parent)); }
+    elm.addContent((Content)new org.jdom.Element("parent").addContent(parent)); }
   if ((property     = property   .trim()).length()   !=0) {
-    elm.addContent(new org.jdom.Element("property").addContent(property)); }
+    elm.addContent((Content)new org.jdom.Element("property").addContent(property)); }
   return elm;
   }
 

@@ -24,12 +24,13 @@
 
 package org.mycore.frontend.cli;
 
-import java.util.*;
-
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.services.query.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.query.MCRQueryInterface;
 
 /**
  * This main program reads all data from the persitence store XML:DB or CM8
@@ -87,8 +88,8 @@ public static void main(String argv[]) throws Exception
   for (int i=0;i<mcr_result.size();i++) {
     System.out.println("ID = "+mcr_result.getId(i));
     MCRObjectID mcrid = new MCRObjectID(mcr_result.getId(i));
-    org.jdom.Element elm = mcr_result.getXML(i).detach();
-    org.jdom.Document doc = new org.jdom.Document(elm);
+    Element elm = (Element)mcr_result.getXML(i).detach();
+    Document doc = new Document(elm);
     xmltable.create(argv[0],mcrid,doc);
     }
 

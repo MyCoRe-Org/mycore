@@ -27,6 +27,7 @@ import java.util.HashSet;
 
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
@@ -117,9 +118,7 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 					if (doc.getRootElement()==null)
 						throw new NullPointerException("Document root element is null");
 					if (doc.getRootElement().getAttribute("ID")==null){
-						XMLOutputter output=new XMLOutputter();
-						output.setIndent("  ");
-						output.setNewlines(true);
+						XMLOutputter output=new XMLOutputter(Format.getPrettyFormat());
 						output.output(doc,System.err);
 						throw new NullPointerException("Root elements Attribute \"ID\" is not available");
 					}

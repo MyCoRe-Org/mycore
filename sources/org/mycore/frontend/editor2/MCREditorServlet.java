@@ -24,21 +24,25 @@
 
 package org.mycore.frontend.editor2;
 
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import org.apache.log4j.*;
-import org.apache.commons.fileupload.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.jdom.output.*;
-import org.jdom.*;
-
-import java.net.*;
-import java.io.*;
-import java.util.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet handles form submissions from
@@ -144,9 +148,7 @@ public class MCREditorServlet extends MCRServlet
     Document xml = sub.getXML();
     
     XMLOutputter outputter = new XMLOutputter();
-    outputter.setEncoding( "UTF-8" );
-    outputter.setNewlines( true );
-    outputter.setIndent( "  " );
+    outputter.setFormat(Format.getPrettyFormat());
     outputter.output( xml, pw );
 
     pw.close();
@@ -176,7 +178,7 @@ public class MCREditorServlet extends MCRServlet
         String msg = "Error while loading editor definition xml file " + path;
         throw new MCRConfigurationException( msg );
       }
-      editor = doc.getRootElement().detach();
+      editor = (Element)doc.getRootElement().detach();
       editorCache.put( path, editor );
     }
 

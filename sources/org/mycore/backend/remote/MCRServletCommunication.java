@@ -24,13 +24,11 @@
 
 package org.mycore.backend.remote;
 
-import java.util.*;
 import java.io.*;
 import java.net.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.BasicConfigurator;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;

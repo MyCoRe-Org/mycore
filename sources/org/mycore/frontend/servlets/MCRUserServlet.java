@@ -24,15 +24,21 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jdom.*;
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
-import org.mycore.user.*;
+import org.jdom.Content;
+import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet provides a web interface for the user management of the mycore system.
@@ -132,7 +138,7 @@ public class MCRUserServlet extends MCRServlet
         return;
       }
       catch (MCRException e) {
-        root.addContent(new org.jdom.Element("error").addContent(e.getMessage()));
+        root.addContent((Content)new org.jdom.Element("error").addContent(e.getMessage()));
       }
     }
     doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet mcr_user-ChangePwd-*.xsl
@@ -219,9 +225,9 @@ public class MCRUserServlet extends MCRServlet
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent(new org.jdom.Element("guest_id").addContent(guestID));
-    root.addContent(new org.jdom.Element("guest_pwd").addContent(guestPWD));
-    root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
+    root.addContent((Content)new org.jdom.Element("guest_id").addContent(guestID));
+    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(guestPWD));
+    root.addContent((Content)new org.jdom.Element("backto_url").addContent(backto_url));
     return jdomDoc;
   }
 

@@ -51,7 +51,7 @@ import org.mycore.common.xml.MCRLayoutServlet;
 public class MCRServlet extends HttpServlet
 {
   // Some configuration details
-  protected static MCRConfiguration config = null;
+  protected static MCRConfiguration config;
 
   private static Logger logger=Logger.getLogger(MCRServlet.class);
   private static String baseURL, servletURL;
@@ -65,6 +65,7 @@ public class MCRServlet extends HttpServlet
 	/** Initialisation of the servlet */
   public void init()
   {
+  	System.err.println("Initializing MCRServlet...");
     MCRConfiguration.instance().reload(true);
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
@@ -130,6 +131,10 @@ public class MCRServlet extends HttpServlet
                          HttpServletResponse res, boolean GETorPOST)
                          throws ServletException, IOException
   {
+  	if (config==null){
+  		//removes NullPointerException below, if somehow Servlet is not yet intialized
+  		init();
+  	}
 		// Try to set encoding of form values
 		ReqCharEncoding = req.getCharacterEncoding();
 		if (ReqCharEncoding == null) {

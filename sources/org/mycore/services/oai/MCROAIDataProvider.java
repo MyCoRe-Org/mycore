@@ -31,7 +31,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
@@ -61,9 +60,9 @@ import org.mycore.common.xml.MCRXSLTransformation;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -181,9 +180,7 @@ public class MCROAIDataProvider extends HttpServlet {
         // Exceptions must be caught...
         try {
             ServletOutputStream out = response.getOutputStream();
-            XMLOutputter outputter = new XMLOutputter("   ");
-            outputter.setNewlines(true);
-	        outputter.setEncoding("UTF-8");
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 
             Namespace ns = Namespace.getNamespace(STR_OAI_NAMESPACE + "2.0/");
             Element eRoot  = new Element("OAI-PMH", ns);
