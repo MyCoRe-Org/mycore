@@ -325,9 +325,7 @@ public static void isValidOrDie(String id){
  **/
 public final boolean equals(MCRObjectID in)
   {
-  if (!mcr_project_id.equals(in.getProjectId())) { return false; }
-  if (!mcr_type_id.equals(in.getTypeId())) { return false; }
-  if (mcr_number != in.getNumberAsInteger()) { return false; }
+  if (!getId().equals(in.getId())) { return false; }
   return true;
   }
 
@@ -337,10 +335,11 @@ public final boolean equals(MCRObjectID in)
  * @param in the MCRObjectID to check
  * @return true if all parts are equal, else return false.
  **/
-public boolean equals(Object in){
-	if (!(in instanceof MCRObjectID)) return false;
-	else return equals((MCRObjectID)in);
-}
+public boolean equals(Object in)
+  {
+  if (!(in instanceof MCRObjectID)) return false;
+  else return equals((MCRObjectID)in);
+  }
 
 } 
 
