@@ -46,7 +46,7 @@ import mycore.xml.MCRXMLHelper;
  * manipulate the data in the abstract persistence data store and return
  * the XML stream to the user application.
  * Additionally, this class provides the public user interface for the
- * linking of MCRObjects against other MCRObjects.
+ * linking of MCRObjects against other MCRObjects with metadata inheritance.
  *
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
@@ -178,64 +178,6 @@ public final MCRObjectService getService()
  **/
 public final MCRObjectStructure getStructure()
   { return mcr_struct; }
-
-/**
- * <em>addUniLinkTo</em> creates an unidirectional link to another object.
- * Note: An unidirectional link cannot occur twice with the same destination
- *       and label, resp. !
- * 
- * @param dest                  the link's destination MCRObject
- * @param label                 the link's label
- * @param title                 the link's title
- * @return                      true, if operation successfully completed
- */
-public final boolean addUniLinkTo (MCRObject dest, String label, String title)
-{
-  return mcr_struct.addUniLinkTo(dest.mcr_id.getId(), label, title);
-}
-
-/** <em>removeUniLinkTo</em> removes an unidirectional link. If the link was
- * found, a "true" will be returned, otherwise "false".
- *
- * @param dest                  the link's destination MCRObject
- * @param label                 the link's label
- * @return                      true, if operation successfully completed
- */
-public final boolean removeUniLinkTo (MCRObject dest, String label)
-{
-  return mcr_struct.removeUniLinkTo(dest.mcr_id.getId(), label);
-}
-
-/**
- * <em>addBiLinkTo</em> creates a bidirectional link to another object.
- * Note: A bidirectional link cannot occur twice with the same destination
- *       and label, resp. !
- * 
- * @param dest                  the link's destination MCRObject
- * @param label                 the link's label
- * @param titleTo               the linkTo's title
- * @param titleFrom             the linkFrom's title
- * @return                      true, if operation successfully completed
- */
-public final boolean addBiLinkTo (MCRObject dest, String label,
-                                  String titleTo, String titleFrom)
-{
-	return mcr_struct.addLinkTo(dest.mcr_id.getId(), label, titleTo)
-	  && dest.mcr_struct.addLinkFrom(mcr_id.getId(), label, titleFrom);
-}
-
-/** <em>removeBiLinkTo</em> removes a bidirectional link. If the link was
- * found, a "true" will be returned, otherwise "false".
- *
- * @param dest                  the link's destination MCRObject
- * @param label                 the link's label
- * @return                      true, if operation successfully completed
- */
-public final boolean removeBiLinkTo (MCRObject dest, String label)
-{
-  return mcr_struct.removeLinkTo(dest.mcr_id.getId(), label)
-    && dest.mcr_struct.removeLinkFrom(mcr_id.getId(), label);
-}
 
 /**
  * <em>addChild</em> creates a (bidirectional) link to a child object.

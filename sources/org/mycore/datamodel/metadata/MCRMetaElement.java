@@ -35,8 +35,14 @@ import mycore.common.MCRUtils;
  * This class is designed to to have a basic class for all metadata.
  * The class has inside a ArrayList that holds all metaddata elements
  * for one XML tag.
+ * Furthermore, this class supports the linking of a document owing this
+ * metadata element to another document, the id of which is given in the
+ * xlink:href attribute of the MCRMetaLink representing the link. The
+ * class name of such a metadata element must be MCRMetaLink, and the
+ * metadata element is considered to be a folder of links.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Hegner
  * @version $Revision$ $Date$
  **/
 public class MCRMetaElement
@@ -47,6 +53,7 @@ private static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 private static String DEFAULT_LANGUAGE = "de";
 private String META_PACKAGE_NAME = "mycore.datamodel.";
+private static String LINK_CLASS_NAME = "MCRMetaLink";
 
 // MetaElement data
 private String lang = null;
@@ -177,6 +184,132 @@ public void setClassName(String classname)
     return; }
   this.classname = classname;
   }
+
+/**
+ * <em>size</em> returns the number of elements in this instance.
+ * 
+ * @return int                  the size of "list"
+ */
+public int size ()
+{
+	return list.size();
+}
+
+/**
+ * <em>isLinkFolder</em> checks whether the class name is MCRMetaLink or not.
+ * 
+ * @return boolean              true, if the elements of this instance are links
+ */
+public final boolean isLinkFolder ()
+{
+	if (classname == null) return false;
+	return classname.trim().equals(LINK_CLASS_NAME);
+}
+
+/**
+ * <em>addLink</em> adds an MCRMetaLink to the list if and only if the
+ * classname of this MCRMetaElement is MCRMetaLink and the link to be added
+ * is of type "locator".
+ * 
+ * @param link                  an MCRMetaLink to be added
+ * @return boolean              true, if successfully completed
+ */
+public final boolean addLink (MCRMetaLink link)
+{
+	if (size() == 0) setClassName(LINK_CLASS_NAME);
+	if (! isLinkFolder()) return false;
+	if (! link.getXLinkType().equals("locator")) return false;
+	return list.add(link);
+}
+
+/**
+ * <em>indexOfLink</em> searches for a link with given href (and optionally
+ * with given subtag and/or title) in the list starting from arbitrary position
+ * and returns the index of its first occurrence, or -1 if not found.
+ * 
+ * @param str_href              the link's destination id
+ * @param str_subtag            the subtag name to search for (or null)
+ * @param str_title             the title to search for (or null)
+ * @param start                 the start position
+ * @return int                  the position of the link's first occurrence
+ */
+public final int indexOfLink (String str_href, String str_subtag, String str_title,
+								int start)
+{
+	int i, k, n;
+	MCRMetaLink link = null;
+	for (i = start, k = -1, n = size(); i < n; ++i)
+	{
+		link = (MCRMetaLink) list.get(i);
+		if (! link.getXLinkHrefToString().equals(str_href)) continue;
+		if (str_subtag != null)
+			if (! link.getSubTag().equals(str_subtag)) continue;
+		if (str_title != null)
+			if (! link.getXLinkTitle().equals(str_title)) continue;
+		k = i;
+		break;
+	}
+	return k;
+}
+
+/**
+ * <em>indexOfLink</em> searches for a link with given href (and optionally
+ * with given subtag and/or title) in the list and returns the index of its
+ * first occurrence, or -1 if not found.
+ * 
+ * @param str_href              the link's destination id
+ * @param str_subtag            the subtag name to search for (or null)
+ * @param str_title             the title to search for (or null)
+ * @return int                  the position of the link's first occurrence
+ */
+public final int indexOfLink (String str_href, String str_subtag, String str_title)
+{
+	return indexOfLink(str_href, str_subtag, str_title, 0);
+}
+
+/**
+ * <em>removeLink</em> removes an MCRMetaLink from the list if and only if the
+ * classname of this MCRMetaElement is MCRMetaLink.
+ * 
+ * @param index                 the index of the link to be removed
+ * @return boolean              true, if successfully completed
+ */
+public final boolean removeLink (int index)
+{
+	if (! isLinkFolder()) return false;
+	if (index < 0 || index >= list.size()) return false;
+	list.remove(index);
+	return true;
+}
+
+/**
+ * <em>removeLink</em> searches for a link with given href (and optionally
+ * with given subtag and/or title) in the list and removes it if found
+ * returning true. If not found it returns false.
+ * 
+ * @param str_href              the link's destination id
+ * @param str_subtag            the subtag name to search for (or null)
+ * @param str_title             the title to search for (or null)
+ * @return boolean              true, if successfull removed
+ */
+public final boolean removeLink (String str_href, String str_subtag, String str_title)
+{
+	return removeLink(indexOfLink(str_href, str_subtag, str_title));
+}
+
+/**
+ * <em>removeAllLinks</em> removes all links from the list if and only if the
+ * classname of this MCRMetaElement is MCRMetaLink.
+ * 
+ * @return boolean              true, if successfully completed
+ */
+public final boolean removeAllLinks ()
+{
+	if (size() == 0) return true;
+	if (! isLinkFolder()) return false;
+	list.clear();
+	return true;
+}
 
 /**
  * This methode read the XML input stream part from a DOM part for the
