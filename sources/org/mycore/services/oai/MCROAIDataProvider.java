@@ -398,9 +398,9 @@ public class MCROAIDataProvider extends HttpServlet {
     private Element listFromResumptionToken(Element list, String resumptionToken) throws IOException {
 	    MCRConfiguration config = MCRConfiguration.instance();
 		try {
-		   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
+		   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.pathSeparator;
 		   	int maxreturns = config.getInt(STR_OAI_MAXRETURNS);
-			File objectFile = new File(resumptionTokenDir + 
+			File objectFile = new File(resumptionTokenDir +
                 resumptionToken + STR_RESUMPTIONTOKEN_SUFFIX);
 			FileInputStream fis = new FileInputStream(objectFile);
 			ObjectInputStream ois = new ObjectInputStream(fis);
@@ -430,7 +430,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			if (endObject < objectsInFile) {
 			    String newResumptionToken = resumptionToken.substring(0, resumptionToken.indexOf('x')) + 
                     "x" + (tokenNo + 1) + "x" + (objectsInFile - endObject);
-			    File newObjectFile = new File(resumptionTokenDir + 
+			    File newObjectFile = new File(resumptionTokenDir +
                     newResumptionToken + STR_RESUMPTIONTOKEN_SUFFIX);
 				FileOutputStream fos = new FileOutputStream(newObjectFile);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -488,10 +488,10 @@ public class MCROAIDataProvider extends HttpServlet {
 		    int docs = tokenElements.size();
 
 			try {
-			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
+			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.pathSeparator;
 				String fileName = fileId + "x0x" + docs;
 		
- 				FileOutputStream fos = new FileOutputStream(resumptionTokenDir + 
+ 				FileOutputStream fos = new FileOutputStream(resumptionTokenDir +
    	                fileName + STR_RESUMPTIONTOKEN_SUFFIX);
 			 	ObjectOutputStream oos = new ObjectOutputStream(fos);
 				 	
