@@ -52,6 +52,9 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
   /** store lookup table where keys are file content type IDs, values are content store IDs */
   protected Hashtable table;
   
+  /** list of all storeIDs **/
+  protected String[] storeIDs;
+  
   public MCRSimpleContentStoreSelector()
   {
     MCRConfiguration config = MCRConfiguration.instance();
@@ -75,10 +78,13 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
       table = new Hashtable();
       
       List stores = xml.getRootElement().getChildren( "store" );
+      storeIDs= new String[stores.size()+1];
+
       for( int i = 0; i < stores.size(); i++ )
       {
         Element store = (Element)( stores.get( i ) );
         String storeID = store.getAttributeValue( "ID" );
+        storeIDs[i]=storeID;
         
         List types = store.getChildren();
         for( int j = 0; j < types.size(); j++ )
@@ -91,6 +97,8 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
       }
       
       defaultID = xml.getRootElement().getAttributeValue( "default" );
+      //NOTE: if defaultID is listed as a <store> it's inserted twice here
+      storeIDs[storeIDs.length-1]=defaultID;
     }
     catch( Exception exc )
     {
@@ -106,11 +114,10 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
     
     if( table.containsKey( typeID ) )
       return (String)( table.get( typeID ) );
-    else
-      return defaultID;
+    return defaultID;
   }
   
-  public String[] getAvailableStoreIDs(){
-  	return (String[]) table.values().toArray(new String[table.size()]);
+  public String[] getAvailableStoreIDs() {
+      return storeIDs;
   }
 }
