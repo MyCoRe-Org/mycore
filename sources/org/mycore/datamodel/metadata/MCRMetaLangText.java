@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 
 /**
  * This class implements all method for handling with the MCRMetaLangText part
@@ -147,7 +148,7 @@ public final String createXML() throws MCRException
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     sb.append(" type=\"").append(type).append("\""); }
   sb.append(">").append(NL);
-  sb.append(text);
+  sb.append(MCRUtils.stringToXML(text));
   sb.append("</").append(subtag).append('>').append(NL);
   return sb.toString();
   }

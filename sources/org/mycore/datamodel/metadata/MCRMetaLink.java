@@ -27,6 +27,7 @@ package mycore.datamodel;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import mycore.common.MCRException;
+import mycore.common.MCRUtils;
 import mycore.datamodel.MCRObjectID;
 
 /**
@@ -330,7 +331,8 @@ public final String createXML() throws MCRException
   sb.append('<').append(subtag).append(" xlink:type=\"").append(linktype)
     .append("\" ");
   if (linktype.equals("locator")) {
-    sb.append(" xlink:href=\"").append(href).append("\" ");
+    sb.append(" xlink:href=\"").append(MCRUtils.stringToXML(href))
+      .append("\" ");
     if ((label != null) && ((label = label.trim()).length() !=0)) {
       sb.append("xlink:label=\"").append(label).append("\" "); }
     if ((title != null) && ((title = title.trim()).length() !=0)) {

@@ -140,5 +140,33 @@ public static final boolean isDateInEn_US(String date)
     return false; }
   return true;
   }
+
+/**
+ * This methode replace any characters to XML entity references.<p>
+ * <ul>
+ * <li> &lt; to &amp;lt;
+ * <li> &gt; to &amp;gt;
+ * <li> &amp; to &amp;amp;
+ * <li> &quot; to &amp;quot;
+ * <li> &apos; to &amp;apos;
+ * </ul>
+ *
+ * @param in  a string
+ * @return the converted string.
+ **/
+public static final String stringToXML(String in)
+  {
+  if (in == null) { return ""; }
+  StringBuffer sb = new StringBuffer(2048);
+  for (int i=0;i<in.length();i++) {
+    if (in.charAt(i)=='<') { sb.append("&lt;"); continue; }
+    if (in.charAt(i)=='>') { sb.append("&gt;"); continue; }
+    if (in.charAt(i)=='&') { sb.append("&amp;"); continue; }
+    if (in.charAt(i)=='\"') { sb.append("&quot;"); continue; }
+    if (in.charAt(i)=='\'') { sb.append("&apos;"); continue; }
+    sb.append(in.charAt(i));
+    }
+  return sb.toString();
+  }
 } 
 
