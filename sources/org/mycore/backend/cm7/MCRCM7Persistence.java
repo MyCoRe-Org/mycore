@@ -145,7 +145,7 @@ private final void createCM7(MCRObjectID mcr_id, String mcr_label,
         connection);
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+" exists."); }
-    catch (MCRCM7PersistenceException e) { }
+    catch (MCRPersistenceException e) { }
     MCRCM7Item item = new MCRCM7Item(connection,mcr_index_class,
       DKConstant.DK_DOCUMENT);
     item.setKeyfield(mcr_id_name,mcr_id.getId());
@@ -204,7 +204,7 @@ private final void deleteCM7(MCRObjectID mcr_id)
       item.delete();
       exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
       }
-    catch (MCRCM7PersistenceException e) {
+    catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
@@ -254,7 +254,7 @@ private final String receiveCM7(MCRObjectID mcr_id)
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       xml = item.getPart(mcr_xml_part);
       }
-    catch (MCRCM7PersistenceException e) {
+    catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
@@ -306,7 +306,7 @@ private final GregorianCalendar receiveCreateDateCM7(MCRObjectID mcr_id)
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       create = item.getKeyfieldToDate(mcr_create_name);
       }
-    catch (MCRCM7PersistenceException e) {
+    catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
@@ -358,7 +358,7 @@ private final String receiveLabelCM7(MCRObjectID mcr_id)
       MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
       label = item.getKeyfieldToString(mcr_label_name);
       }
-    catch (MCRCM7PersistenceException e) {
+    catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }
@@ -432,7 +432,7 @@ private final void updateCM7(MCRObjectID mcr_id, String mcr_label,
       item.update();
       exec("imlupdix -s "+mcr_ts_server+" -x "+mcr_ts_index);
       }
-    catch (MCRCM7PersistenceException e) { 
+    catch (MCRPersistenceException e) { 
       throw new MCRPersistenceException(
         "A object with ID "+mcr_id.getId()+"does not exists."); }
     }

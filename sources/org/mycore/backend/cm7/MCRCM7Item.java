@@ -28,6 +28,7 @@ import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import java.util.*;
 import java.io.File;
+import mycore.common.MCRPersistenceException;
 
 /**
  * <B>This class implements the access routines for a IBM Content Manager
@@ -91,12 +92,12 @@ public final class MCRCM7Item implements DKConstant
    * @param condition           the condition for search to this item
    * @param indexClass          the given Index Class
    * @param connection          the given DL connection
-   * @exception MCRCM7PersistenceException Exceptions of MyCoRe
+   * @exception MCRPersistenceException Exceptions of MyCoRe
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
   public MCRCM7Item(String condition, String indexClass,
-    DKDatastoreDL connection) throws DKException, MCRCM7PersistenceException,
+    DKDatastoreDL connection) throws DKException, MCRPersistenceException,
     Exception
     {
     DKNVPair parms[] = null;
@@ -110,7 +111,7 @@ public final class MCRCM7Item implements DKConstant
       parms);
     query.execute(parms);
     dkIterator iter = ((DKResults) query.result()).createIterator();
-    if (! iter.more()) throw new MCRCM7PersistenceException(
+    if (! iter.more()) throw new MCRPersistenceException(
       "There is no item in index class " + indexClass +
       " that matches the condition (" + condition + ")" );
     this.ddo = ( DKDDO ) iter.next();
