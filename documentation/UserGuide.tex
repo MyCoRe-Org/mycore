@@ -1,20 +1,14 @@
-\documentclass[a4paper,12pt]{book}
-\usepackage{german}
-\usepackage{supertabular}
-\usepackage{fancyheadings}
-\usepackage[dvips]{graphicx}
-\pagestyle{fancyplain}
-\addtolength{\headwidth}{\marginparsep}
-\addtolength{\headwidth}{\marginparwidth}
-\renewcommand{\chaptermark}[1]%
-      {\markboth{#1}{}}
-\renewcommand{\sectionmark}[1]%
-      {\markright{\thesection\ #1}}
-\lhead[\fancyplain{}{\bfseries\thepage}]%
-      {\fancyplain{}{\bfseries\rightmark}}
-\rhead[\fancyplain{}{\bfseries\leftmark}]%
-      {\fancyplain{}{\bfseries\thepage}}
-\cfoot{}
+\documentclass[a4paper,12pt]{report}
+\usepackage{ngerman}
+
+%neue deutsche Rechtschreibung
+%\usepackage[english,ngerman]{babel}
+
+\usepackage[latin1]{inputenc} %für Linux
+%\usepackage[ansinew]{inputenc} %fuer Windows
+
+\usepackage{mycore}
+
 \begin{document}
 %-------   Vorspann
 \title{MyCoRe User Guide}
@@ -49,7 +43,7 @@ In diesem Dokument sind alle Arbeiten zum Start der Beispielanwendung und zur Ge
 \subsection{Interaktive Arbeit mit den Daten}
 \section{Download der Beispielanwendung}
 \section{Konfiguration zur Arbeit mit den Beispieldaten}
-Wenn man nur sections und subsections aneinanderf"ugt, wird offensichtlich kein Seitenumbruch gemacht??
+%Wenn man nur sections und subsections aneinanderf"ugt, wird offensichtlich kein Seitenumbruch gemacht??
 \subsection{Grundlegende Konfigurationen (JDBC, CM, Logger, usw.)}
 \subsection{Das User- und Rechtesystem  + Laden der Beispieldaten}
 \subsection{Das Klassifikationsmodel + Laden der Beispieldaten}
