@@ -36,7 +36,6 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class is a abstract basic class for objects in the MyCoRe Project.

@@ -38,7 +38,7 @@ import org.mycore.datamodel.metadata.*;
  * MyCoRe command line interface.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  **/
 
@@ -324,7 +324,7 @@ public class MCRObjectCommands
       return false;
       }
     logger.info( "Reading file " + file + " ..." );
-    if (new org.jdom.input.DOMBuilder(false).build(MCRXMLHelper.parseURI(file))!=null)
+    if (MCRXMLHelper.parseURI(file)!=null)
     	logger.info( "The file has no XML errors." );
     return true;
     }

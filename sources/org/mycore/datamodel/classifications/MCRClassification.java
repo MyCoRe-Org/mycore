@@ -31,15 +31,15 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
-import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class implements all methods for a classification and extended
  * the MCRClassificationObject class.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
@@ -176,8 +176,7 @@ private ArrayList cat;
   public final String createFromURI( String uri ) throws MCRException
     { 
     try {
-      org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-      org.jdom.Document jdom = bulli.build(MCRXMLHelper.parseURI(uri));
+      org.jdom.Document jdom = MCRXMLHelper.parseURI(uri);
       return createFromJDOM(jdom);
       }
     catch (Exception e) {
@@ -240,8 +239,7 @@ private ArrayList cat;
   public final String updateFromURI( String uri ) throws MCRException
     { 
     try {
-      org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-      org.jdom.Document jdom = bulli.build(MCRXMLHelper.parseURI(uri));
+      org.jdom.Document jdom = MCRXMLHelper.parseURI(uri);
       return updateFromJDOM(jdom);
       }
     catch (Exception e) {

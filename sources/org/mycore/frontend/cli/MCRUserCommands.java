@@ -40,7 +40,7 @@ import org.mycore.user.*;
  * can be used by the command line interface.
  *
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -503,8 +503,7 @@ public static final void createUserFromFile(MCRSession session,String filename)
   if (!checkFilename(filename)) return;
   logger.info( "Reading file " + filename + " ..." );
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Document doc = MCRXMLHelper.parseURI(filename,true);
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getName().equals("mycoreuser")) {
       throw new MCRException("The data are not for user."); }
@@ -529,8 +528,7 @@ public static final void createGroupFromFile(MCRSession session,String filename)
   if (!checkFilename(filename)) return;
   logger.info( "Reading file " + filename + " ..." );
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Document doc = MCRXMLHelper.parseURI(filename,true);
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getName().equals("mycoregroup")) {
       throw new MCRException("The data are not for group."); }
@@ -555,8 +553,7 @@ public static final void updateUserFromFile(MCRSession session,String filename)
   if (!checkFilename(filename)) return;
   logger.info( "Reading file " + filename + " ..." );
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Document doc = MCRXMLHelper.parseURI(filename,true);
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getName().equals("mycoreuser")) {
       throw new MCRException("The data are not for user."); }
@@ -581,8 +578,7 @@ public static final void updateGroupFromFile(MCRSession session,String filename)
   if (!checkFilename(filename)) return;
   logger.info( "Reading file " + filename + " ..." );
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Document doc = MCRXMLHelper.parseURI(filename,true);
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getName().equals("mycoregroup")) {
       throw new MCRException("The data are not for group."); }
@@ -608,8 +604,7 @@ public static final void updatePrivilegesFromFile(MCRSession session,
   if (!checkFilename(filename)) return;
   logger.info( "Reading file " + filename + " ..." );
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Document doc = MCRXMLHelper.parseURI(filename,true);
     org.jdom.Element rootelm = doc.getRootElement();
     if (!rootelm.getName().equals("mycoreprivilege")) {
       throw new MCRException("The data are not for privileges."); }

@@ -27,6 +27,7 @@ package org.mycore.common.xml;
 import java.io.*;
 import java.util.*;
 
+import org.jdom.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -247,7 +248,7 @@ public final synchronized void add(String in_host, String in_id, int in_rank,
  * @exception org.jdom.JDOMException if a JDOm error was occured
  **/
 public final synchronized void add(String in_host, String in_id, int in_rank, 
-  byte[] in_xml) throws org.jdom.JDOMException
+  byte[] in_xml) throws JDOMException, IOException
   {
   ByteArrayInputStream bin = new ByteArrayInputStream(in_xml);
   org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
@@ -415,7 +416,7 @@ private static String ERRORTEXT =
  * @see importElements(InputStream)
  **/
 public final synchronized void importElements(byte [] in) 
-  throws MCRException, org.jdom.JDOMException{
+  throws MCRException, JDOMException, IOException{
   ByteArrayInputStream bin = new ByteArrayInputStream(in);
   org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
   logger.info("Debug of MCRXMLContainer.importElements(byte[])");
@@ -443,7 +444,7 @@ public final synchronized void importElements(byte [] in)
    * @exception org.jdom.JDOMException cant read the byte array as XML
    **/
   public final synchronized void importElements(InputStream in) 
-	throws MCRException, org.jdom.JDOMException{
+	throws MCRException, JDOMException, IOException{
 	org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
 	org.jdom.Document jdom = builder.build(in);
 	importElements(jdom);

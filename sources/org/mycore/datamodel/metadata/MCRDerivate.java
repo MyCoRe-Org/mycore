@@ -24,12 +24,8 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.GregorianCalendar;
 import java.io.File;
 //import java.util.Vector;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -122,8 +118,7 @@ private final void set() throws MCRException
 public final void setFromURI(String uri) throws MCRException
   {
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(MCRXMLHelper.parseURI(uri));
+     jdom_document = MCRXMLHelper.parseURI(uri);
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }
@@ -140,8 +135,7 @@ public final void setFromURI(String uri) throws MCRException
 public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(MCRXMLHelper.parseXML(xml,false));
+    jdom_document = MCRXMLHelper.parseXML(xml,false);
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }

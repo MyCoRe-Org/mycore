@@ -24,14 +24,15 @@
 
 package org.mycore.common.xml;
 
-import org.w3c.dom.Document;
+import org.jdom.Document;
 import org.mycore.common.MCRException;
 
 /**
  * This interface is designed to choose the XML parser. To construct a
- * DOM you have to methodes, one for a URI input an one for a XML stream.
+ * JDOM you have to methodes, one for a URI input an one for a XML stream.
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 public interface MCRParserInterface

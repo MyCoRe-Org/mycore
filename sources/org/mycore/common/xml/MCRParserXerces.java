@@ -25,18 +25,13 @@
 package org.mycore.common.xml;
 
 import java.io.*;
-import org.apache.xerces.parsers.DOMParser;
 import org.apache.log4j.*;
-import org.w3c.dom.Document;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
 /**
@@ -44,7 +39,8 @@ import org.mycore.common.MCRException;
  * to a DOM document.
  *
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  **/
@@ -52,7 +48,8 @@ public class MCRParserXerces
   implements MCRParserInterface, ErrorHandler
 {
   // the Xerces parser to be used
-  DOMParser parser = new DOMParser();
+  SAXBuilder builderValid;
+  SAXBuilder builder;
 
   // parser configuration flags 
   private static boolean flagvalidation        = false;
@@ -60,6 +57,7 @@ public class MCRParserXerces
   private static boolean flagschemasupport     = true;
   private static boolean flagschemafullsupport = false;
   private static boolean flagdeferreddom       = true;
+  private static MCREntityResolver entityResolver;
 
   private static String setvalidation          =
     "http://xml.org/sax/features/validation";
@@ -80,20 +78,27 @@ public class MCRParserXerces
   {
     flagvalidation = MCRConfiguration.instance()
       .getBoolean( "MCR.parser_schema_validation", flagvalidation );
-    try 
-    {
-      parser.setFeature( setnamespaces,        flagnamespaces        );
-      parser.setFeature( setschemasupport,     flagschemasupport     );
-      parser.setFeature( setschemafullsupport, flagschemafullsupport );
-      parser.setFeature( setdeferreddom,       flagdeferreddom       );
-    }
-    catch( SAXException ex ) 
-    { 
-      String msg = "Initialization error in Xerces parser";
-      throw new MCRConfigurationException( msg, ex ); 
-    }
-    parser.setErrorHandler  ( this );
-    parser.setEntityResolver( new MCREntityResolver() );
+	builderValid=new SAXBuilder("org.apache.xerces.parsers.SAXParser",true);
+	builder=new SAXBuilder("org.apache.xerces.parsers.SAXParser",false);
+	entityResolver=new MCREntityResolver();
+
+	builder.setFeature( setnamespaces,        flagnamespaces        );
+	builder.setFeature( setschemasupport,     flagschemasupport     );
+	builder.setFeature( setschemafullsupport, flagschemafullsupport );
+	builder.setFeature( setdeferreddom,       flagdeferreddom       );
+	builderValid.setFeature( setnamespaces,        flagnamespaces        );
+	builderValid.setFeature( setschemasupport,     flagschemasupport     );
+	builderValid.setFeature( setschemafullsupport, flagschemafullsupport );
+	builderValid.setFeature( setdeferreddom,       flagdeferreddom       );
+
+	builder.setReuseParser(true);
+	builder.setReuseParser(false);
+    
+	builder.setErrorHandler  ( this );
+	builderValid.setErrorHandler  ( this );
+
+	builder.setEntityResolver( entityResolver );
+	builder.setEntityResolver( entityResolver );
   }
 
   /**
@@ -185,12 +190,14 @@ public class MCRParserXerces
    **/
   private synchronized Document parse( InputSource source, boolean validate )
   {
+  	SAXBuilder builder;
+  	if (validate)
+  		builder=this.builderValid;
+  	else
+  		builder=this.builder;
     try
     {
-      parser.setFeature( setvalidation, validate );
-      parser.setFeature( setschemasupport, validate);
-      parser.parse( source );
-      return parser.getDocument();
+      return builder.build(source);
     }
     catch( Exception ex ) 
     {
