@@ -14,7 +14,11 @@
 			</tr>
 			<!-- give general information about done action -->
 			<tr>
-				<th class="green" colspan="2"> Änderungen erfolgreich! </th>
+				<th align="left" class="green" colspan="2">
+					Seite abgespeichert...<br/>
+					Parser: <xsl:value-of select="/cms/usedParser"/>...<br/>
+					Änderungen erfolgreich...
+				</th>
 			</tr>
 			<!-- END OF: give general information about done action -->
 			<tr>

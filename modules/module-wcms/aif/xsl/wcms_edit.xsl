@@ -140,6 +140,18 @@
 					</td>
 				</tr>
 			</xsl:when>
+						<xsl:when test=" /cms/error = 'non_valid_xhtml_content' ">
+				<tr>
+					<th colspan="2" class="red" align="left"> Fehler aufgetreten: Eingegebener Content war nicht XHTML/XML konform. <br/>
+						<br/> Deaktivieren sie den Haken bei "HTML-Codekorrektur ausschalten" oder überprüfen sie ihren Content.</th>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<br/>
+						<br/>
+					</td>
+				</tr>
+			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
 	<!-- ============================================================================================================ -->

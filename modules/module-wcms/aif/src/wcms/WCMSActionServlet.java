@@ -16,11 +16,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -40,6 +44,8 @@ import org.mycore.common.MCRUtils;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -84,7 +90,8 @@ public class WCMSActionServlet extends WCMSServlet {
     private String error = null; // Errors, such as "empty form fields" aso
     private String attribute = null;
     private String avalue = null;
-
+    private String usedParser = null; //Parser that is used for content code validation (xhtml|xml|none);
+    
     private boolean dcbActionAdd = false;
     private String dcbValueAdd = null;
     private boolean dcbActionDelete = false;
@@ -92,13 +99,20 @@ public class WCMSActionServlet extends WCMSServlet {
 
     private String sessionParam = null;
     private String addAtPosition = null;
-
+    
+    private File naviFile = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+    
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+   
     char fs = File.separatorChar;
 
     String [] imageList, documentList;
     File hrefFile;
     Element actElem;
     File [] masterTemplates;
+    
+    static Logger logger = Logger.getLogger(WCMSActionServlet.class);
 
     /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -106,9 +120,11 @@ public class WCMSActionServlet extends WCMSServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-
+    	setReq(request);
+    	setResp(response);
+    	usedParser = "none";
         sessionParam="final";
-    		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
+    	MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         contentFileBackup = null;
         naviFileBackup = null;
         hrefFile = null;
@@ -137,41 +153,10 @@ public class WCMSActionServlet extends WCMSServlet {
 
         //System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
         /* code validation by JTidy */
-        if ( request.getParameter("codeValidationDisable") == null ) {
-        	//System.out.println("JTIDY bei der Arbeit..................................................................................................");
-            Tidy tidy = new Tidy();
-            
-            tidy.setXHTML(true);
-            tidy.setInputEncoding("UTF-8");
-            tidy.setOutputEncoding("UTF-8");
-			tidy.setPrintBodyOnly(true);
-			tidy.setIndentContent(true);
-			tidy.setForceOutput(true);
-			tidy.setMakeClean(true);
-			tidy.setMakeBare(true);
-			tidy.setQuoteAmpersand(true);
-			tidy.setQuoteMarks(true);
-			tidy.setQuoteNbsp(true);				
-            
-            if (content != null) {
-                ByteArrayInputStream bais = new ByteArrayInputStream(content.getBytes("UTF-8"));
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                tidy.parse(bais, baos);
-                content = baos.toString("UTF-8");
-                bais.close();
-                baos.flush();
-                baos.close();
-            }
-            if (contentCurrentLang != null) {
-                ByteArrayInputStream baisc = new ByteArrayInputStream(contentCurrentLang.getBytes("UTF-8"));
-                ByteArrayOutputStream baosc = new ByteArrayOutputStream();
-                tidy.parse(baisc, baosc);
-                contentCurrentLang = baosc.toString("UTF-8");
-                baisc.close();
-                baosc.flush();
-                baosc.close();
-            }
-        }
+        if ( request.getParameter("codeValidationDisable") == null ) {        	
+        	logger.debug("Code validation using"+VALIDATOR);
+        	codeValidation(VALIDATOR);     	
+        }       	
         /* END: code validation by JTidy */
 
         currentLangLabel = request.getParameter("label_currentLang");
@@ -211,7 +196,6 @@ public class WCMSActionServlet extends WCMSServlet {
         replaceMenu = request.getParameter("replaceMenu");
         if ( replaceMenu == null ) replaceMenu = "false";
         masterTemplate = request.getParameter("masterTemplate");
-        File naviFile = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 
         fileName = href;
  /* -------------------------------------------------------------------- */
@@ -323,17 +307,17 @@ public class WCMSActionServlet extends WCMSServlet {
         /*---------------------------------------------------------------------*/
 
         if ( !realyDel.equals("false") ) {
-            doItAll(request, response, naviFile, hrefFile, action, mode, addAtPosition );
+            doItAll(hrefFile, action, mode, addAtPosition );
         }
         else {
             sessionParam="choose";
-            generateOutput(request, error, response, naviFile, label, fileName);
+            generateOutput(error, label, fileName);
         }
     }
 
-    public void generateOutput(HttpServletRequest request, String error, HttpServletResponse response, File naviFile, String label, String fileName){
+    public void generateOutput(String error, String label, String fileName){
         try {
-        		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
+        	MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(naviFile);
             Element root = doc.getRootElement();
@@ -345,6 +329,7 @@ public class WCMSActionServlet extends WCMSServlet {
             rootOut.addContent(new Element("label").setText(label));
             rootOut.addContent(new Element("target").setText(target));
             rootOut.addContent(new Element("style").setText(style));
+            rootOut.addContent(new Element("usedParser").setText(usedParser));
             rootOut.addContent(new Element("addAtPosition").setText(addAtPosition));
             rootOut.addContent(new Element("action").setAttribute("mode", mode).setText(action));
             rootOut.addContent(new Element("sessionID").setText(mcrSession.getID()));
@@ -409,14 +394,22 @@ public class WCMSActionServlet extends WCMSServlet {
             			rootOut.addContent(new Element("error").setText(error));
 					}
 					catch (JDOMException jex) {
-						content = "<section>"+content+"</section>";
-                    	saxDoc = saxb.build(new StringReader(content));
-                       	Element html = saxDoc.getRootElement();
-                       	html.detach();
-			           	Element contentElem = new Element("section");
-			           	contentElem.setContent(html);
-			           	rootOut.addContent(contentElem);
-            			rootOut.addContent(new Element("error").setText(error));
+						try {
+							String contentTmp = "<section>"+content+"</section>";
+							saxDoc = saxb.build(new StringReader(contentTmp));
+							Element html = saxDoc.getRootElement();
+							html.detach();
+							Element contentElem = new Element("section");
+							contentElem.setContent(html);
+							rootOut.addContent(contentElem);
+							rootOut.addContent(new Element("error").setText(error));
+						} catch (Exception e) {
+							/*Element contentElem = new Element("content");
+							contentElem.addContent(content);
+							rootOut.addContent(contentElem);*/
+							rootOut.addContent(new Element("error").setText(error));
+							//e.printStackTrace();
+						}
 					}
             	}
             	else {
@@ -430,14 +423,22 @@ public class WCMSActionServlet extends WCMSServlet {
             			rootOut.addContent(new Element("error").setText(error));
 					}
 					catch (JDOMException jex) {
-						content = "<section>"+contentCurrentLang+"</section>";
-                    	saxDoc = saxb.build(new StringReader(contentCurrentLang));
-                    	Element html = saxDoc.getRootElement();
-			           	html.detach();
-			           	Element contentElem = new Element("section");
-			           	contentElem.setContent(html);
-			           	rootOut.addContent(contentElem);
-            			rootOut.addContent(new Element("error").setText(error));
+						try {
+							String contentCurrentLangTmp = "<section>"+contentCurrentLang+"</section>";
+							saxDoc = saxb.build(new StringReader(contentCurrentLangTmp));
+							Element html = saxDoc.getRootElement();
+							html.detach();
+							Element contentElem = new Element("section");
+							contentElem.setContent(html);
+							rootOut.addContent(contentElem);
+							rootOut.addContent(new Element("error").setText(error));
+						} catch (Exception e) {
+							/*Element contentElem = new Element("content");
+							contentElem.addContent(contentCurrentLang);
+							rootOut.addContent(contentElem);*/
+							rootOut.addContent(new Element("error").setText(error));
+							//e.printStackTrace();
+						}
 					}
 				}
             }
@@ -912,165 +913,191 @@ public class WCMSActionServlet extends WCMSServlet {
     }
 
     public void makeAction( String action ) throws IOException {
-        if ( action.equals("add") ) {
-            if ( mode.equals("intern") ) {
-                if ( !hrefFile.exists() ) {
-                    hrefFile.getParentFile().mkdir();
-                    BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(hrefFile));
-                    StringBuffer output=new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-						.append("<!DOCTYPE MyCoReWebPage>\n")
-						.append("<MyCoReWebPage>\n")
-						.append("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\">\n")
-						.append(content)
-						.append("\t</section>\n")
-						.append("</MyCoReWebPage>\n");
-                    BufferedInputStream bi = new BufferedInputStream(
-							new ByteArrayInputStream(output.toString()
-									.getBytes("UTF-8")));
-                    MCRUtils.copyStream(bi,bo);
-                    bi.close();
-                    bo.close();
-                }
-                else {
-                    error = "Unter diesem Pfad existiert bereits ein File mit diesem Filename!";
-                    return;
-                }
-            }
-            else return;
-        }
+        try {
+			if ( action.equals("add") ) {
+			    if ( mode.equals("intern") ) {
+			        if ( !hrefFile.exists() ) {
+			            hrefFile.getParentFile().mkdir();
+			            BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(hrefFile));
+			            StringBuffer output = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+							.append("<!DOCTYPE MyCoReWebPage>\n")
+							.append("<MyCoReWebPage>\n")
+							.append("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\">\n")
+							.append(content)
+							.append("\t</section>\n")
+							.append("</MyCoReWebPage>\n");
+			            BufferedInputStream bi = new BufferedInputStream(
+								new ByteArrayInputStream(output.toString()
+										.getBytes("UTF-8")));
+			            MCRUtils.copyStream(bi,bo);
+			            bi.close();
+			            bo.close();
+			        }
+			        else {
+			            error = "Unter diesem Pfad existiert bereits ein File mit diesem Filename!";
+			            return;
+			        }
+			    }
+			    else return;
+			}
  /*---- build new ----*/
-        if ( action.equals("edit") ) {
-            if ( mode.equals("intern") ) {
-                try {
-                    SAXBuilder builder = new SAXBuilder();
-                    builder.setEntityResolver(new ResolveDTD());
-                    Document doc = new Document();
-                    try {
-                    	doc = builder.build(new StringReader(content));
-                    	Element html = doc.getRootElement();
-                    	html.detach();
-                    	builder = new SAXBuilder();
-						doc = builder.build(hrefFile);
-						Element root = doc.getRootElement();
-						validate(root);
-						Element actElem = findActElem(root, "lang", defaultLang, ns);
-						actElem.setAttribute("title", label);
-                    	actElem.setContent(html);
-		    		}
-					catch (JDOMException jex) {
-						content = "<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >"+content+"</section>";
-						//content.replaceAll("&", "&amp;");
-						doc = builder.build(new StringReader(content));
-						Element html = doc.getRootElement();
-						html.detach();
-						builder = new SAXBuilder();
-						doc = builder.build(hrefFile);
-						Element root = doc.getRootElement();
-						validate(root);
-						Element actElem = findActElem(root, "lang", defaultLang, ns);
-						Element parent = (Element)actElem.getParent();
-						parent.removeContent(actElem);
-						parent.addContent(html);
+			if ( action.equals("edit") ) {
+			    if ( mode.equals("intern") ) {
+			        try {
+			            SAXBuilder builder = new SAXBuilder();
+			            builder.setEntityResolver(new ResolveDTD());
+			            Document doc = new Document();
+			            try {
+			            	doc = builder.build(new StringReader(content));
+			            	Element html = doc.getRootElement();
+			            	html.detach();
+			            	builder = new SAXBuilder();
+							doc = builder.build(hrefFile);
+							Element root = doc.getRootElement();
+							validate(root);
+							Element actElem = findActElem(root, "lang", defaultLang, ns);
+							actElem.setAttribute("title", label);
+			            	actElem.setContent(html);
+			    		}
+						catch (JDOMException jex) {
+							try {
+								content = "<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >"+content+"</section>";
+								//content.replaceAll("&", "&amp;");
+								doc = builder.build(new StringReader(content));
+								Element html = doc.getRootElement();
+								html.detach();
+								builder = new SAXBuilder();
+								doc = builder.build(hrefFile);
+								Element root = doc.getRootElement();
+								validate(root);
+								Element actElem = findActElem(root, "lang", defaultLang, ns);
+								Element parent = (Element)actElem.getParent();
+								parent.removeContent(actElem);
+								parent.addContent(html);
+							}
+							catch (Exception e) {
+								error = "non_valid_xhtml_content";
+								sessionParam = "action";
+								generateOutput(error, label, fileName);
+								return;
+							}
+						}
+
+			            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+			            xmlout.output(doc, new FileOutputStream(hrefFile));
+			        }
+			        
+			        catch (Exception e) {
+			        	e.printStackTrace();
+			        }
+			       /* PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
+			        po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			        po.println("<!DOCTYPE MyCoReWebPage>");
+			        po.println("<MyCoReWebPage>");
+			        po.println("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >");
+			        po.print(content);
+			        po.println("\t</section>");
+			        po.println("</MyCoReWebPage>");
+			        po.flush();
+			        po.close();*/
+			    }
+			    else return;
+			}
+
+			if ( action.equals("translate") && mode.equals("intern") ) {
+			    try {
+			        SAXBuilder builder = new SAXBuilder();
+			        builder.setEntityResolver(new ResolveDTD());
+			        Document doc = new Document();
+			        try {
+			        	doc = builder.build(new StringReader(contentCurrentLang));
+			        	Element html = doc.getRootElement();
+			        	html.detach();
+			        	builder = new SAXBuilder();
+			        	doc = builder.build(hrefFile);
+			        	Element root = doc.getRootElement();
+			        	validate(root);
+			        	Element actElem = findActElem(root, "lang", currentLang, ns);
+			        	if (actElem == null) {
+			        	    root.addContent(new Element("section").setAttribute("lang", currentLang, ns)
+			        	                                          .setAttribute("title", label));
+			        	}
+			        	actElem = findActElem(root, "lang", currentLang, ns);
+			        	actElem.setAttribute("title", label);
+			        	actElem.setContent(html);
 					}
 
-                    XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                    xmlout.output(doc, new FileOutputStream(hrefFile));
-                }
-                catch (JDOMException je) {
-					je.printStackTrace();
-                }
-
-               /* PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
-                po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                po.println("<!DOCTYPE MyCoReWebPage>");
-                po.println("<MyCoReWebPage>");
-                po.println("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >");
-                po.print(content);
-                po.println("\t</section>");
-                po.println("</MyCoReWebPage>");
-                po.flush();
-                po.close();*/
-            }
-            else return;
-        }
-
-        if ( action.equals("translate") && mode.equals("intern") ) {
-            try {
-
-                SAXBuilder builder = new SAXBuilder();
-                builder.setEntityResolver(new ResolveDTD());
-                Document doc = new Document();
-                try {
-                	doc = builder.build(new StringReader(contentCurrentLang));
-                	Element html = doc.getRootElement();
-                	html.detach();
-                	builder = new SAXBuilder();
-                	doc = builder.build(hrefFile);
-                	Element root = doc.getRootElement();
-                	validate(root);
-                	Element actElem = findActElem(root, "lang", currentLang, ns);
-                	if (actElem == null) {
-                	    root.addContent(new Element("section").setAttribute("lang", currentLang, ns)
-                	                                          .setAttribute("title", label));
-                	}
-                	actElem = findActElem(root, "lang", currentLang, ns);
-                	actElem.setAttribute("title", label);
-                	actElem.setContent(html);
-				}
-
-                catch (JDOMException jex) {
-					contentCurrentLang = "<section xml:lang=\""+currentLang+"\" title=\""+currentLangLabel+"\" >"+contentCurrentLang+"</section>";
-					//contentCurrentLang.replaceAll("&", "&amp;");
-					doc = builder.build(new StringReader(contentCurrentLang));
-					Element html = doc.getRootElement();
-					html.detach();
-					builder = new SAXBuilder();
-					doc = builder.build(hrefFile);
-					Element root = doc.getRootElement();
-					validate(root);
-					Element actElem = findActElem(root, "lang", currentLang, ns);
-					if (actElem == null) {
-					    root.addContent(html);
-                	}
-					actElem = findActElem(root, "lang", currentLang, ns);
-					Element parent = (Element)actElem.getParent();
-					parent.removeContent(actElem);
-					parent.addContent(html);
-				}
-
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                xmlout.output(doc, new FileOutputStream(hrefFile));
-            }
-            catch (JDOMException je) {
-				je.printStackTrace();
-            }
-                /*PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
-                po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                po.println("<!DOCTYPE MyCoReWebPage>");
-                po.println("<MyCoReWebPage>");
-                po.println("\t<section xml:lang=\""+currentLang+"\" title=\""+label+"\">");
-                po.print(contentCurrentLang);
-                po.println("\t</section>");
-                po.println("</MyCoReWebPage>");
-                po.flush();
-                po.close();*/
-        }
+			        catch (JDOMException jex) {
+						try {
+							contentCurrentLang = "<section xml:lang=\""+currentLang+"\" title=\""+currentLangLabel+"\" >"+contentCurrentLang+"</section>";
+							//contentCurrentLang.replaceAll("&", "&amp;");
+							doc = builder.build(new StringReader(contentCurrentLang));
+							Element html = doc.getRootElement();
+							html.detach();
+							builder = new SAXBuilder();
+							doc = builder.build(hrefFile);
+							Element root = doc.getRootElement();
+							validate(root);
+							Element actElem = findActElem(root, "lang", currentLang, ns);
+							if (actElem == null) {
+							    root.addContent(html);
+							}
+							actElem = findActElem(root, "lang", currentLang, ns);
+							Element parent = (Element)actElem.getParent();
+							parent.removeContent(actElem);
+							parent.addContent(html);
+						}
+						catch (Exception e) {
+							error = "non_valid_xhtml_content";
+							sessionParam = "action";
+							generateOutput(error, label, fileName);
+							return;
+						}
+					}
+			        XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+			        xmlout.output(doc, new FileOutputStream(hrefFile));
+			    }
+			
+			    catch (Exception e) {
+					e.printStackTrace();
+			    }
+			        /*PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
+			        po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			        po.println("<!DOCTYPE MyCoReWebPage>");
+			        po.println("<MyCoReWebPage>");
+			        po.println("\t<section xml:lang=\""+currentLang+"\" title=\""+label+"\">");
+			        po.print(contentCurrentLang);
+			        po.println("\t</section>");
+			        po.println("</MyCoReWebPage>");
+			        po.flush();
+			        po.close();*/
+			}
 
 /*---- END ----*/
 
-        if ( action.equals("delete") ) {
-            if ( realyDel.equals("true") ) {
-                if ( mode.equals("intern") ) {
-                    hrefFile.delete();
-                    File testFile = hrefFile;
-                    while (testFile.getParentFile().listFiles().length < 1) {
-                        testFile.getParentFile().delete();
-                        testFile = testFile.getParentFile();
-                    }
-                }
-            }
-            else sessionParam = "choose";
-        }
+			if ( action.equals("delete") ) {
+			    if ( realyDel.equals("true") ) {
+			        if ( mode.equals("intern") ) {
+			            hrefFile.delete();
+			            File testFile = hrefFile;
+			            while (testFile.getParentFile().listFiles().length < 1) {
+			                testFile.getParentFile().delete();
+			                testFile = testFile.getParentFile();
+			            }
+			        }
+			    }
+			    else sessionParam = "choose";
+			}
+		} catch (FileNotFoundException e) {
+			error = "File not found. For further information look at the System Output.";
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			error = "Unsupportet Encoding found. For further information look at the System Output.";
+			e.printStackTrace();
+		} catch (IOException e) {
+			error = "IO Error. For further information look at the System Output.";
+			e.printStackTrace();
+		}
     }
 
     public boolean checkInput() {
@@ -1086,10 +1113,10 @@ public class WCMSActionServlet extends WCMSServlet {
         return true;
     }
 
-    public void doItAll( HttpServletRequest request, HttpServletResponse response, File naviFile, File hrefFile, String action, String mode, String addAtPosition) throws IOException {
+    public void doItAll(File hrefFile, String action, String mode, String addAtPosition) throws IOException {
         if ( (checkInput()) == false ) {
             sessionParam = "action";
-            generateOutput(request, error, response, naviFile, label, fileName);
+            generateOutput (error, label, fileName);
             return;
         }
         if ( !action.equals("add") && mode.equals("intern") ) contentFileBackup = makeBackup(hrefFile);
@@ -1099,14 +1126,137 @@ public class WCMSActionServlet extends WCMSServlet {
         if ( !action.equals("delete") && mode.equals("intern") ) updateXMLFileFooter(hrefFile);
         updateFooter();
         writeToLogFile(action, contentFileBackup);
-        generateOutput(request, error, response, naviFile, label, fileName);
+        generateOutput(error, label, fileName);
     }
 
+    public void codeValidation(String validator) {
+    	try {
+			String contentTmp = content;
+			String contentCurrentLangTmp = contentCurrentLang;
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			logger.debug("Trying XHTML code validation using "+VALIDATOR);
+			//JTidy Configuration
+			Tidy tidy = new Tidy();
+			tidy.setXHTML(true);
+			tidy.setInputEncoding(OUTPUT_ENCODING);
+			tidy.setOutputEncoding(OUTPUT_ENCODING);
+			tidy.setPrintBodyOnly(true);
+			tidy.setIndentContent(true);
+			tidy.setForceOutput(true);
+			tidy.setMakeClean(true);
+			tidy.setMakeBare(true);
+			tidy.setQuoteAmpersand(true);
+			tidy.setQuoteMarks(true);
+			tidy.setQuoteNbsp(true);   	
+			tidy.setErrout(pw);
+			
+			if (content != null) {
+				ByteArrayInputStream bais = new ByteArrayInputStream(contentTmp.getBytes(OUTPUT_ENCODING));
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				tidy.parse(bais, baos); 
+				contentTmp = baos.toString(OUTPUT_ENCODING);
+				baos.flush();
+				baos.close();
+				bais.close();
+			}    	
+			if (contentCurrentLang != null) {
+				ByteArrayInputStream bais = new ByteArrayInputStream(contentCurrentLangTmp.getBytes(OUTPUT_ENCODING));
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				tidy.parse(bais, baos);
+				contentCurrentLangTmp = baos.toString(OUTPUT_ENCODING);
+				baos.flush();
+				baos.close();
+				bais.close();   		 		
+			}
+			pw.flush();
+			pw.close();
+			
+			
+			if (sw.toString().indexOf("Warning: discarding unexpected") != -1) {
+				logger.debug("Jumping to XML code validation because content contains at least one non-valid XHTML Element.");
+				Tidy tidyXML = new Tidy();
+			    
+			    tidyXML.setXmlOut(true);
+			    tidyXML.setInputEncoding("UTF-8");
+			    tidyXML.setOutputEncoding("UTF-8");
+				tidyXML.setIndentContent(true);	
+				tidyXML.setForceOutput(true);
+				tidyXML.setMakeClean(true);		
+				tidyXML.setMakeBare(true);			
+				tidyXML.setQuoteAmpersand(true);
+				tidyXML.setQuoteMarks(true);
+				tidyXML.setQuoteNbsp(true);
+				tidyXML.setXmlTags(true);
+				
+				if (content != null) {
+					contentTmp = 	"<dummyroot>"+
+									content+
+									"</dummyroot>";
+					//logger.debug("content vor parsing= "+content);
+					ByteArrayInputStream bais = new ByteArrayInputStream(contentTmp.getBytes("UTF-8"));
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					tidyXML.parse(bais, baos);
+					contentTmp = baos.toString("UTF-8");
+					contentTmp = contentTmp.substring(contentTmp.indexOf(">")+1, contentTmp.lastIndexOf("<"));
+					//logger.debug("content nach parsing= "+content);
+					bais.close();
+					baos.flush();
+			        baos.close();
+			    }
+			    if (contentCurrentLang != null) {
+			    	contentCurrentLangTmp = 	"<dummyroot>"+
+												contentCurrentLangTmp+
+												"</dummyroot>";
+			    	ByteArrayInputStream baisc = new ByteArrayInputStream(contentCurrentLangTmp.getBytes("UTF-8"));
+			    	ByteArrayOutputStream baosc = new ByteArrayOutputStream();
+			    	tidyXML.parse(baisc, baosc);
+			    	contentCurrentLangTmp = baosc.toString("UTF-8");
+			    	contentCurrentLangTmp = contentCurrentLangTmp.substring(contentCurrentLangTmp.indexOf(">")+1, contentCurrentLangTmp.lastIndexOf("<"));
+			    	baisc.close();
+			    	baosc.flush();
+			    	baosc.close();
+			    }
+			    usedParser = "xml";
+			    logger.debug("XML code validation successfully done.");
+			}
+			else {
+				usedParser = "xhtml";
+				logger.debug("XHTML code validation successfully done.");
+			}
+			content = contentTmp;
+			contentCurrentLang = contentCurrentLangTmp;
+		} catch (UnsupportedEncodingException e) {
+			logger.debug("XHTML/XML code validation unsuccessfully.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.debug("XHTML/XML code validation unsuccessfully.");
+			e.printStackTrace();
+		}
+    }
+    
     /** Returns a short description of the servlet.
      */
     public String getServletInfo() {
         return "Short description";
     }
+    
+	public void setReq(HttpServletRequest req) {
+		this.request = req;
+	}
+	
+	public HttpServletRequest getReq() {
+		return request;
+	}
+	
+	public void setResp(HttpServletResponse resp) {
+		this.response = resp;
+	}
+	
+	public HttpServletResponse getResp() {
+		return response;
+	}
+	
 	public static class ResolveDTD implements EntityResolver {
 		public InputSource resolveEntity(String publicId, String systemId) {
 			return new InputSource(new StringReader(" "));
