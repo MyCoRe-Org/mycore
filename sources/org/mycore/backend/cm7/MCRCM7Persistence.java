@@ -45,23 +45,24 @@ public final class MCRCM7Persistence implements MCRObjectPersistenceInterface
 {
 
 // from configuration
-private String mcr_id_name = null;
-private String mcr_label_name = null;
-private String mcr_flag_name = null;
-private String mcr_create_name = null;
-private String mcr_modify_name = null;
+private static String mcr_id_name = null;
+private static String mcr_label_name = null;
+private static String mcr_flag_name = null;
+private static String mcr_create_name = null;
+private static String mcr_modify_name = null;
+private static String mcr_ts_server = null;
+private static String mcr_ts_lang = null;
+private static int mcr_ts_part = 1;
+private static int mcr_xml_part = 2;
+private static MCRConfiguration conf = null;
+
 private String mcr_index_class = null;
-private String mcr_ts_server = null;
 private String mcr_ts_index = null;
-private String mcr_ts_lang = null;
-private int mcr_ts_part = 1;
-private int mcr_xml_part = 2;
-private MCRConfiguration conf = null;
 
 /**
- * The constructor of this class.
+ * The static part that read the configuration
  **/
-public MCRCM7Persistence()
+static
   {
   conf = MCRConfiguration.instance();
   mcr_id_name = conf.getString("MCR.persistence_cm7_field_id");
@@ -78,6 +79,12 @@ public MCRCM7Persistence()
       (mcr_create_name == null) || (mcr_modify_name == null)) {
     throw new MCRConfigurationException("A indexclass field name is false."); }
   }
+
+/**
+ * The constructor of this class.
+ **/
+public MCRCM7Persistence()
+  { }
 
 /**
  * The methode create an object in the data store. The index class
@@ -126,9 +133,9 @@ public final void create(MCRTypedContent mcr_tc, byte [] xml)
   // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   sb.append("_ts");
-  mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
+  mcr_ts_index = conf.getString(sb.toString());
   // store the data
   DKDatastoreDL connection = null;
   try {
@@ -190,9 +197,9 @@ public final void delete(MCRObjectID mcr_id)
   {
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   sb.append("_ts");
-  mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
+  mcr_ts_index = conf.getString(sb.toString());
   DKDatastoreDL connection = null;
   try {
     connection = MCRCM7ConnectionPool.instance().getConnection();
@@ -207,6 +214,40 @@ public final void delete(MCRObjectID mcr_id)
     throw new MCRPersistenceException(e.getMessage(),e); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
+  }
+
+/**
+ * The methode return true if an object  for the MCRObjectId exists.
+ * The index class is determinated by the type
+ * of the object ID. This <b>must</b> correspond with the lower case 
+ * configuration name.<br>
+ * As example: Document --> MCR.persistence_cm7_document
+ *
+ * @param mcr_id      the object id
+ * @return true if the object exists, else false
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final boolean exist(MCRObjectID mcr_id)
+  throws MCRConfigurationException, MCRPersistenceException
+  {
+  StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
+  sb.append(mcr_id.getTypeId().toLowerCase());
+  mcr_index_class = conf.getString(sb.toString()); 
+  try {
+    DKDatastoreDL connection = null;
+    try {
+      connection = MCRCM7ConnectionPool.instance().getConnection();
+      try {
+        MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection); }
+      catch (MCRPersistenceException e) { return false; }
+      }
+    finally {
+      MCRCM7ConnectionPool.instance().releaseConnection(connection); }
+    }
+  catch (Exception e) {
+    throw new MCRPersistenceException(e.getMessage()); }
+  return true;
   }
 
 /**
@@ -226,7 +267,7 @@ public final byte [] receive(MCRObjectID mcr_id)
   {
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   DKDatastoreDL connection = null;
   byte [] xml = null;
   try {
@@ -266,7 +307,7 @@ public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
   // search the index class
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   // make a connection
   DKDatastoreDL connection = null;
   GregorianCalendar create = new GregorianCalendar();
@@ -304,7 +345,7 @@ public final String receiveLabel(MCRObjectID mcr_id)
   {
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   String label = new String("");
   try {
     DKDatastoreDL connection = null;
@@ -373,9 +414,9 @@ public final void update(MCRTypedContent mcr_tc, byte [] xml)
   // read configuration
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
-  mcr_index_class = MCRConfiguration.instance().getString(sb.toString()); 
+  mcr_index_class = conf.getString(sb.toString()); 
   sb.append("_ts");
-  mcr_ts_index = MCRConfiguration.instance().getString(sb.toString());
+  mcr_ts_index = conf.getString(sb.toString());
   // store the data
   try {
     DKDatastoreDL connection = null;
@@ -586,7 +627,7 @@ private final String createTS(MCRTypedContent mcr_tc)
   { 
     String prefix     = project_ID + "_" + type_ID;
     String property   = "MCR.persistence_cm7_" + type_ID.toLowerCase().trim();
-    String indexclass = MCRConfiguration.instance().getString( property );
+    String indexclass = conf.getString( property );
 
     // What table and column name is this in DB2?
     String table  = MCRCM7Bypass.getTableName ( indexclass  );
