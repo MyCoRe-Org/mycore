@@ -14,6 +14,34 @@ Zu den angebotenen Grundtypen geh"oren.....
 
 \section{Hierarchisches Klassifikationssystem}
 \section{Internes Dateisystem}
+Viele Systeme ermöglichen nur die Pflege und Bearbeitung von beschreibenden Daten (Metadaten)
+zu Dokumenten und verwalten darüber hinaus nur einen Link auf die eigentlichen Dokumentvolltexte
+auf einem Webserver. MyCoRe hingegen verwaltet nicht nur Metadaten, sondern auch die dazugehörenden
+Dateien selbst. Das bedeutet, dass die zu einem MyCoRe Objekt dazugehörenden Dateien, wie z. B. die PDF- oder HTML-Version
+eines Dokumentes oder das Foto einer Person bzw. Autors in das System importiert werden und 
+dort verwaltet werden. 
+
+MyCoRe besitzt zu diesem Zweck ein \mcridentifier{Internes Dateisystem} (Internal Filesystem, IFS), 
+das Dateien,
+Verzeichnisse und ihre Strukturen untereinander abbildet. Dieses Dateisystem verwaltet die Dateiinhalte
+(Content) und beschreibende Informationen wie Dateiname, MD5 Prüfsumme, Datum der letzten Änderung,
+Verzeichnisstrukturen usw. Eine Programmierschnittstelle (API) erlaubt es, Dateien zu importieren,
+zu verändern oder zu löschen, Dateien anhand von Pfadausdrücken in einer intern abgebildeten 
+Verzeichnisstruktur aufzufinden oder Verzeichnisinhalte zu sortieren. 
+
+Über das MyCoRe Command Line Interface können \mcridentifier{Derivate}, d. h. 
+Dateibündel, die zu einem Dokument gehören, importiert oder aktualisiert werden. Über ein Servlet
+werden Dateien und Verzeichnisse im Browser angezeigt und ausgeliefert. In Vorbereitung ist auch
+die Möglichkeit, Dateien interaktiv über den Browser in das System hochzuladen.
+
+Die beschreibenden und technischen Daten zu Dateien und Verzeichnissen werden in einem \mcridentifier{FileMetadataStore}
+gespeichert. Prinzipiell kann es für diesen Store verschiedene Implementierungen geben, derzeit ist
+nur eine Implementierung für relationale Datenbanken realisiert, die sich z. B. mit MySQL oder DB2
+nutzen lässt.
+
+Die Dateiinhalte dagegen werden getrennt davon in einem \mcridentifier{FileContentStore} gespeichert und verwaltet.
+Derzeit gibt es fünf Implementierungen eines FileContentStores, die je nacht Konfiguration des Systems auch
+gleichzeitig eingesetzt werden können.
 
 \section{Verteilte Suche und Schnittstellen}
 \subsection{Verteilte Suche}
