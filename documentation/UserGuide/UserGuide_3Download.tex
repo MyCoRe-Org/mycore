@@ -3,7 +3,11 @@
 \section{Download der Beispielanwendung}
 %
 %
-Nachdem Sie den MyCoRe-kern erfolgreich installiert haben, ist nun die Installation der mitgelieferten Beispielanwendung sinnvoll. Hier können Sie ein erstes gefühl dafür gewinnen, wie eine eigene Anwendung gestaltet sein könnte. Das MyCoRe Sample wird für alle unterstützten Systeme über das CVS Repository ausgeliefert. Das Holen der aktuellen Version erfolgt mit dem Kommando
+Nachdem Sie den MyCoRe-kern erfolgreich installiert haben, ist nun die 
+Installation der mitgelieferten Beispielanwendung sinnvoll. Hier können Sie ein
+erstes Gefühl dafür gewinnen, wie eine eigene Anwendung gestaltet sein könnte. 
+Das MyCoRe Sample wird für alle unterstützten Systeme über das CVS Repository 
+ausgeliefert. Das Holen der aktuellen Version erfolgt mit dem Kommando
 \begin{center}
 {\tt cvs -d :pserver:anoncvs@server.mycore.de:/cvs checkout mycore-sample-application}
 \end{center}
@@ -22,20 +26,21 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \qquad FileContentTypes.xml & Liste der erkannten Dateitypen (FileContentTypes) \\
 \qquad MyCoReDemoDC\_....xml & Die Konfigurationsdateien der einzelnen Sample-Metadatentypen. \\
 \qquad SearchMask\_....xml & Die Konfigurationsdateien der Suchmasken \\
-\qquad editor-...-nbn.xml & Konfigurationsdateien für die NBN Funktionalität. \\
+\qquad editor-....xml & Konfigurationsdateien für die Editor Funktionalität. \\
 \qquad ibm-web-... & Zusätzliche Dateien zur Nutzung von IBM WebSphere. \\
 \qquad mycore.properties & Das Master-Property-File für MyCoRe \\
 \qquad mycore.properties.application & Ein Platzhalter-Property-File für andere MyCoRe-Anwendungen. \\
 \qquad mycore.properties.classification & Das Property-File für den Klassifikationsbereich. \\
-\qquad mycore.properties.cm7 & Das Property-File für den IBM CM 7.x-Bereich. \\
-\qquad mycore.properties.cm8 & Das Property-File für den IBM CM 8.x-Bereich. \\
+\qquad mycore.properties.cm8 & Das Property-File für das IBM CM 8.x-Backend. \\
 \qquad mycore.properties.ifs & Das Property-File für den Bereich des Internal File Systems. \\
 \qquad mycore.properties.logger & Das Property-File für den Logger-Bereich. \\
+\qquad mycore.properties.lucene & Das Property-File für das Lucene-Backend. \\
 \qquad mycore.properties.nbn & Das Property-File für den NBN-Bereich. \\
 \qquad mycore.properties.oai & Das Property-File für den OAI-Bereich. \\
 \qquad mycore.properties.private & Das Property-File für den Bereich, in welchem die meisten Anpassungen der jeweiligen Sample Anwender getätigt werden müssen. \\
 \qquad mycore.properties.remote & Das Property-File für den Bereich der Remote-Zugriffe. \\
 \qquad mycore.properties.user & Das Property-File für den User- und Rechteverwaltungs-Bereich. \\
+\qquad mycore.properties.xmldb & Das Property-File für das XML:DB-Backend. \\
 \qquad mycore.properties.xmlsortkeys & Das Property-File für den Präsentationsbereich. \\
 \qquad reservation.xml & ein Konfigurations-File für den NBN-Bereich. \\
 \qquad web.xml & Das Konfigurations-File für die Servlet-Engine \\
@@ -45,7 +50,7 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \qquad {\bf derivates} & Die Daten der Derivate. \\
 \qquad {\bf legalentities} & Die Daten der LegalEntities. \\
 \qquad {\bf user} & Gruppen, Nutzer und Privilegien, welche für das Sample benötigt werden. \\
-\qquad {\bf objects} & Die eigentlichen multimedialen Objekte. \\
+\quad {\bf sources} & Hier sind zusätzliche Java-Klassen für die Text-Konverter-Plugins untergebracht. \\
 \quad {\bf stylesheets} & Die verwendeten XSLT-Stylesheets der Präsentation dieses Samples. \\
 \quad build.xml & Konfigurations-File für die Arbeit mit ANT \\
 \quad license.txt & Das Lizenz-File des MyCoRe-Projektes, bitte lesen Sie dieses File aufmerksam durch, bevor Sie MyCore einsetzen. \\

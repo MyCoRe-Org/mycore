@@ -41,9 +41,10 @@ Nach dem erfolgreichen Checkout erhalten Sie folgende Dateistruktur:\\[2ex]
 \quad \qquad {\bf remote} & Klassen zum Zugriff auf Remote-MyCoRe-Daten \\
 \quad \qquad {\bf sql} & Klassen zum Zugriff auf relationale Datenbanken mittels SQL-Standart \\
 \quad \qquad {\bf videocharger} & Klassen zum Content Store in einen IBM Videocharger \\
+\quad \qquad {\bf xmldb} & Klassen zur Speicherung der Daten mittels einer XML:DB \\
 \qquad {\bf frontend} & Klassen f"ur die Frontends des MyCoRe-Systems \\
 \quad \qquad {\bf cli} & Klassen des Commandline-Tools \\
-\quad \qquad {\bf editor} & Klassen zug Gestaltung von Editoren \\
+\quad \qquad {\bf editor2} & Klassen zur Gestaltung von Editoren \\
 \quad \qquad {\bf servlets} & Klassen zu Gestaltung von Servlets \\
 \qquad {\bf services} & Klassen f"ur weiterf"uhrende Services des MyCoRe-Projektes \\
 \quad \qquad {\bf nbn} & Klassen zur Arbeit mit NBN's \\
@@ -95,12 +96,12 @@ generierten CLASSPATH und LIBPATH (für Unix Systeme) an.
 Xalan-Version benutzt, führen Sie bitte folgende Kommandos aus und prüfen Sie danach Ihr System erneut.
 
 {\tt
-cd $JAVA_HOME/jre/lib \newline
+cd \$JAVA\_HOME/jre/lib \newline
 mkdir endorsed \newline
 cd endorsed \newline
-cp MYCORE_INSTALL_HOME/lib/xerces* . \newline
-cp MYCORE_INSTALL_HOME/lib/xalan* . \newline
-cd $JAVA_HOME/lib \newline
+cp \$MYCORE\_HOME/lib/xerces* . \newline
+cp \$MYCORE\_HOME/lib/xalan* . \newline
+cd \$JAVA\_HOME/lib \newline
 ln -s ../jre/lib/endorsed endorsed
 }
 

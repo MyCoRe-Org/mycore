@@ -4,7 +4,11 @@
 %
 %
 \subsection{Allgemeines}
-Um die Funktionsweise des MyCoRe-Kernes zu testen wurde eine Beispielanwendung basiered auf diesem Kern entwickelt. Sie soll dem Anwender eine voll funktionsf"ahige Applikation in die Hand geben, welche eine Vielzahl von Komponenten des MyCoRe-Projektes nutzt und deren Arbeitweise klar werden l"asst. Um die Anwendung, im weiteren MyCore-Sample genannt, gleichzeitig sinnvoll einsetzten zu k"onnen, wurde als Beispielszenario ein Dokumentserver gew"ahlt, wie er bei vielen potentiellen Nutzern zur Anwendung kommt. Auch soll das MyCore-Sample die Nachfolge des erfolgreichen MILESS-Dokumentservers sein und den Migrationspfad zu MyCoRe hin aufzeigen. \\[2ex]
+Um die Funktionsweise des MyCoRe-Kernes zu testen wurde eine Beispielanwendung 
+basiered auf diesem Kern entwickelt. Sie soll dem Anwender eine voll 
+funktionsfähige Applikation in die Hand geben, welche eine Vielzahl von 
+Komponenten des MyCoRe-Projektes nutzt und deren Arbeitweise klar werden lässt.
+Um die Anwendung, im weiteren MyCoRe-Sample genannt, gleichzeitig sinnvoll einsetzten zu k"onnen, wurde als Beispielszenario ein Dokumentserver gew"ahlt, wie er bei vielen potentiellen Nutzern zur Anwendung kommt. Auch soll das MyCore-Sample die Nachfolge des erfolgreichen MILESS-Dokumentservers sein und den Migrationspfad zu MyCoRe hin aufzeigen. \\[2ex]
 Analog zum MILESS werden auch hier die Metadaten in drei Gruppen aufgeteilt und von den eigentlichen multimedialen Objekten getrennt behandelt. Zur Modellierung des Datenmodells f"ur die Multimedia-metadaten wurde das allgemein verbreitete Dublin Core Datenmodell herangezogen und umgesetzt. Zur Realisierung wurden folgende Metadaten-Objekte entwickelt:
 \begin{itemize}
 \item {\bf Document} - Dieses Objekt beinhaltet die eigentlichen Metadaten des Multimedi-Objektes, in unserem Fall im Dublin Core Format, sowie Verweise auf extern gehaltene Daten wie die drei im weiteren genannten. Das Datenmodell besteht aus 15 Feldern, zur Speicherung verschiedener Datentypen gibt es atomare Grundkomponenetn. Weiterhin beinhalten die Metaddaten noch Teile zu ihrer Struktur und Verwaltung.
@@ -19,7 +23,7 @@ Eine "Ubersicht zu den Beziehungen der Objektteile zueinander soll die folgende 
 \caption{"Ubersicht der Objekte im MyCoRe-Sample}
 \end{center}
 \end{figure}
-Wie man der Grafik entnehmen kann, ist es m"oglich, neben Kategorien in Klassifikationen auch Metadaten der Documnets und LegalEntities hierarchich ineienander zu verschachteln. Auf dieser Basis k"onnen dann Strukturen wie z. B. die eines Buches abgebildet werden. Alle Beziehungen zwischen den Metadaten sind "uber eine eindeutige MCRObjectID gel"ost. \\
+Wie man der Grafik entnehmen kann, ist es m"oglich, neben Kategorien in Klassifikationen auch Metadaten der Documnets und LegalEntities hierarchich ineinander zu verschachteln. Auf dieser Basis k"onnen dann Strukturen wie z. B. die eines Buches abgebildet werden. Alle Beziehungen zwischen den Metadaten sind "uber eine eindeutige MCRObjectID gel"ost. \\
 \subsection{Die MCRObjectID}
 Dreh- und Angelpunkt aller Beziehungen von Metadaten und der daran angeknüpften Objekte ist ein eindeutiger Identifizierer. Im Falle des MyCoRe Projektes hat dieser den Namen {\bf MCRObjectID} erhalten. Er hat für alle Matadaten einen einheitlichen Aufbau und wird ständig zur Identifizierung genutzt. Auch das API des Systems bietet die Möglichkeit, diese ID automatisch zu generieren.\footnote{Siehe Programmers Guide.} Der Syntax der {\bf MCRObjectID} ist wie folgend festgelegt:\\
 \begin{center}
@@ -33,6 +37,12 @@ Dreh- und Angelpunkt aller Beziehungen von Metadaten und der daran angeknüpften 
 \end{itemize}
 Zur Umsetztung des Datenmodells wurden weiterhin die Typen {\bf document} für Dokumente und {\bf legalentity} für Personen verwendet.
 {\it number} - Dieser Teil dient der Identifizierung des Einzelobjektes. Es dürfen nur natürliche Zahlen angegeben werden. Planen Sie Ihre Vergabe der Nummern bei eigenen Objekten sorgfältig. Da die Nummern teilweise als Strings verarbeitet werden, ist es sinnvoll, sie mit einer ausreichenden Zahl von Vornullen zu versehen. Dies erledigt das MyCoRe-System automatisch unter Zuhilfenahme des Konfogurationswertes {\tt MCR.metadata\_objectid\_number\_pattern } im File {\it mycore.properties.private }.
+%
+%
+\subsection{Das User- und Rechtemodell}
+
+%
+%
 \subsection{Das Sample-Datenmodell}
 Das Datenmodell des MyCoRe-Samples soll exemplarisch einen kleinen Dokumentserver abbliden, wie er dann für große Lösungen übernommen werden kann. Dabei sollen Multimediale Objekte verschiedenster Art und Herkunft gemeinsam verwaltet werden. Als Grundgerüst für die Dokumente diente uns das Dublin Core Datenmodell, welches in einigen Punkten inhaltlich etwas nach unseren Auffassungen angepasst wurde. Das Personen-Datenmodell ist hingegen derzeit propitär. Ggf. kommen hier in einer späteren version von MyCoRe Standard-Datenmodelle zum Einsatz. Die Klassifikationen sind hierarchich angelegt, d. h. Kategorien können wieder Unterkategorien beherbergen. Im folgenden werden die einzelnen Felder des Metadatenmodelles beschrieben und es wird aufgezeigt, welche Suchen vorgesehen sind. Dabei bedeutet PS - parametrische Suche, TS - Volltextsuche. Eine genaue Beschreibung der Suchmechanismen finden Sie im Programmers Guide. \\[2ex]
 {\bf Die Klassifikationen (Classifications)}  \\[2ex]

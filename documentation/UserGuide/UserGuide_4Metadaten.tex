@@ -12,7 +12,7 @@ Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstruk
 
 \lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
 \begin{lstlisting}[caption=XML-Syntax eines Metadatenobjektes,label=lst:xml_syntax_metadatenobjekt]
- <?xml version="1.0" cncoding="iso-8859" ?>
+ <?xml version="1.0" cncoding="ISO-8859-1" ?>
  <mycoreobject
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="....xsd"
@@ -357,6 +357,39 @@ Der Basistyp \mcridentifier{MCRMetaPerson} beinhaltet eine Liste von Namen für n
    <surname>Schmidt<surname>
    <academic>Dr. phil.</academic>
    <peerage>von</peerage>
+  </subtag>
+  ...
+ </tag>
+\end{lstlisting}
+%
+%
+\subsubsection{XML-Syntax des Metadatentyps MCRMetaXML}
+Der Basistyp \mcridentifier{MCRMetaXML} wurde zusätzlich als Container für 
+einen beliebigen XML-Baum in das Projekt integriert. Dieser wird in
+den Textknoten des Subtags gestellt und kann dort theoretisch beliebig groß sein. Achten Sie aber darauf, dass entsprechend vies Speicherplatz in dem
+XML-SQL-Store vorgesehen wird. Die Tag-Attribute \mcridentifier{parasearch} und
+\mcridentifier{textsearch} haben keine Wirkung.\\[2ex]
+
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}[caption=XML-Syntax des Metadatenbasistyps MCRMetaXML,label=lst:xml_syntax_basistyp_mcrxml]
+ <tag class="MCRMetaXML" heritable="..." parasearch="...">
+  <subtag type="..." >
+   ...
+  </subtag>
+  ...
+ </tag>
+\end{lstlisting}
+
+\lstset{language=XML,fancyvrb=true,frame=btlr,breaklines,prebreak={\space\MyHookSign}}
+\begin{lstlisting}[caption=Beispiel-Syntax des Metadatenbasistyps MCRMetaXML,label=lst:beispiel_basistyp_mcrxml]
+ <tag class="MCRMetaPerson" heritable="true" parasearch="false">
+  <subtag type="tab1" >
+   <table width="100">
+    <tr>
+     <td>Col A</td>
+     <td>Col B</td>
+    </tr>
+   </table>
   </subtag>
   ...
  </tag>

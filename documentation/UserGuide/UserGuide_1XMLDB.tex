@@ -1,5 +1,5 @@
 
-\section{Hinweise zur Installation freier und komerzieller Datenbanken, XML:DB's und Web--Komponenten}
+\section{Hinweise zur Installation freier Datenbanken, XML:DB's, Text-Suchmaschinen und Web--Komponenten}
 %
 %
 \subsection{Installation der Komponenten unter Linux}
@@ -90,11 +90,11 @@ Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen kön
 
 \subsubsection{Die Installation der freien XML:DB eXist}
 
-eXist ist eine Frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. 
+eXist ist eine frei verfügbare XML:DB, welche die entsprechenden Interfaces implementiert. 
 Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. 
 So ist die Nutzung von eXist direkt möglich.
 \paragraph*{Vorbedingungen} 
-Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw Websphere Server nicht auf den Port 8080 hört, 
+Für das folgende Szenario ist darauf zu achten, dass der Tomcat bzw. Websphere Server nicht auf den Port 8080 hört, 
 da es ansonsten zu einem Konflikt mit der hier vorgestellten Installation kommt, 
 weil der eXist servlet Container ebenfalls standardmäßig auf den port 8080 hört. 
 Den Port für Tomact ändern sie in der {\it tomcatinstalldir/conf/server.xml}. 
@@ -112,6 +112,18 @@ in \$MYCORE\_HOME bzw. \$MYCORE\_SAMPLE\_HOME liegen.
 \item Anschliessend können Sie auch den Client mit {\tt <eXist-installdir>/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
 \end{enumerate}
 
+\subsubsection{Die Nutzung der freien Text-Suchmaschine Lucene}
+\label{sec:lucene_installation}
+
+Um die frei verfügbare Text-Suchmaschine für die Volltextsuche Lucene des Apache
+Jakarta Projektes (\url{http://jakarta.apache.org/lucene/docs/index.html}) 
+zu benutzen, bedarf es keiner zusätzlichen Installationen.
+Derzeit ist die Version Lucene 1.3 Final Released aktuell. 
+Die erforderliche \mcrfile{lucene-1.3-final.jar} Datei wird unter dem 
+MyCoRe-Kern im /mycorefile{lib} Verzeichnis mitgeliefert. Zur Nutzung ist
+lediglich die weiter hinten beschriebene Konfiguration in der MyCore-Anwendung
+nötig.
+
 \subsubsection{Die Installation von Apache 2}
 \label{sec:apchache2_installation}
 
@@ -124,7 +136,9 @@ Im Linux-Umfeld kann der Apache-Webserver als Standard betrachtet werden. Er ist
 Mit \mcrcommand{rcapache2 start} wird der Server per default Einstellungen gestartet und sollte jetzt über \url{http://localhost} erreichbar sein. Etwaige Fehlermeldunge werden in \mcrfile{/var/log/apache2/error\_log} geschrieben.\\[2ex]
 Die zentrale Konfigurationsdatei des Apache2 ist die unter \mcrpath{/etc/apache2} liegende Datei \mcrfile{httpd.conf}. Bevor irgendwelche Änderungen vorgenommen werden bitte immer ein Sicherheitskopie anlegen. Der Befehl (als root) \mcrcommand{/usr/sbin/apache2ctl configtest} Überprüft die Syntax ihrer geänderten Einstellungen.
 Vorerst sollten jedoch die Standard Einstellungen genügen.
-Mit \mcrcommand{rcapache2 [start; stop; restart]} als root kann der Server gestartet gestoppt bzw neugestartet werden und über \mcrcommand{rcapache2 [status]} wird der aktuelle Staus abgefragt.
+Mit \mcrcommand{rcapache2 [start; stop; restart]} als root kann der Server 
+gestartet gestoppt bzw. neugestartet werden und über \mcrcommand{rcapache2 
+[status]} wird der aktuelle Staus abgefragt.
 
 \subsubsection{Die Installation von Tomcat 4}
 
@@ -146,7 +160,7 @@ Weiterhin ist noch die richtige Gruppenzugehörigkeit für die Tomcat-Installation
 \begin{verbatim}
 chown wwwrun:nogroup -R /opt/jakarta/tomcat
 \end{verbatim}
-Mit \mcrcommand{rctomcat [start; stop; restart]} als root kann der Server gestartet gestoppt bzw 
+Mit \mcrcommand{rctomcat [start; stop; restart]} als root kann der Server gestartet gestoppt bzw. 
 neugestartet werden und über \mcrcommand{rctomcat [status]} wird der aktuelle Staus abgefragt. 
 Nach erfolgreichem starten des Tomcat Servers sollte er unter der Standardadresse \url{http://localhost:8080/examples} 
 erreichbar sein. 

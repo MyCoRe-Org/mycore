@@ -7,24 +7,66 @@
 %
 %
 Das MyCoRe-Projekt ist so designed, dass es dem einzelnen Anwender frei steht,
-welche Komponenten er für die Speicherung der Daten verwenden will. Dabei spielt natürlich das verwendete Betriebssystem eine wesentliche Rolle. Jedes System hat seine eigenen Vor- und Nachteile, die an dieser Stelle aber nicht dikutiert werden sollen. Vielmehr wollen wir es dem Anwender überlassen, in welchem System er für seine Anwendung die größten Vorteile sieht. Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des gewählten Basissystems. \\[2ex]
+welche Komponenten er für die Speicherung der Daten verwenden will. Dabei 
+spielt natürlich das verwendete Betriebssystem eine wesentliche Rolle. Jedes 
+System hat seine eigenen Vor- und Nachteile, die an dieser Stelle nur kurz
+dikutiert werden sollen. Wir wollen es dem Anwender überlassen, in welchem 
+System er für seine Anwendung die größten Vorteile sieht. Nachfolgend finden 
+Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des 
+gewählten Basissystems. \\[2ex]
 \small
-\bottomcaption{MyCoRe Komponentenübersicht}
+\bottomcaption{MyCoRe Komponentenübersicht für IBM CM}
 \tablehead{\hline}
 \tabletail{\hline}
-\begin{supertabular}{|p{2cm}|p{6cm}|p{6cm}|}
+\begin{supertabular}{|p{3cm}|p{11cm}|}
 \hline
- & {\bf IBM CM Basis} & {\bf freie Software} \\[1,5ex] \hline
-Metadaten Store & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & eXist - parametrische Suche mittels XPath Abfragen \\ \hline
-TextSearch & IBM DB2 NSE & lucene  \\ \hline
-Datenbank & IBM DB2 8.1 oder Oracle & MySQL 4.x \\ \hline
-Objekt & Filesystem, & Filesystem,  \\
-Store & IBM CM 8.2 Ressource Manager, &  \\ 
- & IBM Video Charger 8, & IBM Video Charger 8, \\
- & Helix Server & Helix Server  \\  \hline
-Systembasis & IBM AIX & alle Systeme mit Java \\
- & Sun Solaris & \\
- & MS Windows & \\
+{\bf allg. Basis} & komerzieller IBM Content Manager \\ \hline
+{\bf Metadaten Store} & IBM Content Manager 8.2 mit integrierter Text-Suchmashiene IBM NSE \\ \hline
+{\bf Volltextsuche} & Diese ist für die Nutzung des IBM CM Ressource Managers voll integriert. \\ \hline
+{\bf Datenbank} & Es wird die mitgelieferte DB2 Datenbank benutzt. \\ \hline
+{\bf Dokument Stores} & Filesystem \\
+ & IBM CM Ressource Manager \\
+ & IBM Video Carger \\
+ & Helix Server \\ \hline
+{\bf Web-Server} & IBM WebSphere \\ \hline
+{\bf Servlet-Engine} & IBM WebSphere \\ \hline
+{\bf OS} & IBM AIX \\
+ & Sun Solaris \\
+ & Linux \\
+ & Microsoft Windows \\ \hline
+{\bf Vorteile} & - Parametrische Metadaten-Werte können ggf. auch volltextindizeirt und so gesucht werden werden. \\
+ & - Viele Dokumenttypen lassen sich automatisch volltextindizieren. \\
+ & - Das Basisprodukt kommt von einem Hersteller. \\ \hline
+{\bf Nachteile} & - Sehr komplexe Installation des benötigten Content Manager / WebSphere Systems. \\
+ & - Abhängigkeit von den IBM Lizenz-Bedingungen. \\
+\hline
+\end{supertabular}
+\normalsize
+\\[2ex]
+\small
+\bottomcaption{MyCoRe Komponentenübersicht für freie Lösung}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{3cm}|p{11cm}|}
+\hline
+{\bf allg. Basis} & Lösung auf freien Komponenten \\ \hline
+{\bf Metadaten Store} & Es wird die freie XML:DB eXist benutzt. \\ \hline
+{\bf Volltextsuche} & Es wird die freie Text-Suchmaschine Lucene benutzt. \\ \hline
+{\bf Datenbank} & Es wird die freie Datenbank MySQL benutzt. \\ \hline
+{\bf Dokument Stores} & Filesystem \\
+ & Lucene für Textdokumente \\
+ & IBM Video Carger \\
+ & Helix Server \\ \hline
+{\bf Web-Server} & Apache / Tomcat \\ \hline
+{\bf Servlet-Engine} & Tomcat \\ \hline
+{\bf OS} & Linux \\
+ & Microsoft Windows \\ \hline
+{\bf Vorteile} & - Geringe Kosten durch die Nutzung freier Komponeneten. \\
+ & - Keine direkte Bindung an einen Hersteller. \\
+ & - Die Komponenten sind gut getestet und dokumentiert. \\ \hline
+{\bf Nachteile} & - Keine Lösung der Basis aus einer Hand. \\
+ & - Viele unterschiedliche Quellen der Komponenten. \\
+ & - Schwierige Installation auf nicht-Linux/MS Systemen. \\
 \hline
 \end{supertabular}
 \normalsize

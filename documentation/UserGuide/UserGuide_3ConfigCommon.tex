@@ -14,7 +14,7 @@ Umgebungsvariablen {\tt JAVA\_HOME} und {\tt ANT\_HOME} gesetzt haben. Sollten d
 gesetzt sein, können Sie dies in der Datei {\tt build.sh} (Unix) bzw. {\tt build.cmd} (Windows) nachholen und korrigieren. 
 
 Die MyCoRe Beispiel-Anwendung verwendet die Dateien aus dem MyCore Kern, insbesondere die erzeugte Datei 
-{\tt mycore-for[cm7|cm8|xmldb].jar} und die Konfigurationsdatei für den Build-Prozess {\tt build.properties}.
+{\tt mycore-for[cm8|xmldb].jar} und die Konfigurationsdatei für den Build-Prozess {\tt build.properties}.
 Wenn die Verzeichnisse {\tt mycore} und \\
 {\tt mycore-sample-application} auf Ihrem System nicht in einem gemeinsamen
 übergeordneten Verzeichnis liegen, können Sie im build-Skript auch die Umgebungsvariable {\tt MYCORE\_HOME} auf einen entsprechend
@@ -67,18 +67,15 @@ MCR.log4j.rootLogger=INFO, stdout
 #MCR.log4j.logger.org.mycore.services.oai=DEBUG, stdout
 \end{verbatim}
 
-\subsubsection{XML-Datenbank konfigurieren}
+\subsubsection{Metadaten-Store konfigurieren}
 
-Den Typ der zur Laufzeit des Systems zu wählenden XML-Datenbank haben Sie bereits in der Datei {\tt build.properties} 
-über den Parameter {\tt MCR.XMLStore.Type} festgelegt. Dabei sind die Werte {\tt cm7} für IBM Content Manager 7, 
-{\tt cm8} für IBM Content Manager 8, oder {\tt xmldb} für eine XML:DB kompatible XML-Datenbank wie Apache Xindice, eXist 
-oder Tamino (Software AG) möglich. Die MyCoRe Beispiel-Anwendung verwendet automatisch diese Konfiguration, sie 
-müssen nun nur noch die Parameter der einzelnen XML-Datenbanken konfigurieren.
-
-\subsubsection{Konfiguration von IBM Content Manager 7}
-
-Falls Sie {\tt MCR.XMLStore.Type=cm7} verwenden, passen Sie in der Datei \\
-{\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_cm7\_*} an.
+Den Typ des zur Laufzeit des Systems zu nutzenden Metadaten-Store konfigurieren
+haben Sie bereits in der Datei {\tt \$MYCORE\_HOME/bin/build.properties} 
+über den Parameter {\tt MCR.XMLStore.Type} festgelegt. Dabei sind die Werte
+{\tt cm8} für IBM Content Manager 8, oder {\tt xmldb} für eine XML:DB 
+kompatible XML-Datenbank wie eXist oder Tamino (Software AG) möglich. Die 
+MyCoRe Beispiel-Anwendung verwendet automatisch diese Konfiguration, sie 
+müssen nun nur noch die Parameter der einzelnen XML-Stores konfigurieren.
 
 \subsubsection{Konfiguration von IBM Content Manager 8}
 
@@ -110,6 +107,9 @@ Da der Persitence Layer CM8 auf einem Mapping der XML-Daten nach DB2 besteht, mü
 Falls Sie {\tt MCR.XMLStore.Type=xmldb} verwenden, passen Sie in der Datei \\
 {\tt mycore.properties.private} die Variablen {\tt MCR.persistence\_xmldb\_driver} \\
 und {\tt MCR.persistence\_xmldb\_database\_url} an.
+Die folgenden Zeilen sind für Nutzer der freien Software eXist gedacht. Sollten
+Sie eine andere XML:DB benutzen, passen sie die Daten bitte entsprechend den
+Erfordernissen an.
 
 \begin{verbatim}
 MCR.persistence_xmldb_driver=org.exist.xmldb.DatabaseImpl
@@ -117,7 +117,10 @@ MCR.persistence_xmldb_database_url=xmldb:exist://localhost:8081/db/mycore
 MCR.persistence_xmldb_database=exist
 \end{verbatim}
 
-Starten Sie nun den eXist-Client ({\it <eXist-installdir>/bin/client.sh} bzw. {\it cliend.cmd}) und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
+Die folgenden Zeilen sind für Nutzer der freien Software eXist gedacht. Sollten
+Sie eine andere XML:DB benutzen, passen sie die Daten bitte entsprechend den
+Erfordernissen an.
+Starten Sie nun den eXist-Client ({\it $<$eXist-installdir$>$/bin/client.sh} bzw. {\it cliend.cmd}) und führe Sie folgende Kommandos zum anlegen der Stores unter eXist aus:
 
 \begin{verbatim}
 mkcol mycore
@@ -132,9 +135,48 @@ chown guest guest derivate
 quit
 \end{verbatim}
 
-\subsubsection{Speicherung von Datei-Inhalten konfigurieren}
+\subsubsection{Speicherung von Dokumenten konfigurieren}
 
+Neben den Metadaten sind im Sample auch eine Reihe von Dokumenten und Bildern
+zum Laden in die Beispielanwendung abgelegt.\\[2ex]
+
+{\bf File System Store}\\
 In der Grundkonfiguration verwendet die Beispiel-Applikation zur Speicherung der Datei-Inhalte der Derivate das lokale Dateisystem. Passen Sie in der Datei \\
 {\tt mycore.properties.private} die Variable {\tt MCR.IFS.ContentStore.FS.BaseDirectory} 
-an und erzeugen Sie ein neues, leeres Verzeichnis am angegebenen Ort.
+an und erzeugen Sie ein neues, leeres Verzeichnis am angegebenen Ort.\\[2ex]
+
+{\bf Lucene Store}\\
+Sollten sie in der freien Variante noch die Textindizierung für 
+\mcrfile{*.txt} und \mcrfile{*.pdf} mittels Lucene wünschen, so sind noch
+folgende Dinge zu tun:
+
+\begin{enumerate}
+
+\item
+{\tt build.sh compile }
+
+\item
+{\tt build.sh plugins }
+
+\item
+Setzen Sie die nachfolgenden Variablen in {\tt mycore.properties.private} auf 
+die richtigen Werten. Dabei kann das Lucene.BaseDirectory auf das selbe 
+Verzeichnis verweisen wie der File System Store.\\
+{\tt MCR.PluginDirectory}\\
+{\tt MCR.IFS.ContentStore.Lucene.IndexDirectory}\\
+{\tt MCR.IFS.ContentStore.Lucene.BaseDirectory}
+
+\item
+Erzeugen Sie nun noch die eingetragenen Verzeichnisse.
+
+\item
+Als letztes muss noch in der Datei {\tt ContentStoreSelectionRules.xml} die
+Sektion für den Lucene-Store aktiviert werden.
+\end{enumerate}
+
+{\bf CM8 Store}\\
+Die Speicherung der Dokumente im IBM Content Manager bietet die Möglichkeit
+einer automatischen Textindizierung. Dazu müssen aber alle Konfigurationen
+für die Nutzung des TextSearch Extenders gesetzt werden. Siehe Installation
+CM.
 
