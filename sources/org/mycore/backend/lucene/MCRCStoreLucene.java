@@ -44,13 +44,15 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 
 import org.mycore.backend.filesystem.MCRCStoreLocalFilesystem;
@@ -81,15 +83,23 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	private static int docCount;
 
 	private static IndexReader indexReader;
+	private static Searcher indexSearcher;
+	
+	private static final String STORAGE_FIELD="StorageID";
+	private static final String DERIVATE_FIELD="DerivateID";
+	
 	/* (non-Javadoc)
 	 * @see org.mycore.datamodel.ifs.MCRContentStore#doDeleteContent(java.lang.String)
 	 */
 	protected void doDeleteContent(String storageID) throws Exception {
 		//remove from index
-		Term term = new Term("StorageID", storageID);
+		Term term = new Term(STORAGE_FIELD, storageID);
 		int deleted = indexReader.delete(term);
+		indexSearcher.close();
 		indexReader.close();
+		indexReader = null;
 		loadIndexReader();
+		loadIndexSearcher();
 		logger.debug("deleted " + deleted + " documents containing " + term);
 		//remove file
 		super.doDeleteContent(storageID);
@@ -113,7 +123,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 					+ file.getID()
 					+ " to local file system!");
 		doc = getDocument(file, isc.getNewInputStream());
-		Field storageID = new Field("StorageID", returns, true, true, false);
+		Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
 		doc.add(storageID);
 		try {
 			indexDocument(doc);
@@ -143,25 +153,27 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		if (indexWriter == null) {
 			logger.debug("creating IndexWriter...");
 			try {
-			if (indexDir.exists()){
-				//do some hardcore...
-				Directory index=FSDirectory.getDirectory(indexDir,false);
-				if (IndexReader.isLocked(indexDir.getAbsolutePath()))
-					IndexReader.unlock(index);
-			}
-			loadIndexWriter();
-			logger.debug("IndexWriter created...");
-			docCount = indexWriter.docCount();
+				if (indexDir.exists()) {
+					//do some hardcore...
+					Directory index = FSDirectory.getDirectory(indexDir, false);
+					if (IndexReader.isLocked(indexDir.getAbsolutePath()))
+						IndexReader.unlock(index);
+				}
+				loadIndexWriter();
+				logger.debug("IndexWriter created...");
+				docCount = indexWriter.docCount();
 				indexWriter.close();
 			} catch (IOException e) {
 				logger.error("Setting indexWriter=null");
-				indexWriter=null;
+				indexWriter = null;
 			}
 		}
 		if (indexReader == null) {
 			loadIndexReader();
 		}
-
+		if (indexSearcher == null) {
+			loadIndexSearcher();
+		}
 	}
 	private synchronized void loadIndexReader() {
 		try {
@@ -174,6 +186,12 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 					+ indexDir.getName(),
 				e);
 		}
+	}
+	private synchronized void loadIndexSearcher() {
+		if (indexReader == null) {
+			loadIndexReader();
+		}
+		indexSearcher = new IndexSearcher(indexReader);
 	}
 	private synchronized void loadIndexWriter() {
 		boolean create = true;
@@ -209,7 +227,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		if (reader instanceof MCRFile) {
 			MCRFile file = (MCRFile) reader;
 			Field derivateID =
-				new Field("DerivateID", file.getOwnerID(), true, true, false);
+				new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
 			Field fileID = new Field("FileID", file.getID(), true, true, false);
 			/* since file is stored elsewhere 
 			 * we only index the file and do not store
@@ -226,23 +244,29 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		} else
 			return null;
 	}
-	protected String[] getDerivateID(String docTextQuery) {
+	public String[] getDerivateID(String docTextQuery) {
 		String[] returns = null;
 		//maybe transform query here
-		String queryText = docTextQuery;
+		String queryText = parseQuery(docTextQuery);
 		try {
-			HashSet derivateIDs = getUniqueFieldValues("DerivateID");
+			HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD);
 			Iterator it = derivateIDs.iterator();
-			Hits hits;
+			Hits[] hits;
 			Document doc;
 			String derivateID;
 			HashSet collector = new HashSet();
 			int i = 0;
 			while (it.hasNext()) {
 				hits = getHitsForDerivate((String) it.next(), queryText);
-				if (hits.length() > 0) {
-					doc = hits.doc(0);
-					derivateID = doc.get("DerivateID");
+				//we have an array of hits each should contain only
+				//documents belonging to a single derivateID
+				boolean ok=true;
+				for (int j=0;j<hits.length;j++)
+					if(hits[j]==null || hits[j].length()==0)
+						ok=false;
+				if (ok) {
+					doc = hits[0].doc(0);
+					derivateID = doc.get(DERIVATE_FIELD);
 					if (derivateID != null) {
 						logger.debug(++i + ". " + derivateID);
 						collector.add(derivateID);
@@ -252,6 +276,9 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 								+ doc);
 					}
 				}
+//				else{
+//					logger.error("At least one hit returned was empty!");
+//				}
 			}
 			returns = MCRUtils.getStringArray(collector.toArray());
 		} catch (IOException e) {
@@ -263,10 +290,11 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	}
 
 	private void indexDocument(Document doc) throws IOException {
+		indexSearcher.close();
 		loadIndexWriter();
 		logger.debug(
 			"Create index for storageID="
-				+ doc.getField("StorageID").stringValue());
+				+ doc.getField(STORAGE_FIELD).stringValue());
 		indexWriter.addDocument(doc);
 		docCount++;
 		if (docCount % optimizeIntervall == 0) {
@@ -274,6 +302,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 			indexWriter.optimize();
 		}
 		indexWriter.close();
+		loadIndexSearcher();
 	}
 	private static Analyzer getAnalyzer() {
 		//TODO: have to replace GermanAnalyzer by more generic
@@ -306,38 +335,40 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		}
 		return collector;
 	}
-	private Hits getHitsForDerivate(String derivateID, String queryText) {
-		Hits hits = null;
-		Searcher searcher;
+	private Hits[] getHitsForDerivate(String derivateID, String queryText) {
+		Hits[] hits = null;
 		Analyzer analyzer = getAnalyzer();
 
-		BufferedReader in =
-			new BufferedReader(new InputStreamReader(System.in));
-		logger.debug("Query: ");
-		QueryParser parser = new QueryParser("content", analyzer);
+		logger.debug("Query: "+derivateID+"-->"+queryText);
+		LuceneCStoreQueryParser parser = new LuceneCStoreQueryParser("content", analyzer);
+		parser.setGroupingValue(derivateID);
 		//combine to a query over a specific DerivateID
-		StringBuffer queryStr =
-			new StringBuffer("DerivateID:\"").append(derivateID).append(
-				"\" ").append(
-				queryText);
+//		StringBuffer queryStr =
+//			new StringBuffer("DerivateID:\"").append(derivateID).append(
+//				"\" AND ").append(
+//				queryText);
 		try {
-			searcher = new IndexSearcher(indexReader);
-			try {
-				Query query = parser.parse(queryStr.toString());
-				logger.debug("Searching for: " + query.toString("content"));
-				hits = searcher.search(query);
-				logger.debug(hits.length() + " total matching documents");
-			} catch (ParseException e) {
-				StringBuffer msg =
-					new StringBuffer("Error while querying (")
-						.append(queryText)
-						.append(") over Files matching DerivateID=")
-						.append(derivateID)
-						.append("!");
-				throw new MCRPersistenceException(msg.toString(), e);
-			} finally {
-				searcher.close();
+			BooleanQuery[] queries = parser.getBooleanQueries(queryText);
+			hits=new Hits[queries.length];
+			for (int i=0;i<queries.length;i++){
+				logger.debug("  -Searching for: " + queries[i].toString("content"));
+				hits[i] = indexSearcher.search(queries[i]);
+				if(containsExclusiveClause(queries[i])){
+					//check that all documents meets negative clause
+					Hits test=indexSearcher.search(QueryParser.parse(derivateID,DERIVATE_FIELD,new WhitespaceAnalyzer()));
+					if (test.length()!=hits[i].length())
+						hits[i]=null;
+				}
+				//logger.debug(hits[i].length() + " total matching documents");
 			}
+		} catch (ParseException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while querying (")
+					.append(queryText)
+					.append(") over Files matching DerivateID=")
+					.append(derivateID)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
 		} catch (IOException e) {
 			StringBuffer msg =
 				new StringBuffer("Error while querying (")
@@ -348,6 +379,21 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 			throw new MCRPersistenceException(msg.toString(), e);
 		}
 		return hits;
+	}
+	
+	private final boolean containsExclusiveClause(BooleanQuery query){
+		BooleanClause[] clauses=query.getClauses();
+		if (clauses.length==1){
+			clauses=((BooleanQuery)clauses[0].query).getClauses();
+			if (clauses.length==2)
+				return clauses[1].prohibited;
+		}
+		return false;
+	}
+	
+	
+	protected static String parseQuery(String query){
+		return query;
 	}
 
 	protected void finalize() throws Throwable {

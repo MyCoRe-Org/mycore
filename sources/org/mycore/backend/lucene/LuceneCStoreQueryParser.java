@@ -1,0 +1,144 @@
+/**
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, normally in the file license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
+ **/
+package org.mycore.backend.lucene;
+
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+
+/**
+ * @author Thomas Scheffler (yagee)
+ * 
+ * Need to insert some things here
+ *
+ */
+public class LuceneCStoreQueryParser extends QueryParser {
+	private static final Logger logger =
+		Logger.getLogger(MCRCStoreLucene.class);
+	protected static final String GROUPING_FIELD = "DerivateID";
+	private String groupingValue;
+	Analyzer analyzer;
+	String field;
+
+	/** uses org.apache.lucene.queryParser.QueryParser to parse a query
+	 * and delivers a query that handles special condition of mycore derivates
+	 * 
+	 * @param f the default field for query terms.
+	 * @param a used to find terms in the query text.
+	 */
+	public LuceneCStoreQueryParser(String f, Analyzer a) {
+		super(f, a);
+		analyzer = a;
+		field = f;
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @return
+	 */
+	public String getGroupingValue() {
+		return groupingValue;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setGroupingValue(String string) {
+		if (string.indexOf(" ") != -1)
+			logger.error("Grouping value may not contain space characters");
+		groupingValue = string;
+	}
+
+	protected Query getBooleanQuery(Vector clauses) throws ParseException {
+		BooleanQuery query = new BooleanQuery();
+		BooleanQuery singleCombined;
+		BooleanClause clause;
+		BooleanClause combiner;
+		Vector v;
+		for (int i = 0; i < clauses.size(); i++) {
+			clause = (BooleanClause) clauses.elementAt(i);
+			if (!clause.prohibited && !clause.required) {
+				clause.required = true;
+			}
+			singleCombined = new BooleanQuery();
+			combiner =
+				new BooleanClause(
+					getFieldQuery(
+						GROUPING_FIELD,
+						new WhitespaceAnalyzer(),
+						groupingValue),
+					true,
+					false);
+			singleCombined.add(combiner);
+			singleCombined.add(clause);
+			v = new Vector();
+			v.add(combiner);
+			v.add(clause);
+			query.add(super.getBooleanQuery(v), false, false);
+		}
+		return query;
+	}
+	public Query parse(String query) throws ParseException {
+		Query queryTemp = super.parse(query);
+		if (queryTemp.toString(field).equals(query)) {
+			Vector v = new Vector();
+			BooleanClause clause = new BooleanClause(queryTemp, true, false);
+			v.add(clause);
+			return getBooleanQuery(v);
+		}
+		return queryTemp;
+	}
+	public BooleanQuery[] getBooleanQueries(String query) throws ParseException {
+		BooleanQuery bQuery = (BooleanQuery) parse(query);
+		BooleanClause[] clauses = bQuery.getClauses();
+		BooleanQuery[] queries = new BooleanQuery[clauses.length];
+		for (int i = 0; i < clauses.length; i++) {
+			if (clauses[i].prohibited == true
+				|| (clauses.length > 1 && clauses[i].required == true))
+				logger.error(
+					"Queries should be OR linked: "
+						+ clauses[i].prohibited
+						+ ":"
+						+ clauses[i].required
+						+ "\n"
+						+ clauses[i].query.toString(field));
+			queries[i] = bClauseToBQuery(clauses[i]);
+		}
+		return queries;
+	}
+	private final BooleanQuery bClauseToBQuery(BooleanClause clause)
+		throws ParseException {
+		BooleanQuery query = new BooleanQuery();
+		query.add(clause);
+		return query;
+	}
+
+}
