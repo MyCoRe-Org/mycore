@@ -51,5 +51,18 @@ public interface MCRQueryInterface
 public MCRXMLContainer getResultList(String query, String type,
   int maxresults);
 
+/**
+ * returns the ObjectID of the Object containing derivate with given ID
+ * @param DerivateID ID of Derivate
+ * @return ObjectID
+ */
+public String getObjectID(String DerivateID);
+
+/**
+ * returns XMLContainer containing mycoreobject related do DerivateID
+ * @param DerivateID
+ * @return
+ */
+public MCRXMLContainer getObjectForDerivate(String DerivateID);
 }
 
