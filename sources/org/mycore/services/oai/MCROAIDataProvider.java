@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.18 $ $Date: 2003/01/31 10:56:25 $
+ * $Revision: 1.19 $ $Date: 2003/01/31 11:04:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.18 $ $Date: 2003/01/31 10:56:25 $
+ * @version $Revision: 1.19 $ $Date: 2003/01/31 11:04:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -825,7 +825,7 @@ public class MCROAIDataProvider extends HttpServlet {
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
         //The number of arguments must not exceed maxArguments
-        if (badArgumentsFound(request, maxArguments)) {
+        if (badArguments(request, maxArguments)) {
         	logger.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
@@ -900,13 +900,13 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	
 	    	while (iterator.hasNext()) {
 	    		elementCounter++;
-	    		String[] set = (String[]) iterator.next();
+	    		String[] header = (String[]) iterator.next();
 	    		
 		        Element eHeader = new Element("header", ns);
-    	        eHeader.addContent(newElementWithContent("identifier", ns, set[0]));
-            	eHeader.addContent(newElementWithContent("datestamp", ns, set[1]));
-	            if ((set[2] != null) && (set[2].length() > 0)) {
-		    	    StringTokenizer tokenizer = new StringTokenizer(set[2], " ");
+    	        eHeader.addContent(newElementWithContent("identifier", ns, header[0]));
+            	eHeader.addContent(newElementWithContent("datestamp", ns, header[1]));
+	            if ((header[2] != null) && (header[2].length() > 0)) {
+		    	    StringTokenizer tokenizer = new StringTokenizer(header[2], " ");
     	    	
 	    	    	while (tokenizer.hasMoreTokens()) {
                         eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
