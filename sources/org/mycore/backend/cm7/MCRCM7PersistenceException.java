@@ -33,8 +33,8 @@ import mycore.common.MCRPersistenceException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  * @see RuntimeException
- * @see MCRException
- * @see MCRPersistenceException
+ * @see mycore.common.MCRException
+ * @see mycore.common.MCRPersistenceException
  **/
 public class MCRCM7PersistenceException extends MCRPersistenceException
 {
