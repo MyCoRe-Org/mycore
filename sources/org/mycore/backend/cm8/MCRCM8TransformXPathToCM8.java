@@ -272,6 +272,7 @@ private final String traceOneCondition(String condstr, String itemtypeprefix)
         if (tag[counter].charAt(j) == '@') {
           nt = tag[counter].substring(j,tag[counter].length()); }
         if (tag[counter].charAt(j) == '*') { nt = "*"; }
+        if (tag[counter].indexOf("ts()",j) != -1) { nt = "*"; }
         if (tag[counter].indexOf("text()",j) != -1) { nt = "text()"; }
         if (nt.length() == 0) { 
           nt = "text()"; 
