@@ -366,7 +366,7 @@ public class MCRLayoutServlet extends HttpServlet
       { stylesheet = factory.newTemplates( new StreamSource( file ) ); }
       catch( TransformerConfigurationException exc )
       {
-        String msg = "Error while compiling XSL stylesheet " + file.getName();
+        String msg = "Error while compiling XSL stylesheet " + file.getName() +":\n"+exc.getMessageAndLocation();
         throw new MCRConfigurationException( msg, exc );
       }
       
@@ -382,7 +382,7 @@ public class MCRLayoutServlet extends HttpServlet
     { return factory.newTransformerHandler( stylesheet ); }
     catch( TransformerConfigurationException exc )
     {
-      String msg = "Error while compiling XSL stylesheet";
+      String msg = "Error while compiling XSL stylesheet:\n"+exc.getMessageAndLocation();
       throw new MCRConfigurationException( msg, exc );
     }
   }  
