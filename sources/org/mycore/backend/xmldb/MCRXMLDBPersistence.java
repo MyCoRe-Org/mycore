@@ -183,7 +183,7 @@ public void delete( MCRObjectID mcr_id )
     if ( null != document ) {
       collection.removeResource(document); }
     else {
-      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+" does not exist."); }
+      logger.warn("A object with ID "+mcr_id.getId()+" does not exist."); }
     }
   catch( Exception e ) {
     throw new MCRPersistenceException( e.getMessage(), e ); }
