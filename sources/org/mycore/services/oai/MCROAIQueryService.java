@@ -1,4 +1,5 @@
 /**
+/**
  * $RCSfile: MCROAIQueryService.java,v $
  * $Revision: 1.10 $ $Date: 2003/01/31 11:56:25 $
  *
@@ -264,7 +265,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				separated list of categories the element is classified in
 	 * 				and a JDOM element with the metadata of the record
 	 */
-	public List getRecord(String id, String instance) {
+	public List getRecord(String id, String metadataPrefix, String instance) {
 		List list = new ArrayList();
 
         MCRObject object = new MCRObject();
