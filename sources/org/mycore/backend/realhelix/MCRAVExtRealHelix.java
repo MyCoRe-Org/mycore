@@ -113,7 +113,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
       }
       else if( sType.indexOf( "MPEG" ) >= 0 )
       {
-        contentTypeID = "mpeg1";
+        contentTypeID = "mpegvid";
         mediaType     = VIDEO;
       }
       else if( sType.indexOf( "RealVideo" ) >= 0 )
