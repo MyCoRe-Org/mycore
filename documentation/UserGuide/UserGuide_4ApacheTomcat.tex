@@ -1,0 +1,271 @@
+\section{Tomcat und Apache 2}
+Ziel dieses Szenarios ist, dass unter mcradmin (oder einem anderen User) mehrere Applikationen mit verschiedenen URL Aliasen parallel laufen und sich dabei nicht ins Gehege kommen. Konkret bedeuted dies, dass verschiedene Tomcat Instanzen, die über einen Connector in den Apache Server integriert sind, parallel nebeneinander laufen. Zudem können die einzelenen Applikationen über eigene URLs angesprochen werden was mit Aapche über sogenannte virtual hosts realisiert wird.
+Das folgende Beispiel ist etwas SuSE spezifisch sollte sich jedoch ohne weiteres auch auf eine andere Distribution übertragen lassen . Eine sehr gute Anleitung findet sich jedoch auch in der Dokumentation von Tomcat.
+
+\subsection{Funktionsweise}
+
+
+\subsection{Installation}
+Als Ausgangsbedingung wird die in Kapitel \ref{sec:installationlinux} beschriebene Installation zugrundegelegt.
+In allen gängigen Distributionen ist auch der Tomcat Server enthalten. Unter SuSE empfehle ich das von mir neu erstellte Tomcat Paket zu installieren. Es sollte auch mit niedrigeren Version funkltionieren, allerding sind diese zum Teil noch etwas buggy. Ansonsten kann man auch die Binaries von der Tomcat Homepage herunterladen.
+\begin{itemize}
+\item {\bf jakarta-tomcat-4.1.27-37} oder höher
+\item {\bf apache2-jakarta-tomcat-connectors-4.1.27-37} oder höher
+\end{itemize}
+
+\section{Einrichten der Tomcat Instanzen}
+Zum Betreiben mehrer Tomcat Instanzen werden folgende zwei Variablen benötigt \$CATALINA\_BASE und \$CATALINA\_HOME.
+
+\begin{quotation}
+\$CATALINA\_HOME: This environment variable indicates the location of the root Tomcat install directory. This is where Tomcat can find the main scripts, system jar files, etc. As outlined in this document, the value should be \mcrpath{/opt/jakarta/tomcat}.
+\$CATALINA\_BASE: When running multiple instances of Tomcat this variable indicates where the root location of one of the instances. This is so Tomcat can find instance configuration information, temporary file locations, etc. When you have a single instance of Tomcat it is typically the same as \$CATALINA\_HOME.
+\end{quotation}
+
+Für eine Mehr-Instanzen Umgebung legen sie bitte folgendes Verzeichnis an:
+Führen sie folgende Befehle aus:
+\mcrcommand{cd /dlwww}
+\mcrcommand{mkdir tomcat-instances}
+\mcrcommand{cd tomcat-instances}
+
+Die Beschreibung ist für mehere Tomcat Instanzen geeignet, jedoch wird im Folgenden nur eine Instanz beschrieben. Für weitere Instanten ist analog  dazu vorzugehen.
+Als nächstes wird für jede neue Tomcat Instanz ein Verzeichnis mit folgender Unterverzeichnisstruktur angelegt.
+
+\mcrcommand{mkdir mycoresample}
+\mcrcommand{cd mycoresample}
+
+\mcrcommand{cp -r \$CATALINA\_HOME/conf .}
+\mcrcommand{mkdir bin logs temp webapps work}
+
+Kopiere die Datei \mcrfile{mycoresample.war} in das \mcrpath{\$CATALINA\_BASE/webapps} Verzeichnis.
+
+Erstelle das mycoresample.sh Skript zum Starten und Stoppen in \mcrpath{\$CATALINA\_BASE/bin}.
+
+\begin{verbatim}
+#!/bin/sh
+# set the environment
+
+CATALINA\_BASE=/dlwww/tomcat-instances/mycoresample
+CATALINA\_HOME=/opt/jakarta/tomcat
+JAVA_HOME=/usr/lib/java
+CATALINA\_OPTS="$CATALINA\_OPTS -server -Xms64m -Xmx256m -Xincgc"
+
+#für IBM Java
+#CATALINA\_OPTS="$CATALINA\_OPTS -Xms64m -Xmx256m -Xgcpolicy:optavgpause"
+
+
+export CATALINA\_BASE CATALINE_HOME JAVA_HOME CATALINA\_OPTS
+
+exec "$CATALINA\_HOME"/bin/catalina.sh "$@"
+\end{verbatim}
+
+Nun legen sie am besten die Datei \mcrfile{server.xml} neu im \mcrpath{\$CATALINA\_BASE/conf} mit folgendem Inhalt an.
+Ändern sie den Hostnamen entsprechend ihrer Umgebung. Es ist der selbe Hostname wie wir ihn im folgenden Abschnitt unter VirtualHost einrichten. Wenn sie den Port ändern wollen vergessen sie nicht auch Anpassungen in den Dateien \mcrfile{jk2.properties} und \mcrfile{workers2.properties} vorzunehmen.
+
+\begin{verbatim}
+<!-- Mycore Configuration File -->
+
+<Server port="8006" shutdown="SHUTDOWN" debug="0">
+  <!-- Define an Apache-Connector Service -->
+
+  <Service name="Tomcat-Apache">
+
+   <!-- Define a Coyote/JK2 AJP 1.3 Connector on port 8019 -->
+    <Connector className="org.apache.coyote.tomcat4.CoyoteConnector"
+               port="8019" minProcessors="5" maxProcessors="75"
+               enableLookups="false"
+               acceptCount="10" debug="0" connectionTimeout="0"
+               useURIValidationHack="false"
+               protocolHandlerClassName="org.apache.jk.server.JkCoyoteHandler"/>
+
+      <Engine name="Apache" defaultHost="your_host_name" debug="0">
+
+         <Logger className="org.apache.catalina.logger.FileLogger"
+              prefix="apache_log." suffix=".txt"
+              timestamp="true"/>
+
+<!-- Access log processes all requests for this virtual host. -->
+      <Valve className="org.apache.catalina.valves.AccessLogValve"
+       directory="logs"  prefix="your_host_name" suffix=".txt"
+       pattern="common" resolveHosts="false"/>
+
+        <Host name="your_host_name" debug="0"
+         appBase="/dlwww/tomcat-instances/mycoresample/webapps"
+         unpackWARs="true" autoDeploy="true">
+
+			<Alias>mycoresample</Alias>
+
+			<Context path="" docBase="" debug="0"/>
+            <Valve className="org.apache.catalina.valves.AccessLogValve"
+             directory="logs"  prefix="home_access_log." suffix=".txt"
+            pattern="common" resolveHosts="false"/>
+
+		</Host>
+
+   </Engine>
+
+  </Service>
+
+</Server>
+
+\end{verbatim}
+
+Um den Connector einzurichten sind folgende Dateien zu editieren \mcrfile{jk2.properties} und \mcrfile{workers2.properties}
+
+Folgende zwei Zeilen in \mcrfile{\$CATALINA\_HOME/conf/jk2.properties} einfügen.
+
+\begin{verbatim}
+handler.list=channelSocket,request
+channelSocket.port=8019
+\end{verbatim}
+
+Am besten die Datei \mcrfile{\$CATALINA\_HOME/conf/workers2.properties} neu anlegen.
+
+\begin{verbatim}
+[logger]
+level=DEBUG
+
+# Alternate file logger
+[logger.file:0]
+level=DEBUG
+file=/var/log/jk2.log
+
+[config:]
+file=/opt/jakarta/tomcat/conf/workers2.properties
+debug=0
+debugEnv=0
+
+[shm:]
+info=Scoreboard. Required for reconfiguration and status with multiprocess servers
+file=/var/log/jk2.shm
+size=1000000
+debug=0
+disabled=0
+
+[workerEnv:]
+info=Global server options
+timing=1
+debug=0
+
+[lb:lb]
+info=Default load balancer.
+debug=0
+
+[channel.socket:localhost:8019]
+info=Ajp13 forwarding over socket
+debug=0
+group=lb
+tomcatId=mycoresample-tc
+lb_factor=1
+
+[status:]
+info=Status worker, displays runtime informations
+
+[uri:/jkstatus/*]
+info=Display status information and checks the config file for changes.
+group=status:
+
+\end{verbatim}
+
+Der Apache Server wird über die \mcrfile{httpd.conf} folgendermaßen eingerichtet.
+
+\begin{verbatim}
+
+
+LoadModule jk2_module       /usr/lib/apache2/mod_jk2.so
+
+<IfModule mod_jk2.c>
+  JkSet config:file /opt/jakarta/tomcat/conf/workers2.properties
+</IfModule>
+
+<VirtualHost *>
+     ServerAdmin admin@your_host_name
+     DocumentRoot /dlwww/tomcat-instances/mycoresample/webapps
+     ServerName your_host_name
+
+Alias /mycoresample "/dlwww/tomcat-instances/mycoresample/webapps/mycoresample"
+<Directory "/dlwww/tomcat-instances/mycoresample/webapps/mycoresample" >
+  Options Indexes FollowSymLinks
+  DirectoryIndex
+  AddHandler jakarta-servlet2 .jsp
+</Directory>
+
+<Location "/mycoresample/WEB-INF" >
+  AllowOverride None
+  Deny from all
+</Location>
+
+<Location "/mycoresample/META-INF" >
+  AllowOverride None
+  Deny from all
+</Location>
+
+<Location "/mycoresample*.xml" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRStaticXMLFileServlet
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRSearchMaskServlet" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRSearchMaskServlet
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRQueryServlet" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRQueryServlet
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRNBNResolver" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRNBNResolver
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRNBNResolver/*" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRNBNResolver
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRFileNodeServlet/*" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRFileNodeServlet
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCROAIDataProvider" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCROAIDataProvider
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+<Location "/mycoresample/servlets/MCRLoginServlet" >
+  SetHandler jakarta-servlet2
+  JkUriSet group lb
+  JkUriSet servlet MCRLoginServlet
+  JkUriSet host mycoresample.feld45.lan
+  JkUriSet context /mycoresample
+</Location>
+
+</VirtualHost>
+
+
+\end{verbatim}
+Das sollte es auch schon gewesen sein. Jetzt nur noch starten mit \mcrcommand{\$CATALINA\_BASE/bin/mycoresample.sh} und \mcrcommand{rcapache2 restart}. Ein Blick auf \url{http://your_host_name/mycoresample} sollte jetzt die Startseite liefern. Zudem lohnt sich oft auch \url{http://your_host_name/jkstatus} aufzurufen um zu den Status des JK Connectors zu überprüfen.
+Zum erstellen des Mappings habe ich das Java Progrämmchen WebXml2Jk verwendet, das in den Tomcat-Connector Sources enthalten ist.
