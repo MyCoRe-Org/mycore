@@ -364,7 +364,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    try {
 		    dir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
 	    } catch (MCRConfigurationException mcrx) {
-	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterst�tzt.");
+	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterst?tzt.");
 	    	return null;
 	    }
 	    
@@ -401,7 +401,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    dir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
 		    timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
 	    } catch (MCRConfigurationException mcrx) {
-	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterst�tzt.");
+	    	logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_DIR + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterst?tzt.");
 	    	return;
 	    } catch (NumberFormatException nfx) {
 	    	timeout = 72;
@@ -421,7 +421,7 @@ public class MCROAIDataProvider extends HttpServlet {
             File tmpFile = tokenList[i];
             fileAge = now.getTime() - tmpFile.lastModified(); // in milliseconds!
             if (fileAge > timeout * 3600000) {
-	        	logger.debug("Token File " + tmpFile.getName() + " wird gel�scht.");
+	        	logger.debug("Token File " + tmpFile.getName() + " wird gel?scht.");
                 tmpFile.delete();
             }
         }
@@ -606,7 +606,7 @@ public class MCROAIDataProvider extends HttpServlet {
         org.jdom.Document document = header;
         
         if (badArguments(request, 1)) {
-        	logger.info("Es wurden �berfl�ssige Argumente an die Anfrage �bergeben. Nach OAI 2.0 erfolgt hier ein Abbruch.");
+        	logger.info("Es wurden ???berfl???ssige Argumente an die Anfrage ???bergeben. Nach OAI 2.0 erfolgt hier ein Abbruch.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -803,7 +803,7 @@ public class MCROAIDataProvider extends HttpServlet {
         }
         //The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
-        	logger.info("Anfrage 'listSets' enth�lt fehlerhafte Parameter.");
+        	logger.info("Anfrage 'listSets' enth???lt fehlerhafte Parameter.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
         
@@ -819,7 +819,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    try {
 				eListSets = listFromResumptionToken(eListSets, resumptionToken[0], "null");
 				if (eListSets == null) {
-        			logger.info("Anfrage 'listSets' enth�lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+        			logger.info("Anfrage 'listSets' enth???lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
 				}
 		        eRoot.addContent(eListSets);
@@ -941,7 +941,7 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
             maxArguments++;
             if ((from != null) || (until != null) || (set != null) || (metadataPrefix != null)) {
-    	    	logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    	logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
@@ -949,7 +949,7 @@ public class MCROAIDataProvider extends HttpServlet {
     	    if (from != null) {
         		fromDate = getDate(from[0]);
         		if (fromDate == null) {
-    	    		logger.info("Anfrage 'listIdentifiers' enth�lt fehlerhafte Parameter.");
+    	    		logger.info("Anfrage 'listIdentifiers' enth???lt fehlerhafte Parameter.");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
     	    	}
         	    maxArguments++;
@@ -960,12 +960,12 @@ public class MCROAIDataProvider extends HttpServlet {
     	    if (until != null) {
         		untilDate = getDate(until[0]);
         		if (untilDate == null) {
-    	    		logger.info("Anfrage 'listIdentifiers' enth�lt fehlerhafte Parameter.");
+    	    		logger.info("Anfrage 'listIdentifiers' enth???lt fehlerhafte Parameter.");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
     	    	}
         		if (fromDate != null) {
         			if (fromDate.after(untilDate)) {
-    		    		logger.info("Anfrage 'listIdentifiers' enth�lt fehlerhafte Parameter.");
+    		    		logger.info("Anfrage 'listIdentifiers' enth???lt fehlerhafte Parameter.");
 		           		return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	        		}
     	    	}
@@ -975,7 +975,7 @@ public class MCROAIDataProvider extends HttpServlet {
         	    maxArguments++;
 	        }
         	if (metadataPrefix == null) {
-    	    	logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    	logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         	}
         }
@@ -1028,7 +1028,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    try {
 				eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0], prefix);
 				if (eListIdentifiers == null) {
-        			logger.info("Anfrage 'listIdentifiers' enth�lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+        			logger.info("Anfrage 'listIdentifiers' enth???lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
 				}
 		        eRoot.addContent(eListIdentifiers);
@@ -1267,7 +1267,7 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
             maxArguments++;
             if ((from != null) || (until != null) || (set != null) || (metadataPrefix != null)) {
-    	    	logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    	logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
@@ -1275,7 +1275,7 @@ public class MCROAIDataProvider extends HttpServlet {
     	    if (from != null) {
         		fromDate = getDate(from[0]);
         		if (fromDate == null) {
-    	    		logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    		logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
     	    	}
         	    maxArguments++;
@@ -1286,12 +1286,12 @@ public class MCROAIDataProvider extends HttpServlet {
     	    if (until != null) {
         		untilDate = getDate(until[0]);
         		if (untilDate == null) {
-    	    		logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    		logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
     	    	}
         		if (fromDate != null) {
         			if (fromDate.after(untilDate)) {
-    		    		logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    		    		logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 		           		return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	        		}
     	    	}
@@ -1301,13 +1301,13 @@ public class MCROAIDataProvider extends HttpServlet {
         	    maxArguments++;
         	}
         	if (metadataPrefix == null) {
-    	    	logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+    	    	logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         	}
         }
         //The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
-        	logger.info("Anfrage 'listRecords' enth�lt fehlerhafte Parameter.");
+        	logger.info("Anfrage 'listRecords' enth???lt fehlerhafte Parameter.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
         
@@ -1354,7 +1354,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		    try {
 				eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0], prefix);
 				if (eListRecords == null) {
-        			logger.info("Anfrage 'listRecords' enth�lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+        			logger.info("Anfrage 'listRecords' enth???lt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
 		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
 				}
 		        eRoot.addContent(eListRecords);
@@ -1516,7 +1516,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			throw new MCRException("Error in legalOAIIdentifier");
 		}
 		
-		String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*�()");
+		String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*???()");
 		StringBuffer buffer = new StringBuffer(tokenizer.nextToken());
 		while (tokenizer.hasMoreTokens()) {
 			buffer.append(":")
