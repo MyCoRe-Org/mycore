@@ -71,6 +71,7 @@ public final static int FORMAT_LINK = 5;
 public final static int FORMAT_CLASSID = 6;
 public final static int FORMAT_CATEGID = 7;
 private final static int FORMAT_LAST = 7;
+private final static int FORMAT_XML = 8;
 
 // static 
 private static String default_lang;
@@ -289,6 +290,28 @@ public final boolean addStringElement(int intype, String inname,
   type.add(new Integer(intype));
   name.add(inname);
   format.add(new Integer(FORMAT_STRING));
+  value.add(invalue);
+  return true;
+  }
+
+/**
+ * This method add a XML String to this list.
+ *
+ * @param intype     TYPE_VALUE
+ * @param inname     a name as a String
+ * @param invalue    the value as an String
+ * @return false if an error was occured, else return true
+ **/
+public final boolean addXMLElement(int intype, String inname,
+  String invalue)
+  {
+  if (intype!=TYPE_VALUE) { return false; }
+  if (intype==TYPE_VALUE) { inname = ""; }
+  else { if (inname==null) { return false; } }
+  if (invalue==null) { return false; }
+  type.add(new Integer(intype));
+  name.add(inname);
+  format.add(new Integer(FORMAT_XML));
   value.add(invalue);
   return true;
   }
