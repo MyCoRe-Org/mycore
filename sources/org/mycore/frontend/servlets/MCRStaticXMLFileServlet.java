@@ -26,6 +26,8 @@ package org.mycore.frontend.servlets;
 
 import org.mycore.common.*;
 
+import org.apache.log4j.*;
+
 import java.net.*;
 import java.io.*;
 
@@ -41,10 +43,13 @@ import javax.servlet.http.*;
  */
 public class MCRStaticXMLFileServlet extends HttpServlet
 {
+  protected final static Logger logger = Logger.getLogger(  MCRStaticXMLFileServlet.class );
+
   public void doGet( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, java.io.IOException
   {
     String requestedPath = request.getServletPath();
+    logger.info( "MCRStaticXMLFileServlet " + requestedPath );
     URL url = null;
     
     try{ url = getServletContext().getResource( requestedPath ); }
