@@ -69,7 +69,7 @@ import org.mycore.common.MCRConfiguration;
  * // Now you are able to set some properties (if you want!):
  * Properties parameters = new Properties();
  * ...
- * setParameters(th, parameters);
+ * transformation.setParameters(th, parameters);
  * 
  * // Finally, you need an OutputStream and might get at work:
  * OutputStream out = response.getOutputStream();
