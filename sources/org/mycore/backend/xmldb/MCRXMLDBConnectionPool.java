@@ -136,6 +136,7 @@ public class MCRXMLDBConnectionPool
   public synchronized Collection getConnection( String collection )
     throws MCRPersistenceException
     {
+     collection = collection.toLowerCase();   
      Collection connection;
      try {
      // Do we have to build a connection or is there already one?
@@ -147,7 +148,7 @@ public class MCRXMLDBConnectionPool
        connections.removeElement( connection );
        connection = buildConnection( collection ); 
        }
-     connections.addElement( connection );
+//     connections.addElement( connection );
      }
      catch( Exception e ) {
        throw new MCRPersistenceException( e.getMessage(), e );
@@ -163,10 +164,18 @@ public class MCRXMLDBConnectionPool
    **/
   public synchronized void releaseConnection( Collection connection )
     {
-/*        
     if( connection == null ) return;
+    try {
+      connection.close();
+     }
+     catch( Exception e ) {
+       throw new MCRPersistenceException( e.getMessage(), e );
+     }
+/*    
     if( connections.contains( connection ) )
+    {    
       connections.removeElement( connection );
+    }  
  */
     }
 

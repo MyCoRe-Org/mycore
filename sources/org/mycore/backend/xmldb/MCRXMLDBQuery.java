@@ -23,6 +23,7 @@
  **/
 package org.mycore.backend.xmldb;
 
+import java.io.*;
 import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
@@ -32,6 +33,9 @@ import org.mycore.services.query.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import org.jdom.*;
+import org.jdom.input.*;
+import org.jdom.output.*;
 
 /**
  * This is the implementation of the MCRQueryInterface for the XML:DB API
@@ -76,8 +80,6 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
     public final MCRXMLContainer getResultList( String query,
 						String type,
 						int maxresults ) {
-	// This has to be parametrized!
-	String projectID = "MyCoReDemoDC";
 
 	MCRXMLContainer result = new MCRXMLContainer();
 	if( (type == null) || ((type = type.trim()).length() == 0) )
@@ -88,21 +90,22 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	    query = "/*";
         query = handleQueryString( query, type);
 	try {
-	    Collection typeCollection = MCRXMLDBConnectionPool.instance().getConnection( type.toLowerCase() );
+	    Collection collection = MCRXMLDBConnectionPool.instance().getConnection( type );
 	    XPathQueryService xps =
-		(XPathQueryService)typeCollection.getService(
-							     "XPathQueryService", "1.0" );
+		(XPathQueryService)collection.getService( "XPathQueryService", "1.0" );
 	    
+            MCRXMLDBConnectionPool.instance().releaseConnection( collection );
 	    ResourceSet resultset = xps.query( query );
 	    //	    System.out.println( "Results: " + resultset.getSize() );
 
 	    String objid = "";
+            org.jdom.Document doc;
 	    ResourceIterator ri = resultset.getIterator();
 	    while( ri.hasMoreResources() ) {
 		XMLResource xmldoc = (XMLResource)ri.nextResource();
-		MCRXMLDBItem item = new MCRXMLDBItem( xmldoc );
-		objid = item.getId().getId();
-		byte[] xml = MCRUtils.getByteArray( item.getContent() );
+                doc        = MCRXMLDBPersistence.convertResToDoc( xmldoc );
+                objid      =  doc.getRootElement().getAttribute( "ID" ).getValue();
+		byte[] xml = MCRUtils.getByteArray( doc );
 		result.add( "local", objid, 0, xml );
 	    }
 	}
@@ -144,11 +147,6 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
      * Handle query string for exist
      **/
     private String handleQueryStringExist( String query, String type ) {
-// with exist dev version from 03/07/03 no longer needed        
-//        if ( query.equals( "/*" ))
-//          query = "xcollection('/db/mycore/" + type + "')/mycoreobject";
-//        query = MCRUtils.replaceString(query, "like", "=");
-// a lot of queries of mycore sample (document and legal entity) work!!
         query = MCRUtils.replaceString(query, "like", "&=");
 //        query = MCRUtils.replaceString(query, "contains(", "contains(.,");
         query = MCRUtils.replaceString(query, ")", "");
