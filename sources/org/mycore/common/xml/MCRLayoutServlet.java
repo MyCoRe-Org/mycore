@@ -62,13 +62,24 @@ public class MCRLayoutServlet extends HttpServlet
     
     // Create caches
     stylesheetCache = new MCRCache( 50 );
-
   }
+
+
+
+ /**
+  * Reads the input XML from a file or from the invoking servlet,
+  * chooses a stylesheet and does the layout by applying the XSL
+  * stylesheet. This method handles HTTP POST requests.
+  */
+  public void doPost( HttpServletRequest  request,
+                      HttpServletResponse response )
+    throws IOException, ServletException
+  { doGet( request, response ) ; }
     
  /**
   * Reads the input XML from a file or from the invoking servlet,
   * chooses a stylesheet and does the layout by applying the XSL
-  * stylesheet.
+  * stylesheet. This method handles HTTP GET requests.
   */
   public void doGet( HttpServletRequest  request, 
                      HttpServletResponse response ) 
@@ -96,10 +107,16 @@ public class MCRLayoutServlet extends HttpServlet
       String styleDir     = "/WEB-INF/stylesheets/";
       
       File styleFile = getStylesheetFile( styleDir, styleName );
-      Templates stylesheet = getCompiledStylesheet( factory, styleFile );
-      TransformerHandler handler = getHandler( stylesheet );
-      setXSLParameters( handler, parameters );
-      transform( xml, stylesheet, handler, response );
+
+      if( styleFile == null ) 
+        renderAsXML( xml, response );
+      else
+      {
+        Templates stylesheet = getCompiledStylesheet( factory, styleFile );
+        TransformerHandler handler = getHandler( stylesheet );
+        setXSLParameters( handler, parameters );
+        transform( xml, stylesheet, handler, response );
+      }
     }
   }
 
@@ -295,11 +312,8 @@ public class MCRLayoutServlet extends HttpServlet
     String path = getServletContext().getRealPath( dir + name );
     File file = new File( path );
     
-    if( ! file.exists() )
-    {
-      String msg = "XSL stylesheet " + path + " does not exist";
-      throw new MCRConfigurationException( msg );
-    }  
+    if( ! file.exists() ) return null;
+
     if( ! file.canRead() )
     {
       String msg = "XSL stylesheet " + path + " not readable";
