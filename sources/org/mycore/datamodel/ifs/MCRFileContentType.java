@@ -24,12 +24,6 @@
 
 package mycore.ifs;
 
-import mycore.common.*;
-import org.jdom.*;
-import org.jdom.input.*;
-import java.util.*;
-import java.io.*;
-
 /**
  * Instances of this class represent information about the content type
  * of a file.
@@ -48,14 +42,19 @@ public class MCRFileContentType
   protected String mimeType;
   
   /** 
-   * Constructs a new file content type instance.
+   * Constructs a new file content type instance. The list of known file content
+   * types is defined in an XML file that is specified in the property
+   * MCR.IFS.FileContentTypes.DefinitionFile, and that file is searched in the
+   * CLASSPATH directories or JAR files and parsed by MCRFileContentTypeFactory.
+   *
+   * @see MCRFileContentTypeFactory
    *
    * @param ID the unique content type ID
    * @param label the label of this content type
    * @param url the url where information like a plug-in can be found
    * @param mimeType the MIME type used for this content type
    */
-  protected MCRFileContentType( String ID, String label, String url, String mimeType )
+  MCRFileContentType( String ID, String label, String url, String mimeType )
   {
     this.ID = ID;
     this.label = label;
@@ -91,72 +90,4 @@ public class MCRFileContentType
    */  
   public String getURL() 
   { return this.url; }
-
-  /** 
-   * Table for looking up all file content types by ID
-   */  
-  protected static Hashtable typesTable = new Hashtable();
- 
-  /**
-   * Read the file content types from the file FileContentTypes.xml
-   * somewhere in the CLASSPATH directories or JAR files and 
-   * instantiates the objects.
-   *
-   * @throws MCRConfigurationException if the file FileContentTypes.xml can not be found or parsed
-   */
-  static
-  {
-    InputStream in = MCRFileContentType.class.getResourceAsStream( "/FileContentTypes.xml" );
-    if( in == null )
-    {
-      String msg = "Configuration file FileContentTypes.xml not found in CLASSPATH";
-      throw new MCRConfigurationException( msg );
-    }
-    
-    try
-    {
-      Document xml = new SAXBuilder().build( in );
-      // TODO: Validate and provide a DTD/Schema file
-    
-      List types = xml.getRootElement().getChildren( "type" );
-      for( int i = 0; i < types.size(); i++ )
-      {
-        Element xType = (Element)( types.get( i ) );
-        String ID    = xType.getAttributeValue( "ID" );
-        String label = xType.getChildTextTrim( "label" );
-        String url   = xType.getChildTextTrim( "url"   );
-        String mime  = xType.getChildTextTrim( "mime"  );
-      
-        MCRFileContentType type = new MCRFileContentType( ID, label, url, mime );
-        typesTable.put( ID, type );
-      }
-    }
-    catch( Exception exc )
-    {
-      String msg = "Error processing file FileContentTypes.xml";
-      throw new MCRConfigurationException( msg, exc );
-    }
-  }
-  
-  /** 
-   * Returns the file content type with the given ID
-   *
-   * @param ID The non-null ID of the content type that should be returned
-   * @return The file content type with the given ID
-   * @throws MCRConfigurationException if no such file content type is known in the system
-   */  
-  public static MCRFileContentType getType( String ID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
-    if( typesTable.containsKey( ID ) )
-      return (MCRFileContentType)( typesTable.get( ID ) );
-    else
-    {
-      String msg = "There is no file content type with ID = " + ID + " configured";
-      throw new MCRConfigurationException( msg );
-    }
-  }
-  
-  // TODO: Regeln -> FCT bestimmen (extensions, rules, points)
-  // TODO: FCT -> Store (und andere Bestimmungsregeln)
 }
