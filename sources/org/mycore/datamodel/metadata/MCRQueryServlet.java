@@ -117,11 +117,11 @@ private String defaultLang = "";
       {
         if (session != null)
         {
-          jdom = (org.jdom.Document) session.getValue("CachedList");
-          type = (String) session.getValue("CachedType");
+          jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
+          type = (String)            session.getAttribute( "CachedType" );
         }
         else
-          System.out.println("session for getValue is null");
+          System.out.println("session for getAttribute is null");
         if (jdom == null)
           System.out.println("jdom could not be retrieved from session cache");
         if (type == null)
@@ -158,11 +158,11 @@ private String defaultLang = "";
           session = request.getSession(true);
         if (session != null)
         {
-          session.putValue("CachedList", jdom);
-          session.putValue("CachedType", type);
+          session.setAttribute( "CachedList", jdom );
+          session.setAttribute( "CachedType", type );
         }
         else
-          System.out.println("session for putValue is null");
+          System.out.println("session for setAttribute is null");
       }
     }
 
