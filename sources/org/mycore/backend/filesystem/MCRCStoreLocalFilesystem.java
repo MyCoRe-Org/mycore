@@ -68,11 +68,6 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
       String msg = "Content store base must be a directory, but is not: " + baseDir.getPath();
       throw new MCRConfigurationException( msg );
     }
-    else if( ! baseDir.canWrite() )
-    {
-      String msg = "Content store base directory must be writeable: " + baseDir.getPath();
-      throw new MCRConfigurationException( msg );
-    }
     else if( ! baseDir.canRead() )
     {
       String msg = "Content store base directory must be readable: " + baseDir.getPath();
@@ -80,9 +75,20 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
     }
   }
 
+  private void ensureCanWrite()
+  {
+    if( ! baseDir.canWrite() )
+    {
+      String msg = "Content store base directory must be writeable: " + baseDir.getPath();
+      throw new MCRConfigurationException( msg );
+    }
+  }
+
   protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
     throws Exception
   {
+    ensureCanWrite();
+
     StringBuffer storageID = new StringBuffer();  
     String[] slots = buildSlotPath();
       
@@ -114,6 +120,8 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore
   protected void doDeleteContent( String storageID )
     throws Exception
   {
+    ensureCanWrite();
+
     File local = new File( baseDir, storageID );
     local.delete();
       
