@@ -11,7 +11,9 @@
 <xsl:param name="mycore_appl"/>
 
 <xsl:include href='MCRMetadataCoreTemplates.xsl'/>
+<xsl:include href='MCRMetadataCoreTypes.xsl'/>
 <xsl:include href='MCRMetadataTemplates.xsl'/>
+<xsl:include href='MCRMetadataTypes.xsl'/>
 
 <xsl:variable name="newline">
  <xsl:text>
@@ -23,12 +25,15 @@
 <xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' 
             xmlns:xml='http://www.w3.org/XML/1998/namespace'
             xmlns:xlink='http://www.w3.org/1999/xlink'
-            elementFormDefault="unqualified">
+            elementFormDefault="qualified">
 
  <xsd:import namespace='http://www.w3.org/XML/1998/namespace'
               schemaLocation='xml-2001.xsd'/> 
  <xsd:import namespace="http://www.w3.org/1999/xlink"
               schemaLocation="xlinks-2001.xsd" />
+
+ <xsl:call-template name="mcrtypedefinitioncore"/>
+ <xsl:call-template name="mcrtypedefinition"/>
 
  <xsl:variable name="var" select="/configuration/@type" />
  <xsl:choose>

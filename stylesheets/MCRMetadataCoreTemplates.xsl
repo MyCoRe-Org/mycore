@@ -28,7 +28,7 @@
    <xsd:complexType>
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
@@ -102,9 +102,9 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-     <xsd:attribute name="classid" />
-     <xsd:attribute name="categid" />
-     <xsd:attribute name="type" use="optional" type="xsd:string" />
+     <xsd:attribute name="classid" use="required" type="mcrobjectid" />
+     <xsd:attribute name="categid" use="required" type="mcrcategory" />
+     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
      <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
      <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
@@ -122,7 +122,7 @@
    <xsd:complexType>
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
@@ -143,7 +143,7 @@
      <xsd:attribute name="sourcepath" use="required" type="xsd:string" />
      <xsd:attribute name="maindoc" use="required" type="xsd:string"/>
      <xsd:attribute name="ifsid" use="optional" type="xsd:string"/>
-     <xsd:attribute name="type" use="optional" type="xsd:string" />
+     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
      <xsd:attribute ref="xml:lang" use="optional" />
      <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    </xsd:complexType>
@@ -161,11 +161,11 @@
    <xsd:complexType>
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" type="xsd:string" />
+         <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
          <xsd:attribute ref="xml:lang" />
-         <xsd:attribute name="dimension" use="optional" type="xsd:string" />
-         <xsd:attribute name="measurement" use="optional" type="xsd:string" />
+         <xsd:attribute name="dimension" use="optional" type="mcrdimension" />
+         <xsd:attribute name="measurement" use="optional" type="mcrmeasurement" />
        </xsd:extension>
      </xsd:simpleContent>
    </xsd:complexType>
@@ -193,7 +193,7 @@
     <xsd:element name="peerage" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute ref="xml:lang" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
   </xsd:complexType>
@@ -223,7 +223,7 @@
     <xsd:element name="number" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
@@ -249,7 +249,7 @@
     <xsd:element name="property" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
