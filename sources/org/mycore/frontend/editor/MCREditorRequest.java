@@ -110,7 +110,13 @@ class MCREditorRequest
     }
     else if( "new".equals( action ) )
     {
-      sendEditorPageXML();
+      MCREditorXMLSource source = getXMLSource();
+      if( ! source.isEditingAllowed( request, context, objectID ) )
+      {
+        String msg = "You are not authorized to create a new object!";
+        response.sendError( response.SC_FORBIDDEN, msg );
+      }
+      else sendEditorPageXML();
     }
     else if( "submit".equals( action ) ) 
     {
