@@ -11,9 +11,9 @@ public class MCRCM8ViewItemType
 	final static String database="icmnlsdb";
 	final static String userid="icmadmin";
 	final static String password="Mf1sPwe.";
-	final static String itemType="MCR_Demo_Doc1";
+	final static String itemType="MCR_Demo_Doc7";
 	//final static String itemType="MCR_Demo_Legal1";
-	final static String prefix="d1";
+	final static String prefix="d7";
 	//final static String prefix="l1";
 	final static String mcrid="MyCoReDemoDC_Document_1";
 	//final static String mcrid="MyCoReDemoDC_LegalEntity_1";

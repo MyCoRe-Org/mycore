@@ -25,6 +25,7 @@
 package mycore.cm8;
 
 import java.io.*;
+import java.text.*;
 import java.util.*;
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
@@ -157,9 +158,9 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         item.setChild(connection,xmlpath[lastpath-1],xmlpath[lastpath],
           sb.toString(),
           sb.append(xmlpath[lastpath]).append('/').toString());
-System.out.println("SetChild : "+xmlpath[lastpath-1]+"   "+xmlpath[lastpath]+
-  "   "+sb.toString()+"   "+
-  sb.append(xmlpath[lastpath]).append('/').toString());
+//System.out.println("SetChild : "+xmlpath[lastpath-1]+"   "+xmlpath[lastpath]+
+//  "   "+sb.toString()+"   "+
+//  sb.append(xmlpath[lastpath]).append('/').toString());
         continue; 
         }
       // set a  attribute or value
@@ -183,9 +184,14 @@ System.out.println("Attribute : "+sb+"  "+elname+"  "+
 (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_DATE :
-          valueobject = java.sql.Date.valueOf("2001-08-12");
+          GregorianCalendar cal = (GregorianCalendar)mcr_tc.getValueElement(i);
+          valueobject = new java.sql.Date(((Date)cal.getTime()).getTime());
+Calendar calendar = (GregorianCalendar)mcr_tc.getValueElement(i);
+SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
+formatter.setCalendar(calendar);
+String datestamp = formatter.format(calendar.getTime());
 System.out.println("Attribute : "+sb+"  "+elname+"  "+
-"2001-08-12");
+datestamp);
           break;
         case MCRTypedContent.FORMAT_LINK :
           valueobject = mcr_tc.getValueElement(i);
@@ -350,30 +356,53 @@ public final byte[] receive(MCRObjectID mcr_id)
   }
 
 /**
- * The methode receive an object from the data store and return the 
- * creation data the object. The index class is determinated by the type
- * of the object ID. This <b>must</b> correspond with the lower case 
+ * The methode receive an object from the data store and return the
+ * service date for the given type. The index class is determinated by the type
+ * of the object ID. This <b>must</b> correspond with the lower case
  * configuration name.<br>
- * As example: Document --> MCR.persistence_cm8_document
  *
  * @param mcr_id      the object id
- * @return the GregorianCalendar data of the object
+ * @param type     the type of the service date
+ * @return the date for the type or null
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final GregorianCalendar receiveCreateDate(MCRObjectID mcr_id)
-  throws MCRConfigurationException, MCRPersistenceException
+public final GregorianCalendar receiveServiceDate(MCRObjectID mcr_id,
+  String type) throws MCRConfigurationException, MCRPersistenceException
   {
-  GregorianCalendar create = new GregorianCalendar();
+  GregorianCalendar cal = new GregorianCalendar();
+  // Read the item type name from the configuration
+  StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
+  sb.append(mcr_id.getTypeId().toLowerCase());
+  String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
+  // retrieve the createdate value
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
+    MCRCM8Item item = null;
+    try {
+      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
+        itemtypeprefix);
+      item.retrieve();
+      sb = new StringBuffer(128);
+      sb.append("/").append(itemtypeprefix).append("service")
+        .append("/").append(itemtypeprefix).append("servdates")
+        .append("/").append(itemtypeprefix).append("servdate");
+      java.sql.Date date = item.getTypedDate(sb.toString(),
+        itemtypeprefix+"servdate",itemtypeprefix+"type",type);
+      if (date == null) { return null; }
+      cal.setTime(date);
+      }
+    catch (MCRPersistenceException e) {
+      throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
+        " does not exist."); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
     MCRCM8ConnectionPool.releaseConnection(connection); }
-  return create;
+  return cal;
   }
 
 /**
