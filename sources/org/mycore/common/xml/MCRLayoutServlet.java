@@ -211,8 +211,7 @@ public class MCRLayoutServlet extends HttpServlet
     if( user == null ) user = "gast";
     
     String contextPath = request.getContextPath() + "/";
-
-    String requestURL = HttpUtils.getRequestURL( request ).toString();
+    String requestURL  = getCompleteURL( request );
     
     int pos = requestURL.indexOf( contextPath, 9 );
     String applicationBaseURL = requestURL.substring( 0, pos ) + contextPath;
@@ -225,6 +224,27 @@ public class MCRLayoutServlet extends HttpServlet
     parameters.put( "ServletsBaseURL",       servletsBaseURL    );
     
     return parameters;
+  }
+
+  protected String getCompleteURL( HttpServletRequest request )
+  {
+    StringBuffer buffer = HttpUtils.getRequestURL( request );
+
+    String queryString = request.getQueryString();
+
+    if( queryString != null )
+    {
+      buffer.append( "?" );
+      StringTokenizer tokenizer = new StringTokenizer( queryString, "&" );
+      while( tokenizer.hasMoreTokens() )
+      {
+        String token = tokenizer.nextToken();
+        String encoded =  URLEncoder.encode( token );
+        buffer.append( encoded );
+        if( tokenizer.hasMoreTokens() ) buffer.append( "&" );
+      }
+    }
+    return buffer.toString();
   }
   
   protected void renderAsXML( org.jdom.Document xml,
