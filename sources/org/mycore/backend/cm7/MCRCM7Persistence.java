@@ -154,9 +154,9 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     connection = MCRCM7ConnectionPool.instance().getConnection();
     boolean test = false;
     try {
-      MCRCM7Item checkitem = getItem(mcr_id.getId(),mcr_index_class,
-        connection);
-      test = true; }
+      if (getItem(mcr_id.getId(),mcr_index_class,connection) != null)
+      	test = true;
+    }
     catch (MCRPersistenceException e) { }
     if (test) {
       throw new MCRPersistenceException(
@@ -255,7 +255,8 @@ public final boolean exist(MCRObjectID mcr_id)
     try {
       connection = MCRCM7ConnectionPool.instance().getConnection();
       try {
-        MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection); }
+        getItem(mcr_id.getId(),mcr_index_class,connection);
+      }
       catch (MCRPersistenceException e) { return false; }
       }
     finally {
