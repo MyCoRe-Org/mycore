@@ -94,7 +94,7 @@ public class MCRRequestParameters
         else
           value = item.getName();
 
-        if( ( value != null ) && ( ! files.containsKey( name ) ) )
+        if( ( value != null ) && ( value.trim().length() > 0 ) && ( ! files.containsKey( name ) ) )
         {
           if( ! item.isFormField() ) files.put( name, item );
           parameters.put( name, value );

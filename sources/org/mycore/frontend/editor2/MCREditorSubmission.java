@@ -92,7 +92,7 @@ public class MCREditorSubmission
       String ID     = parms.getParameter( "_id@" + name );
       String delete = parms.getParameter( "_delete-" + name );
 
-      if( "true".equals( delete ) ) continue;
+      if( "true".equals( delete ) && ( parms.getFileItem( name ) == null ) ) continue;
       if( sortNr == null ) continue;
       if( value  == null ) continue;
       if( value.trim().length() == 0 ) continue;
