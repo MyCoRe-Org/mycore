@@ -47,10 +47,11 @@ public interface MCROAIQuery {
 	/**
 	 * Method listSets. Gets a list of classificationId's and Labels for a given ID
 	 * @param classificationId
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-	public List listSets(String classificationId);
+	public List listSets(String classificationId, String instance);
 	
 	/**
 	 * Method listIdentifiers.Gets a list of identifiers

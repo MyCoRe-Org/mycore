@@ -729,7 +729,7 @@ public class MCROAIDataProvider extends HttpServlet {
     	    logger.debug("Suche in Klassifikation: " + classificationIdentifier);
         
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
-		    sets = new ArrayList(query.listSets(classificationIdentifier));
+		    sets = new ArrayList(query.listSets(classificationIdentifier, getServletName()));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
             return addError(document, "badResumptionToken", mcrx.getMessage());

@@ -67,17 +67,18 @@ public class MCROAIQueryService implements MCROAIQuery {
 	/**
 	 * Method listSets. Gets a list of classificationId's and Labels for a given ID
 	 * @param classificationId
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-	public List listSets(String classificationId) {
+	public List listSets(String classificationId, String instance) {
 		List list = new ArrayList();
         MCRClassificationItem repository = MCRClassificationItem.
             getClassificationItem(classificationId);
         if ((repository != null) && (repository.hasChildren())) {
         	MCRCategoryItem[] children = repository.getChildren();
 
-			list = getSets(list, repository.getChildren(), "");
+			list = getSets(list, repository.getChildren(), "", instance);
 			return list;
         }
         return null;
@@ -88,10 +89,11 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * @param list The list to add the new elements to.
 	 * @param categories The categories to extract the information from.
 	 * @param parentSpec The setSpec of the parent set.
+	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-    private List getSets(List list, MCRCategoryItem[] categories, String parentSpec) {
+    private List getSets(List list, MCRCategoryItem[] categories, String parentSpec, String instance) {
         List newList = new ArrayList(list);
         
         for (int i = 0; i < categories.length; i++) { 
@@ -103,14 +105,14 @@ public class MCROAIQueryService implements MCROAIQuery {
 	    	// logger.debug("Suche nach Kategorie: " + set[0]);    
     		
     		//We should better have a look if the set is empty...        
-/*	        StringBuffer query = new StringBuffer("");
+	        StringBuffer query = new StringBuffer("");
             query.append("/mycoreobject[@classid=\"").append(categories[i].getClassificationID()).
                 append("\" and @categid=\"").append(categories[i].getID()).append("\"]");
 
 			MCRConfiguration config = MCRConfiguration.instance();
 			try {
-				String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION);
-				String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY);
+				String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
+				String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
 				
 				query.append(" and ").append("/mycoreobject[@classid=\"").append(restrictionClassification).
 	                append("\" and @categid=\"").append(restrictionCategory).append("\"]");
@@ -121,18 +123,18 @@ public class MCROAIQueryService implements MCROAIQuery {
     	    try {
 		        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
     	    } catch (MCRException mcrx) {
-*/    	    	// logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
-/*    	    	return newList;
+    	    	// logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
+    	    	return newList;
     	    }
 
 			if (qra.size() > 0) {
-*/		    	newList.add(set);
+		    	newList.add(set);
 		    
     	        if (categories[i].hasChildren()) {
-        	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":");
+        	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
 	            }
-/*			}
-*/		}
+			}
+		}
         
         return newList;
     }
@@ -179,6 +181,15 @@ public class MCROAIQueryService implements MCROAIQuery {
 	    } catch (MCRConfigurationException mcrx) {
 	    }
         
+		try {
+			String restrictionClassification = config.getString(STR_OAI_RESTRICTION_CLASSIFICATION + "." + instance);
+			String restrictionCategory = config.getString(STR_OAI_RESTRICTION_CATEGORY + "." + instance);
+				
+			query.append(" and ").append("/mycoreobject[@classid=\"").append(restrictionClassification).
+                append("\" and @categid=\"").append(restrictionCategory).append("\"]");
+	    } catch (MCRConfigurationException mcrx) {
+	    }
+			    
         MCRQueryResult qr = new MCRQueryResult();
    	    try {
 	        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
