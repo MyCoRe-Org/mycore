@@ -155,11 +155,11 @@ public class MCRBaseCommands
     String schema_filename = conf_filename.substring(0,conf_filename.length()-4)
       +".xsd";
     // Read transformer file
-    String xslt_home = mycore_root+SLASH+"stylesheets";
-    String xslt_filename = "MCRObjectSchema.xsl";
+    String xslt_home = mycore_appl+SLASH+"stylesheets";
+    String xslt_filename = "MCRMetadataSchema.xsl";
     File xslt_file = new File(xslt_home,xslt_filename);
     if(! xslt_file.isFile()) {
-      throw new MCRException("Can't read schema from MCRSchema.xsl"); }
+      throw new MCRException("Can't read schema from MCRMetadataSchema.xsl"); }
     logger.info( "Reading file " + xslt_filename + " ...\n" );
     // Transform
     try {

@@ -10,8 +10,8 @@
 <xsl:param name="mycore_home"/>
 <xsl:param name="mycore_appl"/>
 
-<xsl:include href='/dlwww/cvs/mycore/stylesheets/MCRMetadataTemplates.xsl'/>
-<xsl:include href='/dlwww/cvs/mycore-sample-application/stylesheets/MCRMetadataTemplates.xsl'/>
+<xsl:include href='MCRMetadataCoreTemplates.xsl'/>
+<xsl:include href='MCRMetadataTemplates.xsl'/>
 
 <xsl:variable name="newline">
  <xsl:text>
