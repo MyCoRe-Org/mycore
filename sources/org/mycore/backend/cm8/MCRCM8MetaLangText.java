@@ -65,15 +65,14 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   catch (NumberFormatException e) {
     throw new MCRPersistenceException(e.getMessage(),e); }
   // Text search option
-  String subtagsearch = "no";
+  String subtagtextsearch = "no";
   try {
-    subtagsearch = (String)element.getAttribute("textsearch").getValue(); 
-    if (subtagsearch == null) { subtagsearch = "no"; }
+    subtagtextsearch = (String)element.getAttribute("textsearch").getValue(); 
+    if (subtagtextsearch == null) { subtagtextsearch = "no"; }
     }
   catch (Exception e) { }
   boolean ts = false;
-  if (subtagsearch.toLowerCase().equals("yes")) { ts = true; }
-System.out.println("MCRCM8MetaLangText "+subtagname+"  "+len+"  "+subtagsearch);
+  if (subtagtextsearch.toLowerCase().equals("yes")) { ts = true; }
 
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {
@@ -82,9 +81,13 @@ System.out.println("MCRCM8MetaLangText "+subtagname+"  "+len+"  "+subtagsearch);
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     // add lang attribute
     DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"lang");
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     // add type attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     // create the attribute for the data content in string form
     // with given textsearch flag
@@ -93,6 +96,8 @@ System.out.println("MCRCM8MetaLangText "+subtagname+"  "+len+"  "+subtagsearch);
         subtagname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     }
   catch (Exception e) {

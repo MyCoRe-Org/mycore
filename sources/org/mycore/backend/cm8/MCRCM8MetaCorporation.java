@@ -64,15 +64,15 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   catch (NumberFormatException e) {
     throw new MCRPersistenceException(e.getMessage(),e); }
   // Text search option
-  String subtagsearch = "no";
+  String subtagtextsearch = "no";
   try {
-    subtagsearch = (String)element.getAttribute("textsearch").getValue();
-    if (subtagsearch == null) { subtagsearch = "no"; }
+    subtagtextsearch = (String)element.getAttribute("textsearch").getValue();
+    if (subtagtextsearch == null) { subtagtextsearch = "no"; }
     }
   catch (Exception e) { }
   boolean ts = false;
-  if (subtagsearch.toLowerCase().equals("yes")) { ts = true; }
-System.out.println("MCRCM8MetaCorporation "+subtagname);
+  if (subtagtextsearch.toLowerCase().equals("yes")) { ts = true; }
+
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {
     // create component child
@@ -80,10 +80,15 @@ System.out.println("MCRCM8MetaCorporation "+subtagname);
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     // add lang attribute
     DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"lang");
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     // add type attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
+
     // add the corporation child component name
     String name = prefix+"name";
     DKComponentTypeDefICM it = new DKComponentTypeDefICM(connection);
@@ -93,8 +98,11 @@ System.out.println("MCRCM8MetaCorporation "+subtagname);
       System.out.println( "Warning CM8 Datastore Creation: attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
+    attr.setNullable(true);
+    attr.setUnique(false);
     it.addAttr(attr);
     lt.addSubEntity(it);
+
     // add the corporation child component nickname
     name = prefix+"nickname";
     it = new DKComponentTypeDefICM(connection);
@@ -104,8 +112,11 @@ System.out.println("MCRCM8MetaCorporation "+subtagname);
       System.out.println( "Warning CM8 Datastore Creation: attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
+    attr.setNullable(true);
+    attr.setUnique(false);
     it.addAttr(attr);
     lt.addSubEntity(it);
+
     // add the corporation child component parent
     name = prefix+"parent";
     it = new DKComponentTypeDefICM(connection);
@@ -115,8 +126,11 @@ System.out.println("MCRCM8MetaCorporation "+subtagname);
       System.out.println( "Warning CM8 Datastore Creation: attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
+    attr.setNullable(true);
+    attr.setUnique(false);
     it.addAttr(attr);
     lt.addSubEntity(it);
+
     // add the corporation child component property
     name = prefix+"property";
     it = new DKComponentTypeDefICM(connection);
@@ -126,6 +140,8 @@ System.out.println("MCRCM8MetaCorporation "+subtagname);
       System.out.println( "Warning CM8 Datastore Creation: attribute "+
         name+" already exists."); }
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(name);
+    attr.setNullable(true);
+    attr.setUnique(false);
     it.addAttr(attr);
     lt.addSubEntity(it);
     }

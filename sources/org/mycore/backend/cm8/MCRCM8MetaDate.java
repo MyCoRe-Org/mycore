@@ -55,7 +55,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   throws MCRPersistenceException
   {
   String subtagname = prefix+(String)element.getAttribute("name").getValue();
-System.out.println("MCRCM8MetaDate "+subtagname);
+
   DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
   try {
     // create component child
@@ -63,8 +63,12 @@ System.out.println("MCRCM8MetaDate "+subtagname);
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     // add lang attribute
     DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"lang");
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     // add type attribute
+    attr.setNullable(true);
+    attr.setUnique(false);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     lt.addAttr(attr);
     // create the attribute for the data content in date form
@@ -73,6 +77,8 @@ System.out.println("MCRCM8MetaDate "+subtagname);
         subtagname+" already exists."); }
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
+    attr.setNullable(true);
+    attr.setUnique(false);
     lt.addAttr(attr);
     }
   catch (Exception e) {

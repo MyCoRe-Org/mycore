@@ -170,9 +170,7 @@ public final class MCRCM8Item implements DKConstantICM
     String childname, String parentpath, String childpath) throws DKException, 
     Exception
     {
-System.out.println("Parent = "+parentname+"   Child = "+childname);
-System.out.println("Parentpath = "+parentpath);
-System.out.println("Childpath = "+childpath);
+System.out.println("Parent = "+parentname+"   Child = "+childname+"   Parentpath = "+parentpath+"  Childpath = "+childpath);
     // Check for existing child component path
     int poschild = -1;
     for (int i = 0; i < ddopath.size(); i++) {
@@ -191,15 +189,11 @@ System.out.println("Childpath = "+childpath);
         "Path name error for parent in MCRCM8Item.setAttribute()."); }
     // Create if it does not exist
     if (poschild == -1) {
-System.out.println("========================");
       DKDDO ddochild = connection.createChildDDO(itemtypename,childname);
-System.out.println("========================");
       DKChildCollection colchild = new DKChildCollection();
-System.out.println("========================");
-      ((DKDDO)ddolist.get(posparent)).setData(((DKDDO)ddolist.get(posparent)).dataId(DK_CM_NAMESPACE_CHILD,ddochild.getObjectType()),colchild);
-System.out.println("========================");
+      ((DKDDO)ddolist.get(posparent)).setData(((DKDDO)ddolist.get(posparent))
+        .dataId(DK_CM_NAMESPACE_CHILD,ddochild.getObjectType()),colchild);
       colchild.addElement(ddochild);
-System.out.println("========================");
       ddolist.add(ddochild);
       ddopath.add(childpath);
       ddocoll.add(colchild);
