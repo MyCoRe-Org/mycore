@@ -1,0 +1,62 @@
+%
+%
+\section{Hinweise zur Installation des IBM Content Manager 8.2}
+%
+%
+\subsection{Der IBM Content Manager unter AIX}
+An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Managers 8.2 f"ur AIX von Holger K"onig, IBM Deutschland GmbH, wiedergegeben werden. \\[2ex]
+\subsubsection{Vorbereitung}
+\begin{enumerate}
+\item Installieren Sie das AIX Betriebssystem mit dem Release 4.3.3 ML 10, 5.1 ML 01 oder 5.2.
+\item Sorgen Sie daf"ur, dass 'Cultural Conversion' und 'Language' auf English US eingestellt ist.
+\item Aktivieren Sie die Netzanbindung inklusive DNS.
+\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}. Wenn Sie auch das Paket {\bf Java131.ext.java3d } mit installieren wollen, müssen Sie vorher die Pakete {\bf OpenGL.OpenGL\_X.adt} und {\bf OpenGL.OpenGL\_X.rte} installiert haben.
+\item Installieren Sie den VAC Compiler Version 5.x oder 6.0 entsprechend der Anleitung und tragen Sie den Suchpfad unter {\it PATH} im File {\it /etc/environment } mit ein.
+\item Aktivieren Sie das Lizenzsystem {\bf ifor} und tragen Sie sie Compilerlizenzen ein.
+\end{enumerate}
+\subsubsection{DB2}
+\begin{enumerate}
+\item Kopieren Sie das File {\it ese.sbcs.tar.Z} von der CD {\bf 'DB2 8.1 with FP1'} und entpacken Sie dieses.
+\item {\tt ./db2setup}
+\item W"ahlen Sie {\bf Install Products} $\rightarrow$ {\bf DB2 UDB Enterprise Server Edition}. Folgen Sie den Schritten:
+\begin{itemize}
+\item {\bf Netx}
+\item {\bf Accept License}
+\item Auswahl 'Custom' $\rightarrow$ {\bf Next}
+\item Auswahl 'Install DB2 UDB Enterprise Server Edition on this computer' $\rightarrow$ {\bf Next}
+\item Standartwerte lassn, 'Appliction Development Tools' zus"atzlich ausw"ahlen
+\item Sprache 'Englisch' beibehalten $\rightarrow$ {\bf Next}
+\item DAS User : Standartwert {\bf db2as} wenn möglich beibehalten, Password setzen $\rightarrow$ {\bf Next}
+\item Erzeugen der DB2 Instanz durch Auswahl 'Create a DB2 instance - 32 bit' $\rightarrow$ {\bf Next}
+\item Auswahl 'Single-partition instance' $\rightarrow$ {\bf Next}
+\item Eintrag des DB2 Instance owner : Standartwert ({\bf db2inst1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
+\item Eintrag des DB2 Fenced users : Standartwert ({\bf db2fenc1}) m"oglichst lassen, Password setzten $\rightarrow$ {\bf Next} \footnote{Achten Sie darauf, keine exotischen Sonderzeichen zu nehmen, das macht im CM Probleme!}
+\item Instance TCPIP : Auswahl 'Configure' $\rightarrow$ Service Name : db2c\_dv2inst1 $\rightarrow$ Port 50000 $\rightarrow$ {\bf Next}
+\item Instance properties $\rightarrow$ Authentication Type : Server $\rightarrow$ beibehalten 'Autostart the instance at system startup' $\rightarrow$ {\bf Next}
+\item Prepare the DB2 tools catalog  beibehalten 'Do not prepare the DB2 tools catalog on this computer' $\rightarrow$ {\bf Next}
+\item Administrator contact : Standart beibehalten $\rightarrow$ {\bf Next} \footnote{Warnung ignorieren}
+\item Contact : Standart beibehalten ({\bf db2inst1}) $\rightarrow$ {\bf Next}
+\item Summary $\rightarrow$ {\bf Finish}
+\item Warten (dauert etwas)
+\item Setup complete $\rightarrow$ {\bf Finish}
+\end{itemize}
+\item Test der Installation:\\
+\qquad\qquad{\tt su - db2inst1} \\
+\qquad\qquad{\tt db2stop} \\
+\qquad\qquad{\tt db2start} \footnote{Es sollte keine Nachricht bez"uglich der Lizenz erscheinen.}\\
+\qquad\qquad{\tt db2level} \\
+\end{enumerate}
+\subsubsection{NSE}
+%
+
+%
+%
+\subsection{Der IBM Content Manager unter Solaris}
+
+%
+%
+\subsection{Der IBM Content Manager unter Windows}
+
+%
+%
+
