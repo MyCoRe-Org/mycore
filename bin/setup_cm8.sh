@@ -3,7 +3,7 @@
 # Configuration part for IBM Content Manager 8
 #
 
-export ANT_HOME=/usr/local/src/jakarta-ant-1.5
+export ANT_HOME=/usr/local/src/jakarta-ant-1.4
 export DB2_HOME=/db2/db2inst1/sqllib
 export CM8_HOME=/usr/lpp/cmb
 export JAVA_HOME=/usr/java130/jre
