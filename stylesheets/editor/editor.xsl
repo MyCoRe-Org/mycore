@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.6 $ $Date: 2004-03-11 15:20:54 $ -->
+<!-- $Revision: 1.7 $ $Date: 2004-03-16 10:05:08 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1199,7 +1199,17 @@
 </xsl:template>
 
 <xsl:template match="loadfrom" mode="read.items">
-  <xsl:apply-templates select="document(concat($WebApplicationBaseURL,@url))/items" mode="read.items" />
+  <xsl:choose>
+    <xsl:when test="starts-with(@url,'http://')">
+      <xsl:apply-templates select="document(@url)/items" mode="read.items" />
+    </xsl:when>
+    <xsl:when test="starts-with(@url,'https://')">
+      <xsl:apply-templates select="document(@url)/items" mode="read.items" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates select="document(concat($WebApplicationBaseURL,@url))/items" mode="read.items" />
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- ======== html select list option ======== -->
