@@ -330,6 +330,7 @@ public final org.jdom.Element createXML() throws MCRException
     org.jdom.Element elmm = new org.jdom.Element("servdates");
     elmm.setAttribute("class","MCRMetaDate");
     elmm.setAttribute("heritable","false");
+    elmm.setAttribute("notinherit","false");
     elmm.setAttribute("parasearch","true");
     elmm.setAttribute("textsearch","false");
     for (int i=0;i<dates.size();i++) {
@@ -340,6 +341,7 @@ public final org.jdom.Element createXML() throws MCRException
     org.jdom.Element elmm = new org.jdom.Element("servflags");
     elmm.setAttribute("class","MCRMetaLangText");
     elmm.setAttribute("heritable","false");
+    elmm.setAttribute("notinherit","false");
     elmm.setAttribute("parasearch","true");
     elmm.setAttribute("textsearch","false");
     for (int i=0;i<flags.size();i++) {

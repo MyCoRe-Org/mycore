@@ -361,7 +361,7 @@ public final void addMetaObject(MCRMetaInterface obj)
 public final void removeInheritedObject()
   {
   for (int i=0;i<size();i++) {
-    if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { list.remove(i); }
+    if (((MCRMetaInterface)list.get(i)).getInherited() > 0) { list.remove(i); i--; }
     }
   }
 

@@ -601,7 +601,7 @@ private final void updateMetadataInDatastore(MCRObjectID child_id)
   for (int i= 0; i<mcr_metadata.size();i++) {
     mcr_metadata.getMetadataElement(i).removeInheritedObject();
     if (mcr_metadata.getMetadataElement(i).size() == 0) {
-      mcr_metadata.removeMetadataElement(i); }
+      mcr_metadata.removeMetadataElement(i); i--; }
     }
   // import all herited matadata from the parent
   MCRObjectID parent_id = mcr_struct.getParentID();

@@ -343,15 +343,30 @@ public class MCRObjectStructure
     org.jdom.Element elm = new org.jdom.Element("structure");
     if (children.size() > 0) {
       org.jdom.Element elmm = new org.jdom.Element("children");
+      elmm.setAttribute("class","MCRMetaLinkID");
+      elmm.setAttribute("heritable","false");
+      elmm.setAttribute("notinherit","false");
+      elmm.setAttribute("parasearch","false");
+      elmm.setAttribute("textsearch","false");
       for (i = 0; i < children.size(); ++i){
         elmm.addContent(((MCRMetaLink) children.get(i)). createXML()); }
       elm.addContent(elmm); }
     if (parent != null) {
       org.jdom.Element elmm = new org.jdom.Element("parents");
+      elmm.setAttribute("class","MCRMetaLinkID");
+      elmm.setAttribute("heritable","false");
+      elmm.setAttribute("notinherit","false");
+      elmm.setAttribute("parasearch","false");
+      elmm.setAttribute("textsearch","false");
       elmm.addContent(parent.createXML());
       elm.addContent(elmm); }
     if (derivates.size() > 0) {
       org.jdom.Element elmm = new org.jdom.Element("derobjects");
+      elmm.setAttribute("class","MCRMetaLinkID");
+      elmm.setAttribute("heritable","false");
+      elmm.setAttribute("notinherit","false");
+      elmm.setAttribute("parasearch","true");
+      elmm.setAttribute("textsearch","false");
       for (i = 0; i < derivates.size(); ++i) {
         elmm.addContent(((MCRMetaLink) derivates.get(i))
           .createXML()); }

@@ -216,7 +216,7 @@ public final boolean removeMetadataElement(String tag)
   int len = tag_names.size();
   for (int i = 0; i < len; i++) {
     if (((String)tag_names.get(i)).equals(tag)) {
-      meta_list.remove(i); return true; }
+      meta_list.remove(i); tag_names.remove(i); return true; }
     }
   return false;
   }
@@ -230,6 +230,7 @@ public final boolean removeMetadataElement(int index)
   {
   if ((index<0) || (index>size())) { return false; }
   meta_list.remove(index);
+  tag_names.remove(index);
   return true; 
   }
 
