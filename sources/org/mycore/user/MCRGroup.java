@@ -100,135 +100,142 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * @param creationDate   timestamp of the creation of this group, if null the current date will be used
    * @param modifiedDate   timestamp of the last modification of this group
    * @param description    description of the group
-   * @param admUserIDs     a ArrayList of user IDs which have administrative rights for the group
-   * @param admGroupIDs    a ArrayList of groups which members have administrative rights for the group
-   * @param mbrUserIDs     a ArrayList of user IDs this group has as members
-   * @param mbrGroupIDs    a ArrayList of group IDs this group has as members
-   * @param groupIDs       a ArrayList of group IDs this group is a member of
-   * @param privileges     a ArrayList of privileges members of this group have
+   * @param admUserIDs     ArrayList of user IDs which have administrative rights for the group
+   * @param admGroupIDs    ArrayList of groups which members have administrative rights for the group
+   * @param mbrUserIDs     ArrayList of user IDs this group has as members
+   * @param mbrGroupIDs    ArrayList of group IDs this group has as members
+   * @param groupIDs       ArrayList of group IDs this group is a member of
+   * @param privileges     ArrayList of privileges members of this group have
    */
   public MCRGroup(String ID, String creator, Timestamp creationDate,
-  Timestamp modifiedDate, String description, ArrayList admUserIDs,
-  ArrayList admGroupIDs, ArrayList mbrUserIDs, ArrayList mbrGroupIDs,
-  ArrayList groupIDs, ArrayList privileges)
-  throws MCRException, Exception
+    Timestamp modifiedDate, String description, ArrayList admUserIDs,
+    ArrayList admGroupIDs, ArrayList mbrUserIDs, ArrayList mbrGroupIDs,
+    ArrayList groupIDs, ArrayList privileges)
+    throws MCRException, Exception
   {
-  super.ID = trim(ID,id_len);
-  super.creator = trim(creator,id_len);
-  // check if the creation timestamp is provided. If not, use current timestamp
-  if (creationDate == null) {
-    super.creationDate = new Timestamp(new GregorianCalendar().getTime()
-      .getTime()); }
-  else {
-    super.creationDate = creationDate; }
-  if (modifiedDate == null) {
-    super.modifiedDate = new Timestamp(new GregorianCalendar().getTime()
-      .getTime()); }
-  else {
-    super.modifiedDate = modifiedDate; }
-  this.description = trim(description,description_len);
-  this.admUserIDs = new ArrayList();
-  if (admUserIDs != null) { this.admUserIDs = admUserIDs; }
-  this.admGroupIDs = new ArrayList();
-  if (admGroupIDs != null) { this.admGroupIDs = admGroupIDs; }
-  this.mbrUserIDs = new ArrayList();
-  if (mbrUserIDs != null) { this.mbrUserIDs = mbrUserIDs; }
-  this.mbrGroupIDs = new ArrayList();
-  if (mbrGroupIDs != null) { this.mbrGroupIDs = mbrGroupIDs; }
-  this.groupIDs = new ArrayList();
-  if (groupIDs != null) { this.groupIDs = groupIDs; }
-  this.privileges = new ArrayList();
-  if (privileges != null) { this.privileges = privileges; }
+    super.ID = trim(ID,id_len);
+    super.creator = trim(creator,id_len);
+
+    // check if the creation timestamp is provided. If not, use current timestamp
+    if (creationDate == null) {
+      super.creationDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+    else {
+      super.creationDate = creationDate; }
+
+    if (modifiedDate == null) {
+      super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+    else {
+      super.modifiedDate = modifiedDate; }
+
+    this.description = trim(description, description_len);
+    this.admUserIDs = new ArrayList();
+    if (admUserIDs != null) { this.admUserIDs = admUserIDs; }
+    this.admGroupIDs = new ArrayList();
+    if (admGroupIDs != null) { this.admGroupIDs = admGroupIDs; }
+    this.mbrUserIDs = new ArrayList();
+    if (mbrUserIDs != null) { this.mbrUserIDs = mbrUserIDs; }
+    this.mbrGroupIDs = new ArrayList();
+    if (mbrGroupIDs != null) { this.mbrGroupIDs = mbrGroupIDs; }
+    this.groupIDs = new ArrayList();
+    if (groupIDs != null) { this.groupIDs = groupIDs; }
+    this.privileges = new ArrayList();
+    if (privileges != null) { this.privileges = privileges; }
   }
 
   /**
-   * This constructor create the data of this class from an JDOM Element.
+   * This constructor creates the data of this object from a given JDOM Element.
    *
    * @param the JDOM Element
-   **/
+   */
   public MCRGroup(org.jdom.Element elm)
   {
-  this();
-  if (!elm.getName().equals("group")) { return; }
-  super.ID = trim((String)elm.getAttributeValue("ID"),id_len);
-  this.creator = trim(elm.getChildTextTrim("group.creator"),id_len);
-  String tmp = elm.getChildTextTrim("group.creation_date");
-  if (tmp != null) {
-    try {
-      super.creationDate = Timestamp.valueOf(tmp); }
-    catch (Exception e) { }
+    this();
+    if (!elm.getName().equals("group")) { return; }
+    super.ID = trim((String)elm.getAttributeValue("ID"), id_len);
+    this.creator = trim(elm.getChildTextTrim("group.creator"), id_len);
+
+    String tmp = elm.getChildTextTrim("group.creation_date");
+    if (tmp != null) {
+      try {
+        super.creationDate = Timestamp.valueOf(tmp); }
+      catch (Exception e) { }
     }
-  tmp = elm.getChildTextTrim("group.last_modified");
-  if (tmp != null) {
-    try {
-      super.modifiedDate = Timestamp.valueOf(tmp); }
-    catch (Exception e) { }
+    tmp = elm.getChildTextTrim("group.last_modified");
+    if (tmp != null) {
+      try {
+        super.modifiedDate = Timestamp.valueOf(tmp); }
+      catch (Exception e) { }
     }
-  this.description = trim(elm.getChildTextTrim("group.description"),
-    description_len);
-  org.jdom.Element adminElement = elm.getChild("group.admins");
-  if (adminElement != null) {
-    List adminIDList = adminElement.getChildren();
-    for (int j=0; j<adminIDList.size(); j++) {
-      org.jdom.Element newID = (org.jdom.Element)adminIDList.get(j);
-      String id = trim((String)newID.getTextTrim(),id_len);
-      if(newID.getName().equals("admins.userID")) {
-        if (!id.equals("")) { addAdminUserID(id); }
-        continue;
+
+    this.description = trim(elm.getChildTextTrim("group.description"), description_len);
+    org.jdom.Element adminElement = elm.getChild("group.admins");
+    if (adminElement != null) {
+      List adminIDList = adminElement.getChildren();
+      for (int j=0; j<adminIDList.size(); j++) {
+        org.jdom.Element newID = (org.jdom.Element)adminIDList.get(j);
+        String id = trim((String)newID.getTextTrim(),id_len);
+        if(newID.getName().equals("admins.userID")) {
+          if (!id.equals("")) { addAdminUserID(id); }
+          continue;
         }
-      if(newID.getName().equals("admins.groupID")) {
-        if (!id.equals("")) { addAdminGroupID(id); }
-        }
-      }
-    }
-  org.jdom.Element memberElement = elm.getChild("group.members");
-  if (memberElement != null) {
-    List memberIDList = memberElement.getChildren();
-    for (int j=0; j<memberIDList.size(); j++) {
-      org.jdom.Element newID = (org.jdom.Element)memberIDList.get(j);
-      String id = trim((String)newID.getTextTrim(),id_len);
-      if(newID.getName().equals("members.userID")) {
-        if (!id.equals("")) { addMemberUserID(id); }
-        continue;
-        }
-      if(newID.getName().equals("members.groupID")) {
-        if (!id.equals("")) { addMemberGroupID(id); }
+        if(newID.getName().equals("admins.groupID")) {
+          if (!id.equals("")) { addAdminGroupID(id); }
         }
       }
     }
-  org.jdom.Element userGroupElement = elm.getChild("group.groups");
-  if (userGroupElement != null) {
-    List groupIDList = userGroupElement.getChildren();
-    for (int j=0; j<groupIDList.size(); j++) {
-      org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
-      String id = trim((String)groupID.getTextTrim(),id_len);
-      if (!id.equals("")) { this.groupIDs.add(id); }
+
+    org.jdom.Element memberElement = elm.getChild("group.members");
+    if (memberElement != null) {
+      List memberIDList = memberElement.getChildren();
+      for (int j=0; j<memberIDList.size(); j++) {
+        org.jdom.Element newID = (org.jdom.Element)memberIDList.get(j);
+        String id = trim((String)newID.getTextTrim(),id_len);
+        if(newID.getName().equals("members.userID")) {
+          if (!id.equals("")) { addMemberUserID(id); }
+          continue;
+        }
+        if(newID.getName().equals("members.groupID")) {
+          if (!id.equals("")) { addMemberGroupID(id); }
+        }
       }
     }
-  org.jdom.Element privilegeElement = elm.getChild("group.privileges");
-  if (privilegeElement != null) {
-    List privilegeIDList = privilegeElement.getChildren();
-    for (int j=0; j<privilegeIDList.size(); j++) {
-      org.jdom.Element privilegeID = (org.jdom.Element)privilegeIDList.get(j);
-      String priv = trim((String)privilegeID.getTextTrim(),privilege_len);
-      if (!priv.equals("")) { this.privileges.add(priv); }
+
+    org.jdom.Element userGroupElement = elm.getChild("group.groups");
+    if (userGroupElement != null) {
+      List groupIDList = userGroupElement.getChildren();
+      for (int j=0; j<groupIDList.size(); j++) {
+        org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
+        String id = trim((String)groupID.getTextTrim(),id_len);
+        if (!id.equals("")) { this.groupIDs.add(id); }
+      }
+    }
+
+    org.jdom.Element privilegeElement = elm.getChild("group.privileges");
+    if (privilegeElement != null) {
+      List privilegeIDList = privilegeElement.getChildren();
+      for (int j=0; j<privilegeIDList.size(); j++) {
+        org.jdom.Element privilegeID = (org.jdom.Element)privilegeIDList.get(j);
+        String priv = trim((String)privilegeID.getTextTrim(),privilege_len);
+        if (!priv.equals("")) { this.privileges.add(priv); }
       }
     }
   }
 
   /**
-   * This method adds a group to the list of groups with administrative privileges of the group.
+   * This method adds a group to the list of groups with administrative privileges for the group.
    * @param groupID   ID of the group added to the group admin list
    */
-  public void addAdminGroupID(String groupID) throws MCRException
-  { addAndUpdate(groupID, admGroupIDs); }
+  public void addAdminGroupID(String groupID) throws MCRException {
+    addAndUpdate(groupID, admGroupIDs);
+  }
 
   /**
    * This method adds a user (ID) to the administrators list of the group
    * @param userID   ID of the administrative user added to the group
    */
-  public void addAdminUserID(String userID) throws MCRException
-  { addAndUpdate(userID, admUserIDs); }
+  public void addAdminUserID(String userID) throws MCRException {
+    addAndUpdate(userID, admUserIDs);
+  }
 
   /**
    * This method adds a group to the list of member groups of the group. Do not confuse
@@ -236,82 +243,91 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    *
    * @param groupID   ID of the group added to the group member list
    */
-  public void addMemberGroupID(String groupID) throws MCRException
-  { addAndUpdate(groupID, mbrGroupIDs); }
+  public void addMemberGroupID(String groupID) throws MCRException {
+    addAndUpdate(groupID, mbrGroupIDs);
+  }
 
   /**
    * This method adds a user (ID) to the users list of the group
    * @param userID   ID of the user added to the group
    */
-  public void addMemberUserID(String userID) throws MCRException
-  { addAndUpdate(userID, mbrUserIDs); }
+  public void addMemberUserID(String userID) throws MCRException {
+    addAndUpdate(userID, mbrUserIDs);
+  }
 
   /**
    * This method adds a privilege to the privileges list of the group
    * @param privName   Name of the privilege added to the group
    */
-  public void addPrivilege(String privName) throws MCRException
-  { addAndUpdate(privName, privileges); }
+  public void addPrivilege(String privName) throws MCRException {
+    addAndUpdate(privName, privileges);
+  }
 
   /**
    * @return
    *   This method returns the list of admin groups as a ArrayList of strings.
    */
-  public final ArrayList getAdminGroupIDs()
-  { return admGroupIDs; }
+  public final ArrayList getAdminGroupIDs() {
+    return admGroupIDs;
+  }
 
   /**
    * @return
    *   This method returns the list of admin users as a ArrayList of strings.
    */
-  public final ArrayList getAdminUserIDs()
-  { return admUserIDs; }
+  public final ArrayList getAdminUserIDs() {
+    return admUserIDs;
+  }
 
   /**
    * @return
    *   This method returns the list of group members (groups) as a ArrayList of strings.
    *   Do not confuse with the list of groups the group itself is a member of.
    */
-  public final ArrayList getMemberGroupIDs()
-  { return mbrGroupIDs; }
+  public final ArrayList getMemberGroupIDs() {
+    return mbrGroupIDs;
+  }
 
   /**
    * @return
    *   This method returns the user list (group members) as a ArrayList of strings.
    */
-  public final ArrayList getMemberUserIDs()
-  { return mbrUserIDs; }
+  public final ArrayList getMemberUserIDs() {
+    return mbrUserIDs;
+  }
 
   /**
    * @return
    *   This method returns the list of privileges as a ArrayList of strings.
    */
-  public final ArrayList getPrivileges()
-  { return privileges; }
+  public final ArrayList getPrivileges() {
+    return privileges;
+  }
 
   /**
    * This method return all privileges of this group and of groups in which this
    * group is member as an ArrayList.
    *
-   * @return a ArrayList of all priviliges, that this group holds
+   * @return a ArrayList of all privileges, that this group holds
    **/
   public final ArrayList getAllPrivileges()
   {
-  ArrayList ar = new ArrayList();
-  for (int i=0;i<privileges.size();i++) { ar.add(privileges.get(i)); }
-  for (int i=0; i<groupIDs.size(); i++) {
-    MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i));
-    ar.addAll(nextGroup.getAllPrivileges());
+    ArrayList ar = new ArrayList();
+    for (int i=0;i<privileges.size();i++) { ar.add(privileges.get(i)); }
+    for (int i=0; i<groupIDs.size(); i++) {
+      MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i), false);
+      ar.addAll(nextGroup.getAllPrivileges());
     }
-  return ar;
+    return ar;
   }
 
   /**
    * @return
    *   This method returns the ID (user ID or group ID) of the user object.
    */
-  public final String getID()
-  { return ID; }
+  public final String getID() {
+    return ID;
+  }
 
   /**
    * This method checks if members of this group have a given privilege. Not only the
@@ -323,17 +339,16 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    */
   public boolean hasPrivilege(String privilege) throws MCRException
   {
-  if (privileges.contains(privilege)) {
+    if (privileges.contains(privilege)) {
       return true; }
-  else {
-    for (int i=0; i<groupIDs.size(); i++) {
-      MCRGroup nextGroup = MCRUserMgr.instance()
-        .retrieveGroup((String)groupIDs.get(i));
-      if (nextGroup.hasPrivilege(privilege)) {
-        return true; }
+    else {
+      for (int i=0; i<groupIDs.size(); i++) {
+        MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i), false);
+        if (nextGroup.hasPrivilege(privilege)) {
+          return true; }
       }
     }
-  return false;
+    return false;
   }
 
   /**
@@ -342,12 +357,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * @param user Is this user a member of the group?
    * @return Returns true if the given user is a member of this group.
    */
-  public boolean hasMember (MCRUser user)
-  {
+  public boolean hasMember (MCRUser user) {
     if ((admUserIDs.contains(user.getID())) || (mbrUserIDs.contains(user.getID())))
       return true;
-
-    return false;
+    else return false;
   }
 
   /**
@@ -361,29 +374,27 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   public static boolean isImplicitMemberOf(MCRGroup group, String matchID)
   throws MCRException
   {
-  ArrayList groupIDs = group.getGroupIDs();
-  if (groupIDs.contains(matchID)) {
-    return true; }
-  else {
-    for (int i=0; i<groupIDs.size(); i++) {
-      MCRGroup nextGroup = MCRUserMgr.instance()
-        .retrieveGroup((String)groupIDs.get(i), true);
-      if (MCRGroup.isImplicitMemberOf(nextGroup, matchID)) { return true; }
+    ArrayList memberGroupIDs = group.getMemberGroupIDs();
+    if (memberGroupIDs.contains(matchID)) {
+      return true; }
+    else {
+      for (int i=0; i<memberGroupIDs.size(); i++) {
+        MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)memberGroupIDs.get(i), true);
+        if (MCRGroup.isImplicitMemberOf(nextGroup, matchID)) { return true; }
       }
     }
-  return false;
+    return false;
   }
 
   /**
    * This method checks whether this group is a member of a given group. It not only
-   * considers the groups list of this group but recursively checks the group lists
-   * of all groups it is a member of.
+   * considers the groups list of the given group but recursively checks the group lists
+   * of all groups the given group is a member of.
    *
    * @param groupID   ID of the group to check if this group is a member of
    * @return          returns true if the group is an implicit member of the given group
    */
-  public boolean isMemberOf(String groupID) throws MCRException
-  {
+  public boolean isMemberOf(String groupID) throws MCRException {
     if (super.groupIDs.contains(groupID))
       return true;
     else return MCRGroup.isImplicitMemberOf(this, groupID);
@@ -398,14 +409,29 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    */
   public boolean isValid() throws MCRException
   {
-  ArrayList requiredGroupAttributes =
-    MCRUserPolicy.instance().getRequiredGroupAttributes();
-  boolean test = true;
-  if (requiredGroupAttributes.contains("groupID"))
-    test = test && super.ID.length() > 0;
-  if (requiredGroupAttributes.contains("creator"))
-    test = test && super.ID.length() > 0;
-  return test;
+    ArrayList requiredGroupAttributes = MCRUserPolicy.instance().getRequiredGroupAttributes();
+    boolean test = true;
+    if (requiredGroupAttributes.contains("groupID"))
+      test = test && super.ID.length() > 0;
+    if (requiredGroupAttributes.contains("creator"))
+      test = test && super.ID.length() > 0;
+    return test;
+  }
+
+  /**
+   * This method cleans the list of member groups.
+   */
+  protected final void cleanMemberGroupID() throws MCRException {
+    if (modificationIsAllowed())
+      mbrGroupIDs.clear();
+  }
+
+  /**
+   * This method cleans the list of member users.
+   */
+  protected final void cleanMemberUserID() throws MCRException {
+    if (modificationIsAllowed())
+      mbrUserIDs.clear();
   }
 
   /**
@@ -414,27 +440,17 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    *
    * @param groupID   ID of the administrative group removed from the group
    */
-  public void removeAdminGroupID(String groupID) throws MCRException
-  { removeAndUpdate(groupID, admGroupIDs); }
-
-  /**
-   * This method clean the administrative groups ArrayList.
-   */
-  protected final void cleanAdminGroupID()
-  { admGroupIDs.clear(); }
+  public void removeAdminGroupID(String groupID) throws MCRException {
+    removeAndUpdate(groupID, admGroupIDs);
+  }
 
   /**
    * This method removes a user from the list of administrators of the group.
    * @param userID   ID of the administrative user removed from the group
    */
-  public void removeAdminUserID(String userID) throws MCRException
-  { removeAndUpdate(userID, admUserIDs); }
-
-  /**
-   * This method clean the administrative user ArrayList.
-   */
-  protected final void cleanAdminUserID()
-  { admUserIDs.clear(); }
+  public void removeAdminUserID(String userID) throws MCRException {
+    removeAndUpdate(userID, admUserIDs);
+  }
 
   /**
    * This method removes a group from the list of group members (groups).
@@ -442,50 +458,26 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    *
    * @param groupID   ID of the group removed from the group
    */
-  public void removeMemberGroupID(String groupID) throws MCRException
-  { removeAndUpdate(groupID, mbrGroupIDs); }
-
-  /**
-   * This method clean the member group ArrayList.
-   */
-  protected final void cleanMemberGroupID()
-  { mbrGroupIDs.clear(); }
+  public void removeMemberGroupID(String groupID) throws MCRException {
+    removeAndUpdate(groupID, mbrGroupIDs);
+  }
 
   /**
    * This method removes a user from the users list (members) of the group.
    *
    * @param userID   ID of the user removed from the group
    */
-  public void removeMemberUserID(String userID) throws MCRException
-  { removeAndUpdate(userID, mbrUserIDs); }
-
-  /**
-   * This method clean the member user ArrayList.
-   */
-  protected final void cleanMemberUserID()
-  { mbrUserIDs.clear(); }
+  public void removeMemberUserID(String userID) throws MCRException {
+    removeAndUpdate(userID, mbrUserIDs);
+  }
 
   /**
    * This method removes a privilege from the privileges list of the group.
    *
    * @param privName   Name of the privilege removed from the group
    */
-  public void removePrivilege(String privName) throws MCRException
-  { removeAndUpdate(privName, privileges); }
-
-  /**
-   * This method update this instance with the data of the given MCRUser.Group.
-   *
-   * @param newgroup the data for the update.
-   */
-  public void update(MCRGroup newgroup) throws MCRException
-  {
-  if (newgroup.getDescription().length() != 0) {
-    super.description = newgroup.getDescription(); }
-  super.groupIDs   = newgroup.getGroupIDs();
-  this.admUserIDs  = newgroup.getAdminUserIDs();
-  this.admGroupIDs = newgroup.getAdminGroupIDs();
-  this.privileges  = newgroup.getPrivileges();
+  public void removePrivilege(String privName) throws MCRException {
+    removeAndUpdate(privName, privileges);
   }
 
   /**
@@ -494,17 +486,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    */
   public org.jdom.Document toJDOMDocument() throws MCRException
   {
-  // Build the DOM
-  org.jdom.Element root = new org.jdom.Element("mycoregroup");
-  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
-    MCRDefaults.XSI_URL));
-  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
-    MCRDefaults.XLINK_URL));
-  root.setAttribute("noNamespaceSchemaLocation","MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
-    MCRDefaults.XSI_URL));
-  root.addContent(this.toJDOMElement());
-  org.jdom.Document jdomDoc = new org.jdom.Document(root);
-  return jdomDoc;
+    org.jdom.Element root = new org.jdom.Element("mycoregroup");
+    root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+    root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+    root.setAttribute("noNamespaceSchemaLocation","MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+    root.addContent(this.toJDOMElement());
+    org.jdom.Document jdomDoc = new org.jdom.Document(root);
+    return jdomDoc;
   }
 
   /**
@@ -515,66 +503,75 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    */
   public org.jdom.Element toJDOMElement()
   {
-  org.jdom.Element group =
-    new org.jdom.Element("group").setAttribute("ID", ID);
-  org.jdom.Element Creator = new org.jdom.Element("group.creator")
-    .setText(super.creator);
-  org.jdom.Element CreationDate = new org.jdom.Element("group.creation_date")
-    .setText(super.creationDate.toString());
-  org.jdom.Element ModifiedDate = new org.jdom.Element("group.last_modified")
-    .setText(super.modifiedDate.toString());
-  org.jdom.Element Description = new org.jdom.Element("group.description")
-    .setText(super.description);
-  org.jdom.Element admins = new org.jdom.Element("group.admins");
-  org.jdom.Element members = new org.jdom.Element("group.members");
-  org.jdom.Element groups = new org.jdom.Element("group.groups");
-  org.jdom.Element Privileges = new org.jdom.Element("group.privileges");
-  // Loop over all admin user IDs
-  for (int i=0; i<admUserIDs.size(); i++) {
-    org.jdom.Element admUserID = new org.jdom.Element("admins.userID")
-      .setText((String)admUserIDs.get(i));
-    admins.addContent(admUserID);
+    org.jdom.Element group = new org.jdom.Element("group").setAttribute("ID", ID);
+    org.jdom.Element Creator = new org.jdom.Element("group.creator").setText(super.creator);
+    org.jdom.Element CreationDate = new org.jdom.Element("group.creation_date").setText(super.creationDate.toString());
+    org.jdom.Element ModifiedDate = new org.jdom.Element("group.last_modified").setText(super.modifiedDate.toString());
+    org.jdom.Element Description = new org.jdom.Element("group.description").setText(super.description);
+    org.jdom.Element admins = new org.jdom.Element("group.admins");
+    org.jdom.Element members = new org.jdom.Element("group.members");
+    org.jdom.Element groups = new org.jdom.Element("group.groups");
+    org.jdom.Element Privileges = new org.jdom.Element("group.privileges");
+
+    // Loop over all admin user IDs
+    for (int i=0; i<admUserIDs.size(); i++) {
+      org.jdom.Element admUserID = new org.jdom.Element("admins.userID").setText((String)admUserIDs.get(i));
+      admins.addContent(admUserID);
     }
-  // Loop over all admin group IDs
-  for (int i=0; i<admGroupIDs.size(); i++) {
-    org.jdom.Element admGroupID = new org.jdom.Element("admins.groupID")
-      .setText((String)admGroupIDs.get(i));
-    admins.addContent(admGroupID);
+
+    // Loop over all admin group IDs
+    for (int i=0; i<admGroupIDs.size(); i++) {
+      org.jdom.Element admGroupID = new org.jdom.Element("admins.groupID").setText((String)admGroupIDs.get(i));
+      admins.addContent(admGroupID);
     }
-  // Loop over all user IDs (members of this group!)
-  for (int i=0; i<mbrUserIDs.size(); i++) {
-    org.jdom.Element mbrUserID = new org.jdom.Element("members.userID")
-      .setText((String)mbrUserIDs.get(i));
-    members.addContent(mbrUserID);
+
+    // Loop over all user IDs (members of this group!)
+    for (int i=0; i<mbrUserIDs.size(); i++) {
+      org.jdom.Element mbrUserID = new org.jdom.Element("members.userID").setText((String)mbrUserIDs.get(i));
+      members.addContent(mbrUserID);
     }
-  // Loop over all group IDs (members of this group!)
-  for (int i=0; i<mbrGroupIDs.size(); i++) {
-    org.jdom.Element mbrGroupID = new org.jdom.Element("members.groupID")
-      .setText((String)mbrGroupIDs.get(i));
-    members.addContent(mbrGroupID);
+
+    // Loop over all group IDs (members of this group!)
+    for (int i=0; i<mbrGroupIDs.size(); i++) {
+      org.jdom.Element mbrGroupID = new org.jdom.Element("members.groupID").setText((String)mbrGroupIDs.get(i));
+      members.addContent(mbrGroupID);
     }
-  // Loop over all group IDs (where this group is a member of!)
-  for (int i=0; i<groupIDs.size(); i++) {
-    org.jdom.Element groupID = new org.jdom.Element("groups.groupID")
-      .setText((String)groupIDs.get(i));
-    groups.addContent(groupID);
+
+    // Loop over all group IDs (where this group is a member of!)
+    for (int i=0; i<groupIDs.size(); i++) {
+      org.jdom.Element groupID = new org.jdom.Element("groups.groupID").setText((String)groupIDs.get(i));
+      groups.addContent(groupID);
     }
-  // Loop over all privileges
-  for (int i=0; i<privileges.size(); i++) {
-    org.jdom.Element priv = new org.jdom.Element("privileges.privilege")
-      .setText((String)privileges.get(i));
-    Privileges.addContent(priv);
+
+    // Loop over all privileges
+    for (int i=0; i<privileges.size(); i++) {
+      org.jdom.Element priv = new org.jdom.Element("privileges.privilege").setText((String)privileges.get(i));
+      Privileges.addContent(priv);
     }
-  // Aggregate group element
-  group.addContent(Creator)
-       .addContent(CreationDate)
-       .addContent(ModifiedDate)
-       .addContent(Description)
-       .addContent(admins)
-       .addContent(members)
-       .addContent(groups)
-       .addContent(Privileges);
-  return group;
+
+    // Aggregate group element
+    group.addContent(Creator)
+         .addContent(CreationDate)
+         .addContent(ModifiedDate)
+         .addContent(Description)
+         .addContent(admins)
+         .addContent(members)
+         .addContent(groups)
+         .addContent(Privileges);
+    return group;
+  }
+
+  /**
+   * This method writes debug data to the logger (for the debug mode).
+   **/
+  public final void debug()
+  {
+    debugDefault();
+    for (int i=0;i<admGroupIDs.size();i++){ logger.debug("admGroupIDs        = "+(String)admGroupIDs.get(i)); }
+    for (int i=0;i<admUserIDs.size();i++) { logger.debug("admUserIDs         = "+(String)admUserIDs.get(i)); }
+    for (int i=0;i<mbrGroupIDs.size();i++){ logger.debug("mbrGroupIDs        = "+(String)mbrGroupIDs.get(i)); }
+    for (int i=0;i<mbrUserIDs.size();i++) { logger.debug("mbrUserIDs         = "+(String)mbrUserIDs.get(i)); }
+    for (int i=0;i<privileges.size();i++) { logger.debug("privileges         = "+(String)privileges.get(i)); }
   }
 
   /**
@@ -583,8 +580,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * @param s       String to be added to the vector vec
    * @param vec     ArrayList to which the string s will be added to
    */
-  private void addAndUpdate(String s, ArrayList vec) throws MCRException
-  { if (!vec.contains(s)) { vec.add(s); } }
+  private void addAndUpdate(String s, ArrayList vec) throws MCRException {
+    if (modificationIsAllowed()) {
+      if (!vec.contains(s)) {
+        vec.add(s);
+      }
+    }
+  }
 
   /**
    * This private helper method removes values from a given vector. It is used by removeGroupID etc.
@@ -592,25 +594,43 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * @param s       String to be removed from the vector vec
    * @param vec     ArrayList from which the string s will be removed from
    */
-  private void removeAndUpdate(String s, ArrayList vec) throws MCRException
-  { if (vec.contains(s)) { vec.remove(s); } }
+  private void removeAndUpdate(String s, ArrayList vec) throws MCRException {
+    if (modificationIsAllowed()) {
+      if (vec.contains(s)) {
+        vec.remove(s);
+      }
+    }
+  }
 
   /**
-   * This method put debug data to the logger (for the debug mode).
-   **/
-  public final void debug()
+   * This private helper method checks if the modification of the group object is
+   * allowed for the current user/session.
+   */
+  public final boolean modificationIsAllowed() throws MCRException
   {
-  debugDefault();
-  for (int i=0;i<admGroupIDs.size();i++) {
-    logger.debug("admGroupIDs        = "+(String)admGroupIDs.get(i)); }
-  for (int i=0;i<admUserIDs.size();i++) {
-    logger.debug("admUserIDs         = "+(String)admUserIDs.get(i)); }
-  for (int i=0;i<mbrGroupIDs.size();i++) {
-    logger.debug("mbrGroupIDs        = "+(String)mbrGroupIDs.get(i)); }
-  for (int i=0;i<mbrUserIDs.size();i++) {
-    logger.debug("mbrUserIDs         = "+(String)mbrUserIDs.get(i)); }
-  for (int i=0;i<privileges.size();i++) {
-    logger.debug("privileges         = "+(String)privileges.get(i)); }
+    // Get the MCRSession object for the current thread from the session manager.
+    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    String currentUserID=mcrSession.getCurrentUserID();
+
+    MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID, false);
+    if (currentUser.hasPrivilege("user administrator")) {
+      return true;
+    }
+    if (this.creator.equals(currentUserID)) {
+      return true;
+    }
+    if (admUserIDs.contains(currentUserID)) {
+      return true;
+    } else { // check if the current user is (direct, not implicit) member of one of the admGroups
+      for (int i=0; i<admGroupIDs.size(); i++) {
+        MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup((String)admGroupIDs.get(i), false);
+        if (currentGroup.getMemberUserIDs().contains(currentUserID)) {
+          return true;
+        }
+      }
+    }
+    throw new MCRException("The current user "
+      +currentUserID+ " has no right to modify the group "+this.ID+".");
   }
 }
 

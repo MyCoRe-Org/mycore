@@ -132,7 +132,7 @@ public class MCRUserServlet extends MCRServlet
     }
     else {
       try {
-        MCRUserMgr.instance().setPassword(mcrSession, currentUser, pwd_1);
+        MCRUserMgr.instance().setPassword(currentUser, pwd_1);
         root.setAttribute("pwd_change_ok", "true");
         doLayout(job, "SelectTask", jdomDoc); // use the stylesheet mcr_user-SelectTask-*.xsl
         return;
@@ -199,7 +199,7 @@ public class MCRUserServlet extends MCRServlet
     org.jdom.Document jdomDoc = createJdomDocBase(job);
     org.jdom.Element root = jdomDoc.getRootElement();
 
-    MCRUser user = MCRUserMgr.instance().retrieveUser(mcrSession, currentUser);
+    MCRUser user = MCRUserMgr.instance().retrieveUser(currentUser);
     root.addContent(user.toJDOMElement());
 
     doLayout(job, "Metadata", jdomDoc); // use the stylesheet mcr_user-Metadata-*.xsl

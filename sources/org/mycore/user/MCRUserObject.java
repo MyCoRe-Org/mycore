@@ -53,42 +53,42 @@ abstract class MCRUserObject
   /** The maximum length of user and group names */
   public static final int id_len = 20;
 
-  /** The maximum length of the password */
+  /** The maximum length of a password */
   public static final int password_len = 128;
 
-  /** The maximum length of the decription */
+  /** The maximum length of a decription */
   public static final int description_len = 200;
 
-  /** The maximum length of the privilege */
+  /** The maximum length of a privilege */
   public static final int privilege_len = 100;
 
-  /** The ID of the MyCoRe user unit (either user ID or group ID) */
+  /** The ID of the MyCoRe user object (either user ID or group ID) */
   protected String ID = "";
 
-  /** Specifies the user responsible for the creation of this user unit */
+  /** Specifies the user responsible for the creation of this user object */
   protected String creator = "";
 
-  /** The date of creation of the user object in the MyCoRe system */
+  /** The date and time of creation of the user object in the MyCoRe system */
   protected Timestamp creationDate = null;
 
-  /** The date of the last modification of this user object */
+  /** The date and time of the last modification of this user object */
   protected Timestamp modifiedDate = null;
 
-  /** Description of the user unit */
+  /** Description of the user object */
   protected String description = "";
 
   /** A list of groups (IDs) where this object is a member of */
   protected ArrayList groupIDs = null;
 
   /**
-   * The constructor for an empty object. Only the logger was set.
-   **/
+   * The constructor for an empty object. Only the logger is defined.
+   */
   public MCRUserObject()
   {
     ID = "";
     creator = "";
-    setCreationDate();
-    setModifiedDate();
+    creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+    modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
     description = "";
     groupIDs = new ArrayList();
     config = MCRConfiguration.instance();
@@ -96,38 +96,45 @@ abstract class MCRUserObject
   }
 
   /**
-   * This method sets the creationDate to the time provided as a parameter.
+   * This method sets the attribute creationDate to the time provided as a parameter.
    * @param time Timestamp to set the creation date
-   **/
-  public final void setCreationDate(Timestamp time)
-  { creationDate = time; }
+   */
+  public final void setCreationDate(Timestamp time) {
+    if (modificationIsAllowed()) creationDate = time;
+  }
 
   /**
-   * This method sets the creationDate to the time the method is called.
-   **/
-  public final void setCreationDate()
-  { creationDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+   * This method sets the attribute creationDate to the time the method is called.
+   */
+  public final void setCreationDate() {
+    if (modificationIsAllowed())
+      creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+  }
 
   /**
-   * This method sets the modifiedDate to the time provided as a parameter.
+   * This method sets the attribute modifiedDate to the time provided as a parameter.
    * @param time Timestamp to set the modified date
    **/
-  public final void setModifiedDate(Timestamp time)
-  { modifiedDate = time; }
+  public final void setModifiedDate(Timestamp time) {
+    if (modificationIsAllowed()) modifiedDate = time;
+  }
 
   /**
-   * This method sets the modifiedDate to the time the method is called.
-   **/
-  public final void setModifiedDate()
-  { modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime()); }
+   * This method sets the attribute modifiedDate to the time the method is called.
+   */
+  public final void setModifiedDate() {
+    if (modificationIsAllowed())
+      modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+  }
 
   /**
-   * This method sets the creator value.
-   *
+   * This method sets the creator.
    * @param creator the creator of a user or group
    **/
-  public final void setCreator(String creator)
-  { this.creator = trim(creator); }
+  public final void setCreator(String creator) {
+    if (modificationIsAllowed())
+      this.creator = trim(creator);
+  }
 
   /**
    * @return
@@ -166,29 +173,30 @@ abstract class MCRUserObject
   { return groupIDs; }
 
   /**
-   * This method adds a group to the groups list of the group. This is the list of
-   * group IDs where this group is a member of, not the list of groups this group
-   * has as members!
+   * This method adds a group to the groups list of the user object. This is the list of
+   * group IDs where this user or group itself is a member of, not the list of groups
+   * this user or group has as members.
    *
-   * @param groupID   ID of the group added to the group
+   * @param groupID   ID of the group added to the user object
    */
-  public void addGroupID(String groupID) throws MCRException
-  { if (!groupIDs.contains(groupID)) { groupIDs.add(groupID); } }
+  public void addGroupID(String groupID) throws MCRException {
+    // Since this operation is a modification of the group with ID groupID and not of
+    // the current group we do not need to check if the modification is allowed.
+    if (!groupIDs.contains(groupID)) {groupIDs.add(groupID);}
+  }
 
   /**
-   * This method clears the ArrayList containing the administrative groups.
-   */
-  protected final void cleanGroupID()
-  { groupIDs.clear(); }
-
-  /**
-   * This method removes a group from the groups list of the group. These are the
-   * groups where the group itself is a member of.
+   * This method removes a group from the groups list of the user object. This list
+   * is the list of group IDs where this user or group itself is a member of, not the
+   * list of groups this user or group has as members.
    *
-   * @param groupID   ID of the group removed from the group
+   * @param groupID   ID of the group removed from the user object
    */
-  public void removeGroupID(String groupID) throws MCRException
-  { if (groupIDs.contains(groupID))  { groupIDs.remove(groupID); } }
+  public void removeGroupID(String groupID) throws MCRException {
+    // Since this operation is a modification of the group with ID groupID and not of
+    // the current group we do not need to check if the modification is allowed.
+    if (groupIDs.contains(groupID)) { groupIDs.remove(groupID); }
+  }
 
   /**
    * This method must be implemented by a subclass and then returns the user or group
@@ -201,6 +209,18 @@ abstract class MCRUserObject
    * object as a JDOM element.
    */
   abstract public org.jdom.Element toJDOMElement() throws MCRException;
+
+  /**
+   * This method must be implemented by a subclass and the returns true if the current
+   * user or session may modify the current user object, false otherwise.
+   */
+  abstract public boolean modificationIsAllowed() throws MCRException;
+
+  /**
+   * This method must be implemented by a subclass and returns the the ID of the object.
+   */
+  abstract public String getID(); // Although the implementation just returns the ID-string
+  // it cannot be implemented only in this super class of MCRUser und MCRGroup due to the ACL system.
 
   /**
    * This helper method replaces null with an empty string and trims whitespace from
@@ -245,5 +265,4 @@ abstract class MCRUserObject
    */
   public String toString()
   { return ID; }
-
 }

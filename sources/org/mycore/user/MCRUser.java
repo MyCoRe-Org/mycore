@@ -163,7 +163,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    * the password if the flag useEncryption is true. This constructor must only be used if
    * a cleartext password is provided in the JDOM element user data.
    *
-   * @param elm JDOM Element defining a user 
+   * @param elm JDOM Element defining a user
    * @param useEncryption flag to determine if the password has to be encrypted
    **/
   public MCRUser(org.jdom.Element elm, boolean useEncryption)
@@ -172,9 +172,9 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     if (useEncryption) {
       String cryptPwd = MCRCrypt.crypt(this.passwd);
       this.passwd = cryptPwd;
-    } 
+    }
   }
-  
+
   /**
    * This constructor creates the data of this object from a given JDOM element.
    *
@@ -197,7 +197,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     this.updateAllowed = (elm.getAttributeValue("update_allowed").equals("true")) ? true : false;
     this.creator = trim(elm.getChildTextTrim("user.creator"), id_len);
     this.passwd = trim(elm.getChildTextTrim("user.password"), password_len);
-    
+
     String tmp = elm.getChildTextTrim("user.creation_date");
     if (tmp != null) {
       try {
@@ -273,10 +273,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     ArrayList ar = new ArrayList();
     try {
       // Privileges of the primary group
-      MCRGroup g = MCRUserMgr.instance().retrieveGroup(primaryGroupID);
+      MCRGroup g = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
       ar.addAll(g.getAllPrivileges());
       for (int i=0;i<groupIDs.size();i++) {
-        g = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i));
+        g = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i), false);
         ar.addAll(g.getAllPrivileges());
       }
     }
@@ -330,8 +330,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    * @param group Is the user a member of this group?
    * @return Returns true if the user is a member of the given group.
    */
-  public boolean isMemberOf (MCRGroup group)
-  {
+  public boolean isMemberOf (MCRGroup group) {
     if (groupIDs.contains(group.getID())) {
       return true;
     }
@@ -382,11 +381,15 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   {
     // We do not allow empty passwords. Later we might check if the password is
     // conform with a password policy.
-    if (newPassword == null) { return false; }
-    if (newPassword.length() != 0) {
-      passwd = trim(newPassword,password_len);
-      super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-      return true;
+    if (newPassword == null) {
+        return false;
+    }
+    if (modificationIsAllowed()) {
+      if (newPassword.length() != 0) {
+        passwd = trim(newPassword, password_len);
+        super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+        return true;
+      }
     }
     return false;
   }
@@ -396,8 +399,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    *
    * @param flag the boolean data
    */
-  public final void setEnabled(boolean flag)
-  { idEnabled = flag; }
+  public final void setEnabled(boolean flag) {
+    if (modificationIsAllowed())
+      idEnabled = flag;
+  }
 
   /**
    * This method updates this instance with the data of the given MCRUser.
@@ -406,13 +411,17 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    */
   public final void update(MCRUser newuser)
   {
+    // updateAllowed is an attribute of the user object which determines, whether
+    // the user himself may modify his or her data at all.
     if (!updateAllowed) return;
-    idEnabled = newuser.isEnabled();
-    passwd = newuser.getPassword();
-    primaryGroupID = newuser.getPrimaryGroupID();
-    description = newuser.getDescription();
-    groupIDs = newuser.getGroupIDs();
-    userContact = newuser.getUserContact();
+    if (modificationIsAllowed()) { // check if the current user/session may modify the object
+      idEnabled = newuser.isEnabled();
+      passwd = newuser.getPassword();
+      primaryGroupID = newuser.getPrimaryGroupID();
+      description = newuser.getDescription();
+      groupIDs = newuser.getGroupIDs();
+      userContact = newuser.getUserContact();
+    }
   }
 
   /**
@@ -421,7 +430,6 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    */
   public org.jdom.Document toJDOMDocument() throws MCRException
   {
-    // Build the DOM
     org.jdom.Element root = new org.jdom.Element("mycoreuser");
     root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
     root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
@@ -441,27 +449,21 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   public org.jdom.Element toJDOMElement() throws MCRException
   {
     org.jdom.Element user = new org.jdom.Element("user")
-      .setAttribute("numID", Integer.toString(numID))
-      .setAttribute("ID", ID)
-      .setAttribute("id_enabled", (idEnabled) ? "true" : "false")
-      .setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
+       .setAttribute("numID", Integer.toString(numID))
+       .setAttribute("ID", ID)
+       .setAttribute("id_enabled", (idEnabled) ? "true" : "false")
+       .setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
     org.jdom.Element Creator = new org.jdom.Element("user.creator").setText(super.creator);
-    org.jdom.Element CreationDate = new org.jdom.Element("user.creation_date")
-      .setText(super.creationDate.toString());
-    org.jdom.Element ModifiedDate = new org.jdom.Element("user.last_modified")
-      .setText(super.modifiedDate.toString());
-    org.jdom.Element Passwd = new org.jdom.Element("user.password")
-      .setText(passwd);
-    org.jdom.Element Description  = new org.jdom.Element("user.description")
-      .setText(super.description);
-    org.jdom.Element Primarygroup = new org.jdom.Element("user.primary_group")
-      .setText(primaryGroupID);
+    org.jdom.Element CreationDate = new org.jdom.Element("user.creation_date").setText(super.creationDate.toString());
+    org.jdom.Element ModifiedDate = new org.jdom.Element("user.last_modified").setText(super.modifiedDate.toString());
+    org.jdom.Element Passwd = new org.jdom.Element("user.password").setText(passwd);
+    org.jdom.Element Description  = new org.jdom.Element("user.description").setText(super.description);
+    org.jdom.Element Primarygroup = new org.jdom.Element("user.primary_group").setText(primaryGroupID);
 
     // Loop over all group IDs
     org.jdom.Element Groups = new org.jdom.Element("user.groups");
     for (int i=0; i<groupIDs.size(); i++) {
-      org.jdom.Element groupID = new org.jdom.Element("groups.groupID")
-        .setText((String)groupIDs.get(i));
+      org.jdom.Element groupID = new org.jdom.Element("groups.groupID").setText((String)groupIDs.get(i));
       Groups.addContent(groupID);
     }
 
@@ -485,5 +487,38 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     debugDefault();
     logger.debug("primaryGroupID     = "+primaryGroupID);
     userContact.debug();
+  }
+
+  /**
+   * This private helper method checks if the modification of the user object is
+   * allowed for the current user/session.
+   */
+  public final boolean modificationIsAllowed() throws MCRException
+  {
+    // Get the MCRSession object for the current thread from the session manager.
+    MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    String currentUserID=mcrSession.getCurrentUserID();
+
+    MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID, false);
+    if (currentUser.hasPrivilege("user administrator")) {
+      return true;
+    }
+    if (this.ID.equals(currentUserID) || this.creator.equals(currentUserID)) {
+      return true;
+    }
+    MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
+    if (primaryGroup.getAdminUserIDs().contains(currentUserID)) {
+      return true;
+    } else { // check if the current user is (direct, not implicit) member of one of the admGroups
+      ArrayList admGroupIDs = primaryGroup.getAdminGroupIDs();
+      for (int i=0; i<admGroupIDs.size(); i++) {
+        MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup((String)admGroupIDs.get(i), false);
+        if (currentGroup.getMemberUserIDs().contains(mcrSession.getCurrentUserID())) {
+          return true;
+        }
+      }
+    }
+    throw new MCRException("The current user "
+      +currentUserID+ " has no right to modify the user "+this.ID+".");
   }
 }

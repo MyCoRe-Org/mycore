@@ -314,6 +314,18 @@ public class MCRCommandLineInterface
       "disable user {0}",
       "org.mycore.frontend.cli.MCRUserCommands.disableUser MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "add group {0} as member to group {1}",
+      "org.mycore.frontend.cli.MCRUserCommands.addMemberGroupToGroup MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "remove group {0} as member from group {1}",
+      "org.mycore.frontend.cli.MCRUserCommands.removeMemberGroupFromGroup MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "add user {0} as member to group {1}",
+      "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "remove user {0} as member from group {1}",
+      "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup MCRSession String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "encrypt passwords in user xml file {0} to file {1}",
       "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile MCRSession String String" );
 
@@ -556,12 +568,12 @@ public class MCRCommandLineInterface
   public static void changeToUser( String user, String password )
     {
     logger.info("The old user is "+session.getCurrentUserID());
-    if (org.mycore.user.MCRUserMgr.instance().login(user.trim(),password.trim())) {
+    if (org.mycore.user.MCRUserMgr.instance().login(user.trim(), password.trim())) {
       session.setCurrentUserID(user);
       logger.info("The new user is "+session.getCurrentUserID());
       }
     else {
-      logger.error("The password was false, no changes of session context!"); }
+      logger.error("The password was wrong, no changes of session context!"); }
     }
 
  /**

@@ -97,9 +97,9 @@ public class MCRUserCommands
 
     session.setCurrentUserID(suser);
     try {
-      if (MCRUserMgr.instance().retrieveUser(session, suser) != null)
-      if (MCRUserMgr.instance().retrieveGroup(session, sgroup) != null)
-	logger.info("The superuser already exist!");
+      if (MCRUserMgr.instance().retrieveUser(suser) != null)
+      if (MCRUserMgr.instance().retrieveGroup(sgroup) != null)
+	logger.info("The superuser already exists!");
       return;
     } catch (Exception e) {}
 
@@ -136,7 +136,7 @@ public class MCRUserCommands
 	privList.add(
 		new MCRPrivilege(
 			"user administrator",
-			"Users with this privilege has administrator rights in the system."));
+			"Users with this privilege have administrator rights in the system."));
 	privList.add(
 		new MCRPrivilege(
 			"list all users",
@@ -221,10 +221,10 @@ public class MCRUserCommands
     }
       logger.info("The user "   + suser
 				+ " with password "
-				+ spasswd
+				+ config.getString("MCR.users_superuser_userpasswd", "mycore")
 				+ " is installed.");
 
-      // the guest
+    // the guest
     try {
       ArrayList groupIDs = new ArrayList();
       groupIDs.add(ggroup);
@@ -240,12 +240,12 @@ public class MCRUserCommands
     }
       logger.info("The user "	+ guser
 				+ " with password "
-				+ gpasswd
+				+ config.getString("MCR.users_guestuser_userpasswd", "gast")
 				+ " is installed.");
 
       // check all
       session.setCurrentUserID(suser);
-      MCRUserMgr.instance().checkConsistency(session);
+      MCRUserMgr.instance().checkConsistency();
       logger.info("");
   }
 
@@ -256,7 +256,7 @@ public class MCRUserCommands
    * @param session the MCRSession object
    */
   public static void checkConsistency(MCRSession session) throws Exception {
-    MCRUserMgr.instance().checkConsistency(session);
+    MCRUserMgr.instance().checkConsistency();
   }
 
   /**
@@ -268,7 +268,7 @@ public class MCRUserCommands
    **/
   public static void deleteGroup(MCRSession session, String groupID) throws Exception {
     init();
-    MCRUserMgr.instance().deleteGroup(session, groupID);
+    MCRUserMgr.instance().deleteGroup(groupID);
     logger.info("Group ID " + groupID + " deleted!");
   }
 
@@ -281,7 +281,7 @@ public class MCRUserCommands
    **/
   public static void deleteUser(MCRSession session, String userID) throws Exception {
     init();
-    MCRUserMgr.instance().deleteUser(session, userID);
+    MCRUserMgr.instance().deleteUser(userID);
     logger.info("User ID " + userID + " deleted!");
   }
 
@@ -293,7 +293,7 @@ public class MCRUserCommands
    **/
   public static void enableUser(MCRSession session, String userID) throws Exception {
     init();
-    MCRUserMgr.instance().enableUser(session, userID);
+    MCRUserMgr.instance().enableUser(userID);
     logger.info("User ID " + userID + " enabled!");
   }
 
@@ -308,6 +308,7 @@ public class MCRUserCommands
    * @param newFile the filename of the user data output (encrypted passwords)
    **/
   public static final void encryptPasswordsInXMLFile(MCRSession session, String oldFile, String newFile)
+  throws MCRException
   {
     init();
     if (!checkFilename(oldFile)) return;
@@ -341,7 +342,7 @@ public class MCRUserCommands
    **/
   public static void disableUser(MCRSession session, String userID) throws Exception {
     init();
-    MCRUserMgr.instance().disableUser(session, userID);
+    MCRUserMgr.instance().disableUser(userID);
     logger.info("User ID " + userID + " disabled!");
   }
 
@@ -353,7 +354,7 @@ public class MCRUserCommands
    **/
   public static void listAllUsers(MCRSession session) throws Exception {
     init();
-    ArrayList users = MCRUserMgr.instance().getAllUserIDs(session);
+    ArrayList users = MCRUserMgr.instance().getAllUserIDs();
     logger.info("");
     for (int i = 0; i < users.size(); i++) {
       logger.info((String) users.get(i));
@@ -368,7 +369,7 @@ public class MCRUserCommands
    **/
   public static void listAllGroups(MCRSession session) throws Exception {
     init();
-    ArrayList groups = MCRUserMgr.instance().getAllGroupIDs(session);
+    ArrayList groups = MCRUserMgr.instance().getAllGroupIDs();
     logger.info("");
     for (int i = 0; i < groups.size(); i++) {
       logger.info((String) groups.get(i));
@@ -384,7 +385,7 @@ public class MCRUserCommands
   {
     try {
       init();
-      ArrayList privs = MCRUserMgr.instance().getAllPrivileges(session);
+      ArrayList privs = MCRUserMgr.instance().getAllPrivileges();
       logger.info("");
       for (int i = 0; i < privs.size(); i++) {
 	MCRPrivilege currentPriv = (MCRPrivilege) privs.get(i);
@@ -407,7 +408,7 @@ public class MCRUserCommands
   throws MCRException
   {
     try {
-      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups(session);
+      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups();
       FileWriter outFile = new FileWriter(new File(filename));
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
@@ -425,7 +426,7 @@ public class MCRUserCommands
   throws MCRException
   {
     try {
-      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllPrivilegesAsJDOMDocument(session);
+      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllPrivilegesAsJDOMDocument();
       FileWriter outFile = new FileWriter(new File(filename));
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
@@ -444,7 +445,7 @@ public class MCRUserCommands
   throws MCRException
   {
     try {
-      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers(session);
+      org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers();
       FileWriter outFile = new FileWriter(new File(filename));
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
@@ -464,7 +465,7 @@ public class MCRUserCommands
   throws Exception
   {
     try {
-      MCRGroup group = MCRUserMgr.instance().retrieveGroup(session, groupID);
+      MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
       org.jdom.Document jdomDoc = group.toJDOMDocument();
       FileWriter outFile = new FileWriter(new File(filename));
       saveToXMLFile(jdomDoc, outFile);
@@ -485,7 +486,7 @@ public class MCRUserCommands
   throws MCRException
   {
     try {
-      MCRUser user = MCRUserMgr.instance().retrieveUser(session, userID);
+      MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
       org.jdom.Document jdomDoc = user.toJDOMDocument();
       FileWriter outFile = new FileWriter(new File(filename));
       saveToXMLFile(jdomDoc, outFile);
@@ -506,7 +507,7 @@ public class MCRUserCommands
     if (password == null)
       return;
     init();
-    MCRUserMgr.instance().setPassword(session, userID, password);
+    MCRUserMgr.instance().setPassword(userID, password);
     logger.info("The new password was set.");
   }
 
@@ -517,7 +518,7 @@ public class MCRUserCommands
    */
   public static void setLock(MCRSession session) throws MCRException {
     init();
-    MCRUserMgr.instance().setLock(session, true);
+    MCRUserMgr.instance().setLock(true);
     logger.info("Write access to the user component persistent database now is denied.");
   }
 
@@ -528,7 +529,7 @@ public class MCRUserCommands
    */
   public static void unLock(MCRSession session) throws MCRException {
     init();
-    MCRUserMgr.instance().setLock(session, false);
+    MCRUserMgr.instance().setLock(false);
     logger.info("Write access to the user component persistent database now is allowed.");
   }
 
@@ -542,7 +543,7 @@ public class MCRUserCommands
   public static final void showGroup(MCRSession session, String groupID)
   throws MCRException {
     MCRGroup group =
-    MCRUserMgr.instance().retrieveGroup(session, groupID, true);
+    MCRUserMgr.instance().retrieveGroup(groupID);
     org.jdom.Document jdomDoc = group.toJDOMDocument();
     showAsXML(jdomDoc);
   }
@@ -556,7 +557,7 @@ public class MCRUserCommands
    */
   public static final void showUser(MCRSession session, String userID)
   throws MCRException {
-    MCRUser user = MCRUserMgr.instance().retrieveUser(session, userID, true);
+    MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
     org.jdom.Document jdomDoc = user.toJDOMDocument();
     showAsXML(jdomDoc);
   }
@@ -599,6 +600,7 @@ public class MCRUserCommands
    * @param useEncryption flag to determine whether we use password encryption or not
    **/
   private static final void createUserFromFile(MCRSession session, String filename, boolean useEncryption)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -613,7 +615,7 @@ public class MCRUserCommands
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
 	MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), useEncryption);
-	MCRUserMgr.instance().createUser(session, u);
+	MCRUserMgr.instance().createUser(u);
       }
     } catch (Exception e) {
       throw new MCRException("Error while loading user data.", e);
@@ -630,6 +632,7 @@ public class MCRUserCommands
    * @param filename the filename of the user data input
    **/
   public static final void importUserFromFile(MCRSession session, String filename)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -644,7 +647,7 @@ public class MCRUserCommands
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
         MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), false); // do not encrypt passwords
-        MCRUserMgr.instance().importUserObject(session, u);
+        MCRUserMgr.instance().importUserObject(u);
       }
     } catch (Exception e) {
       throw new MCRException("Error while loading user data.", e);
@@ -657,6 +660,7 @@ public class MCRUserCommands
    * @param filename the filename of the user data input
    **/
   public static final void createGroupFromFile(MCRSession session, String filename)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -671,7 +675,7 @@ public class MCRUserCommands
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
 	MCRGroup g = new MCRGroup((org.jdom.Element) listelm.get(i));
-	MCRUserMgr.instance().createGroup(session, g);
+	MCRUserMgr.instance().createGroup(g);
       }
     } catch (Exception e) {
       throw new MCRException("Error while loading group data.", e);
@@ -685,6 +689,7 @@ public class MCRUserCommands
    * @param filename the filename of the group data input
    **/
   public static final void importGroupFromFile(MCRSession session, String filename)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -699,7 +704,7 @@ public class MCRUserCommands
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
         MCRGroup g = new MCRGroup((org.jdom.Element) listelm.get(i));
-        MCRUserMgr.instance().importUserObject(session, g);
+        MCRUserMgr.instance().importUserObject(g);
       }
     } catch (Exception e) {
       throw new MCRException("Error while loading group data.", e);
@@ -712,6 +717,7 @@ public class MCRUserCommands
    * @param filename the filename of the user data input
    **/
   public static final void updateUserFromFile(MCRSession session, String filename)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -726,7 +732,7 @@ public class MCRUserCommands
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
 	MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i));
-	MCRUserMgr.instance().updateUser(session, u);
+	MCRUserMgr.instance().updateUser(u);
       }
     } catch (Exception e) {
       throw new MCRException("Error while update user form file.", e);
@@ -739,6 +745,7 @@ public class MCRUserCommands
    * @param filename the filename of the user data input
    **/
   public static final void updateGroupFromFile(MCRSession session, String filename)
+  throws MCRException
   {
     init();
     if (!checkFilename(filename))
@@ -748,15 +755,111 @@ public class MCRUserCommands
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
       if (!rootelm.getName().equals("mycoregroup")) {
-	throw new MCRException("The data are not for group.");
+	throw new MCRException("The data are not for a group.");
       }
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
 	MCRGroup g = new MCRGroup((org.jdom.Element) listelm.get(i));
-	MCRUserMgr.instance().updateGroup(session, g);
+	MCRUserMgr.instance().updateGroup(g);
       }
     } catch (Exception e) {
-      throw new MCRException("Error while update group form file.", e);
+      throw new MCRException("Error while update group from file.", e);
+    }
+  }
+
+  /**
+   * This method adds a group as a member to another group
+   *
+   * @param session the MCRSession object
+   * @param mbrGroupID the ID of the group which will be a member of the group
+   *   represented by groupID
+   * @param groupID the ID of the group to which the group with ID mbrGroupID
+   *   will be added
+   * @throws MCRException
+   */
+  public static final void addMemberGroupToGroup(MCRSession session,
+    String mbrGroupID, String groupID) throws MCRException
+  {
+    init();
+    try {
+     MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+     group.addMemberGroupID(mbrGroupID);
+     MCRUserMgr.instance().updateGroup(group);
+    } catch (Exception e) {
+      throw new MCRException("Error while adding group "+mbrGroupID+
+                             " to group "+groupID+".", e);
+    }
+  }
+
+  /**
+   * This method removes a member group from another group
+   *
+   * @param session the MCRSession object
+   * @param mbrGroupID the ID of the group which will be removed from the group
+   *   represented by groupID
+   * @param groupID the ID of the group from which the group with ID mbrGroupID
+   *   will be removed
+   * @throws MCRException
+   */
+  public static final void removeMemberGroupFromGroup(MCRSession session,
+    String mbrGroupID, String groupID) throws MCRException
+  {
+    init();
+    try {
+     MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+     group.removeMemberGroupID(mbrGroupID);
+     MCRUserMgr.instance().updateGroup(group);
+    } catch (Exception e) {
+      throw new MCRException("Error while removing group "+mbrGroupID+
+                             " from group "+groupID+".", e);
+    }
+  }
+
+  /**
+   * This method adds a user as a member to a group
+   *
+   * @param session the MCRSession object
+   * @param mbrUserID the ID of the user which will be a member of the group
+   *   represented by groupID
+   * @param groupID the ID of the group to which the user with ID mbrUserID
+   *   will be added
+   * @throws MCRException
+   */
+  public static final void addMemberUserToGroup(MCRSession session,
+    String mbrUserID, String groupID) throws MCRException
+  {
+    init();
+    try {
+     MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+     group.addMemberUserID(mbrUserID);
+     MCRUserMgr.instance().updateGroup(group);
+    } catch (Exception e) {
+      throw new MCRException("Error while adding group "+mbrUserID+
+                             " to group "+groupID+".", e);
+    }
+  }
+
+  /**
+   * This method removes a member user from a group
+   *
+   * @param session the MCRSession object
+   * @param mbrUserID the ID of the user which will be removed from the group
+   *   represented by groupID
+   * @param groupID the ID of the group from which the user with ID mbrUserID
+   *   will be removed
+   * @throws MCRException
+   */
+  public static final void removeMemberUserFromGroup(MCRSession session,
+    String mbrUserID, String groupID) throws MCRException
+  {
+    init();
+    try {
+     MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
+     group.removeMemberUserID(mbrUserID);
+     MCRUserMgr.instance().updateGroup(group);
+    } catch (Exception e) {
+      throw new MCRException("Error while removing group "+mbrUserID+
+                             " from group "+groupID+".", e);
     }
   }
 
@@ -785,7 +888,7 @@ public class MCRUserCommands
 	if (p.isValid())
 	  list.add(p);
       }
-      MCRUserMgr.instance().updatePrivileges(session, list);
+      MCRUserMgr.instance().updatePrivileges(list);
     } catch (Exception e) {
       throw new MCRException("Error while update privileges form file.", e);
     }
@@ -796,6 +899,7 @@ public class MCRUserCommands
    * @param jdomDoc  the JDOM XML document to be printed
    **/
   private static final void showAsXML(org.jdom.Document jdomDoc)
+  throws MCRException
   {
     XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat());
     try {
@@ -811,6 +915,7 @@ public class MCRUserCommands
    * @param outFile  a FileWriter object for the output
    */
   private static final void saveToXMLFile(org.jdom.Document jdomDoc, FileWriter outFile)
+  throws MCRException
   {
     // get encoding
     config = MCRConfiguration.instance();
