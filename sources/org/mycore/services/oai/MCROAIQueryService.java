@@ -40,6 +40,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 //import org.mycore.datamodel.classifications.MCRClassificationManager;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -101,7 +102,7 @@ public class MCROAIQueryService implements MCROAIQuery {
     	String classification[];
     	if (classificationId.length() == 0) {
     		logger.debug("Suche in allen Klassifikationen");
-    		classification = new String[0];
+    		classification = MCRClassification.getAllClassificationID();
     		//classification = MCRClassificationManager.instance().getAllClassificationID();
     	} else {
     	    logger.debug("Suche in Klassifikationen: " + classificationId);
