@@ -213,9 +213,16 @@ public class MCRCStoreLucene
 		indexSearcher.close();
 		indexReader.close();
 		indexReader = null;
+		docCount--;
+		logger.debug("deleted " + deleted + " documents containing " + term);
+		if (docCount % optimizeIntervall == 0) {
+			loadIndexWriter();
+			logger.debug("Optimize index for searching...");
+			indexWriter.optimize();
+			indexWriter.close();
+		}
 		loadIndexReader();
 		loadIndexSearcher();
-		logger.debug("deleted " + deleted + " documents containing " + term);
 		//remove file
 		super.doDeleteContent(storageID);
 	}
@@ -263,6 +270,7 @@ public class MCRCStoreLucene
 			indexReader = null;
 		}
 		synchronized (indexWriter) {
+			indexWriter.optimize();
 			indexWriter.close();
 			indexWriter = null;
 		}
@@ -482,9 +490,7 @@ public class MCRCStoreLucene
 		} catch (IOException e) {
 			throw new MCRPersistenceException(
 				"Cannot create index in "
-					+ indexDir.getAbsolutePath()
-					+ File.pathSeparatorChar
-					+ indexDir.getName(),
+					+ indexDir.getAbsolutePath(),
 				e);
 		}
 		indexWriter.mergeFactor = optimizeIntervall;
