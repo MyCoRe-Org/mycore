@@ -118,7 +118,7 @@ private final MCRXMLTableInterface checkType(String type)
  **/
 public final void create(String type, MCRObjectID mcrid, org.jdom.Document xml)
   throws MCRException
-  { checkType(type).create(mcrid,MCRUtils.getByteArray(xml)); }
+  { checkType(type).create(mcrid,MCRUtils.getByteArray(xml),1); }
 
 /**
  * The method create a new item in the datastore.
@@ -130,7 +130,7 @@ public final void create(String type, MCRObjectID mcrid, org.jdom.Document xml)
  **/
 public final void create(String type, MCRObjectID mcrid, byte[] xml)
   throws MCRException
-  { checkType(type).create(mcrid,xml); }
+  { checkType(type).create(mcrid,xml,1); }
 
 /**
  * The method remove a item for the MCRObjectID from the datastore.
@@ -141,7 +141,7 @@ public final void create(String type, MCRObjectID mcrid, byte[] xml)
  **/
 public final void delete( String type, MCRObjectID mcrid )
   throws MCRException
-  { checkType(type).delete(mcrid); }
+  { checkType(type).delete(mcrid,1); }
 
 /**
  * The method update an item in the datastore.
@@ -153,7 +153,7 @@ public final void delete( String type, MCRObjectID mcrid )
  **/
 public final void update( String type, MCRObjectID mcrid, org.jdom.Document xml)
   throws MCRException
-  { checkType(type).update(mcrid,MCRUtils.getByteArray(xml)); }
+  { checkType(type).update(mcrid,MCRUtils.getByteArray(xml),1); }
 
 /**
  * The method update an item in the datastore.
@@ -165,7 +165,7 @@ public final void update( String type, MCRObjectID mcrid, org.jdom.Document xml)
  **/
 public final void update( String type, MCRObjectID mcrid, byte[] xml)
   throws MCRException
-  { checkType(type).update(mcrid,xml); }
+  { checkType(type).update(mcrid,xml,1); }
 
 /**
  * The method retrieve a dataset for the given MCRObjectID and returns
@@ -176,7 +176,7 @@ public final void update( String type, MCRObjectID mcrid, byte[] xml)
  **/
 public final byte[] retrieve( String type, MCRObjectID mcrid)
   throws MCRException
-  { return checkType(type).retrieve(mcrid); }
+  { return checkType(type).retrieve(mcrid,1); }
 
 /**
   * This method returns the next free ID number for a given
@@ -203,7 +203,7 @@ public final int getNextFreeIdInt( String type, String idproject, String idtype 
  * @return true if the MCRObjectID exist, else return false
  **/
 public final boolean exist( String type, MCRObjectID mcrid)
-  { return checkType(type).exist(mcrid); }
+  { return checkType(type).exist(mcrid,1); }
 
 }
 

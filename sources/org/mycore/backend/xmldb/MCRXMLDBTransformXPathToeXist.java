@@ -27,6 +27,7 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
+import org.mycore.datamodel.metadata.*;
 import org.mycore.services.query.*;
 
 import org.jdom.*;
@@ -88,11 +89,19 @@ protected final MCRXMLContainer startQuery( String type ) {
     String objid = "";
     org.jdom.Document doc;
     ResourceIterator ri = resultset.getIterator();
+    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
     while( ri.hasMoreResources() ) {
       XMLResource xmldoc = (XMLResource)ri.nextResource();
       doc = MCRXMLDBPersistence.convertResToDoc( xmldoc );
-      objid      =  doc.getRootElement().getAttribute( "ID" ).getValue();
-      result.add( "local", objid, 0, doc.getRootElement());
+      objid =  doc.getRootElement().getAttribute( "ID" ).getValue();
+      try {
+        byte[] xml = xmltable.retrieve(type,new MCRObjectID(objid));
+        result.add( "local", objid, 0, xml); 
+        }
+      catch (Exception e) {
+        logger.debug(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
+        result.add( "local", objid, 0, doc.getRootElement());
+        }
       }
     }
   catch( Exception e ) {

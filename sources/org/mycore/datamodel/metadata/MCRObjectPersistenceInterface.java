@@ -80,8 +80,10 @@ public void delete(MCRObjectID mcr_id)
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
+/*
 public boolean exist(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
+*/
 
 /**
  * The methode receive a object as XML stream from the data store.
@@ -91,8 +93,10 @@ public boolean exist(MCRObjectID mcr_id)
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
+/*
 public byte [] receive(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException;
+*/
 
 /**
  * The methode update a object in the data store.
@@ -115,8 +119,10 @@ public void update(MCRTypedContent mcr_tc, org.jdom.Document xml, String mcr_ts)
  * @exception MCRPersistenceException if a persistence problem is occured
  * @return the number a string
  **/
+/*
 public String getNextFreeId  (String project_id, String type_id) 
   throws MCRPersistenceException;
+*/
 
 }
 

@@ -199,6 +199,7 @@ public void delete( MCRObjectID mcr_id )
  * @return the content as a JDOM document
  * @throws MCRPersistenceException
  **/
+/*
 public final byte[] receive( MCRObjectID mcr_id )
   throws MCRConfigurationException 
   {
@@ -219,6 +220,7 @@ public final byte[] receive( MCRObjectID mcr_id )
     MCRXMLDBConnectionPool.instance().releaseConnection( collection ); }
   return MCRUtils.getByteArray( doc );
   }
+*/
 
 /**
  * A private method to convert the result in a dom tree.
@@ -252,11 +254,13 @@ public static org.jdom.Document convertResToDoc( XMLResource res )
  *
  * @return the next free ID number as a String
  **/
+/*
 public synchronized String getNextFreeId( String project_ID, String type_ID )
   throws MCRPersistenceException { 
   logger.debug("MCRXMLDBPersistence: getNextFreeId");    
   return "1";
   }
+*/
 
 /**
  * Checks whether an object with the given object id exists in the
@@ -265,6 +269,7 @@ public synchronized String getNextFreeId( String project_ID, String type_ID )
  * @param mcr_id id of the object to check exist
  * @return true if the item with the MCRObjectID exist, else false 
  **/
+/*
 public boolean exist( MCRObjectID mcr_id )
   {
   logger.debug("MCRXMLDBPersistence exist: "+mcr_id.getTypeId().toLowerCase()+
@@ -280,5 +285,6 @@ public boolean exist( MCRObjectID mcr_id )
   catch( Exception e ) { return false; }
   return false;
   }
+*/
 
 }

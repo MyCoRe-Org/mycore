@@ -102,10 +102,11 @@ private synchronized final void createXMLTable()
     c.doUpdate( new MCRSQLStatement( tableName )
      .addColumn( "MCRID VARCHAR("+
        Integer.toString(lengthObjectID)+") NOT NULL" )
+     .addColumn( "MCRVERSION INTEGER NOT NULL" )
      .addColumn( "MCRTYPE VARCHAR("+
        Integer.toString(lengthObjectID)+") NOT NULL" )
      .addColumn( "MCRXML BLOB" )
-     .addColumn("PRIMARY KEY(MCRID)")
+     .addColumn("PRIMARY KEY(MCRID,MCRVERSION)")
      .toCreateTableStatement() );
     }
   finally{ c.release(); }
@@ -116,37 +117,78 @@ private synchronized final void createXMLTable()
  *
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ * @param version the version of the XML Blob as integer
  * @exception if the method arguments are not correct
  **/
-public synchronized final void create(MCRObjectID mcrid, byte[] xml)
-  throws MCRPersistenceException
+public synchronized final void create(MCRObjectID mcrid, byte[] xml,
+  int version) throws MCRPersistenceException
   {
   if (mcrid == null) {
      throw new MCRPersistenceException("The MCRObjectID is null."); }
   if ((xml == null) || (xml.length ==0)) {
      throw new MCRPersistenceException("The XML arrax is null or empty."); }
-  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableName )
-    .setValue( "MCRID", mcrid.getId())
-    .setValue( "MCRTYPE", mcrid.getTypeId())
-    .setValue( "MCRXML", "?")
-    .toInsertStatement(),
-    xml, 1 );
+  MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+  try {
+    connection.getJDBCConnection().setAutoCommit(false);
+    StringBuffer sb = new StringBuffer(1024);
+    sb.append("INSERT INTO ").append(tableName)
+      .append(" (MCRID,MCRVERSION,MCRTYPE,MCRXML) VALUES (?,?,?,?)");
+    PreparedStatement statement = connection.getJDBCConnection()
+      .prepareStatement(sb.toString());
+    statement.setString(1,mcrid.getId());
+    statement.setInt(2,version);
+    statement.setString(3,mcrid.getTypeId());
+    statement.setBytes(4,xml);
+    statement.execute();
+    statement.close();
+    connection.getJDBCConnection().commit();
+    connection.getJDBCConnection().setAutoCommit(true);
+    }
+  catch(Exception ex) {
+    try{ connection.getJDBCConnection().rollback(); }
+    catch(SQLException ignored){}
+    throw new MCRException("Error in MCRXMLStore table create "+tableName+".",
+      ex);
+  }
+  finally
+    { connection.release(); }
   }
   
 /**
  * The method remove a item for the MCRObjectID from the datastore.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version of the XML Blob as integer
  * @exception if the method argument is not correct
  **/
-public synchronized final void delete( MCRObjectID mcrid )
+public synchronized final void delete( MCRObjectID mcrid, int version )
   throws MCRPersistenceException
   {
   if (mcrid == null){
      throw new MCRPersistenceException("The MCRObjectID is null."); }
-  MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableName )
-    .setCondition( "MCRID", mcrid.getId() )
-    .toDeleteStatement() );
+  MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+  try {
+    connection.getJDBCConnection().setAutoCommit(false);
+    StringBuffer sb = new StringBuffer(1024);
+    sb.append("DELETE FROM ").append(tableName)
+      .append("WHERE ( MCRID = ? AND MCRVERSION = ? )");
+    PreparedStatement statement = connection.getJDBCConnection()
+      .prepareStatement(sb.toString());
+    statement.setString(1,mcrid.getId());
+    statement.setInt(2,version);
+    statement.execute();
+    statement.close();
+    connection.getJDBCConnection().commit();
+    connection.getJDBCConnection().setAutoCommit(true);
+    }
+  catch(Exception ex) {
+    try{ connection.getJDBCConnection().rollback(); }
+    catch(SQLException ignored){}
+    throw new MCRException("Error in MCRXMLStore table delete "+tableName+".",
+      ex);
+    }
+  finally
+    { connection.release(); }
   }
   
 /**
@@ -154,24 +196,44 @@ public synchronized final void delete( MCRObjectID mcrid )
  *
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ * @param version the version of the XML Blob as integer
  * @exception if the method arguments are not correct
  **/
-public synchronized final void update(MCRObjectID mcrid, byte[] xml) 
+public synchronized final void update(MCRObjectID mcrid, byte[] xml,
+  int version) 
   throws MCRPersistenceException
   {
   if (mcrid == null) {
     throw new MCRPersistenceException("The MCRObjectID is null."); }
   if ((xml == null) || (xml.length ==0)) {
     throw new MCRPersistenceException("The XML arrax is null or empty."); }
+  MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
   try {
-    MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableName )
-      .setValue( "MCRID", mcrid.getId())
-      .setValue( "MCRTYPE", mcrid.getTypeId())
-      .setValue( "MCRXML", "?")
-      .toUpdateStatement(),
-      xml, 1 );
+    connection.getJDBCConnection().setAutoCommit(false);
+    StringBuffer sb = new StringBuffer(1024);
+    sb.append("UPDATE ").append(tableName)
+      .append(" SET MCRID = ?, MCRVERSION = ?, MCRTYPE = ?, MCRXML = ? ")
+      .append("WHERE (MCRID = ? AND MCRVERSION = ? )");
+    PreparedStatement statement = connection.getJDBCConnection()
+      .prepareStatement(sb.toString());
+    statement.setString(1,mcrid.getId());
+    statement.setInt(2,version);
+    statement.setString(3,mcrid.getTypeId());
+    statement.setBytes(4,xml);
+    statement.setString(5,mcrid.getId());
+    statement.setInt(6,version);
+    statement.execute();
+    statement.close();
+    connection.getJDBCConnection().commit();
+    connection.getJDBCConnection().setAutoCommit(true);
     }
-  catch (Exception ex) { create(mcrid,xml); }
+  catch(Exception ex) {
+      try{ connection.getJDBCConnection().rollback(); }
+      catch(SQLException ignored){}
+      throw new MCRException("Error in MCRXMLStore table update "+tableName+".",ex);
+    }
+  finally
+    { connection.release(); }
   }
   
 /**
@@ -179,10 +241,11 @@ public synchronized final void update(MCRObjectID mcrid, byte[] xml)
  * the corresponding XML file as byte array.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version of the XML Blob as integer
  * @return the XML-File as byte array or null
  * @exception if the method arguments are not correct
  **/
-public final byte[] retrieve(MCRObjectID mcrid)
+public final byte[] retrieve(MCRObjectID mcrid, int version)
   throws MCRPersistenceException
   {
   if (mcrid == null) {
@@ -190,8 +253,9 @@ public final byte[] retrieve(MCRObjectID mcrid)
   MCRSQLConnection connection = MCRSQLConnectionPool.instance()
     .getConnection();
   try {
-    StringBuffer sb = new StringBuffer("SELECT * FROM ").append(tableName)
-      .append(" WHERE MCRID = '").append(mcrid.getId()).append("'");
+    StringBuffer sb = new StringBuffer("SELECT MCRXML FROM ").append(tableName)
+      .append(" WHERE ( MCRID = '").append(mcrid.getId()).append("'")
+      .append(" AND MCRVERSION = '").append(version).append("' )");
     Statement statement = connection.getJDBCConnection().createStatement();
     ResultSet rs = statement.executeQuery(sb.toString());
     if(!rs.next()) {
@@ -199,7 +263,7 @@ public final byte[] retrieve(MCRObjectID mcrid)
       logger.debug(msg);
       return null;
       }
-    byte[] xml = rs.getBytes(3);
+    byte[] xml = rs.getBytes(1);
     rs.close();
     return xml;
     }
@@ -240,16 +304,18 @@ public final int getNextFreeIdInt( String project, String type )
  * This method check that the MCRObjectID exist in this store.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version of the XML Blob as integer
  * @return true if the MCRObjectID exist, else return false
  **/
-public final boolean exist(MCRObjectID mcrid)
+public final boolean exist(MCRObjectID mcrid, int version)
   {
   MCRSQLConnection connection = MCRSQLConnectionPool.instance()
     .getConnection();
   boolean test = false;
   try {
-    StringBuffer sb = new StringBuffer("SELECT * FROM ").append(tableName)
-      .append(" WHERE MCRID = '").append(mcrid.getId()).append("'");
+    StringBuffer sb = new StringBuffer("SELECT MCRID FROM ").append(tableName)
+      .append(" WHERE ( MCRID = '").append(mcrid.getId()).append("'")
+      .append(" AND MCRVERSION = '").append(version).append("' )");
     Statement statement = connection.getJDBCConnection().createStatement();
     ResultSet rs = statement.executeQuery(sb.toString());
     if(rs.next()) { test = true; } 

@@ -161,32 +161,6 @@ public class MCRSQLConnection
   }
   
   /**
-   * Executes an SQL update statement with a blob on this connection.
-   *
-   * @param statement the SQL create, insert or delete statement to be executed
-   * @param xml the XML Stream as an byte array
-   * @param pos  the position of the XML stream
-   **/  
-  public void doUpdate( String statement, byte[] xml, int pos )
-    throws MCRPersistenceException
-  {
-    MCRArgumentChecker.ensureNotEmpty( statement, "statement" );
-    try { 
-      PreparedStatement ps = connection.prepareStatement(statement);
-      ps.setBytes(pos,xml);
-      ps.executeUpdate();
-      }
-    catch( SQLException ex )
-    { 
-      Logger logger = MCRSQLConnectionPool.getLogger();
-      logger.info("MCRSQLConnection doUpdate: " + statement);
-      logger.error(ex.getMessage());
-      throw new MCRPersistenceException 
-      ( "Error while executing SQL update statement: " + statement, ex ); 
-    }
-  }
-  
-  /**
    * Executes an SQL select statement on this connection, where the expected result
    * is just a single value of a row.
    *
@@ -253,22 +227,6 @@ public class MCRSQLConnection
   {
     MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
     try{ c.doUpdate( statement ); }
-    finally{ c.release(); }
-  }
-
-  /**
-   * Executes an SQL update statement, using any currently free connection 
-   * from the pool. 
-   *
-   * @param statement the SQL create, insert or delete statement to be executed
-   * @param xml the XML Stream as an byte array
-   * @param pos  the position of the XML stream
-   **/  
-  public static void justDoUpdate( String statement, byte[] xml, int pos )
-    throws MCRPersistenceException
-  {
-    MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-    try{ c.doUpdate( statement, xml, pos ); }
     finally{ c.release(); }
   }
 

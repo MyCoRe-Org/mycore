@@ -52,27 +52,31 @@ public void init(String type) throws MCRPersistenceException;
  *
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ * @param version the version number as integer
  * @exception if the method arguments are not correct
  **/
-public void create(MCRObjectID mcrid, byte[] xml)
+public void create(MCRObjectID mcrid, byte[] xml, int version)
   throws MCRPersistenceException;
 
 /**
  * The method remove a item for the MCRObjectID from the datastore.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version number as integer
  * @exception if the method argument is not correct
  **/
-public void delete( MCRObjectID mcrid ) throws MCRPersistenceException;
+public void delete( MCRObjectID mcrid, int version) 
+  throws MCRPersistenceException;
 
 /**
  * The method update an item in the datastore.
  *
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ * @param version the version number as integer
  * @exception if the method arguments are not correct
  **/
-public void update(MCRObjectID mcrid, byte[] xml)
+public void update(MCRObjectID mcrid, byte[] xml, int version)
   throws MCRPersistenceException;
 
 /**
@@ -80,9 +84,11 @@ public void update(MCRObjectID mcrid, byte[] xml)
  * the corresponding XML file as byte array.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version number as integer
  * @exception if the method arguments are not correct
  **/
-public byte[] retrieve(MCRObjectID mcrid) throws MCRPersistenceException;
+public byte[] retrieve(MCRObjectID mcrid, int version) 
+  throws MCRPersistenceException;
 
 /**
   * This method returns the next free ID number for a given
@@ -105,9 +111,10 @@ public int getNextFreeIdInt( String project, String type )
  * This method check that the MCRObjectID exist in this store.
  *
  * @param mcrid a MCRObjectID
+ * @param version the version number as integer
  * @return true if the MCRObjectID exist, else return false
  **/
-public boolean exist(MCRObjectID mcrid);
+public boolean exist(MCRObjectID mcrid, int version);
 
 }
 
