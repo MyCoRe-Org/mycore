@@ -20,3 +20,18 @@ Eine "Ubersicht zu den Beziehungen der Objektteile zueinander soll die folgende 
 \end{center}
 \end{figure}
 Wie man der Grafik entnehmen kann, ist es m"oglich, neben Kategorien in Klassifikationen auch Metadaten der Documnets und LegalEntities hierarchich ineienander zu verschachteln. Auf dieser Basis k"onnen dann Strukturen wie z. B. die eines Buches abgebildet werden. Alle Beziehungen zwischen den Metadaten sind "uber eine eindeutige MCRObjectID gel"ost. \\
+\subsection{Die MCRObjectID}
+Dreh- und Angelpunkt aller Beziehungen von Metadaten und der daran angeknüpften Objekte ist ein eindeutiger Identifizierer. Im Falle des MyCoRe Projektes hat dieser den Namen {\bf MCRObjectID} erhalten. Er hat für alle Matadaten einen einheitlichen Aufbau und wird ständig zur Identifizierung genutzt. Auch das API des Systems bietet die Möglichkeit, diese ID automatisch zu generieren.\footnote{Siehe Programmers Guide.} Der Syntax der {\bf MCRObjectID} ist wie folgend festgelegt:\\
+\begin{center}
+{\bf MCRObjectID = {\it project\_type\_number}}
+\end{center}
+{\it project} - Dieses Element der ID spezifiziert ein bestimmtes Projekt. Es dient dazu, Daten verschiedener Projekte, welche sich gemeinsam auf einem System befinden, zu unterscheiden. Der Projektname sollte eindeutig sein und besteht aus einem Wort {\bf ohne Sonderzeichen}. Achten Sie immer darauf, dass Sie sich bei Vorhaben mit mehreren MyCoRe-Partnern von Anfang an auf einen Namen pro Projektteilnehmer verständigen. Für unser Sample haben wir {\bf MyCoReDemoDC} ausgewählt. {\bf Dieser Teil der ID ist case sensitive!}\\[2ex]
+{\it type} - Jedem Metadatentyp des Datenmodells ist ein Typbezeichner zuzuordnen. Dieser stellt in MyCoRe die Verbindung von der Konfiguration des Metadatums bis hin zu dessen Suche und Präsentation dar. Der Typname der MCRObjectID wird immer in Kleinbuchstaben (lower case) innerhalb des Systems verwendet. Achten Sie von Anfang an darauf, dies umzusetzen. Im MyCoRe-Projekt gibt es reservierte Typnamen, diese sind\\
+\begin{itemize}
+\item {\bf class} - für Klassifikationen
+\item {\bf derivate} - für Derivate
+\end{itemize}
+Zur Umsetztung des Datenmodells wurden weiterhin die Typen {\bf document} für Dokumente und {\bf legalentity} für Personen verwendet.
+{\it number} - Dieser Teil dient der Identifizierung des Einzelobjektes. Es dürfen nur natürliche Zahlen angegeben werden. Planen Sie Ihre Vergabe der Nummern bei eigenen Objekten sorgfältig. Da die Nummern teilweise als Strings verarbeitet werden, ist es sinnvoll, sie mit einer ausreichenden Zahl von Vornullen zu versehen. Dies erledigt das MyCoRe-System automatisch unter Zuhilfenahme des Konfogurationswertes {\tt MCR.metadata\_objectid\_number\_pattern } im File {\it mycore.properties.private }.
+\subsection{Das Sample-Datenmodell}
+Das Datenmodell des MyCoRe-Samples soll exemplarisch einen kleinen Dokumentserver abbliden, wie er dann für große Lösungen übernommen werden kann. Dabei sollen Multimediale Objekte verschiedenster Art und Herkunft gemeinsam verwaltet werden.
