@@ -196,7 +196,7 @@ public class MCRServlet extends HttpServlet {
 			String h = req.getRemoteHost();
 
 			if ((h == null) || (h.trim().length() == 0)) {
-				h = req.getRemoteAddr();
+				h = getRemoteAddr( req );
 				h = InetAddress.getByName(h).getHostName();
 			}
 			h = h.toLowerCase();
@@ -333,4 +333,17 @@ public class MCRServlet extends HttpServlet {
 		return value;
 	}
 
+  /**
+   * Returns the IP address of the client that made the request.
+   * When a proxy server was used, e. g. Apache mod_proxy in front
+   * of Tomcat, the value of the HTTP header X_FORWARDED_FOR
+   * is returned, otherwise the REMOTE_ADDR is returned 
+   **/
+  public static String getRemoteAddr( HttpServletRequest req )
+  {
+    String addr = req.getHeader( "X_FORWARDED_FOR" );
+    if( ( addr == null ) || ( addr.trim().length() == 0 ) )
+      addr = req.getRemoteAddr();
+     return addr;
+  }
 }
