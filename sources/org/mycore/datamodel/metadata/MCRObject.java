@@ -540,14 +540,58 @@ public final void updateInDatastore() throws MCRPersistenceException
   // check the data
   createXML();
   // clean the structure
-  mcr_struct.clear();
+  mcr_struct.clearChildren();
+  mcr_struct.clearDerivate();
   // set the derivate data in structure
   for (int i=0;i<old.mcr_struct.getDerivateSize();i++) {
     mcr_struct.addDerivate(old.mcr_struct.getDerivate(i));
     }
-  // set the parent from the original
-  if (old.mcr_struct.getParent() != null) {
-    mcr_struct.setParent(old.mcr_struct.getParent()); }
+  // set the parent from the original and this update
+  boolean setparent = false;
+  byte [] xmlarray;
+  if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() != null)) {
+    String oldparent = old.mcr_struct.getParent().getXLinkHref();
+    String newparent = mcr_struct.getParent().getXLinkHref();
+    if (!newparent.equals(oldparent)) {
+      // remove child from the old parent
+      logger.debug("Parent ID = "+oldparent);
+      try {
+        MCRObjectID parent_id = new MCRObjectID(oldparent);
+        xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
+        MCRObject parent = new MCRObject();
+        parent.setFromXML(xmlarray,false);
+        parent.mcr_struct.removeChild(mcr_id);
+        parent.updateThisInDatastore();
+        setparent = true;
+        }
+      catch (Exception e) {
+        logger.debug(MCRException.getStackTraceAsString(e));
+        logger.error("Error while delete child ID in parent object.");
+        logger.warn("Attention, the parent "+oldparent+"is now inconsist.");
+        }
+      }
+    }
+  if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() == null)) {
+    String oldparent = old.mcr_struct.getParent().getXLinkHref();
+    // remove child from the old parent
+    logger.debug("Parent ID = "+oldparent);
+    try {
+      MCRObjectID parent_id = new MCRObjectID(oldparent);
+      xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
+      MCRObject parent = new MCRObject();
+      parent.setFromXML(xmlarray,false);
+      parent.mcr_struct.removeChild(mcr_id);
+      parent.updateThisInDatastore();
+      setparent = true;
+      }
+    catch (Exception e) {
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error("Error while delete child ID in parent object.");
+      logger.warn("Attention, the parent "+oldparent+"is now inconsist.");
+      }
+    }
+  if ((old.mcr_struct.getParent() == null) && (mcr_struct.getParent() != null)) {
+    setparent = true; }
   // set the children from the original
   for (int i=0;i<old.mcr_struct.getChildSize();i++) {
     mcr_struct.addChild(old.mcr_struct.getChild(i));
@@ -571,6 +615,23 @@ public final void updateInDatastore() throws MCRPersistenceException
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   // update this dataset
   updateThisInDatastore();
+  // check if the parent was new set and set them
+  if (setparent) {
+    try {
+      MCRObject parent = new MCRObject();
+      parent.receiveFromDatastore(parent_id);
+      parent.getStructure().addChild(mcr_id,mcr_struct.getParent()
+        .getXLinkLabel(),mcr_label);
+      parent.updateThisInDatastore();
+      }
+    catch (Exception e) {
+      logger.debug(MCRException.getStackTraceAsString(e));
+      logger.error("Error while store child ID in parent object.");
+      deleteFromDatastore();
+      logger.error("Child object was removed.");
+      return;
+      }
+    }
   // update all children
   for (int i=0;i<mcr_struct.getChildSize();i++) {
     MCRObject child = new MCRObject();

@@ -90,6 +90,18 @@ public class MCRObjectStructure
     { parent = null; children.clear(); derivates.clear(); }
 
   /**
+   * This method clean the data lists children of this class.
+   **/
+  final void clearChildren()
+    { children.clear(); }
+
+  /**
+   * This method clean the data lists derivate of this class.
+   **/
+  final void clearDerivate()
+    { children.clear(); }
+
+  /**
    * The method returns the parent link.
    * 
    * @return MCRMetaLinkID       the corresponding link
