@@ -1,115 +1,39 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<!-- common used templates -->
-	<xsl:include href="wcms_common-used.xsl" />
-	<!-- end: common used templates -->
-	<xsl:include href="wcms_chooseTemplate.xsl" />
+      <xsl:variable name="MainTitle">
+            <xsl:value-of select="document($navigationBase)/navigation/@mainTitle" />
+      </xsl:variable>
+      <xsl:param name="navigationBase" 
+            select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/navigation.xml')" />
+      <xsl:param name="ImageBaseURL" select="concat($WebApplicationBaseURL,'modules/module-wcms/uif/web/common/images/') " />
 
-	<!-- =================================================================================================== -->
-	<xsl:template name="wcms.generatePage">
-		<!-- GET BROWSER ADDRESS -> $browserAddress-->
-		<!-- test if navigation.xml contains the current browser address -->
-
-		<xsl:variable name="completeRootNode" select="document($navigationBase)/navigation" />
-
-		<xsl:variable name="browserAddress_extern" >
-			<!-- verify each item with @type="extern" -->
-			<xsl:for-each select="$completeRootNode//item[@type='extern']" >
-				<!-- cut if neccesary the lang parameter at the end of the URL -->
-				<xsl:choose>
-					<xsl:when test="current()[@href = $RequestURL ]">
-						<xsl:value-of select="$RequestURL" />
-					</xsl:when>
-					<xsl:when test="current()[@href = (substring-before($RequestURL, concat('?lang=',$CurrentLang) ))]">
-						<xsl:value-of select="(substring-before($RequestURL, concat('?lang=',$CurrentLang) ))" />
-					</xsl:when>
-				</xsl:choose>
-			</xsl:for-each>
-			<!-- END OF: verify each item with @type="extern" -->
-		</xsl:variable>
-		<!-- verify each item with @type="intern" -->
-		<xsl:variable name="browserAddress_intern" >
-			<xsl:if test=" $browserAddress_extern = '' " >
-				<xsl:for-each select="$completeRootNode//item[@type='intern']" >
-					<!-- cut if neccesary the lang parameter at the end of the URL -->
-					<xsl:choose>
-						<!-- test if normal webapp path reduced by one doubled '/' -->
-						<xsl:when test=" current()[@href = concat('/',substring-after($RequestURL,$WebApplicationBaseURL)) ] ">
-							<xsl:value-of select="concat('/',substring-after($RequestURL,$WebApplicationBaseURL))" />
-						</xsl:when>
-						<!-- lang attribute at end cuted -->
-						<xsl:when 
-							test="current()[@href = (substring-before(concat('/',substring-after($RequestURL,$WebApplicationBaseURL)), concat('?lang=',$CurrentLang) ))]">
-							<xsl:value-of 
-								select="(substring-before(concat('/',substring-after($RequestURL,$WebApplicationBaseURL)), concat('?lang=',$CurrentLang) ))" 
-								/>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:for-each>
-			</xsl:if>
-		</xsl:variable>
-		<!-- END OF: verify each item with @type="intern" -->
-		<!-- look for appropriate dynamicContentBinding/rootTag -> $browserAddress_dynamicContentBinding -->
-		<xsl:variable name="browserAddress_dynamicContentBinding" >
-			<xsl:if test=" $browserAddress_extern = '' and $browserAddress_intern = '' " >
-				<!-- assign name of rootTag -> $rootTag -->
-				<xsl:variable name="rootTag" select="name(*)" />
-				<xsl:for-each select="$completeRootNode//dynamicContentBinding/rootTag" >
-					<xsl:if test=" current() = $rootTag " >
-						<xsl:for-each select="ancestor-or-self::*[@href]">
-							<xsl:if test="position()=last()" >
-								<xsl:value-of select="@href" />
-							</xsl:if>
-						</xsl:for-each>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:if>
-		</xsl:variable>
-		<!-- END OF: look for appropriate dynamicContentBinding/rootTag -> $browserAddress_dynamicContentBinding -->
-		<!-- END OF: test if navigation.xml contains the current browser address -->
+      <xsl:include href="wcms_coreFunctions.xsl" />      
+      <xsl:include href="wcms_common-used.xsl" />
+      <xsl:include href="wcms_chooseTemplate.xsl" />
+      
+      <!-- =================================================================================================== -->
+      <xsl:template name="wcms.generatePage">
+            
 		<!-- assign right browser address -->
 		<xsl:variable name="browserAddress" >
-			<xsl:choose>
-				<xsl:when test=" $browserAddress_extern != '' " >
-					<xsl:value-of select="$browserAddress_extern" />
-				</xsl:when>
-				<xsl:when test=" $browserAddress_intern != '' " >
-					<xsl:value-of select="$browserAddress_intern" />
-				</xsl:when>
-				<xsl:when test=" $browserAddress_dynamicContentBinding != '' " >
-					<xsl:value-of select="$browserAddress_dynamicContentBinding" />
-				</xsl:when>
-			</xsl:choose>
+	            <xsl:call-template name="wcms.getBrowserAddress" />
 		</xsl:variable>
-		<!-- END OF: assign right browser address -->
-		<!-- END OF: GET BROWSER ADDRESS -> $browserAddress-->
-		<!-- look for appropriate template entry and assign -> $template -->
-		<xsl:variable name="template" >
-			<!-- point to rigth item -->
-			<xsl:for-each 
-				select="document($navigationBase) /navigation//item[@href = $browserAddress]" 
-				>
-				<!-- collect @template !='' entries along the choosen axis -->
-				<xsl:for-each select="ancestor-or-self::*[  @template != '' ]">
-					<xsl:if test="position()=last()" >
-						<xsl:value-of select="@template" />
-					</xsl:if>
-				</xsl:for-each>
-				<!-- END OF: collect @template !='' entries along the choosen axis -->
-			</xsl:for-each>
-			<!-- END OF: point to rigth item -->
-		</xsl:variable>
-		<!-- END OF: look for appropriate template entry and assign -> $template -->
-		
-		<!-- call the appropriate template -->
-		<xsl:call-template name="chooseTemplate">
-			<xsl:with-param name="template" select="$template" />
-			<xsl:with-param name="browserAddress" select="$browserAddress" />
-			<!--			<xsl:with-param name="PrivOfUser" select="$PrivOfUser" /> -->
-		</xsl:call-template>
-		<!-- end: call the appropriate template -->
-		
-	</xsl:template>
-	<!-- ================================================================================= -->
+            
+            <!-- look for appropriate template entry and assign -> $template -->
+            <xsl:variable name="template" >
+	            <xsl:call-template name="wcms.getTemplate" >
+                        <xsl:with-param name="browserAddress" select="$browserAddress"/>
+                  </xsl:call-template>
+            </xsl:variable>
+
+            <!-- call the appropriate template -->
+            <xsl:call-template name="chooseTemplate">
+                  <xsl:with-param name="template" select="$template" />
+                  <xsl:with-param name="browserAddress" select="$browserAddress" />
+            </xsl:call-template>
+
+      </xsl:template>
+      <!-- ================================================================================= -->
+      
 </xsl:stylesheet>

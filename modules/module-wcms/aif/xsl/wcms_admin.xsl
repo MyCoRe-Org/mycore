@@ -37,7 +37,7 @@
 		src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
 		height="8" border="0" alt="" title=""/> <!-- 	 <a href="/common/wcms/logs.xml">Nutzungsstatistik einsehen</a> -->
 		 <a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">Nutzungsstatistik einsehen</a> 
-		<br/><br/> <img src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/greenArrow.gif" 
+		<br/><br/> <img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
 		width="16" height="8" border="0" alt="" title="" /> <a href="javascript: window.close()">Abmelden</a> </td>
   </tr>
 
