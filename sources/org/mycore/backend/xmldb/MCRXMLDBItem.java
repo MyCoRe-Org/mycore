@@ -37,6 +37,7 @@ import org.jdom.output.*;
  * This class implements a storage item for xml:db databases. 
  * 
  * @author marc schluepmann
+ * @author harald richter
  * @version $Revision$ $Date$
  **/
 public final class MCRXMLDBItem {
@@ -98,14 +99,21 @@ public final class MCRXMLDBItem {
      * encoding is to be used. Should never occur.
      **/
     public final void create() 
-	throws XMLDBException, 
+	throws XMLDBException,
+               MCRPersistenceException,
 	       UnsupportedEncodingException {
 	XMLResource res =
 	    (XMLResource)collection.createResource( objectID.getNumberAsString(),
 						    XMLResource.RESOURCE_TYPE );
-	XMLOutputter xmlouter = new XMLOutputter();
-	xmlouter.setEncoding( store_enc );
-	res.setContent( xmlouter.outputString( doc ) );
+        try {
+            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
+            org.w3c.dom.Document dom = outputter.output( doc );
+            res.setContentAsDOM( dom );
+        }
+        catch ( Exception e )
+        {
+            throw new MCRPersistenceException( e.getMessage(), e );
+        }
 	collection.storeResource( res );
     }
     
@@ -119,20 +127,11 @@ public final class MCRXMLDBItem {
 	       UnsupportedEncodingException, 
 	       JDOMException {
 
-// Commented things are old and lame!!
-// 	String[] resIDs = collection.listResources();
-// 	for( int i = 0; i < resIDs.length; i++ ) {
-// 	    XMLResource res = (XMLResource)collection.getResource( resIDs[i] );
-
 	XMLResource res = (XMLResource)collection.getResource( objectID.getNumberAsString() );
 	String xml = (String)res.getContent();
 	xml = new String( xml.getBytes( store_enc ), def_enc );
 	doc = builder.build( new StringReader( xml ) );
 
-// 	    if( objectID.getId().equals( doc.getRootElement().getAttribute( "ID" ).getValue() ) ) {
-// 		break;
-// 	    }
-// 	}
     }
 
     /**
@@ -144,12 +143,22 @@ public final class MCRXMLDBItem {
      **/
     public final void update()
 	throws XMLDBException, 
+               MCRPersistenceException,
 	       UnsupportedEncodingException, 
 	       JDOMException {
 	XMLResource res = (XMLResource)collection.getResource( objectID.getNumberAsString() );
-	XMLOutputter xmlouter = new XMLOutputter();
-	xmlouter.setEncoding( store_enc );
-	res.setContent( xmlouter.outputString( doc ) );
+//	XMLOutputter xmlouter = new XMLOutputter();
+//	xmlouter.setEncoding( store_enc );
+//	res.setContent( xmlouter.outputString( doc ) );
+        try {
+            org.jdom.output.DOMOutputter outputter = new org.jdom.output.DOMOutputter();
+            org.w3c.dom.Document dom = outputter.output( doc );
+            res.setContentAsDOM( dom );
+        }
+        catch ( Exception e )
+        {
+            throw new MCRPersistenceException( e.getMessage(), e );
+        }
 	collection.storeResource( res );
     }
 

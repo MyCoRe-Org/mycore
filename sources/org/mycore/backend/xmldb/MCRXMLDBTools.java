@@ -183,12 +183,14 @@ public final class MCRXMLDBTools {
 // a lot of queries of mycore sample (document and legal entity) work!!
         query = subst(query, "like", "&=");
         query = subst(query, "contains(", "contains(.,");
+        query = subst(query, "metadata/*/*/@href=", "metadata//*/@xlink:href=");
         if ( -1 != query.indexOf("] and") )
         {
           query = subst(query, "[", "/");
           query = subst(query, "] and", " and");
           query = "//*[" + query; 
         }
+        query = subst(query, "/mycoreobject/", "/");
 	return query;
     }
     

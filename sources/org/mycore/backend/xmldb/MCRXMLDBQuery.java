@@ -110,11 +110,6 @@ public class MCRXMLDBQuery implements MCRQueryInterface {
 	    ResourceIterator ri = resultset.getIterator();
 	    while( ri.hasMoreResources() ) {
 		XMLResource xmldoc = (XMLResource)ri.nextResource();
-		//		Document doc = (Document)xmldoc.getContentAsDOM();
-		//  		doc.getDocumentElement().removeAttribute( "src:col" );
-		//  		doc.getDocumentElement().removeAttribute( "src:key" );
-		//  		doc.getDocumentElement().removeAttribute( "xmlns:src" );
-		//		xmldoc.setContentAsDOM( doc );
 		MCRXMLDBItem item = new MCRXMLDBItem( xmldoc );
 		objid = item.getId().getId();
 		byte[] xml = MCRUtils.getByteArray( item.getContent() );
