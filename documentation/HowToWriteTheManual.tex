@@ -1,0 +1,48 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage{ngerman}
+
+%neue deutsche Rechtschreibung
+%\usepackage[english,ngerman]{babel}
+
+\usepackage[latin1]{inputenc} %für Linux
+%\usepackage[ansinew]{inputenc} %fuer Windows
+
+\usepackage{mycore}
+
+\makeindex
+\makeglossary
+
+\begin{document}
+%-------   Vorspann
+\title{HowTo Write a Manual for MyCoRe}
+\author{
+    Johannes Bühler\\
+    }
+\maketitle
+\setcounter{secnumdepth}{10}
+
+
+
+\chapter*{Vorwort}
+Ich hoffe mit dieser kurzen Anleitung \LaTeX -- Neulingen die Hilfestellung zu geben, die sie benötigen, um ihre Dokumentation für das MyCoRe Projekt schreiben zu können. \LaTeX -- Dokumenationen gibts doch schon wie Sand am Meer, warum also noch eine. Naja dieses Dokument hat in erster Linie die Absicht einen Leitfaden zu bieten, wie man für MyCoRe eine Dokumenation in \LaTeX erstellt und die dafür benötigten Befehle beschreibt. 
+Ich habe alle mir für die MyCoRe Dokumenation wichtig erscheinenden Latex Paket Aufrufe in die mycore.sty Datei gepackt, sodass ein Aufruf \verb+\usepackage{mycore}+ alle Pakete einbinden sollte.  
+
+\tableofcontents
+\listoffigures
+\listoftables
+%-------    Hauptteil
+\input{HowToWriteTheManual_latexnutzung}
+\input{HowToWriteTheManual_styles}
+\input{HowToWriteTheManual_tabellen}
+\input{HowToWriteTheManual_grafiken}
+\input{HowToWriteTheManual_querverweise}
+\input{HowToWriteTheManual_indexerstellung}
+\input{HowToWriteTheManual_glossary}
+
+\printglossary
+\printindex
+
+
+\end{document}
+ 
+

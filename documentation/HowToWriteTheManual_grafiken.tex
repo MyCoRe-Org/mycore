@@ -1,0 +1,63 @@
+\chapter{Grafiken}
+\section{Vorbereitungen}  
+Prinzipiell kann \LaTeX nur Grafiken im eps Format verarbeiten. Im Folgenden wird eine Möglichkeit aufgezeigt wie dieses Problem umgangen werden kann, und so auch andere Grafikformate in \LaTeX eingebunden werden können. Nichtsdestotrotz sollte man Vektorgrafiken nach Möglichkeit immer ins eps Format exportieren, da so verlustfrei gespeichert wird, im Gegensatz zu einer Speicheurng in einem Rasterformat. Mittlerweile sollten eigentlich die meisten Vektorzeichenprogramme das eps Format exportieren können. Bei Rastergrafiken ist das eps Format nicht unbedingt die erste Wahl, da die Dateien sehr groß werden können. Zwar gibt es natürlich auch hier die Möglichkeit die eps Dateien gezippt einzubinden, doch es soll auch gezeigt werden wie andere Rastergrafiken eingebunden werden können. Dies ist vorallem vor dem Hintergrund interessant, dass die Dokumenation in verschiedene Formate  überführt werden soll (ps, pdf, html, etc) und die wiederrum ein anderes Grafikformat benötigen als eps.
+Die Option {\tt \begin{verbatim}\DeclareGraphicsRule{.jpg}{eps}{.bb}{`convert #1 'eps:-'}\end{verbatim}} im Dokumentenkopf definert beispielsweise eine Regel für alle jpg Grafiken im Latex Dokument, die besagt, dass alle jpg Grafiken mit dem Programm convert in eps umgewandelt werden, und dabei die BoundingBox, die die Ausdehung der \index{Grafik} beschreibt, aus der Datei mit dem gleichen Namen aber der Endung bb gelesen werden soll. 
+
+Fuer unterschiedliche Grafikformate (bitmaps) wird nach dem latex Durchlauf die erstellte dvi Datei mit dvips "on the fly"  
+in eps umgewandelt. Dafür braucht latex die entsprechende BoundingBox der Grafik-Datei die man jedoch einfach erzeugen kann
+indem man im Grafik Verzeichnis mit 'ebb *.jpg' bzw 'ebb *.tif' aufruft. Bei jpg Dateien wird die BoundingBox manchmal falsch
+berechnet. Deshalb empfehle ich mit \begin{verbatim}convert file.jpg file.eps | grep \%\%BoundingBox \> file.bb \end{verbatim} die BoundingBox zu erzeugen oder folgendes shellscript zu verwenden 
+
+\begin{verbatim}
+  #!/bin/bash
+
+  for filename in *.jpg  ; do
+  echo "$filename" | grep -i "jpg$" > /dev/null
+  bb=`echo "$filename" | sed 's/jpg$/bb/i'`
+  echo "exctracting BoundingBox  $filname to $bb ..."
+  convert $filename eps:- | head -20 |  grep -e "^%!" -e "%%BoundingBox:" > $bb
+ done
+ 
+\end{verbatim}
+
+Bei der Betrachtung in einem dvi -- Viewer, werden die meisten eps Grafiken nicht richtig angezeigt.
+Nach der Erstellung der dvi Datei durch latex erzeugt man eine Postscript Datei mit dem Programm dvips. Dabei muss das Programm mit der option -R0 aufgerufen werden \begin{verbatim} dvips -R0   UserGuide.dvi \end{verbatim}
+Danach sollte eine ps Datei vorhanden sein in der alle Grafiken eingebunden sind. 
+Das Programm convert ist Teil des ImageMagick Pakets und ist bei fast jeder Linux Distri dabei.
+Es ist aber auch für windows (\url{http://www.imagemagick.org}) erhältlich. Ansonsten kann man natürlich auch andere Programme 
+wie beispielsweise \texttt{jpeg2ps} oder \texttt{tiff2ps} verwenden. Dann muss einfach die jeweilige GraphicsRule entsprechend geändert werden. 
+
+\section{Einbinden der Grafiken}
+
+Konkret werden Grafiken dann im Dokument folgendermaßen eingebunden:
+
+\begin{verbatim}
+   \begin{figure}[h]
+       \begin{center}
+          \fbox{\includegraphics[scale=.5]{bild.jpg}}
+          \label{testgrafik}
+          \caption{Dies ist eine jpg Grafik}
+       \end{center}
+   \end{figure}
+\end{verbatim}
+
+dazu folgende Erläuterungen:
+\subsection{Positionierung}
+Die Option [h] hinter \begin{verbatim}\begin{figure} \end{verbatim} steht für die Positionierung im Text. Dabei können folgende Parameter verwendet werden: h für here; t für top; b für bottom; p für page of floats (Alle Bilder werden auf einer Seite gesammelt); H für hier und nirgendwo sonst. H ist der absolute stärkste befehl und sollte nur mit Bedacht gewählt werden, da er jegliche latex Typographie Überlegungen übergeht. Dabei kann es sogar vorkommen, dass die Reihenfolge der Grafiken durcheinanderkommt, wenn unterschiedliche Parameter zusammen mit der Option H verwendet werden. also vorsicht! \LaTeX macht das schon ganz gut und oft ist es sinnvoll diese Layoutgeschichten wirklich erst ganz am Ende zu tun, da sich zwischenzeitlich ja doch immer mal wieder was verschiebt. Und da man ja nur den Parameter für die Positionierung ändern muss ist es ja kein Problem. 
+\subsection{Einbinden}
+Mit \begin{verbatim} \includegraphics[scale=.5]{Bild.jpg}\end{verbatim} wird die Grafik eingebunden. Auch hier können in der eckigen Klammer Optionen angegeben werden wie zum Beispiel height, width, scale, angle etc.
+Wichtig ist, dass die Datei Bild.bb, die die BoundingBox enthält, im Verzeichnis liegt. Ansonsten kann man natürlich auch per Hand die BoundingBox als Option eintragen. 
+
+\subsection{Rahmen}
+Möchte man gerne einen Rahmen um die Grafik haben so greift man einfach auf den Befehl \begin{verbatim}\fbox{}\end{verbatim} zurück.
+
+\subsection{Labeln - gibts dafür einen besseren Ausdruck}
+Um im Dokument auf die Grafik verweisen zu können muss die Grafik gelabelt werden \begin{verbatim}\label{testgrafik} \end{verbatim}
+
+\subsection{Beschriftung}
+Die Beschriftung erfolgt mit \begin{verbatim}\cation{Dies ist eine jpg Grafik} \end{verbatim}
+
+\subsection{Textumflossene Grafiken}
+\begin{window}[0,l,{\includegraphics[width=4cm]{mycore_logo.jpg}},{\centering{Das ist MyCoRe}}]                                 
+Das ist mal wieder ein Text, der keine weitere Aufgabe hat, als Platz zu fullen. Denn damit soll gezeigt werden, wie ein wunderbares Bild ganz asthetisch im Text ... Da sind wir wieder. 
+\end{window}

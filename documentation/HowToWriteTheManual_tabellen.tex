@@ -1,0 +1,117 @@
+\chapter{Tabellen}
+Tabellen stehen in der Umgebung tabular und ihrer um weiter Funktionaltät erweiterten Abkömmlinge (supertabular, tabularx). Im Allgemeinen wird auch die Tabelle als fließendes Objekt realisiert und die gesamte Tabelle in die Umgebung table gesetzt. Als Parameter werden der Tabelle die Ausrichtung der Einträge übergeben, also zentriert (c), linksbündig (l) oder rechtsbündig (r). Die Spaltenbreite wird automatisch ermittelt. Jede Zeile wird mit \textbackslash\textbackslash abgeschlossen, jede Spalte mit \&. Die letzte Zeile wird mit dem letzten Eintrag beendet. Horizontale Linien werden mit \verb+\hline+ eingezogen, vertikale Linien im Ausrichtungsblock (\textbar). Aus typographischen Gesichtspunkten empfehle ich jedoch keine vertikalen Linien und nur folgende horizontalen (\begin{verbatim} \toprule, \midrule, \bottomrule \end{verbatim})  zu verwenden. Um die Lesbarkeit noch weiter zu verbessern kann man am Ende jeder Zeile mit \verb+ \addlinespace+ einen vertikalen Abstand einfügen zwichen den Zeilen einfügen.
+Ich empfehle folgende Tabellenumgebungen zu verwenden \verb+tabular, tabularx, supertab+. 
+Man kann zwar alle möglichen Tabellen unter \LaTeX erstellen, jedoch ist die in aller Regel nicht ganz so trivial. Für Windows empfehle ich LaTable\footnote{Download: \url{http://www.g32.org/files/latable/latable-0_7_2.zip}} oder excel2latex\footnote{Download: \url{http://www.jam-software.com/freeware/xl2latex.zip} \& Readme: \url{http://www.jam-software.com/freeware/excel2latex_readme_en.txt}} um komplexte Tabellen zu erzeugen. Unter Linux leistet kile oder gnumeric ganz gute Dienste. Verwendet man diese Tools kann ich mir eigentlich jede weitere Erklärung sparen. Doc nur noch ganz kurz ein paar Worte zu den einzelnen Umgebungen
+
+\section{tabular}
+Tabular ist die einfachste Tabellenform. Verwendet werden sollte sie bei einfachen Tabellen, die sich nicht über mehrere Seiten (siehe Abschnitt \ref{supertab}) erstrecken und nicht über die Seitenbreite hinausragt. da dies im allgemeinen schwierig ist vorrauszusehen empfielt sich die tabularx Umgebung. Prinzipiell
+
+\section{tabularx}
+
+Mit diesem Package kann man Spalten von Tabellen gleich groß (=breit) machen. Die Größe bestimmt sich durch die Gesamtbreite der Tabelle. Tabularx Spalten werden mit einem X in die Spaltendefinition aufgenommen. Wichtig ist noch (wie bei Tabular*), dass eine Tabellenbreite nach dem \verb+\begin{tabularx}+ Befehl angegeben wird, damit Latex weiß wie breit die Spalten zu machen sind. Spalten, die mit X eingefügt werden sind linksbündig. Es ist möglich mehrere Tabularx Spalten im Header zu definieren, falls man beispielsweise rechtsbündige oder centrierte Spalten möchte (Befehle, die in den Header gehören sind unter dem Beispiel angeführt). Diese unterschiedlichen Tabularx Spaltentypen können innerhalb eine Tabularx Tabelle gleichzeitig verwendet werden und werden unabhängig von der Textausrichtung gleich breit formatiert.
+
+Beispiel für eine Tabularx Tabelle:
+
+\begin{verbatim}
+\newcolumntype{Y}{>{\raggedleft\arraybackslash}X}
+%neues Tabellenspaltenformat um TABULARX Spalten zu zentrieren
+\newcolumntype{Z}{>{\centering\arraybackslash}X}
+
+\begin{table}[htb] 
+\caption{Tabellenüberschrift} %Überschrift der Tabelle 
+\label{label} %Label der Tabelle 
+%
+\begin{tabularx}{\textwidth}{rlXYZp{1cm}}
+\toprule
+rechts    &  links  &    X &        Y &        Z    &     p \\ 
+\midrule
+1         &  2      & LINKS &  RECHTS &       MITTE &  definiert \\ 
+\bottomrule
+   
+\end{tabularx} 
+
+\end{table}
+\end{verbatim}
+
+
+\newcolumntype{Y}{>{\raggedleft\arraybackslash}X}
+%neues Tabellenspaltenformat um TABULARX Spalten zu zentrieren
+\newcolumntype{Z}{>{\centering\arraybackslash}X}
+
+\begin{table}[htb] 
+\caption{Tabellenüberschrift} %Überschrift der Tabelle 
+\label{label} %Label der Tabelle 
+%
+\begin{tabularx}{\textwidth}{rlXYZp{1cm}}
+\toprule
+       rechts    &  links         &      X &       Y &        Z &         p \\ \midrule
+       1         &         2      & LINKS &       RECHTS &       MITTE &       definiert \\ 
+       \bottomrule
+   
+\end{tabularx} 
+
+\end{table}
+
+Spalten die gleich groß werden sollen und rechtsbündig sind anstatt als X als Y einzufügen, zentrierte Spalten als Z (oder nach eigener Definition). In die oben angeführten Spaltendefinitionen können auch Schriftgrößenbefehle eingefügt werden und/oder Textformatierungen. Wichtig ist, dass den Befehlen der \verb+\arraybackslash+ folgt.
+
+
+
+\section{Mehrseitige Tabellen - Die supertabular Umgebung}\label{supertab}
+Supertabular wird für mehrseitige Tabellen verwendet. Mit mpsupertabular ist es zudem möglich Fußnoten in den Tabellen zu setzen. Für weitere Optionen ist ein Blick in die Dokumentation (liegt jeder \LaTeX Distribution bei) supertabular.dvi zu werfen. Da ist eigentlich alles sehr gut erklärt. Prinzipiell kann aber einfach statt der tabular die supertabular Umgebung verwendet werden. 
+ 
+\begin{verbatim}
+ \begin{supertabular}
+    ...
+  \end{supertabular} 
+\end{verbatim} 
+
+
+
+\section{Eine lange Tabelle querformatig einfügen}
+Bettet man eine tabular, tabularx Umgebung mit 
+\begin{verbatim}
+\begin{sidewaystable}
+  \begin{tabular}
+    ...
+  \end{tabular} 
+\end{sidewaystable}
+\end{verbatim} 
+
+ein. so wird die Tabelle im Querformat auf die Seite gedruckt.
+
+
+\section{Bunte Tabellen}
+Ist eigentlich selbsterklärend.
+\begin{verbatim}
+\begin{tabular}{%
+    >{\columncolor[gray]{0.9}}p{0.3\linewidth}  % graue Spalte
+    p{0.3\linewidth}                            % normale Spalte
+    >{\columncolor[gray]{0.9}}p{0.3\linewidth}  % graue Spalte
+    }\toprule
+  Kon\-ti\-nent & Berg & H"ohe [m]\\ \midrule
+  Asien & Chomolungma & 8848\\
+  S"udamerika ist ein Land das ich sehr sch"on finde& Aconcagua & 6962\\
+  Nord\-ameri\-ka & Denali & 6194\\
+  Afrika & Kilimandscharo & 5895\\
+  Antarktis & Mount Vinson & 4897\\
+  Australien & Carstensz Pyramid & 4884\\
+  Europa & Elbrus & 5642\\
+  \bottomrule
+\end{tabular}
+\end{verbatim}
+
+\begin{tabular}{%
+    >{\columncolor[gray]{0.9}}p{0.3\linewidth}  % graue Spalte
+    p{0.3\linewidth}                            % normale Spalte
+    >{\columncolor[gray]{0.9}}p{0.3\linewidth}  % graue Spalte
+    }\toprule
+  Kon\-ti\-nent & Berg & H"ohe [m]\\ \midrule
+  Asien & Chomolungma & 8848\\
+  S"udamerika ist ein Land das ich sehr sch"on finde& Aconcagua & 6962\\
+  Nord\-ameri\-ka & Denali & 6194\\
+  Afrika & Kilimandscharo & 5895\\
+  Antarktis & Mount Vinson & 4897\\
+  Australien & Carstensz Pyramid & 4884\\
+  Europa & Elbrus & 5642\\
+  \bottomrule
+\end{tabular}

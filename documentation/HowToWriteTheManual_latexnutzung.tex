@@ -1,0 +1,17 @@
+\chapter{Die Arbeit mit einem \LaTeX -- System}
+\section{Die Installation}
+\subsection{Die Installation unter SuSE Linux}
+Die Linux-Distribution von SuSE bietet unter 8.x ein recht vollständiges, umfangreiches und aktuelles \LaTeX -- System inklusive einer ganzen Reihe von zusätzlichen Komponenten.
+Folgende Pakete werden empfohlen zu installieren:\\
+\begin{itemize}
+\item {\bf te\_latex} - Alles zu und um \LaTeX
+\item {\bf te\_pdf} - Eine TeX/\LaTeX - Version mit PDF-Ausgabeformat
+\item {\bf tex4ht} - Ein TeX/\LaTeX Umwandler
+\item {\bf ImageMagick} - Ein mächtiges Bildverarbeitungs-Tool
+\end{itemize}
+\section{Verarbeitungskommandos}
+\subsection{Unix-Kommandos}
+Das Kommando {\tt latex {\it filename.tex}} erzeugt aus den \LaTeX - Quelle ein {\bf .dvi} - File, welches dann entsprechend weiterverarbeitet werden kann.\\[2ex]
+Das Kommando {\tt dvips {\it filename.dvi}} generiert aus dem {\bf .dvi} - File ein Postscript-File mit der Endung {\bf .ps}.\\[2ex]
+Um mit einem Rutsch direkt PDF-Dokumente zu erzeugen genügt das Kommando {\tt pdflatex {\it filename.tex}}.\\[2ex] 
+Zusätzlich haben wir ein Shell Script {\tt convert\_jpeg.sh } unter {\it \$MYCORE\_HOME/bin } gestellt, welches auf Basis von {\bf ImageMagick} von allen jpeg-Files Bounding Boxes zur Verarbeitung unter \LaTeX erzeugt.
