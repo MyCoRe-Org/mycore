@@ -103,6 +103,7 @@ class MCRCM8ConnectionPool
     // Build the initial number of CM8 connections
     for( int i = 0; i < initNumConnections; i++ )
       freeConnections.addElement( buildConnection() );
+    logger.info("");
     }
 
   /**

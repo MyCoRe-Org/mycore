@@ -26,6 +26,7 @@ package org.mycore.backend.cm8;
 
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
@@ -146,9 +147,12 @@ public void retrieveContent( MCRFile file, OutputStream target )
   DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
   try {
     DKLobICM ddo = (DKLobICM)connection.createDDO(file.getStorageID());
-    ddo.retrieve(DK_CM_CONTENT_YES);
-    InputStream is = ddo.getInputStream(-1,-1,-1);
-    int bufsize = 8192;
+    ddo.retrieve(DK_CM_CONTENT_NO);
+    String url = ddo.getContentURL(-1,-1,-1);
+    logger.debug("URL = "+url);
+    URL content = new URL(url);
+    InputStream is = content.openStream();
+    int bufsize = 65536;
     byte [] buf = new byte[bufsize];
     int inread;
     while ((inread = is.read(buf,0,bufsize)) != -1) { 
@@ -198,9 +202,9 @@ private void createStore(DKDatastoreICM connection) throws Exception
   item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_RESOURCE_ITEM);
   item_type.setXDOClassName(DK_ICM_XDO_LOB_CLASS_NAME);
   item_type.setXDOClassID(DK_ICM_XDO_LOB_CLASS_ID);
-  short rmcode = 1;
+  short rmcode = 1; // the default
   item_type.setDefaultRMCode(rmcode);
-  short smscode = 1;
+  short smscode = 1; // the default
   item_type.setDefaultCollCode(smscode);
   item_type.add();
   logger.info("The ItemType "+itemTypeName+" for IFS CM8 store is created."); 
