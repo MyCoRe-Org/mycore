@@ -42,7 +42,7 @@ import org.xmldb.api.*;
  * @author marc schluepmann
  * @version $Revision$ $Date$
  */
-public class MCRXMLDBObjectStore implements MCRContentStore {
+public class MCRXMLDBObjectStore extends MCRContentStore {
     protected int segmentSize;
     
     /** The unique store ID for this MCRContentStore implementation */
@@ -138,7 +138,7 @@ public class MCRXMLDBObjectStore implements MCRContentStore {
 	}	
     }
 
-    public void deleteContent( String storageID ) throws MCRPersistenceException {
+    public void doDeleteContent( String storageID ) throws MCRPersistenceException {
 	try {
 	    org.xmldb.api.base.Collection storageCollection = rootCollection.getChildCollection( storageID );
 	    Resource res = storageCollection.getResource( storageID );
@@ -162,4 +162,17 @@ public class MCRXMLDBObjectStore implements MCRContentStore {
 	    throw new MCRPersistenceException( e.getMessage(), e );
 	}		
     }
+/*    
+    protected void doDeleteContent(String storageID) throws Exception {
+    }
+*/    
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+      System.out.println("MCRXMLDBObjectStore method doRetrieveContent not implemented!!!!!"); 
+    }
+    
+    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+      System.out.println("MCRXMLDBObjectStore method doStoreContent not implemented!!!!!"); 
+      return null;  
+    }
+    
 }
