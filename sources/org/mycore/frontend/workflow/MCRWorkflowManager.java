@@ -116,19 +116,23 @@ public String getDirectoryPath(String type)
  * The method return the information mail address for a given MCRObjectID type.
  *
  * @param type the MCRObjectID type
- * @return the string of the information mail address
+ * @return the List of the information mail addresses
  **/
-public String getMailAddress(String type)
+public List getMailAddress(String type)
   {
-  if (mt.containsKey(type)) { return (String)mt.get(type); }
+  if (mt.containsKey(type)) { return (List)mt.get(type); }
   String mailaddr = config.getString("MCR.editor_"+type+"_mail",null);
+  ArrayList li = new ArrayList();
   if (mailaddr == null) {
-    mt.put(type,"mcradmin@localhost");
+    li.add("mcradmin@localhost");
+    mt.put(type,li);
     logger.warn("No mail address for "+type+" is in the configuration.");
-    return "mcradmin@localhost";
+    return li;
     }
-  mt.put(type,mailaddr);
-  return mailaddr;
+  StringTokenizer st = new StringTokenizer(mailaddr,",");
+  while (st.hasMoreTokens()) { li.add(st.nextToken()); }
+  mt.put(type,li);
+  return li;
   }
 
 /**
