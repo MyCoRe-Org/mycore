@@ -293,7 +293,7 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
       ((temp_subtag = temp_subtag.trim()).length() ==0)) {
     throw new MCRException("The subtag is null or empty."); }
   subtag = temp_subtag;
-  String temp_lang = element.getAttributeValue("lang");
+  String temp_lang = element.getAttributeValue("lang",org.jdom.Namespace.XML_NAMESPACE);
   if ((temp_lang!=null) && ((temp_lang = temp_lang.trim()).length() !=0)) {
     lang = temp_lang; }
   String temp_type = (String)element.getAttributeValue("type");

@@ -238,7 +238,8 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
   {
   super.setFromDOM(element);
   super.type = "";
-  String temp = element.getAttributeValue("type");
+  String temp = element.getAttributeValue("type",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
   if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
     if ((temp.equals("locator"))||(temp.equals("arc"))) {
       linktype = temp; }
@@ -250,15 +251,21 @@ public void setFromDOM(org.jdom.Element element) throws MCRException
     linktype = null;
     throw new MCRException("The xlink:type is not locator or arc."); }
   if (linktype.equals("locator")) {
-    String temp1 = (String)element.getAttributeValue("href");
-    String temp2 = (String)element.getAttributeValue("label");
-    String temp3 = (String)element.getAttributeValue("title");
+    String temp1 = (String)element.getAttributeValue("href",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+    String temp2 = (String)element.getAttributeValue("label",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+    String temp3 = (String)element.getAttributeValue("title",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
     setReference(temp1,temp2,temp3);
     }
   else {
-    String temp1 = (String)element.getAttributeValue("from");
-    String temp2 = (String)element.getAttributeValue("to");
-    String temp3 = (String)element.getAttributeValue("title");
+    String temp1 = (String)element.getAttributeValue("from",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+    String temp2 = (String)element.getAttributeValue("to",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+    String temp3 = (String)element.getAttributeValue("title",org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
     setBiLink(temp1,temp2,temp3);
     }
   }
