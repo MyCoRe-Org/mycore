@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.27 $ $Date: 2004-12-28 09:08:47 $ -->
+<!-- $Revision: 1.28 $ $Date: 2004-12-30 08:05:27 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -717,6 +717,7 @@
       <xsl:with-param name="var" select="$var" />
     </xsl:call-template>
   </xsl:variable>
+
   <!-- ======== find the "position number" of this hidden field in panel ======== -->
   <xsl:variable name="pos.new">
     <xsl:if test="$pos">
@@ -733,24 +734,25 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ======== select matching nodes from source xml ======== -->  
-  <xsl:variable name="selected.source.values" 
-    select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]"
-  />
   <xsl:choose>
-    <!-- ======== if there are nodes, copy values to hidden fields ======== -->
-    <xsl:when test="count($selected.source.values) &gt; 0"> 
-      <xsl:for-each select="$selected.source.values">
+    <!-- ======== copy all elements, attributes and child elements with current xpath to hidden field ======== -->  
+    <xsl:when test="@descendants='true'">
+      <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]">
         <input type="hidden" name="{@name}" value="{@value}" />
-        <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
       </xsl:for-each>
     </xsl:when>
-    <!-- ======== otherwise copy default value to hidden field ======== -->
-    <xsl:otherwise>
+    <!-- ======== copy single source value to hidden field ======== -->
+    <xsl:when test="ancestor::editor/input/var[@name = $var.new]">
+      <input type="hidden" name="{$var.new}" value="{ancestor::editor/input/var[@name = $var.new]/@value}" />
+      <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
+    </xsl:when>
+    <!-- ======== copy default value to hidden field ======== -->
+    <xsl:when test="@default">
       <input type="hidden" name="{$var.new}" value="{@default}" />
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
-    </xsl:otherwise>
+    </xsl:when>
   </xsl:choose>
+
 </xsl:template>
 
 <!-- ======== label ======== -->
