@@ -1,8 +1,8 @@
 package wcms.util;
 
-import java.io.*;
-import java.security.*;
-//import javax.crypto.*;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class HashCipher {
     

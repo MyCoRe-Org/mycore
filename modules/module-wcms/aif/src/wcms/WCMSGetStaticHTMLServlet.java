@@ -1,7 +1,7 @@
 /**
  * WCMSGetStaticHTMLServlet.java
  *
- * @author: Michael Brendel, Andreas Trappe
+ * @author: Michael Brendel, Andreas Trappe, Thomas Scheffler (yagee)
  * @contact: michael.brendel@uni-jena.de, andreas.trappe@uni-jena.de
  *
  * Copyright (C) 2003 University of Jena, Germany
@@ -26,19 +26,15 @@ package wcms;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.jdom.Comment;
 import org.jdom.DocType;
@@ -49,10 +45,8 @@ import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 
-public class WCMSGetStaticHTMLServlet extends HttpServlet {
-    MCRConfiguration mcrConf = MCRConfiguration.instance();
+public class WCMSGetStaticHTMLServlet extends WCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE; //xml Namespace for the language attribute lang
     File hrefFile = null;
     char fs = File.separatorChar;
@@ -65,52 +59,12 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
     private String defaultLang = null;     //
     boolean validXHTML = true;
     
-    /** Initializes the servlet.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
-
-    /** Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        
-            processRequest(request, response, request.getSession(false));
-        
-    }
-
-    /** Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            processRequest(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-    }
-
-    /** Destroys the servlet.
-     */
-    public void destroy() {
-
-    }
 
     /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         href = request.getParameter("href");
         lang = request.getParameter("lang");

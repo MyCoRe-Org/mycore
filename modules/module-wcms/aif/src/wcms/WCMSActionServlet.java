@@ -23,12 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -37,7 +34,6 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.EntityResolver;
@@ -45,11 +41,10 @@ import org.xml.sax.InputSource;
 
 /**
  *
- * @author  m5brmi-sh
+ * @author  m5brmi-sh, Thomas Scheffler (yagee)
  * @version
  */
-public class WCMSActionServlet extends HttpServlet {
-    MCRConfiguration mcrConf = MCRConfiguration.instance();
+public class WCMSActionServlet extends WCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE;
 
     /*Session, userDB*/
@@ -103,55 +98,11 @@ public class WCMSActionServlet extends HttpServlet {
     Element actElem;
     File [] masterTemplates;
 
-    /** Initializes the servlet.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
-
-    /** Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            processRequest(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-    }
-
-    /** Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            processRequest(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-    }
-
-    /** Destroys the servlet.
-     */
-    public void destroy() {
-
-    }
-
     /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
         sessionParam="final";
@@ -160,20 +111,19 @@ public class WCMSActionServlet extends HttpServlet {
         hrefFile = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
-
-        userID = (String)session.getAttribute("userID");
-        userClass = (String)session.getAttribute("userClass");
-        userRealName = (String)session.getAttribute("userRealName");
-        rootNodes = (List)session.getAttribute("rootNodes");
-        action = (String)session.getAttribute("action");
-        mode = (String)session.getAttribute("mode");
-        href = (String)session.getAttribute("href");
-        dir = (String)session.getAttribute("dir");
-        currentLang = (String)session.getAttribute("currentLang");
-        defaultLang = (String)session.getAttribute("defaultLang");
-        if ( session.getAttribute("addAtPosition")!= null)
-            addAtPosition = (String)session.getAttribute("addAtPosition");
+        masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
+        userID = (String)mcrSession.get("userID");
+        userClass = (String)mcrSession.get("userClass");
+        userRealName = (String)mcrSession.get("userRealName");
+        rootNodes = (List)mcrSession.get("rootNodes");
+        action = (String)mcrSession.get("action");
+        mode = (String)mcrSession.get("mode");
+        href = (String)mcrSession.get("href");
+        dir = (String)mcrSession.get("dir");
+        currentLang = (String)mcrSession.get("currentLang");
+        defaultLang = (String)mcrSession.get("defaultLang");
+        if ( mcrSession.get("addAtPosition")!= null)
+            addAtPosition = (String)mcrSession.get("addAtPosition");
 
         target = request.getParameter("target");
         style = request.getParameter("style");
@@ -258,7 +208,7 @@ public class WCMSActionServlet extends HttpServlet {
         replaceMenu = request.getParameter("replaceMenu");
         if ( replaceMenu == null ) replaceMenu = "false";
         masterTemplate = request.getParameter("masterTemplate");
-        File naviFile = new File(mcrConf.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+        File naviFile = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 
         fileName = href;
  /* -------------------------------------------------------------------- */
@@ -283,7 +233,7 @@ public class WCMSActionServlet extends HttpServlet {
                 else {
                     fileName = href + link;
                 }
-                href = (String)session.getAttribute("href");
+                href = (String)mcrSession.get("href");
             }
         }
 
@@ -327,7 +277,7 @@ public class WCMSActionServlet extends HttpServlet {
 
         if (!dir.equals("false")) {
             attribute = "dir";
-            avalue = (String)session.getAttribute("dir");
+            avalue = (String)mcrSession.get("dir");
         }
 
         else {
@@ -370,15 +320,15 @@ public class WCMSActionServlet extends HttpServlet {
         /*---------------------------------------------------------------------*/
 
         if ( !realyDel.equals("false") ) {
-            doItAll( session, request, response, naviFile, hrefFile, action, mode, addAtPosition );
+            doItAll(request, response, naviFile, hrefFile, action, mode, addAtPosition );
         }
         else {
             sessionParam="choose";
-            generateOutput(session, request, error, response, naviFile, label, fileName);
+            generateOutput(request, error, response, naviFile, label, fileName);
         }
     }
 
-    public void generateOutput(HttpSession session, HttpServletRequest request, String error, HttpServletResponse response, File naviFile, String label, String fileName){
+    public void generateOutput(HttpServletRequest request, String error, HttpServletResponse response, File naviFile, String label, String fileName){
         try {
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(naviFile);
@@ -393,7 +343,7 @@ public class WCMSActionServlet extends HttpServlet {
             rootOut.addContent(new Element("style").setText(style));
             rootOut.addContent(new Element("addAtPosition").setText(addAtPosition));
             rootOut.addContent(new Element("action").setAttribute("mode", mode).setText(action));
-            rootOut.addContent(new Element("sessionID").setText(session.getId()));
+            rootOut.addContent(new Element("sessionID").setText(mcrSession.getID()));
             rootOut.addContent(new Element("userID").setText(userID));
             rootOut.addContent(new Element("userClass").setText(userClass));
             Iterator rootNodesIterator = rootNodes.iterator();
@@ -402,7 +352,7 @@ public class WCMSActionServlet extends HttpServlet {
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
             if ( action.equals("delete") ) {
-                File [] contentTemplates = new File((mcrConf.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
+                File [] contentTemplates = new File((super.CONFIG.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
                 for (int i=0; i < contentTemplates.length; i++) {
@@ -419,16 +369,16 @@ public class WCMSActionServlet extends HttpServlet {
 
                 Element images = new Element("images");
                 rootOut.addContent(images);
-                imageList = (new File(mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
+                imageList = (new File(super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
                 for (int i=0; i < imageList.length; i++) {
-                    images.addContent(new Element("image").setText(mcrConf.getString("MCR.WCMS.imagePath")+imageList[i]));
+                    images.addContent(new Element("image").setText(super.CONFIG.getString("MCR.WCMS.imagePath")+imageList[i]));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
-                documentList = (new File(mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
+                documentList = (new File(super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
                 for (int i=0; i < documentList.length; i++) {
-                    documents.addContent(new Element("document").setText(mcrConf.getString("MCR.WCMS.imagePath")+documentList[i]));
+                    documents.addContent(new Element("document").setText(super.CONFIG.getString("MCR.WCMS.imagePath")+documentList[i]));
                 }
                 Element templates = new Element("templates");
                 Element master = new Element("master");
@@ -502,7 +452,7 @@ public class WCMSActionServlet extends HttpServlet {
 
     public void updateFooter() {
         try {
-            File footer = new File(mcrConf.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
+            File footer = new File(super.CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
             Document doc;
             if (!footer.exists()) {
@@ -562,7 +512,7 @@ public class WCMSActionServlet extends HttpServlet {
 
     public void writeToLogFile(String action, String contentFileBackup) {
         try {
-            File logFile = new File(mcrConf.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
+            File logFile = new File(super.CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
             Document doc;
             if (!logFile.exists()) {
@@ -685,9 +635,9 @@ public class WCMSActionServlet extends HttpServlet {
     public String makeBackup (File inputFile) {
         File backupFile = null;
         if (inputFile.toString().endsWith(fs+"navigation.xml")) {
-            backupFile = new File(mcrConf.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fs+"navi"+fs+"navigation.xml");
+            backupFile = new File(super.CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fs+"navi"+fs+"navigation.xml");
         }
-        else backupFile = new File(mcrConf.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+href.replace('/', File.separatorChar));
+        else backupFile = new File(super.CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+href.replace('/', File.separatorChar));
         if (inputFile.exists()) {
             try {
                 BufferedInputStream bi = new BufferedInputStream(new FileInputStream(inputFile));
@@ -1132,10 +1082,10 @@ public class WCMSActionServlet extends HttpServlet {
         return true;
     }
 
-    public void doItAll( HttpSession session, HttpServletRequest request, HttpServletResponse response, File naviFile, File hrefFile, String action, String mode, String addAtPosition) throws IOException {
+    public void doItAll( HttpServletRequest request, HttpServletResponse response, File naviFile, File hrefFile, String action, String mode, String addAtPosition) throws IOException {
         if ( (checkInput()) == false ) {
             sessionParam = "action";
-            generateOutput(session, request, error, response, naviFile, label, fileName);
+            generateOutput(request, error, response, naviFile, label, fileName);
             return;
         }
         if ( !action.equals("add") && mode.equals("intern") ) contentFileBackup = makeBackup(hrefFile);
@@ -1145,7 +1095,7 @@ public class WCMSActionServlet extends HttpServlet {
         if ( !action.equals("delete") && mode.equals("intern") ) updateXMLFileFooter(hrefFile);
         updateFooter();
         writeToLogFile(action, contentFileBackup);
-        generateOutput(session, request, error, response, naviFile, label, fileName);
+        generateOutput(request, error, response, naviFile, label, fileName);
     }
 
     /** Returns a short description of the servlet.

@@ -1,7 +1,7 @@
 /**
  * WCMSLoginServlet.java
  *
- * @author: Michael Brendel, Andreas Trappe
+ * @author: Michael Brendel, Andreas Trappe, Thomas Scheffler (yagee)
  * @contact: michael.brendel@uni-jena.de, andreas.trappe@uni-jena.de
  * @version: 0.81
  * @last update: 11/25/2003
@@ -26,72 +26,56 @@
 
 package wcms;
 
-import java.io.*;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.Properties;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.frontend.servlets.MCRServletJob;
+
 import wcms.util.HashCipher;
-//import wcms.util.WCMSProperties;
-import org.mycore.common.*;
 
 /**
  * Loginprocess for Web-Content-Management-System (WCMS).
  */
-public class WCMSLoginServlet extends HttpServlet {
-
+public class WCMSLoginServlet extends WCMSServlet {
+	private static Logger LOGGER=Logger.getLogger(WCMSLoginServlet.class);
     /**
      * Identify and assign the system dependent file seperator character.
      */
     char fs = File.separatorChar;
 
-    /**
-     * Initializes the servlet.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
-
-    /**
-     * Destroys the servlet.
-     */
-    public void destroy() {
-    }
-
-    /**
-     * Handles the HTTP POST Method.
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-
-            doGetPost(request, response, request.getSession(true));
-    }
-
-    /**
-     * Handles the HTTP GET Method.
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-
-            doGetPost(request, response, request.getSession(true));
-    }
+    /*
+  	 * (non-Javadoc)
+  	 * 
+  	 * @see org.mycore.frontend.servlets.MCRServlet#doGetPost(org.mycore.frontend.servlets.MCRServletJob)
+  	 */
+  	protected void doGetPost(MCRServletJob job) throws Exception {
+  		/*This method is overwritten from WCMSServlet, because ther is no user yet */
+ 			processRequest(job.getRequest(), job.getResponse());
+  	}
 
     /**
      * Main program called by doGet and doPost.
      */
-    private void doGetPost(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
         String userID = null;
         String userPassword = null;
         String userRealName = null;
         String userClass = null;
-        List rootNodes = (List)session.getAttribute("rootNodes");
+        List rootNodes = (List)mcrSession.get("rootNodes");
         boolean loginOk = false;
         MCRConfiguration mcrConf = MCRConfiguration.instance();
 
@@ -104,15 +88,16 @@ public class WCMSLoginServlet extends HttpServlet {
             System.err.println(e.getMessage());
         }
 
-        if (session.getAttribute("status") != null && userPassword == null && userID == null) {
-            if (session.getAttribute("status").equals("loggedIn")) {
-                userID = (String)session.getAttribute("userID");
-                userRealName = (String)session.getAttribute("userRealName");
-                userClass = (String)session.getAttribute("userClass");
+        if (mcrSession.get("status") != null && userPassword == null && userID == null) {
+            if (mcrSession.get("status").equals("loggedIn")) {
+                userID = (String)mcrSession.get("userID");
+                userRealName = (String)mcrSession.get("userRealName");
+                userClass = (String)mcrSession.get("userClass");
                 loginOk = true;
             }
         }
-        if (session.getAttribute("status") == null && userPassword == null && userID == null) {
+        if (mcrSession.get("status") == null && userPassword == null && userID == null) {
+        		System.err.println("\n\n\nstatus==null\n\n\n");
             response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
         }
 
@@ -139,10 +124,7 @@ public class WCMSLoginServlet extends HttpServlet {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
-            PrintWriter errorOut = response.getWriter();
-            errorOut.println(e.getMessage());
-            errorOut.close();
+        	LOGGER.error(e);
         }
 
         //System.out.println("loginValue = "+loginOk);
@@ -170,11 +152,11 @@ public class WCMSLoginServlet extends HttpServlet {
 
         if (loginOk) {
             //System.out.println(session+" - "+userID+" - "+userRealName+" - "+userClass);
-            session.setAttribute("status", "loggedIn");
-            if (!userID.equals(session.getAttribute("userID"))) session.setAttribute("userID", userID);
-            if (!userRealName.equals(session.getAttribute("userRealName"))) session.setAttribute("userRealName", userRealName);
-            if (!userClass.equals(session.getAttribute("userClass"))) session.setAttribute("userClass", userClass);
-            if (!rootNodes.equals(session.getAttribute("rootNodes"))) session.setAttribute("rootNodes", rootNodes);
+            mcrSession.put("status", "loggedIn");
+            if (!userID.equals(mcrSession.get("userID"))) mcrSession.put("userID", userID);
+            if (!userRealName.equals(mcrSession.get("userRealName"))) mcrSession.put("userRealName", userRealName);
+            if (!userClass.equals(mcrSession.get("userClass"))) mcrSession.put("userClass", userClass);
+            if (!rootNodes.equals(mcrSession.get("rootNodes"))) mcrSession.put("rootNodes", rootNodes);
             rootOut.addContent(new Element("session").setText("welcome"));
             rootOut.addContent(new Element("userID").setText(userID));
             rootOut.addContent(new Element("userRealName").setText(userRealName));

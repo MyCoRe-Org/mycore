@@ -1,7 +1,7 @@
 /**
  * WCMSLoginServlet.java
  *
- * @author: Michael Brendel, Andreas Trappe
+ * @author: Michael Brendel, Andreas Trappe, Thomas Scheffler (yagee)
  * @contact: michael.brendel@uni-jena.de, andreas.trappe@uni-jena.de
  * @version: 0.81
  * @last update: 11/25/2003
@@ -26,22 +26,29 @@
 
 package wcms;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.jdom.input.SAXBuilder;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Dictionary;
+import java.util.Set;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
 
-public class WCMSFileUploadServlet extends HttpServlet {
-    MCRConfiguration mcrConf = MCRConfiguration.instance();
+public class WCMSFileUploadServlet extends WCMSServlet {
     char fs = File.separatorChar;
     private static Set props=null;
     private String fileName, filePath, contentType, fileContentType, error, status, action = null;
-    private String documentPath = mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
-    private String imagePath = mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
+    private String documentPath = super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
+    private String imagePath = super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
     private String savePath = null;
     private Dictionary fields;
     private int fileSize, fileMaxSize;
@@ -68,51 +75,14 @@ public class WCMSFileUploadServlet extends HttpServlet {
         return (String) fields.get(fieldName);
     }
 
-    /** Initializes the servlet.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-
-    }
-
-    /**
-     * Handles the HTTP GET Method.
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            doGetPost(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-    }
-
-    /**
-     * Handles the HTTP POST Method.
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            doGetPost(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-    }
-
     /**
      * Main program called by doGet and doPost.
      */
-    protected void doGetPost(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         action = request.getParameter("action");
         if (action.equals("upload")) {
-            fileMaxSize = mcrConf.getInt("MCR.WCMS.maxUploadFileSize");
+            fileMaxSize = super.CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
             fileSize = request.getContentLength();
             fileContentType = request.getContentType();
 
@@ -211,8 +181,8 @@ public class WCMSFileUploadServlet extends HttpServlet {
             Element rootOut = new Element("cms");
             Document jdom = new Document(rootOut);
             rootOut.addContent(new Element("session").setText("fileUpload"));
-            rootOut.addContent(new Element("userID").setText((String)session.getAttribute("userID")));
-            rootOut.addContent(new Element("userClass").setText((String)session.getAttribute("userClass")));
+            rootOut.addContent(new Element("userID").setText((String)mcrSession.get("userID")));
+            rootOut.addContent(new Element("userClass").setText((String)mcrSession.get("userClass")));
             rootOut.addContent(new Element("status").setText(status));
             rootOut.addContent(new Element("error").setText(error));
             rootOut.addContent(new Element("contentType").setText(contentType));
@@ -260,17 +230,5 @@ public class WCMSFileUploadServlet extends HttpServlet {
         int pos = s.indexOf(": ");
         if (pos != -1)
             contentType = s.substring(pos+2, s.length());
-    }
-
-    /** Returns a short description of the servlet.
-     */
-    public String getServletInfo() {
-        return "Short description";
-    }
-
-    /** Destroys the servlet.
-     */
-    public void destroy() {
-
     }
 }

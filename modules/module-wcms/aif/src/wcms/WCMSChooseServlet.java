@@ -1,7 +1,7 @@
 /**
  * WCMSChooseServlet.java
  *
- * @author: Michael Brendel, Andreas Trappe
+ * @author: Michael Brendel, Andreas Trappe, Thomas Scheffler (yagee)
  * @contact: michael.brendel@uni-jena.de, andreas.trappe@uni-jena.de
  * @version: 1.6
  * @last update: 06/25/2003
@@ -26,20 +26,37 @@
 
 package wcms;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.jdom.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.jdom.Comment;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.*;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRSession;
 /**
  * Select action process for Web-Content-Management-System (WCMS).
  */
-public class WCMSChooseServlet extends HttpServlet {
-    MCRConfiguration mcrConf = MCRConfiguration.instance();
+public class WCMSChooseServlet extends WCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE; //xml Namespace for the language attribute lang
     private String currentLang = null;     //
     private String defaultLang = null;     //
@@ -58,7 +75,7 @@ public class WCMSChooseServlet extends HttpServlet {
     private String target = null;   //target of the selected element: {_blank, _self}
     private String template = null; //choosen Template
     private String style = null;    //style of the selected element: {bold, normal}
-    private String dir = null;      //main navigation elements like "Menü links" have a valid dir attribute instead of a href attribute
+    private String dir = null;      //main navigation elements like "Men? links" have a valid dir attribute instead of a href attribute
     private String addAtPosition = null; //position, where a link can be added: {predecessor, successor, child}
     private String replaceMenu = null; // Representing a Parameter, allowing an navigation element to replace the previous navigation structure only with its subelements. Can be "true" or "false".
     char c, d;                      //representing the errorcodes {1,2,5,6,7,8,9,0}
@@ -71,68 +88,23 @@ public class WCMSChooseServlet extends HttpServlet {
     File [] documentList; //listing of the documents directory (without cvs)
 
     /**
-     * Initializes the servlet.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
-
-    /**
-     * Destroys the servlet.
-     */
-    public void destroy() {
-    }
-
-    /**
-     * Handles the HTTP GET Method.
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            doGetPost(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-
-    }
-
-    /**
-     * Handles the HTTP POST Method.
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-
-        /* Validate if user has been authentificated */
-        if ( request.getSession(false) != null ) {
-            doGetPost(request, response, request.getSession(false));
-        }
-        else {
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-
-    }
-
-    /**
      * Main program called by doGet and doPost.
      */
-    protected void doGetPost(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
-        String userID = (String)session.getAttribute("userID");
-        String userClass = (String)session.getAttribute("userClass");
-        List rootNodes = (List)session.getAttribute("rootNodes");
+        String userID = (String)mcrSession.get("userID");
+        String userClass = (String)mcrSession.get("userClass");
+        List rootNodes = (List)mcrSession.get("rootNodes");
         addAtPosition = request.getParameter("addAtPosition");
         if (request.getParameter("action") != null) {
             action = request.getParameter("action");
         }
         else action = "false";
-        File [] contentTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar)).listFiles();
-        File [] masterTemplates = new File(mcrConf.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
+        File [] contentTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar)).listFiles();
+        File [] masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
-        File conTemp = new File(mcrConf.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar));
+        File conTemp = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -140,7 +112,6 @@ public class WCMSChooseServlet extends HttpServlet {
         contentError = null;
 
 		/* get languages */
-		MCRSession mcrSession = (MCRSession) (session.getAttribute("mycore.session"));
 		if (mcrSession != null) {
 			defaultLang =	MCRConfiguration.instance().getString("MCR.metadata_default_lang","en").toLowerCase();
 			currentLang = mcrSession.getCurrentLanguage().toLowerCase();
@@ -165,10 +136,10 @@ public class WCMSChooseServlet extends HttpServlet {
          * Transfered characters are:
          * --- valid values ------------------------------------------------------------------------
          * '1' - if the selected element has a valid href attribute.
-         * '2' - if the selected element was a main element (e.g.: "Menü oberhalb", "Menü links"
-         *       and "Zusatzmenü links unten") and has a valid dir attribute instead of a valid href attribute.
+         * '2' - if the selected element was a main element (e.g.: "Men? oberhalb", "Men? links"
+         *       and "Zusatzmen? links unten") and has a valid dir attribute instead of a valid href attribute.
          * --- invalid values ----------------------------------------------------------------------
-         * '5' - if the selected element is a main navigation element like "Menü links" and addAtPosition
+         * '5' - if the selected element is a main navigation element like "Men? links" and addAtPosition
          *       is "predecessor" or "successor".
          * '6' - if the selected element has an external target and action was add.
          *       This is to avoid the creation of a child under a parent with external target
@@ -187,8 +158,8 @@ public class WCMSChooseServlet extends HttpServlet {
         }
         else c = d = '0';
 
-        if (c=='2') session.setAttribute("dir", href);
-        else session.setAttribute("dir", "false");
+        if (c=='2') mcrSession.put("dir", href);
+        else mcrSession.put("dir", "false");
 
         /**
          * Build jdom object dependence on the selected action and selected element.
@@ -201,7 +172,7 @@ public class WCMSChooseServlet extends HttpServlet {
          */
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(mcrConf.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+            Document doc = builder.build(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
             Element root = doc.getRootElement();
             validate(root);
         }
@@ -228,7 +199,7 @@ public class WCMSChooseServlet extends HttpServlet {
                     if (!action.equals("add") && mode.equals("intern")) ed = sax.build(getServletContext().getRealPath("")+fs+href);
                     else {
                         //if (mode.equals("intern")) {
-                            ed = sax.build((mcrConf.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)+template);
+                            ed = sax.build((super.CONFIG.getString("MCR.WCMS.templatePath")+"content/").replace('/', File.separatorChar)+template);
                         //}
                         //else return;
                     }
@@ -443,7 +414,7 @@ public class WCMSChooseServlet extends HttpServlet {
 
         Element images = new Element("images");
         rootOut.addContent(images);
-        File imagePath = new File((mcrConf.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
+        File imagePath = new File((super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
         if (!imagePath.exists()) imagePath.mkdirs();
         imageList = new File(imagePath.toString()).listFiles();
         for (int i=0; i < imageList.length; i++) {
@@ -452,11 +423,11 @@ public class WCMSChooseServlet extends HttpServlet {
             }
         }
 
-        rootOut.addContent(new Element("imagePath").setText( mcrConf.getString("MCR.WCMS.imagePath").substring( mcrConf.getString("MCR.WCMS.imagePath").lastIndexOf("webapps")  )  ));
+        rootOut.addContent(new Element("imagePath").setText( super.CONFIG.getString("MCR.WCMS.imagePath").substring( super.CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps")  )  ));
 
         Element documents = new Element("documents");
         rootOut.addContent(documents);
-        File documentPath = new File((mcrConf.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
+        File documentPath = new File((super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
         if (!documentPath.exists()) documentPath.mkdirs();
         documentList = new File(documentPath.toString()).listFiles();
         for (int i=0; i < documentList.length; i++) {
@@ -464,7 +435,7 @@ public class WCMSChooseServlet extends HttpServlet {
                 documents.addContent(new Element("document").setText(documentList[i].getName()));
             }
         }
-        rootOut.addContent(new Element("documentPath").setText(  mcrConf.getString("MCR.WCMS.documentPath").substring(mcrConf.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))  ));
+        rootOut.addContent(new Element("documentPath").setText(  super.CONFIG.getString("MCR.WCMS.documentPath").substring(super.CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))  ));
 
         Element master = new Element("master");
         for (int i = 0; i < masterTemplates.length; i++ ) {
@@ -486,16 +457,16 @@ public class WCMSChooseServlet extends HttpServlet {
          * ... href=href label=label action="add"|"edit"|"delete" mode="intern"|"extern" ...
          * ... target="intern"|"extern" style="normal"|"bold" />
          */
-        if (href != null) session.setAttribute("href", href);
-        if (label != null) session.setAttribute("label", label);
-		if (label_currentLang != null) session.setAttribute("label_currentLang", label_currentLang);
-        if (action != null) session.setAttribute("action", action);
-        if (mode != null) session.setAttribute("mode", mode);
-        if (target != null) session.setAttribute("target", target);
-        if (style != null) session.setAttribute("style", style);
-        if (defaultLang != null) session.setAttribute("defaultLang", defaultLang);
-        if (currentLang != null) session.setAttribute("currentLang", currentLang);
-        if (addAtPosition != null) session.setAttribute("addAtPosition", addAtPosition);
+        if (href != null) mcrSession.put("href", href);
+        if (label != null) mcrSession.put("label", label);
+		if (label_currentLang != null) mcrSession.put("label_currentLang", label_currentLang);
+        if (action != null) mcrSession.put("action", action);
+        if (mode != null) mcrSession.put("mode", mode);
+        if (target != null) mcrSession.put("target", target);
+        if (style != null) mcrSession.put("style", style);
+        if (defaultLang != null) mcrSession.put("defaultLang", defaultLang);
+        if (currentLang != null) mcrSession.put("currentLang", currentLang);
+        if (addAtPosition != null) mcrSession.put("addAtPosition", addAtPosition);
 
         /**
          * Transfer content of jdom object to MCRLayoutServlet.
