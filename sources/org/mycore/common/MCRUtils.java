@@ -162,11 +162,13 @@ public static final String covertDateToISO(String indate)
   GregorianCalendar calendar = new GregorianCalendar();
   boolean test = false;
   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+  formatter.setLenient( false );
   try { calendar.setTime(formatter.parse(indate)); test = true; }
   catch (ParseException e) { }
   if (!test) { 
     for (int i=0;i<SUPPORTED_LANG.length;i++) {
       DateFormat df =  getDateFormat(SUPPORTED_LANG[i]);
+      df.setLenient( false );
       try { calendar.setTime(df.parse(indate)); test = true; }
       catch (ParseException e) { }
       if (test) { break; }
