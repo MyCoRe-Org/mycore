@@ -40,33 +40,6 @@ import mycore.common.*;
 */
 public class MCRQueryServlet extends HttpServlet 
 {
-  // The list of hosts from the configuration
-  private ArrayList remoteAliasList = null;
-
-  /**
-   * The methode initialized the servlet and read the host list
-   * from the mycore.property configuration.
-   *
-   * @exception ServletException for errors from the servlet engine.
-   **/
-  public void init() throws ServletException
-    {
-    // read host list from configuration
-    MCRConfiguration config = MCRConfiguration.instance();
-    String hostconf = config.getString("MCR.communication_hostaliases",
-      "local");
-    remoteAliasList = new ArrayList();
-    int i = 0;
-    int j = hostconf.length();
-    int k = 0;
-    while (k!=-1) {
-      k = hostconf.indexOf(",",i);
-      if (k==-1) {
-        remoteAliasList.add(hostconf.substring(i,j)); }
-      else {
-        remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
-      }
-    }
 
   /**
    * The methode get a request and resolve them to a output.
@@ -85,76 +58,20 @@ public class MCRQueryServlet extends HttpServlet
     String type  = request.getParameter( "type"  );
     String host  = request.getParameter( "hosts" );
 
-    System.out.println( "mode  = " + mode  );
-    System.out.println( "query = " + query );
-    System.out.println( "type  = " + type  );
-    System.out.println( "hosts = " + host  );
-
     if( mode  == null ) mode  = "ResultList";
     if( host  == null ) host  = "local";
     if( query == null ) query = "";
     if( type  == null ) return; 
-
-    // build host list from host string
-    ArrayList hostAliasList = new ArrayList();
-    int i = 0;
-    int j = host.length();
-    int k = 0;
-    int n = 0;
-    while (n!=-1) {
-      n = host.indexOf(",",i);
-      String hostname = "";
-      if (n==-1) { hostname = host.substring(i,j); }
-      else { hostname = host.substring(i,n); i = n+1; }
-      if (hostname.equals("local")) {
-        k = -1;
-        for (int l=0;l<hostAliasList.size();l++) {
-          if (((String)hostAliasList.get(l)).equals("local")) { 
-            k = 0; break; }
-          }
-        if (k==-1) { hostAliasList.add("local"); }
-        }
-      else {
-        if (hostname.equals("remote")) {
-          for (int m=0;m<remoteAliasList.size();m++) {
-            k = -1;
-            for (int l=0;l<hostAliasList.size();l++) {
-              if (((String)hostAliasList.get(l))
-                .equals(remoteAliasList.get(m))) { k = 0; break; }
-              }
-            if (k==-1) { hostAliasList.add(remoteAliasList.get(m)); }
-            }
-          }
-        else {
-          k = -1;
-          for (int m=0;m<remoteAliasList.size();m++) {
-            if (((String)remoteAliasList.get(m)).equals(hostname)) { 
-              k = 0; break; } }
-          if (k==-1) {
-            throw new MCRException( "The host name is not in the list."); }
-          k = -1;
-          for (int l=0;l<hostAliasList.size();l++) {
-            if (((String)hostAliasList.get(l)).equals(hostname)) { 
-              k = 0; break; } }
-          if (k==-1) { hostAliasList.add(hostname); }
-          }
-        }
-      }
-
-    // print list for debug
-    for (i=0;i<hostAliasList.size();i++) {
-      System.out.println("Host : "+hostAliasList.get(i)); }
-    System.out.println();
 
     // prepare the stylesheet name
     String style = mode + "-" + type;
 
     try
     {
-      MCRQueryResult result = new MCRQueryResult( type );
-      result.setFromQuery( hostAliasList, query );
+      MCRQueryResult result = new MCRQueryResult();
+      MCRQueryResultArray resarray = result.setFromQuery(host, type, query );
 
-      String xml = result.getResultArray().exportAll();
+      String xml = resarray.exportAll();
 
       Reader in = new StringReader( xml );
 
@@ -163,7 +80,8 @@ public class MCRQueryServlet extends HttpServlet
 
       request.setAttribute( "jdom",  jdom  );
       request.setAttribute( "style", style );
-      RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
+      RequestDispatcher rd = getServletContext()
+        .getNamedDispatcher( "MCRLayoutServlet" );
       rd.forward( request, response );
     }
     catch( Exception ex )

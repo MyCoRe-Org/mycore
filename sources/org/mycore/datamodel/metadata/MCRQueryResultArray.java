@@ -195,7 +195,7 @@ public final void add(String in_host, String in_id, int in_rank, String in_xml)
   mcr_id.add(in_id);
   rank.add(new Integer(in_rank));
   int i = in_xml.indexOf(NL);
-  xml.add(in_xml.substring(i+NL.length(),in_xml.length()));
+  xml.add(in_xml.substring(i+NL.length(),in_xml.length()).trim());
   }
 
 /**
@@ -361,7 +361,7 @@ public final void importElements(String in)
       throw new MCRException(ERRORTEXT); }
     Integer inrank = null;
     try {
-      inrank = new Integer(in.substring(iattrstart+1,iattrend)); }
+      inrank = new Integer(in.substring(iattrstart,iattrend)); }
     catch (NumberFormatException e) {
       throw new MCRException(ERRORTEXT); }
     itagresults = itagresulte+1;
@@ -386,5 +386,12 @@ public final void importElements(MCRQueryResultArray in)
       this.add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));
   }
 
+/**
+ * This methode print the content of this MCRQueryResultArray as
+ * an XML String.
+ **/
+public final void debug()
+  { System.out.println(exportAll()); }
+  
 }
 

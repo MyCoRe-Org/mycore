@@ -27,6 +27,7 @@ package mycore.datamodel;
 import java.util.*;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
+import mycore.common.MCRConfiguration;
 import mycore.datamodel.MCRQueryResultArray;
 
 /**
@@ -43,58 +44,121 @@ import mycore.datamodel.MCRQueryResultArray;
  **/
 public class MCRQueryResult
 {
-private MCRQueryResultArray mcr_result = null;
-private String mcr_type = null;
-private ArrayList mcr_hostAliases = null;
-private String mcr_query = null;
+// The list of hosts from the configuration
+private ArrayList remoteAliasList = null;
+// The instcnce of configuraion
+private MCRConfiguration conf = null;
 
 /**
- * This constructor create the MCRQueryResult class with an empty
- * MCRQueryResultArray.
- *
- * @param type the type of the MCRObjectId
+ * This constructor create the MCRQueryResult class and read the host list
+ * from the mycore.property configuration.
  **/
-public MCRQueryResult(String type)
+public MCRQueryResult()
   {
-  if (type==null) {
-    throw new MCRException("The MCRObjectID type is empty."); }
-  mcr_type = type.toLowerCase();
-  mcr_hostAliases = new ArrayList();
-  mcr_query = "";
+  // read host list from configuration
+  MCRConfiguration config = MCRConfiguration.instance();
+  String hostconf = config.getString("MCR.communication_hostaliases",
+    "local");
+  remoteAliasList = new ArrayList();
+  int i = 0;
+  int j = hostconf.length();
+  int k = 0;
+  while (k!=-1) {
+    k = hostconf.indexOf(",",i);
+    if (k==-1) {
+      remoteAliasList.add(hostconf.substring(i,j)); }
+    else {
+      remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
+    }
+  // get an instance of configuration
+  conf = MCRConfiguration.instance();
   }
 
 /**
- * This methode read the properties for the MCRObjectID type and call
- * the coresponding class for a query to the persistence layer. If
- * it was succesful, the MCRQueryResultArray is filled with answers.
+ * IF it was succesful, the MCRQueryResultArray is filled with answers.
  *
- * @param host                  a list of host name aliases
+ * @param type                  the MCRObjectID type
+ * @param hostlist              a String of host name aliases
  * @param query	                the Query string
+ * @return                      the filled MCRQueryResultArray
  * @exception MCRException      general Exception of MyCoRe
  * @exception MCRConfigurationException
  *                              an Exception of MyCoRe Configuration
  **/
-public final void setFromQuery(ArrayList hostAliases, String query)
-  throws MCRException, MCRConfigurationException
+public final MCRQueryResultArray setFromQuery(String host, String type,
+  String query) throws MCRException, MCRConfigurationException
   {
+  System.out.println( "hosts = " + host  );
+  System.out.println( "type  = " + type  );
+  System.out.println( "query = " + query );
+
+  // check the type
+  type  = type .toLowerCase();
+  try {
+    String test = conf.getString("MCR.persistence_type_"+type); }
+  catch (MCRConfigurationException e) {
+    throw new MCRException("The MCRObjectID type is false for search."); }
+
+  // build host list from host string
+  ArrayList hostAliasList = new ArrayList();
+  int i = 0;
+  int j = host.length();
+  int k = 0;
+  int n = 0;
+  while (n!=-1) {
+    n = host.indexOf(",",i);
+    String hostname = "";
+    if (n==-1) { hostname = host.substring(i,j); }
+    else { hostname = host.substring(i,n); i = n+1; }
+    if (hostname.equals("local")) {
+      k = -1;
+      for (int l=0;l<hostAliasList.size();l++) {
+        if (((String)hostAliasList.get(l)).equals("local")) {
+          k = 0; break; }
+        }
+      if (k==-1) { hostAliasList.add("local"); }
+      }
+    else {
+      if (hostname.equals("remote")) {
+        for (int m=0;m<remoteAliasList.size();m++) {
+          k = -1;
+          for (int l=0;l<hostAliasList.size();l++) {
+            if (((String)hostAliasList.get(l))
+              .equals(remoteAliasList.get(m))) { k = 0; break; }
+            }
+          if (k==-1) { hostAliasList.add(remoteAliasList.get(m)); }
+          }
+        }
+      else {
+        k = -1;
+        for (int m=0;m<remoteAliasList.size();m++) {
+          if (((String)remoteAliasList.get(m)).equals(hostname)) {
+            k = 0; break; } }
+        if (k==-1) {
+          throw new MCRException( "The host name is not in the list."); }
+        k = -1;
+        for (int l=0;l<hostAliasList.size();l++) {
+          if (((String)hostAliasList.get(l)).equals(hostname)) {
+            k = 0; break; } }
+        if (k==-1) { hostAliasList.add(hostname); }
+        }
+      }
+    }
+
+  // print list for debug
+  for (i=0;i<hostAliasList.size();i++) {
+    System.out.println("Host : "+hostAliasList.get(i)); }
+  System.out.println();
+
   ThreadGroup threadGroup = new ThreadGroup("threadGroup");
-  mcr_hostAliases = hostAliases;
-  mcr_query = query;
-  mcr_result = new MCRQueryResultArray();
-  for (int i=0; i<hostAliases.size() ;i++)
-    new MCRQueryThread(threadGroup,(String)hostAliases.get(i),
-      mcr_query,mcr_type,mcr_result).start();
+  MCRQueryResultArray result = new MCRQueryResultArray();
+  for (i=0; i<hostAliasList.size() ;i++)
+    new MCRQueryThread(threadGroup,(String)hostAliasList.get(i),
+      query,type,result).start();
   // wait until all threads have finished
   do {} while(threadGroup.activeCount() > 0);
+  return result;
   }
-
-/**
- * This methode return the MCRQueryResultArray.
- *
- * @return the MCRQueryResultArray.
- **/
-public final MCRQueryResultArray getResultArray()
-  { return mcr_result; }
 
 }
 
