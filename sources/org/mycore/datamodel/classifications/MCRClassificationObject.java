@@ -136,12 +136,13 @@ public abstract class MCRClassificationObject
     { 
     ensureNotDeleted(); 
     if (this.lang.size()==0) { return ""; }
-    if (this.lang==null) { return ((String)this.label.get(0)); }
+    if (!MCRUtils.isSupportedLang(lang)) {
+      return (String)this.label.get(0); }
     for (int i=0;i<this.lang.size();i++) {
       if (((String)this.lang.get(i)).equals(lang)) {
         return (String)this.label.get(i); }
       }
-    return "";
+    return (String)this.label.get(0);
     }
   
   /**
@@ -185,13 +186,14 @@ public abstract class MCRClassificationObject
   public String getDescription(String lang) throws MCRUsageException
     { 
     ensureNotDeleted(); 
-    if (this.description.size()==0) { return ""; }
-    if (this.lang==null) { return ((String)this.description.get(0)); }
+    if (this.lang.size()==0) { return ""; }
+    if (!MCRUtils.isSupportedLang(lang)) { 
+      return (String)this.description.get(0); }
     for (int i=0;i<this.lang.size();i++) {
       if (((String)this.lang.get(i)).equals(lang)) {
         return (String)this.description.get(i); }
       }
-    return "";
+    return (String)this.description.get(0);
     }
   
   /**
