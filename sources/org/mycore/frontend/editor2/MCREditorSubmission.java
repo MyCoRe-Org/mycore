@@ -87,25 +87,30 @@ public class MCREditorSubmission
       String name = (String)( e.nextElement() );
       if( name.startsWith( "_" ) ) continue;
       
-      String value  = parms.getParameter( name );
-      String sortNr = parms.getParameter( "_sortnr-" + name );
-      String ID     = parms.getParameter( "_id@" + name );
-      String delete = parms.getParameter( "_delete-" + name );
+      String[] values = parms.getParameterValues( name );
+      String sortNr   = parms.getParameter( "_sortnr-" + name );
+      String ID       = parms.getParameter( "_id@" + name );
+      String delete   = parms.getParameter( "_delete-" + name );
 
       if( "true".equals( delete ) && ( parms.getFileItem( name ) == null ) ) continue;
       if( sortNr == null ) continue;
-      if( value  == null ) continue;
-      if( value.trim().length() == 0 ) continue;
+      if( ( values == null ) || ( values.length == 0 ) ) continue;
 
-      Element component = resolveComponent( editor, ID );
+      for( int k = 0; k < values.length; k++ )
+      {
+        String value = values[ k ];
+        if( ( value == null ) || ( value.trim().length() == 0 ) ) continue;
+        String nname = ( k == 0 ? name : name + "[" + (k+1) + "]" );
 
-      FileItem file = parms.getFileItem( name );
+        Element component = resolveComponent( editor, ID );
+        FileItem file = parms.getFileItem( name );
 
-      MCREditorVariable var = new MCREditorVariable( name, value, sortNr, file, component );
-      if( ! var.value.trim().equals( var.autofill ) )
-      { 
-        variables.add( var );
-        if( file != null ) files.add( file );
+        MCREditorVariable var = new MCREditorVariable( nname, value, sortNr, file, component );
+        if( ! var.value.trim().equals( var.autofill ) )
+        { 
+          variables.add( var );
+          if( file != null ) files.add( file );
+        }
       }
     }
   }

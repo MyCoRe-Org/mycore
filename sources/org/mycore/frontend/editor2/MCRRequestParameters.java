@@ -48,8 +48,8 @@ public class MCRRequestParameters
 {
   protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
 
-  private Properties parameters = new Properties();
-  private Hashtable  files      = new Hashtable();
+  private Hashtable parameters = new Hashtable();
+  private Hashtable files      = new Hashtable();
 
   private static int    threshold;
   private static long   maxSize;  
@@ -113,7 +113,9 @@ public class MCRRequestParameters
         if( ( value != null ) && ( value.trim().length() > 0 ) && ( ! files.containsKey( name ) ) )
         {
           if( ! item.isFormField() ) files.put( name, item );
-          parameters.put( name, value );
+          String[] values = new String[ 1 ];
+          values[ 0 ] = value;
+          parameters.put( name, values );
         }
       }
     }
@@ -122,8 +124,9 @@ public class MCRRequestParameters
       for( Enumeration e = req.getParameterNames(); e.hasMoreElements(); )
       {
         String name = (String)( e.nextElement() );
-        String value  = req.getParameter( name );        
-        if( value != null ) parameters.put( name, value );
+        String[] values = req.getParameterValues( name );
+        if( ( values != null ) && ( values.length > 0 ) ) 
+          parameters.put( name, values );
       }
     }
   }
@@ -132,7 +135,16 @@ public class MCRRequestParameters
   { return parameters.keys(); }
 
   public String getParameter( String name )
-  { return parameters.getProperty( name ); }
+  {
+    String[] values = getParameterValues( name ); 
+    if( ( values == null ) || ( values.length == 0 ) )
+      return null;
+    else
+      return values[ 0 ];
+  }
+
+  public String[] getParameterValues( String name )
+  { return (String[])( parameters.get( name ) ); }
     
   public FileItem getFileItem( String name )
   { return (FileItem)( files.get( name ) ); }
