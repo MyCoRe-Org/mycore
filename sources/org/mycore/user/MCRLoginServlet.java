@@ -86,7 +86,7 @@ public class MCRLoginServlet extends MCRServlet
 
     if (url == null) url = MCRServlet.getBaseURL();
 
-    org.jdom.Element root = new org.jdom.Element("mcr_user");
+    org.jdom.Element root = new org.jdom.Element("mycoreuser");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
     root.addContent(new org.jdom.Element("guest_id").addContent(guestID));

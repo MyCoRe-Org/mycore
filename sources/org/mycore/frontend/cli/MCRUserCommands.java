@@ -108,8 +108,6 @@ public static void initSuperuser(MCRSession session) throws MCRException
       "Users with this privilege has administrator rights in the system."));
     privList.add(new MCRPrivilege("list all users",
       "Users with this privilege may list the users of the system."));
-    privList.add(new MCRPrivilege("create object in datastore",
-      "Users with this privilege may create objects (documents etc.)."));
     p.loadPrivileges(privList);
     }
   catch (Exception e) {
@@ -134,7 +132,6 @@ public static void initSuperuser(MCRSession session) throws MCRException
     privileges.add("modify group");
     privileges.add("list all users");
     privileges.add("user administrator");
-    privileges.add("create object in datastore");
     MCRGroup g = new MCRGroup(sgroup,suser,null,null,"The superuser group",
       admUserIDs,admGroupIDs,mbrUserIDs,mbrGroupIDs,groupIDs,privileges);
     MCRUserMgr.instance().initializeGroup(g,suser);
@@ -509,9 +506,9 @@ public static final void createUserFromFile(MCRSession session,String filename)
   logger.info( "Reading file " + filename + " ..." );
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
     org.jdom.Element rootelm = doc.getRootElement();
-    if (!rootelm.getAttribute("type").getValue().equals("user")) {
+    if (!rootelm.getName().equals("mycoreuser")) {
       throw new MCRException("The data are not for user."); }
     List listelm = rootelm.getChildren();
     for (int i=0;i<listelm.size();i++) {
@@ -535,9 +532,9 @@ public static final void createGroupFromFile(MCRSession session,String filename)
   logger.info( "Reading file " + filename + " ..." );
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
     org.jdom.Element rootelm = doc.getRootElement();
-    if (!rootelm.getAttribute("type").getValue().equals("group")) {
+    if (!rootelm.getName().equals("mycoregroup")) {
       throw new MCRException("The data are not for group."); }
     List listelm = rootelm.getChildren();
     for (int i=0;i<listelm.size();i++) {
@@ -561,9 +558,9 @@ public static final void updateUserFromFile(MCRSession session,String filename)
   logger.info( "Reading file " + filename + " ..." );
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
     org.jdom.Element rootelm = doc.getRootElement();
-    if (!rootelm.getAttribute("type").getValue().equals("user")) {
+    if (!rootelm.getName().equals("mycoreuser")) {
       throw new MCRException("The data are not for user."); }
     List listelm = rootelm.getChildren();
     for (int i=0;i<listelm.size();i++) {
@@ -587,9 +584,9 @@ public static final void updateGroupFromFile(MCRSession session,String filename)
   logger.info( "Reading file " + filename + " ..." );
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,false));
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
     org.jdom.Element rootelm = doc.getRootElement();
-    if (!rootelm.getAttribute("type").getValue().equals("group")) {
+    if (!rootelm.getName().equals("mycoregroup")) {
       throw new MCRException("The data are not for group."); }
     List listelm = rootelm.getChildren();
     for (int i=0;i<listelm.size();i++) {

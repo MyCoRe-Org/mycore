@@ -448,8 +448,7 @@ public void update(MCRGroup newgroup) throws MCRException
  */
 public org.jdom.Document toJDOMDocument() throws MCRException
   {
-  org.jdom.Element root = new org.jdom.Element("mycoreuser");
-  root.setAttribute("type", "group");
+  org.jdom.Element root = new org.jdom.Element("mycoregroup");
   root.addContent(this.toJDOMElement());
   org.jdom.Document jdomDoc = new org.jdom.Document(root);
   return jdomDoc;

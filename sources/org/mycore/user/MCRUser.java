@@ -338,7 +338,6 @@ public final void update(MCRUser newuser)
 public org.jdom.Document toJDOMDocument() throws MCRException
   {
   org.jdom.Element root = new org.jdom.Element("mycoreuser");
-  root.setAttribute("type", "user");
   root.addContent(this.toJDOMElement());
   org.jdom.Document jdomDoc = new org.jdom.Document(root);
   return jdomDoc;
