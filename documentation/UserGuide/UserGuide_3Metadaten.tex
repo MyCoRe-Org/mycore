@@ -1,0 +1,70 @@
+%
+%
+\subsection{Metadatenmodel}
+%
+%
+Die zu speichenden Daten des Beispiels wie auch anderer vom Anwender entwickelter Applikationen teilen sich in unserem Modell in Metadaten und digitale Objkete. Hinsichtlich letzterer sei auf den Anschnitt {\bf 'IFS und Content Store'} verwiesen. Unter Metadaten verstehen wir in MyCoRe  alle beschreibenden Daten des Objektes, die extern hinzugefügt, separat gespeichert und gesucht werden können. Dem gegenüber stehen Daten welche die digitalen Objekte selbst mitbringen. In diesem Abschnitt werden nur erstere behandelt. \\[2ex]
+Um die Metadaten besser auf unterschiedlichen Datenspiechern ablegen zu können, wurde eins System von XML-Strukturen entwickelt, welches es gestattet, neben den eigentlichen Daten wie Titel, Autor usw. auch Struktur- und Service-Informationen mit abzulegen. Die eigentlichen Nutzerdaten sind wiederum typisiert, was denen speicherunabhängige Aufzeichnung erheblich vereinfacht. Es steht dem Entwickler einer Anwendung jedoch frei, hier bei bedarf weitere hinzuzufügen. Im Folgenden soll nun der Aufbau der Metadaten-Objekte im Detail beschrieben werden. Zum verständnis des Samples sei hier auch auf den vorigen Abschnitt verwiesen.\\[2ex]
+Die Metadaten werden komplett in XML erfasst und verarbeitet. Für die Grundstrukturen und Standard-Metadaten-Typen werden seitens MyCoRe bereits XMLSchema-Dateien mitgeliefert.
+%
+%
+\subsubsection{Konkreter Aufbau eines Matadaten-Objektes}
+\begin{center}
+%\begin{boxedminipage}[t]{13cm}
+%\bottomcaption{Allgemeiner Aufbau des Metadaten-Objektes}
+\begin{verbatim}
+<?xml version="1.0" cncoding="iso-8859" ?>
+<mycoreobject
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="....xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ ID="..."
+ label="..."
+ >
+ <structure>
+  ...
+ </structure>
+ <metadata xml:lang="de">
+  ...
+ </metadata>
+ <service>
+  ...
+ </service>
+</mycoreobject>
+\end{verbatim}
+%\end{boxedminipage}
+\end{center}
+
+Für {\bf xsi:noNamespaceSchemaLocation} ist das entsprechende XMLSchema-File des Metadaten-Types anzugeben (z. B. \mcrfile{Document.xsd})\\[2ex]
+Die {\bf ID} ist die eindeutige MCRObjectID.\\[2ex]
+Der {\bf label} ist ein kurzer Text-String, der bei administrativen Arbeiten an der Datenbasis das Identifizieren einzelner Datensätze erleichtern soll. Er kann maximal 256 Zeichen lang sein.\\[2ex]
+Innerhalb der XML-Datenstruktur gibt es die Abschnitte {\bf structure}, {\bf metadata} und {\bf service} zur Trennung von Struktur-, Beschreibungs- und Wartungsdaten. Diese Tag-Namen sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!}\\[2ex]
+%
+%
+\subsubsection{Aufbau des XML-Knotens structure}
+Im XML-Knoten {\bf structure} sind alle Informationen über die Beziehung des Metadaten-Objektes zu anderen Objekten abgelegt. Es werden derzeit die folgenden XML-Daten unter diesem Knoten abgelegt. Die Tag-Namen {\bf parents/parent}, {\bf children/child} und {\bf derobjects/derobject} sind reserviert und {\bf dürfen NICHT anderweitig verwendet werden!} Alle Sub-Knoten haben einen Aufbau wie für MCRMetaLinkID beschieben.\\[2ex]
+In {\bf parents} wird ein Link zu einem Eltern-Objekt gespeichert, sofern das referentierende Objekt Eltern hat. Ob dies der Fall ist, bestimmt die Anwendung. Das Tag dient der getsaltung von Vererbungsbäumen und kann durch den Anweder festgelegt werden. Siehe auch 'Programmers Guide', Abschnitt Vererbung. Die Werte für {\it xlink:title} und {\it xlink:label} werden beim Laden der Daten automatisch ergänzt.\\[2ex]
+Die Informationen über die {\bf children} hingegen werden durch das MyCoRe-System beim Laden der Daten {\bf automatisch} erzeugt und {\bf dürfen nicht per Hand geändert werden}, das sonst das Gesamtsystem nicht mehr konsistent ist. Werden die Metadaten eines Kindes oder eines Baumes von Kindern gelöscht, so wird in diesem Teil des XML-Knotens der Eintrag durch die Software entfernt.\\[2ex]
+Das selbe gilt auch für den XML-Unterknoten {\bf derobjects}. In diesem Bereich werden alle Verweise auf die an das Metadaten-Objekt angehangenen digitalen Objekte gespeichert. Jeder Eintrag verweist mittels einer Referenz auf ein Datenobjekt vom Typ {\it mycorederivate}, wie es im nachfolgenden Abschnitt {\bf 'IFS und Content Store'} näher erläutert ist.
+\begin{center}
+%\begin{boxedminipage}[t]{13cm}
+%\bottomcaption{Allgemeiner Aufbau des structure XML-Knotens}
+\begin{verbatim}
+<structure>
+ <parents class="MCRMetaLinkID">
+  <parent xlink:type="locator" xlink:href="...mcr_id..." />
+ </parents>
+ <children class="MCRMetaLinkID">
+  <child xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+  ...
+ </children>
+ <derobjects class="MCRMetaLinkID">
+  <derobject xlink:type="locator" xlink:href="...mcr_id..." xlink:label="..." xlink:title="..." />
+  ...
+ </derobjects>
+</structure>
+\end{verbatim}
+%\end{boxedminipage}
+\end{center}
+
+
