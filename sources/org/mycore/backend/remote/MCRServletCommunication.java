@@ -135,7 +135,7 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
   sb.append("Connecting to ").append(protocol).append("://")
     .append(realhost).append(':').append(port).append(location).append('?')
     .append("type=").append(URLEncoder.encode(reqtype))
-    .append("&hosts=local").append("&query=").append(URLEncoder.encode(query));
+    .append("&hosts=local").append("&XSL.Style=xml").append("&query=").append(URLEncoder.encode(query));
   logger.debug(sb.toString());
 
   URL currentURL;
@@ -147,6 +147,7 @@ public MCRXMLContainer requestQuery(String hostAlias, String reqtype,
     PrintWriter out = new PrintWriter(urlCon.getOutputStream());
     out.print("type=" + URLEncoder.encode(reqtype)
               + "&hosts=local"
+              + "&XSL.Style=xml"
               + "&query=" + URLEncoder.encode(query));
     out.close();
     BufferedInputStream in = new BufferedInputStream(urlCon.getInputStream());
