@@ -152,6 +152,26 @@ Die wichtigsten Schritte sind:
 \item Im Browser {\tt http://<hostname>/snoop}
 \end{enumerate}
 %
+{\bf Konfigurieren von SSL}\\[1ex]
+\begin{enumerate}
+\item starten Sie \mcrcommand{/usr/IBMHttpServer/bin/ikeyman}
+\begin{itemize}
+\item Auswahl {\bf 'New'} 
+\item Auswahl {\bf CMS key database file} $\rightarrow$ File Name = \mcrfile{key.kdb} $\rightarrow$ Location = \mcrfile{/usr/IBMHttpServer/ssl}
+\item Auswahl {\bf 'OK'}
+\item Ausfüllen \mcrcommand{<password>} $\rightarrow$ \mcrcommand{<password>}
+\item 'Stach the password to a file?' $\rightarrow$ {\bf 'OK'}
+\item Auswahl {\bf 'OK'}
+\item Auswahl {\bf 'Create'}
+\item Auswahl {\bf 'New self signed certificate'} $\rightarrow$ Label = \mcrfile{icmrm} $\rightarrow$ Version = X509V3 $\rightarrow$ Key Size = 1024 $\rightarrow$ Name = \mcrcommand{<full qualified host name>} $\rightarrow$ Organization = \mcrcommand{<your org>} $\rightarrow$ Country = \mcrcommand{DE} $\rightarrow$ Valid Period = \mcrcommand{1000}
+\item Auswahl {\bf 'OK'}
+\item Auswahl {\bf 'Key database'}
+\item Auswahl {\bf 'Exit'}
+\end{itemize}
+\end{enumerate}
+Bei Problemem mit \mcrcommand{/usr/IBMHttpServer/bin/ikeyman} versuche Sie, das File \mcrfile{gskikm.jar} unter \mcrfile{/usr/java131/jre/lib/ext} umzubenennen.
+
+%
 %
 \subsection{Der IBM Content Manager unter Solaris}
 

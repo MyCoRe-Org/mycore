@@ -1,27 +1,30 @@
 %
 %
-\chapter{Voraussetzungen f"ur eine MyCoRe Anwendung}
+\chapter{Voraussetzungen für eine MyCoRe Anwendung}
 %
 %
 \section{Vorabbemerkungen}
 %
 %
-Das MyCoRe-Projekt ist so designed, dass es dem Einzelnen Anwender frei steht,
-welche Komponenten er f"ur die Speicherung der Daten verwenden will. dabei spielt nat"urlich das verwendete Betriebssystem eine wesentliche Rolle. Jedes System hat seine eigenen Vor- und Nachteile, die an dieser Stelle aber nicht dikutiert werden sollen. Vielmehr wollen wir es dem Anwender "uberlassen, in welchem System er f"ur seine Anwendung die gr"o"sten Vorteile sieht. Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des gew"ahlten Basissystems. \\[2ex]
+Das MyCoRe-Projekt ist so designed, dass es dem einzelnen Anwender frei steht,
+welche Komponenten er für die Speicherung der Daten verwenden will. Dabei spielt natürlich das verwendete Betriebssystem eine wesentliche Rolle. Jedes System hat seine eigenen Vor- und Nachteile, die an dieser Stelle aber nicht dikutiert werden sollen. Vielmehr wollen wir es dem Anwender überlassen, in welchem System er für seine Anwendung die größten Vorteile sieht. Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des gewählten Basissystems. \\[2ex]
 \small
-\bottomcaption{MyCoRe Komponenten"ubersicht}
+\bottomcaption{MyCoRe Komponentenübersicht}
 \tablehead{\hline}
 \tabletail{\hline}
-\begin{supertabular}{|p{2cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+\begin{supertabular}{|p{2cm}|p{6cm}|p{6cm}|}
 \hline
-{\bf Teil} & {\bf AIX} & {\bf Solaris} & {\bf Linux} & {\bf MS Windows}\\[1,5ex] \hline
-Metadaten Store & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & eXist - parametrische Suche mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen \\ \hline
-TextSearch & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & htdig ??? & IBM DB2 TIE (Sprachunterstützung nur f"ur English) \\ \hline
-Datenbank & IBM DB2 8.x & Oracle ??? & MySQL 4.x & IBM DB2 8.x \\ \hline
-Objekt Store & Filesystem, & Filesystem, & Filesystem, & Filesystem, \\
- & IBM CM 8.2 Ressource Manager, & IBM CM 8.2 Ressource Manager, & & IBM CM 8.2 Ressource Manager, \\ 
- & IBM Video Charger 8, & IBM Video Charger 8, & IBM Video Charger 8, & IBM Video Charger 8, \\
- & Helix Server & Helix Server & Helix Server & Helix Server \\ 
+ & {\bf IBM CM Basis} & {\bf freie Software} \\[1,5ex] \hline
+Metadaten Store & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & eXist - parametrische Suche mittels XPath Abfragen \\ \hline
+TextSearch & IBM DB2 NSE & lucene  \\ \hline
+Datenbank & IBM DB2 8.1 oder Oracle & MySQL 4.x \\ \hline
+Objekt & Filesystem, & Filesystem,  \\
+Store & IBM CM 8.2 Ressource Manager, &  \\ 
+ & IBM Video Charger 8, & IBM Video Charger 8, \\
+ & Helix Server & Helix Server  \\  \hline
+Systembasis & IBM AIX & alle Systeme mit Java \\
+ & Sun Solaris & \\
+ & MS Windows & \\
 \hline
 \end{supertabular}
 \normalsize
