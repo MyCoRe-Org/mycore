@@ -330,7 +330,7 @@ public class MCRCommandLineInterface
     {
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
-    session = new MCRSession();
+    session = MCRSessionMgr.getCurrentSession();
 
     logger.info( "" );
     logger.info( "MyCoRe Command Line Interface. Type 'help' to get help!" );
