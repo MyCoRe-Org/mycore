@@ -370,6 +370,7 @@ public class MCRClassification
     boolean cat = false;
     String classname = "";
     String categname = "";
+    query = query.replace('\'','\"');
     int classstart = query.indexOf("@ID");
     if (classstart == -1) { return null; }
     classstart = query.indexOf("\"",classstart);
@@ -388,7 +389,6 @@ public class MCRClassification
       categname = query.substring(categstart+1,categstop);
       cat = true;
       }
-    System.out.println(classname+"   "+categname);
     if (cat) {
       return receiveCategoryAsJDOM(classname,categname); }
     else {

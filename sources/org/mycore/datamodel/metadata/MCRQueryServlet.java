@@ -112,6 +112,40 @@ private String defaultLang = "";
     System.out.println("MCRQueryServlet : lang = "+lang);
     System.out.println("MCRQueryServlet : query = "+query);
 
+    // query for classifications
+    if (type.toLowerCase().equals("class")) {
+      Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
+      String style = parameters.getProperty("Style",mode+"-class-"+lang);
+      System.out.println("Style = "+style);
+      MCRClassification cl = new MCRClassification();
+      jdom = cl.search(query);
+      if (jdom==null) {
+        throw new MCRException( 
+          "No classification or category exists" ); }
+System.out.println(new String(MCRUtils.getByteArray(jdom)));
+      try {
+        if (style.equals("xml")) {
+          response.setContentType( "text/xml" );
+          OutputStream out = response.getOutputStream();
+          new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
+          out.close();
+          }
+        else {
+          request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+          request.setAttribute( "XSL.Style", style );
+          RequestDispatcher rd = getServletContext()
+            .getNamedDispatcher( "MCRLayoutServlet" );
+          rd.forward( request, response );
+          }
+        }
+      catch( Exception ex ) {
+        System.out.println( ex.getClass().getName() );
+        System.out.println( ex ); 
+        }
+      return;
+      }
+
+    // all other document types
     if (mode.equals("CachedResultList"))
     {
       cachedFlag = true;
