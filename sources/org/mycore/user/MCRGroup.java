@@ -514,3 +514,5 @@ public class MCRGroup extends MCRUserObject
       MCRUserMgr.instance().updateGroup(this);
     }
   }
+}
+

@@ -126,3 +126,5 @@ public class MCRPrivilegeSet
    */
   private static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
+}
+

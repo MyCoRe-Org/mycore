@@ -171,3 +171,5 @@ public interface MCRUserStore
    * @param user       the user to be updated
    */
   public void updateUser(MCRUser user) throws Exception;
+}
+

@@ -112,3 +112,5 @@ public class MCRUserPolicy
    */
   public Vector getRequiredGroupAttributes()
   { return reqGroupAttributes; }
+}
+

@@ -444,3 +444,5 @@ public class MCRCommandLineInterface
     System.out.println( "Goodbye, and remember: \"Alles wird gut.\"\n" );
     System.exit( 0 );
   }
+}
+
