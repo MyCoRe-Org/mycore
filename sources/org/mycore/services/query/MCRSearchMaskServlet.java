@@ -24,14 +24,22 @@
 
 package org.mycore.services.query;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.http.*;
-import javax.servlet.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet provides a web interface to create a search mask and
@@ -50,22 +58,8 @@ protected static Logger LOGGER=Logger.getLogger(MCRSearchMaskServlet.class.getNa
 // The default mode for this class
 String mode = "CreateSearchMask";
 
-// Default Language 
-String defaultLang = "";
-
 // The configuration XML files
 org.jdom.Document jdom = null;
-
- /**
-  * The initialization method for this servlet. This read the default
-  * language from the configuration.
-  **/
-  public void init() throws MCRConfigurationException
-  {
-    super.init();
-  PropertyConfigurator.configure(CONFIG.getLoggingProperties());
-  defaultLang = CONFIG.getString( "MCR.metadata_default_lang", "de" );
-  }
 
  /**
   * This method handles HTTP requests and resolves them to output.
@@ -103,10 +97,8 @@ org.jdom.Document jdom = null;
   {  
   String type  = request.getParameter( "type"  );
   String layout = request.getParameter( "layout"  );
-  String lang  = request.getParameter( "lang" );
   if( type  == null ) return;
   if( layout  == null ) layout = type;
-  if( lang  == null ) lang  = defaultLang; 
   type = type.toLowerCase();
 
   String smc = CONFIG.getString( "MCR.searchmask_config_"+layout.toLowerCase());
@@ -120,7 +112,7 @@ org.jdom.Document jdom = null;
       smc+" or it has a parse error.",e); }
 
   // prepare the stylesheet name
-  String style = mode + "-" + layout+ "-" + lang;
+  String style = mode + "-" + layout+ "-" + MCRSessionMgr.getCurrentSession().getCurrentLanguage();
 
   // start Layout servlet
     request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );

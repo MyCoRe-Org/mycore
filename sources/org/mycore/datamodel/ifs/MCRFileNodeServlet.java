@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -86,9 +85,6 @@ public class MCRFileNodeServlet extends MCRServlet
   // The Log4J logger
   private static Logger LOGGER = Logger.getLogger( MCRFileNodeServlet.class.getName() );
 
-  // Default language
-  private static String defaultLang;
-
   // The list of hosts from the configuration
   private ArrayList remoteAliasList = null;
 
@@ -102,7 +98,6 @@ public class MCRFileNodeServlet extends MCRServlet
  
     // read host list from configuration
     String hostconf = CONFIG.getString( "MCR.remoteaccess_hostaliases", "local" );
-    defaultLang = CONFIG.getString("MCR.metadata_default_lang", "en");
     remoteAliasList = new ArrayList();
     if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
     
@@ -118,14 +113,7 @@ public class MCRFileNodeServlet extends MCRServlet
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        // get the language
-        String lang = getProperty(req, "lang");
-        if ((lang == null) || (lang.trim().length() == 0))
-            lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        if ((lang == null) || (lang.trim().length() == 0))
-            lang = defaultLang;
-
-        LOGGER.debug("MCRFileNodeServlet: lang = " + lang);
+        String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
 
         // get the host alias
         String hostAlias = getProperty(req, "hosts");
@@ -454,7 +442,7 @@ public class MCRFileNodeServlet extends MCRServlet
   private void addString( Element parent, String itemName, String content )
   {
     if( ( content == null ) || ( content.trim().length() == 0 ) ) return;
-    parent.addContent((Content) new Element( itemName ).addContent( content.trim() ) );
+    parent.addContent(new Element( itemName ).addContent( content.trim() ) );
   }
   
   private void addExtenderData( Element parent, MCRAudioVideoExtender ext )

@@ -31,7 +31,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Content;
 import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;

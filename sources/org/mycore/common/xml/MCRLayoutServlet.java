@@ -53,7 +53,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -97,8 +96,7 @@ public class MCRLayoutServlet extends MCRServlet {
     public static final String STREAM_ATTR = "MCRLayoutServlet.Input.STREAM";
 
     public void init() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        PropertyConfigurator.configure(config.getLoggingProperties());
+        super.init();
         buildTransformerFactory();
         CACHE = new MCRCache(100);
     }
@@ -259,7 +257,7 @@ public class MCRLayoutServlet extends MCRServlet {
                  */
                 String mode = getProperty(request, "mode");
                 String layout = getProperty(request, "layout");
-                String lang = getProperty(request, "lang");
+                String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
                 if ((layout == null) || (layout.equals("")))
                     layout = type;
                 style = mode + "-" + layout + "-" + lang;

@@ -24,21 +24,35 @@
 
 package org.mycore.services.query;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import javax.servlet.http.*;
-import javax.servlet.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.jdom.*;
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXMLSortInterface;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet provides a web interface to query the datastore using XQueries
@@ -58,9 +72,6 @@ public class MCRQueryServlet extends MCRServlet {
 	private static MCRConfiguration MCR_CONFIG = null;
 
 	private MCRQueryCollector collector;
-
-	// Default Language
-	private String defaultLang = "";
 
 	private static final String MCR_SORTER_CONFIG_PREFIX = "MCR.XMLSorter";
 
@@ -124,8 +135,6 @@ public class MCRQueryServlet extends MCRServlet {
 					"MCR.Collector_Thread_num", 2), MCR_CONFIG.getInt(
 					"MCR.Agent_Thread_num", 6));
 		this.getServletContext().setAttribute("QueryCollector", collector);
-		PropertyConfigurator.configure(MCR_CONFIG.getLoggingProperties());
-		defaultLang = MCR_CONFIG.getString("MCR.metadata_default_lang", "de");
 	}
 
 	/**
@@ -182,6 +191,8 @@ public class MCRQueryServlet extends MCRServlet {
 					false);
 			return;
 		}
+		lang=MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+		LOGGER.info("MCRQueryServlet : lang = " + lang);
 
 		// prepare the stylesheet name
 		Properties parameters = MCRLayoutServlet.buildXSLParameters(request);
@@ -502,7 +513,6 @@ public class MCRQueryServlet extends MCRServlet {
 		query = getProperty(request, "query");
 		type = getProperty(request, "type");
 		layout = getProperty(request, "layout");
-		lang = getProperty(request, "lang");
 		String saveResults_str = getProperty(request, "saveResults");
 		if (saveResults_str!=null && saveResults_str.equals("true"))
 		    saveResults=true;
@@ -597,12 +607,6 @@ public class MCRQueryServlet extends MCRServlet {
 		if (layout.equals("")) {
 			layout = type;
 		}
-		if (lang == null) {
-			lang = defaultLang;
-		}
-		if (lang.equals("")) {
-			lang = defaultLang;
-		}
 		type = type.toLowerCase();
 
 		if (view == null)
@@ -616,7 +620,6 @@ public class MCRQueryServlet extends MCRServlet {
 		LOGGER.info("MCRQueryServlet : type = " + type);
 		LOGGER.info("MCRQueryServlet : layout = " + layout);
 		LOGGER.info("MCRQueryServlet : hosts = " + host);
-		LOGGER.info("MCRQueryServlet : lang = " + lang);
 		LOGGER.info("MCRQueryServlet : query = \"" + query + "\"");
 		return true;
 	}
