@@ -122,11 +122,7 @@ public class OoTextPlugin implements TextFilterPlugin {
 			}
 		} else
 			throw new FilterPluginTransformException(
-				"ContentType "
-					+ ct
-					+ " is not supported by "
-					+ getName()
-					+ "!");
+				"ContentType " + ct + " is not supported by " + getName() + "!");
 	}
 
 	/**
@@ -174,8 +170,8 @@ public class OoTextPlugin implements TextFilterPlugin {
 	private Reader getTextReader(InputStream xml)
 		throws IOException, SAXException {
 		XMLReader reader =
-			XMLReaderFactory.createXMLReader(
-				"org.apache.xerces.parsers.SAXParser");
+			XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+		reader.setFeature("", true);
 		StringBuffer buf = new StringBuffer();
 		reader.setContentHandler(new TextHandler(buf));
 		InputSource inp = new InputSource(xml);
@@ -201,8 +197,7 @@ public class OoTextPlugin implements TextFilterPlugin {
 		 * @see java.io.Reader#read(char[], int, int)
 		 */
 		public int read(char[] cbuf, int off, int len) throws IOException {
-			int charsRead =
-				(buf.length() < (off + len)) ? (buf.length() - off) : len;
+			int charsRead = (buf.length() < (off + len)) ? (buf.length() - off) : len;
 			if (pos == buf.length() - 1)
 				return -1;
 			else {
@@ -217,10 +212,9 @@ public class OoTextPlugin implements TextFilterPlugin {
 	}
 
 	private static class TextHandler extends DefaultHandler {
-		private static final String textNS = "http://openoffice.org/2000/text";
+		private static String textNS = "http://openoffice.org/2000/text";
 		private final StringBuffer buf;
 		private boolean textElement = false;
-		private static final char[] space = new char[] { ' ' };
 
 		private TextHandler(StringBuffer buf) {
 			this.buf = buf;
@@ -246,8 +240,13 @@ public class OoTextPlugin implements TextFilterPlugin {
 			String qName,
 			Attributes attributes)
 			throws SAXException {
-			if (uri.equals(textNS)) {
+			//using internal optimized Strings of Xerces-J
+			if (uri == textNS) {
 				textElement = true;
+			} else if (uri.equals(textNS)) {
+				textElement = true;
+				//therefor we might need to assign a given uri to textNS
+				textNS = uri;
 			} else
 				textElement = false;
 		}
@@ -259,12 +258,7 @@ public class OoTextPlugin implements TextFilterPlugin {
 		 * we don't need them, since we validate them either
 		 */
 		public InputSource resolveEntity(String publicId, String systemId) {
-			if (systemId.endsWith(".dtd")) {
-				StringReader stringInput = new StringReader(" ");
-				return new InputSource(stringInput);
-			} else {
-				return null; // default behavior
-			}
+			return new InputSource(new StringReader(" "));
 		}
 	}
 
