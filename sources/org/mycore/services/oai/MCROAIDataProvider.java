@@ -1044,12 +1044,15 @@ public class MCROAIDataProvider extends HttpServlet {
 	    				mappedSets.add(mappedSet);
 	    			}
 	    		}
-	    	} else {
+		    } else {
+				//Add the given set to make the query work 
+		    	//when the given set is not configured by STR_OAI_CATEGORY_MAPPING
 		    	mappedSets.add(set);
-		    }
-	    } else {
+		    } 
+    	} else {
+			//Add a null set to make the query work when no set was queried 
 	    	mappedSets.add(set);
-	    }
+	    } 
 	    
 	    List sets = new ArrayList();
 	    try {
@@ -1347,7 +1350,7 @@ public class MCROAIDataProvider extends HttpServlet {
         List mappedSets = new ArrayList();
 	    if (set != null) {
 	    	buildMappings();
-	    	if (mappings.containsValue(set[0])) {
+	    	if (mappings != null && mappings.containsValue(set[0])) {
 	    		Set keys = mappings.keySet();
 	    		Iterator keyIterator = keys.iterator();
 	    		while (keyIterator.hasNext()) {
@@ -1361,6 +1364,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    		}
 	    	}
 	    } else {
+			//Add a null set to make the query work when no set was queried
 	    	mappedSets.add(set);
 	    }
 	    
