@@ -568,18 +568,22 @@ private final String createTS(MCRTypedContent mcr_tc)
       if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_LINK) {
         sb.append("XXX");
         for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+/*
         sb.append("XXX")
           .append(ttt.createSearchStringText((String)mcr_tc
             .getValueElement(i)))
           .append("XXX");
+*/
         if (((String)mcr_tc.getValueElement(i)).toLowerCase()
           .equals("locator")) {
           sb.append("XXXHREFXXX")
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+1)))
             .append("XXX ")
+/*
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+2)))
+*/
             .append(' ')
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+3)));
@@ -593,6 +597,7 @@ private final String createTS(MCRTypedContent mcr_tc)
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+2)))
             .append("XXX ")
+            .append(' ')
             .append(ttt.createSearchStringText((String)mcr_tc
               .getValueElement(i+3)));
           }
