@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.16 $ $Date: 2003/01/30 13:39:25 $
+ * $Revision: 1.17 $ $Date: 2003/01/30 14:38:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.16 $ $Date: 2003/01/30 13:39:25 $
+ * @version $Revision: 1.17 $ $Date: 2003/01/30 14:38:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -585,13 +585,14 @@ public class MCROAIDataProvider extends HttpServlet {
     	    		+ STR_OAI_NAMESPACE + "2.0/friends.xsd", xsi);
     	    	
     	    	while (tokenizer.hasMoreTokens()) {
-    	    		eFriends.addContent(newElementWithContent("baseURL", frns, tokenizer.nextToken()));	
+    	    		eFriends.addContent(newElementWithContent("baseURL", frns, "http://" + tokenizer.nextToken()));	
     	    	}
     	    	
-    	    	eIdentify.addContent(eFriends);
+    	    	eFriendsDescription.addContent(eFriends);
+    	    	eIdentify.addContent(eFriendsDescription);
     	    }
 		} catch (MCRConfigurationException mcrx) {
-			// Nothing to be done here (realy, not kidding!)
+			// Nothing to be done here (really, not kidding!)
 		}
 
         eRoot.addContent(eIdentify);
@@ -686,7 +687,7 @@ public class MCROAIDataProvider extends HttpServlet {
         
         deleteOutdatedTokenFiles();
         
-        int maxArguments = 0;
+        int maxArguments = 1; // the parameter verb is allways there
         String resumptionToken[] = getParameter("resumptionToken", request); 
         if (resumptionToken != null) {
             maxArguments++;
