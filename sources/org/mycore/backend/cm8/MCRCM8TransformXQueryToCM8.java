@@ -312,7 +312,7 @@ private final String traceOneCondition(String cond, String itemtypename,
     counter++;
     }
 
-/*
+
   for (i=0;i<counter;i++) {
     System.out.println("TAG="+tag[i]);
     System.out.println("OPER="+op[i]);
@@ -320,7 +320,7 @@ private final String traceOneCondition(String cond, String itemtypename,
     System.out.println("BOOLEAN="+bool[i]);
     System.out.println();
     }
-*/
+
 
   StringBuffer sbout = new StringBuffer();
   sbout.append(pretag).append('[');
@@ -328,40 +328,60 @@ private final String traceOneCondition(String cond, String itemtypename,
     if (tag[i].endsWith("@href")) { 
       tag[i] = tag[i].substring(0,tag[i].length()-5)+"@xlinkhref"; }
     if (op[i].equals("contains")) {
-      sbout.append(" contains-text(@").append(itemtypeprefix)
-        .append("ts, \"").append(value[i]).append("\")=1");
+      if (tag[i].equals("*")) {
+        sbout.append(" contains-text(@").append(itemtypeprefix)
+          .append("ts, \"\'").append(value[i]).append("\'\")=1");
+        }
+      else {
+        sbout.append(" contains-text(").append(convPath(tag[i],itemtypeprefix))
+          .append(", \"\'").append(value[i]).append("\'\")=1");
+        }
       continue;
       }
-    j = 0;
-    k = tag[i].length();
-    m = 0;
-    n = 0;
-    while( j < k) {
-      l = tag[i].indexOf("/",j);
-      if (l == -1) { 
-        if (tag[i].charAt(j) == '@') { 
-          sbout.append('@').append(itemtypeprefix)
-            .append(tag[i].substring(j+1,k));  break; }
-        else {
-          sbout.append(itemtypeprefix).append(tag[i].substring(j,k))
-            .append('/').append('@').append(itemtypeprefix)
-            .append(tag[i].substring(j,k)); break;
-          }
-        }
-      if (!tag[i].substring(j,l).equals("*")) {
-        sbout.append(itemtypeprefix); }
-      sbout.append(tag[i].substring(j,l)).append('/');
-      m = j; n = l;
-      j = l+1; 
-      }
+    sbout.append(convPath(tag[i],itemtypeprefix));
     if (op[i].equals("like")) { 
       // replace * with %
-      value[i] = value[i].replace('*','%'); } 
+      value[i] = "%"+value[i].replace('*','%')+"%"; } 
     sbout.append(' ').append(op[i]).append(" \"").append(value[i])
       .append("\"").append(bool[i]); 
     }
   sbout.append(']');
   //return sbout.toString().replace('\'','\"');
+  return sbout.toString();
+  }
+
+/**
+ * Convert the input XML Path to a CM8 PATH
+ *
+ * @param inpath the input XML Path
+ * @param itemtypeprefix the prefix for this item
+ * @return the CM8 PATH
+ **/
+private final String convPath(String inpath, String itemtypeprefix)
+  {
+  StringBuffer sbout = new StringBuffer(256);
+  int j = 0;
+  int k = inpath.length();
+  int m = 0;
+  int n = 0;
+  while( j < k) {
+    int l = inpath.indexOf("/",j);
+    if (l == -1) { 
+      if (inpath.charAt(j) == '@') { 
+        sbout.append('@').append(itemtypeprefix)
+          .append(inpath.substring(j+1,k));  break; }
+      else {
+        sbout.append(itemtypeprefix).append(inpath.substring(j,k))
+          .append('/').append('@').append(itemtypeprefix)
+          .append(inpath.substring(j,k)); break;
+        }
+      }
+    if (!inpath.substring(j,l).equals("*")) {
+      sbout.append(itemtypeprefix); }
+    sbout.append(inpath.substring(j,l)).append('/');
+    m = j; n = l;
+    j = l+1; 
+    }
   return sbout.toString();
   }
 
