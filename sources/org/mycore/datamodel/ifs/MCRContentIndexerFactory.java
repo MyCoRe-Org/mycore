@@ -31,6 +31,8 @@ import org.jdom.input.*;
 import java.util.*;
 import java.io.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class manages instances of MCRContentIndexer
  * and provides methods to get these for a given Indexer ID or MCRFile instance.
@@ -45,9 +47,10 @@ public class MCRContentIndexerFactory
 {
   /** Hashtable IndexerID to MCRContentIndexer instance */  
   protected static Hashtable indexers = new Hashtable();
+  /** Hashtable IndexerID to attributes of handler */  
+  protected static Hashtable handlers = new Hashtable();
 
-  /** The MCRContentIndexerDetector implementation that will be used */
-  protected static MCRContentIndexerDetector indexerDetector;
+  static final private Logger logger = Logger.getLogger( MCRContentIndexerFactory.class.getName() );
   
   static
   {
@@ -59,9 +62,10 @@ public class MCRContentIndexerFactory
     if( in == null )
     {
       String msg = "Configuration file " + file + " not found in CLASSPATH";
-      throw new MCRConfigurationException( msg );
+      logger.info( msg );
+//      throw new MCRConfigurationException( msg );
     }
-    
+    else
     try
     {
       SAXBuilder builder = new SAXBuilder();
@@ -81,14 +85,18 @@ public class MCRContentIndexerFactory
         {
           org.jdom.Element xAttribute = (org.jdom.Element)handler.get(j);
           List attribute = xAttribute.getChildren( "attribute" );
-          for( int k = 0; k < attribute.size(); k++ )      // handle all attributes
+          Hashtable attr = new Hashtable();
+          for( int k = 0; k < attribute.size(); k++ )      // handle all attributes of handler
           {
             org.jdom.Element xValue = (org.jdom.Element)attribute.get(k);
-            System.out.println("FCTTYPE: " + fcttype + " " + 
+            logger.info("FCTTYPE: " + fcttype + " " + 
                                 xAttribute.getAttributeValue( "ID" ) + " " + 
                                 xAttribute.getAttributeValue( "type" ) + " " +
+                                xValue.getAttributeValue( "type" ) + " " +
                                 xValue.getTextTrim() );
+            attr.put( xValue.getAttributeValue( "type" ), xValue.getTextTrim( ) );
           }
+          handlers.put( fcttype + "/" + xAttribute.getAttributeValue( "ID" ) + "/", attr ); 
         } 
         
       }
@@ -103,8 +111,7 @@ public class MCRContentIndexerFactory
   
   /**
    * Returns the MCRContentIndexer instance that is configured for this
-   * IndexerID. The instance that is returned is configured by the property
-   * <tt>MCR.IFS.ContentIndexer.<IndexerID>.Class</tt> in mycore.properties.
+   * IndexerID.
    * 
    * @param indexerID the non-null ID of the MCRContentIndexer implementation
    * @return the MCRContentIndexer instance that uses this indexerID
@@ -116,14 +123,10 @@ public class MCRContentIndexerFactory
     {
       try
       { 
-        Class cl   = Class.forName( "org.mycore.backend.lucene.MCRContentIndexerXML" );
+        Hashtable attribute = (Hashtable)handlers.get( indexerID );
+        Class cl   = Class.forName( (String)attribute.get( "class" ) );
         Object obj = cl.newInstance();
-//        String indexerClass = "MCR.IFS.ContentIndexer." + indexerID + ".Class";
-//        Object obj = MCRConfiguration.instance().getInstanceOf( indexerClass );
         MCRContentIndexer s = (MCRContentIndexer)( obj );
-        Hashtable attribute = new Hashtable();
-        attribute.put( "dir", "d:/_indexer" );
-        attribute.put( "index", "bibentry-index.xml" );
         s.init( indexerID, attribute );
         indexers.put( indexerID, s );
       }
@@ -138,24 +141,22 @@ public class MCRContentIndexerFactory
 
   /**
    * Returns the MCRContentIndexer instance that should be used
-   * to indexer the content of the given file. The configured
-   * MCRContentIndexerDetector is used to make this decision.
+   * to index the content of the given file.
    *
-   * @see MCRContentIndexerDetector
    * @see MCRContentIndexer
    **/
   public static MCRContentIndexer getIndexerFromFCT( String fct )
   {
-    if( indexerDetector == null )
+    String indexerID = null;
+    for ( Enumeration e = handlers.keys(); e.hasMoreElements(); )
     {
-      String property = "MCR.IFS.ContentIndexerDetector.Class";
-      Object obj = MCRConfiguration.instance().getInstanceOf( property );
-      indexerDetector = (MCRContentIndexerDetector)obj;
+      String h = (String)e.nextElement();
+      if ( h.startsWith( fct ) )
+        indexerID = h;
     }
-    String indexerID = indexerDetector.getIndexer( fct );
     if ( null != indexerID)
     {
-      System.out.println("++++ Indexer gefunden: " + indexerID );
+      logger.info("++++ Indexer found: " + indexerID );
       return getIndexer( indexerID );
     }
     else
