@@ -26,7 +26,7 @@ package org.mycore.common.xml;
 
 import java.io.File;
 
-import javax.xml.parsers.ParserConfigurationException
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
