@@ -54,6 +54,19 @@ MCR.persistence_sql_init_connections=1
 MCR.persistence_sql_max_connections=5
 \end{verbatim}
 
+\subsubsection{Debug  konfigurieren}
+
+Innerhalb des MyCoRe-Projektes wird zum Erzeugen aller Print-Ausgaben für das Commandline-Tool und/oder die Stdout-Logs das externe Paket {\bf log4j}des Apache-Jakarta-Projektes benutzt, URL \url{http://jakarta.apache.org/log4j/docs/index2.html} . Dieses ist mittlerweile ein Quasistandard und ermöglicht eine gezielte Steuerung der Informationen, welche man erhalten möchte. \\[2ex]
+In der Grundkonfiguration in \mcrfile{mycore.properties.private} ist der Output-Level INFO eingestellt. Eine zweite Standardvorgabe ist DEBUG, diese ist auskommentiert und kann alternativ bei Problemen genommen werden. {\bf log4j} bietet jedoch darüber hinaus noch viele weitere Möglichkeiten, die Sie bitte der Dokumentation zu diesem Produkt entnehmen. Ergänzend sei auch auf das MyCoRe-Konfigurationsfile \mcrfile{mycore.properties.logger} hingewiesen.
+\begin{verbatim}
+# Set the log level and appender for the general logger
+MCR.log4j.rootLogger=INFO, stdout
+#MCR.log4j.rootLogger=DEBUG, stdout
+
+# Set the log level and appender special classes
+#MCR.log4j.logger.org.mycore.services.oai=DEBUG, stdout
+\end{verbatim}
+
 \subsubsection{XML-Datenbank konfigurieren}
 
 Den Typ der zur Laufzeit des Systems zu wählenden XML-Datenbank haben Sie bereits in der Datei {\tt build.properties} 
