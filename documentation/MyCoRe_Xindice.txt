@@ -1,0 +1,59 @@
+Use Xindice with MyCoRe-Sample under Windows XP Professional       17.06.2003
+
+Xindice supports the XML.DB-interface. Before you start change build.xml in
+mycore-directory from
+
+ <property name="persistency"  value="cm7"/>
+
+ <property name="persistency"  value="xmldb"/>
+
+1. download Xindice from http://xml.apache.org/xindice/download.html
+
+2. I have unzipped the file to d:\Xindice
+
+3. add D:\Xindice\bin to your path
+
+4. set environment variable XINDICE_HOME to d:\Xindice
+
+5. Start Xindice as server application by running startup.bat in directory XINDICE_HOME
+
+6. put url http://localhost:4080 in your browser. You should see the Xindice homepage on
+   your machine. If there are any problems consult INSTALL.windows in the docs directory
+
+7. now generate the collections by typing
+
+   xindiceadmin ac -c /db -n mycore
+   xindiceadmin ac -c /db/mycore -n legalentity
+   xindiceadmin ac -c /db/mycore -n document
+   xindiceadmin ac -c /db/mycore -n derivate
+
+   on the commandline. This will create directory %XINDICE_HOME\db\mycore
+
+   You can delete these collections by typing 
+
+   xindiceadmin dc -c /db -n mycore
+
+8. now set in mycore.properties.private
+
+   MCR.persistence_type=xmldb
+
+   make sure that the cm7 and cm8 persistence types are deactivated, add # at the beginning
+   of the line
+
+9. Try to load legal entities into mycore/legalentity collection
+   This is done by running ant legal in the mycore-sample-application directory
+
+If this doesn't work, check if all the directory settings in the property files are ok. I
+spent a lot of time on this topic. May be that you get the message
+
+java.lang.ExceptionInInitializerError
+
+This means that a property in the property files is not set. I don't know how to do
+a better error handling for this problem.
+
+10. If all is ok you can run ant documents to load the documents 
+
+
+
+
+      
