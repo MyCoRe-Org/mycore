@@ -31,10 +31,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Content;
 import org.jdom.Document;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -54,8 +52,16 @@ public class MCRLoginServlet extends MCRServlet
   private static Logger LOGGER=Logger.getLogger(MCRLoginServlet.class);
 
   // user ID and password of the guest user
-  private static String GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );;
-  private static String GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
+  private static String GUEST_ID;
+  private static String GUEST_PWD;
+  
+  public void init(){
+  	super.init();
+  	if (GUEST_ID==null || GUEST_PWD==null){
+  		 GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );
+  		 GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
+  	}
+  }
 
   /** This method overrides doGetPost of MCRServlet. */
   public void doGetPost(MCRServletJob job) throws Exception
@@ -65,13 +71,13 @@ public class MCRLoginServlet extends MCRServlet
     // Get the MCRSession object for the current thread from the session manager.
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-    String uid = getProperty(job.getRequest(), "uid").trim();
-    String pwd = getProperty(job.getRequest(), "pwd").trim();
-    String backto_url = getProperty(job.getRequest(), "url").trim();
-
-    if (uid.length() == 0) uid = null;
-    if (pwd.length() == 0) pwd = null;
-    if (backto_url.length() == 0) backto_url = null;
+    String uid = getProperty(job.getRequest(), "uid");
+    String pwd = getProperty(job.getRequest(), "pwd");
+    String backto_url = getProperty(job.getRequest(), "url");
+		
+		if (uid!=null) uid=(uid.trim().length()==0)? null : uid.trim();
+		if (pwd!=null) pwd=(pwd.trim().length()==0)? null : pwd.trim();
+		if (backto_url!=null) backto_url=(backto_url.trim().length()==0)? null : backto_url.trim();
 
     // Do not change login, just redirect to given url:
     if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (backto_url != null)) {

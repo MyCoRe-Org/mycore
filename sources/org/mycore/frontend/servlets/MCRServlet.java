@@ -206,7 +206,7 @@ public class MCRServlet extends HttpServlet {
 
 			// Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal nur als Test!!!
 			String lang = getProperty(req, "lang");
-			if (lang.trim().length() != 0)
+			if (lang != null && lang.trim().length() != 0)
 				session.setCurrentLanguage(lang.trim());
 			if (GETorPOST == GET)
 				doGet(job);
@@ -255,9 +255,9 @@ public class MCRServlet extends HttpServlet {
 		String servlet = cname.substring(cname.lastIndexOf(".") + 1);
 		String trace = MCRException.getStackTraceAsString(ex);
 
-		LOGGER.info("Exception caught in : " + servlet);
-		LOGGER.info("Exception type      : " + type);
-		LOGGER.info("Exception message   : " + msg);
+		LOGGER.warn("Exception caught in : " + servlet);
+		LOGGER.warn("Exception type      : " + type);
+		LOGGER.warn("Exception message   : " + msg);
 		LOGGER.debug(trace);
 	}
 
