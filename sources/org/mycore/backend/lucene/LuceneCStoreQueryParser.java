@@ -73,7 +73,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	 * @param string DerivateID
 	 */
 	public void setGroupingValue(String string) {
-		if (string.indexOf(" ") != -1)
+		if (string.indexOf(' ') != -1)
 			logger.error("Grouping value may not contain space characters");
 		groupingValue = string;
 		logger.debug(
@@ -96,6 +96,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
 			if (!clause.prohibited && !clause.required) {
 				clause.required = true;
 			}
+			logger.debug("adding clause: "+clause.query);
 			singleCombined = new BooleanQuery();
 			combiner =
 				new BooleanClause(
@@ -119,10 +120,11 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	 * @see org.apache.lucene.queryParser.QueryParser#parse(java.lang.String)
 	 */
 	public Query parse(String query) throws ParseException {
+		logger.debug("parsing query using: "+analyzer.getClass().getName());
 		Query queryTemp = super.parse(query);
 		//as a workaround to filter standard lucene query change
 		//only queries that search against the standard field..
-		if (queryTemp.toString(field).equalsIgnoreCase(query)) {
+		if (queryTemp.toString().indexOf(GROUPING_FIELD)==-1) {
 			Vector v = new Vector();
 			BooleanClause clause = new BooleanClause(queryTemp, true, false);
 			v.add(clause);

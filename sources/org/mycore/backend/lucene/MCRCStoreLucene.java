@@ -184,11 +184,11 @@ public class MCRCStoreLucene
 
 	protected static String parseQuery(String query) {
 		logger.debug("TS incoming query: " + query);
-		int i = query.indexOf("\"");
+		int i = query.indexOf('\"');
 		i++;
 		if (i == 0)
 			return "";
-		int j = query.indexOf("\"", i);
+		int j = query.lastIndexOf('\"');
 		if (j == -1)
 			return "";
 		return query.substring(i, j);
