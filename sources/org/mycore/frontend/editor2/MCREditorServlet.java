@@ -133,8 +133,11 @@ public class MCREditorServlet extends MCRServlet
     if( param != null ) editor.addContent( param );
 
     MCREditorSubmission sub = MCREditorSourceReader.readSource( editor, requestParameters ); 
-    editor.addContent( sub.buildInputElements()  );
-    editor.addContent( sub.buildRepeatElements() );
+    if( sub != null )
+    {
+      editor.addContent( sub.buildInputElements()  );
+      editor.addContent( sub.buildRepeatElements() );
+    }
 
     String sessionID = buildSessionID();
     sessions.put( sessionID, editor );
@@ -228,6 +231,16 @@ public class MCREditorServlet extends MCRServlet
       editor.removeChild( "repeats" );
 
       MCREditorSubmission sub = new MCREditorSubmission( parms, editor );
+
+      if( "p".equals( action ) )
+        sub.doPlus( path, nr );
+      else if( "m".equals( action ) )
+        sub.doMinus( path, nr );
+      else if( "u".equals( action ) )
+        sub.doUp( path, nr );
+      else if( "d".equals( action ) )
+        sub.doUp( path, nr + 1 );
+
       editor.addContent( sub.buildInputElements()  );
       editor.addContent( sub.buildRepeatElements() );
 
@@ -306,8 +319,10 @@ public class MCREditorServlet extends MCRServlet
   private void sendToDebug( HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub )
     throws IOException, UnsupportedEncodingException
   {
-    res.setContentType( "text/plain; charset=UTF-8" );
-    PrintWriter pw = new PrintWriter( new OutputStreamWriter( res.getOutputStream(), "UTF-8" ) );
+    res.setContentType( "text/html; charset=UTF-8" );
+    PrintWriter pw = res.getWriter();
+
+    pw.println( "<html><body><p><pre>" );
 
     for( int i = 0; i < sub.getVariables().size(); i++ )
     {
@@ -321,18 +336,19 @@ public class MCREditorServlet extends MCRServlet
       }
     }
 
-    pw.println();
-    pw.println();
+    pw.println( "</pre></p><p>" );
 
-    Document xml = sub.getXML();
-    
     XMLOutputter outputter = new XMLOutputter();
     Format fmt = Format.getPrettyFormat();
+    fmt.setLineSeparator( "\n" );
     fmt.setOmitDeclaration( true );
-    fmt.setEncoding( "UTF-8" );
     outputter.setFormat( fmt );
-    outputter.output( xml, pw );
 
+    Element pre = new Element( "pre" );
+    pre.addContent( outputter.outputString( sub.getXML() ) );
+    outputter.output( pre, pw );
+
+    pw.println( "</p></body></html>" );
     pw.close();
   }
 }

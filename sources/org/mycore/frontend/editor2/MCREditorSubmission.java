@@ -348,4 +348,127 @@ public class MCREditorSubmission
       }	
     }
   }
+
+  void doPlus( String prefix, int nr )
+  {
+    changeRepeatNumber( prefix, +1 );
+    changeVariablesAndRepeats( prefix, nr, +1 );
+  }
+        
+  void doMinus( String prefix, int nr )
+  {
+    changeRepeatNumber( prefix, -1 );
+
+    String prefix2; 
+    if( nr > 1 ) 
+      prefix2 = prefix + "[" + nr + "]";  
+    else
+      prefix2 = prefix;  
+
+    for( int i = 0; i < variables.size(); i++ )
+    {
+      String path = ( (MCREditorVariable)( variables.get( i ) ) ).getPath();
+
+      if( path.startsWith( prefix2 + "/"  ) || path.equals( prefix2 ) )
+        variables.remove( i-- );
+    }
+ 
+    for( int i = 0; i < repeats.size(); i++ )
+    {
+      String path = ( (MCREditorVariable)( repeats.get( i ) ) ).getPath();
+
+      if( path.startsWith( prefix2 + "/"  ) )
+        repeats.remove( i-- );
+    }
+
+    changeVariablesAndRepeats( prefix, nr, -1 );
+  }
+
+  void doUp( String prefix, int nr )
+  {
+    String prefix1 = prefix + ( nr > 2 ? "[" + String.valueOf( nr - 1 ) + "]" : "" );
+    String prefix2 = prefix + "[" + String.valueOf( nr ) + "]";
+      
+    for( int i = 0; i < variables.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( variables.get( i ) );
+      String path = var.getPath();
+        
+      if( path.startsWith( prefix1 + "/"  ) || path.equals( prefix1 ) )
+      {
+        String rest = path.substring( prefix1.length() );
+        var.setPath( prefix2 + rest );
+      }  
+      else if( path.startsWith( prefix2 ) || path.equals( prefix2 ) )
+      {
+        String rest = path.substring( prefix2.length() );
+        var.setPath( prefix1 + rest );
+      }  
+    }
+
+    for( int i = 0; i < repeats.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( repeats.get( i ) );
+      String path = var.getPath();
+
+      if( path.startsWith( prefix1 + "/" ) )
+      {
+        String rest = path.substring( prefix1.length() );
+        var.setPath( prefix2 + rest );
+      }
+      else if( path.startsWith( prefix2 + "/" ) )
+      {
+        String rest = path.substring( prefix2.length() );
+        var.setPath( prefix1 + rest );
+      }
+    }
+  }
+
+  void changeRepeatNumber( String prefix, int change )
+  {
+    for( int i = 0; i < repeats.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( repeats.get( i ) );
+      if( var.getPath().equals( prefix ) )
+      {
+        int value = Integer.parseInt( var.getValue() ) + change;
+        if( value == 0 ) value = 1;
+        var.setValue( String.valueOf( value ) );
+        return;
+      }
+    }
+  }  
+
+  void changeVariablesAndRepeats( String prefix, int nr, int change )
+  {
+    ArrayList list = new ArrayList();
+    list.addAll( variables );
+    list.addAll( repeats   );
+      
+    for( int i = 0; i < list.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( list.get( i ) );
+      String path = var.getPath();
+        
+      if( ! path.startsWith( prefix + "[" ) ) continue;
+       
+      String rest = path.substring( prefix.length() + 1 );
+        
+      int pos = rest.indexOf( "]" );
+      int num = Integer.parseInt( rest.substring( 0, pos ) );
+        
+      if( num > nr )
+      {
+        num += change;
+
+        StringBuffer newpath = new StringBuffer( prefix );
+        if( num > 1 ) 
+          newpath.append( "[" ).append( num ).append( "]" );
+        newpath.append( rest.substring( pos + 1 ) );
+
+        var.setPath( newpath.toString() );
+      }
+    }
+  }
 }
+

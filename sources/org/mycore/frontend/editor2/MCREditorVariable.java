@@ -52,14 +52,15 @@ public class MCREditorVariable implements Comparable
   
   MCREditorVariable( String path, String value )
   {
-    this.path  = path;
-    this.value = value;
-    
-    buildPathElements();
+    setPath( path );
+    setValue( value );
   }
 
   public String getPath()
   { return path; }
+
+  void setValue( String value )
+  { this.value = value; }
   
   public String getValue()
   { return value; }
@@ -95,8 +96,10 @@ public class MCREditorVariable implements Comparable
   public String[] getPathElements()
   { return pathElements; }
   
-  private void buildPathElements()
+  void setPath( String path )
   {
+    this.path = path;
+
     ArrayList elements = new ArrayList();
     for( StringTokenizer st = new StringTokenizer( path, "/" ); st.hasMoreTokens(); )
     {
