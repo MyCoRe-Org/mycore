@@ -24,16 +24,26 @@
 
 package org.mycore.user;
 
-import org.jdom.Element;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * This class defines a privilege of the MyCoRe user management system.
  *
  * @author Detlev Degenhardt
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRPrivilege
 {
+  /** The logger */
+  private static Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
+
   /** The name of the privilege */
   private String privName;
 
@@ -45,6 +55,21 @@ public class MCRPrivilege
   {
     privName = name;
     privDescription = description;
+  }
+
+  /** constructor */
+  public MCRPrivilege (org.jdom.Element priv)
+  {
+  privName = "";
+  privDescription = "";
+  if (!priv.getName().equals("privilege")) return;
+  privName = ((String)priv.getAttributeValue("name")).trim();
+  List listelm = priv.getChildren();
+  if (listelm.size()>0) {
+    org.jdom.Element elm = (org.jdom.Element)listelm.get(0);
+    if (!priv.getName().equals("privilege.descrition")) return; 
+    privDescription = ((String)elm.getText()).trim();
+    }
   }
 
   /** @return returns the name of the privilege */
@@ -60,13 +85,38 @@ public class MCRPrivilege
    *   This method returns the privilege object as a JDOM element. This is needed if
    *   one wants to get a representation of several privileges in one xml document.
    */
-  public Element toJDOMElement() throws Exception
+  public org.jdom.Element toJDOMElement() throws MCRException
   {
-    Element priv = new Element("privilege").setAttribute("name", privName);
-    Element Description = new Element("privilege.descrition").setText(privDescription);
+    org.jdom.Element priv = new org.jdom.Element("privilege").setAttribute("name", privName);
+    org.jdom.Element Description = new org.jdom.Element("privilege.descrition").setText(privDescription);
 
     // Aggregate privilege element
     priv.addContent(Description);
     return priv;
+  }
+
+/**
+ * The method check the validation of this class.
+ * @return true if name is not null or empty, else return false
+ **/
+public boolean isValid()
+  { if (privName.length()==0) return false; else return true; }
+
+/**
+ * This helper method replaces null with an empty string and trims whitespace from
+ * non-null strings.
+ */
+protected final static String trim(String s)
+  { return (s != null) ? s.trim() : ""; }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  MCRConfiguration config = MCRConfiguration.instance();
+  PropertyConfigurator.configure(config.getLoggingProperties());
+  logger.debug("privName           = "+privName);
+  logger.debug("privDescription    = "+privDescription);
   }
 }

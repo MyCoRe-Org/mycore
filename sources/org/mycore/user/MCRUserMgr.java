@@ -116,7 +116,8 @@ public final void checkConsistency(MCRSession session) throws MCRException
   locked = true; // we now run in the read only mode
   // For this action you must have list rights.
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     locked = false;
     throw new MCRException("The session has no privilig to list all users!"); }
   if (!admin.hasPrivilege("user administrator")) {
@@ -280,7 +281,8 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group)
      "The user component is locked. At the moment write access is denied."); }
   // For this action you must have list rights.
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("create group")) {
+  if ((!admin.hasPrivilege("create group")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to create group!"); }
   // check the group to null.
   if (group == null) {
@@ -420,7 +422,8 @@ public final synchronized void createUser(MCRSession session,MCRUser user)
       "The user component is locked. At the moment write access is denied."); }
   // For this action you must have list rights.
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("create user")) {
+  if ((!admin.hasPrivilege("create user")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to create user!"); }
   // Check if the user is not null
   if (user == null) {
@@ -480,6 +483,32 @@ public final synchronized void createUser(MCRSession session,MCRUser user)
   }
 
 /**
+ * This method initalized the User/Group system and create the start
+ * configuration without check the data.
+ * @param privileges The privileges ArrayList which should be created
+ **/
+public final synchronized void initializePrivileges(ArrayList privileges)
+  throws MCRException
+  { 
+  if (locked) {
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
+  if (privileges == null) {
+    setLock(false);
+    throw new MCRException("The privileges are null."); }
+  // set the privileges
+  try {
+    MCRPrivilegeSet p = MCRPrivilegeSet.instance();
+    p.loadPrivileges(privileges);
+    }
+  catch (MCRException ex)
+    {
+    setLock(false);
+    throw new MCRException("Can't initialize privileges.",ex);
+    }
+  }
+
+/**
  * This method deletes a group from the datastore (and the group cache as well).
  * @param session  The session context
  * @param groupID   The group ID which will be deleted
@@ -492,7 +521,8 @@ public final synchronized void deleteGroup(MCRSession session, String groupID)
       " access is denied."); }
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("delete group")) {
+  if ((!admin.hasPrivilege("delete group")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to delete group!"); }
   // check if the group exists at all
   if (!mcrUserStore.existsGroup(groupID)) {
@@ -561,7 +591,8 @@ public final synchronized void deleteUser(MCRSession session, String userID)
       " access is denied."); }
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("delete user")) {
+  if ((!admin.hasPrivilege("delete user")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to delete user!"); }
   // check if the user exists at all
   if (!mcrUserStore.existsUser(userID)) {
@@ -606,7 +637,8 @@ public final synchronized ArrayList getAllGroupIDs(MCRSession session)
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilege to list all users!"); }
   return mcrUserStore.getAllGroupIDs(); 
   }
@@ -622,11 +654,22 @@ public final synchronized org.jdom.Document getAllGroups(MCRSession session)
   {
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   MCRGroup currentGroup;
-  org.jdom.Element root = new org.jdom.Element("mycoreuser");
-  root.setAttribute("type", "group");
+  // Path of XML schema
+  String SLASH = System.getProperty("file.separator");
+  String schema_path = config.getString("MCR.appl_path")+SLASH+"schema";
+  // Build the DOM
+  org.jdom.Element root = new org.jdom.Element("mycoregroup");
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+  root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
+    "MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
   ArrayList allGroupIDs = mcrUserStore.getAllGroupIDs();
   for (int i=0; i<allGroupIDs.size(); i++) {
     currentGroup = mcrUserStore.retrieveGroup((String)allGroupIDs.get(i));
@@ -648,7 +691,8 @@ public final synchronized ArrayList getAllUserIDs(MCRSession session)
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   return mcrUserStore.getAllUserIDs(); 
   }
@@ -664,11 +708,22 @@ public final synchronized org.jdom.Document getAllUsers(MCRSession session)
   {
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   MCRUser currentUser;
+  // Path of XML schema
+  String SLASH = System.getProperty("file.separator");
+  String schema_path = config.getString("MCR.appl_path")+SLASH+"schema";
+  // Build the DOM
   org.jdom.Element root = new org.jdom.Element("mycoreuser");
-  root.setAttribute("type", "user");
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
+  root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    MCRDefaults.XLINK_URL));
+  root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
+    "MCRUser.xsd",org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
   ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
   for (int i=0; i<allUserIDs.size(); i++) {
     currentUser = mcrUserStore.retrieveUser((String)allUserIDs.get(i));
@@ -676,6 +731,42 @@ public final synchronized org.jdom.Document getAllUsers(MCRSession session)
     }
   org.jdom.Document jdomDoc = new org.jdom.Document(root);
   return jdomDoc;
+  }
+
+/**
+ * This method gets all privileges from the persistent datastore and returns them
+ * as a ArrayList of strings.
+ *
+ * @param session  The session context
+ * @return   ArrayList of strings containing the privileges of the system.
+ */
+public final synchronized ArrayList getAllPrivileges(MCRSession session) 
+  throws MCRException
+  { 
+  // check the privilegs of this session
+  MCRUser admin = retrieveUser(session.getCurrentUserID());
+  if ((!admin.hasPrivilege("list all privileges")) && 
+      (!admin.hasPrivilege("user administrator"))) {
+    throw new MCRException("The session has no privilege to list all privileges!"); }
+  return MCRPrivilegeSet.instance().getPrivileges(); 
+  }
+
+/**
+ * This method gets all privileges from the persistent datastore and returns them
+ * as a JDOMDocument.
+ *
+ * @param session  The session context
+ * @return   JDOMDocument containing the privileges of the system.
+ */
+public final synchronized org.jdom.Document getAllPrivilegesAsJDOMDocument(
+  MCRSession session) throws MCRException
+  { 
+  // check the privilegs of this session
+  MCRUser admin = retrieveUser(session.getCurrentUserID());
+  if ((!admin.hasPrivilege("list all privileges")) && 
+      (!admin.hasPrivilege("user administrator"))) {
+    throw new MCRException("The session has no privilege to list all privileges!"); }
+  return MCRPrivilegeSet.instance().toJDOMDocument(); 
   }
 
 /**
@@ -734,7 +825,8 @@ public MCRGroup retrieveGroup(MCRSession session, String groupID)
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   return this.retrieveGroup(groupID, false); 
   }
@@ -744,7 +836,8 @@ public MCRGroup retrieveGroup(MCRSession session, String groupID, boolean bFromD
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   return this.retrieveGroup(groupID, bFromDataStore); 
   }
@@ -787,7 +880,8 @@ public MCRUser retrieveUser(MCRSession session ,String userID) throws MCRExcepti
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   return this.retrieveUser(userID, false); 
   }
@@ -797,7 +891,8 @@ public MCRUser retrieveUser(MCRSession session ,String userID,boolean bFromDataS
   { 
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("list all users")) {
+  if ((!admin.hasPrivilege("list all users")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   return this.retrieveUser(userID, bFromDataStore); 
   }
@@ -899,7 +994,8 @@ public final synchronized void updateGroup(MCRSession session,MCRGroup updGroup)
       "The user component is locked. At the moment write access is denied."); }
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("modify group")) {
+  if ((!admin.hasPrivilege("modify group")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to modify group!"); }
   // check that the udtGroup is valid
   if (updGroup == null) {
@@ -990,7 +1086,8 @@ public final synchronized void updateUser(MCRSession session,MCRUser updUser)
       "The user component is locked. At the moment write access is denied."); }
   // check the privilegs of this session
   MCRUser admin = retrieveUser(session.getCurrentUserID());
-  if (!admin.hasPrivilege("modify user")) {
+  if ((!admin.hasPrivilege("modify user")) &&
+    (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to modify user!"); }
   // check that the udtUser is valid
   if (updUser == null) {
@@ -1046,6 +1143,37 @@ public final synchronized void updateUser(MCRSession session,MCRUser updUser)
     throw new MCRException("Error while update user "+updUser.getID()+
       ", the user was delete."); 
     }
+  }
+
+/**
+ * This method updates a list of new privileges in the datastore.
+ * @param session the MCRSession object
+ * @param user   The privilege ArrayList which will be updated
+ */
+public final synchronized void updatePrivileges(MCRSession session,ArrayList updPriv) 
+  throws MCRException
+  {
+  if (locked) {
+    throw new MCRException(
+      "The user component is locked. At the moment write access is denied."); }
+  // check the privilegs of this session
+  MCRUser admin = retrieveUser(session.getCurrentUserID());
+  if ((!admin.hasPrivilege("modify privileges")) &&
+    (!admin.hasPrivilege("user administrator"))) {
+    throw new MCRException("The session has no privilig to modify privileges!"); }
+  // check that the udtPriv is valid
+  if (updPriv == null) {
+    throw new MCRException("The updPriv is null!"); }
+  boolean test = true;
+  try {
+    for (int i=0;i<updPriv.size();i++) {
+      if (!((MCRPrivilege)updPriv.get(i)).isValid()) { test = false; }
+      }
+    }
+  catch (Exception e) { test = false; }
+  if (!test) {
+    throw new MCRException("The update user is not valid."); }
+  MCRPrivilegeSet.instance().loadPrivileges(updPriv);
   }
 
 /**

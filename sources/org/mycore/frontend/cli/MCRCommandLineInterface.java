@@ -242,6 +242,9 @@ public class MCRCommandLineInterface
       "update group data from file {0}",
       "org.mycore.frontend.cli.MCRUserCommands.updateGroupFromFile MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "update privileges data from file {0}",
+      "org.mycore.frontend.cli.MCRUserCommands.updatePrivilegesFromFile MCRSession String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete user {0}",
       "org.mycore.frontend.cli.MCRUserCommands.deleteUser MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
@@ -255,7 +258,7 @@ public class MCRCommandLineInterface
       "org.mycore.frontend.cli.MCRUserCommands.listAllGroups MCRSession" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "list all privileges",
-      "org.mycore.frontend.cli.MCRUserCommands.listAllPrivileges" );
+      "org.mycore.frontend.cli.MCRUserCommands.listAllPrivileges MCRSession" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save all users to file {0}",
       "org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile MCRSession String" );
@@ -264,7 +267,7 @@ public class MCRCommandLineInterface
       "org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save all privileges to file {0}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveAllPrivilegesToFile String" );
+      "org.mycore.frontend.cli.MCRUserCommands.saveAllPrivilegesToFile MCRSession String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "save user {0} to file {1}",
       "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile MCRSession String String" );

@@ -90,7 +90,6 @@ public static void initSuperuser(MCRSession session) throws MCRException
   catch (Exception e) { }
 
   try {
-    MCRPrivilegeSet p = MCRPrivilegeSet.instance();
     ArrayList privList = new ArrayList();
     privList.add(new MCRPrivilege("create user",
       "Users with this privilege may create new users."));
@@ -104,11 +103,15 @@ public static void initSuperuser(MCRSession session) throws MCRException
       "Users with this privilege may modify data of other users."));
     privList.add(new MCRPrivilege("modify group",
       "Users with this privilege may modify data of groups."));
+    privList.add(new MCRPrivilege("modify privileges",
+      "Users with this privilege may modify data of privileges."));
     privList.add(new MCRPrivilege("user administrator",
       "Users with this privilege has administrator rights in the system."));
     privList.add(new MCRPrivilege("list all users",
       "Users with this privilege may list the users of the system."));
-    p.loadPrivileges(privList);
+    privList.add(new MCRPrivilege("list all privileges",
+      "Users with this privilege may list the privileges of the system."));
+    MCRUserMgr.instance().initializePrivileges(privList);
     }
   catch (Exception e) {
     throw new MCRException("Can't create the privileges.",e); }
@@ -124,13 +127,6 @@ public static void initSuperuser(MCRSession session) throws MCRException
     ArrayList mbrGroupIDs = new ArrayList();
     ArrayList groupIDs = new ArrayList();
     ArrayList privileges= new ArrayList();
-    privileges.add("create user");
-    privileges.add("delete user");
-    privileges.add("modify user");
-    privileges.add("create group");
-    privileges.add("delete group");
-    privileges.add("modify group");
-    privileges.add("list all users");
     privileges.add("user administrator");
     MCRGroup g = new MCRGroup(sgroup,suser,null,null,"The superuser group",
       admUserIDs,admGroupIDs,mbrUserIDs,mbrGroupIDs,groupIDs,privileges);
@@ -288,14 +284,15 @@ public static void listAllGroups(MCRSession session) throws Exception
   }
 
 /**
- * This method invokes MCRPrivilegeSet.getPrivileges() and retrieves a ArrayList
+ * This method invokes MCRUserMgr.getAllPrivileges() and retrieves a ArrayList
  * of all privileges stored in the persistent datastore.
+ * @param session the MCRSession object
  **/
-public static void listAllPrivileges() throws MCRException
+public static void listAllPrivileges(MCRSession session) throws MCRException
   {
   try {
     init();
-    ArrayList privs = MCRPrivilegeSet.instance().getPrivileges();
+    ArrayList privs = MCRUserMgr.instance().getAllPrivileges(session);
     logger.info("");
     for (int i=0; i<privs.size(); i++) {
       MCRPrivilege currentPriv = (MCRPrivilege)privs.get(i);
@@ -328,15 +325,16 @@ public static void saveAllGroupsToFile(MCRSession session, String filename)
 
 /**
  * This command takes a file name as a parameter, retrieves all privileges 
- * from MCRPrivilegeSet as JDOM document and saves this to the given file.
+ * from MCRUserMgr as JDOM document and saves this to the given file.
  *
  * @param filename Name of the file the privileges will be saved to
  */
-public static void saveAllPrivilegesToFile(String filename)
+public static void saveAllPrivilegesToFile(MCRSession session, String filename)
   throws MCRException
   {
   try {
-    org.jdom.Document jdomDoc = MCRPrivilegeSet.instance().toJDOMDocument();
+    org.jdom.Document jdomDoc = MCRUserMgr.instance()
+      .getAllPrivilegesAsJDOMDocument(session);
     FileWriter outFile = new FileWriter(new File(filename));
     saveToXMLFile(jdomDoc, outFile);
     }
@@ -599,6 +597,35 @@ public static final void updateGroupFromFile(MCRSession session,String filename)
   }
 
 /**
+ * This method invokes MCRUserMgr.updatePrivileges() with data from a file.
+ * @param session the MCRSession object
+ * @param filename the filename of the privileg data input
+ **/
+public static final void updatePrivilegesFromFile(MCRSession session,
+  String filename) throws MCRException
+  {
+  init();
+  if (!checkFilename(filename)) return;
+  logger.info( "Reading file " + filename + " ..." );
+  try {
+    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.Document doc = bulli.build(MCRXMLHelper.parseURI(filename,true));
+    org.jdom.Element rootelm = doc.getRootElement();
+    if (!rootelm.getName().equals("mycoreprivilege")) {
+      throw new MCRException("The data are not for privileges."); }
+    List listelm = rootelm.getChildren();
+    ArrayList list = new ArrayList();
+    for (int i=0;i<listelm.size();i++) {
+      MCRPrivilege p = new MCRPrivilege((org.jdom.Element)listelm.get(i));
+      if (p.isValid()) list.add(p);
+      }
+    MCRUserMgr.instance().updatePrivileges(session,list);
+    }
+  catch (Exception e) {
+    throw new MCRException("Error while update privileges form file.",e); }
+  }
+
+/**
  * This method just prints a pretty XML output to System.out.
  * @param jdomDoc  the JDOM XML document to be printed
  **/
@@ -618,7 +645,13 @@ private static final void showAsXML(org.jdom.Document jdomDoc)
 private static final void saveToXMLFile(org.jdom.Document jdomDoc, 
   FileWriter outFile)
   {
-  org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter("  ", true);
+  // get encoding
+  config = MCRConfiguration.instance();
+  String mcr_encoding = config.getString("MCR.metadata_default_encoding",
+    MCRDefaults.ENCODING);
+  // Create the output
+  org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(
+    "  ", true,mcr_encoding);
   try { outputter.output(jdomDoc, outFile); }
   catch (Exception e) { 
     throw new MCRException("Error while save XML to file."); }

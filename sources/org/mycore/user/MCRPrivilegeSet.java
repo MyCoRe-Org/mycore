@@ -26,6 +26,7 @@ package org.mycore.user;
 
 import java.util.ArrayList;
 import org.mycore.common.*;
+import org.mycore.datamodel.metadata.*;
 
 /**
  * This class defines the set of privileges of the MyCoRe user management. It
@@ -46,17 +47,26 @@ public class MCRPrivilegeSet
   /** The one and only instance of this class */
   private static MCRPrivilegeSet theInstance = null;
 
-  /** private constructor to create the singleton instance. */
-  private MCRPrivilegeSet() throws Exception
-  {
-    ArrayList privs = new ArrayList();
-    String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
-    mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
-    privs = mcrUserStore.retrievePrivilegeSet();
+  /** The instance of MCRConfiguration */
+  private MCRConfiguration conf = null;
 
+  /** private constructor to create the singleton instance. */
+  private MCRPrivilegeSet() throws MCRException
+    {
+    ArrayList privs = new ArrayList();
+    // Load the configuration
+    conf = MCRConfiguration.instance();
+    // Get the user store name
+    try {
+      String userStoreName = conf.instance().getString("MCR.userstore_class_name");
+      mcrUserStore = (MCRUserStore)Class.forName(userStoreName).newInstance();
+      privs = mcrUserStore.retrievePrivilegeSet();
+      }
+    catch (Exception e) {
+      throw new MCRException("Can't instancied MCRPrivilegeSet."); }
     if (!(privs == null)) // There already exists a privilege set
       this.privileges = privs;
-  }
+    }
 
   /**
    * This method is the only way to get an instance of this class. It calls the
@@ -65,7 +75,7 @@ public class MCRPrivilegeSet
    * @return
    *   returns the one and only instance of <CODE>MCRPrivilegeSet</CODE>
    */
-  public final static synchronized MCRPrivilegeSet instance() throws Exception
+  public final static synchronized MCRPrivilegeSet instance() throws MCRException
   {
     if (theInstance == null)
       theInstance = new MCRPrivilegeSet();
@@ -78,45 +88,66 @@ public class MCRPrivilegeSet
    *
    * @param privList   ArrayList containing privilege objects
    */
-  public void loadPrivileges(ArrayList privList) throws Exception
-  {
-    if (!MCRUserMgr.instance().isLocked())
+  public final void loadPrivileges(ArrayList privList) throws MCRException
     {
-      this.privileges = privList;
-
-      if (mcrUserStore.existsPrivilegeSet())
-        mcrUserStore.updatePrivilegeSet(this);
-      else mcrUserStore.createPrivilegeSet(this);
+    privList.add(new MCRPrivilege("user administrator",
+      "Users with this privilege has administrator rights in the system."));
+    this.privileges = removeDouble(privList);
+    if (mcrUserStore.existsPrivilegeSet())
+      mcrUserStore.updatePrivilegeSet(this);
+    else mcrUserStore.createPrivilegeSet(this);
     }
-    else
-      throw new MCRException("The user component is locked. At the moment write access is denied.");
-  }
+
+  /**
+   * The method return the privileg set without doubles.
+   **/
+  private final ArrayList removeDouble(ArrayList privList)
+    {
+    ArrayList n = new ArrayList();
+    for (int i=0;i<privList.size();i++) {
+      boolean test = false;
+      String name = ((MCRPrivilege)privList.get(i)).getName();
+      for (int j=0;j<n.size();j++) {
+        if (name.equals(((MCRPrivilege)n.get(j)).getName())) { test = true; }
+        }
+      if (!test) { n.add(privList.get(i)); }
+      } 
+    return n;
+    }
 
   /**
    * @returns
    *   This method returns a ArrayList of strings containing all names of the
    *   privileges of the system.
    */
-  public ArrayList getPrivileges()
+  public final ArrayList getPrivileges()
   { return privileges; }
 
   /**
    * @return
    *   This method returns the privilege set object as a DOM document.
    */
-  public synchronized org.jdom.Document toJDOMDocument() throws Exception
-  {
-    org.jdom.Element root = new org.jdom.Element("mycoreuser");
-    root.setAttribute("type", "privilege");
-
+  public synchronized org.jdom.Document toJDOMDocument() throws MCRException
+    {
+    // Path of XML schema
+    String SLASH = System.getProperty("file.separator");
+    String schema_path = conf.getString("MCR.appl_path")+SLASH+"schema";
+    // Build the DOM
+    org.jdom.Element root = new org.jdom.Element("mycoreprivilege");
+    root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+      MCRDefaults.XSI_URL));
+    root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+      MCRDefaults.XLINK_URL));
+    root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
+      "MCRPrivilege.xsd",org.jdom.Namespace.getNamespace("xsi",
+      MCRDefaults.XSI_URL));
     for (int i=0; i<privileges.size(); i++) {
       MCRPrivilege currentPriv = (MCRPrivilege)privileges.get(i);
       root.addContent(currentPriv.toJDOMElement());
     }
-
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
     return jdomDoc;
-  }
+    }
 
   /**
    * This helper method replaces null with an empty string and trims whitespace
