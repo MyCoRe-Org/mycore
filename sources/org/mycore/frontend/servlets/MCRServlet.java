@@ -205,7 +205,7 @@ public class MCRServlet extends HttpServlet {
 			MCRServletJob job = new MCRServletJob(req, res);
 
 			// Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal nur als Test!!!
-			String lang = getStringParameter(job, "lang");
+			String lang = getProperty(req, "lang");
 			if (lang.trim().length() != 0)
 				session.setCurrentLanguage(lang.trim());
 			if (GETorPOST == GET)
@@ -232,24 +232,6 @@ public class MCRServlet extends HttpServlet {
 	 */
 	protected void doGetPost(MCRServletJob job) throws Exception {
 		job.getResponse().sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-
-	/**
-	 * This method gets a string parameter defined by parameterName out of the request.
-	 *
-	 * @param job the ServletJob instance
-	 * @param parameterName the name of the parameter to be extracted
-	 * @return the parameter
-	 */
-	protected String getStringParameter(
-		MCRServletJob job,
-		String parameterName) {
-		String param = "";
-		String[] array = job.getRequest().getParameterValues(parameterName);
-
-		if (array != null)
-			param = array[0];
-		return param;
 	}
 
 	/** Handles an exception by reporting it and its embedded exception */
@@ -322,14 +304,11 @@ public class MCRServlet extends HttpServlet {
 		rd.forward(request, response);
 	}
 
-	protected String getProperty(HttpServletRequest request, String name) {
+	protected static String getProperty(HttpServletRequest request, String name) {
 		String value = (String) request.getAttribute(name);
 		//if Attribute not given try Parameter
 		if (value == null || value.length() == 0)
 			value = request.getParameter(name);
-		//this fixes NullPointerException with value.getBytes() below
-		if (value == null || value.length() == 0)
-			return value;
 		return value;
 	}
 

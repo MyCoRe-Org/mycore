@@ -51,24 +51,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRLoginServlet extends MCRServlet
 {
   // The configuration
-  private static MCRConfiguration config;
-  private static Logger logger=Logger.getLogger(MCRLoginServlet.class);
+  private static Logger LOGGER=Logger.getLogger(MCRLoginServlet.class);
 
   // user ID and password of the guest user
-  private static String guestID  = null;
-  private static String guestPWD = null;
-
-  /** Initialisation of the servlet */
-  public void init()
-  {
-    super.init();
-    MCRConfiguration.instance().reload(true);
-    config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
-
-    guestID  = config.getString( "MCR.users_guestuser_username"   );
-    guestPWD = config.getString( "MCR.users_guestuser_userpasswd" );
-  }
+  private static String GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );;
+  private static String GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
 
   /** This method overrides doGetPost of MCRServlet. */
   public void doGetPost(MCRServletJob job) throws Exception
@@ -78,9 +65,9 @@ public class MCRLoginServlet extends MCRServlet
     // Get the MCRSession object for the current thread from the session manager.
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-    String uid = getStringParameter(job, "uid").trim();
-    String pwd = getStringParameter(job, "pwd").trim();
-    String backto_url = getStringParameter(job, "url").trim();
+    String uid = getProperty(job.getRequest(), "uid").trim();
+    String pwd = getProperty(job.getRequest(), "pwd").trim();
+    String backto_url = getProperty(job.getRequest(), "url").trim();
 
     if (uid.length() == 0) uid = null;
     if (pwd.length() == 0) pwd = null;
@@ -97,8 +84,8 @@ public class MCRLoginServlet extends MCRServlet
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent((Content)new org.jdom.Element("guest_id").addContent(guestID));
-    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(guestPWD));
+    root.addContent((Content)new org.jdom.Element("guest_id").addContent(GUEST_ID));
+    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
 
     try {
       loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
@@ -110,7 +97,7 @@ public class MCRLoginServlet extends MCRServlet
 
       if (loginOk) {
         mcrSession.setCurrentUserID(uid);
-        logger.info("MCRLoginServlet: user " + uid + " logged in successfully.");
+        LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
 
         // We here put the list of groups separated by blanks as a string into the HTTP
         // session. The LayoutServlet then forwards them to the XSL Stylesheets.
@@ -123,7 +110,7 @@ public class MCRLoginServlet extends MCRServlet
         }
         job.getRequest().getSession().setAttribute("XSL.CurrentGroups", groups.toString());
 
-        if (uid.equals(guestID)) {
+        if (uid.equals(GUEST_ID)) {
           job.getResponse().sendRedirect(backto_url);
           return;
         }
@@ -144,14 +131,14 @@ public class MCRLoginServlet extends MCRServlet
     catch (MCRException e) {
       if (e.getMessage().equals("Error in UserStore.")) {
         root.setAttribute("unknown_user", "true");
-        logger.info("MCRLoginServlet: unknown user: " + uid);
+        LOGGER.info("MCRLoginServlet: unknown user: " + uid);
       }
       else if (e.getMessage().equals("Login denied. User is disabled.")) {
         root.setAttribute("user_disabled", "true");
-        logger.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
+        LOGGER.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
       }
       else {
-        logger.debug("MCRLoginServlet: unknown error: "+e.getMessage());
+        LOGGER.debug("MCRLoginServlet: unknown error: "+e.getMessage());
         throw e;
       }
     }

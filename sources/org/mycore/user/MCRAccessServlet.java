@@ -24,18 +24,15 @@
 
 package org.mycore.user;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.util.ArrayList;
+
+import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jdom.*;
-
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
-import org.mycore.user.*;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet returns a XML Object that contains the access check result.
@@ -46,17 +43,7 @@ import org.mycore.user.*;
 
 public class MCRAccessServlet extends MCRServlet
   {
-  // The configuration
-  private static MCRConfiguration config;
-  private static Logger logger=Logger.getLogger(MCRAccessServlet.class);
-
-  /** Initialisation of the servlet */
-  public void init()
-    {
-    MCRConfiguration.instance().reload(true);
-    config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
-    }
+  private static Logger LOGGER=Logger.getLogger(MCRAccessServlet.class);
 
   /**
    * This method overrides doGetPost of MCRServlet.<br />
@@ -77,23 +64,23 @@ public class MCRAccessServlet extends MCRServlet
     boolean retip = false;
 
     // read the parameter
-    String ip = getStringParameter(job, "ip");
+    String ip = getProperty(job.getRequest(), "ip");
     if (ip == null) { ip = ""; }
     ip.trim();
     if (ip.length()==0) { retip = true; }
-    String privilege = getStringParameter(job, "privilege");
+    String privilege = getProperty(job.getRequest(), "privilege");
     if (privilege == null) { privilege = ""; }
     privilege.trim();
     if (privilege.length()==0) { retpriv = true; }
     StringBuffer sb = new StringBuffer(1024);
     sb.append("Access check for ip [").append(ip).append("] and privilege [")
       .append(privilege).append(']');
-    logger.debug(sb.toString());
+    LOGGER.debug(sb.toString());
 
     // get the MCRSession object for the current thread from the session manager.
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
     String userid = mcrSession.getCurrentUserID();
-    logger.debug("Access check for user "+userid);
+    LOGGER.debug("Access check for user "+userid);
 
     // check the data
     boolean result = false;

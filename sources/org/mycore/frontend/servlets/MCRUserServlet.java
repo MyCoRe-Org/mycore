@@ -30,10 +30,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Content;
 import org.jdom.Document;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -49,27 +47,14 @@ import org.mycore.user.MCRUserMgr;
 
 public class MCRUserServlet extends MCRServlet
 {
-  // The configuration
-  private static MCRConfiguration config;
-  private static Logger logger=Logger.getLogger(MCRUserServlet.class);
+  private static Logger LOGGER=Logger.getLogger(MCRUserServlet.class);
 
   // user ID and password of the guest user
-  private static String guestID  = null;
-  private static String guestPWD = null;
+  private static String GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );
+  private static String GUEST_PWD = CONFIG.getString( "MCR.users_guestuser_userpasswd" );
 
   // The default mode for this class
   String mode = "Select";
-
-  /** Initialisation of the servlet */
-  public void init()
-  {
-    MCRConfiguration.instance().reload(true);
-    config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
-
-    guestID  = config.getString( "MCR.users_guestuser_username"   );
-    guestPWD = config.getString( "MCR.users_guestuser_userpasswd" );
-  }
 
   /**
    * This method overrides doGetPost of MCRServlet and handles HTTP requests. Depending
@@ -83,14 +68,14 @@ public class MCRUserServlet extends MCRServlet
   public void doGetPost(MCRServletJob job)
     throws IOException, ServletException
   {
-    mode  = getStringParameter(job, "mode").trim();
+    mode  = getProperty(job.getRequest(), "mode");
     if (mode.length() == 0) mode = "Select";
     if (mode.equals("ChangePwd")) {changePwd(job);}
     else if (mode.equals("CreatePwdDialog")){createPwdDialog(job);}
     else if (mode.equals("Select")){selectTask(job);}
     else if (mode.equals("ShowUser")){showUser(job);}
     else { // no valid mode, redirect to original URL
-      String backto_url = getStringParameter(job, "url").trim();
+      String backto_url = getProperty(job.getRequest(), "url");
       if (backto_url.length() == 0) backto_url = null;
       job.getResponse().sendRedirect(backto_url);
       return;
@@ -117,9 +102,9 @@ public class MCRUserServlet extends MCRServlet
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
     String currentUser = mcrSession.getCurrentUserID();
 
-    String pwd_1  = getStringParameter(job, "pwd_1").trim();
-    String pwd_2  = getStringParameter(job, "pwd_2").trim();
-    String oldpwd = getStringParameter(job, "oldpwd").trim();
+    String pwd_1  = getProperty(job.getRequest(), "pwd_1").trim();
+    String pwd_2  = getProperty(job.getRequest(), "pwd_2").trim();
+    String oldpwd = getProperty(job.getRequest(), "oldpwd").trim();
 
     org.jdom.Document jdomDoc = createJdomDocBase(job);
     org.jdom.Element root = jdomDoc.getRootElement();
@@ -219,14 +204,14 @@ public class MCRUserServlet extends MCRServlet
     // Get the MCRSession object for the current thread from the session manager.
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
     String currentUser = mcrSession.getCurrentUserID();
-    String backto_url = getStringParameter(job, "url").trim();
+    String backto_url = getProperty(job.getRequest(), "url").trim();
     if (backto_url.length() == 0) backto_url = null;
 
     org.jdom.Element root = new org.jdom.Element("mcr_user");
     org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-    root.addContent((Content)new org.jdom.Element("guest_id").addContent(guestID));
-    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(guestPWD));
+    root.addContent((Content)new org.jdom.Element("guest_id").addContent(GUEST_ID));
+    root.addContent((Content)new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
     root.addContent((Content)new org.jdom.Element("backto_url").addContent(backto_url));
     return jdomDoc;
   }

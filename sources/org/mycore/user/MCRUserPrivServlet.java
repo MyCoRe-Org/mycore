@@ -24,18 +24,15 @@
 
 package org.mycore.user;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.util.ArrayList;
+
+import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jdom.*;
-
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.*;
-import org.mycore.user.*;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet returns a XML Object that contains the name of a user and his
@@ -48,17 +45,8 @@ import org.mycore.user.*;
 
 public class MCRUserPrivServlet extends MCRServlet
   {
-  // The configuration
-  private static MCRConfiguration config;
-  private static Logger logger=Logger.getLogger(MCRUserPrivServlet.class);
+  private static Logger LOGGER=Logger.getLogger(MCRUserPrivServlet.class);
 
-  /** Initialisation of the servlet */
-  public void init()
-    {
-    MCRConfiguration.instance().reload(true);
-    config = MCRConfiguration.instance();
-    PropertyConfigurator.configure(config.getLoggingProperties());
-    }
 
   /**
    * This method overrides doGetPost of MCRServlet.<br />
@@ -80,15 +68,15 @@ public class MCRUserPrivServlet extends MCRServlet
   public void doGetPost(MCRServletJob job) throws Exception
     {
     // read the privilege parameter
-    String searchpriv = getStringParameter(job, "privilege");
+    String searchpriv = getProperty(job.getRequest(), "privilege");
     if (searchpriv == null) { searchpriv = ""; }
     searchpriv.trim();
-    logger.info("Search privilege = "+searchpriv);
+    LOGGER.info("Search privilege = "+searchpriv);
 
     // get the MCRSession object for the current thread from the session manager.
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
     String userid = mcrSession.getCurrentUserID();
-    logger.info("Curren user      = "+userid);
+    LOGGER.info("Curren user      = "+userid);
 
     // prepare the document
     org.jdom.Element root = new org.jdom.Element("mycoreuserpriv");

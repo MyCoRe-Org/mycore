@@ -24,27 +24,25 @@
 package org.mycore.frontend.servlets;
 
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.File;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
-import org.mycore.common.*;
-import org.mycore.datamodel.ifs.*;
-import org.mycore.frontend.editor2.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.jdom.output.*;
-
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.queryParser.QueryParser;
+import org.jdom.output.XMLOutputter;
+import org.mycore.datamodel.ifs.MCRContentIndexer;
+import org.mycore.datamodel.ifs.MCRContentIndexerFactory;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.frontend.editor2.MCREditorSubmission;
 
 /**
  * This class handles: searches on arbitrary xml files and generates resultset
@@ -58,19 +56,19 @@ import org.apache.lucene.queryParser.QueryParser;
 public final class MCRContentHandleServlet extends MCRServlet
 {
   private static String SLASH = System.getProperty( "file.separator" );
-  static final private Logger logger = Logger.getLogger( MCRContentHandleServlet.class.getName() );
+  static final private Logger LOGGER = Logger.getLogger( MCRContentHandleServlet.class );
   
   public void doGetPost( MCRServletJob job )
     throws Exception
   {
     HttpServletRequest  req = job.getRequest();
     HttpServletResponse res = job.getResponse();
-    String button = getStringParameter(job, "button").trim();
+    String button = getProperty(req,"button");
     // show ifsnode?
-    String ifsnodeid = getStringParameter(job, "ifsnodeid").trim();
+    String ifsnodeid = getProperty(req, "ifsnodeid");
     if( ifsnodeid.length() > 0 )
     {
-      logger.info( "ifsnode to show : " + ifsnodeid );
+      LOGGER.info( "ifsnode to show : " + ifsnodeid );
       showIFSNode( req, res, ifsnodeid );
       return;
     }
@@ -81,14 +79,14 @@ public final class MCRContentHandleServlet extends MCRServlet
     {
       org.jdom.Document input = sub.getXML();
       if (null == input)
-        logger.info( "jdom from editor is null" );
+        LOGGER.info( "jdom from editor is null" );
       else
       {
         XMLOutputter outputter = new XMLOutputter();
         outputter.output( input, System.out );
         org.jdom.Element root = input.getRootElement();
         String rootName = root.getName();
-        logger.info( "MCRContentHandleServlet Root Name: " + rootName );
+        LOGGER.info( "MCRContentHandleServlet Root Name: " + rootName );
         if ( rootName.equals( "files") )
           doStore( req, res, sub, input );  
         else  
@@ -113,7 +111,7 @@ public final class MCRContentHandleServlet extends MCRServlet
     MCRFile f = (MCRFile)MCRFilesystemNode.getNode( ifsnodeid );
     if ( null == f )
     {
-      logger.info( ifsnodeid + " not found." );
+      LOGGER.info( ifsnodeid + " not found." );
     }
     else
     {
@@ -158,7 +156,7 @@ public final class MCRContentHandleServlet extends MCRServlet
          }
          catch( NoSuchElementException e)
          {
-           logger.info( e );
+           LOGGER.info( e );
          }
        }
      }// for
@@ -184,7 +182,7 @@ public final class MCRContentHandleServlet extends MCRServlet
      {  
        try
        { 
-         logger.info("QUERY: " + query);
+         LOGGER.info("QUERY: " + query);
          result = indexer.doSearchIndex( query  );
          org.jdom.Element res2 = new org.jdom.Element( "res" );
          input = new org.jdom.Document( res2 );
@@ -193,7 +191,7 @@ public final class MCRContentHandleServlet extends MCRServlet
            MCRFile f = (MCRFile)MCRFilesystemNode.getNode( result[i] );
            if ( null == f )
            {
-             logger.info( result[i] + " not found." );
+             LOGGER.info( result[i] + " not found." );
            }
            else
            {
@@ -206,7 +204,7 @@ public final class MCRContentHandleServlet extends MCRServlet
        catch ( Exception ex ){}
      }
      else
-       logger.info("Handler not found for: " + handler );
+       LOGGER.info("Handler not found for: " + handler );
         
      req.setAttribute( "MCRLayoutServlet.Input.JDOM", input );
      RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
@@ -231,7 +229,7 @@ public final class MCRContentHandleServlet extends MCRServlet
     {
       FileItem item = (FileItem)( files.get( j ) );
       String fpath = item.getName().trim();
-      logger.info( "Path: " + fpath );
+      LOGGER.info( "Path: " + fpath );
       processFromFile( fpath, update.equals( "true" ) );
     }
   }
@@ -245,11 +243,11 @@ public final class MCRContentHandleServlet extends MCRServlet
   private static boolean processFromFile( String file, boolean update )
     {
     if( ! file.endsWith( ".xml" ) ) {
-      logger.warn( file + " ignored, does not end with *.xml" );
+      LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
       }
     if( ! new File( file ).isFile() ) {
-      logger.warn( file + " ignored, is not a file." );
+      LOGGER.warn( file + " ignored, is not a file." );
       return false;
       }
     
@@ -265,7 +263,7 @@ public final class MCRContentHandleServlet extends MCRServlet
     {
       if ( null == difs )
       {
-        logger.warn( "Content with " + ID + " not found in IFS." );
+        LOGGER.warn( "Content with " + ID + " not found in IFS." );
         return false;
       }
       difs.delete();
@@ -275,16 +273,16 @@ public final class MCRContentHandleServlet extends MCRServlet
     {
       if ( null != difs )
       {
-        logger.warn( "Content with " + ID + " allready stored in IFS." );
+        LOGGER.warn( "Content with " + ID + " allready stored in IFS." );
         return false;
       }
       message = " stored in IFS.";
     }
-    logger.info( "Reading file " + file + " ..." );
+    LOGGER.info( "Reading file " + file + " ..." );
     File f = new File( file );
     MCRFileImportExport.importFiles(f, ID );
-    logger.info( ID + message );
-    logger.info("");
+    LOGGER.info( ID + message );
+    LOGGER.info("");
     
     return true;
     }
