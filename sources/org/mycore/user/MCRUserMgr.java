@@ -643,15 +643,7 @@ public class MCRUserMgr
    * @return   ArrayList of strings containing the privileges of the system.
    */
   public final synchronized ArrayList getAllPrivileges() throws MCRException
-  {
-    // Check the privileges
-    MCRSession session = MCRSessionMgr.getCurrentSession();
-    MCRUser admin = retrieveUser(session.getCurrentUserID(), false);
-    if ((!admin.hasPrivilege("list all privileges")) && (!admin.hasPrivilege("user administrator"))) {
-      throw new MCRException("The current user does not have the privilege to list all privileges!");
-    }
-    return MCRPrivilegeSet.instance().getPrivileges();
-  }
+  { return MCRPrivilegeSet.instance().getPrivileges(); }
 
   /**
    * This method gets all privileges from the persistent datastore and returns them
