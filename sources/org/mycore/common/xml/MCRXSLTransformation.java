@@ -43,7 +43,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
 import org.jdom.transform.JDOMResult;
@@ -104,7 +103,7 @@ public class MCRXSLTransformation {
 	/**
 	 * Method MCRXSLTransformation.
 	 */
-	private MCRXSLTransformation() {
+	static {
 		logger = Logger.getLogger(MCRXSLTransformation.class);
     	MCRConfiguration.instance().reload(true);
     	PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
