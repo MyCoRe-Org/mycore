@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<collection>
+  <uri>kupudrawers/demolibrary2.xml</uri>
+  <icon></icon>
+  <title>Library 2</title>
+  <description></description>
+  <items>
+    <resource id="res-a">
+      <uri>kupudrawers/res-a</uri>
+      <icon></icon>
+      <description>Demo Resource alpha</description>
+    </resource>
+    <resource id="res-b">
+      <uri>kupudrawers/res-b</uri>
+      <icon></icon>
+      <description>Demo Resource beta</description>
+    </resource>
+  </items>
+</collection>

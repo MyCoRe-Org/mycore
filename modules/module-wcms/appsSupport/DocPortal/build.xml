@@ -192,6 +192,11 @@
 		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/uif/common" preservelastmodified="yes">
 			<fileset dir="${env.MYCORESAMPLE_HOME}/modules/module-wcms/uif/web/common" />
 		</copy>		
+
+		<!-- get kupu to webapps -->
+		<copy todir="${env.MYCORESAMPLE_HOME}/webapps/modules/module-wcms/thirdParty/kupu" preservelastmodified="yes">			
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/thirdParty/kupu" />
+		</copy>						
 		
 	</target>	
 

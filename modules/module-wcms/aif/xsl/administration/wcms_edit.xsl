@@ -650,31 +650,29 @@
 		    </th>
 		  </tr>		  		  
 
-		  <!-- get content / link -->            
-          <xsl:choose>
-              <xsl:when test="/cms/action = 'translate'">
-                  <tr>
-                    <!-- internal content -->		      
-                    <xsl:call-template name="buildInterface.general.content.getContent"/>		          
-                  </tr>              
-              </xsl:when>
-              <xsl:otherwise>
-                  <tr>
-                     <th align="left" colspan="2">
-        	            <!-- internal content -->		      
-                        <xsl:call-template name="buildInterface.general.content.getContent"/>		            
-        	            <!-- external new content -->		      
-                        <xsl:call-template name="buildInterface.general.content.getExternalHREF"/>		           		    	<!-- external existing content -->		      		            
-                        <xsl:call-template name="buildInterface.general.content.showExistingHREF">
-                            <xsl:with-param name="href" select="$href"/>
-                        </xsl:call-template>		            
-                     </th>
-                  </tr>              
-              </xsl:otherwise>
-          </xsl:choose>
-		  <!-- END OF: get content / link -->                              
-            
-		 </table>	
+            <tr>
+               <th align="left" colspan="2">
+			  <!-- get content / link -->            
+		          <xsl:choose>
+		              <xsl:when test="/cms/action = 'translate'">
+		                    <!-- internal content -->		      
+		                    <xsl:call-template name="buildInterface.general.content.getContent"/>		          
+		              </xsl:when>
+		              <xsl:otherwise>
+		        	            <!-- internal content -->		      
+		                        <xsl:call-template name="buildInterface.general.content.getContent"/>		            
+		        	            <!-- external new content -->		      
+		                        <xsl:call-template name="buildInterface.general.content.getExternalHREF"/>		           		    	<!-- external existing content -->		      		            
+		                        <xsl:call-template name="buildInterface.general.content.showExistingHREF">
+		                            <xsl:with-param name="href" select="$href"/>
+		                        </xsl:call-template>		            
+		              </xsl:otherwise>
+		          </xsl:choose>
+			  <!-- END OF: get content / link -->                              
+               </th>
+            </tr>              
+		            
+	 </table>	
 	  </td>
         
     </tr>  
@@ -746,37 +744,25 @@
 <xsl:template name="buildInterface.general.content.getContent">
 
 <xsl:if test="/cms/action[@mode = 'intern'] ">
+   
     <xsl:choose>
         
         <xsl:when test="/cms/action = 'translate'">
-            <th align="left" valign="top">
-                Inhalt in Standardsprache (<xsl:value-of select="$DefaultLang" />):<br/>
-		    <br/>
-                <xsl:call-template name="buildInterface.general.content.validateXHTML"/>
-                <textarea name="content" rows="30" cols="80" readonly="readonly" wrap="off">
-                       <xsl:value-of select="/cms/content"/>                                  
-                </textarea>        
-            </th>
-            <th align="right" valign="top">                
                 übersetzter Inhalt (<xsl:value-of select="$CurrentLang" />):<br/>
-	          <input type="checkbox" name="codeValidation" value="true" />autom. Korrektur des XHTML-Codes
-                <textarea name="content_currentLang" rows="30" cols="80" wrap="off">
-                       <xsl:value-of select="/cms/content_currentLang"/>                                  
-                </textarea>        
-            </th>                
+	          <input type="checkbox" name="codeValidationDisable" value="true" />Codekorrektur ausschalten
+                <xsl:call-template name="buildInterface.general.content.validateXHTML"/>		    
+	          <xsl:call-template name="kupu"/>		     		    
         </xsl:when>
         
-		<xsl:otherwise> 
-			<span style="text-decoration:underline;">Statischer Inhalt:</span><br/>
-			
-			<input type="checkbox" 
-			name="codeValidationDisable" value="true" />autom. Codekorrektur deaktivieren (Vorsicht, Seite könnte nicht abgespeichert 
-			werden!) 
-			
-			<xsl:call-template name="buildInterface.general.content.validateXHTML"/> <xsl:call-template name="kupu"/> 
-		</xsl:otherwise>
+        <xsl:otherwise>
+                <span style="text-decoration:underline;">Statischer Inhalt:</span><br/>
+	           <input type="checkbox" name="codeValidationDisable" value="true" />Codekorrektur ausschalten
+                <xsl:call-template name="buildInterface.general.content.validateXHTML"/>
+	          <xsl:call-template name="kupu"/>
+        </xsl:otherwise>
         
     </xsl:choose>
+    
 </xsl:if>        
     
 </xsl:template>    

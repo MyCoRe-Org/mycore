@@ -252,6 +252,11 @@
 		<copy todir="${env.MYCOREWCMS_HOME}/webapps/images" preservelastmodified="yes">
 			<fileset dir="${env.MYCOREWCMS_HOME}/webpages/images" />
 		</copy>			   	  		  	
+	
+		<!-- get kupu to webapps -->
+		<copy todir="${env.MYCOREWCMS_HOME}/webapps/modules/module-wcms/thirdParty/kupu" preservelastmodified="yes">			
+			<fileset dir="${env.MYCORE_HOME}/modules/module-wcms/thirdParty/kupu" />
+		</copy>				
 		
 	</target>	
 

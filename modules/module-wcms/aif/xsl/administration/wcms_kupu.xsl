@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" >
 	<!-- ================================================================================= -->
 	<xsl:template name="kupu">
+
 		<div style="display: none;">
 			<xml id="kupuconfig">
 				<kupuconfig>
@@ -53,23 +54,23 @@
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-bold" 
 							id="kupu-bold-button" title="bold: alt-b" i18n:attributes="title" accesskey="b">&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-italic" 
-							id="kupu-italic-button" title="italic: alt-i" i18n:attributes="title" accesskey="i">
+							id="kupu-italic-button" title="italic: alt-i" i18n:attributes="title" accesskey="i"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-underline" 
-							id="kupu-underline-button" title="underline: alt-u" i18n:attributes="title" accesskey="u">
+							id="kupu-underline-button" title="underline: alt-u" i18n:attributes="title" accesskey="u"> 
 							&#xA0;</button>
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-subsuper">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-subscript" 
-							id="kupu-subscript-button" title="subscript: alt--" i18n:attributes="title" accesskey="-">
+							id="kupu-subscript-button" title="subscript: alt--" i18n:attributes="title" accesskey="-"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-superscript" 
-							id="kupu-superscript-button" title="superscript: alt-+" i18n:attributes="title" accesskey="+">
+							id="kupu-superscript-button" title="superscript: alt-+" i18n:attributes="title" accesskey="+"> 
 							&#xA0;</button>
 					</span>
 					<span class="kupu-tb-buttongroup">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-forecolor" 
-							id="kupu-forecolor-button" title="text color: alt-f" i18n:attributes="title" accesskey="f">
+							id="kupu-forecolor-button" title="text color: alt-f" i18n:attributes="title" accesskey="f"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-hilitecolor" 
 							id="kupu-hilitecolor-button" title="background color: alt-h" i18n:attributes="title" 
@@ -77,21 +78,21 @@
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-justify">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-justifyleft" 
-							id="kupu-justifyleft-button" title="left justify: alt-l" i18n:attributes="title" accesskey="l">
+							id="kupu-justifyleft-button" title="left justify: alt-l" i18n:attributes="title" accesskey="l"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-justifycenter" 
 							id="kupu-justifycenter-button" title="center justify: alt-c" i18n:attributes="title" 
 							accesskey="c">&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-justifyright" 
-							id="kupu-justifyright-button" title="right justify: alt-r" i18n:attributes="title" accesskey="r">
+							id="kupu-justifyright-button" title="right justify: alt-r" i18n:attributes="title" accesskey="r"> 
 							&#xA0;</button>
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-list">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-insertorderedlist" 
-							title="numbered list: alt-#" id="kupu-list-ol-addbutton" i18n:attributes="title" accesskey="#">
+							title="numbered list: alt-#" id="kupu-list-ol-addbutton" i18n:attributes="title" accesskey="#"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-insertunorderedlist" 
-							title="unordered list: alt-*" id="kupu-list-ul-addbutton" i18n:attributes="title" accesskey="*">
+							title="unordered list: alt-*" id="kupu-list-ul-addbutton" i18n:attributes="title" accesskey="*"> 
 							&#xA0;</button>
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-definitionlist">
@@ -101,10 +102,10 @@
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-indent">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-outdent" 
-							id="kupu-outdent-button" title="outdent: alt-&lt;" i18n:attributes="title" accesskey="&lt;">
+							id="kupu-outdent-button" title="outdent: alt-&lt;" i18n:attributes="title" accesskey="&lt;"> 
 							&#xA0;</button>
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-indent" 
-							id="kupu-indent-button" title="indent: alt-&gt;" i18n:attributes="title" accesskey="&gt;">
+							id="kupu-indent-button" title="indent: alt-&gt;" i18n:attributes="title" accesskey="&gt;"> 
 							&#xA0;</button>
 					</span>
 					<span class="kupu-tb-buttongroup" id="kupu-bg-remove">
@@ -127,30 +128,29 @@
 					</span>
 				</span>
 				<select id="kupu-ulstyles">
-					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="disc" i18n:translate="list-disc">
+					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="disc" i18n:translate="list-disc"> 
 						&#x25CF;</option>
-					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="square" i18n:translate="list-square">
+					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="square" i18n:translate="list-square"> 
 						&#x25A0;</option>
-					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="circle" i18n:translate="list-circle">
+					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="circle" i18n:translate="list-circle"> 
 						&#x25CB;</option>
 					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="none" i18n:translate="list-nobullet">no 
 						bullet</option>
 				</select>
 				<select id="kupu-olstyles">
-					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="decimal" i18n:translate="list-decimal">
+					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="decimal" i18n:translate="list-decimal"> 
 						1</option>
 					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="upper-roman" i18n:translate="list-upperroman">
-						I</option>
+						 I</option>
 					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="lower-roman" i18n:translate="list-lowerroman">
-						i</option>
+						 i</option>
 					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="upper-alpha" i18n:translate="list-upperalpha">
-						A</option>
+						 A</option>
 					<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="lower-alpha" i18n:translate="list-loweralpha">
-						a</option>
+						 a</option>
 				</select>
 			</div>
 			<div xmlns="" class="kupu-toolboxes">
-				<!--
 				<div class="kupu-toolbox" id="kupu-toolbox-properties">
 					<h1>Properties</h1>
 					<div class="kupu-toolbox-label">Title</div>
@@ -159,7 +159,6 @@
 					<textarea style="width: 90%" id="kupu-properties-description">
 					</textarea>
 				</div>
-				-->
 				<div class="kupu-toolbox" id="kupu-toolbox-links">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="links">Links</h1>
 					<div id="kupu-toolbox-addlink">
@@ -171,7 +170,6 @@
 						</div>
 					</div>
 				</div>
-				
 				<div class="kupu-toolbox" id="kupu-toolbox-images">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="images">Images</h1>
 					<div class="kupu-toolbox-label"><span xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate=""> 
@@ -220,27 +218,38 @@
 						</div>
 					</div>
 				</div>
-				<!--
 				<div class="kupu-toolbox" id="kupu-toolbox-debug">
 					<h1 xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:translate="debug-log">Debug Log</h1>
 					<div id="kupu-toolbox-debuglog" class="kupu-toolbox-label" style="height: 150px;">
 					</div>
 				</div>
-				-->
 			</div>
 			<table id="kupu-colorchooser" cellpadding="0" cellspacing="0" 
 				style="position: fixed; border-style: solid; border-color: black; border-width: 1px;">
 			</table>
+
 			<div class="kupu-editorframe">
 				<form>
-					<iframe id="kupu-editor" frameborder="0" src="http://ulbp1034.thulb.uni-jena.de:8191/wcms/dieter.html" 
+					<iframe id="kupu-editor" frameborder="0" 
+						src=" {concat($WebApplicationBaseURL,'servlets/WCMSGetStaticHTMLServlet?href=',/cms/href,'&amp;lang=',$CurrentLang) }" 
 						scrolling="auto">
 					</iframe>
-					<textarea name="content" id="kupu-editor-textarea" style="display: none">hallo kjhkjh
-					</textarea>
+					<xsl:choose>
+						<xsl:when test="/cms/action = 'translate'">
+							<textarea id="kupu-editor-textarea" name="content_currentLang" style="display: none">
+							</textarea>
+						</xsl:when>
+						<xsl:otherwise>
+							<textarea id="kupu-editor-textarea" name="content" style="display: none">
+							</textarea>							
+						</xsl:otherwise>
+					</xsl:choose>
+
 				</form>
 			</div>
+			
 		</div>
+
 	</xsl:template>
 	<!-- ================================================================================= -->
 </xsl:stylesheet>

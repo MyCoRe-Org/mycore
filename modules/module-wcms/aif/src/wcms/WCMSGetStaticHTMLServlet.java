@@ -129,11 +129,20 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
             }
             if (contentOutput != null && validXHTML) {
                 StringWriter sw = new StringWriter();
+                               
                 XMLOutputter contentOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
                 contentOut.output(contentOutput, sw);
                 ServletOutputStream sos = response.getOutputStream();
-                sos.println(sw.toString());
-                System.out.println("WCMSGetStaticHTMLServlet-Output: "+sw.toString());
+
+                String completeOutput = new String();
+                completeOutput = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head></head><body>"
+                							+ sw.toString()+"</body></html>";
+                
+                sos.println(completeOutput);
+                
+                //System.out.println("WCMSGetStaticHTMLServlet-Output: "+sw.toString());
+                System.out.println("WCMSGetStaticHTMLServlet-Output: "+completeOutput);
+                
                 sos.flush();
                 sos.close();
                 sw.flush();
@@ -142,30 +151,6 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-           /* try {
-                if (!mode.equals("extern")){
-                    error = "Error: "+getServletContext().getRealPath("")+href.replace('/', File.separatorChar)+" is no valid XHTML file.";
-                    File hrefFile = new File(getServletContext().getRealPath("")+href);
-                    BufferedReader br = new BufferedReader(new FileReader(hrefFile));
-                    String test = hrefFile.toString();
-                    validXHTML = false;
-                    String str, stri = "";
-                    while (true){
-                        if ((str = br.readLine()) != null){
-                            stri = stri.concat(str+'\n');
-                        }
-                        else break;
-                    }
-                    br.close();
-                    int begin = stri.indexOf("<section");
-                    String wow = stri.substring(begin, stri.indexOf("</section>"));
-                    String strin = stri.substring(begin+wow.indexOf('>')+2, stri.indexOf("</section>"));
-                    defaultLangContentOutput.add(strin);
-                }
-            }
-            catch (FileNotFoundException fne){
-                System.out.println(fne);
-            }*/
         }
     }
     
