@@ -500,7 +500,7 @@ private final String createTS(MCRTypedContent mcr_tc)
         int j = i+1;
         int k = 1;
         while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
-          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+          if (!mcr_tc.getNameElement(j).equals("lang")) {
             sb.append("XXX")
               .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
               .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
@@ -519,7 +519,7 @@ private final String createTS(MCRTypedContent mcr_tc)
         int j = i+1;
         int k = 1;
         while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
-          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+          if (!mcr_tc.getNameElement(j).equals("lang")) {
             sb.append("XXX")
               .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
               .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
@@ -572,7 +572,7 @@ private final String createTS(MCRTypedContent mcr_tc)
         int j = i+1;
         int k = 1;
         while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
-          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+          if (!mcr_tc.getNameElement(j).equals("lang")) {
             sb.append("XXX")
               .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
               .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
@@ -609,7 +609,7 @@ private final String createTS(MCRTypedContent mcr_tc)
         int j = i+1;
         int k = 1;
         while (mcr_tc.getTypeElement(j)==MCRTypedContent.TYPE_ATTRIBUTE) {
-          if (!mcr_tc.getNameElement(j).equals("xml:lang")) {
+          if (!mcr_tc.getNameElement(j).equals("lang")) {
             sb.append("XXX")
               .append(mcr_tc.getNameElement(j).toUpperCase()).append("XXX")
               .append(((String)mcr_tc.getValueElement(j)).toUpperCase())
