@@ -332,12 +332,20 @@ public final org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element("service");
   if (dates.size()!=0) {
     org.jdom.Element elmm = new org.jdom.Element("servdates");
+    elmm.setAttribute("class","MCRMetaDate");
+    elmm.setAttribute("heritable","false");
+    elmm.setAttribute("parasearch","true");
+    elmm.setAttribute("textsearch","false");
     for (int i=0;i<dates.size();i++) {
       elmm.addContent(((MCRMetaDate)dates.get(i)).createXML()); }
     elm.addContent(elmm); 
     }
   if (flags.size()!=0) {
     org.jdom.Element elmm = new org.jdom.Element("servflags");
+    elmm.setAttribute("class","MCRMetaLangText");
+    elmm.setAttribute("heritable","false");
+    elmm.setAttribute("parasearch","true");
+    elmm.setAttribute("textsearch","false");
     for (int i=0;i<flags.size();i++) {
       elmm.addContent(((MCRMetaLangText)flags.get(i)).createXML()); }
     elm.addContent(elmm); 
