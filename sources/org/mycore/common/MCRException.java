@@ -87,7 +87,7 @@ public class MCRException extends RuntimeException
    * @param ex the exception you want the stack trace of
    * @return the invocation stack trace of an exception
    */  
-  public static String getStackTraceAsString( Exception ex )
+  public static String getStackTraceAsString( Throwable ex )
   {
     // We let Java print the stack trace to a buffer in memory to be able to get it as String:
     ByteArrayOutputStream baos = new ByteArrayOutputStream();

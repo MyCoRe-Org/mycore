@@ -187,16 +187,21 @@ public class MCRConfiguration
   {
     MCRArgumentChecker.ensureNotEmpty( filename, "filename" );  
 
+    InputStream in = this.getClass().getResourceAsStream( "/" + filename );
+    if( in == null )
+    {
+      String msg = "Could not find configuration file " + filename + " in CLASSPATH";
+      throw new MCRConfigurationException( msg );
+    }
     try
     {
-      InputStream in = this.getClass().getResourceAsStream( "/" + filename );
       properties.load( in );
       in.close();
     }
     catch( Exception exc )
     { 
       throw new MCRConfigurationException
-      ( "Could not load configuration file " + filename, exc );
+      ( "Exception while loading configuration file " + filename, exc );
     }
 
     String include = getString( "MCR.configuration.include", null );
@@ -296,19 +301,11 @@ public class MCRConfiguration
       }
       else if( t instanceof Exception )
         throw new MCRConfigurationException( msg, (Exception)t ); 
-      else{
-      	msg+=" because of: "+t.getMessage();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try
-		{
-		  PrintStream buffer = new PrintStream( baos );
-		  t.printStackTrace( buffer );
-		  buffer.close();
-		}
-		catch( Exception willNeverBeThrown ){}
-      	msg+="\n"+baos.toString();
-      	baos=null;
-		throw new MCRConfigurationException( msg );
+      else
+      {
+      	msg += " because of: " + t.getMessage();
+        msg += "\n" + MCRException.getStackTraceAsString( t );
+        throw new MCRConfigurationException( msg );
       }
     }    
     return o;
