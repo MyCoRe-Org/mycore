@@ -47,9 +47,10 @@ function initKupu(iframe) {
     kupu.registerTool('ui', ui); // XXX Should this be a different method?
 
     // add the buttons to the toolbar
-    var savebuttonfunc = function(button, editor) {editor.saveDocument()};
-    var savebutton = new KupuButton('kupu-save-button', savebuttonfunc);
-    kupu.registerTool('savebutton', savebutton);
+    // removed for wcms customisation
+    // var savebuttonfunc = function(button, editor) {editor.saveDocument()};
+    // var savebutton = new KupuButton('kupu-save-button', savebuttonfunc);
+    // kupu.registerTool('savebutton', savebutton);
 
     // function that returns a function to execute a button command
     var execCommand = function(cmd) {

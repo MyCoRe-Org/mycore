@@ -46,10 +46,12 @@
 						<option xmlns:i18n="http://xml.zope.org/namespaces/i18n" value="PRE" 
 							i18n:translate="paragraph-formatted"> Formatted </option>
 					</select>
+					<!--
 					<span class="kupu-tb-buttongroup">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-save" 
 							id="kupu-save-button" title="save: alt-s" i18n:attributes="title" accesskey="s">&#xA0;</button>
 					</span>
+					-->
 					<span class="kupu-tb-buttongroup" id="kupu-bg-basicmarkup">
 						<button xmlns:i18n="http://xml.zope.org/namespaces/i18n" type="button" class="kupu-bold" 
 							id="kupu-bold-button" title="bold: alt-b" i18n:attributes="title" accesskey="b">&#xA0;</button>
