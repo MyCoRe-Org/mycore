@@ -242,8 +242,7 @@ public class MCRConfiguration
   }
 
 /**
- * Returns the configuration property with the specified name as a String,
- * or null if the property is not set.
+ * Returns the configuration property with the specified name as a String.
  *
  * @param name the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as a String
