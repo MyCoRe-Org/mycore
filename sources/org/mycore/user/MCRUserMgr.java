@@ -254,7 +254,8 @@ public final synchronized void initializeGroup(MCRGroup group,String creator)
  * @param group    The group object which should be created
  * @param create   Boolean value, if true: create a new group, if false: import from file
  */
-public final synchronized void createGroup(MCRSession session, MCRGroup group) throws MCRException
+public final synchronized void createGroup(MCRSession session, MCRGroup group) 
+  throws MCRException
   {
   if (locked) {
     throw new MCRException("The user component is locked. At the moment write access is denied."); }
@@ -263,83 +264,111 @@ public final synchronized void createGroup(MCRSession session, MCRGroup group) t
   if (!admin.hasPrivilege("create group")) {
     throw new MCRException("The session has no privilig to create group!"); }
   // Check if the group already exists. If so, throw an exception
-  if (!mcrUserStore.existsGroup(group.getID())) {
-    try {
-      // Set the values from Manager side 
-      group.setCreationDate();
-      group.setModifiedDate();
-      group.setCreator(session.getCurrentUserID());
-      // At first create the group. The group must be created before updating the groups
-      // this group is a member of because the existence of the group will be checked 
-      // while updating the groups.
-      mcrUserStore.createGroup(group);
-      // We first check whether this group has admins (users or groups) and if so, whether
-      // they exist at all.
-      ArrayList admUserIDs = group.getAdminUserIDs();
-      for (int j=0; j<admUserIDs.size(); j++) {
-        if (!mcrUserStore.existsUser((String)admUserIDs.get(j))) {
-          throw new MCRException("MCRUserMgr.createGroup(): unknown admin userID: "
-            +(String)admUserIDs.get(j)); }
-        }
-      ArrayList admGroupIDs = group.getAdminGroupIDs();
-      for (int j=0; j<admGroupIDs.size(); j++) {
-        if (!mcrUserStore.existsGroup((String)admGroupIDs.get(j))) {
-          throw new MCRException("MCRUserMgr.createGroup(): unknown admin groupID: "
-            +(String)admGroupIDs.get(j)); }
-        }
-      // We now check whether this group already has members (users or groups) and if so,
-      // remove them from the cache such that they will have to be retrieved from the
-      // datastore again. In addition we test if the members exist at all...
-      ArrayList mbrUserIDs = group.getMemberUserIDs();
-      if (mbrUserIDs != null) { // members (users) are already defined
-        for (int i=0; i<mbrUserIDs.size(); i++) {
-          if (mcrUserStore.existsUser((String)mbrUserIDs.get(i)))
-            userCache.remove((String)mbrUserIDs.get(i));
-           else
-            throw new MCRException("Unknown userID: "+(String)mbrUserIDs.get(i)+
-              " for the group.");
-          }
-        }
-      ArrayList mbrGroupIDs = group.getMemberGroupIDs();
-      if (mbrGroupIDs != null) { // members (groups) are already defined
-        for (int i=0; i<mbrGroupIDs.size(); i++) {
-          if (group.getID().equals((String)mbrGroupIDs.get(i)))
-            throw new MCRException("The group '"+group.getID()+ "' cannot contain itself.");
-          if (mcrUserStore.existsGroup((String)mbrGroupIDs.get(i)))
-            groupCache.remove((String)mbrGroupIDs.get(i));
-          else
-            throw new MCRException("Unknown groupID: "+((String)mbrGroupIDs.get(i))+
-              " for the group.");
-          }
-        }
-      // We now check if the privileges set for the group really exist at all.
-      checkPrivsForGroup(group);
-      // We now check if the group implicitly would be a member of itself. Attention: 
-      // it is important
-      // to do this *before* the following update of the groups this group will be a 
-      // member of!
-      if (MCRGroup.isImplicitMemberOf(group, group.getID())) {
-        throw new MCRException("Create failed: the group '"+group.getID()
-          +"' implicitly is a member of itself. Check the affiliations!");
-        }
-      // We finally update the groups this group will be a member of
-      ArrayList groupIDs = group.getGroupIDs();
-      if (groupIDs != null) {
-        for (int i=0; i<groupIDs.size(); i++) {
-          MCRGroup currentGroup = this.retrieveGroup((String)groupIDs.get(i), true);
-          currentGroup.addMemberGroupID(group.getID());
-          }
-        }
-      }
-    catch (Exception ex) {
-      // Since something went wrong we delete the previously created group. We do this
-      // using this.deleteGroup() in order to ensure that already updated groups will
-      // be resetted to the original state as well.
-      throw new MCRException("Can't create MCRGroup.",ex);
+  if (mcrUserStore.existsGroup(group.getID())) {
+    throw new MCRException("The group '"+group.getID()+"' already exists!"); }
+  // Set the values from Manager side 
+  group.setCreationDate();
+  group.setModifiedDate();
+  group.setCreator(admin.getID());
+  // We first check whether this group has admins (users or groups) and if so, 
+  // whether they exist at all.
+  group.addAdminUserID(admin.getID());
+  ArrayList admUserIDs = group.getAdminUserIDs();
+  for (int j=0; j<admUserIDs.size(); j++) {
+    if (!mcrUserStore.existsUser((String)admUserIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): unknown admin userID: "
+        +(String)admUserIDs.get(j)); 
       }
     }
-  else
-    throw new MCRException("The group '"+group.getID()+"' already exists!");
+  group.addAdminGroupID(admin.getPrimaryGroupID());
+  ArrayList admGroupIDs = group.getAdminGroupIDs();
+  for (int j=0; j<admGroupIDs.size(); j++) {
+    if (((String)admGroupIDs.get(j)).equals(group.getID())) { continue; }
+    if (!mcrUserStore.existsGroup((String)admGroupIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): unknown admin groupID: "
+        +(String)admGroupIDs.get(j)); 
+      }
+    }
+  // now we check the member groups and users if they exists, else we get an
+  // MCRException. Also this group can not be a member of himself.
+  ArrayList mbrUserIDs = group.getMemberUserIDs();
+  for (int j=0; j<mbrUserIDs.size(); j++) {
+    if (!mcrUserStore.existsUser((String)mbrUserIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): unknown member userID: "
+        +(String)mbrUserIDs.get(j)); 
+      }
+    }
+  ArrayList mbrGroupIDs = group.getMemberGroupIDs();
+  for (int j=0; j<mbrGroupIDs.size(); j++) {
+    if (group.getID().equals((String)mbrGroupIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): the group '"+
+        group.getID()+ "' cannot contain itself."); }
+    if (!mcrUserStore.existsGroup((String)mbrGroupIDs.get(j))) {
+      throw new MCRException("MCRUserMgr.createGroup(): unknown member groupID: "
+        +(String)admGroupIDs.get(j)); 
+      }
+    }
+  ArrayList groupIDs = group.getGroupIDs();
+  for (int j=0; j<groupIDs.size(); j++) {
+    MCRGroup linkedGroup = this.retrieveGroup((String)groupIDs.get(j), true);
+    if (!linkedGroup.getAdminUserIDs().contains(session.getCurrentUserID())) {
+      throw new MCRException("MCRUserMgr.createGroup(): cant set member to "+
+        " groupIDs: "+(String)groupIDs.get(j)+" because this session is not an"+
+        "adminMember."); 
+      }
+    }
+  // We now check if the privileges set for the group really exist at all.
+  checkPrivsForGroup(group);
+  // We now check if the group implicitly would be a member of itself. 
+  // Attention: it is important to do this *before* the following update of 
+  // the groups this group will be a member of!
+  if (MCRGroup.isImplicitMemberOf(group, group.getID())) {
+    throw new MCRException("Create failed: the group '"+group.getID()
+      +"' implicitly is a member of itself. Check the affiliations!");
+    }
+  try {
+    // Just create the group. The group must be created before updating the 
+    // groups this group is a member of because the existence of the group will
+    // be checked  while updating the groups.
+    mcrUserStore.createGroup(group);
+    // We now check whether this group already has members (users or groups) 
+    // and if so, remove them from the cache such that they will have to be 
+    // retrieved from the datastore again. In addition we test if the members 
+    // exist at all...
+    for (int i=0; i<mbrUserIDs.size(); i++) {
+      userCache.remove((String)mbrUserIDs.get(i)); }
+    for (int i=0; i<mbrGroupIDs.size(); i++) {
+      groupCache.remove((String)mbrGroupIDs.get(i)); }
+    // now we set the groupIDs of the users they are connected with mbrUserIDs
+    for (int j=0; j<mbrUserIDs.size(); j++) {
+      MCRUser otheruser = retrieveUser((String)mbrUserIDs.get(j));
+      otheruser.addGroupID((String)mbrUserIDs.get(j));
+      otheruser.setModifiedDate();
+      mcrUserStore.updateUser(otheruser);
+      }
+    // now we set the groupIDs of the groups they are connected with mbrGroupIDs
+    for (int j=0; j<mbrGroupIDs.size(); j++) {
+      MCRGroup othergroup = retrieveGroup((String)mbrGroupIDs.get(j));
+      othergroup.addGroupID((String)mbrGroupIDs.get(j));
+      othergroup.setModifiedDate();
+      mcrUserStore.updateGroup(othergroup);
+      }
+    // We finally update the groups this group will be a member of
+    for (int i=0; i<groupIDs.size(); i++) {
+      MCRGroup membergroup = retrieveGroup((String)groupIDs.get(i), true);
+      membergroup.addMemberGroupID(group.getID());
+      membergroup.setModifiedDate();
+      mcrUserStore.updateGroup(membergroup);
+      }
+    }
+  catch (Exception ex) {
+    // Since something went wrong we delete the previously created group. We do this
+    // using this.deleteGroup() in order to ensure that already updated groups will
+    // be resetted to the original state as well.
+    try { mcrUserStore.deleteGroup(group.getID()); }
+    catch (MCRException e) { }
+    throw new MCRException("Can't create MCRGroup.",ex);
+    }
   }
 
 /**
@@ -465,9 +494,17 @@ public final synchronized void deleteGroup(MCRSession session, String groupID)
   // lists.
   MCRGroup delGroup = retrieveGroup(groupID);
   for (int i=0; i<delGroup.getMemberGroupIDs().size(); i++) {
-    groupCache.remove((String)delGroup.getMemberGroupIDs().get(i)); }
+    groupCache.remove((String)delGroup.getMemberGroupIDs().get(i));
+    MCRGroup ugroup = retrieveGroup((String)delGroup.getMemberGroupIDs().get(i));
+    ugroup.removeGroupID(groupID);
+    mcrUserStore.updateGroup(ugroup);
+    }
   for (int i=0; i<delGroup.getMemberUserIDs().size(); i++) {
-    userCache.remove((String)delGroup.getMemberUserIDs().get(i)); }
+    userCache.remove((String)delGroup.getMemberUserIDs().get(i));
+    MCRUser uuser = retrieveUser((String)delGroup.getMemberUserIDs().get(i));
+    uuser.removeGroupID(groupID);
+    mcrUserStore.updateUser(uuser);
+    }
   // We have to notify the groups where this group is an administrative group
   for (int i=0; i<delGroup.getAdminGroupIDs().size(); i++) {
     String gid = (String)delGroup.getAdminGroupIDs().get(i);
@@ -484,8 +521,15 @@ public final synchronized void deleteGroup(MCRSession session, String groupID)
       currentGroup.removeMemberGroupID(groupID);
       }
     }
-  mcrUserStore.deleteGroup(groupID);
+  // Remove this grou from the memberIDs of othe groups
+  for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
+    groupCache.remove((String)delGroup.getGroupIDs().get(i));
+    MCRGroup ggroup = retrieveGroup((String)delGroup.getGroupIDs().get(i));
+    ggroup.removeMemberGroupID(groupID);
+    mcrUserStore.updateGroup(ggroup);
+    }
   groupCache.remove(groupID);
+  mcrUserStore.deleteGroup(groupID);
   }
 
 /**
@@ -863,7 +907,7 @@ public final synchronized void updateGroup(MCRSession session,MCRGroup group) th
           +"' implicitly is a member of itself. Check the affiliations!");
       }
     // Now check and update changes in the membership to other groups
-    oldGroup.updateGroup(group);
+    oldGroup.update(group);
     // Now we really update the group object in the datastore
     mcrUserStore.updateGroup(oldGroup);
     groupCache.remove(groupID);
@@ -899,7 +943,7 @@ public final synchronized void updateUser(MCRSession session,MCRUser updUser)
     // Set the values from Manager side 
     oldUser.setModifiedDate();
     // Now check and update changes in the membership to groups
-    oldUser.updateUser(updUser); 
+    oldUser.update(updUser); 
     // Now we really update the current user
     mcrUserStore.updateUser(updUser);
     userCache.remove(userID);

@@ -1,4 +1,5 @@
 /**
+
  * $RCSfile$
  * $Revision$ $Date$
  *
@@ -27,6 +28,7 @@ package org.mycore.user;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.common.*;
 
@@ -154,18 +156,57 @@ public MCRGroup(org.jdom.Element elm)
     }
   tmp = elm.getChildTextTrim("user.description");
   if (tmp != null) { this.description = tmp; }
-
+  org.jdom.Element adminElement = elm.getChild("group.admins");
+  if (adminElement != null) {
+    List adminIDList = adminElement.getChildren();
+    for (int j=0; j<adminIDList.size(); j++) {
+      org.jdom.Element newID = (org.jdom.Element)adminIDList.get(j);
+      if(newID.getName().equals("admins.userID")) {
+        if (!((String)newID.getTextTrim()).equals("")) {
+          addAdminUserID((String)newID.getTextTrim()); }
+        continue;
+        }
+      if(newID.getName().equals("admins.groupID")) {
+        if (!((String)newID.getTextTrim()).equals("")) {
+          addAdminGroupID((String)newID.getTextTrim()); }
+        }
+      }
+    }
+  org.jdom.Element memberElement = elm.getChild("group.members");
+  if (memberElement != null) {
+    List memberIDList = memberElement.getChildren();
+    for (int j=0; j<memberIDList.size(); j++) {
+      org.jdom.Element newID = (org.jdom.Element)memberIDList.get(j);
+      if(newID.getName().equals("members.userID")) {
+        if (!((String)newID.getTextTrim()).equals("")) {
+          addMemberUserID((String)newID.getTextTrim()); }
+        continue;
+        }
+      if(newID.getName().equals("members.groupID")) {
+        if (!((String)newID.getTextTrim()).equals("")) {
+          addMemberGroupID((String)newID.getTextTrim()); }
+        }
+      }
+    }
+  org.jdom.Element userGroupElement = elm.getChild("group.groups");
+  if (userGroupElement != null) {
+    List groupIDList = userGroupElement.getChildren();
+    for (int j=0; j<groupIDList.size(); j++) {
+      org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
+      if (!((String)groupID.getTextTrim()).equals("")) {
+        this.groupIDs.add((String)groupID.getTextTrim()); }
+      }
+    }
+  org.jdom.Element privilegeElement = elm.getChild("group.privileges");
+  if (privilegeElement != null) {
+    List privilegeIDList = privilegeElement.getChildren();
+    for (int j=0; j<privilegeIDList.size(); j++) {
+      org.jdom.Element privilegeID = (org.jdom.Element)privilegeIDList.get(j);
+      if (!((String)privilegeID.getTextTrim()).equals("")) {
+        this.privileges.add((String)privilegeID.getTextTrim()); }
+      }
+    }
   }
-
-/**
- * This method adds a group to the groups list of the group. This is the list of
- * group IDs where this group is a member of, not the list of groups this group
- * has as members!
- *
- * @param groupID   ID of the group added to the group
- */
-public void addGroupID(String groupID) throws MCRException
-  { addAndUpdate(groupID, groupIDs); }
 
 /**
  * This method adds a group to the list of groups with administrative privileges of the group.
@@ -331,6 +372,12 @@ public void removeAdminGroupID(String groupID) throws MCRException
   { removeAndUpdate(groupID, admGroupIDs); }
 
 /**
+ * This method clean the administrative groups ArrayList.
+ */
+protected final void cleanAdminGroupID()
+  { admGroupIDs.clear(); }
+
+/**
  * This method removes a user from the list of administrators of the group.
  * @param userID   ID of the administrative user removed from the group
  */
@@ -338,13 +385,10 @@ public void removeAdminUserID(String userID) throws MCRException
   { removeAndUpdate(userID, admUserIDs); }
 
 /**
- * This method removes a group from the groups list of the group. These are the
- * groups where the group itself is a member of.
- *
- * @param groupID   ID of the group removed from the group
+ * This method clean the administrative user ArrayList.
  */
-public void removeGroupID(String groupID) throws MCRException
-  { removeAndUpdate(groupID, groupIDs); }
+protected final void cleanAdminUserID()
+  { admUserIDs.clear(); }
 
 /**
  * This method removes a group from the list of group members (groups).
@@ -376,7 +420,7 @@ public void removePrivilege(String privName) throws MCRException
  *
  * @param newgroup the data for the update.
  */
-public void updateGroup(MCRGroup newgroup) throws MCRException
+public void update(MCRGroup newgroup) throws MCRException
   {
   super.description = newgroup.getDescription();
   super.groupIDs   = newgroup.getGroupIDs();

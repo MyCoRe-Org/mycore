@@ -151,23 +151,48 @@ abstract class MCRUserObject
   public final ArrayList getGroupIDs()
   { return groupIDs; }
 
-  /**
-   * This method must be implemented by a subclass and then returns the user or group
-   * object as a JDOM document.
-   */
-  abstract public org.jdom.Document toJDOMDocument() throws MCRException;
+/**
+ * This method adds a group to the groups list of the group. This is the list of
+ * group IDs where this group is a member of, not the list of groups this group
+ * has as members!
+ *
+ * @param groupID   ID of the group added to the group
+ */
+public void addGroupID(String groupID) throws MCRException
+  { if (!groupIDs.contains(groupID)) { groupIDs.add(groupID); } }
 
-  /**
-   * This method must be implemented by a subclass and then returns the user or group
-   * object as a JDOM element.
-   */
-  abstract public org.jdom.Element toJDOMElement() throws MCRException;
+/**
+ * This method clean the administrative groups ArrayList.
+ */
+protected final void cleanGroupID()
+  { groupIDs.clear(); }
 
-  /**
-   * This helper method replaces null with an empty string and trims whitespace from
-   * non-null strings.
-   */
-  protected final static String trim(String s)
+/**
+ * This method removes a group from the groups list of the group. These are the
+ * groups where the group itself is a member of.
+ *
+ * @param groupID   ID of the group removed from the group
+ */
+public void removeGroupID(String groupID) throws MCRException
+  { if (groupIDs.contains(groupID))  { groupIDs.remove(groupID); } }
+
+/**
+ * This method must be implemented by a subclass and then returns the user or group
+ * object as a JDOM document.
+ */
+abstract public org.jdom.Document toJDOMDocument() throws MCRException;
+
+/**
+ * This method must be implemented by a subclass and then returns the user or group
+ * object as a JDOM element.
+ */
+abstract public org.jdom.Element toJDOMElement() throws MCRException;
+
+/**
+ * This helper method replaces null with an empty string and trims whitespace from
+ * non-null strings.
+ */
+protected final static String trim(String s)
   { return (s != null) ? s.trim() : ""; }
 
 /**

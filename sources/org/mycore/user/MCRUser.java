@@ -314,7 +314,7 @@ public boolean setPassword(String newPassword)
  *
  * @param newuser the data for the update.
  **/
-public final void updateUser(MCRUser newuser)
+public final void update(MCRUser newuser)
   {
   if (!updateAllowed) return;
   idEnabled = newuser.isEnabled();
@@ -394,8 +394,6 @@ public final void debug()
   {
   debugDefault();
   logger.debug("primaryGroupID     = "+primaryGroupID); 
-  for (int i=0;i<groupIDs.size();i++) {
-    logger.debug("groupIDs           = "+(String)groupIDs.get(i)); }
   userContact.debug();
   }
 }
