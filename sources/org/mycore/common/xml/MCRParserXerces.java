@@ -105,11 +105,11 @@ public Document parseURI(String uri) throws MCRException
   try {
     parser.setFeature(setvalidation,flagvalidation);
     parser.parse(uri);
-    if (parse_error) { throw new MCRException(""); }
+    if (parse_error) { throw new MCRException("Error parsing: "+uri); }
     return parser.getDocument();
     }
   catch (Exception e) {
-    throw new MCRException("Parse error in XRECES parser.",e); }
+    throw new MCRException("Parse error in XERCES parser.",e); }
   }
 
 /**
