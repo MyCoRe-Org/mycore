@@ -308,6 +308,14 @@ public boolean setPassword(String newPassword)
   }
 
 /**
+ * This method set the enabled value with a boolean data.
+ *
+ * @param flag the boolean data
+ **/
+public final void setEnabled(boolean flag)
+  { idEnabled = flag; }
+
+/**
  * This method update this instance with the data of the given MCRUser.
  *
  * @param newuser the data for the update.

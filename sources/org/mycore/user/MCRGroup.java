@@ -434,12 +434,11 @@ public void removePrivilege(String privName) throws MCRException
  */
 public void update(MCRGroup newgroup) throws MCRException
   {
-  super.description = newgroup.getDescription();
+  if (newgroup.getDescription().length() != 0) {
+    super.description = newgroup.getDescription(); }
   super.groupIDs   = newgroup.getGroupIDs();
   this.admUserIDs  = newgroup.getAdminUserIDs();
   this.admGroupIDs = newgroup.getAdminGroupIDs();
-  this.mbrUserIDs = newgroup.getMemberGroupIDs();
-  this.mbrGroupIDs = newgroup.getMemberGroupIDs();
   this.privileges  = newgroup.getPrivileges();
   }
 
