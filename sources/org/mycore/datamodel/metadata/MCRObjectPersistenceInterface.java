@@ -55,11 +55,11 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
  * The methode create a object in the data store.
  *
  * @param mcr_tc      the typed content
- * @param xml         the XML stream as byte array from the object
+ * @param xml         the XML stream as JDOM object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void create(MCRTypedContent mcr_tc, byte [] xml)
+public void create(MCRTypedContent mcr_tc, org.jdom.Document xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**
@@ -121,11 +121,11 @@ public String receiveLabel(MCRObjectID mcr_id)
  * The methode update a object in the data store.
  *
  * @param mcr_tc      the typed content
- * @param xml         the XML stream as byte array from the object
+ * @param xml         the XML stream as JDOM object
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public void update(MCRTypedContent mcr_tc, byte [] xml)
+public void update(MCRTypedContent mcr_tc, org.jdom.Document xml)
   throws MCRConfigurationException, MCRPersistenceException;
 
 /**

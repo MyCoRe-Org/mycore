@@ -205,9 +205,9 @@ public final MCRTypedContent createTypedContent(boolean parametric,
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,textsearch);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,false);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,false); }
   if ((name = name.trim()).length() !=0) {
     tc.addTagElement(tc.TYPE_SUB2TAG,"name");
     tc.addStringElement(tc.TYPE_VALUE,null,name,parametric,textsearch);

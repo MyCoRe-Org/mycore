@@ -47,7 +47,6 @@ import mycore.xml.MCRXMLHelper;
  *
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
- * @author marc schluepmann
  * @version $Revision$ $Date$
  **/
 final public class MCRObject
@@ -68,7 +67,7 @@ private static String persist_type;
 // interface classes
 private static MCRObjectPersistenceInterface mcr_persist;
 
-// the JDOM document
+// the DOM document
 private org.jdom.Document jdom_document = null;
 
 // the object content
@@ -216,17 +215,8 @@ public final boolean addChild (MCRObject child, String label,
     for (int i = 0; i < inh_fore.size(); ++i)
       inh_metadata.addElement((MCRObjectMetadata) inh_fore.elementAt(i));
   }
-  if( flag &&
-      child.mcr_struct.setParent( mcr_id.getId(), 
-				  label, 
-				  titleParent, 
-				  inh_metadata ) ) {
-      jdom_document = createJDOM();
-      return true;
-  }
-  else {
-      return false;
-  }
+  return flag &&
+    child.mcr_struct.setParent(mcr_id.getId(), label, titleParent, inh_metadata);
 }
 
 /** <em>removeChild</em> removes a child link. If the link was
@@ -237,18 +227,12 @@ public final boolean addChild (MCRObject child, String label,
  */
 public final boolean removeChild (MCRObject dest)
 {
-    if( mcr_struct.removeChild(dest.mcr_id.getId())
-	&& dest.mcr_struct.removeParent(mcr_id.getId() ) ) {
-	jdom_document = createJDOM();
-	return true;
-    }
-    else {
-	return false;
-    }
+  return mcr_struct.removeChild(dest.mcr_id.getId())
+    && dest.mcr_struct.removeParent(mcr_id.getId());
 }
 
 /**
- * The given JDOM was convert into an internal view of metadata. This are 
+ * The given DOM was convert into an internal view of metadata. This are 
  * the object ID and the object label, also the blocks structure, flags and 
  * metadata.
  *
@@ -326,12 +310,7 @@ public final void setFromXML(byte [] xml, boolean valid) throws MCRException
  * @param id   the object ID
  **/
 public final void setId(MCRObjectID id)
-  { 
-      if (id.isValid()) {
-	  mcr_id = id;
-	  jdom_document = createJDOM();
-      } 
-  }
+  { if (id.isValid()) { mcr_id = id; } }
 
 /**
  * This methode set the object label.
@@ -343,7 +322,6 @@ public final void setLabel(String label)
   mcr_label = label.trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
    mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
-  jdom_document = createJDOM();
   }
 
 /**
@@ -357,13 +335,7 @@ public final boolean setMetadataElement(MCRMetaElement obj, String tag)
   { 
   if (obj == null) { return false; }
   if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }
-  if( mcr_metadata.setMetadataElement(obj, tag) ) {
-      jdom_document = createJDOM();
-      return true;
-  }
-  else {
-      return false;
-  }
+  return mcr_metadata.setMetadataElement(obj, tag);
   }
 
 /**
@@ -371,89 +343,42 @@ public final boolean setMetadataElement(MCRMetaElement obj, String tag)
  *
  * @param service   the object MCRObjectService part
  **/
-public final void setService( MCRObjectService service ) { 
-    if( service != null ) { 
-	mcr_service = service; 
-	// we have to update the JDOM
-	jdom_document = createJDOM();
-    } 
-}
+public final void setService(MCRObjectService service)
+  { if (service != null) { mcr_service = service; } }
 
 /**
  * This methode set the object MCRObjectStructure.
  *
  * @param structure   the object MCRObjectStructure part
  **/
-public final void setStructure( MCRObjectStructure structure ) { 
-    if( structure != null ) { 
-	mcr_struct = structure;
-	// we have to update the JDOM
-	jdom_document = createJDOM();
-    } 
-}
+public final void setStructure(MCRObjectStructure structure)
+  { if (structure != null) { mcr_struct = structure; } }
 
 /**
  * This methode create a XML stream for all object data.
  *
  * @exception MCRException if the content of this class is not valid
- * @return the XML data of the object as byte array
+ * @return a JDOM Document with the XML data of the object as byte array
  **/
-public final byte [] createXML() throws MCRException {
-    ByteArrayOutputStream outb = new ByteArrayOutputStream();
-    try {
-	org.jdom.output.XMLOutputter outp = new org.jdom.output.XMLOutputter();
-	outp.setEncoding(mcr_encoding);
-	outp.setNewlines(true);
-	outp.output( createJDOM(), outb ); 
-    }
-  catch (Exception e) {
-      throw new MCRException("Can't produce byte array."); 
+public final org.jdom.Document createXML() throws MCRException
+  {
+  if (!isValid()) {
+    debug();
+    throw new MCRException("The content is not valid."); }
+  org.jdom.Element elm = new org.jdom.Element("mycoreobject");
+  org.jdom.Document doc = new org.jdom.Document(elm);
+  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
+    XLINK_URL));
+  elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+SLASH+mcr_schema,
+    org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+  elm.setAttribute("ID",mcr_id.getId());
+  elm.setAttribute("label",mcr_label);
+  elm.addContent(mcr_struct.createXML());
+  elm.addContent(mcr_metadata.createXML());
+  elm.addContent(mcr_service.createXML());
+  return doc;
   }
-    return outb.toByteArray();
-}
-
-/**
- * This method builds a JDOM tree of the object data.
- *
- * @return org.jdom.Document the object data as JDOM Document
- * @exception MCRException if the content is not valid
- **/
-private org.jdom.Document createJDOM() throws MCRException {
-    if ( !isValid() ) {
-	debug();
-	throw new MCRException( "The content is not valid." ); 
-    }
-    org.jdom.Element elm = new org.jdom.Element( "mycoreobject" );
-    org.jdom.Document doc = new org.jdom.Document( elm );
-    elm.addNamespaceDeclaration( org.jdom.Namespace.getNamespace(
-								"xsi",
-								XSI_URL )
-				 );
-    elm.addNamespaceDeclaration( org.jdom.Namespace.getNamespace( "xlink",
-								  XLINK_URL)
-				 );
-    elm.setAttribute( "noNamespaceSchemaLocation",
-		      mcr_schema_path + SLASH + mcr_schema,
-		      org.jdom.Namespace.getNamespace( "xsi", 
-						       XSI_URL
-						       )
-		      );
-    elm.setAttribute( "ID", mcr_id.getId() );
-    elm.setAttribute( "label", mcr_label );
-    elm.addContent( mcr_struct.createXML() );
-    elm.addContent( mcr_metadata.createXML() );
-    elm.addContent( mcr_service.createXML() );
-    return doc;
-}
-
-/**
- * This method returns the JDOM document.
- * @return object content as JDOM tree
- *
- **/
-public org.jdom.Document getJDOM() {
-    return jdom_document;
-}
 
 /**
  * This methode create a typed content list for all MCRObject data.
@@ -468,8 +393,8 @@ public final MCRTypedContent createTypedContent() throws MCRException
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId(),true,true);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label,true,true);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId(),true,false);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label,true,false);
   tc.addMCRTypedContent(mcr_struct.createTypedContent());
   tc.addMCRTypedContent(mcr_metadata.createTypedContent());
   tc.addMCRTypedContent(mcr_service.createTypedContent());
@@ -495,7 +420,7 @@ public final void createInDatastore() throws MCRPersistenceException
   {
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  byte [] xml = createXML();
+  org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.create(mcr_tc,xml);
   }
@@ -562,7 +487,7 @@ public final void updateInDatastore() throws MCRPersistenceException
   {
   mcr_service.setDate("createdate",mcr_persist.receiveCreateDate(mcr_id));
   mcr_service.setDate("modifydate");
-  byte [] xml = createXML();
+  org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   mcr_persist.update(mcr_tc,xml);
   }

@@ -24,7 +24,10 @@
 
 package mycore.datamodel;
 
+import java.text.*;
 import java.util.*;
+import mycore.common.MCRConfiguration;
+import mycore.common.MCRUtils;
 
 /**
  * This class is an internal MyCoRe interface to storing the metadata
@@ -67,6 +70,9 @@ public final static int FORMAT_BOOLEAN = 4;
 public final static int FORMAT_LINK = 5;
 private final static int FORMAT_LAST = 5;
 
+// static 
+private static String default_lang;
+
 // data
 private ArrayList type;
 private ArrayList name;
@@ -74,6 +80,15 @@ private ArrayList format;
 private ArrayList value;
 private ArrayList paraflag;
 private ArrayList tsflag;
+
+/**
+ * The static part that read the configuration
+ **/
+static
+  {
+  MCRConfiguration conf = MCRConfiguration.instance();
+  default_lang = conf.getString("MCR.metadata_default_lang","en");
+  }
 
 /**
  * This is the constructor for MCRTypedContent. The list of content is empty.
@@ -89,7 +104,7 @@ public MCRTypedContent()
   }
 
 /**
- * This methode add a MCRTypedContent to the own data list.
+ * This method add a MCRTypedContent to the own data list.
  *
  * @param in - the MCRTypedContent input list
  **/
@@ -106,7 +121,7 @@ public final void addMCRTypedContent(MCRTypedContent in)
   }
 
 /**
- * This methode add an element of the typed content list to this list.
+ * This method add an element of the typed content list to this list.
  *
  * @param intype     one of the type constante of this class
  * @param inname     a name as a String
@@ -131,7 +146,7 @@ public final boolean addElement(int intype, String inname, int informat,
   }
 
 /**
- * This methode add a tag name to this list.
+ * This method add a tag name to this list.
  *
  * @param intype     TYPE_MASTERTAG or TYPE_TAG or TYPE_SUBTAG
  * @param inname     a name as a String
@@ -152,7 +167,7 @@ public final boolean addTagElement(int intype, String inname)
   }
 
 /**
- * This methode add a Boolean value to this list.
+ * This method add a Boolean value to this list.
  *
  * @param intype     TYPE_VALUE 
  * @param inname     a name as a String
@@ -174,7 +189,7 @@ public final boolean addBooleanElement(boolean invalue, boolean inparaflag,
   }
 
 /**
- * This methode add a Date value to this list.
+ * This method add a Date value to this list.
  *
  * @param invalue    the value as a GregorianCalendar date
  * @param inparaflag is true if the value should use for parametric search
@@ -195,7 +210,7 @@ public final boolean addDateElement(GregorianCalendar invalue,
   }
 
 /**
- * This methode add a Double value to this list.
+ * This method add a Double value to this list.
  *
  * @param invalue    the value as a double
  * @param inparaflag is true if the value should use for parametric search
@@ -215,7 +230,7 @@ public final boolean addDoubleElement(double invalue, boolean inparaflag,
   }
 
 /**
- * This methode add a Link value to this list.
+ * This method add a Link value to this list.
  *
  * @param inparaflag is true if the value should use for parametric search
  * @param intsflag   is true if the value should use for text search
@@ -233,7 +248,7 @@ public final boolean addLinkElement(boolean inparaflag, boolean intsflag)
   }
 
 /**
- * This methode add a String value or attribute to this list.
+ * This method add a String value or attribute to this list.
  *
  * @param intype     TYPE_VALUE or TYPE_ATTRIBUTE
  * @param inname     a name as a String
@@ -259,7 +274,7 @@ public final boolean addStringElement(int intype, String inname,
   }
 
 /**
- * The methode return true if the type is a MASTERTAG.
+ * The method return true if the type is a MASTERTAG.
  *
  * @param index  the index number of the element
  * @return true if the type is a MASTERTAG, else false
@@ -272,7 +287,7 @@ public final boolean isMasterTag(int index)
   }
 
 /**
- * The methode return true if the type is a TAG.
+ * The method return true if the type is a TAG.
  *
  * @param index  the index number of the element
  * @return true if the type is a TAG, else false
@@ -285,7 +300,7 @@ public final boolean isTag(int index)
   }
 
 /**
- * The methode return true if the type is a SUBTAG.
+ * The method return true if the type is a SUBTAG.
  *
  * @param index  the index number of the element
  * @return true if the type is a SUBTAG, else false
@@ -298,7 +313,7 @@ public final boolean isSubTag(int index)
   }
 
 /**
- * The methode return true if the type is a SUB2TAG.
+ * The method return true if the type is a SUB2TAG.
  *
  * @param index  the index number of the element
  * @return true if the type is a SUB2TAG, else false
@@ -311,7 +326,7 @@ public final boolean isSub2Tag(int index)
   }
 
 /**
- * The methode return true if the type is a VALUE.
+ * The method return true if the type is a VALUE.
  *
  * @param index  the index number of the element
  * @return true if the type is a VALUE, else false
@@ -324,7 +339,7 @@ public final boolean isValue(int index)
   }
 
 /**
- * The methode return true if the type is a ATTRIBUTE.
+ * The method return true if the type is a ATTRIBUTE.
  *
  * @param index  the index number of the element
  * @return true if the type is a ATTRIBUTE, else false
@@ -337,7 +352,7 @@ public final boolean isAttribute(int index)
   }
 
 /**
- * The methode return the type number for the element.
+ * The method return the type number for the element.
  *
  * @param index  the type number of the element
  * @return the type number of the element
@@ -348,39 +363,82 @@ public final int getTypeElement(int index)
   return ((Integer)type.get(index)).intValue();
   }
 
+/**
+ * The method return the name of the element with a index.
+ *
+ * @param index  the index of the element
+ * @return the name of the element
+ **/
 public final String getNameElement(int index)
   {
   if ((index<0) || (index>type.size())) { return ""; }
   return (String) name.get(index);
   }
 
+/**
+ * The method return the format number of the element with a index.
+ *
+ * @param index  the index of the element
+ * @return the format number of the element
+ **/
 public final int getFormatElement(int index)
   {
   if ((index<0) || (index>type.size())) { return FORMAT_UNDEFINED; }
   return ((Integer)format.get(index)).intValue();
   }
 
+/**
+ * The method return the value of the element with a index.
+ *
+ * @param index  the index of the element
+ * @return the value of the element
+ **/
 public final Object getValueElement(int index)
   {
   if ((index<0) || (index>type.size())) { return null; }
   return value.get(index);
   }
 
+/**
+ * The method return the parametric flag of the element with a index.
+ *
+ * @param index  the index of the element
+ * @return the parametric flag of the element
+ **/
 public final boolean getParaFlagElement(int index)
   {
   if ((index<0) || (index>type.size())) { return false; }
   return ((Boolean)paraflag.get(index)).booleanValue();
   }
  
+/**
+ * The method return the text search flag of the element with a index.
+ *
+ * @param index  the index of the element
+ * @return the text search flag of the element
+ **/
 public final boolean getTSFlagElement(int index)
   {
   if ((index<0) || (index>type.size())) { return false; }
   return ((Boolean)tsflag.get(index)).booleanValue();
   }
  
+/**
+ * The method return the size of the MCRTypedContent array.
+ *
+ * @return the size of the array
+ **/
 public final int getSize()
   { return type.size(); }
 
+/**
+ * The method return the a new MCRTypedContent array as data of this
+ * MCRTypedContent in the index range of (from;to).
+ *
+ * @param from the start index
+ * @param to the stop index
+ * @return a MCRTypedContent object with data in this range
+ **/
 public final MCRTypedContent getElements(int from, int to)
   {
   if (from >= to) { return null; }
@@ -394,6 +452,32 @@ public final MCRTypedContent getElements(int from, int to)
   return out;
   }
 
+/**
+ * The method create a text search string for this MCRTypedContent.
+ *
+ * @return a text search string
+ **/
+public final String getTextString()
+  {
+  StringBuffer sb = new StringBuffer(4096);
+  for (int i=0;i<type.size();i++) {
+    if (getTSFlagElement(i)) { 
+      if (getFormatElement(i) == FORMAT_STRING) {
+        sb.append((String)getValueElement(i)).append(' '); continue; }
+      if (getFormatElement(i) == FORMAT_DATE) {
+        DateFormat df = MCRUtils.getDateFormat(default_lang);
+        if (df==null) { continue; }
+        sb.append(df.format(((GregorianCalendar)getValueElement(i)).getTime()))
+          .append(' '); continue; 
+        }
+      }
+    }
+  return sb.toString().trim();
+  }
+
+/**
+ * The method print the array.
+ **/
 public final void debug()
   {
   System.out.println("\nMCRTypedContent table");

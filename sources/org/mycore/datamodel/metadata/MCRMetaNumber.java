@@ -285,15 +285,15 @@ public final MCRTypedContent createTypedContent(boolean parametric,
   MCRTypedContent tc = new MCRTypedContent();
   tc.addTagElement(tc.TYPE_SUBTAG,subtag.toUpperCase());
   tc.addDoubleElement(number,parametric,textsearch);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,textsearch);
+  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang,parametric,false);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,textsearch); }
+    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type,parametric,false); }
   if ((dimension = dimension.trim()).length() !=0) {
     tc.addStringElement(tc.TYPE_ATTRIBUTE,"dimension",dimension,parametric,
-      textsearch); }
+      false); }
   if ((measurement = measurement.trim()).length() !=0) {
     tc.addStringElement(tc.TYPE_ATTRIBUTE,"measurement",measurement,
-      parametric,textsearch); }
+      parametric,false); }
   return tc;
   }
 

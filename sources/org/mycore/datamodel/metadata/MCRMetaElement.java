@@ -48,7 +48,10 @@ public class MCRMetaElement
 // common data
 private static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
-private static String DEFAULT_LANGUAGE = "de";
+public static String DEFAULT_LANGUAGE = "de";
+public static boolean DEFAULT_PARAMETRIC_SEARCH = true;
+public static boolean DEFAULT_TEXT_SEARCH = true;
+public static boolean DEFAULT_HERITABLE = false;
 private String META_PACKAGE_NAME = "mycore.datamodel.";
 private static String LINK_CLASS_NAME = "MCRMetaLink";
 
@@ -57,6 +60,8 @@ private String lang = null;
 private String classname = null;
 private String tag = null;
 private boolean heritable;
+private boolean parasearch;
+private boolean textsearch;
 private ArrayList list = null;
 
 /**
@@ -68,7 +73,9 @@ public MCRMetaElement()
   lang = DEFAULT_LANGUAGE; 
   classname = "";
   tag = "";
-  heritable = false;
+  parasearch = DEFAULT_PARAMETRIC_SEARCH;
+  textsearch = DEFAULT_TEXT_SEARCH;
+  heritable = DEFAULT_HERITABLE;
   list = new ArrayList();
   }
 
@@ -88,7 +95,9 @@ public MCRMetaElement(String default_lang)
     lang = default_lang; }
   classname = "";
   tag = "";
-  heritable = false;
+  parasearch = DEFAULT_PARAMETRIC_SEARCH;
+  textsearch = DEFAULT_TEXT_SEARCH;
+  heritable = DEFAULT_HERITABLE;
   list = new ArrayList();
   }
 
@@ -110,6 +119,22 @@ public final MCRMetaInterface getElement(int index)
   if ((index<0) || (index>list.size())) { return null; }
   return (MCRMetaInterface)list.get(index); 
   }
+
+/**
+ * This methode return the parametric search of this metadata as boolean value.
+ *
+ * @return the parametric search of this metadata class
+ **/
+public final boolean getParametricSearch()
+  { return parasearch; }
+
+/**
+ * This methode return the text search of this metadata as boolean value.
+ *
+ * @return the text search of this metadata class
+ **/
+public final boolean getTextSearch()
+  { return textsearch; }
 
 /**
  * This methode return the heritable of this metadata as boolean value.
@@ -136,15 +161,56 @@ public final String getTag()
   { return tag; }
 
 /**
+ * This methode set the  parametric search for the metadata class.
+ *
+ * @param parasearch           the  parametric search as string
+ */
+public void setParametricSearch(String parasearch)
+  {
+  this.parasearch = DEFAULT_PARAMETRIC_SEARCH;
+  if ((parasearch == null) || ((parasearch = parasearch.trim()).length() ==0))
+    { return; }
+  if (parasearch.equals("true")) { this.parasearch = true; }
+  this.parasearch = false;
+  }
+
+/**
+ * This methode set the parametric search for the metadata class.
+ *
+ * @param parasearch           the parametric search as boolean value
+ */
+public void setParametricSearch(boolean parasearch)
+  { this.parasearch = parasearch; }
+
+/**
+ * This methode set the  text search for the metadata class.
+ *
+ * @param textsearch           the  text search as string
+ */
+public void setTextSearch(String textsearch)
+  {
+  this.textsearch = DEFAULT_TEXT_SEARCH;
+  if ((textsearch == null) || ((textsearch = textsearch.trim()).length() ==0))
+    { return; }
+  if (textsearch.equals("true")) { this.textsearch = true; }
+  this.textsearch = false;
+  }
+
+/**
+ * This methode set the text search for the metadata class.
+ *
+ * @param textsearch           the text search as boolean value
+ */
+public void setTextSearch(boolean textsearch)
+  { this.textsearch = textsearch; }
+
+/**
  * This methode set the heritable for the metadata class.
  *
  * @param heritable            the heritable as boolean value
  */
 public void setHeritable(boolean heritable)
-  {
-  this.heritable = false;
-  if (heritable) { this.heritable = heritable; return; }
-  }
+  { this.heritable = heritable; }
 
 /**
  * This methode set the heritable for the metadata class.
@@ -153,10 +219,11 @@ public void setHeritable(boolean heritable)
  */
 public void setHeritable(String heritable)
   {
-  this.heritable = false;
+  this.heritable = DEFAULT_HERITABLE;
   if ((heritable == null) || ((heritable = heritable.trim()).length() ==0))
     { return; }
   if (heritable.equals("true")) { this.heritable = true; }
+  this.heritable = false;
   }
 
 /**
@@ -321,6 +388,8 @@ public final void setFromDOM(org.jdom.Element element) throws MCRException
   classname = element.getAttributeValue("class");
   String fullname = META_PACKAGE_NAME+classname;
   setHeritable(element.getAttributeValue("heritable"));
+  setParametricSearch(element.getAttributeValue("parasearch"));
+  setTextSearch(element.getAttributeValue("textsearch"));
   List element_list = element.getChildren();
   int len = element_list.size();
   for (int i=0;i<len;i++) {
@@ -355,6 +424,8 @@ public final org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element(tag);
   elm.setAttribute("class",classname);
   elm.setAttribute("heritable",new Boolean(heritable).toString());
+  elm.setAttribute("parasearch",new Boolean(parasearch).toString());
+  elm.setAttribute("textsearch",new Boolean(textsearch).toString());
   for (int i=0;i<list.size();i++) {
     elm.addContent(((MCRMetaInterface)list.get(i)).createXML()); }
   return elm;
@@ -376,7 +447,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
   tc.addTagElement(tc.TYPE_TAG,tag);
   for (int i=0;i<list.size();i++) {
     tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
-      .createTypedContent(true,true)); }
+      .createTypedContent(parasearch,textsearch)); }
   return tc;
   }
 
@@ -414,6 +485,8 @@ public final void debug()
   System.out.println("<lang>"+lang+"</lang>");
   System.out.println("<tag>"+tag+"</tag>");
   System.out.println("<heritable>"+heritable+"</heritable>");
+  System.out.println("<parasearch>"+parasearch+"</parasearch>");
+  System.out.println("<textsearch>"+parasearch+"</textsearch>");
   for (int i=0;i<list.size();i++) {
     ((MCRMetaInterface)list.get(i)).debug(); }
   System.out.println("MCRMetaElement debug end"+NL);

@@ -360,14 +360,14 @@ public final MCRTypedContent createTypedContent() throws MCRException
     tc.addTagElement(tc.TYPE_TAG,"dates");
     for (int i=0;i<dates.size();i++) {
       tc.addMCRTypedContent(((MCRMetaDate)dates.get(i))
-        .createTypedContent(true,true));
+        .createTypedContent(true,false));
       }
     }
   if (flags.size()!=0) {
     tc.addTagElement(tc.TYPE_TAG,"flags");
     for (int i=0;i<flags.size();i++) {
       tc.addMCRTypedContent(((MCRMetaLangText)flags.get(i))
-        .createTypedContent(true,true)); }
+        .createTypedContent(true,false)); }
     }
   return tc;
   }
