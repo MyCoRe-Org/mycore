@@ -30,6 +30,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.common.MCRSortable;
 
 /**
  * This class is the cache of one result list included all XML files
@@ -39,9 +40,10 @@ import org.mycore.datamodel.metadata.MCRObject;
  *
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
+ * @author Thomas Scheffler
  * @version $Revision$ $Date$
  **/
-public class MCRXMLContainer
+public class MCRXMLContainer implements MCRSortable 
 {
 
 // data
@@ -112,7 +114,7 @@ public MCRXMLContainer(MCRXMLContainer in)
     rank.add(new Integer(in.getRank(i)));
     xml.add(in.getXML(i));
     }
-  fillStatus();
+  resetStatus();
   }
 
 /**
@@ -425,7 +427,7 @@ public final synchronized void importElements(byte [] in)
     System.out.print("MCRXMLContainer.importElements(byte[]): status="+istatus);
     xml.add(inxml);
     }
-   if (list.size()>1) fillStatus();
+   if (list.size()>1) resetStatus();
   }
 
 /**
@@ -437,7 +439,7 @@ public final synchronized void importElements(MCRXMLContainer in)
   { 
   for (int i=0; i<in.size(); i++) {
     add(in.getHost(i),in.getId(i),in.getRank(i),in.getXML(i));}
-  if (in.size()>1) fillStatus();
+  if (in.size()>1) resetStatus();
   }
 
 /**
@@ -454,7 +456,7 @@ public final void debug() throws IOException
   System.out.println(new String(exportAllToByteArray())); 
   }
 
-private final void fillStatus()
+private final void resetStatus()
   {
     if (size() != status.size()){
       System.out.print("MCRXMLContainer: refreshing status :");
@@ -472,5 +474,13 @@ private final void fillStatus()
   	}
   }
 
+  public void sort(MCRXMLSortInterface sorter) throws MCRException{
+	/* do some sorting here */
+	throw new MCRException("method not implemented yet");
+  }
+  public void sort(MCRXMLSortInterface sorter, boolean reversed) throws MCRException{
+	/* do some sorting here */
+	throw new MCRException("method not implemented yet");
+  }
 }
 
