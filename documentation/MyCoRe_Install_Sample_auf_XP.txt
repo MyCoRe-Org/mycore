@@ -1,0 +1,62 @@
+Sample am 17.06.03 vollständig neu
+
+Nachdem mycore und mycore-sample-application vollständig neu ausgecheckt
+und mysql und xindice auf Grundstellung:
+
+1. cmbdl71.jar, cmbcm71.jar, servlet.jar und xindice.jar ins lib-Verzeichnis von mycore
+
+2. in build.xml von MyCoRe 
+   <property name="persistency"  value="xmldb"/>
+
+3. ant jar
+
+4. mycore.properties.private
+   MCR.root_path=d:/wd_sample/mycore
+   MCR.appl_path=d:/wd_sample/mycore-sample-application  
+   MCR.persistence_type=xmldb
+   MCR.persistence_sql_database_url=jdbc:mysql://localhost/mycore?user=ODBC
+   MCR.IFS.ContentStore.FS.BaseDirectory=d:/wd_sample/mycore-sample-application/filestore
+   MCR.log4j.rootLogger=DEBUG, stdout
+
+5. Verzeichnis anlegen: d:/wd_sample/mycore-sample-application/filestore
+
+6. mycore.properties.jdbc
+   MCR.persistence_sql_driver=org.gjt.mm.mysql.Driver
+
+7. ContentStoreSelectionRules.xml
+   <store ID="FS">
+     <type> jpeg </type>
+   </store>
+
+8. mycore.properties
+   MCR.parser_schema_path=d:/wd_sample/mycore-sample-application/schema
+
+9. ant class (Laden der Klassifikationen in die MySQL-Datenbank)
+
+10. ant legal (Laden der legal entities in die XML-Datenbank)
+
+11. ant documents (laden der documents in die XML-Datenbank)
+
+12. Pfad in content/derivates/demo_dc_derivate_01.xml anpassen
+    restliche derivates entsprechend oder löschen
+
+13. ant derivates
+
+14. ant webapps
+
+15. tomcat starten und prüfen, ob in der Suchmaske die Comboboxen Herkunft, Format und Typ gefüllt
+
+Das läuft damit bei mir:
+
+- Comboboxen in der Suchmaske gefüllt
+- Suchmaske Dokumente ohne Einschränkung der Suche: Auflistung aller Dokumente
+- Suchmaske Personen ohne Einschränkung der Suche: Auflistung aller Personen
+- Auswahl eines Dokuments/einer Person aus der Auflistung: Daten werden richtig angezeigt
+- Auswahl eines Derivates: Derivat wird angezeigt (getestet mit Derivat 1)  
+
+ACHTUNG: 
+
+- Suchanfragen mit Einschränkungen gehen nicht
+- Anzeige aller Dokumente einer Person gehen nicht
+         
+      
