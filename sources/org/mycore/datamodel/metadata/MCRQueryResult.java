@@ -62,20 +62,16 @@ public MCRQueryResult(String type, String query)
   throws MCRException, MCRConfigurationException
   {
   vec_max_length = MCRConfiguration.instance()
-    .getInt("MCR.query_vec_max_length",10);
+    .getInt("MCR.query_max_results",10);
   mcr_result = new Vector(vec_max_length);
   String persist_type = "";
   String transform_name = "";
   String proptype = "MCR.persistence_type_"+type.toLowerCase();
   try {
     persist_type = MCRConfiguration.instance().getString(proptype);
-    if (persist_type == null) {
-      throw new MCRConfigurationException(proptype+" not found."); }
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_query_name";
     transform_name = MCRConfiguration.instance().getString(proppers);
-    if (transform_name == null) {
-      throw new MCRConfigurationException(proppers+" not found."); }
     mcr_transform = (MCRQueryInterface)Class.forName(transform_name)
       .newInstance(); 
     mcr_result = mcr_transform.getResultList(query,type,vec_max_length);
@@ -87,7 +83,7 @@ public MCRQueryResult(String type, String query)
   catch (InstantiationException e) {
      System.out.println("InstantiationException : "+e.getMessage()); }
   catch (Exception e) {
-     throw new MCRException(e.getMessage()); }
+     throw new MCRException(e.getMessage(),e); }
   }
 
 /**

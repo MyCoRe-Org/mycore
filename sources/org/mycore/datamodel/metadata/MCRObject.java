@@ -103,8 +103,6 @@ public MCRObject() throws MCRException, MCRConfigurationException
   // Parser class
     parser_name = MCRConfiguration.instance()
       .getString("MCR.parser_class_name");
-    if (parser_name == null) {
-      throw new MCRConfigurationException("MCR.parser_class_name"); }
     mcr_parser = (MCRParserInterface)Class.forName(parser_name).newInstance();
   // Metadata class
     mcr_metadata = new MCRObjectMetadata();
@@ -114,7 +112,7 @@ public MCRObject() throws MCRException, MCRConfigurationException
     mcr_service = new MCRObjectService();
     }
   catch (Exception e) {
-     throw new MCRException(e.getMessage()); }
+     throw new MCRException(e.getMessage(),e); }
   }
 
 /**
@@ -204,18 +202,14 @@ private final void setPersistence() throws MCRException
   String proptype = "MCR.persistence_type_"+mcr_id.getTypeId().toLowerCase();
   try {
     persist_type = MCRConfiguration.instance().getString(proptype);
-    if (persist_type == null) {
-      throw new MCRConfigurationException(proptype+" not found."); }
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
     persist_name = MCRConfiguration.instance().getString(proppers);
-    if (persist_name == null) {
-      throw new MCRConfigurationException(proppers+" not found."); }
     mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
       .newInstance(); 
     }
   catch (Exception e) {
-     throw new MCRException(e.getMessage()); }
+     throw new MCRException(e.getMessage(),e); }
   }
 
 /**
@@ -232,7 +226,6 @@ public final void setFromURI(String uri) throws MCRException
     set();
     }
   catch (Exception e) {
-    System.out.println(e.getMessage());
     throw new MCRException(e.getMessage()); }
   }
 
