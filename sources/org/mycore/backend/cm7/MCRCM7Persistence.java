@@ -172,6 +172,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
     item.create();
     updateTextIndexQueue(connection,mcr_ts_index);
+    logger.info("Item "+mcr_id.getId()+" was created.");
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage()); }
@@ -208,6 +209,7 @@ public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
 public final void delete(MCRObjectID mcr_id)
   throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM7ConnectionPool.getLogger();
   StringBuffer sb = new StringBuffer("MCR.persistence_cm7_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   mcr_index_class = conf.getString(sb.toString()); 
@@ -219,6 +221,7 @@ public final void delete(MCRObjectID mcr_id)
     MCRCM7Item item = getItem(mcr_id.getId(),mcr_index_class,connection);
     item.delete();
     updateTextIndexQueue(connection,mcr_ts_index);
+    logger.info("Item "+mcr_id.getId()+" was deleted.");
     }
   catch (MCRPersistenceException e) {
     throw new MCRPersistenceException(
@@ -315,6 +318,7 @@ public final byte [] receive(MCRObjectID mcr_id)
 public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   String mcr_ts_in) throws MCRConfigurationException, MCRPersistenceException
   {
+  Logger logger = MCRCM7ConnectionPool.getLogger();
   // convert the JDOM tree
   byte [] xml = MCRUtils.getByteArray(jdom);
   // extract index data from typed content
@@ -374,6 +378,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         item.setPart(mcr_ts_part,mcr_ts,mcr_ts_server,mcr_ts_index,mcr_ts_lang);
         item.update();
         updateTextIndexQueue(connection,mcr_ts_index);
+        logger.info("Item "+mcr_id.getId()+" was updated.");
         }
       catch (MCRPersistenceException e) { 
         throw new MCRPersistenceException(
