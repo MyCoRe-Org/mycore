@@ -123,7 +123,7 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
     }
   }
   
-  public void getPlayerStarterTo( OutputStream out, String queryString )
+  public void getPlayerStarterTo( OutputStream out, String startPos, String stopPos )
     throws MCRPersistenceException
   {
     try
@@ -131,7 +131,9 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
       cgi.append( "?VIDEOID=" );
       cgi.append( URLEncoder.encode( file.getStorageID() ) );
-      if( queryString != null ) cgi.append( "&" ).append( queryString );
+
+      if( startPos != null ) cgi.append( "&StartPos=" ).append( startPos );
+      if( stopPos  != null ) cgi.append( "&StopPos="  ).append( stopPos  );
     
       URLConnection connection = getConnection( cgi.toString() );
       forwardData( connection, out );

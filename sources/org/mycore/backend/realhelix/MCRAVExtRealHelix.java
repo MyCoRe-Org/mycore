@@ -125,14 +125,18 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
     }
   }
   
-  public void getPlayerStarterTo( OutputStream out, String queryString )
+  public void getPlayerStarterTo( OutputStream out, String startPos, String stopPos )
     throws MCRPersistenceException
   {
     try
     {
       StringBuffer cgi = new StringBuffer( basePlayerStarter ); 
       cgi.append( file.getStorageID() );
-      if( queryString != null ) cgi.append( "?" ).append( queryString );
+      
+      if( ( startPos != null ) || ( stopPos != null ) ) cgi.append( "?" );
+      if( startPos != null ) cgi.append( "start=" ).append( startPos );
+      if( ( startPos != null ) && ( stopPos != null ) ) cgi.append( "&" );
+      if( stopPos != null ) cgi.append( "stop=" ).append( stopPos );
     
       URLConnection connection = getConnection( cgi.toString() );
       forwardData( connection, out );
