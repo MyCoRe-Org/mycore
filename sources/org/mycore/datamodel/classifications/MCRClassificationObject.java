@@ -25,7 +25,6 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
-import java.util.Vector;
 import org.mycore.common.*;
 
 /**
@@ -41,9 +40,9 @@ public abstract class MCRClassificationObject
   /** The number of the languages **/
   public static final int MAX_CLASSIFICATION_LANG = 8;
   /** The length of the text **/
-  public static final int MAX_CLASSIFICATION_TEXT = 256;
+  public static final int MAX_CLASSIFICATION_TEXT = 254;
   /** The length of the description **/
-  public static final int MAX_CLASSIFICATION_DESCRIPTION = 256;
+  public static final int MAX_CLASSIFICATION_DESCRIPTION = 254;
 
   protected String    ID;
   protected ArrayList lang;
