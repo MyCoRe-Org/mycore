@@ -91,6 +91,32 @@ public class MCRCommandLineInterface
       "! {0}",
       "mycore.commandline.MCRCommandLineInterface.executeShellCommand String" );
 
+    // *************************************************
+    // Commands for document and legal entity management
+    // *************************************************
+
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "delete object {0}",
+      "mycore.commandline.MCRObjectCommands.delete String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load object from file {0}",
+      "mycore.commandline.MCRObjectCommands.loadFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update object from file {0}",
+      "mycore.commandline.MCRObjectCommands.updateFromFile String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "load all objects from directory {0}",
+      "mycore.commandline.MCRObjectCommands.loadFromDirectory String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "update all objects from directory {0}",
+      "mycore.commandline.MCRObjectCommands.updateFromDirectory String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "show object {0}",
+      "mycore.commandline.MCRObjectCommands.show String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "get next object ID for base {0}",
+      "mycore.commandline.MCRObjectCommands.getID String" );
+ 
     // **************************************
     // Commands for user and group management
     // **************************************
