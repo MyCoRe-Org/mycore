@@ -10,8 +10,9 @@
 %-------   Vorspann
 \title{MyCoRe Internal Design Guide}
 \author{
-Johannes Bühler
-            }
+Johannes Bühler\\
+Detlev Degenhardt
+}
 \maketitle
 
 \setcounter{secnumdepth}{4} 
@@ -23,48 +24,13 @@ Johannes Bühler
 \listoffigures
 \listoftables
 
+% Kapitel 1
 \chapter{Softwareentwicklung}
 \input{ProgGuide_Softwareentwicklung.tex}
 
-\chapter{ Einf"uhrung und Grundprinzipien} 
-\section{XML/XSLT}
-\section{XPath/Queries}
-\section{Sessionmodell}
-\section{Das Vererbungsmodell}
-\section{Das API-Konzept allgemein}
-\section{Klassen und Verantwortlichkeiten }
-\section{Allgemeine Klassen / Exception-Modell / MCRCache}
-\section{Das Metadatenmodell}
-\subsection{MCRClassification}
-\subsection{MCRObject}
-\subsection{MCRDerivate}
-\subsection{MCRLinkManager}
-\subsection{Erweiterungsm"oglichkeiten}
-\pagebreak
-Seitenumbruch erzwingen?
-\section{Das IFS Modell (ohne Stores)}
-\section{Das User- und ACL-Modell}
-\section{Der Backend-Store}
-\subsection{CM7}
-\subsection{CM8.2 (inklusive Datenspeichermodell und Query Umsetztung)}
-\subsection{XMLDB (inklusive Datenspeichermodell und Query Umsetztung)}
-\subsection{DB2 / MySQL / Oracle}
-\subsection{Filesystem-Store}
-\subsection{VideoStores}
-\subsection{RemoteStore im Detail}
-\subsection{Weitere Ausbaumöglichkeiten}
-\section{Die Frontend Komponenten}
-\subsection{Das Commandline-Tool und seine Erweiterungen}
-\subsection{Zusammenspiel der Servlets und Funktion der einzelnen}
-\subsection{Login-Servlet und MCRSession}
-\subsection{IFS-Servlet}
-\subsection{Query-Servlet}
-\subsection{Innere Struktur des Editor-Servlets}
-\subsection{Innere Struktur des User-Servlets}
-\section{Funktionsprinzipen der Services}
-\subsection{OAI}
-\subsection{NBN}
-\subsection{Weitere}
+% Kapitel 2 
+\input{ProgGuide_2.tex}
+
 \chapter{Konfiguration im Detail}
 \section{Mycore.properties}
 \section{Suchmasken}
