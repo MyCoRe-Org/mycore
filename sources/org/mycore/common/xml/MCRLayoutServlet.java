@@ -108,7 +108,6 @@ public class MCRLayoutServlet extends HttpServlet
                      HttpServletResponse response ) 
     throws IOException, ServletException
   {
-  	logger.info("MCRLayoutServlet started...");
     Properties parameters = buildXSLParameters( request );
     
     org.jdom.Document xml;  
@@ -119,6 +118,7 @@ public class MCRLayoutServlet extends HttpServlet
       xml = getXMLInputFromFile( request, parameters );
     
     String style = parameters.getProperty( "Style", "default" );
+    logger.debug( "MCRLayoutServlet using style " + style );
 
     if( "xml".equals( style ) )
     {
@@ -131,7 +131,6 @@ public class MCRLayoutServlet extends HttpServlet
       String styleDir     = "/WEB-INF/stylesheets/";
       
       File styleFile = getStylesheetFile( styleDir, styleName );
-      logger.info("MCRLayoutServlet: Stylesheet read!");
 
       if( styleFile == null ) 
         renderAsXML( xml, response );
@@ -147,7 +146,6 @@ public class MCRLayoutServlet extends HttpServlet
 		}
       }
     }
-  	logger.info("MCRLayoutServlet finished!");
   }
 
  /**
@@ -339,7 +337,7 @@ public class MCRLayoutServlet extends HttpServlet
   {
     String path = getServletContext().getRealPath( dir + name );
     File file = new File( path );
-    logger.info("Stylesheet: "+file.getPath());
+    logger.debug( "MCRLayoutServlet using stylesheet " + file.getPath() );
     
     if( ! file.exists() ) return null;
 
