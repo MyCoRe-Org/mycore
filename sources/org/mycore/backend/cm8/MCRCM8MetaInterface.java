@@ -44,10 +44,13 @@ public interface MCRCM8MetaInterface
  * ItemType from the configuration.
  *
  * @param element  a MCR datamodel element as JDOM Element
+ * @param connection the connection to the CM8 datastore
+ * @param dsDefICM the datastore definition
+ * @param prefix the prefix name for the item type
  * @return a DKComponentTypeDefICM for the MCR datamodel element
  * @exception MCRPersistenceException a general Exception of MyCoRe CM8
  **/
-public DKComponentTypeDefICM createItemType(org.jdom.Element je,
+public DKComponentTypeDefICM createItemType(org.jdom.Element element,
   DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix)
   throws MCRPersistenceException;
 

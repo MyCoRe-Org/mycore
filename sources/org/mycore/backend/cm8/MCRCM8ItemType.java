@@ -126,7 +126,8 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     DKItemTypeDefICM item_type = new DKItemTypeDefICM(connection);
     System.out.println("Info CM8 Datastore Creation: "+mcr_item_type_name);
     item_type.setName(mcr_item_type_name);
-    item_type.setDescription("MyCoRe ItemType");
+    item_type.setDescription(mcr_item_type_name);
+    item_type.setClassification(DK_ICM_ITEMTYPE_CLASS_DOC_MODEL);
     DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
     DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(
       mcr_item_type_prefix+"ID");
@@ -145,7 +146,6 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     for (int i=0;i<mcr_taglist.size();i++) {
       org.jdom.Element mcr_tag = (org.jdom.Element)mcr_taglist.get(i);
       String tagname = (String)mcr_tag.getAttribute("name").getValue();
-System.out.println(tagname);
       DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
       item_tag.setName(mcr_item_type_prefix+tagname);
       item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
@@ -162,7 +162,6 @@ System.out.println(tagname);
         StringBuffer stb = new StringBuffer(128);
         stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
           substring(3,classname.length()));
-System.out.println(stb.toString());
         Object obj = new Object();
         try {
           obj = Class.forName(stb.toString()).newInstance();
@@ -205,9 +204,10 @@ public static final boolean createAttributeVarChar(DKDatastoreICM connection,
   try {
     attr.setName(name);
     attr.setType(DK_CM_VARCHAR);
+    attr.setStringType(DK_CM_ATTR_VAR_ALPHANUM_EXT);
     attr.setSize(len);
     attr.setTextSearchable(search);
-    attr.setNullable(false);
+    attr.setNullable(true);
     attr.setUnique(false);
     attr.add(); }
   catch (DKException e) { return false; }

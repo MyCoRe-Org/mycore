@@ -39,17 +39,10 @@ import mycore.common.MCRPersistenceException;
  **/
 public final class MCRCM8Item implements DKConstantICM
   {
-  private DKDDO ddo;
-  private DKChildCollection children;
-
-  /**
-   * Constructor for a new Item.
-   * 
-   * @param ddo                 a DKDDO object
-   * @exception DKException     Exceptions of CM
-   **/
-  public MCRCM8Item( DKDDO ddo ) throws DKException
-    { this.ddo = ddo; }
+  private ArrayList ddolist = new ArrayList();
+  private ArrayList ddopath = new ArrayList();
+  private ArrayList ddocoll = new ArrayList();
+  private String itemtypename = "";
 
   /**
    * Constructor for a new Item with given CM connection.
@@ -61,8 +54,13 @@ public final class MCRCM8Item implements DKConstantICM
   public MCRCM8Item(DKDatastoreICM connection, String itemtypename)
     throws DKException, Exception
     {
-    ddo = connection.createDDO(itemtypename,DK_CM_DOCUMENT);
-    children = null;
+    ddolist = new ArrayList();
+    ddopath = new ArrayList();
+    ddocoll = new ArrayList();
+    ddolist.add(connection.createDDO(itemtypename,DK_CM_DOCUMENT));
+    ddopath.add("/");
+    ddocoll.add(null);
+    this.itemtypename = itemtypename;
     }
 
   /**
@@ -82,8 +80,12 @@ public final class MCRCM8Item implements DKConstantICM
     {
     if (id==null) {
       throw new MCRPersistenceException("MCRCM7Item constructor error."); }
-    ddo = connection.createDDO(itemtypename,DK_CM_DOCUMENT);
-    children = null;
+    ddolist = new ArrayList();
+    ddopath = new ArrayList();
+    ddocoll = new ArrayList();
+    ddolist.add(connection.createDDO(itemtypename,DK_CM_DOCUMENT));
+    ddopath.add("/");
+    ddocoll.add(null);
 
     StringBuffer qs = new StringBuffer(128);
     qs.append('/').append(itemtypename).append("[@").append(itemtypeprefix)
@@ -96,7 +98,8 @@ public final class MCRCM8Item implements DKConstantICM
     if (! iter.more()) throw new MCRPersistenceException(
       "There is no item in Item Type " + itemtypename +
       " that matches the MCRObjectID (" + id + ")" );
-    this.ddo = ( DKDDO ) iter.next();
+    ddolist.set(0,(DKDDO)iter.next());
+    this.itemtypename = itemtypename;
     }
 
   /**
@@ -108,7 +111,7 @@ public final class MCRCM8Item implements DKConstantICM
    **/
   public final void lock(DKDatastoreICM connection) throws DKException, 
     Exception
-    { connection.checkOut(ddo); }
+    { connection.checkOut((DKDDO)ddolist.get(0)); }
 
   /**
    * This methode creates the item in the datastore.
@@ -117,7 +120,7 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception Exception       Exceptions of JDK
    **/
   public final void create() throws DKException, Exception
-    { ddo.add(); } 
+    { ((DKDDO)ddolist.get(0)).add(); } 
 
   /**
    * This methode retrievs the item from the datastore.
@@ -126,7 +129,7 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception Exception       Exceptions of JDK
    **/
   public final void retrieve() throws DKException, Exception
-    { ddo.retrieve(); }
+    { ((DKDDO)ddolist.get(0)).retrieve(); }
 
   /**
    * This methode updates the item in the datastore.
@@ -135,7 +138,7 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception Exception       Exceptions of JDK
    **/
   public final void update() throws DKException, Exception
-    { ddo.update(); }
+    { ((DKDDO)ddolist.get(0)).update(DK_CM_CHECKIN); }
 
   /**
    * This methode updates the item in the datastore with an option.
@@ -145,7 +148,7 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception Exception       Exceptions of JDK
    **/
   public final void update(short option) throws DKException, Exception
-    { ddo.update(option); }
+    { ((DKDDO)ddolist.get(0)).update(option); }
 
   /**
    * This methode deletes the item from the datastore.
@@ -154,39 +157,58 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception Exception       Exceptions of JDK
    **/
   public final void delete() throws DKException, Exception
-    { ddo.del(); }
+    { ((DKDDO)ddolist.get(0)).del(); }
 
   /**
-   * This methode set the string value of the named attribute in the
-   * given DKDDO.
-   * 
-   * @param pathname            the path to the attribute
-   * @param attrname            the name of the object
-   * @param value               the value for this keyfield
+   * This method add a child component to the existing DKDDO with the
+   * given path name list.
+   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
-  public final void setAttribute(String pathname, String attrname, 
-    String value) throws DKException, Exception
+  public final void setChild(DKDatastoreICM connection, String parentname, 
+    String childname, String parentpath, String childpath) throws DKException, 
+    Exception
     {
-    if ((pathname==null)||((pathname = pathname.trim()).length() ==0)) {
-      throw new MCRPersistenceException( 
-        "Path name error in MCRCM8Item.setAttribute()."); }
-    if ((attrname==null)||((attrname = attrname.trim()).length() ==0)) {
-      throw new MCRPersistenceException( 
-        "Attribute name error in MCRCM8Item.setAttribute()."); }
-    if (value != null) {
-      value = value.trim(); if ( value.length() == 0 ) value = null; }
-    // Do enything if path is not /
-    if (!pathname.equals("/")) {
+System.out.println("Parent = "+parentname+"   Child = "+childname);
+System.out.println("Parentpath = "+parentpath);
+System.out.println("Childpath = "+childpath);
+    // Check for existing child component path
+    int poschild = -1;
+    for (int i = 0; i < ddopath.size(); i++) {
+      if (((String)ddopath.get(i)).equals(childpath)) {
+        poschild = i; break; }
       }
-    short dataId = ddo.dataId(DK_CM_NAMESPACE_ATTR,attrname);
-    ddo.setData(dataId,value);
+    if (poschild != -1) { return; }
+    // Check for existing parent component path
+    int posparent = -1;
+    for (int i = 0; i < ddopath.size(); i++) {
+      if (((String)ddopath.get(i)).equals(parentpath)) {
+        posparent = i; break; }
+      }
+    if (posparent == -1) {
+      throw new MCRPersistenceException( 
+        "Path name error for parent in MCRCM8Item.setAttribute()."); }
+    // Create if it does not exist
+    if (poschild == -1) {
+System.out.println("========================");
+      DKDDO ddochild = connection.createChildDDO(itemtypename,childname);
+System.out.println("========================");
+      DKChildCollection colchild = new DKChildCollection();
+System.out.println("========================");
+      ((DKDDO)ddolist.get(posparent)).setData(((DKDDO)ddolist.get(posparent)).dataId(DK_CM_NAMESPACE_CHILD,ddochild.getObjectType()),colchild);
+System.out.println("========================");
+      colchild.addElement(ddochild);
+System.out.println("========================");
+      ddolist.add(ddochild);
+      ddopath.add(childpath);
+      ddocoll.add(colchild);
+      } 
     }
-
+   
   /**
-   * This methode set the byte array value of the named attribute in the
-   * given DKDDO.
+   * This methode set the value of the named attribute for the given path
+   * in an existing root DKDDO.
    * 
    * @param pathname            the path to the attribute
    * @param attrname            the name of the object
@@ -195,7 +217,7 @@ public final class MCRCM8Item implements DKConstantICM
    * @exception DKException     Exceptions of CM
    **/
   public final void setAttribute(String pathname, String attrname, 
-    byte [] value) throws DKException, Exception
+    Object value) throws DKException, Exception
     {
     if ((pathname==null)||((pathname = pathname.trim()).length() ==0)) {
       throw new MCRPersistenceException( 
@@ -203,11 +225,19 @@ public final class MCRCM8Item implements DKConstantICM
     if ((attrname==null)||((attrname = attrname.trim()).length() ==0)) {
       throw new MCRPersistenceException( 
         "Attribute name error in MCRCM8Item.setAttribute()."); }
-    // Do enything if path is not /
-    if (!pathname.equals("/")) {
+    // Check for existing component path
+    int pos = -1;
+    for (int i = 0; i < ddopath.size(); i++) {
+      if (((String)ddopath.get(i)).equals(pathname)) {
+        pos = i; break; }
       }
-    short dataId = ddo.dataId(DK_CM_NAMESPACE_ATTR,attrname);
-    ddo.setData(dataId,value);
+    if (pos == -1) {
+      throw new MCRPersistenceException( 
+        "Path name error in MCRCM8Item.setAttribute()."); }
+    // Set attribute
+    short dataId = ((DKDDO)ddolist.get(pos)).dataId(DK_CM_NAMESPACE_ATTR,
+      attrname);
+    ((DKDDO)ddolist.get(pos)).setData(dataId,value);
     }
 
   /**
@@ -227,11 +257,19 @@ public final class MCRCM8Item implements DKConstantICM
     if ((attrname==null)||((attrname = attrname.trim()).length() ==0)) {
       throw new MCRPersistenceException( 
         "Attribute name error in MCRCM8Item.setAttribute()."); }
-    // Do enything if path is not /
-    if (!pathname.equals("/")) {
+    // Check for existing component path
+    int pos = -1;
+    for (int i = 0; i < ddopath.size(); i++) {
+      if (((String)ddopath.get(i)).equals(pathname)) {
+        pos = i; break; }
       }
-    short dataId = ddo.dataId(DK_CM_NAMESPACE_ATTR,attrname);
-    return (byte []) ddo.getData(dataId);
+    if (pos == -1) {
+      throw new MCRPersistenceException( 
+        "Path name error in MCRCM8Item.setAttribute()."); }
+    // Set attribute
+    short dataId = ((DKDDO)ddolist.get(pos)).dataId(DK_CM_NAMESPACE_ATTR,
+      attrname);
+    return (byte []) ((DKDDO)ddolist.get(pos)).getData(dataId);
     }
 
   /**
@@ -251,11 +289,19 @@ public final class MCRCM8Item implements DKConstantICM
     if ((attrname==null)||((attrname = attrname.trim()).length() ==0)) {
       throw new MCRPersistenceException( 
         "Attribute name error in MCRCM8Item.setAttribute()."); }
-    // Do enything if path is not /
-    if (!pathname.equals("/")) {
+    // Check for existing componet path
+    int pos = -1;
+    for (int i = 0; i < ddopath.size(); i++) {
+      if (((String)ddopath.get(i)).equals(pathname)) {
+        pos = i; break; }
       }
-    short dataId = ddo.dataId(DK_CM_NAMESPACE_ATTR,attrname);
-    return (String) ddo.getData(dataId);
+    if (pos == -1) {
+      throw new MCRPersistenceException( 
+        "Path name error in MCRCM8Item.setAttribute()."); }
+    // Set attribute
+    short dataId = ((DKDDO)ddolist.get(pos)).dataId(DK_CM_NAMESPACE_ATTR,
+      attrname);
+    return (String) ((DKDDO)ddolist.get(pos)).getData(dataId);
     }
 
   }
