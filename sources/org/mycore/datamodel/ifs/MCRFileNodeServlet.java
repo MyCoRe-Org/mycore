@@ -313,7 +313,10 @@ private ArrayList remoteAliasList = null;
     addString( root, "path",         dir.getPath() );
     addString( root, "ownerID",      dir.getOwnerID() );
     addDate  ( root, "lastModified", dir.getLastModified() );
-    addString( root, "numChildren",  String.valueOf( dir.getNumChildren( dir.NODES, dir.HERE ) ) );
+    addString( root, "numChildDirectoriesHere",  String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.HERE  ) ) );
+    addString( root, "numChildDirectoriesTotal", String.valueOf( dir.getNumChildren( dir.DIRECTORIES, dir.TOTAL ) ) );
+    addString( root, "numChildFilesHere",        String.valueOf( dir.getNumChildren( dir.FILES, dir.HERE ) ) );
+    addString( root, "numChildFilesTotal",       String.valueOf( dir.getNumChildren( dir.FILES, dir.TOTAL ) ) );
     addString( root, "size",         String.valueOf( dir.getSize() ) );
 
     Element nodes = new Element( "children" );
