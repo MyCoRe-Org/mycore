@@ -50,10 +50,9 @@ import org.mycore.common.*;
  * @see #justDoQuery( String )
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
- *
  * @author Frank Lützenkirchen
- *
- * @version $Revision$ $Date$
+ *@author Johannes Buehler
+  * @version $Revision$ $Date$
  */
 public class MCRSQLConnection
 {
@@ -66,16 +65,25 @@ public class MCRSQLConnection
    * 
    * @see MCRSQLConnectionPool#getConnection()
    **/
-  MCRSQLConnection() throws MCRPersistenceException
+  MCRSQLConnection() throws MCRPersistenceException, MCRConfigurationException
   {
     Logger logger = MCRSQLConnectionPool.getLogger();
 
     String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
-    
+	      
     logger.debug( "MCRSQLConnection: Building connection to JDBC datastore... with " + url);
     
     Connection connection = null;
-    try{ connection = DriverManager.getConnection( url ); }
+    try{
+		try  {
+			String userid = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_userid" );
+			String passwd = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_passwd" );
+			connection = DriverManager.getConnection( url, userid, passwd );
+		  	} 
+        catch(Exception MCRConfigurationException) {
+        	connection = DriverManager.getConnection( url );
+		}
+    }
     catch( Exception exc )
     {
       throw new MCRPersistenceException
