@@ -54,30 +54,27 @@ public final class MCRObjectID {
 
 	private String mcr_project_id = null;
 	private String mcr_type_id = null;
+	private String mcr_id = null;
 	private int mcr_number = -1;
-	private boolean mcr_valid_id;
+	private boolean mcr_valid_id = false;
 
-	private String number_pattern = null;
-	private DecimalFormat number_format = null;
+	private static String number_pattern = null;
+	private static DecimalFormat number_format = null;
 
 	/**
 	 * Static mthode to load the configuration.
 	 **/
 	static {
 		conf = MCRConfiguration.instance();
+		number_pattern =
+			conf.getString("MCR.metadata_objectid_number_pattern", "0000000000");
+		number_format = new DecimalFormat(number_pattern);
 	}
 
 	/**
 	 * The constructor for an empty MCRObjectId.
 	 **/
 	public MCRObjectID() {
-		mcr_project_id = null;
-		mcr_type_id = null;
-		mcr_number = -1;
-		mcr_valid_id = false;
-		number_pattern =
-			conf.getString("MCR.metadata_objectid_number_pattern", "0000000000");
-		number_format = new DecimalFormat(number_pattern);
 	}
 
 	/**
@@ -86,15 +83,10 @@ public final class MCRObjectID {
 	 * @exception MCRException if the given string is not valid.
 	 **/
 	public MCRObjectID(String id) throws MCRException {
-		mcr_valid_id = false;
-		boolean is = isValid(id);
-		if (!is) {
+		if (!setID(id)) {
 			throw new MCRException("The ID is not valid: " + id);
 		}
 		mcr_valid_id = true;
-		number_pattern =
-			conf.getString("MCR.metadata_objectid_number_pattern", "0000000000");
-		number_format = new DecimalFormat(number_pattern);
 	}
 
 	/**
@@ -109,17 +101,19 @@ public final class MCRObjectID {
 	 **/
 	public void setNextFreeId(String base_id) throws MCRUsageException {
 		mcr_valid_id = false;
-		StringBuffer sb = new StringBuffer(MAX_LENGTH);
-		sb.append(base_id).append("_1");
-		boolean is = isValid(sb.toString());
-		if (!is) {
-			throw new MCRException("The ID is not valid");
-		}
-		MCRObjectPersistenceInterface mcr_persist;
+		StringBuffer mcrid = new StringBuffer(base_id).append('_').append(1);
+		MCRObjectID test = new MCRObjectID(mcrid.toString());
+		mcrid.deleteCharAt(mcrid.length() - 1);
 		try {
 			MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-			mcr_number =
-				xmltable.getNextFreeIdInt(mcr_type_id, mcr_project_id, mcr_type_id);
+			mcrid.append(
+				xmltable.getNextFreeIdInt(
+					test.mcr_type_id,
+					test.mcr_project_id,
+					test.mcr_type_id));
+			test=null;
+			if (!setID(mcrid.toString()))
+				throw new MCRException("Error setting to new ID:" + mcrid);
 		} catch (Exception e) {
 			throw new MCRUsageException(e.getMessage(), e);
 		}
@@ -139,6 +133,7 @@ public final class MCRObjectID {
 			return false;
 		}
 		mcr_number = num;
+		mcr_id=null;
 		return true;
 	}
 
@@ -201,7 +196,7 @@ public final class MCRObjectID {
 	 *
 	 * @return the string of the schema name
 	 **/
-	public final String getBase() {
+	public String getBase() {
 		if (!mcr_valid_id) {
 			return "";
 		}
@@ -215,15 +210,21 @@ public final class MCRObjectID {
 	 *
 	 * @return the string of the schema name
 	 **/
-	public final String getId() {
+	public String getId() {
 		if (!mcr_valid_id) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer(MAX_LENGTH);
-		sb.append(mcr_project_id).append('_').append(mcr_type_id).append(
-			'_').append(
-			number_format.format((long) mcr_number));
-		return sb.toString();
+		if (mcr_id == null) {
+			mcr_id =
+				new StringBuffer(MAX_LENGTH)
+					.append(mcr_project_id)
+					.append('_')
+					.append(mcr_type_id)
+					.append('_')
+					.append(number_format.format((long) mcr_number))
+					.toString();
+		}
+		return mcr_id;
 	}
 
 	/**
@@ -239,7 +240,7 @@ public final class MCRObjectID {
 	 * @return the validation value, true if the MCRObjectId is correct,
 	 * otherwise return false
 	 **/
-	public final boolean isValid() {
+	public boolean isValid() {
 		return mcr_valid_id;
 	}
 
@@ -260,7 +261,7 @@ public final class MCRObjectID {
 	 * @return the validation value, true if the MCRObjectId is correct,
 	 * otherwise return false
 	 **/
-	public final boolean isValid(String id) {
+	private final boolean setID(String id) {
 		mcr_valid_id = false;
 		if ((id == null) || ((id = id.trim()).length() == 0)) {
 			return false;
@@ -277,12 +278,12 @@ public final class MCRObjectID {
 		if (i == -1) {
 			return false;
 		}
-		mcr_project_id = mcr_id.substring(0, i);
+		mcr_project_id = mcr_id.substring(0, i).intern();
 		int j = mcr_id.indexOf("_", i + 1);
 		if (j == -1) {
 			return false;
 		}
-		mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase();
+		mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase().intern();
 		if (!conf.getBoolean("MCR.type_" + mcr_type_id.toLowerCase(), false)) {
 			return false;
 		}
@@ -295,6 +296,7 @@ public final class MCRObjectID {
 		if (mcr_number < 0) {
 			return false;
 		}
+		this.mcr_id=null;
 		mcr_valid_id = true;
 		return mcr_valid_id;
 	}
@@ -315,36 +317,8 @@ public final class MCRObjectID {
 	 * @throws MCRException if ID is not valid
 	 **/
 	public static void isValidOrDie(String id) {
-		boolean is = false;
-		if (!((id == null) || ((id = id.trim()).length() == 0))) {
-			if (id.length() <= MAX_LENGTH) {
-				String mcr_id = URLEncoder.encode(id);
-				if (mcr_id.equals(id)) {
-					int len = mcr_id.length();
-					int i = mcr_id.indexOf("_");
-					if (i >= 0) {
-						int j = mcr_id.indexOf("_", i + 1);
-						if (j >= 0) {
-							String mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase();
-							if (conf
-								.getBoolean("MCR.type_" + mcr_type_id.toLowerCase(), false)) {
-								int mcr_number = -1;
-								try {
-									mcr_number = Integer.parseInt(mcr_id.substring(j + 1, len));
-								} catch (NumberFormatException e) {
-								}
-								if (mcr_number >= 0) {
-									is = true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (!is) {
-			throw new MCRException("The ID is not valid");
-		}
+		MCRObjectID obj=new MCRObjectID(id);
+		obj=null;
 	}
 
 	/**
@@ -353,11 +327,13 @@ public final class MCRObjectID {
 	 * @param in the MCRObjectID to check
 	 * @return true if all parts are equal, else return false.
 	 **/
-	public final boolean equals(MCRObjectID in) {
-		if (!getId().equals(in.getId())) {
+	public boolean equals(MCRObjectID in) {
+		if ((mcr_project_id == in.mcr_project_id)
+			&& (mcr_type_id == in.mcr_type_id)
+			&& (mcr_number == in.mcr_number))
+			return true;
+		else
 			return false;
-		}
-		return true;
 	}
 
 	/**
