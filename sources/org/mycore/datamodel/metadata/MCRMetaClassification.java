@@ -44,6 +44,10 @@ final public class MCRMetaClassification extends MCRMetaDefault
   implements MCRMetaInterface 
 {
 
+/** The length of the classification ID **/
+public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
+public static final int MAX_CATEGID_LENGTH = 32;
+
 // MCRMetaClassification data
 private String classid;
 private String categid;
@@ -76,19 +80,14 @@ public MCRMetaClassification()
  * @param set_classid      the classification ID
  * @param set_categid      the category ID
  * @exception MCRException if the set_subtag value, the set_classid value or
- * the set_categid are null or empty
+ * the set_categid are null, empty, too long or not a MCRObjectID
  */
 public MCRMetaClassification(String set_datapart, String set_subtag, 
   String default_lang, String set_classid, String set_categid) 
   throws MCRException
   {
   super(set_datapart,set_subtag,"en","");
-  if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
-    throw new MCRException("The classid is not empty."); }
-  if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
-    throw new MCRException("The categid is not empty."); }
-  classid = set_classid;
-  categid = set_categid;
+  setValue(set_classid,set_categid);
   }
 
 /**
@@ -96,14 +95,25 @@ public MCRMetaClassification(String set_datapart, String set_subtag,
  *
  * @param set_classid      the classification ID
  * @param set_categid      the category ID
+ * @exception MCRException if the set_classid value or
+ * the set_categid are null, empty, too long or not a MCRObjectID
  **/
 public final void setValue(String set_classid, String set_categid)
+  throws MCRException
   {
   if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
-    throw new MCRException("The classid is not empty."); }
+    throw new MCRException("The classid is empty."); }
   if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
-    throw new MCRException("The categid is not empty."); }
+    throw new MCRException("The categid is empty."); }
+  if (set_classid.length() > MAX_CLASSID_LENGTH) {
+    throw new MCRException("The classid is too long."); }
+  try {
+    MCRObjectID mid = new MCRObjectID(set_classid); }
+  catch (Exception e) {
+    throw new MCRException("The classid is not MCRObjectID."); }
   classid = set_classid;
+  if (set_categid.length() > MAX_CATEGID_LENGTH) {
+    throw new MCRException("The categid is too long."); }
   categid = set_categid;
   }
 
@@ -112,18 +122,16 @@ public final void setValue(String set_classid, String set_categid)
  * metadata of the document.
  *
  * @param element a relevant JDOM element for the metadata
+ * @exception MCRException if the set_classid value or
+ * the set_categid are null, empty, too long or not a MCRObjectID
  **/
 public final void setFromDOM(org.jdom.Element element)
+  throws MCRException
   {
   super.setFromDOM(element);
   String set_classid = element.getAttributeValue("classid");
-  if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
-    throw new MCRException("The classid is not empty."); }
   String set_categid = element.getAttributeValue("categid");
-  if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
-    throw new MCRException("The categid is not empty."); }
-  classid = set_classid;
-  categid = set_categid;
+  setValue(set_classid,set_categid);
   }
 
 /**
@@ -159,7 +167,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; } 
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag.toUpperCase());
+  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
   tc.addClassElement(classid);
   tc.addCategElement(categid);
   return tc;

@@ -182,7 +182,7 @@ public final boolean addBooleanElement(boolean invalue)
 public final boolean addClassElement( String invalue)
   {
   if (invalue==null) { return false; }
-  type.add(new Integer(TYPE_VALUE));
+  type.add(new Integer(TYPE_ATTRIBUTE));
   name.add("classid");
   format.add(new Integer(FORMAT_CLASSID));
   value.add(invalue);
@@ -198,7 +198,7 @@ public final boolean addClassElement( String invalue)
 public final boolean addCategElement( String invalue)
   {
   if (invalue==null) { return false; }
-  type.add(new Integer(TYPE_VALUE));
+  type.add(new Integer(TYPE_ATTRIBUTE));
   name.add("categid");
   format.add(new Integer(FORMAT_CATEGID));
   value.add(invalue);

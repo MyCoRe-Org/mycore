@@ -38,10 +38,15 @@ import mycore.common.*;
  **/
 public abstract class MCRClassificationObject
   {
-  /** The length of the label **/
-  public static final int MAX_CLASSIFICATION_LABEL = 250;
+  /** The number of the languages **/
+  public static final int MAX_CLASSIFICATION_LANG = 2;
+  /** The length of the text **/
+  public static final int MAX_CLASSIFICATION_TEXT = 64;
   /** The length of the description **/
-  public static final int MAX_CLASSIFICATION_DESCRIPTION = 1024;
+  public static final int MAX_CLASSIFICATION_DESCRIPTION = 156;
+  /** The length of the tag **/
+  public static final int MAX_CLASSIFICATION_TAG = MAX_CLASSIFICATION_LANG *
+    (MAX_CLASSIFICATION_TEXT+MAX_CLASSIFICATION_DESCRIPTION+30);
 
   protected String    ID;
   protected ArrayList label;
@@ -209,8 +214,8 @@ public abstract class MCRClassificationObject
     ensureNotDeleted();
     if (lang==null) { lang = default_lang; }
     if (label==null) { label = ""; }
-    if (label.length() > MAX_CLASSIFICATION_LABEL) {
-      label = label.substring(0,MAX_CLASSIFICATION_LABEL); }
+    if (label.length() > MAX_CLASSIFICATION_TEXT) {
+      label = label.substring(0,MAX_CLASSIFICATION_TEXT); }
     if (description==null) { description = ""; }
     if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
       description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
@@ -232,8 +237,8 @@ public abstract class MCRClassificationObject
     ensureNotDeleted();
     if (lang==null) { lang = default_lang; }
     if (label==null) { label = ""; }
-    if (label.length() > MAX_CLASSIFICATION_LABEL) {
-      label = label.substring(0,MAX_CLASSIFICATION_LABEL); }
+    if (label.length() > MAX_CLASSIFICATION_TEXT) {
+      label = label.substring(0,MAX_CLASSIFICATION_TEXT); }
     if (description==null) { description = ""; }
     if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
       description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
@@ -267,11 +272,14 @@ public abstract class MCRClassificationObject
    **/
   public String getTag()
     {
-    StringBuffer sb = new StringBuffer(4096);
+    StringBuffer sb = new StringBuffer(MAX_CLASSIFICATION_TAG);
     for (int i=0;i<getSize();i++) {
-      sb.append("<label xml:lang=\"").append(lang.get(i)).append("\" text=\"")
+      StringBuffer sbb = new StringBuffer(2*MAX_CLASSIFICATION_DESCRIPTION);
+      sbb.append("<label xml:lang=\"").append(lang.get(i)).append("\" text=\"")
         .append(label.get(i)).append("\" description=\"")
         .append(description.get(i)).append("\" />");
+      if (sbb.length()+sb.length() > MAX_CLASSIFICATION_TAG) { break; }
+      sb.append(sbb);
       }
     return sb.toString();
     }

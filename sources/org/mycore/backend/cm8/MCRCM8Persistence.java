@@ -124,7 +124,6 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
 
     // set the metadata children data
     for (int i=mcr_tc_counter;i<mcr_tc.getSize();i++) {
-System.out.println(mcr_tc.getNameElement(i)+"   "+mcr_tc.getTypeElement(i));
       // tag is 'metadata'
       if ((mcr_tc.getNameElement(i).equals("metadata")) &&
           (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
@@ -158,6 +157,9 @@ System.out.println(mcr_tc.getNameElement(i)+"   "+mcr_tc.getTypeElement(i));
         item.setChild(connection,xmlpath[lastpath-1],xmlpath[lastpath],
           sb.toString(),
           sb.append(xmlpath[lastpath]).append('/').toString());
+System.out.println("SetChild : "+xmlpath[lastpath-1]+"   "+xmlpath[lastpath]+
+  "   "+sb.toString()+"   "+
+  sb.append(xmlpath[lastpath]).append('/').toString());
         continue; 
         }
       // set a  attribute or value
@@ -173,14 +175,27 @@ System.out.println(mcr_tc.getNameElement(i)+"   "+mcr_tc.getTypeElement(i));
         for (int j=mcr_tc.TYPE_MASTERTAG;j<lastpath+1;j++) {
           sb.append(xmlpath[j]).append('/'); }
         }
-System.out.println("Attribute : "+sb+"  "+elname);
       Object valueobject = null;
       switch (mcr_tc.getFormatElement(i)) {
         case MCRTypedContent.FORMAT_STRING :
           valueobject = mcr_tc.getValueElement(i);
+System.out.println("Attribute : "+sb+"  "+elname+"  "+
+(String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_DATE :
           valueobject = java.sql.Date.valueOf("2001-08-12");
+System.out.println("Attribute : "+sb+"  "+elname+"  "+
+"2001-08-12");
+          break;
+        case MCRTypedContent.FORMAT_CLASSID :
+          valueobject = mcr_tc.getValueElement(i);
+System.out.println("Attribute : "+sb+"  "+elname+"  "+
+(String)mcr_tc.getValueElement(i));
+          break;
+        case MCRTypedContent.FORMAT_CATEGID :
+          valueobject = mcr_tc.getValueElement(i);
+System.out.println("Attribute : "+sb+"  "+elname+"  "+
+(String)mcr_tc.getValueElement(i));
           break;
         }
       item.setAttribute(sb.toString(),elname,valueobject);

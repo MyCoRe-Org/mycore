@@ -170,7 +170,6 @@ public final class MCRCM8Item implements DKConstantICM
     String childname, String parentpath, String childpath) throws DKException, 
     Exception
     {
-System.out.println("Parent = "+parentname+"   Child = "+childname+"   Parentpath = "+parentpath+"  Childpath = "+childpath);
     // Check for existing child component path
     int poschild = -1;
     for (int i = 0; i < ddopath.size(); i++) {
