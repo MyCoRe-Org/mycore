@@ -124,6 +124,7 @@ System.out.println("MCRCM7TransformXQueryToCM8 : "+cond.toString());
 System.out.println("================================");
   query = traceOneCondition(cond.toString(),itemtypename,itemtypeprefix);
   if (query.length()==0) { query = "/"+itemtypename; }
+  if (query.equals("/MCR_Demo_Legal[]")) { query = "/"+itemtypename; }
 System.out.println("MCRCM7TransformXQueryToCM8 : >>>"+query+"<<<");
 System.out.println("================================");
   // Start the search
@@ -206,7 +207,7 @@ private final String traceOneCondition(String cond, String itemtypename,
   if (klammerauf!=ROOT_TAG.length()) { return ""; }
   if (!cond.startsWith(ROOT_TAG)) { return ""; }
   String pretag = "/"+itemtypename;
-System.out.println("PRETAG="+pretag);
+//System.out.println("PRETAG="+pretag);
   // search operations
   String tag[] = new String[10];
   String op[] = new String[10];
@@ -240,9 +241,16 @@ System.out.println("PRETAG="+pretag);
     value[counter] = new String(cond.substring(tippelauf+1,tippelzu).trim());
     boolean opset = false;
     if (!opset) {
-      opstart = cond.indexOf("CONTAINS(",tagstart);
+      opstart = cond.toUpperCase().indexOf("CONTAINS(",tagstart);
       if ((opstart != -1)&&(opstart<tippelauf)) {
         op[counter] = "contains";
+        tag[counter] = cond.substring(tagstart,opstart).trim();
+        opset = true; }
+      }
+    if (!opset) {
+      opstart = cond.toUpperCase().indexOf("LIKE",tagstart);
+      if ((opstart != -1)&&(opstart<tippelauf)) {
+        op[counter] = "like";
         tag[counter] = cond.substring(tagstart,opstart).trim();
         opset = true; }
       }
@@ -302,6 +310,7 @@ System.out.println("PRETAG="+pretag);
     counter++;
     }
 
+/*
   for (i=0;i<counter;i++) {
     System.out.println("TAG="+tag[i]);
     System.out.println("OPER="+op[i]);
@@ -309,6 +318,7 @@ System.out.println("PRETAG="+pretag);
     System.out.println("BOOLEAN="+bool[i]);
     System.out.println();
     }
+*/
 
   StringBuffer sbout = new StringBuffer();
   sbout.append(pretag).append('[');
@@ -336,6 +346,29 @@ System.out.println("PRETAG="+pretag);
     if (op[i].equals("contains")) {
       return ""; }
     else {
+      if (op[i].equals("like")) { 
+        // replace * with %
+        value[i] = value[i].replace('*','%'); 
+        // search all words
+        ArrayList list = new ArrayList();
+        j = 0;
+        k = value[0].length();
+        while (j < k) {
+          l = value[0].indexOf(" ",j);
+          if (l == -1) { list.add(value[0].substring(j,k)); break; }
+          list.add(value[0].substring(j,l));
+          j = l+1;
+          }
+        // set % to the begin and end
+        StringBuffer sbval = new StringBuffer(128);
+        for (j=0;j<list.size();j++) {
+          if (!((String)list.get(j)).startsWith("%")) { sbval.append('%'); }
+          sbval.append((String)list.get(j));
+          if (!((String)list.get(j)).endsWith("%")) { sbval.append('%'); }
+          sbval.append(' ');
+          }
+        value[i] = sbval.toString();
+        } 
       sbout.append(' ').append(op[i]).append(" \"").append(value[i])
         .append("\"").append(bool[i]); }
     }

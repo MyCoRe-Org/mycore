@@ -229,6 +229,13 @@ private final String traceOneCondition(String cond)
         opset = true; }
       }
     if (!opset) {
+      opstart = cond.indexOf("LIKE",tagstart);
+      if ((opstart != -1)&&(opstart<tippelauf)) {
+        op[counter] = "contains";
+        tag[counter] = cond.substring(tagstart,opstart).trim();
+        opset = true; }
+      }
+    if (!opset) {
       opstart = cond.indexOf("!=",tagstart);
       if ((opstart != -1)&&(opstart<tippelauf)) {
         op[counter] = "!=";
