@@ -39,6 +39,8 @@ import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXMLSorter;
 import org.mycore.common.xml.MCRXMLSortInterface;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * This servlet provides a web interface to query
@@ -60,6 +62,7 @@ private String sortType = "";
 private static final String MCRSorterConfPrefix="MCR.XMLSorter";
 private static final String MCRSorterConfDelim="\"+lang+\"";
 private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
+private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
  /**
   * The initialization method for this servlet. This read the default
@@ -68,6 +71,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
   public void init() throws MCRConfigurationException
     {
     conf = MCRConfiguration.instance();
+	PropertyConfigurator.configure(conf.getLoggingProperties());
     defaultLang = conf
       .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
     sortType = conf.getString("MCR.XMLSortType", "OutOfFunction");
@@ -143,11 +147,11 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
     if (view == null) view="";
     else view=view.toLowerCase();
 
-    System.out.println("MCRQueryServlet : mode = "+mode);
-    System.out.println("MCRQueryServlet : type = "+type);
-    System.out.println("MCRQueryServlet : hosts = "+host);
-    System.out.println("MCRQueryServlet : lang = "+lang);
-    System.out.println("MCRQueryServlet : query = "+query);
+    logger.info("MCRQueryServlet : mode = "+mode);
+    logger.info("MCRQueryServlet : type = "+type);
+    logger.info("MCRQueryServlet : hosts = "+host);
+    logger.info("MCRQueryServlet : lang = "+lang);
+    logger.info("MCRQueryServlet : query = "+query);
 
 	if (type.equals(sortType)){
 		status = (request.getParameter( "status")!=null) ? Integer.parseInt(request.getParameter( "status")) : 0;
@@ -155,9 +159,9 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
 		if (att_status!=null) { status = Integer.parseInt(att_status); }
 		boolean successor = ((status % 2) == 1) ? true : false;
 		boolean predecessor   = (((status>>1) % 2) == 1) ? true : false;
-		System.out.println("MCRQueryServlet : status = "+status);
-		System.out.println("MCRQueryServlet : predecessor = "+predecessor);
-		System.out.println("MCRQueryServlet : successor = "+successor);
+		logger.info("MCRQueryServlet : status = "+status);
+		logger.info("MCRQueryServlet : predecessor = "+predecessor);
+		logger.info("MCRQueryServlet : successor = "+successor);
 	}
 
     // query for classifications
@@ -199,8 +203,8 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
           }
         }
       catch( Exception ex ) {
-        System.out.println( ex.getClass().getName() );
-        System.out.println( ex ); 
+        logger.fatal( ex.getClass().getName() );
+        logger.fatal( ex.getMessage(), ex ); 
         }
       return;
       }
@@ -226,23 +230,23 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
           type = (String)            session.getAttribute( "CachedType" );
         }
         else
-          System.out.println("session for getAttribute is null");
+          logger.warn("session for getAttribute is null");
         if (jdom == null)
-          System.out.println("jdom could not be retrieved from session cache");
+          logger.warn("jdom could not be retrieved from session cache");
         if (type == null)
-          System.out.println("type could not be retrieved from session cache");
+          logger.warn("type could not be retrieved from session cache");
       }
       catch (Exception exc)
       {
-        System.out.println(exc.getClass().getName());
-        System.out.println(exc);
+        logger.fatal(exc.getClass().getName());
+        logger.fatal(exc.getMessage(), exc);
       }
     }
 
     // prepare the stylesheet name
     Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
     String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
-    System.out.println("Style = "+style);
+    logger.info("Style = "+style);
 
     if (! cachedFlag)
     {
@@ -269,7 +273,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
           session.setAttribute( "CachedType", type );
         }
         else
-          System.out.println("session for setAttribute is null");
+          logger.warn("session for setAttribute is null");
       }
       else
       	jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
@@ -296,7 +300,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
     		request.setAttribute("lang",lang);
     		request.setAttribute("query",query);
     		request.setAttribute("view","done");
-    		System.out.println("MCRQueryServlet: sending to myself:" +
+    		logger.info("MCRQueryServlet: sending to myself:" +
     		   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
     		   "&lang="+lang+"&query="+query );
     		doGet(request,response);
@@ -319,8 +323,8 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
         	}
       	}
     	catch( Exception ex ) {
-      		System.out.println( ex.getClass().getName() );
-      		System.out.println( ex );
+      		logger.fatal( ex.getClass().getName() );
+      		logger.fatal( ex.getMessage(), ex );
     	}
 	}
   }
@@ -354,7 +358,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
   private String getBrowseElementID(org.jdom.Document jdom, String ref, boolean next)
   	      throws ServletException, IOException{
   	org.jdom.Document tempDoc = (org.jdom.Document)jdom.clone();
-    System.out.println("MCRQueryServlet: getBrowseElementID() got: "+ref);
+    logger.info("MCRQueryServlet: getBrowseElementID() got: "+ref);
 	StringTokenizer refGet = new StringTokenizer(ref,"@");
 	if (refGet.countTokens() < 2)
 		throw new ServletException("MCRQueryServlet: Sorry \"ref\" has not 2 Tokens: "+ref);
@@ -390,7 +394,7 @@ private static final String MCRStdSorter="org.mycore.common.xml.MCRXMLSorter";
 	host=search.getAttributeValue("host");
 	String result=new StringBuffer().append(status).append('@').append(id)
 	.append('@').append(host).toString();
-	System.out.println("MCRQueryServlet: getBrowseElementID() returns: "+result);
+	logger.info("MCRQueryServlet: getBrowseElementID() returns: "+result);
   	return result;
   }
   private MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang){

@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 /**
  * This Class uses XPath expressions for sorting the MCRResult list
@@ -36,6 +37,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	                     stylesheet;
 	private MCRXMLContainer finalCont;
 	private Object[] fContCont;
+	private static Logger logger=Logger.getLogger(MCRXMLSorter.class);
 	
 	public MCRXMLSorter (MCRXMLContainer XMLCont){
 		this.ObjectPool=new ArrayList();
@@ -74,7 +76,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 		finally {
 			if (StrSortKey==null) return null;
 		}
-		System.out.println("MCRXMLSorter: adding sort key: "+StrSortKey+ (order? " ascending":" descending"));
+		logger.info("MCRXMLSorter: adding sort key: "+StrSortKey+ (order? " ascending":" descending"));
 		sortKeys.add(StrSortKey);
 		orderList.add(new Boolean(order));
 		return this;
@@ -136,13 +138,13 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 	public Object[] sort(boolean reversed) throws MCRException {
 		if (ObjectPool.size()==0){
 			//throw new MCRException("ObjectPool is empty!\n What should I sort?");
-			System.err.println("MCRXMLSorter: ObjectPool is empty!\n What should I sort?");
+			logger.warn("MCRXMLSorter: ObjectPool is empty!\n What should I sort?");
 			return ObjectPool.toArray();
 		}
 		if ((orderList.size()==0) || (sortKeys.size()==0)){
 			//throw new MCRException("List of sorting keys is empty!\n How should I sort?");
 			//maybe the list should returned unsorted here?
-			System.err.println("MCRXMLSorter: List of sorting keys is empty!\n How should I sort?");
+			logger.warn("MCRXMLSorter: List of sorting keys is empty!\n How should I sort?");
 			return ObjectPool.toArray();
 		}
 		if (orderList.size()!=sortKeys.size())
@@ -165,12 +167,12 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 			}
 			buildSortingStylesheet();
 			try{
-				System.out.print("MCRXMLSorter: sorting jdom...");
+				logger.info("MCRXMLSorter: sorting jdom...");
 				Document jdom = transform(tempCont.exportAllToDocument());
-				System.out.println("\t done!");
-				System.out.print("MCRXMLSorter: building MCRXMLContainer...");
+				logger.info("\t done!");
+				logger.info("MCRXMLSorter: building MCRXMLContainer...");
 				finalCont.importElements(jdom);
-				System.out.println("\t done!");
+				logger.info("\t done!");
 				sorted=true;
 				reverse_sorted=reversed;
 				// finalCont.debug(); //checked

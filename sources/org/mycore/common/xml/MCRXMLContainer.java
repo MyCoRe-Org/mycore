@@ -32,6 +32,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.common.MCRSortable;
+import org.apache.log4j.Logger;
 
 /**
  * This class is the cache of one result list included all XML files
@@ -54,6 +55,7 @@ private ArrayList rank;
 private ArrayList xml;
 private ArrayList status;
 private String default_encoding;
+private static Logger logger=Logger.getLogger(MCRXMLContainer.class);
 
 /** The tag for the result collection **/
 public static final String TAG_RESULTS = "mcr_results";
@@ -398,8 +400,7 @@ private static String ERRORTEXT =
  * @exception org.jdom.JDOMException cant read the byte array as XML
  **/
 public final synchronized void importElements(byte [] in) 
-  throws MCRException, org.jdom.JDOMException
-  {
+  throws MCRException, org.jdom.JDOMException{
   ByteArrayInputStream bin = new ByteArrayInputStream(in);
   org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
   org.jdom.Document jdom = builder.build(bin);
@@ -474,16 +475,15 @@ public final synchronized void importElements(MCRXMLContainer in)
  **/
 public final void debug() throws IOException
   { 
-  System.out.println("Debug of MCRXMLContainer");
-  System.out.println("============================");
-  System.out.println("Size = "+size()); 
-  System.out.println(new String(exportAllToByteArray())); 
+  logger.debug("Debug of MCRXMLContainer");
+  logger.debug("============================");
+  logger.debug("Size = "+size()); 
+  logger.debug(new String(exportAllToByteArray())); 
   }
 
 private final void resetStatus()
   {
     if (size() != status.size()){
-      System.out.print("MCRXMLContainer: refreshing status :");
       int in_status=0;
 	  status.clear();
 	  for (int i=0; i < size(); i++){
@@ -492,9 +492,8 @@ private final void resetStatus()
 		  in_status=2;
 		}
 	  status.add(new Integer(in_status));
-	  System.out.print(" "+in_status);
+	  logger.info("MCRXMLContainer: refreshing status : "+in_status);
 	  }
-	  System.out.print("\n");
   	}
   }
 
