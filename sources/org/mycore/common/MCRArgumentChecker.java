@@ -87,4 +87,14 @@ public abstract class MCRArgumentChecker
     ensureNotNull( s, argumentName );
     ensureIsTrue( s.trim().length() > 0, argumentName + " is an empty String" );
   }
+  
+ /** 
+  * Ensures that a given numeric value is not negative.
+  *
+  * @param value the value that must not be negative
+  * @param argumentName the name of the number argument
+  * @throws MCRUsageException if value is negative
+  */    
+  public static void ensureNotNegative( double value, String argumentName )
+  { ensureIsTrue( value >= 0, argumentName + " is negative" ); }
 }
