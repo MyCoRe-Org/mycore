@@ -78,9 +78,17 @@
     </javac>
   </target>
 
-  <target name="compile">
+  <target name="compile" depends="compile_all_cm7" />
+
+  <target name="compile_all_cm7">
     <antcall target="javac">
       <param name="packages" value="mycore/common/**,mycore/cm7/**,mycore/datamodel/**,mycore/nbn/**,mycore/xml/**,mycore/classifications/**,mycore/commandline/**,mycore/communication/**,mycore/ifs/**,mycore/sql/**,mycore/user/**" />
+    </antcall>
+  </target>
+  
+  <target name="compile_all_cm8">
+    <antcall target="javac">
+      <param name="packages" value="mycore/common/**,mycore/cm8/**,mycore/datamodel/**,mycore/nbn/**,mycore/xml/**,mycore/classifications/**,mycore/commandline/**,mycore/communication/**,mycore/ifs/**,mycore/sql/**,mycore/user/**" />
     </antcall>
   </target>
   
