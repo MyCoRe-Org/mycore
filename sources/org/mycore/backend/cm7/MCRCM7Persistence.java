@@ -449,6 +449,30 @@ private final MCRCM7Item getItem(String id, String indexclass,
   return new MCRCM7Item(sb.toString(),mcr_index_class,connection );
   }
 
+private static int lastID = 1;
+
+/**
+ * This methode return the next free number for a given MCRObjectId
+ * base.
+ * 
+ * @param project_id   the project ID
+ * @param type_id      the type ID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ * @return the number a string
+ **/
+public String getNextFreeId(String project_id, String type_id) 
+  throws MCRPersistenceException
+  { return getNextFreeIdInt(project_id,type_id); }
+
+/**
+ * This is the internal methode for getNextFreeId(...).
+ **/
+private static synchronized String getNextFreeIdInt(String project_id, 
+  String type_id) throws MCRPersistenceException
+  {
+  return Integer.toString(lastID);
+  }
+
 /**
  * This methode let a system command run.
  *

@@ -111,5 +111,17 @@ public void update(MCRObjectID mcr_id, String mcr_label,
   MCRObjectService mcr_service, String xml, String ts) 
   throws MCRConfigurationException, MCRPersistenceException;
 
+/**
+ * This methode return the next free number for a given MCRObjectId
+ * base.
+ *
+ * @param project_id   the project ID
+ * @param type_id      the type ID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ * @return the number a string
+ **/
+public String getNextFreeId  (String project_id, String type_id) 
+  throws MCRPersistenceException;
+
 }
 

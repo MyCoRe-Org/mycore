@@ -316,7 +316,7 @@ public final String createXML() throws MCRException
   sb.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\"")
     .append(NL);
   sb.append("xsi:noNamespaceSchemaLocation=\"../schema/")
-    .append(mcr_id.getSchema()).append(".xsd\"").append(NL);
+    .append(mcr_id.getBase()).append(".xsd\"").append(NL);
   sb.append("ID=\"").append(mcr_id.getId()).append("\" ").append(NL);
   sb.append("label=\"").append(mcr_label).append("\">").append(NL);
   sb.append(mcr_struct.createXML());

@@ -37,8 +37,14 @@ import mycore.datamodel.*;
  * <p>
  * 
  * The follwing actions you can do:
- * - load an object to the datastore
- * - delete an object from the datastore
+ * <ul>
+ * <li> load an object to the datastore
+ * <li> delete an object from the datastore
+ * <li> show an object from the datastore
+ * <li> update an object in the datastore
+ * <li> query to objects in the datastore
+ * <li> getid to get the next MCRObjectId
+ * </ul>
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -55,11 +61,14 @@ private static String SLASH = new String((System.getProperties())
  * @param args   the argument string from the command line.
  * 
  * Call:
- * to load   - java MCRCommandTool load [dir|file]
- * to delete - java MCRCommandTool delete object_id
- * to show   - java MCRCommandTool show object_id
- * to update - java MCRCommandTool load [dir|file]
- * to query  - java MCRCommandTool query type query
+ * <ul>
+ * <li> to load   - java MCRCommandTool load [dir|file]
+ * <li> to delete - java MCRCommandTool delete object_id
+ * <li> to show   - java MCRCommandTool show object_id
+ * <li> to update - java MCRCommandTool load [dir|file]
+ * <li> to query  - java MCRCommandTool query type query
+ * <li> to getid  - java MCRCommandTool getid MCRObjectId.Base()
+ * </ul>
  **/
 public static void main(String[] args)
   {
@@ -85,12 +94,14 @@ public static void main(String[] args)
   if (args[0].equals("show")) { todo = 3; }
   if (args[0].equals("update")) { todo = 4; }
   if (args[0].equals("query")) { todo = 5; }
+  if (args[0].equals("getid")) { todo = 6; }
   switch(todo) {
     case 1: delete(args); break;
     case 2: load(args); break;
     case 3: show(args); break;
     case 4: update(args); break;
     case 5: query(args); break;
+    case 6: getid(args); break;
     default : usage(); System.exit(1);
     }
   System.out.println("Ready.");
@@ -114,6 +125,8 @@ private static final void usage()
     ("        java MCRCommandTool update [dir|file]");
   System.out.println
     ("        java MCRCommandTool query type query");
+  System.out.println
+    ("        java MCRCommandTool getid base_id");
   System.out.println(); 
   }
 
@@ -336,5 +349,17 @@ private static final void query(String[] args)
     System.out.println("Query for "+args[1]+" ignored.\n"); System.exit(1); }
   }
 
+/**
+ * This methode shows a list of next MCRObjectID's.
+ * 
+ * @param args   the argument stack from the command line
+ **/
+private static final void getid(String[] args)
+  { 
+  String base_id = args[1];
+  MCRObjectID mcr_id = new MCRObjectID();
+  mcr_id.setNextId(base_id);
+  mcr_id.debug();
+  }
 }
 
