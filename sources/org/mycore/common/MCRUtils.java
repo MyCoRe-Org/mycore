@@ -26,6 +26,8 @@ package mycore.common;
 
 import java.util.*;
 import java.text.*;
+import mycore.common.MCRArgumentChecker;
+
 /**
  * This class represent a general set of external methods to support
  * the programming API.
@@ -38,13 +40,14 @@ public class MCRUtils
 // common data
 private static DateFormat DE_DF =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
-private static DateFormat EN_DF =
+private static DateFormat UK_DF =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
 private static DateFormat US_DF =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.US);
 
 /**
- * This method check the language string to the supported language.
+ * This method check the language string base on RFC 1766 to the supported
+ * languages in mycore.
  *
  * @param lang          the language string
  * @return trye if the language was supported, otherwise false
@@ -53,10 +56,11 @@ public static final boolean isSupportedLang(String lang)
   { 
   if ((lang == null) || ((lang = lang.trim()).length() ==0)) {
     return false; }
-  lang = lang.trim().toUpperCase();
-  if (lang.equals("DE")) return true;
-  if (lang.equals("EN")) return true;
-  if (lang.equals("US")) return true;
+  lang = lang.trim().toLowerCase();
+  if (lang.equals("de")) return true;
+  if (lang.equals("en")) return true;
+  if (lang.equals("en_uk")) return true;
+  if (lang.equals("en_us")) return true;
   return false;
   }
 
@@ -68,11 +72,12 @@ public static final boolean isSupportedLang(String lang)
  **/
 public static final DateFormat getDateFormat(String lang)
   {
-  lang = lang.trim().toUpperCase();
+  lang = lang.trim().toLowerCase();
   if (!isSupportedLang(lang)) { return null; }
-  if (lang.equals("DE")) return DE_DF;
-  if (lang.equals("EN")) return EN_DF;
-  if (lang.equals("US")) return US_DF;
+  if (lang.equals("de")) return DE_DF;
+  if (lang.equals("en")) return US_DF;
+  if (lang.equals("en_uk")) return UK_DF;
+  if (lang.equals("en_us")) return US_DF;
   return null;
   }
          
@@ -102,7 +107,7 @@ public static final boolean isDateInDe(String date)
  * @param date          the date string
  * @return true if the pattern is correct, otherwise false
  **/
-public static final boolean isDateInEn(String date)
+public static final boolean isDateInEn_UK(String date)
   {
   if ((date == null) || ((date = date.trim()).length() ==0)) {
     return false; }
@@ -110,7 +115,7 @@ public static final boolean isDateInEn(String date)
   if (date.length()!=10) { return false; }
   try {
     GregorianCalendar newdate = new GregorianCalendar();
-    newdate.setTime(EN_DF.parse(date)); }
+    newdate.setTime(UK_DF.parse(date)); }
   catch (ParseException e) {
     return false; }
   return true;
@@ -122,7 +127,7 @@ public static final boolean isDateInEn(String date)
  * @param date          the date string
  * @return true if the pattern is correct, otherwise false
  **/
-public static final boolean isDateInUs(String date)
+public static final boolean isDateInEn_US(String date)
   {
   if ((date == null) || ((date = date.trim()).length() ==0)) {
     return false; }
