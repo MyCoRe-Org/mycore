@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.14 $ $Date: 2003/01/30 11:20:25 $
+ * $Revision: 1.15 $ $Date: 2003/01/30 13:32:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.14 $ $Date: 2003/01/30 11:20:25 $
+ * @version $Revision: 1.15 $ $Date: 2003/01/30 13:32:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -471,6 +471,48 @@ public class MCROAIDataProvider extends HttpServlet {
     }
     
 	/**
+	 * Method listToResumptionToken. Add the elements in the list to a resumption token file.
+	 * @param list a list of Element's(!)
+	 */
+    private void listToResumptionToken(List list) {
+	    MCRConfiguration config = MCRConfiguration.instance();
+	    List tokenElements = new ArrayList(list);
+	    
+	    if (tokenElements.size() > 0) {
+	    	// a resumption token file has to be written
+		    Date tmpDate = new Date();
+		   	long fileId = tmpDate.getTime();
+		    int docs = tokenElements.size();
+
+			try {
+			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
+				String fileName = fileId + "x0x" + docs;
+		
+ 				FileOutputStream fos = new FileOutputStream(resumptionTokenDir + 
+   	                fileName + STR_RESUMPTIONTOKEN_SUFFIX);
+			 	ObjectOutputStream oos = new ObjectOutputStream(fos);
+				 	
+			 	ListIterator tokenElementsIterator = tokenElements.listIterator();
+				 	
+			 	while (tokenElementsIterator.hasNext()) {
+			 		Element element = (Element) tokenElementsIterator.next();
+				 		
+				    oos.writeObject(element);
+			 	}
+				
+				oos.close();
+				fos.close(); 	
+			} catch (MCRConfigurationException mcrcx) {
+				logger.error("Resumption Token Directory not configured.");
+				logger.error("The result list was only partially returned.");
+	    	} catch (IOException e) { 
+	            logger.error(e.getMessage());
+				logger.error("The result list was only partially returned.");
+			}					
+    	}
+    }
+    
+	/**
 	 * Method identify. Implementation of the OAI Verb Identify.
 	 * @param request
 	 * @param header
@@ -700,11 +742,44 @@ public class MCROAIDataProvider extends HttpServlet {
 				//do nothing, just let maxreturns be 0
 			}
 	    	
+	    	int elementCounter = 0;
+	    	
+	    	List tokenElements = new ArrayList();
+	    	
 	    	while (iterator.hasNext()) {
-	    		String[] set = (String[]) (iterator.next());
+	    		elementCounter++;
+	    		String[] set = (String[]) iterator.next();
+	    		
+	            Element eSet = new Element("set", ns);
+    	        eSet.addContent(newElementWithContent("setSpec", ns, set[0]));
+            	eSet.addContent(newElementWithContent("setName", ns, set[1]));
+	            if ((set[2] != null) && (set[2].length() > 0)) {
+	                Namespace oaidc = Namespace.getNamespace("oai_dc", STR_DC_NAMESPACE);
+    	            Element eDC = new Element("dc", oaidc);
+        	        Namespace dc = Namespace.getNamespace("dc", "http://purl.org/dc/elements/1.1/");
+            	    Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
+    	            eDC.addNamespaceDeclaration(dc);
+	                eDC.addNamespaceDeclaration(xsi);
+        	        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "oai_dc/ "  
+        	        	+ STR_OAI_NAMESPACE + "oai_dc.xsd", xsi);
+	                Element eDescription = new Element("description", dc);
+                	eDescription.addContent(categoryDescription);
+            	    eDC.addContent(eDescription);
+        	        eSet.addContent(eDC);
+    	        }
+            
+            	if ((maxreturns == 0) || (elementCounter <= maxReturns)) {
+		            eListSets.addContent(eSet);
+            	} else {
+            		tokenElements.add(eSet);
+            	}
 	    	}
+	    	
+	    	listToResumptionToken(tokenElements);
+	    	
+	    	eRoot.addContent(eListSets);
 	    }
-        
+
         return document;
     }
 
