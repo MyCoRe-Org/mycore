@@ -62,9 +62,8 @@ public class MCRLayoutServlet extends HttpServlet
     
     // Create caches
     stylesheetCache = new MCRCache( 50 );
+    staticFileCache = new MCRCache( 50 );
   }
-
-
 
  /**
   * Reads the input XML from a file or from the invoking servlet,
@@ -172,17 +171,29 @@ public class MCRLayoutServlet extends HttpServlet
       throw new MCRException( msg );
     }
 
-    String realPath = getServletContext().getRealPath( requestedPath );
-    String documentBaseURL = new File( realPath ).getParent() + File.separator;
+    String path = getServletContext().getRealPath( requestedPath );
+    File   file = new File( path );
+    long   time = file.lastModified();
 
+    String documentBaseURL = file.getParent() + File.separator;
     parameters.put( "DocumentBaseURL", documentBaseURL );
-    
-    try{ return new org.jdom.input.SAXBuilder().build( url ); }
-    catch( Exception exc )
+
+    org.jdom.Document input = (org.jdom.Document)
+      ( staticFileCache.getIfUpToDate( path, time ) );
+   
+    if( input == null )
     {
-      String msg = "LayoutServlet could not parse XML input from " + realPath;
-      throw new MCRException( msg, exc );
+      try{ input = new org.jdom.input.SAXBuilder().build( url ); }
+      catch( Exception exc )
+      {
+        String msg = "LayoutServlet could not parse XML input from " + path;
+        throw new MCRException( msg, exc );
+      }
+
+      staticFileCache.put( path, input );
     }
+
+    return input;
   }
   
   protected Properties buildXSLParameters( HttpServletRequest request )
@@ -237,7 +248,7 @@ public class MCRLayoutServlet extends HttpServlet
     String servletsBaseURL = applicationBaseURL + "servlets/";
 
     String defaultLang = MCRConfiguration.instance()
-      .getString("MCR.metadata_default_lang","en");
+      .getString( "MCR.metadata_default_lang", "en" );
 
     parameters.put( "CurrentUser",           user               );
     parameters.put( "RequestURL",            requestURL         );
@@ -323,28 +334,13 @@ public class MCRLayoutServlet extends HttpServlet
     return file;
   }
   
-  class MCRLayoutCacheEntry
-  {
-    Object value;
-    long   lastModified;
-  }
-  
   protected Templates getCompiledStylesheet( TransformerFactory factory,
                                              File file )
   {
     String path = file.getPath();
     long   time = file.lastModified();
     
-    Templates stylesheet = null;
-    
-    MCRLayoutCacheEntry entry = (MCRLayoutCacheEntry)( stylesheetCache.get( path ) );
-    if( entry != null )
-    {
-      if( time > entry.lastModified )
-        stylesheetCache.remove( path );
-      else
-        stylesheet = (Templates)( entry.value );
-    }
+    Templates stylesheet = (Templates)( stylesheetCache.getIfUpToDate( path, time ) );
     
     if( stylesheet == null )
     {
@@ -356,10 +352,7 @@ public class MCRLayoutServlet extends HttpServlet
         throw new MCRConfigurationException( msg, exc );
       }
       
-      entry = new MCRLayoutCacheEntry();
-      entry.value = stylesheet;
-      entry.lastModified = time;
-      stylesheetCache.put( path, entry );
+      stylesheetCache.put( path, stylesheet );
     }
     
     return stylesheet;
