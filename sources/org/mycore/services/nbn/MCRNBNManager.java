@@ -132,4 +132,11 @@ public interface MCRNBNManager
 	 **/
 	public void setDocumentId(MCRNBN urn, String documentId);
 	
+	/**
+	 * Finds the urn for a given document id
+	 * @param documentId the document id
+	 * @return the nbn or null
+	 */
+	public MCRNBN getNBNByDocumentId(String documentId);
+	
 }
