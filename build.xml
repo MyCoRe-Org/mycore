@@ -1,0 +1,159 @@
+<!-- build.xml - build file for the MyCoRe API -->
+
+<project default="usage" basedir=".">
+
+  <!-- =================================================================== -->
+  <!-- Constant values                                                     -->
+  <!-- =================================================================== -->
+
+  <!-- general -->
+  <property name="Name" value="MyCoRe"/>
+  <property name="name" value="mycore"/>
+  <property name="version" value="1.0"/>
+
+  <!-- compiler -->
+  <property name="build.compiler" value="classic"/>
+  <property name="debug" value="on"/>
+  <property name="optimize" value="on"/>
+  <property name="deprecation" value="on"/>
+    
+  <!-- file system -->
+  <property name="mycore.source" value="./sources"/>
+  <property name="mycore.source.common" value="./sources/mycore/common"/>
+  <property name="mycore.source.datamodel" value="./sources/mycore/datamodel"/>
+  <property name="mycore.source.cm7" value="./sources/mycore/cm7"/>
+  <property name="mycore.source.command" value="./sources/mycore/commandline"/>
+  <property name="mycore.class" value="./classes"/>
+  <property name="mycore.javadoc" value="./javadocs"/>
+  <property name="demo_dc.source" value="./demo_dublin_core/sources"/>
+  <property name="demo_dc.class" value="./demo_dublin_core/classes"/>
+  <property name="demo_dc.javadoc" value="./demo_dublin_core/javadocs"/>
+    
+  <!-- =================================================================== -->
+  <!-- Help on usage                                                       -->
+  <!-- =================================================================== -->
+  <target name="usage">
+    <echo message=""/>
+    <echo message="----------- ${Name} ${version} ------------"/>
+    <echo message=""/>
+    <echo message="${Name} build file"/>
+    <echo message="-------------------------------------------------------------"/>
+    <echo message=""/>
+    <echo message=" available targets are:"/>
+    <echo message=""/>
+    <echo message="   package  --> generates the classes and docs (default)"/>
+    <echo message="   compile  --> compiles the source code"/>
+    <echo message="   javadoc  --> generates the API documentation"/>
+    <echo message="   clean    --> cleans up the directory"/>
+    <echo message=""/>
+    <echo message=" See the comments inside the build.xml file for more details."/>
+    <echo message="-------------------------------------------------------------"/>
+    <echo message=""/>
+    <echo message=""/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the class package                                           -->
+  <!-- =================================================================== -->
+  <target name="package" depends="compile,javadoc">
+  </target>
+  
+  <!-- =================================================================== -->
+  <!-- Compiles all source directory                                       -->
+  <!-- =================================================================== -->
+  <target name="compile" depends="compile_common,compile_datamodel,compile_cm7,compile_commandline,compile_demo_dublin_core">
+  </target>
+  
+  <target name="compile_common">
+    <!-- compiles the common source classes -->
+    <javac srcdir="${mycore.source.common}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_cm7">
+    <!-- compiles the Content Manager 7 source classes -->
+    <javac srcdir="${mycore.source.cm7}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_datamodel">
+    <!-- compiles the datamodel source classes -->
+    <javac srcdir="${mycore.source.datamodel}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_commandline">
+    <!-- compiles the commandline tool source classes -->
+    <javac srcdir="${mycore.source.command}"
+           destdir="${mycore.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <target name="compile_demo_dublin_core">
+    <!-- compiles the demo for Dublin Core source classes -->
+    <javac srcdir="${demo_dc.source}"
+           destdir="${demo_dc.class}"
+           debug="${debug}"
+           optimize="${optimize}">
+    </javac>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Create the JavaDoc for all source trees                             -->
+  <!-- =================================================================== -->
+  <target name="javadoc">
+    <!-- create the common java documentation -->
+    <javadoc packagenames="mycore.*"
+           sourcepath="${mycore.source}"
+           destdir="${mycore.javadoc}"
+           Verbose="true"
+           Package="true"
+           Version="true"
+           Author="true"
+           doctitle="MyCoRe"
+           >
+      <group title="MyCoRe Common" packages="mycore.common.*"/>
+      <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
+      <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
+    </javadoc>
+    <!-- create the project java documentation -->
+    <javadoc packagenames="demo_dublin_core.*"
+           sourcepath="${demo_dc.source}"
+           destdir="${demo_dc.javadoc}"
+           Package="true"
+           Version="true"
+           Author="true"
+           doctitle="MyCoRe"
+           >
+      <group title="MyCoRe Common" packages="demo_dublin_core.*"/>
+    </javadoc>
+    <!-- copy to the web Server -->
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the class package                                           -->
+  <!-- =================================================================== -->
+  <target name="clean">
+    <delete includeEmptyDirs="true" >
+      <fileset dir="${mycore.javadoc}" />
+      <fileset dir="${mycore.class}" />
+      <fileset dir="${demo_dc.javadoc}" />
+      <fileset dir="${demo_dc.class}" />
+    </delete>
+  </target>
+
+</project>
+
+<!-- End of file -->
+
