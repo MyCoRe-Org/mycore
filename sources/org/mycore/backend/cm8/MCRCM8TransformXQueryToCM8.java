@@ -33,101 +33,82 @@ import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.MCRUtils;
+import org.mycore.services.query.MCRQueryInterface;
+import org.mycore.services.query.MCRQueryBase;
 
 /**
- * This is the tranformer implementation for CM 8 from XQuery language
- * to the CM Search Engine language (this is XQuery like).
+ * This is the tranformer implementation for CM 8 from XPath language
+ * to the CM Search Engine language (this is XPath like).
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRCM8TransformXQueryToCM8 implements MCRQueryInterface,
+public class MCRCM8TransformXQueryToCM8 extends MCRQueryBase implements
   DKConstantICM 
 {
-// common data
-protected static String NL =
-  new String((System.getProperties()).getProperty("line.separator"));
-// defaults
-private final int MAX_RESULTS = 1000;
 // private data
-private MCRConfiguration conf = null;
-private int maxres = 0;
-private Logger logger = null;
-
 protected static String ROOT_TAG = "/mycoreobject";
+public static final String DEFAULT_QUERY = "/mycoreobject[]";
 
 /**
  * The constructor.
  **/
 public MCRCM8TransformXQueryToCM8()
-  { 
-  conf = MCRConfiguration.instance();
-  maxres = conf.getInt("MCR.query_max_results",MAX_RESULTS);
-  logger = MCRCM8ConnectionPool.getLogger();
-  }
+  { super(); }
 
 /**
- * This method parse the XQuery string and return the result as
- * MCRXMLContainer. If the type is null or empty or maxresults
- * is lower 1 an empty list was returned.
+ * This method start the Query over one object type and return the
+ * result as MCRXMLContainer.
  *
- * @param query                 the XQuery string
- * @param maxresults            the maximum of results
  * @param type                  the MCRObject type
  * @return                      a result list as MCRXMLContainer
  **/
-public final MCRXMLContainer getResultList(String query, String type, 
-  int maxresults) 
+public final MCRXMLContainer startQuery(String type) 
   {
-  // check the parameter
   MCRXMLContainer result = new MCRXMLContainer();
-  if ((type == null) || ((type = type.trim()).length() ==0)) {
-    return result; }
-  if ((maxresults < 1) || (maxresults > maxres)) {
-    return result; }
   // read prefix from configuration
   String sb = new String("MCR.persistence_cm8_"+type.toLowerCase());
-  String itemtypename = conf.getString(sb); 
-  String itemtypeprefix = conf.getString(sb+"_prefix");
-  // prepare query
-  logger.debug("Incomming query = "+query);
-  int startpos = 0;
-  int stoppos = query.length();
-  int operpos = -1;
-  String onecond = "";
-  StringBuffer cond = new StringBuffer("/mycoreobject[");
-  while (startpos<stoppos) {
-    onecond = getNextCondition(startpos,stoppos,query);
-    logger.debug("Next cond = "+onecond);
-    startpos += onecond.length();
-    int klammerauf = onecond.indexOf('[');
-    int klammerzu = onecond.indexOf(']');
-    if ((klammerauf == -1) || (klammerzu == -1)) { break; }
-    cond.append(onecond.substring(klammerauf+1,klammerzu));
-    if (startpos<stoppos) {
-      operpos = query.toLowerCase().indexOf(" and ",startpos);
-      if (operpos != -1) {
-        startpos = operpos+5;
-        cond.append(' ').append(query.substring(operpos,startpos)).append(' ');
-        continue;
-        }
-      operpos = query.toLowerCase().indexOf(" or ",startpos);
-      if (operpos != -1) {
-        startpos = operpos+4;
-        cond.append(' ').append(query.substring(operpos,startpos)).append(' ');
-        continue;
-        }
+  String itemtypename = config.getString(sb); 
+  String itemtypeprefix = config.getString(sb+"_prefix");
+
+  // Search in the text document
+  String tsquery = "";
+  for (int i=0;i<subqueries.size();i++) {
+    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
+      tsquery = (String)subqueries.get(i);
+      flags.set(i,Boolean.TRUE);
       }
     }
-  cond.append(']');
+
+  // Search in the metadata
+  // Select the query strings
+  StringBuffer cond = new StringBuffer(1024);
+  if (subqueries.size() == 0) { 
+     cond.append(DEFAULT_QUERY); }
+  else {
+    cond.append("/mycoreobject[");
+    for (int i=0;i<subqueries.size();i++) {
+      if (((Boolean)flags.get(i)).booleanValue()) continue;
+      String subquery = (String)subqueries.get(i);
+      subquery = MCRUtils.replaceString(subquery,"/mycoreobject["," ");
+      subquery = MCRUtils.replaceString(subquery, "/mycorederivate["," ");
+      subquery = MCRUtils.replaceString(subquery, "]"," ");
+      cond.append(' ').append(subquery).append(' ')
+        .append((String)andor.get(i));
+      flags.set(i,Boolean.TRUE);
+      }
+    cond.append(']');
+    }
   logger.debug("First transformation "+cond.toString());
+  // transform the query
+  String query = "";
   if (cond.toString().equals("/mycoreobject[]")) { 
     query = ""; }
   else {
-    query = traceOneCondition(cond.toString(),itemtypename,itemtypeprefix); }
+    query = traceOneCondition(cond.toString().trim(),itemtypename,
+      itemtypeprefix); }
   if (query.length()==0) { query = "/"+itemtypename; }
   logger.debug("Transformed query "+query);
   // Start the search
@@ -165,28 +146,6 @@ public final MCRXMLContainer getResultList(String query, String type,
   finally {
     MCRCM8ConnectionPool.instance().releaseConnection(connection); }
   return result;
-  }
-
-/**
- * This private method get the next condition of the query string.
- *
- * @param startpos   the first character position
- * @param stoppos    the last character position
- * @param query      the query string
- * @return the separated condition
- **/
-private final String getNextCondition(int startpos,int stoppos,String query)
-  {
-  int numopen = 0;
-  int numclose = 0;
-  StringBuffer sb = new StringBuffer(128);
-  for (int i=startpos;i<stoppos;i++) {
-    sb.append(query.charAt(i));
-    if (query.charAt(i)=='[') { numopen++; }
-    if (query.charAt(i)==']') { numclose++; }
-    if ((numopen==1)&&(numclose==1)) { break; }
-    }
-  return sb.toString();
   }
 
 /**
@@ -329,6 +288,7 @@ private final String traceOneCondition(String cond, String itemtypename,
         tag[i].substring(x+7,tag[i].length());
       }
     if (op[i].equals("contains")) {
+      value[i] = value[i].replace('*','%');  
       StringTokenizer st = new StringTokenizer(value[i]);
       int stcount = st.countTokens();
       while (st.hasMoreTokens()) {
@@ -343,6 +303,7 @@ private final String traceOneCondition(String cond, String itemtypename,
           }
         if ((stcount > 1) && (st.countTokens()>0)) { sbout.append(" and "); }
         }
+      sbout.append(bool[i]).append(' ');
       continue;
       }
     sbout.append(convPath(tag[i],itemtypeprefix));
