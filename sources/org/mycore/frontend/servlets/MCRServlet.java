@@ -173,10 +173,7 @@ public class MCRServlet extends HttpServlet
       if (lang.trim().length() != 0)
         session.setCurrentLanguage(lang.trim().toUpperCase());
 
-      if(GETorPOST == GET)
-        doGet(job);
-      else doPost(job);
-
+      if( GETorPOST == GET ) doGet( job ); else doPost( job );
     }
 
     catch(Exception ex)
@@ -190,7 +187,9 @@ public class MCRServlet extends HttpServlet
     }
 
     finally {
-      MCRSessionMgr.getCurrentSession().reset();
+      // Release current MCRSession from current Thread,
+      // in case that Thread pooling will be used by servlet engine
+      MCRSessionMgr.releaseCurrentSession();
     }
   }
 

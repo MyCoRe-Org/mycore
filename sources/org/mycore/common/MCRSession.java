@@ -63,7 +63,9 @@ public class MCRSession implements Cloneable
    **/
   public MCRSession()
   { 
-    reset(); 
+    MCRConfiguration config = MCRConfiguration.instance();
+    userID = config.getString("MCR.users_guestuser_username","gast");
+    language = "DE";
     sessionID = buildSessionID();
     sessions.put( sessionID, this );
   }
@@ -159,12 +161,5 @@ public class MCRSession implements Cloneable
     logger.debug("UserID             = "+userID);
     logger.debug("language           = "+language);
   }
-
-  /** Resets the session to the default values */
-  public final void reset()
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    userID = config.getString("MCR.users_guestuser_username","gast");
-    language = "DE";
-  }
 }
+

@@ -79,12 +79,14 @@ public class MCRSessionMgr
   }
 
   /**
-   * Resets the MyCoRe session to its default value. The method getCurrentSession() will
-   * still return the same object. One use for this method is to reset the session inside
+   * Releases the MyCoRe session from its current thread. 
+   * Subsequent calls of getCurrentSession() will return a different MCRSession object
+   * than before for the current Thread.
+   * One use for this method is to reset the session inside
    * a Thread-pooling environment like Servlet engines.
    */
-  public static void resetSession() {
-    MCRSession theSession = (MCRSession) theThreadLocalSession.get();
-    theSession.reset();
+  public static void releaseCurrentSession() {
+    theThreadLocalSession = new ThreadLocalSession();
   }
 }
+
