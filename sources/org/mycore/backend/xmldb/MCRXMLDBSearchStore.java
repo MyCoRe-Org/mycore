@@ -135,13 +135,14 @@ public final class MCRXMLDBSearchStore
 			XMLResource res =
 				(XMLResource) collection.getResource(obj.getId().getId());
 			if (res == null) {
-				throw new MCRPersistenceException(
-					"A object with ID "
+				logger.warn("A object with ID "
 						+ obj.getId().getId()
 						+ " does not exist.");
 			}
-			// delete the old item
-			delete(obj.getId());
+			else {
+				// delete the old item
+			 	delete(obj.getId());
+			}
 			// create the new item
 			res =
 				(XMLResource) collection.createResource(
