@@ -26,9 +26,11 @@ package org.mycore.common.xml;
 
 import java.io.*;
 import org.apache.xerces.parsers.DOMParser;
+import org.apache.log4j.*;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -38,220 +40,225 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
 /**
- * This class implements the MCRParserInterface to use the Xerces 1.4.x XML
- * parser, which return a DOM.
+ * Implements the MCRParserInterface using the Xerces XML to parse XML streams
+ * to a DOM document.
  *
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ *
  * @version $Revision$ $Date$
  **/
-public class MCRParserXerces implements MCRParserInterface, ErrorHandler
+public class MCRParserXerces 
+  implements MCRParserInterface, ErrorHandler, EntityResolver
 {
+  // the Xerces parser to be used
+  DOMParser parser = new DOMParser();
 
-// the Xerces parser
-DOMParser parser = new DOMParser();
+  // parser configuration flags 
+  private static boolean flagvalidation        = false;
+  private static boolean flagnamespaces        = true;
+  private static boolean flagschemasupport     = true;
+  private static boolean flagschemafullsupport = false;
+  private static boolean flagdeferreddom       = true;
 
-// data for the configuration
-private static boolean flagvalidation        = false;
-private static boolean flagnamespaces        = true;
-private static boolean flagschemasupport     = true;
-private static boolean flagschemafullsupport = false;
-private static boolean flagdeferreddom       = true;
+  private static String setvalidation          =
+    "http://xml.org/sax/features/validation";
+  private static String setnamespaces          =
+    "http://xml.org/sax/features/namespaces";
+  private static String setschemasupport       =
+    "http://apache.org/xml/features/validation/schema";
+  private static String setschemafullsupport   =
+    "http://apache.org/xml/features/validation/schema-full-checking";
+  private static String setdeferreddom         =
+    "http://apache.org/xml/features/dom/defer-node-expansion";
 
-private static String setvalidation          =
-  "http://xml.org/sax/features/validation";
-private static String setnamespaces          =
-  "http://xml.org/sax/features/namespaces";
-private static String setschemasupport       =
-  "http://apache.org/xml/features/validation/schema";
-private static String setschemafullsupport   =
-  "http://apache.org/xml/features/validation/schema-full-checking";
-private static String setdeferreddom         =
-  "http://apache.org/xml/features/dom/defer-node-expansion";
-
-private boolean parse_error = false;
-
-/**
- * Constructor for the xerces parser.
- * Here was the configuration set for the XERCES parser.
- **/
-public MCRParserXerces()
+  /**
+   * Constructor for the xerces parser. Sets default validation flag as
+   * specified by the property MCR.parser_schema_validation in mycore.properties
+   **/
+  public MCRParserXerces()
   {
-  flagvalidation = MCRConfiguration.instance()
-    .getBoolean("MCR.parser_schema_validation",flagvalidation);
-  try {
-    parser.setFeature(setnamespaces,flagnamespaces);
-    parser.setFeature(setschemasupport,flagschemasupport);
-    parser.setFeature(setschemafullsupport,flagschemafullsupport);
-    parser.setFeature(setdeferreddom,flagdeferreddom);
+    flagvalidation = MCRConfiguration.instance()
+      .getBoolean( "MCR.parser_schema_validation", flagvalidation );
+    try 
+    {
+      parser.setFeature( setnamespaces,        flagnamespaces        );
+      parser.setFeature( setschemasupport,     flagschemasupport     );
+      parser.setFeature( setschemafullsupport, flagschemafullsupport );
+      parser.setFeature( setdeferreddom,       flagdeferreddom       );
     }
-  catch (SAXNotRecognizedException e) {
-    throw new MCRException("Initialization error in XRECES parser.",e); }
-  catch (SAXNotSupportedException e) {
-    throw new MCRException("Initialization error in XRECES parser.",e); }
-  parser.setErrorHandler(this);
+    catch( SAXException ex ) 
+    { 
+      String msg = "Initialization error in Xerces parser";
+      throw new MCRConfigurationException( msg, ex ); 
+    }
+    parser.setErrorHandler  ( this );
+    parser.setEntityResolver( this );
   }
 
-/**
- * This metode parse the XML stream from an URI with XERCES parser and 
- * returns a DOM.
- * Use the validation value from mycore.properties.
- *
- * @param uri			the URI of the XML input stream
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseURI(String uri) throws MCRException
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the validation flag from mycore.properties.
+   *
+   * @param uri	the URI of the XML input stream
+   * @param validate if true, will validate against XML Schema
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public Document parseURI( String uri )
+  { return parseURI( uri, flagvalidation ); }
+
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the validation flag given.
+   *
+   * @param uri	the URI of the XML input stream
+   * @param validate if true, will validate against XML Schema
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public synchronized Document parseURI( String uri, boolean validate )
+  { return parse( new InputSource( uri ), validate ); }
+
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the validation flag from
+   * mycore.properties
+   *
+   * @param xml the XML byte stream
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public Document parseXML( String xml )
+  { return parseXML( xml, flagvalidation ); }
+
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the validation flag given.
+   *
+   * @param xml the XML byte stream
+   * @param validate if true, will validate against XML Schema
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public Document parseXML( String xml, boolean validate )
   {
-  try {
-    parser.setFeature(setvalidation,flagvalidation);
-    parser.parse(uri);
-    if (parse_error) { throw new MCRException("Error parsing: "+uri); }
-    return parser.getDocument();
-    }
-  catch (Exception e) {
-    throw new MCRException("Parse error in XERCES parser.",e); }
+    InputSource source = new InputSource( new StringReader( xml ) );
+    return parse( source, validate ); 
   }
 
-/**
- * This metode parse the XML stream from an URI with XERCES parser and 
- * returns a DOM.
- * Use the given validation flag.
- *
- * @param uri			the URI of the XML input stream
- * @param valid                 the validation flag
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseURI(String uri, boolean valid) throws MCRException
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the validation flag from
+   * mycore.properties
+   *
+   * @param xml the XML byte stream
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public Document parseXML( byte[] xml )
+  { return parseXML( xml, flagvalidation ); }
+
+  /**
+   * Parses the XML byte stream with xerces parser and 
+   * returns a DOM document. Uses the given validation flag.
+   *
+   * @param xml the XML byte stream
+   * @param validate if true, will validate against XML Schema
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  public Document parseXML( byte[] xml, boolean validate )
   {
-  try {
-    parser.setFeature(setvalidation,valid);
-    parser.parse(uri);
-    if (parse_error) { throw new MCRException(""); }
-    return parser.getDocument();
-    }
-  catch (Exception e) {
-    throw new MCRException("Parse error in XRECES parser.",e); }
+    InputSource source = new InputSource( new ByteArrayInputStream( xml ) );
+    return parse( source, validate ); 
   }
 
-/**
- * This metode parse the XML data stream with xerces parser and 
- * returns a DOM.
- * Use the validation value from mycore.properties.
- *
- * @param xml			the XML input stream
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseXML(String xml) throws MCRException
+  /**
+   * Parses the InputSource with xerces parser and 
+   * returns a DOM document. Uses the given validation flag.
+   *
+   * @param source the XML InputSource
+   * @param validate if true, will validate against XML Schema
+   * @throws MCRException if XML could not be parsed
+   * @return the parsed XML stream as a DOM document
+   **/
+  private synchronized Document parse( InputSource source, boolean validate )
   {
-  try {
-    InputSource source = new InputSource((Reader)new StringReader(xml));
-    parser.setFeature(setvalidation,flagvalidation);
-    parser.parse(source);
-    if (parse_error) { throw new MCRException(""); }
-    return parser.getDocument();
+    try
+    {
+      parser.setFeature( setvalidation, validate );
+      parser.parse( source );
+      return parser.getDocument();
     }
-  catch (Exception e) {
-    throw new MCRException("Parse error in XRECES parser.",e); }
+    catch( Exception ex ) 
+    {
+      logger.error( "Error while parsing XML document", ex );
+      throw new MCRException( "Error parsing XML document", ex );
+    }
   }
 
-/**
- * This metode parse the XML data stream with xerces parser and 
- * returns a DOM.
- * Use the given validation flag.
- *
- * @param xml			the XML input stream
- * @param valid                 the validation flag
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseXML(String xml, boolean valid) throws MCRException
-  {
-  try {
-    InputSource source = new InputSource((Reader)new StringReader(xml));
-    parser.setFeature(setvalidation,valid);
-    parser.parse(source);
-    if (parse_error) { throw new MCRException(""); }
-    return parser.getDocument();
-    }
-  catch (Exception e) {
-    throw new MCRException("Parse error in XRECES parser.",e); }
-  }
+  /** The logger */
+  private Logger logger = Logger.getLogger( MCRParserXerces.class );
 
-/**
- * This metode parse the XML data stream with xerces parser and 
- * returns a DOM.
- * Use the validation value from mycore.properties.
- *
- * @param xml			the XML input stream
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseXML(byte [] xml) throws MCRException
-  { return parseXML(new String(xml)); }
-
-/**
- * This metode parse the XML data stream with xerces parser and 
- * returns a DOM.
- * Use the given validation flag.
- *
- * @param xml			the XML input stream
- * @param valid                 the validation flag
- * @throws MCRException if XML could not be parsed
- * @return			the parsed XML straem as a DOM
- **/
-public Document parseXML(byte [] xml, boolean valid) throws MCRException
-  { return parseXML(new String(xml), valid); }
-
-/**
- * The error handler methode warning.
- **/
-public void warning(SAXParseException ex)
+  /**
+   * Handles parser warnings
+   **/
+  public void warning( SAXParseException ex )
   { 
-  System.out.println("[Warning] "+getLocationString(ex)+": "+ex.getMessage());
+    logger.warn( getSAXErrorMessage( ex ), ex );
   }
 
-/**
- * The error handler methode error.
- **/
-public void error(SAXParseException ex)
+  /**
+   * Handles fatal parse errors
+   **/
+  public void error( SAXParseException ex )
   { 
-  System.out.println("[Error] "+getLocationString(ex)+": "+ex.getMessage());
-  parse_error = true;
+    logger.error( getSAXErrorMessage( ex ), ex );
+    throw new MCRException( "Error parsing XML document", ex );
   }
 
-/**
- * The error handler methode fatal error.
- **/
-public void fatalError(SAXParseException ex)
+  /**
+   * Handles fatal parse errors
+   **/
+  public void fatalError( SAXParseException ex )
   { 
-  System.out.println("[Fatal Error] "+getLocationString(ex)+": "+
-    ex.getMessage());
-  parse_error = true;
+    logger.fatal( getSAXErrorMessage( ex ) );
+    throw new MCRException( "Error parsing XML document", ex );
   }
 
-/** 
- * This methode returns a string of the location.
- *
- * @param ex   the SAXParseException exception
- * @return the location string
- **/
-private String getLocationString(SAXParseException ex) {
-  StringBuffer str = new StringBuffer();
-  String systemId = ex.getSystemId();
-  if (systemId != null) {
-    int index = systemId.lastIndexOf('/');
-    if (index != -1) 
-      systemId = systemId.substring(index + 1);
-    str.append(systemId);
+ /** 
+  * This methode returns a string of the location.
+  *
+  * @param ex   the SAXParseException exception
+  * @return the location string
+  **/
+  private String getSAXErrorMessage( SAXParseException ex ) 
+  {
+    StringBuffer str = new StringBuffer();
+    String systemId = ex.getSystemId();
+    if (systemId != null) 
+    {
+      int index = systemId.lastIndexOf('/');
+      if( index != -1 ) 
+        systemId = systemId.substring(index + 1);
+      str.append(systemId);
     }
-  str.append(':');
-  str.append(ex.getLineNumber());
-  str.append(':');
-  str.append(ex.getColumnNumber());
-  return str.toString();
+    str.append( ": line=" );
+    str.append( ex.getLineNumber() );
+    str.append( " : column=" );
+    str.append( ex.getColumnNumber() );
+    str.append( " : message=" );
+    str.append( ex.getLocalizedMessage() );
+    return str.toString();
   }
 
+  /** Implements the SAX EntityResolver interface */
+  public InputSource resolveEntity( String publicId, String systemId ) 
+    throws org.xml.sax.SAXException, java.io.IOException
+  {
+    logger.debug( "MCREntityResolver publicID = " + publicId );
+    logger.debug( "MCREntityResolver systemID = " + systemId );
+    return null;
+  }
 }
-
