@@ -67,14 +67,20 @@ public class MCRSessionMgr
    *
    * @return MyCoRe MCRSession object
    */
-  public static MCRSession getCurrentSession() {
-    return (MCRSession) theThreadLocalSession.get();
+  public static synchronized MCRSession getCurrentSession() {
+    MCRSession session = (MCRSession) theThreadLocalSession.get();
+    if( session == null )
+    {
+      theThreadLocalSession.set( theThreadLocalSession.initialValue() );
+      session = (MCRSession) theThreadLocalSession.get();
+    }
+    return session;
   }
 
   /**
    * This method sets a MyCoRe session object for the current Thread.
    */
-  public static void setCurrentSession(MCRSession theSession) {
+  public static synchronized void setCurrentSession(MCRSession theSession) {
     theThreadLocalSession.set(theSession);
   }
 
@@ -84,9 +90,13 @@ public class MCRSessionMgr
    * the current Thread. One use for this method is to reset the session inside
    * a Thread-pooling environment like Servlet engines.
    */
-  public static void releaseCurrentSession() {
-    MCRSession.logger.debug( "MCRSession released " + getCurrentSession().getID() );
-    theThreadLocalSession = new ThreadLocalSession();
+  public static synchronized void releaseCurrentSession() {
+    MCRSession session = (MCRSession) theThreadLocalSession.get();
+    if( session != null )
+    {
+      MCRSession.logger.debug( "MCRSession released " + session.getID() );
+      theThreadLocalSession.set( null );
+    }
   }
 }
 
