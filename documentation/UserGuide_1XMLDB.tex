@@ -1,6 +1,6 @@
 %
 %
-\section{Hinweise zur Installation feier Datenbanken und XML:DB's}
+\section{Hinweise zur Installation einer freier und komerzieller Datenbanken, XML:DB's und Web-Komponenten}
 %
 %
 \subsection{Installation der Komponenten unter Linux}
@@ -26,6 +26,7 @@ Sinnvollerweise sollten Sie sich einen Benutzer (z. B. {\bf mcradmin} anlegen, u
 %
 %
 \subsubsection{Die Installation von MySQL}
+MySQL ist eine derzeit frei relationale Datenbank, welche zur schnellen Speicherung von Daten innerhalb des MyCoRe-Projektes benötigt wird. Sie besitzt eine JDBC Schnittstelle und ist SQL konform. Sie könnten MySQL auch durch eine andere verfügbare Datenbank mit gleicher Funktionalität ersetzen.
 \begin{enumerate}
 \item Installieren Sie aus Ihrer Distribution die folgenden Pakete und danach ggf. noch vom Hersteller der Distribution per Netz angebotene Updates. Die angegebenen versionsnummern sind nur exemplarisch.
 \begin{itemize}
@@ -68,6 +69,32 @@ quit
 Falls sie keine Connection auf ihren Rechnernamen (nicht localhost) aufbauen können, kann es auch mit ihrer Firewall oder TCPWrapper Einstellung zu tun haben. Bei einer Firewall sollte der Port 3306 freigegeben werden und bei einem TCPWrapper der entsprechende Dienst (mysql) in die Datei ???? geschrieben werden.
 %
 %
+\subsubsection{Die Installation der freien XML:DB eXist}
+eXist ist eine Frei verfügbare XML:BD, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
+\begin{enumerate}
+\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
+\item entpacken Sie die Distribution in ein entsprechendes Verzeichnis, z. B. unter {\it /usr/local/bin}.
+\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {/tt uri=xmldb:exist://localhost:8081} im File {\it client.properties}.
+\item Starten Sie den Server mit {\tt <installdir>/eXist-0.9.2/bin/startup.sh }.
+\item unter der URL \url{http://localhost:8080/exist/index.html} sollte jetzt die eXist-Homepage erscheinen. Dies nur als Test.
+\item Wenn alles okay ist, starten Sie {\tt <installdir>/eXist-0.9.2/bin/server.sh }.
+\item Anschliessend können Sie auch den Client mit {\tt <installdir>/eXist-0.9.2/bin/client.sh } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\end{enumerate}
+%
+%
 \subsection{Installation der Komponenten unter MS Windows}
+%
+%
+\subsubsection{Die Installation der freien XML:DB eXist}
+eXist ist eine Frei verfügbare XML:BD, welche die entsprechenden Interfaces implementiert. Für MyCoRe wurde ein auf diesen Schnittstellen basierender Persitence-Layer implementiert. So sollte die Nutzung von eXist direkt möglich sein.
+\begin{enumerate}
+\item Download der aktuellen Version von eXist von \url{http://exist-db.org/}. Achtung, da dieses produkt noch stark im Wachsen ist, sollte hier die letzte Version geholt werden. Zum Test kam Version eXist-0.9.2.
+\item entpacken Sie die Distribution in ein entsprechendes Verzeichnis.
+\item Entfernen Sie zur Nutzung des stand-alone-Servers den Kommentar aus der Zeile {/tt uri=xmldb:exist://localhost:8081} im File {\it <installdir>\\eXist-0.9.2\\client.properties}.
+\item Starten Sie den Server mit {\tt <installdir>\\eXist-0.9.2\\bin\\startup.bat }.
+\item unter der URL \url{http://localhost:8080/exist/index.html} sollte jetzt die eXist-Homepage erscheinen. Dies nur als Test.
+\item Wenn alles okay ist, starten Sie {\tt <installdir>\\eXist-0.9.2\\bin\\server.bat }.
+\item Anschliessend können Sie auch den Client mit {\tt <installdir>\\eXist-0.9.2\\bin\\client.bat } starten. Hier sollten Sie dem Admin-User ein Password spendieren.
+\end{enumerate}
 %
 %
