@@ -229,7 +229,6 @@ public class MCRLayoutServlet extends HttpServlet
   
   public static final Properties buildXSLParameters(HttpServletRequest request)
   {
-  	long time=System.currentTimeMillis();
 	Properties parameters = new Properties();
 	String name=null;
 	String user=null;
@@ -287,7 +286,6 @@ public class MCRLayoutServlet extends HttpServlet
 	parameters.put( "ServletsBaseURL",       servletsBaseURL    );
 	parameters.put( "DefaultLang",           defaultLang        );
     
-    logger.info("buildXSLTParameters runned: "+(System.currentTimeMillis()-time)+" msec!");
     return parameters;
   }
 
