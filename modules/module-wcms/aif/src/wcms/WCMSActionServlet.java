@@ -34,6 +34,8 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.EntityResolver;
@@ -106,6 +108,7 @@ public class WCMSActionServlet extends WCMSServlet {
     throws ServletException, IOException {
 
         sessionParam="final";
+    		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         contentFileBackup = null;
         naviFileBackup = null;
         hrefFile = null;
@@ -330,6 +333,7 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void generateOutput(HttpServletRequest request, String error, HttpServletResponse response, File naviFile, String label, String fileName){
         try {
+        		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(naviFile);
             Element root = doc.getRootElement();

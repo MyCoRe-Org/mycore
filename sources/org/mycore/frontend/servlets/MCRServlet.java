@@ -61,7 +61,6 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean POST = false;
 
 	protected String ReqCharEncoding;
-	protected MCRSession mcrSession;
 
 	/** Initialisation of the servlet */
 	public void init() {
@@ -186,7 +185,6 @@ public class MCRServlet extends HttpServlet {
 
 			// Forward MCRSessionID to XSL Stylesheets
 			req.setAttribute("XSL.MCRSessionID", session.getID());
-			mcrSession=session;
 
 			String s =
 				(theSession.isNew() ? "new" : "old")

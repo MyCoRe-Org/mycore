@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 public class WCMSAdminServlet extends WCMSServlet {
 
@@ -49,6 +51,7 @@ public class WCMSAdminServlet extends WCMSServlet {
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
 		String action = request.getParameter("action");
 		List rootNodes = (List) mcrSession.get("rootNodes");
 		File[] contentTemplates = new File((super.CONFIG

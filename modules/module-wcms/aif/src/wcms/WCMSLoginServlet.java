@@ -41,6 +41,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 import wcms.util.HashCipher;
@@ -71,6 +73,7 @@ public class WCMSLoginServlet extends WCMSServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
+    		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         String userID = null;
         String userPassword = null;
         String userRealName = null;

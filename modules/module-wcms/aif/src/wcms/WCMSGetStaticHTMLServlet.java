@@ -45,6 +45,8 @@ import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 public class WCMSGetStaticHTMLServlet extends WCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE; //xml Namespace for the language attribute lang
@@ -66,6 +68,7 @@ public class WCMSGetStaticHTMLServlet extends WCMSServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+  			MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         href = request.getParameter("href");
         lang = request.getParameter("lang");
         contentOutput = new Vector();

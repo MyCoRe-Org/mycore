@@ -53,6 +53,8 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 /**
  * Select action process for Web-Content-Management-System (WCMS).
  */
@@ -93,6 +95,7 @@ public class WCMSChooseServlet extends WCMSServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
+  			MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         String userID = (String)mcrSession.get("userID");
         String userClass = (String)mcrSession.get("userClass");
         List rootNodes = (List)mcrSession.get("rootNodes");

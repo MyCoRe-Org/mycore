@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -55,7 +56,7 @@ public abstract class WCMSServlet extends MCRServlet {
 	}
 	
 	protected final boolean isValidUser(){
-		String status=(String)mcrSession.get("status");
+		String status=(String)MCRSessionMgr.getCurrentSession().get("status");
 		return (status != null && status.equals("loggedIn"));
 	}
 	

@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 public class WCMSFileUploadServlet extends WCMSServlet {
     char fs = File.separatorChar;
@@ -80,6 +82,7 @@ public class WCMSFileUploadServlet extends WCMSServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+    		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
         action = request.getParameter("action");
         if (action.equals("upload")) {
             fileMaxSize = super.CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
