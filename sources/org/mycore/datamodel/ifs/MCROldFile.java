@@ -63,7 +63,7 @@ public class MCROldFile
   protected GregorianCalendar lastModified;
   
   /** The optional extender for streaming audio/video files */
-  protected MCROldAudioVideoExtender avExtender;
+  protected MCRAudioVideoExtender avExtender;
   
   /**
    * Creates a new empty, unstored MCROldFile instance.
@@ -359,7 +359,7 @@ public class MCROldFile
   
   /**
    * Returns true, if this file is stored in a content store that provides
-   * an MCROldAudioVideoExtender for audio/video streaming and additional metadata
+   * an MCRAudioVideoExtender for audio/video streaming and additional metadata
    **/
   public boolean hasAudioVideoExtender()
   {
@@ -373,7 +373,7 @@ public class MCROldFile
    * Returns the AudioVideoExtender in case this file is streaming audio/video
    * and stored in a ContentStore that supports this
    **/
-  public MCROldAudioVideoExtender getAudioVideoExtender()
+  public MCRAudioVideoExtender getAudioVideoExtender()
   {
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
       avExtender = MCROldContentStoreFactory.buildExtender( this );

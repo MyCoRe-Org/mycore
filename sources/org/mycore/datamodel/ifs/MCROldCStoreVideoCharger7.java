@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.ifs;
 
+import org.mycore.backend.videocharger.*;
 import org.mycore.common.*;
 import java.util.*;
 import java.io.*;
@@ -52,7 +53,7 @@ import com.enterprisedt.net.ftp.*;
  * @deprecated USED BY MILESS 1.3 ONLY!
  * @version $Revision$ $Date$
  *
- * @see MCROldAVExtVideoCharger7
+ * @see org.mycore.backend.videocharger.MCRAVExtVideoCharger7
  */
 public class MCROldCStoreVideoCharger7 implements MCROldContentStore
 { 
@@ -173,7 +174,7 @@ public class MCROldCStoreVideoCharger7 implements MCROldContentStore
   public static void backupContentTo( String storeID, String directory )
     throws MCRPersistenceException, IOException
   {
-    MCROldAVExtVideoCharger7 extender = new MCROldAVExtVideoCharger7();
+    MCRAVExtVideoCharger7 extender = new MCRAVExtVideoCharger7();
     extender.readConfig( storeID );
     String[] list = extender.listAssets();
 

@@ -173,7 +173,7 @@ public class MCRContentStoreFactory
     { 
       Object obj = cl.newInstance();
       MCRAudioVideoExtender ext = (MCRAudioVideoExtender)obj;
-      ext.init( file );
+      ext.init( file.getStorageID(), file.getStoreID(), file.getExtension() );
       return ext;
     }
     catch( Exception exc )

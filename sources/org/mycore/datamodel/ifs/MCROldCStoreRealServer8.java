@@ -50,7 +50,7 @@ import com.enterprisedt.net.ftp.*;
  * @deprecated USED BY MILESS 1.3 ONLY!
  * @version $Revision$ $Date$
  *
- * @see MCROldAVExtRealServer8
+ * @see org.mycore.backend.realhelix.MCRAVExtRealServer8
  */
 public class MCROldCStoreRealServer8 implements MCROldContentStore
 { 

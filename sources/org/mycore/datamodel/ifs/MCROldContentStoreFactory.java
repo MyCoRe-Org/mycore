@@ -28,10 +28,10 @@ import org.mycore.common.*;
 import java.util.*;
 
 /**
- * This class manages instances of MCROldContentStore and MCROldAudioVideoExtender 
+ * This class manages instances of MCROldContentStore and MCRAudioVideoExtender 
  * and provides methods to get these for a given Store ID or MCROldFile instance.
  * The class is responsible for looking up, loading, instantiating and
- * remembering the implementations of MCROldContentStore and MCROldAudioVideoExtender 
+ * remembering the implementations of MCROldContentStore and MCRAudioVideoExtender 
  * that are used in the system.
  *
  * @author Frank Lützenkirchen 
@@ -43,7 +43,7 @@ public class MCROldContentStoreFactory
   /** Hashtable StoreID to MCROldContentStore instance */  
   protected static Hashtable stores = new Hashtable();
 
-  /** Hashtable StoreID to Class that implements MCROldAudioVideoExtender */  
+  /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */  
   protected static Hashtable extenderClasses = new Hashtable();
   
   /**
@@ -78,14 +78,14 @@ public class MCROldContentStoreFactory
   }
   
   /**
-   * Returns the Class instance that implements the MCROldAudioVideoExtender for 
+   * Returns the Class instance that implements the MCRAudioVideoExtender for 
    * the MCROldContentStore with the given ID. That class is configured by 
    * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
    * mycore.properties.
    * 
    * @param storeID the non-null StoreID of the MCROldContentStore
-   * @return the Class that implements MCROldAudioVideoExtender for the StoreID given, or null
-   * @throws MCRConfigurationException if the MCROldAudioVideoExtender implementation class could not be loaded
+   * @return the Class that implements MCRAudioVideoExtender for the StoreID given, or null
+   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
   */
   protected static Class getExtenderClass( String storeID )
   {
@@ -115,30 +115,30 @@ public class MCROldContentStoreFactory
   
   /**
    * Returns true if the MCROldContentStore with the given StoreID provides an 
-   * MCROldAudioVideoExtender implementation, false otherwise.
-   * The MCROldAudioVideoExtender for a certain MCROldContentStore is configured by 
+   * MCRAudioVideoExtender implementation, false otherwise.
+   * The MCRAudioVideoExtender for a certain MCROldContentStore is configured by 
    * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
    * mycore.properties.
    * 
    * @param storeID the non-null StoreID of the MCROldContentStore
-   * @return the MCROldAudioVideoExtender for the StoreID given, or null
-   * @throws MCRConfigurationException if the MCROldAudioVideoExtender implementation class could not be loaded
+   * @return the MCRAudioVideoExtender for the StoreID given, or null
+   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
   */
   static boolean providesAudioVideoExtender( String storeID )
   { return ( getExtenderClass( storeID ) != null ); }
   
   /**
    * If the MCROldContentStore of the MCROldFile given provides an 
-   * MCROldAudioVideoExtender implementation, this method creates and initializes 
-   * the MCROldAudioVideoExtender instance for the MCROldFile. 
+   * MCRAudioVideoExtender implementation, this method creates and initializes 
+   * the MCRAudioVideoExtender instance for the MCROldFile. 
    * The instance that is returned is configured by the property
    * <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in mycore.properties.
    * 
    * @param file the non-null MCROldFile
-   * @return the MCROldAudioVideoExtender for the MCROldFile given, or null
-   * @throws MCRConfigurationException if the MCROldAudioVideoExtender implementation class could not be loaded
+   * @return the MCRAudioVideoExtender for the MCROldFile given, or null
+   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
    */
-  static MCROldAudioVideoExtender buildExtender( MCROldFile file )
+  static MCRAudioVideoExtender buildExtender( MCROldFile file )
   {
     MCRArgumentChecker.ensureNotNull( file, "file" );
 
@@ -150,15 +150,15 @@ public class MCROldContentStoreFactory
     try
     { 
       Object obj = cl.newInstance();
-      MCROldAudioVideoExtender ext = (MCROldAudioVideoExtender)obj;
-      ext.init( file );
+      MCRAudioVideoExtender ext = (MCRAudioVideoExtender)obj;
+      ext.init( file.getStorageID(), file.getStoreID(), file.getExtension() );
       return ext;
     }
     catch( Exception exc )
     { 
       if( exc instanceof MCRException ) throw (MCRException)exc;
       
-      String msg = "Could not build MCROldAudioVideoExtender instance";
+      String msg = "Could not build MCRAudioVideoExtender instance";
       throw new MCRConfigurationException( msg, exc ); 
     }
   }
