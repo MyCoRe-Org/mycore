@@ -149,6 +149,10 @@ class MCRClassificationManager
   
   int retrieveNumberOfChildren( String classifID, String parentID )
     { return store.retrieveNumberOfChildren( classifID, parentID ); }
+
+  int retrieveNumberOfDocs( String classifID)
+	{ return store.retrieveNumberofDocs( classifID ); 
+	}
   
   void deleteClassificationItem( String classifID )
     {
@@ -168,4 +172,5 @@ class MCRClassificationManager
   protected String [] getAllClassificationID()
     { return store.getAllClassificationID(); }
   }
-
+  
+  
