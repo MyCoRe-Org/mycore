@@ -132,7 +132,10 @@ public class MCRCommandLineInterface
       "update all objects from directory {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save object {0} to {1}",
+      "save object from {0} to {1} to directory {2}",
+      "org.mycore.frontend.cli.MCRObjectCommands.save String String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "save object of {0} to directory {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.save String String" );
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "get last object ID for base {0}",

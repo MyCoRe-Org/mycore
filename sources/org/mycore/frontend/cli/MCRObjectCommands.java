@@ -29,6 +29,10 @@ import java.io.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
@@ -243,21 +247,46 @@ public class MCRObjectCommands
     }
 
  /**
-  * Save an MCRObject.
+  * Save an MCRObject to a file named <em>MCRObjectID</em>.xml in a directory.
   *
   * @param ID the ID of the MCRObject to be save.
-  * @param filename the filename to store the object
+  * @param dirname the dirname to store the object
   **/
-  public static void save( String ID, String filename )
+  public static void save( String ID, String dirname )
     {
-    MCRObject obj = new MCRObject();
-    byte[] xml = obj.receiveXMLFromDatastore(ID);
+    MCRObject obj = new MCRObject(); 
+    MCRObjectID id = null;
+    try { id = new MCRObjectID(ID); }
+    catch (Exception ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      return;
+      }
+    byte[] xml = null;
+    try { xml = obj.receiveXMLFromDatastore(ID); }
+    catch (MCRException ex) {
+      logger.error( ex.getMessage() );
+      logger.error("");
+      return;
+      }
+    String xslfile = "mcr_save-object.xsl";
+    String filename = dirname+SLASH+id.toString()+".xml";
     try {
       FileOutputStream out = new FileOutputStream(filename);
-      out.write(xml);
-      out.flush();
+      InputStream in = MCRQueryCommands.class.getResourceAsStream("/"+xslfile);
+      if( in != null ) {
+        StreamSource source = new StreamSource( in );
+        TransformerFactory transfakt = TransformerFactory.newInstance();
+        Transformer trans = transfakt.newTransformer( source );
+        StreamResult sr = new StreamResult( (OutputStream)out );
+        trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml,false)),sr);
+        }
+      else {
+        out.write(xml);
+        out.flush();
+        }
       }
-    catch (IOException ex) {
+    catch (Exception ex) {
       logger.error( ex.getMessage() );
       logger.error( "Exception while store to file " + filename );
       logger.error("");
@@ -265,6 +294,74 @@ public class MCRObjectCommands
       }
     logger.info( "Object "+ID+" stored under "+filename+"." );
     logger.info( "" );
+    }
+
+ /**
+  * Save any MCRObject's to files named <em>MCRObjectID</em>.xml in a directory.
+  * The saving starts with fromID and runs to toID. ID's they was not found
+  * will skiped.
+  *
+  * @param fromID the ID of the MCRObject from be save.
+  * @param toID the ID of the MCRObject to be save.
+  * @param dirname the filename to store the object
+  **/
+  public static void save( String fromID, String toID, String dirname )
+    {
+    MCRObject obj = new MCRObject(); 
+    MCRObjectID fid = null;
+    MCRObjectID tid = null;
+    try { fid = new MCRObjectID(fromID); }
+    catch (Exception ex) {
+      logger.error( "FromID : "+ex.getMessage() );
+      logger.error("");
+      return;
+      }
+    try { tid = new MCRObjectID(toID); }
+    catch (Exception ex) {
+      logger.error( "ToID : "+ex.getMessage() );
+      logger.error("");
+      return;
+      }
+    String xslfile = "mcr_save-object.xsl";
+    Transformer trans = null;
+    try {
+      InputStream in = MCRQueryCommands.class.getResourceAsStream("/"+xslfile);
+      if( in != null ) {
+        StreamSource source = new StreamSource( in );
+        TransformerFactory transfakt = TransformerFactory.newInstance();
+        trans = transfakt.newTransformer( source );
+        }
+      }
+    catch (Exception e) { }
+    MCRObjectID nid = fid;
+    int k = 0;
+    try {
+      for (int i = fid.getNumberAsInteger();i<tid.getNumberAsInteger()+1;i++) {
+        nid.setNumber(i);
+        byte[] xml = null;
+        try { xml = obj.receiveXMLFromDatastore(nid.toString()); }
+        catch (MCRException ex) { continue; }
+        String filename = dirname+SLASH+nid.toString()+".xml";
+        FileOutputStream out = new FileOutputStream(filename);
+        if( trans != null ) {
+          StreamResult sr = new StreamResult( (OutputStream)out );
+          trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml,false)),sr);
+          }
+        else {
+          out.write(xml);
+          out.flush();
+          }
+        k++;
+        logger.info( "Object "+nid.toString()+" stored under "+filename+"." );
+        }
+      }
+    catch (Exception ex) {
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while store to file " + dirname );
+      logger.error("");
+      return;
+      }
+    logger.info( k + " Object's stored under "+dirname+"." );
     }
 
  /**
