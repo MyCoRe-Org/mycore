@@ -1,0 +1,30 @@
+%
+%
+\section{Hinweise zur Installation feier Datenbanken und XML:DB's}
+%
+%
+\subsection{Installation der Komponenten unter Linux}
+Die folgende Beschreibung erläutert die Arbeit unter SuSE Linux, getestet wurde unter der Version 8.1. Sollten für RedHat Abweichungen auftreten, so werder diese gesondert vermerkt.
+%
+%
+\subsubsection{Die Installation von MySQL}
+\begin{enumerate}
+\item Installieren Sie aus Ihrer Distribution die folgenden Pakete und danach ggf. noch vom Hersteller der Distribution per Netz angebotene Updates. Die angegebenen versionsnummern sind nur exemplarisch.
+\begin{itemize}
+\item {\bf mysql-3.23.52-83}
+\item {\bf mysql-shared-3.23.52-83}
+\item {\bf mysql-client-3.23.52-83}
+\item {\bf mysql-devel-3.23.52-83}
+\item {\bf mysql-bench-3.23.52-83}
+\end{itemize}
+\item Die Dokumentation steht nun unter {\it /usr/share/doc/package/mysql}.
+\item Setzen Sie das Password für den User mysql und die Shell auf /bin/bash.
+\item Führe Sie das Kommando {\tt mysql\_install\_db } als mysql aus.
+\item Führe Sie das Kommando {\tt safe\_mysqld \& } als mysql aus.
+\item Zum verifizieren, ob der Server läuft nutzen Sie {\tt mysqladmin version} und  {\tt mysqladmin variables}.
+\end{enumerate}
+%
+%
+\subsection{Installation der Komponenten unter MS Windows}
+%
+%
