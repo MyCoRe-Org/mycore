@@ -174,8 +174,8 @@ public class TextFilterPluginManager {
 		throws FilterPluginTransformException {
 		if (isSupported(ct)) {
 			return getPlugin(ct).transform(ct, input);
-		} else
-			return null;
+		}
+		return null;
 	}
 
 	/**
@@ -186,8 +186,10 @@ public class TextFilterPluginManager {
 	private final URL[] getPluginURLs() throws MalformedURLException {
 		HashSet returnS = new HashSet();
 		File pluginDir = new File(conf.getString("MCR.PluginDirectory"));
-		if (pluginDir == null || !pluginDir.isDirectory())
-			return null;
+		if (pluginDir == null || !pluginDir.isDirectory()){
+		    logger.error("PluginDirectory does not exist! "+pluginDir.getAbsolutePath());
+		    return new URL[0];
+		}
 		File[] plugins = pluginDir.listFiles();
 		for (int i = 0; i < plugins.length; i++) {
 			System.err.println(plugins[i].getName());
