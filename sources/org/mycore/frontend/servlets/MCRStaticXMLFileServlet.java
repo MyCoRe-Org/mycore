@@ -57,14 +57,16 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     
     if( url == null )
     {
-      String msg = "StaticXMLFileServlet could not find file " + requestedPath;
-      throw new MCRUsageException( msg );
+      String msg = "Could not find file " + requestedPath;
+      job.getResponse().sendError( HttpServletResponse.SC_NOT_FOUND, msg );
+      return;
     }
 
     String path = getServletContext().getRealPath( requestedPath );
     File file = new File( path );
 
     String documentBaseURL = file.getParent() + File.separator;
+    job.getRequest().setAttribute( "XSL.StaticFilePath", requestedPath );
     job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
     job.getRequest().setAttribute( "XSL.FileName", file.getName() );
     job.getRequest().setAttribute( "XSL.FilePath", file.getPath() );
