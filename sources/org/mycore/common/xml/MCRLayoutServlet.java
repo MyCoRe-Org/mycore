@@ -48,6 +48,7 @@ public class MCRLayoutServlet extends HttpServlet
   protected SAXTransformerFactory factory;  
   protected MCRCache stylesheetCache;
   protected MCRCache staticFileCache;
+  private MCRConfiguration conf;
 
   public void init()
   {
@@ -62,6 +63,9 @@ public class MCRLayoutServlet extends HttpServlet
     
     // Create caches
     stylesheetCache = new MCRCache( 50 );
+
+    // Init configuration
+    conf = MCRConfiguration.instance();
   }
     
  /**
@@ -218,10 +222,13 @@ public class MCRLayoutServlet extends HttpServlet
 
     String servletsBaseURL = applicationBaseURL + "servlets/";
 
+    String defaultLang = conf.getString("MCR.metadata_default_lang","en");
+
     parameters.put( "CurrentUser",           user               );
     parameters.put( "RequestURL",            requestURL         );
     parameters.put( "WebApplicationBaseURL", applicationBaseURL );
     parameters.put( "ServletsBaseURL",       servletsBaseURL    );
+    parameters.put( "DelaultLang",           defaultLang        );
     
     return parameters;
   }
