@@ -45,9 +45,8 @@ public class MCRCM7TransformToText
 // common data
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
-// 31 Bit
-protected static int MAX_DATE_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
-protected static int MAX_NUMBER_STRING_LENGTH = 1024 * 1024 * 1024 * 1024 * 1024 * 2;
+// 32 Bit
+protected static int MAX_BIN_STRING_LENGTH = 1024 * 1024 * 1024 * 2;
 
 /**
  * The constructor.
@@ -89,22 +88,28 @@ public final String createSearchStringText(String part, String tag,
   sb.append(subtag.toUpperCase()).append("XXX");
   if ((innertag != null) && ((innertag = innertag.trim()).length() !=0)) {
     sb.append(innertag.toUpperCase()).append("XXX"); }
-  sb.append(' ');
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
+        .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
   if (iattrib != null) {
     for (int i=0;i<iattrib.length;i++) {
       if (iattrib[i]==null) { continue; }
       sb.append("XXX").append(iattrib[i].toUpperCase()).append("XXX")
-        .append(ivalue[i].toUpperCase()).append("XXX ");
+        .append(ivalue[i].toUpperCase()).append("XXX");
       }
     }
+  sb.append(' ');
   if ((text != null) && ((text = text.trim()).length() !=0)) {
+    try {
+      MCRObjectID mid = new MCRObjectID(text);
+      if (mid.isValid()) {
+        text = mid.getId().replace('_','X'); }
+      }
+    catch (MCRException e) { }
     sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); }
   sb.append(NL);
   return sb.toString();
@@ -143,7 +148,7 @@ public final String createSearchStringDate(String part, String tag,
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append(sattrib[i].toUpperCase()).append("XXX")
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
@@ -151,7 +156,7 @@ public final String createSearchStringDate(String part, String tag,
               date.get(Calendar.MONTH)*100 +
               date.get(Calendar.DAY_OF_MONTH);
   String binstr = Integer.toBinaryString(idate);
-  String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
+  String binstrmax = Integer.toBinaryString(MAX_BIN_STRING_LENGTH);
   int lenstr = binstr.length();
   int lenstrmax = binstrmax.length();
   for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
@@ -191,7 +196,7 @@ public final String createSearchStringBoolean(String part, String tag,
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append(sattrib[i].toUpperCase()).append("XXX")
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
@@ -208,7 +213,7 @@ public final String createSearchStringBoolean(String part, String tag,
  * the IBM Content Manager 7 persistence system.<p>
  * The number was transformed to a string to cut the number of the third decimal
  * position and tronspose it then in a integer number by multiply with 1000.
- * the number must be in range of 10^10 to -10^10.
+ * the number must be in range of 10^6 to -10^6.
  * A full XML tag element shows like<br>
  * &lt;subtag sattrib="svalue" ... &gt;<br>
  * number<br>
@@ -237,14 +242,14 @@ public final String createSearchStringDouble(String part, String tag,
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       if (sattrib[i].toUpperCase().equals("LANG")) { continue; }
-      sb.append(sattrib[i].toUpperCase()).append("XXX")
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
         .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
-  sb.append(' ');
-  long a = Math.round(number*100.); 
+  //long a = (Math.round(number*1000.))/10; 
+  long a = (Math.round(number*10.))/10; 
   String binstr = Long.toBinaryString(a);
-  String binstrmax = Integer.toBinaryString(MAX_NUMBER_STRING_LENGTH);
+  String binstrmax = Integer.toBinaryString(MAX_BIN_STRING_LENGTH);
   int lenstr = binstr.length();
   int lenstrmax = binstrmax.length();
   for (int i=0;i<(lenstrmax-lenstr);i++) { sb.append('0'); }
@@ -277,28 +282,28 @@ public final String createSearchStringHref(String part, String tag,
   StringBuffer sb = new StringBuffer(1024);
   sb.append("XXX").append(part.toUpperCase()).append("XXX")
     .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX ");
+    .append(subtag.toUpperCase()).append("XXX");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
+        .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
   MCRCM7Persistence mcr_pers = new MCRCM7Persistence();
   String label = mcr_pers.receiveLabel(href);
-  sb.append(label.toUpperCase()).append(NL);
+  sb.append(' ').append(label.toUpperCase()).append(NL);
   sb.append("XXX").append(part.toUpperCase()).append("XXX")
     .append(tag.toUpperCase()).append("XXX")
-    .append(subtag.toUpperCase()).append("XXX ");
+    .append(subtag.toUpperCase()).append("XXX");
   if (sattrib != null) {
     for (int i=0;i<sattrib.length;i++) {
       if (sattrib[i]==null) { continue; }
       sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
-        .append(svalue[i].toUpperCase()).append("XXX ");
+        .append(svalue[i].toUpperCase()).append("XXX");
       }
     }
-  sb.append(href.getId().replace('_','X').toUpperCase()).append(NL);
+  sb.append(' ').append(href.getId().replace('_','X').toUpperCase()).append(NL);
   return sb.toString();
   }
 
