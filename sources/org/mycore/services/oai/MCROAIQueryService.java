@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -40,6 +41,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
+//import org.mycore.datamodel.classifications.MCRClassificationManager;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -95,30 +97,45 @@ public class MCROAIQueryService implements MCROAIQuery {
 	 * 				the label and a description
 	 */
 	public List listSets(String instance) {
-    	String classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance);
-	    logger.debug("Suche in Klassifikation: " + classificationId);
+    	String classificationId = config.getString(STR_OAI_SETSCHEME + "." + instance, "");
+    	String classification[];
+    	if (classificationId.length() == 0) {
+    		logger.debug("Suche in allen Klassifikationen");
+    		classification = new String[0];
+    		//classification = MCRClassificationManager.instance().getAllClassificationID();
+    	} else {
+    	    logger.debug("Suche in Klassifikationen: " + classificationId);
+    		StringTokenizer tokenizer = new StringTokenizer(classificationId, " ");
+    		classification = new String[tokenizer.countTokens()];
+    		int i = 0;
+    		while (tokenizer.hasMoreTokens()) {
+    			classification[i++] = tokenizer.nextToken();
+    		}
+    	}
 	    
 		List list = new ArrayList();
-        MCRClassificationItem repository = MCRClassificationItem.
-            getClassificationItem(classificationId);
-        if ((repository != null) && (repository.hasChildren())) {
-			list = getSets(list, repository.getChildren(), "", instance);
-        }
+		for (int i = 0; i < classification.length; i++) {
+			MCRClassificationItem repository = 
+				MCRClassificationItem.getClassificationItem(
+						classification[i]);
+			if ((repository != null) && (repository.hasChildren())) {
+				list.addAll(getSets(repository.getChildren(), "", instance));
+			}
+		}
 
 		return list;
 	}
 	
 	/**
 	 * Method getSets. Creates a <i>list</i> from an Array of Sets
-	 * @param list The list to add the new elements to.
 	 * @param categories The categories to extract the information from.
 	 * @param parentSpec The setSpec of the parent set.
 	 * @param instance the Servletinstance
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-    private List getSets(List list, MCRCategoryItem[] categories, String parentSpec, String instance) {
-        List newList = new ArrayList(list);
+    private List getSets(MCRCategoryItem[] categories, String parentSpec, String instance) {
+        List newList = new ArrayList();
         
         for (int i = 0; i < categories.length; i++) { 
            	String[] set = new String[3];
@@ -160,7 +177,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugef�gt.");
 		    	
     	        if (categories[i].hasChildren()) {
-        	        newList = getSets(newList, categories[i].getChildren(), set[0] + ":", instance);
+        	        newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
 	            }
 			}
 		}
