@@ -294,7 +294,7 @@ public final byte [] receive(MCRObjectID mcr_id)
       }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException(
-        "A object with ID "+mcr_id.getId()+"does not exists."); }
+        "A object with ID "+mcr_id.getId()+" does not exists."); }
     }
   catch (Exception e) {
     throw new MCRPersistenceException(e.getMessage(),e); }
@@ -382,7 +382,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         }
       catch (MCRPersistenceException e) { 
         throw new MCRPersistenceException(
-          "A object with ID "+mcr_id.getId()+"does not exists."); }
+          "A object with ID "+mcr_id.getId()+" does not exists."); }
       }
     finally {
       MCRCM7ConnectionPool.instance().releaseConnection(connection); }
