@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- =================================================================== -->
+<!-- MyCoRe-SimpleWorkflow build file for use with ANT                   -->
+<!-- $Revision: 1.1 $ $Date: 2005-02-18 19:13:04 $                      -->
+<!-- =================================================================== -->
+
+<project name="MyCoReModule - SimpleWorkflow" default="usage" basedir=".">
+
+  <property name="build.sysclasspath" value="last" />
+
+<!-- =================================================================== -->
+<!-- The info target                                                     -->
+<!-- =================================================================== -->
+
+  <target name="info">
+    <echo>
+           Ant version: ${ant.version}
+      Java JDK version: ${java.version}
+      Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
+    </echo>
+  </target>
+
+<!-- =================================================================== -->
+<!-- Help on usage                                                       -->
+<!-- =================================================================== -->
+
+  <target name="usage">
+    <echo>
+      Usage:
+        build.sh [target] or build.cmd [target] or ant [target]
+
+      Available targets are:
+        info                 --> Shows Java/Ant/Operating System version
+        clean                --> Removes all generated files, cleaning up
+        compile              --> Compiles all sources under the sample directory
+    </echo>
+  </target>
+
+<!-- =================================================================== -->
+<!-- Initalization of directories and CLASSPATH, LIBPATH                 -->
+<!-- =================================================================== -->
+
+  <target name="init">
+    <mkdir dir="${basedir}/classes" />
+    <path id="mycore.classpath">
+      <fileset dir="${basedir}/lib" includes="*.jar"/>
+    </path>
+  </target>
+
+<!-- =================================================================== -->
+<!-- Compiles all application classes                                    -->
+<!-- =================================================================== -->
+
+  <target name="javac" depends="init">
+    <echo>Compiling ${packages}</echo>
+    <javac srcdir="${basedir}/modules/module-swf/sources"
+           destdir="${basedir}/classes"
+           includes="${packages}"
+           classpathref="mycore.classpath"
+           debug="${debug}"
+           optimize="${optimize}"
+           deprecation="${deprecation}">
+    </javac>
+    <echo>---------------------------------------------------------</echo>
+  </target>
+
+  <target name="compile" depends="compile_frontend_servlets" />
+
+  <target name="compile_frontend_servlets">
+    <echo>Compiling the MyCoRe SWF frontent servlets</echo>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/frontend/servlets/**"/>
+    </antcall>
+  </target>
+
+<!-- =================================================================== -->
+<!-- Remove the user created directories and files                       -->
+<!-- =================================================================== -->
+
+  <target name="clean">
+  </target>
+
+<!-- =================================================================== -->
+
+</project>
+
+<!-- =========================== End of file =========================== -->
+
