@@ -36,7 +36,7 @@ import javax.servlet.http.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRFile extends MCRFilesystemNode
+public class MCRFile extends MCRFilesystemNode implements MCRFileReader
 {
   /** The ID of the store that holds this file's content */
   protected String storeID;  
@@ -225,7 +225,7 @@ public class MCRFile extends MCRFilesystemNode
     {
       MCRContentStore store = MCRContentStoreFactory.selectStore( this );
       
-      storageID = store.storeContent( getName(), getExtension(), getOwnerID(), getContentType().getMimeType(), cis ); 
+      storageID = store.storeContent( this, cis ); 
       storeID   = store.getID();
     }
     
@@ -273,7 +273,7 @@ public class MCRFile extends MCRFilesystemNode
       MessageDigest digest = MCRContentInputStream.buildMD5Digest();
 
       DigestOutputStream dos = new DigestOutputStream( target, digest );
-      getContentStore().retrieveContent( this.storageID, this.size, dos ); 
+      getContentStore().retrieveContent( this, dos ); 
       
       String md5_new = MCRContentInputStream.getMD5String( digest );
       if( ! this.md5.equals( md5_new ) )
@@ -345,7 +345,7 @@ public class MCRFile extends MCRFilesystemNode
     ensureNotDeleted();
 
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
-      avExtender = MCRContentStoreFactory.buildExtender( storeID, storageID, getExtension() );
+      avExtender = MCRContentStoreFactory.buildExtender( this );
 
     return avExtender;
   }

@@ -36,7 +36,7 @@ import javax.servlet.http.*;
  * @deprecated USED BY MILESS 1.3 ONLY!
  * @version $Revision$ $Date$
  */
-public class MCROldFile
+public class MCROldFile implements MCRFileReader
 {
   /** The ID of the store that holds this file's content */
   protected String storeID;  
@@ -286,7 +286,7 @@ public class MCROldFile
     }
     else
     { 
-      storageID = store.storeContent( this.getFileName(), this.getExtension(), this.getOwnerID(), "www/unknown", source ); 
+      storageID = store.storeContent( this, source ); 
       storeID   = store.getID();
     }
     
@@ -317,7 +317,7 @@ public class MCROldFile
     throws MCRPersistenceException
   { 
     if( storageID.length() != 0 ) 
-      getContentStore().retrieveContent( storageID, size, target ); 
+      getContentStore().retrieveContent( this, target ); 
   }
   
   /**
@@ -376,7 +376,7 @@ public class MCROldFile
   public MCRAudioVideoExtender getAudioVideoExtender()
   {
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
-      avExtender = MCRContentStoreFactory.buildExtender( storeID, storageID, getExtension() );
+      avExtender = MCRContentStoreFactory.buildExtender( this );
 
     return avExtender;
   }
