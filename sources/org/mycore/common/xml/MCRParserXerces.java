@@ -88,7 +88,7 @@ public class MCRParserXerces
 	builderValid.setFeature( setschemafullsupport, flagschemafullsupport );
 
 	builder.setReuseParser(true);
-	builder.setReuseParser(false);
+	builderValid.setReuseParser(true);
     
 	builder.setErrorHandler  ( this );
 	builderValid.setErrorHandler  ( this );
