@@ -25,6 +25,7 @@
 package org.mycore.datamodel.classifications;
 
 import org.mycore.common.*;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -129,18 +130,5 @@ public class MCRClassificationItem extends MCRClassificationObject
     MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
     return manager().retrieveClassificationItem( ID );
     }
-
-	/**
-	  * The method return the number of Documents
-	  * for the ClassifID
-	  * @return int
-	  **/
-
-   public int countDocLinks()
-   {
-	   return manager().retrieveNumberOfDocs(ID );
-   }
-
-
 
   }

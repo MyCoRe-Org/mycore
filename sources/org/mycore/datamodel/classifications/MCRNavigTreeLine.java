@@ -33,13 +33,14 @@ class MCRNavigTreeLine
   public MCRCategoryItem cat;
   public int      level;
   public String   status;
-  public boolean  isfixed;
+
 
   public MCRNavigTreeLine( MCRCategoryItem cat, int level )
   {
     this.cat    = cat;
     this.level  = level;
     this.status = ( cat.hasChildren() ? "T" : " " );
+
   }
 
 }

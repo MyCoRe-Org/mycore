@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -39,8 +39,8 @@ public class MCRCategoryItem extends MCRClassificationObject
   protected String parentID;
   protected String classifID;
   protected String URL;
-  
-    
+
+
   /**
    * The constructor to fill this item.
    *
@@ -50,7 +50,7 @@ public class MCRCategoryItem extends MCRClassificationObject
   public MCRCategoryItem( String ID, MCRClassificationObject parent)
     {
     super( ID );
-    MCRArgumentChecker.ensureNotNull( parent, "parent" );  
+    MCRArgumentChecker.ensureNotNull( parent, "parent" );
     this.classifID = parent.getClassificationID();
     MCRArgumentChecker.ensureIsFalse( ID.equals( classifID ),
       "A category ID can not be the same as its classification ID" );
@@ -58,7 +58,7 @@ public class MCRCategoryItem extends MCRClassificationObject
     if( parent.childrenIDs != null ) parent.childrenIDs = null;
     URL = "";
     }
-  
+
   /**
    * The constructor to fill this item.
    *
@@ -89,7 +89,7 @@ public class MCRCategoryItem extends MCRClassificationObject
     {
     MCRClassificationObject parent = getParent();
     if( parent == null ) parent = getClassificationItem();
-    parent.childrenIDs = null; 
+    parent.childrenIDs = null;
     super.delete();
     manager().deleteCategoryItem( classifID, ID );
     }
@@ -101,30 +101,30 @@ public class MCRCategoryItem extends MCRClassificationObject
    **/
   public String getClassificationID()
     { return classifID; }
-  
-  
-  
+
+
+
   public MCRClassificationItem getClassificationItem()
-    { 
+    {
     ensureNotDeleted();
-    return MCRClassificationItem.getClassificationItem( classifID ); 
+    return MCRClassificationItem.getClassificationItem( classifID );
     }
-  
+
   public MCRCategoryItem getParent()
-    { 
+    {
     ensureNotDeleted();
     if( parentID != null )
       return getCategoryItem( classifID, parentID );
-    else 
+    else
       return null;
     }
-  
+
   public String getParentID()
-    { 
+    {
     ensureNotDeleted();
     return parentID;
     }
-  
+
   /**
    * The method return a MCRCategoryItem for the given Classification and
    * Category ID.
@@ -133,11 +133,11 @@ public class MCRCategoryItem extends MCRClassificationObject
    * @param categID the category ID
    * @return a MCRCategoryItem
    **/
-  public static MCRCategoryItem getCategoryItem( String classifID, 
+  public static MCRCategoryItem getCategoryItem( String classifID,
     String categID )
     {
-    MCRArgumentChecker.ensureNotEmpty( classifID, "classifID" );  
-    MCRArgumentChecker.ensureNotEmpty( categID,   "categID"   );  
+    MCRArgumentChecker.ensureNotEmpty( classifID, "classifID" );
+    MCRArgumentChecker.ensureNotEmpty( categID,   "categID"   );
     return manager().retrieveCategoryItem( classifID, categID );
     }
 
@@ -146,28 +146,16 @@ public class MCRCategoryItem extends MCRClassificationObject
    * Category label text.
    *
    * @param classifID the classification ID
-   * @param labeltext the category label text 
+   * @param labeltext the category label text
    * @return a MCRCategoryItem
    **/
-  public static MCRCategoryItem getCategoryItemForLabelText( String classifID, 
+  public static MCRCategoryItem getCategoryItemForLabelText( String classifID,
     String labeltext )
     {
-    MCRArgumentChecker.ensureNotEmpty( classifID, "classifID" );  
-    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext"   );  
+    MCRArgumentChecker.ensureNotEmpty( classifID, "classifID" );
+    MCRArgumentChecker.ensureNotEmpty( labeltext, "labeltext"   );
     return manager().retrieveCategoryItemForLabelText( classifID, labeltext );
     }
-
-   /**
-	 * The method return a the number of Documents
-	 * for the ClassifID 
-	 * @return int 
-	 **/
-	public int countDocLinks()
-	{
-	  String classifIDandID = this.classifID+"##"+this.ID	;
-	  return manager().retrieveNumberOfDocs(classifIDandID);	
-    }
-
 
   /**
    * The method returns the URL string.

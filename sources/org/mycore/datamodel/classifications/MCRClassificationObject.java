@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -21,13 +21,14 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
- 
+
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 
 import org.jdom.Namespace;
 import org.mycore.common.*;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 
 /**
  * This class is an abstract class for the implementation of the classes
@@ -53,7 +54,7 @@ public abstract class MCRClassificationObject
   protected ArrayList text;
   protected ArrayList description;
   protected String [] childrenIDs;
-  
+
   protected boolean deleted = false;
 
   protected static String default_lang = "en";
@@ -61,12 +62,12 @@ public abstract class MCRClassificationObject
   /**
    * Load static data for all MCRClassificationObject
    **/
-  static 
-    { 
+  static
+    {
     default_lang = MCRConfiguration.instance()
       .getString("MCR.metadata_default_lang",default_lang);
     }
-  
+
   /**
    * The method get the MCRClassificationManager instance.
    *
@@ -74,7 +75,7 @@ public abstract class MCRClassificationObject
    **/
   protected static MCRClassificationManager manager()
     { return MCRClassificationManager.instance(); }
-  
+
   /**
    * The abstract constructor of a classififcation or a category.
    *
@@ -84,10 +85,10 @@ public abstract class MCRClassificationObject
     {
     MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
     this.ID    = ID;
-    this.text = new ArrayList(); 
-    this.lang = new ArrayList(); 
+    this.text = new ArrayList();
+    this.lang = new ArrayList();
     this.description = new ArrayList();
-    this.childrenIDs = null; 
+    this.childrenIDs = null;
     this.deleted = false;
     }
 
@@ -108,7 +109,7 @@ public abstract class MCRClassificationObject
    **/
   public String getID() throws MCRUsageException
     { ensureNotDeleted(); return ID; }
-  
+
   /**
    * This method get the classification ID.
    * @return the classification ID
@@ -121,7 +122,7 @@ public abstract class MCRClassificationObject
    **/
   public ArrayList getTextArray() throws MCRUsageException
     { ensureNotDeleted(); return text; }
-  
+
   /**
    * The method return the text String for a given index.
    *
@@ -129,12 +130,12 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getText(int index) throws MCRUsageException
-    { 
-    ensureNotDeleted(); 
+    {
+    ensureNotDeleted();
     if ((index<0)||(index>text.size())) { return ""; }
-    return ((String)text.get(index)); 
+    return ((String)text.get(index));
     }
-  
+
   /**
    * The method returns the text String for a given language.
    *
@@ -142,8 +143,8 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getText(String lang) throws MCRUsageException
-    { 
-    ensureNotDeleted(); 
+    {
+    ensureNotDeleted();
     if (this.text.size()==0) { return ""; }
     if (!MCRUtils.isSupportedLang(lang)) {
       return (String)this.text.get(0); }
@@ -153,14 +154,14 @@ public abstract class MCRClassificationObject
       }
     return (String)this.text.get(0);
     }
-  
+
   /**
    * The method return the lang ArrayList.
    * @exception MCRUsageException if the classification is deleted.
    **/
   public ArrayList getLangArray() throws MCRUsageException
     { ensureNotDeleted(); return lang; }
-  
+
   /**
    * The method return the lang String for a given index.
    *
@@ -168,19 +169,19 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getLang(int index) throws MCRUsageException
-    { 
-    ensureNotDeleted(); 
+    {
+    ensureNotDeleted();
     if ((index<0)||(index>text.size())) { return default_lang; }
-    return ((String)lang.get(index)); 
+    return ((String)lang.get(index));
     }
-  
+
   /**
    * The method return the description ArrayList.
    * @exception MCRUsageException if the classification is deleted.
    **/
   public ArrayList getDescriptionArray() throws MCRUsageException
     { ensureNotDeleted(); return description; }
-  
+
   /**
    * The method return the description String for a given index.
    *
@@ -188,12 +189,12 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getDescription(int index) throws MCRUsageException
-    { 
-    ensureNotDeleted(); 
+    {
+    ensureNotDeleted();
     if ((index<0)||(index>text.size())) { return ""; }
-    return ((String)description.get(index)); 
+    return ((String)description.get(index));
     }
-  
+
   /**
    * The method returns the description String for a given language.
    *
@@ -201,10 +202,10 @@ public abstract class MCRClassificationObject
    * @exception MCRUsageException if the classification is deleted.
    **/
   public String getDescription(String lang) throws MCRUsageException
-    { 
-    ensureNotDeleted(); 
+    {
+    ensureNotDeleted();
     if (this.description.size()==0) { return ""; }
-    if (!MCRUtils.isSupportedLang(lang)) { 
+    if (!MCRUtils.isSupportedLang(lang)) {
       return (String)this.description.get(0); }
     for (int i=0;i<this.lang.size();i++) {
       if (((String)this.lang.get(i)).equals(lang)) {
@@ -212,7 +213,7 @@ public abstract class MCRClassificationObject
       }
     return (String)this.description.get(0);
     }
-  
+
   /**
    * The method add a triple of a lang with a lable and a description
    * to the object. The text and the description can be an empty string.
@@ -235,7 +236,7 @@ public abstract class MCRClassificationObject
     this.lang.add(lang);
     this.description.add(description);
     }
-  
+
   /**
    * The method set a triple of a lang with a lable and a description
    * to the object. The text and the description can be an empty string.
@@ -258,7 +259,7 @@ public abstract class MCRClassificationObject
     for (int j=0;j<this.lang.size();j++) {
       if (((String)this.lang.get(i)).equals(lang)) { i = j; break; }
       }
-    if (i != -1) { 
+    if (i != -1) {
       this.text.add(i,text);
       this.lang.add(i,lang);
       this.description.add(i,description);
@@ -268,7 +269,7 @@ public abstract class MCRClassificationObject
     this.lang.add(lang);
     this.description.add(description);
     }
-  
+
   /**
    * The method return the size of the lang/text/description triple.
    *
@@ -299,11 +300,11 @@ public abstract class MCRClassificationObject
    * @return true if it is, else false
    **/
   public boolean hasChildren()
-    { 
+    {
     ensureNotDeleted();
-    return( getNumChildren() > 0 ); 
+    return( getNumChildren() > 0 );
     }
-  
+
   /**
    * The method return the number of chlidren.
    *
@@ -317,7 +318,25 @@ public abstract class MCRClassificationObject
     else
       return manager().retrieveNumberOfChildren( getClassificationID(), ID );
     }
-  
+
+	/**
+	  * The method return the number of Documents from a Cassification or Category
+	  * for the Classification ID  with the Category ID
+	  * @return int
+	  **/
+
+   public int countDocLinks()
+   {
+
+        ensureNotDeleted();
+
+        MCRLinkTableManager mcl = MCRLinkTableManager.instance();
+        if ( this.getClassificationID().equals( this.getID()) )
+            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),"");
+        else
+            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),this.getID());
+    }
+
   /**
    * The method return a list of MCRCategoryItems they are childre
    * of this.
@@ -338,12 +357,12 @@ public abstract class MCRClassificationObject
     else {
       children = new MCRCategoryItem[ childrenIDs.length ];
       for( int i = 0; i < children.length; i++ )
-        children[ i ] = manager().retrieveCategoryItem( getClassificationID(), 
+        children[ i ] = manager().retrieveCategoryItem( getClassificationID(),
           childrenIDs[ i ] );
       }
     return children;
     }
-  
+
   /**
    * The method remove this.
    **/
@@ -366,9 +385,9 @@ public abstract class MCRClassificationObject
     for (int i=0;i<text.size();i++) {
       sb.append( "Lang:           " ).append( ((String)lang.get(i)) )
         .append( "\n" )
-        .append( "Text:          " ).append( ((String)text.get(i)) ) 
+        .append( "Text:          " ).append( ((String)text.get(i)) )
         .append( "\n" )
-        .append( "Description:    " ).append( ((String)description.get(i)) ) 
+        .append( "Description:    " ).append( ((String)description.get(i)) )
         .append( "\n" );
       }
     sb.append( "\n" );

@@ -125,15 +125,6 @@ public interface MCRClassificationInterface
    **/
   public int retrieveNumberOfChildren(String CLID, String PID);
 
-  /**
-   * The method returns the Count of the documents that
-   * are members of any category in this classification
-   *
-   * @param CLID the ID of the MCRClassificationItem
-   * @return the number of documents
-   */
-  public int retrieveNumberofDocs( String CLID );
-
 
   /**
    * The method returns all availiable classification ID's they are loaded.
