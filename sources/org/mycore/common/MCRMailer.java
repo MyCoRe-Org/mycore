@@ -53,7 +53,7 @@ public class MCRMailer {
 	sysProps.setProperty( "mail.transport.protocol", 
 			      milConfig.getString( "MCR.mail.protocol", "smtp" ) 
 			      );
-	mailsess = Session.getDefaultInstance( sysProps );
+	mailsess = Session.getDefaultInstance( sysProps, null );
 	mailsess.setDebug( milConfig.getBoolean( "MCR.mail.debug", false ) );
     }
 
