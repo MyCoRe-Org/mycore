@@ -56,30 +56,23 @@ private String mcr_ts_index = null;
 private String mcr_ts_lang = null;
 private int mcr_ts_part = 1;
 private int mcr_xml_part = 2;
+private MCRConfiguration conf = null;
 
 /**
  * The constructor of this class.
  **/
 public MCRCM7Persistence()
   {
-  mcr_id_name = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_id");
-  mcr_label_name = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_label");
-  mcr_flag_name = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_flag");
-  mcr_create_name = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_datecreate");
-  mcr_modify_name = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_field_datemodify");
-  mcr_ts_part = MCRConfiguration.instance()
-    .getInt("MCR.persistence_cm7_part_ts");
-  mcr_xml_part = MCRConfiguration.instance()
-    .getInt("MCR.persistence_cm7_part_xml");
-  mcr_ts_server = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_textsearch_server");
-  mcr_ts_lang = MCRConfiguration.instance()
-    .getString("MCR.persistence_cm7_textsearch_lang");
+  conf = MCRConfiguration.instance();
+  mcr_id_name = conf.getString("MCR.persistence_cm7_field_id");
+  mcr_label_name = conf.getString("MCR.persistence_cm7_field_label");
+  mcr_flag_name = conf.getString("MCR.persistence_cm7_field_flag");
+  mcr_create_name = conf.getString("MCR.persistence_cm7_field_datecreate");
+  mcr_modify_name = conf.getString("MCR.persistence_cm7_field_datemodify");
+  mcr_ts_part = conf.getInt("MCR.persistence_cm7_part_ts");
+  mcr_xml_part = conf.getInt("MCR.persistence_cm7_part_xml");
+  mcr_ts_server = conf.getString("MCR.persistence_cm7_textsearch_server");
+  mcr_ts_lang = conf.getString("MCR.persistence_cm7_textsearch_lang");
   if ((mcr_id_name == null) || (mcr_label_name == null) || 
       (mcr_flag_name == null) ||
       (mcr_create_name == null) || (mcr_modify_name == null)) {
@@ -165,6 +158,21 @@ public final void create(MCRTypedContent mcr_tc, byte [] xml)
     throw new MCRPersistenceException(e.getMessage()); }
   finally {
     MCRCM7ConnectionPool.instance().releaseConnection(connection); }
+  }
+
+/**
+ * The methode create a new datastore based of given configuration. It create
+ * a new data table for storing MCRObjects with the same MCRObjectID type.
+ *
+ * @param mcr_type    the MCRObjectID type as string
+ * @param mcr_conf    the configuration XML stream as JDOM tree
+ * @exception MCRConfigurationException if the configuration is not correct
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
+  throws MCRConfigurationException, MCRPersistenceException
+  { 
+  System.out.println("This feature comes in the future with CM8.");
   }
 
 /**

@@ -482,8 +482,7 @@ public void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
   setId(new MCRObjectID("Template_"+mcr_type+"_1"));
   if (mcr_persist==null) { setPersistence(); }
-  System.out.println("This feature comes in the future.");
-  //mcr_persist.createDataBase(mcr_tc);
+  mcr_persist.createDataBase(mcr_type, confdoc);
   }
 
 /**
