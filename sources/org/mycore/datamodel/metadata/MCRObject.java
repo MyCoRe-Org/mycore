@@ -55,6 +55,11 @@ final public class MCRObject
  * constant value for the object id length
  **/
 public final int MAX_LABEL_LENGTH = 256;
+/**
+ * the header of all XML Files
+ **/
+public final static String XML_HEADER = 
+  "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 
 // from configuration
 private String parser_name;
@@ -320,7 +325,7 @@ public final String createXML() throws MCRException
     debug();
     throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(4096);
-  sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL);
+  sb.append(XML_HEADER).append(NL);
   sb.append("<mycoreobject ").append(NL);
   sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
     .append(NL);
@@ -366,10 +371,10 @@ public final String createTS() throws MCRException, MCRConfigurationException
       throw new MCRException(e.getMessage()); }
     }
   StringBuffer sb = new StringBuffer(4096);
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    null,"ID",null,null,null,null,null,mcr_id.getId()));
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
-    null,"Label",null,null,null,null,null,mcr_label));
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(
+    "MyCoReObject",null,"ID",null,null,null,null,null,mcr_id.getId()));
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(
+    "MyCoReObject",null,"Label",null,null,null,null,null,mcr_label));
   sb.append(mcr_struct.createTS(mcr_query));
   sb.append(mcr_metadata.createTS(mcr_query));
   sb.append(mcr_service.createTS(mcr_query));
