@@ -80,7 +80,8 @@ public static void main(String argv[]) throws DKException, Exception
   if (argv[0].equals("doc")) {
     itemtype = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId());
     prefix = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId()+"_prefix");
-    query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
+    //query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
+    query = "/"+itemtype+"["+prefix+"service/"+prefix+"servdates/"+prefix+"servdate[@"+prefix+"servdate = 60010821 and @"+prefix+"type = \"validfromdate\"]]";
     }
   if (argv[0].equals("ifs")) {
     itemtype = conf.getString("MCR.IFS.ContentStore.CM8.ItemType");

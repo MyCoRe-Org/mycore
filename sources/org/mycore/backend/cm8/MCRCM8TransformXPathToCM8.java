@@ -45,17 +45,16 @@ import org.mycore.services.query.MCRQueryBase;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRCM8TransformXQueryToCM8 extends MCRQueryBase implements
+public class MCRCM8TransformXPathToCM8 extends MCRQueryBase implements
   DKConstantICM 
 {
 // private data
-protected static String ROOT_TAG = "/mycoreobject";
-public static final String DEFAULT_QUERY = "/mycoreobject[]";
+public static final String DEFAULT_QUERY = "";
 
 /**
  * The constructor.
  **/
-public MCRCM8TransformXQueryToCM8()
+public MCRCM8TransformXPathToCM8()
   { super(); }
 
 /**
@@ -85,31 +84,18 @@ public final MCRXMLContainer startQuery(String type)
   // Search in the metadata
   // Select the query strings
   StringBuffer cond = new StringBuffer(1024);
-  if (subqueries.size() == 0) { 
-     cond.append(DEFAULT_QUERY); }
-  else {
-    cond.append("/mycoreobject[");
-    for (int i=0;i<subqueries.size();i++) {
-      if (((Boolean)flags.get(i)).booleanValue()) continue;
-      String subquery = (String)subqueries.get(i);
-      subquery = MCRUtils.replaceString(subquery,"/mycoreobject["," ");
-      subquery = MCRUtils.replaceString(subquery, "/mycorederivate["," ");
-      subquery = MCRUtils.replaceString(subquery, "]"," ");
-      cond.append(' ').append(subquery).append(' ')
-        .append((String)andor.get(i));
+  for (int i=0;i<subqueries.size();i++) {
+    if (((Boolean)flags.get(i)).booleanValue()) continue;
+      cond.append(' ').append(traceOneCondition((String)subqueries.get(i),
+        itemtypeprefix)).append(' ').append((String)andor.get(i));
       flags.set(i,Boolean.TRUE);
-      }
-    cond.append(']');
     }
-  logger.debug("First transformation "+cond.toString());
-  // transform the query
-  String query = "";
-  if (cond.toString().equals("/mycoreobject[]")) { 
-    query = ""; }
-  else {
-    query = traceOneCondition(cond.toString().trim(),itemtypename,
-      itemtypeprefix); }
-  if (query.length()==0) { query = "/"+itemtypename; }
+  logger.debug("Codition transformation "+cond.toString());
+  // build the query
+  StringBuffer query = new StringBuffer(1024);
+  query.append('/').append(itemtypename); 
+  if (cond.toString().trim().length() > 0) {
+    query.append('[').append(cond).append(']'); }
   logger.debug("Transformed query "+query);
   // Start the search
   DKDatastoreICM connection = null;
@@ -122,7 +108,7 @@ public final MCRXMLContainer startQuery(String type)
       //new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
       new Integer(DK_CM_CONTENT_YES));
     parms[2] = new DKNVPair(DK_CM_PARM_END,null);
-    DKResults rsc = (DKResults)connection.evaluate(query,
+    DKResults rsc = (DKResults)connection.evaluate(query.toString(),
       DK_CM_XQPE_QL_TYPE,parms);
     dkIterator iter = rsc.createIterator();
     logger.debug("Results :"+rsc.cardinality());
@@ -152,34 +138,43 @@ public final MCRXMLContainer startQuery(String type)
  * This is a private routine they trace one condition.
  *
  * @param onecond  one single condition
- * @param itemtypename the name of the itme type
  * @param itemtypeprefix the prefix of the itme type
  * @ return the transfromed query for CM7.
  **/
-private final String traceOneCondition(String cond, String itemtypename,
-  String itemtypeprefix)
+private final String traceOneCondition(String condstr, String itemtypeprefix)
   {
-  int i;
-  // search [..]
-  int klammerauf = cond.indexOf("[");
-  int klammerzu = cond.indexOf("]",klammerauf+1);
-  if ((klammerauf==-1)||(klammerzu==-1)) { return ""; }
-  // create pretag as value of the path to the data
-  if (klammerauf!=ROOT_TAG.length()) { return ""; }
-  if (!cond.startsWith(ROOT_TAG)) { return ""; }
-  String pretag = "/"+itemtypename;
-  logger.debug("PRETAG="+pretag);
   // search operations
-  String tag[] = new String[10];
-  String op[] = new String[10];
-  String value[] = new String[10];
-  String bool[] = new String[10];
+  int maxcount = 10;
+  String pathin[] = new String[maxcount];
+  String pathout[] = new String[maxcount];
+  String tag[] = new String[maxcount];
+  String op[] = new String[maxcount];
+  String value[] = new String[maxcount];
+  String bool[] = new String[maxcount];
   int counter = 0;
+  boolean klammer = false;
+  // search for []
+  String cond = "";
+  int i = condstr.indexOf("[");
+  if (i != -1) {
+    int j = condstr.indexOf("]");
+    if (j == -1) { throwQueryEx(); }
+    klammer = true;
+    cond = condstr.substring(i+1,j);
+    String p = condstr.substring(0,i);
+    for (int k=0;k<maxcount;k++) { pathout[k] = p; pathin[k] = ""; }
+    }
+  else { 
+    for (int k=0;k<maxcount;k++) { pathin[k] = ""; pathout[k] = ""; }
+    cond = condstr;
+    }
+  logger.debug("Incomming condition : "+cond);
+  // analyze cond
   int tippelauf = 0;
   int tippelzu = 0;
   int tippelauf1 = 0;
   int tippelauf2 = 0;
-  int tagstart = klammerauf+1;
+  int tagstart = 0;
   int opstart = 0;
   while ((tippelauf!=-1)&&(tippelzu!=-1)) {
     tippelauf1 = cond.indexOf("\"",tippelzu+1);
@@ -266,39 +261,128 @@ private final String traceOneCondition(String cond, String itemtypename,
         }
       else { tagstart+=5; bool[counter] = " and "; }
       }
+    // has the tag a path (if true split them)
+    StringBuffer sbpath = new StringBuffer("");
+    int j = 0, l, lastl = 0;
+    int k = tag[counter].length();
+    while( j < k) {
+      l = tag[counter].indexOf("/",j);
+      if (l == -1) { 
+        String nt = "";
+        if (tag[counter].charAt(j) == '@') {
+          nt = tag[counter].substring(j,tag[counter].length()); }
+        if (tag[counter].charAt(j) == '*') { nt = "*"; }
+        if (tag[counter].indexOf("text()",j) != -1) { nt = "text()"; }
+        if (nt.length() == 0) { 
+          nt = "text()"; 
+          if (lastl != 0) { sbpath.append('/'); }
+          sbpath.append(tag[counter].substring(j,tag[counter].length()));
+          }
+        if (sbpath.length() != 0) { pathin[counter] = sbpath.toString(); }
+        else { pathin[counter] = ""; }
+        tag[counter] = nt;
+        break; }
+      if (lastl != 0) { sbpath.append('/'); }
+      sbpath.append(tag[counter].substring(j,l));
+      lastl = l;
+      j = l+1;
+      }
+    // add the itemtypeprefix to the pathout 
+    sbpath = new StringBuffer("");
+    j = 0;
+    k = pathout[counter].length();
+    while( j < k) {
+      l = pathout[counter].indexOf("/",j);
+      if (l == -1) {
+        sbpath.append(itemtypeprefix).append(pathout[counter].substring(j,k));
+        pathout[counter] = sbpath.toString();
+        break; }
+      sbpath.append(itemtypeprefix).append(pathout[counter].substring(j,l+1));
+      j = l+1;
+      }
+    // add the itemtypeprefix to the pathin 
+    sbpath = new StringBuffer("");
+    j = 0;
+    k = pathin[counter].length();
+    while( j < k) {
+      l = pathin[counter].indexOf("/",j);
+      if (l == -1) {
+        sbpath.append(itemtypeprefix).append(pathin[counter].substring(j,k));
+        pathin[counter] = sbpath.toString();
+        break; }
+      sbpath.append(itemtypeprefix).append(pathin[counter].substring(j,l+1));
+      j = l+1;
+      }
+    // replace the tag if it is text()    
+    if (tag[counter].equals("text()")) {
+      j = 0;
+      if (pathin[counter].length() != 0) {
+        k = pathin[counter].length();
+        while( j < k) {
+          l = pathin[counter].indexOf("/",j);
+          if (l == -1) {
+            tag[counter] = "@"+pathin[counter].substring(j+2,k); break; }
+          j = l+1;
+          }
+        }
+      else {
+        if (pathout[counter].length() == 0) { tag[counter] = "*"; }
+        k = pathout[counter].length();
+        while( j < k) {
+          l = pathout[counter].indexOf("/",j);
+          if (l == -1) {
+            tag[counter] = "@"+pathout[counter].substring(j+2,k); break; }
+          j = l+1;
+          }
+        }
+      }
+    // increment the counter
     counter++;
     }
 
-
+  // debug
+/*
   for (i=0;i<counter;i++) {
+    logger.debug("PATHOUT="+pathout[i]);
+    logger.debug("PATHIN="+pathin[i]);
     logger.debug("TAG="+tag[i]);
     logger.debug("OPER="+op[i]);
     logger.debug("VALUE="+value[i]);
     logger.debug("BOOLEAN="+bool[i]);
     logger.debug("");
     }
-
+*/
 
   StringBuffer sbout = new StringBuffer();
-  sbout.append(pretag).append('[');
+  // if we have a common path
+  if (klammer) { sbout.append(pathout[0]).append('['); }
   for (i=0;i<counter;i++) {
-    int x = tag[i].indexOf("@xlink:");
+    // if we have a xml namespace
+    int x = tag[i].indexOf("@xml:");
     if (x != -1) { 
-      tag[i] = tag[i].substring(0,x)+"@xlink"+
-        tag[i].substring(x+7,tag[i].length());
-      }
+      tag[i] = "@"+tag[i].substring(x+5,tag[i].length()); }
+    // if we have a xlink namespace
+    x = tag[i].indexOf("@xlink:");
+    if (x != -1) { 
+      tag[i] = "@xlink"+tag[i].substring(x+7,tag[i].length()); }
+    // expand the attributes with itemtypeprefix
+    if (!tag[i].equals("*")) {
+      tag[i] = "@" + itemtypeprefix + tag[i].substring(1,tag[i].length()); }
+    // create for CONTAINS
     if (op[i].equals("contains")) {
       value[i] = value[i].replace('*','%');  
       StringTokenizer st = new StringTokenizer(value[i]);
       int stcount = st.countTokens();
       while (st.hasMoreTokens()) {
+System.out.println(tag[i]);
         if (tag[i].equals("*")) {
           sbout.append(" contains-text(@").append(itemtypeprefix)
             .append("ts,\"\'").append(st.nextToken()).append("\'\")=1");
           }
         else {
-          sbout.append(" contains-text(")
-            .append(convPath(tag[i],itemtypeprefix))
+          sbout.append(" contains-text(");
+          if (pathin[i].length() != 0) { sbout.append(pathin[i]).append('/'); }
+          sbout.append(tag[i])
             .append(",\"\'").append(st.nextToken()).append("\'\")=1");
           }
         if ((stcount > 1) && (st.countTokens()>0)) { sbout.append(" and "); }
@@ -306,7 +390,8 @@ private final String traceOneCondition(String cond, String itemtypename,
       sbout.append(bool[i]).append(' ');
       continue;
       }
-    sbout.append(convPath(tag[i],itemtypeprefix));
+    if (pathin[i].length() != 0) { sbout.append(pathin[i]).append('/'); }
+    sbout.append(tag[i]);
     if (op[i].equals("like")) { 
       // replace * with %
       value[i] = "%"+value[i].replace('*','%')+"%"; } 
@@ -340,40 +425,7 @@ private final String traceOneCondition(String cond, String itemtypename,
     sbout.append(' ').append(op[i]).append(" \"").append(value[i])
       .append("\"").append(bool[i]); 
     }
-  sbout.append(']');
-  //return sbout.toString().replace('\'','\"');
-  return sbout.toString();
-  }
-
-/**
- * Convert the input XML Path to a CM8 PATH
- *
- * @param inpath the input XML Path
- * @param itemtypeprefix the prefix for this item
- * @return the CM8 PATH
- **/
-private final String convPath(String inpath, String itemtypeprefix)
-  {
-  StringBuffer sbout = new StringBuffer(256);
-  int j = 0;
-  int k = inpath.length();
-  while( j < k) {
-    int l = inpath.indexOf("/",j);
-    if (l == -1) { 
-      if (inpath.charAt(j) == '@') { 
-        sbout.append('@').append(itemtypeprefix)
-          .append(inpath.substring(j+1,k));  break; }
-      else {
-        sbout.append(itemtypeprefix).append(inpath.substring(j,k))
-          .append('/').append('@').append(itemtypeprefix)
-          .append(inpath.substring(j,k)); break;
-        }
-      }
-    if (!inpath.substring(j,l).equals("*")) {
-      sbout.append(itemtypeprefix); }
-    sbout.append(inpath.substring(j,l)).append('/');
-    j = l+1; 
-    }
+  if (klammer) { sbout.append(']'); }
   return sbout.toString();
   }
 

@@ -49,7 +49,7 @@ protected static Logger logger = Logger.getLogger(MCRQueryBase.class.getName());
 /** The default maximum of resultes */
 public final static int MAX_RESULTS = 1000;
 /** The node name for a search in all document texts */
-public final static String XPATH_ATTRIBUTE_DOCTEXT = "doctext ";
+public final static String XPATH_ATTRIBUTE_DOCTEXT = "doctext()";
 protected static String NL =
   new String((System.getProperties()).getProperty("line.separator"));
 // protected data
@@ -59,6 +59,7 @@ protected MCRConfiguration config = null;
 protected ArrayList flags = null;
 protected ArrayList subqueries = null;
 protected ArrayList andor = null;
+protected String root = null;
 
 /**
  * The Constructor
@@ -94,18 +95,25 @@ public MCRXMLContainer getResultList( String query, String type,
   flags = new ArrayList();
   subqueries = new ArrayList();
   andor = new ArrayList();
-  int i=0, j = query.length(), l, m, n;
+  int i=0, j = query.length(), l, m, n, kon;
   while (i < j) {
     l = query.indexOf("/mycore",i);
     if (l == -1) { break; }
-    m = query.indexOf("[",i);
-    n = query.indexOf("]",i);
-    if ((m == -1) || (n == -1)) { break; }
-    if ((m < l) || (n < l)) { break; }
+    m = query.indexOf("[",l);
+    if (m == -1) { throwQueryEx(); }
+    if (root == null) { root = query.substring(l,m); }
+    n = query.indexOf("]",m);
+    if (n == -1) { throwQueryEx(); }
+    kon = 1;
+    for (int o=m+1;o<n;o++) {
+      if (query.charAt(o) == '[') { kon++; } }
+    for (int o=kon;o>1;o--) {
+      n = query.indexOf("]",n+1);
+      if (n == -1) { throwQueryEx(); }
+      }
     flags.add(Boolean.FALSE);
-    subqueries.add(query.substring(l,n+1));
+    subqueries.add(query.substring(m+1,n));
     i = n+1;
-System.out.println(i+"  "+j);
     if (i+5 < j) {
       l = query.toLowerCase().indexOf(" and ",i);
       if (l != -1) { andor.add("and"); i = l+5; continue; }
@@ -118,7 +126,8 @@ System.out.println(i+"  "+j);
     }
   // debug subqueries
   for (i=0;i<flags.size();i++) {
-    logger.debug("Q: "+(String)subqueries.get(i)+" "+(String)andor.get(i)); }
+    logger.debug("Q: "+(String)subqueries.get(i)+" by "+(String)andor.get(i)); }
+  logger.debug("R: The root string is "+root);
   // run over all types
   i=0; j = type.length(); l = i;
   String onetype = "";
@@ -130,12 +139,19 @@ System.out.println(i+"  "+j);
       onetype = type.substring(i,l); i = l+1; }
     if( (onetype == null) || ((onetype = onetype.trim()).length() == 0) ) {
       break; }
-    logger.debug("The separated query type is "+onetype);
+    logger.debug("T: The separated query type is "+onetype);
     result.importElements((MCRXMLContainer)startQuery(onetype));
     }
   return result;
   }
 
+/**
+ * Throw a MCRPersiteceException when the query is corrupt.
+ *
+ * @exception if this method would called
+ **/
+protected void throwQueryEx() throws MCRPersistenceException
+  { throw new MCRPersistenceException("Error while analyze the query string."); }
 /**
  * This method start the Query over one object type and return the
  * result as MCRXMLContainer. This implementation must be overwrite with
