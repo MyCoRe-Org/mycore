@@ -541,40 +541,6 @@ private final String createTS(MCRTypedContent mcr_tc)
         sb.append(NL);
         i += k; continue;
         }
-      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_LINK) {
-        sb.append("XXX");
-        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
-        sb.append("XXX")
-          .append(ttt.createSearchStringText((String)mcr_tc
-            .getValueElement(i+1)))
-          .append("XXX");
-        if (((String)mcr_tc.getValueElement(i+1)).toLowerCase()
-          .equals("locator")) {
-          sb.append("XXXHREFXXX")
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+2)))
-            .append("XXX ")
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+3)))
-            .append(' ')
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+4)));
-          }
-        else {
-          sb.append("XXXFROMXXX")
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+2)))
-            .append("XXX")
-            .append("XXXTOXXX")
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+3)))
-            .append("XXX ")
-            .append(ttt.createSearchStringText((String)mcr_tc
-              .getValueElement(i+4)));
-          }
-        sb.append(NL);
-        i += 5; continue;
-        }
       if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_NUMBER) {
         sb.append("XXX");
         for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
@@ -594,24 +560,6 @@ private final String createTS(MCRTypedContent mcr_tc)
         sb.append(NL);
         i += k; continue;
         }
-      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_CLASSID) {
-        sb.append("XXX");
-        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
-        sb.append("XXX")
-          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
-          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
-            .replace('.','X').replace('_','X'))
-          .append("XXX"); 
-        i++;
-        sb.append("XXX")
-          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
-          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
-            .replace('.','X').replace('_','X'))
-          .append("XXX"); 
-        i++;
-        sb.append(NL);
-        continue;
-        }
       if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_STRING) {
         sb.append("XXX");
         for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
@@ -630,6 +578,60 @@ private final String createTS(MCRTypedContent mcr_tc)
             .getValueElement(i)));
         sb.append(NL);
         i += k; continue;
+        }
+      }
+    if (mcr_tc.getTypeElement(i)==MCRTypedContent.TYPE_ATTRIBUTE) {   
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_CLASSID) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        sb.append("XXX")
+          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
+          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
+            .replace('.','X').replace('_','X'))
+          .append("XXX"); 
+        i++;
+        sb.append("XXX")
+          .append(mcr_tc.getNameElement(i).toUpperCase()).append("XXX")
+          .append(((String)mcr_tc.getValueElement(i)).toUpperCase()
+            .replace('.','X').replace('_','X'))
+          .append("XXX"); 
+        i++;
+        sb.append(NL);
+        continue;
+        }
+      if (mcr_tc.getFormatElement(i)==MCRTypedContent.FORMAT_LINK) {
+        sb.append("XXX");
+        for (int j=0;j<maxtag;j++) { sb.append(tag[j]).append("XXX"); }
+        sb.append("XXX")
+          .append(ttt.createSearchStringText((String)mcr_tc
+            .getValueElement(i)))
+          .append("XXX");
+        if (((String)mcr_tc.getValueElement(i)).toLowerCase()
+          .equals("locator")) {
+          sb.append("XXXHREFXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+1)))
+            .append("XXX ")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+2)))
+            .append(' ')
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+3)));
+          }
+        else {
+          sb.append("XXXFROMXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+1)))
+            .append("XXX")
+            .append("XXXTOXXX")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+2)))
+            .append("XXX ")
+            .append(ttt.createSearchStringText((String)mcr_tc
+              .getValueElement(i+3)));
+          }
+        sb.append(NL);
+        i += 4; continue;
         }
       }
     i++;
