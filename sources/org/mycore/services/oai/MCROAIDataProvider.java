@@ -874,37 +874,8 @@ public class MCROAIDataProvider extends HttpServlet {
         
         // get the arguments from the request
         String from[] = getParameter("from", request);
-        Date fromDate = null;
-        if (from != null) {
-        	fromDate = getDate(from[0]);
-        	if (fromDate == null) {
-    	    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
-	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
-        	}
-            maxArguments++;
-        } else {
-        	fromDate = getDate(STR_FIRST_DATE);
-        }
         String until[] = getParameter("until", request); 
-        Date untilDate = null;
-        if (until != null) {
-        	untilDate = getDate(until[0]);
-        	if (untilDate == null) {
-    	    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
-	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
-        	}
-        	if (fromDate != null) {
-        		if (fromDate.after(untilDate)) {
-    		    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
-		           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-        		}
-        	}
-            maxArguments++;
-        }
         String set[] = getParameter("set", request); 
-        if (set != null) {
-            maxArguments++;
-        }
         String metadataPrefix[] = getParameter("metadataPrefix", request); 
         String resumptionToken[] = getParameter("resumptionToken", request); 
         if (resumptionToken != null) {
@@ -914,6 +885,35 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
+	        Date fromDate = null;
+    	    if (from != null) {
+        		fromDate = getDate(from[0]);
+        		if (fromDate == null) {
+    	    		logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+    	    	}
+        	    maxArguments++;
+	        } else {
+    	    	fromDate = getDate(STR_FIRST_DATE);
+        	}
+	        Date untilDate = null;
+    	    if (until != null) {
+        		untilDate = getDate(until[0]);
+        		if (untilDate == null) {
+    	    		logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+    	    	}
+        		if (fromDate != null) {
+        			if (fromDate.after(untilDate)) {
+    		    		logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+		           		return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+	        		}
+    	    	}
+        	    maxArguments++;
+	        }
+    	    if (set != null) {
+        	    maxArguments++;
+	        }
         	if (metadataPrefix == null) {
     	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
@@ -1169,37 +1169,8 @@ public class MCROAIDataProvider extends HttpServlet {
         
         // Second: get the arguments from the request
         String from[] = getParameter("from", request);
-        Date fromDate = null;
-        if (from != null) {
-        	fromDate = getDate(from[0]);
-        	if (fromDate == null) {
-    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
-	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
-        	}
-            maxArguments++;
-        } else {
-        	fromDate = getDate(STR_FIRST_DATE);
-        }
         String until[] = getParameter("until", request); 
-        Date untilDate = null;
-        if (until != null) {
-        	untilDate = getDate(until[0]);
-        	if (untilDate == null) {
-    	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
-	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
-        	}
-        	if (fromDate != null) {
-        		if (fromDate.after(untilDate)) {
-    		    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
-		           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-        		}
-        	}
-            maxArguments++;
-        }
         String set[] = getParameter("set", request); 
-        if (set != null) {
-            maxArguments++;
-        }
         String metadataPrefix[] = getParameter("metadataPrefix", request); 
         String resumptionToken[] = getParameter("resumptionToken", request); 
         if (resumptionToken != null) {
@@ -1209,6 +1180,35 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
+	        Date fromDate = null;
+    	    if (from != null) {
+        		fromDate = getDate(from[0]);
+        		if (fromDate == null) {
+    	    		logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+    	    	}
+        	    maxArguments++;
+	        } else {
+    	    	fromDate = getDate(STR_FIRST_DATE);
+        	}
+	        Date untilDate = null;
+    	    if (until != null) {
+        		untilDate = getDate(until[0]);
+        		if (untilDate == null) {
+    	    		logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+    	    	}
+        		if (fromDate != null) {
+        			if (fromDate.after(untilDate)) {
+    		    		logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
+		           		return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+	        		}
+    	    	}
+        	    maxArguments++;
+	        }
+    	    if (set != null) {
+        	    maxArguments++;
+        	}
         	if (metadataPrefix == null) {
     	    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
