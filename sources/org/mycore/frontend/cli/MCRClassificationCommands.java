@@ -25,9 +25,14 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
+
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.mycore.common.*;
@@ -45,7 +50,19 @@ import org.mycore.datamodel.classifications.MCRClassification;
 
 public class MCRClassificationCommands
   {
+  private static Logger logger = 
+    Logger.getLogger(MCRClassificationCommands.class.getName());
   private static String SLASH = System.getProperty( "file.separator" );
+  
+
+ /**
+  * Initialize common data.
+  **/
+  private static void init()
+    {
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    }
 
  /**
   * Deletes an MCRClassification from the datastore.
@@ -55,10 +72,19 @@ public class MCRClassificationCommands
   public static void delete( String ID )
     throws Exception
     {
+    init();
     MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
-    cl.delete( mcr_id.getId() );
-    System.out.println( mcr_id.getId() + " deleted." );
+    try {
+      cl.delete( mcr_id.getId() );
+      logger.info( mcr_id.getId() + " deleted." );
+      }
+    catch ( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "Can't deltete " + mcr_id.getId() + "." );
+      logger.error( "" );
+      }
     }
 
  /**
@@ -86,28 +112,24 @@ public class MCRClassificationCommands
   **/
   private static void processFromDirectory( String directory, boolean update )
     {
+    init();
     File dir = new File( directory );
-
     if( ! dir.isDirectory() ) {
-      System.out.println( directory + " ignored, is not a directory." );
+      logger.warn( directory + " ignored, is not a directory." );
       return;
       }
-
     String[] list = dir.list();
-
     if( list.length == 0) {
-      System.out.println( "No files found in directory " + directory );
+      logger.warn( "No files found in directory " + directory );
       return;
       }
-
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
       if ( ! list[ i ].endsWith(".xml") ) { continue; }
       if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
       }
-
-    System.out.println( "Processed " + numProcessed + " files." );
+    logger.info( "Processed " + numProcessed + " files." );
     }
 
  /**
@@ -134,41 +156,35 @@ public class MCRClassificationCommands
   * is created
   **/
   private static boolean processFromFile( String file, boolean update )
-  {
-    if( ! file.endsWith( ".xml" ) )
     {
-      System.out.println( file + " ignored, does not end with *.xml" );
+    init();
+    if( ! file.endsWith( ".xml" ) ) {
+      logger.warn( file + " ignored, does not end with *.xml" );
       return false;
-    }
+      }
 
-    if( ! new File( file ).isFile() )
-    {
-      System.out.println( file + " ignored, is not a file." );
+    if( ! new File( file ).isFile() ) {
+      logger.warn( file + " ignored, is not a file." );
       return false;
-    }
-
-    System.out.println( "Reading file " + file + " ...\n" );
-
-    try
-    {
-    MCRClassification cl = new MCRClassification();
-      if( update )
-      {
+      }
+    logger.info( "Reading file " + file + " ...\n" );
+    try {
+      MCRClassification cl = new MCRClassification();
+      if( update ) {
         String id = cl.updateFromURI(file);
-        System.out.println( id + " updated.\n" );
-      }
-      else
-      {
+        logger.info( id + " updated.\n" );
+        }
+      else {
         String id = cl.createFromURI(file);
-        System.out.println( id + " loaded.\n" );
-      }
+        logger.info( id + " loaded.\n" );
+        }
       return true;
-    }
-    catch( Exception ex )
-    {
-      System.out.println( ex.getMessage() );
-      System.out.println();
-      System.out.println( "Exception while loading from file " + file );
+      }
+    catch( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while loading from file " + file );
+      logger.error("");
       return false;
     }
   }
@@ -181,6 +197,7 @@ public class MCRClassificationCommands
   **/
   public static void save( String ID, String filename )
   {
+    init();
     MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
     byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());
@@ -190,12 +207,14 @@ public class MCRClassificationCommands
       out.flush();
       }
     catch (IOException ex) {
-      System.out.println( ex.getMessage() );
-      System.out.println();
-      System.out.println( "Exception while store to file " + filename );
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while store to file " + filename );
+      logger.error("");
+      return;
       }
-    System.out.println( "Classification "+mcr_id.getId()+" stored under "
-      +filename+".\n" );
+    logger.info( "Classification "+mcr_id.getId()+" stored under "
+      +filename+"." );
+    logger.info("");
   }
 
 }

@@ -25,9 +25,14 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
+
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.mycore.common.*;
@@ -44,8 +49,19 @@ import org.mycore.datamodel.ifs.*;
  **/
 
 public class MCRDerivateCommands
-{
+  {
   private static String SLASH = System.getProperty( "file.separator" );
+  private static Logger logger =
+    Logger.getLogger(MCRDerivateCommands.class.getName());
+
+ /**
+  * Initialize common data.
+  **/
+  private static void init()
+    {
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    }
 
  /**
   * Delete an MCRDerivate from the datastore.
@@ -53,12 +69,20 @@ public class MCRDerivateCommands
   * @param ID the ID of the MCRDerivate that should be deleted
   **/
   public static void delete( String ID )
-    throws Exception
-  {
+    {
+    init();
     MCRDerivate mycore_obj = new MCRDerivate();
-    mycore_obj.deleteFromDatastore( ID );
-    System.out.println( mycore_obj.getId().getId() + " deleted." );
-  }
+    try {
+      mycore_obj.deleteFromDatastore( ID );
+      logger.info( mycore_obj.getId().getId() + " deleted." );
+      }
+    catch ( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "Can't deltete " + mycore_obj.getId().getId() + "." );
+      logger.error( "" );
+      }
+    }
 
  /**
   * Delete MCRDerivates form ID to ID from the datastore.
@@ -67,16 +91,27 @@ public class MCRDerivateCommands
   * @param IDto   the stop ID for deleting the MCRDerivate 
   **/
   public static void delete( String IDfrom, String IDto )
-    throws Exception
-  {
-  MCRObjectID from = new MCRObjectID(IDfrom);
-  MCRObjectID to = new MCRObjectID(IDto);
-  MCRObjectID now = new MCRObjectID(IDfrom);
-  for (int i=from.getNumberAsInteger();i<to.getNumberAsInteger()+1;i++) {
-    now.setNumber(i);
-    delete(now.getId());
+    {
+    init();
+    int from_i = 0;
+    int to_i = 0;
+    try {
+      MCRObjectID from = new MCRObjectID(IDfrom);
+      MCRObjectID to = new MCRObjectID(IDto);
+      MCRObjectID now = new MCRObjectID(IDfrom);
+      from_i = from.getNumberAsInteger(); 
+      to_i = to.getNumberAsInteger(); 
+      if (from_i > to_i) {
+        throw new MCRException( "The from-to-interval is false." ); }
+      for (int i=from_i;i<to_i+1;i++) {
+        now.setNumber(i); delete(now.getId()); }
+      }
+    catch ( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "" );
+      }
     }
-  }
 
  /**
   * Loads MCRDerivates from all XML files in a directory.
@@ -84,7 +119,7 @@ public class MCRDerivateCommands
   * @param directory the directory containing the XML files
   **/
   public static void loadFromDirectory( String directory )
-  { processFromDirectory( directory, false ); }
+    { processFromDirectory( directory, false ); }
 
  /**
   * Updates MCRDerivates from all XML files in a directory.
@@ -92,7 +127,7 @@ public class MCRDerivateCommands
   * @param directory the directory containing the XML files
   **/
   public static void updateFromDirectory( String directory )
-  { processFromDirectory( directory, true ); }
+    { processFromDirectory( directory, true ); }
 
  /**
   * Loads or updates MCRDerivates from all XML files in a directory.
@@ -101,32 +136,26 @@ public class MCRDerivateCommands
   * @param update if true, object will be updated, else object is created
   **/
   private static void processFromDirectory( String directory, boolean update )
-  {
+    {
+    init();
     File dir = new File( directory );
-
-    if( ! dir.isDirectory() )
-    {
-      System.out.println( directory + " ignored, is not a directory." );
+    if( ! dir.isDirectory() ) {
+      logger.warn( directory + " ignored, is not a directory." );
       return;
-    }
-
+      }
     String[] list = dir.list();
-
-    if( list.length == 0)
-    {
-      System.out.println( "No files found in directory " + directory );
+    if( list.length == 0) {
+      logger.warn( "No files found in directory " + directory );
       return;
-    }
-
+      }
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
-	if ( ! list[ i ].endsWith(".xml") ) continue;
-	if( processFromFile( directory + SLASH + list[ i ], update ) )
-	    numProcessed++;
+      if ( ! list[ i ].endsWith(".xml") ) continue;
+      if( processFromFile( directory + SLASH + list[ i ], update ) )
+        numProcessed++;
+      }
+    logger.info( "Processed " + numProcessed + " files." );
     }
-
-    System.out.println( "Processed " + numProcessed + " files." );
-  }
 
  /**
   * Loads an MCRDerivates from an XML file.
@@ -134,7 +163,7 @@ public class MCRDerivateCommands
   * @param filename the location of the xml file
   **/
   public static boolean loadFromFile( String file )
-  { return processFromFile( file, false ); }
+    { return processFromFile( file, false ); }
 
  /**
   * Updates an MCRDerivates from an XML file.
@@ -142,7 +171,7 @@ public class MCRDerivateCommands
   * @param filename the location of the xml file
   **/
   public static boolean updateFromFile( String file )
-  { return processFromFile( file, true ); }
+    { return processFromFile( file, true ); }
 
  /**
   * Loads or updates an MCRDerivates from an XML file.
@@ -151,47 +180,39 @@ public class MCRDerivateCommands
   * @param update if true, object will be updated, else object is created
   **/
   private static boolean processFromFile( String file, boolean update )
-  {
-    if( ! file.endsWith( ".xml" ) )
     {
-      System.out.println( file + " ignored, does not end with *.xml" );
+    init();
+    if( ! file.endsWith( ".xml" ) ) {
+      logger.warn( file + " ignored, does not end with *.xml" );
       return false;
-    }
-
-    if( ! new File( file ).isFile() )
-    {
-      System.out.println( file + " ignored, is not a file." );
+      }
+    if( ! new File( file ).isFile() ) {
+      logger.warn( file + " ignored, is not a file." );
       return false;
-    }
-
-    System.out.println( "Reading file " + file + " ...\n" );
-
-    try
-    {
+      }
+    logger.info( "Reading file " + file + " ...\n" );
+    try {
       MCRDerivate mycore_obj = new MCRDerivate();
       mycore_obj.setFromURI( file );
-      System.out.println( "Label --> " + mycore_obj.getLabel() );
-
-      if( update )
-      {
+      logger.info( "Label --> " + mycore_obj.getLabel() );
+      if( update ) {
         mycore_obj.updateInDatastore();
-        System.out.println( mycore_obj.getId().getId() + " updated.\n" );
-      }
-      else
-      {
+        logger.info( mycore_obj.getId().getId() + " updated.\n" );
+        }
+      else {
         mycore_obj.createInDatastore();
-        System.out.println( mycore_obj.getId().getId() + " loaded.\n" );
-      }
+        logger.info( mycore_obj.getId().getId() + " loaded.\n" );
+        }
       return true;
-    }
-    catch( Exception ex )
-    {
-      System.out.println( ex );
-      System.out.println();
-      System.out.println( "Exception while loading from file " + file );
+      }
+    catch( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while loading from file " + file );
+      logger.error( "" );
       return false;
+      }
     }
-  }
 
  /**
   * Shows an MCRDerivates.
@@ -199,23 +220,23 @@ public class MCRDerivateCommands
   * @param ID the ID of the MCRDerivate to be shown.
   **/
   public static void show( String ID )
-  {
+    {
     MCRDerivate mycore_obj = new MCRDerivate();
     mycore_obj.receiveFromDatastore( ID );
     mycore_obj.debug();
     MCRObjectService se = mycore_obj.getService();
     if (se != null) { se.debug(); }
-  }
+    }
 
  /**
   * Shows a list of next MCRObjectIDs.
   */
   public static void getid( String base )
-  { 
+    { 
     MCRObjectID mcr_id = new MCRObjectID();
     mcr_id.setNextId( base );
     mcr_id.debug();
-  }
+    }
 
  /**
   * Save an MCRDerivate with the ID under the dirname and store the derivate
@@ -226,14 +247,15 @@ public class MCRDerivateCommands
   **/
   public static void save( String ID, String dirname )
     {
+    init();
     // check dirname
     File dir = new File(dirname);
     if (dir.isFile()) {
-      System.out.println(dirname+" is not a dirctory."); return; }
+      logger.error(dirname+" is not a dirctory."); return; }
     if (dir.isDirectory()) {
-      System.out.println(dirname+" is an existing dirctory."); return; }
+      logger.error(dirname+" is an existing dirctory."); return; }
     if (!dir.mkdir()) {
-      System.out.println("Can not create dirctory "+dirname+"."); return; }
+      logger.error("Can not create dirctory "+dirname+"."); return; }
     // checkID
     MCRObjectID mcr_id = new MCRObjectID(ID);
     // store the derivate metadata in dirname.xml
@@ -246,21 +268,23 @@ public class MCRDerivateCommands
       out.flush();
       }
     catch (IOException ex) {
-      System.out.println( ex.getMessage() );
-      System.out.println();
-      System.out.println( "Exception while store to file " + filename );
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while store to file " + filename );
+      return;
       }
     // store the derivate file under dirname
     try {
       MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(ID),dir); }
-    catch (IOException ex) {
-      System.out.println( ex );
-      System.out.println();
-      System.out.println( "Exception while store to object in " + dirname );
+    catch (MCRException ex) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "Exception while store to object in " + dirname );
+      logger.error( "" );
+      return;
       }
-    System.out.println( "Derivate "+ID+" stored under "+dirname+" and "+
+    logger.info( "Derivate "+ID+" stored under "+dirname+" and "+
       filename+".\n" );
-  }
+    }
 
  /**
   * Save an MCRDerivate with the ID under the ID as name and store the 
@@ -271,4 +295,5 @@ public class MCRDerivateCommands
   public static void save( String ID )
     { save(ID,ID); }
 
-}
+  }
+

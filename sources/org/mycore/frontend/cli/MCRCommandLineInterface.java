@@ -28,6 +28,10 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.lang.reflect.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.*;
 
 /**
@@ -46,7 +50,14 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  */
 public class MCRCommandLineInterface
-{
+  {
+
+  /** The Logger **/
+  static Logger logger=Logger.getLogger(MCRCommandLineInterface.class.getName());
+
+  /** The configuration **/
+  private static MCRConfiguration config = null;
+
   /** The total number of known commands */
   protected static int numCommands = 0;
 
@@ -64,10 +75,7 @@ public class MCRCommandLineInterface
   * and builds the MCRCommand instances
   **/
   protected static void initCommands()
-    throws NoSuchMethodException, ClassNotFoundException
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-
+    {
     // **************************************
     // Built-in commands
     // **************************************
@@ -265,53 +273,51 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(
       "show group {0}",
       "org.mycore.frontend.cli.MCRUserCommands.showGroup String" );
-  }
+    }
 
  /**
   * The main method that either shows up an interactive command prompt or
   * reads a file containing a list of commands to be processed
   */
   public static void main( String[] args )
-  {
-    System.out.println( "\nMyCoRe Command Line Interface. Type 'help' to get help!" );
-    System.out.print( "Initializing: " );
-
-    try{ initCommands(); }
-    catch( Exception ex )
     {
-      System.out.println();
-      System.out.println( ex );
+    config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+
+    logger.info( "" );
+    logger.info( "MyCoRe Command Line Interface. Type 'help' to get help!" );
+    logger.info( "Initializing: " );
+
+    try{ 
+      initCommands(); }
+    catch( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "" );
       System.exit( 1 );
-    }
-    System.out.println( "done." );
+      }
+    logger.info( "Done." );
+    logger.info( "" );
 
-    if( args.length > 0 )
-    {
+    if( args.length > 0 ) {
       StringBuffer cmd = new StringBuffer();
-
-      for( int i = 0; i < args.length; i++ )
-        cmd.append( args[ i ] ).append( " " );
-
+      for( int i = 0; i < args.length; i++ ) {
+        cmd.append( args[ i ] ).append( " " ); }
       commandQueue.addElement( cmd.toString().trim() );
       commandQueue.addElement( "exit" );
-    }
+      }
 
     String command;
-
-    while( true )
-    {
-      if( commandQueue.isEmpty() )
-      {
-        command = readCommandFromPrompt();
-      }
-      else
-      {
+    while( true ) {
+      if( commandQueue.isEmpty() ) {
+        command = readCommandFromPrompt(); }
+      else {
         command = (String) commandQueue.firstElement();
         commandQueue.removeElementAt( 0 );
-      }
+        }
       processCommand( command );
+      }
     }
-  }
 
  /**
   * Shows up a command prompt.
@@ -320,17 +326,14 @@ public class MCRCommandLineInterface
   */
   protected static String readCommandFromPrompt()
   {
-    System.out.println();
     String line = "";
-    do
-    {
-      System.out.print( "MyCoRe:> " );
+    do {
+      logger.info( "MyCoRe:> " );
       try{ line = console.readLine(); }catch( IOException ex ){}
-    }
+      }
     while( ( line = line.trim() ).length() == 0 );
-
     return line;
-  }
+    }
 
  /**
   * Processes a command entered by searching a matching command
@@ -339,29 +342,28 @@ public class MCRCommandLineInterface
   * @param command The command string to be processed
   */
   protected static void processCommand( String command )
-  {
-    try
     {
-      for( int i = 0; i < numCommands; i++ )
-        if( knownCommands[ i ].invoke( command ) )
-          return;
-
-      System.out.println( "Command not understood. Enter 'help' to get a list of commands." );
-    }
-    catch( Exception ex )
-    {
-      if( ex instanceof InvocationTargetException )
-      {
+    try {
+      for( int i = 0; i < numCommands; i++ ) {
+        if( knownCommands[ i ].invoke( command ) ) { return; } 
+        }
+      logger.error( "Command not understood. Enter 'help' to get a list of commands." );
+      }
+    catch( MCRException ex ) {
+      logger.debug( ex.getStackTraceAsString() );
+      logger.error( ex.getMessage() );
+      logger.error( "" );
+      }
+    catch( Exception ex ) {
+      if( ex instanceof InvocationTargetException ) {
         Throwable t = ( (InvocationTargetException)ex ).getTargetException();
-        System.out.println( t );
-      }
-      else
-      {
-        System.out.println( ex );
-        System.out.println( ex.getMessage() );
+        logger.error(t.toString());
+        }
+      else {
+        logger.error( ex.getMessage() );
+        }
       }
     }
-  }
 
  /**
   * Reads a file containing a list of commands to be executed and adds
@@ -374,34 +376,31 @@ public class MCRCommandLineInterface
   */
   public static void readCommandsFile( String file )
     throws IOException, FileNotFoundException
-  {
+    {
     BufferedReader reader = new BufferedReader( new FileReader( file ) );
-    System.out.println( "Reading commands from file " + file );
-
+    logger.info( "Reading commands from file " + file );
     String line;
     int pos = 0;
-    while( ( line = reader.readLine() ) != null )
-    {
+    while( ( line = reader.readLine() ) != null ) {
       line = line.trim();
       if( line.startsWith( "#" ) || ( line.length() == 0 ) )
         continue;
       else
         commandQueue.insertElementAt( line, pos++ );
-    }
+      }
     reader.close();
-  }
+    }
 
  /**
   * Shows a list of commands understood by the command line interface and
   * shows their input syntax. This method implements the "help" command
   */
   public static void listKnownCommands()
-  {
-    System.out.println( "The following is a list of known commands:\n" );
-
-    for( int i = 0; i < numCommands; i++ )
-      knownCommands[ i ].showSyntax();
-  }
+    {
+    logger.info( "The following is a list of known commands:\n" );
+    for( int i = 0; i < numCommands; i++ ) {
+      logger.info(knownCommands[ i ].showSyntax()); }
+    }
 
  /**
   * Executes simple shell commands from inside the command line
@@ -415,12 +414,11 @@ public class MCRCommandLineInterface
   */
   public static void executeShellCommand( String command )
     throws IOException, SecurityException, InterruptedException
-  {
+    {
     Process p = Runtime.getRuntime().exec( command );
-
     showOutput( p.getInputStream() );
     showOutput( p.getErrorStream() );
-  }
+    }
 
  /**
   * Catches the output read from an input stream and prints it line by line
@@ -429,20 +427,22 @@ public class MCRCommandLineInterface
   */
   protected static void showOutput( InputStream in )
     throws IOException
-  {
+    {
     int c;
-    while( ( c = in.read() ) != -1 )
-      System.out.print( (char)c );
-  }
+    StringBuffer sb = new StringBuffer(1024);
+    while( ( c = in.read() ) != -1 ) {
+      sb.append( (char)c ); }
+    logger.info(sb.toString());
+    }
 
  /**
   * Exits the command line interface. This method implements the "exit" and
   * "quit" commands.
   */
   public static void exit()
-  {
-    System.out.println( "Goodbye, and remember: \"Alles wird gut.\"\n" );
+    {
+    logger.info( "Goodbye, and remember: \"Alles wird gut.\"\n" );
     System.exit( 0 );
+    }
   }
-}
 

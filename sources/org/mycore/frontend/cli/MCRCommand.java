@@ -185,11 +185,11 @@ public class MCRCommand
   }
 
  /** 
-  * Shows the input syntax to be used for invoking this command from the 
+  * Returns the input syntax to be used for invoking this command from the 
   * command prompt.
+  *
+  * @return the input syntax for this command
   **/
-  public void showSyntax()
-  {
-    System.out.println( messageFormat.toPattern() );
-  }
+  public final String showSyntax()
+    { return messageFormat.toPattern(); }
 }

@@ -25,9 +25,14 @@
 package org.mycore.frontend.cli;
 
 import java.io.*;
+
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.mycore.common.*;
@@ -45,6 +50,18 @@ import org.mycore.datamodel.metadata.*;
 public class MCRBaseCommands
 {
   private static String SLASH = System.getProperty( "file.separator" );
+  private static Logger logger =
+    Logger.getLogger(MCRDerivateCommands.class.getName());
+  private static MCRConfiguration config = null;
+
+ /**
+  * Initialize common data.
+  **/
+  private static void init()
+    {
+    config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    }
 
  /**
   * Create a new data base file for the MCRObjectId type.
@@ -54,11 +71,11 @@ public class MCRBaseCommands
   **/
   public static boolean createDataBase ( String mcr_type )
     {
-    MCRConfiguration conf = MCRConfiguration.instance();
+    init();
     // Application pathes
     String mycore_appl = "";
     try {
-      mycore_appl = conf.getString("MCR.appl_path"); }
+      mycore_appl = config.getString("MCR.appl_path"); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for MCR.appl_path." ); }
     String SLASH = System.getProperty("file.separator");
@@ -66,7 +83,7 @@ public class MCRBaseCommands
     String conf_home = mycore_appl+SLASH+"config";
     String conf_filename = "";
     try {
-      conf_filename = conf.getString("MCR.persistence_config_"+mcr_type); }
+      conf_filename = config.getString("MCR.persistence_config_"+mcr_type); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for "+mcr_type ); }
     if(!conf_filename.endsWith(".xml")) {
@@ -74,7 +91,7 @@ public class MCRBaseCommands
     File conf_file = new File(conf_home,conf_filename);
     if(! conf_file.isFile()) {
       throw new MCRException("Can't read configuration for "+mcr_type ); }
-    System.out.println( "Reading file " + conf_filename + " ...\n" );
+    logger.info( "Reading file " + conf_filename + " ...\n" );
     org.jdom.Document confdoc = null;
     try {
       SAXBuilder builder = new SAXBuilder();
@@ -99,16 +116,16 @@ public class MCRBaseCommands
   **/
   public static boolean createXMLSchema ( String mcr_type )
     {
-    MCRConfiguration conf = MCRConfiguration.instance();
+    init();
     // Root pathes
     String mycore_root = "";
     try {
-      mycore_root = conf.getString("MCR.root_path"); }
+      mycore_root = config.getString("MCR.root_path"); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for MCR.root_path." ); }
     String mycore_appl = "";
     try {
-      mycore_appl = conf.getString("MCR.appl_path"); }
+      mycore_appl = config.getString("MCR.appl_path"); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for MCR.appl_path." ); }
     String SLASH = System.getProperty("file.separator");
@@ -116,7 +133,7 @@ public class MCRBaseCommands
     String conf_home = mycore_appl+SLASH+"config";
     String conf_filename = "";
     try {
-      conf_filename = conf.getString("MCR.persistence_config_"+mcr_type); }
+      conf_filename = config.getString("MCR.persistence_config_"+mcr_type); }
     catch ( Exception e ) {
       throw new MCRException("Can't find configuration for "+mcr_type ); }
     if(!conf_filename.endsWith(".xml")) {
@@ -124,7 +141,7 @@ public class MCRBaseCommands
     File conf_file = new File(conf_home,conf_filename);
     if(! conf_file.isFile()) {
       throw new MCRException("Can't read configuration for "+mcr_type ); }
-    System.out.println( "Reading file " + conf_filename + " ...\n" );
+    logger.info( "Reading file " + conf_filename + " ...\n" );
     // Set schema file
     String schema_home = mycore_appl+SLASH+"schema";
     String schema_filename = conf_filename.substring(0,conf_filename.length()-4)
@@ -135,7 +152,7 @@ public class MCRBaseCommands
     File xslt_file = new File(xslt_home,xslt_filename);
     if(! xslt_file.isFile()) {
       throw new MCRException("Can't read schema from MCRSchema.xsl"); }
-    System.out.println( "Reading file " + xslt_filename + " ...\n" );
+    logger.info( "Reading file " + xslt_filename + " ...\n" );
     // Transform
     try {
     TransformerFactory transfakt = TransformerFactory.newInstance();
@@ -144,7 +161,7 @@ public class MCRBaseCommands
     trans.setParameter("mycore_appl",mycore_appl);
     trans.transform(new StreamSource(conf_file),new StreamResult(schema_home+
       System.getProperty("file.separator")+schema_filename));
-    System.out.println( "Write file " + schema_filename + " ...\n" ); }
+    logger.info( "Write file " + schema_filename + " ...\n" ); }
     catch ( Exception e ) {
       throw new MCRException(e.getMessage()); }
     return true;

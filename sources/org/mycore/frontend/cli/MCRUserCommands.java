@@ -30,6 +30,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -46,6 +50,18 @@ import org.mycore.user.*;
  */
 public class MCRUserCommands
 {
+  private static Logger logger =
+    Logger.getLogger(MCRUserCommands.class.getName());
+
+ /**
+  * Initialize common data.
+  **/
+  private static void init()
+    {
+    MCRConfiguration config = MCRConfiguration.instance();
+    PropertyConfigurator.configure(config.getLoggingProperties());
+    }
+
   /**
    * This method checks the data consistency of the user management and should be
    * called after a system crash or after importing data from files, respectively.
@@ -73,8 +89,9 @@ public class MCRUserCommands
    */
   public static void deleteGroup(String groupID) throws Exception
   {
+    init();
     MCRUserMgr.instance().deleteGroup(groupID);
-    System.out.println("Group ID " + groupID + " deleted!");
+    logger.info("Group ID " + groupID + " deleted!");
   }
 
   /**
@@ -85,8 +102,9 @@ public class MCRUserCommands
    */
   public static void deleteUser(String userID) throws Exception
   {
+    init();
     MCRUserMgr.instance().deleteUser(userID);
-    System.out.println("User ID " + userID + " deleted!");
+    logger.info("User ID " + userID + " deleted!");
   }
 
   /**
@@ -95,10 +113,11 @@ public class MCRUserCommands
    */
   public static void listAllUsers() throws Exception
   {
+    init();
     Vector users = new Vector(MCRUserMgr.instance().getAllUserIDs());
-    System.out.println();
+    logger.info("");
     for (int i=0; i<users.size(); i++)
-      System.out.println(users.elementAt(i));
+      logger.info(users.elementAt(i));
   }
 
   /**
@@ -107,10 +126,11 @@ public class MCRUserCommands
    */
   public static void listAllGroups() throws Exception
   {
+    init();
     Vector groups = new Vector(MCRUserMgr.instance().getAllGroupIDs());
-    System.out.println();
+    logger.info("");
     for (int i=0; i<groups.size(); i++)
-      System.out.println(groups.elementAt(i));
+      logger.info(groups.elementAt(i));
   }
 
   /**
@@ -119,12 +139,13 @@ public class MCRUserCommands
    */
   public static void listAllPrivileges() throws Exception
   {
+    init();
     Vector privs = new Vector(MCRPrivilegeSet.instance().getPrivileges());
-    System.out.println();
+    logger.info("");
     for (int i=0; i<privs.size(); i++) {
       MCRPrivilege currentPriv = (MCRPrivilege)privs.elementAt(i);
-      System.out.println(currentPriv.getName());
-      System.out.println("    "+currentPriv.getDescription());
+      logger.info(currentPriv.getName());
+      logger.info("    "+currentPriv.getDescription());
     }
   }
 
@@ -225,8 +246,9 @@ public class MCRUserCommands
   /** This method sets the user management component to read only mode */
   public static void setLock() throws Exception
   {
+    init();
     MCRUserMgr.instance().setLock(true);
-    System.out.println("Write access to the user component persistent database now is denied.");
+    logger.info("Write access to the user component persistent database now is denied.");
   }
 
   /**
@@ -258,8 +280,9 @@ public class MCRUserCommands
   /** This method sets the user management component to read/write access mode */
   public static void unLock() throws Exception
   {
+    init();
     MCRUserMgr.instance().setLock(false);
-    System.out.println("Write access to the user component persistent database now is allowed.");
+    logger.info("Write access to the user component persistent database now is allowed.");
   }
 
   /**
@@ -284,18 +307,19 @@ public class MCRUserCommands
    */
   private static void loadFromFile(String filename, String todo) throws Exception
   {
+    init();
     String SLASH = new String((System.getProperties()).getProperty("file.separator"));
     int fnLength;  // Length of the file name
     File inFile = new File(filename);
 
-    System.out.println("Creating|importing|updating user/group/privilege data "
+    logger.info("Creating|importing|updating user/group/privilege data "
                       + " from file|directory: "+filename);
 
     if (inFile.isDirectory())
     {
       String [] fileList = inFile.list();
       if (fileList.length == 0)
-        System.out.println("The given directory is empty!");
+        logger.info("The given directory is empty!");
 
       int xmlFileCounter = 0;
       for (int i=0; i<fileList.length; i++)
@@ -308,14 +332,14 @@ public class MCRUserCommands
         }
       }
       if (xmlFileCounter == 0)
-        System.out.println("The given directory contains no .xml file!");
+        logger.info("The given directory contains no .xml file!");
 
       return;  // All .xml-files in the given directory are read.
     }  // No, the given parameter is *not* a directory...
 
     if (inFile.isFile() && filename.substring(filename.length()-4, filename.length()).equals(".xml"))
       loadFromXMLFile(filename, todo);
-    else System.out.println("File not valid or not !");
+    else logger.info("File not valid or not !");
   }
 
   /**
@@ -330,7 +354,8 @@ public class MCRUserCommands
    */
   private static void loadFromXMLFile(String filename, String todo) throws Exception
   {
-    System.out.print("Reading file : "+filename+"\n");
+    init();
+    logger.info("Reading file : "+filename+"\n");
     Document jdomDoc = null;
     File inFile = new File(filename);
 
@@ -347,10 +372,10 @@ public class MCRUserCommands
       else if (type.equals("privilege"))
         loadPrivilegeFromXMLFile(jdomRootElement);
       else
-        System.out.println("MCRUserCommands: unknown object type!");
+        logger.info("MCRUserCommands: unknown object type!");
     }
     catch (Exception e) {
-      System.out.println("Exception: "+e.getMessage());
+      logger.info("Exception: "+e.getMessage());
     }
   }
 
@@ -367,9 +392,10 @@ public class MCRUserCommands
    */
   private static void loadUserFromXMLFile(Element rootElement, String todo) throws Exception
   {
+    init();
     List userList  = rootElement.getChildren();
     int iNumUsers  = userList.size();
-    System.out.println("Number of users to create resp. update: "+iNumUsers);
+    logger.info("Number of users to create resp. update: "+iNumUsers);
 
     for (int i=0; i<iNumUsers; i++) {
       Element userElement = (Element)userList.get(i);
@@ -462,7 +488,7 @@ public class MCRUserCommands
           groups, "update");
       }
     } // end for
-    System.out.println("All users created resp. updated.");
+    logger.info("All users created resp. updated.");
   }
 
   /**
@@ -478,10 +504,11 @@ public class MCRUserCommands
    */
   private static void loadGroupFromXMLFile(Element rootElement, String todo) throws Exception
   {
+    init();
     boolean create = false;
     List groupList = rootElement.getChildren();
     int iNumGroups = groupList.size();
-    System.out.println("Number of groups to create resp. update: "+iNumGroups);
+    logger.info("Number of groups to create resp. update: "+iNumGroups);
 
     for (int i=0; i<iNumGroups; i++) { // Loop over all groups in the xml file
       Vector groups  = null;
@@ -592,7 +619,7 @@ public class MCRUserCommands
           adminUsers, adminGroups, users, memberGroups, groups, privileges, "update");
       }
     }
-    System.out.println("All groups created resp. updated.");
+    logger.info("All groups created resp. updated.");
   }
 
   /**
@@ -603,10 +630,11 @@ public class MCRUserCommands
    */
   private static void loadPrivilegeFromXMLFile(Element rootElement) throws Exception
   {
+    init();
     List privList = rootElement.getChildren();
     int iNumPrivs = privList.size();
     Vector privileges = new Vector();
-    System.out.println("Number of privileges to create resp. update: "+iNumPrivs);
+    logger.info("Number of privileges to create resp. update: "+iNumPrivs);
 
     for (int i=0; i<iNumPrivs; i++) {
       Element privElement = (Element)privList.get(i);
@@ -618,7 +646,7 @@ public class MCRUserCommands
       privileges.add(priv);
     }
     MCRPrivilegeSet.instance().loadPrivileges(privileges);
-    System.out.println("All privileges created resp. updated.");
+    logger.info("All privileges created resp. updated.");
   }
 
   /**
