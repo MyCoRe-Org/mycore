@@ -278,9 +278,10 @@ public class MCROAIQueryService implements MCROAIQuery {
 	public List getRecord(String id, String instance) {
 		List list = new ArrayList();
 
+		MCRConfiguration config = MCRConfiguration.instance();
         MCRObject object = new MCRObject();
         try {
-        	repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
+        	String repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
             object.receiveFromDatastore(id);
 	    } catch (MCRConfigurationException mcrx) {
 	    	return null;

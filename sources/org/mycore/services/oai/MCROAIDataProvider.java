@@ -984,7 +984,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    }
 
         if (query.exists(id)) {
-        	List record = new ArrayList(query.getRecord(id));
+        	List record = new ArrayList(query.getRecord(id, getServletName()));
             Element eGetRecord = new Element("GetRecord", ns);
             
 		    if (record != null) {
