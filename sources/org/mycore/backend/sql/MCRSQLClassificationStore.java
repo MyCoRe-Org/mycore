@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -33,8 +33,9 @@ import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.classifications.*;
 
-/** 
- * This class implements the MCRClassificationInterface as presistence
+
+/**
+ * This class implements the MCRClassificationInterface as persistence
  * layer for a SQL database.
  *
  * @author Frank Lützenkirchen
@@ -52,6 +53,8 @@ private String tableClass;
 private String tableClassLabel;
 private String tableCateg;
 private String tableCategLabel;
+private String tableLinkClass;
+
 private int lengthClassID = MCRMetaClassification.MAX_CLASSID_LENGTH;
 private int lengthCategID = MCRMetaClassification.MAX_CATEGID_LENGTH;
 private int lengthLang    = MCRClassificationObject.MAX_CLASSIFICATION_LANG;
@@ -61,48 +64,52 @@ private int lengthDescription = MCRClassificationObject
     .MAX_CLASSIFICATION_DESCRIPTION;
 
 /**
- * The constructor for the class MCRSQLClassificationStore. It reads 
+ * The constructor for the class MCRSQLClassificationStore. It reads
  * the classification configuration and checks the table names.
  **/
 public MCRSQLClassificationStore()
-  { 
+  {
   MCRConfiguration config = MCRConfiguration.instance();
   // set the logger property
   PropertyConfigurator.configure(config.getLoggingProperties());
   // set configuration
-  tableClass = config.getString( 
+  tableClass = config.getString(
     "MCR.classifications_store_sql_table_class","MCRCLASS" );
-  tableClassLabel = config.getString( 
+  tableClassLabel = config.getString(
     "MCR.classifications_store_sql_table_classlabel","MCRCLASSLABEL" );
-  tableCateg = config.getString( 
+  tableCateg = config.getString(
     "MCR.classifications_store_sql_table_categ","MCRCATEG" );
-  tableCategLabel = config.getString( 
+  tableCategLabel = config.getString(
     "MCR.classifications_store_sql_table_categlabel","MCRCATEGLABEL" );
+  tableLinkClass = config.getString(
+    "MCR.linktable_store_sql_table_class","MCRLINKCLASS" );
+
+
   if(! MCRSQLConnection.doesTableExist(tableClass)) {
     logger.info("Create table "+tableClass);
-    createClass(); 
+    createClass();
     logger.info("Done."); }
-  if(! MCRSQLConnection.doesTableExist(tableClassLabel)) { 
+  if(! MCRSQLConnection.doesTableExist(tableClassLabel)) {
     logger.info("Create table "+tableClassLabel);
-    createClassLabel(); 
+    createClassLabel();
     logger.info("Done."); }
-  if(! MCRSQLConnection.doesTableExist(tableCateg)) { 
+  if(! MCRSQLConnection.doesTableExist(tableCateg)) {
     logger.info("Create table "+tableCateg);
-    createCateg(); 
+    createCateg();
     logger.info("Done."); }
-  if(! MCRSQLConnection.doesTableExist(tableCategLabel)) { 
+  if(! MCRSQLConnection.doesTableExist(tableCategLabel)) {
     logger.info("Create table "+tableCategLabel);
-    createCategLabel(); 
+    createCategLabel();
     logger.info("Done."); }
   }
-  
+
 /**
  * The method drop the classification and category tables.
  **/
 public final void dropTables()
   {
   MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-  try { 
+  try {
     c.doUpdate( "DROP TABLE " + tableClass );
     c.doUpdate( "DROP TABLE " + tableClassLabel );
     c.doUpdate( "DROP TABLE " + tableCateg );
@@ -117,7 +124,7 @@ public final void dropTables()
 private final void createClass()
   {
   MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-  try { 
+  try {
     // the classification table
     c.doUpdate( new MCRSQLStatement( tableClass )
      .addColumn( "ID VARCHAR("+Integer.toString(lengthClassID)+
@@ -126,14 +133,14 @@ private final void createClass()
     }
   finally{ c.release(); }
   }
-    
+
 /**
  * The method create a table for category.
  **/
 private final void createCateg()
   {
   MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-  try { 
+  try {
     // the category table
     c.doUpdate( new MCRSQLStatement( tableCateg )
      .addColumn( "ID VARCHAR("+Integer.toString(lengthCategID)+") NOT NULL" )
@@ -145,14 +152,14 @@ private final void createCateg()
     }
   finally{ c.release(); }
   }
-    
+
 /**
  * The method create a label table for classification.
  **/
 private final void createClassLabel()
   {
   MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-  try { 
+  try {
     // the classification table
     c.doUpdate( new MCRSQLStatement( tableClassLabel )
      .addColumn( "ID VARCHAR("+Integer.toString(lengthClassID)+
@@ -168,14 +175,14 @@ private final void createClassLabel()
     }
   finally{ c.release(); }
   }
-    
+
 /**
  * The method create a label table for category.
  **/
 private final void createCategLabel()
   {
   MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-  try { 
+  try {
     // the category table
     c.doUpdate( new MCRSQLStatement( tableCategLabel )
      .addColumn( "ID VARCHAR("+Integer.toString(lengthCategID)+
@@ -193,13 +200,13 @@ private final void createCategLabel()
     }
   finally{ c.release(); }
   }
-    
+
 /**
  * The method create a new MCRClassificationItem in the datastore.
  *
  * @param classification an instance of a MCRClassificationItem
  **/
-public final void createClassificationItem( MCRClassificationItem 
+public final void createClassificationItem( MCRClassificationItem
   classification )
   {
   MCRSQLConnection.justDoUpdate( new MCRSQLStatement( tableClass )
@@ -214,7 +221,7 @@ public final void createClassificationItem( MCRClassificationItem
       .toInsertStatement() );
     }
   }
-  
+
 /**
  * The method remove a MCRClassificationItem from the datastore.
  *
@@ -235,7 +242,7 @@ public void deleteClassificationItem( String ID )
     .setCondition( "CLID", ID )
     .toDeleteStatement() );
   }
-  
+
 /**
  * The method return a MCRClassificationItem from the datastore.
  *
@@ -243,13 +250,13 @@ public void deleteClassificationItem( String ID )
  **/
 public final MCRClassificationItem retrieveClassificationItem( String ID )
   {
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableClass )
     .setCondition( "ID", ID )
     .toSelectStatement() );
   if( ! reader.next() ) return null;
   MCRClassificationItem c = new MCRClassificationItem( ID );
-  reader = MCRSQLConnection.justDoQuery( 
+  reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableClassLabel )
     .setCondition( "ID", ID )
     .toSelectStatement() );
@@ -261,7 +268,7 @@ public final MCRClassificationItem retrieveClassificationItem( String ID )
     }
   return c;
   }
-  
+
 /**
  * The method return if the MCRClassificationItem is in the datastore.
  *
@@ -307,7 +314,7 @@ public final void createCategoryItem( MCRCategoryItem category )
       .toInsertStatement() );
     }
   }
-    
+
 /**
  * The method remove a MCRCategoryItem from the datastore.
  *
@@ -325,7 +332,7 @@ public final void deleteCategoryItem( String CLID, String ID )
     .setCondition( "ID",   ID   )
     .toDeleteStatement() );
   }
-  
+
 /**
  * The method return a MCRCategoryItem from the datastore.
  *
@@ -334,7 +341,7 @@ public final void deleteCategoryItem( String CLID, String ID )
  **/
 public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
   {
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableCateg )
     .setCondition( "ID",   ID   )
     .setCondition( "CLID", CLID )
@@ -346,7 +353,7 @@ public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
   if (URL == null) { URL = ""; }
   MCRCategoryItem c = new MCRCategoryItem( ID, CLID, PID );
   c.setURL(URL);
-  reader = MCRSQLConnection.justDoQuery( 
+  reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableCategLabel )
     .setCondition( "ID",   ID   )
     .setCondition( "CLID", CLID )
@@ -360,7 +367,7 @@ public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
     } while (reader.next());
   return c;
   }
-  
+
 /**
  * The method return a MCRCategoryItem from the datastore.
  *
@@ -370,7 +377,7 @@ public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
 public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID,
   String labeltext)
   {
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableCategLabel )
     .setCondition( "TEXT", labeltext )
     .setCondition( "CLID", CLID )
@@ -382,7 +389,7 @@ public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID,
   String desc = reader.getString( "MCRDESC" );
   MCRCategoryItem c = new MCRCategoryItem( ID, CLID, "" );
   c.addData(lang,text,desc);
-  reader = MCRSQLConnection.justDoQuery( 
+  reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableCateg )
     .setCondition( "ID",   ID   )
     .setCondition( "CLID", CLID )
@@ -420,12 +427,12 @@ public final boolean categoryItemExists( String CLID, String ID )
 public final ArrayList retrieveChildren( String CLID, String PID )
   {
   ArrayList children = new ArrayList();
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableCateg )
     .setCondition( "PID",  PID  )
     .setCondition( "CLID", CLID )
     .toSelectStatement() );
-  logger.debug("Generiertes Statement: " + 
+  logger.debug("Generiertes Statement: " +
   		new MCRSQLStatement( tableCateg )
   	    .setCondition( "PID",  PID  )
 	    .setCondition( "CLID", CLID )
@@ -440,7 +447,7 @@ public final ArrayList retrieveChildren( String CLID, String PID )
     children.add( child );
     }
   for (int i=0;i<children.size();i++) {
-    reader = MCRSQLConnection.justDoQuery( 
+    reader = MCRSQLConnection.justDoQuery(
       new MCRSQLStatement( tableCategLabel )
       .setCondition( "ID", ((MCRCategoryItem)children.get(i)).getID())
       .setCondition( "CLID", CLID )
@@ -454,7 +461,7 @@ public final ArrayList retrieveChildren( String CLID, String PID )
     }
   return children;
   }
-  
+
 /**
  * The method return the number of MCRCategoryItems from the datastore.
  *
@@ -469,11 +476,26 @@ public final int retrieveNumberOfChildren( String CLID, String PID )
     .setCondition( "CLID", CLID )
     .toRowSelector() );
   }
-  
+
+
+/**
+ * The method returns the Count of the documents that
+ * are members of any category in this classification
+ *
+ * @param CLID the ID of the MCRClassificationItem
+ * @return the number of documents
+ */
+public final int retrieveNumberofDocs( String CLID )
+{
+	int num =  MCRSQLConnection.justCountRows( tableLinkClass + " where MCRTO like '"+CLID+"%'");
+	logger.debug(" where MCRTO like '"+CLID+"%'");
+	return num;
+}
+
 /**
  * The method returns all availiable classification ID's they are loaded.
- * 
- * @return a list of classification ID's as String array 
+ *
+ * @return a list of classification ID's as String array
  **/
 public final String [] getAllClassificationID()
   {
@@ -482,7 +504,7 @@ public final String [] getAllClassificationID()
 //    .setCondition( "ID",  "*"  )
     .toRowSelector() );
   logger.debug("Number of classifications = "+Integer.toString(len));
-  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( 
+  MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(
     new MCRSQLStatement( tableClass )
 	.addColumn("ID")
 //  .setCondition( "ID",  "*"  )
@@ -496,5 +518,5 @@ public final String [] getAllClassificationID()
     }
   return ID;
   }
-}
 
+}
