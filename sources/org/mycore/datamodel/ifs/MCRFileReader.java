@@ -35,11 +35,11 @@ import org.mycore.common.*;
 public interface MCRFileReader
 {
   /**
-   * Returns the ID of the owner of this file
+   * Returns the ID of this file
    *
-   * @return the ID of the owner of this file
+   * @return the ID of this file
    **/
-  public String getOwnerID();
+  public String getID();
 
   /**
    * Returns the relative path of this file

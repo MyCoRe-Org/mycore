@@ -98,6 +98,9 @@ public class MCROldFile implements MCRFileReader
    **/
   public String getOwnerID()
   { return ownerID; }
+  
+  public String getID()
+  { return ownerID; }
 
   /**
    * Sets the relative path of this file
