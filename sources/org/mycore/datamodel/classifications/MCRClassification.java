@@ -333,22 +333,25 @@ private ArrayList cat;
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.setAttribute("ID",classID);
+    org.jdom.Element cats = new org.jdom.Element("categories");
     // get the classification
     try {
       cl = MCRClassificationItem.getClassificationItem(classID); }
-    catch (Exception e) { return doc; }
-    for (int i=0;i<cl.getSize();i++) {
-      elm.addContent(cl.getJDOMElement(i)); }
-    // get the category
-    MCRCategoryItem ci = cl.getCategoryItem(categID);
-    org.jdom.Element cats = new org.jdom.Element("categories");
-    org.jdom.Element cat = new org.jdom.Element("category");
-    cat.setAttribute("ID",ci.getID());
-    int cou = mcr_linktable.countCategoryReferencesFuzzy(classID, categID);
-    cat.setAttribute("counter",Integer.toString(cou));
-    for (int i=0;i<ci.getSize();i++) {
-      cat.addContent(ci.getJDOMElement(i)); }
-    cats.addContent(cat);
+    catch (Exception e) { cl = null; }
+    if (cl != null) { 
+      for (int i=0;i<cl.getSize();i++) { elm.addContent(cl.getJDOMElement(i)); }
+      // get the category
+      MCRCategoryItem ci = cl.getCategoryItem(categID);
+      if (ci !=null) {
+        org.jdom.Element cat = new org.jdom.Element("category");
+        cat.setAttribute("ID",ci.getID());
+        int cou = mcr_linktable.countCategoryReferencesFuzzy(classID, categID);
+        cat.setAttribute("counter",Integer.toString(cou));
+        for (int i=0;i<ci.getSize();i++) {
+          cat.addContent(ci.getJDOMElement(i)); }
+        cats.addContent(cat);
+        }
+      }
     elm.addContent(cats);
     return doc;
     }
