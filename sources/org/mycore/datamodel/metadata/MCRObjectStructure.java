@@ -94,7 +94,7 @@ public class MCRObjectStructure
    * 
    * @return MCRMetaLinkID       the corresponding link
    */
-  final MCRMetaLinkID getParent ()
+  public final MCRMetaLinkID getParent ()
     { return parent; }
 
   /**
@@ -102,7 +102,7 @@ public class MCRObjectStructure
    *
    * @return the parent MCRObjectID.
    **/
-  final MCRObjectID getParentID()
+  public final MCRObjectID getParentID()
     { 
     if (parent != null) { return parent.getXLinkHrefID(); }
     else { return null; }
@@ -113,7 +113,7 @@ public class MCRObjectStructure
    *
    * @param in_parent the MCRMetaLinkID to set
    **/
-  final void setParent(MCRMetaLinkID in_parent)
+  public final void setParent(MCRMetaLinkID in_parent)
     { parent = in_parent; }
 
   /**
@@ -126,7 +126,7 @@ public class MCRObjectStructure
    * @param child                the MCRMetaLinkID  of the child
    * @return boolean             true, if successfully done
    */
-  final boolean addChild (MCRMetaLinkID child)
+  public final boolean addChild (MCRMetaLinkID child)
     {
     int i, n = children.size();
     for (i = 0; i < n; ++i) {
@@ -149,7 +149,7 @@ public class MCRObjectStructure
    * @param title                the link's title
    * @return boolean             true, if successfully done
    */
-  final boolean addChild (MCRObjectID href, String label, String title)
+  public final boolean addChild (MCRObjectID href, String label, String title)
     {
     MCRConfiguration mcr_conf = MCRConfiguration.instance();
     String lang = mcr_conf.getString("MCR.metadata_default_lang");
@@ -171,7 +171,7 @@ public class MCRObjectStructure
    * @param href                 the MCRObjectID of the child
    * @return boolean             true, if successfully completed
    */
-  final boolean removeChild (MCRObjectID href)
+  public final boolean removeChild (MCRObjectID href)
     {
     logger.debug("Remove child ID "+href.getId());
     int i, n = children.size();
@@ -205,7 +205,7 @@ public class MCRObjectStructure
    *
    * @return the child MCRObjectID.
    **/
-  final MCRObjectID getChildID(int index)
+  public final MCRObjectID getChildID(int index)
     { return ((MCRMetaLinkID)children.get(index)).getXLinkHrefID(); }
 
   /**
