@@ -81,7 +81,7 @@ public class MCRParserXerces
 	entityResolver=new MCREntityResolver();
 
 	builder.setFeature( setnamespaces,        flagnamespaces        );
-	builder.setFeature( setschemasupport,     flagschemasupport     );
+	builder.setFeature( setschemasupport,     !flagschemasupport    );
 	builder.setFeature( setschemafullsupport, flagschemafullsupport );
 	builderValid.setFeature( setnamespaces,        flagnamespaces        );
 	builderValid.setFeature( setschemasupport,     flagschemasupport     );
