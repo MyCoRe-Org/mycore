@@ -257,10 +257,13 @@ public final void setLabel(String label)
  *
  * @param obj      the class object of a metadata part
  * @param tag      the tag of a metadata part
+ * @return true if set was succesful, otherwise false
  **/
-public final void setMetadataElement(Object obj, String tag)
+public final boolean setMetadataElement(Object obj, String tag)
   { 
-  if (obj == null) { return; }
+  if (obj == null) { return false; }
+  if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }
+  return mcr_metadata.setMetadataElement(obj, tag);
   }
 
 /**
@@ -391,4 +394,3 @@ public final void debug()
   System.out.println();
   }
 }
-

@@ -86,9 +86,30 @@ public final Object getMetadataElement(String tag)
 
 /**
  * This methode set the given object metadata element.
+ *
+ * @param obj       the metadata part object
+ * @param tag       the metadata part tag
+ * @return true if set was succesful, otherwise false
  **/
-public final Object setMetadataElement()
-  { return null; }
+public final boolean setMetadataElement(Object obj, String tag)
+  { 
+  if (obj == null) { return false; }
+  if ((tag == null) || ((tag = tag.trim()).length() ==0)) { return false; }
+  Object meta_obj = new Object();
+  int len = meta_list.size();
+  int fl = -1;
+  for (int i = 0; i < len; i++) {
+    meta_obj = meta_list.get(i);
+    if (((MCRMetaInterface)meta_obj).getTag().equals(tag)) { fl = i; }
+    }
+  if (fl == -1) {
+    meta_list.add(obj);
+    return true;
+    }
+  meta_list.remove(fl);
+  meta_list.add(obj);
+  return true;
+  }
 
 /**
  * This methode read the XML input stream part from a DOM part for the
@@ -192,4 +213,3 @@ public final void debug()
     }
   }
 }
-
