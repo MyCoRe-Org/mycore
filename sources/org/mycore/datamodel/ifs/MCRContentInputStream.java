@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
 import java.io.*;
 import java.util.*;
 import java.security.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This input stream is used by the MyCoRe filesystem classes to

@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.sql;
+package org.mycore.backend.sql;
 
 import java.sql.*;
 import java.util.GregorianCalendar;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Instances of this class are used to read the rows of a result set

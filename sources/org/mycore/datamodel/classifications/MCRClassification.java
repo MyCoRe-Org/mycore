@@ -22,14 +22,14 @@
  *
  **/
 
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
 import java.io.*;
 import java.util.*;
-import mycore.common.*;
-import mycore.datamodel.MCRObject;
-import mycore.datamodel.MCRObjectID;
-import mycore.xml.MCRXMLHelper;
+import org.mycore.common.*;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class implements all methods for a classification and extended

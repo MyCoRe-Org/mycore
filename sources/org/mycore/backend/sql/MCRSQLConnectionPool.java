@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.sql;
+package org.mycore.backend.sql;
 
 import java.sql.*;
 import java.util.*;
 import java.lang.reflect.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class implements a pool of database connections to a
@@ -112,9 +112,9 @@ public class MCRSQLConnectionPool
       
       if( value.equals( "CM7" ) ) 
       {
-        // Call method mycore.cm7.MCRCM7ConnectionPool.instance()
+        // Call method org.mycore.backend.cm7.MCRCM7ConnectionPool.instance()
           
-        Class c = Class.forName( "mycore.cm7.MCRCM7ConnectionPool" );
+        Class c = Class.forName( "org.mycore.backend.cm7.MCRCM7ConnectionPool" );
         Method m = c.getMethod( "instance", new Class[ 0 ] );
         m.invoke( null, new Object[ 0 ] );
       }

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
 /**
  * Instances of this class represent information about the content type

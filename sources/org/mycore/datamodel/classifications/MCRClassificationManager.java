@@ -22,9 +22,9 @@
  *
  **/
  
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
-import mycore.common.*;
+import org.mycore.common.*;
 import java.util.Vector;
 
 /**

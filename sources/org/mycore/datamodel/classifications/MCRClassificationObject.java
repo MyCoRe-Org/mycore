@@ -22,11 +22,11 @@
  *
  **/
  
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 import java.util.Vector;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class is an abstract class for the implementation of the classes

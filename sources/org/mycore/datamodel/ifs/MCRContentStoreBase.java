@@ -22,9 +22,9 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
-import mycore.common.*;
+import org.mycore.common.*;
 import java.util.*;
 import java.text.*;
 

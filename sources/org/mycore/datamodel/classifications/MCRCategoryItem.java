@@ -22,9 +22,9 @@
  *
  **/
 
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * This class represents a category item of the MyCoRe classification model and

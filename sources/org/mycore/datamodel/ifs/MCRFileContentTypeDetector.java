@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
 import org.jdom.Element;
 

@@ -22,9 +22,9 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.backend.filesystem;
 
-import mycore.common.*;
+import org.mycore.common.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;

@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
 import java.util.Vector;
 

@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.classifications;
+package org.mycore.datamodel.classifications;
 
-import mycore.common.*;
-import mycore.datamodel.MCRObjectID;
+import org.mycore.common.*;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class represents a classification item of the MyCoRe classification 

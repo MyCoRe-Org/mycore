@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
 import java.io.File;
 import java.util.*;
 import java.text.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Represents a stored file or directory node with its metadata and content.

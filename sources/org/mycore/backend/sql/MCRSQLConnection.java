@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.sql;
+package org.mycore.backend.sql;
 
 import java.sql.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * Instances of this class represent a database connection to a

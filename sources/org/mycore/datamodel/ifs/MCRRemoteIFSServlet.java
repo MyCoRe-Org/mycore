@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.ifs;
+package org.mycore.datamodel.ifs;
 
 import java.io.*;
 import java.util.*;
@@ -32,8 +32,8 @@ import java.text.DateFormat;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.jdom.*;
-import mycore.common.*;
-import mycore.xml.*;
+import org.mycore.common.*;
+import org.mycore.common.xml.*;
 
 /**
  * @author Frank Lützenkirchen

@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.sql;
+package org.mycore.backend.sql;
 
 import java.sql.*;
 import java.util.*;
-import mycore.common.*;
+import org.mycore.common.*;
 
 /**
  * @author Frank Lützenkirchen
