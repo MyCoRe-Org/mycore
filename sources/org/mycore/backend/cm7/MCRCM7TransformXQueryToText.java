@@ -567,5 +567,10 @@ private final String traceOneCondition(String cond)
   return sbout.toString();
   }
 
+  /** Not implemented for Content Manager 7 **/
+  public MCRObjectID getObjectID( String s )
+  {
+    throw new UnsupportedOperationException( "Not implemented for Content Manager 7" );
+  }
 }
 
