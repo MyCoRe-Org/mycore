@@ -56,7 +56,7 @@ public final static int MAX_LABEL_LENGTH = 256;
 protected static MCRConfiguration mcr_conf = null;
 protected static String mcr_encoding = null;
 protected static String persist_name;
-private static String persist_type;
+protected static String persist_type;
 protected static MCRLinkTableManager mcr_linktable = null;
 protected static MCRXMLTableManager mcr_xmltable = null;
 
