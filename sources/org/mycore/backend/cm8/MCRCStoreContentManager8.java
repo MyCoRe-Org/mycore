@@ -76,11 +76,10 @@ public void init( String storeID )
   attributePath  = config.getString( prefix + "Attribute.Path"  );
   }
 
-public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
+public String storeContent( MCRFileReader file, MCRContentInputStream source )
   throws MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger(); 
-  logger.debug("OwnerID = "+ owner );
   DKDatastoreICM connection = null;
   try {
     logger.debug("Get a connection to CM8 connection pool.");
@@ -93,14 +92,14 @@ public String storeContent( String filename, String extension, String owner, Str
       ddo = (DKLobICM)connection.createDDO(itemTypeName,DK_CM_DOCUMENT); 
       }
     logger.debug("A new DKLobICM was created.");
-    logger.debug("OwnerID = "+owner);
+    logger.debug("OwnerID = "+ file.getOwnerID() );
     short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,"ifsowner");
-    ((DKDDO)ddo).setData(dataId,owner);
-    logger.debug("PATH = "+filename);
+    ((DKDDO)ddo).setData(dataId, file.getOwnerID() );
+    logger.debug("PATH = "+ file.getPath() );
     dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,"ifspath");
-    ((DKDDO)ddo).setData(dataId,filename);
-    logger.debug("MimeType = "+mime);
-    ddo.setMimeType(mime);
+    ((DKDDO)ddo).setData(dataId,file.getPath());
+    logger.debug("MimeType = "+file.getContentType().getMimeType());
+    ddo.setMimeType(file.getContentType().getMimeType());
     if (source==null) {
       throw new MCRPersistenceException("The source is NULL."); }
     logger.debug("Set the MCRContentInputStream with length "
@@ -139,14 +138,14 @@ public void deleteContent( String storageID )
   finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-public void retrieveContent( String storageID, long size, OutputStream target )
+public void retrieveContent( MCRFileReader file, OutputStream target )
   throws MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger(); 
-  logger.debug("StorageID = "+storageID);
+  logger.debug("StorageID = "+ file.getStorageID() );
   DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
   try {
-    DKLobICM ddo = (DKLobICM)connection.createDDO(storageID);
+    DKLobICM ddo = (DKLobICM)connection.createDDO( file.getStorageID() );
     ddo.retrieve(DK_CM_CONTENT_NO);
     String url = ddo.getContentURL(-1,-1,-1);
     logger.debug("URL = "+url);
@@ -162,7 +161,7 @@ public void retrieveContent( String storageID, long size, OutputStream target )
     }
   catch( Exception ex ) {
     String msg = "Error while retrieving data from CM8 item " + 
-      storageID;
+      file.getStorageID();
     throw new MCRPersistenceException( msg, ex );
     }
   finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
