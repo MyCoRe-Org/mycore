@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.14 $ $Date: 2004-07-26 09:11:21 $ -->
+<!-- $Revision: 1.15 $ $Date: 2004-09-29 13:46:56 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -13,14 +13,7 @@
 
 <!-- ========================================================================= -->
 
-<xsl:include href="editor-config.xsl" />
-
-<!-- ============ Parameter aus MyCoRe LayoutServlet ============ -->
-<xsl:param name="WebApplicationBaseURL"     />
-<xsl:param name="ServletsBaseURL"           />
-<xsl:param name="DefaultLang"               />
-<xsl:param name="Lang"                      />
-<xsl:param name="MCRSessionID"              />
+<xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameters ======== -->
 <xsl:param name="editor.source.new" select="'false'" /> <!-- if true, empty source -->
@@ -708,61 +701,6 @@
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
     </xsl:otherwise>
   </xsl:choose>
-</xsl:template>
-
-<!-- ========= multi-language label ======== -->
-<xsl:template name="output.label">
-  <xsl:param name="usefont" select="'no'" />
-
-  <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;span style="</xsl:text>
-    <xsl:value-of select="$editor.font" />
-    <xsl:text disable-output-escaping="yes">" &gt;</xsl:text>
-  </xsl:if>
-
-  <xsl:choose>
-
-    <!-- If there is a label with xml:lang = selected lang, output it -->
-    <xsl:when test="label[lang($Lang)]">
-      <xsl:for-each select="label[lang($Lang)]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, if there is a label in the default language, output it -->
-    <xsl:when test="label[lang($DefaultLang)]">
-      <xsl:for-each select="label[lang($DefaultLang)]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, use the language-independent @label attribute, if it exists -->
-    <xsl:when test="@label">
-      <xsl:value-of select="@label" />
-    </xsl:when>
-
-    <!-- Otherwise, use the language-independent nested label elements, if existing -->
-    <xsl:when test="label[string-length(@xml:lang)=0]">
-      <xsl:for-each select="label[string-length(@xml:lang)=0]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, use the first label of any language that exists -->
-    <xsl:otherwise>
-      <xsl:for-each select="label[1]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:otherwise>
-
-    <!-- Otherwise give up, user is too stupid to configure the editor -->
-
-  </xsl:choose>
-
-  <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>
-  </xsl:if>
-
 </xsl:template>
 
 <!-- ======== label ======== -->

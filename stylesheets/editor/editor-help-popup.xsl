@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2004-03-11 08:20:07 $ -->
+<!-- $Revision: 1.3 $ $Date: 2004-09-29 13:46:56 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -16,11 +16,7 @@
   doctype-public="-//W3C//DTD HTML 3.2 Final//EN"
 />
 
-<xsl:include href="editor-config.xsl" />
-
-<!-- ============ Parameter aus MyCoRe LayoutServlet ============ -->
-
-<xsl:param name="WebApplicationBaseURL" />
+<xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameter ======== -->
 
@@ -44,8 +40,9 @@
         
         <tr>
           <td align="left">
-            <xsl:variable name="help" select="descendant::helpPopup[@id=$help.id]" />
-            <xsl:copy-of select="$help/*|$help/text()" />
+            <xsl:for-each select="descendant::helpPopup[@id=$help.id]">
+              <xsl:call-template name="output.label" />
+            </xsl:for-each>
           </td>
         </tr>
 
