@@ -67,6 +67,8 @@ public class MCRLayoutServlet extends HttpServlet
   protected MCRCache stylesheetCache;
   protected MCRCache staticFileCache;
   private static Logger logger=Logger.getLogger(MCRLayoutServlet.class);
+  public static final String JDOM_ATTR="MCRLayoutServlet.Input.JDOM";
+  public static final String DOM_ATTR="MCRLayoutServlet.Input.DOM";
 
   public void init()
   {
@@ -153,8 +155,8 @@ public class MCRLayoutServlet extends HttpServlet
   */
   protected boolean invokedByServlet( HttpServletRequest request )
   { 
-    return ( request.getAttribute( "MCRLayoutServlet.Input.JDOM" ) != null ) ||
-           ( request.getAttribute( "MCRLayoutServlet.Input.DOM"  ) != null );
+    return ( request.getAttribute( JDOM_ATTR ) != null ) ||
+           ( request.getAttribute( DOM_ATTR  ) != null );
   }
   
  /**
@@ -165,11 +167,11 @@ public class MCRLayoutServlet extends HttpServlet
   protected org.jdom.Document getXMLInputFromServlet( HttpServletRequest request )
   {
     org.jdom.Document jdom = (org.jdom.Document)
-      request.getAttribute( "MCRLayoutServlet.Input.JDOM" );
+      request.getAttribute( JDOM_ATTR );
     if( jdom != null) return jdom;
     
     org.w3c.dom.Document dom = (org.w3c.dom.Document)
-      request.getAttribute( "MCRLayoutServlet.Input.DOM" );
+      request.getAttribute( DOM_ATTR );
 
     try{ return new org.jdom.input.DOMBuilder().build( dom ); }
     catch( Exception exc )
