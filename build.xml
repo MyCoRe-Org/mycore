@@ -18,7 +18,7 @@
   <property name="classes"      value="./classes"/>
   <property name="javadocs"     value="./javadocs"/>
   <property name="lib"          value="./lib"/>
-  <property name="persistency"  value="xmldb"/>
+  <property name="persistency"  value="cm7"/>
     
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -30,11 +30,12 @@
     
    available targets are:
    
-      package  --> generates class files, jar and javadocs
-      compile  --> compiles the source code
-      javadocs --> generates the JavaDoc API documentation
-      jar      --> creates /lib/mycore.jar containing all MyCoRe classes
-      clean    --> cleans up the directory, removes all generated files
+      package     --> generates class files, jar and javadocs
+      compile     --> compiles the source code
+      compile_pkg --> compiles mycore subpackage pkg
+      javadocs    --> generates the JavaDoc API documentation
+      jar         --> creates /lib/mycore.jar containing all MyCoRe classes
+      clean       --> cleans up the directory, removes all generated files
    
    See the comments inside the build.xml file for more details.
 
@@ -79,7 +80,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common,compile_datamodel,compile_nbn,compile_xml,compile_classifications,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_user,compile_persistency"/>
+  <target name="compile" depends="compile_common,compile_datamodel,compile_nbn,compile_xml,compile_classifications,compile_commandline,compile_communication,compile_ifs,compile_sql,compile_user,compile_persistency,compile_gui"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -167,6 +168,11 @@
    </antcall>
   </target>
 
+  <target name="compile_gui">
+    <antcall target="javac">
+      <param name="packages" value="mycore/gui/**"/>
+    </antcall>
+  </target>
 
   <!-- =================================================================== -->
   <!-- Create the JavaDocs from sources                                    -->
@@ -180,7 +186,7 @@
       ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
     </echo>
     <javadoc
-      packagenames        = "mycore.classifications.*,mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*"
+      packagenames        = "mycore.classifications.*,mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.ifs.*,mycore.nbn.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.gui.*"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
       classpath           = "${lib}/ftp.jar"
