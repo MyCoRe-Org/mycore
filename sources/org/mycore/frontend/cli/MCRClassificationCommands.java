@@ -32,6 +32,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import mycore.common.*;
 import mycore.datamodel.*;
+import mycore.classifications.MCRClassification;
 
 /**
  * Provides static methods that implement commands for the

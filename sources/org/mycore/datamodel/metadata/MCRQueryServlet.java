@@ -33,6 +33,7 @@ import javax.xml.transform.stream.*;
 import org.jdom.transform.*;
 import org.jdom.*;
 import mycore.common.*;
+import mycore.classifications.*;
 import mycore.xml.MCRLayoutServlet;
 
 /**

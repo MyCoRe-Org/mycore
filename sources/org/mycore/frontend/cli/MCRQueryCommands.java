@@ -32,7 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 import mycore.common.*;
 import mycore.datamodel.MCRQueryResult;
 import mycore.datamodel.MCRQueryResultArray;
-import mycore.datamodel. MCRClassification;
+import mycore.classifications.MCRClassification;
 
 /**
  * This class implements the query command to start a query to a local

@@ -25,6 +25,8 @@
 package mycore.datamodel;
 
 import mycore.common.MCRException;
+import mycore.classifications.MCRCategoryItem;
+import mycore.classifications.MCRClassificationItem;
 
 /**
  * This class implements all method for handling with the MCRMetaClassification

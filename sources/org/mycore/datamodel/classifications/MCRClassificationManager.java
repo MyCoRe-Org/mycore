@@ -27,130 +27,133 @@ package mycore.classifications;
 import mycore.common.*;
 import java.util.Vector;
 
+/**
+ * This class is the manangement class for the whole classification system
+ * of MyCoRe. They would only used by the ClassificationItem and CategoryItem.
+ **/ 
 class MCRClassificationManager
-{
+  {
   protected static MCRClassificationManager manager;
   
+  /**
+   * Make an instance of MCRClassificationManager.
+   **/
   protected static MCRClassificationManager instance()
-  {
+    {
     if( manager == null ) manager = new MCRClassificationManager();
     return manager;
-  }
+    }
   
   protected MCRCache categoryCache;
   protected MCRCache classificationCache;
   
-  protected MCRClassificationStore store;
+  protected MCRClassificationInterface store;
 
+  /**
+   * Constructor for a new MCRClassificationManager.
+   **/
   protected MCRClassificationManager()
-  {
+    {
     MCRConfiguration config = MCRConfiguration.instance();
-    
     Object object = config.getInstanceOf( "MCR.classifications_store_class" );  
-    store = (MCRClassificationStore)object;
-    
-    int classifSize = config.getInt( "MCR.classifications_classification_cache_size", 30 );
-    int categSize   = config.getInt( "MCR.classifications_category_cache_size", 500 );
-    
+    store = (MCRClassificationInterface)object;
+    int classifSize = config
+      .getInt( "MCR.classifications_classification_cache_size", 30 );
+    int categSize   = config
+      .getInt( "MCR.classifications_category_cache_size", 500 );
     classificationCache = new MCRCache( classifSize );
     categoryCache       = new MCRCache( categSize   );
-  }
+    }
   
-  void createClassification( MCRClassification classification )
-  {
-    if( store.classificationExists( classification.getID() ) )
+  void createClassificationItem( MCRClassificationItem classification )
+    {
+    if( store.classificationItemExists( classification.getID() ) )
       throw new MCRPersistenceException( "Classification already exists" );
-    
-    store.createClassification( classification );
+    store.createClassificationItem( classification );
     classificationCache.put( classification.getID(), classification );
-  }
+    }
 
-  void updateClassification( MCRClassification classification )
-  {
-    store.updateClassification( classification );
-    
+  void updateClassificationItem( MCRClassificationItem classification )
+    {
+    store.updateClassificationItem( classification );
     classificationCache.remove( classification.getID() );
     classificationCache.put   ( classification.getID(), classification );
-  }
+    }
   
-  void createCategory( MCRCategory category )
-  {
-    if( store.categoryExists( category.getClassificationID(), category.getID() ) )
-      throw new MCRPersistenceException( "Category already exists" );
-    
-    store.createCategory( category );
+  void createCategoryItem( MCRCategoryItem category )
+    {
+    if( store.categoryItemExists( category.getClassificationID(), 
+      category.getID() ) )
+      throw new MCRPersistenceException( "Category "+category.getID()
+        +" already exists" );
+    store.createCategoryItem( category );
     categoryCache.put( getCachingID( category ), category );
-  }
+    }
   
-  void updateCategory( MCRCategory category )
-  {
-    store.updateCategory( category );
-    
+  void updateCategoryItem( MCRCategoryItem category )
+    {
+    store.updateCategoryItem( category );
     categoryCache.remove( getCachingID( category ) );
     categoryCache.put   ( getCachingID( category ), category );
-  }
+    }
 
-  MCRClassification retrieveClassification( String ID )
-  {
-    MCRClassification c = (MCRClassification)( classificationCache.get( ID ) );
-    if( c == null )
+  MCRClassificationItem retrieveClassificationItem( String ID )
     {
-      c = store.retrieveClassification( ID );
+    MCRClassificationItem c = (MCRClassificationItem)
+      ( classificationCache.get( ID ) );
+    if( c == null ) {
+      c = store.retrieveClassificationItem( ID );
       if( c != null ) classificationCache.put( ID, c );
-    }
+      }
     return c;
-  }
+    }
   
-  MCRCategory retrieveCategory( String classifID, String categID )
-  {
+  MCRCategoryItem retrieveCategoryItem( String classifID, String categID )
+    {
     String cachingID = classifID + "@@" + categID;
-    MCRCategory c = (MCRCategory)( categoryCache.get( cachingID ) );
-    
-    if( c == null )
-    {
-      c = store.retrieveCategory( classifID, categID );
+    MCRCategoryItem c = (MCRCategoryItem)( categoryCache.get( cachingID ) );
+    if( c == null ) {
+      c = store.retrieveCategoryItem( classifID, categID );
       if( c != null ) categoryCache.put( cachingID, c );
-    }
+      }
     return c;
-  }
+    }
   
-  MCRCategory[] retrieveChildren( String classifID, String parentID )
-  {
-    Vector retrieved = store.retrieveChildren( classifID, parentID );
-    MCRCategory[] children = new MCRCategory[ retrieved.size() ];
-    
-    for( int i = 0; i < children.length; i++ )
+  MCRCategoryItem[] retrieveChildren( String classifID, String parentID )
     {
-      MCRCategory cRetrieved = (MCRCategory)( retrieved.elementAt( i ) );
+    Vector retrieved = store.retrieveChildren( classifID, parentID );
+    MCRCategoryItem[] children = new MCRCategoryItem[ retrieved.size() ];
+    for( int i = 0; i < children.length; i++ ) {
+      MCRCategoryItem cRetrieved = (MCRCategoryItem)(retrieved.elementAt(i));
       String cachingID = getCachingID( cRetrieved );
-      MCRCategory cFromCache = (MCRCategory)( categoryCache.get( cachingID ) );
-      
-      if( cFromCache != null )
-        children[ i ] = cFromCache;
-      else
-      {
+      MCRCategoryItem cFromCache = (MCRCategoryItem)
+        ( categoryCache.get( cachingID ) );
+      if( cFromCache != null ) {
+        children[ i ] = cFromCache; }
+      else {
         children[ i ] = cRetrieved;
         categoryCache.put( cachingID, cRetrieved );
+        }
       }
-    }
     return children;
-  }
+    }
   
   int retrieveNumberOfChildren( String classifID, String parentID )
-  { return store.retrieveNumberOfChildren( classifID, parentID ); }
+    { return store.retrieveNumberOfChildren( classifID, parentID ); }
   
-  void deleteClassification( String classifID )
-  {
+  void deleteClassificationItem( String classifID )
+    {
     classificationCache.remove( classifID );
-    store.deleteClassification( classifID );
-  }
+    store.deleteClassificationItem( classifID );
+    }
   
-  void deleteCategory( String classifID, String categID )
-  {
+  void deleteCategoryItem( String classifID, String categID )
+    {
     categoryCache.remove( classifID + "@@" + categID );
-    store.deleteCategory( classifID, categID );
-  }
+    store.deleteCategoryItem( classifID, categID );
+    }
   
-  protected String getCachingID( MCRCategory category )
-  { return category.getClassificationID() + "@@" + category.getID(); }
-}
+  protected String getCachingID( MCRCategoryItem category )
+    { return category.getClassificationID() + "@@" + category.getID(); }
+  }
+
