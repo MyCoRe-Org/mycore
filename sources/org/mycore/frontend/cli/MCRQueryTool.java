@@ -145,7 +145,8 @@ private static final void printResult(MCRQueryResult results,
   MCRConfiguration config, String type)
   {
   String xsltoneresult = config.getString("MCR.xslt_oneresult_"+type);
-  String outoneresult = config.getString("MCR.out_oneresult_"+type);
+  String outtype = config.getString("MCR.out_type_"+type);
+  String outpath = config.getString("MCR.out_path_"+type);
   TransformerFactory transfakt = TransformerFactory.newInstance();
   try {
     Transformer trans = 
@@ -156,10 +157,13 @@ private static final void printResult(MCRQueryResult results,
       System.out.println(mcrid); 
       System.out.println();
       StreamResult sr = null;
-      if (outoneresult.equals("SYSOUT")) {
+      if (outpath.equals("SYSOUT")) {
         sr = new StreamResult((OutputStream) System.out); }
       else {
-        sr = new StreamResult(outoneresult); }
+        System.out.println(outpath+System.getProperty("file.separator")+
+          mcrid+"."+outtype);
+        sr = new StreamResult(outpath+System.getProperty("file.separator")+
+          mcrid+"."+outtype); }
       trans.transform(new StreamSource((Reader)new StringReader(mcrxml)),sr);
       System.out.println();
       }
