@@ -25,6 +25,8 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
+import org.mycore.services.query.IndexableStore;
+
 import java.util.*;
 
 /**
@@ -35,152 +37,172 @@ import java.util.*;
  * that are used in the system.
  *
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public class MCRContentStoreFactory
-{
-  /** Hashtable StoreID to MCRContentStore instance */  
-  protected static Hashtable stores = new Hashtable();
+public class MCRContentStoreFactory {
+	/** Hashtable StoreID to MCRContentStore instance */
+	protected static Hashtable stores;
 
-  /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */  
-  protected static Hashtable extenderClasses = new Hashtable();
-  
-  /** The MCRContentStoreSelector implementation that will be used */
-  protected static MCRContentStoreSelector storeSelector;
-  
-  /**
-   * Returns the MCRContentStore instance that is configured for this
-   * StoreID. The instance that is returned is configured by the property
-   * <tt>MCR.IFS.ContentStore.<StoreID>.Class</tt> in mycore.properties.
-   * 
-   * @param storeID the non-null ID of the MCRContentStore implementation
-   * @return the MCRContentStore instance that uses this storeID
-   * @throws MCRConfigurationException if no MCRContentStore implementation is configured for this storeID
-   */
-  public static MCRContentStore getStore( String storeID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( storeID, "Store ID" );
-    if( ! stores.containsKey( storeID ) )
-    {
-      try
-      { 
-        String storeClass = "MCR.IFS.ContentStore." + storeID + ".Class";
-        Object obj = MCRConfiguration.instance().getInstanceOf( storeClass );
-        MCRContentStore s = (MCRContentStore)( obj );
-        s.init( storeID );
-        stores.put( storeID, s );
-      }
-      catch( Exception ex )
-      { 
-        String msg = "Could not load MCRContentStore with store ID = " + storeID;
-        throw new MCRConfigurationException( msg, ex ); 
-      }
-    }
-    return (MCRContentStore)( stores.get( storeID ) );
-  }
+	/** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
+	protected static Hashtable extenderClasses;
 
-  /**
-   * Returns the MCRContentStore instance that should be used
-   * to store the content of the given file. The configured
-   * MCRContentStoreSelector is used to make this decision.
-   *
-   * @see MCRContentStoreSelector
-   * @see MCRContentStore
-   **/
-  public static MCRContentStore selectStore( MCRFile file )
-  {
-    if( storeSelector == null )
-    {
-      String property = "MCF.IFS.ContentStoreSelector.Class";
-      Object obj = MCRConfiguration.instance().getInstanceOf( property );
-      storeSelector = (MCRContentStoreSelector)obj;
-    }
-    String store = storeSelector.selectStore( file );
-    return getStore( store );
-  }
-  
-  /**
-   * Returns the Class instance that implements the MCRAudioVideoExtender for 
-   * the MCRContentStore with the given ID. That class is configured by 
-   * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
-   * mycore.properties.
-   * 
-   * @param storeID the non-null StoreID of the MCRContentStore
-   * @return the Class that implements MCRAudioVideoExtender for the StoreID given, or null
-   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
-  */
-  protected static Class getExtenderClass( String storeID )
-  {
-    MCRArgumentChecker.ensureNotNull( storeID, "store ID" );
-    
-    String storeClass = "MCR.IFS.AVExtender." + storeID + ".Class";
+	/** Hashtable StoreID to MCRContentStore implementing {@link org.mycore.services.query.IndexableStore} */
+	protected static Hashtable indexStores;
 
-    String value = MCRConfiguration.instance().getString( storeClass, "" );
-    if( value.equals( "" ) ) return null;
-    
-    if( ! extenderClasses.containsKey( storeID ) )
-    {
-      try
-      { 
-        Class cl = Class.forName( value );
-        extenderClasses.put( storeID, cl );
-      }
-      catch( Exception ex )
-      { 
-        String msg = "Could not load AudioVideoExtender class " + value;
-        throw new MCRConfigurationException( msg, ex ); 
-      }
-    }
-    
-    return (Class)( extenderClasses.get( storeID ) );
-  }
-  
-  /**
-   * Returns true if the MCRContentStore with the given StoreID provides an 
-   * MCRAudioVideoExtender implementation, false otherwise.
-   * The MCRAudioVideoExtender for a certain MCRContentStore is configured by 
-   * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
-   * mycore.properties.
-   * 
-   * @param storeID the non-null StoreID of the MCRContentStore
-   * @return the MCRAudioVideoExtender for the StoreID given, or null
-   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
-  */
-  static boolean providesAudioVideoExtender( String storeID )
-  { return ( getExtenderClass( storeID ) != null ); }
-  
-  /**
-   * If the MCRContentStore of the MCRFile given provides an 
-   * MCRAudioVideoExtender implementation, this method creates and initializes 
-   * the MCRAudioVideoExtender instance for the MCRFile. 
-   * The instance that is returned is configured by the property
-   * <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in mycore.properties.
-   * 
-   * @param file the non-null MCRFile that should get an MCRAudioVideoExtender
-   * @return the MCRAudioVideoExtender for the MCRFile given, or null
-   * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
-   */
-  static MCRAudioVideoExtender buildExtender( MCRFileReader file )
-  {
-    MCRArgumentChecker.ensureNotNull( file, "file" );
+	/** The MCRContentStoreSelector implementation that will be used */
+	protected static MCRContentStoreSelector storeSelector;
 
-    if( ! providesAudioVideoExtender( file.getStoreID() ) ) return null;
-    
-    Class cl = getExtenderClass( file.getStoreID() );
-    
-    try
-    { 
-      Object obj = cl.newInstance();
-      MCRAudioVideoExtender ext = (MCRAudioVideoExtender)obj;
-      ext.init( file );
-      return ext;
-    }
-    catch( Exception exc )
-    { 
-      if( exc instanceof MCRException ) throw (MCRException)exc;
-      
-      String msg = "Could not build MCRAudioVideoExtender instance";
-      throw new MCRConfigurationException( msg, exc ); 
-    }
-  }
+	/**
+	 * Returns the MCRContentStore instance that is configured for this
+	 * StoreID. The instance that is returned is configured by the property
+	 * <tt>MCR.IFS.ContentStore.<StoreID>.Class</tt> in mycore.properties.
+	 * 
+	 * @param storeID the non-null ID of the MCRContentStore implementation
+	 * @return the MCRContentStore instance that uses this storeID
+	 * @throws MCRConfigurationException if no MCRContentStore implementation is configured for this storeID
+	 */
+	public static MCRContentStore getStore(String storeID) {
+		if (stores == null)
+			stores = new Hashtable();
+		if (indexStores == null)
+			indexStores = new Hashtable();
+		MCRArgumentChecker.ensureNotEmpty(storeID, "Store ID");
+		if (!stores.containsKey(storeID)) {
+			try {
+				String storeClass =
+					"MCR.IFS.ContentStore." + storeID + ".Class";
+				Object obj =
+					MCRConfiguration.instance().getInstanceOf(storeClass);
+				MCRContentStore s = (MCRContentStore) (obj);
+				s.init(storeID);
+				stores.put(storeID, s);
+				if (s instanceof IndexableStore) {
+					indexStores.put(storeID, s);
+				}
+			} catch (Exception ex) {
+				String msg =
+					"Could not load MCRContentStore with store ID = " + storeID;
+				throw new MCRConfigurationException(msg, ex);
+			}
+		}
+		return (MCRContentStore) (stores.get(storeID));
+	}
+
+	/**
+	 * returns all ContentStores which implements {@link org.mycore.services.query.IndexableStore}
+	 * @return Array of {@link org.mycore.services.query.IndexableStore} ContentStores
+	 */
+	public static IndexableStore[] getAllIndexables() {
+		if (storeSelector == null)
+			initStoreSelector();
+		String[] s = storeSelector.getAvailableStoreIDs();
+		for (int i = 0; i < s.length; i++)
+			getStore(s[i]);
+		return (IndexableStore[]) indexStores.values().toArray(
+			new IndexableStore[indexStores.size()]);
+	}
+
+	/**
+	 * Returns the MCRContentStore instance that should be used
+	 * to store the content of the given file. The configured
+	 * MCRContentStoreSelector is used to make this decision.
+	 *
+	 * @see MCRContentStoreSelector
+	 * @see MCRContentStore
+	 **/
+	public static MCRContentStore selectStore(MCRFile file) {
+		if (storeSelector == null)
+			initStoreSelector();
+		String store = storeSelector.selectStore(file);
+		return getStore(store);
+	}
+
+	private static void initStoreSelector() {
+		String property = "MCF.IFS.ContentStoreSelector.Class";
+		Object obj = MCRConfiguration.instance().getInstanceOf(property);
+		storeSelector = (MCRContentStoreSelector) obj;
+	}
+
+	/**
+	 * Returns the Class instance that implements the MCRAudioVideoExtender for 
+	 * the MCRContentStore with the given ID. That class is configured by 
+	 * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
+	 * mycore.properties.
+	 * 
+	 * @param storeID the non-null StoreID of the MCRContentStore
+	 * @return the Class that implements MCRAudioVideoExtender for the StoreID given, or null
+	 * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
+	*/
+	protected static Class getExtenderClass(String storeID) {
+		if (extenderClasses == null)
+			extenderClasses = new Hashtable();
+		MCRArgumentChecker.ensureNotNull(storeID, "store ID");
+
+		String storeClass = "MCR.IFS.AVExtender." + storeID + ".Class";
+
+		String value = MCRConfiguration.instance().getString(storeClass, "");
+		if (value.equals(""))
+			return null;
+
+		if (!extenderClasses.containsKey(storeID)) {
+			try {
+				Class cl = Class.forName(value);
+				extenderClasses.put(storeID, cl);
+			} catch (Exception ex) {
+				String msg = "Could not load AudioVideoExtender class " + value;
+				throw new MCRConfigurationException(msg, ex);
+			}
+		}
+
+		return (Class) (extenderClasses.get(storeID));
+	}
+
+	/**
+	 * Returns true if the MCRContentStore with the given StoreID provides an 
+	 * MCRAudioVideoExtender implementation, false otherwise.
+	 * The MCRAudioVideoExtender for a certain MCRContentStore is configured by 
+	 * the property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in 
+	 * mycore.properties.
+	 * 
+	 * @param storeID the non-null StoreID of the MCRContentStore
+	 * @return the MCRAudioVideoExtender for the StoreID given, or null
+	 * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
+	*/
+	static boolean providesAudioVideoExtender(String storeID) {
+		return (getExtenderClass(storeID) != null);
+	}
+
+	/**
+	 * If the MCRContentStore of the MCRFile given provides an 
+	 * MCRAudioVideoExtender implementation, this method creates and initializes 
+	 * the MCRAudioVideoExtender instance for the MCRFile. 
+	 * The instance that is returned is configured by the property
+	 * <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in mycore.properties.
+	 * 
+	 * @param file the non-null MCRFile that should get an MCRAudioVideoExtender
+	 * @return the MCRAudioVideoExtender for the MCRFile given, or null
+	 * @throws MCRConfigurationException if the MCRAudioVideoExtender implementation class could not be loaded
+	 */
+	static MCRAudioVideoExtender buildExtender(MCRFileReader file) {
+		MCRArgumentChecker.ensureNotNull(file, "file");
+
+		if (!providesAudioVideoExtender(file.getStoreID()))
+			return null;
+
+		Class cl = getExtenderClass(file.getStoreID());
+
+		try {
+			Object obj = cl.newInstance();
+			MCRAudioVideoExtender ext = (MCRAudioVideoExtender) obj;
+			ext.init(file);
+			return ext;
+		} catch (Exception exc) {
+			if (exc instanceof MCRException)
+				throw (MCRException) exc;
+
+			String msg = "Could not build MCRAudioVideoExtender instance";
+			throw new MCRConfigurationException(msg, exc);
+		}
+	}
 }
