@@ -29,6 +29,7 @@ import java.util.Vector;
 import org.jdom.Document;
 import org.jdom.Element;
 import mycore.common.*;
+import mycore.db2.MCRDB2UserStore;
 
 /**
  * This class is the user (and group) manager of the MyCoRe system. It is implemented
