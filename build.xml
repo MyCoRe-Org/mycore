@@ -353,18 +353,20 @@
       start    = "1 Jan ${changelog-year}"
       end      = "31 Dec ${changelog-year}"
     >
-      <user displayname = "Frank Lützenkirchen / Essen"  userid = "dlclient" />
-      <user displayname = "Frank Lützenkirchen / Essen"  userid = "mcrfluet" />
-      <user displayname = "Holger Gollan / Essen"        userid = "mcrhgoll" />
-      <user displayname = "Detlev Degenhardt / Freiburg" userid = "mcrddege" />
-      <user displayname = "Harald Richter / Essen"       userid = "mcrhrich" />
-      <user displayname = "Jens Kupferschmidt / Leipzig" userid = "mcrjkupf" />
-      <user displayname = "Mathias Hegner / Jena"        userid = "mcrmhegn" />
-      <user displayname = "Marc Schlüppmann / Essen"     userid = "mcrmslue" />
-      <user displayname = "Thorsten Agemar / Göttingen"  userid = "mcrtagem" />
-      <user displayname = "Thomas Scheffler / Jena"      userid = "mcrukroe" />
-      <user displayname = "Werner Gresshoff / Münster"   userid = "mcrwgres" />
-      <user displayname = "Benno Süselbeck / Münster"    userid = "mcrbsuse" />
+      <user displayname = "Frank Lützenkirchen / Essen"   userid = "dlclient" />
+      <user displayname = "Frank Lützenkirchen / Essen"   userid = "mcrfluet" />
+      <user displayname = "Holger Gollan / Essen"         userid = "mcrhgoll" />
+      <user displayname = "Detlev Degenhardt / Freiburg"  userid = "mcrddege" />
+      <user displayname = "Harald Richter / Essen"        userid = "mcrhrich" />
+      <user displayname = "Jens Kupferschmidt / Leipzig"  userid = "mcrjkupf" />
+      <user displayname = "Mathias Hegner / Jena"         userid = "mcrmhegn" />
+      <user displayname = "Marc Schlüppmann / Essen"      userid = "mcrmslue" />
+      <user displayname = "Thorsten Agemar / Göttingen"   userid = "mcrtagem" />
+      <user displayname = "Thomas Scheffler / Jena"       userid = "mcrukroe" />
+      <user displayname = "Werner Gresshoff / Münster"    userid = "mcrwgres" />
+      <user displayname = "Benno Süselbeck / Münster"     userid = "mcrbsuse" />
+      <user displayname = ""Johannes Bühler / Greifswald" userid = "mcrjbueh" />
+      <user displayname = "Maik Bunschkowski / Rostock"   userid = "mcrldbis" /> 
     </cvschangelog>
 
     <style 
