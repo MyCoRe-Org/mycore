@@ -342,6 +342,19 @@ public class MCRUtils {
 		}
 		return outb.toByteArray();
 	}
+	
+	/**
+	 * converts an Array of Objects to an Array of Strings
+	 * using the toString() method.
+	 * @param objects Array of Objects to be converted
+	 * @return Array of Strings representing Objects
+	 */
+	public static final String[] getStringArray(Object[] objects){
+		String[] returns=new String[objects.length];
+		for (int i=0;i<objects.length,i++)
+			returns[i]=objects[i].toString();
+		return returns
+	}
 
 	/**
 	 * Copies all content read from the given input stream to the
