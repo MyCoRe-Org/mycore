@@ -72,7 +72,7 @@ public class MCRSQLConnection
 
     String url = MCRConfiguration.instance().getString( "MCR.persistence_sql_database_url" );
     
-    logger.info( "Building connection to JDBC datastore..." );
+    logger.info( "MCRSQLConnection: Building connection to JDBC datastore... with " + url);
     
     Connection connection = null;
     try{ connection = DriverManager.getConnection( url ); }
