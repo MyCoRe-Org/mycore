@@ -74,7 +74,7 @@
     <javac srcdir="${sources}"
            destdir="${classes}"
            includes="${packages}"
-           classpath="${lib}/ftp.jar"
+           classpath="${lib}/ftp.jar;${lib}/activation.jar;${lib}/mail.jar"
            debug="${debug}"
            optimize="${optimize}"
            deprecation="on">
