@@ -165,7 +165,10 @@ public class MCRFile
   { return getSizeFormatted( size ); }
   
   /**
-   * Takes a file size in bytes and formats it as a string for output
+   * Takes a file size in bytes and formats it as a string for output.
+   * For values &lt; 5 KB the output format is for example "320 Byte".
+   * For values &gt; 5 KB the output format is for example "6,8 KB".
+   * For values &gt; 1 MB the output format is for example "3,45 MB".
    **/
   public static String getSizeFormatted( long bytes )
   {
@@ -344,6 +347,7 @@ public class MCRFile
   
   /**
    * Gets the content of this file as a string, using the default encoding
+   * of the system environment
    **/
   public String getContentAsString()
     throws MCRPersistenceException
