@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.88 $ $Date: 2004-12-02 13:33:27 $                      -->
+  <!-- $Revision: 1.89 $ $Date: 2004-12-03 11:13:10 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -64,7 +64,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.88 $ $Date: 2004-12-02 13:33:27 $</echo>
+    <echo>Ant build file   : $Revision: 1.89 $ $Date: 2004-12-03 11:13:10 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -346,11 +346,16 @@
       <fileset dir="${basedir}/lib" includes="*.jar"/>
     </path>
 
+    <path id="sourcepath">
+      <dirset dir="${basedir}" includes="sources" />
+      <dirset dir="${basedir}" includes="modules/module-*/**/src" />
+    </path>
+
     <condition property="javadocs.outdated">
       <not>
         <uptodate>
-          <srcfiles dir="${basedir}/sources" includes="**/*.java" />
-          <srcfiles dir="${basedir}/sources" includes="**/*.html" />
+          <srcfiles dir="${basedir}" includes="**/*.java" />
+          <srcfiles dir="${basedir}" includes="**/*.html" />
           <mapper type="merge" to="${basedir}/documentation/html/overview-tree.html"/>
         </uptodate>
       </not>
@@ -359,7 +364,7 @@
     <condition property="pdf.outdated">
       <not>
         <uptodate>
-          <srcfiles dir="${basedir}/sources" includes="**/*.java" />
+          <srcfiles dir="${basedir}" includes="**/*.java" />
           <srcfiles dir="${doclets}" includes="pdfdoclet-mycore.properties" />
           <mapper type="merge" to="${basedir}/documentation/pdf/javadocs.pdf"/>
         </uptodate>
@@ -376,8 +381,8 @@
     <echo>Building the MyCoRe JavaDoc API documentation...</echo>
 
     <javadoc
-      packagenames        = "org.mycore.*"
-      sourcepath          = "${basedir}/sources"
+      packagenames        = "*"
+      sourcepathref       = "sourcepath"
       destdir             = "${basedir}/documentation/html"
       classpathref        = "javadocs.classpath"
       author              = "true"
@@ -418,9 +423,9 @@
 
     <mkdir dir="${basedir}/documentation/pdf" />
     <javadoc
-      packagenames        = "org.mycore.*"
+      packagenames        = "*"
       excludepackagenames = "${exclude.cm7},${exclude.cm8}"
-      sourcepath          = "${basedir}/sources"
+      sourcepathref       = "sourcepath"
       classpathref        = "javadocs.classpath"
       author              = "true"
       version             = "true"
@@ -473,55 +478,23 @@
       Building CVS ChangeLog, please be patient...
     </echo>
 
-    <antcall target="do-log"><param name="changelog-year" value="2004" /></antcall>
-    <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
-    <antcall target="do-log"><param name="changelog-year" value="2002" /></antcall>
-    <antcall target="do-log"><param name="changelog-year" value="2001" /></antcall>
-  </target>
-
-  <target name="do-log" depends="init">
-    <echo>Logging changes of the year ${changelog-year}...</echo>
-
-    <path id="changelog.classpath">
-      <fileset dir="${basedir}/lib" includes="*.jar"/>
-    </path>
-
     <mkdir dir="${basedir}/documentation/changelogs" />
-    <cvschangelog 
-      dir      = "."
-      destfile = "${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" 
-      start    = "1 Jan ${changelog-year}"
-      end      = "31 Dec ${changelog-year}"
-    >
-      <user displayname = "Frank Lützenkirchen / Essen"  userid = "dlclient" />
-      <user displayname = "Frank Lützenkirchen / Essen"  userid = "mcrfluet" />
-      <user displayname = "Holger Gollan / Essen"        userid = "mcrhgoll" />
-      <user displayname = "Detlev Degenhardt / Freiburg" userid = "mcrddege" />
-      <user displayname = "Harald Richter / Essen"       userid = "mcrhrich" />
-      <user displayname = "Jens Kupferschmidt / Leipzig" userid = "mcrjkupf" />
-      <user displayname = "Mathias Hegner / Jena"        userid = "mcrmhegn" />
-      <user displayname = "Marc Schlüppmann / Essen"     userid = "mcrmslue" />
-      <user displayname = "Thorsten Agemar / Göttingen"  userid = "mcrtagem" />
-      <user displayname = "Thomas Scheffler / Jena"      userid = "mcrukroe" />
-      <user displayname = "Thomas Scheffler / Jena"      userid = "mcrtchef" />
-      <user displayname = "Werner Gresshoff / Münster"   userid = "mcrwgres" />
-      <user displayname = "Benno Süselbeck / Münster"    userid = "mcrbsuse" />
-      <user displayname = "Johannes Bühler / Greifswald" userid = "mcrjbueh" />
-      <user displayname = "Maik Bunschkowski / Rostock"  userid = "mcrldbis" /> 
-    </cvschangelog>
- 
-    <java classname="org.apache.xalan.xslt.Process"
-      dir="${basedir}" fork="yes" classpathref="changelog.classpath" >
-      <arg value="-IN"  /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
-      <arg value="-XSL" /><arg value="${ant.home}/etc/changelog.xsl" />
-      <arg value="-OUT" /><arg value="${basedir}/documentation/changelogs/changelog-${changelog-year}.html" />
-      <arg value="-HTML"/>
-      <arg value="-PARAM" /><arg value="title"  /><arg value="MyCoRe CVS ChangeLog for the year ${changelog-year}" />
-      <arg value="-PARAM" /><arg value="module" /><arg value="mycore" />
-      <arg value="-PARAM" /><arg value="cvsweb" /><arg value="http://www.mycore.de/cvs/viewcvs.cgi/" />
-    </java>
 
-    <delete file="${basedir}/documentation/changelogs/changelog-${changelog-year}.xml" />
+    <tstamp>
+      <format property="year" pattern="yyyy" />
+    </tstamp>
+
+    <mkdir dir="${basedir}/documentation/changelogs/${year}" />
+
+    <exec executable="/mcr/applications/cvschangelogbuilder-2.0/cvschangelogbuilder.pl">
+      <arg value="-module=mycore" />
+      <arg value="-output=buildhtmlreport" />
+      <arg value="-viewcvsurl=http://www.mycore.de/cvs/viewcvs.cgi" />
+      <arg value="-dir=${basedir}/documentation/changelogs/${year}" /> 
+    </exec>
+
+    <move file="${basedir}/documentation/changelogs/${year}/cvschangelogbuilder_mycore.html" 
+        tofile="${basedir}/documentation/changelogs/${year}/index.html" />
   </target>
   
   <!-- =================================================================== -->
@@ -547,9 +520,12 @@
 
   <target name="postcommit">
     <antcall target="update" />
-    <antcall target="do-log"><param name="changelog-year" value="2004" /></antcall>
+    <antcall target="changelog" />
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
+
+    <chmod dir="${basedir}/documentation" type="file" perm="ugo+r"  includes="**/*" /> 
+    <chmod dir="${basedir}/documentation" type="dir"  perm="ugo+rx" includes="**/*" />
   </target>
 
   <!-- =================================================================== -->
