@@ -230,7 +230,7 @@ public class MCRCStoreContentManager8
       DKTextICM ddo = (DKTextICM)connection.createDDO( file.getStorageID() );
       ddo.retrieve(DK_CM_CONTENT_NO);
       
-      String url[] = ddo.getContentURLs(DK_CM_CHECKOUT,-1,-1,
+      String url[] = ddo.getContentURLs(DK_CM_RETRIEVE,DK_CM_CHECKOUT,-1,-1,
         DK_ICM_GETINITIALRMURL);
       logger.debug("URL = "+url[0]);
       InputStream is = new URL( url[0] ).openStream();
@@ -264,7 +264,7 @@ public class MCRCStoreContentManager8
     DKTextIndexDefICM mcr_item_text_index = 
       MCRCM8ItemTypeCommon.getTextDefinition();
     mcr_item_text_index.setUDFName("ICMfetchFilter");
-    mcr_item_text_index.setUDFSchema("icmadmin");
+    mcr_item_text_index.setUDFSchema("ICMADMIN");
 
     // create the root itemtype
     logger.info("Create the ItemType "+itemTypeName);

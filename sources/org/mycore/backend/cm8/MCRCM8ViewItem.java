@@ -43,7 +43,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  **/
 
-public class MCRCM8ViewItem
+public class MCRCM8ViewItem implements DKConstantICM
 {
 
 // The configuration
@@ -87,9 +87,9 @@ public static void main(String argv[]) throws DKException, Exception
     ifsfile = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.File");
     //query = "/"+itemtype+"[@ifsfile=\""+mcrid.getId()+"\"]";
     // show all items
-    query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
+    // query = "/"+itemtype+"[contains-text (@TIEREF,\"\'Randbereich\'\")=1]";
     // show all items
-    //query = "/"+itemtype;
+    query = "/"+itemtype;
     }
 
   System.out.println(query);
@@ -135,7 +135,10 @@ private static void processDDO(Object obj, String pre) throws Exception
     DKLobICM lob=(DKLobICM) ddo;
     System.out.println(pre+"+  +-- Size: "+lob.getSize()+" Bytes, Mime-Type: "+
       lob.getMimeType());
-    System.out.println(pre+"+  +-- URL: "+lob.getContentURL(-1,-1,1));
+    String url[] = lob.getContentURLs(DK_CM_RETRIEVE,DK_CM_CHECKOUT,-1,-1,
+        DK_ICM_GETINITIALRMURL);
+    System.out.println(pre+"+  +-- URL: "+url[0]);
+    //System.out.println(pre+"+  +-- URL: "+lob.getContentURL(-1,-1,-1));
     }
 
   for (short i=1; i<=ddo.dataCount(); i++) {
