@@ -29,8 +29,6 @@
  <xsd:import namespace="http://www.w3.org/1999/xlink"
               schemaLocation="{$mycore_home}/schema/xlinks-2001.xsd" />
  <xsd:include schemaLocation='{$mycore_home}/schema/MCRObjectStructure.xsd'/>
- <xsd:include schemaLocation='{$mycore_home}/schema/MCRObjectService.xsd'/>
- 
 
  <xsd:element name="mycoreobject" type="MCRObject"/>
 
@@ -48,6 +46,7 @@
  </xsd:complexType>
 
  <xsl:apply-templates select="/configuration/metadata"/>
+ <xsl:apply-templates select="/configuration/service"/>
 
  </xsd:schema>
 
@@ -71,7 +70,34 @@
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
-  <xsl:value-of select="$newline"/>
+
+   <xsl:value-of select="$newline"/>
+  </xsd:sequence>
+  <xsd:attribute ref="xml:lang" />
+ </xsd:complexType>
+
+</xsl:template>
+
+<!-- Template for the service part -->
+
+<xsl:template match="/configuration/service">
+
+ <xsd:complexType name="MCRObjectService">
+  <xsd:sequence>
+
+ <xsl:for-each select="element">
+  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+    <xsd:sequence>
+     <xsl:apply-templates select="*"/>
+    </xsd:sequence>
+    <xsd:attribute name="class" type="xsd:string" use="required" />
+    <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
+   </xsd:complexType>
+  </xsd:element>
+ </xsl:for-each>
+
+   <xsl:value-of select="$newline"/>
   </xsd:sequence>
   <xsd:attribute ref="xml:lang" />
  </xsd:complexType>
