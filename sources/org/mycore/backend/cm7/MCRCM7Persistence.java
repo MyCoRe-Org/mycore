@@ -117,7 +117,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom)
   for (int i=0;i<mcr_tc.getSize();i++) {
     if (mcr_tc.getNameElement(i).toLowerCase().equals("service")) {
       for (int j=i;j<mcr_tc.getSize();j++) {
-        if (mcr_tc.getNameElement(j).toLowerCase().equals("date")) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("servdate")) {
           if (mcr_tc.getValueElement(j+3).equals("createdate")) {
             mcr_create = (GregorianCalendar) mcr_tc.getValueElement(j+1);
             continue; }
@@ -125,7 +125,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom)
             mcr_modify = (GregorianCalendar) mcr_tc.getValueElement(j+1);
             continue; }
           }
-        if (mcr_tc.getNameElement(j).toLowerCase().equals("flag")) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("servflag")) {
           mcr_flags = mcr_flags + " " + (String)mcr_tc.getValueElement(j+1); }
         }
       break;
@@ -398,7 +398,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom)
   for (int i=0;i<mcr_tc.getSize();i++) {
     if (mcr_tc.getNameElement(i).toLowerCase().equals("service")) {
       for (int j=i;j<mcr_tc.getSize();j++) {
-        if (mcr_tc.getNameElement(j).toLowerCase().equals("date")) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("servdate")) {
           if (mcr_tc.getValueElement(j+3).equals("createdate")) {
             mcr_create = (GregorianCalendar) mcr_tc.getValueElement(j+1);
             continue; }
@@ -406,7 +406,7 @@ public final void update(MCRTypedContent mcr_tc, org.jdom.Document jdom)
             mcr_modify = (GregorianCalendar) mcr_tc.getValueElement(j+1);
             continue; }
           }
-        if (mcr_tc.getNameElement(j).toLowerCase().equals("flag")) {
+        if (mcr_tc.getNameElement(j).toLowerCase().equals("servflag")) {
           mcr_flags = mcr_flags + " " + (String)mcr_tc.getValueElement(j+1); }
         }
       break;
