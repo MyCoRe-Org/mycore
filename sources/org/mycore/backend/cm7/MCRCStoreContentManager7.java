@@ -63,17 +63,17 @@ public class MCRCStoreContentManager7 extends MCRContentStore
   
   /** The name of the keyfield that stores the creation MCRFile.getOwnerID */
   protected String keyfieldOwner;
-  
+
   public void init( String storeID )
   {
     super.init( storeID );
       
     MCRConfiguration config = MCRConfiguration.instance();  
       
-    segmentSize  = config.getInt   ( prefix + "SegmentSize", 1024 * 1024 );
-    indexClass   = config.getString( prefix + "IndexClass"    ); 
-    keyfieldFile = config.getString( prefix + "Keyfield.File" );
-    keyfieldTime = config.getString( prefix + "Keyfield.Time" );
+    segmentSize   = config.getInt   ( prefix + "SegmentSize", 1024 * 1024 );
+    indexClass    = config.getString( prefix + "IndexClass"     ); 
+    keyfieldFile  = config.getString( prefix + "Keyfield.File"  );
+    keyfieldTime  = config.getString( prefix + "Keyfield.Time"  );
     keyfieldOwner = config.getString( prefix + "Keyfield.Owner" );
   }
   
@@ -84,9 +84,23 @@ public class MCRCStoreContentManager7 extends MCRContentStore
     try
     {
       MCRCM7Item item = new MCRCM7Item( connection, indexClass, DKConstant.DK_DOCUMENT );
-      item.setKeyfield( keyfieldFile, file.getID()         );
-      item.setKeyfield( keyfieldTime, buildNextTimestamp() );
-      item.setKeyfield( keyfieldOwner, ((MCRFile)file).getOwnerID() );
+
+      if( file instanceof MCRFile ) // used by MyCoRe application
+      {
+        item.setKeyfield( keyfieldFile,  file.getID()                 );
+        item.setKeyfield( keyfieldTime,  buildNextTimestamp()         );
+        item.setKeyfield( keyfieldOwner, ((MCRFile)file).getOwnerID() );
+      }
+      else // used by MILESS application, compatibility mode
+      {
+        String derivateID = "0";
+        StringTokenizer st = new StringTokenizer( ((MCROldFile)file).getOwnerID(), "_-" );
+        while( st.hasMoreTokens() ) derivateID = st.nextToken();
+
+        item.setKeyfield( keyfieldFile,  ((MCROldFile)file).getPath()   );
+        item.setKeyfield( keyfieldOwner, Integer.parseInt( derivateID ) );
+      }
+
       item.create();
       String itemID = item.getItemId();
       
