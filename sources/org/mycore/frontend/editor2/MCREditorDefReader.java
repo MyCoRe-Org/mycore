@@ -37,7 +37,7 @@ public class MCREditorDefReader
   static Element readDef( String uri, String ref )
   {
     Element editor = new Element( "editor" );
-    editor.addContent( resolveInclude( uri, ref ) );
+    editor.addContent( resolveInclude( uri, ref, true ).getIncludedElements() );
     return editor;
   }
 
@@ -84,7 +84,7 @@ public class MCREditorDefReader
    * @param idref if not null, include contents of element with that ID
    * @return a List of resolved, included elements
    */
-  protected static List resolveInclude( String uri, String idref )
+  protected static MCRResolvedInclude resolveInclude( String uri, String idref, boolean cacheable )
   {
     if( idref == null ) idref = "";
     
@@ -97,7 +97,7 @@ public class MCREditorDefReader
     if( cached != null) 
     {
       MCREditorServlet.logger.debug( "Editor resolved include from cache: " + key );
-      return getClonedChildren( cached );
+      return new MCRResolvedInclude( cached, cacheable );
     }
 
     // Get the elements to include from uri
@@ -108,30 +108,11 @@ public class MCREditorDefReader
       container = findElementByID( idref, container );
     
     // Recursively resolve include elements in the included resource
-    resolveIncludes( container );
+    cacheable = resolveIncludes( container ) && cacheable;
+    MCREditorServlet.logger.debug( "Editor resolved include " + key + " is cacheable? " + cacheable );
+    if( cacheable ) includesCache.put( key, container );
 
-    // If container/@cacheable != "false", cache this include for later reuse
-    boolean doNotCache = "false".equals( container.getAttributeValue( "cacheable" ) );
-    if( ! doNotCache ) 
-    {
-      MCREditorServlet.logger.debug( "Editor resolved include is cacheable, putting into cache: " + key );
-      includesCache.put( key, container );
-    }
-
-    return getClonedChildren( container );
-  }
-
-  private static List getClonedChildren( Element parent )
-  {
-    List children = parent.getChildren();
-    List copy = new java.util.Vector();
-    for( int i = 0; i < children.size(); i++ )
-    {
-      Element child = (Element)( children.get( i ) );
-      Element clone = (Element)( child.clone() );
-      copy.add( clone );
-    }
-    return copy;
+    return new MCRResolvedInclude( container, cacheable );
   }
 
   /**
@@ -142,8 +123,9 @@ public class MCREditorDefReader
    *  
    * @param container The element where to start resolving includes
    **/
-  protected static void resolveIncludes( Element container )
+  protected static boolean resolveIncludes( Element container )
   {
+    boolean allCacheable = true;
     List children = container.getChildren();
     
     for( int i = 0; i < children.size(); i++ )
@@ -153,14 +135,48 @@ public class MCREditorDefReader
       {
         String ref = child.getAttributeValue( "ref" );
         String uri = child.getAttributeValue( "uri" );
+
         if( ( uri == null ) || ( uri.trim().length() == 0 ) ) continue;
 
+        boolean includeCacheable = ! "false".equals( child.getAttributeValue( "cacheable" ) );
+        allCacheable = allCacheable && includeCacheable;
+
         children.remove( child );
-        List includes = resolveInclude( uri, ref );
-        children.addAll( i--, includes );
+        MCRResolvedInclude ri = resolveInclude( uri, ref, includeCacheable );
+        children.addAll( i--, ri.getIncludedElements() );
+        allCacheable = allCacheable && ri.isCacheable();
       }
-      else resolveIncludes( child );
+      else
+      {
+        allCacheable = allCacheable & resolveIncludes( child );
+      }
+    }
+    return allCacheable;
+  }
+}
+  
+class MCRResolvedInclude
+{
+  private List included;
+  private boolean cacheable;
+
+  MCRResolvedInclude( Element container, boolean cacheable )
+  {
+    this.cacheable = cacheable;
+    this.included  = new java.util.Vector();
+
+    List children = container.getChildren();
+    for( int i = 0; i < children.size(); i++ )
+    {
+      Element child = (Element)( children.get( i ) );
+      included.add( child.clone() );
     }
   }
+
+  boolean isCacheable()
+  { return cacheable; }
+
+  List getIncludedElements()
+  { return included; }
 }
 

@@ -94,7 +94,7 @@ class MCREditorResolver
   protected static Element readFromWebapp( String uri )
   {
     String path = uri.substring( uri.indexOf( ":" ) + 1 );
-    MCREditorServlet.logger.info( "Reading from webapp " + path );
+    MCREditorServlet.logger.info( "Editor reading xml from webapp " + path );
     uri = "file://" + context.getRealPath( path );
     return readFromFile( uri );
   }
@@ -108,13 +108,13 @@ class MCREditorResolver
 
     File file = new File( path );
     Element fromCache = (Element) fileCache.getIfUpToDate( path, file.lastModified() );
-    if( fromCache != null ) return fromCache;
+    if( fromCache != null ) return (Element)( fromCache.clone() );
     
     try
     {
       Element parsed = parseStream( new FileInputStream( file ) );
       fileCache.put( path, parsed );
-      return parsed;
+      return (Element)( parsed.clone() );
     }
     catch( FileNotFoundException ex )
     {
