@@ -73,16 +73,17 @@ import org.mycore.services.query.MCRTextSearchInterface;
 public class MCRCStoreLucene
 	extends MCRCStoreLocalFilesystem
 	implements MCRTextSearchInterface {
-	private static final MCRConfiguration conf = MCRConfiguration.instance();
+	private static final MCRConfiguration CONF = MCRConfiguration.instance();
 	private static final String DERIVATE_FIELD = "DerivateID";
 	private static final String STORAGE_FIELD = "StorageID";
-	private static final Logger logger =
+	private static final Logger LOGGER =
 		Logger.getLogger(MCRCStoreLucene.class);
-	private static final int optimizeIntervall = 10;
-	private static final TextFilterPluginManager pMan =
+	private static final int OPTIMIZE_INTERVALL = 10;
+	private static final TextFilterPluginManager PLUGIN_MANAGER =
 		TextFilterPluginManager.getInstance();
 	private static int docCount;
 	private static File indexDir = null;
+	private static long lastModified;
 
 	private static IndexReader indexReader;
 	private static Searcher indexSearcher;
@@ -104,7 +105,7 @@ public class MCRCStoreLucene
 		String[] returns = null;
 		//transform query here
 		String queryText = parseQuery(docTextQuery);
-		logger.debug("TS transformed query:" + queryText);
+		LOGGER.debug("TS transformed query:" + queryText);
 		if (queryText.length() == 0)
 			return new String[0];
 		//Start a filtering query for the largest word in the query
@@ -136,10 +137,10 @@ public class MCRCStoreLucene
 					doc = hits[0].doc(0);
 					derivateID = doc.get(DERIVATE_FIELD);
 					if (derivateID != null) {
-						logger.debug(++i + ". " + derivateID);
+						LOGGER.debug(++i + ". " + derivateID);
 						collector.add(derivateID);
 					} else {
-						logger.warn(
+						LOGGER.warn(
 							"Found Document containes no Field \"DerivateID\":"
 								+ doc);
 					}
@@ -162,11 +163,11 @@ public class MCRCStoreLucene
 	 */
 	public void init(String storeID) {
 		super.init(storeID);
-		pMan.loadPlugins();
-		indexDir = new File(conf.getString(prefix + "IndexDirectory"));
-		logger.debug("TextIndexDir: " + indexDir);
+		PLUGIN_MANAGER.loadPlugins();
+		indexDir = new File(CONF.getString(prefix + "IndexDirectory"));
+		LOGGER.debug("TextIndexDir: " + indexDir);
 		if (indexWriter == null) {
-			logger.debug("creating IndexWriter...");
+			LOGGER.debug("creating IndexWriter...");
 			try {
 				if (indexDir.exists()) {
 					//do some hardcore...
@@ -175,11 +176,11 @@ public class MCRCStoreLucene
 						IndexReader.unlock(index);
 				}
 				loadIndexWriter();
-				logger.debug("IndexWriter created...");
+				LOGGER.debug("IndexWriter created...");
 				docCount = indexWriter.docCount();
 				indexWriter.close();
 			} catch (IOException e) {
-				logger.error("Setting indexWriter=null");
+				LOGGER.error("Setting indexWriter=null");
 				indexWriter = null;
 			}
 		}
@@ -189,10 +190,15 @@ public class MCRCStoreLucene
 		if (indexSearcher == null) {
 			loadIndexSearcher();
 		}
+		try {
+			lastModified=IndexReader.getCurrentVersion(indexDir);
+		} catch (IOException e) {
+			LOGGER.error("Error while getting last modified info from IndexDir",e);
+		}
 	}
 
 	protected static String parseQuery(String query) {
-		logger.debug("TS incoming query: " + query);
+		LOGGER.debug("TS incoming query: " + query);
 		int i = query.indexOf('\"');
 		i++;
 		if (i == 0)
@@ -214,10 +220,10 @@ public class MCRCStoreLucene
 		indexReader.close();
 		indexReader = null;
 		docCount--;
-		logger.debug("deleted " + deleted + " documents containing " + term);
-		if (docCount % optimizeIntervall == 0) {
+		LOGGER.debug("deleted " + deleted + " documents containing " + term);
+		if (docCount % OPTIMIZE_INTERVALL == 0) {
 			loadIndexWriter();
-			logger.debug("Optimize index for searching...");
+			LOGGER.debug("Optimize index for searching...");
 			indexWriter.optimize();
 			indexWriter.close();
 		}
@@ -234,14 +240,14 @@ public class MCRCStoreLucene
 		MCRFileReader file,
 		MCRContentInputStream source)
 		throws Exception {
-		if (!pMan.isSupported(file.getContentType())) {
+		if (!PLUGIN_MANAGER.isSupported(file.getContentType())) {
 			throw new MCRPersistenceException(
 				new StringBuffer(file.getContentTypeID())
 					.append(" is not supported by any TextFilterPlugin detected")
 					.append(" by the TextFilterPluginManager.\n")
 					.append("Make sure you have a Plugin installed in the proper directory:")
 					.append(
-						conf.getString(
+						CONF.getString(
 							"MCR.PluginDirectory",
 							"(not configured yet)"))
 					.append("\nIf you don't have the right Plugin ready, reasign \"")
@@ -281,7 +287,7 @@ public class MCRCStoreLucene
 	}
 
 	protected void finalize() throws Throwable {
-		logger.debug("finalize() called on Lucenestore: shutting down...");
+		LOGGER.debug("finalize() called on Lucenestore: shutting down...");
 		synchronized (indexReader) {
 			indexReader.close();
 			indexReader = null;
@@ -291,7 +297,7 @@ public class MCRCStoreLucene
 			indexWriter.close();
 			indexWriter = null;
 		}
-		logger.debug("shutting down... completed");
+		LOGGER.debug("shutting down... completed");
 	}
 
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
@@ -305,12 +311,12 @@ public class MCRCStoreLucene
 			Field derivateID = new Field(DERIVATE_FIELD, file.getOwnerID(),
 					true, true, false);
 			Field fileID = new Field("FileID", file.getID(), true, true, false);
-			logger.debug("adding fields to document");
+			LOGGER.debug("adding fields to document");
 			returns.add(derivateID);
 			returns.add(fileID);
 		}
 		try {
-			BufferedReader in = new BufferedReader(pMan.transform(reader
+			BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(reader
 					.getContentType(), stream));
 			/*
 			 * since file is stored elsewhere we only index the file and do not
@@ -320,14 +326,15 @@ public class MCRCStoreLucene
 			returns.add(content);
 		} catch (FilterPluginTransformException fe) {
 			//no transformation was done because of an error
-			logger.error("Error while transforming document.", fe);
+			LOGGER.error("Error while transforming document.", fe);
+			return returns;
 		} catch (NullPointerException ne) {
 			//maybe ContentType is unsupported?
-			logger.error("Error while transforming document.", ne);
-		} finally {
-			logger.debug("returning document");
+			LOGGER.error("Error while transforming document.", ne);
 			return returns;
-		}
+		} 
+		LOGGER.debug("returning document");
+		return returns;
 	}
 
 	private final boolean containsExclusiveClause(BooleanQuery query) {
@@ -349,7 +356,7 @@ public class MCRCStoreLucene
 		Hits[] hits = null;
 		Analyzer analyzer = getAnalyzer();
 
-		logger.debug("Query: " + derivateID + "-->" + queryText);
+		LOGGER.debug("Query: " + derivateID + "-->" + queryText);
 		LuceneCStoreQueryParser parser =
 			new LuceneCStoreQueryParser("content", analyzer);
 		parser.setGroupingValue(derivateID);
@@ -362,7 +369,7 @@ public class MCRCStoreLucene
 			BooleanQuery[] queries = parser.getBooleanQueries(queryText);
 			hits = new Hits[queries.length];
 			for (int i = 0; i < queries.length; i++) {
-				logger.debug(
+				LOGGER.debug(
 					"  -Searching for: " + queries[i].toString("content"));
 				hits[i] = indexSearcher.search(queries[i]);
 				if (containsExclusiveClause(queries[i])) {
@@ -438,7 +445,7 @@ public class MCRCStoreLucene
 				}
 			}
 		}
-		logger.debug("Start a presearch for subquery:" + biggestSub);
+		LOGGER.debug("Start a presearch for subquery:" + biggestSub);
 		try {
 			Hits hits =
 				indexSearcher.search(
@@ -447,7 +454,7 @@ public class MCRCStoreLucene
 			for (int i = 0; i < hits.length(); i++) {
 				values = hits.doc(i).getValues(fieldName);
 				if (values == null) {
-					logger.warn(
+					LOGGER.warn(
 						"Found a document but "
 							+ fieldName
 							+ " was not stored in!");
@@ -477,13 +484,13 @@ public class MCRCStoreLucene
 	private void indexDocument(Document doc) throws IOException {
 		indexSearcher.close();
 		loadIndexWriter();
-		logger.debug(
+		LOGGER.debug(
 			"Create index for storageID="
 				+ doc.getField(STORAGE_FIELD).stringValue());
 		indexWriter.addDocument(doc);
 		docCount++;
-		if (docCount % optimizeIntervall == 0) {
-			logger.debug("Optimize index for searching...");
+		if (docCount % OPTIMIZE_INTERVALL == 0) {
+			LOGGER.debug("Optimize index for searching...");
 			indexWriter.optimize();
 		}
 		indexWriter.close();
@@ -506,6 +513,11 @@ public class MCRCStoreLucene
 		if (indexReader == null) {
 			loadIndexReader();
 		}
+		try {
+			lastModified=IndexReader.getCurrentVersion(indexDir);
+		} catch (IOException e) {
+			LOGGER.warn("Cannot get current Version of IndexDir",e);
+		}
 		indexSearcher = new IndexSearcher(indexReader);
 	}
 	private synchronized void loadIndexWriter() {
@@ -521,8 +533,18 @@ public class MCRCStoreLucene
 				"Cannot create index in " + indexDir.getAbsolutePath(),
 				e);
 		}
-		indexWriter.mergeFactor = optimizeIntervall;
+		indexWriter.mergeFactor = OPTIMIZE_INTERVALL;
 		indexWriter.minMergeDocs = 1; //always write to local dir
+	}
+	private void refreshIndexSearcher(){
+		try {
+			if(lastModified!=IndexReader.getCurrentVersion(indexDir)){
+				indexSearcher.close();
+				loadIndexSearcher();
+			}
+		} catch (IOException e) {
+			LOGGER.warn("Cannot refresh IndexReader",e);
+		}
 	}
 
 }
