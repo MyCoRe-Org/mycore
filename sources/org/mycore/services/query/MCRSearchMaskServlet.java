@@ -45,10 +45,6 @@ String mode = "CreateSearchMask";
 
 // Default Language (as UpperCase)
 private String defaultLang = "";
-// Default application path
-private String applicationPath = "";
-// Slash for pathes
-private String slash = "/";
 
 // An instance of the MCRConfiguration
 MCRConfiguration conf = null;
@@ -65,8 +61,6 @@ org.jdom.Document jdom = null;
   conf = MCRConfiguration.instance();
   defaultLang = conf.getString( "MCR.metadata_default_lang", "en" )
     .toUpperCase();
-  applicationPath = conf.getString( "MCR.appl_path", "" );
-  slash = System.getProperty("file.separator");
   }
 
  /**
@@ -111,16 +105,15 @@ org.jdom.Document jdom = null;
   if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
   type = type.toLowerCase();
 
-  StringBuffer sb = new StringBuffer(128);
-  sb.append(applicationPath).append(slash).append("config").append(slash)
-    .append(conf.getString( "MCR.searchmask_config_"+layout.toLowerCase()));
+  String smc = conf.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
-    File file = new File(sb.toString());
-    jdom = new org.jdom.input.SAXBuilder().build(file);
+    InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
+    if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );
+    jdom = new org.jdom.input.SAXBuilder().build( in );
     }
   catch (org.jdom.JDOMException e) {
     throw new MCRException("SearchMaskServlet : Can't read config file "+
-      sb.toString()+" or it has a parse error."); }
+      smc+" or it has a parse error."); }
 
   // prepare the stylesheet name
   String style = mode + "-" + layout+ "-" + lang;
@@ -162,16 +155,15 @@ org.jdom.Document jdom = null;
   if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
   StringBuffer query = new StringBuffer("");
 
-  StringBuffer sb = new StringBuffer(128);
-  sb.append(applicationPath).append(slash).append("config").append(slash)
-    .append(conf.getString( "MCR.searchmask_config_"+layout.toLowerCase()));
+  String smc = conf.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
-    File file = new File(sb.toString());
-    jdom = new org.jdom.input.SAXBuilder().build(file);
+    InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
+    if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );
+    jdom = new org.jdom.input.SAXBuilder().build(in);
     }
   catch (org.jdom.JDOMException e) {
     throw new MCRException("SearchMaskServlet : Can't read config file "+
-      sb.toString()+" or it has a parse error."); }
+      smc+" or it has a parse error."); }
   org.jdom.Element searchpage = jdom.getRootElement().getChild("searchpage");
   List element_list = searchpage.getChildren();
   int len = element_list.size();
@@ -193,7 +185,7 @@ org.jdom.Document jdom = null;
     ArrayList param = new ArrayList();
     ArrayList varia = new ArrayList();
     for (int j=0;j<tempfields;j++) {
-      sb = (new StringBuffer(name)).append(j+1);
+      StringBuffer sb = (new StringBuffer(name)).append(j+1);
       param.add(request.getParameter(sb.toString()));
       sb = (new StringBuffer("$")).append(j+1);
       varia.add(sb.toString());
