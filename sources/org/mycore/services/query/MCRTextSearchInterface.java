@@ -31,7 +31,7 @@ package org.mycore.services.query;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public interface IndexableStore {
+public interface MCRTextSearchInterface {
 
 	/**
 	 * searches on the index and delivers derivate ids matching the search

@@ -25,7 +25,7 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
-import org.mycore.services.query.IndexableStore;
+import org.mycore.services.query.MCRTextSearchInterface;
 
 import java.util.*;
 
@@ -36,7 +36,7 @@ import java.util.*;
  * remembering the implementations of MCRContentStore and MCRAudioVideoExtender 
  * that are used in the system.
  *
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
@@ -47,7 +47,7 @@ public class MCRContentStoreFactory {
 	/** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
 	protected static Hashtable extenderClasses;
 
-	/** Hashtable StoreID to MCRContentStore implementing {@link org.mycore.services.query.IndexableStore} */
+	/** Hashtable StoreID to MCRContentStore implementing {@link org.mycore.services.query.MCRTextSearchInterface} */
 	protected static Hashtable indexStores;
 
 	/** The MCRContentStoreSelector implementation that will be used */
@@ -77,7 +77,7 @@ public class MCRContentStoreFactory {
 				MCRContentStore s = (MCRContentStore) (obj);
 				s.init(storeID);
 				stores.put(storeID, s);
-				if (s instanceof IndexableStore) {
+				if (s instanceof MCRTextSearchInterface) {
 					indexStores.put(storeID, s);
 				}
 			} catch (Exception ex) {
@@ -90,17 +90,17 @@ public class MCRContentStoreFactory {
 	}
 
 	/**
-	 * returns all ContentStores which implements {@link org.mycore.services.query.IndexableStore}
-	 * @return Array of {@link org.mycore.services.query.IndexableStore} ContentStores
+	 * returns all ContentStores which implements {@link org.mycore.services.query.MCRTextSearchInterface}
+	 * @return Array of {@link org.mycore.services.query.MCRTextSearchInterface} ContentStores
 	 */
-	public static IndexableStore[] getAllIndexables() {
+	public static MCRTextSearchInterface[] getAllIndexables() {
 		if (storeSelector == null)
 			initStoreSelector();
 		String[] s = storeSelector.getAvailableStoreIDs();
 		for (int i = 0; i < s.length; i++)
 			getStore(s[i]);
-		return (IndexableStore[]) indexStores.values().toArray(
-			new IndexableStore[indexStores.size()]);
+		return (MCRTextSearchInterface[]) indexStores.values().toArray(
+			new MCRTextSearchInterface[indexStores.size()]);
 	}
 
 	/**
