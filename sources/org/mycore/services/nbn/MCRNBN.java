@@ -26,6 +26,7 @@ package org.mycore.services.nbn;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Properties;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
@@ -161,34 +162,31 @@ public class MCRNBN {
 		return (last = niss);
 	}
 
- /**
-  * Calculates the checksum for the given URN. The algorithm
-  * is specified by the "Carmen AP-4" project.
-  *
-  * @return the checksum for the given URN
-  **/ 
-  protected static String buildChecksum( String urn )
-  {
-    StringBuffer buffer = new StringBuffer();
-    for( int i = 0; i < urn.length(); i++ )
-    { 
-      String character = urn.substring( i, i + 1 );
-      buffer.append( codes.getProperty( character ) );
-    }
+	/**
+	 * Calculates the checksum for the given URN. The algorithm
+	 * is specified by the "Carmen AP-4" project.
+	 *
+	 * @return the checksum for the given URN
+	 */ 
+	protected static String buildChecksum(String urn) {
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < urn.length(); i++) { 
+			String character = urn.substring(i, i + 1);
+			buffer.append(codes.getProperty(character));
+		}
     
-    String digits = buffer.toString();
-    long   sum    = 0;
-    long   digit  = 0;
+		String digits = buffer.toString();
+		long sum = 0;
+		long digit = 0;
     
-    for( int i = 0; i < digits.length(); i++ )
-    {
-      digit = Long.parseLong( digits.substring( i, i + 1 ) );
-      sum += digit * ( i + 1 );
-    }
+		for (int i = 0; i < digits.length(); i++) {
+			digit = Long.parseLong(digits.substring(i, i + 1));
+			sum += digit * (i + 1);
+		}
     
-    String quotient = String.valueOf( sum / digit );
-    return quotient.substring( quotient.length() - 1 );
-  } 
+		String quotient = String.valueOf(sum / digit);
+		return quotient.substring(quotient.length() - 1);
+	} 
 
 	/**
 	 * Method getLocalPrefix. Returns the local prefix of the urn's
@@ -198,118 +196,151 @@ public class MCRNBN {
   		return prefix;
 	}
   
-  protected String  urn;
-  protected Boolean valid;
+	protected String  urn;
+	protected Boolean valid;
   
- /**
-  * Creates a new local NBN and calculates a unique NISS
-  * and checksum for it.
-  * This implementation creates a NISS of eight digits
-  * length that is derived from the current time measured
-  * in seconds. The constructor guarantees uniqueness and therefore
-  * will block to produce only one NBN per second.
-  **/
-  public MCRNBN()
-  {
-    StringBuffer buffer = new StringBuffer( prefix );
-    buffer.append( produceNISS() );
-    buffer.append( buildChecksum( buffer.toString() ) );
-    urn = buffer.toString();
+	/**
+	 * Creates a new local NBN and calculates a unique NISS
+	 * and checksum for it.
+	 * This implementation creates a NISS of eight digits
+	 * length that is derived from the current time measured
+	 * in seconds. The constructor guarantees uniqueness and therefore
+	 * will block to produce only one NBN per second.
+	 */
+	public MCRNBN() {
+		StringBuffer buffer = new StringBuffer(prefix);
+		buffer.append(produceNISS());
+		buffer.append(buildChecksum(buffer.toString()));
+		urn = buffer.toString();
 
-    valid = Boolean.TRUE;
-  }
+		valid = Boolean.TRUE;
+		manager.reserveURN(this);
+	}
   
- /**
-  * Creates a new NBN object from the given URN.
-  **/
-  public MCRNBN( String urn )
-  {
-    MCRArgumentChecker.ensureNotEmpty( urn, "urn" );  
-    this.urn = urn; 
-  }
+	/**
+	 * Method MCRNBN. Creates a new NBN object from the given URN. If the
+	 * urn is local but not in the persistence store, it will be stored.
+	 * 
+	 * @param the urn to create a NBN from.
+	 */
+	public MCRNBN(String urn) {
+		MCRArgumentChecker.ensureNotEmpty(urn, "urn");  
+		this.urn = urn; 
+		
+		if (isLocal()) {
+			HashMap map = (HashMap) manager.listURNs(getNISSandChecksum());
+			if (map.isEmpty()) {
+				manager.reserveURN(this);
+			}
+		}
+	}
   
- /**
-  * Returns the namespace of this URN, that is the part
-  * between "urn:" and the last "-" in the URN. Returns null
-  * if this NBN is not valid.
-  **/
-  public String getNamespace()
-  { return ( isValid() ? urn.substring( 4, urn.lastIndexOf( "-" ) ) : null ); }
+	/**
+	 * Method delete. Removes a URN from the store and makes frees the 
+	 * non-static resources.
+	 */
+	public void delete() {
+		manager.removeURN(this);
+		urn = null;
+		valid = null;
+	}
+	
+	/**
+	 * Method getURL. Returns the URL which has been locally attached with the URN
+	 * @return the URL belonging to the URN
+	 */
+	public String getURL() {
+		if (isLocal()) {
+			return manager.getURL(this);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Returns the namespace of this URN, that is the part
+	 * between "urn:" and the last "-" in the URN. Returns null
+	 * if this NBN is not valid.
+	 */
+	public String getNamespace() {
+		return (isValid() ? urn.substring(4, urn.lastIndexOf("-")) : null);
+	}
   
- /**
-  * Returns the NISS and checksum part of this NBN URN.
-  * Returns null if this NBN is not valid.
-  **/
-  public String getNISSandChecksum()
-  { return ( isValid() ? urn.substring( urn.lastIndexOf( "-" ) + 1 ) : null ); }
+	/**
+	 * Returns the NISS and checksum part of this NBN URN.
+	 * Returns null if this NBN is not valid.
+	 */
+	public String getNISSandChecksum() {
+		return (isValid() ? urn.substring(urn.lastIndexOf("-") + 1) : null);
+	}
   
- /**
-  * Returns the NBN part of this URN, that is the part
-  * after "urn:", or null if this NBN is not valid.
-  **/
-  public String getNBN()
-  { return ( isValid() ? urn.substring( 4 ) : null );  }
+	/**
+	 * Returns the NBN part of this URN, that is the part
+	 * after "urn:", or null if this NBN is not valid.
+	 */
+	public String getNBN() {
+		return (isValid() ? urn.substring(4) : null);
+	}
   
- /**
-  * Returns true if this NBN is valid and starts with
-  * the local NBN prefix.
-  **/
-  public boolean isLocal()
-  { return isValid() && urn.startsWith( prefix ); }
+	/**
+	 * Returns true if this NBN is valid and starts with
+	 * the local NBN prefix.
+	 */
+	public boolean isLocal() {
+		return isValid() && urn.startsWith(prefix);
+	}
   
- /**
-  * Returns true if this NBN has a valid structure and 
-  * the checksum is correct.
-  **/
-  public boolean isValid()
-  {
-    if( valid == null )
-    {
-      if( ( urn == null ) || ( urn.length() < 19 )
-          || ( ! urn.startsWith( "urn:nbn:" ) )
-          || ( ! urn.toLowerCase().equals( urn ) ) 
-        )
-        valid = Boolean.FALSE;
-      else
-      {
-        String start = urn.substring( 0, urn.length() - 1 );
-        String check = buildChecksum( start );
-        valid = new Boolean( urn.endsWith( check ) );
-      }
-    }
-    return valid.booleanValue();
-  }
+	/**
+	 * Returns true if this NBN has a valid structure and 
+	 * the checksum is correct.
+	 */
+	public boolean isValid() {
+		if (valid == null) {
+			if ((urn == null) || (urn.length() < 19)
+					|| (!urn.startsWith("urn:nbn:"))
+					|| (!urn.toLowerCase().equals(urn))) {
+				valid = Boolean.FALSE;
+			} else {
+				String start = urn.substring(0, urn.length() - 1);
+				String check = buildChecksum(start);
+				valid = new Boolean(urn.endsWith(check));
+			}
+		}
+		
+		return valid.booleanValue();
+	}
   
- /** Returns the URN this NBN object represents **/
-  public String toString()
-  { return urn; }
+	/** Returns the URN this NBN object represents **/
+	public String toString() {
+		return urn;
+	}
 
- /** 
-  * A simple test application that generates and tests some NBN URNs
-  **/
-  public static void main( String[] args )
-  {
-    System.out.println( "NBN URN produced : " + new MCRNBN() );  
-    System.out.println( "NBN URN produced : " + new MCRNBN() );  
-    System.out.println( "NBN URN produced : " + new MCRNBN() );  
-    System.out.println();
+	/** 
+	 * A simple test application that generates and tests some NBN URNs
+	 */
+	public static void main(String[] args) {
+		System.out.println("NBN URN produced : " + new MCRNBN());  
+		System.out.println("NBN URN produced : " + new MCRNBN());  
+		System.out.println("NBN URN produced : " + new MCRNBN());  
+		System.out.println();
     
-    MCRNBN urn = new MCRNBN( "urn:nbn:de:bv:333-123456788" );
-    System.out.println( "  NBN URN : " + urn                      );
-    System.out.println( " is valid : " + urn.isValid()            );
-    System.out.println( " is local : " + urn.isLocal()            );
-    System.out.println( "      nbn : " + urn.getNBN()             );
-    System.out.println( "   niss+p : " + urn.getNISSandChecksum() );
-    System.out.println( "namespace : " + urn.getNamespace()       );
-    System.out.println();
+		MCRNBN urn = new MCRNBN("urn:nbn:de:bv:333-123456788");
+		System.out.println("  NBN URN : " + urn);
+		System.out.println(" is valid : " + urn.isValid());
+		System.out.println(" is local : " + urn.isLocal());
+		System.out.println("      nbn : " + urn.getNBN());
+		System.out.println("   niss+p : " + urn.getNISSandChecksum());
+		System.out.println("namespace : " + urn.getNamespace());
+		System.out.println();
     
-    urn = new MCRNBN();
-    System.out.println( "  NBN URN : " + urn                      );
-    System.out.println( " is valid : " + urn.isValid()            );
-    System.out.println( " is local : " + urn.isLocal()            );
-    System.out.println( "      nbn : " + urn.getNBN()             );
-    System.out.println( "   niss+p : " + urn.getNISSandChecksum() );
-    System.out.println( "namespace : " + urn.getNamespace()       );
-  }
+		urn = new MCRNBN();
+		System.out.println("  NBN URN : " + urn);
+		System.out.println(" is valid : " + urn.isValid());
+		System.out.println(" is local : " + urn.isLocal());
+		System.out.println("      nbn : " + urn.getNBN());
+		System.out.println("   niss+p : " + urn.getNISSandChecksum());
+		System.out.println("namespace : " + urn.getNamespace());
+	}
+  
 }
 
