@@ -169,11 +169,15 @@ private final String getNextCondition(int startpos,int stoppos,String query)
  * @param onecond  one single condition
  * @ return the transfromed query for CM7.
  **/
-private final String traceOneCondition(String cond)
+private final String traceOneCondition(String condin)
   {
   int i, j, k;
+  // remove /mycoreobject from the begin
+  i = 0;
+  if (condin.startsWith("(/MYCOREOBJECT")) { i = 14; }
+  if (condin.startsWith("(//MYCOREOBJECT")) { i = 15; }
+  String cond = "("+condin.substring(i,condin.length());
   StringBuffer sb = new StringBuffer(128);
-  //System.out.println("ONECOND="+cond);
   // search [..]
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
@@ -181,7 +185,7 @@ private final String traceOneCondition(String cond)
   // cerate path to the data
   StringBuffer pt = new StringBuffer(128);
   boolean ispath = false;
-  String inpath = cond.substring(0,klammerauf);
+  String inpath = cond.substring(i,klammerauf);
   if ((inpath.equals("(")) || (inpath.equals("(.")) ||
       (inpath.equals("(*")) || (inpath.equals("(//*")) ||
       (inpath.equals("(/"))) { 
@@ -196,7 +200,9 @@ private final String traceOneCondition(String cond)
     while ((j!=-1)&&(j<klammerauf)) {
       j=cond.indexOf("/",i);
       if (j!=-1) { 
-        pt.append("XXX").append(cond.substring(i,j)); i = j+1; }
+        if (i != j) { pt.append("XXX").append(cond.substring(i,j)); }
+        i = j+1; 
+        }
       }
     pt.append("XXX").append(cond.substring(i,klammerauf));
     }
