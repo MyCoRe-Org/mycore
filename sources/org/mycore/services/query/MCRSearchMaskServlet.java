@@ -40,9 +40,18 @@ import mycore.common.*;
 public class MCRSearchMaskServlet extends HttpServlet 
 {
 
+// The default mode for this class
 String mode = "CreateSearchMask";
+
 // Default Language (as UpperCase)
 private String defaultLang = "";
+// Default application path
+private String applicationPath = "";
+// Default search configuration file
+private String searchConfig = "";
+
+// The configuration XML file
+private org.jdom.Document jdom = null;
 
  /**
   * The initialization method for this servlet. This read the default
@@ -50,8 +59,19 @@ private String defaultLang = "";
   **/
   public void init() throws MCRConfigurationException
   {
-  String defaultLang = MCRConfiguration.instance()
-    .getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+  MCRConfiguration conf = MCRConfiguration.instance();
+  String defaultLang = conf.getString( "MCR.metadata_default_lang", "en" )
+    .toUpperCase();
+  String applicationPath = conf.getString( "MCR.appl_path", "" );
+  String searchConfig = conf.getString( "MCR.searchmask_config", 
+    "config/searchmask.xml" );
+  try {
+    File file = new File(applicationPath,searchConfig);
+    jdom = new org.jdom.input.SAXBuilder().build(file);
+    }
+  catch (org.jdom.JDOMException e) {
+    throw new MCRException("SearchMaskServlet : Can't read config file "+
+      applicationPath+searchConfig); }
   }
 
  /**
@@ -95,9 +115,6 @@ private String defaultLang = "";
 
   // prepare the stylesheet name
   String style = mode + "-" + type+ "-" + lang;
-
-  org.jdom.Element root = new org.jdom.Element("mcr_search");
-  org.jdom.Document jdom = new org.jdom.Document(root);
 
   // start Layout servlet
   try {
