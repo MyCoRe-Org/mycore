@@ -26,25 +26,23 @@ package mycore.datamodel;
 
 import mycore.common.MCRException;
 import mycore.common.MCRUtils;
-import mycore.datamodel.MCRObjectID;
 
 /**
- * This class implements all method for handling with the MCRMetaLink part
+ * This class implements all method for generic handling with the MCRMetaLink part
  * of a metadata object. The MCRMetaLink class present two types. At once
- * a reference of a other MCRObject or a URL. At second a bidirectional
- * link between two MCRObject's. Optional you can append the reference
+ * a reference to an URL. At second a bidirectional link between two URL's. 
+ * Optional you can append the reference
  * with the label attribute. See to W3C XLink Standard for more informations.
  * <p>
- * &lt;tag class="MCRMetaLink" heritable="..."&gt;<br>
- * &lt;subtag xlink:type="locator" xlink:href="<em>MCRObjectId</em>" xlink:label="..." xlink:title="..."/&gt;<br>
+ * &lt;tag class="MCRMetaLink" heritable="..." parasearch="..."&gt;<br>
  * &lt;subtag xlink:type="locator" xlink:href="<em>URL</em>" xlink:label="..." xlink:title="..."/&gt;<br>
- * &lt;subtag xlink:type="arc" xlink:from="<em>MCRObjectId</em>" xlink:to="MCRObjectId"/&gt;<br>
+ * &lt;subtag xlink:type="arc" xlink:from="<em>URL</em>" xlink:to="URL"/&gt;<br>
  * &lt;/tag&gt;<br>
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRMetaLink extends MCRMetaDefault 
+public class MCRMetaLink extends MCRMetaDefault 
   implements MCRMetaInterface 
 {
 
@@ -62,12 +60,11 @@ public static final int MAX_XLINK_FROM_LENGTH = MCRObjectID.MAX_LENGTH;
 public static final int MAX_XLINK_TO_LENGTH = MCRObjectID.MAX_LENGTH;
 
 // MetaLink data
-private String href;
-private String label;
-private String title;
-private String linktype;
-private MCRObjectID ref, from, to;
-private boolean ismcrobjectid;
+protected String href;
+protected String label;
+protected String title;
+protected String linktype;
+protected String from, to;
 
 /**
  * This is the constructor. <br>
@@ -81,10 +78,8 @@ public MCRMetaLink()
   label = "";
   title = "";
   linktype = null;
-  ref = null;
-  from = null;
-  to = null;
-  ismcrobjectid = false;
+  from = "";
+  to = "";
   }
 
 /**
@@ -92,53 +87,24 @@ public MCRMetaLink()
  * The language element was set. If the value of <em>default_lang</em>
  * is null, empty or false <b>en</b> was set. The subtag element was set
  * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
- * is null or empty an exception was throwed. The linktype element was set to
- * the value of <em>set_linktype<em>, if it is not "locator" or "arc" a
- * MCRException was throwed. Depending of the linktype the <em>set_data1</em>
- * value was set to the href or from element. The <em>set_data2</em> was set 
- * to label or to element. The <em>set_data3</em> was set to title element.
- * If the from or to element are not a MCRObjectId
- * a MCRException was throwed.
+ * is null or empty an exception was throwed. 
  *
  * @param set_datapart     the global part of the elements like 'metadata'
- *                         or 'service'
+ *                         or 'service' or so
  * @param set_subtag       the name of the subtag
  * @param default_lang     the default language
- * @param set_linktype     the XLink type string
- * @param set_data1        the first data
- * @param set_data2        the second data
- * @param set_data3        the third data
- * @exception MCRException if the set_subtag value is null or empty, or
- *   the from or to element is not a MCRObjectId or the linktype is not 
- *   "locator" or "arc"
+ * @exception MCRException if the set_datapart or set_subtag value is null or empty
  */
-public MCRMetaLink(String set_datapart, String set_subtag, 
-  String default_lang, String set_linktype, String set_data1, String set_data2,
-    String set_data3) throws MCRException
+public MCRMetaLink(String set_datapart, String set_subtag, String default_lang)
+  throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,"");
-  if (set_linktype == null) {
-    throw new MCRException("The xlink:type is null."); }
-  if (set_linktype.equals("locator")) {
-    if (set_data1==null) { href = ""; } else { href = set_data1.trim(); }
-    try {
-      MCRObjectID id = new MCRObjectID(href); ismcrobjectid = true; }
-    catch (Exception e) { ismcrobjectid = false; }
-    if (set_data2==null) { label = ""; } else { label = set_data2.trim(); }
-    if (set_data3==null) { title = ""; } else { title = set_data3.trim(); }
-    linktype = set_linktype;
-    }
-  if (set_linktype.equals("arc")) {
-    try {
-      from = new MCRObjectID(set_data1); to = new MCRObjectID(set_data2); }
-    catch (Exception e) { 
-      throw new MCRException("The from/to value is not a MCRObjectID."); }
-    if (set_data3==null) { title = ""; } else { title = set_data3.trim(); }
-    linktype = set_linktype;
-    return;
-    }
+  href = "";
+  label = "";
+  title = "";
   linktype = null;
-  throw new MCRException("The xlink:type is not locator or arc."); 
+  from = "";
+  to = "";
   }
 
 /**
@@ -147,15 +113,15 @@ public MCRMetaLink(String set_datapart, String set_subtag,
  * @param set_href        the reference 
  * @param set_label       the new label string
  * @param set_title       the new title string
+ * @exception MCRException if the set_href value is null or empty
  **/
-public final void setReference(String set_href, String set_label, 
-  String set_title)
+public void setReference(String set_href, String set_label, 
+  String set_title) throws MCRException
   {
   linktype = "locator";
-  if (set_href==null) { href = ""; } else { href = set_href.trim(); }
-  try {
-    MCRObjectID id = new MCRObjectID(href); ismcrobjectid = true; }
-  catch (Exception e) { ismcrobjectid = false; }
+  if ((set_href==null) || ((set_href = set_href.trim()).length() ==0)) {
+    throw new MCRException("The href value is null or empty."); }
+  href = set_href.trim(); 
   if (set_label==null) { label = ""; } else { label = set_label.trim(); }
   if (set_title==null) { title = ""; } else { title = set_title.trim(); }
   }
@@ -164,20 +130,23 @@ public final void setReference(String set_href, String set_label,
  * This method set a bidirectional link with xlink:from, xlink:to and 
  * xlink:title. 
  *
- * @param set_from        the source MCRObjectID
- * @param set_to          the target MCRObjectID
+ * @param set_from        the source 
+ * @param set_to          the target 
  * @param set_title       the new title string
- * @exception MCRException if the from or to element is not a MCRObjectId
+ * @exception MCRException if the from or to element is  null or empty
  **/
-public final void setBiLink(String set_from, String set_to, String set_title)
+public void setBiLink(String set_from, String set_to, String set_title)
   throws MCRException
   {
   linktype = "arc";
-  try {
-    from = new MCRObjectID(set_from); to = new MCRObjectID(set_to); }
-  catch (Exception e) { 
-    linktype = null;
-    throw new MCRException("The from/to value is not a MCRObjectID."); }
+  if ((set_from==null) || ((set_from = set_from.trim()).length() ==0)) {
+    throw new MCRException("The from value is null or empty."); }
+  else { 
+    from = set_from.trim(); }
+  if ((set_to==null) || ((set_to = set_to.trim()).length() ==0)) {
+    throw new MCRException("The to value is null or empty."); }
+  else { 
+    to = set_to.trim(); }
   if (set_title==null) { title = ""; } else { title = set_title.trim(); }
   }
 
@@ -194,20 +163,8 @@ public final String getXLinkType()
  *
  * @return the xlink:href element as string
  **/
-public final String getXLinkHrefToString()
+public final String getXLinkHref()
   { return href; }
-
-/**
- * This method get the xlink:href element as MCRObjectID. If xlink:href
- * is not a MCRObjectID, null was returned.
- *
- * @return the xlink:href as MCRObjectID
- **/
-public final MCRObjectID getXLinkHerfToMCRObjectID()
-  { 
-  if (ismcrobjectid) { return new MCRObjectID(href); }
-  return null;
-  }
 
 /**
  * This method get the xlink:label element.
@@ -230,45 +187,41 @@ public final String getXLinkTitle()
  *
  * @return the xlink:from element as string
  **/
-public final String getXLinkFromToString()
-  { return from.getId(); }
-
-/**
- * This method get the xlink:from element as MCRObjectID.
- *
- * @return the xlink:from as MCRObjectID
- **/
-public final MCRObjectID getXLinkFromToMCRObjectID()
-  { 
-  return from;
-  }
+public final String getXLinkFrom()
+  { return from; }
 
 /**
  * This method get the xlink:to element as string.
  *
  * @return the xlink:to element as string
  **/
-public final String getXLinkToToString()
-  { return to.getId(); }
+public final String getXLinkTo()
+  { return to; }
 
 /**
- * This method get the xlink:to element as MCRObjectID.
+ * The methode compare this instance of MCRMetaLink with a input object of the
+ * class type MCRMetaLink. The both instances are equal, if:<br>
+ * <ul><br>
+ * <li>for the type 'arc' the 'from' and 'to' element is equal</li><br>
+ * <li>for the type 'locator' the 'href' element is equal</li><br>
+ * </ul><br>
  *
- * @return the xlink:to as MCRObjectID
+ * @param in_derivate the MCRMetaLink input
+ * @return true if it is compare, else return false
  **/
-public final MCRObjectID getXLinkToToMCRObjectID()
-  { 
-  return to;
+public final boolean compare(MCRMetaLink input)
+  {
+  if (linktype.equals("locator")) {
+    if ((linktype.equals(input.getXLinkType())) &&
+        (href.equals(input.getXLinkHref()))) { return true; }
+    }
+  if (linktype.equals("arc")) {
+    if ((linktype.equals(input.getXLinkType())) &&
+        (from.equals(input.getXLinkFrom())) &&
+        (to.equals(input.getXLinkTo()))) { return true; }
+    }
+  return false;
   }
-
-/**
- * This method get the flag for the xlink:href element.
- *
- * @return the flag, true if xlink:href is a MCRObjectID, otherwise return
- * false
- **/
-public final boolean getIsMCRObjectID()
-  { return ismcrobjectid; }
 
 /**
  * This method read the XML input stream part from a DOM part for the
@@ -276,9 +229,9 @@ public final boolean getIsMCRObjectID()
  *
  * @param element a relevant DOM element for the metadata
  * @exception MCRException if the xlink:type is not locator or arc or if 
- * the from or to element is not a MCRObjectId
+ * href or from and to are null or empty
  **/
-public final void setFromDOM(org.jdom.Element element)
+public void setFromDOM(org.jdom.Element element) throws MCRException
   {
   super.setFromDOM(element);
   super.type = "";
@@ -294,36 +247,16 @@ public final void setFromDOM(org.jdom.Element element)
     linktype = null;
     throw new MCRException("The xlink:type is not locator or arc."); }
   if (linktype.equals("locator")) {
-    temp = element.getAttributeValue("href");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      try {
-        MCRObjectID id = new MCRObjectID(temp); ismcrobjectid = true; }
-      catch (Exception e) { ismcrobjectid = false; }
-      href = temp;
-      }
-    temp = (String)element.getAttributeValue("label");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      label = temp; }
-    temp = (String)element.getAttributeValue("title");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      title = temp; }
+    String temp1 = (String)element.getAttributeValue("href");
+    String temp2 = (String)element.getAttributeValue("label");
+    String temp3 = (String)element.getAttributeValue("title");
+    setReference(temp1,temp2,temp3);
     }
   else {
-    temp = (String)element.getAttributeValue("from");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      try { from = new MCRObjectID(temp); }
-      catch (Exception e) { 
-        throw new MCRException("The from/to value is not a MCRObjectID."); }
-      }
-    temp = (String)element.getAttributeValue("to");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      try { to = new MCRObjectID(temp); }
-      catch (Exception e) { 
-        throw new MCRException("The from/to value is not a MCRObjectID."); }
-      }
-    temp = (String)element.getAttributeValue("title");
-    if ((temp!=null) && ((temp = temp.trim()).length() !=0)) {
-      title = temp; }
+    String temp1 = (String)element.getAttributeValue("from");
+    String temp2 = (String)element.getAttributeValue("to");
+    String temp3 = (String)element.getAttributeValue("title");
+    setBiLink(temp1,temp2,temp3);
     }
   }
 
@@ -334,7 +267,7 @@ public final void setFromDOM(org.jdom.Element element)
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Element with the XML MCRMetaLink part
  **/
-public final org.jdom.Element createXML() throws MCRException
+public org.jdom.Element createXML() throws MCRException
   {
   if (!isValid()) {
     debug();
@@ -353,9 +286,9 @@ public final org.jdom.Element createXML() throws MCRException
         MCRObject.XLINK_URL)); }
     }
   else {
-    elm.setAttribute("from",from.getId(),org.jdom.Namespace.getNamespace(
-      "xlink",MCRObject.XLINK_URL));
-    elm.setAttribute("to",to.getId(),org.jdom.Namespace.getNamespace("xlink",
+    elm.setAttribute("from",from,org.jdom.Namespace.getNamespace("xlink",
+      MCRObject.XLINK_URL));
+    elm.setAttribute("to",to,org.jdom.Namespace.getNamespace("xlink",
       MCRObject.XLINK_URL));
     if ((title != null) && ((title = title.trim()).length() !=0)) {
       elm.setAttribute("title",title,org.jdom.Namespace.getNamespace("xlink",
@@ -371,7 +304,7 @@ public final org.jdom.Element createXML() throws MCRException
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent(boolean parasearch)
+public MCRTypedContent createTypedContent(boolean parasearch)
   throws MCRException
   {
   if (!isValid()) {
@@ -387,8 +320,8 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     tc.addLinkElement("title",title);
     }
   else {
-    tc.addLinkElement("from",from.getId());
-    tc.addLinkElement("to",to.getId());
+    tc.addLinkElement("from",from);
+    tc.addLinkElement("to",to);
     tc.addLinkElement("title",title);
     }
   return tc;
@@ -419,15 +352,18 @@ public final String createTextSearch(boolean textsearch)
  *
  * @return a boolean value
  **/
-public final boolean isValid()
+public boolean isValid()
   {
   if (!super.isValid()) { return false; }
   if (linktype == null) { return false; }
   if ((!linktype.equals("locator"))&&(!linktype.equals("arc"))) { 
     return false; }
   if (linktype.equals("arc")) {
-    if (!from.isValid()) { return false; }
-    if (!to.isValid()) { return false; }
+    if (from.equals("")) { return false; }
+    if (to.equals("")) { return false; }
+    }
+  if (linktype.equals("locator")) {
+    if (href.equals("")) { return false; }
     }
   return true;
   }
@@ -435,7 +371,7 @@ public final boolean isValid()
 /**
  * This method print all data content from the MCRMetaLink class.
  **/
-public final void debug()
+public void debug()
   {
   System.out.println("MCRMetaLink debug start:");
   super.debug();
@@ -446,8 +382,8 @@ public final void debug()
     System.out.println("<xlink:title>"+title+"</xlink:title>");
     }
   if (linktype.equals("arc")) {
-    System.out.println("<xlink:from>"+from.getId()+"</xlink:from>");
-    System.out.println("<xlink:to>"+to.getId()+"</xlink:to>");
+    System.out.println("<xlink:from>"+from+"</xlink:from>");
+    System.out.println("<xlink:to>"+to+"</xlink:to>");
     System.out.println("<xlink:title>"+title+"</xlink:title>");
     }
   System.out.println("MCRMetaLink debug end"+NL);

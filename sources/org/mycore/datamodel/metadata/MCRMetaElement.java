@@ -305,7 +305,7 @@ public final int indexOfLink (String str_href, String str_subtag, String str_tit
 	for (i = start, k = -1, n = size(); i < n; ++i)
 	{
 		link = (MCRMetaLink) list.get(i);
-		if (! link.getXLinkHrefToString().equals(str_href)) continue;
+		if (! link.getXLinkHref().equals(str_href)) continue;
 		if (str_subtag != null)
 			if (! link.getSubTag().equals(str_subtag)) continue;
 		if (str_title != null)

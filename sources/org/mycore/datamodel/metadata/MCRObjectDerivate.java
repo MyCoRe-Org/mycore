@@ -74,7 +74,7 @@ public final void setFromDOM(org.jdom.Element derivate_element)
     for (int i=0;i<linkmeta_len;i++) {  
       org.jdom.Element linkmeta_element = (org.jdom.Element)
         linkmeta_element_list.get(i);
-      MCRMetaLink link = new MCRMetaLink();
+      MCRMetaLinkID link = new MCRMetaLinkID();
       link.setDataPart("linkmeta");
       link.setFromDOM(linkmeta_element);
       linkmetas.add(link); 
@@ -99,22 +99,22 @@ public final void setFromDOM(org.jdom.Element derivate_element)
 /**
  * This method return the size of the linkmeta array.
  **/
-public final int getSizeLinkMeta()
+public final int getLinkMetaSize()
   { return linkmetas.size(); }
 
 /**
- * This method get a single link from the linkmeta list as a MCRMetaLink.
+ * This method get a single link from the linkmeta list as a MCRMetaLinkMCRObject.
  *
  * @exception IndexOutOfBoundsException throw this exception, if
  *                              the index is false
- * @return a metadata link as MCRMetaLink
+ * @return a metadata link as MCRMetaLinkID
  **/
-public final MCRMetaLink getLinkMeta(int index) 
+public final MCRMetaLinkID getLinkMeta(int index) 
   throws IndexOutOfBoundsException
   {
   if ((index<0)||(index>linkmetas.size())) {
     throw new IndexOutOfBoundsException("Index error in getLinkMeta."); }
-  return (MCRMetaLink)linkmetas.get(index);
+  return (MCRMetaLinkID)linkmetas.get(index);
   }
 
 /**
@@ -152,12 +152,12 @@ public final org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element("derivate");
   if (linkmetas.size()!=0) {
     org.jdom.Element elmm = new org.jdom.Element("linkmetas");
-    elmm.setAttribute("class","MCRMetaLink");
+    elmm.setAttribute("class","MCRMetaLinkMCRObject");
     elmm.setAttribute("heritable","false");
     elmm.setAttribute("parasearch","true");
     elmm.setAttribute("textsearch","false");
     for (int i=0;i<linkmetas.size();i++) {
-      elmm.addContent(((MCRMetaLink)linkmetas.get(i)).createXML()); }
+      elmm.addContent(((MCRMetaLinkID)linkmetas.get(i)).createXML()); }
     elm.addContent(elmm); 
     }
   if (externals.size()!=0) {
@@ -188,7 +188,7 @@ public final MCRTypedContent createTypedContent() throws MCRException
   tc.addTagElement(tc.TYPE_MASTERTAG,"derivate");
   tc.addTagElement(tc.TYPE_TAG,"linkmetas");
   for (int i=0;i<linkmetas.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaLink)linkmetas.get(i))
+    tc.addMCRTypedContent(((MCRMetaLinkID)linkmetas.get(i))
       .createTypedContent(true));
     }
   return tc;
@@ -208,7 +208,7 @@ public final boolean isValid()
   {
   if (linkmetas.size() == 0) { return false; }
   for (int i=0;i<linkmetas.size();i++) {
-    if (!((MCRMetaLink)linkmetas.get(i)).getXLinkType().equals("arc")) {
+    if (!((MCRMetaLinkID)linkmetas.get(i)).getXLinkType().equals("locator")) {
       return false; }
     }
   return true;
@@ -221,7 +221,7 @@ public final void debug()
   {
   System.out.println("MCRObjectDerivate debug start");
   for (int i=0;i<linkmetas.size();i++) {
-    ((MCRMetaLink)linkmetas.get(i)).debug(); }
+    ((MCRMetaLinkID)linkmetas.get(i)).debug(); }
   for (int i=0;i<externals.size();i++) {
     ((MCRMetaLink)externals.get(i)).debug(); }
   System.out.println("MCRObjectDerivate debug end"+NL);

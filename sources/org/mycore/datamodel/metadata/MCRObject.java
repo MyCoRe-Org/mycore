@@ -415,7 +415,7 @@ public final String createTextSearch()
  * The methode create a new datastore based of given data. It create
  * a new data table for storing MCRObjects with the same MCRObjectID type.
  **/
-public void createDataBase(String mcr_type, org.jdom.Document confdoc)
+public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
   {
   setId(new MCRObjectID("Template_"+mcr_type+"_1"));
   mcr_persist.createDataBase(mcr_type, confdoc);
@@ -437,6 +437,57 @@ public final void createInDatastore() throws MCRPersistenceException
   }
 
 /**
+ * The methode add a derivate MCRMetaLinkID to the structure part and
+ * update the object with the ID in the data store.
+ *
+ * @param id the object ID
+ * @param derivate a link to a derivate as MCRMetaLinkID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final void addDerivateInDatastore(String id, MCRMetaLinkID link)
+  throws MCRPersistenceException
+  {
+  mcr_id = new MCRObjectID(id);
+  byte [] xmlarray = mcr_persist.receive(mcr_id);
+  setFromXML(xmlarray,false);
+  mcr_service.setDate("modifydate");
+  getStructure().addDerivate(link);
+  org.jdom.Document xml = createXML();
+  MCRTypedContent mcr_tc = createTypedContent();
+  String mcr_ts = createTextSearch();
+  mcr_persist.update(mcr_tc,xml,mcr_ts);
+  }
+
+/**
+ * The methode remove a derivate MCRMetaLinkID from the structure part and
+ * update the object with the ID in the data store.
+ *
+ * @param id the object ID
+ * @param derivate a link to a derivate as MCRMetaLinkID
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
+  throws MCRPersistenceException
+  {
+  mcr_id = new MCRObjectID(id);
+  byte [] xmlarray = mcr_persist.receive(mcr_id);
+  setFromXML(xmlarray,false);
+  mcr_service.setDate("modifydate");
+  int j = getStructure().searchForDerivate(link);
+  if (j != -1) {
+    getStructure().removeDerivate(j);
+    org.jdom.Document xml = createXML();
+    MCRTypedContent mcr_tc = createTypedContent();
+    String mcr_ts = createTextSearch();
+    mcr_persist.update(mcr_tc,xml,mcr_ts);
+    }
+  else {
+    throw new MCRPersistenceException("The derivate link "+link.getXLinkHref()+
+      " was not found."); 
+    }
+  }
+
+/**
  * The methode delete the object in the data store.
  *
  * @param id   the object ID
@@ -445,6 +496,18 @@ public final void createInDatastore() throws MCRPersistenceException
 public final void deleteFromDatastore(String id) throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
+  // get the Item
+  byte [] xml = mcr_persist.receive(mcr_id);
+  setFromXML(xml,false);
+  // set the derivate data in structure
+  MCRDerivate der;
+  for (int i=0;i<getStructure().getDerivateSize();i++) {
+    der = new MCRDerivate();
+    try {
+      der.deleteFromDatastore(getStructure().getDerivate(i).getXLinkHref()); }
+    catch (MCRException e) {
+      System.out.println(e.getMessage()); }
+    }
   mcr_persist.delete(mcr_id);
   }
 
@@ -496,9 +559,17 @@ public final byte [] receiveXMLFromDatastore(String id)
  **/
 public final void updateInDatastore() throws MCRPersistenceException
   {
-  mcr_service.setDate("createdate",
-    mcr_persist.receiveServiceDate(mcr_id,"createdate"));
+  // get the old Item
+  MCRObject old = new MCRObject();
+  old.receiveFromDatastore(mcr_id.getId());
+  // set the derivate data in structure
+  for (int i=0;i<old.getStructure().getDerivateSize();i++) {
+    getStructure().addDerivate(old.getStructure().getDerivate(i));
+    }
+  // set the date
+  mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");
+  // update all
   org.jdom.Document xml = createXML();
   MCRTypedContent mcr_tc = createTypedContent();
   String mcr_ts = createTextSearch();

@@ -27,24 +27,23 @@ package mycore.datamodel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
-import java.util.Vector;
+//import java.util.Vector;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
 import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
+import mycore.datamodel.MCRObjectService;
 import mycore.xml.MCRXMLHelper;
 
 /**
- * This class implements all methode for handling one derivate object.
- * Methodes of this class can read the XML metadata by using a XML parser,
- * manipulate the data in the abstract persistence data store and return
- * the XML stream to the user application.
+ * This class is a abstract basic class for objects in the MyCoRe Project.
+ * It is the frame to produce a full functionality object.
  *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-final public class MCRDerivate
+public abstract class MCRBase
 {
 
 /**
@@ -69,7 +68,6 @@ private org.jdom.Document jdom_document = null;
 private MCRObjectID mcr_id = null;
 private String mcr_label = null;
 private String mcr_schema = null;
-private MCRObjectDerivate mcr_derivate = null;
 private MCRObjectService mcr_service = null;
 
 // other
@@ -79,7 +77,7 @@ public final static String XLINK_URL = "http://www.w3.org/1999/xlink";
 public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
 /**
- * Load static data for all MCRDerivates
+ * Load static data for all MCRObjects
  **/
 static
   {
@@ -106,26 +104,24 @@ static
   }
 
 /**
- * This is the constructor of the MCRDerivate class. It make an
- * instance of the parser class and the metadata class.
+ * This is the constructor of the MCRBase class. It make an
+ * instance of the parser class and the metadata class.<br>
  *
  * @exception MCRException      general Exception of MyCoRe
  * @exception MCRConfigurationException
  *                              a special exception for configuartion data
  */
-public MCRDerivate() throws MCRException, MCRConfigurationException
+public MCRBase() throws MCRException, MCRConfigurationException
   {
   mcr_id = new MCRObjectID();
   mcr_label = new String("");
   mcr_schema = new String("");
-  // Derivate class
-  mcr_derivate = new MCRObjectDerivate();
   // Service class
   mcr_service = new MCRObjectService();
   }
 
 /**
- * This methode return the derivate id. If this is not set, null was returned.
+ * This methode return the object id. If this is not set, null was returned.
  *
  * @return the id as MCRObjectID
  **/
@@ -133,21 +129,12 @@ public final MCRObjectID getId()
   { return mcr_id; }
 
 /**
- * This methode return the derivate label. If this is not set, null was returned.
+ * This methode return the object label. If this is not set, null was returned.
  *
  * @return the lable as a string
  **/
 public final String getLabel()
   { return mcr_label; }
-
-/**
- * This methode return the instance of the MCRObjectDerivate class.
- * If this was not found, null was returned.
- *
- * @return the instance of the MCRObjectDerivate class
- **/
-public final MCRObjectDerivate getDerivate()
-  { return mcr_derivate; }
 
 /**
  * This methode return the instance of the MCRObjectService class.
@@ -165,7 +152,7 @@ public final MCRObjectService getService()
  *
  * @exception MCRException      general Exception of MyCoRe
  **/
-private final void set() throws MCRException
+private void set() throws MCRException
   {
   if (jdom_document == null) {
     throw new MCRException("The JDOM document is null or empty."); }
@@ -184,12 +171,8 @@ private final void set() throws MCRException
   while (j!=-1) {
     j = mcr_schema.indexOf(SLASH,i+1); if (j!=-1) { i = j; } }
   mcr_schema = mcr_schema.substring(i+1,mcr_schema.length());
-  org.jdom.Element jdom_element;
-  // get the derivate data of the object
-  jdom_element = jdom_element_root.getChild("derivate");
-  mcr_derivate.setFromDOM(jdom_element);
   // get the service data of the object
-  jdom_element = jdom_element_root.getChild("service");
+  org.jdom.Element jdom_element = jdom_element_root.getChild("service");
   mcr_service.setFromDOM(jdom_element);
   }
 
@@ -200,16 +183,7 @@ private final void set() throws MCRException
  * @param uri                   an URI
  * @exception MCRException      general Exception of MyCoRe
  **/
-public final void setFromURI(String uri) throws MCRException
-  {
-  try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(MCRXMLHelper.parseURI(uri));
-    }
-  catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
-  set();
-  }
+public abstract void setFromURI(String uri) throws MCRException;
 
 /**
  * This methode read the XML input stream from a byte array into JDOM 
@@ -218,16 +192,8 @@ public final void setFromURI(String uri) throws MCRException
  * @param xml                   a XML string
  * @exception MCRException      general Exception of MyCoRe
  **/
-public final void setFromXML(byte [] xml, boolean valid) throws MCRException
-  {
-  try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(new ByteArrayInputStream(xml));
-    }
-  catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
-  set();
-  }
+public abstract void setFromXML(byte [] xml, boolean valid) 
+  throws MCRException;
 
 /**
  * This methode set the object ID.
@@ -250,14 +216,6 @@ public final void setLabel(String label)
   }
 
 /**
- * This methode set the object MCRObjectDerivate.
- *
- * @param service   the object MCRObjectDerivate part
- **/
-public final void setDerivate(MCRObjectDerivate derivate)
-  { if (derivate != null) { mcr_derivate = derivate; } }
-
-/**
  * This methode set the object MCRObjectService.
  *
  * @param service   the object MCRObjectService part
@@ -271,24 +229,7 @@ public final void setService(MCRObjectService service)
  * @exception MCRException if the content of this class is not valid
  * @return a JDOM Document with the XML data of the object as byte array
  **/
-public final org.jdom.Document createXML() throws MCRException
-  {
-  if (!isValid()) {
-    debug();
-    throw new MCRException("The content is not valid."); }
-  org.jdom.Element elm = new org.jdom.Element("mycorederivate");
-  org.jdom.Document doc = new org.jdom.Document(elm);
-  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",XSI_URL));
-  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
-    XLINK_URL));
-  elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+SLASH+mcr_schema,
-    org.jdom.Namespace.getNamespace("xsi",XSI_URL));
-  elm.setAttribute("ID",mcr_id.getId());
-  elm.setAttribute("label",mcr_label);
-  elm.addContent(mcr_derivate.createXML());
-  elm.addContent(mcr_service.createXML());
-  return doc;
-  }
+public abstract org.jdom.Document createXML() throws MCRException;
 
 /**
  * This methode create a typed content list for all MCRObject data.
@@ -296,71 +237,28 @@ public final org.jdom.Document createXML() throws MCRException
  * @exception MCRException if the content of this class is not valid
  * @return a MCRTypedContent with the data of the MCRObject data
  **/
-public final MCRTypedContent createTypedContent() throws MCRException
-  {
-  if (!isValid()) {
-    debug();
-    throw new MCRException("The content is not valid."); }
-  MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId());
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label);
-  tc.addMCRTypedContent(mcr_derivate.createTypedContent());
-  tc.addMCRTypedContent(mcr_service.createTypedContent());
-  return tc;
-  }
+public abstract MCRTypedContent createTypedContent() throws MCRException;
 
 /**
- * This methode create an empty String. They exist only for the interface.
+ * This methode create a String for all text searchable data in this instance.
  *
  * @exception MCRException if the content of this class is not valid
  * @return a String with the text values from the metadata object
  **/
-public final String createTextSearch()
-  throws MCRException
-  { return ""; }
+public abstract String createTextSearch() throws MCRException;
 
 /**
  * The methode create a new datastore based of given data. It create
  * a new data table for storing MCRObjects with the same MCRObjectID type.
- *
- * @param confdoc the configuration XML document
  **/
-public final void createDataBase(org.jdom.Document confdoc)
-  {
-  setId(new MCRObjectID("Template_derivate_1"));
-  mcr_persist.createDataBase("derivate", confdoc);
-  }
+public abstract void createDataBase(String mcr_type, org.jdom.Document confdoc);
 
 /**
  * The methode create the object in the data store.
  *
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void createInDatastore() throws MCRPersistenceException
-  {
-  // create the derivate
-  mcr_service.setDate("createdate");
-  mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.create(mcr_tc,xml,mcr_ts);
-  // add the link to metadata
-  MCRObject obj;
-  for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
-    MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
-    MCRMetaLinkID der = new MCRMetaLinkID();
-    der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
-    try {
-      obj = new MCRObject();
-      obj.addDerivateInDatastore(meta.getXLinkHref(),der); }
-    catch (MCRException e) {
-      throw new MCRPersistenceException("The MCRObject "+meta.getXLinkHref()+
-        " was not found."); }
-    }
-  }
+public abstract void createInDatastore() throws MCRPersistenceException;
 
 /**
  * The methode delete the object in the data store.
@@ -368,28 +266,8 @@ public final void createInDatastore() throws MCRPersistenceException
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void deleteFromDatastore(String id) throws MCRPersistenceException
-  {
-  // get the derivate
-  mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_persist.receive(mcr_id);
-  setFromXML(xml,false);
-  // remove the link to metadata
-  MCRObject obj;
-  for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
-    MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
-    MCRMetaLinkID der = new MCRMetaLinkID();
-    der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
-    try {
-      obj = new MCRObject();
-      obj.removeDerivateInDatastore(meta.getXLinkHref(),der); }
-    catch (MCRException e) {
-      System.out.println(e.getMessage()); }
-    }
-  // delete derivate
-  mcr_persist.delete(mcr_id);
-  }
+public abstract void deleteFromDatastore(String id) 
+  throws MCRPersistenceException;
 
 /**
  * The methode return true if the object is in the data store, else return 
@@ -398,9 +276,8 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final static boolean existInDatastore(String id) 
-  throws MCRPersistenceException
-  { return mcr_persist.exist(new MCRObjectID(id)); }
+public abstract boolean existInDatastore(String id) 
+  throws MCRPersistenceException;
 
 /**
  * The methode receive the object for the given MCRObjectID and stored
@@ -409,13 +286,8 @@ public final static boolean existInDatastore(String id)
  * @param id   the object ID
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void receiveFromDatastore(String id) 
-  throws MCRPersistenceException
-  {
-  mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_persist.receive(mcr_id);
-  setFromXML(xml,false);
-  }
+public abstract void receiveFromDatastore(String id) 
+  throws MCRPersistenceException;
 
 /**
  * The methode receive the object for the given MCRObjectID and returned
@@ -425,57 +297,15 @@ public final void receiveFromDatastore(String id)
  * @return the XML stream of the object as string
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final byte [] receiveXMLFromDatastore(String id) 
-  throws MCRPersistenceException
-  {
-  mcr_id = new MCRObjectID(id);
-  return mcr_persist.receive(mcr_id);
-  }
+public abstract byte [] receiveXMLFromDatastore(String id) 
+  throws MCRPersistenceException;
 
 /**
  * The methode update the object in the data store.
  *
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-public final void updateInDatastore() throws MCRPersistenceException
-  {
-  // get the old Item
-  MCRDerivate old = new MCRDerivate();
-  old.receiveFromDatastore(mcr_id.getId());
-  // remove the old link to metadata
-  MCRObject obj;
-  for (int i=0;i<old.getDerivate().getLinkMetaSize();i++) {
-    MCRMetaLinkID meta = old.getDerivate().getLinkMeta(i);
-    MCRMetaLinkID der = new MCRMetaLinkID();
-    der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
-    try {
-      obj = new MCRObject();
-      obj.removeDerivateInDatastore(meta.getXLinkHref(),der); }
-    catch (MCRException e) {
-      System.out.println(e.getMessage()); }
-    }
-  // update the derivate
-  mcr_service.setDate("createdate",old.getService().getDate("createdate"));
-  mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
-  // add the link to metadata
-  for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
-    MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
-    MCRMetaLinkID der = new MCRMetaLinkID();
-    der.setReference(mcr_id.getId(),mcr_label,"");
-    der.setSubTag("derivate");
-    try {
-      obj = new MCRObject();
-      obj.addDerivateInDatastore(meta.getXLinkHref(),der); }
-    catch (MCRException e) {
-      throw new MCRPersistenceException("The MCRObject "+meta.getXLinkHref()+
-        " was not found."); }
-    }
-  }
+public abstract void updateInDatastore() throws MCRPersistenceException;
 
 /**
  * This method check the validation of the content of this class.
@@ -488,7 +318,7 @@ public final void updateInDatastore() throws MCRPersistenceException
  *
  * @return a boolean value
  **/
-public final boolean isValid()
+public boolean isValid()
   {
   if (!mcr_id.isValid()) { return false; }
   if ((mcr_label == null) || ((mcr_label = mcr_label.trim()).length() ==0)) {
@@ -501,7 +331,7 @@ public final boolean isValid()
 /**
  * This metode print the data content from this class.
  **/
-public final void debug()
+public void debug()
   {
   System.out.println();
   System.out.println("The object content :");
