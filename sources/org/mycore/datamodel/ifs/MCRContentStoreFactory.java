@@ -99,8 +99,11 @@ public class MCRContentStoreFactory {
 		String[] s = storeSelector.getAvailableStoreIDs();
 		for (int i = 0; i < s.length; i++)
 			getStore(s[i]);
-		return (MCRTextSearchInterface[]) indexStores.values().toArray(
-			new MCRTextSearchInterface[indexStores.size()]);
+		if (indexStores.size()==0)
+			return new MCRTextSearchInterface[0];
+		else
+			return (MCRTextSearchInterface[]) indexStores.values().toArray(
+				new MCRTextSearchInterface[indexStores.size()]);
 	}
 
 	/**
