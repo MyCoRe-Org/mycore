@@ -296,7 +296,7 @@ public final void setFromURI(String uri) throws MCRException
 public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
   try {
-    org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
+    org.jdom.input.SAXBuilder bulli = new org.jdom.input.SAXBuilder(false);
     jdom_document = bulli.build(new ByteArrayInputStream(xml));
     }
   catch (Exception e) {
