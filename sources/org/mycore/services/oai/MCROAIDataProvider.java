@@ -482,18 +482,12 @@ public class MCROAIDataProvider extends HttpServlet {
 	 */
     private Date getDate(String date) {
     	logger.debug("Given date: " + date);
-    	logger.debug("First date: " + date);
    	    SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
    	    if (date.length() > STR_GRANULARITY.length()) {
    	    	return null;
    	    }
 		ParsePosition pos = new ParsePosition(0);
-		Date firstDate = dateFormat.parse(STR_FIRST_DATE, pos);
-		pos = new ParsePosition(0);
 		Date currentDate = dateFormat.parse(date, pos);
-		if ((currentDate == null) || currentDate.before(firstDate)) {
-			return null;
-		}
 
     	return currentDate;
     }
@@ -880,11 +874,31 @@ public class MCROAIDataProvider extends HttpServlet {
         
         // get the arguments from the request
         String from[] = getParameter("from", request);
+        Date fromDate = null;
         if (from != null) {
+        	fromDate = getDate(from[0]);
+        	if (fromDate == null) {
+    	    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
             maxArguments++;
+        } else {
+        	fromDate = getDate(STR_FIRST_DATE);
         }
         String until[] = getParameter("until", request); 
+        Date untilDate = null;
         if (until != null) {
+        	untilDate = getDate(until[0]);
+        	if (untilDate == null) {
+    	    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        	}
+        	if (fromDate != null) {
+        		if (fromDate.after(untilDate)) {
+    		    	logger.info("Anfrage 'listIdentifiers' enthält fehlerhafte Parameter.");
+		           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+        		}
+        	}
             maxArguments++;
         }
         String set[] = getParameter("set", request); 
@@ -1163,6 +1177,8 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         	}
             maxArguments++;
+        } else {
+        	fromDate = getDate(STR_FIRST_DATE);
         }
         String until[] = getParameter("until", request); 
         Date untilDate = null;
@@ -1173,9 +1189,9 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         	}
         	if (fromDate != null) {
-        		if (!fromDate.before(untilDate)) {
+        		if (fromDate.after(untilDate)) {
     		    	logger.info("Anfrage 'listRecords' enthält fehlerhafte Parameter.");
-		            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+		           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
         		}
         	}
             maxArguments++;
