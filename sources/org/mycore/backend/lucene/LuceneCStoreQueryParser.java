@@ -43,6 +43,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	private static final Logger logger =
 		Logger.getLogger(MCRCStoreLucene.class);
 	protected static final String GROUPING_FIELD = "DerivateID";
+	protected static final LuceneCStoreQueryParser WS_PARSER=new LuceneCStoreQueryParser(null,new WhitespaceAnalyzer());
 	private String groupingValue;
 	Analyzer analyzer;
 	String field;
@@ -57,7 +58,6 @@ public class LuceneCStoreQueryParser extends QueryParser {
 		super(f, a);
 		analyzer = a;
 		field = f;
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -100,9 +100,8 @@ public class LuceneCStoreQueryParser extends QueryParser {
 			singleCombined = new BooleanQuery();
 			combiner =
 				new BooleanClause(
-					getFieldQuery(
+					WS_PARSER.getFieldQuery(
 						GROUPING_FIELD,
-						new WhitespaceAnalyzer(),
 						groupingValue),
 					true,
 					false);
