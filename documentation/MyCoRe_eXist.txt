@@ -1,4 +1,4 @@
-Use eXist with MyCoRe-Sample under Windows XP Professional       08.07.2003
+Use eXist with MyCoRe-Sample under Windows XP Professional       21.07.2003
 
 eXist supports the XML:DB-interface. Before you start change build.xml in
 mycore-directory from
@@ -14,8 +14,7 @@ mycore-directory from
 
 3. in this version there is a bug, so after installation download 
    the development version from http://sourceforge.net/project/showfiles.php?group_id=17691
-   I had to add mysql.jar, xalan-2.3.1.jar, xercesImpl.jar and xmpl-apis.jar to lib/core 
-   directory of eXist 
+   I tried the snapshot from 16.07.03
 
 4. in client.properties of eXist 
    # uncomment following line if you want to access a
@@ -65,16 +64,16 @@ mycore-directory from
 13. If all is ok you can run ant derivates to load the derivates 
 
 On my system all these step worked. With the actual mycore-sample application
-in combination with MySQL I could view listing of legal entities and documents.
+in combination with MySQL I could view the listing of legal entities and documents.
 
 Searching works pretty good. In the search mask for documents type in datafield
-Title       eide        and in datafield
-Freetext    2000
+Title       Wagens        and in datafield
+Description Bild
 
-you should get MyCoReDemoDC_document_0001 in your resultlist
+you should get MyCoReDemoDC_document_0003 in your resultlist
 
-"More documents" in the result of a legalentity search doesn't work.
-Furthermore are problems with national characters.
+Furthermore are problems if national characters are in searchstrings, such as
+Hühnerstall in the title.
 
 
 
