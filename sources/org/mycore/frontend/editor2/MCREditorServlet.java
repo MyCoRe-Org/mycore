@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -119,10 +120,13 @@ public class MCREditorServlet extends MCRServlet
     sendToDisplay( req, res, new Document( editor ) );
   }
 
+  private static Random random = new Random();
+
   private static synchronized String buildSessionID()
   {
     StringBuffer sb = new StringBuffer();
     sb.append( Long.toString( System.currentTimeMillis(), 36 ) );
+    sb.append( Long.toString( random.nextLong(), 36 ) );
     sb.reverse();
     return sb.toString();
   }
