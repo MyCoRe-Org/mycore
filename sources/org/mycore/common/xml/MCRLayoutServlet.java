@@ -257,7 +257,6 @@ public class MCRLayoutServlet extends HttpServlet
   public static final Properties buildXSLParameters( HttpServletRequest request )
   {
   	Properties parameters = new Properties();
-	  String user = null;
     
   	// Read all *.xsl attributes that are stored in the browser session
 	  HttpSession session = request.getSession( false );
@@ -269,7 +268,6 @@ public class MCRLayoutServlet extends HttpServlet
 	  		if( name.startsWith( "XSL." ) )
 	  			parameters.put( name.substring( 4 ), session.getAttribute( name ) );
 	  	}
-  		user = (String)( session.getAttribute( "XSL.CurrentUser" ) );
     }
 	    
 	  // Read all *.xsl attributes provided by the invoking servlet
@@ -292,8 +290,6 @@ public class MCRLayoutServlet extends HttpServlet
 
 	  // Set some predefined XSL parameters:
 
-	  if( user == null ) user = "gast";
-    
 	  String contextPath = request.getContextPath() + "/";
   	String requestURL  = getCompleteURL( request );
     
@@ -304,6 +300,14 @@ public class MCRLayoutServlet extends HttpServlet
 
 	  String defaultLang = MCRConfiguration.instance()
 	    .getString( "MCR.metadata_default_lang", "en" );
+
+  String user = MCRConfiguration.instance().getString( "MCR.users_guestuser_username" );
+  String mcrSessionID = parameters.getProperty( "MCRSessionID" );
+  if( mcrSessionID != null )
+  {
+     MCRSession mcrSession = MCRSession.getSession( mcrSessionID );
+     if( mcrSession != null ) user = mcrSession.getCurrentUserID();
+  }
 
 	  parameters.put( "CurrentUser",           user               );
 	  parameters.put( "RequestURL",            requestURL         );
