@@ -151,7 +151,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   {
     this();
     if (!elm.getName().equals("group")) { return; }
-    super.ID = trim((String)elm.getAttributeValue("ID"), id_len);
+    super.ID = trim(elm.getAttributeValue("ID"), id_len);
     this.creator = trim(elm.getChildTextTrim("group.creator"), id_len);
 
     String tmp = elm.getChildTextTrim("group.creation_date");
@@ -173,7 +173,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
       List adminIDList = adminElement.getChildren();
       for (int j=0; j<adminIDList.size(); j++) {
         org.jdom.Element newID = (org.jdom.Element)adminIDList.get(j);
-        String id = trim((String)newID.getTextTrim(),id_len);
+        String id = trim(newID.getTextTrim(),id_len);
         if(newID.getName().equals("admins.userID")) {
           if (!id.equals("")) { addAdminUserID(id); }
           continue;
@@ -189,7 +189,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
       List memberIDList = memberElement.getChildren();
       for (int j=0; j<memberIDList.size(); j++) {
         org.jdom.Element newID = (org.jdom.Element)memberIDList.get(j);
-        String id = trim((String)newID.getTextTrim(),id_len);
+        String id = trim(newID.getTextTrim(),id_len);
         if(newID.getName().equals("members.userID")) {
           if (!id.equals("")) { addMemberUserID(id); }
           continue;
@@ -205,7 +205,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
       List groupIDList = userGroupElement.getChildren();
       for (int j=0; j<groupIDList.size(); j++) {
         org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
-        String id = trim((String)groupID.getTextTrim(),id_len);
+        String id = trim(groupID.getTextTrim(),id_len);
         if (!id.equals("")) { this.groupIDs.add(id); }
       }
     }
@@ -215,7 +215,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
       List privilegeIDList = privilegeElement.getChildren();
       for (int j=0; j<privilegeIDList.size(); j++) {
         org.jdom.Element privilegeID = (org.jdom.Element)privilegeIDList.get(j);
-        String priv = trim((String)privilegeID.getTextTrim(),privilege_len);
+        String priv = trim(privilegeID.getTextTrim(),privilege_len);
         if (!priv.equals("")) { this.privileges.add(priv); }
       }
     }
@@ -341,12 +341,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   {
     if (privileges.contains(privilege)) {
       return true; }
-    else {
       for (int i=0; i<groupIDs.size(); i++) {
         MCRGroup nextGroup = MCRUserMgr.instance().retrieveGroup((String)groupIDs.get(i), false);
-        if (nextGroup.hasPrivilege(privilege)) {
-          return true; }
-      }
+        if (nextGroup.hasPrivilege(privilege))
+          return true;
     }
     return false;
   }
@@ -360,7 +358,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   public boolean hasMember (MCRUser user) {
     if ((admUserIDs.contains(user.getID())) || (mbrUserIDs.contains(user.getID())))
       return true;
-    else return false;
+    return false;
   }
 
   /**
@@ -380,11 +378,9 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
     if (matchMemberGroupIDs.contains(group.getID())) {
       return true;
     }
-    else {
-      for (int i=0; i<matchMemberGroupIDs.size(); i++) {
-        if (MCRGroup.isImplicitMemberOf(group, (String)matchMemberGroupIDs.get(i)))
-          { return true; }
-      }
+    for (int i=0; i<matchMemberGroupIDs.size(); i++) {
+      if (MCRGroup.isImplicitMemberOf(group, (String)matchMemberGroupIDs.get(i)))
+        return true;
     }
     return false;
   }
@@ -400,7 +396,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
   public boolean isMemberOf(String groupID) throws MCRException {
     if (super.groupIDs.contains(groupID))
       return true;
-    else return MCRGroup.isImplicitMemberOf(this, groupID);
+    return MCRGroup.isImplicitMemberOf(this, groupID);
   }
 
   /**
@@ -619,10 +615,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
     if (currentUser.hasPrivilege("user administrator")) {
       return true;
     }
-    if (this.creator.equals(currentUserID)) {
+    else if (this.creator.equals(currentUserID)) {
       return true;
     }
-    if (admUserIDs.contains(currentUserID)) {
+    else if (admUserIDs.contains(currentUserID)) {
       return true;
     } else { // check if the current user is (direct, not implicit) member of one of the admGroups
       for (int i=0; i<admGroupIDs.size(); i++) {

@@ -24,17 +24,19 @@
 
 package org.mycore.user;
 
-import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import org.mycore.common.*;
-import org.mycore.backend.sql.MCRSQLUserStore;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRDefaults;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * This class is the user (and group) manager of the MyCoRe system. It is
@@ -73,9 +75,6 @@ public class MCRUserMgr
   /** The one and only instance of this class */
   private static MCRUserMgr theInstance = null;
 
-  /** The superuser from the property */
-  private static String root = null;
-
   /**
    * private constructor to create the singleton instance.
    */
@@ -84,7 +83,6 @@ public class MCRUserMgr
     config = MCRConfiguration.instance();
     String userStoreName = config.getString("MCR.userstore_class_name");
     PropertyConfigurator.configure(config.getLoggingProperties());
-    root = config.getString("MCR.users_superuser_username","mcradmin");
     String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
     useEncryption = (useCrypt.trim().equals("true")) ? true : false;
 
@@ -154,9 +152,9 @@ public class MCRUserMgr
       }
       MCRGroup primaryGroup = retrieveGroup(currentUser.getPrimaryGroupID(),true);
       ArrayList mbrUserIDs = primaryGroup.getMemberUserIDs();
-      if (!mbrUserIDs.contains((String)currentUser.getID())) {
+      if (!mbrUserIDs.contains(currentUser.getID())) {
         logger.error("user : '"+currentUser.getID()+"' error: is not member of"+
-        " primary group '"+(String)currentUser.getPrimaryGroupID()+"'!");
+        " primary group '"+currentUser.getPrimaryGroupID()+"'!");
       }
     }
 
@@ -201,7 +199,7 @@ public class MCRUserMgr
           logger.error("group: '"+currentGroup.getID()+"' error: unknown member"+
           " group '"+(String)mbrGroupIDs.get(j)+"'!");
         }
-        else if (currentGroup.getID().equals((String)mbrGroupIDs.get(j))) {
+        else if (currentGroup.getID().equals(mbrGroupIDs.get(j))) {
           logger.error("group: '"+currentGroup.getID()+"' error: the group "
           +"must not contain itself as a member group!");
         }
@@ -379,10 +377,8 @@ public class MCRUserMgr
     // Check if the primary group exists and if so, whether the current user may modify the group
     if (!mcrUserStore.existsGroup(user.getPrimaryGroupID())) {
       throw new MCRException("The primary group of the user '"+user.getID()+"' does not exist."); }
-    else {
-      MCRGroup primGroup = retrieveGroup(user.getPrimaryGroupID());
-      primGroup.modificationIsAllowed();
-    }
+    MCRGroup primGroup = retrieveGroup(user.getPrimaryGroupID());
+    primGroup.modificationIsAllowed();
 
     // Check if the groups the user will be a member of really exist
     ArrayList groupIDs = user.getGroupIDs();
@@ -409,7 +405,6 @@ public class MCRUserMgr
       mcrUserStore.createUser(user);
 
       // now we update the primary group
-      MCRGroup primGroup = retrieveGroup(user.getPrimaryGroupID());
       primGroup.addMemberUserID(user.getID());
       groupCache.remove(primGroup.getID());
       mcrUserStore.updateGroup(primGroup);
@@ -469,20 +464,20 @@ public class MCRUserMgr
       // hence no longer have this group in their group lists.
       MCRGroup delGroup = retrieveGroup(groupID);
       for (int i=0; i<delGroup.getMemberGroupIDs().size(); i++) {
-        groupCache.remove((String)delGroup.getMemberGroupIDs().get(i));
+        groupCache.remove(delGroup.getMemberGroupIDs().get(i));
         MCRGroup ugroup = retrieveGroup((String)delGroup.getMemberGroupIDs().get(i));
         ugroup.removeGroupID(groupID);
         mcrUserStore.updateGroup(ugroup);
       }
       for (int i=0; i<delGroup.getMemberUserIDs().size(); i++) {
-        userCache.remove((String)delGroup.getMemberUserIDs().get(i));
+        userCache.remove(delGroup.getMemberUserIDs().get(i));
         MCRUser uuser = retrieveUser((String)delGroup.getMemberUserIDs().get(i), false);
         uuser.removeGroupID(groupID);
         mcrUserStore.updateUser(uuser);
       }
       // Remove this group from the memberIDs of other groups
       for (int i=0; i<delGroup.getGroupIDs().size(); i++) {
-        groupCache.remove((String)delGroup.getGroupIDs().get(i));
+        groupCache.remove(delGroup.getGroupIDs().get(i));
         MCRGroup ggroup = retrieveGroup((String)delGroup.getGroupIDs().get(i));
         ggroup.removeMemberGroupID(groupID);
         mcrUserStore.updateGroup(ggroup);
@@ -490,7 +485,7 @@ public class MCRUserMgr
       // Remove all admin items from other groups
       ArrayList ogroups = mcrUserStore.getGroupIDsWithAdminUser(groupID);
       for (int i=0; i<ogroups.size(); i++) {
-        groupCache.remove((String)ogroups.get(i));
+        groupCache.remove(ogroups.get(i));
         MCRGroup agroup = retrieveGroup((String)ogroups.get(i));
         agroup.removeAdminGroupID(groupID);
         mcrUserStore.updateGroup(agroup);
@@ -830,10 +825,6 @@ public class MCRUserMgr
       throw new MCRException(
       "The user component is locked. At the moment write access is denied.");
     }
-
-    // Get the MCRSession object for the current thread from the session manager.
-    MCRSession session = MCRSessionMgr.getCurrentSession();
-
     try {
       // backup up creator and dates
       String creator = obj.getCreator();
@@ -989,11 +980,11 @@ public class MCRUserMgr
       if (useEncryption) {
         String salt = loginUser.getPassword().substring(0, 3);
         String newCrypt = MCRCrypt.crypt(salt, passwd);
-        return (loginUser.getPassword().equals(newCrypt)) ? true : false;
+        return (loginUser.getPassword().equals(newCrypt));
       }
-      else return (loginUser.getPassword().equals(passwd)) ? true : false;
+      return (loginUser.getPassword().equals(passwd));
     }
-    else throw new MCRException("Login denied. User is disabled.");
+    throw new MCRException("Login denied. User is disabled.");
   }
 
   /**
@@ -1053,13 +1044,9 @@ public class MCRUserMgr
       reqGroup = mcrUserStore.retrieveGroup(groupID);
       if (reqGroup == null)
         throw new MCRException("MCRUserMgr.retrieveGroup(): Unknown group '"+groupID+"'!");
-      else {
-        groupCache.put(groupID, reqGroup);
-        return reqGroup;
-      }
+      groupCache.put(groupID, reqGroup);
     }
-    else
-      return reqGroup;
+    return reqGroup;
   }
 
   /**
@@ -1121,19 +1108,15 @@ public class MCRUserMgr
   {
     // In order to compare a modified user object with the persistent one we must
     // be able to force this method to get the user from the store
-    MCRUser reqUser;
-    reqUser = (bFromDataStore) ? null : (MCRUser)userCache.get(userID);
+    MCRUser reqUser=null;
+    if (bFromDataStore)
+        reqUser=(MCRUser)userCache.get(userID);
     if (reqUser == null) { // We do not have this user in the cache
       reqUser = mcrUserStore.retrieveUser(userID);
-      if (reqUser == null)
-        return null; // no such user available
-      else {
+      if (reqUser != null)
         userCache.put(userID, reqUser);
-        return reqUser;
-      }
     }
-    else
-      return reqUser;
+    return reqUser;
   }
 
   /**
@@ -1317,22 +1300,22 @@ public class MCRUserMgr
       // them from the user or group cache so that they will be retrieved from the datastore.
       for (int i=0; i<oldGroup.getMemberUserIDs().size(); i++) {
         if (!updGroup.getMemberUserIDs().contains(oldGroup.getMemberUserIDs().get(i))) {
-          userCache.remove((String)oldGroup.getMemberUserIDs().get(i));
+          userCache.remove(oldGroup.getMemberUserIDs().get(i));
         }
       }
       for (int i=0; i<oldGroup.getMemberGroupIDs().size(); i++) {
         if (!updGroup.getMemberGroupIDs().contains(oldGroup.getMemberGroupIDs().get(i))) {
-          groupCache.remove((String)oldGroup.getMemberGroupIDs().get(i));
+          groupCache.remove(oldGroup.getMemberGroupIDs().get(i));
         }
       }
       for (int i=0; i<updGroup.getMemberUserIDs().size(); i++) {
         if (!oldGroup.getMemberUserIDs().contains(updGroup.getMemberUserIDs().get(i))) {
-          userCache.remove((String)updGroup.getMemberUserIDs().get(i));
+          userCache.remove(updGroup.getMemberUserIDs().get(i));
         }
       }
       for (int i=0; i<updGroup.getMemberGroupIDs().size(); i++) {
         if (!oldGroup.getMemberGroupIDs().contains(updGroup.getMemberGroupIDs().get(i))) {
-          groupCache.remove((String)updGroup.getMemberGroupIDs().get(i));
+          groupCache.remove(updGroup.getMemberGroupIDs().get(i));
         }
       }
 
@@ -1509,25 +1492,6 @@ public class MCRUserMgr
     throw new MCRException("Error while updating user "+userID); }
   }
 
-
-  /**
-   * Returns information about the group cache as a formatted string - ready for
-   * printing it with System.out.println() or so.
-   *
-   * @return   returns information about the group cache as a formatted string
-   */
-  private final String getGroupCacheInfo()
-  { return groupCache.toString(); }
-
-  /**
-   * Returns information about the user cache as a formatted string - ready for
-   * printing it with System.out.println() or so.
-   *
-   * @return   returns information about the user cache as a formatted string
-   */
-  private final String getUserCacheInfo()
-  { return userCache.toString(); }
-
   /**
    * This method updates groups where a given user or group object is a new member of or is no longer
    * a member of, respectively. The groups are determined by comparing the user or group to be updated
@@ -1549,10 +1513,10 @@ public class MCRUserMgr
     for (int i=0; i<updObject.getGroupIDs().size(); i++) {
       String gid = (String)updObject.getGroupIDs().get(i);
       if (!mcrUserStore.existsGroup(gid)) {
-        if (updObject instanceof MCRUser)
-          throw new MCRException("You tried to update user '"+ID+"' with the unknown group '"+gid+"'.");
-        else // it's a MCRGroup object
-          throw new MCRException("You tried to update group '"+ID+"' with the unknown group '"+gid+"'.");
+          StringBuffer msg=new StringBuffer("You tried to update ");
+          msg.append((updObject instanceof MCRUser)? "user '":"group '")
+          .append(ID).append("' with the unknown group '").append(gid).append("'.");
+          throw new MCRException(msg.toString());
       }
       MCRGroup linkedGroup = retrieveGroup(gid);
       linkedGroup.modificationIsAllowed();  // If the modification is not allowed an exception will be thrown.
@@ -1583,4 +1547,3 @@ public class MCRUserMgr
     }
   }
 }
-

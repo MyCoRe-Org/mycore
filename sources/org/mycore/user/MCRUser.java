@@ -25,11 +25,14 @@
 package org.mycore.user;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.ArrayList;
 
-import org.mycore.common.*;
+import org.mycore.common.MCRDefaults;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * Instances of this class represent MyCoRe users.
@@ -184,8 +187,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   {
     this();
     if (!elm.getName().equals("user")) { return; } // Detlev asks: Jens, what is this good for??
-    super.ID = trim((String)elm.getAttributeValue("ID"), id_len);
-    String numIDtmp = trim((String)elm.getAttributeValue("numID"));
+    super.ID = trim(elm.getAttributeValue("ID"), id_len);
+    String numIDtmp = trim(elm.getAttributeValue("numID"));
 
     try {
       this.numID = Integer.parseInt(numIDtmp); }
@@ -222,8 +225,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
       List groupIDList = userGroupElement.getChildren();
       for (int j=0; j<groupIDList.size(); j++) {
         org.jdom.Element groupID = (org.jdom.Element)groupIDList.get(j);
-        if (!((String)groupID.getTextTrim()).equals("")) {
-          groupIDs.add((String)groupID.getTextTrim());
+        if (!(groupID.getTextTrim()).equals("")) {
+          groupIDs.add(groupID.getTextTrim());
 	}
       }
     }
@@ -314,7 +317,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
       boolean test = false;
       String name = ((String)ar.get(i));
       for (int j=0;j<n.size();j++) {
-        if (name.equals((String)n.get(j))) { test = true; }
+        if (name.equals(n.get(j))) { test = true; }
       }
       if (!test) { n.add(ar.get(i)); }
     }
@@ -342,7 +345,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    *   returns true if the user is authenticated
    */
   public final boolean isAuthenticated()
-  { return MCRUserMgr.instance().isAuthenticated(this); }
+  { return MCRUserMgr.isAuthenticated(this); }
 
   /**
    * @return
@@ -527,14 +530,14 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     String currentUserID=mcrSession.getCurrentUserID();
 
     MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID, false);
+    MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
     if (currentUser.hasPrivilege("user administrator")) {
       return true;
     }
-    if (this.ID.equals(currentUserID) || this.creator.equals(currentUserID)) {
+    else if (this.ID.equals(currentUserID) || this.creator.equals(currentUserID)) {
       return true;
     }
-    MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
-    if (primaryGroup.getAdminUserIDs().contains(currentUserID)) {
+    else if (primaryGroup.getAdminUserIDs().contains(currentUserID)) {
       return true;
     } else { // check if the current user is (direct, not implicit) member of one of the admGroups
       ArrayList admGroupIDs = primaryGroup.getAdminGroupIDs();
