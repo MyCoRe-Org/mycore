@@ -24,6 +24,8 @@
 
 package org.mycore.user;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -113,10 +115,50 @@ public class MCRAccessServlet extends MCRServlet
    * @param job         the current job
    * @return true if the current session is in the host or domain name.
    **/
-  public static boolean checkIP(String ip, MCRServletJob job)
-    {
-    return true;
-    }
+  boolean checkIP(String ip, MCRServletJob job) {
+		String ipAddr, subNet;
+		int i;
+		if ((i = ip.indexOf("/")) >= 0) {
+			//subnet mask present
+			ipAddr = ip.substring(0, i).trim();
+			subNet = ip.substring(i + 1, ip.length()).trim();
+		} else {
+			ipAddr = ip.trim();
+			subNet = "255.255.255.255";
+		}
+		String remAddr = getRemoteAddr(job.getRequest());
+		try {
+			return isInetAddressInSubnet(remAddr, ipAddr, subNet);
+		} catch (UnknownHostException e) {
+			LOGGER.info("Unknown Host while checking ip : " + ip, e);
+			return false;
+		}
+	}
+  
+  private boolean isInetAddressInSubnet(String ip, String ipSub,
+			String subnetMask) throws UnknownHostException {
+		InetAddress ipAddr = InetAddress.getByName(ip);
+		InetAddress ipSubAddr = InetAddress.getByName(ipSub);
+		InetAddress subnetMaskAddr = InetAddress.getByName(subnetMask);
+		int length = (ipAddr.getAddress().length
+				+ ipSubAddr.getAddress().length + subnetMaskAddr.getAddress().length) / 3;
+		if (length == 4) {
+			// subnet1 is the subnet of ipSub and subnet2 is the subnet of ip
+			// assigned to the subnetMask
+			byte[] subnet1 = new byte[] { 0, 0, 0, 0 };
+			byte[] subnet2 = new byte[] { 0, 0, 0, 0 };
+			for (int i = 0; i < 4; i++) {
+				subnet1[i] = (byte) (ipSubAddr.getAddress()[i] & subnetMaskAddr
+						.getAddress()[i]);
+				subnet2[i] = (byte) (ipAddr.getAddress()[i] & subnetMaskAddr
+						.getAddress()[i]);
+				if (subnet1[i] != subnet2[i])
+					return false;
+			}
+			return true; //ip is in subnet ipSub/subnetMask
+		}
+		return false;
+	}
 
   /**
    * The method check the given privilege against the privilege of the user.
@@ -125,7 +167,7 @@ public class MCRAccessServlet extends MCRServlet
    * @param userid      the user with his privileges
    * @return true if the user has the privilege, else false
    **/
-  public static boolean checkPrivileg(String privilege, String userid)
+  boolean checkPrivileg(String privilege, String userid)
     {
     if ((privilege == null) || ((privilege = privilege.trim()).length() ==0)) {
       return false; }
