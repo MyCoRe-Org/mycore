@@ -62,6 +62,9 @@ public class MCRCache
     /** The key for this object, to be used for removing the object */
     Object key;
     
+    /** The timestamp when this object was placed in the cache */
+    long time;
+
     /** The stored object encapsulated by this entry */
     Object object;
   }
@@ -98,7 +101,8 @@ public class MCRCache
   /**
    * Puts an object into the cache, storing it under the given key.
    * If the cache is already full, the least recently used object will be
-   * removed from the cache first.
+   * removed from the cache first. If the cache already contains an
+   * entry under the key provided, this entry is replaced.
    * 
    * @param key the non-null key to store the object under
    * @param obj the non-null object to be put into the cache
@@ -109,13 +113,14 @@ public class MCRCache
     MCRArgumentChecker.ensureNotNull( obj, "obj" );
     
     if( capacity == 0 ) return;
-    if( index.containsKey( key ) ) return;
+    if( index.containsKey( key ) ) remove( key );
     
     if( isFull() ) remove( lru.key );
 
     MCRCacheEntry added = new MCRCacheEntry();
     added.object = obj;
     added.key    = key;
+    added.time   = System.currentTimeMillis();
     index.put( key, added );
     
     if( isEmpty() )
@@ -155,6 +160,7 @@ public class MCRCache
     
     removed.object = null;
     removed.key    = null;
+    removed.time   = 0;
     removed.before = null;
     removed.after  = null;
     index.remove( key ); 
@@ -193,6 +199,29 @@ public class MCRCache
     }
     
     return found.object; 
+  }
+
+  /**
+   * Returns an object from the cache for the given key, but only if the
+   * cache entry is not older than the given timestamp. If there
+   * currently is no object in the cache with this key, null is returned.
+   * If the cache entry is older than the timestamp, the entry is removed
+   * from the cache and null is returned.
+   *
+   * @param key the key for the object you want to get from this cache
+   * @param time the timestamp to check that the cache entry is up to date
+   * @return the cached object, or null
+   **/
+  public synchronized Object getIfUpToDate( Object key, long time )
+  {
+    Object value = get( key );
+    if( value == null ) return null;
+
+    MCRCacheEntry found = (MCRCacheEntry)( index.get( key ) );
+    if( found.time >= time ) return value;
+
+    remove( key );
+    return null;
   }
 
   /**
