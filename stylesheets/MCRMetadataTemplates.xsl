@@ -26,7 +26,7 @@
    <xsd:complexType>
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" />
+         <xsd:attribute name="type" use="optional" type="xsd:string" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
      </xsd:simpleContent>
@@ -71,7 +71,7 @@
    <xsd:complexType>
      <xsd:attribute name="classid" />
      <xsd:attribute name="categid" />
-     <xsd:attribute name="type" use="optional" />
+     <xsd:attribute name="type" use="optional" type="xsd:string" />
      <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
@@ -84,10 +84,23 @@
    <xsd:complexType>
      <xsd:simpleContent>
        <xsd:extension base="xsd:string">
-         <xsd:attribute name="type" use="optional" />
+         <xsd:attribute name="type" use="optional" type="xsd:string" />
          <xsd:attribute ref="xml:lang" />
        </xsd:extension>
      </xsd:simpleContent>
+   </xsd:complexType>
+  </xsd:element>
+</xsl:template>
+
+<!-- Template for the metadata MCRMetaIFS -->
+
+<xsl:template match="mcrmetaifs">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:attribute name="sourcepath" use="required" type="xsd:string" />
+     <xsd:attribute name="maindoc" use="required" type="xsd:string"/>
+     <xsd:attribute name="type" use="optional" type="xsd:string" />
+     <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
 </xsl:template>
@@ -109,7 +122,7 @@
     <xsd:element name="peerage" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
@@ -134,7 +147,7 @@
     <xsd:element name="number" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
@@ -155,7 +168,7 @@
     <xsd:element name="property" type="xsd:string" minOccurs='0' 
      maxOccurs='1'/>
    </xsd:sequence>
-   <xsd:attribute name="type" use="optional" />
+   <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
