@@ -26,6 +26,7 @@ package org.mycore.services.oai;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -143,7 +144,17 @@ public class MCROAIDataProvider extends HttpServlet {
         "ListSets"};
 
     private static Map mappings = null;
-    
+	private static MCRConfiguration config;
+	private static String resumptionTokenDir;
+	
+	static {
+    	MCRConfiguration.instance().reload(true);
+		config = MCRConfiguration.instance();
+    	PropertyConfigurator.configure(config.getLoggingProperties());
+		resumptionTokenDir = config.getString(
+				STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
+	}
+	
 	/**
 	 * Method init. Initializes the Servlet when first loaded
 	 * @param config Configuration data
@@ -192,7 +203,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	 */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
         response.setContentType("text/xml; charset=UTF-8");
         
         // Exceptions must be caught...
@@ -345,7 +355,6 @@ public class MCROAIDataProvider extends HttpServlet {
     }
 
 	private String getPrefix(String token) {
-	    MCRConfiguration config = MCRConfiguration.instance();
 	    String dir = new String();
 	    
 	    try {
@@ -381,7 +390,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * Method deleteOutdatedTokenFiles. Helper function to delete outdated resumption token files
 	 */
     private void deleteOutdatedTokenFiles() {
-	    MCRConfiguration config = MCRConfiguration.instance();
 	    String dir = new String();
 	    int timeout;
 	    
@@ -423,7 +431,10 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @throws IOException
 	 */
     private Element listFromResumptionToken(Element list, String resumptionToken, String prefix) throws IOException {
-	    MCRConfiguration config = MCRConfiguration.instance();
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
 		try {
 		   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
 		   	int maxreturns = config.getInt(STR_OAI_MAXRETURNS);
@@ -432,8 +443,8 @@ public class MCROAIDataProvider extends HttpServlet {
 			if (!objectFile.exists()) {
 				return null;
 			}
-			FileInputStream fis = new FileInputStream(objectFile);
-			ObjectInputStream ois = new ObjectInputStream(fis);
+			fis = new FileInputStream(objectFile);
+			ois = new ObjectInputStream(fis);
 			int tokenNo = Integer.valueOf(resumptionToken
                 .substring(resumptionToken.indexOf('x') + 1, 
                 resumptionToken.lastIndexOf('x'))).intValue();
@@ -462,16 +473,13 @@ public class MCROAIDataProvider extends HttpServlet {
                     "x" + (tokenNo + 1) + "x" + (objectsInFile - endObject);
 			    File newObjectFile = new File(resumptionTokenDir +
                     newResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
-				FileOutputStream fos = new FileOutputStream(newObjectFile);
-				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				fos = new FileOutputStream(newObjectFile);
+				oos = new ObjectOutputStream(fos);
 					
 				for (int i = endObject; i < objectsInFile; i++) {
-				    Element record = (Element) ois.readObject();
+					Element record = (Element) ois.readObject();
 				    oos.writeObject(record);
 				}
-					
-				oos.close();
-				fos.close();
 					
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
            		String sDate = getUTCDate(timeout);
@@ -480,18 +488,23 @@ public class MCROAIDataProvider extends HttpServlet {
 			}
 				
            	list.addContent(eResumptionToken);
-            	
-			ois.close();
- 			fis.close();	
+	        return list;
 	    } catch (MCRConfigurationException mcrx) {
             logger.fatal(mcrx.getMessage());
+			return null;
     	} catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
+			return null;
 	    } catch (IOException e) { 	
+            logger.error(e.getMessage());
 	    	throw new IOException(e.getMessage());
+		} finally {
+			oos.close();
+			fos.close();
+        	
+			ois.close();
+ 			fis.close();	
 		}
-        
-        return list;
     }
     
 	/**
@@ -539,25 +552,20 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @param list a list of Element's(!)
 	 * @return String The resumption token
 	 */
-    private String listToResumptionToken(List list, String prefix) {
-	    MCRConfiguration config = MCRConfiguration.instance();
-	    List tokenElements = new ArrayList(list);
-	    String fileName = null;
-	    
+    private String listToResumptionToken(List tokenElements, String prefix, ObjectOutputStream oos) {
 	    if (tokenElements.size() > 0) {
-	    	// a resumption token file has to be written
-		    Date tmpDate = new Date();
-		   	long fileId = tmpDate.getTime();
-		    int docs = tokenElements.size();
-
 			try {
-			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
-				fileName = fileId + "x1x" + docs;
-		
- 				FileOutputStream fos = new FileOutputStream(resumptionTokenDir +
-   	                fileName + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
-			 	ObjectOutputStream oos = new ObjectOutputStream(fos);
-				 	
+				String fileName = null;
+				FileOutputStream fos = null;
+				
+				if (oos == null) {
+					fileName = newResumptionToken() + tokenElements.size();
+					File resumptionTokenFile = new File(resumptionTokenDir +
+							fileName + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
+					fos = new FileOutputStream(resumptionTokenFile);
+					oos = new ObjectOutputStream(fos);
+				}
+				// a resumption token file has to be written
 			 	ListIterator tokenElementsIterator = tokenElements.listIterator();
 				 	
 			 	while (tokenElementsIterator.hasNext()) {
@@ -566,8 +574,12 @@ public class MCROAIDataProvider extends HttpServlet {
 				    oos.writeObject(element);
 			 	}
 				
-				oos.close();
-				fos.close(); 	
+				if (fos != null) {
+					oos.close();
+					fos.close(); 	
+				}
+				
+				return fileName;
 			} catch (MCRConfigurationException mcrcx) {
 				logger.error("Resumption Token Directory not configured.");
 				logger.error("The result list was only partially returned.");
@@ -577,7 +589,7 @@ public class MCROAIDataProvider extends HttpServlet {
 			}					
     	}
     	
-    	return fileName;
+    	return null;
     }
     
 	/**
@@ -595,7 +607,6 @@ public class MCROAIDataProvider extends HttpServlet {
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
-	    MCRConfiguration config = MCRConfiguration.instance();
 	    String repositoryIdentifier = new String();
 	    String repositoryName = new String();
 		try {
@@ -679,7 +690,6 @@ public class MCROAIDataProvider extends HttpServlet {
         
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
-	    MCRConfiguration config = MCRConfiguration.instance();
 		MCROAIQuery query = null;
 		        
 		try {
@@ -800,8 +810,6 @@ public class MCROAIDataProvider extends HttpServlet {
             eRequest.setAttribute("resumptionToken", resumptionToken[0]);
         }
         
-	    MCRConfiguration config = MCRConfiguration.instance();
-	    
 		Element eListSets = new Element("ListSets", ns);
         
         if (resumptionToken != null) {
@@ -887,7 +895,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements, "null");
+	    	String sResumptionToken = listToResumptionToken(tokenElements, "null", null);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
@@ -1000,11 +1008,12 @@ public class MCROAIDataProvider extends HttpServlet {
         	}
         }
         
-        MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
+		int maxreturns = 0;
 	    try {
 			//check if property is set, else Exception is thrown 
 	        config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
+	        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 	    } catch (MCRConfigurationException mcrx) {
         	logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
@@ -1032,7 +1041,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    if (set != null) {
 	    	buildMappings();
 	    	logger.info("Set: " + set[0]);
-	    	if (mappings != null && mappings.containsValue(set[0])) {
+	    	if ((mappings != null) && mappings.containsValue(set[0])) {
 	    		Set keys = mappings.keySet();
 	    		Iterator keyIterator = keys.iterator();
 	    		while (keyIterator.hasNext()) {
@@ -1048,62 +1057,69 @@ public class MCROAIDataProvider extends HttpServlet {
 				//Add the given set to make the query work 
 		    	//when the given set is not configured by STR_OAI_CATEGORY_MAPPING
 		    	mappedSets.add(set);
-		    } 
-    	} else {
+		    }
+	    } else {
 			//Add a null set to make the query work when no set was queried 
 	    	mappedSets.add(set);
-	    } 
+    	}
 	    
-	    List sets = new ArrayList();
+    	int elementCounter = 0;
+		String sResumptionToken = null;
 	    try {
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		    Iterator mappedSetIterator = mappedSets.iterator();
+			sResumptionToken = newResumptionToken();
+			File resumptionTokenFile = new File(resumptionTokenDir +
+					sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
+			FileOutputStream fos = new FileOutputStream(resumptionTokenFile);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
 		    while (mappedSetIterator.hasNext()) {
 		    	String[] mappedSet = (String[]) mappedSetIterator.next();
-		    	List result = query.listIdentifiers(mappedSet, from, until, getServletName());
-		    	if (result != null) {
-		    		sets.addAll(result);
-		    	}
+				do {
+			    	List result = query.listIdentifiers(mappedSet, from, until, getServletName());
+					if (result != null) {
+						Iterator iterator = result.iterator();
+				    	List tokenElements = new ArrayList();
+				    	
+				    	while (iterator.hasNext()) {
+				    		elementCounter++;
+				    		String[] array = (String[]) iterator.next();
+				    		
+					        Element eHeader = new Element("header", ns);
+			    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
+			            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+			            	eHeader = setSpec(eHeader, array[2], ns);
+			            
+			            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
+					            eListIdentifiers.addContent(eHeader);
+			            	} else {
+			            		tokenElements.add(eHeader);
+			            	}
+				    	}
+				    	listToResumptionToken(tokenElements, prefix, oos);
+					}
+				} while (query.hasMore());
+				int docs = elementCounter - maxreturns;
+				if (docs > 0) {
+					sResumptionToken += docs;
+					File newFile = new File(resumptionTokenDir +
+							sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
+					resumptionTokenFile.renameTo(newFile);
+				}
 		    }
-	    } catch (MCRConfigurationException mcrx) {
-	    	logger.fatal(mcrx.getMessage());
+	    } catch (MCRConfigurationException e) {
+	    	logger.fatal(e.getMessage());
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-	    }
-
-	    if (sets.size() > 0) {
-	    	int maxreturns = 0;
-	    	ListIterator iterator = sets.listIterator();
-	    	
-			try {
-		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
-			} catch (NumberFormatException nfx) {
-				//do nothing, just let maxreturns be 0
-			}
-	    	
-	    	int elementCounter = 0;
-	    	
-	    	List tokenElements = new ArrayList();
-	    	
-	    	while (iterator.hasNext()) {
-	    		elementCounter++;
-	    		String[] array = (String[]) iterator.next();
-	    		
-		        Element eHeader = new Element("header", ns);
-    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
-            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
-            	eHeader = setSpec(eHeader, array[2], ns);
-            
-            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
-		            eListIdentifiers.addContent(eHeader);
-            	} else {
-            		tokenElements.add(eHeader);
-            	}
-	    	}
-	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements, prefix);
+	    } catch (FileNotFoundException e) {
+		} catch (IOException e) {
+	    	logger.fatal(e.getMessage());
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+		}
+		
+	    if (elementCounter > 0) {
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
-				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
+				eResumptionToken.setAttribute("completeListSize", Integer.toString(elementCounter));
 				eResumptionToken.setAttribute("cursor", "0");
 				
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
@@ -1156,7 +1172,6 @@ public class MCROAIDataProvider extends HttpServlet {
         eRequest.setAttribute("identifier", identifier[0]);
         eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
         
-        MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
         String format = null;
         //Check, if the requested metadata format is supported
@@ -1311,11 +1326,12 @@ public class MCROAIDataProvider extends HttpServlet {
         	}
         }
         
-        MCRConfiguration config = MCRConfiguration.instance();
         String format = null;
+    	int maxreturns = 0;
         //Check, if the requested metadata format is supported
 	    try {
 	        format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
+	        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 	    } catch (MCRConfigurationException mcrx) {
         	logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
@@ -1350,7 +1366,7 @@ public class MCROAIDataProvider extends HttpServlet {
         List mappedSets = new ArrayList();
 	    if (set != null) {
 	    	buildMappings();
-	    	if (mappings != null && mappings.containsValue(set[0])) {
+	    	if ((mappings != null) && mappings.containsValue(set[0])) {
 	    		Set keys = mappings.keySet();
 	    		Iterator keyIterator = keys.iterator();
 	    		while (keyIterator.hasNext()) {
@@ -1362,69 +1378,78 @@ public class MCROAIDataProvider extends HttpServlet {
 	    				mappedSets.add(mappedSet);
 	    			}
 	    		}
+		    } else {
+		    	mappedSets.add(set);
 	    	}
 	    } else {
 			//Add a null set to make the query work when no set was queried
 	    	mappedSets.add(set);
 	    }
 	    
-	    List sets = new ArrayList();
+    	int elementCounter = 0;
+		String sResumptionToken = null;
 	    try {
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		    Iterator mappedSetIterator = mappedSets.iterator();
+			sResumptionToken = newResumptionToken();
+			File resumptionTokenFile = new File(resumptionTokenDir +
+					sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
+			FileOutputStream fos = new FileOutputStream(resumptionTokenFile);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
 		    while (mappedSetIterator.hasNext()) {
 		    	String[] mappedSet = (String[]) mappedSetIterator.next();
-		    	List result = query.listRecords(mappedSet, from, until, getServletName());
-		    	if (result != null) {
-		    		sets.addAll(result);
-		    	}
+				do {
+					List result = query.listRecords(mappedSet, from, until, getServletName());
+					if (result != null) {
+						Iterator iterator = result.iterator();
+				    	List tokenElements = new ArrayList();
+				    	
+				    	while (iterator.hasNext()) {
+				    		elementCounter++;
+				    		String[] array = (String[]) iterator.next();
+				    		
+					        Element eHeader = new Element("header", ns);
+			    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
+			            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+			            	eHeader = setSpec(eHeader, array[2], ns);
+
+			            	Element eRecord = new Element("record", ns);
+					        eRecord.addContent(eHeader);
+				            
+				            Element eMetadata = (Element) iterator.next();
+				            eRecord.addContent(eMetadata);
+				            
+			            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
+					            eListRecords.addContent(eRecord);
+			            	} else {
+			            		tokenElements.add(eRecord);
+			            	}
+			            	
+				    	}
+				    	listToResumptionToken(tokenElements, prefix, oos);
+					}
+				} while (query.hasMore());
+				int docs = elementCounter - maxreturns;
+				if (docs > 0) {
+					sResumptionToken += docs;
+					File newFile = new File(resumptionTokenDir +
+							sResumptionToken + "." + prefix + STR_RESUMPTIONTOKEN_SUFFIX);
+					resumptionTokenFile.renameTo(newFile);
+				}
 		    }
-	    } catch (MCRConfigurationException mcrx) {
-	    	logger.fatal(mcrx.getMessage());
+	    } catch (MCRConfigurationException e) {
+	    	logger.fatal(e.getMessage());
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-	    }
+	    } catch (FileNotFoundException e) {
+		} catch (IOException e) {
+	    	logger.fatal(e.getMessage());
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+		}
 
-	    if (sets.size() > 0) {
-	    	int maxreturns = 0;
-	    	ListIterator iterator = sets.listIterator();
-	    	
-			try {
-		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
-			} catch (NumberFormatException nfx) {
-				//do nothing, just let maxreturns be 0
-			}
-	    	
-	    	int elementCounter = 0;
-	    	
-	    	List tokenElements = new ArrayList();
-	    	
-	    	while (iterator.hasNext()) {
-	    		elementCounter++;
-	    		String[] array = (String[]) iterator.next();
-	    		
-		        Element eHeader = new Element("header", ns);
-    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
-            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
-            	eHeader = setSpec(eHeader, array[2], ns);
-
-            	Element eRecord = new Element("record", ns);
-		        eRecord.addContent(eHeader);
-	            
-	            Element eMetadata = (Element) iterator.next();
-	            eRecord.addContent(eMetadata);
-	            
-            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
-		            eListRecords.addContent(eRecord);
-            	} else {
-            		tokenElements.add(eRecord);
-            	}
-            	
-	    	}
-	    	
-	    	String sResumptionToken = listToResumptionToken(tokenElements, prefix);
+	    if (elementCounter > 0) {
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
-				eResumptionToken.setAttribute("completeListSize", Integer.toString(maxreturns + tokenElements.size()));
+				eResumptionToken.setAttribute("completeListSize", Integer.toString(elementCounter));
 				eResumptionToken.setAttribute("cursor", "0");
 				
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
@@ -1464,7 +1489,6 @@ public class MCROAIDataProvider extends HttpServlet {
 		}
 		String scheme = tokenizer.nextToken();
 		String repositoryIdentifierFromIdentifier = tokenizer.nextToken();
-	    MCRConfiguration config = MCRConfiguration.instance();
 	    String repositoryIdentifier = new String();
 		try {
 	        repositoryIdentifier = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + getServletName());
@@ -1520,8 +1544,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	
 	private void buildMappings() {
 		if (mappings == null) {
-	        MCRConfiguration config = 
-	        	MCRConfiguration.instance();
 			Properties mappingProperties = 
 				config.getProperties(STR_OAI_CATEGORY_MAPPING);
 			if (mappingProperties.size() > 0) {
@@ -1542,6 +1564,13 @@ public class MCROAIDataProvider extends HttpServlet {
 				}
 			}
 		}
+	}
+	
+	private String newResumptionToken() {
+		Date tmpDate = new Date();
+		long id = tmpDate.getTime();
+		String token = id + "x1x";
+		return token;
 	}
 	
 	class TokenFileFilter implements FilenameFilter {
