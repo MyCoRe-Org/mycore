@@ -34,6 +34,7 @@ import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
@@ -42,6 +43,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
@@ -206,40 +208,32 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		//maybe transform query here
 		String queryText = docTextQuery;
 		try {
-			Searcher searcher = new IndexSearcher(indexReader);
-
-			BufferedReader in =
-				new BufferedReader(new InputStreamReader(System.in));
-			logger.debug("Query: ");
-			Query query =
-				QueryParser.parse(queryText, "content", getAnalyzer());
-			logger.debug("Searching for: " + query.toString("content"));
-
-			Hits hits = searcher.search(query);
-			logger.debug(hits.length() + " total matching documents");
+			HashSet derivateIDs = getUniqueFieldValues("DerivateID");
+			Iterator it = derivateIDs.iterator();
+			Hits hits;
 			Document doc;
-			HashSet collector=new HashSet();
 			String derivateID;
-			for (int i=0;i<hits.length();i++){
-				doc = hits.doc(i);
-				derivateID = doc.get("DerivateID");
-				if (derivateID != null) {
-					logger.debug(i + ". " + derivateID);
-					collector.add(derivateID);
-				}
-				else {
-					logger.warn("Found Document containes no Field \"DerivateID\":"+doc);
+			HashSet collector = new HashSet();
+			int i = 0;
+			while (it.hasNext()) {
+				hits = getHitsForDerivate((String) it.next(), queryText);
+				if (hits.length() > 0) {
+					doc = hits.doc(0);
+					derivateID = doc.get("DerivateID");
+					if (derivateID != null) {
+						logger.debug(++i + ". " + derivateID);
+						collector.add(derivateID);
+					} else {
+						logger.warn(
+							"Found Document containes no Field \"DerivateID\":"
+								+ doc);
+					}
 				}
 			}
-			searcher.close();
-			returns=MCRUtils.getStringArray(collector.toArray());
+			returns = MCRUtils.getStringArray(collector.toArray());
 		} catch (IOException e) {
 			throw new MCRPersistenceException(
 				"IOException while query:" + docTextQuery,
-				e);
-		} catch (ParseException e) {
-			throw new MCRPersistenceException(
-				"ParseException while query:" + docTextQuery,
 				e);
 		}
 		return returns;
@@ -257,6 +251,76 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 	private static Analyzer getAnalyzer() {
 		//TODO: have to replace GermanAnalyzer by more generic
 		return new GermanAnalyzer();
+	}
+
+	private HashSet getUniqueFieldValues(String fieldName) {
+		HashSet collector = new HashSet();
+		if (fieldName == null || fieldName.length() == 0)
+			return collector;
+		TermEnum enum = null;
+		try {
+			try {
+				enum = indexReader.terms(new Term(fieldName, ""));
+				while (fieldName.equals(enum.term().field())) {
+					//... collect enum.term().text() ...
+					collector.add(enum.term().text());
+					if (!enum.next())
+						break;
+				}
+			} finally {
+				enum.close();
+			}
+		} catch (IOException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while fetching unique values of field ")
+					.append(fieldName)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
+		}
+		return collector;
+	}
+	private Hits getHitsForDerivate(String derivateID, String queryText) {
+		Hits hits = null;
+		Searcher searcher;
+		Analyzer analyzer = getAnalyzer();
+
+		BufferedReader in =
+			new BufferedReader(new InputStreamReader(System.in));
+		logger.debug("Query: ");
+		QueryParser parser = new QueryParser("content", analyzer);
+		//combine to a query over a specific DerivateID
+		StringBuffer queryStr =
+			new StringBuffer("DerivateID:\"").append(derivateID).append(
+				"\" ").append(
+				queryText);
+		try {
+			searcher = new IndexSearcher(indexReader);
+			try {
+				Query query = parser.parse(queryStr.toString());
+				logger.debug("Searching for: " + query.toString("content"));
+				hits = searcher.search(query);
+				logger.debug(hits.length() + " total matching documents");
+			} catch (ParseException e) {
+				StringBuffer msg =
+					new StringBuffer("Error while querying (")
+						.append(queryText)
+						.append(") over Files matching DerivateID=")
+						.append(derivateID)
+						.append("!");
+				throw new MCRPersistenceException(msg.toString(), e);
+			} finally {
+				searcher.close();
+			}
+		} catch (IOException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while querying (")
+					.append(queryText)
+					.append(") over Files matching DerivateID=")
+					.append(derivateID)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
+		}
+		return hits;
 	}
 
 }
