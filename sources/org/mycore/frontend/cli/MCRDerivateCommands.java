@@ -225,7 +225,7 @@ public class MCRDerivateCommands
       throw new MCRException("Can't parse configuration for "+mcr_type ); }
     // create the database
     MCRDerivate obj = new MCRDerivate();
-    obj.createDataBase(confdoc);
+    obj.createDataBase(mcr_type,confdoc);
     return true;
     }
 
