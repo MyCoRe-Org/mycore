@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.19 $ $Date: 2004-12-13 15:03:04 $ -->
+<!-- $Revision: 1.20 $ $Date: 2004-12-15 15:02:44 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -24,6 +24,8 @@
 <xsl:param name="editor.cancel.url" /> <!-- if given, use this url for cancel button -->
 <xsl:param name="editor.cancel.id"  /> <!-- if given, substitute @@ID@@ in cancel/@url -->
 
+<xsl:param name="StaticFilePath" /> <!-- path of static webpage including this editor -->
+
 <!-- ========= http request parameter zum Durchreichen an target ======== -->
 <xsl:param name="target.param.0" />
 <xsl:param name="target.param.1" />
@@ -42,15 +44,18 @@
 
 <xsl:template match="editor">
 
-  <xsl:variable name="url" select="concat($WebApplicationBaseURL,'editor/editor-',@ref,'.xml?XSL.Style=xml&amp;MCRSessionID=',$MCRSessionID)" />
+  <xsl:variable name="uri" select="concat('webapp:', $StaticFilePath)" />
+  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=load.definition&amp;_uri=',$uri,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID)" />
 
   <xsl:variable name="combined">
     <editor>
-
       <!-- ======== import editor definition ======== -->
       <xsl:variable name="imported.editor" select="document($url,.)/editor" />
-      <!-- ======== copy editor id ======== -->
-      <xsl:attribute name="id"><xsl:value-of select="$imported.editor/@id" /></xsl:attribute>
+
+      <!-- ======== remember editor session ID ======== -->
+      <xsl:attribute name="session">
+        <xsl:value-of select="$imported.editor/@session" />
+      </xsl:attribute>
 
       <!-- ======== read input xml from source url ======== -->
       <xsl:for-each select="$imported.editor">
@@ -58,10 +63,7 @@
       </xsl:for-each>
 
       <!-- ======== copy editor definition ======== -->
-      <xsl:apply-templates select="$imported.editor/*" mode="copy-editor">
-        <xsl:with-param name="filename" select="concat('editor-',$imported.editor/@id,'.xml')" />
-      </xsl:apply-templates>
-
+      <xsl:apply-templates select="$imported.editor/*" mode="copy-editor" />
     </editor>
   </xsl:variable>
 
@@ -72,39 +74,12 @@
 
 <!-- ======== copy imported editor definition ======== -->
 <xsl:template match="*" mode="copy-editor">
-  <xsl:param name="filename" />
 
   <xsl:copy>
     <xsl:for-each select="@*">
       <xsl:copy-of select="." />
     </xsl:for-each>
-    <xsl:apply-templates select="node()" mode="copy-editor">
-      <xsl:with-param name="filename" select="$filename" />
-    </xsl:apply-templates>
-  </xsl:copy>
-</xsl:template>
-
-<!-- ======== import parts of editor definition from another file ======== -->
-<xsl:template match="import" mode="copy-editor">
-  <xsl:variable name="filename" select="concat('imports-',@ref,'.xml')" />
-  <xsl:variable name="imp-url"  select="concat($WebApplicationBaseURL,'editor/',$filename,'?XSL.Style=xml&amp;MCRSessionID=',$MCRSessionID)" />
-  <xsl:apply-templates select="document($imp-url,.)/editor/components/*" mode="copy-editor">
-    <xsl:with-param name="filename" select="$filename" />
-  </xsl:apply-templates>
-</xsl:template>
-
-<!-- ======== for helpPopup, we need to add the filename this was imported from ======== -->
-<xsl:template match="helpPopup" mode="copy-editor">
-  <xsl:param name="filename" />
-
-  <xsl:copy>
-    <xsl:for-each select="@*">
-      <xsl:copy-of select="." />
-    </xsl:for-each>
-    <xsl:attribute name="file"><xsl:value-of select="$filename"/></xsl:attribute>
-    <xsl:apply-templates select="node()" mode="copy-editor">
-      <xsl:with-param name="filename" select="$filename" />
-    </xsl:apply-templates>
+    <xsl:apply-templates select="node()" mode="copy-editor" />
   </xsl:copy>
 </xsl:template>
 
@@ -282,8 +257,9 @@
     </xsl:otherwise>
   </xsl:choose>
 
-  <!-- ======== send editor ID to servlet ======== -->
-  <input type="hidden" name="{$editor.delimiter.internal}editorID" value="{../@id}" />
+  <!-- ======== send editor session ID to servlet ======== -->
+  <input type="hidden" name="{$editor.delimiter.internal}session" value="{../@session}" />
+  <input type="hidden" name="{$editor.delimiter.internal}action" value="submit" />
 
   <!-- ======== durchreichen der XSL.target.param.X=name=value parameter ======== -->
   <xsl:call-template name="handle.target.parameter">
@@ -625,26 +601,7 @@
 
 <!-- ======== helpPopup ======== -->
 <xsl:template match="helpPopup">
-  <xsl:variable name="url.helper">
-    <xsl:choose>
-      <xsl:when test="@url">
-        <xsl:value-of select="@url" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$WebApplicationBaseURL" />
-        <xsl:text>editor/</xsl:text>
-        <xsl:value-of select="@file" />
-        <xsl:text>?XSL.Style=help-popup&amp;XSL.help.id=</xsl:text>
-        <xsl:value-of select="@id" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
-  <xsl:variable name="url">
-    <xsl:call-template name="build.url">
-      <xsl:with-param name="url" select="$url.helper" />                                                                                      
-    </xsl:call-template>
-  </xsl:variable>
+  <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor?_action=show.popup&amp;_session=',ancestor::editor/@session,'&amp;_ref=',@id,'&amp;MCRSessionID=',$MCRSessionID)" />
 
   <xsl:variable name="properties">
     <xsl:text>width=</xsl:text>
@@ -804,7 +761,7 @@
       <b><xsl:value-of select="$source" /></b>
       <br/>
       <input type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
-      <xsl:text> löschen </xsl:text>
+      <xsl:text> l÷schen </xsl:text>
       <input type="hidden" name="{$var}" value="{$source}" />
       und/oder ersetzen durch diese Datei: <xsl:text/>
       <br/>
@@ -973,18 +930,13 @@
   <xsl:param name="var"   />
   <xsl:param name="value" />
 
-  <xsl:variable name="helper">
-    <xsl:apply-templates select="*" mode="read.items" />
-  </xsl:variable>
-  <xsl:variable name="items" select="xalan:nodeset($helper)/*" />
-
-  <xsl:variable name="last" select="count($items)-1" />
+  <xsl:variable name="last" select="count(item)-1" />
 
   <xsl:variable name="cols">
     <xsl:choose>
        <xsl:when test="@cols"><xsl:value-of select="@cols"/></xsl:when>
        <xsl:when test="@rows"><xsl:value-of select="(($last - ($last mod @rows)) div @rows)+1"/></xsl:when>
-       <xsl:otherwise><xsl:value-of select="count($items)"/></xsl:otherwise>
+       <xsl:otherwise><xsl:value-of select="count(item)"/></xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
   <xsl:variable name="rows">
@@ -997,7 +949,7 @@
   <xsl:variable name="type" select="@type" />
 
   <table border="0" cellpadding="0" cellspacing="0">
-    <xsl:for-each select="$items">
+    <xsl:for-each select="item">
 
       <xsl:variable name="pxy" select="position() - 1" />
 
@@ -1139,37 +1091,10 @@
       </xsl:if>
     </xsl:attribute>
 
-    <xsl:variable name="items">
-      <xsl:apply-templates select="*" mode="read.items" />
-    </xsl:variable>
-
-    <xsl:for-each select="xalan:nodeset($items)/item">
-      <xsl:apply-templates select="." mode="editor.list">
-        <xsl:with-param name="value" select="$value" />
-      </xsl:apply-templates>
-    </xsl:for-each>
+    <xsl:apply-templates select="item" mode="editor.list">
+      <xsl:with-param name="value" select="$value" />
+    </xsl:apply-templates>
   </select>
-</xsl:template>
-
-<xsl:template match="item" mode="read.items">
-  <item value="{@value}">
-    <xsl:copy-of select="@label" />
-    <xsl:apply-templates select="*" mode="read.items" />
-  </item>
-</xsl:template>
-
-<xsl:template match="label" mode="read.items">
-  <xsl:copy-of select="." />
-</xsl:template>
-
-<xsl:template match="loadfrom" mode="read.items">
-  <xsl:variable name="url">
-    <xsl:call-template name="build.url">
-      <xsl:with-param name="url" select="@url" />
-    </xsl:call-template>
-  </xsl:variable>
-
-  <xsl:apply-templates select="document($url)/items" mode="read.items" />
 </xsl:template>
 
 <!-- ======== If url is relative, add WebApplicationBaseURL and make it absolute ======== -->

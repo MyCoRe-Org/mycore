@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2004-09-29 13:46:56 $ -->
+<!-- $Revision: 1.1 $ $Date: 2004-12-15 15:02:44 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -18,15 +18,11 @@
 
 <xsl:include href="editor-common.xsl" />
 
-<!-- ======== http request parameter ======== -->
-
-<xsl:param name="help.id" /> <!-- ID of help text to show -->
-
 <!-- ========================================================================= -->
 
 <!-- ======== handles editor help ======== -->
 
-<xsl:template match="/editor/components">
+<xsl:template match="/">
   <html>
     <head>
       <title>Hilfe zum Formular</title>
@@ -40,7 +36,7 @@
         
         <tr>
           <td align="left">
-            <xsl:for-each select="descendant::helpPopup[@id=$help.id]">
+            <xsl:for-each select="helpPopup">
               <xsl:call-template name="output.label" />
             </xsl:for-each>
           </td>
