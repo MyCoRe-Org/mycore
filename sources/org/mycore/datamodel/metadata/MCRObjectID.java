@@ -278,6 +278,50 @@ public final boolean isValid(String id)
   return mcr_valid_id; 
   }
 
+  /**
+   * This method checks the value of a MCRObjectId.
+   * The MCRObjectId is valid if:
+   * <ul>
+   * <li> The argument is not null.
+   * <li> The syntax of the ID is 
+   * <em>project_id</em>_<em>type_id</em>_<em>number</em> as
+   * <em>String_String_Integer</em>.
+   * <li> The ID is not longer as MAX_LENGTH.
+   * >li> The ID has only characters, they must not encoded.
+   * </ul>
+   *
+   * @param id   the MCRObjectId
+   * @throws MCRException if ID is not valid
+   **/
+public static void isValidOrDie(String id){
+	boolean is = false;
+	if (!((id == null) || ((id = id.trim()).length() ==0))){
+		if (id.length()<=MAX_LENGTH) {
+			String mcr_id = URLEncoder.encode(id);
+			if (mcr_id.equals(id)) {
+				int len = mcr_id.length();
+				int i = mcr_id.indexOf("_");
+				if (i>=0) {
+					int j = mcr_id.indexOf("_",i+1);
+					if (j>=0) {
+						String mcr_type_id = mcr_id.substring(i+1,j).toLowerCase();
+						if (conf.getBoolean("MCR.type_"+mcr_type_id.toLowerCase(),false)) {
+							int mcr_number = -1;
+							try { mcr_number = Integer.parseInt(mcr_id.substring(j+1,len)); }
+							catch (NumberFormatException e) {}
+							if (mcr_number >= 0) {
+								is = true;
+							}
+						}
+					}
+				} 
+			}
+		}
+	}
+	if (!is) { throw new MCRException("The ID is not valid"); }
+}
+
+
 /**
  * This method check this data again the  input and retuns the result as
  * boolean.
