@@ -70,8 +70,6 @@ public class MCREditorServlet extends MCRServlet
   public void doGetPost( MCRServletJob job )
 	throws ServletException, java.io.IOException
   {
-    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
-
     HttpServletRequest  req = job.getRequest();
     HttpServletResponse res = job.getResponse();
   
@@ -108,7 +106,6 @@ public class MCREditorServlet extends MCRServlet
                                       HttpServletResponse res )
   throws ServletException, java.io.IOException
   {
-    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
     String uri = req.getParameter( "_uri" );
     String ref = req.getParameter( "_ref" );
 
@@ -128,11 +125,8 @@ public class MCREditorServlet extends MCRServlet
 
   private void addTargetParameters( Element editor )
   { 
-    System.out.println( "-------- my session ID = " + MCRSessionMgr.getCurrentSession().getID() );
     String key = "StoredRequestParameters";
     Map parameters = (Map)( MCRSessionMgr.getCurrentSession().get( key ) );
-    System.out.println( "parameters is null? " + ( parameters == null ));
-    System.out.println( MCRSessionMgr.getCurrentSession().getID() );
     if( parameters == null ) return;
 
     Element tps = new Element( "target-parameters" );
@@ -151,9 +145,6 @@ public class MCREditorServlet extends MCRServlet
         tps.addContent( tp );
       }
     }
-
-    XMLOutputter outputter = new XMLOutputter();
-    System.out.println( outputter.outputString( tps ) );
   }
 
   private static Random random = new Random();
