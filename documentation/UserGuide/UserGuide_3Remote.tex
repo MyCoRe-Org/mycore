@@ -1,0 +1,32 @@
+\section{Die Zusammenarbeit mit anderen MyCoRe-Sample-Installationen}
+
+Das MyCoRe-System ist so konzipiert, dass hinsichtlich der metadaten gleichartige Installationen miteinander arbeiten können und von einer gemeinsamen Oberfächer (Frontend) abgefragt werden können. Hierzu müssen die Remote-Instanzen definiert werden. Auch die eigene Installation kann über diesen Weg abgefragt werden. Voraussetzung ist die im Abschitt 'Erzeugen und Konfigurieren der Web-Anwendung' beschriebene Installation eines Web Application Servers, welcher für die Remote-Zugriffe via Servlets zuständig ist. 
+
+\subsection{Die eigene Installation}
+
+Die Konfiguration für die eigene Installation finden Sie im File \mcrfile{mycore.properties.private}. Hier muss im Normalfall nur die Hostadresse und ggf. der Port geändert werden, alle anderen Angaben sollten übernommen werden können.
+\begin{verbatim}
+# Configuration for the own host with remote access
+MCR.remoteaccess_remote_query_class=org.mycore.backend.remote.MCRServletCommunication
+MCR.remoteaccess_remote_host=pcclu02.rz.uni-leipzig.de
+MCR.remoteaccess_remote_protocol=http
+MCR.remoteaccess_remote_port=8080
+MCR.remoteaccess_remote_query_servlet=/mycoresample/servlets/MCRQueryServlet
+MCR.remoteaccess_remote_ifs_servlet=/mycoresample/servlets/MCRFileNodeServlet
+\end{verbatim}
+
+\subsection{Standard-Server des MyCoRe-Projektes}
+
+Von den Entwicklern des MyCoRe-Projektes werden exemplarisch einige MyCoRe-Sample-Installationen bereitgehalten. Diese sind im Konfigurationsfile \mcrfile{mycore.properties.remote} notiert und sollten in der Regel verfügbar sein. Sie repräsentieren eine Auswahl der verschieden Persistence-Layer. Auch die Auswahl für die Suche in diesen Instanzen ist bereits in das Sample integriert und solle nach dem erfolgreichen Start der Web Applikation aktiv sein.\\[2ex]
+\small
+\bottomcaption{Feste MyCoRe-Sample-Instanzen }
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{4cm}|p{7cm}|p{3cm}|}
+\hline
+{\bf Alias} & {\bf URL} & {\bf Standort}\\[1,5ex]
+ \hline
+mcrLpzHHttp & ibmdlh.rz.uni-leipzig.de & Uni Leipzig \\ \hline
+\end{supertabular}
+\normalsize
+
