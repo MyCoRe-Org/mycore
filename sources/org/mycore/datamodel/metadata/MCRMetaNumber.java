@@ -236,12 +236,21 @@ public final String getNumberToString()
 public final void setFromDOM(org.jdom.Element element)
   {
   super.setFromDOM(element);
-  String temp_meas = (String)element.getAttribute("measurement").getValue();
-  if ((temp_meas!=null) && ((temp_meas = temp_meas.trim()).length() !=0)) {
-    measurement = temp_meas; }
-  String temp_dim = (String)element.getAttribute("dimension").getValue();
-  if ((temp_dim!=null) && ((temp_dim = temp_dim.trim()).length() !=0)) {
-    dimension = temp_dim; }
+  org.jdom.Attribute attr;
+  measurement = "";
+  attr=element.getAttribute("measurement");
+  if (attr != null) {
+    String temp_meas = (String)attr.getValue();
+    if ((temp_meas!=null) && ((temp_meas = temp_meas.trim()).length() !=0)) {
+      measurement = temp_meas; }
+    }
+  dimension = "";
+  attr = element.getAttribute("dimension");
+  if (attr != null) {
+    String temp_dim = (String)attr.getValue();
+    if ((temp_dim!=null) && ((temp_dim = temp_dim.trim()).length() !=0)) {
+      dimension = temp_dim; }
+    }
   String temp_value = (element.getText()).trim();
   if (temp_value==null) { number = 0.; return; }
   setNumber(temp_value);
@@ -335,6 +344,19 @@ public final Object clone()
   MCRMetaNumber out = new MCRMetaNumber(datapart,subtag,lang,inherited,
     dimension,measurement,number);
   return (Object) out;
+  }
+
+/**
+ * This method put debug data to the logger (for the debug mode).
+ **/
+public final void debug()
+  {
+  logger.debug("Start Class : MCRMetaNumber");
+  super.debugDefault();
+  logger.debug("Measurement        = "+measurement);
+  logger.debug("Dimension          = "+dimension);
+  logger.debug("Value              = "+number);
+  logger.debug("");
   }
 
 }
