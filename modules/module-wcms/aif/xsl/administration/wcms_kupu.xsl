@@ -11,7 +11,7 @@
 					<reload_after_save>0</reload_after_save>
 					<strict_output>1</strict_output>
 					<content_type>application/xhtml+xml</content_type>
-					<compatible_singletons>1</compatible_singletons>
+					<compatible_singletons>0</compatible_singletons>
 					<table_classes>
 						<class>plain</class>
 						<class>listing</class>

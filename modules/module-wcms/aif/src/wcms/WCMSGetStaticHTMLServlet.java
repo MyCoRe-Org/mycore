@@ -136,18 +136,19 @@ public class WCMSGetStaticHTMLServlet extends HttpServlet {
 
                 String completeOutput = new String();
                 completeOutput = 
-//               	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-				"<html>\n<head>\n" +
-				"<meta http-equiv=\"content-type\" content=\"text/html;charset=ISO-8859-1\"/>" +
-				"</head>\n"+
-//                		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"+
-						"<body>\n"+
-                		sw.toString() +
-						"</body>\n</html>\n";
+                	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
+                    "<meta http-equiv=\"Content-Type\" content=\"text/html; \"/>"		+
+					"<html>\n<head>\n" +
+					" <meta http-equiv=\"Pragma\" content=\"no-cache\" />\n " +
+					"<meta http-equiv=\"Cache-Control\" content=\"no-cache, must-revalidate\" />\n"	+
+					"</head>\n"	+
+					"<body>\n"		+
+                	sw.toString() +
+					"</body>\n</html>\n";
                 
+                response.setContentType( "text/html" );  
                 sos.println(completeOutput);
-                
-                //System.out.println("WCMSGetStaticHTMLServlet-Output: "+sw.toString());
+
                 System.out.println("WCMSGetStaticHTMLServlet-Output: "+completeOutput);
                 
                 sos.flush();
