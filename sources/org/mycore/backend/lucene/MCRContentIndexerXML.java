@@ -286,5 +286,43 @@ private Document buildLuceneDocument( String key, List types )
   }
   return doc;
 }
+
+  /**
+   * Search in Index with query
+   *
+   * @param the query
+   *
+   * @return the hits of the query (ifs IDs)
+   *
+   */
+  protected String[] doSearchIndex( String query )
+    throws MCRException
+  {
+    String result[] = null; 
+    try
+    {
+      IndexSearcher searcher = new IndexSearcher(indexDir);
+      Analyzer analyzer = new GermanAnalyzer();
+
+      Query qu = QueryParser.parse( query, "", analyzer);
+      logger.info("Searching for: " + qu.toString(""));
+
+      Hits hits = searcher.search( qu );
+      
+      int anz = hits.length();
+      result = new String[anz];
+      logger.info("Number of documents found : " + hits.length());
+      for (int i=0; i<anz; i++)
+      {    
+        result[i] = hits.doc(0).get("key");
+//        logger.info(" id: " + hits.id(0) + " score: " + hits.score(0) + " key: " +  hits.doc(0).get("key") );
+      }  
+      return result;
+
+    }
+    catch( Exception e){ logger.info( "error search with lucene: " + query); } 
+    return result;
+  }
+ 
 }
 

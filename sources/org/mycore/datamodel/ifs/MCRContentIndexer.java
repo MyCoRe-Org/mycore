@@ -133,6 +133,44 @@ public abstract class MCRContentIndexer
   }
     
   /**
+   * Search Deletes the index of an MCRFile object that is indexed under the given
+   * Storage ID in this indexer instance.
+   *
+   * @param query
+   *
+   * @return the hits of the query (ifs IDs)
+   *
+   */
+  protected abstract String[] doSearchIndex( String query )
+    throws Exception;
+
+  /**
+   * Search in Index with query
+   *
+   * @param query the query for the serch
+   *
+   * @return the hits of the query (ifs IDs)
+   *
+   */
+  public String[] searchIndex( String query )
+    throws MCRException
+  {
+    try
+    { return doSearchIndex( query ); }
+    catch( Exception exc )
+    {
+      if( ! ( exc instanceof MCRException ) )
+      {
+        StringBuffer msg = new StringBuffer();
+        msg.append( "Could not build search with indexer [" );
+        msg.append( indexerID ).append( "]" );
+        throw new MCRPersistenceException( msg.toString(), exc );
+      }
+      else throw (MCRException)exc;
+    }
+  }
+    
+  /**
    * Deletes the index of an MCRFile object that is indexed under the given
    * Storage ID in this indexer instance.
    *
