@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.backend.remote.*;
+import org.mycore.frontend.servlets.*;
 
 /**
  * This class implements the connection to the IFS database via HTTP/HTTPS
@@ -48,12 +49,9 @@ import org.mycore.backend.remote.*;
  *
  * @version $Revision$ $Date$
  **/
-public class MCRFileNodeServlet extends HttpServlet
+public class MCRFileNodeServlet extends MCRServlet
 {
   private static Logger logger = Logger.getLogger( MCRFileNodeServlet.class.getName() );
-
-  // The configuration
-  private MCRConfiguration conf = null;
 
   // Default language toUpperCase()
   private String defaultLang = "";
@@ -67,13 +65,13 @@ public class MCRFileNodeServlet extends HttpServlet
   **/
   public void init() throws MCRConfigurationException
   {
-    conf = MCRConfiguration.instance();
-    
+    super.init();
+ 
     // read the default language
-    String defaultLang = conf.getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
+    String defaultLang = config.getString( "MCR.metadata_default_lang", "en" ).toUpperCase();
     
     // read host list from configuration
-    String hostconf = conf.getString( "MCR.remoteaccess_hostaliases", "local" );
+    String hostconf = config.getString( "MCR.remoteaccess_hostaliases", "local" );
     
     remoteAliasList = new ArrayList();
     if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
@@ -82,13 +80,12 @@ public class MCRFileNodeServlet extends HttpServlet
     while( st.hasMoreTokens() ) remoteAliasList.add( st.nextToken() );
   }
 
-  public void doPost( HttpServletRequest req, HttpServletResponse res )
-    throws IOException, ServletException
-  { doGet(req,res); }
-
-  public void doGet( HttpServletRequest req, HttpServletResponse res )
+  public void doGetPost( MCRServletJob job )
     throws IOException, ServletException
   {
+    HttpServletRequest  req = job.getRequest();
+    HttpServletResponse res = job.getResponse();
+
     // get the language
     String lang = req.getParameter( "lang" );
     String att_lang = (String)( req.getAttribute( "lang" ) );
@@ -208,7 +205,7 @@ public class MCRFileNodeServlet extends HttpServlet
     {
       String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
       MCRRemoteAccessInterface comm = 
-        (MCRRemoteAccessInterface)( conf.getInstanceOf( prop ) );
+        (MCRRemoteAccessInterface)( config.getInstanceOf( prop ) );
 
       BufferedInputStream in = comm.requestIFS( hostAlias, requestPath );
       if( in == null ) return;

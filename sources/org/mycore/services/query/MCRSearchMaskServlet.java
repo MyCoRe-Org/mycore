@@ -29,6 +29,7 @@ import java.util.*;
 import javax.servlet.http.*;
 import javax.servlet.*;
 import org.mycore.common.*;
+import org.mycore.frontend.servlets.*;
 
 /**
  * This servlet provides a web interface to create a search mask and
@@ -37,7 +38,7 @@ import org.mycore.common.*;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
 */
-public class MCRSearchMaskServlet extends HttpServlet 
+public class MCRSearchMaskServlet extends MCRServlet 
 {
 
 // The default mode for this class
@@ -45,9 +46,6 @@ String mode = "CreateSearchMask";
 
 // Default Language (as UpperCase)
 private String defaultLang = "";
-
-// An instance of the MCRConfiguration
-MCRConfiguration conf = null;
 
 // The configuration XML files
 org.jdom.Document jdom = null;
@@ -58,26 +56,26 @@ org.jdom.Document jdom = null;
   **/
   public void init() throws MCRConfigurationException
   {
-  conf = MCRConfiguration.instance();
-  defaultLang = conf.getString( "MCR.metadata_default_lang", "en" )
+    super.init();
+  defaultLang = config.getString( "MCR.metadata_default_lang", "en" )
     .toUpperCase();
   }
 
  /**
-  * This method handles HTTP GET requests and resolves them to output.
+  * This method handles HTTP requests and resolves them to output.
   * The method can get two modi : 'CreateSearchMask' to generate a new
   * search mask or 'CreateQuery' to read the data from the search mask
   * and start the MCRQueryServlet.
   *
-  * @param request the HTTP request instance
-  * @param response the HTTP response instance
   * @exception IOException for java I/O errors.
   * @exception ServletException for errors from the servlet engine.
   **/
-  public void doGet( HttpServletRequest  request, 
-                     HttpServletResponse response )
+  public void doGetPost( MCRServletJob job )
     throws IOException, ServletException
   {  
+    HttpServletRequest  request  = job.getRequest();
+    HttpServletResponse response = job.getResponse();
+
   mode  = request.getParameter( "mode"  );
   if( mode  == null ) mode  = "CreateSearchMask";
   if (mode.equals("CreateSearchMask")) { createSearchMask(request,response); }
@@ -105,7 +103,7 @@ org.jdom.Document jdom = null;
   if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
   type = type.toLowerCase();
 
-  String smc = conf.getString( "MCR.searchmask_config_"+layout.toLowerCase());
+  String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
     InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
     if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );
@@ -119,17 +117,11 @@ org.jdom.Document jdom = null;
   String style = mode + "-" + layout+ "-" + lang;
 
   // start Layout servlet
-  try {
     request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
     request.setAttribute( "XSL.Style", style );
     RequestDispatcher rd = getServletContext()
       .getNamedDispatcher( "MCRLayoutServlet" );
     rd.forward( request, response );
-    }
-  catch( Exception ex ) {
-      System.out.println( ex.getClass().getName() );
-      System.out.println( ex ); }
-
   }
 
  /**
@@ -155,7 +147,7 @@ org.jdom.Document jdom = null;
   if( lang  == null ) lang  = "DE"; else { lang = lang.toUpperCase(); }
   StringBuffer query = new StringBuffer("");
 
-  String smc = conf.getString( "MCR.searchmask_config_"+layout.toLowerCase());
+  String smc = config.getString( "MCR.searchmask_config_"+layout.toLowerCase());
   try {
     InputStream in = MCRSearchMaskServlet.class.getResourceAsStream( "/" + smc );
     if( in == null ) throw new MCRConfigurationException( "Can't read config file " + smc );
@@ -224,7 +216,6 @@ System.out.println(tempquery);
   
 
   // start Query servlet
-  try {
     request.removeAttribute( "mode" );
     request.setAttribute( "mode", "ResultList" );
     request.removeAttribute( "type" );
@@ -240,10 +231,6 @@ System.out.println(tempquery);
     RequestDispatcher rd = getServletContext()
       .getNamedDispatcher( "MCRQueryServlet" );
     rd.forward( request, response );
-    }
-  catch( Exception ex ) {
-      System.out.println( ex.getClass().getName() );
-      System.out.println( ex ); }
   }
 }
 

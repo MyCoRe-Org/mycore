@@ -41,20 +41,14 @@ import javax.servlet.http.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRStaticXMLFileServlet extends HttpServlet
+public class MCRStaticXMLFileServlet extends MCRServlet
 {
   protected final static Logger logger = Logger.getLogger(  MCRStaticXMLFileServlet.class );
 
-  public void init()
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    PropertyConfigurator.configure( config.getLoggingProperties() );
-  }
-
-  public void doGet( HttpServletRequest request, HttpServletResponse response )
+  public void doGetPost( MCRServletJob job )
     throws ServletException, java.io.IOException
   {
-    String requestedPath = request.getServletPath();
+    String requestedPath = job.getRequest().getServletPath();
     logger.info( "MCRStaticXMLFileServlet " + requestedPath );
     URL url = null;
     
@@ -71,12 +65,12 @@ public class MCRStaticXMLFileServlet extends HttpServlet
     File file = new File( path );
 
     String documentBaseURL = file.getParent() + File.separator;
-    request.setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
-    request.setAttribute( "XSL.FileName", file.getName() );
-    request.setAttribute( "XSL.FilePath", file.getPath() );
-    request.setAttribute( "MCRLayoutServlet.Input.FILE", file );
+    job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
+    job.getRequest().setAttribute( "XSL.FileName", file.getName() );
+    job.getRequest().setAttribute( "XSL.FilePath", file.getPath() );
+    job.getRequest().setAttribute( "MCRLayoutServlet.Input.FILE", file );
     
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
-    rd.forward( request, response );
+    rd.forward( job.getRequest(), job.getResponse() );
   }
 }
