@@ -1,5 +1,5 @@
 /*
- * CMSActionServlet.java
+ * WCMSActionServlet.java
  *
  * Created on 22. September 2003, 16:09
  */
@@ -15,22 +15,25 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.SequenceInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -45,21 +48,19 @@ import org.w3c.tidy.Tidy;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
-import org.apache.log4j.Logger;
-
 /**
  *
  * @author  m5brmi-sh, Thomas Scheffler (yagee)
  * @version
  */
 public class WCMSActionServlet extends WCMSServlet {
-    private Namespace ns = Namespace.XML_NAMESPACE;
+    private static final Namespace ns = Namespace.XML_NAMESPACE;
 
     /*Session, userDB*/
     private String userID = null; // UserID of the current user
     private String userRealName = null; // Name of the current user
     private String userClass = null; // Class which a current user belongs to {sysadmin, admin, editor, author}
-    private List rootNodes; // List of nodes under wich the current user can perform actions like add, edit and delete
+    private List rootNodes = null; // List of nodes under wich the current user can perform actions like add, edit and delete
 
     /*Session, WCMSChooseServlet*/
     private String href = null;
@@ -113,199 +114,18 @@ public class WCMSActionServlet extends WCMSServlet {
     File [] masterTemplates;
     
     static Logger logger = Logger.getLogger(WCMSActionServlet.class);
-
+    MCRSession mcrSession = null;
+    
     /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    	setReq(request);
+    	mcrSession = MCRSessionMgr.getCurrentSession();
+		setReq(request);
     	setResp(response);
-    	usedParser = "none";
-        sessionParam="final";
-    	MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
-        contentFileBackup = null;
-        naviFileBackup = null;
-        hrefFile = null;
-        error = href = labelPath = content = label = link = dir = null;
-        changeInfo = null;
-        masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
-        userID = (String)mcrSession.get("userID");
-        userClass = (String)mcrSession.get("userClass");
-        userRealName = (String)mcrSession.get("userRealName");
-        rootNodes = (List)mcrSession.get("rootNodes");
-        action = (String)mcrSession.get("action");
-        mode = (String)mcrSession.get("mode");
-        href = (String)mcrSession.get("href");
-        dir = (String)mcrSession.get("dir");
-        currentLang = (String)mcrSession.get("currentLang");
-        defaultLang = (String)mcrSession.get("defaultLang");
-        if ( mcrSession.get("addAtPosition")!= null)
-            addAtPosition = (String)mcrSession.get("addAtPosition");
-
-        target = request.getParameter("target");
-        style = request.getParameter("style");
-        label = request.getParameter("label");
-        content = request.getParameter("content");
-        //System.out.println("first in content value:"+content+"-----------------------------------------------------------------------------------------------");
-        contentCurrentLang = request.getParameter("content_currentLang");
-
-        //System.out.println("request.getParameter(codeValidationDisable) = "+request.getParameter("codeValidationDisable") +"........................................" );
-        /* code validation by JTidy */
-        if ( request.getParameter("codeValidationDisable") == null ) {        	
-        	logger.debug("Code validation using"+VALIDATOR);
-        	codeValidation(VALIDATOR);     	
-        }       	
-        /* END: code validation by JTidy */
-
-        currentLangLabel = request.getParameter("label_currentLang");
-
-        /*if (content != null ) {
-            if ( content.endsWith("\n") ) content = content.substring(0, content.length() - 2);
-        }*/
-
-        /* check for dynamic content bindings */
-        /* add */
-
-
-        if ( request.getParameter("dcbActionAdd") != null && !request.getParameter("dcbActionAdd").equals("")
-			&& request.getParameter("dcbValueAdd") != null && !request.getParameter("dcbValueAdd").equals("") ) {
-			dcbActionAdd = true;
-			dcbValueAdd = request.getParameter("dcbValueAdd");
-        }
-        else dcbActionAdd = false;
-        /* remove */
-		if ( request.getParameter("dcbActionDelete") != null && !request.getParameter("dcbActionDelete").equals("")
-			&& request.getParameter("dcbValueDelete") != null && !request.getParameter("dcbValueDelete").equals("") ) {
-			dcbActionDelete = true;
-			dcbValueDelete = request.getParameter("dcbValueDelete");
-		}
-		else dcbActionDelete = false;
-		/* END OF: check for dynamic content bindings */
-
-        if ( request.getParameter("href") != null)
-            link = request.getParameter("href"); //.toLowerCase();
-
-        changeInfo = request.getParameter("changeInfo");
-        if ( request.getParameter("delete") != null )
-            realyDel = request.getParameter("delete");
-        else realyDel = "";
-
-        labelPath = request.getParameter("labelPath");
-        replaceMenu = request.getParameter("replaceMenu");
-        if ( replaceMenu == null ) replaceMenu = "false";
-        masterTemplate = request.getParameter("masterTemplate");
-
-        fileName = href;
- /* -------------------------------------------------------------------- */
-
-        if ( action.equals("add") && mode.equals("intern") ) {
-            if ( link != null && !link.toLowerCase().endsWith(".xml") && !link.toLowerCase().endsWith(".html") ) link = link + ".xml";
-            fileName = href + link;
-            if( addAtPosition.equals("child") ) {
-		//implement here (add, intern, child)3
-                labelPath = labelPath + '/' +label;
-                if ( href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html") ) {
-                    fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
-                }
-            }
-            else {
-		//implement here (add, intern, predecessor, successor)1
-                labelPath = labelPath.substring(0, labelPath.indexOf('/')+1)+label;
-                href = getParentAttribute( naviFile, "href", href, "href", "dir" );
-                if ( href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html") ) {
-                    fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
-                }
-                else {
-                    fileName = href + link;
-                }
-                href = (String)mcrSession.get("href");
-            }
-        }
-
-        if ( action.equals("add") && mode.equals("extern") ) {
-            fileName = link;
-            if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
-                //fileName = "http://" + link;
-            	fileName = link;            	
-            }
-
-            if( addAtPosition.equals("child") ) {
-		//implement here (add, extern, child)4
-                labelPath = labelPath+ '/' +label;
-            }
-            else {
-		//implement here (add, extern, predecessor, successor)2
-                labelPath = labelPath.substring(0, labelPath.indexOf('/')+1)+label;
-            }
-        }
-
-        if ( action.equals("edit") && mode.equals("intern") ) {
-            //implement here (edit, intern)5
-        }
-
-        if ( action.equals("edit") && mode.equals("extern") ) {
-            //implement here (edit, extern)6
-            fileName = link;
-            if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
-                //fileName = "http://" + link;
-            	fileName = link;
-            }
-        }
-
-        if ( action.equals("delete") ) {
-            //implement here (delete)7
-        }
-
-        if ( action.equals("translate") ) label = currentLangLabel;
-
-/*-------------------------------------------------------------------*/
-
-        if (!dir.equals("false")) {
-            attribute = "dir";
-            avalue = (String)mcrSession.get("dir");
-        }
-
-        else {
-            attribute = "href";
-            avalue = href;
-        }
-
-        hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
-
-        /*---------------------- Variable Test Output -------------------------*/
-        //System.out.println("----- Variable Test Output ------");
-        //System.out.println("hrefFile: "+hrefFile);
-
-        //System.out.println("---------Session--------");
-        //System.out.println("userID: "+userID);
-        //System.out.println("userClass: "+userClass);
-        //System.out.println("rootNodes: "+rootNodes);
-        //System.out.println("action: "+action);
-        //System.out.println("mode: "+mode);
-        //System.out.println("href: "+href);
-        //System.out.println("defaultLang: "+defaultLang);
-        //System.out.println("currentLang: "+currentLang);
-        //System.out.println("currentLangLabel: "+currentLangLabel);
-        //System.out.println("---------Request--------");
-        //System.out.println("label: "+label);
-        //System.out.println("target: "+target);
-        //System.out.println("style: "+style);
-        //System.out.println("content: "+content);
-        //System.out.println("contentCurrentLang: "+contentCurrentLang);
-        //System.out.println("link: "+link);
-        //System.out.println("realy_delete: "+realyDel);
-        //System.out.println("fileName: "+fileName);
-        //System.out.println("labelPath: "+labelPath);
-        //System.out.println("---------Error--------");
-        //System.out.println("error: "+error);
-        //System.out.println("avalue: "+avalue);
-
-        //System.out.println("replaceMenu: "+replaceMenu);
-		//System.out.println("masterTemplate: "+masterTemplate);
-        /*---------------------------------------------------------------------*/
-
+    	initParam(getReq());
         if ( !realyDel.equals("false") ) {
             doItAll(hrefFile, action, mode, addAtPosition );
         }
@@ -317,9 +137,10 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void generateOutput(String error, String label, String fileName){
         try {
-        	MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
+        	//MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(naviFile);
+            Document doc = getXMLAsJDOM(naviFile);
+            //Document doc = builder.build(naviFile);
             Element root = doc.getRootElement();
             validate(root);
             Element rootOut = new Element("cms");
@@ -335,6 +156,7 @@ public class WCMSActionServlet extends WCMSServlet {
             rootOut.addContent(new Element("sessionID").setText(mcrSession.getID()));
             rootOut.addContent(new Element("userID").setText(userID));
             rootOut.addContent(new Element("userClass").setText(userClass));
+            //rootNodes Iterator used in case of action==delete && realyDel==false
             Iterator rootNodesIterator = rootNodes.iterator();
             while (rootNodesIterator.hasNext()) {
                 Element rootNode = (Element)rootNodesIterator.next();
@@ -455,25 +277,26 @@ public class WCMSActionServlet extends WCMSServlet {
         }
     }
 
-    public void updateFooter() {
+    public void updateFooterFile() {
         try {
             File footer = new File(super.CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             SAXBuilder builder = new SAXBuilder();
-            Document doc;
+            Document doc = new Document();
             if (!footer.exists()) {
                 footer.getParentFile().mkdirs();
-                doc = builder.build(footer);
+                doc = getXMLAsJDOM(footer);
                 Element root = doc.getRootElement();
                 //System.out.println("Footer gibts noch nicht.");
             }
-            else doc = builder.build(footer);
+            else doc = getXMLAsJDOM(footer);
             Element root = doc.getRootElement();
             root.setAttribute("date", getDate())
                 .setAttribute("time", getTime())
                 .setAttribute("labelPath", labelPath)
                 .setAttribute("lastEditor", userRealName);
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-            xmlout.output(doc, new FileOutputStream(footer));
+            writeJDOMDocumentToFile(doc, footer);
+            /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            xmlout.output(doc, new FileOutputStream(footer));*/
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -481,10 +304,10 @@ public class WCMSActionServlet extends WCMSServlet {
         }
     }
 
-    public void updateXMLFileFooter(File hrefFile) {
+    public void addLastModifiedToContent(File hrefFile) {
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(hrefFile);
+            Document doc = getXMLAsJDOM(hrefFile);
             Element root = doc.getRootElement();
             if (root.getChild("meta") != null){
                 if (root.getChild("meta").getChild("log") != null){
@@ -506,8 +329,9 @@ public class WCMSActionServlet extends WCMSServlet {
                                                   .setAttribute("lastEditor", userRealName));
                 root.addContent(meta);
             }
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-            xmlout.output(doc, new FileOutputStream(hrefFile));
+            writeJDOMDocumentToFile(doc, hrefFile);
+            /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            xmlout.output(doc, new FileOutputStream(hrefFile));*/
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -526,7 +350,7 @@ public class WCMSActionServlet extends WCMSServlet {
                 doc = new Document(new Element("loggings"));
                 //System.out.println("Logfile wurde unter"+logFile.toString()+"angelegt.");
             }
-            else doc = builder.build(logFile);
+            else doc = getXMLAsJDOM(logFile);
             Element root = doc.getRootElement();
             if (contentFileBackup == null) contentFileBackup = "";
             if (changeInfo == null) {
@@ -550,9 +374,9 @@ public class WCMSActionServlet extends WCMSServlet {
                    .addContent(new Element("note").setText(changeInfo));
                 root.addContent(log);
             }
-
-            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-            xmlout.output(doc, new FileOutputStream(logFile));
+            writeJDOMDocumentToFile(doc, logFile);
+            /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+            xmlout.output(doc, new FileOutputStream(logFile));*/
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -677,11 +501,11 @@ public class WCMSActionServlet extends WCMSServlet {
         return backupFile.toString();
     }
 
-    public void modify(File inputFile) {
+    public void modifyNavi(File inputFile) {
         if (action.equals("add")) {
             try {
                 SAXBuilder builder = new SAXBuilder();
-                Document doc = builder.build(inputFile);
+                Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
                 Element actElem = findActElem(root, attribute, avalue);
@@ -747,9 +571,9 @@ public class WCMSActionServlet extends WCMSServlet {
 				}
 				/* END OF: set */
 				/* END OF: dynamic content binding */
-
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                xmlout.output(doc, new FileOutputStream(inputFile));
+				writeJDOMDocumentToFile(doc, inputFile);
+                /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                xmlout.output(doc, new FileOutputStream(inputFile));*/
             }
             catch (Exception e) {}
         }
@@ -757,7 +581,7 @@ public class WCMSActionServlet extends WCMSServlet {
         if (action.equals("edit")) {
             try {
                 SAXBuilder builder = new SAXBuilder();
-                Document doc = builder.build(inputFile);
+                Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
                 actElem = findActElem(root, attribute, avalue);
@@ -825,25 +649,25 @@ public class WCMSActionServlet extends WCMSServlet {
 				}
                 /* END OF: remove */
 				/* END OF: dynamic content binding */
-
-                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                outputter.output(doc, new FileOutputStream(inputFile));
+				writeJDOMDocumentToFile(doc, inputFile);
+                /*XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                outputter.output(doc, new FileOutputStream(inputFile));*/
             }
             catch (Exception e) {}
         }
         if (action.equals("delete")) {
             try {
                 SAXBuilder builder = new SAXBuilder();
-                Document doc = builder.build(inputFile);
+                Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
                 actElem = findActElem(root, attribute, avalue);
                 fileName = ((Element)actElem.getParent()).getAttributeValue("href");
                 label = actElem.getChildText("label");
                 actElem.detach();
-
-                XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                outputter.output(doc, new FileOutputStream(inputFile));
+                writeJDOMDocumentToFile(doc, inputFile);
+                /*XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                outputter.output(doc, new FileOutputStream(inputFile));*/
             }
             catch (Exception e) {}
         }
@@ -851,7 +675,7 @@ public class WCMSActionServlet extends WCMSServlet {
         if (action.equals("translate")) {
             try {
                 SAXBuilder builder = new SAXBuilder();
-                Document doc = builder.build(inputFile);
+                Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
                 actElem = findActElem(root, attribute, avalue);
@@ -868,8 +692,9 @@ public class WCMSActionServlet extends WCMSServlet {
                 if (newEntry) {
                     actElem.addContent(new Element("label").setAttribute("lang", currentLang, ns).setText(label));
                 }
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                xmlout.output(doc, new FileOutputStream(inputFile));
+                writeJDOMDocumentToFile(doc, inputFile);
+                /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                xmlout.output(doc, new FileOutputStream(inputFile));*/
             }
             catch (Exception e) {}
         }
@@ -889,7 +714,7 @@ public class WCMSActionServlet extends WCMSServlet {
         String reval = "";
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(inputFile);
+            Document doc = getXMLAsJDOM(inputFile);
             Element root = doc.getRootElement();
             validate(root);
             actElem = findActElem(root, attribute, avalue);
@@ -912,26 +737,32 @@ public class WCMSActionServlet extends WCMSServlet {
         return reval;
     }
 
+    /**
+     * @param action
+     * @throws IOException
+     */
     public void makeAction( String action ) throws IOException {
         try {
 			if ( action.equals("add") ) {
 			    if ( mode.equals("intern") ) {
 			        if ( !hrefFile.exists() ) {
 			            hrefFile.getParentFile().mkdir();
-			            BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(hrefFile));
-			            StringBuffer output = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+			            //BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(hrefFile));
+			            StringBuffer head = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 							.append("<!DOCTYPE MyCoReWebPage>\n")
 							.append("<MyCoReWebPage>\n")
-							.append("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\">\n")
-							.append(content)
-							.append("\t</section>\n")
+							.append("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\">\n");
+						StringBuffer body = new StringBuffer(content);
+						StringBuffer tail = new StringBuffer("\t</section>\n")
 							.append("</MyCoReWebPage>\n");
-			            BufferedInputStream bi = new BufferedInputStream(
-								new ByteArrayInputStream(output.toString()
+			            BufferedInputStream bis = new BufferedInputStream(
+								new ByteArrayInputStream(((head).append(body).append(tail)).toString()
 										.getBytes("UTF-8")));
-			            MCRUtils.copyStream(bi,bo);
-			            bi.close();
-			            bo.close();
+			            Document doc = getXMLAsJDOM(bis);
+			            bis.close();
+			            writeJDOMDocumentToFile(doc, hrefFile);
+			            //MCRUtils.copyStream(bi,bo);
+			            //bo.close();
 			        }
 			        else {
 			            error = "Unter diesem Pfad existiert bereits ein File mit diesem Filename!";
@@ -1114,18 +945,29 @@ public class WCMSActionServlet extends WCMSServlet {
     }
 
     public void doItAll(File hrefFile, String action, String mode, String addAtPosition) throws IOException {
+    	// verify if html form was filled in correctly 
         if ( (checkInput()) == false ) {
             sessionParam = "action";
             generateOutput (error, label, fileName);
             return;
         }
+        // do backups
         if ( !action.equals("add") && mode.equals("intern") ) contentFileBackup = makeBackup(hrefFile);
         naviFileBackup = makeBackup(naviFile);
-        modify(naviFile);
+        //for testing
+        //test();
+        // update navigation base
+        modifyNavi(naviFile);
+        // update content page 
         makeAction(action);
-        if ( !action.equals("delete") && mode.equals("intern") ) updateXMLFileFooter(hrefFile);
-        updateFooter();
+
+//      update footer with
+        if ( !action.equals("delete") && mode.equals("intern") ) addLastModifiedToContent(hrefFile);
+        
+        updateFooterFile();
+        // update log file
         writeToLogFile(action, contentFileBackup);
+        // prepare xml container for MCRLayoutServlet   
         generateOutput(error, label, fileName);
     }
 
@@ -1141,6 +983,7 @@ public class WCMSActionServlet extends WCMSServlet {
 			tidy.setXHTML(true);
 			tidy.setInputEncoding(OUTPUT_ENCODING);
 			tidy.setOutputEncoding(OUTPUT_ENCODING);
+			tidy.setWord2000(true);
 			tidy.setPrintBodyOnly(true);
 			tidy.setIndentContent(true);
 			tidy.setForceOutput(true);
@@ -1180,6 +1023,7 @@ public class WCMSActionServlet extends WCMSServlet {
 			    tidyXML.setXmlOut(true);
 			    tidyXML.setInputEncoding("UTF-8");
 			    tidyXML.setOutputEncoding("UTF-8");
+			    tidyXML.setWord2000(true);
 				tidyXML.setIndentContent(true);	
 				tidyXML.setForceOutput(true);
 				tidyXML.setMakeClean(true);		
@@ -1241,22 +1085,498 @@ public class WCMSActionServlet extends WCMSServlet {
         return "Short description";
     }
     
+	/**
+	 * @param req
+	 */
 	public void setReq(HttpServletRequest req) {
 		this.request = req;
 	}
 	
+	/**
+	 * @return
+	 */
 	public HttpServletRequest getReq() {
 		return request;
 	}
 	
+	/**
+	 * @param resp
+	 */
 	public void setResp(HttpServletResponse resp) {
 		this.response = resp;
 	}
 	
+	/**
+	 * @return
+	 */
 	public HttpServletResponse getResp() {
 		return response;
 	}
 	
+	/* new methods */
+	//--------------
+	/**
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
+	public File getFile(String fileName) throws IOException, FileNotFoundException {
+		File loadFile = new File(fileName);
+		if (!loadFile.exists()) {
+			logger.debug("File \""+fileName+"\" don't exist.");
+			setFile(fileName);
+			//or maybe better loadFile = setFile(fileName);
+			//and setting return type of setFile method to File
+			//???
+			getFile(fileName);
+		}
+		else {
+			if (!loadFile.isFile()) {
+				logger.debug("File \""+fileName+"\" is no valid File.");
+			}
+			else {
+				if(!loadFile.canRead()) {
+					logger.debug("File \""+fileName+"\" can't be read.");
+				}
+				if(!loadFile.canWrite()) {
+					logger.debug("File \""+fileName+"\" can't be written to.");
+				}
+			}
+		}
+		return loadFile;
+	}
+	
+	/**
+	 * @param fileName
+	 * @throws IOException
+	 */
+	public void setFile(String fileName) throws IOException{
+		File newFile = new File(fileName);
+		newFile.createNewFile();
+		logger.debug("New file \""+fileName+"\" created.");
+	}
+	
+	/**
+	 * @param xmlSource - any source that contains xml-valid content
+	 * @return JDOM Document
+	 */
+	public Document getXMLAsJDOM(Object xmlSource) {
+		SAXBuilder builder = new SAXBuilder();
+		Document jdomDoc = new Document();
+		try {
+			if (xmlSource instanceof String) {
+				jdomDoc = builder.build(new ByteArrayInputStream(((String)xmlSource).getBytes("UTF-8")));
+			}
+			if (xmlSource instanceof File) {
+				jdomDoc = builder.build((File)xmlSource);
+			}
+			/*if (xmlSource instanceof InputSource) {
+				jdomDoc = builder.build((InputSource)xmlSource);
+			}*/
+			if (xmlSource instanceof InputStream) {
+				jdomDoc = builder.build((InputStream)xmlSource);
+			}
+			/*if (xmlSource instanceof Reader) {
+				jdomDoc = builder.build((Reader)xmlSource);
+			}*/
+			if (xmlSource instanceof URL) {
+				jdomDoc = builder.build((URL)xmlSource);
+			}
+		} catch (JDOMException e) {
+			logger.debug("JDOM warning: Source is not a valid XML Document.");
+			jdomDoc = validateSource(xmlSource);
+		} catch (IOException e) {
+			logger.debug("IO error: File \""+xmlSource+"\" can't be parsed as JDOM.");
+			e.printStackTrace();
+		}
+		return jdomDoc;
+	}
+	
+	/*private class MyInputStream extends InputStream
+	{
+		private InputStream istream;
+		private int state = 0;
+		private InputStream tag1Stream;
+		private InputStream tag2Stream;
+
+		public MyInputStream (InputStream istream, String tag1, String tag2)
+		{
+			this.istream = istream;
+			tag1Stream = new ByteArrayInputStream (tag1.getBytes());
+			tag2Stream = new ByteArrayInputStream (tag2.getBytes());
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.io.InputStream#read()
+		 */
+		/*public int read() throws IOException
+		{
+			try {
+				switch (state)
+				{
+				case 0:
+					return tag1Stream.read ();
+				case 1:
+					return istream.read ();
+				case 2:
+					return tag2Stream.read ();
+				}
+			}
+			catch (EOFException e) {
+				if ( (state==0) || (state==1) ) {
+					++state;
+					return read ();
+				}
+				else
+					throw e;
+			}
+			
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		
+		
+	};*/
+
+	
+	/**
+	 * @param xmlSource
+	 * @return
+	 */
+	public Document validateSource(Object xmlSource) {
+		logger.debug("Trying to build a valid XHTML/XML Document from Source using JTidy.");
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		/* Construct a new JTidy object and get Configuration |
+		 * ---------------------------------------------------+
+		 * At first, allways try to parse the Document as XHTML.
+		 * Only if an unknown Element is found and JTidy wants to discard it,
+		 * the Output format is set to XML. */
+		Tidy tidy = new Tidy();
+		tidy = getTidyConfig(tidy, "xhtml");
+		tidy.setErrout(pw);
+		BufferedInputStream bis = null;
+		ByteArrayInputStream beginTag = new ByteArrayInputStream("<dummyRoot>".getBytes());
+		ByteArrayInputStream endTag = new ByteArrayInputStream("</dummyRoot>".getBytes());
+		ByteArrayInputStream bais = null;
+		Document jdomDoc = null;
+		try {
+			if (xmlSource != null) {
+				if (xmlSource instanceof String) {
+					System.out.println("String");
+					//bis = new BufferedInputStream(new ByteArrayInputStream(((String)xmlSource).getBytes("UTF-8")));
+					bais = new ByteArrayInputStream(((String)xmlSource).getBytes("UTF-8"));
+				}
+				if (xmlSource instanceof File) {
+					System.out.println("File");
+					//bis = new BufferedInputStream(new FileInputStream((File)xmlSource));
+					bis = new BufferedInputStream(new FileInputStream((File)xmlSource));
+				}
+				/*if (xmlSource instanceof InputSource) {//check this later
+					System.out.println("InputSource");
+					bis = new BufferedInputStream(((InputSource)xmlSource).getByteStream());
+				}*/
+				if (xmlSource instanceof InputStream) {//
+					System.out.println("InputStream");
+					bis = new BufferedInputStream((InputStream)xmlSource);
+				}
+				/*if (xmlSource instanceof Reader) {//check this later
+					System.out.println("Reader");
+					bis = new BufferedInputStream(new ByteArrayInputStream(((Reader)xmlSource).toString().getBytes("UTF-8")));
+				}
+				if (xmlSource instanceof URL) {
+					System.out.println("URL");
+					//bis = new BufferedInputStream(((URL)xmlSource).openStream());
+					bis = new BufferedInputStream( new ByteArrayInputStream(new String(((URL)xmlSource).getContent().toString()).getBytes("UTF-8")));
+				}*/
+			}
+			SequenceInputStream sis = new SequenceInputStream(new SequenceInputStream(beginTag, bais), endTag);
+			System.out.println("---begin parsing---");
+			ByteArrayOutputStream baisCopy = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			MCRUtils.copyStream(sis, baisCopy);
+			bais.close();
+			sis.close();
+			tidy.parse(new ByteArrayInputStream(baisCopy.toByteArray()), baos);
+			pw.flush();
+			pw.close();
+			System.out.println(pw);
+			if (sw.toString().indexOf("is not recognized!") != -1 && sw.toString().indexOf("Warning: discarding unexpected") != -1) {
+				System.out.println("Parsing Document as XML");
+				tidy = new Tidy();
+				tidy = getTidyConfig(tidy, "xml");
+				baos.reset();
+				tidy.parse(new ByteArrayInputStream(baisCopy.toByteArray()), baos);
+			}
+			SAXBuilder builder = new SAXBuilder();
+			baos.flush();
+			System.out.println ("jdom = " + baos.toByteArray().toString());
+			jdomDoc = builder.build(new ByteArrayInputStream(baos.toByteArray()));
+			baos.flush();
+			baos.close();
+			System.out.println("---parsing ended---");	
+				
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JDOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("jdomDoc erzeugt");
+		return jdomDoc;
+	}
+	
+	/**
+	 * @param tidy
+	 * @param outputFormat
+	 * @return
+	 */
+	public Tidy getTidyConfig(Tidy tidy, String outputFormat) {
+		if (outputFormat.equals("xhtml")) {
+			logger.debug("Parsing Document using JTidy. Output as XHTML.");
+			tidy.setXHTML(true);
+			tidy.setPrintBodyOnly(true);
+		}
+		else {
+			logger.debug("Parsing Document using JTidy. Output as well-formed XML.");
+			tidy.setXmlOut(true);
+			tidy.setXmlTags(true);
+		}
+		tidy.setInputEncoding(OUTPUT_ENCODING);
+		tidy.setOutputEncoding(OUTPUT_ENCODING);
+		tidy.setWord2000(true);
+		tidy.setIndentContent(true);
+		tidy.setForceOutput(true);
+		tidy.setMakeClean(true);
+		tidy.setMakeBare(true);
+		tidy.setQuoteAmpersand(true);
+		tidy.setQuoteMarks(true);
+		tidy.setQuoteNbsp(true);  			
+		return tidy;
+	}
+	
+	/**
+	 * @param request
+	 */
+	public void initParam(HttpServletRequest request) {
+    	usedParser = "none";
+        sessionParam="final";
+        contentFileBackup = null;
+        naviFileBackup = null;
+        hrefFile = null;
+        error = href = labelPath = content = label = link = dir = null;
+        changeInfo = null;
+        masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath")+"master/".replace('/', File.separatorChar)).listFiles();
+        userID = (String)mcrSession.get("userID");
+        userClass = (String)mcrSession.get("userClass");
+        userRealName = (String)mcrSession.get("userRealName");
+        rootNodes = (List)mcrSession.get("rootNodes");
+        action = (String)mcrSession.get("action");
+        mode = (String)mcrSession.get("mode");
+        href = (String)mcrSession.get("href");
+        dir = (String)mcrSession.get("dir");
+        currentLang = (String)mcrSession.get("currentLang");
+        defaultLang = (String)mcrSession.get("defaultLang");
+        if ( mcrSession.get("addAtPosition")!= null)
+        	addAtPosition = (String)mcrSession.get("addAtPosition");
+
+        target = request.getParameter("target");
+        style = request.getParameter("style");
+        label = request.getParameter("label");
+        content = request.getParameter("content");
+        contentCurrentLang = request.getParameter("content_currentLang");
+        /* code validation by JTidy */
+        if ( request.getParameter("codeValidationDisable") == null ) {        	
+        	logger.debug("Code validation using"+VALIDATOR);
+        	codeValidation(VALIDATOR);     	
+        }       	
+        /* END: code validation by JTidy */
+
+        currentLangLabel = request.getParameter("label_currentLang");
+
+        /*if (content != null ) {
+            if ( content.endsWith("\n") ) content = content.substring(0, content.length() - 2);
+        }*/
+
+        /* check for dynamic content bindings */
+        /* add */
+
+
+        if ( request.getParameter("dcbActionAdd") != null && !request.getParameter("dcbActionAdd").equals("")
+			&& request.getParameter("dcbValueAdd") != null && !request.getParameter("dcbValueAdd").equals("") ) {
+			dcbActionAdd = true;
+			dcbValueAdd = request.getParameter("dcbValueAdd");
+        }
+        else dcbActionAdd = false;
+        /* remove */
+		if ( request.getParameter("dcbActionDelete") != null && !request.getParameter("dcbActionDelete").equals("")
+			&& request.getParameter("dcbValueDelete") != null && !request.getParameter("dcbValueDelete").equals("") ) {
+			dcbActionDelete = true;
+			dcbValueDelete = request.getParameter("dcbValueDelete");
+		}
+		else dcbActionDelete = false;
+		/* END OF: check for dynamic content bindings */
+
+        if ( request.getParameter("href") != null)
+            link = request.getParameter("href"); //.toLowerCase();
+
+        changeInfo = request.getParameter("changeInfo");
+        if ( request.getParameter("delete") != null )
+            realyDel = request.getParameter("delete");
+        else realyDel = "";
+
+        labelPath = request.getParameter("labelPath");
+        replaceMenu = request.getParameter("replaceMenu");
+        if ( replaceMenu == null ) replaceMenu = "false";
+        masterTemplate = request.getParameter("masterTemplate");
+
+        fileName = href;
+ /* -------------------------------------------------------------------- */
+        if ( action.equals("add") && mode.equals("intern") ) {
+            if ( link != null && !link.toLowerCase().endsWith(".xml") && !link.toLowerCase().endsWith(".html") ) link = link + ".xml";
+            fileName = href + link;
+            if( addAtPosition.equals("child") ) {
+		//implement here (add, intern, child)3
+                labelPath = labelPath + '/' +label;
+                if ( href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html") ) {
+                    fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
+                }
+            }
+            else {
+		//implement here (add, intern, predecessor, successor)1
+                labelPath = labelPath.substring(0, labelPath.indexOf('/')+1)+label;
+                href = getParentAttribute( naviFile, "href", href, "href", "dir" );
+                if ( href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html") ) {
+                    fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
+                }
+                else {
+                    fileName = href + link;
+                }
+                href = (String)mcrSession.get("href");
+            }
+        }
+
+        if ( action.equals("add") && mode.equals("extern") ) {
+            fileName = link;
+            if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
+                //fileName = "http://" + link;
+            	fileName = link;            	
+            }
+
+            if( addAtPosition.equals("child") ) {
+		//implement here (add, extern, child)4
+                labelPath = labelPath+ '/' +label;
+            }
+            else {
+		//implement here (add, extern, predecessor, successor)2
+                labelPath = labelPath.substring(0, labelPath.indexOf('/')+1)+label;
+            }
+        }
+
+        if ( action.equals("edit") && mode.equals("intern") ) {
+            //implement here (edit, intern)5
+        }
+
+        if ( action.equals("edit") && mode.equals("extern") ) {
+            //implement here (edit, extern)6
+            fileName = link;
+            if ( !(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:")) ) {
+                //fileName = "http://" + link;
+            	fileName = link;
+            }
+        }
+
+        if ( action.equals("delete") ) {
+            //implement here (delete)7
+        }
+
+        if ( action.equals("translate") ) label = currentLangLabel;
+
+/*-------------------------------------------------------------------*/
+
+        if (!dir.equals("false")) {
+            attribute = "dir";
+            avalue = (String)mcrSession.get("dir");
+        }
+
+        else {
+            attribute = "href";
+            avalue = href;
+        }
+
+        hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
+
+        /*---------------------- Variable Test Output -------------------------*/
+        //System.out.println("----- Variable Test Output ------");
+        //System.out.println("hrefFile: "+hrefFile);
+
+        //System.out.println("---------Session--------");
+        //System.out.println("userID: "+userID);
+        //System.out.println("userClass: "+userClass);
+        //System.out.println("rootNodes: "+rootNodes);
+        //System.out.println("action: "+action);
+        //System.out.println("mode: "+mode);
+        //System.out.println("href: "+href);
+        //System.out.println("defaultLang: "+defaultLang);
+        //System.out.println("currentLang: "+currentLang);
+        //System.out.println("currentLangLabel: "+currentLangLabel);
+        //System.out.println("---------Request--------");
+        //System.out.println("label: "+label);
+        //System.out.println("target: "+target);
+        //System.out.println("style: "+style);
+        //System.out.println("content: "+content);
+        //System.out.println("contentCurrentLang: "+contentCurrentLang);
+        //System.out.println("link: "+link);
+        //System.out.println("realy_delete: "+realyDel);
+        //System.out.println("fileName: "+fileName);
+        //System.out.println("labelPath: "+labelPath);
+        //System.out.println("---------Error--------");
+        //System.out.println("error: "+error);
+        //System.out.println("avalue: "+avalue);
+
+        //System.out.println("replaceMenu: "+replaceMenu);
+		//System.out.println("masterTemplate: "+masterTemplate);
+        /*---------------------------------------------------------------------*/
+	}
+	
+	/**
+	 * @param jdomDoc - JDOM Document
+	 * @param xmlFile - File the Document is written to.
+	 */
+	public void writeJDOMDocumentToFile(Document jdomDoc, File xmlFile) throws IOException, FileNotFoundException {
+		XMLOutputter xmlOut = new XMLOutputter();
+		xmlOut.output(jdomDoc, new FileOutputStream(xmlFile));
+	}
+	
+	/**
+	 * 
+	 */
+	public void test() throws IOException, FileNotFoundException {
+		Document jdomDoc = getXMLAsJDOM(content);
+		//Document jdomDoc2 = getXMLAsJDOM(getFile("c:\\test.xml"));
+		//Document jdomDoc3 = getXMLAsJDOM(new URL("http://java.sun.com/j2se/1.3/docs/api/java/net/URL.html"));
+		writeJDOMDocumentToFile(jdomDoc, getFile("C:\\test_string.xml"));
+		//writeJDOMDocumentToFile(jdomDoc2, getFile("C:\\test_file.xml"));
+		//writeJDOMDocumentToFile(jdomDoc3, getFile("C:\\test_url.xml"));
+	}
+	//-----------------------
+	/* END OF: new methods */
+	
+	/**
+	 * @author m5brmi-s
+	 *
+	 * TODO To change the template for this generated type comment go to
+	 * Window - Preferences - Java - Code Style - Code Templates
+	 */
 	public static class ResolveDTD implements EntityResolver {
 		public InputSource resolveEntity(String publicId, String systemId) {
 			return new InputSource(new StringReader(" "));
