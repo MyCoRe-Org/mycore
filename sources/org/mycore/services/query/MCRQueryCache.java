@@ -94,7 +94,7 @@ public class MCRQueryCache {
 		timePassed*=1000;
 		timePassed_cl=config.getLong("MCR.query_cache_time_class",5*60*60);
 		timePassed_cl*=1000;
-		jdom=new Document();
+		jdom=new Document(new Element("root"));
 		comm= new MCRServletCommunication();
 		initialized=true;
 		logger.info("MCRQueryCache initialized!");
