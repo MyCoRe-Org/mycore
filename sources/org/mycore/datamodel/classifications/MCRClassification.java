@@ -451,5 +451,14 @@ private ArrayList cat;
     return cat.getID();
     }
 
+ /**
+   * The method returns all availiable classification ID's they are loaded.
+   *
+   * @return a list of classification ID's as String array
+   **/
+  public static final String [] getAllClassificationID()
+    { 
+    return (MCRClassificationItem.manager()).getAllClassificationID();
+    }
   }
 
