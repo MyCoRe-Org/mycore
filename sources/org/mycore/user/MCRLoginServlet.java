@@ -61,6 +61,7 @@ public class MCRLoginServlet extends MCRServlet
   /** Initialisation of the servlet */
   public void init()
   {
+    super.init();
     MCRConfiguration.instance().reload(true);
     config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
