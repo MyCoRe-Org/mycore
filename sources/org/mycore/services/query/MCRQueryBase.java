@@ -30,6 +30,7 @@ import org.jdom.Namespace;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.ifs.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -56,6 +57,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 
 	protected static String NL =
 		new String((System.getProperties()).getProperty("line.separator"));
+
 	// protected data
 	protected int maxres = 0;
 	protected int maxresults = 0;
@@ -65,6 +67,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	protected ArrayList andor = null;
 	protected String root = null;
 	protected MCRXMLTableManager xmltable = null;
+	protected MCRTextSearchInterface [] tsint = null;
 
 	/**
 	 * The Constructor
@@ -76,6 +79,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		logger.info(
 			"The maximum of the results is " + Integer.toString(maxres));
 		xmltable = MCRXMLTableManager.instance();
+System.out.println("########################");
+		tsint = MCRContentStoreFactory.getAllIndexables();
+System.out.println("########################");
 	}
 
 	/**
@@ -113,14 +119,14 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			}
 			m = query.indexOf("[", l);
 			if (m == -1) {
-				throwQueryEx();
+				throw new MCRPersistenceException("Error while analyze the query string.");
 			}
 			if (root == null) {
 				root = query.substring(l, m);
 			}
 			n = query.indexOf("]", m);
 			if (n == -1) {
-				throwQueryEx();
+				throw new MCRPersistenceException("Error while analyze the query string.");
 			}
 			kon = 1;
 			for (int o = m + 1; o < n; o++) {
@@ -131,7 +137,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			for (int o = kon; o > 1; o--) {
 				n = query.indexOf("]", n + 1);
 				if (n == -1) {
-					throwQueryEx();
+					throw new MCRPersistenceException("Error while analyze the query string.");
 				}
 			}
 			flags.add(Boolean.FALSE);
@@ -213,12 +219,13 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		}
 		return result;
 	}
+
 	/**
 	 * returns the ObjectID of the Object containing derivate with given ID
 	 * @param DerivateID ID of Derivate
 	 * @return ObjectID if found, else null
 	 */
-	public String getObjectID(String DerivateID) {
+	public MCRObjectID getObjectID(String DerivateID) {
 		StringBuffer query =
 			new StringBuffer("/mycorederivate[@ID=\"").append(
 				DerivateID).append(
@@ -236,106 +243,50 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 					.getAttributeValue(
 						"href",
 						Namespace.getNamespace("http://www.w3.org/1999/xlink"));
-			return objectID;
+			return (new MCRObjectID(objectID));
 		}
 		return null;
 	}
 
 	/**
-	 * returns XMLContainer containing mycoreobject related do DerivateID
-	 * @param DerivateID
-	 * @return XMLContainer with MyCoreObject, null if nothing found
-	 */
-	public MCRXMLContainer getObjectForDerivate(String DerivateID) {
-		String ObjectID = getObjectID(DerivateID);
-		if (ObjectID != null) {
-			StringBuffer query =
-				new StringBuffer("/mycoreobject[@ID=\"").append(
-					ObjectID).append(
-					"\"]");
-			return getResultList(query.toString(), "document", 1);
-		}
-		return null;
-	}
-
-	/**
-	 * merges to XMLContainer after specific rules
-	 * @see #COMMAND_OR
-	 * @see #COMMAND_AND
-	 * @see #COMMAND_XOR
-	 * @param result1 1st MCRXMLContainer to be merged
-	 * @param result2 2nd MCRXMLContainer to be merged
-	 * @param operation available COMMAND_XYZ
-	 * @return merged ResultSet
-	 */
-	public MCRXMLContainer mergeResults(
-		MCRXMLContainer result1,
-		MCRXMLContainer result2,
-		char operation) {
-		MCRXMLContainer merged = new MCRXMLContainer();
-		Hashtable contents1 = new Hashtable(), contents2 = new Hashtable();
-		for (int i = 0; i < result1.size(); i++)
-			contents1.put(
-				result1.getId(i),
-				result1.exportElementToContainer(i));
-		for (int i = 0; i < result2.size(); i++)
-			contents2.put(
-				result2.getId(i),
-				result2.exportElementToContainer(i));
-		String id;
-		Hashtable mergedT;
-		switch (operation) {
-			case COMMAND_OR :
-				mergedT = new Hashtable();
-				mergedT.putAll((Map) result1);
-				mergedT.putAll((Map) result2);
-				for (Iterator it = mergedT.values().iterator(); it.hasNext();)
-					merged.importElements((MCRXMLContainer) it.next());
-				break;
-			case COMMAND_AND :
-				for (Enumeration enum = contents1.keys();
-					enum.hasMoreElements();
-					) {
-					id = (String) enum.nextElement();
-					if (contents2.containsKey(id))
-						merged.importElements(
-							(MCRXMLContainer) contents2.get(id));
-				}
-				break;
-			case COMMAND_XOR :
-				mergedT = new Hashtable();
-				for (Enumeration enum = contents1.keys();
-					enum.hasMoreElements();
-					) {
-					id = (String) enum.nextElement();
-					if (!contents2.containsKey(id))
-						mergedT.put(id, contents1.get(id));
-				}
-				for (Enumeration enum = contents2.keys();
-					enum.hasMoreElements();
-					) {
-					id = (String) enum.nextElement();
-					if (!contents1.containsKey(id) && !mergedT.contains(id))
-						mergedT.put(id, contents2.get(id));
-				}
-				for (Iterator it = mergedT.values().iterator(); it.hasNext();)
-					merged.importElements((MCRXMLContainer) it.next());
-				break;
-			default :
-				throw new IllegalArgumentException(
-					"operation not permited: " + operation);
-		}
-		return merged;
-	}
-
-	/**
-	 * Throw a MCRPersiteceException when the query is corrupt.
+	 * This method merge two ArrayList of MCRObjectID's to one output based on AND.
 	 *
-	 * @exception if this method would called
+	 * @param in1 a ArrayList of MCRObjectID
+	 * @param in2 a ArrayList of MCRObjectID
+	 * @return a with AND merged ArrayList
 	 **/
-	protected void throwQueryEx() throws MCRPersistenceException {
-		throw new MCRPersistenceException("Error while analyze the query string.");
-	}
+	protected ArrayList mergeWithAnd(ArrayList in1, ArrayList in2)
+	  {
+	  ArrayList out = new ArrayList();
+	  for (int i=0;i<in1.size();i++) {
+	    if (in2.contains(in1.get(i))) { out.add(in1.get(i)); }
+	    }
+	  return out;
+	  }
+  
+	/**
+	 * This method take a n ArrayList of MCRObjectID's and put the coresponding XML in a
+	 * MCRResultContainer. If the method can not find a coresponding XML, nothing will be add
+	 * for this MCRObjectID.
+	 *
+	 * @param list	the list of MCRObjectID's
+	 * @return a MCRResultContainer
+	 **/
+	protected MCRXMLContainer createResultContainer(ArrayList list)
+	  {
+	  MCRXMLContainer result = new MCRXMLContainer();
+          if (list==null) { return result; }
+	  for (int i=0;i<list.size();i++) {
+	    try {
+	      MCRObjectID s = (MCRObjectID)list.get(i);
+	      byte[] xml = xmltable.retrieve(s.getTypeId(),s);
+	      result.add( "local", s.getId() , 0, xml);
+	      }
+	    catch (Exception e) { }
+	    }
+	  return result;
+	  }
+    
 	/**
 	 * This method start the Query over one object type and return the
 	 * result as MCRXMLContainer. This implementation must be overwrite with

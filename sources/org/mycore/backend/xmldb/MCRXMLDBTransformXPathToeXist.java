@@ -68,52 +68,61 @@ public MCRXMLDBTransformXPathToeXist() {
  **/
 protected final MCRXMLContainer startQuery( String type ) {
   MCRXMLContainer result = new MCRXMLContainer();
-  // Mark all document searches
-  for (int i=0;i<subqueries.size();i++) {
-    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1)
-      flags.set(i,Boolean.TRUE);
-    }
-  // prepare the query over the metadata
-  String query = handleQueryString(type);
-  logger.debug("Transformed query : "+query);
-  // do it over the metadata
-  try {
-    Collection collection = MCRXMLDBConnectionPool.instance().getConnection( type );
-    XPathQueryService xps =
-      (XPathQueryService)collection.getService( "XPathQueryService", "1.0" );
-	    
-    MCRXMLDBConnectionPool.instance().releaseConnection( collection );
-    ResourceSet resultset = xps.query( query );
-    logger.debug("Results: "+Integer.toString((int)resultset.getSize()));
+  boolean hasts = false;
+  boolean hasmeta = false;
 
-    String objid = "";
-    org.jdom.Document doc;
-    ResourceIterator ri = resultset.getIterator();
-    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-    while( ri.hasMoreResources() ) {
-      XMLResource xmldoc = (XMLResource)ri.nextResource();
-      doc = MCRXMLDBPersistence.convertResToDoc( xmldoc );
-      objid =  doc.getRootElement().getAttribute( "ID" ).getValue();
-      try {
-        byte[] xml = xmltable.retrieve(type,new MCRObjectID(objid));
-        result.add( "local", objid, 0, xml); 
-        }
-      catch (Exception e) {
-        logger.debug(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
-        result.add( "local", objid, 0, doc.getRootElement());
+  // Make all document searches
+  java.util.ArrayList idts = new java.util.ArrayList();
+  for (int i=0;i<subqueries.size();i++) {
+    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
+      hasts = true;
+      flags.set(i,Boolean.TRUE);
+      logger.debug("TextSearch query : "+(String)subqueries.get(i));
+      // start the query against the textsearch
+      for (int j = 0; j<tsint.length;j++) {
+        String [] der = tsint[j].getDerivateIDs((String)subqueries.get(i));
+        for (int k=0;k<der.length;k++) { idts.add(getObjectID(der[k])); }
         }
       }
     }
-  catch( Exception e ) {
-    throw new MCRPersistenceException( e.getMessage(), e ); }
-  finally {
+
+  // prepare the query over the rest of the metadata
+  java.util.ArrayList idmeta = new java.util.ArrayList();
+  String query = handleQueryString(type);
+  logger.debug("Transformed query : "+query);
+  // do it over the metadata
+  if (query.length()!=0) {
+    hasmeta = true;
     try {
+     Collection collection = MCRXMLDBConnectionPool.instance().getConnection( type );
+      XPathQueryService xps =
+        (XPathQueryService)collection.getService( "XPathQueryService", "1.0" );
+	    
+      MCRXMLDBConnectionPool.instance().releaseConnection( collection );
+      ResourceSet resultset = xps.query( query );
+      logger.debug("Results: "+Integer.toString((int)resultset.getSize()));
+
+      org.jdom.Document doc;
+      ResourceIterator ri = resultset.getIterator();
+      MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+      while( ri.hasMoreResources() ) {
+        XMLResource xmldoc = (XMLResource)ri.nextResource();
+        doc = MCRXMLDBPersistence.convertResToDoc( xmldoc );
+        idmeta.add(new MCRObjectID(doc.getRootElement().getAttribute( "ID" ).getValue()));
+        }
       }
     catch( Exception e ) {
       throw new MCRPersistenceException( e.getMessage(), e ); }
     }
-  // Here you can add other searches and merge the result container with
-  // them from the first query.
+  
+  // merge the results
+  java.util.ArrayList myresult = null;
+  if (!hasts) { myresult = idmeta; }
+  if (!hasmeta) { myresult = idts; }
+  if ((hasts) && (hasmeta)) { myresult = mergeWithAnd(idts,idmeta); }
+
+  // put the XML files in the result container
+  result = createResultContainer(myresult);
   return result;
   }
 
@@ -130,7 +139,7 @@ private String handleQueryString(String type) {
     flags.set(i,Boolean.TRUE);
     }
   logger.debug("Incomming condition : "+qsb.toString());
-  if ( database.equals( "exist" ) )
+  if ( database.equals( "exist" ) && (qsb.length()!=0) )
     return handleQueryStringExist(qsb.toString().trim(),type);
   return qsb.toString();
   }

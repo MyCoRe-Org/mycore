@@ -25,6 +25,7 @@
 package org.mycore.services.query;
 
 import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This interface is designed to choose the tranformer from XQuery to
@@ -57,30 +58,9 @@ public MCRXMLContainer getResultList(String query, String type,
 /**
  * returns the ObjectID of the Object containing derivate with given ID
  * @param DerivateID ID of Derivate
- * @return ObjectID
+ * @return MCRObjectID of data objects
  */
-public String getObjectID(String DerivateID);
+public MCRObjectID getObjectID(String DerivateID);
 
-/**
- * returns XMLContainer containing mycoreobject related do DerivateID
- * @param DerivateID
- * @return
- */
-public MCRXMLContainer getObjectForDerivate(String DerivateID);
-
-/**
- * merges to XMLContainer after specific rules
- * @see #COMMAND_OR
- * @see #COMMAND_AND
- * @see #COMMAND_XOR
- * @param result1 1st MCRXMLContainer to be merged
- * @param result2 2nd MCRXMLContainer to be merged
- * @param operation available COMMAND_XYZ
- * @return merged ResultSet
- */
-public MCRXMLContainer mergeResults(
-	MCRXMLContainer result1,
-	MCRXMLContainer result2,
-	char operation);
 }
 
