@@ -24,9 +24,16 @@
 
 package org.mycore.services.nbn;
 
-import java.util.*;
-import java.text.*;
-import org.mycore.common.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Properties;
+import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.services.nbn.MCRNBNManager;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Represents a "National Bibliographic Name" URN that is
@@ -41,101 +48,118 @@ import org.mycore.common.*;
  * @author Werner Greﬂhoff
  * @version $Revision$ $Date$
  */
-public class MCRNBN
-{
-  /** The URN prefix, that is the part of the URN before the NISS */
-  protected static String prefix;  
+public class MCRNBN {
+	
+	/** Logger */
+	static Logger logger = Logger.getLogger(MCRNBN.class);
+	
+	private static MCRConfiguration config;
+	
+	/** The persistence interface */
+	private static MCRNBNManager manager;
+	
+	/** The URN prefix, that is the part of the URN before the NISS */
+	protected static String prefix;  
  
-  /** The last URN that has been created */
-  protected static String last;
+	/** The last URN that has been created */
+	protected static String last;
 
-  /** The table of character codes for calculating the URN checksum */
-  protected static Properties codes;
+	/** The table of character codes for calculating the URN checksum */
+	protected static Properties codes;
 
-  /** Initializes the class */
-  static
-  {
-    prefix = MCRConfiguration.instance().getString( "MCR.NBN.NamespacePrefix" );
-    
-    codes = new Properties();
-    codes.put( "0",  "1" );
-    codes.put( "1",  "2" );
-    codes.put( "2",  "3" );
-    codes.put( "3",  "4" );
-    codes.put( "4",  "5" );
-    codes.put( "5",  "6" );
-    codes.put( "6",  "7" );
-    codes.put( "7",  "8" );
-    codes.put( "8",  "9" );
-    codes.put( "9", "41" );
-    codes.put( "a", "18" );
-    codes.put( "b", "14" );
-    codes.put( "c", "19" );
-    codes.put( "d", "15" );
-    codes.put( "e", "16" );
-    codes.put( "f", "21" );
-    codes.put( "g", "22" );
-    codes.put( "h", "23" );
-    codes.put( "i", "24" );
-    codes.put( "j", "25" );
-    codes.put( "k", "42" );
-    codes.put( "l", "26" );
-    codes.put( "m", "27" );
-    codes.put( "n", "13" );
-    codes.put( "o", "28" );
-    codes.put( "p", "29" );
-    codes.put( "q", "31" );
-    codes.put( "r", "12" );
-    codes.put( "s", "32" );
-    codes.put( "t", "33" );
-    codes.put( "u", "11" );
-    codes.put( "v", "34" );
-    codes.put( "w", "35" );
-    codes.put( "x", "36" );
-    codes.put( "y", "37" );
-    codes.put( "z", "38" );
-    codes.put( "-", "39" );
-    codes.put( ":", "17" );
-  }
+	/** Initializes the class */
+	static {
+		MCRConfiguration.instance().reload(true);
+		config = MCRConfiguration.instance();
+    	PropertyConfigurator.configure(config.getLoggingProperties());
+    	
+		codes = new Properties();
+		codes.put( "0",  "1" );
+		codes.put( "1",  "2" );
+		codes.put( "2",  "3" );
+		codes.put( "3",  "4" );
+		codes.put( "4",  "5" );
+		codes.put( "5",  "6" );
+		codes.put( "6",  "7" );
+		codes.put( "7",  "8" );
+		codes.put( "8",  "9" );
+		codes.put( "9", "41" );
+		codes.put( "a", "18" );
+		codes.put( "b", "14" );
+		codes.put( "c", "19" );
+		codes.put( "d", "15" );
+		codes.put( "e", "16" );
+		codes.put( "f", "21" );
+		codes.put( "g", "22" );
+		codes.put( "h", "23" );
+		codes.put( "i", "24" );
+		codes.put( "j", "25" );
+		codes.put( "k", "42" );
+		codes.put( "l", "26" );
+		codes.put( "m", "27" );
+		codes.put( "n", "13" );
+		codes.put( "o", "28" );
+		codes.put( "p", "29" );
+		codes.put( "q", "31" );
+		codes.put( "r", "12" );
+		codes.put( "s", "32" );
+		codes.put( "t", "33" );
+		codes.put( "u", "11" );
+		codes.put( "v", "34" );
+		codes.put( "w", "35" );
+		codes.put( "x", "36" );
+		codes.put( "y", "37" );
+		codes.put( "z", "38" );
+		codes.put( "-", "39" );
+		codes.put( ":", "17" );
+
+		try {
+			prefix = config.getString("MCR.NBN.NamespacePrefix");
+	    	manager = (MCRNBNManager) config.getInstanceOf("MCR.NBN.ManagerImplementation");
+		} catch (MCRConfigurationException mcrx) {
+			String msg = "Missing configuration data.";
+            logger.fatal(msg);
+		}
+	}
    
-  /** 
-   * Creates a new NISS, the local ID of the ressource.
-   * This implementation creates a NISS of eight digits 
-   * length that is derived from the current time measured
-   * in seconds. The method guarantees uniqueness and therefore
-   * will block to produce only one NISS per second.
-   * 
-   * @return a new NISS
-   **/
-  protected static synchronized String produceNISS()  
-  {
-    String niss;  
+	/** 
+	 * Method getLocalPrefix. Creates a new NISS, the local ID of the ressource.
+	 * This implementation creates a NISS of eight digits 
+	 * length that is derived from the current time measured
+	 * in seconds. The method guarantees uniqueness and therefore
+	 * will block to produce only one NISS per second.
+	 * 
+	 * @return a new NISS
+	 */
+	protected static synchronized String produceNISS() {
+		String niss;  
       
-    do
-    {    
-      Calendar now = new GregorianCalendar();
-      int yyy = 2268 - now.get( Calendar.YEAR        );
-      int ddd = 500  - now.get( Calendar.DAY_OF_YEAR );
-      int hh  = now.get( Calendar.HOUR_OF_DAY );
-      int mm  = now.get( Calendar.MINUTE      );
-      int ss  = now.get( Calendar.SECOND      );
-      int sss = 99999 - ( hh * 3600 + mm * 60 + ss );
+		do {
+			Calendar now = new GregorianCalendar();
+			int yyy = 2268 - now.get(Calendar.YEAR);
+			int ddd = 500 - now.get(Calendar.DAY_OF_YEAR);
+			int hh = now.get( Calendar.HOUR_OF_DAY);
+			int mm = now.get( Calendar.MINUTE);
+			int ss = now.get( Calendar.SECOND);
+			int sss = 99999 - (hh * 3600 + mm * 60 + ss);
 
-      String DDDDD = String.valueOf( yyy * 366 + ddd );
+			String DDDDD = String.valueOf(yyy * 366 + ddd);
       
-      StringBuffer buffer = new StringBuffer();
-      buffer.append( DDDDD.charAt( 4 ) );
-      buffer.append( DDDDD.charAt( 2 ) );
-      buffer.append( DDDDD.charAt( 1 ) );
-      buffer.append( DDDDD.charAt( 3 ) );
-      buffer.append( DDDDD.charAt( 0 ) );
-      buffer.append( sss );
-      niss = buffer.toString();
-    }
-    while( niss.equals( last ) ); 
+			StringBuffer buffer = new StringBuffer();
+			buffer.append(DDDDD.charAt(4));
+			buffer.append(DDDDD.charAt(2));
+			buffer.append(DDDDD.charAt(1));
+			buffer.append(DDDDD.charAt(3));
+			buffer.append(DDDDD.charAt(0));
+			buffer.append(sss);
+			niss = buffer.toString();
+		}
+		
+		while (niss.equals(last));
 
-    return ( last = niss );
-  }
+		logger.info("New NISS created: " + niss);
+		return (last = niss);
+	}
 
  /**
   * Calculates the checksum for the given URN. The algorithm
@@ -166,9 +190,13 @@ public class MCRNBN
     return quotient.substring( quotient.length() - 1 );
   } 
 
-  public static String getLocalPrefix() {
-  	return prefix;
-  }
+	/**
+	 * Method getLocalPrefix. Returns the local prefix of the urn's
+	 * @return the local prefix of an urn
+	 */
+	public static String getLocalPrefix() {
+  		return prefix;
+	}
   
   protected String  urn;
   protected Boolean valid;
