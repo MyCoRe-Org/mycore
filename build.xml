@@ -22,6 +22,7 @@
     
   <!-- classpath -->
   <property name="build.sysclasspath" value="last"/>
+
   <path id="mycore.classpath">
     <fileset dir="${lib}">
       <include name="*.jar"/>
@@ -219,7 +220,7 @@
       ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
     </echo>
     <javadoc
-      packagenames        = "mycore.commandline.*,mycore.common.*,mycore.communication.*,mycore.datamodel.*,mycore.classifications.*,mycore.ifs.*,mycore.nbn.*,mycore.editor.*,mycore.sql.*,mycore.user.*,mycore.xml.*,mycore.${persistency}.*,mycore.${database}.*,mycore.gui.*,mycore.webservice.*"
+      packagenames        = "org.mycore.*"
       sourcepath          = "${sources}"
       destdir             = "${javadocs}"
       classpathref        = "mycore.classpath"

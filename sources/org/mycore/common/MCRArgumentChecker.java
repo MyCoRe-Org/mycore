@@ -97,3 +97,5 @@ public abstract class MCRArgumentChecker
   */    
   public static void ensureNotNegative( double value, String argumentName )
   { ensureIsTrue( value >= 0, argumentName + " is negative" ); }
+}
+
