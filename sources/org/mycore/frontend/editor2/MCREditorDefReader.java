@@ -32,16 +32,15 @@ import org.mycore.common.MCRCache;
 public class MCREditorDefReader
 {
   /**
-   * Reads that editor definition from the given 
-   * webpage that has the given ID
+   * Reads the editor definition from the given URI
    **/
-  static Element readDef( String webpage, String editorRefID )
+  static Element readDef( String uri, String ref )
   {
-    Element definition = new Element( "definition" );
-    definition.addContent( resolveInclude( "webapp:" + webpage, editorRefID ) );
-    return definition;
+    Element editor = new Element( "editor" );
+    editor.addContent( resolveInclude( uri, ref ) );
+    return editor;
   }
-  
+
   /**
    * Returns that direct or indirect child element of the given element, thats ID 
    * attribute has the given value.
@@ -50,13 +49,13 @@ public class MCREditorDefReader
    * @param parent the element to start searching with
    * @return the child element that has the given ID, or null if no such element exists.
    */
-  protected static Element findElementByID( String id, Element parent )
+  static Element findElementByID( String id, Element parent )
   {
     List children = parent.getChildren();
     for( int i = 0; i < children.size(); i++ )
     {
       Element child = (Element)( children.get( i ) );
-      if( id.equals( child.getAttributeValue( "ID" ) ) )
+      if( id.equals( child.getAttributeValue( "id" ) ) )
         return child;
       else
       {
@@ -91,14 +90,16 @@ public class MCREditorDefReader
     
     // May be the included resource is already in the cache
     String key = idref + "@" + uri;
+
+    MCREditorServlet.logger.debug( "Editor resolving include " + key );
+
     Element cached = (Element)( includesCache.get( key ) );
     if( cached != null) 
     {
-      MCREditorServlet.logger.info( "Resolved include from cache: " + key );
-      return cached.cloneContent();
+      MCREditorServlet.logger.debug( "Editor resolved include from cache: " + key );
+      return getClonedChildren( cached );
     }
 
-    MCREditorServlet.logger.info( "Resolving include from URI: " + key );
     // Get the elements to include from uri
     Element container = MCREditorResolver.readXML( uri );
     
@@ -113,11 +114,24 @@ public class MCREditorDefReader
     boolean doNotCache = "false".equals( container.getAttributeValue( "cacheable" ) );
     if( ! doNotCache ) 
     {
-      MCREditorServlet.logger.info( "Resolved include is cacheable, putting into cache: " + key );
+      MCREditorServlet.logger.debug( "Editor resolved include is cacheable, putting into cache: " + key );
       includesCache.put( key, container );
     }
 
-    return container.cloneContent();
+    return getClonedChildren( container );
+  }
+
+  private static List getClonedChildren( Element parent )
+  {
+    List children = parent.getChildren();
+    List copy = new java.util.Vector();
+    for( int i = 0; i < children.size(); i++ )
+    {
+      Element child = (Element)( children.get( i ) );
+      Element clone = (Element)( child.clone() );
+      copy.add( clone );
+    }
+    return copy;
   }
 
   /**
@@ -130,20 +144,23 @@ public class MCREditorDefReader
    **/
   protected static void resolveIncludes( Element container )
   {
-    List children = container.getContent();
+    List children = container.getChildren();
     
     for( int i = 0; i < children.size(); i++ )
     {
       Element child = (Element)( children.get( i ) );
       if( child.getName().equals( "include" ) )
       {
+        String ref = child.getAttributeValue( "ref" );
+        String uri = child.getAttributeValue( "uri" );
+        if( ( uri == null ) || ( uri.trim().length() == 0 ) ) continue;
+
         children.remove( child );
-        String idref = child.getAttributeValue( "idref" );
-        String uri   = child.getAttributeValue( "uri"   );
-        List includes = resolveInclude( uri, idref );
+        List includes = resolveInclude( uri, ref );
         children.addAll( i--, includes );
       }
       else resolveIncludes( child );
     }
   }
 }
+

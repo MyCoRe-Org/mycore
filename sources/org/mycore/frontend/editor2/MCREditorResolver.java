@@ -59,6 +59,8 @@ class MCREditorResolver
   
   protected static Element readXML( String uri )
   {
+    MCREditorServlet.logger.info( "Editor reading xml from uri " + uri );
+
     String scheme = new StringTokenizer( uri, ":" ).nextToken();
     
     if( "resource".equals( scheme ) )
@@ -82,6 +84,9 @@ class MCREditorResolver
   protected static Element readFromResource( String uri )
   {
     String path = uri.substring( uri.indexOf( ":" ) + 1 );
+
+    MCREditorServlet.logger.debug( "Editor reading xml from classpath resource " + path );
+
     return parseStream( MCREditorResolver.class.getResourceAsStream( path ) );
   }
 
@@ -89,6 +94,7 @@ class MCREditorResolver
   protected static Element readFromWebapp( String uri )
   {
     String path = uri.substring( uri.indexOf( ":" ) + 1 );
+    MCREditorServlet.logger.info( "Reading from webapp " + path );
     uri = "file://" + context.getRealPath( path );
     return readFromFile( uri );
   }
@@ -97,6 +103,9 @@ class MCREditorResolver
   protected static Element readFromFile( String uri )
   {
     String path = uri.substring( "file://".length() );
+
+    MCREditorServlet.logger.debug( "Editor reading xml from file " + path );
+
     File file = new File( path );
     Element fromCache = (Element) fileCache.getIfUpToDate( path, file.lastModified() );
     if( fromCache != null ) return fromCache;
@@ -117,6 +126,8 @@ class MCREditorResolver
   // http:// oder https://
   protected static Element readFromHTTP( String url )
   {
+    MCREditorServlet.logger.debug( "Editor reading xml from url " + url );
+
     try
     { return parseStream( new URL( url ).openStream() ); }
     catch( java.net.MalformedURLException ex )
@@ -135,6 +146,9 @@ class MCREditorResolver
   protected static Element readFromRequest( String uri )
   {
     String path = uri.substring( uri.indexOf( ":" ) + 1 );
+
+    MCREditorServlet.logger.debug( "Editor reading xml from request " + path );
+
     StringBuffer url = new StringBuffer( MCRServlet.getBaseURL() );
     url.append( path );
     

@@ -24,7 +24,6 @@
 
 package org.mycore.frontend.editor2;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
@@ -41,10 +40,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.common.MCRCache;
 
 /**
  * This servlet handles form submissions from
@@ -58,17 +56,85 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCREditorServlet extends MCRServlet
 {
   protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
+  protected final static MCRCache sessions = new MCRCache( 100 );
+
+  public void init()
+  {
+    super.init();
+    MCREditorResolver.init( getServletContext(), getBaseURL() );
+  }
 
   public void doGetPost( MCRServletJob job )
-    throws ServletException, java.io.IOException
+	throws ServletException, java.io.IOException
   {
-    HttpServletRequest req  = job.getRequest();
+    HttpServletRequest  req = job.getRequest();
     HttpServletResponse res = job.getResponse();
-
+  
     MCRRequestParameters parms = new MCRRequestParameters( req );
+    
+    String action = parms.getParameter( "_action" );
+    if( "load.definition".equals( action ) )
+      processLoadDefinition( req, res );
+    else if( "show.popup".equals( action ) )
+      processShowPopup( req, res );
+    else if( "submit".equals( action ) )
+      processSubmit( req, res, parms );
+    else
+      res.sendError( HttpServletResponse.SC_BAD_REQUEST );
+  }
 
-    String  editorID = parms.getParameter( "_editorID" );
-    Element editor   = getEditorDefinition( editorID );
+  private void processShowPopup( HttpServletRequest  req, 
+                                 HttpServletResponse res )
+	throws ServletException, java.io.IOException
+  {
+    String sessionID = req.getParameter( "_session" );
+    String ref       = req.getParameter( "_ref" );
+
+    logger.info( "Editor session " + sessionID + " show popup " + ref );
+	
+    Element editor = (Element)( sessions.get( sessionID ) );
+    Element popup  = MCREditorDefReader.findElementByID( ref, editor );
+    Element clone = (Element)( popup.clone() );
+	
+    sendToDisplay( req, res, new Document( clone ) );
+  }
+  
+  private void processLoadDefinition( HttpServletRequest  req, 
+                                      HttpServletResponse res )
+  throws ServletException, java.io.IOException
+  {
+    String uri = req.getParameter( "_uri" );
+    String ref = req.getParameter( "_ref" );
+
+    logger.info( "Editor load editor definition from " + ref + "@" + uri );
+
+    Element editor = MCREditorDefReader.readDef( uri, ref );
+    String sessionID = buildSessionID();
+    sessions.put( sessionID, editor );
+    editor.setAttribute( "session", sessionID );
+
+    logger.info( "Editor session " + sessionID + " created" );
+
+    req.setAttribute( "XSL.Style", "xml" );
+    sendToDisplay( req, res, new Document( editor ) );
+  }
+
+  private static synchronized String buildSessionID()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append( Long.toString( System.currentTimeMillis(), 36 ) );
+    sb.reverse();
+    return sb.toString();
+  }
+  
+  private void processSubmit( HttpServletRequest req, HttpServletResponse res, 
+                              MCRRequestParameters parms )
+	throws ServletException, java.io.IOException
+  {
+    String sessionID = parms.getParameter( "_session" );
+    Element editor = (Element)( sessions.get( sessionID ) );
+
+    logger.info( "Editor session " + sessionID + " submitting form data" );
 
     MCREditorSubmission sub = new MCREditorSubmission( parms, editor );
 
@@ -158,35 +224,5 @@ public class MCREditorServlet extends MCRServlet
 
     pw.close();
   }
-
-  private Element getEditorDefinition( String ID )
-  {
-    return loadEditorXML( "editor-" + ID + ".xml" );
-  }
-
-  protected static MCRCache editorCache = new MCRCache( 50 );
-
-  private Element loadEditorXML( String fileName )
-  {
-    String name = "/editor/" + fileName;
-    String path = getServletContext().getRealPath( name );
-    File   file = new File( path );
-    long   time = file.lastModified();
-
-    Element editor = (Element)( editorCache.getIfUpToDate( path, time ) );
-    if( editor == null )
-    {
-      Document doc = null;
-      try{ doc = new org.jdom.input.SAXBuilder().build( file ); }
-      catch( Exception ex )
-      {
-        String msg = "Error while loading editor definition xml file " + path;
-        throw new MCRConfigurationException( msg );
-      }
-      editor = (Element)doc.getRootElement().detach();
-      editorCache.put( path, editor );
-    }
-
-    return editor;
-  }
 }
+
