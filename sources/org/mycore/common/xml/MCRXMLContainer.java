@@ -33,8 +33,6 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.common.MCRSortable;
 import org.apache.log4j.Logger;
 
@@ -401,8 +399,7 @@ public class MCRXMLContainer implements MCRSortable {
 		throws IOException {
 		org.jdom.Document doc = exportElementToDocument(index);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		org.jdom.output.XMLOutputter op = new org.jdom.output.XMLOutputter();
-		op.setEncoding(default_encoding);
+		XMLOutputter op = new XMLOutputter(Format.getCompactFormat().setEncoding(default_encoding));
 		op.output(doc, os);
 		return os.toByteArray();
 	}
