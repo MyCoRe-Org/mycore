@@ -24,6 +24,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -110,12 +111,12 @@ private final void set() throws MCRException
     throw new MCRException("The JDOM document is null or empty."); }
   // get object ID from DOM
   org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-  mcr_id = new MCRObjectID((String)jdom_element_root.getAttribute("ID")
+  mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID")
     .getValue());
-  mcr_label = (String)jdom_element_root.getAttribute("label").getValue().trim();
+  mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
   if (mcr_label.length()>MAX_LABEL_LENGTH) {
     mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
-  mcr_schema = (String)jdom_element_root
+  mcr_schema = jdom_element_root
     .getAttribute("noNamespaceSchemaLocation",
      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL)).getValue()
      .trim();
@@ -135,28 +136,39 @@ private final void set() throws MCRException
   }
 
 /**
- * This methode read the XML input stream from an URI into a temporary DOM 
- * and check it with XSchema file.
+ * This method read the XML input stream from an URI
+ * to build up the MyCoRe-Object. 
  *
  * @param uri                   an URI
  * @exception MCRException      general Exception of MyCoRe
  **/
 public final void setFromURI(String uri) throws MCRException
   {
-  jdom_document = MCRXMLHelper.parseURI(uri);
-  set();
+  setFromJDOM(MCRXMLHelper.parseURI(uri));
   }
 
 /**
- * This methode read the XML input stream from a byte array into JDOM 
- * and check it with XSchema file.
+ * This method read the XML input stream from a byte array
+ * to build up the MyCoRe-Object. 
  *
  * @param xml                   a XML string
  * @exception MCRException      general Exception of MyCoRe
  **/
 public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
-  jdom_document = MCRXMLHelper.parseXML(xml,valid);
+  setFromJDOM(MCRXMLHelper.parseXML(xml,valid));
+  }
+
+/**
+ * This methode gets a JDOM-Document 
+ * to build up the MyCoRe-Object.
+ *
+ * @param doc                   an JDOM Object
+ * @exception MCRException      general Exception of MyCoRe
+ **/
+public final void setFromJDOM(Document doc) throws MCRException
+  {
+  jdom_document = doc;
   set();
   }
 
