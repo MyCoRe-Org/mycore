@@ -7,22 +7,55 @@
 %
 %
 Das MyCoRe-Projekt ist so designed, dass es dem Einzelnen Anwender frei steht,
-welche Komponenten er für die Speicherung der Daten verwenden will. dabei spielt
-nat"urlich das verwendete betriebssystem eine wesentliche Rolle. Dabei hat jeses System eine eigenen Vor- und Nachteile, die an dieser Stelle aber nicht dikutiert werden sollen. Vielmehr wollen wir es dem Anwender "uberlassen, in welchem System er f"ur seine Anwendung die gr"o"sten Vorteile sieht. Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des gew"ahlten Basissystems. \\[2ex]
-\begin{tabular}{lllll}
-Komponente & AIX & Solaris & Linux & MS Windows\\[1,5ex]
-Metadaten-Store & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & Xindice - parametrische Suche mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen \\
-TextSearch & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & htdig ??? & IBM DB2 TIE (Sprachunterstützung nur f"ur English) \\
-Datenbank & IBM DB2 8.x & Oracle ??? & MySQL 4.x & IBM DB2 8.x \\
-Objekt-Store & Filesystem, IBM CM 8.2 Ressource Manager, IBM Video Charger 8, Helix Server & Filesystem, IBM CM 8.2 Ressource Manager, IBM Video Charger 8, Helix Server & Filesystem, IBM Video Charger 8, Helix Server & Filesystem, IBM CM 8.2 Ressource Manager, IBM Video Charger 8,Helix Server \\
-\end{tabular}
+welche Komponenten er f"ur die Speicherung der Daten verwenden will. dabei spielt nat"urlich das verwendete Betriebssystem eine wesentliche Rolle. Dabei hat jeses System eine eigenen Vor- und Nachteile, die an dieser Stelle aber nicht dikutiert werden sollen. Vielmehr wollen wir es dem Anwender "uberlassen, in welchem System er f"ur seine Anwendung die gr"o"sten Vorteile sieht. Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Komponenten entsprechend des gew"ahlten Basissystems. \\[2ex]
+\bottomcaption{MyCoRe Komponenten"ubersicht}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{2cm}|p{3,25cm}|p{3,25cm}|p{3,25cm}|p{3,25cm}|}
+\hline
+{\bf Teil} & {\bf AIX} & {\bf Solaris} & {\bf Linux} & {\bf MS Windows}\\[1,5ex] \hline
+Metadaten Store & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen & Xindice - parametrische Suche mittels XPath Abfragen & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen \\ \hline
+TextSearch & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & IBM DB2 TIE (Sprachunterstützung nur f"ur English) & htdig ??? & IBM DB2 TIE (Sprachunterstützung nur f"ur English) \\ \hline
+Datenbank & IBM DB2 8.x & Oracle ??? & MySQL 4.x & IBM DB2 8.x \\ \hline
+Objekt Store & Filesystem, & Filesystem, & Filesystem, & Filesystem, \\
+ & IBM CM 8.2 Ressource Manager, & IBM CM 8.2 Ressource Manager, & & IBM CM 8.2 Ressource Manager, \\ 
+ & IBM Video Charger 8, & IBM Video Charger 8, & IBM Video Charger 8, & IBM Video Charger 8, \\
+ & Helix Server & Helix Server & Helix Server & Helix Server \\ 
+\hline
+\end{supertabular}
 %
 %
 \section{Hinweise zur Installation des IBM Content Manager 8.2}
-
 %
 %
 \subsection{Der IBM Content Manager unter AIX}
+An dieser Stelle soll eine Kurzbeschreibung der Installation des IBM Content Managers 8.2 f"ur AIX von Holger K"onig, IBM Deutschland GmbH, wiedergegeben werden. \\[2ex]
+\subsubsection{Vorbereitung}
+\begin{enumerate}
+\item Installieren Sie das AIX Betriebssystem mit dem Release 4.3.3 ML 10, 5.1 ML 01 oder 5.2.
+\item Sorgen Sie daf"ur, dass 'Cultural Conversion' und 'Language' auf English US eingestellt ist.
+\item Aktivieren Sie die Netzanbindung inklusive DNS.
+\item F"ur die Betriebssystem-Releases 4.3.3 und 5.1 muss Java 1.3.1 entsprechend der Anleitung installiert werden. Erweitern Sie in {\it /etc/environment }  die {\it PATH} Variable um {\it /usr/java131/jre/bin} und {\it /usr/java131/bin}.
+\item Installieren Sie den VAC Compiler Version 5.x oder 6.0 entsprechend der Anleitung.
+\item Aktivieren Sie das Lizenzsystem {\bf ifor} und Tragen Sie sie Compilerlizenzen ein.
+\end{enumerate}
+\subsubsection{DB2 und NSE}
+\begin{enumerate}
+\item Kopieren Sie das File {\it ese.sbcs.tar.Z} von der CD {\bf 'DB2 8.1 with FP1'} und entpacken Sie dieses.
+\item {\tt ./db2setup}
+\item W"ahlen Sie {\bf Install Products} $\rightarrow$ {\bf DB2 UDB Enterprise Server Edition}. Folgen Sie den Schritten:
+\begin{itemize}
+\item {\bf Netx}
+\item {\bf Accept License}
+\item Select 'Custom' $\rightarrow$ {\bf Next}
+\item Select 'Install DB2 UDB Enterprise Server Edition on this computer' $\rightarrow$ {\bf Next}
+\item Select 'Appliction Development Tools' zus"atzlich
+\item Sprache 'Englisch' beibehalten $\rightarrow$ {\bf Next}
+\item Erzeugen der DB2 Instanz durch Select 'Create a DB2 instance - 32 bit' $\rightarrow$ {\bf Next}
+\item Select 'Single-partition instance' $\rightarrow$ {\bf Next}
+\end{itemize}
+\end{enumerate}
+%
 
 %
 %
