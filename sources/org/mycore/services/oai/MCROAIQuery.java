@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQuery.java,v $
- * $Revision: 1.5 $ $Date: 2003/01/28 13:25:25 $
+ * $Revision: 1.6 $ $Date: 2003/01/31 10:56:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.5 $ $Date: 2003/01/28 13:25:25 $
+ * @version $Revision: 1.6 $ $Date: 2003/01/31 10:56:25 $
  * 
  * This is an interface which encapsulates the functions needed for
  * the communication with the datastore. All functions which are
@@ -51,5 +51,16 @@ public interface MCROAIQuery {
 	 * 				the label and a description
 	 */
 	public List listSets(String classificationId);
+	
+	/**
+	 * Method listIdentifiers.Gets a list of identifiers
+	 * @param set the category (if known) is in the first element
+	 * @param from the date (if known) is in the first element
+	 * @param until the date (if known) is in the first element
+	 * @return List A list that contains an array of three Strings: the identifier,
+	 * 				a datestamp (modification date) and a string with a blank
+	 * 				separated list of categories the element is classified in
+	 */
+	public List listIdentifiers(String[] set, String[] from, String[] until);
 	
 }

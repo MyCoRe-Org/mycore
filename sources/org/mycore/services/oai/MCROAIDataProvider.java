@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.17 $ $Date: 2003/01/30 14:38:25 $
+ * $Revision: 1.18 $ $Date: 2003/01/31 10:56:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.17 $ $Date: 2003/01/30 14:38:25 $
+ * @version $Revision: 1.18 $ $Date: 2003/01/31 10:56:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -89,6 +89,7 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; //maximum number of returned list sets
     private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; //Classification and...
     private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; //...Category to restrict the access to
+    private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.oai.metadata.transformer"; 
     
     // If there are other metadata formats available, all need a namespace and schema entry
     // of it's own, e.g. 
@@ -113,6 +114,7 @@ public class MCROAIDataProvider extends HttpServlet {
     private static final String ERR_UNKNOWN_ID = "Unknown identifier";
     private static final String ERR_BAD_RESUMPTION_TOKEN = "Bad resumption token";
     private static final String ERR_NO_RECORDS_MATCH = "No results where found with your search criteria";
+    private static final String ERR_UNKNOWN_FORMAT = "Unknown metadata format";
 
     private static final String[] STR_VERBS = {"GetRecord", "Identify",
         "ListIdentifiers", "ListMetadataFormats", "ListRecords",
@@ -216,7 +218,7 @@ public class MCROAIDataProvider extends HttpServlet {
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[1])) {
                     document = identify(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[2])) {
-                    // document = listIdentifiers(request, header, ns);
+                    document = listIdentifiers(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[3])) {
                     document = listMetadataFormats(request, header);
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[4])) {
@@ -514,9 +516,9 @@ public class MCROAIDataProvider extends HttpServlet {
     
 	/**
 	 * Method identify. Implementation of the OAI Verb Identify.
-	 * @param request
-	 * @param header
-	 * @return Document
+	 * @param request The servlet request.
+	 * @param header The document so far
+	 * @return Document The document with all new elements added.
 	 */
     private org.jdom.Document identify(HttpServletRequest request, org.jdom.Document header) {
     	logger.info("Harvester hat 'Identify' angefordert");
@@ -602,9 +604,9 @@ public class MCROAIDataProvider extends HttpServlet {
 
 	/**
 	 * Method listMetadataFormats. Implementation of the OAI Verb ListMetadataFormats.
-	 * @param request
-	 * @param header
-	 * @return Document
+	 * @param request The servlet request.
+	 * @param header The document so far
+	 * @return Document The document with all new elements added.
 	 */
     private org.jdom.Document listMetadataFormats(HttpServletRequest request, org.jdom.Document header) {
     	logger.info("Harvester hat 'listMetadatFormats' angefordert");
@@ -678,7 +680,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * Method listSets. Implementation of the OAI Verb ListSets.
 	 * @param request The servlet request.
 	 * @param header The document so far
-	 * @return Document
+	 * @return Document The document with all new elements added.
 	 */
     private org.jdom.Document listSets(HttpServletRequest request, org.jdom.Document header) {
         org.jdom.Document document = header;
@@ -703,10 +705,11 @@ public class MCROAIDataProvider extends HttpServlet {
         if (resumptionToken != null) {
             eRequest.setAttribute("resumptionToken", resumptionToken[0]);
         }
-		Element eListSets = new Element("ListSets", ns);
         
 	    MCRConfiguration config = MCRConfiguration.instance();
 	    
+		Element eListSets = new Element("ListSets", ns);
+        
         if (resumptionToken != null) {
 		    try {
 				eListSets = listFromResumptionToken(eListSets, resumptionToken[0]);
@@ -784,6 +787,150 @@ public class MCROAIDataProvider extends HttpServlet {
         return document;
     }
 
+	/**
+	 * Method listIdentifiers. Implementation of the OAI Verb ListIdentifiers.
+	 * @param request The servlet request.
+	 * @param header The document so far
+	 * @return Document The document with all new elements added.
+	 */
+    private org.jdom.Document listIdentifiers(HttpServletRequest request, org.jdom.Document header) {
+        org.jdom.Document document = header;
+        Element eRoot = document.getRootElement();
+        Namespace ns = eRoot.getNamespace();
+        
+        deleteOutdatedTokenFiles();
+        
+        int maxArguments = 2; //verb and metadataPrefix are required!
+        
+        // get the arguments from the request
+        String from[] = getParameter("from", request);
+        if (from != null) {
+            maxArguments++;
+        }
+        String until[] = getParameter("until", request); 
+        if (until != null) {
+            maxArguments++;
+        }
+        String set[] = getParameter("set", request); 
+        if (set != null) {
+            maxArguments++;
+        }
+        String resumptionToken[] = getParameter("resumptionToken", request); 
+        if (resumptionToken != null) {
+            maxArguments++;
+        }
+        String metadataPrefix[] = getParameter("metadataPrefix", request); 
+        if (metadataPrefix == null) {
+        	logger.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        //The number of arguments must not exceed maxArguments
+        if (badArgumentsFound(request, maxArguments)) {
+        	logger.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
+            return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+        }
+        
+        Element eRequest = eRoot.getChild("request", ns);
+        eRequest.setAttribute("verb", "ListIdentifiers");
+        if (from != null) {
+            eRequest.setAttribute("from", from[0]);
+        }
+        if (until != null) {
+            eRequest.setAttribute("until", until[0]);
+        }
+        if (set != null) {
+            eRequest.setAttribute("set", set[0]);
+        }
+        if (resumptionToken != null) {
+            eRequest.setAttribute("resumptionToken", resumptionToken[0]);
+        }
+        eRequest.setAttribute("metadataPrefix", metadataPrefix[0]);
+        
+        MCRConfiguration config = MCRConfiguration.instance();
+        //Check, if the requested metadata format is supported
+	    try {
+	        String format = config.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+	    } catch (MCRConfigurationException mcrx) {
+        	logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+            return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
+	    }
+        
+        Element eListIdentifiers = new Element("ListIdentifiers", ns);
+        
+        if (resumptionToken != null) {
+		    try {
+				eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0]);
+		        eRoot.addContent(eListIdentifiers);
+		    } catch (IOException e) { 	
+	            logger.error(e.getMessage());
+                return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
+            }
+            
+            return document;
+        }
+        
+	    List sets = null;
+	    
+	    try {
+		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
+		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+		    sets = new ArrayList(query.listIdentifiers(set, from, until));
+	    } catch (MCRConfigurationException mcrx) {
+	    	logger.fatal(mcrx.getMessage());
+	    	return document;
+	    }
+
+	    if (sets != null) {
+	    	int maxreturns = 0;
+	    	ListIterator iterator = sets.listIterator();
+	    	
+	        if (!iterator.hasNext()) {
+            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+        	}
+        
+			try {
+		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
+			} catch (NumberFormatException nfx) {
+				//do nothing, just let maxreturns be 0
+			}
+	    	
+	    	int elementCounter = 0;
+	    	
+	    	List tokenElements = new ArrayList();
+	    	
+	    	while (iterator.hasNext()) {
+	    		elementCounter++;
+	    		String[] set = (String[]) iterator.next();
+	    		
+		        Element eHeader = new Element("header", ns);
+    	        eHeader.addContent(newElementWithContent("identifier", ns, set[0]));
+            	eHeader.addContent(newElementWithContent("datestamp", ns, set[1]));
+	            if ((set[2] != null) && (set[2].length() > 0)) {
+		    	    StringTokenizer tokenizer = new StringTokenizer(set[2], " ");
+    	    	
+	    	    	while (tokenizer.hasMoreTokens()) {
+                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
+    		    	}
+    	    	
+    	        }
+            
+            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
+		            eListIdentifiers.addContent(eHeader);
+            	} else {
+            		tokenElements.add(eHeader);
+            	}
+	    	}
+	    	
+	    	listToResumptionToken(tokenElements);
+	    	
+	    	eRoot.addContent(eListIdentifiers);
+	    } else {
+           	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
+	    }
+	    
+        return document;
+    }
+    
 	class TokenFileFilter implements FilenameFilter {
     	String filter = null;
     
