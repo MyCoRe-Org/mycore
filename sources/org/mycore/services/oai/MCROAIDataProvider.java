@@ -347,6 +347,7 @@ public class MCROAIDataProvider extends HttpServlet {
             if (fileName.indexOf(token) != -1) {
             	StringTokenizer tokenizer = new StringTokenizer(fileName, ".");
             	String name = tokenizer.nextToken();
+            	name = tokenizer.nextToken();
             	
             	return name;
             }
@@ -941,7 +942,6 @@ public class MCROAIDataProvider extends HttpServlet {
         String prefix = null;
         if (metadataPrefix != null) {
         	prefix = metadataPrefix[0];
-	        eRequest.setAttribute("metadataPrefix", prefix);
         } else {
         	prefix = getPrefix(resumptionToken[0]);
         	if (prefix == null) {
@@ -949,6 +949,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
         	}
         }
+        eRequest.setAttribute("metadataPrefix", prefix);
         
         MCRConfiguration config = MCRConfiguration.instance();
         //Check, if the requested metadata format is supported
@@ -1236,7 +1237,6 @@ public class MCROAIDataProvider extends HttpServlet {
         String prefix = null;
         if (metadataPrefix != null) {
         	prefix = metadataPrefix[0];
-	        eRequest.setAttribute("metadataPrefix", prefix);
         } else {
         	prefix = getPrefix(resumptionToken[0]);
         	if (prefix == null) {
@@ -1244,6 +1244,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	            return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
         	}
         }
+        eRequest.setAttribute("metadataPrefix", prefix);
         
         MCRConfiguration config = MCRConfiguration.instance();
         String format = null;
