@@ -81,13 +81,13 @@ public final MCRQueryResultArray getResultList(String query, String type,
   if (query.equals("\'\'")) { query = ""; }
   // transform the search string
   StringBuffer cond = new StringBuffer("");
-//System.out.println("================================");
-//System.out.println("MCRCM7TransformXQueryToText : "+query);
-//System.out.println("================================");
+System.out.println("================================");
+System.out.println("MCRCM7TransformXQueryToText : "+query);
+System.out.println("================================");
   String rawtext = query.toUpperCase();
   rawtext.replace('\n',' ');
   rawtext.replace('\r',' ');
-//System.out.println("Raw text :"+rawtext);
+System.out.println("Raw text :"+rawtext);
   int startpos = 0;
   int stoppos = rawtext.length();
   int operpos = -1;
@@ -120,8 +120,8 @@ public final MCRQueryResultArray getResultList(String query, String type,
     }
   if (cond.length()==1) { cond.append("( $MC=*$ XXXMYCOREOBJECTXXX* )"); }
   cond.append(')');
-//System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
-//System.out.println("================================");
+System.out.println("MCRCM7TransformXQueryToText : "+cond.toString());
+System.out.println("================================");
   // search
   MCRCM7SearchTS ts = new MCRCM7SearchTS();
   ts.setSearchLang(conf.getString("MCR.persistence_cm7_textsearch_lang"));
@@ -137,7 +137,7 @@ public final MCRQueryResultArray getResultList(String query, String type,
     e.printStackTrace();
     throw new MCRPersistenceException("The text search error.");
     }
-  //System.out.println("================================");
+//System.out.println("================================");
   return result;
   }
 
@@ -185,7 +185,7 @@ private final String traceOneCondition(String cond)
   if ((inpath.equals("(")) || (inpath.equals("(.")) ||
       (inpath.equals("(*")) || (inpath.equals("(//*")) ||
       (inpath.equals("(/"))) { 
-    pt.append(""); ispath = true; }
+    pt.append("*"); ispath = true; }
   if (!ispath) {
     i = 1;
     if (inpath.substring(0,2).equals("(/")) { i = 2; }
