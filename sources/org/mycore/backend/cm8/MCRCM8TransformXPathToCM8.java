@@ -35,6 +35,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.services.query.MCRQueryInterface;
 import org.mycore.services.query.MCRQueryBase;
 
@@ -112,6 +114,7 @@ public final MCRXMLContainer startQuery(String type)
       DK_CM_XQPE_QL_TYPE,parms);
     dkIterator iter = rsc.createIterator();
     logger.debug("Results :"+rsc.cardinality());
+    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
     String id = "";
     int rank = 0;
     byte [] xml = null;
@@ -122,9 +125,17 @@ public final MCRXMLContainer startQuery(String type)
       dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
       id = (String) resitem.getData(dataId);
       logger.debug(itemtypeprefix+"ID :"+id);
-      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");     
-      xml = (byte []) resitem.getData(dataId);
-      result.add("local",id,rank,xml);
+      try {
+        xml = xmltable.retrieve(type,new MCRObjectID(id));
+        result.add( "local", id, 0, xml);
+        }
+      catch (Exception e) {
+        //e.printStackTrace();
+        logger.debug(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
+        dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");     
+        xml = (byte []) resitem.getData(dataId);
+        result.add("local",id,rank,xml);
+        }
       }
     }
   catch (Exception e) {
