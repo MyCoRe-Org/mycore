@@ -32,6 +32,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,13 +57,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMResult;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -1222,8 +1226,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	            eGetRecord.addContent(eRecord);
 		    	eRoot.addContent(eGetRecord);
 
-            	org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
-            		getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+            	org.jdom.Document newDocument = doMCRXSLTransformation(request, document,format);
         	    if (newDocument != null) {
     	            document = newDocument;
 	            } else {
@@ -1361,8 +1364,7 @@ public class MCROAIDataProvider extends HttpServlet {
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
             
-            org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
-            	getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+            org.jdom.Document newDocument = doMCRXSLTransformation(request, document,format);
         	if (newDocument != null) {
     	        document = newDocument;
 	        } else {
@@ -1476,8 +1478,7 @@ public class MCROAIDataProvider extends HttpServlet {
 				
 	    	eRoot.addContent(eListRecords);
 		    	
-            org.jdom.Document newDocument = MCRXSLTransformation.transform(document, 
-            	getServletContext().getRealPath("/WEB-INF/stylesheets/" + format));
+            org.jdom.Document newDocument =  doMCRXSLTransformation(request, document, format);
         	if (newDocument != null) {
     	        document = newDocument;
 	        } else {
@@ -1587,6 +1588,32 @@ public class MCROAIDataProvider extends HttpServlet {
 		String token = id + "x1x";
 		return token;
 	}
+
+	/**
+	 * Method doMCRXSLTransformation. Executes the XSL-Transformation of the OAI-Metadata
+	 * @param request
+	 * @param document the document that has to be transformed
+	 * @param format name of the transforming stylesheet
+	 * @return document the transformed Jdom-Document
+	 */	    
+	private Document doMCRXSLTransformation(HttpServletRequest request, 
+			                                                                  Document document, 
+																			  String format) {
+		
+		String contextPath = request.getContextPath() + "/";
+		int pos = request.getRequestURL().indexOf(contextPath,9);
+		String servletsBaseURL = request.getRequestURL().substring(0,pos) + contextPath + "servlets/";
+		HttpSession session = request.getSession(false);
+		Properties parameters = new Properties();
+		if (session != null) {
+    		parameters.put("JSessionID",";jsessionid="+session.getId());
+		}
+        parameters.put("ServletsBaseURL",servletsBaseURL);
+        return MCRXSLTransformation.transform(document,
+        		getServletContext().getRealPath("/WEB-INF/stylesheets/" + format),
+				parameters) ;
+	}		
+	
 	
 	class TokenFileFilter implements FilenameFilter {
     	String filter = null;
@@ -1603,5 +1630,6 @@ public class MCROAIDataProvider extends HttpServlet {
     	    }
 			return false;
     	}
+    
 	}
 }
