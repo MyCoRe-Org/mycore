@@ -28,6 +28,7 @@ import java.io.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mycore.xml.MCRXMLHelper;
 
 /**
  * Instances of this class store address information of MyCoRe users. MCRUserAddress
@@ -65,18 +66,18 @@ public class MCRUserAddress
    */
   public MCRUserAddress(NodeList addressElements)
   {
-    salutation  = MCRXmlHelper.getElementText("salutation", addressElements);
-    firstname   = MCRXmlHelper.getElementText("firstname", addressElements);
-    lastname    = MCRXmlHelper.getElementText("lastname", addressElements);
-    street      = MCRXmlHelper.getElementText("street", addressElements);
-    city        = MCRXmlHelper.getElementText("city", addressElements);
-    postalcode  = MCRXmlHelper.getElementText("postalcode", addressElements);
-    country     = MCRXmlHelper.getElementText("country", addressElements);
-    institution = MCRXmlHelper.getElementText("institution", addressElements);
-    telephone   = MCRXmlHelper.getElementText("telephone", addressElements);
-    fax         = MCRXmlHelper.getElementText("fax", addressElements);
-    email       = MCRXmlHelper.getElementText("email", addressElements);
-    cellphone   = MCRXmlHelper.getElementText("cellphone", addressElements);
+    salutation  = MCRXMLHelper.getElementText("salutation", addressElements);
+    firstname   = MCRXMLHelper.getElementText("firstname", addressElements);
+    lastname    = MCRXMLHelper.getElementText("lastname", addressElements);
+    street      = MCRXMLHelper.getElementText("street", addressElements);
+    city        = MCRXMLHelper.getElementText("city", addressElements);
+    postalcode  = MCRXMLHelper.getElementText("postalcode", addressElements);
+    country     = MCRXMLHelper.getElementText("country", addressElements);
+    institution = MCRXMLHelper.getElementText("institution", addressElements);
+    telephone   = MCRXMLHelper.getElementText("telephone", addressElements);
+    fax         = MCRXMLHelper.getElementText("fax", addressElements);
+    email       = MCRXMLHelper.getElementText("email", addressElements);
+    cellphone   = MCRXMLHelper.getElementText("cellphone", addressElements);
   }
 
   /**

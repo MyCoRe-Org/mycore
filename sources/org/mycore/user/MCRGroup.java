@@ -28,6 +28,7 @@ import java.util.Vector;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mycore.xml.MCRXMLHelper;
 
 /**
  * Instances of this class represent MyCoRe groups. MCRGroup is part of the MyCoRe user
@@ -66,7 +67,7 @@ public class MCRGroup
    */
   public MCRGroup(Element domGroup) throws Exception
   {
-    groupID = MCRXmlHelper.getElementText("groupID", domGroup);
+    groupID = MCRXMLHelper.getElementText("groupID", domGroup);
 
     // Now we extract the privileges-information from the DOM Element and fill the
     // Vector "privileges". This way the group knows which privileges it has, resp.
@@ -74,7 +75,7 @@ public class MCRGroup
 
     NodeList privList = domGroup.getElementsByTagName("privileges");
     NodeList privElements = privList.item(0).getChildNodes();
-    privileges = new Vector(MCRXmlHelper.getAllElementTexts("privilege", privElements));
+    privileges = new Vector(MCRXMLHelper.getAllElementTexts("privilege", privElements));
 
     // Now we extract the members-information from the DOM Element and fill the
     // Vectors "users" and "groups". Members of a group can be users as well as
@@ -82,8 +83,8 @@ public class MCRGroup
 
     NodeList memberList = domGroup.getElementsByTagName("members");
     NodeList memberElements = memberList.item(0).getChildNodes();
-    users  = new Vector(MCRXmlHelper.getAllElementTexts("userID", memberElements));
-    groups = new Vector(MCRXmlHelper.getAllElementTexts("groupID", memberElements));
+    users  = new Vector(MCRXMLHelper.getAllElementTexts("userID", memberElements));
+    groups = new Vector(MCRXMLHelper.getAllElementTexts("groupID", memberElements));
   }
 
   /**

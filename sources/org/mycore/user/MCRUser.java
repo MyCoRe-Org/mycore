@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mycore.xml.MCRXMLHelper;
 
 /**
  * Instances of this class represent MyCoRe users. MCRUser is part of the MyCoRe user
@@ -75,10 +76,10 @@ public class MCRUser
     NodeList accountList = domUser.getElementsByTagName("account");
     NodeList accountElements = accountList.item(0).getChildNodes();
 
-    userID = MCRXmlHelper.getElementText("userID", accountElements);
-    passwd = MCRXmlHelper.getElementText("password", accountElements);
+    userID = MCRXMLHelper.getElementText("userID", accountElements);
+    passwd = MCRXMLHelper.getElementText("password", accountElements);
 
-    String date = MCRXmlHelper.getElementText("creationdate", accountElements);
+    String date = MCRXMLHelper.getElementText("creationdate", accountElements);
     if (date.equals(""))
       creationDate = new Date();
     else{
@@ -95,7 +96,7 @@ public class MCRUser
 
     NodeList groupList = domUser.getElementsByTagName("groups");
     NodeList groupElements = groupList.item(0).getChildNodes();
-    groups = new Vector(MCRXmlHelper.getAllElementTexts("group", groupElements));
+    groups = new Vector(MCRXMLHelper.getAllElementTexts("group", groupElements));
   }
 
   /**

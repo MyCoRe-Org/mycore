@@ -22,7 +22,7 @@
  *
  **/
 
-package mycore.user;
+package mycore.xml;
 
 import java.io.*;
 import java.util.Vector;
@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
-public class MCRXmlHelper
+public class MCRXMLHelper
 {
   /**
    * This method prints out a node. It is meant only for debugging purposes
