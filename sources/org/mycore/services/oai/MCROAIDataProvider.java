@@ -1044,9 +1044,10 @@ public class MCROAIDataProvider extends HttpServlet {
 	    				mappedSets.add(mappedSet);
 	    			}
 	    		}
-	    	} else {
-		    	mappedSets.add(set);
 		    }
+    	} else {
+			//Add a null set to make the query work when no set was queried
+	    	mappedSets.add(set);
 	    } 
 	    
 	    List sets = new ArrayList();
@@ -1359,6 +1360,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    		}
 	    	}
 	    } else {
+			//Add a null set to make the query work when no set was queried
 	    	mappedSets.add(set);
 	    }
 	    
