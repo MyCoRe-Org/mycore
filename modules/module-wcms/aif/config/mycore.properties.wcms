@@ -3,20 +3,20 @@
 #########################################################################
 ### content and configuratin stuff
 #########################################################################
-#Path and File containing the WCMS user Database. Normally WCMSUserDB.xml
+#Path and File containing the WCMS user Database
 MCR.WCMS.wcmsUserDBFile=$MYCOREAPPLICATION_HOME/modules/module-wcms/aif/config/WCMSUserDB.xml
 
 #Path to the content section
-MCR.WCMS.contentRoot=$MYCOREAPPLICATION_HOME/webapps/content/
+MCR.WCMS.contentRoot=$AppServer_DocumentRoot/webapps/content/
 
 #Path and File containing the navigation menu
-MCR.WCMS.navigationFile=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/uif/common/navigation.xml
+MCR.WCMS.navigationFile=$AppServer_DocumentRoot/webapps/modules/module-wcms/uif/common/navigation.xml
 
 #Path an File containing the invalid Session information
-MCR.WCMS.sessionError=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/aif/admin/error/noSession.xml
+MCR.WCMS.sessionError=$AppServer_DocumentRoot/webapps/modules/module-wcms/aif/admin/error/noSession.xml
 
 #Path containing the templates
-MCR.WCMS.templatePath=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/templates/
+MCR.WCMS.templatePath=$AppServer_DocumentRoot/webapps/modules/module-wcms/templates/
 
 #########################################################################
 ### backups, logs, etc.
@@ -28,16 +28,16 @@ MCR.WCMS.backupPath=$MYCOREAPPLICATION_HOME/modules/module-wcms/aif/archive/cont
 MCR.WCMS.logFile=$MYCOREAPPLICATION_HOME/modules/module-wcms/aif/archive/logs/WCMSLogFile.xml
 
 #Path a file containing the general last done action information
-MCR.WCMS.footer=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/uif/common/lastModified.xml
+MCR.WCMS.footer=$AppServer_DocumentRoot/webapps/modules/module-wcms/uif/common/lastModified.xml
 
 #########################################################################
 ### file upload properties
 #########################################################################
 #Path for documents uploaded with WCMSFileUploadServlet
-MCR.WCMS.documentPath=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/uif/common/documents/
+MCR.WCMS.documentPath=$AppServer_DocumentRoot/webapps/modules/module-wcms/uif/common/documents/
 
 #Path for images uploaded with WCMSFileUploadServlet
-MCR.WCMS.imagePath=$MYCOREAPPLICATION_HOME/webapps/modules/module-wcms/uif/common/images/uploads/
+MCR.WCMS.imagePath=$AppServer_DocumentRoot/webapps/modules/module-wcms/uif/common/images/uploads/
 
 #Maximum Size of uploadabel Files in Bytes
 MCR.WCMS.maxUploadFileSize=5000000
