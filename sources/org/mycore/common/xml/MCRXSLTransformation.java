@@ -242,5 +242,34 @@ public class MCRXSLTransformation {
             return null;
         }
     }
+    
+	/**
+	 * Method transform. Transforms a JDOM-Document <i>in</i> with a given <i>stylesheet</i> to a new document.
+	 * @param in A JDOM-Document.
+	 * @param stylesheet The Filename with complete path (this is not a servlet!) of the stylesheet.
+	 * @param parameters parameters used by the stylesheet for transformation
+	 * @return Document The new document or null, if an exception was thrown.
+	 */
+    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Properties parameters) {
+        try {
+            JDOMResult out = new JDOMResult();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer(
+                    new StreamSource(new File(stylesheet)));
+    		Enumeration names = parameters.propertyNames();
+   			while (names.hasMoreElements()) {
+    				String name = (String) (names.nextElement());
+    				String value = parameters.getProperty(name);
+
+    				transformer.setParameter(name, value);
+   			}            
+            transformer.transform(new JDOMSource(in), out);
+            
+            return out.getDocument();
+        }
+        catch (TransformerException e) {
+            logger.fatal(e.getMessage());
+            return null;
+        }
+    }    
 
 }
