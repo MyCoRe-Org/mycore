@@ -75,17 +75,18 @@ public class MCRSession implements Cloneable
   { return userID.trim(); }
 
   /** returns the current user object */
-  public final MCRUser getCurrentUser() throws MCRException
-  {
-    try {
-      if (userID != null)
-        return MCRUserMgr.instance().retrieveUser(userID.trim());
-      else return null;
-    }
-    catch(Exception ex) {
-      throw new MCRException("Error in MCRSession!", ex);
-    }
-  }
+
+  //public final MCRUser getCurrentUser() throws MCRException
+  //{
+  //  try {
+  //    if (userID != null)
+  //      return MCRUserMgr.instance().retrieveUser(userID.trim());
+  //    else return null;
+  //  }
+  //  catch(Exception ex) {
+  //    throw new MCRException("Error in MCRSession!", ex);
+  //  }
+  //}
 
   /** sets the current user ID */
   public final void setCurrentUserID(String userID)
