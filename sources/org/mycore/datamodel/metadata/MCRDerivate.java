@@ -440,7 +440,7 @@ public final void updateInDatastore() throws MCRPersistenceException
   MCRDerivate old = new MCRDerivate();
   try {
     old.receiveFromDatastore(mcr_id.getId()); }
-  catch (MCRException e) { createInDatastore(); }
+  catch (MCRException e) { createInDatastore(); return; }
   // remove the old link to metadata
   MCRObject obj;
   for (int i=0;i<old.getDerivate().getLinkMetaSize();i++) {
