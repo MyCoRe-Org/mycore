@@ -39,6 +39,7 @@ import org.apache.log4j.PropertyConfigurator;
  * methods can be overwrite from this classes.
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 abstract public class MCRQueryBase implements MCRQueryInterface {
@@ -101,7 +102,7 @@ public MCRXMLContainer getResultList( String query, String type,
     if (l == -1) { break; }
     m = query.indexOf("[",l);
     if (m == -1) { throwQueryEx(); }
-    if (root == null) { root = query.substring(l,m); }
+    root = query.substring(l,m);
     n = query.indexOf("]",m);
     if (n == -1) { throwQueryEx(); }
     kon = 1;
