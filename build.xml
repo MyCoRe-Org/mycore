@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.90 $ $Date: 2004-12-16 14:10:16 $                      -->
+  <!-- $Revision: 1.91 $ $Date: 2005-02-17 05:55:23 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.90 $ $Date: 2004-12-16 14:10:16 $</echo>
+    <echo>Ant build file   : $Revision: 1.91 $ $Date: 2005-02-17 05:55:23 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -540,7 +540,10 @@
       <param name="Distrib.Module" value="mycore" />
     </antcall>
     <antcall target="distribution.module">
-      <param name="Distrib.Module" value="mycore-sample-application" />
+      <param name="Distrib.Module" value="docportal" />
+    </antcall>
+    <antcall target="distribution.module">
+      <param name="Distrib.Module" value="mycoresample" />
     </antcall>
   </target>
 
@@ -548,8 +551,8 @@
     <property name="Distrib.TmpDir"     value="tmp"      />
     <property name="Distrib.TargetDir"  value="/mcr/www/download" />
     <property name="Distrib.CVSRoot"    value=":pserver:anoncvs@server.mycore.de:/cvs" />
-    <property name="Distrib.ReleaseTag" value="release_0_9" />
-    <property name="Distrib.ReleaseNr"  value="0.9" />
+    <property name="Distrib.ReleaseTag" value="release_1_0" />
+    <property name="Distrib.ReleaseNr"  value="1.0" />
 
     <delete dir="${Distrib.TmpDir}" />
 
@@ -578,7 +581,7 @@
 
     <delete dir="${Distrib.TmpDir}" />
 
-    <chmod dir="${Distrib.TargetDir}" includes="${Distrib.Module}*.*" perm="a+r" />
+    <chmod dir="${Distrib.TargetDir}" includes="${Distrib.Module}-${Distrib.ReleaseNr}.*" perm="a+r" />
 
   </target>
 
