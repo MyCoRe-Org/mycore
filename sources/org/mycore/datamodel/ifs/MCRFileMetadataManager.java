@@ -56,13 +56,35 @@ public class MCRFileMetadataManager
     cache = new MCRCache( size );
   }
   
-  private long lastID = System.currentTimeMillis();
+  private long last_number = System.currentTimeMillis();
+  
+  private String prefix;
+  
+  private String getIDPrefix()
+  {
+    if( prefix == null )
+    {
+      String ip = "127.0.0.1";
+      try{ ip = java.net.InetAddress.getLocalHost().getHostAddress(); }
+      catch( java.net.UnknownHostException ignored ){}
+      
+      java.util.StringTokenizer st = new java.util.StringTokenizer( ip, "." );
+
+      long sum = Integer.parseInt( st.nextToken() );
+      while( st.hasMoreTokens() )
+        sum = ( sum << 8 ) + Integer.parseInt( st.nextToken() );
+
+      String address = Long.toString( sum, 36 );
+      address = "000000" + address;
+      prefix = address.substring( address.length() - 6 );
+    }
+    return prefix;
+  }
   
   synchronized String createNodeID()
   {
-    lastID++;
-    String value = "0000000000000000" + Long.toString( lastID, 36 );
-    return value.substring( value.length() - 16 );
+    String time = "0000000000" + Long.toString( last_number++, 36 );
+    return getIDPrefix() + time.substring( time.length() - 10 );
   }
   
   void storeNode( MCRFilesystemNode node )
