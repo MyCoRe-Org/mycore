@@ -51,14 +51,14 @@ public class MCRSQLStatement
   public MCRSQLStatement setValue( String columnName, String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
-    values.put( columnName, columnValue ); 
+    if( columnValue != null ) values.put( columnName, columnValue ); 
     return this;
   }
   
   public MCRSQLStatement setCondition( String columnName, String columnValue )
   { 
     MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
-    conditions.put( columnName, columnValue ); 
+    if( columnValue != null ) conditions.put( columnName, columnValue ); 
     return this;
   }
   
@@ -118,8 +118,8 @@ public class MCRSQLStatement
       
       if( keys.hasMoreElements() )
       {
-        columnList.append( ", " );
-        valueList .append( ", " );
+        columnList.append( "," );
+        valueList .append( "," );
       }
     }
     
@@ -141,7 +141,7 @@ public class MCRSQLStatement
       String value = getSQLValue( key );
 
       statement.append( " " ).append( key   ).append( " =" );
-      statement.append( " " ).append( value ).append( " "  );
+      statement.append( " " ).append( value );
       if( keys.hasMoreElements() ) statement.append( ", "  );
     }
     
@@ -158,7 +158,7 @@ public class MCRSQLStatement
     for( int i = 0; i < columns.size(); i++ )
     {
       statement.append( " " ).append( columns.elementAt( i ) );
-      if( i < columns.size() - 1 ) statement.append( ", " );
+      if( i < columns.size() - 1 ) statement.append( "," );
     }
     
     statement.append( " )" );
