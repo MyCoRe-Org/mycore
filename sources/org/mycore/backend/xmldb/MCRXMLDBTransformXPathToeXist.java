@@ -137,7 +137,39 @@ private String handleQueryStringExist(String root, String query, String type) {
 	query = MCRUtils.replaceString(query, "text()", ".");
 	query = MCRUtils.replaceString(query, "ts()", ".");
 	query = MCRUtils.replaceString(query, "contains(", "&=");
+	query = MCRUtils.replaceString(query, "contains (", "&=");
 	query = MCRUtils.replaceString(query, ")", "");
+        // select numbers and remove ""
+        int i = 0;
+        int l = query.length();
+        double k = 0;
+        while (i < l) {
+          i = query.indexOf("\"",i);
+          if (i != -1) {
+            int j = query.indexOf("\"",i+1);
+            if (j != -1) {
+              try {
+                k = Double.parseDouble(query.substring(i+1,j).replace(',','.'));
+                StringBuffer sb = new StringBuffer(1024);
+                sb.append(query.substring(0,i));
+                if (k == Math.floor(k)) {
+                  int m = (int)k; sb.append(m); }
+                else { 
+                  String s = ((String)Double.toString(k)).replace(',','.');
+                  sb.append(s);
+                  }
+                sb.append(query.substring(j+1,l));
+                query = sb.toString();
+                l = sb.length();
+                }
+              catch (Exception e) { }
+              i = j+1;
+              }
+            i = i+1;
+            }
+          else { break; }
+          }
+
 	// combine the separated queries
 	query = root + "[" + query + "]";
 	return query;
