@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
 <!-- build.xml - build file for the MyCoRe API -->
 
 <project default="usage" basedir=".">
@@ -11,23 +13,25 @@
   <property name="debug" value="on"/>
   <property name="optimize" value="on"/>
   <property name="deprecation" value="on"/>
-    
-  <!-- file system -->
-  <property name="sources"      value="./sources"/>
-  <property name="classes"      value="./classes"/>
-  <property name="javadocs"     value="./javadocs"/>
-  <property name="lib"          value="./lib"/>
+
+  <!-- persistency -->
   <property name="persistency"  value="cm7"/>
   <property name="database"     value="db2"/>
+
+  <!-- PDF generation -->
+  <property name="doclets" value="/mycore/cvs/doclets" />
     
   <!-- classpath -->
   <property name="build.sysclasspath" value="last"/>
 
   <path id="mycore.classpath">
-    <fileset dir="${lib}">
+    <fileset dir="${basedir}/lib">
       <include name="*.jar"/>
     </fileset>
   </path>
+
+  <!-- CVS repository -->
+  <property name="CVSRoot" value="server.mycore.de:/cvs" />
 
   <!-- =================================================================== -->
   <!-- Help on usage                                                       -->
@@ -43,9 +47,11 @@
       compile     --> compiles the source code
       compile_pkg --> compiles mycore subpackage pkg
       javadocs    --> generates the JavaDoc API documentation
+      update      --> do a cvs update -dP
       jar         --> creates /lib/mycore.jar containing all MyCoRe classes
       clean       --> cleans up the directory, removes all generated files
-   
+
+   There are some other targets only for internal use, ignore them.   
    See the comments inside the build.xml file for more details.
 
  ---------------------------------------------------------------------
@@ -57,8 +63,8 @@
   <!-- The initalization for all                                           -->
   <!-- =================================================================== -->
   <target name="init" >
-   <mkdir dir="${classes}"/>
-   <mkdir dir="${javadocs}"/>
+   <mkdir dir="${basedir}/classes"/>
+   <mkdir dir="${basedir}/javadocs"/>
   </target>
   
   <!-- =================================================================== -->
@@ -71,7 +77,7 @@
   <!-- Creates a mycore.jar file containing all compiled MyCoRe classes    -->
   <!-- =================================================================== -->
   <target name="jar" depends="compile">
-    <jar jarfile="${lib}/mycore.jar" basedir="${classes}"/>
+    <jar jarfile="${basedir}/lib/mycore.jar" basedir="${basedir}/classes"/>
   </target>
   
   <!-- =================================================================== -->
@@ -79,8 +85,8 @@
   <!-- =================================================================== -->
 
   <target name="javac" depends="init">
-    <javac srcdir="${sources}"
-           destdir="${classes}"
+    <javac srcdir="${basedir}/sources"
+           destdir="${basedir}/classes"
            includes="${packages}"
            classpathref="mycore.classpath"
            debug="${debug}"
@@ -89,7 +95,7 @@
     </javac>
   </target>
 
-  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_webservice, compile_query, compile_persistency, compile_database"/>
+  <target name="compile" depends="compile_common, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_editor, compile_cli, compile_ifs, compile_remote, compile_sql, compile_oai, compile_query, compile_persistency, compile_database"/>
 
   <target name="compile_common">
     <antcall target="javac">
@@ -114,12 +120,6 @@
   <target name="compile_sql">
     <antcall target="javac">
       <param name="packages" value="org/mycore/backend/sql/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_webservice">
-    <antcall target="javac">
-      <param name="packages" value="org/mycore/webservice/**"/>
     </antcall>
   </target>
 
@@ -184,10 +184,40 @@
   </target>
 
   <!-- =================================================================== -->
-  <!-- Create the JavaDocs from sources                                    -->
+  <!-- Check if javadocs and pdf are up to date or outdated                -->
   <!-- =================================================================== -->
 
-  <target name="javadocs" depends="init">
+  <target name="up2date" depends="init">
+
+    <condition property="javadocs.outdated">
+      <not>
+        <uptodate>
+          <srcfiles dir="${basedir}/sources" includes="**/*.java" />
+          <srcfiles dir="${basedir}/sources" includes="**/*.html" />
+          <mapper type="merge" to="${basedir}/javadocs/overview-tree.html"/>
+        </uptodate>
+      </not>
+    </condition>
+    <echo>JavaDocs outdated: ${javadocs.outdated} ${basedir}</echo>
+
+    <condition property="pdf.outdated">
+      <not>
+        <uptodate>
+          <srcfiles dir="${basedir}/sources" includes="**/*.java" />
+          <srcfiles dir="${doclets}" includes="pdfdoclet-mycore.properties" />
+          <mapper type="merge" to="${basedir}/javadocs/javadocs.pdf"/>
+        </uptodate>
+      </not>
+    </condition>
+    <echo>PDF outdated: ${pdf.outdated}</echo>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Create the HTML JavaDocs from sources                               -->
+  <!-- =================================================================== -->
+
+  <target name="javadocs" depends="up2date" if="javadocs.outdated">
     <echo>
 
       Building the MyCoRe source code JavaDoc documentation...
@@ -198,8 +228,8 @@
     <javadoc
       packagenames        = "org.mycore.*"
       excludepackagenames = "org.mycore.backend.cm8"
-      sourcepath          = "${sources}"
-      destdir             = "${javadocs}"
+      sourcepath          = "${basedir}/sources"
+      destdir             = "${basedir}/javadocs"
       classpathref        = "mycore.classpath"
       author              = "true"
       version             = "true"
@@ -214,7 +244,7 @@
       <group title="MyCoRe User Interface Frontend"             packages="org.mycore.frontend*"  />
       <group title="MyCoRe Common Functionality"                packages="org.mycore.common*"    />
       <group title="MyCoRe Services"                            packages="org.mycore.services*"  />
-      <group title="MyCoRe Other Packages"                      packages="org.mycore.user:org.mycore.webservice" />
+      <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
 
       <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
       <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
@@ -227,17 +257,119 @@
   </target>
 
   <!-- =================================================================== -->
+  <!-- Create the PDF JavaDocs from sources                                -->
+  <!-- =================================================================== -->
+
+  <target name="pdf" depends="up2date" if="pdf.outdated">
+    <echo>
+
+      Building the MyCoRe source code documentation as PDF...
+
+      NOTE: Under AIX, you have to do the following to make this work:
+      ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
+    </echo>
+    <javadoc
+      packagenames        = "org.mycore.*"
+      excludepackagenames = "org.mycore.backend.cm8"
+      sourcepath          = "${basedir}/sources"
+      classpathref        = "mycore.classpath"
+      author              = "true"
+      version             = "true"
+      access              = "package"
+    >
+      <doclet 
+        name = "com.tarsec.javadoc.pdfdoclet.PDFDoclet"
+        path = "${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar" >                                                                                         
+        <param name="-pdf"    value="${basedir}/javadocs/javadocs.pdf" />             
+        <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />  
+      </doclet>             
+ 
+    </javadoc>
+  </target>
+
+  <!-- =================================================================== -->
   <!-- Remove the user created directories and files                       -->
   <!-- =================================================================== -->
+
   <target name="clean" depends="init">
     <delete includeEmptyDirs="true" >
-      <fileset dir="${javadocs}" />
-      <fileset dir="${classes}"  />
+      <fileset dir="${basedir}/javadocs" />
+      <fileset dir="${basedir}/classes"  />
     </delete>
-    <delete file="${lib}/mycore.jar" />
+    <delete file="${basedir}/lib/mycore.jar" />
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Update current working directory from CVS repository                -->
+  <!-- =================================================================== -->
+
+  <target name="update">
+    <cvs
+      cvsroot="${CVSRoot}"
+      command="update -dP"
+      dest="${basedir}"
+    />
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Build CVS ChangeLog                                                 -->
+  <!-- =================================================================== -->
+
+  <target name="changelog" depends="init">
+    <echo>
+
+      Building CVS ChangeLog, please be patient...
+    </echo>
+
+    <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
+    <antcall target="do-log"><param name="changelog-year" value="2002" /></antcall>
+    <antcall target="do-log"><param name="changelog-year" value="2001" /></antcall>
+  </target>
+
+  <target name="do-log">
+    <echo>Logging changes of the year ${changelog-year}...</echo>
+
+    <cvschangelog 
+      dir      = "."
+      destfile = "${basedir}/javadocs/changelog-${changelog-year}.xml" 
+      start    = "1 Jan ${changelog-year}"
+      end      = "31 Dec ${changelog-year}"
+    >
+      <user displayname = "Frank Lützenkirchen / Essen"  userid = "dlclient" />
+      <user displayname = "Frank Lützenkirchen / Essen"  userid = "mcrfluet" />
+      <user displayname = "Holger Gollan / Essen"        userid = "mcrhgoll" />
+      <user displayname = "Detlev Degenhardt / Freiburg" userid = "mcrddege" />
+      <user displayname = "Harald Richter / Essen"       userid = "mcrhrich" />
+      <user displayname = "Jens Kupferschmidt / Leipzig" userid = "mcrjkupf" />
+      <user displayname = "Mathias Hegner / Jena"        userid = "mcrmhegn" />
+      <user displayname = "Marc Schlüppmann / Essen"     userid = "mcrmslue" />
+      <user displayname = "Thorsten Agemar / Göttingen"  userid = "mcrtagem" />
+      <user displayname = "Thomas Scheffler / Jena"      userid = "mcrukroe" />
+      <user displayname = "Werner Gresshoff / Münster"   userid = "mcrwgres" />
+      <user displayname = "Benno Süselbeck / Münster"    userid = "mcrbsuse" />
+    </cvschangelog>
+
+    <style 
+      in           = "${basedir}/javadocs/changelog-${changelog-year}.xml" 
+      out          = "${basedir}/javadocs/changelog-${changelog-year}.html" 
+      style        = "${ant.home}/etc/changelog.xsl"
+      classpathref = "mycore.classpath"
+    >
+      <param name="title"  expression="MyCoRe CVS ChangeLog for the year ${changelog-year}" />
+      <param name="module" expression="mycore" />
+      <param name="cvsweb" expression="http://www.mycore.de/repository/cgi-bin/viewcvs.cgi/" />
+    </style>
+
+    <delete file="${basedir}/javadocs/changelog-${changelog-year}.xml" />
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Do work after a CVS commit...                                       -->
+  <!-- =================================================================== -->
+
+  <target name="postcommit" depends="update, javadocs, pdf">
+    <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
   </target>
 
 </project>
-
-<!-- End of file -->
 
