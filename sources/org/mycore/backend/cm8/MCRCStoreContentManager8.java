@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
+import org.mycore.services.query.*;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
@@ -52,7 +53,7 @@ import org.mycore.datamodel.ifs.*;
  * @version $Revision$ $Date$
  */
 public class MCRCStoreContentManager8 
-  extends MCRContentStore implements DKConstantICM
+  extends MCRContentStore implements DKConstantICM, MCRTextSearchInterface
 {
   /** The ItemType name to store the content */
   protected String itemTypeName;
@@ -60,6 +61,10 @@ public class MCRCStoreContentManager8
   /** The name of the attribute that stores the MCRFile.getID() */
   protected String attributeFile;
   protected final int MAX_ATTRIBUTE_FILE_LENGTH = 128;
+
+  /** The name of the attribute that stores the MCRFile.getOwnerID() */
+  protected String attributeOwner;
+  protected final int MAX_ATTRIBUTE_OWNER_LENGTH = 128;
 
   /** The name of the attribute that stores the creation timestamp */
   protected String attributeTime;
@@ -94,6 +99,7 @@ public class MCRCStoreContentManager8
     MCRConfiguration config = MCRConfiguration.instance();
     itemTypeName   = config.getString( prefix + "ItemType"       );
     attributeTime  = config.getString( prefix + "Attribute.File" );
+    attributeOwner = config.getString( prefix + "Attribute.Owner" );
     attributeFile  = config.getString( prefix + "Attribute.Time" );
     storeTempType  = config.getString( prefix + "StoreTemp.Type", "none" );
     storeTempSize  = config.getInt( prefix + "StoreTemp.MemSize", 4 );
@@ -125,6 +131,10 @@ public class MCRCStoreContentManager8
       logger.debug("MCRFile ID = "+ file.getID() );
       short dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeFile);
       ((DKDDO)ddo).setData(dataId, file.getID() );
+      
+      logger.debug("MCRFile OwnerID = "+ ((MCRFile)file).getOwnerID() );
+      dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeOwner);
+      ((DKDDO)ddo).setData(dataId, ((MCRFile)file).getOwnerID() );
       
       String timestamp = buildNextTimestamp();
       dataId = ((DKDDO)ddo).dataId(DK_CM_NAMESPACE_ATTR,attributeTime);
@@ -254,6 +264,11 @@ public class MCRCStoreContentManager8
       MAX_ATTRIBUTE_FILE_LENGTH,false))
       logger.warn("CM8 Datastore Creation attribute "+attributeFile+
         " already exists.");
+    // create the Attribute for IFS File OwnerID
+    if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeOwner, 
+      MAX_ATTRIBUTE_OWNER_LENGTH,false))
+      logger.warn("CM8 Datastore Creation attribute "+attributeOwner+
+        " already exists.");
     // create the Attribute for IFS Time 
     if (!MCRCM8ItemTypeCommon.createAttributeVarChar(connection,attributeTime, 
       MAX_ATTRIBUTE_TIME_LENGTH,false))
@@ -282,6 +297,10 @@ public class MCRCStoreContentManager8
     attr.setNullable(false);
     attr.setUnique(false);
     item_type.addAttr(attr);
+    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeOwner);
+    attr.setNullable(false);
+    attr.setUnique(false);
+    item_type.addAttr(attr);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(attributeTime);
     attr.setNullable(false);
     attr.setUnique(false);
@@ -293,6 +312,53 @@ public class MCRCStoreContentManager8
     item_type.add();
     logger.info("The ItemType "+itemTypeName+" for IFS CM8 store is created."); 
   }
+
+ /**
+  *
+  **/
+  public String[] getDerivateIDs(String doctext)
+    {
+    Logger logger = MCRCM8ConnectionPool.getLogger(); 
+    logger.debug("TS incoming query "+doctext);
+    if (doctext==null) { return (new String[0]); }
+
+    // transform query
+    int i = doctext.indexOf("\"");
+    if (i==-1) { return (new String[0]); }
+    int j = doctext.indexOf("\"",i+1);
+    if (j==-1) { return (new String[0]); }
+    StringBuffer sb = new StringBuffer(1024);
+    sb.append('/').append(itemTypeName).append("[contains-text (@TIEREF,\"\'")
+      .append(doctext.substring(i+1,j)).append("\'\")=1]");
+    logger.debug("TS outgoing query "+sb.toString());
+    
+    // start the query
+    String [] outgo = new String[0];
+    DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
+    try {
+      DKNVPair options[] = new DKNVPair[3];
+      options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0"); // No Maximum (Default)
+      options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,new Integer(DKConstant.DK_CM_CONTENT_YES));
+      options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END,null);
+      DKResults results = (DKResults)connection.evaluate(sb.toString(),
+        DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
+      dkIterator iter = results.createIterator();
+      logger.debug("Number of Results:  "+results.cardinality());
+      outgo = new String[results.cardinality()];
+      i = 0;
+      while (iter.more()) {
+        DKDDO resitem = (DKDDO)iter.next();
+        resitem.retrieve();
+        short dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,attributeOwner);
+        outgo[i] = (String) resitem.getData(dataId);
+        logger.debug("MCRDerivateID :"+outgo[i]);
+        }
+      }
+    catch (Exception e) { }
+    finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
+
+    return outgo;
+    }
 
 }
 

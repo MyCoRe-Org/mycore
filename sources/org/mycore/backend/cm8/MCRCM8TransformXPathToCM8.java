@@ -69,21 +69,34 @@ public MCRCM8TransformXPathToCM8()
 public final MCRXMLContainer startQuery(String type) 
   {
   MCRXMLContainer result = new MCRXMLContainer();
+  boolean hasts = false;
+  boolean hasmeta = false;
+
+  // Make all document searches
+  java.util.ArrayList idts = new java.util.ArrayList();
+  for (int i=0;i<subqueries.size();i++) {
+    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
+      hasts = true;
+      flags.set(i,Boolean.TRUE);
+      logger.debug("TextSearch query : "+(String)subqueries.get(i));
+      // start the query against the textsearch
+      for (int j = 0; j<tsint.length;j++) {
+        String [] der = tsint[j].getDerivateIDs((String)subqueries.get(i));
+        for (int k=0;k<der.length;k++) { idts.add(getObjectID(der[k])); }
+        }
+      }
+    }
+  for (int i=0;i<idts.size();i++) {
+    logger.debug("IDTS = "+((String)((MCRObjectID)idts.get(i)).getId())); }
+
+  // prepare the query over the rest of the metadata
+  java.util.ArrayList idmeta = new java.util.ArrayList();
+
   // read prefix from configuration
   String sb = new String("MCR.persistence_cm8_"+type.toLowerCase());
   String itemtypename = config.getString(sb); 
   String itemtypeprefix = config.getString(sb+"_prefix");
 
-  // Search in the text document
-  String tsquery = "";
-  for (int i=0;i<subqueries.size();i++) {
-    if (((String)subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
-      tsquery = (String)subqueries.get(i);
-      flags.set(i,Boolean.TRUE);
-      }
-    }
-
-  // Search in the metadata
   // Select the query strings
   StringBuffer cond = new StringBuffer(1024);
   for (int i=0;i<subqueries.size();i++) {
@@ -94,57 +107,58 @@ public final MCRXMLContainer startQuery(String type)
     }
   logger.debug("Codition transformation "+cond.toString());
   // build the query
-  StringBuffer query = new StringBuffer(1024);
-  query.append('/').append(itemtypename); 
-  if (cond.toString().trim().length() > 0) {
-    query.append('[').append(cond.toString()).append(']'); }
-  logger.debug("Transformed query "+query);
-  // Start the search
-  DKDatastoreICM connection = null;
-  try {
-    connection = MCRCM8ConnectionPool.instance().getConnection();
-    DKNVPair parms [] = new DKNVPair[3];
-    parms[0] = new DKNVPair(DK_CM_PARM_MAX_RESULTS,
-      new Integer(maxresults).toString());
-    parms[1] = new DKNVPair(DK_CM_PARM_RETRIEVE,
-      //new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
-      new Integer(DK_CM_CONTENT_YES));
-    parms[2] = new DKNVPair(DK_CM_PARM_END,null);
-    DKResults rsc = (DKResults)connection.evaluate(query.toString(),
-      DK_CM_XQPE_QL_TYPE,parms);
-    dkIterator iter = rsc.createIterator();
-    logger.debug("Results :"+rsc.cardinality());
-    MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-    String id = "";
-    int rank = 0;
-    byte [] xml = null;
-    short dataId = 0;
-    while (iter.more()) {
-      DKDDO resitem = (DKDDO)iter.next();
-      resitem.retrieve();
-      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
-      id = (String) resitem.getData(dataId);
-      logger.debug(itemtypeprefix+"ID :"+id);
-      try {
-        xml = xmltable.retrieve(type,new MCRObjectID(id));
-        result.add( "local", id, 0, xml);
-        }
-      catch (Exception e) {
-        logger.warn(">>>>>>>>>>>>>>> OLD VERSION <<<<<<<<<<<<<<<<<<<");
-        try {
-          dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"xml");
-          xml = (byte []) resitem.getData(dataId);
-          result.add("local",id,rank,xml);
-          }
-        catch (Exception ex) {
-          logger.warn("Can not retieve the XML data from the old CM8 store."); }
+  if ((cond.length()!=0) || (!hasts)) {
+    hasmeta = true;
+    StringBuffer query = new StringBuffer(1024);
+    query.append('/').append(itemtypename); 
+    if (cond.toString().trim().length() > 0) {
+      query.append('[').append(cond.toString()).append(']'); }
+    logger.debug("Transformed query "+query);
+
+    // Start the search
+    DKDatastoreICM connection = null;
+    try {
+      connection = MCRCM8ConnectionPool.instance().getConnection();
+      DKNVPair parms [] = new DKNVPair[3];
+      parms[0] = new DKNVPair(DK_CM_PARM_MAX_RESULTS,
+        new Integer(maxresults).toString());
+      parms[1] = new DKNVPair(DK_CM_PARM_RETRIEVE,
+        //new Integer(DK_CM_CONTENT_ATTRONLY | DK_CM_CONTENT_LINKS_OUTBOUND));
+        new Integer(DK_CM_CONTENT_YES));
+      parms[2] = new DKNVPair(DK_CM_PARM_END,null);
+      DKResults rsc = (DKResults)connection.evaluate(query.toString(),
+        DK_CM_XQPE_QL_TYPE,parms);
+      dkIterator iter = rsc.createIterator();
+      logger.debug("Results :"+rsc.cardinality());
+      MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
+      String id = "";
+      int rank = 0;
+      byte [] xml = null;
+      short dataId = 0;
+      while (iter.more()) {
+        DKDDO resitem = (DKDDO)iter.next();
+        resitem.retrieve();
+        dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
+        id = (String) resitem.getData(dataId);
+        logger.debug(itemtypeprefix+"ID :"+id);
+        idmeta.add(new MCRObjectID(id));
         }
       }
+    catch (Exception e) {
+      throw new MCRPersistenceException("CM8 Search error."+e.getMessage()); }
+    finally {
+      MCRCM8ConnectionPool.instance().releaseConnection(connection); }
     }
-  catch (Exception e) {
-    throw new MCRPersistenceException("CM8 Search error."+e.getMessage()); }
-  finally {
-    MCRCM8ConnectionPool.instance().releaseConnection(connection); }
+
+  // merge the results
+  java.util.ArrayList myresult = null;
+  if (!hasts) { myresult = idmeta; }
+  if (!hasmeta) { myresult = idts; }
+  if ((hasts) && (hasmeta)) { myresult = mergeWithAnd(idts,idmeta); }
+
+  // put the XML files in the result container
+  result = createResultContainer(myresult);
+
   return result;
   }
 
@@ -172,7 +186,8 @@ private final String traceOneCondition(String condstr, String itemtypeprefix)
   int i = condstr.indexOf("[");
   if (i != -1) {
     int j = condstr.indexOf("]");
-    if (j == -1) { throwQueryEx(); }
+    if (j == -1) { 
+      throw new MCRPersistenceException("Error while analyze the query string."); }
     klammer = true;
     cond = condstr.substring(i+1,j);
     String p = condstr.substring(0,i);
