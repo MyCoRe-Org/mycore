@@ -24,9 +24,7 @@
 
 package org.mycore.user;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
@@ -78,17 +76,17 @@ public class MCRAccessServlet extends MCRServlet
     // ip parameter 'ip' or 'ipmask/subnetmask'
     String ip = getProperty(job.getRequest(), "ip");
     if (ip == null) { ip = ""; }
-    ip.trim();
+    else ip=ip.trim();
     if (ip.length()==0) { retip = true; }
     // privilege parameter
     String privilege = getProperty(job.getRequest(), "privilege");
     if (privilege == null) { privilege = ""; }
-    privilege.trim();
+    else privilege=privilege.trim();
     if (privilege.length()==0) { retpriv = true; }
     // list of user parameter
     String userlist = getProperty(job.getRequest(), "userlist");
     if (userlist == null) { userlist = ""; }
-    userlist.trim();
+    else userlist=userlist.trim();
     if (userlist.length()==0) { retuser = true; }
     HashSet userset = new HashSet();
     StringTokenizer st = new StringTokenizer(userlist,"_");
@@ -101,34 +99,37 @@ public class MCRAccessServlet extends MCRServlet
 
     // check for mode reader
     if (mode.equals("reader")) {
-      StringBuffer sb = new StringBuffer(1024);
-      sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("] and privilege [").append(privilege).append(']');
-      LOGGER.debug(sb.toString());
+    	if(LOGGER.isDebugEnabled()){
+    		StringBuffer sb = new StringBuffer();
+    		sb.append("Access check in mode ").append(mode).append(" for ip [")
+					.append(ip).append("](").append(!retip)
+					.append(") and privilege [").append(privilege).append("](").append(!retpriv)
+					.append(')');
+    		LOGGER.debug(sb.toString());
+    	}
       // check the data
-      if (retip && retpriv) { 
-        result = false; }
-      else {
-        if (!retip) { retip = checkIP(ip,job); }
-        if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
-        result = retip && retpriv;
-        }
-      }
+      if (!retip) { retip = checkIP(ip,job); }
+      if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
+      result = retip && retpriv;
+    }
     
     // check for mode editor
     if (mode.equals("editor")) {
-      StringBuffer sb = new StringBuffer(1024);
-      sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("] and users [").append(userlist).append("] and privilege [").append(privilege).append(']');
-      LOGGER.debug(sb.toString());
+    	if(LOGGER.isDebugEnabled()){
+    		StringBuffer sb = new StringBuffer();
+    		sb.append("Access check in mode ").append(mode).append(" for ip [")
+					.append(ip).append("](").append(!retip)
+					.append(" and users [").append(userlist).append("](").append(!retuser)
+					.append(") and privilege [").append(privilege).append("](").append(!retpriv)
+					.append(')');
+    		LOGGER.debug(sb.toString());
+    	}
       // check the data
-      if (retip && retpriv) { 
-        result = false; }
-      else {
-        if (!retip) { retip = checkIP(ip,job); }
-        if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
-        if (!retuser) { retuser = checkGroupMember(userid,userset); }
-        result = retip && retpriv && retuser;
-        }
-      }
+      if (!retip) { retip = checkIP(ip,job); }
+      if (!retpriv) { retpriv = checkPrivileg(privilege,userid); }
+      if (!retuser) { retuser = checkGroupMember(userid,userset); }
+      result = retip && retpriv && retuser;
+    }
 
     // prepare the document
     org.jdom.Element root = new org.jdom.Element("mycoreaccess");
@@ -153,8 +154,8 @@ public class MCRAccessServlet extends MCRServlet
    **/
   boolean checkIP(String ip, MCRServletJob job) {
 		String ipAddr, subNet;
-		int i;
-		if ((i = ip.indexOf("/")) >= 0) {
+		int i=ip.indexOf("/");
+		if (i >= 0) {
 			//subnet mask present
 			ipAddr = ip.substring(0, i).trim();
 			subNet = ip.substring(i + 1, ip.length()).trim();

@@ -30,17 +30,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class holds a lot of static check methods to test some access
  * values in the current instance. The methods of this class can be used
  * by the access controll of commandline or servlets.
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 
-public class MCRAccessChecker
-  {
+public class MCRAccessChecker {
+	private static Logger LOGGER=Logger.getLogger(MCRAccessChecker.class);
   /**
    * The method check the given IP against an IP address area as peer of
    * IP part and subnet mask.
@@ -52,6 +55,14 @@ public class MCRAccessChecker
    **/ 
   public static final boolean isInetAddressInSubnet(String ip, String subnetIP,
     String subnetMask) throws UnknownHostException {
+  	if (LOGGER.isDebugEnabled()){
+  		StringBuffer buf=new StringBuffer();
+  		buf.append(MCRAccessChecker.class.getName())
+			.append("\nIP: ").append(ip)
+			.append("\nsubnetIP: ").append(subnetIP)
+			.append("\nsubnetMask: ").append(subnetMask);
+  		LOGGER.debug(buf.toString());
+  	}
     if ((ip == null) || ((ip = ip.trim()).length() ==0)) {
       return false; }
     if ((subnetIP == null) || ((subnetIP = subnetIP.trim()).length() ==0)) {
@@ -61,6 +72,14 @@ public class MCRAccessChecker
     InetAddress ipAddr = InetAddress.getByName(ip);
     InetAddress ipSubAddr = InetAddress.getByName(subnetIP);
     InetAddress subnetMaskAddr = InetAddress.getByName(subnetMask);
+  	if (LOGGER.isDebugEnabled()){
+  		StringBuffer buf=new StringBuffer();
+  		buf.append(MCRAccessChecker.class.getName())
+			.append("\nIPAddr: ").append(ipAddr.getHostAddress())
+			.append("\nsubnetIPAddr: ").append(ipSubAddr.getHostAddress())
+			.append("\nsubnetMaskAddr: ").append(subnetMaskAddr.getHostAddress());
+  		LOGGER.debug(buf.toString());
+  	}
     int length = (ipAddr.getAddress().length
       + ipSubAddr.getAddress().length + subnetMaskAddr.getAddress().length) / 3;
     if (length == 4) {
@@ -72,6 +91,14 @@ public class MCRAccessChecker
        subnet1[i] = (byte) (ipSubAddr.getAddress()[i] & subnetMaskAddr.getAddress()[i]);
        subnet2[i] = (byte) (ipAddr.getAddress()[i] & subnetMaskAddr.getAddress()[i]);
        if (subnet1[i] != subnet2[i]) return false;
+     	if (LOGGER.isDebugEnabled()){
+    		StringBuffer buf=new StringBuffer();
+    		buf.append(MCRAccessChecker.class.getName())
+  			.append("\ni: ").append(i)
+  			.append("\nsubnet1[i]: ").append(((int)subnet1[i]) & 0xff)
+  			.append("\nsubnet2[i]: ").append(((int)subnet2[i]) & 0xff);
+    		LOGGER.debug(buf.toString());
+    	}
        }
      return true; //ip is in subnet ipSub/subnetMask
      }
