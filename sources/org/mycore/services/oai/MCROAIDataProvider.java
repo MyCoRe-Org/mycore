@@ -734,7 +734,7 @@ public class MCROAIDataProvider extends HttpServlet {
             	logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
             } else {
-            	record = query.getRecord(id, null, getServletName());
+            	record = query.getRecord(id, "oai_dc", getServletName());
             }
         }
         
@@ -1194,8 +1194,8 @@ public class MCROAIDataProvider extends HttpServlet {
 	    }
 
         if (query.exists(id)) {
-        	List record = new ArrayList(query.getRecord(
-					id, metadataPrefix[0], getServletName()));
+        	List record = query.getRecord(id, 
+					metadataPrefix[0], getServletName());
             Element eGetRecord = new Element("GetRecord", ns);
             
 		    if (record != null) {
@@ -1224,10 +1224,12 @@ public class MCROAIDataProvider extends HttpServlet {
 	            } else {
 	            	logger.error("Die Transformation in 'getRecord' hat nicht funktioniert.");
         	    }
+	    	} else {
+	        	logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+	            return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
 	    	}
-	    	
 		} else {
-			logger.info("Anfrage 'getRecord wurde fegen fehlender ID " + id + "abgebrochen.");
+			logger.info("Anfrage 'getRecord' wurde fegen fehlender ID " + id + " abgebrochen.");
             return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
         }
         
