@@ -31,7 +31,11 @@ import java.security.*;
 /**
  * This class implements a special kind of BufferedInputStream that blocks
  * invocations of the read method until the number of bytes that were requested
- * are fully read from the underlying InputStream.
+ * are fully read from the underlying InputStream. In contrast, 
+ * BufferedInputStream does NOT block when the requested number of bytes is not
+ * available yet.
+ *
+ * @see BufferedInputStream
  *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
