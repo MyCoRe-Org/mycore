@@ -208,7 +208,7 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content of MCRMetaBoolean is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag.toUpperCase());
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
   tc.addBooleanElement(value);
   tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
