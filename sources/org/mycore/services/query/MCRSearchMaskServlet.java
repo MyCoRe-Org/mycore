@@ -38,6 +38,7 @@ import org.mycore.frontend.servlets.*;
  * analyze the output of them to create a XQuery and start the MCRQueryServlet
  *
  * @author Jens Kupferschmidt
+ * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
 */
 public class MCRSearchMaskServlet extends MCRServlet 
@@ -204,22 +205,28 @@ org.jdom.Document jdom = null;
       }
     if (k != 0) { continue; }
     for (int j=0;j<param.size();j++) {
-      k = tempquery.indexOf(((String)varia.get(j)));
+      int start = 0;
+      int l = ((String)varia.get(j)).length() ;
+      k = tempquery.indexOf((String)varia.get(j),0);
       if (k == -1) {
         throw new MCRException("SearchMaskServlet : The query attribute "+
         "has not the elemnt "+((String)varia.get(j)));
         }
       StringBuffer qsb = new StringBuffer(128);
-      if (tempquery.charAt(k-1)=='\'') {
-        qsb.append(tempquery.substring(0,k-1)).append("\"")
-         .append(((String)param.get(j))).append("\"")
-         .append(tempquery.substring(k+1+((String)varia.get(j)).length(),
-         tempquery.length())); }
-      else {
-        qsb.append(tempquery.substring(0,k))
-         .append(((String)param.get(j)))
-         .append(tempquery.substring(k+((String)varia.get(j)).length(),
-         tempquery.length())); }
+      while(k != -1) {
+        if (tempquery.charAt(k-1)=='\'') {
+          qsb.append(tempquery.substring(start,k-1)).append("\"")
+             .append(((String)param.get(j))).append("\"")   ;
+          start = k + 1 + l;
+          }
+        else{
+          qsb.append(tempquery.substring(start,k))
+             .append(((String)param.get(j))) ;
+          start = k  + l;
+          }
+        k = tempquery.indexOf((String)varia.get(j),start);
+        }
+      qsb.append(tempquery.substring(start, tempquery.length()));
       tempquery = qsb.toString();
       }
     if (query.length() != 0) { query.append(" and "); }
