@@ -38,6 +38,9 @@ import mycore.common.MCRArgumentChecker;
  **/
 public class MCRUtils
 {
+// public constant data
+public static String [] SUPPORTED_LANG = {"de","en","en_uk","en_us"};
+
 // common data
 private static DateFormat DE_DF =
   DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.GERMANY);
@@ -58,10 +61,8 @@ public static final boolean isSupportedLang(String lang)
   if ((lang == null) || ((lang = lang.trim()).length() ==0)) {
     return false; }
   lang = lang.trim().toLowerCase();
-  if (lang.equals("de")) return true;
-  if (lang.equals("en")) return true;
-  if (lang.equals("en_uk")) return true;
-  if (lang.equals("en_us")) return true;
+  for (int i=0;i<SUPPORTED_LANG.length;i++) {
+    if (lang.equals(SUPPORTED_LANG[i])) return true; }
   return false;
   }
 
@@ -75,10 +76,10 @@ public static final DateFormat getDateFormat(String lang)
   {
   lang = lang.trim().toLowerCase();
   if (!isSupportedLang(lang)) { return null; }
-  if (lang.equals("de")) return DE_DF;
-  if (lang.equals("en")) return US_DF;
-  if (lang.equals("en_uk")) return UK_DF;
-  if (lang.equals("en_us")) return US_DF;
+  if (lang.equals(SUPPORTED_LANG[0])) return DE_DF;
+  if (lang.equals(SUPPORTED_LANG[1])) return US_DF;
+  if (lang.equals(SUPPORTED_LANG[2])) return UK_DF;
+  if (lang.equals(SUPPORTED_LANG[3])) return US_DF;
   return null;
   }
          
