@@ -179,11 +179,11 @@ public class MCROAIQueryService implements MCROAIQuery {
 			if (qra.size() > 0) {
 		    	newList.add(set);
 		    	logger.debug("Der Gruppenliste wurde ein neuer Datensatz hinzugef�gt.");
-		    	
-    	        if (categories[i].hasChildren()) {
-        	        newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
-	            }
 			}
+	    	
+	        if (categories[i].hasChildren()) {
+    	        newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
+            }
 		}
         
         return newList;
