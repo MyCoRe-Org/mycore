@@ -710,11 +710,24 @@ public class MCRUserCommands
   }
 
   /**
+    * This method invokes MCRUserMgr.updateUser() with data from a file.
+    * @param session the MCRSession object
+    * @param filename the filename of the user data input
+    **/
+   public static final void updateUserFromFile(MCRSession session, String filename) {
+     init();
+     String useCrypt = config.getString("MCR.users_use_password_encryption", "false");
+     boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+     updateUserFromFile(session, filename, useEncryption);
+   }
+
+  /**
    * This method invokes MCRUserMgr.updateUser() with data from a file.
    * @param session the MCRSession object
    * @param filename the filename of the user data input
+   * @param useEncryption flag to determine whether we use password encryption or not
    **/
-  public static final void updateUserFromFile(MCRSession session, String filename)
+  private static final void updateUserFromFile(MCRSession session, String filename, boolean useEncryption)
   throws MCRException
   {
     init();
@@ -725,15 +738,15 @@ public class MCRUserCommands
       org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
       org.jdom.Element rootelm = doc.getRootElement();
       if (!rootelm.getName().equals("mycoreuser")) {
-	throw new MCRException("The data are not for user.");
+	throw new MCRException("These data are not defining a user.");
       }
       List listelm = rootelm.getChildren();
       for (int i = 0; i < listelm.size(); i++) {
-	MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i));
+	MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), useEncryption);
 	MCRUserMgr.instance().updateUser(u);
       }
     } catch (Exception e) {
-      throw new MCRException("Error while update user form file.", e);
+      throw new MCRException("Error while updating a user from file.", e);
     }
   }
 
