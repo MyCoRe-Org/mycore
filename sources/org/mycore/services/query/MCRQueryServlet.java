@@ -121,6 +121,9 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     String lang  = request.getParameter( "lang" );
     String view  = request.getParameter( "view");
     String ref   = request.getParameter( "ref");
+    String offsetStr = request.getParameter( "offset" );
+    String sizeStr = request.getParameter( "size" );
+    String max_results = request.getParameter( "max_results" );
     SortKey = request.getParameter(SortParam);
     if (request.getParameter(InOrderParam)!=null &&
         request.getParameter(InOrderParam).toLowerCase().equals("false"))
@@ -144,6 +147,13 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	if (att_lang!=null) { lang = att_lang; }
 	String att_view  = (String) request.getAttribute( "view" );
 	if (att_view!=null) { view = att_view; }
+	
+	int maxresults=0;
+	if (max_results!=null) maxresults=Integer.parseInt(max_results);
+	int offset=0;
+	if (offsetStr!=null) offset=Integer.parseInt(offsetStr);
+	int size=0;
+	if (sizeStr!=null) size=Integer.parseInt(sizeStr);
 
     if( mode  == null ) { mode  = "ResultList"; }
     if( mode.equals("") ) { mode  = "ResultList"; }
@@ -269,7 +279,9 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	  if (type.equals(sortType)){
 		/** Status setzen für Dokumente **/
     	if (resarray.size()==1)
-    	  resarray.setStatus(0,status);  
+    	  resarray.setStatus(0,status);
+    	else if (maxresults>0)
+    	  resarray.cutDownTo(maxresults);
 	  }
 	  
       // create a new session if not already alive and encache result list
@@ -357,7 +369,10 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 				out.close();
 			}
 			else {
-				request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+				if (mode.equals("ResultList"))
+					request.setAttribute( "MCRLayoutServlet.Input.JDOM",  cutJDOM(jdom,offset,size) );
+				else
+					request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom );
 				request.setAttribute( "XSL.Style", style );
 				RequestDispatcher rd = getServletContext()
 				                       .getNamedDispatcher( "MCRLayoutServlet" );
@@ -488,5 +503,25 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   else
 	  return null;
   }
-
+  
+  private Document cutJDOM(Document jdom, int offset, int size){
+     Document returns = (Document) jdom.clone();
+     returns.getRootElement().removeChildren("mcr_result");
+     List children = jdom.getRootElement().getChildren("mcr_result");
+     if (size<=0){
+     	returns.getRootElement().setChildren(children);
+     }
+     else {
+        int amount=size;
+     	for (int i=offset;((amount>0) && (i<children.size()) && (i<(offset+size)));i++){
+        	returns.getRootElement().addContent((Element)((Element)children.get(i)).clone());
+        	amount--;
+     	}
+     }
+     returns.getRootElement().setAttribute("count",""+children.size())
+                             .setAttribute("offset",""+offset)
+                             .setAttribute("size",""+size);
+     return returns;
+  }
+  
 }
