@@ -49,7 +49,7 @@ public class PdfPlugin implements TextFilterPlugin {
 	private static HashSet contentTypes = null;
 	private static String name = "Yagee's amazing PDF Filter";
 	private static final int MAJOR = 0;
-	private static final int MINOR = 6;
+	private static final int MINOR = 7;
 	private static String info = null;
 	private static String p2t_info = null;
 	private static final String textencoding = "UTF-8";
@@ -64,8 +64,21 @@ public class PdfPlugin implements TextFilterPlugin {
 			if (MCRFileContentTypeFactory.isTypeAvailable("pdf"))
 				contentTypes.add(MCRFileContentTypeFactory.getType("pdf"));
 		}
-		if (p2t_info == null)
-			pdftotext();
+		if (p2t_info == null && !pdftotext())
+			throw new FilterPluginInstantiationException(
+				new StringBuffer("The execution of \"pdftotext\" failed.")
+					.append("Maybe it's not installed or in your search path!\n")
+					.append("To use this Plugin you have to install XPdf")
+					.append("http://www.foolabs.com/xpdf/) and ensure ")
+					.append("the pdftotext binary is in your search path.\n")
+					.append("Another reason maybe that you are using a version that")
+					.append(" is not compatible with this Plugin:\n")
+					.append(getName())
+					.append(" v")
+					.append(MAJOR)
+					.append('.')
+					.append(MINOR)
+					.toString());
 		if (info == null)
 			info =
 				new StringBuffer("This filter uses XPDF for transformation.")
@@ -106,15 +119,20 @@ public class PdfPlugin implements TextFilterPlugin {
 				infofetch.deleteCharAt(infofetch.length() - 2).toString();
 		} catch (IOException e) {
 			if (e.getMessage().indexOf("not found") > 0)
-				throw new MCRConfigurationException(
-					testcommand[0] + " is not installed or in search path!",
+				throw new FilterPluginInstantiationException(
+					new StringBuffer(testcommand[0])
+						.append(" is not installed or in search path!\n")
+						.append("To use this Plugin you have to install XPdf")
+						.append("http://www.foolabs.com/xpdf/) and ensure ")
+						.append("the pdftotext binary is in your search path.")
+						.toString(),
 					e);
 			else
-				throw new MCRConfigurationException(
+				throw new FilterPluginInstantiationException(
 					"Error while excuting " + testcommand,
 					e);
 		} catch (InterruptedException e) {
-			throw new MCRConfigurationException(
+			throw new FilterPluginInstantiationException(
 				"Error while excuting " + testcommand,
 				e);
 		}
