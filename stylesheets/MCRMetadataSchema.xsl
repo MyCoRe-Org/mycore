@@ -168,7 +168,7 @@
 <xsl:template match="/configuration/service">
 
  <xsd:complexType name="MCRObjectService">
-  <xsd:sequence>
+  <xsd:all>
 
  <xsl:for-each select="element">
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
@@ -183,7 +183,7 @@
  </xsl:for-each>
 
    <xsl:value-of select="$newline"/>
-  </xsd:sequence>
+  </xsd:all>
   <xsd:attribute ref="xml:lang" />
  </xsd:complexType>
 
