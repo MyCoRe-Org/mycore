@@ -361,6 +361,7 @@ public class MCRLayoutServlet extends MCRServlet {
                 + parameters.getProperty("MCRSessionID"));
         LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
         LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
+        LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
 
         parameters.put("CurrentUser", user);
         parameters.put("RequestURL", requestURL);
