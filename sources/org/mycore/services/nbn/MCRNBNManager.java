@@ -32,6 +32,7 @@ import org.mycore.common.*;
  * This is still work in progress. 
  *
  * @author Frank Lützenkirchen
+ * @author Werner Greßhoff
  * @version $Revision$ $Date$
  */
 public interface MCRNBNManager
@@ -86,5 +87,5 @@ public interface MCRNBNManager
   * @param pattern the pattern the URNs should match, or null
   * @return a hashtable containing the matched URNs as keys, and their URLs as values
   **/
-  public Hashtable listURNs( String pattern );
+  public Map listURNs( String pattern );
 }
