@@ -120,8 +120,9 @@ public class MCROAIQueryService implements MCROAIQuery {
 		    }
 			    
 			MCRQueryResult qr = new MCRQueryResult();
+			MCRXMLContainer qra = null;
     	    try {
-		        MCRXMLContainer qra = qr.setFromQuery("local", "document", query.toString());
+		        qra = qr.setFromQuery("local", "document", query.toString());
     	    } catch (MCRException mcrx) {
     	    	// logger.error("Die Query " + query.toString() + "ist fehlgeschlagen.");
     	    	return newList;
