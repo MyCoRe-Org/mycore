@@ -75,18 +75,23 @@ public class MCRSQLConnectionPool
     throws MCRPersistenceException
   {
     System.out.println( "Building JDBC connection pool." );
+    MCRConfiguration config = MCRConfiguration.instance();
 
     // The following line is a workaround for CM 7.1 under AIX
     // to prevent error FrnSysInitSharedMem to be thrown by CM:
     // Before connecting to DB2, ensure connect to CM is already done
+    String pertype = config.getString("MCR.persistence_type","");
+    if (pertype.equals("CM7")) {
+      try {
+        MCRSQLCM7Interface cm7int = (MCRSQLCM7Interface)Class.
+          forName("mycore.cm7.MCRCM7SQLWorkaround").newInstance();
+        cm7int.connectToCM7();
+        }
+      catch (Exception e) { }
+      }
 
-    mycore.cm7.MCRCM7ConnectionPool.releaseConnection
-      ( mycore.cm7.MCRCM7ConnectionPool.getConnection() );
-
-  	MCRConfiguration config = MCRConfiguration.instance();
-  	
     int initNumberOfConnections = config.getInt( "MCR.persistence_sql_init_connections", 1 );
-        maxNumberOfConnections  = config.getInt( "MCR.persistence_sql_max_connections" );
+    maxNumberOfConnections  = config.getInt( "MCR.persistence_sql_max_connections" );
 
     // Ok, we tolerate that the user is weak in math ;-)
     if( initNumberOfConnections > maxNumberOfConnections )
