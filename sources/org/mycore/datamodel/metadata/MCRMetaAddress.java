@@ -250,33 +250,33 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang);
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type); }
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   if ((country = country.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"country");
-    tc.addStringElement(tc.TYPE_VALUE,null,country);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"country");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,country);
     }
   if ((state = state.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"state");
-    tc.addStringElement(tc.TYPE_VALUE,null,state);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"state");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,state);
     }
   if ((zipcode = zipcode.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"zipcode");
-    tc.addStringElement(tc.TYPE_VALUE,null,zipcode);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"zipcode");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,zipcode);
     }
   if ((city = city.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"city");
-    tc.addStringElement(tc.TYPE_VALUE,null,city);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"city");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,city);
     }
   if ((street = street.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"street");
-    tc.addStringElement(tc.TYPE_VALUE,null,street);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"street");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,street);
     }
   if ((number = number.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"number");
-    tc.addStringElement(tc.TYPE_VALUE,null,number);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"number");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,number);
     }
   return tc;
   }

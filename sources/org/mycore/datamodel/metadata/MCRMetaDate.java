@@ -215,11 +215,11 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
   tc.addDateElement(date);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang);
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type); }
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   return tc;
   }
 

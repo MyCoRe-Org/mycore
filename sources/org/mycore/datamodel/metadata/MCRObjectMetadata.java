@@ -285,8 +285,8 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRObjectMetadata : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"metadata");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",default_lang);
+  tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG,"metadata");
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",default_lang);
   int len = meta_list.size();
   for (int i = 0; i < len; i++) {
     tc.addMCRTypedContent(((MCRMetaElement)meta_list.get(i))

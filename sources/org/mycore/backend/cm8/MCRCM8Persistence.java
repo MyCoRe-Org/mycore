@@ -119,16 +119,16 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     logger.debug(mcr_ts_in);
     item.setAttribute("/",itemtypeprefix+"ts",mcr_ts_in);
 
-    String [] xmlpath = new String[mcr_tc.TYPE_LASTTAG+1];
+    String [] xmlpath = new String[MCRTypedContent.TYPE_LASTTAG+1];
     int lastpath = 0;
 
     // set the metadata children data
     for (int i=mcr_tc_counter;i<mcr_tc.getSize();i++) {
       // tag is 'metadata'
       if ((mcr_tc.getNameElement(i).equals("metadata")) &&
-          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
-        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"metadata";
-        lastpath = mcr_tc.TYPE_MASTERTAG;
+          (mcr_tc.getTypeElement(i) == MCRTypedContent.TYPE_MASTERTAG)) {
+        xmlpath[MCRTypedContent.TYPE_MASTERTAG] = itemtypeprefix+"metadata";
+        lastpath = MCRTypedContent.TYPE_MASTERTAG;
         item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
         item.setAttribute("/"+xmlpath[lastpath]+"/",itemtypeprefix+"lang",
@@ -138,39 +138,39 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         }
       // tag is 'structure'
       if ((mcr_tc.getNameElement(i).equals("structure")) &&
-          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
-        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"structure";
-        lastpath = mcr_tc.TYPE_MASTERTAG;
+          (mcr_tc.getTypeElement(i) == MCRTypedContent.TYPE_MASTERTAG)) {
+        xmlpath[MCRTypedContent.TYPE_MASTERTAG] = itemtypeprefix+"structure";
+        lastpath = MCRTypedContent.TYPE_MASTERTAG;
         item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
         continue; 
         }
       // tag is 'service'
       if ((mcr_tc.getNameElement(i).equals("service")) &&
-          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
-        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"service";
-        lastpath = mcr_tc.TYPE_MASTERTAG;
+          (mcr_tc.getTypeElement(i) == MCRTypedContent.TYPE_MASTERTAG)) {
+        xmlpath[MCRTypedContent.TYPE_MASTERTAG] = itemtypeprefix+"service";
+        lastpath = MCRTypedContent.TYPE_MASTERTAG;
         item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
         continue; 
         }
       // tag is 'derivate'
       if ((mcr_tc.getNameElement(i).equals("derivate")) &&
-          (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_MASTERTAG)) {
-        xmlpath[mcr_tc.TYPE_MASTERTAG] = itemtypeprefix+"derivate";
-        lastpath = mcr_tc.TYPE_MASTERTAG;
+          (mcr_tc.getTypeElement(i) == MCRTypedContent.TYPE_MASTERTAG)) {
+        xmlpath[MCRTypedContent.TYPE_MASTERTAG] = itemtypeprefix+"derivate";
+        lastpath = MCRTypedContent.TYPE_MASTERTAG;
         item.setChild(connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
         continue; 
         }
       // a path element
-      if (mcr_tc.getTypeElement(i) > mcr_tc.TYPE_MASTERTAG) {
+      if (mcr_tc.getTypeElement(i) > MCRTypedContent.TYPE_MASTERTAG) {
         xmlpath[mcr_tc.getTypeElement(i)] = new String(itemtypeprefix+
           mcr_tc.getNameElement(i));
         lastpath = mcr_tc.getTypeElement(i);
         sb = new StringBuffer(64);
         sb.append('/');
-        for (int j=mcr_tc.TYPE_MASTERTAG;j<lastpath;j++) {
+        for (int j=MCRTypedContent.TYPE_MASTERTAG;j<lastpath;j++) {
           sb.append(xmlpath[j]).append('/'); }
         item.setChild(connection,xmlpath[lastpath-1],xmlpath[lastpath],
           sb.toString(),
@@ -181,13 +181,13 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
       sb = new StringBuffer(64);
       sb.append('/');
       String elname = xmlpath[lastpath];
-      if (mcr_tc.getTypeElement(i) == mcr_tc.TYPE_ATTRIBUTE) {
-        for (int j=mcr_tc.TYPE_MASTERTAG;j<lastpath+1;j++) {
+      if (mcr_tc.getTypeElement(i) == MCRTypedContent.TYPE_ATTRIBUTE) {
+        for (int j=MCRTypedContent.TYPE_MASTERTAG;j<lastpath+1;j++) {
           sb.append(xmlpath[j]).append('/'); }
         elname = itemtypeprefix+mcr_tc.getNameElement(i);
         }
       else {
-        for (int j=mcr_tc.TYPE_MASTERTAG;j<lastpath+1;j++) {
+        for (int j=MCRTypedContent.TYPE_MASTERTAG;j<lastpath+1;j++) {
           sb.append(xmlpath[j]).append('/'); }
         }
       Object valueobject = null;

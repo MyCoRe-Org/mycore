@@ -360,16 +360,16 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"service");
+  tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG,"service");
   if (dates.size()!=0) {
-    tc.addTagElement(tc.TYPE_TAG,"servdates");
+    tc.addTagElement(MCRTypedContent.TYPE_TAG,"servdates");
     for (int i=0;i<dates.size();i++) {
       tc.addMCRTypedContent(((MCRMetaDate)dates.get(i))
         .createTypedContent(true));
       }
     }
   if (flags.size()!=0) {
-    tc.addTagElement(tc.TYPE_TAG,"servflags");
+    tc.addTagElement(MCRTypedContent.TYPE_TAG,"servflags");
     for (int i=0;i<flags.size();i++) {
       tc.addMCRTypedContent(((MCRMetaLangText)flags.get(i))
         .createTypedContent(true)); }

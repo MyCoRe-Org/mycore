@@ -207,25 +207,25 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang);
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type); }
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   if ((name = name.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"name");
-    tc.addStringElement(tc.TYPE_VALUE,null,name);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"name");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,name);
     }
   if ((nickname = nickname.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"nickname");
-    tc.addStringElement(tc.TYPE_VALUE,null,nickname);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"nickname");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,nickname);
     }
   if ((parent = parent.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"parent");
-    tc.addStringElement(tc.TYPE_VALUE,null,parent);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"parent");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,parent);
     }
   if ((property = property.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"property");
-    tc.addStringElement(tc.TYPE_VALUE,null,property);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"property");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,property);
     }
   return tc;
   }

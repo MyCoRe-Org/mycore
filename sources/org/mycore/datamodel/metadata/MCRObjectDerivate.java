@@ -210,8 +210,8 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"derivate");
-  tc.addTagElement(tc.TYPE_TAG,"linkmetas");
+  tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG,"derivate");
+  tc.addTagElement(MCRTypedContent.TYPE_TAG,"linkmetas");
   for (int i=0;i<linkmetas.size();i++) {
     tc.addMCRTypedContent(((MCRMetaLinkID)linkmetas.get(i))
       .createTypedContent(true));

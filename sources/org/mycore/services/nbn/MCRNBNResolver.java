@@ -29,6 +29,7 @@ import java.io.*;
 import java.net.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+
 import org.mycore.common.*;
 
 /**
@@ -79,13 +80,13 @@ public class MCRNBNResolver extends HttpServlet
       urn = new MCRNBN( param );
     else
     {    
-      res.sendError( res.SC_BAD_REQUEST );
+      res.sendError( HttpServletResponse.SC_BAD_REQUEST );
       return;
     }
     
     if( ! urn.isValid() )
     {    
-      res.sendError( res.SC_BAD_REQUEST );
+      res.sendError( HttpServletResponse.SC_BAD_REQUEST );
       return;
     }
     
@@ -97,7 +98,7 @@ public class MCRNBNResolver extends HttpServlet
     
     String url = manager.getURL( urn );
     if( url == null )
-      res.sendError( res.SC_NOT_FOUND );
+      res.sendError( HttpServletResponse.SC_NOT_FOUND );
     else
       res.sendRedirect( url );
   }

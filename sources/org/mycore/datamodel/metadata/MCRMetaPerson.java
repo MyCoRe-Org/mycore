@@ -228,29 +228,29 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"lang",lang);
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
-    tc.addStringElement(tc.TYPE_ATTRIBUTE,"type",type); }
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   if ((firstname = firstname.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"firstname");
-    tc.addStringElement(tc.TYPE_VALUE,null,firstname);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"firstname");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,firstname);
     }
   if ((callname = callname.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"callname");
-    tc.addStringElement(tc.TYPE_VALUE,null,callname);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"callname");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,callname);
     }
   if ((surename = surename.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"surename");
-    tc.addStringElement(tc.TYPE_VALUE,null,surename);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"surename");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,surename);
     }
   if ((academic = academic.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"academic");
-    tc.addStringElement(tc.TYPE_VALUE,null,academic);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"academic");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,academic);
     }
   if ((peerage = peerage.trim()).length() !=0) {
-    tc.addTagElement(tc.TYPE_SUB2TAG,"peerage");
-    tc.addStringElement(tc.TYPE_VALUE,null,peerage);
+    tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG,"peerage");
+    tc.addStringElement(MCRTypedContent.TYPE_VALUE,null,peerage);
     }
   return tc;
   }

@@ -60,7 +60,7 @@ public class MCREditorServlet extends HttpServlet
     }
     catch( Exception ex )
     { 
-      try{ res.sendError( res.SC_INTERNAL_SERVER_ERROR ); }
+      try{ res.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR ); }
       catch( Exception ignored ){}
       String msg = "Error while processing EditorServlet request";
       throw new MCRException( msg, ex ); 

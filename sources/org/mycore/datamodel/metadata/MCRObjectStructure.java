@@ -372,7 +372,7 @@ public class MCRObjectStructure
     if (!isValid()) {
       throw new MCRException("The content is not valid."); }
     MCRTypedContent tc = new MCRTypedContent();
-    tc.addTagElement(tc.TYPE_MASTERTAG,"structure");
+    tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG,"structure");
 /*
     if (children.size() > 0) {
       tc.addTagElement(tc.TYPE_TAG,"children");
@@ -398,7 +398,7 @@ public class MCRObjectStructure
 */
     // add the derivates for the parametric searchable
     if (derivates.size() > 0) {
-      tc.addTagElement(tc.TYPE_TAG,"derobjects");
+      tc.addTagElement(MCRTypedContent.TYPE_TAG,"derobjects");
       for (int i=0;i<derivates.size();i++)
         tc.addMCRTypedContent(((MCRMetaLink) derivates.get(i))
           .createTypedContent(true));

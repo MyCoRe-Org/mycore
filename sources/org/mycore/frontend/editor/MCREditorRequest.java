@@ -90,7 +90,7 @@ class MCREditorRequest
       if( ! source.isEditingAllowed( request, context, objectID ) )
       {
         String msg = "You are not authorized to edit this object!";
-        response.sendError( response.SC_FORBIDDEN, msg );
+        response.sendError( HttpServletResponse.SC_FORBIDDEN, msg );
       }
       else
       {
@@ -98,7 +98,7 @@ class MCREditorRequest
         if( doc == null )
         {
           String msg = "There is no object to edit with ID = " + objectID;
-          response.sendError( response.SC_NOT_FOUND, msg );
+          response.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
         }
         else
         {
@@ -114,7 +114,7 @@ class MCREditorRequest
       if( ! source.isEditingAllowed( request, context, objectID ) )
       {
         String msg = "You are not authorized to create a new object!";
-        response.sendError( response.SC_FORBIDDEN, msg );
+        response.sendError( HttpServletResponse.SC_FORBIDDEN, msg );
       }
       else sendEditorPageXML();
     }
@@ -143,7 +143,7 @@ class MCREditorRequest
         if( ! target.isEditingAllowed( request, context, objectID ) )
         {
           String msg = "You are not authorized to edit this object!";
-          response.sendError( response.SC_FORBIDDEN, msg );
+          response.sendError( HttpServletResponse.SC_FORBIDDEN, msg );
         }
         else
         {
@@ -184,7 +184,7 @@ class MCREditorRequest
         sendEditorPageXML();
       }  
     }
-    else response.sendError( response.SC_BAD_REQUEST, "missing parameter 'action'" );
+    else response.sendError( HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'action'" );
   }
 
   MCREditorXMLSource getXMLSource()

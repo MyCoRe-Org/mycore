@@ -194,9 +194,9 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_MASTERTAG,"mycoreobject");
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"ID",mcr_id.getId());
-  tc.addStringElement(tc.TYPE_ATTRIBUTE,"label",mcr_label);
+  tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG,"mycoreobject");
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"ID",mcr_id.getId());
+  tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"label",mcr_label);
   tc.addMCRTypedContent(mcr_derivate.createTypedContent());
   tc.addMCRTypedContent(mcr_service.createTypedContent());
   return tc;

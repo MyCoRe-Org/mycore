@@ -390,9 +390,9 @@ public final class MCRCM7Item implements DKConstant
     {
     DKDate date = null;
     if (value != null) {
-      date = new DKDate( value.get( value.YEAR            ),
-                         value.get( value.MONTH           ),
-                         value.get( value.DAY_OF_MONTH )  ); }
+      date = new DKDate( value.get( GregorianCalendar.YEAR            ),
+                         value.get( GregorianCalendar.MONTH           ),
+                         value.get( GregorianCalendar.DAY_OF_MONTH )  ); }
     setValue(aKeyfield, date);
     }
 

@@ -316,7 +316,7 @@ public MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(tc.TYPE_SUBTAG,subtag);
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
   tc.addLinkElement("type",linktype);
   if (linktype.equals("locator")) {
     tc.addLinkElement("href",href);

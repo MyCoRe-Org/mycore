@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import javax.servlet.*;
 import javax.servlet.http.*;
+
 import org.jdom.*;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
@@ -113,7 +114,7 @@ private ArrayList remoteAliasList = null;
     {
       String msg = "Error: HTTP request path is null";
       logger.error( msg );
-      res.sendError( res.SC_NOT_FOUND, msg );
+      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
       return;
     }
     
@@ -121,7 +122,7 @@ private ArrayList remoteAliasList = null;
     if(!st.hasMoreTokens()) {
       String msg = "Error: HTTP request path is empty";
       logger.error( msg );
-      res.sendError( res.SC_NOT_FOUND, msg );
+      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
       return;
       }
     
@@ -148,7 +149,7 @@ private ArrayList remoteAliasList = null;
     if (!test) {
       String msg = "Error: HTTP request host is not in the alias list";
       logger.error( msg );
-      res.sendError( res.SC_NOT_FOUND, msg );
+      res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
       return;
       }
      logger.debug( "MCRFileNodeServlet : hosts = " + hostAlias );
@@ -162,7 +163,7 @@ private ArrayList remoteAliasList = null;
       {
         String msg = "Error: No root node found for owner ID " + ownerID;
         logger.error( msg );
-        res.sendError( res.SC_NOT_FOUND, msg );
+        res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
         return;
       }
     
@@ -174,7 +175,7 @@ private ArrayList remoteAliasList = null;
         {
           String msg = "Error: No such file or directory " + st.nextToken();
           logger.error( msg );
-          res.sendError( res.SC_NOT_FOUND, msg );
+          res.sendError( HttpServletResponse.SC_NOT_FOUND, msg );
           return;
         }
         else
@@ -195,7 +196,7 @@ private ArrayList remoteAliasList = null;
         {
           String msg = "Error: No such file or directory " + path;
           logger.error( msg );
-          res.sendError( res.SC_NOT_FOUND );
+          res.sendError( HttpServletResponse.SC_NOT_FOUND );
           return;
         }
         else if( node instanceof MCRFile )

@@ -382,7 +382,7 @@ public final MCRTypedContent createTypedContent(boolean flag)
     if(!((MCRMetaInterface)list.get(i)).getInherited()); { j++; }
     }
   if ((j == 0) && (!flag)) { return tc; }
-  tc.addTagElement(tc.TYPE_TAG,tag);
+  tc.addTagElement(MCRTypedContent.TYPE_TAG,tag);
   for (int i=0;i<list.size();i++) {
     if (!flag) {
       if (((MCRMetaInterface)list.get(i)).getInherited()) { continue; } }
