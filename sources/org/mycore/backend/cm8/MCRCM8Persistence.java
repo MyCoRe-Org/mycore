@@ -87,6 +87,7 @@ public final void create(MCRTypedContent mcr_tc, byte [] xml)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
   // set up data to item
   DKDatastoreICM connection = null;
   try {
@@ -94,15 +95,15 @@ public final void create(MCRTypedContent mcr_tc, byte [] xml)
     boolean test = false;
     try {
       MCRCM8Item checkitem = new MCRCM8Item(mcr_id.getId(),connection,
-        itemtypename); 
+        itemtypename,itemtypeprefix); 
       test = true; }
     catch (MCRPersistenceException e) { }
     if (test) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
         " exists."); }
     MCRCM8Item item = new MCRCM8Item(connection,itemtypename);
-    item.setAttribute("/","ID",mcr_id.getId());
-    item.setAttribute("/","label",mcr_label);
+    item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
+    item.setAttribute("/",itemtypeprefix+"label",mcr_label);
     item.setAttribute("/","xml",xml);
     item.create();
     System.out.println("Item was created.");
@@ -143,13 +144,15 @@ public final void delete(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
   // delete data item
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     MCRCM8Item item = null;
     try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename); }
+      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
+        itemtypeprefix); }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
         " does not exist."); }
@@ -182,13 +185,15 @@ public final byte[] receive(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
   // retrieve the XML byte stream
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     MCRCM8Item item = null;
     try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename);
+      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
+        itemtypeprefix);
       item.retrieve();
       xml = item.getBlob("/","xml");
       }
@@ -250,15 +255,17 @@ public final String receiveLabel(MCRObjectID mcr_id)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
   // receive the label
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     MCRCM8Item item = null;
     try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename);
+      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
+        itemtypeprefix);
       item.retrieve();
-      label = item.getString("/","label");
+      label = item.getString("/",itemtypeprefix+"label");
       }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
@@ -297,15 +304,18 @@ public final void update(MCRTypedContent mcr_tc, byte [] xml)
   StringBuffer sb = new StringBuffer("MCR.persistence_cm8_");
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
+  String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
   // set up data to item
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     MCRCM8Item item = null;
     try {
-      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename); 
-      item.setAttribute("/","ID",mcr_id.getId());
-      item.setAttribute("/","label",mcr_label);
+      item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
+        itemtypeprefix); 
+      item.lock(connection);
+      item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
+      item.setAttribute("/",itemtypeprefix+"label",mcr_label);
       item.setAttribute("/","xml",xml);
       item.update(); }
     catch (MCRPersistenceException e) {

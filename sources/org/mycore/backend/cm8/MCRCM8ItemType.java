@@ -30,11 +30,14 @@ import com.ibm.mm.sdk.server.*;
 import com.ibm.mm.sdk.common.*;
 import mycore.common.MCRConfiguration;
 import mycore.common.MCRConfigurationException;
+import mycore.common.MCRException;
 import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObject;
 import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRTypedContent;
+import mycore.datamodel.MCRMetaDefault;
 import mycore.cm8.MCRCM8ConnectionPool;
+import mycore.cm8.MCRCM8MetaInterface;
 
 /**
  * This class implements all methode for handling the ItemType for a
@@ -44,8 +47,11 @@ import mycore.cm8.MCRCM8ConnectionPool;
  *
  * @version $Revision$ $Date$
  **/
-public final class MCRCM8ItemType
+public final class MCRCM8ItemType implements DKConstantICM
 {
+
+// internal data
+private static final String META_PACKAGE_NAME = "mycore.cm8.";
 
 // from configuration
 
@@ -71,24 +77,37 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
   // read the configuration
   String sb = new String("MCR.persistence_cm8_"+mcr_type);
   String mcr_item_type_name = MCRConfiguration.instance().getString(sb); 
+  String mcr_item_type_prefix = MCRConfiguration.instance()
+    .getString(sb+"_prefix"); 
   // connect to server
   DKDatastoreICM connection = null;
   try {
     connection = MCRCM8ConnectionPool.getConnection();
     System.out.println("Info CM8 Datastore Creation: connected.");
     // create the Attribut for MCRObjectID
-    if (!createAttributeVarChar(connection,"ID",MCRObjectID.MAX_LENGTH,false)) {
-      System.out.println(
-        "Warning CM8 Datastore Creation: attribute ID already exists."); }
+    if (!createAttributeVarChar(connection,mcr_item_type_prefix+"ID",
+      MCRObjectID.MAX_LENGTH,false)) {
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"ID already exists."); }
     // create the Attribut for MCR_Label
-    if (!createAttributeVarChar(connection,"label",MCRObject.MAX_LABEL_LENGTH,
-      false)) {
-      System.out.println(
-        "Warning CM8 Datastore Creation: attribute label already exists."); }
+    if (!createAttributeVarChar(connection,mcr_item_type_prefix+"label",
+      MCRObject.MAX_LABEL_LENGTH,false)) {
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"label already exists."); }
     // create the Attribut for the XML byte array
     if (!createAttributeBlob(connection,"xml",200*1024,false)) {
       System.out.println(
         "Warning CM8 Datastore Creation: attribute xml already exists."); }
+    // create the default attribute type
+    if (!createAttributeVarChar(connection,mcr_item_type_prefix+"type",
+      MCRMetaDefault.DEFAULT_TYPE_LENGTH,false)) {
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"type already exists."); }
+    // create the default attribute lang
+    if (!createAttributeVarChar(connection,mcr_item_type_prefix+"lang",
+      MCRMetaDefault.DEFAULT_LANG_LENGTH,false)) {
+      System.out.println("Warning CM8 Datastore Creation: attribute "+
+        mcr_item_type_prefix+"lang already exists."); }
     // check for the root itemtype
     try {
       DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
@@ -109,19 +128,64 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
     item_type.setName(mcr_item_type_name);
     item_type.setDescription("MyCoRe ItemType");
     DKDatastoreDefICM dsDefICM = new DKDatastoreDefICM(connection);
-    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr("ID");
+    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(
+      mcr_item_type_prefix+"ID");
     item_type.addAttr(attr);
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr("label");
+    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix+"label");
     item_type.addAttr(attr);
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr("xml");
     item_type.addAttr(attr);
+    // set config element offset to metadata
+    org.jdom.Element mcr_root = mcr_conf.getRootElement();
+    org.jdom.Element mcr_metadata = mcr_root.getChild("metadata");
+    DKComponentTypeDefICM item_metadata = new DKComponentTypeDefICM(connection);
+    item_metadata.setName(mcr_item_type_prefix+"metadata");
+    item_metadata.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+    List mcr_taglist = mcr_metadata.getChildren();
+    for (int i=0;i<mcr_taglist.size();i++) {
+      org.jdom.Element mcr_tag = (org.jdom.Element)mcr_taglist.get(i);
+      String tagname = (String)mcr_tag.getAttribute("name").getValue();
+System.out.println(tagname);
+      DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
+      item_tag.setName(mcr_item_type_prefix+tagname);
+      item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+      List mcr_subtaglist = mcr_tag.getChildren();
+      for (int j=0;j<mcr_subtaglist.size();j++) {
+        org.jdom.Element mcr_subtag = (org.jdom.Element)mcr_subtaglist.get(j);
+        String subtagname = mcr_subtag.getName();
+        if (subtagname.length()<=7) { continue; }
+        if (!subtagname.substring(0,7).equals("mcrmeta")) { continue; }
+        String search = (String)mcr_subtag.getAttribute("search").getValue();
+        if (search==null) { search = "no"; }
+        if (!search.toLowerCase().equals("yes")) { continue; }
+        String classname = (String)mcr_subtag.getAttribute("class").getValue();
+        StringBuffer stb = new StringBuffer(128);
+        stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.
+          substring(3,classname.length()));
+System.out.println(stb.toString());
+        Object obj = new Object();
+        try {
+          obj = Class.forName(stb.toString()).newInstance();
+          DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface)obj).
+            createItemType(mcr_subtag,connection,dsDefICM,mcr_item_type_prefix);
+          item_tag.addSubEntity(item_subtag);
+          }
+        catch (ClassNotFoundException e) {
+          throw new MCRException(classname+" ClassNotFoundException"); }
+        catch (IllegalAccessException e) {
+          throw new MCRException(classname+" IllegalAccessException"); }
+        catch (InstantiationException e) {
+          throw new MCRException(classname+" InstantiationException"); }
+        }
+      item_metadata.addSubEntity(item_tag);
+      }
+    item_type.addSubEntity(item_metadata);
     item_type.add(); 
     }
   finally {
     MCRCM8ConnectionPool.releaseConnection(connection); }
     }
   catch (Exception e) {
-    System.out.println(e.getMessage());
     throw new MCRPersistenceException(e.getMessage(),e); }
   }
 
@@ -134,15 +198,36 @@ protected static void create(String mcr_type, org.jdom.Document mcr_conf)
  * @param search ist true, if the attribute should text searchable
  * @return If the attribute exists, false was returned, else true.
  **/
-private static final boolean createAttributeVarChar(DKDatastoreICM connection,
+public static final boolean createAttributeVarChar(DKDatastoreICM connection,
   String name, int len, boolean search) throws Exception
   {
   DKAttrDefICM attr = new DKAttrDefICM(connection);
   try {
     attr.setName(name);
-    attr.setType(DKConstant.DK_CM_VARCHAR);
+    attr.setType(DK_CM_VARCHAR);
     attr.setSize(len);
     attr.setTextSearchable(search);
+    attr.setNullable(false);
+    attr.setUnique(false);
+    attr.add(); }
+  catch (DKException e) { return false; }
+  return true;
+  }
+
+/**
+ * This methode is internal and create a DK_CM_DATE attribute.
+ *
+ * @param connection the connection to the database
+ * @param name the name of the attribute
+ * @return If the attribute exists, false was returned, else true.
+ **/
+public static final boolean createAttributeDate(DKDatastoreICM connection,
+  String name) throws Exception
+  {
+  DKAttrDefICM attr = new DKAttrDefICM(connection);
+  try {
+    attr.setName(name);
+    attr.setType(DK_CM_DATE);
     attr.setNullable(false);
     attr.setUnique(false);
     attr.add(); }
@@ -165,7 +250,7 @@ private static final boolean createAttributeBlob(DKDatastoreICM connection,
   DKAttrDefICM attr = new DKAttrDefICM(connection);
   try {
     attr.setName(name);
-    attr.setType(DKConstant.DK_CM_BLOB);
+    attr.setType(DK_CM_BLOB);
     attr.setSize(len);
     attr.setTextSearchable(search);
     attr.setNullable(false);

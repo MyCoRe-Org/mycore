@@ -82,6 +82,9 @@ public final MCRQueryResultArray getResultList(String query, String type,
     return result; }
   if ((maxresults < 1) || (maxresults > maxres)) {
     return result; }
+  // read prefix from configuration
+  String sb = new String("MCR.persistence_cm8_"+type.toLowerCase()+"_prefix");
+  String itemtypeprefix = conf.getString(sb);
   // prepare query
   if (query.equals("\'\'")) { query = ""; }
 System.out.println("================================");
@@ -112,9 +115,9 @@ System.out.println("Results :"+rsc.cardinality());
     while (iter.more()) {
       DKDDO resitem = (DKDDO)iter.next();
       resitem.retrieve();
-      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,"ID");     
+      dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,itemtypeprefix+"ID");     
       id = (String) resitem.getData(dataId);
-System.out.println("ID :"+id);
+System.out.println(itemtypeprefix+"ID :"+id);
       dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,"xml");     
       xml = (byte []) resitem.getData(dataId);
       result.add("local",id,rank,xml);

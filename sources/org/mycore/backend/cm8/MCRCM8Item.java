@@ -61,7 +61,7 @@ public final class MCRCM8Item implements DKConstantICM
   public MCRCM8Item(DKDatastoreICM connection, String itemtypename)
     throws DKException, Exception
     {
-    ddo = connection.createDDO(itemtypename,DK_CM_ITEM);
+    ddo = connection.createDDO(itemtypename,DK_CM_DOCUMENT);
     children = null;
     }
 
@@ -71,21 +71,23 @@ public final class MCRCM8Item implements DKConstantICM
    * @param id                  the MCRObjectID as string
    * @param connection          the given CM connection
    * @param itemtypename        the given ItemType name
+   * @param itemtypeprefix      the given ItemType name
    * @exception MCRPersistenceException Exceptions of MyCoRe
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
-  public MCRCM8Item(String id, DKDatastoreICM connection, String itemtypename)
+  public MCRCM8Item(String id, DKDatastoreICM connection, String itemtypename,
+    String itemtypeprefix)
     throws DKException, MCRPersistenceException, Exception
     {
     if (id==null) {
       throw new MCRPersistenceException("MCRCM7Item constructor error."); }
-    ddo = connection.createDDO(itemtypename,DK_CM_ITEM);
+    ddo = connection.createDDO(itemtypename,DK_CM_DOCUMENT);
     children = null;
 
     StringBuffer qs = new StringBuffer(128);
-    qs.append('/').append(itemtypename).append("[@ID=\"").append(id)
-      .append("\"]");
+    qs.append('/').append(itemtypename).append("[@").append(itemtypeprefix)
+      .append("ID=\"").append(id).append("\"]");
 
     DKResults results = (DKResults)connection.evaluate(qs.toString(),
       DK_CM_XQPE_QL_TYPE,null);
@@ -96,6 +98,17 @@ public final class MCRCM8Item implements DKConstantICM
       " that matches the MCRObjectID (" + id + ")" );
     this.ddo = ( DKDDO ) iter.next();
     }
+
+  /**
+   * This methode lock the item in the datastore.
+   *
+   * @param connection          the connection to ICM
+   * @exception DKException     Exceptions of CM
+   * @exception Exception       Exceptions of JDK
+   **/
+  public final void lock(DKDatastoreICM connection) throws DKException, 
+    Exception
+    { connection.checkOut(ddo); }
 
   /**
    * This methode creates the item in the datastore.
@@ -123,6 +136,16 @@ public final class MCRCM8Item implements DKConstantICM
    **/
   public final void update() throws DKException, Exception
     { ddo.update(); }
+
+  /**
+   * This methode updates the item in the datastore with an option.
+   *
+   * @param option              The update option
+   * @exception DKException     Exceptions of CM
+   * @exception Exception       Exceptions of JDK
+   **/
+  public final void update(short option) throws DKException, Exception
+    { ddo.update(option); }
 
   /**
    * This methode deletes the item from the datastore.
