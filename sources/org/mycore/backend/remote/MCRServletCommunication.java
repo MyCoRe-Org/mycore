@@ -55,14 +55,6 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface {
 	static Logger logger = Logger.getLogger(MCRServletCommunication.class
 			.getName());
 
-	// HttpClient
-	static HttpClient client = new HttpClient();
-	static {
-		int timeout = 5000;
-		logger.info("Setting timout to " + timeout + " ms!");
-		client.setTimeout(timeout);
-	}
-
 	// internal data
 	private String realhost;
 	private String protocol;
@@ -208,6 +200,11 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface {
 			try {
 				// execute the method.
 				logger.debug("Connection Attempt: " + (attempt + 1));
+			        // HttpClient
+        			HttpClient client = new HttpClient();
+				int timeout = 5000;
+				logger.info("Setting timout to " + timeout + " ms!");
+				client.setTimeout(timeout);
 				statusCode = client.executeMethod(method);
 			} catch (HttpRecoverableException e) {
 				logger.warn("A recoverable exception occurred, retrying.  "
