@@ -96,42 +96,18 @@ private static final void printResult(MCRQueryResultArray results,
   {
   // Configuration
   MCRConfiguration config = MCRConfiguration.instance();
-  String xsltallresult = config.getString("MCR.xslt_allresult_"+type);
-  String xsltoneresult = config.getString("MCR.xslt_oneresult_"+type);
-  String outtype = config.getString("MCR.out_type_"+type);
-  String outpath = config.getString("MCR.out_path_"+type);
+  String applpath = config.getString("MCR.appl_path");
+  String xslfile = applpath + "/stylesheets/mcr_results-PlainText-"+
+    type.toLowerCase()+".xsl";
   TransformerFactory transfakt = TransformerFactory.newInstance();
   // Indexlist
   byte [] mcrxmlall = results.exportAllToByteArray();
   Transformer trans =
-    transfakt.newTransformer(new StreamSource(xsltallresult));
-  StreamResult sr = null;
-  if (outpath.equals("SYSOUT")) {
-    sr = new StreamResult((OutputStream) System.out); }
-  else {
-    System.out.println(outpath+System.getProperty("file.separator")+
-      type+"_index."+outtype);
-    sr = new StreamResult(outpath+System.getProperty("file.separator")+
-      type+"_index."+outtype); }
+    transfakt.newTransformer(new StreamSource(xslfile));
+  StreamResult sr = new StreamResult((OutputStream) System.out); 
   trans.transform(new StreamSource(new ByteArrayInputStream(mcrxmlall)),sr);
   System.out.println();
-  // All data
-  trans = transfakt.newTransformer(new StreamSource(xsltoneresult));
-  for (int l=0;l<results.size();l++) {
-    String mcrid = results.getId(l);
-    byte [] mcrxml = results.exportElementToByteArray(l);
-    sr = null;
-    if (outpath.equals("SYSOUT")) {
-      sr = new StreamResult((OutputStream) System.out); }
-    else {
-      System.out.println(outpath+System.getProperty("file.separator")+
-        mcrid+"."+outtype);
-      sr = new StreamResult(outpath+System.getProperty("file.separator")+
-        mcrid+"."+outtype); }
-    trans.transform(new StreamSource(new ByteArrayInputStream(mcrxml)),sr);
-    System.out.println();
-    }
-  System.out.println();
   }
+
 }
 
