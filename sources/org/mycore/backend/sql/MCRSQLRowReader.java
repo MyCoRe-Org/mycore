@@ -27,6 +27,7 @@ package org.mycore.backend.sql;
 import java.sql.*;
 import java.util.GregorianCalendar;
 import org.mycore.common.*;
+import org.apache.log4j.Logger;
 
 /**
  * Instances of this class are used to read the rows of a result set
@@ -199,18 +200,23 @@ public class MCRSQLRowReader
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
   }
   
-  public void close()
+  public synchronized void close()
   {
+    if( rs == null ) return;
+
     try
     {
       rs.close();
+      rs = null;
     }  
     catch( SQLException ex )
-    { throw new MCRPersistenceException( "Could not close result set", ex ); }
+    { 
+      Logger logger = MCRSQLConnectionPool.getLogger();
+      logger.warn( "Could not close result set: " + ex.getMessage() ); 
+    }
   }
   
   public void finalize()
-  {
-    close();
-  }
+    throws Throwable
+  { close(); }
 }
