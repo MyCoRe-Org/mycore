@@ -38,7 +38,8 @@ import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * This class implements the interface for communication between the
- * local MCRClient and a remote MCRServer via HTTP/HTTPS.
+ * local MCRClient and a remote MCRServer via HTTP/HTTPS.<br>
+ * This class use org.apache.log4j for logging.
  *
  * @author Mathias Zarick
  * @author Jens Kupferschmidt
@@ -67,7 +68,6 @@ public MCRServletCommunication()
   // get the instance of MCRConfiguration
   config = MCRConfiguration.instance();
   // set the logger property
-  //BasicConfigurator.configure();
   PropertyConfigurator.configure(config.getLoggingProperties());
   // set the defaults
   headercontext = ""; hasifsdata = false; 

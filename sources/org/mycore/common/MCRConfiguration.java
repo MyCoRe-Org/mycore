@@ -248,7 +248,7 @@ public class MCRConfiguration
       Enumeration names = this.properties.propertyNames();      
       while (names.hasMoreElements()) {
           String name = (String) (names.nextElement());
-          if (name.startsWith("mcr.log4j")) {
+          if (name.startsWith("MCR.log4j")) {
               String value = this.properties.getProperty(name);
               properties.setProperty(name.substring(4), value);
           }
