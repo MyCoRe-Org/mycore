@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUtils;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -368,7 +367,7 @@ public class MCRLayoutServlet extends MCRServlet
 
   protected static final String getCompleteURL( HttpServletRequest request )
   {
-    StringBuffer buffer = HttpUtils.getRequestURL( request );
+    StringBuffer buffer = request.getRequestURL();
     String queryString = request.getQueryString();
     if( queryString != null ) buffer.append( "?" ).append( queryString );
     return buffer.toString();
