@@ -48,11 +48,7 @@ public abstract class MCRContentStore
   /** The prefix of all properties in mycore.properties for this store */
   protected String prefix;
 
-  public MCRContentStore()
-  {
-    formatter = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss_SSS" );
-    lastID    = null;
-  }
+  public MCRContentStore(){}
   
   /** 
    * Initializes the store and sets its unique store ID. MCRFiles must remember 
@@ -108,20 +104,32 @@ public abstract class MCRContentStore
     throws MCRPersistenceException;
   
   /** DateFormat used to construct new unique IDs based on timecode */
-  protected DateFormat formatter;
+  protected static DateFormat formatter = new SimpleDateFormat( "yyMMdd-HHmmss-SSS" );
 
-  /** The last ID that was constructed */
-  protected String lastID;
-  
   /**
-   * Constructs a new unique ID based on timecode for storing content
+   * Constructs a new unique ID for storing content
    */
-  protected synchronized String buildNextID()
+  protected static synchronized String buildNextID( MCRFileReader file )
   {
-    String ID = null;
-    do{ ID = formatter.format( new Date() ); }
-    while( ID.equals( lastID ) );
-    return ( lastID = ID );
+    StringBuffer sb = new StringBuffer();
+      
+    sb.append( buildNextTimestamp() );
+    sb.append( "-" ).append( file.getID() );
+    if( file.getExtension().length() > 0 ) 
+      sb.append( "." ).append( file.getExtension() );
+
+    return sb.toString();
+  }
+  
+  /** The last timestamp that was constructed */
+  protected static String lastTimestamp = null;
+  
+  protected static synchronized String buildNextTimestamp()
+  {
+    String ts = null;
+    do{ ts = formatter.format( new Date() ); }
+    while( ts.equals( lastTimestamp ) );
+    return ( lastTimestamp = ts );
   }
   
   protected String[] buildSlotPath()
