@@ -56,7 +56,6 @@ public final static int MAX_LABEL_LENGTH = 256;
 // from configuration
 protected static MCRConfiguration mcr_conf = null;
 protected static String mcr_encoding = null;
-protected static String mcr_schema_path = null;
 protected static String persist_name;
 private static String persist_type;
 protected static MCRLinkTableManager mcr_linktable = null;
@@ -98,9 +97,6 @@ static
     mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
       MCRDefaults.ENCODING);
     logger.debug("Encoding = "+mcr_encoding);
-    // Path of XML schema
-    mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
-    logger.debug("XMLSchema Path = "+mcr_schema_path);
     // Set persistence layer
     persist_type = mcr_conf.getString("MCR.persistence_type","cm7");
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+

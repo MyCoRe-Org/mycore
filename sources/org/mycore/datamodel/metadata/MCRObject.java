@@ -217,8 +217,7 @@ public final org.jdom.Document createXML() throws MCRException
     MCRDefaults.XSI_URL));
   elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
     MCRDefaults.XLINK_URL));
-  logger.debug("MCRObject createXML schemafile: " + mcr_schema_path + "/" + mcr_schema );
-  elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+"/"+mcr_schema,
+  elm.setAttribute("noNamespaceSchemaLocation",mcr_schema,
     org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
   elm.setAttribute("ID",mcr_id.getId());
   elm.setAttribute("label",mcr_label);

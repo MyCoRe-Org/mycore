@@ -463,17 +463,13 @@ public void update(MCRGroup newgroup) throws MCRException
  */
 public org.jdom.Document toJDOMDocument() throws MCRException
   {
-  // Path of XML schema
-  String SLASH = System.getProperty("file.separator");
-  String schema_path = config.getString("MCR.appl_path")+SLASH+"schema";
   // Build the DOM
   org.jdom.Element root = new org.jdom.Element("mycoregroup");
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
     MCRDefaults.XLINK_URL));
-  root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
-    "MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
+  root.setAttribute("noNamespaceSchemaLocation","MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   root.addContent(this.toJDOMElement());
   org.jdom.Document jdomDoc = new org.jdom.Document(root);

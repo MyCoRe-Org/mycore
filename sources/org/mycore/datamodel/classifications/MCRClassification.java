@@ -265,8 +265,7 @@ private ArrayList cat;
       MCRDefaults.XSI_URL));
     String SLASH = System.getProperty("file.separator");
     MCRConfiguration mcr_conf = MCRConfiguration.instance();
-    String mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema"
-      +SLASH+"MCRClassification.xsd";
+    String mcr_schema_path = "MCRClassification.xsd";
     elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
       org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
     elm.setAttribute("ID",ID);

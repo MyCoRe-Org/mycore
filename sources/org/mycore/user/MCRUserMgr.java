@@ -53,9 +53,6 @@ private static Logger logger =
   Logger.getLogger(MCRUserMgr.class.getName());
 private static MCRConfiguration config = null;
 
-/** file separator, read from system properties */
-private String SLASH = "";
-
 /** flag that determines whether write access to the data is denied (true) or allowed */
 private boolean locked = false;
 
@@ -79,7 +76,6 @@ private static String root = null;
  */
 private MCRUserMgr() throws MCRException
   {
-  SLASH = new String((System.getProperties()).getProperty("file.separator"));
   config = MCRConfiguration.instance();
   String userStoreName =  config.getString("MCR.userstore_class_name");
   PropertyConfigurator.configure(config.getLoggingProperties());
@@ -658,17 +654,13 @@ public final synchronized org.jdom.Document getAllGroups(MCRSession session)
     (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   MCRGroup currentGroup;
-  // Path of XML schema
-  String SLASH = System.getProperty("file.separator");
-  String schema_path = config.getString("MCR.appl_path")+SLASH+"schema";
   // Build the DOM
   org.jdom.Element root = new org.jdom.Element("mycoregroup");
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
     MCRDefaults.XLINK_URL));
-  root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
-    "MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
+  root.setAttribute("noNamespaceSchemaLocation","MCRGroup.xsd",org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   ArrayList allGroupIDs = mcrUserStore.getAllGroupIDs();
   for (int i=0; i<allGroupIDs.size(); i++) {
@@ -712,17 +704,13 @@ public final synchronized org.jdom.Document getAllUsers(MCRSession session)
     (!admin.hasPrivilege("user administrator"))) {
     throw new MCRException("The session has no privilig to list all users!"); }
   MCRUser currentUser;
-  // Path of XML schema
-  String SLASH = System.getProperty("file.separator");
-  String schema_path = config.getString("MCR.appl_path")+SLASH+"schema";
   // Build the DOM
   org.jdom.Element root = new org.jdom.Element("mycoreuser");
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
     MCRDefaults.XLINK_URL));
-  root.setAttribute("noNamespaceSchemaLocation",schema_path+SLASH+
-    "MCRUser.xsd",org.jdom.Namespace.getNamespace("xsi",
+  root.setAttribute("noNamespaceSchemaLocation","MCRUser.xsd",org.jdom.Namespace.getNamespace("xsi",
     MCRDefaults.XSI_URL));
   ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
   for (int i=0; i<allUserIDs.size(); i++) {
