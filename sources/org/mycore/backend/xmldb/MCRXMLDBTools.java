@@ -17,46 +17,25 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  **/
 public final class MCRXMLDBTools {
-     static Logger logger      = Logger.getLogger( MCRXMLDBTools.class.getName() );
+     static Logger logger;
      static String conf_prefix = "MCR.persistence_xmldb_";
      static String driver      = "";
      static String connString  = "";
      static String database    = "";
+     private static MCRConfiguration conf = null;
      
-    /**
-     * This method returns an XML:DB conform connection string of the
-     * form:
-     * <code>xmldb:vendor://host:port/collectionpath</code>. It is
-     * built from the configuration file mycore.properties. Therefore
-     * we need to set:<br/>
-     * <code>
-     * MCR.persistence_xmldb_vendor<br/>
-     * MCR.persistence_xmldb_hostname<br/>
-     * MCR.persistence_xmldb_port<br/>
-     * MCR.persistence_xmldb_root<br/>
-     * </code>
-     * The properties <code>MCR.persistence_xmldb_hostname</code> and
-     * <code>MCR.persistence_xmldb_port</code> are optional. If they
-     * are not given, the XML:DB database <strong>must</strong> run on
-     * the same server as mycore itself.
-     *
-     * @return the connection string
-     **/
-    public static String buildConnectString( String vendor,
-					     String hostname,
-					     int port,
-					     String root ) {
-	String connString = "xmldb:"
-	    + vendor
-	    + "://"
-	    + hostname;
-	if( port != 0 )
-	    connString = connString + ":" + port;
-	connString = connString
-	    + root;
-	return connString;
-    }
-
+static
+  {
+   logger     = Logger.getLogger( MCRXMLDBTools.class.getName() );   
+   conf       = MCRConfiguration.instance();
+   driver     = conf.getString( conf_prefix + "driver" );
+   logger.info("MCRXMLDBTools MCR.persistence_xmldb_driver      : " + driver); 
+   connString = conf.getString( conf_prefix + "database_url" , "");
+   logger.info("MCRXMLDBTools MCR.persistence_xmldb_database_url: " + connString); 
+   database   = conf.getString( conf_prefix + "database" , "");
+   logger.info("MCRXMLDBTools MCR.persistence_xmldb_database    : " + database); 
+  }
+     
     /**
      * This method returns the root collection of a given connection.
      *
@@ -121,12 +100,6 @@ public final class MCRXMLDBTools {
      * Get driver name for XML:DB database
      **/
     public static String getDriverName( ) {
-        if (0 == driver.length())
-        {    
-	 MCRConfiguration config = MCRConfiguration.instance();  
-         driver = config.getString( conf_prefix + "driver" );
-         logger.info("MCRXMLDBTools MCR.persistence_xmldb_driver      : " + driver); 
-        } 
 	return driver;
     }
     
@@ -134,12 +107,6 @@ public final class MCRXMLDBTools {
      * Get connection string for XML:DB database
      **/
     public static String getConnectString( ) {
-        if (0 == connString.length())
-        {    
-	 MCRConfiguration config = MCRConfiguration.instance();  
-         connString = config.getString( conf_prefix + "database_url" , "");
-         logger.info("MCRXMLDBTools MCR.persistence_xmldb_database_url: " + connString); 
-        } 
 	return connString;
     }
     
@@ -148,13 +115,6 @@ public final class MCRXMLDBTools {
      **/
     public static String handleQueryString( String query, String type ) {
         logger.debug("MCRXMLDBTools handlequerstring   (old)  : " + query + " type : " + type); 
-        
-        if (0 == database.length())
-        {    
-	 MCRConfiguration config = MCRConfiguration.instance();  
-         database = config.getString( conf_prefix + "database" , "");
-         logger.info("MCRXMLDBTools MCR.persistence_xmldb_database    : " + database); 
-        } 
         
         if ( database.equals( "xindice" ) )
           query = handleQueryStringXindice( query, type );
@@ -179,55 +139,21 @@ public final class MCRXMLDBTools {
 // with exist dev version from 03/07/03 no longer needed        
 //        if ( query.equals( "/*" ))
 //          query = "xcollection('/db/mycore/" + type + "')/mycoreobject";
-//        query = subst(query, "like", "=");
+//        query = MCRUtils.replaceString(query, "like", "=");
 // a lot of queries of mycore sample (document and legal entity) work!!
-        query = subst(query, "like", "&=");
-        query = subst(query, "contains(", "contains(.,");
-        query = subst(query, "metadata/*/*/@href=", "metadata//*/@xlink:href=");
+        query = MCRUtils.replaceString(query, "like", "&=");
+//        query = MCRUtils.replaceString(query, "contains(", "contains(.,");
+        query = MCRUtils.replaceString(query, ")", "");
+        query = MCRUtils.replaceString(query, "contains(", ".&=");
+        query = MCRUtils.replaceString(query, "metadata/*/*/@href=", "metadata//*/@xlink:href=");
         if ( -1 != query.indexOf("] and") )
         {
-          query = subst(query, "[", "/");
-          query = subst(query, "] and", " and");
+          query = MCRUtils.replaceString(query, "[", "/");
+          query = MCRUtils.replaceString(query, "] and", " and");
           query = "//*[" + query; 
         }
-        query = subst(query, "/mycoreobject/", "/");
+        query = MCRUtils.replaceString(query, "/mycoreobject/", "/");
 	return query;
     }
     
-/**
- * <p>
- * Returns String in with newStr substituted for find String.
- * @param in String to edit
- * @param find string to match
- * @param newStr string to substitude for find
-*/
-
-public static String subst(String in, String find, String newStr){
-
-    char[] working = in.toCharArray();
-    StringBuffer sb = new StringBuffer();
-
-	int startindex = in.indexOf(find);
-	if (startindex<0) return in;
-
-
-	int currindex=0;
-
-	while (startindex > -1) {
-		for(int i = currindex; i < startindex; i++){
-			sb.append(working[i]);
-		}//for
-	 	currindex = startindex;
-		sb.append(newStr);
-		currindex += find.length();
-		startindex = in.indexOf(find,currindex);
-	}//while
-
-	for (int i = currindex; i < working.length; i++){
-		sb.append(working[i]);
-	}//for
-
-	return sb.toString();
-
-  } //subst
 }
