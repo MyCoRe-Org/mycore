@@ -68,4 +68,9 @@ public interface MCRFileReader
    * has stored the content of this file
    **/
   public String getStorageID();
+  
+  /**
+   * Returns the content type of the content of this file
+   **/
+  public MCRFileContentType getContentType();
 }

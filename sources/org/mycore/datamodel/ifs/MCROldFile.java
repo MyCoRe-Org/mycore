@@ -395,4 +395,13 @@ public class MCROldFile implements MCRFileReader
    **/
   public String getContentTypeID()
   { return contentTypeID; }
+  
+  /** 
+   * This method will throw an UnsupportedOperationException, it is not
+   * implemented for MCROldFile class.
+   **/
+  public MCRFileContentType getContentType()
+  { 
+    throw new UnsupportedOperationException( "Not implemented for MCROldFile");
+  }
 }
