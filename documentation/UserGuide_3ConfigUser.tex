@@ -1,0 +1,35 @@
+%
+%
+\subsection{Das User- und Rechtesystem}
+%
+%
+Im MyCoRe-Sample wird zur Demonstartion des User- und Rechtesystems auch eine konkrete Beispielkonfiguration für diesen Bereich mitgeliefert. Ein allgemeiner Überblick zu diesem Teilsystem wurde bereits weiter oben gegeben.\\[2ex]
+Im Konfigurationsverzeichnis des Samples unter {\it \$MYCORE\_SAMPLE\_HOME/config} ist zuerst das entsprechende Property-File mit dem Namen {\it mycore.properties.user} näher zu betrachten. Sie finden hier Festlegungen in der folgenden Form:
+\begin{verbatim}
+# The name of the Java class of the UserStore
+MCR.userstore_class_name=org.mycore.backend.sql.MCRSQLUserStore
+
+# SQL tables for the user management
+MCR.users_store_sql_table_users=MCRUSERS
+MCR.users_store_sql_table_groups=MCRGROUPS
+MCR.users_store_sql_table_group_members=MCRGROUPMEMBERS
+MCR.users_store_sql_table_group_admins=MCRGROUPADMINS
+MCR.users_store_sql_table_privileges=MCRPRIVS
+MCR.users_store_sql_table_privs_lookup=MCRPRIVSLOOKUP
+
+# The configuration for the superuser
+MCR.users_superuser_username=gandalf
+MCR.users_superuser_userpasswd=alleswirdgut
+MCR.users_superuser_groupname=zauberer
+
+# The configuration for the guestuser
+MCR.users_guestuser_username=aragorn
+MCR.users_guestuser_userpasswd=mensch
+MCR.users_guestuser_groupname=menschen
+\end{verbatim}
+Der Eintag des Parameters {\bf MCR.userstore\_class\_name} beschreibt den zu verwendenden Persitence Layer für die vom User-System verwendeten relationalen Datenbanken. Wir haben hier einen generischen Store entwickelt der mit allen SQL-konformen Datenbanken wie DB2, MySQL usw. laufen sollte. Sie müssen also diesen Wert normalerweise nicht ändern.\\[2ex]
+Die nächste Sektion in diesem Property-File legt die Tabellennamen der für das User-System benötigten Tabellen fest. Für die Ausführung des Beispieles können Sie die Einstellung übernehmen. Achten Sie jedoch später darauf, dass Sie die Tabellennamen nur in einem Projekt verwenden!\\[2ex]
+Die letzten beiden Abschnitte legen Vorgaben für zwei Benutzer fest, welche automatisch bei der Initialisierung des User-Systems angelegt werden. Der erste ist der Superuser innerhalb dieses MyCoRe-Projektes, der andere ein ganz simpler Anwender. Auch diese Werte können Sie für den Anfang so lassen, für ein eigenes Projekt, wie es weiter unten beschrieben wird, sollten Sie hier Anpassungen vornehmen. Eine Liste aller Gruppen und Benutzer des Beispieles finden Sie im Abschnitt zur allgemeinen Beschreibung dieses Subsystems.\\[2ex]
+Alle für das Beispiel erforderlichen Privileg-, Gruppen- und Benutzerdateien stehen im Verzeichnis {\it \$MYCORE\_SAMPLE\_HOME/config/users}. Sie können diese mit {\tt cd \$MYCORE\_SAMPLE\_HOME; bin/build.sh userdb} oder {\tt cd \$MYCORE\_SAMPLE\_HOME; ant userdb} in einem Arbeitsgang laden.\footnote{Welches Kommando Sie nutzen hängt von Ihrer Umgebungseistellung ab.} Der Aufruf initialisiert zuerst das User-System und legt die in der Konfiguration angegebenen Tabellen an. Anschließend werden die Privilegien, Gruppen und Benutzer geladen. Bitte achten Sie darauf, dass die vorgegebene Reihenfolge eingehalten wird, da es innerhalb des Beispiels Abhängigkeiten zwischen Usern und Gruppen gibt.\\[2ex]
+Nun sollten Sie über ein komplettes User-System, wie es zur Demonstartion des Samples erforderlich ist, verfügen.
+
