@@ -120,17 +120,30 @@ public class MCRFileContentTypeFactory
    * @throws MCRConfigurationException if no such file content type is known in the system
    */  
   public static MCRFileContentType getType( String ID )
-    throws MCRConfigurationException
+	throws MCRConfigurationException
   {
-    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
+	MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
 
-    if( typesTable.containsKey( ID ) )
-      return (MCRFileContentType)( typesTable.get( ID ) );
-    else
-    {
-      String msg = "There is no file content type with ID = " + ID + " configured";
-      throw new MCRConfigurationException( msg );
-    }
+	if( typesTable.containsKey( ID ) )
+	  return (MCRFileContentType)( typesTable.get( ID ) );
+	else
+	{
+	  String msg = "There is no file content type with ID = " + ID + " configured";
+	  throw new MCRConfigurationException( msg );
+	}
+  }
+
+  /** 
+   * Returns true if the file content type with the given ID is configured
+   *
+   * @param ID The non-null ID of the content type that should be returned
+   * @return true if content type is available, else false
+   */  
+  public static boolean isTypeAvailable( String ID )
+	throws MCRConfigurationException
+  {
+	MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
+	return typesTable.containsKey(ID);
   }
   
   /** 
