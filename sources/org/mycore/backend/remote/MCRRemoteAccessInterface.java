@@ -27,47 +27,31 @@ package org.mycore.backend.remote;
 import java.util.*;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.services.query.MCRCommunicationInterface;
 
 /**
- * This class implements the interface to choose the communication methodes
- * for the connection between MCRClient and MCRServer. This class is a
- * dummy implementation without functionallity and returns empty data.
+ * This interface is designed to choose the communication methodes
+ * for the connection between a local MyCoRe-Client and remote MyCoRe-Server.
  *
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 
-public class MCRCommunicationDummy implements MCRCommunicationInterface
+public interface MCRRemoteAccessInterface
 {
 
 /**
- * This is the empty constructor for the MCRCommunicationDummy.
- **/
-public MCRCommunicationDummy()
-  {
-  }
-
-/**
- * This methode represide the query request methode for the communication.
+ * This method represide the XPATH query request to a remote MyCoRe-Server.
  * For the connection parameter would the MCRConfiguration used.
  *
- * @param hostlist the list of hostnames as string they should requested.
+ * @param hostAlias the host alias as string that shall be requested.
  * @param mcrtype  the type value of the MCRObjectId
  * @param query    the query as a stream
- * @return an empty MCRXMLContainer as the response.
+ * @return the result of the query as MCRQueryResultArray
  * @exception MCRException general Exception of MyCoRe
  **/
-public final MCRXMLContainer requestQuery(String hostAlias, String mcrtype,
-  String query) throws MCRException
-  {
-  System.out.println("Hostname = "+hostAlias);
-  System.out.println("MCR type = "+mcrtype);
-  System.out.println("Query    = "+query);
-  System.out.println();
+public MCRXMLContainer requestQuery(String hostAlias, String mcrtype, 
+  String query) throws MCRException;
 
-  return new MCRXMLContainer() ;
-  }
 
 }
