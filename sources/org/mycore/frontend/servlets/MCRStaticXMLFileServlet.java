@@ -84,7 +84,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     job.getRequest().setAttribute( "MCRLayoutServlet.Input.FILE", file );
 
     // Set XSL Style to current language if not XSL.Style=xml in request:
-    if( ! "xml".equals( job.getRequest().getParameter( "XSL.Style" ) )    
+    if( ! "xml".equals( job.getRequest().getParameter( "XSL.Style" ) ) )  
       job.getRequest().setAttribute( "XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage() );
 
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
