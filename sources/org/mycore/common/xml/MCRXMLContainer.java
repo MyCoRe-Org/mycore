@@ -27,6 +27,7 @@ package org.mycore.common.xml;
 import java.io.*;
 import java.util.*;
 
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -64,6 +65,8 @@ public class MCRXMLContainer implements MCRSortable {
 	public static final String TAG_RESULTS = "mcr_results";
 	/** The tag for one result **/
 	public static final String TAG_RESULT = "mcr_result";
+	/** The tag for the object **/
+	public static final String TAG_OBJECT = "mycoreobject";
 	/** The attribute of the host name **/
 	public static final String ATTR_HOST = "host";
 	/** The attribute of the MCRObjectId **/
@@ -267,6 +270,7 @@ public final void add(
 		throws JDOMException, IOException {
 		BufferedInputStream bin = new BufferedInputStream(new ByteArrayInputStream(in_xml));
 		org.jdom.Document jdom = builder.build(bin);
+		bin.close();
 		org.jdom.Element root = jdom.getRootElement();
 		add(in_host, in_id, in_rank, root);
 	}
@@ -304,8 +308,7 @@ public final void add(
 			res.setAttribute(
 				ATTR_SUCC,
 				((((getStatus(i)) % 2) == 1) ? "true" : "false"));
-			org.jdom.Element tmp =
-				(org.jdom.Element) ((org.jdom.Element) xml.get(i)).clone();
+			org.jdom.Element tmp = (Element) ((Element) xml.get(i)).clone();
 			res.addContent(tmp);
 			root.addContent(res);
 		}
@@ -331,10 +334,12 @@ public final void add(
 	public final byte[] exportAllToByteArray() throws IOException {
 		org.jdom.Document doc = exportAllToDocument();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		BufferedOutputStream bos = new BufferedOutputStream(os);
 		XMLOutputter op =
 			new XMLOutputter(
 				Format.getRawFormat().setEncoding(default_encoding));
-		op.output(doc, os);
+		op.output(doc, bos);
+		bos.close();
 		return os.toByteArray();
 	}
 
@@ -363,8 +368,8 @@ public final void add(
 		org.jdom.Document doc = new org.jdom.Document(root);
 		if ((index >= 0) && (index <= rank.size())) {
 			org.jdom.Element res = new org.jdom.Element(TAG_RESULT);
-			res.setAttribute(ATTR_HOST, ((String) host.get(index)).trim());
-			res.setAttribute(ATTR_ID, ((String) mcr_id.get(index)).trim());
+			res.setAttribute(ATTR_HOST, (String) host.get(index));
+			res.setAttribute(ATTR_ID, (String) mcr_id.get(index));
 			res.setAttribute(ATTR_RANK, rank.get(index).toString());
 			res.setAttribute(
 				ATTR_PRED,
@@ -372,8 +377,7 @@ public final void add(
 			res.setAttribute(
 				ATTR_SUCC,
 				((((getStatus(index)) % 2) == 1) ? "true" : "false"));
-			org.jdom.Element tmp =
-				(org.jdom.Element) ((org.jdom.Element) xml.get(index)).clone();
+			org.jdom.Element tmp = (Element)((Element) xml.get(index)).clone();
 			res.addContent(tmp);
 			root.addContent(res);
 		}
@@ -401,8 +405,10 @@ public final void add(
 		throws IOException {
 		org.jdom.Document doc = exportElementToDocument(index);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		BufferedOutputStream bos= new BufferedOutputStream(os);
 		XMLOutputter op = new XMLOutputter(Format.getCompactFormat().setEncoding(default_encoding));
-		op.output(doc, os);
+		op.output(doc, bos);
+		bos.close();
 		return os.toByteArray();
 	}
 
@@ -414,11 +420,10 @@ public final void add(
 	 * Container was returned. */
 	public final MCRXMLContainer exportElementToContainer(int index) {
 		MCRXMLContainer returns = new MCRXMLContainer();
-		returns.add(
-			getHost(index),
-			getId(index),
-			getRank(index),
-			getXML(index));
+		returns.host.add(host.get(index));
+		returns.mcr_id.add(mcr_id.get(index));
+		returns.rank.add(rank.get(index));
+		returns.xml.add(xml.get(index));
 		return returns;
 	}
 
@@ -474,19 +479,18 @@ public final void add(
 		}
 		List list = root.getChildren(TAG_RESULT);
 		int irank = 0;
+		Element curElem;
 		for (int i = 0; i < list.size(); i++) {
-			org.jdom.Element res = (org.jdom.Element) list.get(i);
-			String inhost = res.getAttributeValue(ATTR_HOST);
-			String inid = res.getAttributeValue(ATTR_ID);
-			String inrank = res.getAttributeValue(ATTR_RANK);
+			curElem = (org.jdom.Element) list.get(i);
 			try {
-				irank = Integer.parseInt(inrank);
+				irank = Integer.parseInt(curElem.getAttributeValue(ATTR_RANK));
 			} catch (NumberFormatException e) {
-				throw new MCRException(ERRORTEXT);
+				throw new MCRException(ERRORTEXT,e);
 			}
-			List childlist = res.getChildren();
-			org.jdom.Element inxml = (org.jdom.Element) childlist.get(0);
-			add(inhost,inid,irank,inxml);
+			add(curElem.getAttributeValue(ATTR_HOST),
+					curElem.getAttributeValue(ATTR_ID),
+					irank,
+					curElem.getChild(TAG_OBJECT));
 		}
 	}
 
