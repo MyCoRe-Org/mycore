@@ -225,7 +225,7 @@ public class MCRFile extends MCRFilesystemNode
     {
       MCRContentStore store = MCRContentStoreFactory.selectStore( this );
       
-      storageID = store.storeContent( this, cis ); 
+      storageID = store.storeContent( getName(), getExtension(), getOwnerID(), getContentType().getMimeType(), cis ); 
       storeID   = store.getID();
     }
     
@@ -345,7 +345,7 @@ public class MCRFile extends MCRFilesystemNode
     ensureNotDeleted();
 
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
-      avExtender = MCRContentStoreFactory.buildExtender( this );
+      avExtender = MCRContentStoreFactory.buildExtender( storeID, storageID, getExtension() );
 
     return avExtender;
   }

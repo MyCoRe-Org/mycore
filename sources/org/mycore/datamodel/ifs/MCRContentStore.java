@@ -60,11 +60,14 @@ public interface MCRContentStore
    * Stores the content of an MCRFile by reading from an MCRContentInputStream.
    * Returns a StorageID to indentify the place where the content was stored.
    *
-   * @param file the MCRFile thats content is to be stored
+   * @param filename the name of the MCRFile thats content is to be stored
+   * @param extension the filename extension of the MCRFile thats content is to be stored
+   * @param owner the owner of the MCRFile thats content is to be stored
+   * @param mime the mime type of the content that is to be stored
    * @param source the ContentInputStream where the file content is read from
    * @return an ID that indentifies the place where the content was stored
    **/
-  public String storeContent( MCRFile file, MCRContentInputStream source )
+  public String storeContent( String filename, String extension, String owner, String mime, MCRContentInputStream source )
     throws MCRPersistenceException;
 
   /**

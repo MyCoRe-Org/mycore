@@ -228,7 +228,7 @@ public class MCROldFile
   { return lastModified; }
 
   /**
-   * Sets the ID of the MCROldContentStore implementation that holds the
+   * Sets the ID of the MCRContentStore implementation that holds the
    * content of this file
    **/
   public void setStoreID( String ID )
@@ -238,14 +238,14 @@ public class MCROldFile
   }
   
   /**
-   * Returns the ID of the MCROldContentStore implementation that holds the
+   * Returns the ID of the MCRContentStore implementation that holds the
    * content of this file
    **/
   public String getStoreID()
   { return storeID; }
   
   /**
-   * Sets the storage ID that identifies the place where the MCROldContentStore 
+   * Sets the storage ID that identifies the place where the MCRContentStore 
    * has stored the content of this file
    **/
   public void setStorageID( String ID )
@@ -255,28 +255,28 @@ public class MCROldFile
   }
   
   /**
-   * Returns the storage ID that identifies the place where the MCROldContentStore 
+   * Returns the storage ID that identifies the place where the MCRContentStore 
    * has stored the content of this file
    **/
   public String getStorageID()
   { return storageID; }
   
   /**
-   * Returns the MCROldContentStore instance that holds the content of this file
+   * Returns the MCRContentStore instance that holds the content of this file
    **/
-  protected MCROldContentStore getContentStore()
+  protected MCRContentStore getContentStore()
   {
     if( storeID.length() == 0 )
       return null;
     else
-      return MCROldContentStoreFactory.getStore( storeID );
+      return MCRContentStoreFactory.getStore( storeID );
   }
   
   /**
    * Reads the content of this file from the source ContentInputStream and
    * stores it in the ContentStore given
    **/
-  public void setContentFrom( MCRContentInputStream source, MCROldContentStore store )
+  public void setContentFrom( MCRContentInputStream source, MCRContentStore store )
     throws MCRPersistenceException
   { 
     if( source.getHeader().length == 0 )
@@ -286,7 +286,7 @@ public class MCROldFile
     }
     else
     { 
-      storageID = store.storeContent( this, source ); 
+      storageID = store.storeContent( this.getFileName(), this.getExtension(), this.getOwnerID(), "www/unknown", source ); 
       storeID   = store.getID();
     }
     
@@ -300,7 +300,7 @@ public class MCROldFile
   public void deleteContent()
     throws MCRPersistenceException
   {
-    if( storageID.length() != 0 ) getContentStore().deleteContent( this );
+    if( storageID.length() != 0 ) getContentStore().deleteContent( storageID );
     
     storageID     = "";
     storeID       = "";
@@ -317,7 +317,7 @@ public class MCROldFile
     throws MCRPersistenceException
   { 
     if( storageID.length() != 0 ) 
-      getContentStore().retrieveContent( this, target ); 
+      getContentStore().retrieveContent( storageID, size, target ); 
   }
   
   /**
@@ -366,7 +366,7 @@ public class MCROldFile
     if( storeID.length() == 0 ) 
       return false;
     else
-      return MCROldContentStoreFactory.providesAudioVideoExtender( storeID );
+      return MCRContentStoreFactory.providesAudioVideoExtender( storeID );
   }
   
   /**
@@ -376,7 +376,7 @@ public class MCROldFile
   public MCRAudioVideoExtender getAudioVideoExtender()
   {
     if( hasAudioVideoExtender() && ( avExtender == null ) )  
-      avExtender = MCROldContentStoreFactory.buildExtender( this );
+      avExtender = MCRContentStoreFactory.buildExtender( storeID, storageID, getExtension() );
 
     return avExtender;
   }
