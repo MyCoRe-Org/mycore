@@ -19,7 +19,7 @@
 		<xsl:variable name="browserAddress" >
 	            <xsl:call-template name="wcms.getBrowserAddress" />
 		</xsl:variable>
-            
+                  
             <!-- look for appropriate template entry and assign -> $template -->
             <xsl:variable name="template" >
 	            <xsl:call-template name="wcms.getTemplate" >

@@ -1,52 +1,59 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
       <!-- =================================================================================================== -->
+<!--
+Template: wcms.getBrowserAddress
+synopsis: The template will be used to identify the currently selected menu entry and the belonging element item/@href in the navigationBase
+These strategies are embarked on:
+1. RequestURL - lang ?= @href - lang
+2. RequestURL - $WebApplicationBaseURL - lang ?= @href - lang
+
+3. Root element ?= item//dynamicContentBinding/rootTag
+-->
       <xsl:template name="wcms.getBrowserAddress">
-            <!-- GET BROWSER ADDRESS -> $browserAddress-->
-            <!-- test if navigation.xml contains the current browser address -->
+		
+            <xsl:variable name="RequestURL.langDel" >
+			<xsl:call-template name="UrlDelParam"> 
+			      <xsl:with-param name="url" select="$RequestURL"  />
+	                  <xsl:with-param name="par" select="'lang'" /> 
+                  </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="RequestURL.WebURLDel" >
+			<xsl:value-of select="concat('/',substring-after($RequestURL,$WebApplicationBaseURL))" />
+            </xsl:variable>
+            <xsl:variable name="RequestURL.WebURLDel.langDel" >
+			<xsl:call-template name="UrlDelParam"> 
+			      <xsl:with-param name="url" select="$RequestURL.WebURLDel"  />
+	                  <xsl:with-param name="par" select="'lang'" /> 
+                  </xsl:call-template>
+            </xsl:variable>
             <xsl:variable name="completeRootNode" select="document($navigationBase)/navigation" />
-            <xsl:variable name="browserAddress_extern" >
-                  <!-- verify each item with @type="extern" -->
-                  <xsl:for-each select="$completeRootNode//item[@type='extern']" >
-                        <!-- cut if neccesary the lang parameter at the end of the URL -->
-                        <xsl:choose>
-                              <xsl:when test="current()[@href = $RequestURL ]">
-                                    <xsl:value-of select="$RequestURL" />
-                              </xsl:when>
-                              <xsl:when test="current()[@href = (substring-before($RequestURL, concat('?lang=',$CurrentLang) ))]">
-                                    <xsl:value-of select="(substring-before($RequestURL, concat('?lang=',$CurrentLang) ))" />
-                              </xsl:when>
-                        </xsl:choose>
-                  </xsl:for-each>
-                  <!-- END OF: verify each item with @type="extern" -->
+
+            <!-- test if navigation.xml contains the current browser address -->
+            <xsl:variable name="browserAddress_href" >
+                  <!-- verify each item  -->
+                  <xsl:for-each select="$completeRootNode//item[@href]" >
+                        <!-- remove par lang from @href -->
+                        <xsl:variable name="href.langDel">
+					<xsl:call-template name="UrlDelParam"> 
+					      <xsl:with-param name="url" select="current()/@href"  />
+			                  <xsl:with-param name="par" select="'lang'" /> 
+		                  </xsl:call-template>                              
+                        </xsl:variable>
+
+	                  <xsl:if test="( $RequestURL.langDel = $href.langDel )
+                              or
+                              ($RequestURL.WebURLDel.langDel = $href.langDel) ">
+                              <xsl:value-of select="@href" />
+                        </xsl:if>
+                        
+	            </xsl:for-each>
+                  <!-- END OF: verify each item -->
             </xsl:variable>
-            <!-- verify each item with @type="intern" -->
-            <xsl:variable name="browserAddress_intern" >
-                  <xsl:if test=" $browserAddress_extern = '' " >
-                        <xsl:for-each select="$completeRootNode//item[@type='intern']" >
-                              <!-- cut if neccesary the lang parameter at the end of the URL -->
-                              <xsl:choose>
-                                    <!-- test if normal webapp path reduced by one doubled '/' -->
-                                    <xsl:when 
-                                          test=" current()[@href = concat('/',substring-after($RequestURL,$WebApplicationBaseURL)) ] ">
-                                          <xsl:value-of select="concat('/',substring-after($RequestURL,$WebApplicationBaseURL))" 
-                                                />
-                                    </xsl:when>
-                                    <!-- lang attribute at end cuted -->
-                                    <xsl:when 
-                                          test="current()[@href = (substring-before(concat('/',substring-after($RequestURL,$WebApplicationBaseURL)), concat('?lang=',$CurrentLang) ))]">
-                                          <xsl:value-of 
-                                                select="(substring-before(concat('/',substring-after($RequestURL,$WebApplicationBaseURL)), concat('?lang=',$CurrentLang) ))" 
-                                                />
-                                    </xsl:when>
-                              </xsl:choose>
-                        </xsl:for-each>
-                  </xsl:if>
-            </xsl:variable>
-            <!-- END OF: verify each item with @type="intern" -->
+            
             <!-- look for appropriate dynamicContentBinding/rootTag -> $browserAddress_dynamicContentBinding -->
             <xsl:variable name="browserAddress_dynamicContentBinding" >
-                  <xsl:if test=" $browserAddress_extern = '' and $browserAddress_intern = '' " >
+                  <xsl:if test=" $browserAddress_href = '' " >
                         <!-- assign name of rootTag -> $rootTag -->
                         <xsl:variable name="rootTag" select="name(*)" />
                         <xsl:for-each select="$completeRootNode//dynamicContentBinding/rootTag" >
@@ -64,18 +71,18 @@
             <!-- END OF: test if navigation.xml contains the current browser address -->
             <!-- assign right browser address -->
             <xsl:choose>
-                  <xsl:when test=" $browserAddress_extern != '' " >
-                        <xsl:value-of select="$browserAddress_extern" />
-                  </xsl:when>
-                  <xsl:when test=" $browserAddress_intern != '' " >
-                        <xsl:value-of select="$browserAddress_intern" />
+                  <xsl:when test=" $browserAddress_href != '' " >
+                        <xsl:value-of select="$browserAddress_href" />
                   </xsl:when>
                   <xsl:when test=" $browserAddress_dynamicContentBinding != '' " >
                         <xsl:value-of select="$browserAddress_dynamicContentBinding" />
                   </xsl:when>
+                  <xsl:otherwise>
+                        <xsl:value-of select="'nichts'" />                        
+                  </xsl:otherwise>
             </xsl:choose>
             <!-- END OF: assign right browser address -->
-            <!-- END OF: GET BROWSER ADDRESS -> $browserAddress-->
+
       </xsl:template>
       <!-- =================================================================================================== -->
       <xsl:template name="wcms.getTemplate">
