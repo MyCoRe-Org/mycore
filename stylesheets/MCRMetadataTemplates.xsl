@@ -14,6 +14,11 @@
  </xsl:text>
 </xsl:variable>
 
+<!-- Dummy Template fo label -->
+
+<xsl:template match="label">
+</xsl:template>
+
 <!-- Template for the metadata MCRMetaLangText -->
 
 <xsl:template match="mcrmetalangtext">
@@ -40,6 +45,19 @@
      <xsd:attribute ref="xlink:label" use="optional"/>
      <xsd:attribute ref="xlink:from" use="optional"/>
      <xsd:attribute ref="xlink:to" use="optional"/>
+   </xsd:complexType>
+  </xsd:element>
+</xsl:template>
+
+<!-- Template for the metadata MCRMetaClassification -->
+
+<xsl:template match="mcrmetaclassification">
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:attribute name="classid" />
+     <xsd:attribute name="categid" />
+     <xsd:attribute name="type" use="optional" />
+     <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
   </xsd:element>
 </xsl:template>
