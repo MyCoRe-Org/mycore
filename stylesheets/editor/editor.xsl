@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.8 $ $Date: 2004-03-17 12:43:25 $ -->
+<!-- $Revision: 1.9 $ $Date: 2004-03-18 10:06:01 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -781,8 +781,11 @@
       <xsl:when test="$selected.cell">
         <xsl:value-of select="$selected.cell/@value" disable-output-escaping="yes" />
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="@default">
         <xsl:value-of select="@default" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>  
   </span>
