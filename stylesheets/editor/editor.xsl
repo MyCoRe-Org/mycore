@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.13 $ $Date: 2004-07-23 14:23:44 $ -->
+<!-- $Revision: 1.14 $ $Date: 2004-07-26 09:11:21 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -168,35 +168,29 @@
 <xsl:template name="editor.read.source">
 
   <!-- ======== build url where to get the xml source from ======== -->
-  <xsl:variable name="url.relative">
+  <xsl:variable name="url.helper">
     <xsl:choose>
       <xsl:when test="string-length($editor.source.url) &gt; 0">
         <xsl:value-of select="$editor.source.url"/>
       </xsl:when>
-      <xsl:when test="source/@url">
-        <xsl:choose>
-          <xsl:when test="contains(source/@url,source/@token)">
-            <xsl:value-of select="substring-before(source/@url,source/@token)" />
-            <xsl:value-of select="$editor.source.id"/>
-            <xsl:value-of select="substring-after(source/@url,source/@token)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="source/@url" />
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:when test="string-length($editor.source.id) &gt; 0">
+        <xsl:value-of select="substring-before(source/@url,source/@token)"/>
+        <xsl:value-of select="$editor.source.id"/>
+        <xsl:value-of select="substring-after(source/@url,source/@token)"/>
+      </xsl:when>
+      <xsl:when test="string-length(source/@url) &gt; 0">
+        <xsl:value-of select="source/@url" />
       </xsl:when>
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ======== If necessary, make relative url absolute ======== -->
-  <xsl:variable name="url">
-    <xsl:call-template name="build.url">
-      <xsl:with-param name="url" select="$url.relative" />
-    </xsl:call-template>
-  </xsl:variable>
-
   <!-- ======== if not empty new document, transform source to name=value ======== -->
-  <xsl:if test="($editor.source.new != 'true') and ($url != $WebApplicationBaseURL)">
+  <xsl:if test="($editor.source.new != 'true') and (string-length($url.helper) &gt; 0)">
+    <xsl:variable name="url">
+      <xsl:call-template name="build.url">
+        <xsl:with-param name="url" select="$url.helper" />
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:apply-templates select="document($url)/*" mode="editor.source.to.list" />
   </xsl:if>
 </xsl:template>
@@ -1236,7 +1230,7 @@
   </xsl:choose>
 
   <!-- append MCRSessionID if not already exists in URL -->
-  <xsl:if test="contains($url, 'MCRSessionID=') != true">
+  <xsl:if test="not(contains($url, 'MCRSessionID='))">
     <xsl:choose>
       <xsl:when test="contains($url,'?')"> <!-- there are other http get style parameters in url -->
         <xsl:value-of select="'&amp;'" />  <!-- append new parameter -->
