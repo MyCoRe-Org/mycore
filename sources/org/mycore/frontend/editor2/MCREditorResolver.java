@@ -73,6 +73,8 @@ class MCREditorResolver
       return readFromHTTP( uri );
     else if( "request".equals( scheme ) )
       return readFromRequest( uri );
+    else if( "session".equals( scheme ) )
+      return readFromSession( uri );
     else
     {
       String msg = "Unsupported URI type: " + uri;
@@ -161,6 +163,16 @@ class MCREditorResolver
     url.append( MCRSessionMgr.getCurrentSession().getID() );
     
     return readFromHTTP( url.toString() );
+  }
+
+  // session:key
+  protected static Element readFromSession( String uri )
+  {
+    String key = uri.substring( uri.indexOf( ":" ) + 1 );
+    
+    MCREditorServlet.logger.debug( "Editor reading xml from session using key " + key );
+    Object value = MCRSessionMgr.getCurrentSession().get( key );
+    return (Element)( ((Element)value).clone() );
   }
   
   protected static Element parseStream( InputStream in )
