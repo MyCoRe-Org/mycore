@@ -1038,14 +1038,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		        Element eHeader = new Element("header", ns);
     	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
             	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
-	            if ((array[2] != null) && (array[2].length() > 0)) {
-		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
-    	    	
-	    	    	while (tokenizer.hasMoreTokens()) {
-                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
-    		    	}
-    	    	
-    	        }
+            	eHeader = setSpec(eHeader, array[2], ns);
             
             	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
 		            eListIdentifiers.addContent(eHeader);
@@ -1143,14 +1136,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		        Element eHeader = new Element("header", ns);
     	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
             	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
-	            if ((array[2] != null) && (array[2].length() > 0)) {
-		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
-    	    	
-	    	    	while (tokenizer.hasMoreTokens()) {
-                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
-    		    	}
-    	    	
-    	        }
+            	eHeader = setSpec(eHeader, array[2], ns);
             
 		        Element eRecord = new Element("record", ns);
 		        eRecord.addContent(eHeader);
@@ -1343,15 +1329,9 @@ public class MCROAIDataProvider extends HttpServlet {
 		        Element eHeader = new Element("header", ns);
     	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
             	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
-	            if ((array[2] != null) && (array[2].length() > 0)) {
-		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
-    	    	
-	    	    	while (tokenizer.hasMoreTokens()) {
-                        eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));
-    		    	}
-    	    	
-    	        }
-		        Element eRecord = new Element("record", ns);
+            	eHeader = setSpec(eHeader, array[2], ns);
+
+            	Element eRecord = new Element("record", ns);
 		        eRecord.addContent(eHeader);
 	            
 	            Element eMetadata = (Element) iterator.next();
