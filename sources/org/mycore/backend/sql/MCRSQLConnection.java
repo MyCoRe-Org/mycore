@@ -101,9 +101,21 @@ public class MCRSQLConnection {
 		inPool = true;
 	}
 
-	public MCRSQLConnection(String url, String user, String passwd)
+	public MCRSQLConnection(
+		String driver,
+		String url,
+		String user,
+		String passwd)
 		throws MCRPersistenceException, MCRConfigurationException {
 		Logger logger = MCRSQLConnectionPool.getLogger();
+
+		try {
+			Class.forName(driver);
+		} // Load the JDBC driver
+		catch (Exception exc) {
+			String msg = "Could not load JDBC driver class " + driver;
+			throw new MCRPersistenceException(msg, exc);
+		}
 
 		logger.debug(
 			"MCRSQLConnection: Building connection to JDBC datastore... with "
