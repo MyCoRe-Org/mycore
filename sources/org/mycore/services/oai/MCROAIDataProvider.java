@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.10 $ $Date: 2003/01/28 13:43:25 $
+ * $Revision: 1.11 $ $Date: 2003/01/28 14:02:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -33,8 +33,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
@@ -64,7 +66,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.10 $ $Date: 2003/01/28 13:43:25 $
+ * @version $Revision: 1.11 $ $Date: 2003/01/28 14:02:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -338,8 +340,6 @@ public class MCROAIDataProvider extends HttpServlet {
 		    	return false;
 		    }
 		} 
-        
-		return true;
     }
 
 	/**
@@ -362,7 +362,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    
 		File directory = new File(dir);
 		File[] tokenList = directory.listFiles(new TokenFileFilter(directory, 
-            STR_OAI_RESUMPTIONTOKEN_SUFFIX));
+            STR_RESUMPTIONTOKEN_SUFFIX));
 		if (tokenList == null) {
             return;
 		}
@@ -388,6 +388,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @throws IOException
 	 */
     private Element listFromResumptionToken(Element list, String resumptionToken) throws IOException {
+	    MCRConfiguration config = MCRConfiguration.instance();
 		try {
 		   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR);
 		   	int maxreturns = config.getInt(STR_OAI_MAXRETURNS);

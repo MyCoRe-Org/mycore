@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQueryService.java,v $
- * $Revision: 1.5 $ $Date: 2003/01/28 13:30:25 $
+ * $Revision: 1.6 $ $Date: 2003/01/28 14:03:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -24,6 +24,9 @@
 
 package org.mycore.services.oai;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -32,7 +35,7 @@ import org.mycore.services.oai.MCROAIQuery;
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.5 $ $Date: 2003/01/28 13:30:25 $
+ * @version $Revision: 1.6 $ $Date: 2003/01/28 14:03:25 $
  *
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
  */
