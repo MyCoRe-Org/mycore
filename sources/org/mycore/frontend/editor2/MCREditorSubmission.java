@@ -146,7 +146,7 @@ public class MCREditorSubmission
             else if( ( attrib != null ) && ( attrib.trim().length() > 0 ) )
               autofill = elem.trim();
             
-            if( value.trim().equals( autofill.trim() ) ) continue;
+            if( value.trim().equals( autofill ) ) continue;
           }
         }
         
