@@ -26,7 +26,6 @@ package org.mycore.common.xml;
 
 import java.io.File;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -35,7 +34,6 @@ import javax.xml.transform.TransformerFactory;
 import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
-import org.xml.sax.SAXException;
 
 /**
  * This class implements XSLTransformation functions to be used in all other
@@ -61,15 +59,6 @@ public class MCRXSLTransformation {
             transformer.transform(new JDOMSource(in), out);
             
             return out.getDocument();
-        }
-        catch (ParserConfigurationException e) {
-            //logger.error(e.getMessage());
-            throw new MCRConfigurationException(e.getMessage(), e);
-            return null;
-        }
-        catch (SAXException e) {
-            //logger.error(e.getMessage());
-            return null;
         }
         catch (TransformerException e) {
             //logger.fatal(e.getMessage());
