@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.19 $ $Date: 2003/01/31 11:04:25 $
+ * $Revision: 1.20 $ $Date: 2003/01/31 11:08:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.19 $ $Date: 2003/01/31 11:04:25 $
+ * @version $Revision: 1.20 $ $Date: 2003/01/31 11:08:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -900,13 +900,13 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	
 	    	while (iterator.hasNext()) {
 	    		elementCounter++;
-	    		String[] header = (String[]) iterator.next();
+	    		String[] array = (String[]) iterator.next();
 	    		
 		        Element eHeader = new Element("header", ns);
-    	        eHeader.addContent(newElementWithContent("identifier", ns, header[0]));
-            	eHeader.addContent(newElementWithContent("datestamp", ns, header[1]));
-	            if ((header[2] != null) && (header[2].length() > 0)) {
-		    	    StringTokenizer tokenizer = new StringTokenizer(header[2], " ");
+    	        eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
+            	eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+	            if ((array[2] != null) && (array[2].length() > 0)) {
+		    	    StringTokenizer tokenizer = new StringTokenizer(array[2], " ");
     	    	
 	    	    	while (tokenizer.hasMoreTokens()) {
                         eHeader.addContent(newElementWithContent("setSpec", ns, tokenizer.nextToken()));

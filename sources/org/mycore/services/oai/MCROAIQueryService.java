@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIQueryService.java,v $
- * $Revision: 1.9 $ $Date: 2003/01/31 11:04:25 $
+ * $Revision: 1.9 $ $Date: 2003/01/31 11:08:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -44,7 +44,7 @@ import org.mycore.services.query.MCRQueryResult;
 /**
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.9 $ $Date: 2003/01/31 11:04:25 $
+ * @version $Revision: 1.9 $ $Date: 2003/01/31 11:08:25 $
  *
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery</i>-Interface.
  */
@@ -74,7 +74,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 		List list = new ArrayList();
         MCRClassificationItem repository = MCRClassificationItem.
             getClassificationItem(classificationId);
-        if ((repository != null) && (repository.hasChildren()) {
+        if ((repository != null) && (repository.hasChildren())) {
         	MCRCategoryItem[] children = repository.getChildren();
 
 			list = getSets(list, repository.getChildren(), "");
