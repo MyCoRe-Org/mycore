@@ -101,6 +101,14 @@ public class MCRSQLConnection
     catch( Exception exc )
     { throw new MCRPersistenceException( "Error while closing JDBC connection", exc ); }
   }
+
+  /**
+   * Returns the underlying JDBC java.sql.Connection object
+   *
+   * @return the underlying JDBC java.sql.Connection object
+   **/
+  public Connection getJDBCConnection()
+  { return connection; }
   
   /**
    * Executes an SQL select statement on this connection. The results of the query

@@ -93,8 +93,6 @@ public class MCRCM7ConnectionPool implements DKConstant
     maxNumConnections = config.getInt( "MCR.persistence_cm7_max_connections", 1 );
     int initNumConnections = config.getInt( "MCR.persistence_cm7_init_connections", maxNumConnections );
 
-    initNumConnections = Math.max( maxNumConnections, initNumConnections );
-
     // Build the initial number of JDBC connections
     for( int i = 0; i < initNumConnections; i++ )
       freeConnections.addElement( buildConnection() );
@@ -160,7 +158,7 @@ public class MCRCM7ConnectionPool implements DKConstant
    *
    * @param connection the Content Manager connection that has been used
    **/
-  synchronized void releaseConnection( DKDatastoreDL connection )
+  public synchronized void releaseConnection( DKDatastoreDL connection )
   {
     if( connection == null ) return;
     
