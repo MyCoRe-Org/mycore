@@ -114,60 +114,52 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     org.jdom.Document jdom = null;
 
-    String mode  = request.getParameter( "mode"  );
-    String query = request.getParameter( "query" );
-    String type  = request.getParameter( "type"  );
-    //multiple host are allowed
-    String[] hosts  = request.getParameterValues( "hosts" );
-    String lang  = request.getParameter( "lang" );
-    String view  = request.getParameter( "view");
-    String ref   = request.getParameter( "ref");
-    String offsetStr = request.getParameter( "offset" );
-    String sizeStr = request.getParameter( "size" );
-    String max_results = request.getParameter( "max_results" );
-    SortKey = request.getParameter(SortParam);
-    if (request.getParameter(InOrderParam)!=null &&
-        request.getParameter(InOrderParam).toLowerCase().equals("false"))
-    	inOrder = false;
-    else inOrder = true;
-    String host="";
-    if (hosts!=null && hosts.length>0){
+    String mode  = getProperty(request, "mode"  );
+    String query = getProperty(request, "query" );
+    String type  = getProperty(request, "type"  );
+    String lang  = getProperty(request, "lang" );
+
+	//multiple host are allowed
+	String[] hosts  = request.getParameterValues( "hosts" );
+	String att_host  = (String) request.getAttribute( "hosts" );
+	//dont't overwrite host if getParameter("hosts") was successful 
+	String host="";
+	if (att_host!=null && (hosts == null ||hosts.length==0)) { host = att_host; }
+	else if (hosts!=null && hosts.length>0){
 		// find a Instance of the local one
 		String ServerName = request.getServerName();
 		logger.info("MCRQueryServlet: Try to map remote request to local one!");
 		logger.info("MCRQueryServlet: Local Server Name="+ServerName);
 		StringBuffer hostBf=new StringBuffer();
-   		for (int i=0;i<hosts.length;i++){
-   			if (!hosts[i].equals("local"))
-   				//the following replaces a remote request with "local" if needed
+		for (int i=0;i<hosts.length;i++){
+			if (!hosts[i].equals("local"))
+				//the following replaces a remote request with "local" if needed
 				hosts[i]= (isInstanceOfLocal(hosts[i],request)) ? "local" : hosts[i];
 			//make a comma seperated list of all hosts
-   			hostBf.append(",").append(hosts[i]);
+			hostBf.append(",").append(hosts[i]);
 		}
 		host=hostBf.deleteCharAt(0).toString();
 		if (host.indexOf("local")!=host.lastIndexOf("local")){
 			logger.info("MCRQueryServlet: multiple \"local\" will be removed by MCRQueryResult!");
 		}
 	}
-    	
-    if (SortKey != null) customSort = true;
-    else customSort = false;
+    
+    String view  = request.getParameter( "view");
+    String ref   = request.getParameter( "ref");
+    String offsetStr = request.getParameter( "offset" );
+    String sizeStr = request.getParameter( "size" );
+    String max_results = request.getParameter( "max_results" );
+    SortKey = request.getParameter(SortParam);
+	if (SortKey != null) {
+		if (request.getParameter(InOrderParam)!=null &&
+			request.getParameter(InOrderParam).toLowerCase().equals("false"))
+			inOrder = false;
+		else inOrder = true;
+		customSort = true;
+	}
+	else customSort = false;
+   	
     int status=0;
-
-    String att_mode  = (String) request.getAttribute( "mode"  );
-    if (att_mode!=null) { mode = att_mode; }
-    String att_query = (String) request.getAttribute( "query" );
-    if (att_query!=null) { query = att_query; }
-    String att_type  = (String) request.getAttribute( "type"  );
-    if (att_type!=null) { type = att_type; }
-    String att_host  = (String) request.getAttribute( "hosts" );
-    //dont't overwrite host if getParameter("hosts") was successful 
-    if (att_host!=null && (hosts == null ||hosts.length==0)) { host = att_host; }
-	String att_lang  = (String) request.getAttribute( "lang" );
-	if (att_lang!=null) { lang = att_lang; }
-	String att_view  = (String) request.getAttribute( "view" );
-	if (att_view!=null) { view = att_view; }
-	
 	int maxresults=0;
 	if (max_results!=null) maxresults=Integer.parseInt(max_results);
 	int offset=0;
@@ -196,6 +188,11 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     logger.info("MCRQueryServlet : hosts = "+ host);
     logger.info("MCRQueryServlet : lang = "+lang);
     logger.info("MCRQueryServlet : query = "+query);
+	// prepare the stylesheet name
+	// TODO: Speed this up - it's tooo slow
+	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
+	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
+	logger.info("Style = "+style);
 
 	// check for valid session
 	if (mode.equals("CachedResultList"))
@@ -203,10 +200,11 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	  String sId= (session != null)? session.getId(): "null";
 	  if (!request.isRequestedSessionIdValid()){
 		//page session timed out
-		StringBuffer msg=new StringBuffer("Requested session is invalid, maybe it was timed out!<br/>\n");
-		msg.append("requested session was: ").append(request.getRequestedSessionId()).append("!<br/>\n")
-		   .append("actual session is: ").append(sId).append("!<br/>\n");
-		generateErrorPage(response,HttpServletResponse.SC_REQUEST_TIMEOUT,msg.toString());
+		MCRException ex= new MCRException("Session invalid!");
+		StringBuffer msg=new StringBuffer("Requested session is invalid, maybe it was timed out!\n");
+		msg.append("requested session was: ").append(request.getRequestedSessionId()).append("!\n")
+		   .append("actual session is: ").append(sId).append("!");
+		generateErrorPage(request,response,HttpServletResponse.SC_REQUEST_TIMEOUT,msg.toString(),ex,false);
 		return;
       	
 	  }
@@ -227,8 +225,6 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 
     // query for classifications
     if (type.equals("class")) {
-      Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
-      String style = parameters.getProperty("Style",mode+"-class-"+lang);
       MCRQueryResult result = new MCRQueryResult();
       String squence = conf.getString("MCR.classifications_search_sequence",
         "remote-local");
@@ -244,36 +240,30 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
           resarray = result.setFromQuery("local",type, query ); }
         } 
       if (resarray.size()==0) {
-        throw new MCRException( 
-          "No classification or category exists" ); }
+		generateErrorPage(request,response,
+		HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		"Internal Server Error!",
+		new MCRException( "No classification or category exists" ),false);
+		return;
+      }
       jdom = resarray.exportAllToDocument();
 //System.out.println(new String(MCRUtils.getByteArray(jdom)));
       try {
-        if (style.equals("xml")) {
-          response.setContentType( "text/xml" );
-          OutputStream out = response.getOutputStream();
-          new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
-          out.close();
-          }
-        else {
-          request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom  );
+          request.setAttribute( MCRLayoutServlet.JDOM_ATTR,  jdom  );
           request.setAttribute( "XSL.Style", style );
           RequestDispatcher rd = getServletContext()
             .getNamedDispatcher( "MCRLayoutServlet" );
           rd.forward( request, response );
-          }
         }
       catch( Exception ex ) {
-        logger.fatal( ex.getClass().getName() );
-        logger.fatal( ex.getMessage(), ex ); 
+		generateErrorPage(request,response,
+		HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		"Error while forwarding XML document to LayoutServlet!",
+		ex,false);
+		return;
         }
       return;
       }
-
-	// prepare the stylesheet name
-	Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
-	String style = parameters.getProperty("Style",mode+"-"+type+"-"+lang);
-	logger.info("Style = "+style);
 
     if (cachedFlag)
     {
@@ -283,13 +273,13 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     		jdom = (org.jdom.Document) session.getAttribute( "CachedList" );
     		type = (String)            session.getAttribute( "CachedType" );
     		if (jdom == null || type == null)
-    			throw new MCRException("Failed to get jdom and type out of session cache!");
+    			throw new MCRException("Either jdom or type (or both) were null!");
       	}
-		catch (Exception exc){
-			logger.error(exc.getClass().getName());
-			logger.error(exc.getMessage(), exc);
-			generateErrorPage(response,HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-		                      "Failed to get jdom and type out of session cache!");
+		catch (Exception ex){
+			generateErrorPage(request,response,
+			                  HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		                      "Failed to get jdom and type out of session cache!",
+		                      ex,false);
 			return;
 		}
 
@@ -300,7 +290,11 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 				resarray.importElements(jdom);
 			}
 			catch (JDOMException e) {
-				throw new MCRException("Error while RE-sorting JDOM.", e);
+				generateErrorPage(request,response,
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+				"Error while RE-sorting JDOM",
+				new MCRException("Import of elements failed due to some reason!"),false);
+				return;
 			}
 			if (resarray.size()>0){
 				//let's do resorting.
@@ -314,10 +308,26 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 		}
 		if ((view.equals("prev") || view.equals("next")) && (ref != null)){
 			/* change generate new query */
-			StringTokenizer refGet = 
-			   new StringTokenizer(this.getBrowseElementID(jdom,ref,view.equals("next")),"@");
-			if (refGet.countTokens() < 3)
-				throw new ServletException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: "+refGet);
+			StringTokenizer refGet=null;
+			try {
+				refGet =
+					new StringTokenizer(
+						this.getBrowseElementID(jdom, ref, view.equals("next")),
+						"@");
+			} catch (Exception ex) {
+				generateErrorPage(request,response,
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+				"Could not resolve browse origin!",
+				ex,false);
+				return;
+			}
+			if (refGet.countTokens() < 3){
+				generateErrorPage(request,response,
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+				"Could not resolve browse origin!",
+				new MCRException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: "+refGet),false);
+				return;
+			}
 			String StrStatus=refGet.nextToken();
 			query=new StringBuffer("/mycoreobject[@ID='")
 					  .append(refGet.nextToken()).append("']").toString();
@@ -336,6 +346,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 			   "?mode="+mode+"&status="+StrStatus+"&type="+type+"&hosts="+host+
 			   "&lang="+lang+"&query="+query );
 			doGet(request,response);
+			return;
 		}
     }
     else {
@@ -363,27 +374,22 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     		jdom = resarray.exportAllToDocument(); // no result list --> no sort needed
     }
 	try {
-		if (style.equals("xml")) {
-			response.setContentType( "text/xml" );
-			OutputStream out = response.getOutputStream();
-			new org.jdom.output.XMLOutputter( "  ", true ).output( jdom, out );
-			out.close();
-		}
-		else {
-			if (mode.equals("ResultList"))
-				request.setAttribute( "MCRLayoutServlet.Input.JDOM", cutJDOM(jdom,offset,size));
-			else
-				request.setAttribute( "MCRLayoutServlet.Input.JDOM",  jdom );
-			request.setAttribute( "XSL.Style", style );
-			RequestDispatcher rd = getServletContext()
-			                       .getNamedDispatcher( "MCRLayoutServlet" );
-			logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
-			rd.forward( request, response );
-		}
+		if (mode.equals("ResultList") && !style.equals("xml"))
+			request.setAttribute( MCRLayoutServlet.JDOM_ATTR, cutJDOM(jdom,offset,size));
+		else
+			request.setAttribute( MCRLayoutServlet.JDOM_ATTR,  jdom );
+		request.setAttribute( "XSL.Style", style );
+		RequestDispatcher rd = getServletContext()
+		                       .getNamedDispatcher( "MCRLayoutServlet" );
+		logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
+		rd.forward( request, response );
 	}
 	catch( Exception ex ) {
-		logger.fatal( ex.getClass().getName() );
-		logger.fatal( ex.getMessage(), ex );
+		generateErrorPage(request,response,
+		HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		"Error while forwarding XML document to LayoutServlet!",
+		ex,false);
+		return;
 	}
   }
   
@@ -414,12 +420,12 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
    * 								searched Document.
    */
   private String getBrowseElementID(org.jdom.Document jdom, String ref, boolean next)
-  	      throws ServletException, IOException{
+  	      throws MCRException, IOException{
   	org.jdom.Document tempDoc = (org.jdom.Document)jdom.clone();
     logger.info("MCRQueryServlet: getBrowseElementID() got: "+ref);
 	StringTokenizer refGet = new StringTokenizer(ref,"@");
 	if (refGet.countTokens() < 2)
-		throw new ServletException("MCRQueryServlet: Sorry \"ref\" has not 2 Tokens: "+ref);
+		throw new MCRException("MCRQueryServlet: Sorry \"ref\" has not 2 Tokens: "+ref);
 	String id  =refGet.nextToken();
 	String host=refGet.nextToken();
 	List elements = tempDoc.getRootElement()
@@ -445,7 +451,7 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
 	}
 	
 	if (search==null)
-		throw new ServletException("MCRQueryServlet: Sorry doesn't found searched document");
+		throw new MCRException("MCRQueryServlet: Sorry doesn't found searched document");
 	int status = ((search.getAttributeValue(MCRXMLContainer.ATTR_SUCC).equals("true"))?1:0)
 	            +((search.getAttributeValue(MCRXMLContainer.ATTR_PRED).equals("true"))?2:0);
 	id=search.getAttributeValue("id");
@@ -537,16 +543,47 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
   	        (ServletPort==RemotePort)) ? true : false;
   }
   
-  // TODO: Make errorpage more customizable!!!
-  private void generateErrorPage(HttpServletResponse response,
-                                 int error,
-                                 String msg) throws IOException{
-	response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,msg);
-	StringBuffer back=new StringBuffer("Go back to ");
-	String url="MCRSearchMaskServlet?lang=DE&type=document&mode=CreateSearchMask";
-	back.append("<a href=\"").append(url).append("\">main Search-Page</a>!");
-	response.getOutputStream().println(back.toString());
-	response.flushBuffer();
+  private String getProperty(HttpServletRequest request, String name){
+	String value  = (String) request.getAttribute(name);
+	//if Attribute not given try Parameter
+  	if (value == null)
+		value = request.getParameter(name);
+  	return value;
   }
-  
+    
+  private void generateErrorPage(HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 int error,
+                                 String msg,
+                                 Exception ex,
+                                 boolean xmlstyle)
+               throws IOException, ServletException{
+	logger.error("MCRQueryServlet: Error "+
+				 error+ " occured. The following message was given: "+
+				 msg,ex);
+    String rootname="mcr_error";
+    String lang= (getProperty(request,"lang")!=null)?
+                  getProperty(request,"lang"):defaultLang;
+    String style=(xmlstyle)? "xml":("query-"+lang.toUpperCase());
+	Element root=new Element(rootname);
+	Element exception= new Element("exception");
+	Document errorDoc=new Document(root,new DocType(rootname));
+	root.setAttribute("HttpError",Integer.toString(error))
+	    .setText(msg);
+	if (ex != null){
+		Element trace=new Element("trace");
+		Element message=new Element("message");
+		trace.setText(MCRException.getStackTraceAsString(ex));
+		message.setText(ex.getMessage());
+		exception.addContent(message)
+		         .addContent(trace);
+	}
+	root.addContent(exception);
+	request.setAttribute( MCRLayoutServlet.JDOM_ATTR,  errorDoc );
+	request.setAttribute( "XSL.Style", style );
+	RequestDispatcher rd = getServletContext()
+	                       .getNamedDispatcher( "MCRLayoutServlet" );
+	logger.info("MCRQueryServlet: forward to MCRLayoutServlet!");
+	rd.forward( request, response );
+  }
 }
