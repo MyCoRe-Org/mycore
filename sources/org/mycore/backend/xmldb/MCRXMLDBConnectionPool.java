@@ -62,6 +62,8 @@ public class MCRXMLDBConnectionPool
   private static String conf_prefix = "MCR.persistence_xmldb_";
   private static String driver      = "";
   private static String connString  = "";
+  private static String user;
+  private static String passwd;
   private  Database database;
   
   /**
@@ -94,6 +96,11 @@ public class MCRXMLDBConnectionPool
 		logger
 				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: "
 						+ connString);
+		user = config.getString(conf_prefix + "user", null);
+		logger
+				.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_user      : "
+						+ user);
+		passwd = config.getString(conf_prefix + "passwd", null);
 		try {
 			Class driverclass = Class.forName(driver);
 			database = (Database) driverclass.newInstance();
@@ -131,7 +138,7 @@ public class MCRXMLDBConnectionPool
 			Collection col;
 
 			logger.info("try to create collection in XML:DB: " + collection);
-			Collection root = DatabaseManager.getCollection(uri);
+			Collection root = getCollection(uri);
 			if (root==null) {
 				String msg = "MCRXMLDBConnectionPool: Could not connect to XML:DB: "
 						+ uri;
@@ -164,15 +171,30 @@ public class MCRXMLDBConnectionPool
 			throws XMLDBException {
 		String con = connString + "/" + collection;
 		logger.debug("MCRXMLDBConnectionPool: Building connection to: " + con);
-		Collection connection = DatabaseManager.getCollection(con);
+		Collection connection = getCollection(con);
 		if (connection == null) {
 			createCollection(connString, collection);
-			connection = DatabaseManager.getCollection(con);
+			connection = getCollection(con);
 		}
 		return connection;
 	}
   
   /**
+   * returns a collection for a user account if available
+ * @param collection
+ * @return 
+ * @throws XMLDBException
+ */
+private Collection getCollection(String collection) throws XMLDBException {
+	Collection connection;
+	if (user==null)
+		connection = DatabaseManager.getCollection(collection);
+	else
+		connection = DatabaseManager.getCollection(collection, user, passwd);
+	return connection;
+}
+
+/**
    * Gets a free connection from the pool. When this connection is not used any
    * more by the invoker, he is responsible for returning it into the pool by
    * invoking the <code>releaseConnection()</code> method.
