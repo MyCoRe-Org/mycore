@@ -25,7 +25,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -327,7 +327,7 @@ public class MCRUserCommands
         String encryptedPasswd = MCRCrypt.crypt(passwd);
         elm.getChild("user.password").setText(encryptedPasswd);
       }
-      FileWriter outFile = new FileWriter(new File(newFile));
+      FileOutputStream outFile = new FileOutputStream(newFile);
       saveToXMLFile(doc, outFile);
     }
     catch (Exception e) {
@@ -409,7 +409,7 @@ public class MCRUserCommands
   {
     try {
       org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups();
-      FileWriter outFile = new FileWriter(new File(filename));
+      FileOutputStream outFile = new FileOutputStream(filename);
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
       throw new MCRException("Error while command saveAllGroupsToFile()", e);
@@ -427,7 +427,7 @@ public class MCRUserCommands
   {
     try {
       org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllPrivilegesAsJDOMDocument();
-      FileWriter outFile = new FileWriter(new File(filename));
+      FileOutputStream outFile = new FileOutputStream(filename);
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
       throw new MCRException("Error while command saveAllPrivilegesToFile()", e);
@@ -446,7 +446,7 @@ public class MCRUserCommands
   {
     try {
       org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers();
-      FileWriter outFile = new FileWriter(new File(filename));
+      FileOutputStream outFile = new FileOutputStream(filename);
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
       throw new MCRException("Error while command saveAllUsersToFile()", e);
@@ -467,7 +467,7 @@ public class MCRUserCommands
     try {
       MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
       org.jdom.Document jdomDoc = group.toJDOMDocument();
-      FileWriter outFile = new FileWriter(new File(filename));
+      FileOutputStream outFile = new FileOutputStream(filename);
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
       throw new MCRException("Error while command saveGroupToFile()", e);
@@ -488,7 +488,7 @@ public class MCRUserCommands
     try {
       MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
       org.jdom.Document jdomDoc = user.toJDOMDocument();
-      FileWriter outFile = new FileWriter(new File(filename));
+      FileOutputStream outFile = new FileOutputStream(filename);
       saveToXMLFile(jdomDoc, outFile);
     } catch (Exception e) {
       throw new MCRException("Error while command saveUserToFile()", e);
@@ -912,15 +912,15 @@ public class MCRUserCommands
   /**
    * This method just saves a JDOM document to a file
    * @param jdomDoc  the JDOM XML document to be printed
-   * @param outFile  a FileWriter object for the output
+   * @param outFile  a FileOutputStream object for the output
    */
-  private static final void saveToXMLFile(org.jdom.Document jdomDoc, FileWriter outFile)
+  private static final void saveToXMLFile(org.jdom.Document jdomDoc, FileOutputStream outFile)
   throws MCRException
   {
     // get encoding
     config = MCRConfiguration.instance();
     String mcr_encoding = config.getString("MCR.metadata_default_encoding",
-				           MCRDefaults.ENCODING);
+    				           MCRDefaults.ENCODING);
 
     // Create the output
     XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
