@@ -25,7 +25,6 @@
 package org.mycore.common;
 
 import java.io.*;
-import java.lang.*;
 import java.text.*;
 import java.util.*;
 import javax.mail.*;
@@ -75,7 +74,7 @@ public class MCRMailer {
      * @throws Exception a problem occured
      **/
     protected void send( javax.mail.Message msg ) throws Exception {
-	getSession().getTransport().send( msg );
+	Transport.send( msg );
     }
 
     /**
