@@ -23,7 +23,8 @@ package org.mycore.acl;
 ///============================================================================§
 
 import java.util.Map;
-import java.util.LinkedHashMap;
+//import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Iterator;
 ///============================================================================|
 
@@ -47,7 +48,9 @@ public class MCRDefaultPermissionRing implements MCRPermissionRing {
 
    public MCRDefaultPermissionRing () {
    
-      permissions = new LinkedHashMap();
+//      permissions = new LinkedHashMap();
+      permissions = new HashMap();
+
     
      }
 
@@ -208,7 +211,8 @@ public class MCRDefaultPermissionRing implements MCRPermissionRing {
 
    public MCRPermissionRing copyPermissions () {
    
-      MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(new LinkedHashMap(permissions));
+      //MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(new LinkedHashMap(permissions));
+      MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(new HashMap(permissions));
       
       return newPermissionRing;
          

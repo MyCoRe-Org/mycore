@@ -24,7 +24,8 @@ package org.mycore.acl;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+//import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -58,9 +59,13 @@ public final class MCRDefaultAcl implements MCRAcl,
                                             MCRAclGuarded {
 ///============================================================================/
 
-   private final Map genericEntries = new LinkedHashMap();
-   private final Map userEntries    = new LinkedHashMap();
-   private final Map groupEntries   = new LinkedHashMap();
+//   private final Map genericEntries = new LinkedHashMap();
+//   private final Map userEntries    = new LinkedHashMap();
+//   private final Map groupEntries   = new LinkedHashMap();
+   
+   private final Map genericEntries = new HashMap();
+   private final Map userEntries    = new HashMap();
+   private final Map groupEntries   = new HashMap();
       
    private final MCRPermissionContext context;
    private final MCROwnedObject object;
