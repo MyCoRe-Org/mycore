@@ -29,6 +29,7 @@ import org.mycore.common.*;
 
 /**
  * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  */
@@ -56,7 +57,7 @@ public class MCRSQLStatement
     if( columnValue == null )
       values.put( columnName, NULL );
     else
-      values.put( columnName, columnValue ); 
+      values.put( columnName, mask(columnValue) ); 
 
     return this;
   }
@@ -69,7 +70,7 @@ public class MCRSQLStatement
     if( columnValue == null ) 
       conditions.put( columnName, NULL );
     else
-      conditions.put( columnName, columnValue ); 
+      conditions.put( columnName, mask(columnValue) ); 
 
     return this;
   }
@@ -198,5 +199,24 @@ public class MCRSQLStatement
 
   public final String toCountStatement()
   { return "SELECT COUNT( DISTINCT MCRFROM ) AS NUMBER FROM " + toRowSelector(); }
+  
+  /**
+   * masks the character ' in an sql statement
+   * @param value to be masked
+   * @return value with masked '
+   */
+  private final String mask(String value){
+  	final char mask='\'';
+  	if (value.indexOf(mask)==-1)
+  		return value;
+  	else{
+  		StringTokenizer tok=new StringTokenizer(value,String.valueOf(mask));
+  		StringBuffer returning=new StringBuffer();
+  		while (tok.hasMoreTokens()){
+  			returning.append(tok.nextToken()).append('\\').append(mask);
+  		}
+  		return returning.toString();
+  	}
+  }
   
 }
