@@ -110,7 +110,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
     MCRCM8Item item = new MCRCM8Item(connection,itemtypename);
     item.setAttribute("/",itemtypeprefix+"ID",mcr_id.getId());
     item.setAttribute("/",itemtypeprefix+"label",mcr_label);
-    item.setAttribute("/","xml",xml);
+    item.setAttribute("/",itemtypeprefix+"xml",xml);
 
 //mcr_tc.debug();
 
@@ -186,6 +186,12 @@ System.out.println("Attribute : "+sb+"  "+elname+"  "+
           valueobject = java.sql.Date.valueOf("2001-08-12");
 System.out.println("Attribute : "+sb+"  "+elname+"  "+
 "2001-08-12");
+          break;
+        case MCRTypedContent.FORMAT_LINK :
+          valueobject = mcr_tc.getValueElement(i);
+          elname = itemtypeprefix+"xlink"+elname.substring(2,elname.length());
+System.out.println("Attribute : "+sb+"  "+elname+"  "+
+(String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_CLASSID :
           valueobject = mcr_tc.getValueElement(i);
@@ -330,7 +336,7 @@ public final byte[] receive(MCRObjectID mcr_id)
       item = new MCRCM8Item(mcr_id.getId(),connection,itemtypename,
         itemtypeprefix);
       item.retrieve();
-      xml = item.getBlob("/","xml");
+      xml = item.getBlob("/",itemtypeprefix+"xml");
       }
     catch (MCRPersistenceException e) {
       throw new MCRPersistenceException("A object with ID "+mcr_id.getId()+
