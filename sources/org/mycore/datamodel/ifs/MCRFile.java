@@ -147,7 +147,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * platform where this is running.
    **/
   public void setContentFrom( String source )
-    throws MCRPersistenceException, IOException
+    throws MCRPersistenceException
   { 
     MCRArgumentChecker.ensureNotNull( source, "source string" );
     byte[] bytes = source.getBytes();
@@ -161,7 +161,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * in an MCRContentStore.
    **/
   public void setContentFrom( String source, String encoding )
-    throws MCRPersistenceException, IOException, UnsupportedEncodingException
+    throws MCRPersistenceException, UnsupportedEncodingException
   { 
     MCRArgumentChecker.ensureNotNull( source, "source string"          );
     MCRArgumentChecker.ensureNotNull( source, "source string encoding" );
@@ -175,7 +175,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * filesystem and stores it in an MCRContentStore.
    **/
   public void setContentFrom( File source )
-    throws MCRPersistenceException, IOException
+    throws MCRPersistenceException
   { 
     MCRArgumentChecker.ensureNotNull( source, "source file" );
     MCRArgumentChecker.ensureIsTrue( source.exists(),  
@@ -183,7 +183,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     MCRArgumentChecker.ensureIsTrue( source.canRead(), 
       "source file not readable:" + source.getPath() );
     
-    setContentFrom( new FileInputStream( source ) );
+    FileInputStream fin = null;
+    try{ fin = new FileInputStream( source ); }
+    catch( FileNotFoundException ignored ){} // We already checked it exists
+    setContentFrom( fin );
   }
   
   /**
@@ -191,7 +194,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * stores it in an MCRContentStore.
    **/
   public void setContentFrom( byte[] source )
-    throws MCRPersistenceException, IOException
+    throws MCRPersistenceException
   { 
     MCRArgumentChecker.ensureNotNull( source, "source byte array" );
     
@@ -203,7 +206,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
    * stores it in an MCRContentStore.
    **/
   public void setContentFrom( InputStream source )
-    throws MCRPersistenceException, IOException
+    throws MCRPersistenceException
   { 
     ensureNotDeleted();
     MCRArgumentChecker.ensureNotNull( source, "source input stream" );
