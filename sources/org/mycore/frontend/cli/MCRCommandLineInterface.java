@@ -181,7 +181,7 @@ public class MCRCommandLineInterface
   */
   public static void main( String[] args )
   {
-    System.out.println( "MyCoRe Command Line Interface. Type 'help' to get help!" );
+    System.out.println( "\nMyCoRe Command Line Interface. Type 'help' to get help!" );
     System.out.print( "Initializing: " );
 
     try{ initCommands(); }
@@ -349,7 +349,7 @@ public class MCRCommandLineInterface
   */
   public static void exit()
   {
-    System.out.println( "Goodbye, and remember: \"Alles wird gut.\"" );
+    System.out.println( "Goodbye, and remember: \"Alles wird gut.\"\n" );
     System.exit( 0 );
   }
 }
