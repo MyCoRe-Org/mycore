@@ -101,10 +101,12 @@ protected final MCRXMLContainer startQuery( String type ) {
       String objid;
       byte[] xml;
       
-      if ( query.startsWith( "ID:" ) )
+      if ( query.startsWith( "+" + type + "/ID:" ) )
       {
-        objid = query.substring( 3 );  
-        System.out.println("xyxy" + objid );
+        int i = query.indexOf(":");
+        objid = query.substring( i+1 );  
+        objid = MCRUtils.replaceString(objid, "x", "_");
+        System.out.println("xmltable.retrieve: " + objid );
         xml = xmltable.retrieve(type,new MCRObjectID(objid));
         result.add( "local", objid, 0, xml); 
         return result;
@@ -155,7 +157,9 @@ private String handleQueryString(String type) {
   StringBuffer qsb = new StringBuffer(1024);
   for (int i=0;i<subqueries.size();i++) {
     if (((Boolean)flags.get(i)).booleanValue()) continue;
-    qsb.append(' ').append((String)subqueries.get(i)).append(' ')
+    String help = (String)subqueries.get(i);
+    help = MCRUtils.replaceString(help, " and ", " and +" + type + "/"); // classifications?
+    qsb.append(' ').append('+').append(type).append('/').append(help).append(' ')
       .append((String)andor.get(i));
     flags.set(i,Boolean.TRUE);
     }
@@ -164,20 +168,25 @@ private String handleQueryString(String type) {
   }
     
 /**
- * Handle query string for exist
+ * Handle query string for Lucene
  **/
 private String handleQueryStringExist( String query, String type ) {
-  query = MCRUtils.replaceString(query, "like", "&=");
+  query = MCRUtils.replaceString(query, ":", "");
+  query = MCRUtils.replaceString(query, "@", "");
+  query = MCRUtils.replaceString(query, "\"", "");
+  
+  query = MCRUtils.replaceString(query, " like ", ":");
   query = MCRUtils.replaceString(query, "text()", ".");
   query = MCRUtils.replaceString(query, "ts()", ".");
-  query = MCRUtils.replaceString(query, " contains(", ":");
-  query = MCRUtils.replaceString(query, ")", "");
+  query = MCRUtils.replaceString(query, " contains(", ":\"");
+  query = MCRUtils.replaceString(query, ")", "\"");
   
-  query = MCRUtils.replaceString(query, "@", "");
   query = MCRUtils.replaceString(query, "='", ":");
   query = MCRUtils.replaceString(query, "'", "");
-  query = MCRUtils.replaceString(query, "\"", "");
-  query = MCRUtils.replaceString(query, "metadata/titles/", "");
+  query = MCRUtils.replaceString(query, "=", ":");
+  
+  query = MCRUtils.replaceString(query, "_", "x");
+//  query = MCRUtils.replaceString(query, "metadata/titles/", "");
   // combine the separated queries
 //  query = root+ "[" + query +"]";
   return query;

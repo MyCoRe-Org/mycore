@@ -81,7 +81,7 @@ private void item_setChild(int i, String s1, String s2, String s3, String s4, St
 {
 //   if ( 0 == i )
 //       return;
-    System.out.println(i + " Child: s1:" + s1 + " s2:" + s2 + " s3:" + s3 + " s4:" + s4 + " s5:" + s5);
+//    System.out.println(i + " Child: s1:" + s1 + " s2:" + s2 + " s3:" + s3 + " s4:" + s4 + " s5:" + s5);
 }
 
 
@@ -89,14 +89,14 @@ private void item_setAttribute(int i, String s1, String s2, Object s3)
 {
 //    if ( 0 == i )
 //        return;
-    System.out.println(i + " Attribute: s1" + s1 + " s2:" + s2 + " s3:" + s3);
+//    System.out.println(i + " Attribute: s1" + s1 + " s2:" + s2 + " s3:" + s3);
+    logger.debug( "Attribute: " + s1 + s2 + ":" + s3);
 }
 
 private void item_create( Document doc )    
 {
  try
  {
-    System.out.println("Create ");
     IndexWriter writer = null;
     Analyzer analyzer = new GermanAnalyzer();
         
@@ -108,7 +108,7 @@ private void item_create( Document doc )
 	    
       if ( !file.exists() ) 
       {
-        System.out.println( "The Directory doesn't exist: " + indexDir );
+        logger.info( "The Directory doesn't exist: " + indexDir );
         IndexWriter writer2 = new IndexWriter( indexDir, analyzer, true );
         writer2.close();
       }   
@@ -175,15 +175,17 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
   sb.append(mcr_id.getTypeId().toLowerCase());
   String itemtypename = MCRConfiguration.instance().getString(sb.toString()); 
   String itemtypeprefix = MCRConfiguration.instance().getString(sb+"_prefix");
+  itemtypeprefix = "";
+  String typeId = mcr_id.getTypeId().toLowerCase();
   // set up data to item
   String connection = "";
   try {
-    Document doc = new Document();
-    item_setAttribute(mcr_tc.getFormatElement(mcr_tc_counter-2),"/",itemtypeprefix+"ID",mcr_id.getId());
-    doc.add( Field.Keyword( "ID", mcr_id.getId() ) ); 
-    item_setAttribute(mcr_tc.getFormatElement(mcr_tc_counter-2),"/",itemtypeprefix+"label",mcr_label);
+    Document luceneDoc = new Document();
+    item_setAttribute( mcr_tc.getFormatElement(mcr_tc_counter-2),typeId+"/",itemtypeprefix+"ID",mcr_id.getId());
+    luceneDoc.add( Field.Keyword( "ID", mcr_id.getId() ) ); 
+    item_setAttribute( mcr_tc.getFormatElement(mcr_tc_counter-2),typeId+"/",itemtypeprefix+"label",mcr_label);
     logger.debug(mcr_ts_in);
-    item_setAttribute(mcr_tc.getFormatElement(0),"/",itemtypeprefix+"ts",mcr_ts_in);
+    item_setAttribute(mcr_tc.getFormatElement(0),typeId+"/",itemtypeprefix+"ts",mcr_ts_in);
 
     String [] xmlpath = new String[MCRTypedContent.TYPE_LASTTAG+1];
     int lastpath = 0;
@@ -197,7 +199,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         lastpath = MCRTypedContent.TYPE_MASTERTAG;
         item_setChild(mcr_tc.getFormatElement(i),connection,itemtypename,xmlpath[lastpath],"/",
           "/"+xmlpath[lastpath]+"/");
-        item_setAttribute(mcr_tc.getFormatElement(i),"/"+xmlpath[lastpath]+"/",itemtypeprefix+"lang",
+        item_setAttribute(mcr_tc.getFormatElement(i),typeId+"/"+xmlpath[lastpath]+"/",itemtypeprefix+"lang",
           mcr_tc.getValueElement(i+1));
         i++;
         continue; 
@@ -243,7 +245,7 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
           sb.append(xmlpath[lastpath]).append('/').toString());
         continue; 
         }
-      // set a  attribute or value
+      // set an attribute or value
       sb = new StringBuffer(64);
       sb.append('/');
       String elname = xmlpath[lastpath];
@@ -253,15 +255,13 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
         elname = itemtypeprefix+mcr_tc.getNameElement(i);
         }
       else {
-        for (int j=MCRTypedContent.TYPE_MASTERTAG;j<lastpath+1;j++) {
+        for (int j=MCRTypedContent.TYPE_MASTERTAG;j<lastpath;j++) {
           sb.append(xmlpath[j]).append('/'); }
         }
       Object valueobject = null;
       switch (mcr_tc.getFormatElement(i)) {
         case MCRTypedContent.FORMAT_STRING :
           valueobject = mcr_tc.getValueElement(i);
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+
-            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_DATE :
           GregorianCalendar cal = (GregorianCalendar)mcr_tc.getValueElement(i);
@@ -280,44 +280,31 @@ public final void create(MCRTypedContent mcr_tc, org.jdom.Document jdom,
           SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
           formatter.setCalendar(calendar);
           String datestamp = formatter.format(calendar.getTime());
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+datestamp);
+//          logger.debug("Attribute : "+sb+"  "+elname+"  "+datestamp);
           // end debug
           break;
         case MCRTypedContent.FORMAT_LINK :
           valueobject = mcr_tc.getValueElement(i);
-          elname = itemtypeprefix+"xlink"+elname.substring(2,elname.length());
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+
-            (String)mcr_tc.getValueElement(i));
+          elname = itemtypeprefix+"xlink"+elname;
           break;
         case MCRTypedContent.FORMAT_CLASSID :
           valueobject = mcr_tc.getValueElement(i);
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+
-            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_CATEGID :
           valueobject = mcr_tc.getValueElement(i);
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+
-            (String)mcr_tc.getValueElement(i));
           break;
         case MCRTypedContent.FORMAT_NUMBER :
           valueobject = mcr_tc.getValueElement(i);
-          logger.debug("Attribute : "+sb+"  "+elname+"  "+
-            ((Double)mcr_tc.getValueElement(i)).toString());
           break;
         }
-      if ( elname.equals( "dotitle" ) )
-      {
-        System.out.println("YYYYY " + valueobject);  
-        doc.add( Field.UnStored ( "title", valueobject.toString() ) );  
-      }
-      item_setAttribute(mcr_tc.getFormatElement(i),"xx"+sb.toString(),elname,valueobject);
-      if ( i < mcr_tc.getSize() - 1 )
-        if ( mcr_tc.getTypeElement(i+1) != MCRTypedContent.TYPE_ATTRIBUTE)
-          System.out.println("++++++++++++++++++NEW");  
+      String help = valueobject.toString();
+      help = MCRUtils.replaceString(help, "_", "x");
+      luceneDoc.add( Field.UnStored ( typeId+sb.toString()+elname, help ) );  
+      item_setAttribute(mcr_tc.getFormatElement(i),typeId+sb.toString(),elname,help);
       }
 
     // create the item
-    item_create( doc );
+    item_create( luceneDoc );
     logger.info("Item "+mcr_id.getId()+" was created.");
     }
   catch (Exception e) {
@@ -364,7 +351,7 @@ public final void delete(MCRObjectID mcr_id)
       if ( !file.exists() ) 
       {
         Analyzer analyzer = new GermanAnalyzer();
-        logger.info( "Delete The Directory doesn't exist: " + indexDir );
+        logger.info( "Delete: The Directory doesn't exist: " + indexDir );
         IndexWriter writer2 = new IndexWriter( indexDir, analyzer, true );
         writer2.close();
       }   
@@ -374,14 +361,14 @@ public final void delete(MCRObjectID mcr_id)
 
     Term  t  = new Term( "ID", id );
     Query qu = new TermQuery( t );
-    logger.debug( "Searching for: " + qu.toString("") );
+    logger.debug( "Delete: Searching for: " + qu.toString("") );
 
     Hits hits = searcher.search( qu );
       
-    logger.debug( "Number of documents found : " + hits.length() );
+    logger.debug( "Delete: Number of documents found : " + hits.length() );
     if ( 1 == hits.length() )
     {    
-      logger.debug( "ID: " +  hits.doc(0).get("ID") );
+      logger.debug( "Delete: ID: " +  hits.doc(0).get("ID") );
       if ( id.equals( hits.doc(0).get("ID") ) )
       {    
         IndexReader reader = IndexReader.open( indexDir );
@@ -389,10 +376,10 @@ public final void delete(MCRObjectID mcr_id)
         reader.close();
       } 
       else {
-        throw new MCRPersistenceException("An object with ID " + id + " does not exist."); }
+        throw new MCRPersistenceException("Delete: An object with ID " + id + " does not exist."); }
     }
     else {
-      throw new MCRPersistenceException("An object with ID " + id + " does not exist."); }
+      throw new MCRPersistenceException("Delete: An object with ID " + id + " does not exist."); }
   }  
   catch( Exception e )
   { 
