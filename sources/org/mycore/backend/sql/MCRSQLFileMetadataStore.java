@@ -32,11 +32,11 @@ import java.sql.*;
 import java.util.Vector;
 import java.util.GregorianCalendar;
 
-public class MCRFileMetadataStoreSQL implements MCRFileMetadataStore
+public class MCRSQLFileMetadataStore implements MCRFileMetadataStore
 {
   protected String table;
   
-  public MCRFileMetadataStoreSQL()
+  public MCRSQLFileMetadataStore()
     throws MCRPersistenceException
   { 
     MCRConfiguration config = MCRConfiguration.instance();
