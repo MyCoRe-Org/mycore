@@ -3,7 +3,7 @@
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  *** 
- * see http://mycore.uni-essen.de/ for details.
+ * see http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
