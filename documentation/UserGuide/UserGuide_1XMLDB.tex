@@ -128,9 +128,10 @@ Installiern Sie folgende Komponenten:
 \item {\bf apache2-jakarta-tomcat-connectors-4.1.18-31} oder höher
 \end{itemize}
 Im File \mcrfile{/etc/profile.local} ist folgender Eintrag vorzunehmen, 
-damit Tomcat auch von {\bf mcradmin} genutzt werden kann.
+damit Tomcat auch von {\bf mcradmin} genutzt werden kann. Weiterhin werden der Memory Size für den Server erweitert.
 \begin{verbatim}
 export CATALINA_HOME=/opt/jakarta/tomcat
+export CATALINA_OPTS="$CATALINA_OPTS -server -Xms256m -Xmx1800m -Xincgc"
 \end{verbatim}
 Weiterhin ist noch die richtige Gruppenzugehörigkeit für die Tomcat-Installation festzulegen.
 \begin{verbatim}
