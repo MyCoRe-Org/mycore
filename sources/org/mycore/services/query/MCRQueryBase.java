@@ -206,30 +206,33 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 				continue;
 			}
 			logger.debug("T: The separated query type is " + onetype);
-			boolean retdirect = false;
-			MCRObjectID testid = null;
-			if (subqueries.size() == 1) {
-				String q = (String) subqueries.get(0);
+			MCRObjectID [] testid = new MCRObjectID[subqueries.size()];
+			int isid = 0;
+			for (int p = 0; p < subqueries.size();p++) {
+				String q = ((String) subqueries.get(p)).trim();
+				q = q.replace('\'','\"');
 				if (q.startsWith("@ID")) {
 					int a = q.indexOf("\"");
 					int b = q.indexOf("\"", a + 1);
 					if (a <= 7) {
 						if (b == q.length() - 1) {
 							try {
-								testid = new MCRObjectID(q.substring(a + 1, b));
-								retdirect = true;
+								testid [p] = new MCRObjectID(q.substring(a + 1, b));
+								isid++;
 							} catch (Exception e) {
 							}
 						}
 					}
 				}
 			}
-			if (retdirect) {
+			if (isid == subqueries.size()) {
 				logger.debug("Retrieve the data direcly from XML database.");
-				try {
-					byte[] xml = xmltable.retrieve(onetype, testid);
-					result.add("local", testid.getId(), 0, xml);
-				} catch (Exception e) {
+				for (int p = 0; p < subqueries.size();p++) {
+					try {
+						byte[] xml = xmltable.retrieve(onetype, testid[p]);
+						result.add("local", testid[p].getId(), 0, xml);
+					} catch (Exception e) {
+					}
 				}
 			} else {
 				result.importElements(startQuery(onetype));
