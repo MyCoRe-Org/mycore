@@ -41,7 +41,7 @@ import java.text.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-public class MCREditorVariable implements Comparable
+class MCREditorVariable implements Comparable
 {
   protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
 
