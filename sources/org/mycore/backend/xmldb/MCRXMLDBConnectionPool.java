@@ -54,7 +54,8 @@ public class MCRXMLDBConnectionPool
   protected static MCRXMLDBConnectionPool singleton;
 
   /** The internal list of connections */
-  protected Vector connections = new Vector();
+  protected Vector connections     = new Vector();
+  protected Vector connectionsName = new Vector();
  
   /** The logger */
   private static Logger logger=Logger.getLogger("org.mycore.backend.XMLDB");
@@ -194,18 +195,16 @@ public class MCRXMLDBConnectionPool
     throws MCRPersistenceException
     {
      collection = collection.toLowerCase();   
+     // Do we have to build a connection or is there already one?
+     int i = connectionsName.indexOf( collection );
+     if( i >= 0 )
+       return (Collection)connections.elementAt( i );  
+     
      Collection connection;
      try {
-     // Do we have to build a connection or is there already one?
-     if( connections.isEmpty() ) {
-       connection = buildConnection( collection ); }
-     else {
-       connection = (Collection)( connections.firstElement() );
-       connection.close();
-       connections.removeElement( connection );
        connection = buildConnection( collection ); 
-       }
-//     connections.addElement( connection );
+       connections.addElement( connection );
+       connectionsName.addElement( collection );
      }
      catch( Exception e ) {
        throw new MCRPersistenceException( e.getMessage(), e );
@@ -229,7 +228,7 @@ public class MCRXMLDBConnectionPool
     {
     if( connection == null ) return;
     try {
-      connection.close();
+//      connection.close();
      }
      catch( Exception e ) {
        throw new MCRPersistenceException( e.getMessage(), e );
