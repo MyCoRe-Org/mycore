@@ -453,6 +453,7 @@ public class MCROAIDataProvider extends HttpServlet {
        		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             
            		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		eResumptionToken.addContent(newResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 			}
 				
@@ -476,10 +477,12 @@ public class MCROAIDataProvider extends HttpServlet {
 	/**
 	 * Method listToResumptionToken. Add the elements in the list to a resumption token file.
 	 * @param list a list of Element's(!)
+	 * @return String The resumption token
 	 */
-    private void listToResumptionToken(List list) {
+    private String listToResumptionToken(List list) {
 	    MCRConfiguration config = MCRConfiguration.instance();
 	    List tokenElements = new ArrayList(list);
+	    String fileName = null;
 	    
 	    if (tokenElements.size() > 0) {
 	    	// a resumption token file has to be written
@@ -489,7 +492,7 @@ public class MCROAIDataProvider extends HttpServlet {
 
 			try {
 			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.pathSeparator;
-				String fileName = fileId + "x0x" + docs;
+				fileName = fileId + "x0x" + docs;
 		
  				FileOutputStream fos = new FileOutputStream(resumptionTokenDir +
    	                fileName + STR_RESUMPTIONTOKEN_SUFFIX);
@@ -513,6 +516,8 @@ public class MCROAIDataProvider extends HttpServlet {
 				logger.error("The result list was only partially returned.");
 			}					
     	}
+    	
+    	return fileName;
     }
     
 	/**
@@ -779,7 +784,26 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	listToResumptionToken(tokenElements);
+	    	String resumptionToken = listToResumptionToken(tokenElements);
+            if (resumptionToken != null) {
+				Element eResumptionToken = new Element("resumptionToken", ns);
+				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("cursor", "0");
+				
+				Calendar calendar = new GregorianCalendar();
+				Date now = new Date();
+			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
+				calendar.setTime(now);
+				calendar.add(Calendar.HOUR, timeout);
+	            Date timeoutDate = calendar.getTime();
+	    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+       		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            
+           		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		eResumptionToken.addContent(resumptionToken);
+				eResumptionToken.setAttribute("expirationDate", sDate);
+	           	eListSets.addContent(eResumptionToken);
+			}
 	    	
 	    	eRoot.addContent(eListSets);
 	    }
@@ -920,8 +944,27 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	listToResumptionToken(tokenElements);
-	    	
+	    	String resumptionToken = listToResumptionToken(tokenElements);
+            if (resumptionToken != null) {
+				Element eResumptionToken = new Element("resumptionToken", ns);
+				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("cursor", "0");
+				
+				Calendar calendar = new GregorianCalendar();
+				Date now = new Date();
+			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
+				calendar.setTime(now);
+				calendar.add(Calendar.HOUR, timeout);
+	            Date timeoutDate = calendar.getTime();
+	    	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+       		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            
+           		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
+           		eResumptionToken.addContent(resumptionToken);
+				eResumptionToken.setAttribute("expirationDate", sDate);
+	           	eListIdentifiers.addContent(eResumptionToken);
+			}
+				
 	    	eRoot.addContent(eListIdentifiers);
 	    } else {
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
