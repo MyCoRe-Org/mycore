@@ -286,16 +286,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
       
       storageID = store.storeContent( this, cis ); 
       storeID   = store.getID();
-      MCRContentIndexer indexer = MCRContentIndexerFactory.getIndexerFromFCT( contentTypeID );
-      try
-      {
-        if ( null != indexer )
-        {
-//          cis = new MCRContentInputStream( source );
-          indexer.doIndexContent( this, cis, header );
-        }
-      }
-      catch ( Exception ex ){}
     }
     
     size = cis.getLength();
@@ -309,6 +299,13 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
     if( changed && hasParent() ) getParent().sizeOfChildChanged( old_size, size );
     
     if( old_storageID.length() != 0 ) old_store.deleteContent( old_storageID );
+
+    MCRContentIndexer indexer = MCRContentIndexerFactory.getIndexerFromFCT( contentTypeID );
+    if ( null != indexer )
+    {  
+      try{ indexer.doIndexContent( this  ); }
+      catch ( Exception ex ){}
+    }
   }
 
   /**
@@ -415,6 +412,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader
   public String getContentAsString( String encoding )
     throws MCRPersistenceException, UnsupportedEncodingException
   { return new String( getContentAsByteArray(), encoding ); }
+
+  public InputStream getContentAsInputStream()
+    throws MCRPersistenceException
+  { return new ByteArrayInputStream( getContentAsByteArray() ); }
+
+  public org.jdom.Document getContentAsJDOM()
+    throws MCRPersistenceException, IOException, org.jdom.JDOMException
+  { return new org.jdom.input.SAXBuilder().build( getContentAsInputStream() ); }
   
   /**
    * Returns true, if this file is stored in a content store that provides

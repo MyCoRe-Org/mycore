@@ -78,11 +78,11 @@ public abstract class MCRContentIndexer
    * @param file the MCRFile thats content is to be indexed
    * @param source the ContentInputStream where the file content is read from
    **/
-  public void indexContent( MCRFileReader file, MCRContentInputStream source,  byte[] header )
+  public void indexContent( MCRFile file )
     throws MCRPersistenceException
   {
     try
-    { doIndexContent( file, source, header ); }
+    { doIndexContent( file ); }
     catch( Exception exc )
     {
       if( ! ( exc instanceof MCRException ) )
@@ -103,8 +103,7 @@ public abstract class MCRContentIndexer
    * @param file the MCRFile thats content is to be indexed
    * @param source the ContentInputStream where the file content is read from
    **/
-  protected abstract void doIndexContent( MCRFileReader file, MCRContentInputStream source,
-                                          byte[] header)
+  protected abstract void doIndexContent( MCRFile file )
     throws Exception;
 
   /**
