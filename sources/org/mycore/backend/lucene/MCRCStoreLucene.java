@@ -64,14 +64,16 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.services.plugins.TextFilterPluginManager;
+import org.mycore.services.query.IndexableStore;
 
 /**
- * @author Thomas Scheffler (yagee)
+ * This class provides a content store based on lucene and the local filesystem.
  * 
- * Need to insert some things here
- *
+ * It uses lucene for indexing know file formats and filesystem for storage.
+ * 
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
+public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements IndexableStore {
 	private static final TextFilterPluginManager pMan =
 		TextFilterPluginManager.getInstance();
 	private static final Logger logger =
@@ -244,7 +246,20 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem {
 		} else
 			return null;
 	}
-	public String[] getDerivateID(String docTextQuery) {
+	/**
+	 * searches on the index and delivers derivate ids matching the search
+	 * 
+	 * Syntax:
+	 * <pre>
+	 * foo bar   : search for foo AND bar anywhere across the files of the derivate
+	 * foo -bar  : search for foo and no file of the derivate may contain bar
+	 * "foo bar" : any file of the derivate must contain the phrase foo bar.
+	 * </pre>
+	 * 
+	 * @param doctext query
+	 * @return Array of DerivateIDs
+	 */
+	public String[] getDerivateIDs(String docTextQuery) {
 		String[] returns = null;
 		//maybe transform query here
 		String queryText = parseQuery(docTextQuery);
