@@ -39,17 +39,16 @@ public class MCRQueryAgent {
 	private PoolWorker[] threads;
 	private LinkedList queue;
 	private MCRConfiguration conf;
-	private static int vec_max_length;  
-	public MCRQueryAgent(int nThreads, MCRConfiguration conf)
-	{
+	private static int vec_max_length;
+	public MCRQueryAgent(int nThreads, MCRConfiguration conf) {
 		this.nThreads = nThreads;
 		queue = new LinkedList();
 		threads = new PoolWorker[nThreads];
-		this.conf=conf;
-		vec_max_length = conf.getInt("MCR.query_max_results",10);
-		for (int i=0; i<nThreads; i++) {
+		this.conf = conf;
+		vec_max_length = conf.getInt("MCR.query_max_results", 10);
+		for (int i = 0; i < nThreads; i++) {
 			threads[i] = new PoolWorker();
-			threads[i].setName("MCRQueryAgent #"+(i+1));
+			threads[i].setName("MCRQueryAgent #" + (i + 1));
 			threads[i].start();
 		}
 	}
@@ -63,39 +62,49 @@ public class MCRQueryAgent {
 	 * @param result the MCRXMLContainer collecting results
 	 * @param tc inner Class of MCRQueryCollector
 	 */
-	public void add(String host,String type,String query,MCRXMLContainer result,MCRQueryCollector.ThreadCounter tc) {
-		Mission m=new Mission(host,type,query,result,tc);
-		synchronized(queue) {
+	public void add(
+		String host,
+		String type,
+		String query,
+		MCRXMLContainer result,
+		MCRQueryCollector.ThreadCounter tc) {
+		Mission m = new Mission(host, type, query, result, tc);
+		synchronized (queue) {
 			queue.addLast(m);
 			queue.notify();
 		}
 	}
-	private class Mission{
+	private class Mission {
 		private String host;
 		private String type;
 		private String query;
 		private MCRXMLContainer result;
 		private MCRQueryCollector.ThreadCounter tc;
-		public Mission(String host, String type, String query, MCRXMLContainer result,MCRQueryCollector.ThreadCounter tc){
-			this.host=host;
-			this.type=type;
-			this.query=query;
-			this.result=result;
-			this.tc=tc;
+		public Mission(
+			String host,
+			String type,
+			String query,
+			MCRXMLContainer result,
+			MCRQueryCollector.ThreadCounter tc) {
+			this.host = host;
+			this.type = type;
+			this.query = query;
+			this.result = result;
+			this.tc = tc;
 		}
-		public String getHost(){
+		public String getHost() {
 			return this.host;
 		}
-		public String getType(){
+		public String getType() {
 			return this.type;
 		}
-		public String getQuery(){
+		public String getQuery() {
 			return this.query;
 		}
-		public MCRXMLContainer getResultContainer(){
+		public MCRXMLContainer getResultContainer() {
 			return this.result;
 		}
-		public void accomplished(){
+		public void accomplished() {
 			this.tc.decrease();
 		}
 	}
@@ -106,19 +115,16 @@ public class MCRQueryAgent {
 		private String mcr_type;
 		private String mcr_query;
 		private String hostAlias;
-		
+
 		public void run() {
 			Mission m;
 
 			while (true) {
-				synchronized(queue) {
+				synchronized (queue) {
 					while (queue.isEmpty()) {
-						try
-						{
+						try {
 							queue.wait();
-						}
-						catch (InterruptedException ignored)
-						{
+						} catch (InterruptedException ignored) {
 						}
 					}
 
@@ -128,16 +134,20 @@ public class MCRQueryAgent {
 				// If we don't catch RuntimeException, 
 				// the pool could leak threads
 				try {
-					MCRXMLContainer result=m.getResultContainer();
+					MCRXMLContainer result = m.getResultContainer();
 					result.importElements(
-						MCRQueryCache.getResultList(m.getHost(),
-					                                                     m.getQuery(),
-					                                                     m.getType(),
-					                                                     vec_max_length));
-					 m.accomplished();
-				}
-				catch (RuntimeException e) {
-					throw new MCRException("Error while grabbing resultset: "+e.getMessage(),e);
+						MCRQueryCache.getResultList(
+							m.getHost(),
+							m.getQuery(),
+							m.getType(),
+							vec_max_length));
+					m.accomplished();
+				} catch (RuntimeException e) {
+					//to hang not forever mark mission accomplished
+					m.accomplished();
+					throw new MCRException(
+						"Error while grabbing resultset: " + e.getMessage(),
+						e);
 				}
 			}
 		}
