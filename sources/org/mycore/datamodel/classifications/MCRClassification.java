@@ -262,13 +262,13 @@ private ArrayList cat;
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
     elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
-      MCRObject.XSI_URL));
+      MCRDefaults.XSI_URL));
     String SLASH = System.getProperty("file.separator");
     MCRConfiguration mcr_conf = MCRConfiguration.instance();
     String mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema"
       +SLASH+"MCRClassification.xsd";
     elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
-      org.jdom.Namespace.getNamespace("xsi",MCRObject.XSI_URL));
+      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
     elm.setAttribute("ID",ID);
     try {
       cl = MCRClassificationItem.getClassificationItem(ID); }

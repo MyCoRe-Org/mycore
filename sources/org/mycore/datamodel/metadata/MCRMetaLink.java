@@ -25,6 +25,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRUtils;
 
 /**
@@ -277,25 +278,25 @@ public org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   elm.setAttribute("type",linktype,org.jdom.Namespace.getNamespace("xlink",
-    MCRObject.XLINK_URL));
+    MCRDefaults.XLINK_URL));
   if (linktype.equals("locator")) {
     elm.setAttribute("href",href,org.jdom.Namespace.getNamespace("xlink",
-      MCRObject.XLINK_URL));
+      MCRDefaults.XLINK_URL));
     if ((label != null) && ((label = label.trim()).length() !=0)) {
       elm.setAttribute("label",label,org.jdom.Namespace.getNamespace("xlink",
-        MCRObject.XLINK_URL)); }
+        MCRDefaults.XLINK_URL)); }
     if ((title != null) && ((title = title.trim()).length() !=0)) {
       elm.setAttribute("title",title,org.jdom.Namespace.getNamespace("xlink",
-        MCRObject.XLINK_URL)); }
+        MCRDefaults.XLINK_URL)); }
     }
   else {
     elm.setAttribute("from",from,org.jdom.Namespace.getNamespace("xlink",
-      MCRObject.XLINK_URL));
+      MCRDefaults.XLINK_URL));
     elm.setAttribute("to",to,org.jdom.Namespace.getNamespace("xlink",
-      MCRObject.XLINK_URL));
+      MCRDefaults.XLINK_URL));
     if ((title != null) && ((title = title.trim()).length() !=0)) {
       elm.setAttribute("title",title,org.jdom.Namespace.getNamespace("xlink",
-        MCRObject.XLINK_URL)); }
+        MCRDefaults.XLINK_URL)); }
     }
   return elm;
   }

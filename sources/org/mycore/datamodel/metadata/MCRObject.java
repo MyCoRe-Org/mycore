@@ -30,6 +30,7 @@ import java.util.GregorianCalendar;
 import java.util.Vector;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -121,7 +122,8 @@ private final void set() throws MCRException
     mcr_label = mcr_label.substring(0,MAX_LABEL_LENGTH); }
   mcr_schema = (String)jdom_element_root
     .getAttribute("noNamespaceSchemaLocation",
-     org.jdom.Namespace.getNamespace("xsi",XSI_URL)).getValue().trim();
+     org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL)).getValue()
+     .trim();
   int i=0;
   int j=0;
   while (j!=-1) {
@@ -208,11 +210,12 @@ public final org.jdom.Document createXML() throws MCRException
     throw new MCRException("The content is not valid."); }
   org.jdom.Element elm = new org.jdom.Element("mycoreobject");
   org.jdom.Document doc = new org.jdom.Document(elm);
-  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+  elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+    MCRDefaults.XSI_URL));
   elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
-    XLINK_URL));
+    MCRDefaults.XLINK_URL));
   elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path+SLASH+mcr_schema,
-    org.jdom.Namespace.getNamespace("xsi",XSI_URL));
+    org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
   elm.setAttribute("ID",mcr_id.getId());
   elm.setAttribute("label",mcr_label);
   elm.addContent(mcr_struct.createXML());

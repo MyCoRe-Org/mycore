@@ -34,6 +34,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 
@@ -75,8 +76,6 @@ protected MCRObjectService mcr_service = null;
 // other
 protected static String NL;
 protected static String SLASH;
-public final static String XLINK_URL = "http://www.w3.org/1999/xlink"; 
-public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
 // logger
 static Logger logger=Logger.getLogger(MCRBase.class.getPackage().getName());
@@ -97,7 +96,7 @@ static
     mcr_linktable = MCRLinkTableManager.instance();
     // Default Encoding
     mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding",
-      "ISO_8859-1");
+      MCRDefaults.ENCODING);
     logger.debug("Encoding = "+mcr_encoding);
     // Path of XML schema
     mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema";
