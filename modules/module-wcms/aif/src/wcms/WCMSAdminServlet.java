@@ -185,7 +185,7 @@ public class WCMSAdminServlet extends WCMSServlet {
 	        String contextPath = request.getContextPath() + "/";
 	        int pos = address.indexOf(contextPath, 9);
 	        address = address.substring(0, pos) + contextPath + "servlets/WCMSLoginServlet" ;
-			response.sendRedirect(address);			
+			response.sendRedirect(response.encodeURL(address));			
 			
 		} catch (JDOMException e) {
 			// TODO Auto-generated catch block

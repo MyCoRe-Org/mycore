@@ -107,7 +107,7 @@ These strategies are embarked on:
                   </xsl:when>
                   <!-- default template -->
                   <xsl:otherwise>
-                        <xsl:value-of select="'template_mycoresample-1'" />
+                        <xsl:value-of select="document($navigationBase) /navigation/@template" />
                   </xsl:otherwise>
             </xsl:choose>
             
