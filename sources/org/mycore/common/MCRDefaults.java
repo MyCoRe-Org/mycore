@@ -44,6 +44,9 @@ public final static String XLINK_URL = "http://www.w3.org/1999/xlink";
 /** The URL of the XSI */
 public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
+/** The URL of the XSL */
+public final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
+
 /** The default encoding */
 public final static String ENCODING = "ISO_8859-1";
 
