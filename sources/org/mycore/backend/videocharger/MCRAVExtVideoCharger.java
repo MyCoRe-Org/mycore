@@ -33,7 +33,7 @@ import java.text.*;
 
 /**
  * This class implements the AudioVideoExtender functions for IBM VideoCharger 
- * 7.1 instances. It reads technical metadata about stored assets by parsing
+ * 7.1 and 8.1 instances. It reads technical metadata about stored assets by parsing
  * the vslist cgi responses and gets a player starter file using the 
  * iscpfsel cgi. The parameters can be configured in mycore.properties:
  *
@@ -48,9 +48,9 @@ import java.text.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRAVExtVideoCharger7 extends MCRAudioVideoExtender
+public class MCRAVExtVideoCharger extends MCRAudioVideoExtender
 { 
-  public MCRAVExtVideoCharger7()
+  public MCRAVExtVideoCharger()
   {}
   
   public void readConfig( String storeID )

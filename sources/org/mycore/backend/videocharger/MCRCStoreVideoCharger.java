@@ -53,11 +53,11 @@ import com.enterprisedt.net.ftp.*;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  *
- * @see MCRAVExtVideoCharger7
+ * @see MCRAVExtVideoCharger
  */
-public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRContentStore
+public class MCRCStoreVideoCharger extends MCRContentStoreBase implements MCRContentStore
 { 
-  private static Logger logger = Logger.getLogger( MCRCStoreVideoCharger7.class.getName() );
+  private static Logger logger = Logger.getLogger( MCRCStoreVideoCharger.class.getName() );
 
   /** Hostname of VideoCharger server */
   protected String host;
@@ -158,7 +158,7 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
   public static void backupContentTo( String storeID, String directory )
     throws MCRPersistenceException, IOException
   {
-    MCRAVExtVideoCharger7 extender = new MCRAVExtVideoCharger7();
+    MCRAVExtVideoCharger extender = new MCRAVExtVideoCharger();
     extender.readConfig( storeID );
     String[] list = extender.listAssets();
 
@@ -170,7 +170,7 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
       if( local.exists() ) continue;
       
       FileOutputStream target = new FileOutputStream( local );
-      new MCRCStoreVideoCharger7().retrieveContent( list[ i ], target );
+      new MCRCStoreVideoCharger().retrieveContent( list[ i ], target );
       target.close();
     }
   }
