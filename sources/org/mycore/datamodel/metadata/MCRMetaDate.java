@@ -130,12 +130,18 @@ public final void setDate(String set_date) throws MCRException
   date = null;
   if ((set_date == null) || ((set_date = set_date.trim()).length() ==0)) { 
     return; }
+  date = new GregorianCalendar();
   try {
-    date = new GregorianCalendar();
     DateFormat df = MCRUtils.getDateFormat(lang);
     date.setTime(df.parse(set_date)); }
   catch (ParseException e) {
-    throw new MCRException( "Can't parse date."); }
+    try {
+      SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
+      date.setTime(formatter.parse(set_date)); 
+      }
+    catch (ParseException ex) {
+      throw new MCRException( "Can't parse date."); }
+    }
   }
 
 /**
@@ -154,9 +160,9 @@ public final GregorianCalendar getDate()
 public final String getDateToString()
   {
   if (date == null) { return ""; }
-  DateFormat df = MCRUtils.getDateFormat(lang);
-  if (df==null) { return ""; }
-  return df.format(date.getTime());
+  SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd");
+  formatter.setCalendar(date);
+  return formatter.format(date.getTime());
   }
 
 /**
