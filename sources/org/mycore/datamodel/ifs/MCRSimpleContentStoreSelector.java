@@ -70,12 +70,12 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
         Element store = (Element)( stores.get( i ) );
         String storeID = store.getAttributeValue( "ID" );
         
-        List types = xml.getRootElement().getChildren( "type" );
+        List types = store.getChildren();
         for( int j = 0; j < types.size(); j++ )
         {
           Element type = (Element)( types.get( j ) );
           String typeID = type.getTextTrim();
-          
+
           table.put( typeID, storeID );
         }
       }
