@@ -65,51 +65,59 @@ import org.apache.lucene.queryParser.QueryParser;
  **/
 public class MCRContentIndexerXML extends MCRContentIndexer
 {
-  static final private Logger logger = Logger.getLogger( MCRContentIndexerXML.class.getName() );
-  static String indexDir = "";
-  static boolean first   = true; 
-  static Hashtable search = new Hashtable();
-  
   /** Reads properties from configuration file when class first used */
-  static
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    
-    indexDir       = config.getString( "MCR.IFS.ContentIndexer.tablename.indexdir" );
-    logger.info( "MCR.IFS.ContentIndexer.tablename.indexdir: " + indexDir);
-try
-{
-    org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-    org.jdom.Document jdom = builder.build(new FileInputStream( "D:/Lernen/xsl/typed/bibentry-index.xml" ) );
-    org.jdom.Element root = jdom.getRootElement();
-    List types = root.getChildren( "type" );
-    for( int i = 0; i < types.size(); i++ )
-    {
-      // Build file content type from XML element
-      org.jdom.Element xType = (org.jdom.Element)( types.get( i ) );
-      String sea       = xType.getAttributeValue( "search" );
-      String name      = xType.getAttributeValue( "name" );
-      String fieldType = xType.getAttributeValue( "fieldType" );
-      if ( null != sea && null != name && null != fieldType )
-        if ( sea.equals( "true" ) )
-        {
-          logger.debug("Search: " + sea + " Name: " + name + " fieldType:" + fieldType );
-          search.put( name, fieldType );
-        }
-    }
-    logger.debug("Search size: " + search.size() );
-  }
-  catch (Exception e)
-  {
-    logger.info(e);
-  }
-  }
+  static MCRConfiguration config = MCRConfiguration.instance();
 
+  static final private Logger logger = Logger.getLogger( MCRContentIndexerXML.class.getName() );
+  
+  String indexDir = "";
+  boolean first   = true; 
+  Hashtable search = new Hashtable();
+  
   /**
    * The constructor of this class.
    **/
   public MCRContentIndexerXML()
   {
+  }
+  public void init( String indexerID, Hashtable attribute )
+  { 
+    indexDir         = (String)attribute.get( "dir" );
+    logger.info( "Index directory for indexer " + indexerID + ": " + indexDir);
+    String indexFile = (String)attribute.get( "index" );
+    logger.info( "Index file for indexer " + indexerID + ": " + indexFile);
+    try
+    {
+      InputStream in = this.getClass().getResourceAsStream( "/" + indexFile );
+      if( in == null )
+      {
+        String msg = "Index file for indexer " + indexFile + " not found in CLASSPATH";
+        throw new MCRConfigurationException( msg );
+      }
+    
+      org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+      org.jdom.Document jdom            = builder.build( in );
+      org.jdom.Element root             = jdom.getRootElement();
+      List types                        = root.getChildren( "type" );
+      for( int i = 0; i < types.size(); i++ )
+      {
+        org.jdom.Element xType = (org.jdom.Element)( types.get( i ) );
+        String sea             = xType.getAttributeValue( "search" );
+        String name            = xType.getAttributeValue( "name" );
+        String fieldType       = xType.getAttributeValue( "fieldType" );
+        if ( null != sea && null != name && null != fieldType )
+          if ( sea.equals( "true" ) )
+          {
+            logger.debug("Search: " + sea + " Name: " + name + " fieldType:" + fieldType );
+            search.put( name, fieldType );
+          }
+      }
+      logger.debug("Search size: " + search.size() );
+    }
+    catch (Exception e)
+    {
+      logger.info(e);
+    }
   }
 
 /**
@@ -132,7 +140,7 @@ private void addDocumentToLucene( Document doc )
 	    
       if ( !file.exists() ) 
       {
-        logger.info( "The Directory doesn't exist: " + indexDir );
+        logger.info( "The Directory doesn't exist: " + indexDir + " try to build it" );
         IndexWriter writer2 = new IndexWriter( indexDir, analyzer, true );
         writer2.close();
       }   
@@ -295,7 +303,7 @@ private Document buildLuceneDocument( String key, List types )
    * @return the hits of the query (ifs IDs)
    *
    */
-  protected String[] doSearchIndex( String query )
+  public String[] doSearchIndex( String query )
     throws MCRException
   {
     String result[] = null; 

@@ -58,7 +58,7 @@ public abstract class MCRContentIndexer
    *
    * @param indexerID the non-null unique indexer ID for this indexer instance
    **/
-  public void init( String indexerID )
+  public void init( String indexerID, Hashtable attribute )
   { 
     this.indexerID = indexerID; 
     this.prefix = "MCR.IFS.ContentIndexer." + indexerID + ".";
@@ -110,7 +110,7 @@ public abstract class MCRContentIndexer
    * Deletes the index of an MCRFile object that is indexed under the given
    * Storage ID in this indexer instance.
    *
-   * @param storageID the storage ID of the MCRFile object
+   * @param the MCRFile object to delete
    */
   public void deleteIndex( MCRFile file )
     throws MCRException
@@ -133,15 +133,23 @@ public abstract class MCRContentIndexer
   }
     
   /**
-   * Search Deletes the index of an MCRFile object that is indexed under the given
+   * Deletes the index of an MCRFile object that is indexed under the given
    * Storage ID in this indexer instance.
+   *
+   * @param the MCRFile object to delete
+   */
+  protected abstract void doDeleteIndex( MCRFile file )
+    throws Exception;
+
+  /**
+   * Search in Index with query
    *
    * @param query
    *
    * @return the hits of the query (ifs IDs)
    *
    */
-  protected abstract String[] doSearchIndex( String query )
+  public abstract String[] doSearchIndex( String query )
     throws Exception;
 
   /**
@@ -170,13 +178,4 @@ public abstract class MCRContentIndexer
     }
   }
     
-  /**
-   * Deletes the index of an MCRFile object that is indexed under the given
-   * Storage ID in this indexer instance.
-   *
-   * @param storageID the storage ID of the MCRFile object
-   */
-  protected abstract void doDeleteIndex( MCRFile file )
-    throws Exception;
-
 }
