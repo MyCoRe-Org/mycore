@@ -55,7 +55,7 @@ public class MCRQueryCollector {
 
 	public MCRQueryCollector(int cThreads, int aThreads)
 	{
-		this.nThreads = aThreads;
+		nThreads = cThreads;
 		queue = new LinkedList();
 		threads = new PoolWorker[nThreads];
 
