@@ -150,5 +150,12 @@ public class MCRSession implements Cloneable
   /** Returns the object that was stored in the session under the given key **/
   public Object get( Object key )
   { return map.get( key ); }
+
+  /** 
+   * a cache used to store the request parameters of the last max. 10
+   * http requests to static XML files in the web application against this
+   * MCRSession
+   **/
+  public MCRCache requestParamCache = new MCRCache( 10 );
 }
 
