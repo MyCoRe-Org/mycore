@@ -22,3 +22,11 @@ Sie verlassen das CommandLineInterface durch Eingabe von
 {\tt quit } \qquad oder \qquad {\tt exit } 
 \end{center}
 
+\subsection{Tests auf der Basis des CommandLineInterface}
+Nachdem Sie nun die Testdaten geladen haben, besteht schon einmal die Möglichkeit, zu testen, ob die geladenen Daten sich anfassen lassen. Hierzu können sie das ConnamdLineInterface benutzen. \\[2ex]
+Starten Sie {\tt bin/mycore.sh} (Unix) bzw.  {\tt bin/mycore.cmd} (Windows) und versuchen Sie zum Beispiel folgende Kommandos:
+\begin{verbatim}
+query local document /mycoreobject[@id="MyCoReDemoDc_document_1"]
+
+save derivate MyCoReDemoDC_derivate_2 to MyCoReDemoDC_derivate_2
+\end{verbatim}
