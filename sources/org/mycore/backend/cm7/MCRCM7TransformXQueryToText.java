@@ -91,7 +91,7 @@ public final Vector getResultList(String query, String type, int maxresults)
   cond.append('(');
   while (startpos<stoppos) {
     onecond = getNextCondition(startpos,stoppos,rawtext);
-    System.out.println("Next cond :"+onecond);
+//    System.out.println("Next cond :"+onecond);
     startpos += onecond.length();
     cond.append(traceOneCondition(onecond));
     if (startpos<stoppos) {
@@ -158,7 +158,7 @@ private final String getNextCondition(int startpos,int stoppos,String query)
 private final String traceOneCondition(String cond)
   {
   StringBuffer sb = new StringBuffer(128);
-  System.out.println("ONECOND="+cond);
+//  System.out.println("ONECOND="+cond);
   int klammerauf = cond.indexOf("[");
   int klammerzu = cond.indexOf("]",klammerauf+1);
   if ((klammerauf==-1)||(klammerzu==-1)) { return ""; }
@@ -167,9 +167,12 @@ private final String traceOneCondition(String cond)
   StringBuffer pt = new StringBuffer(128);
   while (j!=-1) {
     j=cond.indexOf("/",i);
-    if (j!=-1) { pt.append("XXX").append(cond.substring(i,j)); }
-    i = j+1;
+    if (j!=-1) { 
+      pt.append("XXX").append(cond.substring(i,j)); 
+      i = j+1;
+      }
     }
+  pt.append("XXX").append(cond.substring(i,klammerauf));
   String pretag = pt.toString();
   String tag[] = new String[10];
   String op[] = new String[10];
@@ -186,8 +189,7 @@ private final String traceOneCondition(String cond)
     if (tippelauf==-1) { break; }
     tippelzu = cond.indexOf("\"",tippelauf+1);
     if (tippelzu==-1) { break; }
-    value[counter] = cond.substring(tippelauf+1,tippelzu);
-System.out.println(tagstart+"   "+counter);
+    value[counter] = new String(cond.substring(tippelauf+1,tippelzu).trim());
     boolean opset = false;
     if (!opset) {
       opstart = cond.indexOf("!=",tagstart);
@@ -243,16 +245,87 @@ System.out.println(tagstart+"   "+counter);
       else { tagstart+=5; }
       }
     }
+/*
+  System.out.println("PRETAG="+pretag);
   for (i=0;i<counter;i++) {
     System.out.println("VALUE="+value[i]);
     System.out.println("OPER="+op[i]);
     System.out.println("TAG="+tag[i]);
     }
+*/
+  // Check for value as date
+  GregorianCalendar date = new GregorianCalendar();
+  boolean isdate = false;
+  try {
+    DateFormat df = MCRUtils.getDateFormat("de");
+    date.setTime(df.parse(value[0]));
+    isdate = true;
+    }
+  catch (ParseException e) {
+    isdate = false; }
+  // date search
+  if (isdate) {
+    int idate = date.get(Calendar.YEAR)*10000 +
+                date.get(Calendar.MONTH)*100 +
+                date.get(Calendar.DAY_OF_MONTH);
+    int ioper = 0;
+    if (op[0].indexOf("<=")>=0) { idate += 1; ioper = 3; }
+    else if (op[0].indexOf(">=")>=0) { ioper = 2; }
+      else if (op[0].indexOf(">")>=0) { idate += 1; ioper = 2; }
+        else if (op[0].indexOf("<")>=0) { ioper = 3; }
+          else if (op[0].indexOf("!=")>=0) { ioper = 4; }
+            else if (op[0].indexOf("=")>=0) { ioper = 1; }
+              else { return ""; }
+    String binstr = Integer.toBinaryString(idate);
+    String binstrmax = Integer.toBinaryString(MAX_DATE_STRING_LENGTH);
+    int lenstr = binstr.length();
+    int lenstrmax = binstrmax.length();
+    StringBuffer sbdate = new StringBuffer(32);
+    for (int k=0;k<(lenstrmax-lenstr);k++) { sbdate.append('2'); }
+    sbdate.append(binstr);
+    String stdate = sbdate.toString();
+    StringBuffer sbstag = new StringBuffer(64);
+    sbstag.append(pretag).append("XXX").append(tag[0]).append("XXX")
+       .append(tag[1].substring(1,tag[1].length())).append("XXX")
+       .append(value[1]).append("XXX");
+    String stag = sbstag.toString();
+    if ((ioper==1) || (ioper==4)) {
+      stdate = stdate.replace('2','0');
+      if (ioper==4) { 
+        sb.append("(NOT "); }
+      else {
+        sb.append("("); }
+      sb.append(stag).append(stdate).append(")").append(NL);
+      return sb.toString(); 
+      }
+    String standor = "";
+    String stnot = "(";
+    if (ioper==3) { stnot = "(NOT "; }
+    stdate = stdate.replace('2','?');
+    int k=stdate.indexOf("0");
+    while(k<stdate.length())
+      {
+      sb.append(standor).append(stnot).append("$SC=?$ ").append(stag);
+      StringBuffer sbtemp = new StringBuffer(32);
+      sbtemp.append(stdate.substring(0,k)).append('1');
+      for (int l=k+1;l<stdate.length();l++) { sbtemp.append('?'); }
+      sb.append(sbtemp.toString()).append(")");
+      if (ioper==2) { standor = " OR "; } else { standor = " AND "; }
+      k=stdate.indexOf("0",k+1);
+      if (k==-1) break;
+      }
+    return sb.toString();
+    }
+  // check value of MCRObjectID
+  MCRObjectID mid = new MCRObjectID(value[0]);
+  if (mid.isValid()) {
+    value[0] = mid.getId().replace('_','X'); }
+  // text search
   sb.append("($PARA$ {");
   for (i=0;i<counter;i++) {
     if (tag[i].charAt(0)=='@') {
-      sb.append(" XXX").append(tag[i].substring(1,tag[i].length())).append("XXX")
-        .append(value[i]).append("XXX");
+      sb.append(" XXX").append(tag[i].substring(1,tag[i].length()))
+        .append("XXX").append(value[i]).append("XXX");
       continue;
       }
     int valuestart = 0;
@@ -271,7 +344,7 @@ System.out.println(tagstart+"   "+counter);
       valuestart = valuestop+1;
       }
     sb.append(" $MC=*$ *").append(pretag).append("XXX");
-    if (!tag.equals(".")) { 
+    if (tag[i].charAt(0)!='.') { 
       sb.append(tag[i]).append("XXX*"); }
     else {
       sb.append('*'); }
