@@ -35,6 +35,7 @@ import mycore.datamodel.MCRObject;
  * as XML file for transforming with XSLT.
  *
  * @author Jens Kupferschmidt
+ * @author Mathias Zarick
  * @version $Revision$ $Date$
  **/
 public class MCRQueryResultArray
@@ -72,7 +73,7 @@ public MCRQueryResultArray()
   }
 
 /**
- * This constructor create the MCRQueryResultArray class with a given 
+ * This constructor create the MCRQueryResultArray class with a given
  * query result list.
  *
  * @param in a MCRQueryResultArray as input
@@ -104,7 +105,7 @@ public final int size()
  * This methode return the host of an element index.
  *
  * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return 
+ * @return an empty string if the index is outside the border, else return
  * the host name
  **/
 public final String getHost(int index)
@@ -114,10 +115,23 @@ public final String getHost(int index)
   }
 
 /**
+ * This method sets an host element at a specified position.
+ *
+ * @param index   the index in the list
+ * @param newhost the new value in the list
+ * @return an empty string if the index is outside the border, else return
+ * the host name
+ **/
+public final void setHost(int index,String newhost)
+  {
+  host.set(index,newhost);
+  }
+
+/**
  * This methode return the MCRObjectId of an element index as string.
  *
  * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return 
+ * @return an empty string if the index is outside the border, else return
  * the MCRObjectId as string.
  **/
 public final String getId(int index)
@@ -142,7 +156,7 @@ public final int getRank(int index)
  * This methode return the XML stream without header of an element index.
  *
  * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return 
+ * @return an empty string if the index is outside the border, else return
  * the NON well formed XML without header
  **/
 public final String getXMLBody(int index)
@@ -155,7 +169,7 @@ public final String getXMLBody(int index)
  * This methode return the well formed XML stream of an element index.
  *
  * @param index   the index in the list
- * @return an empty string if the index is outside the border, else return 
+ * @return an empty string if the index is outside the border, else return
  * the well formed XML without header
  **/
 public final String getXML(int index)
@@ -185,7 +199,7 @@ public final void add(String in_host, String in_id, int in_rank, String in_xml)
   }
 
 /**
- * This methode return a well formed XML stream of the result collection 
+ * This methode return a well formed XML stream of the result collection
  * in form of<br>
  * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
  * &lt;mcr_results&gt;<br>
@@ -218,7 +232,7 @@ public final String exportAll()
   }
 
 /**
- * This methode return a well formed XML stream of one result 
+ * This methode return a well formed XML stream of one result
  * in form of<br>
  * &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;<br>
  * &lt;mcr_results&gt;<br>
@@ -238,7 +252,7 @@ public final String exportElement(int index)
   StringBuffer sb = new StringBuffer(204800);
   sb.append(MCRObject.XML_HEADER).append(NL);
   sb.append('<').append(TAG_RESULTS).append('>').append(NL);
-  if ((index>=0)&&(index<=host.size())) { 
+  if ((index>=0)&&(index<=host.size())) {
     sb.append('<').append(TAG_RESULT).append(' ').append(ATTR_HOST)
       .append("=\"").append(host.get(index)).append("\" ").append(ATTR_ID)
       .append("=\"").append(mcr_id.get(index)).append("\" ").append(ATTR_RANK)
@@ -296,9 +310,6 @@ public final void importAll(String in)
  **/
 public final void importElements(String in)
   {
-//  System.out.println("::::::::::::::::::::");
-//  System.out.println(in);
-System.out.println("::::::::::::::::::::");
   int itagresultss = in.indexOf("<"+TAG_RESULTS+">");
   if (itagresultss == -1) { throw new MCRException(ERRORTEXT); }
   itagresultss = itagresultss+TAG_RESULTS.length()+2;
@@ -313,29 +324,27 @@ System.out.println("::::::::::::::::::::");
     itagresulte = in.indexOf(">",itagresults);
     if (itagresulte == -1) { throw new MCRException(ERRORTEXT); }
     iattrstart = in.indexOf(ATTR_HOST+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) { 
+    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     iattrstart += ATTR_HOST.length()+2;
     iattrend = in.indexOf("\"",iattrstart);
-    if ((iattrend == -1) || (iattrend>itagresulte)) { 
+    if ((iattrend == -1) || (iattrend>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     String inhost = in.substring(iattrstart,iattrend);
-System.out.println(inhost);
     iattrstart = in.indexOf(ATTR_ID+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) { 
+    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     iattrstart += ATTR_ID.length()+2;
     iattrend = in.indexOf("\"",iattrstart);
-    if ((iattrend == -1) || (iattrend>itagresulte)) { 
+    if ((iattrend == -1) || (iattrend>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     String inid = in.substring(iattrstart,iattrend);
-System.out.println(inid);
     iattrstart = in.indexOf(ATTR_RANK+"=\"",itagresults);
-    if ((iattrstart == -1) || (iattrstart>itagresulte)) { 
+    if ((iattrstart == -1) || (iattrstart>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     iattrstart += ATTR_RANK.length()+2;
     iattrend = in.indexOf("\"",iattrstart+1);
-    if ((iattrend == -1) || (iattrend>itagresulte)) { 
+    if ((iattrend == -1) || (iattrend>itagresulte)) {
       throw new MCRException(ERRORTEXT); }
     Integer inrank = null;
     try {
