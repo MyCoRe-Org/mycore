@@ -25,6 +25,7 @@
 package mycore.sql;
 
 import java.sql.*;
+import java.util.GregorianCalendar;
 import mycore.common.*;
 
 /**
@@ -88,6 +89,22 @@ public class MCRSQLRowReader
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
   }
   
+  public GregorianCalendar getDate( int index )
+    throws MCRPersistenceException
+  { 
+    try
+    {
+      Timestamp value = rs.getTimestamp( index );
+      if( rs.wasNull() ) return null;
+      
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.setTime( value );
+      return cal;
+    }
+    catch( SQLException ex )
+    { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
+  }
+  
   /** 
    * Returns the value of a column in the current result row as a String, or null.
    *
@@ -101,6 +118,22 @@ public class MCRSQLRowReader
     {
       String value = rs.getString( columnName );
       return ( rs.wasNull() ? null : value );
+    }
+    catch( SQLException ex )
+    { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
+  }
+  
+  public GregorianCalendar getDate( String columnName )
+    throws MCRPersistenceException
+  { 
+    try
+    {
+      Timestamp value = rs.getTimestamp( columnName );
+      if( rs.wasNull() ) return null;
+      
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.setTime( value );
+      return cal;
     }
     catch( SQLException ex )
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
@@ -124,6 +157,18 @@ public class MCRSQLRowReader
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
   }
   
+  public long getLong( int index )
+    throws MCRPersistenceException
+  { 
+    try
+    {
+      long value = rs.getLong( index );
+      return ( rs.wasNull() ? Long.MIN_VALUE : value );
+    }
+    catch( SQLException ex )
+    { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
+  }
+  
   /** 
    * Returns the value of a column in the current result rowa as an int.
    *
@@ -137,6 +182,18 @@ public class MCRSQLRowReader
     {
       int value = rs.getInt( columnName );
       return ( rs.wasNull() ? Integer.MIN_VALUE : value );
+    }
+    catch( SQLException ex )
+    { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
+  }
+  
+  public long getLong( String columnName )
+    throws MCRPersistenceException
+  { 
+    try
+    {
+      long value = rs.getLong( columnName );
+      return ( rs.wasNull() ? Long.MIN_VALUE : value );
     }
     catch( SQLException ex )
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
