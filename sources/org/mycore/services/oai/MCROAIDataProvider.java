@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.15 $ $Date: 2003/01/30 13:32:25 $
+ * $Revision: 1.16 $ $Date: 2003/01/30 13:39:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.15 $ $Date: 2003/01/30 13:32:25 $
+ * @version $Revision: 1.16 $ $Date: 2003/01/30 13:39:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -763,12 +763,12 @@ public class MCROAIDataProvider extends HttpServlet {
         	        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "oai_dc/ "  
         	        	+ STR_OAI_NAMESPACE + "oai_dc.xsd", xsi);
 	                Element eDescription = new Element("description", dc);
-                	eDescription.addContent(categoryDescription);
+                	eDescription.addContent(set[2]);
             	    eDC.addContent(eDescription);
         	        eSet.addContent(eDC);
     	        }
             
-            	if ((maxreturns == 0) || (elementCounter <= maxReturns)) {
+            	if ((maxreturns == 0) || (elementCounter <= maxreturns)) {
 		            eListSets.addContent(eSet);
             	} else {
             		tokenElements.add(eSet);
