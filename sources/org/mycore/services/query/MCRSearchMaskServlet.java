@@ -107,10 +107,11 @@ org.jdom.Document jdom = null;
   String lang  = request.getParameter( "lang" );
   if( type  == null ) return;
   if( lang  == null ) lang  = defaultLang; else { lang = lang.toUpperCase(); }
+  type = type.toLowerCase();
 
   StringBuffer sb = new StringBuffer(128);
   sb.append(applicationPath).append(slash).append("config").append(slash)
-    .append(conf.getString( "MCR.searchmask_config_"+type.toLowerCase()));
+    .append(conf.getString( "MCR.searchmask_config_"+type));
   try {
     File file = new File(sb.toString());
     jdom = new org.jdom.input.SAXBuilder().build(file);

@@ -105,6 +105,7 @@ private String defaultLang = "";
     if (!conf.getBoolean("MCR.type_"+type.toLowerCase(),false)) { return; }
     if( lang  == null ) { lang  = defaultLang; }
     if (lang.equals("")) { lang = defaultLang; }
+    type = type.toLowerCase();
     lang = lang.toUpperCase();
 
     System.out.println("MCRQueryServlet : mode = "+mode);
@@ -114,7 +115,7 @@ private String defaultLang = "";
     System.out.println("MCRQueryServlet : query = "+query);
 
     // query for classifications
-    if (type.toLowerCase().equals("class")) {
+    if (type.equals("class")) {
       Properties parameters = MCRLayoutServlet.buildXSLParameters( request );
       String style = parameters.getProperty("Style",mode+"-class-"+lang);
 //System.out.println("Style = "+style);
