@@ -128,10 +128,18 @@ public class MCRServlet extends HttpServlet
 
     try
     {
-      HttpSession theSession = req.getSession();
+      HttpSession theSession = req.getSession(true);
 
       // Get the MCRSession object for the current thread from the session manager.
       MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+      
+      if (theSession.isNew()) {
+        theSession.setAttribute("mycore.session", mcrSession);
+      }
+      else {
+        mcrSession = (MCRSession)theSession.getAttribute("mycore.session");
+        MCRSessionMgr.setCurrentSession(mcrSession);
+      }
 
       String s = (theSession.isNew() ? "new" : "old" ) + " session " + theSession.getId();
       String u = mcrSession.getCurrentUserID();
@@ -146,6 +154,8 @@ public class MCRServlet extends HttpServlet
       logger.info(c + " request from " + h + " : " + s + " user " + u);
 
       MCRServletJob job = new MCRServletJob(req, res);
+
+      // Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal nur als Test!!!
       String lang = getStringParameter(job, "lang");
       if (lang.trim().length() != 0)
         mcrSession.setCurrentLanguage(lang.trim().toUpperCase());
@@ -153,6 +163,11 @@ public class MCRServlet extends HttpServlet
       if(GETorPOST == GET)
         doGet(job);
       else doPost(job);
+
+      // The MyCoRe session object might have changed while processing the current thread. Before
+      // resetting the session object in the finally clause we need to put a copy into the
+      // HttpSession in case the HttpSession will be reused.
+      theSession.setAttribute("mycore.session", mcrSession.clone());
     }
 
     catch(Exception ex)
@@ -163,6 +178,10 @@ public class MCRServlet extends HttpServlet
         throw (IOException)ex;
       else
         handleException(ex);
+    }
+
+    finally {
+      MCRSessionMgr.getCurrentSession().reset();
     }
   }
 

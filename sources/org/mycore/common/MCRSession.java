@@ -37,7 +37,7 @@ import org.mycore.common.MCRConfiguration;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRSession
+public class MCRSession implements Cloneable
 {
   /** the logger */
   private static Logger logger = Logger.getLogger(MCRSession.class.getName());
@@ -53,10 +53,20 @@ public class MCRSession
    * of the property variable named 'MCR.users_guestuser_username'.
    **/
   public MCRSession()
+  { reset(); }
+
+  /**
+   * Implement a deep copy of instances of this class
+   * @return MCRSession deep copy
+   */
+  public final Object clone()
   {
-    reset();
-    //MCRConfiguration config = MCRConfiguration.instance();
-    //userID = config.getString("MCR.users_guestuser_username","gast");
+    try {
+      return super.clone();
+    }
+    catch (CloneNotSupportedException e) {       // This should never happen
+      throw new InternalError(e.toString());
+    }
   }
 
   /** returns the current user ID */
@@ -81,6 +91,7 @@ public class MCRSession
     MCRConfiguration config = MCRConfiguration.instance();
     PropertyConfigurator.configure(config.getLoggingProperties());
     logger.debug("UserID             = "+userID);
+    logger.debug("language           = "+language);
   }
 
   /** Resets the session to the default values */
