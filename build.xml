@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.53 $ $Date: 2003-08-07 09:10:27 $                      -->
+  <!-- $Revision: 1.54 $ $Date: 2003-08-08 09:35:19 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -16,11 +16,11 @@
   <property name="optimize"    value="on"  />
   <property name="deprecation" value="off" />
 
-  <!-- System CLASSPATH is completely ignored! -->
-  <property name="build.sysclasspath" value="ignore"/>
-
   <!-- Read in all environment variables -->
   <property environment="env" />
+
+  <!-- Read in properties from bin/build.properties -->
+  <property file="${basedir}/bin/build.properties" />
 
   <!-- MyCoRe CVS repository root -->
   <property name="CVSRoot" value="server.mycore.de:/cvs" />
@@ -56,62 +56,91 @@
   <!-- =================================================================== -->
 
   <target name="info" depends="init" description="display software and os versions">
-    <property name="mcr.classpath" refid="mycore.classpath" />
+    <property name="output.classpath" refid="mycore.classpath" />
+    <property name="output.libpath"   refid="mycore.libpath"   />
 
     <echo>Base directory   : ${basedir}</echo>
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.53 $ $Date: 2003-08-07 09:10:27 $</echo>
+    <echo>Ant build file   : $Revision: 1.54 $ $Date: 2003-08-08 09:35:19 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
-    <echo>Persistency type : ${env.MCR_PERSISTENCE}</echo>
-    <echo>IBM CM home      : ${env.CM_HOME}</echo>
+    <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
+    <echo>JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo>System CLASSPATH : ${build.sysclasspath}</echo>
-    <echo>Active CLASSPATH : ${mcr.classpath}</echo>
+    <echo>Active CLASSPATH : ${output.classpath}</echo>
+    <echo>Active LIBPATH   : ${output.libpath}</echo>
   </target>
 
   <!-- =================================================================== -->
-  <!-- Initialize directories and some configuration properties            -->
+  <!-- Initialize directories                                              -->
+  <!-- Build CLASSPATH LIBPATH and LD_LIBRARY_PATH for compile and exec    -->
   <!-- =================================================================== -->
 
-  <target name="init">
+  <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2" >
     <echo>Initializing directories and classpath...</echo>
 
     <mkdir dir="${basedir}/classes"  />
     <mkdir dir="${basedir}/javadocs" />
 
     <!-- Fail if environment variables are not set -->
-    <fail message="Environment variable MCR_PERSISTENCE ist not set!" unless="env.MCR_PERSISTENCE" />
-
-    <!-- If directory $CM_HOME/lib exists, include all cmb*.jar there -->
-    <condition property="CM_LIB_DIR" value="${env.CM_HOME}/lib">
-      <available file="${env.CM_HOME}/lib" type="dir"/>
-    </condition>
-    <condition property="CM_LIB_DIR" value="${basedir}/lib">
-      <not>
-        <available file="${env.CM_HOME}/lib" type="dir"/>
-      </not>
-    </condition>
+    <fail message="Environment variable JAVA_HOME is not set!" unless="env.JAVA_HOME" />
 
     <path id="mycore.classpath">
-      <fileset dir="${basedir}/lib">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="${CM_LIB_DIR}">
-        <include name="cmb*.jar"/>
-      </fileset>
+      <fileset dir="${basedir}/lib" includes="*.jar"/>
+      <path refid="jdbc.classpath" />
+      <path refid="xml.classpath"  />
+    </path>
+
+    <path id="mycore.libpath">
+      <dirset dir="${env.JAVA_HOME}" includes="bin bin/classic" />
+      <path refid="jdbc.libpath" />
+      <path refid="xml.libpath"  />
     </path>
   </target>
+
+  <target name="jdbcstore.path.1" if="MCR.JDBCStore.BaseDir">
+    <path id="jdbc.classpath">
+      <fileset dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.Jars}"        />
+      <dirset  dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.ClassesDirs}" />
+    </path>
+    <path id="jdbc.libpath">
+      <dirset dir="${MCR.JDBCStore.BaseDir}" includes="${MCR.JDBCStore.LibPath}" />
+    </path>
+  </target>
+
+  <target name="jdbcstore.path.2" unless="MCR.JDBCStore.BaseDir">
+    <path id="jdbc.classpath" />
+    <path id="jdbc.libpath"   />
+  </target>
+
+  <target name="xmlstore.path.1" if="MCR.XMLStore.BaseDir">
+    <path id="xml.classpath">
+      <fileset dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.Jars}"        />
+      <dirset  dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.ClassesDirs}" /> 
+    </path>
+    <path id="xml.libpath">
+      <dirset dir="${MCR.XMLStore.BaseDir}" includes="${MCR.XMLStore.LibPath}" />
+    </path>
+  </target>
+
+  <target name="xmlstore.path.2" unless="MCR.XMLStore.BaseDir">
+    <path id="xml.classpath" />
+    <path id="xml.libpath" />
+  </target>
+
+  <!-- System CLASSPATH is completely ignored! -->
+  <property name="build.sysclasspath" value="ignore"/>
 
   <!-- =================================================================== -->
   <!-- Creates a mycore-for-*.jar file containing all compiled MyCoRe classes  -->
   <!-- =================================================================== -->
 
   <target name="jar" depends="compile" description="creates lib/mycore-for-*.jar">
-    <echo>Creating mycore-for-${env.MCR_PERSISTENCE}.jar containing all compiled classes...</echo>
+    <echo>Creating mycore-for-${MCR.XMLStore.Type}.jar containing all compiled classes...</echo>
     <jar 
-      destfile="${basedir}/lib/mycore-for-${env.MCR_PERSISTENCE}.jar"
+      destfile="${basedir}/lib/mycore-for-${MCR.XMLStore.Type}.jar"
     >
       <fileset dir="${basedir}/classes" includes="**/*.class" />
       <fileset dir="${basedir}/schema"  includes="*.xsd"      />
@@ -147,14 +176,14 @@
   </target>
 
   <target name="compile_persistency">
-    <echo>Compiling persistence implementation ${env.MCR_PERSISTENCE}</echo>
+    <echo>Compiling xml persistence implementation ${MCR.XMLStore.Type}</echo>
 
-    <!-- For internal use: setting MCR_PERSISTENCE=all will compile cm7 and cm8 and xmldb -->
-    <condition property="mcr.packages" value="org/mycore/backend/${env.MCR_PERSISTENCE}/**">
-      <not><equals arg1="${env.MCR_PERSISTENCE}" arg2="all" /></not>
+    <!-- For internal use: setting MCR.XMLStore.Type=all will compile cm7 and cm8 and xmldb -->
+    <condition property="mcr.packages" value="org/mycore/backend/${MCR.XMLStore.Type}/**">
+      <not><equals arg1="${MCR.XMLStore.Type}" arg2="all" /></not>
     </condition>
     <condition property="mcr.packages" value="org/mycore/backend/cm7/**, org/mycore/backend/cm8/**, org/mycore/backend/xmldb/**">
-      <equals arg1="${env.MCR_PERSISTENCE}" arg2="all" />
+      <equals arg1="${MCR.XMLStore.Type}" arg2="all" />
     </condition>
 
     <antcall target="javac">
