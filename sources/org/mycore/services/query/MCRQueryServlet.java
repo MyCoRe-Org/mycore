@@ -354,6 +354,17 @@ private static Logger logger=Logger.getLogger(MCRQueryServlet.class);
     }
     
     if ((view.equals("prev") || view.equals("next")) && (ref != null)){
+    	if (request.getRequestedSessionId()!=session.getId()){
+    		cachedFlag=false;
+    		logger.info("Session timed out for request: "+request.getQueryString()+" from "+request.getHeader("referer"));
+    		//return to last site
+    		if (request.getHeader("referer")!=null && request.getHeader("referer").indexOf("view")==-1)
+    			response.sendRedirect(request.getHeader("referer"));
+    		else
+    			response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,"Session timed out, no referer aviable!");
+    		response.flushBuffer();
+    		return;
+    	}
     	/* change generate new query */
     	if (cachedFlag){
     		StringTokenizer refGet = 
