@@ -76,175 +76,19 @@ import org.mycore.services.query.MCRTextSearchInterface;
 public class MCRCStoreLucene
 	extends MCRCStoreLocalFilesystem
 	implements MCRTextSearchInterface {
+	private static final MCRConfiguration conf = MCRConfiguration.instance();
+	private static final String DERIVATE_FIELD = "DerivateID";
+	private static final String STORAGE_FIELD = "StorageID";
+	private static final Logger logger = Logger.getLogger(MCRCStoreLucene.class);
+	private static final int optimizeIntervall = 10;
 	private static final TextFilterPluginManager pMan =
 		TextFilterPluginManager.getInstance();
-	private static final Logger logger = Logger.getLogger(MCRCStoreLucene.class);
-	private static final MCRConfiguration conf = MCRConfiguration.instance();
-	private static File indexDir = null;
-	private static IndexWriter indexWriter = null;
-	private static final int optimizeIntervall = 10;
 	private static int docCount;
+	private static File indexDir = null;
 
 	private static IndexReader indexReader;
 	private static Searcher indexSearcher;
-
-	private static final String STORAGE_FIELD = "StorageID";
-	private static final String DERIVATE_FIELD = "DerivateID";
-
-	/* (non-Javadoc)
-	 * @see org.mycore.datamodel.ifs.MCRContentStore#doDeleteContent(java.lang.String)
-	 */
-	protected void doDeleteContent(String storageID) throws Exception {
-		//remove from index
-		Term term = new Term(STORAGE_FIELD, storageID);
-		int deleted = indexReader.delete(term);
-		indexSearcher.close();
-		indexReader.close();
-		indexReader = null;
-		loadIndexReader();
-		loadIndexSearcher();
-		logger.debug("deleted " + deleted + " documents containing " + term);
-		//remove file
-		super.doDeleteContent(storageID);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mycore.datamodel.ifs.MCRContentStore#doStoreContent(org.mycore.datamodel.ifs.MCRFileReader, org.mycore.datamodel.ifs.MCRContentInputStream)
-	 */
-	protected String doStoreContent(
-		MCRFileReader file,
-		MCRContentInputStream source)
-		throws Exception {
-		Document doc = null;
-		MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
-		source = new MCRContentInputStream(isc.getNewInputStream());
-		InputStream sourceStream = isc.getNewInputStream();
-		String returns = super.doStoreContent(file, source);
-		if (returns == null || returns.length() == 0)
-			throw new MCRPersistenceException(
-				"Failed to store file " + file.getID() + " to local file system!");
-		doc = getDocument(file, isc.getNewInputStream());
-		Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
-		doc.add(storageID);
-		try {
-			indexDocument(doc);
-		} catch (IOException io) {
-			//Document was not added
-			//remove file from local FileStore
-			super.deleteContent(returns);
-			//send Exception
-			throw new MCRPersistenceException(
-				"Failed to store file "
-					+ file.getID()
-					+ " to local file system!\n"
-					+ "Cannot index file content!",
-				io);
-		}
-		return returns;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mycore.datamodel.ifs.MCRContentStore#init(java.lang.String)
-	 */
-	public void init(String storeID) {
-		super.init(storeID);
-		pMan.loadPlugins();
-		indexDir = new File(conf.getString(prefix + "IndexDirectory"));
-		logger.debug("TextIndexDir: " + indexDir);
-		if (indexWriter == null) {
-			logger.debug("creating IndexWriter...");
-			try {
-				if (indexDir.exists()) {
-					//do some hardcore...
-					Directory index = FSDirectory.getDirectory(indexDir, false);
-					if (IndexReader.isLocked(indexDir.getAbsolutePath()))
-						IndexReader.unlock(index);
-				}
-				loadIndexWriter();
-				logger.debug("IndexWriter created...");
-				docCount = indexWriter.docCount();
-				indexWriter.close();
-			} catch (IOException e) {
-				logger.error("Setting indexWriter=null");
-				indexWriter = null;
-			}
-		}
-		if (indexReader == null) {
-			loadIndexReader();
-		}
-		if (indexSearcher == null) {
-			loadIndexSearcher();
-		}
-	}
-	private synchronized void loadIndexReader() {
-		try {
-			indexReader = IndexReader.open(indexDir);
-		} catch (IOException e) {
-			throw new MCRPersistenceException(
-				"Cannot read index in "
-					+ indexDir.getAbsolutePath()
-					+ File.pathSeparatorChar
-					+ indexDir.getName(),
-				e);
-		}
-	}
-	private synchronized void loadIndexSearcher() {
-		if (indexReader == null) {
-			loadIndexReader();
-		}
-		indexSearcher = new IndexSearcher(indexReader);
-	}
-	private synchronized void loadIndexWriter() {
-		boolean create = true;
-		if (IndexReader.indexExists(indexDir)) {
-			//reuse Index
-			create = false;
-		}
-		try {
-			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
-		} catch (IOException e) {
-			throw new MCRPersistenceException(
-				"Cannot create index in "
-					+ indexDir.getAbsolutePath()
-					+ File.pathSeparatorChar
-					+ indexDir.getName(),
-				e);
-		}
-		indexWriter.mergeFactor = optimizeIntervall;
-		indexWriter.minMergeDocs = 1; //always write to local dir
-	}
-
-	protected Document getDocument(MCRFileReader reader, InputStream stream)
-		throws IOException {
-		Document returns = new Document();
-		PipedInputStream pin = new PipedInputStream();
-		PipedOutputStream pout = new PipedOutputStream(pin);
-		PrintStream out = new PrintStream(pout);
-		BufferedReader in = new BufferedReader(new InputStreamReader(pin));
-		//filter here
-		pMan.transform(reader.getContentType(), stream, out);
-		//reader is instance of MCRFile
-		//ownerID is derivate ID for all mycore files
-		if (reader instanceof MCRFile) {
-			MCRFile file = (MCRFile) reader;
-			Field derivateID =
-				new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
-			Field fileID = new Field("FileID", file.getID(), true, true, false);
-			/* since file is stored elsewhere 
-			 * we only index the file and do not store
-			 */
-			Field content = Field.Text("content", in);
-			//closing stream, else indexDocument will hang
-			stream.close();
-			out.flush();
-			out.close();
-			returns.add(derivateID);
-			returns.add(fileID);
-			returns.add(content);
-			return returns;
-		} else
-			return null;
-	}
+	private static IndexWriter indexWriter = null;
 	/**
 	 * searches on the index and delivers derivate ids matching the search
 	 * 
@@ -305,52 +149,165 @@ public class MCRCStoreLucene
 		return returns;
 	}
 
-	private void indexDocument(Document doc) throws IOException {
-		indexSearcher.close();
-		loadIndexWriter();
-		logger.debug(
-			"Create index for storageID="
-				+ doc.getField(STORAGE_FIELD).stringValue());
-		indexWriter.addDocument(doc);
-		docCount++;
-		if (docCount % optimizeIntervall == 0) {
-			logger.debug("Optimize index for searching...");
-			indexWriter.optimize();
+	/* (non-Javadoc)
+	 * @see org.mycore.datamodel.ifs.MCRContentStore#init(java.lang.String)
+	 */
+	public void init(String storeID) {
+		super.init(storeID);
+		pMan.loadPlugins();
+		indexDir = new File(conf.getString(prefix + "IndexDirectory"));
+		logger.debug("TextIndexDir: " + indexDir);
+		if (indexWriter == null) {
+			logger.debug("creating IndexWriter...");
+			try {
+				if (indexDir.exists()) {
+					//do some hardcore...
+					Directory index = FSDirectory.getDirectory(indexDir, false);
+					if (IndexReader.isLocked(indexDir.getAbsolutePath()))
+						IndexReader.unlock(index);
+				}
+				loadIndexWriter();
+				logger.debug("IndexWriter created...");
+				docCount = indexWriter.docCount();
+				indexWriter.close();
+			} catch (IOException e) {
+				logger.error("Setting indexWriter=null");
+				indexWriter = null;
+			}
 		}
-		indexWriter.close();
-		loadIndexSearcher();
+		if (indexReader == null) {
+			loadIndexReader();
+		}
+		if (indexSearcher == null) {
+			loadIndexSearcher();
+		}
 	}
+
+	protected static String parseQuery(String query) {
+		logger.debug("TS incoming query: " + query);
+		int i = query.indexOf("\"");
+		i++;
+		if (i == 0)
+			return "";
+		int j = query.indexOf("\"", i);
+		if (j == -1)
+			return "";
+		return query.substring(i, j);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mycore.datamodel.ifs.MCRContentStore#doDeleteContent(java.lang.String)
+	 */
+	protected void doDeleteContent(String storageID) throws Exception {
+		//remove from index
+		Term term = new Term(STORAGE_FIELD, storageID);
+		int deleted = indexReader.delete(term);
+		indexSearcher.close();
+		indexReader.close();
+		indexReader = null;
+		loadIndexReader();
+		loadIndexSearcher();
+		logger.debug("deleted " + deleted + " documents containing " + term);
+		//remove file
+		super.doDeleteContent(storageID);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mycore.datamodel.ifs.MCRContentStore#doStoreContent(org.mycore.datamodel.ifs.MCRFileReader, org.mycore.datamodel.ifs.MCRContentInputStream)
+	 */
+	protected String doStoreContent(
+		MCRFileReader file,
+		MCRContentInputStream source)
+		throws Exception {
+		Document doc = null;
+		MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
+		source = new MCRContentInputStream(isc.getNewInputStream());
+		InputStream sourceStream = isc.getNewInputStream();
+		String returns = super.doStoreContent(file, source);
+		if (returns == null || returns.length() == 0)
+			throw new MCRPersistenceException(
+				"Failed to store file " + file.getID() + " to local file system!");
+		doc = getDocument(file, isc.getNewInputStream());
+		Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
+		doc.add(storageID);
+		try {
+			indexDocument(doc);
+		} catch (IOException io) {
+			//Document was not added
+			//remove file from local FileStore
+			super.deleteContent(returns);
+			//send Exception
+			throw new MCRPersistenceException(
+				"Failed to store file "
+					+ file.getID()
+					+ " to local file system!\n"
+					+ "Cannot index file content!",
+				io);
+		}
+		return returns;
+	}
+
+	protected void finalize() throws Throwable {
+		logger.debug("finalize() called on Lucenestore: shutting down...");
+		synchronized (indexReader) {
+			indexReader.close();
+			indexReader = null;
+		}
+		synchronized (indexWriter) {
+			indexWriter.close();
+			indexWriter = null;
+		}
+		logger.debug("shutting down... completed");
+	}
+
+	protected Document getDocument(MCRFileReader reader, InputStream stream)
+		throws IOException {
+		Document returns = new Document();
+		PipedInputStream pin = new PipedInputStream();
+		PipedOutputStream pout = new PipedOutputStream(pin);
+		PrintStream out = new PrintStream(pout);
+		BufferedReader in = new BufferedReader(new InputStreamReader(pin));
+		//filter here
+		pMan.transform(reader.getContentType(), stream, out);
+		//reader is instance of MCRFile
+		//ownerID is derivate ID for all mycore files
+		if (reader instanceof MCRFile) {
+			MCRFile file = (MCRFile) reader;
+			Field derivateID =
+				new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
+			Field fileID = new Field("FileID", file.getID(), true, true, false);
+			/* since file is stored elsewhere 
+			 * we only index the file and do not store
+			 */
+			Field content = Field.Text("content", in);
+			logger.debug("adding fields to document");
+			returns.add(derivateID);
+			returns.add(fileID);
+			returns.add(content);
+			logger.debug("closing stream, else indexDocument will hang");
+			out.flush();
+			out.close();
+			logger.debug("returning document");
+			return returns;
+		} else
+			return null;
+	}
+
+	private final boolean containsExclusiveClause(BooleanQuery query) {
+		BooleanClause[] clauses = query.getClauses();
+		if (clauses.length == 1) {
+			clauses = ((BooleanQuery) clauses[0].query).getClauses();
+			if (clauses.length == 2)
+				return clauses[1].prohibited;
+		}
+		return false;
+	}
+
 	private static Analyzer getAnalyzer() {
 		//TODO: have to replace GermanAnalyzer by more generic
 		return new GermanAnalyzer();
 	}
 
-	private HashSet getUniqueFieldValues(String fieldName) {
-		HashSet collector = new HashSet();
-		if (fieldName == null || fieldName.length() == 0)
-			return collector;
-		TermEnum enum = null;
-		try {
-			try {
-				enum = indexReader.terms(new Term(fieldName, ""));
-				while (fieldName.equals(enum.term().field())) {
-					//... collect enum.term().text() ...
-					collector.add(enum.term().text());
-					if (!enum.next())
-						break;
-				}
-			} finally {
-				enum.close();
-			}
-		} catch (IOException e) {
-			StringBuffer msg =
-				new StringBuffer("Error while fetching unique values of field ")
-					.append(fieldName)
-					.append("!");
-			throw new MCRPersistenceException(msg.toString(), e);
-		}
-		return collector;
-	}
 	private Hits[] getHitsForDerivate(String derivateID, String queryText) {
 		Hits[] hits = null;
 		Analyzer analyzer = getAnalyzer();
@@ -403,38 +360,85 @@ public class MCRCStoreLucene
 		return hits;
 	}
 
-	private final boolean containsExclusiveClause(BooleanQuery query) {
-		BooleanClause[] clauses = query.getClauses();
-		if (clauses.length == 1) {
-			clauses = ((BooleanQuery) clauses[0].query).getClauses();
-			if (clauses.length == 2)
-				return clauses[1].prohibited;
+	private HashSet getUniqueFieldValues(String fieldName) {
+		HashSet collector = new HashSet();
+		if (fieldName == null || fieldName.length() == 0)
+			return collector;
+		TermEnum enum = null;
+		try {
+			try {
+				enum = indexReader.terms(new Term(fieldName, ""));
+				while (fieldName.equals(enum.term().field())) {
+					//... collect enum.term().text() ...
+					collector.add(enum.term().text());
+					if (!enum.next())
+						break;
+				}
+			} finally {
+				enum.close();
+			}
+		} catch (IOException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while fetching unique values of field ")
+					.append(fieldName)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
 		}
-		return false;
+		return collector;
 	}
 
-	protected static String parseQuery(String query) {
-		logger.debug("TS incoming query: " + query);
-		int i = query.indexOf("\"");
-		if (i == -1)
-			return "";
-		int j = query.indexOf("\"", i + 1);
-		if (j == -1)
-			return "";
-		return query.substring(i, j);
+	private void indexDocument(Document doc) throws IOException {
+		indexSearcher.close();
+		loadIndexWriter();
+		logger.debug(
+			"Create index for storageID="
+				+ doc.getField(STORAGE_FIELD).stringValue());
+		indexWriter.addDocument(doc);
+		docCount++;
+		if (docCount % optimizeIntervall == 0) {
+			logger.debug("Optimize index for searching...");
+			indexWriter.optimize();
+		}
+		indexWriter.close();
+		loadIndexSearcher();
 	}
 
-	protected void finalize() throws Throwable {
-		logger.debug("finalize() called on Lucenestore: shutting down...");
-		synchronized (indexReader) {
-			indexReader.close();
-			indexReader = null;
+	private synchronized void loadIndexReader() {
+		try {
+			indexReader = IndexReader.open(indexDir);
+		} catch (IOException e) {
+			throw new MCRPersistenceException(
+				"Cannot read index in "
+					+ indexDir.getAbsolutePath()
+					+ File.pathSeparatorChar
+					+ indexDir.getName(),
+				e);
 		}
-		synchronized (indexWriter) {
-			indexWriter.close();
-			indexWriter = null;
+	}
+	private synchronized void loadIndexSearcher() {
+		if (indexReader == null) {
+			loadIndexReader();
 		}
-		logger.debug("shutting down... completed");
+		indexSearcher = new IndexSearcher(indexReader);
+	}
+	private synchronized void loadIndexWriter() {
+		boolean create = true;
+		if (IndexReader.indexExists(indexDir)) {
+			//reuse Index
+			create = false;
+		}
+		try {
+			indexWriter = new IndexWriter(indexDir, getAnalyzer(), create);
+		} catch (IOException e) {
+			throw new MCRPersistenceException(
+				"Cannot create index in "
+					+ indexDir.getAbsolutePath()
+					+ File.pathSeparatorChar
+					+ indexDir.getName(),
+				e);
+		}
+		indexWriter.mergeFactor = optimizeIntervall;
+		indexWriter.minMergeDocs = 1; //always write to local dir
 	}
 
 }

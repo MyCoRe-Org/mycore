@@ -76,6 +76,13 @@ public class LuceneCStoreQueryParser extends QueryParser {
 		if (string.indexOf(" ") != -1)
 			logger.error("Grouping value may not contain space characters");
 		groupingValue = string;
+		logger.debug(
+			new StringBuffer("Set ")
+				.append(GROUPING_FIELD)
+				.append(" to ")
+				.append(string)
+				.append(" for next query...")
+				.toString());
 	}
 
 	protected Query getBooleanQuery(Vector clauses) throws ParseException {
@@ -113,7 +120,9 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	 */
 	public Query parse(String query) throws ParseException {
 		Query queryTemp = super.parse(query);
-		if (queryTemp.toString(field).equals(query)) {
+		//as a workaround to filter standard lucene query change
+		//only queries that search against the standard field..
+		if (queryTemp.toString(field).equalsIgnoreCase(query)) {
 			Vector v = new Vector();
 			BooleanClause clause = new BooleanClause(queryTemp, true, false);
 			v.add(clause);
@@ -136,6 +145,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
 	 * @throws ParseException if syntax mismatches
 	 */
 	public BooleanQuery[] getBooleanQueries(String query) throws ParseException {
+		logger.debug("preparsed query:"+parse(query).toString());
 		BooleanQuery bQuery = (BooleanQuery) parse(query);
 		BooleanClause[] clauses = bQuery.getClauses();
 		BooleanQuery[] queries = new BooleanQuery[clauses.length];
