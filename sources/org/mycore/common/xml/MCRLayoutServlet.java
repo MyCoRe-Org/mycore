@@ -300,7 +300,7 @@ public class MCRLayoutServlet extends MCRServlet
     }
   }
 
-  public static final Properties buildXSLParameters( HttpServletRequest request )
+  public static Properties buildXSLParameters( HttpServletRequest request )
   {
   	Properties parameters = new Properties();
     
