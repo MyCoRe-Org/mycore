@@ -151,10 +151,10 @@ public abstract String createXML();
  * the persistence database. It was choose over the
  * <em>MCR.persistence_type</em> configuration.
  *
- * @param type   the type of the persistece system
+ * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
  * @return a Text Search string with the data of the metadata part
  **/
-public abstract String createTS(String type);
+public abstract String createTS(Object mcr_query);
 
 /**
  * This methode print all elements of the metadata class.

@@ -36,6 +36,7 @@ import mycore.common.MCRPersistenceException;
 import mycore.datamodel.MCRObjectID;
 import mycore.datamodel.MCRObjectStructure;
 import mycore.datamodel.MCRObjectService;
+import mycore.datamodel.MCRQueryInterface;
 
 /**
  * This class implements all methode for handling one metadata object.
@@ -58,10 +59,12 @@ public final int MAX_LABEL_LENGTH = 256;
 private String parser_name;
 private String persist_name;
 private String persist_type;
+private String query_name;
 
 // interface classes
 private MCRParserInterface mcr_parser;
 private MCRObjectPersistenceInterface mcr_persist;
+private MCRQueryInterface mcr_query;
 
 // the DOM document
 private Document mcr_document = null;
@@ -95,6 +98,7 @@ public MCRObject() throws MCRException, MCRConfigurationException
   mcr_label = new String("");
   persist_type = new String("");
   mcr_persist = null;
+  mcr_query = null;
   try {
   // Parser class
     parser_name = MCRConfiguration.instance()
@@ -327,19 +331,35 @@ public final String createXML()
  * This methode create a Text Search stream for all object data.
  * The content of this stream is depended by the implementation for
  * the persistence database. It was choose over the 
- * <em>MCR.persistence_type</em> configuration.
+ * <em>MCR.persistence_type</em> and <em>MCR.persistence_..._query_name</em>
+ * configuration.
  *
+ * @exception MCRConfigurationException if the configuration faild
  * @return a Text Search string with the Text Search data of the object
  **/
-public final String createTS()
+public final String createTS() throws MCRConfigurationException
   {
-  if (persist_type.equals("CM7")) {
-    StringBuffer sb = new StringBuffer(4096);
-    sb.append(mcr_struct.createTS(persist_type));
-    sb.append(mcr_metadata.createTS(persist_type));
-    sb.append(mcr_service.createTS(persist_type));
-    return sb.toString(); }
-  return "";
+  if (mcr_query == null) {
+    try {
+      String propquery = "MCR.persistence_"+persist_type.toLowerCase()+
+        "_query_name";
+      query_name = MCRConfiguration.instance().getString(propquery);
+      if (query_name == null) {
+        throw new MCRConfigurationException(propquery+" not found."); }
+      mcr_query = (MCRQueryInterface)Class.forName(query_name).newInstance();
+      }
+    catch (Exception e) {
+      throw new MCRException(e.getMessage()); }
+    }
+  StringBuffer sb = new StringBuffer(4096);
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringAttrib("Object",
+    "ID",mcr_id.getId()));
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringAttrib("Object",
+    "Label",mcr_label));
+  sb.append(mcr_struct.createTS(mcr_query));
+  sb.append(mcr_metadata.createTS(mcr_query));
+  sb.append(mcr_service.createTS(mcr_query));
+  return sb.toString();
   }
 
 /**

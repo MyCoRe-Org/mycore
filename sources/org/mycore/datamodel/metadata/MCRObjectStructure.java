@@ -76,18 +76,14 @@ public final String createXML()
  * the persistence database. It was choose over the
  * <em>MCR.persistence_type</em> configuration.
  *
- * @param type   the type of the persistece system
+ * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
  * @return a Text Search string with the data of the metadata part
  **/
-public final String createTS(String type)
+public final String createTS(Object mcr_query)
   {
-  if (type.equals("CM7")) {
-    StringBuffer sb = new StringBuffer(2048);
-    sb.append("<structure>").append(NL);
-    sb.append("</structure>").append(NL);
-    return sb.toString();
-    }
-  return "";
+  StringBuffer sb = new StringBuffer(2048);
+  sb.append("").append(NL);
+  return sb.toString();
   }
 
 /**

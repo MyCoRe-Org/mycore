@@ -85,6 +85,27 @@ public MCRMetaLangText(String default_lang)
   }
 
 /**
+ * This methode add a languge/text pair to the list. 
+ *
+ * @param replang                the new language string, if this is null or
+ *                               empty, the default language was set
+ * @param reptex                 the new text string
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the vector is full
+ **/
+public final void addElement(String replang, String reptext)
+  throws IndexOutOfBoundsException
+  {
+  if (lang.size()>=vec_max_length) {
+    throw new IndexOutOfBoundsException("Index error in addElement."); }
+  if ((replang == null) || ((replang = replang.trim()).length() ==0)) {
+    lang.addElement(default_lang); }
+  else {
+    lang.addElement(replang); }
+  text.addElement(reptext);
+  }
+
+/**
  * This methode get a language element from the vector for the given index.
  *
  * @param index                 the index id of the element
@@ -110,6 +131,43 @@ public final String getTextElement(int index) throws IndexOutOfBoundsException
   if ((index<0)||(index>lang.size())) {
     throw new IndexOutOfBoundsException("Index error in getTextElement."); }
   return (String)text.elementAt(index);  
+  }
+
+/**
+ * This methode remove a languge/text pair from a given index of the list. 
+ *
+ * @param index                  a index of the list
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the index is false
+ **/
+public final void removeElement(int index) throws IndexOutOfBoundsException
+  {
+  if ((index<0)||(index>lang.size())) {
+    throw new IndexOutOfBoundsException("Index error in removeElement."); }
+  lang.removeElementAt(index);
+  text.removeElementAt(index);
+  }
+
+/**
+ * This methode replace a languge/text pair for a given index of the list. 
+ *
+ * @param index                  a index of the list
+ * @param replang                the new language string, if this is null or
+ *                               empty, the default language was set
+ * @param reptex                 the new text string
+ * @exception IndexOutOfBoundsException throw this exception, if
+ *                              the index is false
+ **/
+public final void replaceElement(int index, String replang, String reptext)
+  throws IndexOutOfBoundsException
+  {
+  if ((index<0)||(index>lang.size())) {
+    throw new IndexOutOfBoundsException("Index error in replaceElement."); }
+  if ((replang == null) || ((replang = replang.trim()).length() ==0)) {
+    lang.setElementAt(default_lang,index); }
+  else {
+    lang.setElementAt(replang,index); }
+  text.setElementAt(reptext,index);
   }
 
 /**
@@ -172,24 +230,17 @@ public final String createXML()
  * the persistence database. It was choose over the
  * <em>MCR.persistence_type</em> configuration.
  *
- * @param type              the type of the persistece system
+ * @param mcr_query   a class they implement the <b>MCRQueryInterface</b>
  * @return a XML string with the XML LangText part
  **/
-public final String createTS(String type)
+public final String createTS(Object mcr_query)
   {
-  if (type.equals("CM7")) {
-    StringBuffer sb = new StringBuffer(1024);
-    sb.append('<').append(tag).append(" type=\"LangText\" hereditary=\"")
-      .append(hereditary).append("\">").append(NL);
-    for (int i=0;i<text.size();i++) {
-      sb.append('<').append(subtag).append(" xml:lang=\"")
-        .append(lang.elementAt(i)).append("\">").append(NL);
-      sb.append(text.elementAt(i));
-      sb.append("</").append(subtag).append('>').append(NL);
-      }
-    sb.append("</").append(tag).append('>').append(NL);
-    return sb.toString(); }
-  return "";
+  StringBuffer sb = new StringBuffer(1024);
+  for (int i=0;i<text.size();i++) {
+    sb.append(((MCRQueryInterface)mcr_query).createSearchStringText(subtag,
+        (String)text.elementAt(i)));
+    }
+  return sb.toString();
   }
 
 /**

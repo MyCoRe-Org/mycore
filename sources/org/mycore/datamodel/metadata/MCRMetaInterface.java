@@ -75,7 +75,7 @@ public String createXML();
  * @param type   the type of the persistece system
  * @return a Text Search string with the data of the metadata part
  **/
-public String createTS(String type);
+public String createTS(Object mcr_query);
 
 /**
  * This methode print all elements of the metadata class.
