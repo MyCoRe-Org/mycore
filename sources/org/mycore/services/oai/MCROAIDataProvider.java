@@ -31,8 +31,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
 import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -56,18 +57,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUtils;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRXSLTransformation;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXSLTransformation;
 
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
@@ -144,7 +143,7 @@ public class MCROAIDataProvider extends HttpServlet {
         "ListSets"};
 
     private static Map mappings = null;
-
+    
 	/**
 	 * Method init. Initializes the Servlet when first loaded
 	 * @param config Configuration data
@@ -832,7 +831,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    		String[] set = (String[]) iterator.next();
 	    		
 	            Element eSet = new Element("set", ns);
-    	        eSet.addContent(newElementWithContent("setSpec", ns, set[0]));
+	            eSet = setSpec(eSet, set[0], ns);
     	        if (set[1].length() > 0) {
     	        	eSet.addContent(newElementWithContent("setName", ns, set[1]));
     	        } else {
@@ -1003,24 +1002,48 @@ public class MCROAIDataProvider extends HttpServlet {
             return document;
         }
         
-	    List sets = null;
+        List mappedSets = new ArrayList();
+	    if (set != null) {
+	    	buildMappings();
+	    	logger.info("Set: " + set[0]);
+	    	if (mappings.containsValue(set[0])) {
+	    		Set keys = mappings.keySet();
+	    		Iterator keyIterator = keys.iterator();
+	    		while (keyIterator.hasNext()) {
+	    			String key = (String) keyIterator.next();
+	    			String value = (String) mappings.get(key);
+	    			if (value.equals(set[0])) {
+	    				String[] mappedSet = new String[1];
+	    				mappedSet[0] = key;
+	    				mappedSets.add(mappedSet);
+	    			}
+	    		}
+	    	}
+	    } else {
+	    	mappedSets.add(set);
+	    }
 	    
+	    List sets = new ArrayList();
 	    try {
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
-		    sets = new ArrayList(query.listIdentifiers(set, from, until, getServletName()));
+		    Iterator mappedSetIterator = mappedSets.iterator();
+		    while (mappedSetIterator.hasNext()) {
+		    	String[] mappedSet = (String[]) mappedSetIterator.next();
+		    	logger.info("Query set: " + mappedSet[0]);
+		    	List result = query.listIdentifiers(mappedSet, from, until, getServletName());
+		    	if (result != null) {
+		    		sets.addAll(result);
+		    	}
+		    }
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	    }
 
-	    if (sets != null) {
+	    if (sets.size() > 0) {
 	    	int maxreturns = 0;
 	    	ListIterator iterator = sets.listIterator();
 	    	
-	        if (!iterator.hasNext()) {
-            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-        	}
-        
 			try {
 		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 			} catch (NumberFormatException nfx) {
@@ -1293,25 +1316,47 @@ public class MCROAIDataProvider extends HttpServlet {
         	
             return document;
         }
-        
-	    List sets = null;
+
+        List mappedSets = new ArrayList();
+	    if (set != null) {
+	    	buildMappings();
+	    	if (mappings.containsValue(set[0])) {
+	    		Set keys = mappings.keySet();
+	    		Iterator keyIterator = keys.iterator();
+	    		while (keyIterator.hasNext()) {
+	    			String key = (String) keyIterator.next();
+	    			String value = (String) mappings.get(key);
+	    			if (value.equals(set[0])) {
+	    				String[] mappedSet = new String[1];
+	    				mappedSet[0] = key;
+	    				mappedSets.add(mappedSet);
+	    			}
+	    		}
+	    	}
+	    } else {
+	    	mappedSets.add(set);
+	    }
 	    
+	    List sets = new ArrayList();
 	    try {
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
-		    sets = new ArrayList(query.listRecords(set, from, until, getServletName()));
+		    Iterator mappedSetIterator = mappedSets.iterator();
+		    while (mappedSetIterator.hasNext()) {
+		    	String[] mappedSet = (String[]) mappedSetIterator.next();
+		    	List result = query.listRecords(mappedSet, from, until, getServletName());
+		    	if (result != null) {
+		    		sets.addAll(result);
+		    	}
+		    }
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
 	    }
 
-	    if (sets != null) {
+	    if (sets.size() > 0) {
 	    	int maxreturns = 0;
 	    	ListIterator iterator = sets.listIterator();
 	    	
-	        if (!iterator.hasNext()) {
-            	return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
-        	}
-        
 			try {
 		        maxreturns = config.getInt(STR_OAI_MAXRETURNS);
 			} catch (NumberFormatException nfx) {
@@ -1426,6 +1471,23 @@ public class MCROAIDataProvider extends HttpServlet {
 	 * @return the new header element
 	 */
 	private Element setSpec(Element element, String setSpec, Namespace ns) {
+		buildMappings();
+        if ((setSpec != null) && (setSpec.length() > 0)) {
+    	    StringTokenizer tokenizer = new StringTokenizer(setSpec, " ");
+    	
+	    	while (tokenizer.hasMoreTokens()) {
+	    		String spec = tokenizer.nextToken();
+	    		if ((mappings != null) && mappings.containsKey(spec)) {
+	    			spec = (String) mappings.get(spec);
+	    		}
+	    		element.addContent(newElementWithContent("setSpec", ns, spec));
+	    	}
+    	
+        }
+		return element;
+	}
+	
+	private void buildMappings() {
 		if (mappings == null) {
 	        MCRConfiguration config = 
 	        	MCRConfiguration.instance();
@@ -1449,19 +1511,6 @@ public class MCROAIDataProvider extends HttpServlet {
 				}
 			}
 		}
-        if ((setSpec != null) && (setSpec.length() > 0)) {
-    	    StringTokenizer tokenizer = new StringTokenizer(setSpec, " ");
-    	
-	    	while (tokenizer.hasMoreTokens()) {
-	    		String spec = tokenizer.nextToken();
-	    		if ((mappings != null) && mappings.containsKey(spec)) {
-	    			spec = (String) mappings.get(spec);
-	    		}
-	    		element.addContent(newElementWithContent("setSpec", ns, spec));
-	    	}
-    	
-        }
-		return element;
 	}
 	
 	class TokenFileFilter implements FilenameFilter {
