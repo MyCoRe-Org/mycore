@@ -40,8 +40,10 @@ import java.text.*;
  *
  * <code>
  *   MCR.IFS.AVExtender.<StoreID>.RamGenBaseURL      URL of ramgen mount point
+ *   MCR.IFS.AVExtender.<StoreID>.AsxGenBaseURL      URL of asxgen mount point
  *   MCR.IFS.AVExtender.<StoreID>.ViewSourceBaseURL  URL of view source function
- *   MCR.IFS.AVExtender.<StoreID>.PlayerURL          Download URL for RealOne Player
+ *   MCR.IFS.AVExtender.<StoreID>.RealPlayerURL      Download URL for RealOne Player
+ *   MCR.IFS.AVExtender.<StoreID>.MediaPlayerURL     Download URL for Microsoft Player
  * </code>
  *
  * @author Frank Lützenkirchen
@@ -60,15 +62,10 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
     MCRConfiguration config = MCRConfiguration.instance();  
     String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
       
-    basePlayerStarter = config.getString( prefix + "RamGenBaseURL"     );
-    baseMetadata      = config.getString( prefix + "ViewSourceBaseURL" );
-    playerDownloadURL = config.getString( prefix + "PlayerURL"         ); 
+    baseMetadata = config.getString( prefix + "ViewSourceBaseURL" );
     
     String data = getMetadata( baseMetadata + file.getStorageID() );
     
-    URLConnection con = getConnection( basePlayerStarter + file.getStorageID() );
-    playerStarterCT = con.getContentType();
-
     try
     {
       String sSize      = getBetween( "File Size:</strong>",   "Bytes", data, "0"     );
@@ -111,12 +108,30 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
       
       if( sType.indexOf( "MPEG Layer 3" ) >= 0 )
         contentTypeID = "mp3";
+      else if( sType.indexOf( "MPEG" ) >= 0 )
+        contentTypeID = "mpeg1";
       else if( sType.indexOf( "RealVideo" ) >= 0 )
         contentTypeID = "realvid";
       else if( sType.indexOf( "RealAudio" ) >= 0 )
         contentTypeID = "realaud";
       else if( sType.indexOf( "Wave File" ) >= 0 )
         contentTypeID = "wav";
+      else
+        contentTypeID = file.getContentType().getID();
+      
+      if( " wma wmv asf asx ".indexOf( " " + contentTypeID + " " ) != -1 )
+      {
+        basePlayerStarter = config.getString( prefix + "AsxGenBaseURL"  );
+        playerDownloadURL = config.getString( prefix + "MediaPlayerURL" ); 
+      }
+      else
+      {
+        basePlayerStarter = config.getString( prefix + "RamGenBaseURL" );
+        playerDownloadURL = config.getString( prefix + "RealPlayerURL" ); 
+      }
+      
+      URLConnection con = getConnection( basePlayerStarter + file.getStorageID() );
+      playerStarterCT = con.getContentType();
     }
     catch( Exception exc )
     { 
@@ -143,7 +158,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender
     }
     catch( IOException exc )
     {
-      String msg = "Could not send Real Player starter .ram file";
+      String msg = "Could not send player starter file";
       throw new MCRPersistenceException( msg, exc ); 
     }
   }
