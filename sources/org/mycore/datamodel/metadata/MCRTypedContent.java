@@ -222,6 +222,25 @@ public final boolean addDateElement(GregorianCalendar invalue)
   }
 
 /**
+ * This method add a Date value to this list.
+ *
+ * @param invalue    the value as a GregorianCalendar date
+ * @return false if an error was occured, else return true
+ **/
+public final boolean addDateElement(int intype, String inname, 
+  GregorianCalendar invalue) 
+  {
+  if (invalue==null) { return false; }
+  if (inname==null) { return false; }
+  if (intype!=TYPE_ATTRIBUTE) { return false; }
+  type.add(new Integer(intype));
+  name.add(inname);
+  format.add(new Integer(FORMAT_DATE));
+  value.add(invalue);
+  return true;
+  }
+
+/**
  * This method add a Double value to this list.
  *
  * @param invalue    the value as a double

@@ -295,17 +295,15 @@ public final MCRTypedContent createTypedContent(boolean parasearch)
     throw new MCRException("The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
   if(!parasearch) { return tc; }
-  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag.toUpperCase());
+  tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
   tc.addDoubleElement(number);
   tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"lang",lang);
   if ((type = type.trim()).length() !=0) {
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   if ((dimension = dimension.trim()).length() !=0) {
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"dimension",dimension); }
-/*
   if ((measurement = measurement.trim()).length() !=0) {
     tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"measurement",measurement); }
-*/
   return tc;
   }
 
