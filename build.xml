@@ -44,11 +44,11 @@
     <echo message=""/>
     <echo message=" available targets are:"/>
     <echo message=""/>
-    <echo message="   package  --> generates the classes and docs (default)"/>
+    <echo message="   package  --> generates the classes and javadocs"/>
     <echo message="   compile  --> compiles the source code"/>
-    <echo message="   javadoc  --> generates the API documentation"/>
+    <echo message="   javadocs --> generates the JavaDoc API documentation"/>
     <echo message="   jar      --> creates a jar file containing all MyCoRe classes"/>
-    <echo message="   clean    --> cleans up the directory"/>
+    <echo message="   clean    --> cleans up the directory, removes all generated files"/>
     <echo message=""/>
     <echo message=" See the comments inside the build.xml file for more details."/>
     <echo message="-------------------------------------------------------------"/>
@@ -67,7 +67,7 @@
   <!-- =================================================================== -->
   <!-- Creates the class package                                           -->
   <!-- =================================================================== -->
-  <target name="package" depends="compile,javadoc">
+  <target name="package" depends="compile,javadocs">
   </target>
 
   <!-- =================================================================== -->
@@ -174,30 +174,34 @@
   </target>
 
   <!-- =================================================================== -->
-  <!-- Create the JavaDoc for all source trees                             -->
+  <!-- Create the JavaDocs from sources                                    -->
   <!-- =================================================================== -->
-  <target name="javadoc" depends="init">
-    <!-- create the common java documentation -->
-    <javadoc packagenames="mycore.*"
-           sourcepath="${mycore.source}"
-           destdir="${mycore.javadoc}"
-           verbose="true"
-           package="true"
-           version="true"
-           author="true"
-           doctitle="MyCoRe"
-           >
-      <link href="http://www.mycore.de/library/jdk1.2.2/docs/api/"/>
-      <group title="MyCoRe Common" packages="mycore.common.*"/>
-      <group title="MyCoRe XML" packages="mycore.xml.*"/>
-      <group title="MyCoRe Datamodel" packages="mycore.datamodel.*"/>
-      <group title="MyCoRe SQL" packages="mycore.sql.*"/>
-      <group title="MyCoRe Content Manager 7" packages="mycore.cm7.*"/>
-      <group title="MyCoRe Classification System" packages="mycore.classifications.*"/>
-      <group title="MyCoRe Internal Filesystem (IFS)" packages="mycore.ifs.*"/>
-      <group title="MyCoRe Communication System" packages="mycore.communication.*"/>
-      <group title="MyCoRe User Management" packages="mycore.user.*"/>
-      <group title="MyCoRe Commandline" packages="mycore.commandline.*"/>
+  <target name="javadocs" depends="init">
+    <echo>
+
+      Building the MyCoRe source code JavaDoc documentation...
+
+      NOTE: Under AIX, you have to do the following to make this work:
+      ln -s /usr/java_dev2/lib/tools.jar /usr/java_dev2/jre/lib/ext/tools.jar
+    </echo>
+    <javadoc
+      packagenames = "mycore.*"
+      sourcepath   = "${mycore.source}"
+      destdir      = "${mycore.javadoc}"
+      author       = "true"
+      version      = "true"
+      use          = "true"
+      access       = "package"
+      splitindex   = "true"
+      windowtitle  = "MyCoRe JavaDoc Documentation"
+      doctitle     = "MyCoRe Source Code JavaDoc Documentation"
+    >
+      <group title="MyCoRe Packages" packages="mycore.*"/>
+      <link href="http://www.mycore.de/library/jdk1.2.2/docs/api"/>
+      <link href="http://www-3.ibm.com/software/data/eip/pubs/v7/frnjapr/java"/>
+      <link href="http://www.mycore.de/tomcat/documentation/docs/api"/>
+      <link href="http://www.mycore.de/library/jaxp/docs/api"/>
+      <link href="http://www.jdom.org/docs/apidocs"/>
     </javadoc>
   </target>
 
