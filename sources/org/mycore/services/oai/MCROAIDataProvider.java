@@ -784,8 +784,8 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	String resumptionToken = listToResumptionToken(tokenElements);
-            if (resumptionToken != null) {
+	    	String sResumptionToken = listToResumptionToken(tokenElements);
+            if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
@@ -800,7 +800,7 @@ public class MCROAIDataProvider extends HttpServlet {
        		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             
            		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
-           		eResumptionToken.addContent(resumptionToken);
+           		eResumptionToken.addContent(sResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 	           	eListSets.addContent(eResumptionToken);
 			}
@@ -944,8 +944,8 @@ public class MCROAIDataProvider extends HttpServlet {
             	}
 	    	}
 	    	
-	    	String resumptionToken = listToResumptionToken(tokenElements);
-            if (resumptionToken != null) {
+	    	String sResumptionToken = listToResumptionToken(tokenElements);
+            if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
 				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
@@ -960,7 +960,7 @@ public class MCROAIDataProvider extends HttpServlet {
        		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             
            		String sDate = dateFormat.format(timeoutDate) + "T" + timeFormat.format(timeoutDate) + "Z";
-           		eResumptionToken.addContent(resumptionToken);
+           		eResumptionToken.addContent(sResumptionToken);
 				eResumptionToken.setAttribute("expirationDate", sDate);
 	           	eListIdentifiers.addContent(eResumptionToken);
 			}
