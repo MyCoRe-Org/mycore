@@ -8,24 +8,142 @@ Datenmodellierung relativ schnell und einfach realisiert werden können. MyCoRe g
 
 \begin{figure}[h]
 \begin{center}
-\fbox{\includegraphics[scale=.8]{overview_kern_pic01.jpg}}
+\fbox{\includegraphics[scale=.9]{overview_kern_pic01.jpg}}
 \label{overview_kern_pic01}
 \caption{Grobes Schichtenmodell von MyCoRe}
 \end{center}
 \end{figure}
 
-Auf dem obigen Bild ist dargestellt, wie MyCoRe-Anwendungen innerhalb eines Betreibers und aus der Sicht mehrerer Betreiber angelegt sind. In einer Einrichtung {\bf X} gibt es {\bf einen} MyCoRe-Kern pro Server, auf welchen mehrere Applikationen aufsetzen können. Dabei ist es auch möglich, dass mehrere physische Anwendungen eine gemeinsame logische Anwendung (virtuelle datenbasis) darstellen. Dies ermöglicht gemeinsame Projekte verschiedener Einrichtungen auf der gleichen Basis.
+Auf dem Bild ist dargestellt, wie MyCoRe-Anwendungen innerhalb eines Betreibers
+und aus der Sicht mehrerer Betreiber angelegt sind. In einer Einrichtung {\bf X}
+gibt es {\bf einen} MyCoRe-Kern pro Server, auf welchen mehrere Applikationen 
+aufsetzen können. Dabei ist es auch möglich, dass mehrere physische Anwendungen
+eine gemeinsame logische Anwendung (virtuelle Datenbasis) darstellen. Dies 
+ermöglicht gemeinsame Projekte verschiedener Einrichtungen auf der gleichen 
+Basis.
 
-Nachfolgend werden die Kernkomponenten mit einer Kurzbeschreibung der jeweiligen
-Funktionalit"aten aufgef"uhrt.
+Das MyCoRe-Projekt gliedert sich zum einen in den kern, welcher grundlegende
+Funktionalitäten und ein API bereitstellt und in die darauf aufsetzenden 
+Anwendungen, welche neben einer eigenen Präsentation auch die Kern-Komponenten
+erweitern und/oder umgestalten können. Somit ist gewährleistet, dass MyCoRe
+in vielen Projekten als Datenbasis eingesetzt werden kann. Das nächste Bild 
+zeigt die wesentlichen Hauptkomponenten von MyCoRe und deren 
+Zusammengehörigkeit. In den folgenden Abschnitten sollen dann die Leistungen 
+der einzelnen Projekt-bereiche näher beschrieben werden.
 
-\section{Dokumenten- und Personenmetadaten}
-Das Metadatenmodell gew"ahrleistet die Mehrsprachigkeit aller relevanten Informationen.
-Eine Reihe von Grundtypen f"ur die Metadatenmodellierung sind bereits im Kernsystem
-implementiert.
-Zu den angebotenen Grundtypen geh"oren.....
+\begin{figure}[h]
+\begin{center}
+\fbox{\includegraphics[scale=1.]{overview_kern_pic02.jpg}}
+\label{overview_kern_pic02}
+\caption{Komponentenmodell von MyCoRe}
+\end{center}
+\end{figure}
 
+%
 \section{Hierarchisches Klassifikationssystem}
+Um eine bessere Wiederauffindbarkeit von Informationen, besonders in großen 
+Datenbeständen, zu erreichen, wurden in allen Bereichen der 
+Informationsverarbeitung Klassifikationen eingeführt. Dabei kann es sich um
+sehr allgemeine Klassifikationen, wie die einer Herkunft oder eines Dateiformat-Types oder aber ganz spezeiller eines eng begrenzten Wissenschafts- oder 
+Sachgebietes handeln. In beiden Fällen sollte es jedoch möglich sein, hier
+auch eine Strukturierung der einzelnen Begriffe abbilden zu können.
+
+MyCoRe implementiert ein solches Datenmodell mit folgenden Eigenschaften:
+\begin{itemize}
+\item Abbildung von hierarchischen Strukturen eine Klassifikation.
+\item Eindeutige Identifizierung einer Kategorie über mehrstufige Identifier.
+\item Speicherung der Kategorie-Bezeichner in mehreren Sprachen.
+\item Speicherung von Text-Beschreibungen zu den einzelnen Kategorien.
+\item Jede Klassifikation ist ein XML-File und kann mit den für XML vorhandenen
+Werkzeugen bearbeitet werden. Ein Syntax-Check erfolgt über XSchema.
+\end{itemize}
+
+Auf die im MyCoRe-Projekt gespeicherten Klassifikationen kann von den
+Metadaten aus via einer Referenz aus Klassifikations- und Kategorie-ID 
+zugegriffen werden.
+
+%
+\section{Metadaten und Suche}
+\subsection{Das MyCoRe-Datenmodell}
+Das MyCoRe-Datenmodell soll eine felxible Modellierung von Metadaten bei 
+möglichst geringem Arbeitsaufwand für die Einzelanwendung gestatten. Um dies
+zu realisieren wurden die Ansätze implementiert:
+\begin{enumerate}
+\item Die Notation der Daten erfolgt in XML-Form.
+\item Die eigentlichen Metadaten werden in ein Framework zur Objektverwaltung integriert.
+\item Es erfolgt eine Gestaltung eines Schemas von Typen für die allgemein gültigen und oft gebrauchten Metdaten.
+\end{enumerate}
+
+Ein MyCoRe-Metadaten-Objekt besteht aus den drei Komplexen
+\begin{itemize}
+\item {\bf structure} - hier werden Informationen zur Einordnung des Datensatzes in eine logische Struktur festgehalten. Dies umfasst Verweise zu Eltern- und 
+Kind-Metadaten-Sätzen. Weiterhin werden in dem Abschnitt Referenzen zu den Derivate-metadaten gespeichert. Diese referenzen erlauben den Zugriff auf die 
+eigentlichen multimedialen Objekte.
+\item {\bf metadata} - in diesem Bereich werden die eigentlichen Metadaten 
+gemäß dem Datenmodell abgelegt. Jeder MyCoRe-Metadaten-Typ kann hier als eine 
+Liste von Elementen angegeben werden.
+Jeder Metadaten-Typ hat mindestens folgend Eigenschaften:
+\begin{itemize}
+\item Er hat einen Schalter, ob er parametrisch suchbar sein soll.
+\item Er hat einen Schalter, ob er Volltext suchbar sein soll.
+\item Er hat einen Schalter, ob er vererbt werden darf.
+\item Er hat einen Schalter, ob er selbst erben darf.
+\item Bei jedem Typ kann die zugehörige Sprache spezifiziert werden.
+\item Er hat einen Attribut {\bf 'type'}.
+\end{itemize}
+\item {\bf service} - der letzte Abschnitt enthält Informationen zur Verwaltung des Metadaten-Satzes wie Erstellungsdatum oder Verwaltungs-Flags.
+\end{itemize}
+Sollten die im MyCoRe-Kern angebotenen Datentypen zur Gestaltung eines Projektes
+nicht ausreichen, so besteht die Möglichkeit, innerhalb der Anwendung eigene 
+Typen zu kreieren und diese mit einzubinden. Somit ist MyCoRe auch für
+Nutzungsbereiche offen, von denen die Autoren bisher nicht ausgegangen sind.
+Der Datenmoellierung sind in MyCoRe kaum Grenzen gesetzt.
+
+\subsection{Suche}
+Die Suche in den Metadaten erfolgt über eine extrem vereinfachte Version der 
+XPath Spezifikation des W3C. Es wurden daraus nur Elemente in MyCoRe integriert,
+welche für eine sinnvolle Suche durch die MyCoRe-Anwendungen erforderlich
+sind. Erweiteret wurde die Spezifikation des W3C um die Operatoren {\bf LIKE} 
+und {\bf CONTAINS}, welche besonders im Bereich der Text-Suche zum Einsatz 
+kommen.
+
+Die Nutzung verschiedener Persitence-Layer zur Speicherung der Metadaten 
+macht die oben genannten Einschränkungen erforderlich, da eine Abbildung von
+komplexen Abfragen auf die verwendete Speicherschicht möglichst identisch
+funktionieren soll. Leider gibt es dabei doch Unterschiede in der Qaulität
+der verwendbaren Produkte (IBM Content Manager 8 oder die XML:DB eXist).
+
+Die Resultate einer Anfrage sind die gespeicherten XML-metadaten-Objekte, 
+welche in einem sie umgebenden XML-Container dem fragenden Prozess 
+zurückgeliefert werden. Dies Resultatsliste kann nun zur Datenpräsentation 
+aufbereitet werden.
+
+\subsection{Vererbung}
+
+\begin{figure}[h]
+\begin{center}
+\fbox{\includegraphics[scale=.65]{overview_vererbung_pic01.jpg}}
+\label{overview_vererbung_pic01}
+\caption{Das Vererbungsmodell von MyCoRe}
+\end{center}
+\end{figure}
+
+In einigen Projekten ist es erforderlich, die Strukturierung der zu speichernden
+Objekte mit abzulegen. Eine hierarchische Anordnung der Teilobjekte, z. B. der 
+Kapitel eines Buches, soll zu einem effizienteren Zugriff auf die gewünschten
+Objekte führen. dabei sollen aber alle Metadaten-Informationen möglichst nicht 
+redundant erfasst werden. 
+
+Um dies zu realisieren, wurde in das MyCore-projekt ein Vererbungsmodell 
+integriert, welches eine Verzahnung von Metadaten gleichen Datenmodelltypes
+zuläßt. Dabei können jedem Metadaten-Element Informationen mitgegeben werden,
+ob es von Elementen eines Kind-Objektes geerbt werden kann oder diese von den
+Eltern erben soll. Auf diese Weise lassen sich auch komplexere Strukturen 
+relativ leicht abbilden. Die Informationen über den Strukturzusammenhang 
+einzelner Metadaten-Objekte werden im Frame-Bereich {\bf structure} gespeichert
+und verwaltet.
+
+%
 \section{Internes Dateisystem}
 Viele Systeme ermöglichen nur die Pflege und Bearbeitung von beschreibenden Daten (Metadaten)
 zu Dokumenten und verwalten darüber hinaus nur einen Link auf die eigentlichen Dokumentvolltexte
@@ -58,6 +176,12 @@ gleichzeitig eingesetzt werden können.
 
 \section{Verteilte Suche und Schnittstellen}
 \subsection{Verteilte Suche}
+Wie bereits im Abschnitt Allgemeines erwähnt, ist es möglich, mehrere 
+gleichartige MyCoRe-Anwendungen, z. B. Dokumenten-Server, miteinander
+zu verknüpfen, so dass sie virtuell als Ganzes für den Benutzer erscheinen.
+Die wird u. a. bei unserem MyCoRe-Sample demonstriert. Hier erfolgt eine 
+Verbindung er einzelnen Installationen über eine HTTP-Servlet-Schnittstelle.
+
 \subsection{Schnittstellen zu OAI, Z39.50, Webservices}
 
 \section{Benutzer- und Zugriffsrechteverwaltung}
