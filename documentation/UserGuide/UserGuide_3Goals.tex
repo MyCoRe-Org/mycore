@@ -43,12 +43,13 @@ Für das Datenmodell sind die folgenden Klassifikationen vorgesehen. Alle Label u
 \item {\bf Einger} - enthält eine hierarchiche Liste aller möglichen Eignergruppen eines Dokumentes.
 \end{itemize}
 
-\begin{centering}
+
 {\bf Das Dokument (Document)}  \\[2ex]
 \small
 \bottomcaption{Das Document Datenmodell}
 \tablehead{\hline}
 \tabletail{\hline}
+\begin{center}
 \begin{supertabular}{|p{2cm}|p{4cm}|p{9cm}|}
 \hline
 {\bf Bezeichner} & {\bf Type} & {\bf Beschreibung} \\[1,5ex] \hline
@@ -68,12 +69,14 @@ Keywords & MCRMetaLangText & Schlüsselworte für die Suche, ggf. in mehreren Spra
 Coverage & MCRMetaLangText & Zeitliche und räumliche Erstreckung des Werkes, ggf. in mehreren Sprachen. \\ \hline
 Rights & MCRMetaLangText & Text zu den Rechten eines Werkes, ggf. in mehreren Sprachen.\\ \hline
 \end{supertabular}
-\normalsize
+
+\end{center}\normalsize
 
 \small
 \bottomcaption{Das Document Suchmodell}
 \tablehead{\hline}
 \tabletail{\hline}
+\begin{center}
 \begin{supertabular}{|p{8cm}|p{2cm}|p{2cm}|}
 \hline
 {\bf relativer Pfad} & {\bf PS} & {\bf TS}\\[1,5ex] \hline
@@ -99,13 +102,15 @@ metadata/rights/right & $\surd$ & - \\ \hline
 service/servdates/servdate & $\surd$ & - \\ \hline
 service/servflags/servflag & $\surd$ & - \\ \hline
 \end{supertabular}
-\normalsize
+
+\end{center}\normalsize
 
 {\bf Die Personendaten (LegalEntities)}  \\[2ex]
 \small
 \bottomcaption{Das Personen Datenmodell}
 \tablehead{\hline}
 \tabletail{\hline}
+\begin{center}
 \begin{supertabular}{|p{2cm}|p{4cm}|p{9cm}|}
 \hline
 {\bf Bezeichner} & {\bf Type} & {\bf Beschreibung} \\[1,5ex] \hline
@@ -117,8 +122,10 @@ Phone & MCRMetaLangText & Die Telefonnummern.\\ \hline
 WEB & MCRMetaLangText & Die Web Adressen.\\ \hline
 eMail & MCRMetaLangText & Die eMail Adressen.\\ \hline
 \end{supertabular}
+\end{center}
 \normalsize
 
+\begin{center}
 \small
 \bottomcaption{Das LegalEntity Suchmodell}
 \tablehead{\hline}
@@ -140,7 +147,8 @@ metadata/webs/web & - & - \\ \hline
 service/servdates/servdate & $\surd$ & - \\ \hline
 service/servflags/servflag & $\surd$ & - \\ \hline
 \end{supertabular}
-\end{centering}
+\end{center}
+
 \normalsize
 
 
