@@ -235,16 +235,18 @@ public final void createDataBase(String mcr_type, org.jdom.Document confdoc)
 public final void createInDatastore() throws MCRPersistenceException
   {
   // create data in IFS
-  File f = new File(getDerivate().getInternals().getSourcePath());
-  if ((!f.isDirectory()) && (!f.isFile())) {
-    throw new MCRPersistenceException("The File or Directory on "+
-    getDerivate().getInternals().getSourcePath()+" was not found."); }
-  try {
-    MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
-      mcr_id.getId());
-    //System.out.println(difs.getName());
+  if (getDerivate().getInternals() != null) {
+    File f = new File(getDerivate().getInternals().getSourcePath());
+    if ((!f.isDirectory()) && (!f.isFile())) {
+      throw new MCRPersistenceException("The File or Directory on "+
+      getDerivate().getInternals().getSourcePath()+" was not found."); }
+    try {
+      MCRDirectory difs = MCRFileImportExport.importFiles(f,mcr_id.getId(),
+        mcr_id.getId());
+      getDerivate().getInternals().setIFSID(difs.getID());
+      }
+    catch (Exception e) { e.printStackTrace(); }
     }
-  catch (Exception e) { e.printStackTrace(); }
   // create the derivate
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
@@ -294,8 +296,10 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
       System.out.println(e.getMessage()); }
     }
   // delete data from IFS
-  MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
-  difs.delete();
+  if (getDerivate().getInternals() != null) {
+    MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+    difs.delete();
+    }
   // delete derivate
   mcr_persist.delete(mcr_id);
   }
@@ -342,6 +346,21 @@ public final byte [] receiveXMLFromDatastore(String id)
   }
 
 /**
+ * The methode receive the multimedia object(s) for the given MCRObjectID 
+ * and returned it as MCRDirectory.
+ *
+ * @param id   the object ID
+ * @return the MCRDirectory of the multimedia object 
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final MCRDirectory receiveDirectoryFromIFS(String id) 
+  throws MCRPersistenceException
+  {
+  mcr_id = new MCRObjectID(id);
+  return MCRDirectory.getRootDirectory(mcr_id.getId());
+  }
+
+/**
  * The methode update the object in the data store.
  *
  * @exception MCRPersistenceException if a persistence problem is occured
@@ -365,15 +384,18 @@ public final void updateInDatastore() throws MCRPersistenceException
       System.out.println(e.getMessage()); }
     }
   // update to IFS
-  File f = new File(getDerivate().getInternals().getSourcePath());
-  if ((!f.isDirectory()) && (!f.isFile())) {
-    throw new MCRPersistenceException("The File or Directory on "+
-    getDerivate().getInternals().getSourcePath()+" was not found."); }
-  try {
-    MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
-    MCRFileImportExport.importFiles(f,difs);
+  if (getDerivate().getInternals() != null) {
+    File f = new File(getDerivate().getInternals().getSourcePath());
+    if ((!f.isDirectory()) && (!f.isFile())) {
+      throw new MCRPersistenceException("The File or Directory on "+
+      getDerivate().getInternals().getSourcePath()+" was not found."); }
+    try {
+      MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
+      MCRFileImportExport.importFiles(f,difs);
+      getDerivate().getInternals().setIFSID(difs.getID());
+      }
+    catch (Exception e) { e.printStackTrace(); }
     }
-  catch (Exception e) { e.printStackTrace(); }
   // update the derivate
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");

@@ -217,18 +217,18 @@ public final MCRTypedContent createTypedContent() throws MCRException
  * This method check the validation of the content of this class.
  * The method returns <em>true</em> if<br>
  * <ul>
- * <li>the number of linkmeta is 0</li>
- * <li>the XLink type of linkmeta is not "arc"</li>
+ * <li>the linkmeta exist and the XLink type of linkmeta is not "arc"</li>
  * </ul>
  *
  * @return a boolean value
  **/
 public final boolean isValid()
   {
-  if (linkmetas.size() == 0) { return false; }
-  for (int i=0;i<linkmetas.size();i++) {
-    if (!((MCRMetaLinkID)linkmetas.get(i)).getXLinkType().equals("locator")) {
-      return false; }
+  if (linkmetas.size() != 0) { 
+    for (int i=0;i<linkmetas.size();i++) {
+      if (!((MCRMetaLinkID)linkmetas.get(i)).getXLinkType().equals("locator")) {
+        return false; }
+      }
     }
   return true;
   }

@@ -46,6 +46,7 @@ final public class MCRMetaIFS extends MCRMetaDefault
 // MCRMetaIFS data
 private String sourcepath;
 private String maindoc;
+private String ifsid;
 
 /**
  * This is the constructor. <br>
@@ -57,6 +58,7 @@ public MCRMetaIFS()
   super();
   sourcepath = "";
   maindoc = "";
+  ifsid = "";
   }
 
 /**
@@ -81,6 +83,7 @@ public MCRMetaIFS(String set_datapart, String set_subtag,
   super(set_datapart,set_subtag,"en","");
   setSourcePath(set_sourcepath);
   maindoc = "";
+  ifsid = "";
   }
 
 /**
@@ -98,6 +101,14 @@ public final String getSourcePath()
  **/
 public final String getMainDoc()
   { return maindoc; }
+ 
+/**
+ * The method return the derivate IFS ID.
+ *
+ * @return the IFS ID.
+ **/
+public final String getIFSID()
+  { return ifsid; }
  
 /**
  * This method set the value of derivate source path.
@@ -125,6 +136,16 @@ public final void setMainDoc(String set_maindoc)
   }
 
 /**
+ * This method set the value of derivate IFS ID.
+ *
+ * @param set_maindoc the derivate IFS ID
+ **/
+public final void setIFSID(String set_ifsid)
+  {
+  if (set_ifsid==null) { ifsid=""; } else { ifsid=set_ifsid; }
+  }
+
+/**
  * This method read the XML input stream part from a DOM part for the
  * metadata of the document.
  *
@@ -137,6 +158,7 @@ public final void setFromDOM(org.jdom.Element element)
   super.setFromDOM(element);
   setSourcePath(element.getAttributeValue("sourcepath"));
   setMainDoc(element.getAttributeValue("maindoc"));
+  setIFSID(element.getAttributeValue("ifsid"));
   }
 
 /**
@@ -154,6 +176,7 @@ public final org.jdom.Element createXML() throws MCRException
   org.jdom.Element elm = new org.jdom.Element(subtag);
   elm.setAttribute("sourcepath",sourcepath); 
   elm.setAttribute("maindoc",maindoc); 
+  elm.setAttribute("ifsid",ifsid); 
   return elm;
   }
 
@@ -210,6 +233,7 @@ public final void debug()
   super.debug();
   System.out.println("IFS Source Path   = "+sourcepath);
   System.out.println("IFS Main Document = "+maindoc);
+  System.out.println("IFS ID            = "+ifsid);
   System.out.println("MCRMetaClassification debug end"+NL);
   }
 
