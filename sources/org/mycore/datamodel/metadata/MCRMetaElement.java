@@ -444,10 +444,12 @@ public final MCRTypedContent createTypedContent() throws MCRException
   if (!isValid()) {
     throw new MCRException("MCRMetaElement : The content is not valid."); }
   MCRTypedContent tc = new MCRTypedContent();
-  tc.addTagElement(tc.TYPE_TAG,tag);
-  for (int i=0;i<list.size();i++) {
-    tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
-      .createTypedContent(parasearch,textsearch)); }
+  if (parasearch) { 
+    tc.addTagElement(tc.TYPE_TAG,tag);
+    for (int i=0;i<list.size();i++) {
+      tc.addMCRTypedContent(((MCRMetaInterface)list.get(i))
+        .createTypedContent(parasearch,textsearch)); }
+    }
   return tc;
   }
 
