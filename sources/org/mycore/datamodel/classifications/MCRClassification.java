@@ -251,15 +251,15 @@ public class MCRClassification
     {
     org.jdom.Element elm = new org.jdom.Element("mycoreclass");
     org.jdom.Document doc = new org.jdom.Document(elm);
-    elm.setAttribute("ID",ID);
-//    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
-//      MCRObject.XSI_URL));
+    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
+      MCRObject.XSI_URL));
     String SLASH = System.getProperty("file.separator");
     MCRConfiguration mcr_conf = MCRConfiguration.instance();
-    String mcr_schema_path = mcr_conf.getString("MCR.root_path")+SLASH+"schema"
+    String mcr_schema_path = mcr_conf.getString("MCR.appl_path")+SLASH+"schema"
       +SLASH+"MCRClassification.xsd";
-//    elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
-//      org.jdom.Namespace.getNamespace("xsi",MCRObject.XSI_URL));
+    elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
+      org.jdom.Namespace.getNamespace("xsi",MCRObject.XSI_URL));
+    elm.setAttribute("ID",ID);
     try {
       cl = MCRClassificationItem.getClassificationItem(ID); }
     catch (Exception e) { return doc; }
