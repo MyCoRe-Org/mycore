@@ -128,6 +128,7 @@ public class MCRCStoreContentManager8
 		storeTempType = "none";
 		if (TIEREF_TABLE == null) {
 			//TIEREF_TABLE=MCRSQLConnection.justGetSingleValue(new MCRSQLStatement(TIEINDEX_TABLE).setCondition("COLNAME","TIEREF").toSelectStatement("TABSCHEMA"));
+			logger.debug("Getting TIEREF Table name...");
 			MCRSQLRowReader row =
 				MCRSQLConnection.justDoQuery(
 					new MCRSQLStatement(TIEINDEX_TABLE)
@@ -672,6 +673,9 @@ public class MCRCStoreContentManager8
 					prohibited = true;
 					required = false;
 					i++;
+					while (tmp.charAt(i)== ' ')
+					//removes spaces in front of negative clauses
+						i++;
 				}
 				begin = i;
 				if (tmp.charAt(i) == '\'') {
