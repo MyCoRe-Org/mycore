@@ -38,7 +38,8 @@ public interface MCRParserInterface
 {
 
 /**
- * This method parse the XML file from a URI and returns a DOM.
+ * Parses an XML file from a URI and returns it as DOM.
+ * Use the validation value from mycore.properties.
  *
  * @param uri			the URI of the XML stream
  * @exception MCRException      general Exception of MyCoRe
@@ -46,14 +47,58 @@ public interface MCRParserInterface
  **/
 public Document parseURI(String uri) throws MCRException; 
 
+ /**
+  * Parses an XML file from a URI and returns it as DOM.
+  * Use the given validation flag.
+  *
+  * @param uri           the URI of the XML file
+  * @param valid         the validation flag
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+public Document parseURI(String uri, boolean valid) throws MCRException;
+
 /**
- * This method parse the XML data stream and returns a DOM.
+ * Parses an XML String and returns it as DOM.
+ * Use the validation value from mycore.properties.
  *
  * @param xml			the XML data stream
  * @exception MCRException      general Exception of MyCoRe
  * @return			a document object (DOM)
  **/
 public Document parseXML(String xml) throws MCRException;
+
+/**
+ * Parses an XML String and returns it as DOM.
+ * Use the given validation flag.
+ *
+ * @param xml           the XML String to be parsed
+ * @param valid         the validation flag
+ * @throws MCRException if XML could not be parsed
+ * @return              the XML file as a DOM object
+ **/
+public Document parseXML( String xml, boolean valid ) throws MCRException;
+
+/**
+ * Parses an Byte Array and returns it as DOM.
+ * Use the validation value from mycore.properties.
+ *
+ * @param xml           the XML Byte Array to be parsed
+ * @throws MCRException if XML could not be parsed
+ * @return              the XML file as a DOM object
+ **/
+public Document parseXML( byte [] xml ) throws MCRException;
+
+/**
+ * Parses an Byte Array and returns it as DOM.
+ * Use the given validation flag.
+ *
+ * @param xml           the XML Byte Array to be parsed
+ * @param valid         the validation flag
+ * @throws MCRException if XML could not be parsed
+ * @return              the XML file as a DOM object
+ **/
+public Document parseXML( byte [] xml, boolean valid ) throws MCRException;
 
 }
 

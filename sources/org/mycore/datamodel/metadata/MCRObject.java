@@ -213,7 +213,7 @@ public final void setFromXML(byte [] xml, boolean valid) throws MCRException
   {
   try {
     org.jdom.input.DOMBuilder bulli = new org.jdom.input.DOMBuilder(false);
-    jdom_document = bulli.build(new ByteArrayInputStream(xml));
+    jdom_document = bulli.build(MCRXMLHelper.parseXML(xml,false));
     }
   catch (Exception e) {
     throw new MCRException(e.getMessage()); }

@@ -44,7 +44,7 @@ import mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  **/
-public class MCRParserXerces14 implements MCRParserInterface, ErrorHandler
+public class MCRParserXerces implements MCRParserInterface, ErrorHandler
 {
 
 // the Xerces parser
@@ -71,15 +71,14 @@ private static String setdeferreddom         =
 private boolean parse_error = false;
 
 /**
- * Constructor for the xerces parser 1.4.x.
+ * Constructor for the xerces parser.
  * Here was the configuration set for the XERCES parser.
  **/
-public MCRParserXerces14()
+public MCRParserXerces()
   {
   flagvalidation = MCRConfiguration.instance()
     .getBoolean("MCR.parser_schema_validation",flagvalidation);
   try {
-    parser.setFeature(setvalidation,flagvalidation);
     parser.setFeature(setnamespaces,flagnamespaces);
     parser.setFeature(setschemasupport,flagschemasupport);
     parser.setFeature(setschemafullsupport,flagschemafullsupport);
@@ -95,16 +94,40 @@ public MCRParserXerces14()
 /**
  * This metode parse the XML stream from an URI with XERCES parser and 
  * returns a DOM.
+ * Use the validation value from mycore.properties.
  *
  * @param uri			the URI of the XML input stream
+ * @throws MCRException if XML could not be parsed
  * @return			the parsed XML straem as a DOM
  **/
 public Document parseURI(String uri) throws MCRException
   {
   try {
+    parser.setFeature(setvalidation,flagvalidation);
     parser.parse(uri);
-    if (parse_error) {
-      throw new MCRException(""); }
+    if (parse_error) { throw new MCRException(""); }
+    return parser.getDocument();
+    }
+  catch (Exception e) {
+    throw new MCRException("Parse error in XRECES parser.",e); }
+  }
+
+/**
+ * This metode parse the XML stream from an URI with XERCES parser and 
+ * returns a DOM.
+ * Use the given validation flag.
+ *
+ * @param uri			the URI of the XML input stream
+ * @param valid                 the validation flag
+ * @throws MCRException if XML could not be parsed
+ * @return			the parsed XML straem as a DOM
+ **/
+public Document parseURI(String uri, boolean valid) throws MCRException
+  {
+  try {
+    parser.setFeature(setvalidation,valid);
+    parser.parse(uri);
+    if (parse_error) { throw new MCRException(""); }
     return parser.getDocument();
     }
   catch (Exception e) {
@@ -114,22 +137,72 @@ public Document parseURI(String uri) throws MCRException
 /**
  * This metode parse the XML data stream with xerces parser and 
  * returns a DOM.
+ * Use the validation value from mycore.properties.
  *
  * @param xml			the XML input stream
+ * @throws MCRException if XML could not be parsed
  * @return			the parsed XML straem as a DOM
  **/
 public Document parseXML(String xml) throws MCRException
   {
   try {
     InputSource source = new InputSource((Reader)new StringReader(xml));
+    parser.setFeature(setvalidation,flagvalidation);
     parser.parse(source);
-    if (parse_error) {
-      throw new MCRException(""); }
+    if (parse_error) { throw new MCRException(""); }
     return parser.getDocument();
     }
   catch (Exception e) {
     throw new MCRException("Parse error in XRECES parser.",e); }
   }
+
+/**
+ * This metode parse the XML data stream with xerces parser and 
+ * returns a DOM.
+ * Use the given validation flag.
+ *
+ * @param xml			the XML input stream
+ * @param valid                 the validation flag
+ * @throws MCRException if XML could not be parsed
+ * @return			the parsed XML straem as a DOM
+ **/
+public Document parseXML(String xml, boolean valid) throws MCRException
+  {
+  try {
+    InputSource source = new InputSource((Reader)new StringReader(xml));
+    parser.setFeature(setvalidation,valid);
+    parser.parse(source);
+    if (parse_error) { throw new MCRException(""); }
+    return parser.getDocument();
+    }
+  catch (Exception e) {
+    throw new MCRException("Parse error in XRECES parser.",e); }
+  }
+
+/**
+ * This metode parse the XML data stream with xerces parser and 
+ * returns a DOM.
+ * Use the validation value from mycore.properties.
+ *
+ * @param xml			the XML input stream
+ * @throws MCRException if XML could not be parsed
+ * @return			the parsed XML straem as a DOM
+ **/
+public Document parseXML(byte [] xml) throws MCRException
+  { return parseXML(new String(xml)); }
+
+/**
+ * This metode parse the XML data stream with xerces parser and 
+ * returns a DOM.
+ * Use the given validation flag.
+ *
+ * @param xml			the XML input stream
+ * @param valid                 the validation flag
+ * @throws MCRException if XML could not be parsed
+ * @return			the parsed XML straem as a DOM
+ **/
+public Document parseXML(byte [] xml, boolean valid) throws MCRException
+  { return parseXML(new String(xml), valid); }
 
 /**
  * The error handler methode warning.

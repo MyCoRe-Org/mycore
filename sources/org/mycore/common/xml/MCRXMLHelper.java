@@ -57,6 +57,7 @@ public class MCRXMLHelper
 
  /**
   * Parses an XML file from a URI and returns it as DOM.
+  * Use the validation value from mycore.properties.
   *
   * @param uri           the URI of the XML file
   * @throws MCRException if XML could not be parsed
@@ -66,7 +67,21 @@ public class MCRXMLHelper
   { return getParser().parseURI( uri ); }
 
  /**
+  * Parses an XML file from a URI and returns it as DOM.
+  * Use the given validation flag.
+  *
+  * @param uri           the URI of the XML file
+  * @param valid         the validation flag
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseURI( String uri, boolean valid ) 
+    throws MCRException
+  { return getParser().parseURI( uri, valid ); }
+
+ /**
   * Parses an XML String and returns it as DOM.
+  * Use the validation value from mycore.properties.
   *
   * @param xml           the XML String to be parsed
   * @throws MCRException if XML could not be parsed
@@ -74,6 +89,43 @@ public class MCRXMLHelper
   **/
   public static Document parseXML( String xml ) throws MCRException
   { return getParser().parseXML( xml ); }
+
+ /**
+  * Parses an XML String and returns it as DOM.
+  * Use the given validation flag.
+  *
+  * @param xml           the XML String to be parsed
+  * @param valid         the validation flag
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseXML( String xml, boolean valid ) 
+    throws MCRException
+  { return getParser().parseXML( xml, valid ); }
+
+ /**
+  * Parses an Byte Array and returns it as DOM.
+  * Use the validation value from mycore.properties.
+  *
+  * @param xml           the XML Byte Array to be parsed
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseXML( byte [] xml ) throws MCRException
+  { return getParser().parseXML( xml ); }
+
+ /**
+  * Parses an Byte Array and returns it as DOM.
+  * Use the given validation flag.
+  *
+  * @param xml           the XML Byte Array to be parsed
+  * @param valid         the validation flag
+  * @throws MCRException if XML could not be parsed
+  * @return              the XML file as a DOM object
+  **/
+  public static Document parseXML( byte [] xml, boolean valid ) 
+    throws MCRException
+  { return getParser().parseXML( xml, valid ); }
 
   /**
    * This method prints out a node. It is meant only for debugging purposes
