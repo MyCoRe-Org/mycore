@@ -148,11 +148,13 @@ public class MCRSQLConnection
     throws MCRPersistenceException
   {
     MCRArgumentChecker.ensureNotEmpty( statement, "statement" );
-    
     try
     { connection.createStatement().executeUpdate( statement ); }
-    catch( Exception ex )
+    catch( SQLException ex )
     { 
+      Logger logger = MCRSQLConnectionPool.getLogger();
+      logger.info("MCRSQLConnection doUpdate: " + statement);
+      logger.error(ex.getMessage());
       throw new MCRPersistenceException 
       ( "Error while executing SQL update statement: " + statement, ex ); 
     }
@@ -168,6 +170,7 @@ public class MCRSQLConnection
   public String getSingleValue( String query )
     throws MCRPersistenceException
   {
+//    System.out.println(query);  
     MCRSQLRowReader r = doQuery( query );
     return ( r.next() ? r.getString( 1 ) : null );
   }
