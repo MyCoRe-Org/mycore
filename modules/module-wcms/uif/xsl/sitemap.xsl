@@ -3,7 +3,7 @@
 	<xsl:variable name="PageTitle">
 		<xsl:value-of select="'Sitemap'"/>
 	</xsl:variable>
-	<xsl:include href="MyCoReLayout.xsl" />
+	<xsl:include href="MyCoReLayout-de.xsl" />
 	
 	<!-- ================================================================================= -->
 	<xsl:template match="sitemap">
