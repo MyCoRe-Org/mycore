@@ -24,27 +24,49 @@
 
 package org.mycore.common.xml;
 
-import org.mycore.common.*;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
+import java.util.Enumeration;
+import java.util.Properties;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUtils;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRUtils;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML 
@@ -171,6 +193,7 @@ public class MCRLayoutServlet extends MCRServlet
   	HttpServletResponse response = job.getResponse();
     Source sourceXML = null;   
     String docType   = null;
+    boolean errorPage= false; 
     
     if( request.getAttribute( JDOM_ATTR ) != null )
     {
@@ -182,6 +205,11 @@ public class MCRLayoutServlet extends MCRServlet
         docType = jdom.getDocType().getElementName();
       else
         docType = jdom.getRootElement().getName();
+      //errorpage is delivered as JDOM-Document - always
+      //check if it's a errorpage to suppress later generating a error
+      //page if there's a error in the errorpage stylesheet
+      if (jdom.getRootElement().getName().equals("mcr_error"))
+      	errorPage=true; 
     }
     else if( request.getAttribute( DOM_ATTR ) != null )
     {
@@ -245,7 +273,10 @@ public class MCRLayoutServlet extends MCRServlet
         catch( IOException ex ) 
         {	logger.error("IO Error while XSL transforming XML Document", ex ); }
         catch( MCRException ex){
-        	generateErrorPage(request,
+        	if (errorPage)
+        		throw new MCRException("Error while genrating error page!",ex);
+        	else
+        		generateErrorPage(request,
         	                           response,
         	                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
         	                           ex.getMessage(),
