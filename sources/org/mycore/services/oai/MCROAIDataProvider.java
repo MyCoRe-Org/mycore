@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCROAIDataProvider.java,v $
- * $Revision: 1.22 $ $Date: 2003/01/31 12:24:25 $
+ * $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
@@ -69,7 +69,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Werner Gresshoff
  *
- * @version $Revision: 1.22 $ $Date: 2003/01/31 12:24:25 $
+ * @version $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  **/
 public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
@@ -728,8 +728,7 @@ public class MCROAIDataProvider extends HttpServlet {
         	String classificationIdentifier = config.getString(STR_OAI_SETSCHEME + "." + getServletName());
     	    logger.debug("Suche in Klassifikation: " + classificationIdentifier);
         
-		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
-		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		    sets = new ArrayList(query.listSets(classificationIdentifier));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
@@ -872,8 +871,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    List sets = null;
 	    
 	    try {
-		    String queryImplementation = config.getString(STR_OAI_QUERYSERVICE);
-		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(queryImplementation);
+		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
 		    sets = new ArrayList(query.listIdentifiers(set, from, until, getServletName()));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
