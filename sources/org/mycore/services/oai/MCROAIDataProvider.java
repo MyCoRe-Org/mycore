@@ -564,8 +564,7 @@ public class MCROAIDataProvider extends HttpServlet {
         eRequest.setAttribute("verb", "Identify");
         Element eIdentify = new Element("Identify", ns);
         eIdentify.addContent(newElementWithContent("repositoryName", ns, repositoryName));
-        eIdentify.addContent(newElementWithContent("baseURL", ns, 
-            URLEncoder.encode(HttpUtils.getRequestURL(request).toString())));
+        eIdentify.addContent(newElementWithContent("baseURL", ns, HttpUtils.getRequestURL(request).toString()));
         eIdentify.addContent(newElementWithContent("protocolVersion", ns, STR_OAI_VERSION));
         String adminEmail = MCRConfiguration.instance().getString(STR_OAI_ADMIN_EMAIL);
         eIdentify.addContent(newElementWithContent("adminEmail", ns, adminEmail));
