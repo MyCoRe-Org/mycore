@@ -38,7 +38,9 @@ import org.mycore.frontend.editor.*;
 /**
  * This class is a simple basic mailer class for mycore.
  *
- * @author marc schluepmann
+ * @author Marc Schluepmann
+ * @author Frank Lützenkirchen
+ *
  * @version $Revision$ $Date$
  **/
 public class MCRMailer {
@@ -85,15 +87,43 @@ public class MCRMailer {
      * @param body the textbody of the email
      * @throws Exception something dangerous occored
      **/ 
-    protected void send( String sender, String recipient, String subject, String body ) throws Exception {
-	MimeMessage msg = new MimeMessage( getSession() );
-	msg.setFrom( new InternetAddress( sender ) );
-	msg.addRecipient( Message.RecipientType.TO,
-			  new InternetAddress( recipient )
-			  );
-	msg.setSubject( subject );
-	msg.setSentDate( new Date() );
-	msg.setText( body );
-	send( msg );
+    public void send( String sender, String recipient, String subject, String body ) throws Exception {
+        Vector recipients = new Vector();
+        recipients.addElement( recipient );
+	send( sender, recipients, subject, body, false );
+    }
+
+    /**
+     * This method sends a simple plaintext email to more than one recipient.
+     * If flag BCC is true, the sender will also get the email as BCC recipient.
+     *
+     * @param sender the sender of the email
+     * @param recipients the recipients of the email as a Vector of Strings
+     * @param subject the subject of the email
+     * @param body the textbody of the email
+     * @param bcc if true, sender will also get a copy as cc recipient
+     * @throws Exception something dangerous occored
+     **/
+     public void send( String sender, Vector recipients, String subject, String body, boolean bcc )
+      throws Exception
+    {
+        MimeMessage msg = new MimeMessage( getSession() );
+        msg.setFrom( new InternetAddress( sender ) );
+
+        for( int i = 0; i < recipients.size(); i++ )
+        {
+          String recipient = (String)( recipients.elementAt( i ) );
+          msg.addRecipient( Message.RecipientType.TO, new InternetAddress( recipient ) );
+        }
+        if( bcc ) 
+        {
+          msg.addRecipient( Message.RecipientType.BCC, new InternetAddress( sender ) );
+        }
+
+        msg.setSubject( subject );
+        msg.setSentDate( new Date() );
+        msg.setText( body );
+
+        send( msg );
     }
 }
