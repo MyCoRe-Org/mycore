@@ -94,7 +94,7 @@ class MCREditorResolver
   protected static Element readFromWebapp( String uri )
   {
     String path = uri.substring( uri.indexOf( ":" ) + 1 );
-    MCREditorServlet.logger.info( "Editor reading xml from webapp " + path );
+    MCREditorServlet.logger.debug( "Editor reading xml from webapp " + path );
     uri = "file://" + context.getRealPath( path );
     return readFromFile( uri );
   }
