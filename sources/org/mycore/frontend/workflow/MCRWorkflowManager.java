@@ -49,6 +49,8 @@ import org.mycore.frontend.cli.*;
 
 public class MCRWorkflowManager
 {
+/** New line */
+static String NL = System.getProperty("file.separator");
 
 /** The link table manager singleton */
 protected static MCRWorkflowManager singleton;
@@ -331,6 +333,86 @@ public final boolean commitMetadataObject(String type, String ID)
       }
     }
   return true;
+  }
+
+/**
+ * The method create a new MCRDerivate and store them to the directory
+ * of the workflow that correspons with the type of the given object
+ * MCRObjectID with the name of itseslf. Also ti create a ne directory 
+ * with the same new name. This new derivate ID was returned.
+ *
+ * @param objmcrid the MCRObjectID of the related object
+ * @return the MCRObjectID of the derivate
+ **/
+public String createDerivate(String objmcrid)
+  {
+  // prepare the derivate MCRObjectID
+  MCRObjectID ID = new MCRObjectID(objmcrid);
+  String myproject = ID.getProjectId() + "_derivate";
+  MCRObjectID dmcridnext = new MCRObjectID();
+  dmcridnext.setNextFreeId(myproject);
+  String workdir = getDirectoryPath(ID.getTypeId());
+  File workf = new File(workdir);
+  if (workf.isDirectory()) {
+    String [] list = workf.list();
+    for (int i=0;i<list.length;i++) {
+      if (!list[i].startsWith(myproject)) continue;
+      if (!list[i].endsWith(".xml")) continue;
+      try {
+        MCRObjectID dmcriddir = new MCRObjectID(list[i].substring(0,list[i].length()-4));
+        if (dmcridnext.getNumberAsInteger() <= dmcriddir.getNumberAsInteger()) {
+          dmcriddir.setNumber(dmcriddir.getNumberAsInteger()+1);
+          dmcridnext = dmcriddir;
+          }
+        }
+      catch (Exception e) { }
+      }
+    }
+  MCRObjectID DD = dmcridnext;
+  logger.debug("New derivate ID "+DD.getId());
+
+  // create a new directory
+  String dirname = workdir+NL+DD.getId();
+  File dir = new File(dirname);
+  dir.mkdir();
+  logger.debug("Directory "+dirname+" created.");
+
+  // build the derivate XML file
+  MCRDerivate der = new MCRDerivate();
+  der.setId(DD);
+  der.setLabel("Dataobject from "+ID.getId());
+  der.setSchema("datamodel-derivate.xsd");
+  MCRMetaLinkID link = new MCRMetaLinkID("linkmetas","linkmeta","de",0);
+  link.setReference(ID.getId(),"","");
+  der.getDerivate().setLinkMeta(link);
+  MCRMetaIFS internal = new MCRMetaIFS("internals","internal","de",
+    DD.getId());
+  internal.setMainDoc("#####");
+  der.getDerivate().setInternals(internal);
+  MCRObject obj = new MCRObject();
+  try {
+    obj.setFromURI(workdir+NL+ID.getId()+".xml");
+    MCRObjectService serv = obj.getService();
+    der.setService(serv);
+    }
+  catch (Exception e) {
+    logger.error("Read error of "+workdir+NL+ID.getId()+".xml"); }
+  byte [] outxml = MCRUtils.getByteArray(der.createXML());
+
+  // Save the prepared MCRDerivate to a file
+  String fullname = workdir+NL+DD.getId()+".xml";
+  try {
+    FileOutputStream out = new FileOutputStream(fullname);
+    out.write(outxml);
+    out.flush();
+    }
+  catch (IOException ex) {
+    logger.error( ex.getMessage() );
+    logger.error( "Exception while store to file " + fullname );
+    return "";
+    }
+  logger.info( "Derivate "+DD.getId()+" stored under "+fullname+"." );
+  return DD.getId();
   }
 
 }
