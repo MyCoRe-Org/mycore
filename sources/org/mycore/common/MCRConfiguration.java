@@ -283,9 +283,22 @@ public class MCRConfiguration
     Object o;
     try
     { o = cl.newInstance(); }
-    catch( Exception ex )
-    { throw new MCRConfigurationException( "Could not instantiate class " + classname, ex ); }
-    
+    catch( Throwable t )
+    { 
+      String msg = "Could not instantiate class " + classname;
+      if( t instanceof ExceptionInInitializerError )
+      {
+        Throwable t2 = ((ExceptionInInitializerError)t).getException();
+        if( t2 instanceof Exception )
+          throw new MCRConfigurationException( msg, (Exception)t2 );
+        else
+          throw new MCRConfigurationException( msg + ": " + t2.getClass().getName() + " - " + t2.getMessage() );
+      }
+      else if( t instanceof Exception )
+        throw new MCRConfigurationException( msg, (Exception)t ); 
+      else
+        throw new MCRConfigurationException( msg );
+    }    
     return o;
   }
 
