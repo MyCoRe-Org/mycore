@@ -62,7 +62,7 @@ public class MCRSession implements Cloneable
    * of the property variable named 'MCR.users_guestuser_username'.
    **/
   public MCRSession()
-  { 
+  {
     MCRConfiguration config = MCRConfiguration.instance();
     userID = config.getString("MCR.users_guestuser_username","gast");
     language = config.getString("MCR.metadata_default_lang","de").toUpperCase();
@@ -85,7 +85,7 @@ public class MCRSession implements Cloneable
     String ip = "127.0.0.1";
     try{ ip = java.net.InetAddress.getLocalHost().getHostAddress(); }
     catch( java.net.UnknownHostException ignored ){}
-      
+
     java.util.StringTokenizer st = new java.util.StringTokenizer( ip, "." );
 
     long sum = Integer.parseInt( st.nextToken() );
@@ -97,9 +97,9 @@ public class MCRSession implements Cloneable
     String prefix = address.substring( address.length() - 6 );
 
     long now = System.currentTimeMillis();
-    String suffix = Long.toString( now, 36 );    
+    String suffix = Long.toString( now, 36 );
 
-    return prefix + "-" + suffix;    
+    return prefix + "-" + suffix;
   }
 
   /**
@@ -108,37 +108,9 @@ public class MCRSession implements Cloneable
   public String getID()
   { return sessionID; }
 
-  /**
-   * Implement a deep copy of instances of this class
-   * @return MCRSession deep copy
-   */
-  public final Object clone()
-  {
-    try {
-      return super.clone();
-    }
-    catch (CloneNotSupportedException e) {       // This should never happen
-      throw new InternalError(e.toString());
-    }
-  }
-
   /** returns the current user ID */
   public final String getCurrentUserID()
   { return userID.trim(); }
-
-  /** returns the current user object */
-
-  //public final MCRUser getCurrentUser() throws MCRException
-  //{
-  //  try {
-  //    if (userID != null)
-  //      return MCRUserMgr.instance().retrieveUser(userID.trim());
-  //    else return null;
-  //  }
-  //  catch(Exception ex) {
-  //    throw new MCRException("Error in MCRSession!", ex);
-  //  }
-  //}
 
   /** sets the current user ID */
   public final void setCurrentUserID(String userID)

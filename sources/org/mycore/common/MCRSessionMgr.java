@@ -29,8 +29,8 @@ package org.mycore.common;
  * every Thread is guaranteed to get a unique instance of MCRSession. Care must be taken
  * when using an environment utilizing a Thread pool, such as many Servlet engines. In this
  * case it is possible for the session object to stay attached to a thread where it should
- * not be. Use the {@link #resetSession()} method to reset the session object for a Thread
- * to its default values.
+ * not be. Use the {@link #releaseCurrentSession()} method to reset the session object for a
+ * Thread to its default values.
  *
  * The basic idea for the implementation of this class is taken from an apache project,
  * namely the class org.apache.common.latka.LatkaProperties.java written by Morgan Delagrange.
@@ -79,10 +79,9 @@ public class MCRSessionMgr
   }
 
   /**
-   * Releases the MyCoRe session from its current thread. 
-   * Subsequent calls of getCurrentSession() will return a different MCRSession object
-   * than before for the current Thread.
-   * One use for this method is to reset the session inside
+   * Releases the MyCoRe session from its current thread. Subsequent calls of
+   * getCurrentSession() will return a different MCRSession object than before for
+   * the current Thread. One use for this method is to reset the session inside
    * a Thread-pooling environment like Servlet engines.
    */
   public static void releaseCurrentSession() {
