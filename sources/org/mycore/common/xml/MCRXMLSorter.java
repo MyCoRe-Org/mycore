@@ -23,6 +23,7 @@
  **/
 package org.mycore.common.xml;
 
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -285,7 +286,7 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
 		      .append("<!-- This file is machine generated and can be safely removed -->\n\n")
 			  .append("<xsl:stylesheet version=\"1.0\"\n")
 			  .append("     xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n")
-			  .append("     xmlns:xlink=\"").append(MCRObject.XLINK_URL).append("\">\n\n")
+			  .append("     xmlns:xlink=\"").append(MCRDefaults.XLINK_URL).append("\">\n\n")
 			  .append("<xsl:output\n method=\"xml\"/>\n\n")
 			  .append("<xsl:template match=\"/mcr_results\">\n\n")
 			  .append("<xsl:element name=\"mcr_results\">\n\n")
