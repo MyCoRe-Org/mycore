@@ -1,1 +1,63 @@
-macht Detlev.
+Das MyCoRe-Projekt verwendet f"ur die Speicherung der Objekte (multimediale
+Daten, Metadaten, Benutzerinformationen usw.) sowie f"ur die Suche in
+Texten Software von Dritten.
+Dabei werden zwei grundlegend verschiedene Ans"atze unterst"utzt, und zwar
+die Verwendung der kommerziellen Software 'Content Manager' der Firma IBM
+sowie die Verwendung ausschliesslich frei verf"ugbarer Software.
+Jeder Ansatz hat seine eigenen Vor- und Nachteile, die an dieser Stelle
+aber nicht diskutiert werden sollen.
+Vielmehr wollen wir es dem Anwender "uberlassen, in welchem System er 
+f"ur seine Anwendung die gr"o"sten Vorteile sieht. 
+Bei der Entscheidung wird sicherlich die Ber"ucksichtigung des bereits 
+bestehenden IT-Umfelds eine grosse Rolle spielen. 
+Nachfolgend finden Sie eine Tabelle der wesentlichen eingesetzten Softwarekomponenten 
+entsprechend des gewählten Ansatzes.
+\small
+\bottomcaption{"Ubersicht der MyCoRe Softwarekomponenten}
+\tablehead{\hline}
+\tabletail{\hline}
+\begin{supertabular}{|p{2cm}|p{6cm}|p{6cm}|}
+\hline
+ & {\bf IBM CM Basis} & {\bf freie Software} \\[1,5ex] \hline
+Metadaten Store 
+ & IBM CM 8.2 - parametrische und Volltextsuch mittels XPath Abfragen 
+ & eXist - parametrische Suche mittels XPath Abfragen \\ \hline
+TextSearch 
+ & IBM DB2 NSE 
+ & lucene  \\ \hline
+Datenbank 
+ & IBM DB2 8.1 oder Oracle 
+ & MySQL 4.x \\ \hline
+Objekt 
+ & Filesystem, 
+ & Filesystem,  \\
+Store 
+ & IBM CM 8.2 Ressource Manager, 
+ &  \\ 
+ & IBM Video Charger 8, 
+ & IBM Video Charger 8, \\
+ & Helix Server 
+ & Helix Server  \\  \hline
+Systembasis 
+ & IBM AIX 
+ & alle Systeme mit Java \\
+ & Sun Solaris & \\
+ & Linux & \\
+ & MS Windows (Server) & \\
+\hline
+\end{supertabular}
+\normalsize
+
+Die Hardwareanforderungen h"angen nat"urlich auch von der erforderlichen Performance,
+der Ausfallsicherheit usw. ab. 
+Ein aktuell (November 2003) verf"ugbarer PC mit 1 GB Hauptspeicher oder
+mehr ist aber in der Lage, ein performantes System auf Basis der frei
+verf"ugbaren Software zu realisieren.
+Soll der IBM Content Manager zum Einsatz kommen, so k"onnen die minimalen
+Hardwareanforderungen f"ur die einzelnen Komponenten (Video Charger, Content
+Manager, DB2) auf den Webseiten der IBM eingesehen werden.
+Prinzipiell kann man aber sagen, dass durch den Einsatz des IBM WebSphere
+Application Server h"ohere Anforderungen an den Hauptspeicher gestellt
+werden. 
+Der f"ur die Content Manager Prozesse verf"ugbare Hauptspeicher 
+sollte nicht unter 2 GB liegen.
