@@ -39,7 +39,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -743,6 +742,11 @@ public class WCMSActionServlet extends WCMSServlet {
      */
     public void makeAction( String action ) throws IOException {
         try {
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+        	// prepare content as sdom document
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+        	Document doc = new Document();
+        	
 			if ( action.equals("add") ) {
 			    if ( mode.equals("intern") ) {
 			        if ( !hrefFile.exists() ) {
@@ -758,9 +762,9 @@ public class WCMSActionServlet extends WCMSServlet {
 			            BufferedInputStream bis = new BufferedInputStream(
 								new ByteArrayInputStream(((head).append(body).append(tail)).toString()
 										.getBytes("UTF-8")));
-			            Document doc = getXMLAsJDOM(bis);
+			            doc = getXMLAsJDOM(bis);
 			            bis.close();
-			            writeJDOMDocumentToFile(doc, hrefFile);
+			            //writeJDOMDocumentToFile(doc, hrefFile);
 			            //MCRUtils.copyStream(bi,bo);
 			            //bo.close();
 			        }
@@ -771,34 +775,33 @@ public class WCMSActionServlet extends WCMSServlet {
 			    }
 			    else return;
 			}
- /*---- build new ----*/
 			if ( action.equals("edit") ) {
 			    if ( mode.equals("intern") ) {
 			        try {
-			            SAXBuilder builder = new SAXBuilder();
-			            builder.setEntityResolver(new ResolveDTD());
-			            Document doc = new Document();
+			            //SAXBuilder builder = new SAXBuilder();
+			            //builder.setEntityResolver(new ResolveDTD());
+			            doc = new Document();
 			            try {
-			            	doc = builder.build(new StringReader(content));
+			            	doc = getXMLAsJDOM(content);
 			            	Element html = doc.getRootElement();
-			            	html.detach();
-			            	builder = new SAXBuilder();
-							doc = builder.build(hrefFile);
+			            	doc = getXMLAsJDOM(hrefFile);
 							Element root = doc.getRootElement();
 							validate(root);
 							Element actElem = findActElem(root, "lang", defaultLang, ns);
 							actElem.setAttribute("title", label);
-			            	actElem.setContent(html);
+							actElem.setContent(html.cloneContent());
 			    		}
-						catch (JDOMException jex) {
-							try {
+						catch (Exception ex) {
+							logger.error("Error while updating document, update rejected.", ex);
+						}
+						/*	try {
 								content = "<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >"+content+"</section>";
 								//content.replaceAll("&", "&amp;");
-								doc = builder.build(new StringReader(content));
+								doc = getXMLAsJDOM(new StringReader(content));
 								Element html = doc.getRootElement();
 								html.detach();
-								builder = new SAXBuilder();
-								doc = builder.build(hrefFile);
+								//builder = new SAXBuilder();
+								doc = getXMLAsJDOM(hrefFile);
 								Element root = doc.getRootElement();
 								validate(root);
 								Element actElem = findActElem(root, "lang", defaultLang, ns);
@@ -813,39 +816,29 @@ public class WCMSActionServlet extends WCMSServlet {
 								return;
 							}
 						}
-
-			            XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-			            xmlout.output(doc, new FileOutputStream(hrefFile));
+						//writeJDOMDocumentToFile(doc, hrefFile);
+			            /*XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+			            xmlout.output(doc, new FileOutputStream(hrefFile));*/
 			        }
 			        
 			        catch (Exception e) {
 			        	e.printStackTrace();
 			        }
-			       /* PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
-			        po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-			        po.println("<!DOCTYPE MyCoReWebPage>");
-			        po.println("<MyCoReWebPage>");
-			        po.println("\t<section xml:lang=\""+defaultLang+"\" title=\""+label+"\" >");
-			        po.print(content);
-			        po.println("\t</section>");
-			        po.println("</MyCoReWebPage>");
-			        po.flush();
-			        po.close();*/
 			    }
 			    else return;
 			}
 
 			if ( action.equals("translate") && mode.equals("intern") ) {
 			    try {
-			        SAXBuilder builder = new SAXBuilder();
+			        /*SAXBuilder builder = new SAXBuilder();
 			        builder.setEntityResolver(new ResolveDTD());
-			        Document doc = new Document();
+			        doc = new Document();*/
 			        try {
-			        	doc = builder.build(new StringReader(contentCurrentLang));
+			        	doc = getXMLAsJDOM(contentCurrentLang);
 			        	Element html = doc.getRootElement();
-			        	html.detach();
-			        	builder = new SAXBuilder();
-			        	doc = builder.build(hrefFile);
+			        	//html.detach();
+			        	//builder = new SAXBuilder();
+			        	doc = getXMLAsJDOM(hrefFile);
 			        	Element root = doc.getRootElement();
 			        	validate(root);
 			        	Element actElem = findActElem(root, "lang", currentLang, ns);
@@ -855,11 +848,13 @@ public class WCMSActionServlet extends WCMSServlet {
 			        	}
 			        	actElem = findActElem(root, "lang", currentLang, ns);
 			        	actElem.setAttribute("title", label);
-			        	actElem.setContent(html);
+			        	actElem.setContent(html.cloneContent());
 					}
 
-			        catch (JDOMException jex) {
-						try {
+			        catch (Exception ex) {
+			        	ex.printStackTrace();
+					}
+					/*	try {
 							contentCurrentLang = "<section xml:lang=\""+currentLang+"\" title=\""+currentLangLabel+"\" >"+contentCurrentLang+"</section>";
 							//contentCurrentLang.replaceAll("&", "&amp;");
 							doc = builder.build(new StringReader(contentCurrentLang));
@@ -884,41 +879,42 @@ public class WCMSActionServlet extends WCMSServlet {
 							generateOutput(error, label, fileName);
 							return;
 						}
-					}
-			        XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-			        xmlout.output(doc, new FileOutputStream(hrefFile));
+					}*/
 			    }
 			
 			    catch (Exception e) {
 					e.printStackTrace();
 			    }
-			        /*PrintWriter po = new PrintWriter(new BufferedWriter(new FileWriter(hrefFile)));
-			        po.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-			        po.println("<!DOCTYPE MyCoReWebPage>");
-			        po.println("<MyCoReWebPage>");
-			        po.println("\t<section xml:lang=\""+currentLang+"\" title=\""+label+"\">");
-			        po.print(contentCurrentLang);
-			        po.println("\t</section>");
-			        po.println("</MyCoReWebPage>");
-			        po.flush();
-			        po.close();*/
 			}
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+        	// end of: prepare content as sdom document
+        	///////////////////////////////////////////////////////////////////////////////////////////////
 
-/*---- END ----*/
-
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+        	// management of prepared content jdom
+        	///////////////////////////////////////////////////////////////////////////////////////////////			
 			if ( action.equals("delete") ) {
 			    if ( realyDel.equals("true") ) {
-			        if ( mode.equals("intern") ) {
-			            hrefFile.delete();
-			            File testFile = hrefFile;
-			            while (testFile.getParentFile().listFiles().length < 1) {
-			                testFile.getParentFile().delete();
-			                testFile = testFile.getParentFile();
-			            }
+			        if ( mode.equals("intern")) {
+			        	//if (storeTypMycore) {
+				            hrefFile.delete();
+				            File testFile = hrefFile;
+				            while (testFile.getParentFile().listFiles().length < 1) {
+				                testFile.getParentFile().delete();
+				                testFile = testFile.getParentFile();
+				            }
+			        	//}
 			        }
 			    }
 			    else sessionParam = "choose";
+			    return;
 			}
+			
+			writeJDOMDocumentToFile(doc, hrefFile);
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+        	// end: management of prepared content jdom
+        	///////////////////////////////////////////////////////////////////////////////////////////////
+			
 		} catch (FileNotFoundException e) {
 			error = "File not found. For further information look at the System Output.";
 			e.printStackTrace();
@@ -1192,54 +1188,6 @@ public class WCMSActionServlet extends WCMSServlet {
 		return jdomDoc;
 	}
 	
-	/*private class MyInputStream extends InputStream
-	{
-		private InputStream istream;
-		private int state = 0;
-		private InputStream tag1Stream;
-		private InputStream tag2Stream;
-
-		public MyInputStream (InputStream istream, String tag1, String tag2)
-		{
-			this.istream = istream;
-			tag1Stream = new ByteArrayInputStream (tag1.getBytes());
-			tag2Stream = new ByteArrayInputStream (tag2.getBytes());
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.io.InputStream#read()
-		 */
-		/*public int read() throws IOException
-		{
-			try {
-				switch (state)
-				{
-				case 0:
-					return tag1Stream.read ();
-				case 1:
-					return istream.read ();
-				case 2:
-					return tag2Stream.read ();
-				}
-			}
-			catch (EOFException e) {
-				if ( (state==0) || (state==1) ) {
-					++state;
-					return read ();
-				}
-				else
-					throw e;
-			}
-			
-			// TODO Auto-generated method stub
-			return 0;
-		}
-		
-		
-		
-	};*/
-
-	
 	/**
 	 * @param xmlSource
 	 * @return
@@ -1295,9 +1243,15 @@ public class WCMSActionServlet extends WCMSServlet {
 			System.out.println("---begin parsing---");
 			ByteArrayOutputStream baisCopy = new ByteArrayOutputStream();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			MCRUtils.copyStream(sis, baisCopy);
-			bais.close();
-			sis.close();
+			if (bis==null) {
+				MCRUtils.copyStream(sis, baisCopy);
+				bais.close();
+				sis.close();
+			}
+			else {
+				MCRUtils.copyStream(bis, baisCopy);
+				bis.close();
+			}			
 			tidy.parse(new ByteArrayInputStream(baisCopy.toByteArray()), baos);
 			pw.flush();
 			pw.close();
