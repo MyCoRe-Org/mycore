@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- ============================================== -->
-<!-- $Revision: 1.6 $ $Date: 2004-12-28 23:20:36 $ -->
+<!-- $Revision: 1.7 $ $Date: 2004-12-28 23:38:20 $ -->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" 

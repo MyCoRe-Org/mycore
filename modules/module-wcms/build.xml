@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.6 $ $Date: 2004-12-16 13:19:26 $ -->
+<!-- $Revision: 1.7 $ $Date: 2004-12-28 23:38:54 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
