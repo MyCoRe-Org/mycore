@@ -1,11 +1,11 @@
-\section{Tomcat und Apache 2}
+\subsection{Tomcat und Apache 2}
 Ziel dieses Szenarios ist, dass unter mcradmin (oder einem anderen User) mehrere Applikationen mit verschiedenen URL Aliasen parallel laufen und sich dabei nicht ins Gehege kommen. Konkret bedeuted dies, dass verschiedene Tomcat Instanzen, die über einen Connector in den Apache Server integriert sind, parallel nebeneinander laufen. Zudem können die einzelenen Applikationen über eigene URLs angesprochen werden was mit Aapche über sogenannte virtual hosts realisiert wird.
 Das folgende Beispiel ist etwas SuSE spezifisch sollte sich jedoch ohne weiteres auch auf eine andere Distribution übertragen lassen . Eine sehr gute Anleitung findet sich jedoch auch in der Dokumentation von Tomcat.
 
-\subsection{Funktionsweise}
+\subsubsection{Funktionsweise}
 
 
-\subsection{Installation}
+\subsubsection{Installation}
 Als Ausgangsbedingung wird die in Kapitel \ref{sec:installationlinux} beschriebene Installation zugrundegelegt.
 In allen gängigen Distributionen ist auch der Tomcat Server enthalten. Unter SuSE empfehle ich das von mir neu erstellte Tomcat Paket zu installieren. Es sollte auch mit niedrigeren Version funkltionieren, allerding sind diese zum Teil noch etwas buggy. Ansonsten kann man auch die Binaries von der Tomcat Homepage herunterladen.
 \begin{itemize}
@@ -13,7 +13,7 @@ In allen gängigen Distributionen ist auch der Tomcat Server enthalten. Unter SuS
 \item {\bf apache2-jakarta-tomcat-connectors-4.1.27-37} oder höher
 \end{itemize}
 
-\section{Einrichten der Tomcat Instanzen}
+\subsection{Einrichten der Tomcat Instanzen}
 Zum Betreiben mehrer Tomcat Instanzen werden folgende zwei Variablen benötigt \$CATALINA\_BASE und \$CATALINA\_HOME.
 
 \begin{quotation}
@@ -268,4 +268,5 @@ Alias /mycoresample "/dlwww/tomcat-instances/mycoresample/webapps/mycoresample"
 
 \end{verbatim}
 Das sollte es auch schon gewesen sein. Jetzt nur noch starten mit \mcrcommand{\$CATALINA\_BASE/bin/mycoresample.sh} und \mcrcommand{rcapache2 restart}. Ein Blick auf \url{http://your_host_name/mycoresample} sollte jetzt die Startseite liefern. Zudem lohnt sich oft auch \url{http://your_host_name/jkstatus} aufzurufen um zu den Status des JK Connectors zu überprüfen.
-Zum erstellen des Mappings habe ich das Java Progrämmchen WebXml2Jk verwendet, das in den Tomcat-Connector Sources enthalten ist.
+Zum erstellen des Mappings habe ich das Java Progrämmchen WebXml2Jk verwendet, das in den Tomcat-Connector Sources enthalten ist.\\[2ex]
+
