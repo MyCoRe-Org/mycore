@@ -196,7 +196,7 @@ public class MCRLayoutServlet extends HttpServlet
     return input;
   }
   
-  public Properties buildXSLParameters( HttpServletRequest request )
+  public static final Properties buildXSLParameters(HttpServletRequest request)
   {
     Properties parameters = new Properties();
     
@@ -259,7 +259,7 @@ public class MCRLayoutServlet extends HttpServlet
     return parameters;
   }
 
-  protected String getCompleteURL( HttpServletRequest request )
+  public static final String getCompleteURL( HttpServletRequest request )
   {
     StringBuffer buffer = HttpUtils.getRequestURL( request );
 
