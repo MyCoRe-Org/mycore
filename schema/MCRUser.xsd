@@ -52,6 +52,7 @@
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.city"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.postalcode"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.country"/>
+  <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.state"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.institution"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.faculty"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="contact.department"/>
