@@ -45,18 +45,18 @@ import org.mycore.datamodel.metadata.MCRMetaDefault;
  *
  * @version $Revision$ $Date$
  **/
-public final class MCRCM8ItemType implements DKConstantICM
+final class MCRCM8ItemType implements DKConstantICM
 {
 
 // internal data
-private static final String META_PACKAGE_NAME = "mycore.cm8.";
+private static final String META_PACKAGE_NAME = "org.mycore.backend.cm8.";
 
 // from configuration
 
 /**
  * The constructor of this class.
  **/
-public MCRCM8ItemType()
+MCRCM8ItemType()
   {
   }
 
@@ -68,7 +68,7 @@ public MCRCM8ItemType()
  * @exception MCRConfigurationException if the configuration is not correct
  * @exception MCRPersistenceException if a persistence problem is occured
  **/
-protected static void create(String mcr_type, org.jdom.Document mcr_conf)
+static void create(String mcr_type, org.jdom.Document mcr_conf)
   throws MCRConfigurationException, MCRPersistenceException
   {
   try {
