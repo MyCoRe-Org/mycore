@@ -139,14 +139,14 @@ public void deleteContent( String storageID )
   finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }
   }
 
-public void retrieveContent( MCRFile file, OutputStream target )
+public void retrieveContent( String storageID, long size, OutputStream target )
   throws MCRPersistenceException
   {
   Logger logger = MCRCM8ConnectionPool.getLogger(); 
-  logger.debug("StorageID = "+file.getStorageID());
+  logger.debug("StorageID = "+storageID);
   DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
   try {
-    DKLobICM ddo = (DKLobICM)connection.createDDO(file.getStorageID());
+    DKLobICM ddo = (DKLobICM)connection.createDDO(storageID);
     ddo.retrieve(DK_CM_CONTENT_NO);
     String url = ddo.getContentURL(-1,-1,-1);
     logger.debug("URL = "+url);
@@ -162,7 +162,7 @@ public void retrieveContent( MCRFile file, OutputStream target )
     }
   catch( Exception ex ) {
     String msg = "Error while retrieving data from CM8 item " + 
-      file.getStorageID();
+      storageID;
     throw new MCRPersistenceException( msg, ex );
     }
   finally{ MCRCM8ConnectionPool.instance().releaseConnection( connection ); }

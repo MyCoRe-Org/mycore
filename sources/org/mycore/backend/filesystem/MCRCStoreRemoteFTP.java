@@ -151,12 +151,12 @@ public class MCRCStoreRemoteFTP extends MCRContentStoreBase implements MCRConten
     finally{ disconnect( connection ); }
   }
 
-  public void retrieveContent( MCRFile file, OutputStream target )
+  public void retrieveContent( String storageID, long size, OutputStream target )
     throws MCRPersistenceException
   {
     FTPClient connection = connect();
     try
-    { connection.get( target, file.getStorageID() );  }
+    { connection.get( target, storageID );  }
     catch( Exception exc )
     {
       if( ! ( exc instanceof MCRPersistenceException ) )

@@ -126,9 +126,9 @@ public class MCRCStoreVideoCharger7 extends MCRContentStoreBase implements MCRCo
     finally{ disconnect( connection ); }
   }
 
-  public void retrieveContent( MCRFile file, OutputStream target )
+  public void retrieveContent( String storageID, long size, OutputStream target )
     throws MCRPersistenceException
-  { retrieveContent( file.getStorageID(), target ); }
+  { retrieveContent( storageID, target ); }
   
   protected void retrieveContent( String assetID, OutputStream target )
     throws MCRPersistenceException

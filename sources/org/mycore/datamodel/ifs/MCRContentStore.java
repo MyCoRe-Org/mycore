@@ -78,13 +78,14 @@ public interface MCRContentStore
     throws MCRPersistenceException;
 
   /**
-   * Retrieves the content of the given MCRFile to an OutputStream. 
-   * Uses the StorageID set in the MCRFile object to indentify the place 
-   * where the file content was stored in this store instance.
+   * Retrieves the content of an MCRFile to an OutputStream. 
+   * Uses the StorageID to indentify the place where the file content was 
+   * stored in this store instance.
    *
-   * @param file the MCRFile thats content is to be retrieved
+   * @param storageID the ID identifying where the content of a file was stored
+   * @param size the file's size
    * @param target the OutputStream to write the file content to
    */
-  public void retrieveContent( MCRFile file, OutputStream target )
+  public void retrieveContent( String storageID, long size, OutputStream target )
     throws MCRPersistenceException;
 }

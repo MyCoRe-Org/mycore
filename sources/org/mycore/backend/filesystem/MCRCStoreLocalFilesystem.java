@@ -154,18 +154,18 @@ public class MCRCStoreLocalFilesystem extends MCRContentStoreBase implements MCR
     }
   }
 
-  public void retrieveContent( MCRFile file, OutputStream target )
+  public void retrieveContent( String storageID, long size, OutputStream target )
     throws MCRPersistenceException
   {
     try
     { 
-      File local = new File( baseDir, file.getStorageID() );
+      File local = new File( baseDir, storageID );
       InputStream in = new BufferedInputStream( new FileInputStream( local ) );
       copy( in, target );
     }
     catch( Exception exc )
     {
-      String msg = "Could not get content of stored file to output stream: " + file.getStorageID();
+      String msg = "Could not get content of stored file to output stream: " + storageID;
       throw new MCRPersistenceException( msg, exc );
     }
   }

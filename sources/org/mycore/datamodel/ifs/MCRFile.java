@@ -273,7 +273,7 @@ public class MCRFile extends MCRFilesystemNode
       MessageDigest digest = MCRContentInputStream.buildMD5Digest();
 
       DigestOutputStream dos = new DigestOutputStream( target, digest );
-      getContentStore().retrieveContent( this, dos ); 
+      getContentStore().retrieveContent( this.storageID, this.size, dos ); 
       
       String md5_new = MCRContentInputStream.getMD5String( digest );
       if( ! this.md5.equals( md5_new ) )
