@@ -60,8 +60,7 @@ private int lengthCategID = MCRMetaClassification.MAX_CATEGID_LENGTH;
 private int lengthLang    = MCRClassificationObject.MAX_CLASSIFICATION_LANG;
 private int lengthText    = MCRClassificationObject.MAX_CLASSIFICATION_TEXT;
 private int lengthURL     = MCRClassificationObject.MAX_CATEGORY_URL;
-private int lengthDescription = MCRClassificationObject
-    .MAX_CLASSIFICATION_DESCRIPTION;
+private int lengthDescription = MCRClassificationObject.MAX_CLASSIFICATION_DESCRIPTION;
 
 /**
  * The constructor for the class MCRSQLClassificationStore. It reads
@@ -471,26 +470,13 @@ public final ArrayList retrieveChildren( String CLID, String PID )
  **/
 public final int retrieveNumberOfChildren( String CLID, String PID )
   {
+
   return MCRSQLConnection.justCountRows( new MCRSQLStatement( tableCateg )
     .setCondition( "PID",  PID  )
     .setCondition( "CLID", CLID )
     .toRowSelector() );
+
   }
-
-
-/**
- * The method returns the Count of the documents that
- * are members of any category in this classification
- *
- * @param CLID the ID of the MCRClassificationItem
- * @return the number of documents
- */
-public final int retrieveNumberofDocs( String CLID )
-{
-	int num =  MCRSQLConnection.justCountRows( tableLinkClass + " where MCRTO like '"+CLID+"%'");
-	logger.debug(" where MCRTO like '"+CLID+"%'");
-	return num;
-}
 
 /**
  * The method returns all availiable classification ID's they are loaded.
