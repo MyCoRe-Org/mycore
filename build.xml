@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.55 $ $Date: 2003-08-08 10:52:25 $                      -->
+  <!-- $Revision: 1.56 $ $Date: 2003-08-08 10:56:58 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -57,25 +57,22 @@
 
   <target name="info" depends="init" description="display software and os versions">
     <property name="output.classpath" refid="mycore.classpath" />
-    <property name="output.libpath"   refid="mycore.libpath"   />
 
     <echo>Base directory   : ${basedir}</echo>
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.55 $ $Date: 2003-08-08 10:52:25 $</echo>
+    <echo>Ant build file   : $Revision: 1.56 $ $Date: 2003-08-08 10:56:58 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
     <echo>JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo>System CLASSPATH : ${build.sysclasspath}</echo>
     <echo>Active CLASSPATH : ${output.classpath}</echo>
-    <echo>Active LIBPATH   : ${output.libpath}</echo>
   </target>
 
   <!-- =================================================================== -->
-  <!-- Initialize directories                                              -->
-  <!-- Build CLASSPATH LIBPATH and LD_LIBRARY_PATH for compile and exec    -->
+  <!-- Initialize directories and build CLASSPATH for compiling sources    -->
   <!-- =================================================================== -->
 
   <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2" >
@@ -92,12 +89,6 @@
       <path refid="jdbc.classpath" />
       <path refid="xml.classpath"  />
     </path>
-
-    <path id="mycore.libpath">
-      <dirset dir="${env.JAVA_HOME}" includes="bin bin/classic" />
-      <path refid="jdbc.libpath" />
-      <path refid="xml.libpath"  />
-    </path>
   </target>
 
   <target name="jdbcstore.path.1" if="MCR.JDBCStore.BaseDir">
@@ -105,14 +96,10 @@
       <fileset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.Jars}"        />
       <dirset  dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.ClassesDirs}" />
     </path>
-    <path id="jdbc.libpath">
-      <dirset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.LibPath}" />
-    </path>
   </target>
 
   <target name="jdbcstore.path.2" unless="MCR.JDBCStore.BaseDir">
     <path id="jdbc.classpath" />
-    <path id="jdbc.libpath"   />
   </target>
 
   <target name="xmlstore.path.1" if="MCR.XMLStore.BaseDir">
@@ -120,14 +107,10 @@
       <fileset dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.Jars}"        />
       <dirset  dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.ClassesDirs}" /> 
     </path>
-    <path id="xml.libpath">
-      <dirset dir="${MCR.XMLStore.BaseDir}" includes="_dummy_ ${MCR.XMLStore.LibPath}" />
-    </path>
   </target>
 
   <target name="xmlstore.path.2" unless="MCR.XMLStore.BaseDir">
     <path id="xml.classpath" />
-    <path id="xml.libpath" />
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->
