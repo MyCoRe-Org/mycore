@@ -34,6 +34,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class implements a main program to show the CM8 content of an item.
+ * <br />
+ * Start the program with<br />
+ *   java CRCM8ViewItem doc <em>MCRObjectID</em> or <br />
+ *   java CRCM8ViewItem ifs <br />
  * 
  * @author Holger König
  * @version $Revision$ $Date$
@@ -50,31 +54,46 @@ static String userid = "";
 static String password = "";
 static String itemtype = "";
 static String prefix = "";
+static String ifsowner = "";
+static String query = "";
 static MCRObjectID mcrid = null;
 
 public static void main(String argv[]) throws DKException, Exception
   {
-  // Read the arguments
-  try {
-    mcrid = new MCRObjectID(argv[0]); }
-  catch (MCRException e) {
-    System.out.println("The argument is not a MCRObjectID.");
-    System.out.println();
-    }
-
   // read the configuration
   conf = MCRConfiguration.instance();
   database = conf.getString("MCR.persistence_cm8_library_server");
   userid = conf.getString("MCR.persistence_cm8_user_id");
   password = conf.getString("MCR.persistence_cm8_password");
-  itemtype = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId());
-  prefix = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId()+"_prefix");
+
+  // Read the arguments
+  if ((!argv[0].equals("doc"))&&(!argv[0].equals("ifs"))) {
+    System.out.println("The argument 1 is not doc or ifs.");
+    System.out.println();
+    }
+  try {
+    mcrid = new MCRObjectID(argv[1]); }
+  catch (MCRException e) {
+    System.out.println("The argument 2 is not a MCRObjectID.");
+    System.out.println();
+    }
+  if (argv[0].equals("doc")) {
+    itemtype = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId());
+    prefix = conf.getString("MCR.persistence_cm8_"+mcrid.getTypeId()+"_prefix");
+    query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
+    }
+  if (argv[0].equals("ifs")) {
+    itemtype = conf.getString("MCR.IFS.ContentStore.CM8.ItemType");
+    ifsowner = conf.getString("MCR.IFS.ContentStore.CM8.Attribute.Owner");
+    query = "/"+itemtype+"[@ifsowner=\""+mcrid.getId()+"\"]";
+    }
+
+  System.out.println(query);
 
   // Open connection
   DKDatastoreICM dsICM = new DKDatastoreICM();  // Create new datastore object.
   dsICM.connect(database,userid,password,""); // Connect to the datastore.
 
-  String query = "/"+itemtype+"[@"+prefix+"ID=\""+mcrid.getId()+"\"]";
   System.out.println("| All items in "+itemtype + ", server "+database);
   System.out.println("| Query >>>"+query+"<<<");
                 
