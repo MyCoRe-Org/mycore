@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.9 $ $Date: 2004-03-18 10:06:01 $ -->
+<!-- $Revision: 1.10 $ $Date: 2004-03-18 11:13:39 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -368,13 +368,20 @@
 
 <!-- ======== handle panel ======== -->
 <xsl:template match="panel">
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
+  <xsl:param name="var"      />
+  <xsl:param name="pos"      />
+  <xsl:param name="num.next" />
 
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
   <table border="0" cellspacing="0" cellpadding="0">
+
+    <!-- If panel is last component in parent panel, this table must be width 100% -->
+    <xsl:if test="$num.next = '0'">
+      <xsl:attribute name="width">100%</xsl:attribute>
+    </xsl:if>
+
     <!-- ======== iterate rows in panel ======== -->
     <xsl:call-template name="editor.row">
       <xsl:with-param name="cells" select="$cells" />
@@ -489,8 +496,9 @@
 
       <!-- ======== if there is a cell here, handle it ======== -->
       <xsl:apply-templates select="$the.cell">
-        <xsl:with-param name="var" select="$var"     />
-        <xsl:with-param name="pos" select="$pos.new" />
+        <xsl:with-param name="var"      select="$var"      />
+        <xsl:with-param name="pos"      select="$pos.new"  />
+        <xsl:with-param name="num.next" select="$num.next" />
       </xsl:apply-templates>
 
     </xsl:if>
@@ -510,8 +518,9 @@
 
 <!-- ======== handle cell ======== -->
 <xsl:template match="cell">
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
+  <xsl:param name="var"      />
+  <xsl:param name="pos"      />
+  <xsl:param name="num.next" />
 
   <!-- ======== build new variable path ======== -->
   <xsl:variable name="var.new">
@@ -559,8 +568,9 @@
 
     <!-- ======== handle nested component (textfield, textarea, ...) ======== -->
     <xsl:apply-templates select=".">
-      <xsl:with-param name="var" select="$var.new" />
-      <xsl:with-param name="pos" select="$pos" />
+      <xsl:with-param name="var"      select="$var.new"  />
+      <xsl:with-param name="pos"      select="$pos"      />
+      <xsl:with-param name="num.next" select="$num.next" />
     </xsl:apply-templates>
 
     <!-- ======== hidden field for sorting the entry ======== -->
