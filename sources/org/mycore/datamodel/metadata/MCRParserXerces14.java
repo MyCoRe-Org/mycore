@@ -53,8 +53,8 @@ DOMParser parser = new DOMParser();
 // data for the configuration
 private static boolean flagvalidation        = false;
 private static boolean flagnamespaces        = true;
-private static boolean flagschemasupport     = false;
-private static boolean flagschemafullsupport = true;
+private static boolean flagschemasupport     = true;
+private static boolean flagschemafullsupport = false;
 private static boolean flagdeferreddom       = true;
 
 private static String setvalidation          =
@@ -68,12 +68,16 @@ private static String setschemafullsupport   =
 private static String setdeferreddom         =
   "http://apache.org/xml/features/dom/defer-node-expansion";
 
+private boolean parse_error = false;
+
 /**
  * Constructor for the xerces parser 1.4.x.
  * Here was the configuration set for the XERCES parser.
  **/
 public MCRParserXerces14()
   {
+  flagvalidation = MCRConfiguration.instance()
+    .getBoolean("MCR.parser_schema_validation",flagvalidation);
   try {
     parser.setFeature(setvalidation,flagvalidation);
     parser.setFeature(setnamespaces,flagnamespaces);
@@ -82,9 +86,9 @@ public MCRParserXerces14()
     parser.setFeature(setdeferreddom,flagdeferreddom);
     }
   catch (SAXNotRecognizedException e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Initialization error in XRECES parser.",e); }
   catch (SAXNotSupportedException e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Initialization error in XRECES parser.",e); }
   parser.setErrorHandler(this);
   }
 
@@ -99,10 +103,12 @@ public Document parseURI(String uri) throws MCRException
   {
   try {
     parser.parse(uri);
+    if (parse_error) {
+      throw new MCRException(""); }
     return parser.getDocument();
     }
   catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Parse error in XRECES parser.",e); }
   }
 
 /**
@@ -117,10 +123,12 @@ public Document parseXML(String xml) throws MCRException
   try {
     InputSource source = new InputSource((Reader)new StringReader(xml));
     parser.parse(source);
+    if (parse_error) {
+      throw new MCRException(""); }
     return parser.getDocument();
     }
   catch (Exception e) {
-    throw new MCRException(e.getMessage()); }
+    throw new MCRException("Parse error in XRECES parser.",e); }
   }
 
 /**
@@ -137,6 +145,7 @@ public void warning(SAXParseException ex)
 public void error(SAXParseException ex)
   { 
   System.out.println("[Error] "+getLocationString(ex)+": "+ex.getMessage());
+  parse_error = true;
   }
 
 /**
@@ -146,6 +155,7 @@ public void fatalError(SAXParseException ex)
   { 
   System.out.println("[Fatal Error] "+getLocationString(ex)+": "+
     ex.getMessage());
+  parse_error = true;
   }
 
 /** 
