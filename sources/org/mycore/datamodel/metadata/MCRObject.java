@@ -496,6 +496,26 @@ public final byte [] receiveXMLFromDatastore(String id)
   }
 
 /**
+ * The methode receive the object for the given MCRObjectID and returned
+ * it as JDOM Document.
+ *
+ * @param id   the object ID
+ * @return the JDOM Document of the object as string
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final org.jdom.Document receiveJDOMFromDatastore(String id) 
+  throws MCRPersistenceException
+  {
+  mcr_id = new MCRObjectID(id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  if (xml == null) {
+    throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
+      " was not retrieved.");
+    }
+  return MCRXMLHelper.parseXML(xml,false);
+  }
+
+/**
  * The methode update the object in the data store.
  *
  * @exception MCRPersistenceException if a persistence problem is occured
