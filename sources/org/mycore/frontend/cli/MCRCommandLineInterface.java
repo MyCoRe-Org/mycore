@@ -341,8 +341,17 @@ public class MCRCommandLineInterface
     if( args.length > 0 ) {
       StringBuffer cmd = new StringBuffer();
       for( int i = 0; i < args.length; i++ ) {
-        cmd.append( args[ i ] ).append( " " ); }
-      commandQueue.addElement( cmd.toString().trim() );
+        int j = args[ i ].indexOf(";;");
+        if (j!=-1) {
+          cmd.append( args[ i ].substring(0,j) ).append( " " );
+          commandQueue.addElement( cmd.toString().trim() ); 
+          cmd = new StringBuffer();
+          continue;
+          }
+        cmd.append( args[ i ] ).append( " " );
+        }
+      if (cmd.toString().trim().length() != 0) {
+        commandQueue.addElement( cmd.toString().trim() ); }
       commandQueue.addElement( "exit" );
       }
 
