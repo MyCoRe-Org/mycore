@@ -27,6 +27,7 @@ import java.util.*;
 
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
+import org.mycore.datamodel.metadata.*;
 import org.mycore.services.query.*;
 
 import org.apache.log4j.Logger;
@@ -61,6 +62,7 @@ protected ArrayList flags = null;
 protected ArrayList subqueries = null;
 protected ArrayList andor = null;
 protected String root = null;
+protected MCRXMLTableManager xmltable = null;
 
 /**
  * The Constructor
@@ -70,6 +72,7 @@ public MCRQueryBase() {
   PropertyConfigurator.configure( config.getLoggingProperties() );
   maxres = config.getInt( "MCR.query_max_results", MAX_RESULTS );
   logger.info("The maximum of the results is "+Integer.toString(maxres));
+  xmltable = MCRXMLTableManager.instance();
   }
 
 
@@ -143,7 +146,34 @@ public MCRXMLContainer getResultList( String query, String type,
     if( (onetype == null) || ((onetype = onetype.trim()).length() == 0) ) {
       break; }
     logger.debug("T: The separated query type is "+onetype);
-    result.importElements((MCRXMLContainer)startQuery(onetype));
+    boolean retdirect = false;
+    MCRObjectID testid = null;
+    if (subqueries.size() == 1) {
+      String q = (String)subqueries.get(i);
+      if (q.startsWith("@ID")) {
+        int a = q.indexOf("\"");
+        int b = q.indexOf("\"",a+1);
+        if (a <= 7) {
+          if (b == q.length()-1) {
+            try {
+              testid = new MCRObjectID(q.substring(a+1,b));
+              retdirect = true;
+              }
+            catch (Exception e) { }
+            }
+          }
+        }
+      }
+    if (retdirect) {
+      logger.debug("Retrieve the data direcly from XML database.");
+      byte[] xml = xmltable.retrieve(type,testid);
+      try {
+        result.add( "local", testid.getId(), 0, xml); }
+      catch (Exception e) {
+        throw new MCRPersistenceException("",e); }
+      }
+    else {
+      result.importElements((MCRXMLContainer)startQuery(onetype)); }
     }
   return result;
   }
