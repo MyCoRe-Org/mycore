@@ -79,9 +79,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		logger.info(
 			"The maximum of the results is " + Integer.toString(maxres));
 		xmltable = MCRXMLTableManager.instance();
-System.out.println("########################");
 		tsint = MCRContentStoreFactory.getAllIndexables();
-System.out.println("########################");
 	}
 
 	/**
