@@ -170,8 +170,9 @@ public class MCRObjectStructure
    */
   public final String createXML ()
   {
-    String xml_str = "<structure>" + NL;
     int i, n = the_links.size();
+    if (n==0) { return "<structure/>" + NL; }
+    String xml_str = "<structure>" + NL;
     MCRMetaLink link = null;
     for (i = 0; i < n; ++i)
     {

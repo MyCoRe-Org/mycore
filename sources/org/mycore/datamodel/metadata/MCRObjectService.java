@@ -117,13 +117,20 @@ public final void setFromDOM(NodeList dom_element_list)
       date.setDataPart("service");
       date.setLang(lang);
       date.setFromDOM(date_element);
-      dates.add(date);
+      int k = -1;
+      for (int j=0;j<dates.size();j++) {
+        if (((MCRMetaDate)dates.get(j)).getType().equals(date.getType())) { 
+          k = j;  break; } }
+      if (k==-1) {
+        dates.add(date); }
+      else {
+        dates.set(k,date); }
       }
     }
   // Flag part
   NodeList service_flags_list =
     service_element.getElementsByTagName("flags");
-  if (service_dates_list.getLength()>0) {
+  if (service_flags_list.getLength()>0) {
     Node service_flags_element = service_flags_list.item(0);
     NodeList service_flag_list = service_flags_element.getChildNodes();
     int flag_len = service_flag_list.getLength();
