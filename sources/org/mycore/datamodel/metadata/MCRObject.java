@@ -259,6 +259,8 @@ public final void createInDatastore() throws MCRPersistenceException
   // create this object in datastore
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
+  // check the data
+  createXML();
   // prepare this object with parent metadata
   MCRObjectID parent_id = mcr_struct.getParentID();
   if (parent_id != null) {
@@ -520,6 +522,8 @@ public final void updateInDatastore() throws MCRPersistenceException
     }
   catch (MCRPersistenceException pe) {
     createInDatastore(); return; }
+  // check the data
+  createXML();
   // clean the structure
   mcr_struct.clear();
   // set the derivate data in structure

@@ -639,9 +639,8 @@ public class MCRQueryServlet extends MCRServlet {
 		if (layout.equals("")) {
 			layout = type;
 		}
-		if (!conf.getBoolean("MCR.type_" + type.toLowerCase(), false)) {
-			return false;
-		}
+		try { String ct = conf.getString("MCR.type_"+type.toLowerCase()); }
+		catch(MCRConfigurationException ce) { return false; }
 		if (lang == null) {
 			lang = defaultLang;
 		}

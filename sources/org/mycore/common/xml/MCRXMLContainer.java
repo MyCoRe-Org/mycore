@@ -437,36 +437,6 @@ public class MCRXMLContainer implements MCRSortable {
 	 * &lt;/mcr_result&gt;<br>
 	 * &lt;/mcr_results&gt;<br>
 	 *
-	 * @param the XML input stream as byte array
-	 * @exception MCRException a MyCoRe error is occured
-	 * @exception org.jdom.JDOMException cant read the byte array as XML
-	 * @deprecated use InputStream not byte-Array
-	 * @see importElements(InputStream)
-	 **/
-	public final synchronized void importElements(byte[] in)
-		throws MCRException, JDOMException, IOException {
-		ByteArrayInputStream bin = new ByteArrayInputStream(in);
-		org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-		logger.info("Debug of MCRXMLContainer.importElements(byte[])");
-		logger.info("============================");
-		logger.info(new String(in));
-		org.jdom.Document jdom = builder.build(bin);
-		importElements(jdom);
-	}
-	/**
-	 * This methode import a well formed XML stream of results as byte array and add it to an
-	 * existing list.
-	 * in form of<br>
-	 * &lt;?xml version="1.0" encoding="..."?&gt;<br>
-	 * &lt;mcr_results&gt;<br>
-	 * &lt;mcr_result host="<em>host</em> id="<em>MCRObjectId</em>"
-	 *  rank="<em>rank</em>" &gt;<br>
-	 * &lt;mycore...&gt;<br>
-	 * ...<br>
-	 * &lt;/mycore...&gt;<br>
-	 * &lt;/mcr_result&gt;<br>
-	 * &lt;/mcr_results&gt;<br>
-	 *
 	 * @param the XML input stream as InputStream
 	 * @exception MCRException a MyCoRe error is occured
 	 * @exception org.jdom.JDOMException cant read the byte array as XML

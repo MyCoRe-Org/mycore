@@ -121,6 +121,19 @@ public final class MCRObjectID {
 	}
 
 	/**
+	 * This method set a new type in a existing MCRObjectID.
+	 *
+	 * @param type the new type
+	 **/
+	public final boolean setType(String type) {
+          if (type == null) return false;
+	  String test = type.toLowerCase().intern();
+          if (!conf.getBoolean("MCR.type_" + test, false)) { return false; }
+          mcr_type_id = test;
+          return true;
+          }
+
+	/**
 	 * This method set a new number in a existing MCRObjectID.
 	 *
 	 * @param number the new number

@@ -128,9 +128,20 @@ public final MCRMetaLinkID getLinkMeta(int index)
   }
 
 /**
+ * This method set the metadata link
+ *
+ * @param in_link the MCRMetaLinkID object
+ **/
+public final void setLinkMeta(MCRMetaLinkID in_link)
+  {
+  if (in_link == null) return;
+  linkmetas.add(in_link); 
+  }
+
+/**
  * This method return the size of the external array.
  **/
-public final int getSizeExternal()
+public final int getExternalSize()
   { return externals.size(); }
 
 /**
@@ -155,6 +166,17 @@ public final MCRMetaLink getExternal(int index)
  **/
 public final MCRMetaIFS getInternals() 
   { return internals; }
+
+/**
+ * This method set the metadata internals (the IFS data)
+ *
+ * @param in_ifs the MCRMetaIFS object
+ **/
+public final void setInternals(MCRMetaIFS in_ifs)
+  {
+  if (in_ifs == null) return;
+  internals = in_ifs;
+  }
 
 /**
  * This methode create a XML stream for all derivate data.

@@ -81,10 +81,12 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 				flags.set(i, Boolean.TRUE);
 				logger.debug("TextSearch query : " + (String) subqueries.get(i));
 				// start the query against the textsearch
-				for (int j = 0; j < tsint.length; j++) {
-					String[] der = tsint[j].getDerivateIDs((String) subqueries.get(i));
-					for (int k = 0; k < der.length; k++) {
-						idts.add(getObjectID(der[k]));
+                		if (searchfulltext) {
+					for (int j = 0; j < tsint.length; j++) {
+						String[] der = tsint[j].getDerivateIDs((String) subqueries.get(i));
+						for (int k = 0; k < der.length; k++) {
+							idts.add(getObjectID(der[k]));
+						}
 					}
 				}
 			}
@@ -167,7 +169,7 @@ public class MCRXMLDBTransformXPathToeXist extends MCRQueryBase {
 				}
 			if (fl) {
 				qsb.append(' ').append((String) andor.get(i)); }
-			flags.set(i, Boolean.TRUE);
+			//flags.set(i, Boolean.TRUE);
 		}
 		logger.debug("Incomming condition : " + qsb.toString());
 		if (database.equals("exist") && (qsb.length() != 0))

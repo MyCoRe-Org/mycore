@@ -88,6 +88,33 @@ public MCRMetaDate(String set_datapart, String set_subtag,
   }
 
 /**
+ * This is the constructor. <br>
+ * The language element was set. If the value of <em>default_lang</em>
+ * is null, empty or false <b>en</b> was set. The subtag element was set
+ * to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+ * is null or empty an exception was throwed. The type element was set to
+ * the value of <em>set_type<em>, if it is null, an empty string was set
+ * to the type element. The date element was set to the value of 
+ * <em>set_date<em>, if it is null, the date was set to this null.
+ *
+ * @param set_datapart     the global part of the elements like 'metadata'
+ *                         or 'service'
+ * @param set_subtag       the name of the subtag
+ * @param default_lang     the default language
+ * @param set_type         the optional type string
+ * @param set_inherted     a value >= 0
+ * @param set_date         the date as String
+ * @exception MCRException if the set_subtag value is null or empty
+ */
+public MCRMetaDate(String set_datapart, String set_subtag, 
+  String default_lang, String set_type, int set_inherted, 
+  String set_date) throws MCRException
+  {
+  super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
+  setDate(set_date);
+  }
+
+/**
  * This method set the languge, type and text. 
  *
  * @param set_lang        the new language string, if this is null or
@@ -101,6 +128,21 @@ public final void set(String set_lang, String set_type, GregorianCalendar
   setLang(set_lang);
   setType(set_type);
   if (set_date != null) { date = set_date; }
+  }
+
+/**
+ * This method set the languge, type and text. 
+ *
+ * @param set_lang        the new language string, if this is null or
+ *                        empty, nothing is to do
+ * @param set_type        the optional type syting
+ * @param set_date        the date as String
+ **/
+public final void set(String set_lang, String set_type, String set_date)
+  {
+  setLang(set_lang);
+  setType(set_type);
+  setDate(set_date);
   }
 
 /**

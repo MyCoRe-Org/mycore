@@ -88,9 +88,9 @@ public class MCRXMLDBConnectionPool
      PropertyConfigurator.configure(config.getLoggingProperties());
      logger.info( "Building connection to XML:DB..." );
      driver     = config.getString( conf_prefix + "driver" );
-     logger.info("MCRXMLDBConnectionPool MCR.persistence_xmldb_driver      : " + driver); 
+     logger.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_driver      : " + driver); 
      connString = config.getString( conf_prefix + "database_url" , "");
-     logger.info("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: " + connString); 
+     logger.debug("MCRXMLDBConnectionPool MCR.persistence_xmldb_database_url: " + connString); 
      try
      {
       Class driverclass = Class.forName( driver );
@@ -169,7 +169,7 @@ public class MCRXMLDBConnectionPool
     {
      Collection connection = null;
      String con = connString + "/" + collection;
-     logger.info( "MCRXMLDBConnectionPool: Building connection to: " + con );
+     logger.debug( "MCRXMLDBConnectionPool: Building connection to: " + con );
      try
      {
       connection = DatabaseManager.getCollection( con );

@@ -68,6 +68,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 	protected String root = null;
 	protected MCRXMLTableManager xmltable = null;
 	protected MCRTextSearchInterface[] tsint = null;
+	protected boolean searchfulltext = true;
 
 	/**
 	 * The Constructor
@@ -79,6 +80,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		logger.info("The maximum of the results is " + Integer.toString(maxres));
 		xmltable = MCRXMLTableManager.instance();
 		tsint = MCRContentStoreFactory.getAllIndexables();
+		searchfulltext = true;
 	}
 
 	/**
@@ -102,6 +104,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		if ((maxresults < 1) || (maxresults > maxres))
 			return result;
 		this.maxresults = maxresults;
+		searchfulltext = true;
 		// separate the query
 		logger.debug("QIn: The incomming query is " + query);
 		flags = new ArrayList();
@@ -168,26 +171,34 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 		}
 		logger.debug("R: The root string is " + root);
 		// run over all types
+                String typelist = config.getString("MCR.type_"+type,"none");
+                if (typelist.equals("none")) { return result; }
+                if (typelist.equals("true")) { typelist = type; }
 		i = 0;
-		j = type.length();
+		j = typelist.length();
 		l = i;
 		String onetype = "";
 		while ((l < j) && (l != -1)) {
-			l = type.indexOf(",", i);
+			l = typelist.indexOf(",", i);
 			if (l == -1) {
-				onetype = type.substring(i, j);
+				onetype = typelist.substring(i, j);
 			} else {
-				onetype = type.substring(i, l);
+				onetype = typelist.substring(i, l);
 				i = l + 1;
 			}
 			if ((onetype == null) || ((onetype = onetype.trim()).length() == 0)) {
 				break;
 			}
+                        try {
+                          String ct = config.getString("MCR.type_"+onetype); 
+                          if (!ct.equals("true")) { continue; }
+                          }
+                        catch(MCRConfigurationException ce) { continue; }
 			logger.debug("T: The separated query type is " + onetype);
 			boolean retdirect = false;
 			MCRObjectID testid = null;
 			if (subqueries.size() == 1) {
-				String q = (String) subqueries.get(i);
+				String q = (String) subqueries.get(0);
 				if (q.startsWith("@ID")) {
 					int a = q.indexOf("\"");
 					int b = q.indexOf("\"", a + 1);
@@ -205,13 +216,14 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			if (retdirect) {
 				logger.debug("Retrieve the data direcly from XML database.");
 				try {
-					byte[] xml = xmltable.retrieve(type, testid);
+					byte[] xml = xmltable.retrieve(onetype, testid);
 					result.add("local", testid.getId(), 0, xml);
 				} catch (Exception e) {
 				}
 			} else {
 				result.importElements((MCRXMLContainer) startQuery(onetype));
 			}
+			searchfulltext = false;
 		}
 		return result;
 	}
