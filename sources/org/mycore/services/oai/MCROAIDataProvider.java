@@ -620,7 +620,7 @@ public class MCROAIDataProvider extends HttpServlet {
 		try {
 	        String friends = MCRConfiguration.instance()
     	        .getString(STR_OAI_FRIENDS + "." + getServletName());
-    	    StringTokenizer tokenizer = new StringTokenizer(friends, ":");
+    	    StringTokenizer tokenizer = new StringTokenizer(friends, " ");
     	    if (tokenizer.countTokens() > 0) {
 		        Element eFriendsDescription = new Element("description", ns);
     	    	Namespace frns = Namespace.getNamespace(STR_OAI_NAMESPACE + "2.0/friends/");
@@ -782,11 +782,8 @@ public class MCROAIDataProvider extends HttpServlet {
 	    List sets = null;
 	    
 	    try {
-        	String classificationIdentifier = config.getString(STR_OAI_SETSCHEME + "." + getServletName());
-    	    logger.debug("Suche in Klassifikation: " + classificationIdentifier);
-        
 		    MCROAIQuery query = (MCROAIQuery) config.getInstanceOf(STR_OAI_QUERYSERVICE);
-		    sets = new ArrayList(query.listSets(classificationIdentifier, getServletName()));
+		    sets = new ArrayList(query.listSets(getServletName()));
 	    } catch (MCRConfigurationException mcrx) {
 	    	logger.fatal(mcrx.getMessage());
             return addError(document, "badResumptionToken", mcrx.getMessage());

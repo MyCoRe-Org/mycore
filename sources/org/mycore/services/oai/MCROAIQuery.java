@@ -53,7 +53,7 @@ public interface MCROAIQuery {
 	 * @return List A list that contains an array of three Strings: the category id, 
 	 * 				the label and a description
 	 */
-	public List listSets(String classificationId, String instance);
+	public List listSets(String instance);
 	
 	/**
 	 * Method listIdentifiers.Gets a list of identifiers
