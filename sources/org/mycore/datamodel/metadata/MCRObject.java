@@ -276,13 +276,10 @@ public final void createInDatastore() throws MCRPersistenceException
       }
     }
   // build this object
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,xml);
-  mcr_persist.create(mcr_tc,xml,mcr_ts);
+  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_persist.create(this);
   deleteLinksFromTable();
-  addLinksToTable(mcr_tc);
+  addLinksToTable();
   // add the MCRObjectID to the child list in the parent object
   if (parent_id != null) {
     try {
@@ -318,11 +315,8 @@ public final void addDerivateInDatastore(String id, MCRMetaLinkID link)
   setFromXML(xmlarray,false);
   mcr_service.setDate("modifydate");
   getStructure().addDerivate(link);
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,xml);
+  mcr_persist.update(this);
+  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
   }
 
 /**
@@ -343,11 +337,8 @@ public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
   int j = getStructure().searchForDerivate(link);
   if (j != -1) {
     getStructure().removeDerivate(j);
-    org.jdom.Document xml = createXML();
-    MCRTypedContent mcr_tc = createTypedContent();
-    String mcr_ts = createTextSearch();
-    mcr_persist.update(mcr_tc,xml,mcr_ts);
-    mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,xml);
+    mcr_persist.update(this);
+    mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
     }
   else {
     throw new MCRPersistenceException("The derivate link "+link.getXLinkHref()+
@@ -575,13 +566,10 @@ private final void updateThisInDatastore()
   throws MCRPersistenceException
   {
   mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,xml);
+  mcr_persist.update(this);
+  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
   deleteLinksFromTable();
-  addLinksToTable(mcr_tc);
+  addLinksToTable();
   }
 
 /**
@@ -630,11 +618,10 @@ private final void updateMetadataInDatastore(MCRObjectID child_id)
 /**
  * The method add all class and reference links of this instance to 
  * the link table.
- * 
- * @param mcr_tc the typed content list
  **/
-private void addLinksToTable(MCRTypedContent mcr_tc)
+private void addLinksToTable()
   {
+  MCRTypedContent mcr_tc = createTypedContent();
   int i = 0;
   while ((i<mcr_tc.getSize())&&(!mcr_tc.getNameElement(i).equals("metadata"))) {
     i++; }

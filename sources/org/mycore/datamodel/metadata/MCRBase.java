@@ -61,7 +61,7 @@ protected static MCRLinkTableManager mcr_linktable = null;
 protected static MCRXMLTableManager mcr_xmltable = null;
 
 // interface classes
-protected static MCRObjectPersistenceInterface mcr_persist;
+protected static MCRObjectSearchStoreInterface mcr_persist;
 
 // the DOM document
 protected org.jdom.Document jdom_document = null;
@@ -104,7 +104,7 @@ static
     String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
       "_class_name";
     persist_name = mcr_conf.getString(proppers);
-    mcr_persist = (MCRObjectPersistenceInterface)Class.forName(persist_name)
+    mcr_persist = (MCRObjectSearchStoreInterface)Class.forName(persist_name)
       .newInstance(); 
     }
   catch (Exception e) {

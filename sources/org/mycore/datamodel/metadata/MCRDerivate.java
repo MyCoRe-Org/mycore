@@ -230,10 +230,7 @@ public final void createInDatastore() throws MCRPersistenceException
   // prepare the derivate metadata and store under the XML table
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,xml);
+  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,createXML());
   // create data in IFS
   if (getDerivate().getInternals() != null) {
     File f = new File(getDerivate().getInternals().getSourcePath());
@@ -252,7 +249,7 @@ public final void createInDatastore() throws MCRPersistenceException
     }
   // create the derivate in the search store
   try {
-    mcr_persist.create(mcr_tc,xml,mcr_ts); }
+    mcr_persist.create(this); }
   catch (Exception e) { 
     // delete from IFS
     MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
@@ -457,11 +454,8 @@ public final void updateInDatastore() throws MCRPersistenceException
   // update the derivate
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");
-  org.jdom.Document xml = createXML();
-  MCRTypedContent mcr_tc = createTypedContent();
-  String mcr_ts = createTextSearch();
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,xml);
-  mcr_persist.update(mcr_tc,xml,mcr_ts);
+  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_persist.update(this);
   // add the link to metadata
   for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
     MCRMetaLinkID meta = getDerivate().getLinkMeta(i);

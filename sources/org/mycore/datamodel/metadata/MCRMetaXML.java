@@ -153,7 +153,7 @@ public org.jdom.Element createXML() throws MCRException
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
   for (int i=0;i<xmllist.size();i++) {
-    elm.addContent(((org.jdom.Element)xmllist.get(i))); }
+    elm.addContent(((org.jdom.Element)xmllist.get(i)).detach()); }
   return elm;
   }
 
