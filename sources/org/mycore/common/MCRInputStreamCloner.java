@@ -66,23 +66,6 @@ public class MCRInputStreamCloner {
 		streamSource.deleteOnExit();
 	}
 
-	private static final File getStreamFile(File dir, int hash)
-		throws IOException {
-		File returns = null;
-		final String prefix = "javaStream";
-		if (!dir.canRead())
-			throw new IOException("Access denied(read): " + dir.getName());
-		if (!dir.canWrite())
-			throw new IOException("Access denied(write): " + dir.getName());
-		for (int i = 0; i < Integer.MAX_VALUE; i++) {
-			returns = new File(dir, prefix + hash + "-" + i + ".tmp");
-			if (!returns.exists()) {
-				returns.createNewFile();
-				break;
-			}
-		}
-		return returns;
-	}
 
 	public InputStream getNewInputStream() throws IOException {
 		if (!streamSource.exists())
