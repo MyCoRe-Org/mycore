@@ -462,13 +462,37 @@ public class MCRObjectCommands
     // XML table manager
     MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
     ArrayList ar = mcr_xml.retrieveAllIDs(type);
-    MCRObject obj = new MCRObject();
     String stid = null;
     for (int i=0;i<ar.size();i++) { 
       stid = (String)ar.get(i);
+      MCRObject obj = new MCRObject();
       obj.repairPersitenceDatastore(stid);
       logger.info("Repaired "+(String)ar.get(i)); 
       }
+    logger.info(" ");
+    }
+
+ /**
+  * The method start the repair aof the metadata search for a given
+  * MCRObjectID as String.
+  *
+  * @param id the MCRObjectID as String
+  **/
+  public static void repairMetadataSearchForID(String id)
+    {
+    init();
+    logger.info("Start the repair for the ID "+id);
+    MCRObjectID mid = null;
+    try {
+      mid = new MCRObjectID(id); }
+    catch (Exception e) {
+      logger.error("The String "+id+" is not a MCRObjectID.");
+      logger.info(" ");
+      return;
+      }
+    MCRObject obj = new MCRObject();
+    obj.repairPersitenceDatastore(mid);
+    logger.info("Repaired "+mid.getId()); 
     logger.info(" ");
     }
 

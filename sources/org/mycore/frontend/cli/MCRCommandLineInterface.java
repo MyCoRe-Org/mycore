@@ -155,6 +155,9 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "repair metadata search of type {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "repair metadata search of ID {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String" );
 
     // *************************************************
     // Commands for derivate management
