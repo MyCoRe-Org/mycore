@@ -332,11 +332,10 @@ class MCREditorRequest
       }	
     }  
   }
-    
-  Document loadEditorXML()
-    throws Exception
+  
+  Document loadEditorXML( String editorFile )
   {
-    String name = "/WEB-INF/editor/editor-" + editorID + ".xml";
+    String name = "/WEB-INF/editor/" + editorFile;
     String path = context.getRealPath( name );
     File   file = new File( path );
     long   time = file.lastModified();
@@ -349,6 +348,56 @@ class MCREditorRequest
       editorCache.put( path, editor );
     }
 
+    return editor;
+  }
+    
+  Document loadEditorXML()
+    throws Exception
+  {
+    Document editor = loadEditorXML( "editor-" + editorID + ".xml" );
+    Element components = editor.getRootElement().getChild( "components" );
+    
+    // Recursively substitute <include file="name.xml"> with file contents
+    while( components.getChildren( "include" ).size() > 0 )
+    {
+      List includes = components.getChildren( "include" );
+      
+      for( int i = 0; i < includes.size(); i++ )
+      {
+        Element include = (Element)( includes.get( i ) );
+        include.detach();
+        
+        String filename = include.getAttributeValue( "file" );
+        Document included = loadEditorXML( filename );
+      
+        List children = included.getRootElement().getChildren(); 
+        for( int j = 0; j < children.size(); j++ )
+        {
+          Element child = (Element)( (Element)( children.get( j ) ) ).clone();
+          components.addContent( child );
+        }
+      }
+    }
+    
+    List panels = components.getChildren( "panel" );
+    for( int i = 0; i < panels.size(); i++ )
+    {
+      Element panel = (Element)( panels.get( i ) );
+      Attribute attrib = panel.getAttribute( "extends" );
+      if( attrib == null ) continue;
+      
+      String id = attrib.getValue().trim();
+      attrib.detach();
+      if( id.length() == 0 ) continue;
+      
+      // find panel with that id
+      // copy panel contents into this panel
+      
+      // add recursion to this
+      
+      // what to include, what not?
+    }
+    
     return editor;
   }
 
