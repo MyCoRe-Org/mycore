@@ -117,6 +117,20 @@ public class MCRCommandLineInterface
       "get next object ID for base {0}",
       "mycore.commandline.MCRObjectCommands.getID String" );
  
+    // ******************************
+    // Commands for executing queries
+    // ******************************
+
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "query local {0} {1}",
+      "mycore.commandline.MCRQueryCommands.queryLocal String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "query remote {0} {1}",
+      "mycore.commandline.MCRQueryCommands.queryRemote String String" );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "query host {0} {1} {2}",
+      "mycore.commandline.MCRQueryCommands.query String String String" );
+
     // **************************************
     // Commands for user and group management
     // **************************************
@@ -164,6 +178,12 @@ public class MCRCommandLineInterface
       "set password for user {0} to {1}",
       "mycore.commandline.MCRUserCommands.setPassword String String" );
   }   
+
+  public static void test( String a, String b )
+  {
+    System.out.println( "[" + a + "]" );
+    System.out.println( "[" + b + "]" );
+  }
 
  /** 
   * The main method that either shows up an interactive command prompt or

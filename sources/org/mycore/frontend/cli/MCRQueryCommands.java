@@ -35,45 +35,45 @@ import mycore.communication.MCRCommunicationInterface;
 import mycore.communication.MCRSocketCommunication;
 
 /**
- * This class implements a main program, which start a query to a local
+ * This class implements the query command to start a query to a local
  * Library Server or to any remote Library Server in a configuration
  * list or to a dedicated named remote Library Server.
  * The result was presided as a text output.
- * <p>
- * The follwing parameter must you give
- * <ul>
- * <li> [local|remort|<em>hostname</em>] - for the Library Server location
- * <li> <em>type</em> - for the MCRObjectID - type
- * <li> <em>query</em> - the query for the search
- * </ul>
  *
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  **/
-final public class MCRQueryTool
+final public class MCRQueryCommands
 {
+  /** Executes a local query */
+  public static void queryLocal( String type, String query )
+    throws Exception
+  { query( "local", type, query ); }
 
-/**
- * The query commandline tool.
- *
- * @param args   the argument string from the command line.
- **/
-public static void main(String[] args)
+  /** Executes a remote query */
+  public static void queryRemote( String type, String query )
+    throws Exception
+  { query( "remote", type, query ); }
+
+ /**
+  * The query command
+  *
+  * @param host  either "local", "remote" or hostname
+  * @param type  the result type, "document" of "legalentity"
+  * @param query the query expression
+  **/
+  public static void query( String host, String type, String query )
+    throws Exception
   {
-  System.out.println();
-  System.out.println("* * * M y C o R e * * *");
-  System.out.println();
-  System.out.println("Version 1.0");
-  System.out.println();
+    host  = host .toLowerCase();
+    type  = type .toLowerCase();
+    query = query.toLowerCase();
 
-  if (args.length != 3) { usage(); System.exit(1); }
-  String host = args[0].toLowerCase();
-  String type = args[1].toLowerCase();
-  String query = args[2].toLowerCase();
-  System.out.println("Host  : "+host);
-  System.out.println("Type  : "+type);
-  System.out.println("Query : "+query);
-  System.out.println();
+    System.out.println( "Host  : " + host  );
+    System.out.println( "Type  : " + type  );
+    System.out.println( "Query : " + query );
+    System.out.println();
 
   MCRConfiguration config = MCRConfiguration.instance();
 
@@ -121,19 +121,6 @@ public static void main(String[] args)
 
   System.out.println("Ready.");
   System.out.println();
-  System.exit(0);
-  }
-
-/**
- * This methode print the usage of this tool.
- **/
-private static final void usage()
-  {
-  System.out.println(); 
-  System.out.println("Usage : java MCRQueryTool [local   ] type query");
-  System.out.println("                          [remote  ]");
-  System.out.println("                          [hostname]");
-  System.out.println(); 
   }
 
 /**
@@ -143,35 +130,31 @@ private static final void usage()
  **/
 private static final void printResult(MCRQueryResult results,
   MCRConfiguration config, String type)
+  throws Exception
   {
   String xsltoneresult = config.getString("MCR.xslt_oneresult_"+type);
   String outtype = config.getString("MCR.out_type_"+type);
   String outpath = config.getString("MCR.out_path_"+type);
   TransformerFactory transfakt = TransformerFactory.newInstance();
-  try {
-    Transformer trans = 
-      transfakt.newTransformer(new StreamSource(xsltoneresult));
-    for (int l=0;l<results.getSize();l++) {
-      String mcrid = results.getMCRObjectIdOfElement(l);
-      String mcrxml = results.getXMLOfElement(l);
-      System.out.println(mcrid); 
-      System.out.println();
-      StreamResult sr = null;
-      if (outpath.equals("SYSOUT")) {
-        sr = new StreamResult((OutputStream) System.out); }
-      else {
-        System.out.println(outpath+System.getProperty("file.separator")+
-          mcrid+"."+outtype);
-        sr = new StreamResult(outpath+System.getProperty("file.separator")+
-          mcrid+"."+outtype); }
-      trans.transform(new StreamSource((Reader)new StringReader(mcrxml)),sr);
-      System.out.println();
-      }
+  Transformer trans = 
+    transfakt.newTransformer(new StreamSource(xsltoneresult));
+  for (int l=0;l<results.getSize();l++) {
+    String mcrid = results.getMCRObjectIdOfElement(l);
+    String mcrxml = results.getXMLOfElement(l);
+    System.out.println(mcrid); 
+    System.out.println();
+    StreamResult sr = null;
+    if (outpath.equals("SYSOUT")) {
+      sr = new StreamResult((OutputStream) System.out); }
+    else {
+      System.out.println(outpath+System.getProperty("file.separator")+
+        mcrid+"."+outtype);
+      sr = new StreamResult(outpath+System.getProperty("file.separator")+
+        mcrid+"."+outtype); }
+    trans.transform(new StreamSource((Reader)new StringReader(mcrxml)),sr);
+    System.out.println();
     }
-  catch (Exception e) {
-    System.out.println(e.getMessage()); }
   System.out.println();
   }
-
 }
 
