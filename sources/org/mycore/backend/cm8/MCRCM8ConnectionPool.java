@@ -38,7 +38,7 @@ import org.mycore.common.MCRPersistenceException;
 
 /**
  * This class implements a pool of database connections to
- * IBM Content Manager 7.1 Library Server. Other classes get
+ * IBM Content Manager 8.1 Library Server. Other classes get
  * a connection from the pool when they need one and release
  * the connection after their work has finished.
  *
@@ -99,7 +99,7 @@ class MCRCM8ConnectionPool
     maxNumConnections = 
       config.getInt( "MCR.persistence_cm8_max_connections",1);
     int initNumConnections = 
-      config.getInt( "MCR.persistence_cm7_init_connections",maxNumConnections);
+      config.getInt( "MCR.persistence_cm8_init_connections",maxNumConnections);
     // Build the initial number of CM8 connections
     for( int i = 0; i < initNumConnections; i++ )
       freeConnections.addElement( buildConnection() );
@@ -115,8 +115,8 @@ class MCRCM8ConnectionPool
     logger.info( "Building one connection to Content Manager 8 ..." );
     try {
       DKDatastoreICM connection = new DKDatastoreICM();
+      logger.debug("Server="+serverName+"  User="+uid+"  PW="+password);
       connection.connect( serverName, uid, password, "" );
-//      connection.setOption( DK_OPT_DL_WAKEUPSRV, new Integer( DK_FALSE ) );
       return connection;
       }
     catch( Exception ex ) {
