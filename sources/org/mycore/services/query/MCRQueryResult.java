@@ -25,6 +25,10 @@
 package org.mycore.services.query;
 
 import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
@@ -46,6 +50,9 @@ import org.mycore.common.xml.MCRXMLContainer;
 public class MCRQueryResult
 {
 
+// The logger
+private static Logger logger = Logger.getLogger(MCRQueryResult.class);
+
 // The list of hosts from the configuration
 private ArrayList remoteAliasList = null;
 
@@ -60,6 +67,7 @@ public MCRQueryResult()
   {
   // get an instance of configuration
   conf = MCRConfiguration.instance();
+  PropertyConfigurator.configure(conf.getLoggingProperties());
   // read host list from configuration
   String hostconf = conf.getString("MCR.remoteaccess_hostaliases","local");
   remoteAliasList = new ArrayList();
@@ -73,6 +81,8 @@ public MCRQueryResult()
     else {
       remoteAliasList.add(hostconf.substring(i,k)); i = k+1; }
     }
+  for (i=0;i<remoteAliasList.size();i++) {
+    logger.debug("Remote host = "+(String)remoteAliasList.get(i)); }
   }
 
 /**
@@ -90,9 +100,9 @@ public MCRQueryResult()
 public final MCRXMLContainer setFromQuery(String host, String type,
   String query) throws MCRException, MCRConfigurationException
   {
-  System.out.println( "hosts = " + host  );
-  System.out.println( "type  = " + type  );
-  System.out.println( "query = " + query );
+  logger.debug( "setFromQuery:hosts = " + host  );
+  logger.debug( "setFromQuery:type  = " + type  );
+  logger.debug( "setFromQuery:query = " + query );
 
   // check the type
   type  = type.toLowerCase();
