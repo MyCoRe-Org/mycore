@@ -56,7 +56,6 @@ public class MCRQueryServlet extends MCRServlet {
 
 	// Default Language (as UpperCase)
 	private String defaultLang = "";
-	private String sortType = "";
 	private static final String MCRSorterConfPrefix = "MCR.XMLSorter";
 	private static final String MCRSorterConfDelim = "\"+lang+\"";
 	private static final String MCRStdSorter =
@@ -101,9 +100,6 @@ public class MCRQueryServlet extends MCRServlet {
 		PropertyConfigurator.configure(conf.getLoggingProperties());
 		defaultLang =
 			conf.getString("MCR.metadata_default_lang", "en").toUpperCase();
-		sortType = conf.getString("MCR.XMLSortType", "OutOfFunction");
-		if (sortType.equals("OutOfFunction"))
-			throw new MCRException("Property MCR.XMLSortType undefined but needed for sorting and browsing!");
 	}
 
 	/**
@@ -217,17 +213,16 @@ public class MCRQueryServlet extends MCRServlet {
 				return;
 			}
 
-			if (customSort && type.equals(sortType)) {
+			if (customSort) {
 				// when I'm in here a ResultList exists and I have to resort it.
 				reSort(request, response, jdom);
-			}
-			if ((view.equals("prev") || view.equals("next"))
-				&& (referer != null)) {
+			} else if (
+				(view.equals("prev") || view.equals("next"))
+					&& (referer != null)) {
 				// user want's to browse the documents here..
 				browse(request, response, jdom);
 				return;
-			}
-			if (offset == 0 && size == 0) {
+			} else if (offset == 0 && size == 0) {
 				try {
 					offset =
 						Integer.parseInt(
@@ -255,24 +250,16 @@ public class MCRQueryServlet extends MCRServlet {
 			} catch (InterruptedException ignored) {
 			}
 			// set neighbour status for documents
-			if (type.equals(sortType) && (resarray.size() == 1))
+			if (resarray.size() == 1)
 				resarray.setStatus(0, status);
 			// cut results if more than "maxresults"
 			else if (maxresults > 0)
 				resarray.cutDownTo(maxresults);
-			// create a new session if not already alive and encache result list
-			if (mode.equals("ResultList")) {
-				session = request.getSession(true);
-				if (type.equals(sortType))
-					jdom =
-						sort(resarray, lang.toLowerCase())
-							.exportAllToDocument();
-				else
-					jdom = resarray.exportAllToDocument();
-				// no Resultlist for documents: why sort?
-			} else
-				jdom = resarray.exportAllToDocument();
-			// no result list --> no sort needed
+			jdom = resarray.exportAllToDocument();
+			if (customSort) {
+				// when I'm in here a ResultList exists and I have to resort it.
+				reSort(request, response, jdom);
+			}
 		}
 		if (mode.equals("ResultList")) {
 			jdom.getRootElement().setAttribute(
@@ -639,8 +626,11 @@ public class MCRQueryServlet extends MCRServlet {
 		if (layout.equals("")) {
 			layout = type;
 		}
-		try { String ct = conf.getString("MCR.type_"+type.toLowerCase()); }
-		catch(MCRConfigurationException ce) { return false; }
+		try {
+			String ct = conf.getString("MCR.type_" + type.toLowerCase());
+		} catch (MCRConfigurationException ce) {
+			return false;
+		}
 		if (lang == null) {
 			lang = defaultLang;
 		}
@@ -689,21 +679,18 @@ public class MCRQueryServlet extends MCRServlet {
 		}
 	}
 	private final int getStatus(HttpServletRequest request) {
-		if (type.equals(sortType)) {
-			int status =
-				(getProperty(request, "status") != null)
-					? Integer.parseInt(getProperty(request, "status"))
-					: 0;
-			if (logger.isDebugEnabled()) {
-				boolean successor = ((status % 2) == 1) ? true : false;
-				boolean predecessor = (((status >> 1) % 2) == 1) ? true : false;
-				logger.debug("MCRQueryServlet : status = " + status);
-				logger.debug("MCRQueryServlet : predecessor = " + predecessor);
-				logger.debug("MCRQueryServlet : successor = " + successor);
-			}
-			return status;
-		} else
-			return 0;
+		int status =
+			(getProperty(request, "status") != null)
+				? Integer.parseInt(getProperty(request, "status"))
+				: 0;
+		if (logger.isDebugEnabled()) {
+			boolean successor = ((status % 2) == 1) ? true : false;
+			boolean predecessor = (((status >> 1) % 2) == 1) ? true : false;
+			logger.debug("MCRQueryServlet : status = " + status);
+			logger.debug("MCRQueryServlet : predecessor = " + predecessor);
+			logger.debug("MCRQueryServlet : successor = " + successor);
+		}
+		return status;
 	}
 	private final Document queryClassification(HttpServletRequest request) {
 		String squence =
@@ -799,7 +786,6 @@ public class MCRQueryServlet extends MCRServlet {
 				.toString();
 		host = refGet.nextToken();
 		mode = "ObjectMetadata";
-		type = sortType;
 		request.setAttribute("mode", mode);
 		request.removeAttribute("status");
 		request.setAttribute("status", StrStatus);
