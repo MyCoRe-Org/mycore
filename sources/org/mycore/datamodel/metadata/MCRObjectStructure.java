@@ -26,6 +26,7 @@ package mycore.datamodel;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import java.util.Vector;
 
 /**
  * This class treats the outer structure of documents, that is the
@@ -75,7 +76,7 @@ public class MCRObjectStructure
   public final boolean addLink (MCRMetaLink add_link)
   {
     String role = add_link.getRole();
-    String role_trim = null;
+    String role_link= null;
     if (role == null) role = "";
     role = role.trim();
     String href = add_link.getHrefToString();
@@ -199,7 +200,7 @@ public class MCRObjectStructure
     for (i = 0; i < n; ++i)
     {
       link = (MCRMetaLink) the_links.elementAt(i);
-      ts_str += link.createTS(mcr_query);
+      ts_str += link.createTS(mcr_query, "child");
       role = link.getRole();
       if (role == null) continue;
       if (! role.trim().equals("parent")) continue;
