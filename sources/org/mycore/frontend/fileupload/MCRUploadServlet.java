@@ -170,7 +170,6 @@ public final class MCRUploadServlet
       String   uploadId = this.getStringParameter( req, "uploadId" );
       MCRUploadHandlerInterface uploadHandler = MCRUploadHandlerManager.instance().getHandle( uploadId );
       uploadHandler.finishUpload( ); 
-      MCRUploadHandlerManager.instance().unregister( uploadId );
       sendResponse( res, "upload finished." );
     }
   }
