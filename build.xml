@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.47 $ $Date: 2003-08-05 15:57:13 $                       -->
+  <!-- $Revision: 1.48 $ $Date: 2003-08-06 07:14:04 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -16,8 +16,11 @@
   <property name="optimize"    value="on"  />
   <property name="deprecation" value="off" />
 
-  <!-- System CLASSPATH is used AFTER any other path -->
+  <!-- System CLASSPATH is completely ignored! -->
   <property name="build.sysclasspath" value="ignore"/>
+
+  <!-- Read in all environment variables -->
+  <property environment="env" />
 
   <!-- MyCoRe CVS repository root -->
   <property name="CVSRoot" value="server.mycore.de:/cvs" />
@@ -37,7 +40,8 @@
         ant [target]
 
       Available targets are:
-        jar           --> Creates file lib/mycore.jar containing all compiled classes
+	info          --> Shows Java/Ant/Operating System version, CLASSPATH etc.
+        jar           --> Creates file lib/mycore-for-*.jar containing all compiled classes
         compile       --> Compiles all source code to directory classes
         compile_[pkg] --> Compiles only a certain package (see build.xml for details)
         javadocs      --> Generates JavaDoc API documentation as HTML in directory javadocs
@@ -48,31 +52,62 @@
   </target>
 
   <!-- =================================================================== -->
+  <!-- Output environment variables, software and operating system version -->
+  <!-- =================================================================== -->
+
+  <target name="info" depends="init" description="display software and os versions">
+    <property name="mcr.classpath" refid="mycore.classpath" />
+
+    <echo>Base directory   : ${basedir}</echo>
+    <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
+    <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
+    <echo>Java home        : ${env.JAVA_HOME}</echo>
+    <echo>Ant build file   : $Revision: 1.48 $ $Date: 2003-08-06 07:14:04 $</echo>
+    <echo>Ant version      : ${ant.version}</echo>
+    <echo>Ant home         : ${env.ANT_HOME}</echo>
+    <echo>Persistency type : ${env.MCR_PERSISTENCE}</echo>
+    <echo>IBM CM home      : ${env.CM_HOME}</echo>
+    <echo>System CLASSPATH : ${build.sysclasspath}</echo>
+    <echo>Active CLASSPATH : ${mcr.classpath}</echo>
+  </target>
+
+  <!-- =================================================================== -->
   <!-- Initialize directories and some configuration properties            -->
   <!-- =================================================================== -->
 
   <target name="init">
     <echo>Initializing directories and classpath...</echo>
+
     <mkdir dir="${basedir}/classes"  />
     <mkdir dir="${basedir}/javadocs" />
+
+    <!-- If directory $CM_HOME/lib exists, include all cmb*.jar there -->
+    <condition property="CM_LIB_DIR" value="${env.CM_HOME}/lib">
+      <available file="${env.CM_HOME}/lib" type="dir"/>
+    </condition>
+    <condition property="CM_LIB_DIR" value="${basedir}/lib">
+      <not>
+        <available file="${env.CM_HOME}/lib" type="dir"/>
+      </not>
+    </condition>
 
     <path id="mycore.classpath">
       <fileset dir="${basedir}/lib">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="${CM_HOME}/lib">
+      <fileset dir="${CM_LIB_DIR}">
         <include name="cmb*.jar"/>
       </fileset>
     </path>
   </target>
 
   <!-- =================================================================== -->
-  <!-- Creates a mycore.jar file containing all compiled MyCoRe classes    -->
+  <!-- Creates a mycore-for-*.jar file containing all compiled MyCoRe classes  -->
   <!-- =================================================================== -->
 
-  <target name="jar" depends="compile" description="creates lib/mycore.jar">
-    <echo>Creating mycore.jar containing all compiled classes...</echo>
-    <jar jarfile="${basedir}/lib/mycore.jar" basedir="${basedir}/classes"/>
+  <target name="jar" depends="compile" description="creates lib/mycore-for-*.jar">
+    <echo>Creating mycore-for-${env.MCR_PERSISTENCE}.jar containing all compiled classes...</echo>
+    <jar jarfile="${basedir}/lib/mycore-for-${env.MCR_PERSISTENCE}.jar" basedir="${basedir}/classes"/>
     <echo>---------------------------------------------------------</echo>
   </target>
   
@@ -104,9 +139,18 @@
   </target>
 
   <target name="compile_persistency">
-    <echo>Compiling persistence implementation ${PERSISTENCE}</echo>
+    <echo>Compiling persistence implementation ${env.MCR_PERSISTENCE}</echo>
+
+    <!-- For internal use: setting MCR_PERSISTENCE=all will compile cm7 and cm8 and xmldb -->
+    <condition property="mcr.packages" value="org/mycore/backend/${env.MCR_PERSISTENCE}/**">
+      <not><equals arg1="${env.MCR_PERSISTENCE}" arg2="all" /></not>
+    </condition>
+    <condition property="mcr.packages" value="org/mycore/backend/cm7/**, org/mycore/backend/cm8/**, org/mycore/backend/xmldb/**">
+      <equals arg1="${env.MCR_PERSISTENCE}" arg2="all" />
+    </condition>
+
     <antcall target="javac">
-      <param name="packages" value="org/mycore/backend/${PERSISTENCE}/**"/>
+      <param name="packages" value="${mcr.packages}"/>
     </antcall>
   </target>
 
@@ -220,6 +264,14 @@
       </not>
     </condition>
 
+    <condition property="exclude.cm8" value="org.mycore.backend.cm8">
+      <not><available classname="com.ibm.mm.sdk.common.DKServerDefICM" classpathref="mycore.classpath"/></not>
+    </condition>
+
+    <condition property="exclude.cm7" value="org.mycore.backend.cm7">
+      <not><available classname="com.ibm.mm.sdk.server.DKDatastoreDL" classpathref="mycore.classpath"/></not>
+    </condition>
+
   </target>
 
   <!-- =================================================================== -->
@@ -230,7 +282,7 @@
     <echo>Building the MyCoRe JavaDoc API documentation...</echo>
     <javadoc
       packagenames        = "org.mycore.*"
-      excludepackagenames = "org.mycore.backend.cm8"
+      excludepackagenames = "${exclude.cm7},${exclude.cm8}"
       sourcepath          = "${basedir}/sources"
       destdir             = "${basedir}/javadocs"
       classpathref        = "mycore.classpath"
@@ -268,7 +320,7 @@
     <echo> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
     <javadoc
       packagenames        = "org.mycore.*"
-      excludepackagenames = "org.mycore.backend.cm8"
+      excludepackagenames = "${exclude.cm7},${exclude.cm8}"
       sourcepath          = "${basedir}/sources"
       classpathref        = "mycore.classpath"
       author              = "true"
@@ -318,8 +370,8 @@
     <delete dir="${basedir}/classes"  />
     <delete includeEmptyDirs="true" >
       <fileset dir="${basedir}/documentation" includes="*.toc *.aux *.dvi *.lof *.lot *.log *.idx *.glo *.out" />
+      <fileset dir="${basedir}/lib" includes="mycore*.jar" />
     </delete>
-    <delete file="${basedir}/lib/mycore.jar" />
     <echo>---------------------------------------------------------</echo>
   </target>
 
@@ -393,7 +445,7 @@
   <!-- Do work after a CVS commit...                                       -->
   <!-- =================================================================== -->
 
-  <target name="postcommit" depends="update, javadocs, java2pdf, tex2pdf">
+  <target name="postcommit" depends="update, jar, javadocs, java2pdf, tex2pdf">
     <antcall target="do-log"><param name="changelog-year" value="2003" /></antcall>
   </target>
 

@@ -22,7 +22,7 @@ JAVA_HOME=/usr/java_dev2
 ANT_HOME=/opt/jakarta-ant-1.5.1
 
 # Persistence implementation to use [cm7 | cm8 | xmldb]
-PERSISTENCE=cm7
+MCR_PERSISTENCE=cm7
 
 # If you use cm7 or cm8, directory where IBM Content Manager is installed
 CM_HOME=/usr/lpp/cmb/
@@ -35,8 +35,8 @@ CM_HOME=/usr/lpp/cmb/
 
 export JAVA_HOME
 export ANT_HOME
-export PATH=$ANT_HOME/bin:$PATH
+export MCR_PERSISTENCE
+export CM_HOME
 
-cd ..
-ant -DCM_HOME=$CM_HOME -DPERSISTENCE=$PERSISTENCE $*
+$ANT_HOME/bin/ant -find build.xml $*
 
