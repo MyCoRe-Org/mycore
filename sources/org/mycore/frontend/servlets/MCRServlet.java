@@ -199,7 +199,7 @@ public class MCRServlet extends HttpServlet
    * indicate the HTTP 1.1 status code 501 (Not Implemented).
    */
   protected void doGetPost(MCRServletJob job) throws Exception
-  { job.getResponse().sendError(job.getResponse().SC_NOT_IMPLEMENTED); }
+  { job.getResponse().sendError(HttpServletResponse.SC_NOT_IMPLEMENTED); }
 
   /**
    * This method gets a string parameter defined by parameterName out of the request.
