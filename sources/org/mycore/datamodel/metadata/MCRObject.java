@@ -312,7 +312,7 @@ public final void setStructure(MCRObjectStructure structure)
 public final String createXML()
   {
   StringBuffer sb = new StringBuffer(4096);
-  sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(NL);
+  sb.append("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>").append(NL);
   sb.append("<mycoreobject ")
     .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
     .append(NL);
@@ -352,10 +352,10 @@ public final String createTS() throws MCRConfigurationException
       throw new MCRException(e.getMessage()); }
     }
   StringBuffer sb = new StringBuffer(4096);
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringAttrib("Object",
-    "ID",mcr_id.getId()));
-  sb.append(((MCRQueryInterface)mcr_query).createSearchStringAttrib("Object",
-    "Label",mcr_label));
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
+    null,null,"ID",null,null,mcr_id.getId()));
+  sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Object",
+    null,null,"Label",null,null,mcr_label));
   sb.append(mcr_struct.createTS(mcr_query));
   sb.append(mcr_metadata.createTS(mcr_query));
   sb.append(mcr_service.createTS(mcr_query));

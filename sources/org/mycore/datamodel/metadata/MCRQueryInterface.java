@@ -51,25 +51,26 @@ public Vector getResultList(String query, String type, int maxresult)
 
 /**
  * The methode returns the search string for a XML text field for
- * the persistence system.
+ * the IBM Content Manager 7 persistence system.a<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag sattrib="svalue"&gt;<br>
+ * &lt;innertag iattrib="ivalue"&gt;<br>
+ * text<br>
+ * &lt;/innertag&gt;<br>
+ * &lt;/subtag&gt;
  *
  * @param subtag             the tagname of an element from the list in a tag
- * @param value              the text value of this element
- * @return the search string for the text search engine
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param innertag           the optional inner tag of a subtag element
+ * @param iattrib            the optional attribute vector of a innertag
+ * @param ivalue             the optional value vector of iattrib
+ * @param text               the text value of this element
+ * @return the search string for the CM7 text search engine
  **/
-public String createSearchStringText(String subtag, String value);
-
-/**
- * The methode returns the search string for a XML attribute field for
- * the persistence system.
- *
- * @param subtag             the tagname of an element from the list in a tag
- * @param attrib             the attribute name of this attribute
- * @param value              the text value of this attribute
- * @return the search string for the text search engine
- **/
-public String createSearchStringAttrib(String subtag, String attrib, 
-  String value);
+public String createSearchStringText(String subtag, String [] sattrib,
+  String [] svalue, String innertag, String [] iattrib, String [] ivalue,
+  String text);
 
 }
 

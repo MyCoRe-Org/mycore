@@ -624,7 +624,7 @@ public final String createTS(Object mcr_query)
   if (flag.size()!=0) {
     for (int i=0;i<flag.size();i++) {
       sb.append(((MCRQueryInterface)mcr_query).createSearchStringText("Flag",
-        (String)flag.elementAt(i)));
+        null,null,null,null,null,(String)flag.elementAt(i)));
       }
     }
   else {

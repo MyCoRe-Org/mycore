@@ -161,46 +161,49 @@ private final String setContainsCondition(String condition)
 
 /**
  * The methode returns the search string for a XML text field for
- * the IBM Content Manager 7 persistence system.
+ * the IBM Content Manager 7 persistence system.a<p>
+ * A full XML tag element shows like<br>
+ * &lt;subtag sattrib="svalue"&gt;<br>
+ * &lt;innertag iattrib="ivalue"&gt;<br>
+ * text<br>
+ * &lt;/innertag&gt;<br>
+ * &lt;/subtag&gt;
  *
  * @param subtag             the tagname of an element from the list in a tag
- * @param value              the text value of this element
+ * @param sattrib            the optional attribute vector of a subtag
+ * @param svalue             the optional value vector of sattrib
+ * @param innertag           the optional inner tag of a subtag element
+ * @param iattrib            the optional attribute vector of a innertag
+ * @param ivalue             the optional value vector of iattrib
+ * @param text               the text value of this element
  * @return the search string for the CM7 text search engine
  **/
-public final String createSearchStringText(String subtag, String value)
+public final String createSearchStringText(String subtag, String [] sattrib,
+  String [] svalue, String innertag, String [] iattrib, String [] ivalue,
+  String text)
   {
   if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
     return ""; }
-  if ((value == null) || ((value = value.trim()).length() ==0)) {
-    return ""; }
   StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(subtag.toUpperCase()).append("XXX ");
-  sb.append(value.toUpperCase()).append(NL);
-  return sb.toString();
-  }
-
-/**
- * The methode returns the search string for a XML attribute field for
- * the IBM Content Manager 7 persistence system.
- *
- * @param subtag             the tagname of an element from the list in a tag
- * @param attrib             the attribute name of this attribute
- * @param value              the text value of this attribute
- * @return the search string for the CM7 text search engine
- **/
-public final String createSearchStringAttrib(String subtag, String attrib, 
-  String value)
-  {
-  if ((subtag == null) || ((subtag = subtag.trim()).length() ==0)) {
-    return ""; }
-  if ((attrib == null) || ((attrib = attrib.trim()).length() ==0)) {
-    return ""; }
-  if ((value == null) || ((value = value.trim()).length() ==0)) {
-    return ""; }
-  StringBuffer sb = new StringBuffer(1024);
-  sb.append("XXX").append(subtag.toUpperCase()).append("XXX").
-     append(attrib.toUpperCase()).append("XXX ");
-  sb.append(value.toUpperCase()).append(NL);
+  sb.append("XXX").append(subtag.toUpperCase()).append("XXX");
+  if ((innertag != null) && ((innertag = innertag.trim()).length() !=0)) {
+    sb.append(innertag.toUpperCase()).append("XXX"); }
+  sb.append(' ');
+  if (sattrib != null) {
+    for (int i=0;i<sattrib.length;i++) {
+      sb.append("XXX").append(sattrib[i].toUpperCase()).append("XXX")
+        .append(svalue[i].toUpperCase()).append("XXX ");
+      }
+    }
+  if (iattrib != null) {
+    for (int i=0;i<iattrib.length;i++) {
+      sb.append("XXX").append(iattrib[i].toUpperCase()).append("XXX")
+        .append(ivalue[i].toUpperCase()).append("XXX ");
+      }
+    }
+  if ((text != null) && ((text = text.trim()).length() !=0)) {
+    sb.append(text.replace('\n',' ').replace('\r',' ').toUpperCase()); }
+  sb.append(NL);
   return sb.toString();
   }
 

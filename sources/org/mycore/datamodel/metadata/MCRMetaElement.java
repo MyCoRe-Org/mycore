@@ -51,7 +51,7 @@ private String META_PACKAGE_NAME = "mycore.datamodel.";
 private String lang = null;
 private String classname = null;
 private String tag = null;
-private boolean hereditary;
+private boolean heritable;
 private ArrayList list = null;
 
 /**
@@ -63,7 +63,7 @@ public MCRMetaElement()
   lang = DEFAULT_LANGUAGE; 
   classname = "";
   tag = "";
-  hereditary = false;
+  heritable = false;
   list = new ArrayList();
   }
 
@@ -83,7 +83,7 @@ public MCRMetaElement(String default_lang)
     lang = default_lang; }
   classname = "";
   tag = "";
-  hereditary = false;
+  heritable = false;
   list = new ArrayList();
   }
 
@@ -107,12 +107,12 @@ public final MCRMetaInterface getElement(int index)
   }
 
 /**
- * This methode return the hereditary of this metadata as boolean value.
+ * This methode return the heritable of this metadata as boolean value.
  *
- * @return the hereditary of this metadata class
+ * @return the heritable of this metadata class
  **/
-public final boolean getHereditary()
-  { return hereditary; }
+public final boolean getHeritable()
+  { return heritable; }
 
 /**
  * This methode return the default language of this metadata class as string.
@@ -131,27 +131,27 @@ public final String getTag()
   { return tag; }
 
 /**
- * This methode set the hereditary for the metadata class.
+ * This methode set the heritable for the metadata class.
  *
- * @param hereditary            the hereditary as boolean value
+ * @param heritable            the heritable as boolean value
  */
-public void setHereditary(boolean hereditary)
+public void setHeritable(boolean heritable)
   {
-  this.hereditary = false;
-  if (hereditary) { this.hereditary = hereditary; return; }
+  this.heritable = false;
+  if (heritable) { this.heritable = heritable; return; }
   }
 
 /**
- * This methode set the hereditary for the metadata class.
+ * This methode set the heritable for the metadata class.
  *
- * @param hereditary            the hereditary as string
+ * @param heritable            the heritable as string
  */
-public void setHereditary(String hereditary)
+public void setHeritable(String heritable)
   {
-  this.hereditary = false;
-  if ((hereditary == null) || ((hereditary = hereditary.trim()).length() ==0))
+  this.heritable = false;
+  if ((heritable == null) || ((heritable = heritable.trim()).length() ==0))
     { return; }
-  if (hereditary.equals("true")) { this.hereditary = true; }
+  if (heritable.equals("true")) { this.heritable = true; }
   }
 
 /**
@@ -189,8 +189,8 @@ public final void setFromDOM(Node metadata_element_node) throws MCRException
   tag = metadata_element_node.getNodeName(); 
   classname = ((Element)metadata_element_node).getAttribute("class");
   String fullname = META_PACKAGE_NAME+classname;
-  setHereditary((String)((Element)metadata_element_node)
-    .getAttribute("hereditary"));
+  setHeritable((String)((Element)metadata_element_node)
+    .getAttribute("heritable"));
   NodeList metadata_elements = metadata_element_node.getChildNodes();
   int len = metadata_elements.getLength();
   for (int i=0;i<len;i++) {
@@ -203,14 +203,11 @@ public final void setFromDOM(Node metadata_element_node) throws MCRException
       ((MCRMetaInterface)obj).setFromDOM(metadata_item);
       }
     catch (ClassNotFoundException e) {
-      throw new MCRException("MCRMetaElement : "+classname+
-        " ClassNotFoundException"); }
+      throw new MCRException(classname+" ClassNotFoundException"); }
     catch (IllegalAccessException e) {
-      throw new MCRException("MCRMetaElement : "+classname+
-        " IllegalAccessException"); }
+      throw new MCRException(classname+" IllegalAccessException"); }
     catch (InstantiationException e) {
-      throw new MCRException("MCRMetaElement : "+classname+
-        " InstantiationException"); }
+      throw new MCRException(classname+" InstantiationException"); }
     list.add(obj);
     }
   }
@@ -225,10 +222,10 @@ public final void setFromDOM(Node metadata_element_node) throws MCRException
 public final String createXML() throws MCRException
   {
   if (!isValid()) {
-    throw new MCRException("MCRMetaElement : The content is not valid."); }
+    throw new MCRException("The content is not valid."); }
   StringBuffer sb = new StringBuffer(1024);
   sb.append('<').append(tag).append(" class=\"").append(classname)
-    .append("\" hereditary=\"").append(hereditary).append("\">").append(NL);
+    .append("\" heritable=\"").append(heritable).append("\">").append(NL);
   for (int i=0;i<list.size();i++) {
     sb.append(((MCRMetaInterface)list.get(i)).createXML()); }
   sb.append("</").append(tag).append('>').append(NL);
@@ -287,7 +284,7 @@ public final void debug()
   System.out.println("  class name                   = "+classname);
   System.out.println("  default language             = "+lang);
   System.out.println("  tag                          = "+tag);
-  System.out.println("  hereditary                   = "+hereditary);
+  System.out.println("  heritable                    = "+heritable);
   for (int i=0;i<list.size();i++) {
     ((MCRMetaInterface)list.get(i)).debug(); }
   System.out.println();
