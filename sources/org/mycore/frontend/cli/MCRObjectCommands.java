@@ -44,7 +44,11 @@ import org.mycore.datamodel.metadata.*;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
+<<<<<<< MCRObjectCommands.java
  * @version $Revision$ $Date$
+=======
+ * @version $Revision$ $Date$
+>>>>>>> 1.29.2.2
  **/
 
 public class MCRObjectCommands
@@ -153,7 +157,7 @@ public class MCRObjectCommands
     int numProcessed = 0;
     for( int i = 0; i < list.length; i++ ) {
 	if ( ! list[ i ].endsWith(".xml") ) continue;
-        if ( list[ i ].indexOf("_derivate_") != -1 ) continue;
+        if ( list[ i ].indexOf("derivate") != -1 ) continue;
 	if( processFromFile( directory + SLASH + list[ i ], update ) )
 	    numProcessed++;
       }
