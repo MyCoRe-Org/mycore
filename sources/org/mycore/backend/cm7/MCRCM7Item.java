@@ -2,7 +2,8 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * Copyright (C) 2000 University of Essen, Germany
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -15,26 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file sources/gpl.txt.
+ * along with this program, normally in the file license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
- **/
-
-/**
- * Changes by Jens Kupferschmidt, University of Leipzig, Germany
- * Date 01.03.2001
- *
- * This class is NOT 100% compatible to the MILEES source code!
- * The following methodes are changed:
- *    addMember
- *    removeMember
- *    getNumberOfMember
- *    getAllMember
- * The following methodes are not included:
- *    swap
- *    compareTo
- *    sort
  **/
 
 package mycore.cm7;
@@ -45,7 +30,12 @@ import java.util.*;
 import java.io.File;
 
 /**
- * <B>This class implements the access routines for a CM item.</B>
+ * <B>This class implements the access routines for a IBM Content Manager
+ * item.</B>
+ *
+ * @author Frank Luetzenkirchen
+ * @author Jens Kupferschmidt
+ * @version $Revision$ $Date$
  **/
 public final class MCRCM7Item implements DKConstant
   {
@@ -56,7 +46,6 @@ public final class MCRCM7Item implements DKConstant
    * Constructor for a new Item.
    * 
    * @param ddo                 a DKDDO object
-   *
    * @exception DKException     Exceptions of CM
    **/
   public MCRCM7Item( DKDDO ddo ) throws DKException
@@ -68,7 +57,6 @@ public final class MCRCM7Item implements DKConstant
    * @param connection          the given DL connection
    * @param indexClass          the given Index Class
    * @param itemId              the item ID for the new item
-   *
    * @exception DKException     Exceptions of CM
    **/
   public MCRCM7Item(DKDatastoreDL connection, String indexClass, String itemId)
@@ -86,7 +74,6 @@ public final class MCRCM7Item implements DKConstant
    * @param connection          the given DL connection
    * @param indexClass          the given Index Class
    * @param itemType            the type for the new item
-   *
    * @exception DKException     Exceptions of CM
    **/
   public MCRCM7Item( DKDatastoreDL connection, String indexClass, short itemType)
@@ -104,8 +91,7 @@ public final class MCRCM7Item implements DKConstant
    * @param condition           the condition for search to this item
    * @param indexClass          the given Index Class
    * @param connection          the given DL connection
-   *
-   * @exception MCRCM7PersistenceException Exceptions of LeiLib
+   * @exception MCRCM7PersistenceException Exceptions of MyCoRe
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
@@ -114,12 +100,14 @@ public final class MCRCM7Item implements DKConstant
     Exception
     {
     DKNVPair parms[] = null;
-    String qs = "SEARCH=(INDEX_CLASS=" + indexClass;
+    StringBuffer qs = new StringBuffer(128);
+    qs.append("SEARCH=(INDEX_CLASS=").append(indexClass);
     if ((condition == null) || (condition.length() == 0)) {
-      qs = qs + ")"; }
+      qs.append(')'); }
     else {
-      qs = qs + ", " + "COND=(" + condition + "))"; }
-    dkQuery query = connection.createQuery(qs,DK_PARAMETRIC_QL_TYPE,parms);
+      qs.append(", COND=(").append(condition).append("))"); }
+    dkQuery query = connection.createQuery(qs.toString(),DK_PARAMETRIC_QL_TYPE,
+      parms);
     query.execute(parms);
     dkIterator iter = ((DKResults) query.result()).createIterator();
     if (! iter.more()) throw new MCRCM7PersistenceException(
@@ -132,7 +120,6 @@ public final class MCRCM7Item implements DKConstant
    * This methode returns a string with the IndexClass name.
    *
    * @return the IndexClass name
-   *
    * @exception DKException     Exceptions of CM
    **/
   public String getIndexClass()
@@ -143,7 +130,6 @@ public final class MCRCM7Item implements DKConstant
    * This methode returns a connection to the DL.
    *
    * @return a connection to the DL
-   *
    * @exception DKException     Exceptions of CM
    **/
   public DKDatastoreDL getConnection()
@@ -154,7 +140,6 @@ public final class MCRCM7Item implements DKConstant
    * This methode returns the item ID.
    *
    * @return the item ID
-   *
    * @exception DKException     Exceptions of CM
    **/
   public String getItemId()
@@ -169,98 +154,6 @@ public final class MCRCM7Item implements DKConstant
    **/
   public final void create() throws DKException, Exception
     { ddo.add(); } 
-
-  /**
-   * This methode creates the item in the datastore folder.
-   *
-   * @param item                the member item
-   *
-   * @exception DKException     Exceptions of CM
-   * @exception Exception       Exceptions of JDK
-   **/
-  public final void addMember(MCRCM7Item item)
-    throws DKException, Exception
-    {
-    short dataId = ddo.dataId(DKFOLDER);
-    DKFolder folder = (DKFolder)ddo.getData(dataId);
-    if (folder != null) {
-      folder.addMember(ddo,item.ddo);
-      }
-    else {
-      folder = new DKFolder();
-      ddo.setData(dataId,folder);
-      folder.addElement(item.ddo);
-      ddo.update();
-      }
-    }
-
-  /**
-   * This methode removes the item from the datastore folder.
-   *
-   * @param item                the member item
-   *
-   * @exception DKException     Exceptions of CM
-   * @exception Exception       Exceptions of JDK
-   **/
-  public final void removeMember(MCRCM7Item item)
-    throws DKException, Exception
-    {
-    short dataId = ddo.dataId(DKFOLDER);
-    DKFolder folder = (DKFolder)ddo.getData(dataId);
-    if (folder != null) {
-      folder.removeMember(ddo,item.ddo);
-      ddo.update();
-      }
-    else {
-      return; }
-    }
-
-  /**
-   * This methode gets the number of child items in the datastore folder.
-   *
-   * @return the number of child items
-   *
-   * @exception DKException     Exceptions of CM
-   * @exception Exception       Exceptions of JDK
-   **/
-  public final int getNumberOfMember()
-    throws DKException, Exception
-    {
-    short dataId = ddo.dataId(DKFOLDER);
-    DKFolder folder = (DKFolder)ddo.getData(dataId);
-    if (folder != null) {
-      return folder.cardinality();
-      }
-    else {
-      return 0; }
-    }
-
-  /**
-   * This methode gets the child items in the datastore folder.
-   *
-   * @return the number of child items
-   *
-   * @exception DKException     Exceptions of CM
-   * @exception Exception       Exceptions of JDK
-   **/
-  public final MCRCM7Item[] getAllMember()
-    throws DKException, Exception
-    {
-    short dataId = ddo.dataId(DKFOLDER);
-    DKFolder folder = (DKFolder)ddo.getData(dataId);
-    if (folder != null) {
-      MCRCM7Item[] members = new MCRCM7Item [folder.cardinality()];
-      dkIterator iter = folder.createIterator();
-      int i = 0;
-      while (iter.more()) {
-        members[i++] = new MCRCM7Item((DKDDO)iter.next()); }
-      for (i=0;i<members.length;i++) {
-        members[i].retrieve(); }
-      return members;
-      }
-    else {
-      return null; }
-    }
 
   /**
    * This methode retrievs the item from the datastore.
@@ -312,9 +205,7 @@ public final class MCRCM7Item implements DKConstant
    * This methode gets a value from a object to this item.
    *
    * @param name                the name of the object
-   *
    * @return an object
-   *
    * @exception DKException     Exceptions of CM
    **/
   public final Object getValue(String name) throws DKException
@@ -331,7 +222,6 @@ public final class MCRCM7Item implements DKConstant
    *
    * @param name                the name of the object
    * @param value               the value of the object
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -365,9 +255,7 @@ public final class MCRCM7Item implements DKConstant
    * This method gets a string value for the named keyfield.
    *
    * @param keyfield            the keyfield name string
-   *
    * @return the coresponding string value for the keyfield
-   *
    * @exception DKException     Exceptions of CM
    **/
   public final String getKeyfieldToString(String keyfield)
@@ -382,9 +270,7 @@ public final class MCRCM7Item implements DKConstant
    * This method gets an integer value for the named keyfield.
    *
    * @param keyfield            the keyfield name string
-   *
    * @return the coresponding integer value for the keyfield
-   *
    * @exception DKException     Exceptions of CM
    **/
   public final int getKeyfieldToInt(String aKeyfield)
@@ -395,9 +281,7 @@ public final class MCRCM7Item implements DKConstant
    * This method gets a boolean value for the named keyfield.
    *
    * @param keyfield            the keyfield name string
-   *
    * @return the coresponding boolean value for the keyfield
-   *
    * @exception DKException     Exceptions of CM
    **/
   public final boolean getKeyfieldToBoolean(String keyfield)
@@ -408,9 +292,7 @@ public final class MCRCM7Item implements DKConstant
    * This method gets a date value for the named keyfield.
    *
    * @param keyfield            the keyfield name string
-   *
    * @return the coresponding date value for the keyfield
-   *
    * @exception DKException     Exceptions of CM
    **/
   public final GregorianCalendar getKeyfieldToDate(String aKeyfield)
@@ -430,7 +312,6 @@ public final class MCRCM7Item implements DKConstant
    * @param delta               the increment/decrement value
    *
    * @return the coresponding date value for the keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -448,7 +329,6 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param keyfield            the keyfield name string
    * @param value               the value for this keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -465,7 +345,6 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param keyfield            the keyfield name string
    * @param value               the value for this keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -478,7 +357,6 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param keyfield            the keyfield name string
    * @param value               the value for this keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -491,7 +369,6 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param keyfield            the keyfield name string
    * @param value               the value for this keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -504,7 +381,6 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param keyfield            the keyfield name string
    * @param value               the value for this keyfield
-   *
    * @exception Exception       Exceptions of JDK
    * @exception DKException     Exceptions of CM
    **/
@@ -523,9 +399,7 @@ public final class MCRCM7Item implements DKConstant
    * This method returns an instance of a BLOB.
    * 
    * @param partId              the ID of the part 
-   *
    * @return a DKBlobDL
-   *
    * @exception DKException     Exceptions of CM
    **/
   public DKBlobDL getBlob(int partId)
@@ -548,9 +422,7 @@ public final class MCRCM7Item implements DKConstant
    * This method returns an instance of a Part.
    * 
    * @param partId              the ID of the part 
-   *
    * @return a string
-   *
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
@@ -558,7 +430,6 @@ public final class MCRCM7Item implements DKConstant
     {
     DKBlobDL part = getBlob(partId);
     if(part == null) { return null; }
-//    if(part.isNull()) { return null; }
     String content = new String(part.getContent());
     if ( content.equals( "--null--" ) )
       return null;
@@ -570,9 +441,7 @@ public final class MCRCM7Item implements DKConstant
    * This method returns an instance of a Part as byte array.
    * 
    * @param partId              the ID of the part 
-   *
    * @return a array of byte
-   *
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
@@ -581,7 +450,6 @@ public final class MCRCM7Item implements DKConstant
     {
     DKBlobDL part = getBlob( partId );
     if(part == null) { return null; }
-//    if(part.isNull()) { return null; }
     byte[] content = part.getContent();
     if( ( content.length == 16 ) &&
         ( new String( content ).equals( "--null--" ) ) )
@@ -595,9 +463,7 @@ public final class MCRCM7Item implements DKConstant
    * 
    * @param partId              the ID of the part 
    * @param buffer              an array of bytes
-   *
    * @return the length of the array
-   *
    * @exception Exception       Exceptions of JDK
    **/
   public final int getPart( int partId, byte[] buffer )
@@ -615,7 +481,6 @@ public final class MCRCM7Item implements DKConstant
    * This method add a part to a part vector.
    * 
    * @param part                the part 
-   *
    * @exception Exception       Exceptions of JDK
    **/
   protected final  void addPartToParts( DKBlobDL part )
@@ -640,7 +505,6 @@ public final class MCRCM7Item implements DKConstant
    * @param partId              the ID of this part
    * @param buffer              the stream buffer of this part
    * @param bytes               the size of the buffer
-   *
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
@@ -679,7 +543,6 @@ public final class MCRCM7Item implements DKConstant
    *
    * @param partId              the ID of this part
    * @param text                the text of this part
-   *
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
@@ -714,7 +577,6 @@ public final class MCRCM7Item implements DKConstant
    * @param textSearchServer    the TextSearch Server name
    * @param textSearchIndex     the TextSearch Index name
    * @param textSearchInfo      the TextSearch Information string
-   *
    * @exception DKException     Exceptions of CM
    * @exception Exception       Exceptions of JDK
    **/
