@@ -179,7 +179,9 @@ public class MCRSQLConnection
     throws MCRPersistenceException
   {
     MCRSQLRowReader r = doQuery( query );
-    return ( r.next() ? r.getString( 1 ) : null );
+    String value = r.next() ? r.getString( 1 ) : null;
+    r.close();
+    return ( value );
   }
 
   /**

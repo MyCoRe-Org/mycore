@@ -198,4 +198,19 @@ public class MCRSQLRowReader
     catch( SQLException ex )
     { throw new MCRPersistenceException( "Could not get value from JDBC result set", ex ); }
   }
+  
+  public void close()
+  {
+    try
+    {
+      rs.close();
+    }  
+    catch( SQLException ex )
+    { throw new MCRPersistenceException( "Could not close result set", ex ); }
+  }
+  
+  public void finalize()
+  {
+    close();
+  }
 }
