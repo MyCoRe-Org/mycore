@@ -420,8 +420,8 @@ public class MCROAIDataProvider extends HttpServlet {
 			
             Namespace ns = list.getNamespace();  
 			Element eResumptionToken = new Element("resumptionToken", ns);
-			eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenNo * maxreturns + objectsInFile));
-			eResumptionToken.setAttribute("cursor", Integer.toString(tokenNo * maxreturns));
+			eResumptionToken.setAttribute("completeListSize", Integer.toString(cursor + objectsInFile));
+			eResumptionToken.setAttribute("cursor", Integer.toString(cursor));
 				
 			if (endObject < objectsInFile) {
 			    String newResumptionToken = resumptionToken.substring(0, resumptionToken.indexOf('x')) + 
@@ -503,7 +503,7 @@ public class MCROAIDataProvider extends HttpServlet {
 
 			try {
 			   	String resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
-				fileName = fileId + "x0x" + docs;
+				fileName = fileId + "x1x" + docs;
 		
  				FileOutputStream fos = new FileOutputStream(resumptionTokenDir +
    	                fileName + STR_RESUMPTIONTOKEN_SUFFIX);
@@ -798,7 +798,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	String sResumptionToken = listToResumptionToken(tokenElements);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
-				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("completeListSize", maxreturns + Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
 				
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
@@ -950,7 +950,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	String sResumptionToken = listToResumptionToken(tokenElements);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
-				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("completeListSize", maxreturns + Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
 				
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
@@ -1219,7 +1219,7 @@ public class MCROAIDataProvider extends HttpServlet {
 	    	String sResumptionToken = listToResumptionToken(tokenElements);
             if (sResumptionToken != null) {
 				Element eResumptionToken = new Element("resumptionToken", ns);
-				eResumptionToken.setAttribute("completeListSize", Integer.toString(tokenElements.size()));
+				eResumptionToken.setAttribute("completeListSize", maxreturns + Integer.toString(tokenElements.size()));
 				eResumptionToken.setAttribute("cursor", "0");
 				
 			    int timeout = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT, 72);
