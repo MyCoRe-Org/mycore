@@ -216,7 +216,7 @@ public Object clone()
 /**
  * This method put debug data to the logger (for the debug mode).
  **/
-public final void debug()
+public void debug()
   {
   logger.debug("Start Class : MCRMetaXML");
   super.debugDefault();
