@@ -22,12 +22,11 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
-import mycore.common.MCRException;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRUsageException;
-import mycore.datamodel.MCRObjectPersistenceInterface;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUsageException;
 
 /**
  * This class holds all information an methode to handle the MyCoRe Object ID.

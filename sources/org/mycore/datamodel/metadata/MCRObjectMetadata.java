@@ -22,13 +22,13 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.util.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
-import mycore.common.MCRUtils;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class implements all methode for handling one object metadata part.

@@ -22,13 +22,11 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.util.*;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRTypedContent;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * This interface is designed to choose the Persistence for the project.

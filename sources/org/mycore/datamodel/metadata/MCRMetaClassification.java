@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
-import mycore.common.MCRException;
-import mycore.classifications.MCRCategoryItem;
-import mycore.classifications.MCRClassificationItem;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
 
 /**
  * This class implements all method for handling with the MCRMetaClassification

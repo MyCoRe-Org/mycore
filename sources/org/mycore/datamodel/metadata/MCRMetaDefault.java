@@ -22,11 +22,10 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
-import mycore.common.MCRException;
-import mycore.common.MCRUtils;
-import mycore.datamodel.MCRTypedContent;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class implements any methods for handling the basic data for all 

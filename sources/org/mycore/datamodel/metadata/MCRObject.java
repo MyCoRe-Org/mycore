@@ -22,20 +22,17 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
 import java.util.Vector;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObjectID;
-import mycore.datamodel.MCRObjectStructure;
-import mycore.datamodel.MCRObjectService;
-import mycore.xml.MCRXMLHelper;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class implements all methode for handling one metadata object.

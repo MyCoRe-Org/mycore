@@ -22,10 +22,10 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
-import mycore.common.MCRException;
-import mycore.ifs.*;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.ifs.*;
 
 /**
  * This class implements all method for handling the IFS metadata.

@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import mycore.common.MCRException;
+import org.mycore.common.MCRException;
 
 /**
  * This class implements code for the inheritance of metadata of linked

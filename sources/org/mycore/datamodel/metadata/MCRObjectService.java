@@ -22,15 +22,12 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.text.*;
 import java.util.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRException;
-import mycore.datamodel.MCRMetaDate;
-import mycore.datamodel.MCRMetaLangText;
-import mycore.datamodel.MCRTypedContent;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 /**
  * This class implements all methode for handling one document service data.

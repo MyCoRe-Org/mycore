@@ -22,11 +22,11 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.util.*;
-import mycore.common.MCRException;
-import mycore.common.MCRUtils;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class is designed to to have a basic class for all metadata.

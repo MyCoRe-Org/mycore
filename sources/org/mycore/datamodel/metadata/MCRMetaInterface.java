@@ -22,9 +22,9 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
-import mycore.common.MCRException;
+import org.mycore.common.MCRException;
 
 /**
  * This interface is designed to to have a general description of the

@@ -22,12 +22,12 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.text.*;
 import java.util.*;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRUtils;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class is an internal MyCoRe interface to storing the metadata

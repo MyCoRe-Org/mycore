@@ -22,21 +22,20 @@
  *
  **/
 
-package mycore.datamodel;
+package org.mycore.datamodel.metadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.GregorianCalendar;
 import java.io.File;
 //import java.util.Vector;
-import mycore.common.MCRConfiguration;
-import mycore.common.MCRConfigurationException;
-import mycore.common.MCRException;
-import mycore.common.MCRPersistenceException;
-import mycore.datamodel.MCRObjectID;
-import mycore.xml.MCRXMLHelper;
-import mycore.ifs.MCRDirectory;
-import mycore.ifs.MCRFileImportExport;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
 
 /**
  * This class implements all methode for handling one derivate object.
