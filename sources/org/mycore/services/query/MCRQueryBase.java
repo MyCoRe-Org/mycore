@@ -50,6 +50,8 @@ protected static Logger logger = Logger.getLogger(MCRQueryBase.class.getName());
 public final static int MAX_RESULTS = 1000;
 /** The node name for a search in all document texts */
 public final static String XPATH_ATTRIBUTE_DOCTEXT = "doctext ";
+protected static String NL =
+  new String((System.getProperties()).getProperty("line.separator"));
 // protected data
 protected int maxres = 0;
 protected int maxresults = 0;
