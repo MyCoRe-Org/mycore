@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
@@ -109,7 +110,7 @@ public class MCRCStoreLucene
 		if (queryText.length() == 0)
 			return new String[0];
 		try {
-			HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD);
+			HashSet derivateIDs = getUniqueFieldValues(DERIVATE_FIELD,queryText);
 			Iterator it = derivateIDs.iterator();
 			Hits[] hits;
 			Document doc;
@@ -231,7 +232,7 @@ public class MCRCStoreLucene
 		doc.add(storageID);
 		try {
 			indexDocument(doc);
-			doc=null;
+			doc = null;
 		} catch (IOException io) {
 			//Document was not added
 			//remove file from local FileStore
@@ -263,13 +264,13 @@ public class MCRCStoreLucene
 	protected Document getDocument(MCRFileReader reader, InputStream stream)
 		throws IOException {
 		Document returns = new Document();
-		ByteArrayOutputStream out=new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		//filter here
 		pMan.transform(reader.getContentType(), stream, out);
 		out.flush();
-		byte[] temp=out.toByteArray();
+		byte[] temp = out.toByteArray();
 		out.close();
-		ByteArrayInputStream bin=new ByteArrayInputStream(temp);
+		ByteArrayInputStream bin = new ByteArrayInputStream(temp);
 		BufferedReader in = new BufferedReader(new InputStreamReader(bin));
 		//reader is instance of MCRFile
 		//ownerID is derivate ID for all mycore files
@@ -377,6 +378,74 @@ public class MCRCStoreLucene
 			} finally {
 				enum.close();
 			}
+		} catch (IOException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while fetching unique values of field ")
+					.append(fieldName)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
+		}
+		return collector;
+	}
+
+	/**
+	 * returns all Field values matching the biggest subquery of query
+	 * @param fieldName
+	 * @param query
+	 * @return
+	 */
+	private HashSet getUniqueFieldValues(String fieldName, String query) {
+		HashSet collector = new HashSet();
+		if (fieldName == null
+			|| query == null
+			|| fieldName.length() == 0
+			|| query.length() == 0)
+			return collector;
+		StringTokenizer tok = new StringTokenizer(query, " ");
+		int size = 0;
+		String biggestSub = null, temp;
+		while (tok.hasMoreTokens()) {
+			temp = tok.nextToken();
+			if (biggestSub == null) {
+				biggestSub = temp;
+				size = temp.length();
+			} else {
+				if (temp.length() > size && !(temp.charAt(0) == '-')) {
+					//Subquery is not negative and bigger then current
+					if (temp.charAt(0) == '\"')
+						temp = temp.substring(1);
+					if (temp.charAt(temp.length() - 1) == '\"')
+						temp = temp.substring(0, temp.length() - 2);
+					//removed double quotes
+					biggestSub = temp;
+					size = temp.length();
+				}
+			}
+		}
+		logger.debug("Start a presearch for subquery:" + biggestSub);
+		try {
+			Hits hits =
+				indexSearcher.search(
+					QueryParser.parse(biggestSub, "content", getAnalyzer()));
+			String[] values;
+			for (int i = 0; i < hits.length(); i++) {
+				values = hits.doc(i).getValues(fieldName);
+				if (values == null) {
+					logger.warn(
+						"Found a document but " + fieldName + " was not stored in!");
+				} else {
+					for (int j = 0; j < values.length; j++) {
+						//Store field value in collector
+						collector.add(values[j]);
+					}
+				}
+			}
+		} catch (ParseException e) {
+			StringBuffer msg =
+				new StringBuffer("Error while fetching unique values of field ")
+					.append(fieldName)
+					.append("!");
+			throw new MCRPersistenceException(msg.toString(), e);
 		} catch (IOException e) {
 			StringBuffer msg =
 				new StringBuffer("Error while fetching unique values of field ")
