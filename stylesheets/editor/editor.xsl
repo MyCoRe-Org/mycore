@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.32 $ $Date: 2005-02-04 17:04:36 $ -->
+<!-- $Revision: 1.32.2.1 $ $Date: 2005-04-07 12:35:02 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -15,9 +15,6 @@
 <xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameters ======== -->
-
-<xsl:param name="editor.cancel.url" /> <!-- if given, use this url for cancel button -->
-<xsl:param name="editor.cancel.id"  /> <!-- if given, substitute @@ID@@ in cancel/@url -->
 
 <xsl:param name="editor.session.id" /> <!-- reload session after plus minus up down button -->
 
@@ -892,39 +889,12 @@
 <!-- ======== cancel ======== -->
 <xsl:template match="cancelButton">
 
-  <xsl:variable name="attr.url"   select="ancestor::editor/cancel/@url"   />
-  <xsl:variable name="attr.token" select="ancestor::editor/cancel/@token" />
-
   <!-- ======== build url for cancel button ======== -->
-  <xsl:variable name="url.helper">
-    <xsl:choose>
-      <xsl:when test="string-length($editor.cancel.url) &gt; 0">
-        <xsl:value-of select="$editor.cancel.url"/>
-      </xsl:when>
-
-      <xsl:when test="$attr.url">
-        <xsl:choose>
-          <xsl:when test="contains($attr.url,$attr.token)">
-            <xsl:value-of select="substring-before($attr.url,$attr.token)"/>
-            <xsl:value-of select="$editor.cancel.id"/>
-            <xsl:value-of select="substring-after($attr.url,$attr.token)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$attr.url" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:variable>
-
   <xsl:variable name="url">
     <xsl:call-template name="build.url">
-      <xsl:with-param name="url" select="$url.helper" />
+      <xsl:with-param name="url" select="ancestor::editor/cancel/@url" />
     </xsl:call-template>
   </xsl:variable>
-
-  <!-- ======== pass cancel url to servlet ======== -->
-  <input type="hidden" name="{$editor.delimiter.internal}cancelURL" value="{$url}" />
 
   <!-- ======== output cancel button ======== -->
   <xsl:call-template name="editor.button">

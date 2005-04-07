@@ -26,7 +26,6 @@ package org.mycore.frontend.editor2;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Map;
@@ -131,6 +130,8 @@ public class MCREditorServlet extends MCRServlet
     Element param  = getTargetParameters( requestParameters );
     Element editor = MCREditorDefReader.readDef( uri, ref );
     if( param != null ) editor.addContent( param );
+    
+    buildCancelURL( editor, requestParameters );
 
     MCREditorSubmission sub = MCREditorSourceReader.readSource( editor, requestParameters ); 
     if( sub != null )
@@ -178,6 +179,67 @@ public class MCREditorServlet extends MCRServlet
       }
     }
     return tps;
+  }
+
+  private void buildCancelURL( Element editor, Map parameters )
+  {
+    if( parameters == null )
+    {
+      logger.debug( "CancelURL: no request parameters, cancel element unchanged" );
+      return;
+    }
+
+    // Option 1: Cancel URL comes from http request parameter
+    String[] values = (String[])( parameters.get( "XSL.editor.cancel.url" ) );
+    if( ( values != null ) && ( values.length > 0 ) && ( values[0] != null ) && ( values[0].trim().length() > 0 ) )
+    {
+      editor.removeChild( "cancel" );
+      Element cancel = new Element( "cancel" );
+      editor.addContent( cancel );
+      cancel.setAttribute( "url", values[0].trim() );
+      logger.debug( "CancelURL set from request: " + values[ 0 ] );
+      return;
+    }
+    
+    // Otherwise, use cancel element from editor definition
+    Element cancel = editor.getChild( "cancel" );
+    if( cancel == null )
+    {
+      logger.debug( "CancelURL element in editor definition is null" );
+      return;
+    }
+    
+    String urlFromElement = cancel.getAttributeValue( "url", (String)null );
+    if( urlFromElement == null )
+    {
+      logger.debug( "CancelURL attribute in editor definition is null" );
+      return;
+    }
+    
+    // Option 2: Cancel URL comes from element in editor definition
+    values = (String[])( parameters.get( "XSL.editor.cancel.id" ) );
+    if( ( values == null ) || ( values.length == 0 ) || ( values[ 0 ] == null ) || ( values[ 0 ].trim().length() == 0 ) )
+    {
+      if( cancel.getAttribute( "token" ) != null ) cancel.removeAttribute( "token" );
+      logger.debug( "CancelURL set from editor definition: " + urlFromElement );
+      return;
+    }
+    
+    // Option 3: Cancel URL is combined of request param token with url from editor def
+    String tokenFromElement = cancel.getAttributeValue( "token", (String)null );
+    if( ( tokenFromElement == null ) || ( tokenFromElement.trim().length() == 0 ) || ( urlFromElement.indexOf( tokenFromElement ) < 0 ) )
+    {
+      logger.debug( "CancelURL token in editor definition is null or illegal" );
+      return;
+    }
+    
+    int pos = urlFromElement.indexOf( tokenFromElement );
+    String prefix = urlFromElement.substring( 0, pos );
+    String suffix = urlFromElement.substring( pos + tokenFromElement.length() );
+    String url = prefix + values[ 0 ].trim() + suffix;
+    cancel.setAttribute( "url", url );
+    cancel.removeAttribute( "token" );
+    logger.debug( "CancelURL built from request token: " + url );
   }
 
   private static Random random = new Random();
@@ -264,7 +326,8 @@ public class MCREditorServlet extends MCRServlet
     // If there is no input, handle as if "cancel" button was pressed
     if( sub.getVariables().size() == 0 )
     {
-      String cancelURL = parms.getParameter( "_cancelURL" );
+      Element cancel = editor.getChild( "cancel" );
+      String cancelURL = ( cancel != null ? cancel.getAttributeValue( "url", (String)null ) : null );
       if( cancelURL != null ) res.sendRedirect( cancelURL );
       return;
     }
