@@ -420,7 +420,7 @@ private final void deleteFromDatastore() throws MCRPersistenceException
   if (parent_id != null) {
     logger.debug("Parent ID = "+parent_id.getId());
     try {
-      xmlarray = mcr_xmltable.retrieve(mcr_id.getTypeId(),parent_id);
+      xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
       MCRObject parent = new MCRObject();
       parent.setFromXML(xmlarray,false);
       parent.mcr_struct.removeChild(mcr_id);
