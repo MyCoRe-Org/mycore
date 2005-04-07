@@ -38,16 +38,17 @@ import org.mycore.common.MCRUtils;
  * holds all informations about the MCRObjectID and the corresponding XML file.
  *
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
 public class MCRXMLTableManager
 {
 
 /** The link table manager singleton */
-protected static MCRXMLTableManager singleton;
+protected static MCRXMLTableManager SINGLETON;
 
 // logger
-static Logger logger=Logger.getLogger(MCRLinkTableManager.class.getName());
+static Logger LOGGER=Logger.getLogger(MCRLinkTableManager.class.getName());
 
 // the list of link table 
 private String persistclassname = null;
@@ -58,8 +59,8 @@ private Hashtable tablelist;
  **/
 public static synchronized MCRXMLTableManager instance()
   {
-  if( singleton == null ) singleton = new MCRXMLTableManager();
-  return singleton;
+  if( SINGLETON == null ) SINGLETON = new MCRXMLTableManager();
+  return SINGLETON;
   }
 
 /**
@@ -80,7 +81,7 @@ protected MCRXMLTableManager()
  * @param type the table type
  * @exception if the store for the given type could not find or loaded.
  **/
-private final MCRXMLTableInterface checkType(String type)
+private final MCRXMLTableInterface getXMLTable(String type)
   {
   if ((type == null) || ((type = type.trim()).length() ==0)) {
     throw new MCRException("The type is null or empty."); }
@@ -110,73 +111,68 @@ private final MCRXMLTableInterface checkType(String type)
 
 /**
  * The method create a new item in the datastore.
- *
- * @param type the type of the metadata
  * @param mcrid a MCRObjectID
  * @param xml a JDOM Document 
+ *
  * @exception if the method arguments are not correct
  **/
-public final void create(String type, MCRObjectID mcrid, org.jdom.Document xml)
+public final void create(MCRObjectID mcrid, org.jdom.Document xml)
   throws MCRException
-  { checkType(type).create(mcrid,MCRUtils.getByteArray(xml),1); }
+  { getXMLTable(mcrid.getTypeId()).create(mcrid,MCRUtils.getByteArray(xml),1); }
 
 /**
  * The method create a new item in the datastore.
- *
- * @param type the type of the metadata
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ *
  * @exception if the method arguments are not correct
  **/
-public final void create(String type, MCRObjectID mcrid, byte[] xml)
+public final void create(MCRObjectID mcrid, byte[] xml)
   throws MCRException
-  { checkType(type).create(mcrid,xml,1); }
+  { getXMLTable(mcrid.getTypeId()).create(mcrid,xml,1); }
 
 /**
  * The method remove a item for the MCRObjectID from the datastore.
- *
- * @param type the type of the metadata
  * @param mcrid a MCRObjectID
+ *
  * @exception if the method argument is not correct
  **/
-public final void delete( String type, MCRObjectID mcrid )
+public final void delete( MCRObjectID mcrid )
   throws MCRException
-  { checkType(type).delete(mcrid,1); }
+  { getXMLTable(mcrid.getTypeId()).delete(mcrid,1); }
 
 /**
  * The method update an item in the datastore.
- *
- * @param type the type of the metadata
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ *
  * @exception if the method arguments are not correct
  **/
-public final void update( String type, MCRObjectID mcrid, org.jdom.Document xml)
+public final void update( MCRObjectID mcrid, org.jdom.Document xml)
   throws MCRException
-  { checkType(type).update(mcrid,MCRUtils.getByteArray(xml),1); }
+  { getXMLTable(mcrid.getTypeId()).update(mcrid,MCRUtils.getByteArray(xml),1); }
 
 /**
  * The method update an item in the datastore.
- *
- * @param type the type of the metadata
  * @param mcrid a MCRObjectID
  * @param xml a byte array with the XML file
+ *
  * @exception if the method arguments are not correct
  **/
-public final void update( String type, MCRObjectID mcrid, byte[] xml)
+public final void update( MCRObjectID mcrid, byte[] xml)
   throws MCRException
-  { checkType(type).update(mcrid,xml,1); }
+  { getXMLTable(mcrid.getTypeId()).update(mcrid,xml,1); }
 
 /**
  * The method retrieve a dataset for the given MCRObjectID and returns
  * the corresponding XML file as byte array.
- *
  * @param mcrid a MCRObjectID
+ *
  * @exception if the method arguments are not correct
  **/
-public final byte[] retrieve( String type, MCRObjectID mcrid)
+public final byte[] retrieve( MCRObjectID mcrid)
   throws MCRException
-  { return checkType(type).retrieve(mcrid,1); }
+  { return getXMLTable(mcrid.getTypeId()).retrieve(mcrid,1); }
 
 /**
   * This method returns the next free ID number for a given
@@ -184,26 +180,25 @@ public final byte[] retrieve( String type, MCRObjectID mcrid)
   * returns a new, exclusive ID by remembering the highest ID
   * ever returned and comparing it with the highest ID stored
   * in the related index class.
-  *
-  * @param project_ID   the project ID part of the MCRObjectID base
-  * @param type_ID      the type ID part of the MCRObjectID base
+ * @param project_ID   the project ID part of the MCRObjectID base
+ * @param type_ID      the type ID part of the MCRObjectID base
   *
   * @exception MCRPersistenceException if a persistence problem is occured
   *
   * @return the next free ID number as a String
   **/
-public final int getNextFreeIdInt( String type, String idproject, String idtype )
+public final int getNextFreeIdInt( String idproject, String idtype )
   throws MCRPersistenceException
-  { return checkType(type).getNextFreeIdInt(idproject,idtype); }
+  { return getXMLTable(idtype).getNextFreeIdInt(idproject,idtype); }
 
 /**
  * This method check that the MCRObjectID exist in this store.
- *
  * @param mcrid a MCRObjectID
+ *
  * @return true if the MCRObjectID exist, else return false
  **/
-public final boolean exist( String type, MCRObjectID mcrid)
-  { return checkType(type).exist(mcrid,1); }
+public final boolean exist( MCRObjectID mcrid)
+  { return getXMLTable(mcrid.getTypeId()).exist(mcrid,1); }
 
 /**
  * The method return a Array list with all stored MCRObjectID's of the
@@ -213,7 +208,7 @@ public final boolean exist( String type, MCRObjectID mcrid)
  * @return a ArrayList of MCRObjectID's
  **/
 public ArrayList retrieveAllIDs(String type)
-  { return checkType(type).retrieveAllIDs(type); }
+  { return getXMLTable(type).retrieveAllIDs(type); }
 
 }
 

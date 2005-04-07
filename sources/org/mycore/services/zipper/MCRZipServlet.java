@@ -166,7 +166,7 @@ public class MCRZipServlet extends MCRServlet
         }
         
         MCRXMLContainer result = new MCRXMLContainer();
-        byte[] xml = xmltable.retrieve(mcrid.getTypeId(),mcrid);
+        byte[] xml = xmltable.retrieve(mcrid);
 
         try {
         	result.add("local",mcrid.getId(),0,xml);

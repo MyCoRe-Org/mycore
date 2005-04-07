@@ -38,12 +38,11 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.frontend.fileupload.MCRUploadHandlerInterface;
 import org.mycore.frontend.fileupload.MCRUploadHandlerManager;
 import org.mycore.frontend.workflow.MCRWorkflowManager;
@@ -645,7 +644,7 @@ public class MCRStartEditorServlet extends MCRServlet
     org.jdom.Document jdom = null;
     MCRObjectID id = new MCRObjectID(mcrid);
     if (source) {
-      byte [] xml = MCR_XMLTABLE.retrieve(id.getTypeId(),id);
+      byte [] xml = MCR_XMLTABLE.retrieve(id);
       jdom = MCRXMLHelper.parseXML(xml,false);
       }
     else {

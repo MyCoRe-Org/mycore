@@ -293,7 +293,7 @@ public final void createInDatastore() throws MCRPersistenceException
       }
     }
   // build this object
-  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_xmltable.create(mcr_id,createXML());
   mcr_persist.create(this);
   deleteLinksFromTable();
   addLinksToTable();
@@ -328,12 +328,12 @@ public final void addDerivateInDatastore(String id, MCRMetaLinkID link)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id);
   setFromXML(xmlarray,false);
   mcr_service.setDate("modifydate");
   getStructure().addDerivate(link);
   mcr_persist.update(this);
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_xmltable.update(mcr_id,createXML());
   }
 
 /**
@@ -348,14 +348,14 @@ public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id);
   setFromXML(xmlarray,false);
   mcr_service.setDate("modifydate");
   int j = getStructure().searchForDerivate(link);
   if (j != -1) {
     getStructure().removeDerivate(j);
     mcr_persist.update(this);
-    mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
+    mcr_xmltable.update(mcr_id,createXML());
     }
   else {
     throw new MCRPersistenceException("The derivate link "+link.getXLinkHref()+
@@ -385,7 +385,7 @@ private final void deleteFromDatastore() throws MCRPersistenceException
   if (mcr_id == null) {
     throw new MCRPersistenceException("The MCRObjectID is null."); }
   // get the Item
-  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xmlarray = mcr_xmltable.retrieve(mcr_id);
   if (xmlarray == null) {
     logger.info("The MCRObjectID "+mcr_id.getId()+" does not exist.");
     return;
@@ -420,7 +420,7 @@ private final void deleteFromDatastore() throws MCRPersistenceException
   if (parent_id != null) {
     logger.debug("Parent ID = "+parent_id.getId());
     try {
-      xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
+      xmlarray = mcr_xmltable.retrieve(parent_id);
       MCRObject parent = new MCRObject();
       parent.setFromXML(xmlarray,false);
       parent.mcr_struct.removeChild(mcr_id);
@@ -435,7 +435,7 @@ private final void deleteFromDatastore() throws MCRPersistenceException
   // remove him self
   mcr_persist.delete(mcr_id);
   deleteLinksFromTable();
-  mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
+  mcr_xmltable.delete(mcr_id);
   }
 
 /**
@@ -449,7 +449,7 @@ public final static boolean existInDatastore(String id)
   throws MCRPersistenceException
   { 
   MCRObjectID mcr_id = new MCRObjectID(id);
-  return mcr_xmltable.exist(mcr_id.getTypeId(),mcr_id);
+  return mcr_xmltable.exist(mcr_id);
   }
 
 /**
@@ -474,7 +474,7 @@ public final void receiveFromDatastore(MCRObjectID id)
   throws MCRPersistenceException
   {
   mcr_id = id;
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml != null) {
     setFromXML(xml,false); }
   else {
@@ -495,7 +495,7 @@ public final byte [] receiveXMLFromDatastore(String id)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml == null) {
     throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
       " was not retrieved.");
@@ -515,7 +515,7 @@ public final org.jdom.Document receiveJDOMFromDatastore(String id)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml == null) {
     throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
       " was not retrieved.");
@@ -557,7 +557,7 @@ public final void updateInDatastore() throws MCRPersistenceException
       logger.debug("Parent ID = "+oldparent);
       try {
         MCRObjectID parent_id = new MCRObjectID(oldparent);
-        xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
+        xmlarray = mcr_xmltable.retrieve(parent_id);
         MCRObject parent = new MCRObject();
         parent.setFromXML(xmlarray,false);
         parent.mcr_struct.removeChild(mcr_id);
@@ -577,7 +577,7 @@ public final void updateInDatastore() throws MCRPersistenceException
     logger.debug("Parent ID = "+oldparent);
     try {
       MCRObjectID parent_id = new MCRObjectID(oldparent);
-      xmlarray = mcr_xmltable.retrieve(parent_id.getTypeId(),parent_id);
+      xmlarray = mcr_xmltable.retrieve(parent_id);
       MCRObject parent = new MCRObject();
       parent.setFromXML(xmlarray,false);
       parent.mcr_struct.removeChild(mcr_id);
@@ -647,7 +647,7 @@ private final void updateThisInDatastore()
   {
   mcr_service.setDate("modifydate");
   mcr_persist.update(this);
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_xmltable.update(mcr_id,createXML());
   deleteLinksFromTable();
   addLinksToTable();
   }
@@ -762,7 +762,7 @@ public final void repairPersitenceDatastore(MCRObjectID id)
   throws MCRPersistenceException
   {
   mcr_id = id;
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml != null) {
     setFromXML(xml,false); }
   else {

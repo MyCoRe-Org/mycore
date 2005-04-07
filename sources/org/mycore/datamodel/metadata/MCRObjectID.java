@@ -119,7 +119,7 @@ public final class MCRObjectID {
 		mcrid.deleteCharAt(mcrid.length() - 1);
 		try {
 			MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-			int i = xmltable.getNextFreeIdInt( test.mcr_type_id, test.mcr_project_id, test.mcr_type_id);
+			int i = xmltable.getNextFreeIdInt( test.mcr_project_id, test.mcr_type_id);
 			if (lastnumber < i) {
 				mcrid.append(i); lastnumber = i; }
 			else {

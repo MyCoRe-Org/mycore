@@ -230,12 +230,12 @@ public final void createInDatastore() throws MCRPersistenceException
   // prepare the derivate metadata and store under the XML table
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  mcr_xmltable.create(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_xmltable.create(mcr_id,createXML());
   // create data in IFS
   if (getDerivate().getInternals() != null) {
     File f = new File(getDerivate().getInternals().getSourcePath());
     if ((!f.isDirectory()) && (!f.isFile())) {
-      mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
+      mcr_xmltable.delete(mcr_id);
       throw new MCRPersistenceException("The File or Directory on "+
         getDerivate().getInternals().getSourcePath()+" was not found."); }
     try {
@@ -243,7 +243,7 @@ public final void createInDatastore() throws MCRPersistenceException
       getDerivate().getInternals().setIFSID(difs.getID());
       }
     catch (Exception e) { 
-      mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
+      mcr_xmltable.delete(mcr_id);
       throw new MCRPersistenceException("Error while creating "+
         getDerivate().getInternals().getSourcePath()+" in the IFS.",e); }
     }
@@ -255,7 +255,7 @@ public final void createInDatastore() throws MCRPersistenceException
     MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
     difs.delete();
     // delete from the XML table
-    mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
+    mcr_xmltable.delete(mcr_id);
     // throw final exception
     throw new MCRPersistenceException("Error while creating derivate in"+
       " datastore.",e);
@@ -277,7 +277,7 @@ public final void createInDatastore() throws MCRPersistenceException
       // delete search data
       mcr_persist.delete(mcr_id);
       // delete from the XML table
-      mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id);
+      mcr_xmltable.delete(mcr_id);
       // throw final exception
       throw new MCRPersistenceException("Error while creatlink to MCRObject "+
         meta.getXLinkHref()+".",e);
@@ -299,7 +299,7 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
     throw new MCRPersistenceException("ID error in deleteFromDatastore for "+
       id+".",e);
     }
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   // remove the link from metadata object
   if (xml != null) {
     setFromXML(xml,false);
@@ -338,7 +338,7 @@ public final void deleteFromDatastore(String id) throws MCRPersistenceException
   catch (MCRException e) { logger.warn(e.getMessage()); }
   // delete derivate from XML table
   if (xml != null) {
-    mcr_xmltable.delete(mcr_id.getTypeId(),mcr_id); }
+    mcr_xmltable.delete(mcr_id); }
   }
 
 /**
@@ -352,7 +352,7 @@ public final static boolean existInDatastore(String id)
   throws MCRPersistenceException
   { 
   MCRObjectID mcr_id = new MCRObjectID(id);
-  return mcr_xmltable.exist(mcr_id.getTypeId(),mcr_id);
+  return mcr_xmltable.exist(mcr_id);
   }
 
 /**
@@ -377,7 +377,7 @@ public final void receiveFromDatastore(MCRObjectID id)
   throws MCRPersistenceException
   {
   mcr_id = id;
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml != null) {
     setFromXML(xml,false); }
   else {
@@ -399,7 +399,7 @@ public final byte [] receiveXMLFromDatastore(String id)
   throws MCRPersistenceException
   {
   mcr_id = new MCRObjectID(id);
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml == null) {
     throw new MCRPersistenceException("The XML file for ID "+mcr_id.getId()+
       " was not retrieved.");
@@ -470,7 +470,7 @@ public final void updateInDatastore() throws MCRPersistenceException
   // update the derivate
   mcr_service.setDate("createdate",old.getService().getDate("createdate"));
   mcr_service.setDate("modifydate");
-  mcr_xmltable.update(mcr_id.getTypeId(),mcr_id,createXML());
+  mcr_xmltable.update(mcr_id,createXML());
   mcr_persist.update(this);
   // add the link to metadata
   for (int i=0;i<getDerivate().getLinkMetaSize();i++) {
@@ -505,7 +505,7 @@ public final void repairPersitenceDatastore(MCRObjectID id)
   throws MCRPersistenceException
   {
   mcr_id = id;
-  byte [] xml = mcr_xmltable.retrieve(mcr_id.getTypeId(),mcr_id);
+  byte [] xml = mcr_xmltable.retrieve(mcr_id);
   if (xml != null) {
     setFromXML(xml,false); }
   else {

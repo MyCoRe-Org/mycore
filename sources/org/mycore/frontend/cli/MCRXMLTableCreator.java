@@ -90,7 +90,7 @@ public static void main(String argv[]) throws Exception
     MCRObjectID mcrid = new MCRObjectID(mcr_result.getId(i));
     Element elm = (Element)mcr_result.getXML(i).detach();
     Document doc = new Document(elm);
-    xmltable.create(argv[0],mcrid,doc);
+    xmltable.create(mcrid,doc);
     }
 
   System.out.println("Ready.\n\n");

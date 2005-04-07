@@ -152,7 +152,7 @@ protected final org.jdom.Element retrieveType(String type)
   for (int i=0;i<ar.size();i++) {
     stid = (String)ar.get(i);
     MCRObjectID mid = new MCRObjectID(stid);
-    byte [] xml = mcr_xml.retrieve(type,mid);
+    byte [] xml = mcr_xml.retrieve(mid);
     try {
       org.jdom.Document jdom_document = MCRXMLHelper.parseXML(xml,true); 
       org.jdom.Element jdom_rootelm = jdom_document.getRootElement();
