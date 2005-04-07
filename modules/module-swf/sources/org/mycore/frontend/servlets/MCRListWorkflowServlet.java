@@ -52,7 +52,7 @@ import org.mycore.user.MCRUserMgr;
  * &gt;label&lt;Die 99 582 am Lokschuppen in Schönheide&gt;/label&lt;<br />
  * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt;<br />
  * &gt;data&lt;2004-06-08&gt;/data&lt;<br />
- * &gt;derivate ID="..."&lt;<br />
+ * &gt;derivate ID="..." label="..."&lt;<br />
  * &gt;file size="..." main="true|false" &lt;...&gt;/file&lt;<br />
  * &gt;/derivate&lt;<br />
  * &gt;/item&lt;<br />
@@ -72,7 +72,7 @@ private static Logger LOGGER=Logger.getLogger(MCRListWorkflowServlet.class.getNa
 private static MCRWorkflowManager WFM = null;
 
 // The file slash
-private static String SLASH = System.getProperty("file.separator");;
+private static String SLASH = System.getProperty("file.separator");
 
 /** Initialisation of the servlet */
 public void init() throws MCRConfigurationException {

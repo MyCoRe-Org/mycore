@@ -25,6 +25,8 @@
 package org.mycore.frontend.servlets;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -156,11 +159,12 @@ public class MCRStartEditorServlet extends MCRServlet
       !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") &&
       !mytodo.equals("weditobj") && !mytodo.equals("weditder") && 
       !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") &&
-      !mytodo.equals("wcommit") &&
+      !mytodo.equals("wsetfile") &&!mytodo.equals("wcommit") &&
       !mytodo.equals("seditobj") && !mytodo.equals("seditder") &&
       !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && 
       !mytodo.equals("snewder") && !mytodo.equals("scommitder") &&
-      !mytodo.equals("saddfile")&& !mytodo.equals("snewfile")) {
+      !mytodo.equals("saddfile")&& !mytodo.equals("snewfile") &&
+      !mytodo.equals("sdelfile")&& !mytodo.equals("ssetfile")) {
       mytodo = "wnewobj"; }
     LOGGER.info("TODO = "+mytodo);
     // get the MCRObjectID from the text filed (TF)
@@ -217,6 +221,9 @@ public class MCRStartEditorServlet extends MCRServlet
         myremcrid = ""; }
       }
     LOGGER.info("MCRID (RE) = "+myremcrid);
+    // appending parameter
+    String extparm = getProperty(job.getRequest(), "extparm");
+    LOGGER.info("EXTPARM = "+extparm);
 
     LOGGER.debug("Base URL : "+getBaseURL());
 
@@ -309,9 +316,13 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
         return;
         }
+      StringBuffer sb = new StringBuffer();
+      sb.append("file://")
+        .append(CONFIG.getString("MCR.editor_"+mytype+"_directory"))
+        .append('/').append(mysemcrid).append(".xml" );
       String base = getBaseURL() + myfile;
       Properties params = new Properties();
-      params.put( "XSL.editor.source.url", "file://"+CONFIG.getString("MCR.editor_"+mytype+"_directory")+"/"+mysemcrid+".xml" );
+      params.put( "XSL.editor.source.url", sb.toString() );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
       params.put( "XSL.target.param.0", "mcrid=" + mysemcrid );
       params.put( "XSL.target.param.1", "type="  + mytype );
@@ -427,6 +438,54 @@ public class MCRStartEditorServlet extends MCRServlet
       return;
       }
 
+    // action WEDITDER in the database
+    if (mytodo.equals("weditder")) {
+      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      if (mysemcrid.length()==0) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+        return;
+        }
+      StringBuffer sb = new StringBuffer();
+      return;
+      }
+
+    // action WSETFILE in the database
+    if (mytodo.equals("wsetfile")) {
+      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      if (mysemcrid.length()==0) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+        return;
+        }
+      StringBuffer sb = new StringBuffer();
+      sb.append(WFM.getDirectoryPath(mytype)).append(SLASH).append(mysemcrid).append(".xml");
+      MCRDerivate der = new MCRDerivate();
+      der.setFromURI(sb.toString());
+      if (extparm.startsWith("####main####")) {
+        der.getDerivate().getInternals().setMainDoc(extparm.substring(mysemcrid.length()+1+12,extparm.length()));
+        }
+      if (extparm.startsWith("####label####")) {
+        der.setLabel(extparm.substring(12,extparm.length()));
+        }
+      byte [] outxml = MCRUtils.getByteArray(der.createXML());
+      try {
+        FileOutputStream out = new FileOutputStream(sb.toString());
+        out.write(outxml);
+        out.flush();
+        }
+      catch (IOException ex) {
+        LOGGER.error( "Exception while store to file " + sb.toString() ); }
+      sb = new StringBuffer();
+      sb.append(pagedir).append("editor_").append(mytype).append("_editor.xml");
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+sb.toString()));
+      return;
+      }
+
     // action SEDITOBJ in the database
     if (mytodo.equals("seditobj")) {
       if (!checkAccess(mytfmcrid,userid,privs,"modify-"+mytype,true)) {
@@ -437,13 +496,16 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
         return;
         }
-      String url = getBaseURL()+"servlets/MCRQueryServlet?XSL.Style=editor&"+
-        "mode=ObjectMetadata&type="+mytype+"&hosts="+
-        CONFIG.getString("MCR.editor_baseurl","local")+
-        "&query=/mycoreobject%5b@ID=%22"+mytfmcrid+"%22%5d";
+      StringBuffer sb = new StringBuffer();
+      sb.append(getBaseURL()).append("servlets/MCRQueryServlet")
+        .append("?XSL.Style=editor")
+        .append("&mode=ObjectMetadata")
+        .append("&type=").append(mytype)
+        .append("&hosts=").append(CONFIG.getString("MCR.editor_baseurl","local"))
+        .append("&query=/mycoreobject%5b@ID=%22").append(mytfmcrid).append("%22%5d");
       String base = getBaseURL() + myfile;
       Properties params = new Properties();
-      params.put( "XSL.editor.source.url", url );
+      params.put( "XSL.editor.source.url", sb.toString() );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
       params.put( "XSL.target.param.0", "mcrid=" + mytfmcrid );
       params.put( "XSL.target.param.1", "type="  + mytype );
