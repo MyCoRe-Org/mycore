@@ -230,10 +230,12 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
 			if ((isid == subqueries.size()) && (isid != 0)) {
 				logger.debug("Retrieve the data direcly from XML database.");
 				for (int p = 0; p < subqueries.size();p++) {
-					try {
-						byte[] xml = xmltable.retrieve(testid[p]);
-						result.add("local", testid[p].getId(), 0, xml);
-					} catch (Exception e) {
+					if (onetype.equals(testid[p].getTypeId())) {
+						try {
+							byte[] xml = xmltable.retrieve(testid[p]);
+							result.add("local", testid[p].getId(), 0, xml);
+						} catch (Exception e) {
+						}
 					}
 				}
 			} else {
