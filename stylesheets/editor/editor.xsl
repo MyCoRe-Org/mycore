@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.33 $ $Date: 2005-04-07 12:27:57 $ -->
+<!-- $Revision: 1.34 $ $Date: 2005-04-08 07:22:36 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -20,18 +20,6 @@
 
 <xsl:param name="StaticFilePath"  /> <!-- path of static webpage including this editor -->
 <xsl:param name="RequestParamKey" /> <!-- key for accessing http request params in session -->
-
-<!-- ========= http request parameter zum Durchreichen an target ======== -->
-<xsl:param name="target.param.0" />
-<xsl:param name="target.param.1" />
-<xsl:param name="target.param.2" />
-<xsl:param name="target.param.3" />
-<xsl:param name="target.param.4" />
-<xsl:param name="target.param.5" />
-<xsl:param name="target.param.6" />
-<xsl:param name="target.param.7" />
-<xsl:param name="target.param.8" />
-<xsl:param name="target.param.9" />
 
 <!-- ======== constants, do not change ======== -->
 <xsl:variable name="editor.delimiter.internal"  select="'_'" />
@@ -183,47 +171,10 @@
   <input type="hidden" name="{$editor.delimiter.internal}webpage" value="{$StaticFilePath}" />
   <input type="hidden" name="{$editor.delimiter.internal}action"  value="submit" />
 
-  <!-- ======== durchreichen der XSL.target.param.X=name=value parameter ======== -->
-  <xsl:call-template name="handle.target.parameter">
-    <xsl:with-param name="param" select="$target.param.0" />
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter">  
-    <xsl:with-param name="param" select="$target.param.1" />
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter">  
-    <xsl:with-param name="param" select="$target.param.2" /> 
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter"> 
-    <xsl:with-param name="param" select="$target.param.3" />
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter"> 
-    <xsl:with-param name="param" select="$target.param.4" /> 
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter"> 
-    <xsl:with-param name="param" select="$target.param.5" />  
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter">  
-    <xsl:with-param name="param" select="$target.param.6" />
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter">
-    <xsl:with-param name="param" select="$target.param.7" /> 
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter"> 
-    <xsl:with-param name="param" select="$target.param.8" /> 
-  </xsl:call-template>
-  <xsl:call-template name="handle.target.parameter"> 
-    <xsl:with-param name="param" select="$target.param.9" /> 
-  </xsl:call-template>
-
-</xsl:template>
-
-<!-- ======== durchreichen der XSL.target.param.X=name=value parameter ======== -->
-<xsl:template name="handle.target.parameter">
-  <xsl:param name="param" />
-
-  <xsl:if test="string-length(normalize-space($param)) &gt; 0">
-    <input type="hidden" name="{substring-before($param,'=')}" value="{substring-after($param,'=')}" />
-  </xsl:if>
+  <!-- ======== durchreichen der target parameter ======== -->
+  <xsl:for-each select="../target-parameters/target-parameter">
+    <input type="hidden" name="{@name}" value="{text()}" />
+  </xsl:for-each>
 </xsl:template>
 
 <!-- ======== headline ======== -->

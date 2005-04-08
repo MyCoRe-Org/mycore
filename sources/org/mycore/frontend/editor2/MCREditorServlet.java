@@ -166,6 +166,22 @@ public class MCREditorServlet extends MCRServlet
     while( keys.hasNext() )
     {
       String key = (String)( keys.next() );
+      if( key.startsWith( "XSL.target.param." ) )
+      {
+        String expr = ((String[])( parameters.get( key ) ))[ 0 ];
+        if( ( expr != null ) && ( expr.trim().length() > 0 ) )
+        {
+          int pos = expr.indexOf( "=" );
+          String name  = expr.substring( 0, pos ).trim();
+          String value = expr.substring( pos + 1 ).trim();
+          Element tp = new Element( "target-parameter" );
+          tp.setAttribute( "name", name );
+          tp.addContent( value );
+          tps.addContent( tp );
+        }
+        continue;
+      }
+      
       if( key.startsWith( "XSL." ) ) continue;
 
       String[] values = (String[])( parameters.get( key ) );
