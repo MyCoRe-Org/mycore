@@ -82,6 +82,11 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     // create the classid attribute for the data content
     MCRCM8ItemTypeCommon.createAttributeVarChar(connection,classname,
       clalen,false);
+    // add type attribute
+    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
+    attr.setNullable(true);
+    attr.setUnique(false);
+    lt.addAttr(attr);
     // add the value attribute
     attr = (DKAttrDefICM) dsDefICM.retrieveAttr(classname);
     attr.setNullable(true);

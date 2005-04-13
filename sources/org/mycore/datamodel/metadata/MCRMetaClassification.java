@@ -77,16 +77,17 @@ public MCRMetaClassification()
  *                         or 'service'
  * @param set_subtag       the name of the subtag
  * @param set_inherted     a value >= 0
+ * @param set_type         the type attribute
  * @param set_classid      the classification ID
  * @param set_categid      the category ID
  * @exception MCRException if the set_subtag value, the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  */
 public MCRMetaClassification(String set_datapart, String set_subtag, 
-  int set_inherted, String set_classid, String set_categid) 
+  int set_inherted, String set_type, String set_classid, String set_categid) 
   throws MCRException
   {
-  super(set_datapart,set_subtag,"en","",set_inherted);
+  super(set_datapart,set_subtag,"en",set_type,set_inherted);
   setValue(set_classid,set_categid);
   }
 
@@ -114,9 +115,10 @@ public final String getCategId()
  * @exception MCRException if the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  **/
-public final void setValue(String set_classid, String set_categid)
+public final void setValue(String set_type, String set_classid, String set_categid)
   throws MCRException
   {
+  setType(setType);
   if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
     throw new MCRException("The classid is empty."); }
   if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
@@ -162,6 +164,8 @@ public org.jdom.Element createXML() throws MCRException
   if (!isValid()) {
     throw new MCRException("The content of MCRMetaClassification in subtag "+subtag+" is not valid."); }
   org.jdom.Element elm = new org.jdom.Element(subtag);
+  if ((type != null) && ((type = type.trim()).length() !=0)) {
+  	elm.setAttribute("type",type); }
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   elm.setAttribute("classid",classid); 
   elm.setAttribute("categid",categid); 
@@ -185,6 +189,8 @@ public MCRTypedContent createTypedContent(boolean parasearch)
   tc.addTagElement(MCRTypedContent.TYPE_SUBTAG,subtag);
   tc.addClassElement(classid);
   tc.addCategElement(categid);
+  if ((type = type.trim()).length() !=0) {
+    tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE,"type",type); }
   return tc;
   }
 
@@ -231,7 +237,7 @@ public boolean isValid()
 public Object clone()
   {
   MCRMetaClassification out = new MCRMetaClassification(datapart,subtag,
-    inherited,classid,categid);
+    inherited,type,classid,categid);
     return (Object)out;
   }
 
@@ -247,4 +253,3 @@ public void debug()
   }
 
 }
-
