@@ -360,12 +360,9 @@ public final class MCRObjectID {
 	 * @return true if all parts are equal, else return false.
 	 **/
 	public boolean equals(MCRObjectID in) {
-		if ((mcr_project_id == in.mcr_project_id)
-			&& (mcr_type_id == in.mcr_type_id)
-			&& (mcr_number == in.mcr_number))
-			return true;
-		else
-			return false;
+		return ( mcr_project_id.equals( in.mcr_project_id )
+			&& ( mcr_type_id.equals( in.mcr_type_id ) )
+			&& ( mcr_number == in.mcr_number ) );
 	}
 
 	/**
