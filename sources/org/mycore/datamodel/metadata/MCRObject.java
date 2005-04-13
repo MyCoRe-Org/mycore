@@ -30,6 +30,7 @@ import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.events.*;
 
 /**
  * This class implements all methode for handling one metadata object.
@@ -295,8 +296,15 @@ public final void createInDatastore() throws MCRPersistenceException
   // build this object
   mcr_xmltable.create(mcr_id,createXML());
   mcr_persist.create(this);
+  
   deleteLinksFromTable();
   addLinksToTable();
+  
+  // handle events
+  MCREvent evt = new MCREvent( MCREvent.OBJECT_CREATED );
+  evt.put( "object", this );
+  MCREventManager.instance().handleEvent( evt );
+  
   // add the MCRObjectID to the child list in the parent object
   if (parent_id != null) {
     try {
@@ -436,6 +444,12 @@ private final void deleteFromDatastore() throws MCRPersistenceException
   mcr_persist.delete(mcr_id);
   deleteLinksFromTable();
   mcr_xmltable.delete(mcr_id);
+  
+  // handle events
+  MCREvent evt = new MCREvent( MCREvent.OBJECT_DELETED );
+  evt.put( "object", this );
+  MCREventManager.instance().handleEvent( evt );
+
   }
 
 /**
@@ -650,6 +664,11 @@ private final void updateThisInDatastore()
   mcr_xmltable.update(mcr_id,createXML());
   deleteLinksFromTable();
   addLinksToTable();
+  
+  // handle events
+  MCREvent evt = new MCREvent( MCREvent.OBJECT_UPDATED );
+  evt.put( "object", this );
+  MCREventManager.instance().handleEvent( evt );
   }
 
 /**
