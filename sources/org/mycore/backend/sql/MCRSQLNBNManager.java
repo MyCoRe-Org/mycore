@@ -78,10 +78,8 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 	 * @return boolean true, if table exists, otherwise false.
 	 */
     private boolean tableExists() {
-    	String cond = "SYSCAT.TABLES WHERE TABNAME = '" + table + "'";
     	logger.info("Looking for NBN table.");
-    	
-    	return MCRSQLConnection.justCheckExists(cond);
+    	return MCRSQLConnection.doesTableExist(table) ;
     }
     
 	/**
@@ -92,7 +90,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 			.addColumn("NISS VARCHAR(12) NOT NULL PRIMARY KEY")
 			.addColumn("URL VARCHAR(250)")
 			.addColumn("AUTHOR VARCHAR(80) NOT NULL")
-			.addColumn("COMMENT VARCHAR(400)")
+			.addColumn("COMMENT BLOB")
 			.addColumn("DATE TIMESTAMP NOT NULL")
 			.addColumn("DOCUMENTID VARCHAR(64)")
       		.toCreateTableStatement());
@@ -110,6 +108,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 		Connection connection = mcrConnection.getJDBCConnection();
 		
 		try {
+			connection.setAutoCommit(false);
 			PreparedStatement statement;
 			statement = connection.prepareStatement(
 					"insert into " + table + " values (?, ?, ?, ?, ?, ?)");
