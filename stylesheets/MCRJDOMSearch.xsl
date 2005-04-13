@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2005-01-05 09:06:33 $ -->
+<!-- $Revision: 1.4 $ $Date: 2005-04-13 19:14:43 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet 
@@ -10,23 +10,17 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:java="http://xml.apache.org/xslt/java"
   extension-element-prefixes="java"
-  >
+>
 
-<xsl:output 
-  method="xml" 
-  encoding="UTF-8"
-  />
+<xsl:output method="xml" encoding="UTF-8" />
 
-<xsl:template match="/root">
-<mcr_search_results>
- <xsl:for-each select="mycoreobject" >
-  <mcr_search_result>
-   <xsl:attribute name="ID">
-    <xsl:value-of select="@ID" />
-   </xsl:attribute>
-  </mcr_search_result>
- </xsl:for-each>
-</mcr_search_results>
+<xsl:template match="/">
+  <result>
+    <xsl:choose>
+      <xsl:when test="mycoreobject">true</xsl:when>
+      <xsl:otherwise>false</xsl:otherwise>
+    </xsl:choose>
+  </result>
 </xsl:template>
 
 </xsl:stylesheet>

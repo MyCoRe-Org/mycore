@@ -31,76 +31,81 @@ import org.apache.log4j.Logger;
 
 /**
  * This class is the persistence layer for a nativ memory JDOM databases.
- *
+ * 
  * @author Jens Kupferschmidt
- **/
-public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface {
-
-static final private Logger logger = Logger.getLogger( MCRJDOMSearchStore.class.getName() );
-static final private MCRConfiguration config = MCRConfiguration.instance();
-
-/**
- * The constructor of this class.
- **/
-public MCRJDOMSearchStore() {
-  }
-
-/**
- * The methode create an object in the search store.
- *
- * @param obj    the MCRObject to put in the search store
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final void create(MCRBase obj) throws MCRConfigurationException, MCRPersistenceException
-  {
-  MCRObjectID mcr_id = obj.getId();
-  logger.debug("MCRJDOMSearchStore create: MCRObjectID : "+mcr_id.getId());
-  org.jdom.Element root = obj.createXML().getRootElement();
-  root.detach();
-  MCRJDOMMemoryStore.instance().addElementOfType(mcr_id.getTypeId(),root);
-  }
-
-/**
- * The methode create a new datastore based of given configuration. It create
- * a new data table for storing MCRObjects with the same MCRObjectID type.
- *
- * @param mcr_type    the MCRObjectID type as string
- * @param mcr_conf    the configuration XML stream as JDOM tree
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
-  throws MCRConfigurationException, MCRPersistenceException
-  { logger.info("This feature does not exist for this store."); }
-
-/**
- * The methode update an object in the data store.
- *
- * @param obj    the MCRObject to put in the search store
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
- **/
-public final void update(MCRBase obj) throws MCRConfigurationException, MCRPersistenceException
-  {
-  MCRObjectID mcr_id = obj.getId();
-  logger.debug("MCRJDOMSearchStore update: MCRObjectID : "+mcr_id.getId());
-  org.jdom.Element root = obj.createXML().getRootElement();
-  root.detach();
-  MCRJDOMMemoryStore.instance().removeElementOfType(mcr_id.getTypeId(),mcr_id);
-  MCRJDOMMemoryStore.instance().addElementOfType(mcr_id.getTypeId(),root);
-  }
-
-/**
- * The methode delete an object from the data store.
- * @param mcr_id      the object id
- * @exception MCRConfigurationException if the configuration is not correct
- * @exception MCRPersistenceException if a persistence problem is occured
+ * @author Frank Lützenkirchen
  */
-public void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
-  logger.debug("MCRJDOMSearchStore delete: MCRObjectID : "+mcr_id.getId());
-  MCRJDOMMemoryStore.instance().removeElementOfType(mcr_id.getTypeId(),mcr_id);
+public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface
+{
+  private static final Logger logger = 
+    Logger.getLogger( MCRJDOMSearchStore.class.getName() );
+
+  private static final MCRJDOMMemoryStore store = MCRJDOMMemoryStore.instance();
+  
+  /**
+   * Creates a new JDOM search store
+   */
+  public MCRJDOMSearchStore()
+  {}
+
+  /**
+   * Creates an object in the search store.
+   * 
+   * @param obj
+   *              the MCRObject to put in the search store
+   * @exception MCRConfigurationException
+   *              if the configuration is not correct
+   * @exception MCRPersistenceException
+   *              if a persistence problem is occured
+   */
+  public void create( MCRBase obj ) throws MCRConfigurationException,
+      MCRPersistenceException
+  {
+    MCRObjectID mcr_id = obj.getId();
+    logger.debug( "MCRJDOMSearchStore create: MCRObjectID : " + mcr_id.getId() );
+    org.jdom.Element root = obj.createXML().detachRootElement();
+    store.addElement( mcr_id, root );
   }
 
-}
+  /**
+   * This operation is not necessary for this store, so the method does nothing.
+   */
+  public void createDataBase( String mcr_type, org.jdom.Document mcr_conf )
+  { logger.info( "Create database operation is not needed for this store." ); }
 
+  /**
+   * Updates an object in the search store.
+   * 
+   * @param obj
+   *          the MCRObject to update in the search store
+   * @exception MCRConfigurationException
+   *              if the configuration is not correct
+   * @exception MCRPersistenceException
+   *              if a persistence problem occured
+   */
+  public void update( MCRBase obj ) throws MCRConfigurationException,
+      MCRPersistenceException
+  {
+    MCRObjectID mcr_id = obj.getId();
+    logger.debug( "MCRJDOMSearchStore update: MCRObjectID : " + mcr_id.getId() );
+    org.jdom.Element root = obj.createXML().detachRootElement();
+    store.removeElement( mcr_id );
+    store.addElement( mcr_id, root );
+  }
+
+  /**
+   * Deletes an object from the search store.
+   * 
+   * @param mcr_id 
+   *              the id of the object that should be deleted
+   * @exception MCRConfigurationException
+   *              if the configuration is not correct
+   * @exception MCRPersistenceException
+   *              if a persistence problem occured
+   */
+  public void delete( MCRObjectID mcr_id ) throws MCRPersistenceException
+  {
+    logger.debug( "MCRJDOMSearchStore delete: MCRObjectID : " + mcr_id.getId() );
+    store.removeElement( mcr_id );
+  }
+}
