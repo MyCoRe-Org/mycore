@@ -115,10 +115,9 @@ public final String getCategId()
  * @exception MCRException if the set_classid value or
  * the set_categid are null, empty, too long or not a MCRObjectID
  **/
-public final void setValue(String set_type, String set_classid, String set_categid)
+public final void setValue(String set_classid, String set_categid)
   throws MCRException
   {
-  setType(setType);
   if ((set_classid==null) || ((set_classid=set_classid.trim()).length()==0)) {
     throw new MCRException("The classid is empty."); }
   if ((set_categid==null) || ((set_categid=set_categid.trim()).length()==0)) {
