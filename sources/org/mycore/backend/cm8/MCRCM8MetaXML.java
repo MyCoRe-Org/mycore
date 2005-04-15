@@ -85,7 +85,7 @@ public DKComponentTypeDefICM createItemType(org.jdom.Element element,
     lt.setName(subtagname);
     lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
     // add type attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
+    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
     attr.setNullable(true);
     attr.setUnique(false);
     lt.addAttr(attr);
