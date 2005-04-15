@@ -488,6 +488,18 @@ public final void updateInDatastore() throws MCRPersistenceException
   }
 
 /**
+ * The methode update only the XML part of the object in the data store.
+ *
+ * @exception MCRPersistenceException if a persistence problem is occured
+ **/
+public final void updateXMLInDatastore() throws MCRPersistenceException
+  {
+  mcr_service.setDate("modifydate");
+  mcr_xmltable.update(mcr_id,createXML());
+  mcr_persist.update(this);
+  }
+
+/**
  * The method updates the persistence layer with the data from the XLM store.
  *
  * @param id the MCRObjectID as string
