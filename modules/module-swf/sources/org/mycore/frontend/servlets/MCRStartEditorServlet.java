@@ -46,6 +46,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.frontend.fileupload.MCRUploadHandlerInterface;
 import org.mycore.frontend.fileupload.MCRUploadHandlerManager;
 import org.mycore.frontend.workflow.MCRWorkflowManager;
@@ -163,12 +164,14 @@ public class MCRStartEditorServlet extends MCRServlet
       !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") &&
       !mytodo.equals("weditobj") && !mytodo.equals("weditder") && 
       !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") &&
-      !mytodo.equals("wsetfile") &&!mytodo.equals("wcommit") &&
+      !mytodo.equals("wsetfile") && !mytodo.equals("wsetlabel") &&
+      !mytodo.equals("wcommit") && 
       !mytodo.equals("seditobj") && !mytodo.equals("seditder") &&
       !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && 
       !mytodo.equals("snewder") && !mytodo.equals("scommitder") &&
       !mytodo.equals("saddfile")&& !mytodo.equals("snewfile") &&
-      !mytodo.equals("sdelfile")&& !mytodo.equals("ssetfile")) {
+      !mytodo.equals("sdelfile")&& !mytodo.equals("ssetlabel") &&
+      !mytodo.equals("ssetfile")) {
       mytodo = "wnewobj"; }
     LOGGER.info("TODO = "+mytodo);
     // get the MCRObjectID from the text filed (TF)
@@ -264,14 +267,13 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
-
       String base = getBaseURL() + myfile;
       Properties params = new Properties();
       params.put( "XSL.editor.source.new", "true" );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "XSL.target.param.0", "mcrid=" + mytfmcrid );
-      params.put( "XSL.target.param.1", "type="  + mytype );
-      params.put( "XSL.target.param.2", "step="  + mystep );
+      params.put( "mcrid",mytfmcrid );
+      params.put( "type",mytype );
+      params.put( "step=",mystep );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
@@ -308,10 +310,10 @@ public class MCRStartEditorServlet extends MCRServlet
       params.put( "XSL.UploadID", fuhid);
       params.put( "XSL.editor.source.new", "true" );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "XSL.target.param.0", "mcrid=" + mysemcrid );
-      params.put( "XSL.target.param.1", "type="  + mytype );
-      params.put( "XSL.target.param.2", "step="  + mystep );
-      params.put( "XSL.target.param.3", "remcrid="  + myremcrid );
+      params.put( "mcrid",mysemcrid );
+      params.put( "type",mytype );
+      params.put( "step",mystep );
+      params.put( "remcrid",myremcrid );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
@@ -334,9 +336,9 @@ public class MCRStartEditorServlet extends MCRServlet
       Properties params = new Properties();
       params.put( "XSL.editor.source.url", sb.toString() );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "XSL.target.param.0", "mcrid=" + mysemcrid );
-      params.put( "XSL.target.param.1", "type="  + mytype );
-      params.put( "XSL.target.param.2", "step="  + mystep );
+      params.put( "mcrid",mysemcrid );
+      params.put( "type",mytype );
+      params.put( "step",mystep );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
@@ -458,28 +460,32 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
         return;
         }
-/*
-      org.jdom.Element cell = new org.jdom.Element("cell");
-      cell.setAttribute("col","1");
-      cell.setAttribute("row","1");
-      cell.setAttribute("anchor","NORTHWEST");
-      cell.setAttribute("ref","TFzeile128");
-      cell.setAttribute("var","@label");
-      cell.setAttribute("sortnr","1");
-      cell.setAttribute("default","");
-*/
+      sb = new StringBuffer();
+      sb.append(WFM.getDirectoryPath(mytype)).append(SLASH).append(mysemcrid).append(".xml");
+      MCRDerivate der = new MCRDerivate();
+      der.setFromURI(sb.toString());
+      org.jdom.Element textfield = new org.jdom.Element("textfield");
+      org.jdom.Element defa = new org.jdom.Element("default");
+      defa.setText(der.getLabel());
+      textfield.addContent(defa);
+      MCRSessionMgr.getCurrentSession().put("weditder",textfield);
       sb = new StringBuffer();
       sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
       Properties params = new Properties();
       params.put( "XSL.editor.source.new", "true" );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "mcrid",mysemcrid );
+      params.put( "se_mcrid",mysemcrid );
+      params.put( "re_mcrid",myremcrid );
       params.put( "type",mytype );
       params.put( "step",mystep );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( sb.toString(), params )));
       return;
       }
 
+    // action WSETLABEL in the database
+    if (mytodo.equals("wsetlabel")) {
+      extparm="####label####"+extparm; mytodo="wsetfile";}
+      
     // action WSETFILE in the database
     if (mytodo.equals("wsetfile")) {
       if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,false)) {
@@ -498,7 +504,7 @@ public class MCRStartEditorServlet extends MCRServlet
         der.getDerivate().getInternals().setMainDoc(extparm.substring(mysemcrid.length()+1+12,extparm.length()));
         }
       if (extparm.startsWith("####label####")) {
-        der.setLabel(extparm.substring(12,extparm.length()));
+        der.setLabel(extparm.substring(13,extparm.length()));
         }
       byte [] outxml = MCRUtils.getByteArray(der.createXML());
       try {
@@ -558,7 +564,7 @@ public class MCRStartEditorServlet extends MCRServlet
 
     // action SEDITOBJ in the database
     if (mytodo.equals("seditobj")) {
-      if (!checkAccess(mytfmcrid,userid,privs,"modify-"+mytype,true)) {
+      if (!checkAccess(mytfmcrid,userid,privs,"commit-"+mytype,true)) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
@@ -577,16 +583,16 @@ public class MCRStartEditorServlet extends MCRServlet
       Properties params = new Properties();
       params.put( "XSL.editor.source.url", sb.toString() );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "XSL.target.param.0", "mcrid=" + mytfmcrid );
-      params.put( "XSL.target.param.1", "type="  + mytype );
-      params.put( "XSL.target.param.2", "step="  + mystep );
+      params.put( "mcrid",mytfmcrid );
+      params.put( "type",mytype );
+      params.put( "step",mystep );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
 
    // action SDELOBJ from the database
    if (mytodo.equals("sdelobj")) {
-     if (!checkAccess(mytfmcrid,userid,privs,"delete-"+mytype,true)) {
+     if (!checkAccess(mytfmcrid,userid,privs,"remove-"+mytype,true)) {
        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
        return;
        }
@@ -621,7 +627,7 @@ public class MCRStartEditorServlet extends MCRServlet
 
    // action SDELDER from the database
    if (mytodo.equals("sdelder")) {
-     if (!checkAccess(mysemcrid,userid,privs,"delete-"+mytype,true)) {
+     if (!checkAccess(myremcrid,userid,privs,"remove-"+mytype,true)) {
        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
        return;
        }
@@ -631,13 +637,13 @@ public class MCRStartEditorServlet extends MCRServlet
        }
      MCRDerivate der = new MCRDerivate();
      try {
-       der.deleteFromDatastore(myremcrid);
-       MCRObjectID ID = new MCRObjectID(mysemcrid);
+       der.deleteFromDatastore(mysemcrid);
+       MCRObjectID ID = new MCRObjectID(myremcrid);
        sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
        String searchtype = CONFIG.getString(sb.toString(),ID.getTypeId());
        sb = new StringBuffer();
        sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-       sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(mysemcrid).append("\']");
+       sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
        myfile = sb.toString();
        }
      catch (Exception e) { myfile = deleteerrorpage; }
@@ -647,8 +653,8 @@ public class MCRStartEditorServlet extends MCRServlet
        String appl = CONFIG.getString("MCR.editor_mail_application_id","DocPortal");
        String subject = "Automaticaly message from "+appl;
        StringBuffer text = new StringBuffer();
-       text.append("Es wurde ein Derivate mit der ID ").append(myremcrid)
-         .append(" des Objektes mit der ID ").append(mytfmcrid)
+       text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid)
+         .append(" des Objektes mit der ID ").append(mysemcrid)
          .append(" aus dem Server gelöscht.");
        LOGGER.info(text.toString());
        try {
@@ -660,36 +666,33 @@ public class MCRStartEditorServlet extends MCRServlet
      return;
      }
 
-    // action SNEWDER - create a new derivate
-    if (mytodo.equals("snewder")) {
-      String priv = "modify-"+mytype;
-      if (!privs.contains(priv)) {
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
-        return;
-        }
-      myremcrid = mysemcrid;
-      mysemcrid =  WFM.createDerivate(myremcrid);
-      mystep="addder";
-      mytodo = "saddfile";
-      }
+   // action SNEWDER - create a new derivate
+   if (mytodo.equals("snewder")) {
+     if (!checkAccess(myremcrid,userid,privs,"commit-"+mytype,true)) {
+       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+       return;
+       }
+     mysemcrid =  WFM.createDerivate(myremcrid);
+     mystep="addder";
+     mytodo = "saddfile";
+     }
 
-    // action SNEWFILE - create a new derivate
-    if (mytodo.equals("snewfile")) {
-      String priv = "modify-"+mytype;
-      if (!privs.contains(priv)) {
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
-        return;
-        }
-      String workdir = CONFIG.getString("MCR.editor_"+mytype+"_directory");
-      File ndir = new File(workdir,mysemcrid);
-      ndir.mkdir();
-      mystep="addfile";
-      mytodo = "saddfile";
-      }
+   // action SNEWFILE - create a new derivate
+   if (mytodo.equals("snewfile")) {
+     if (!checkAccess(myremcrid,userid,privs,"commit-"+mytype,true)) {
+       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+       return;
+       }
+     String workdir = CONFIG.getString("MCR.editor_"+mytype+"_directory");
+     File ndir = new File(workdir,mysemcrid);
+     ndir.mkdir();
+     mystep="addfile";
+     mytodo = "saddfile";
+     }
 
     // action SADDFILE - create a new file in the derivate
     if (mytodo.equals("saddfile")) {
-      if (!checkAccess(myremcrid,userid,privs,"modify-"+mytype,true)) {
+      if (!checkAccess(myremcrid,userid,privs,"commit-"+mytype,true)) {
         job.getResponse().sendRedirect(getBaseURL()+usererrorpage);
         return;
         }
@@ -707,10 +710,10 @@ public class MCRStartEditorServlet extends MCRServlet
       params.put( "XSL.UploadID", fuhid);
       params.put( "XSL.editor.source.new", "true" );
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
-      params.put( "XSL.target.param.0", "mcrid=" + mysemcrid );
-      params.put( "XSL.target.param.1", "type="  + mytype );
-      params.put( "XSL.target.param.2", "step="  + mystep );
-      params.put( "XSL.target.param.3", "remcrid="  + myremcrid );
+      params.put( "mcrid",mysemcrid );
+      params.put( "type",mytype );
+      params.put( "step",mystep );
+      params.put( "remcrid",myremcrid );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
@@ -751,9 +754,9 @@ public class MCRStartEditorServlet extends MCRServlet
       return;
       }
 
-    // action SSETFILE in the database
-    if (mytodo.equals("ssetfile")) {
-      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+    // action SEDITDER in the database
+    if (mytodo.equals("seditder")) {
+      if (!checkAccess(mysemcrid,userid,privs,"commit-"+mytype,true)) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
@@ -761,15 +764,66 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
         return;
         }
-      sb = new StringBuffer();
       MCRDerivate der = new MCRDerivate();
       der.receiveFromDatastore(mysemcrid);
-      if (extparm.startsWith("####main####")) {
-        der.getDerivate().getInternals().setMainDoc(extparm.substring(12,extparm.length()));
+      org.jdom.Element textfield = new org.jdom.Element("textfield");
+      org.jdom.Element defa = new org.jdom.Element("default");
+      defa.setText(der.getLabel());
+      textfield.addContent(defa);
+      MCRSessionMgr.getCurrentSession().put("seditder",textfield);
+      sb = new StringBuffer();
+      sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
+      Properties params = new Properties();
+      params.put( "XSL.editor.source.new", "true" );
+      params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
+      params.put( "se_mcrid",mysemcrid );
+      params.put( "re_mcrid",myremcrid );
+      params.put( "type",mytype );
+      params.put( "step",mystep );
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( sb.toString(), params )));
+      return;
+      }
+
+    // action SSETLABEL in the database
+    if (mytodo.equals("ssetlabel")) {
+      if (!checkAccess(myremcrid,userid,privs,"commit-"+mytype,true)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
         }
-      if (extparm.startsWith("####label####")) {
-        der.setLabel(extparm.substring(12,extparm.length()));
+      if (mysemcrid.length()==0) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+        return;
         }
+      MCRDerivate der = new MCRDerivate();
+      der.receiveFromDatastore(mysemcrid);
+      der.setLabel(extparm);
+      try { der.updateXMLInDatastore(); }
+      catch (MCRException ex) {
+        LOGGER.error( "Exception while store to derivate " + mysemcrid ); }
+      MCRObjectID ID = new MCRObjectID(myremcrid);
+      sb = new StringBuffer();
+      sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
+      String searchtype = CONFIG.getString(sb.toString(),ID.getTypeId());
+      sb = new StringBuffer(getBaseURL());
+      sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
+      sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
+      job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+      return;
+      }
+      
+    // action SSETFILE in the database
+    if (mytodo.equals("ssetfile")) {
+      if (!checkAccess(myremcrid,userid,privs,"commit-"+mytype,true)) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
+        return;
+        }
+      if (mysemcrid.length()==0) {
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
+        return;
+        }
+      MCRDerivate der = new MCRDerivate();
+      der.receiveFromDatastore(mysemcrid);
+      der.getDerivate().getInternals().setMainDoc(extparm);
       try { der.updateXMLInDatastore(); }
       catch (MCRException ex) {
         LOGGER.error( "Exception while store to derivate " + mysemcrid ); }
@@ -781,7 +835,7 @@ public class MCRStartEditorServlet extends MCRServlet
 
     // action SDELFILE in the database
     if (mytodo.equals("sdelfile")) {
-      if (!checkAccess(mysemcrid,userid,privs,"delete-"+mytype,true)) {
+      if (!checkAccess(myremcrid,userid,privs,"remove-"+mytype,true)) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
@@ -789,7 +843,6 @@ public class MCRStartEditorServlet extends MCRServlet
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+mcriderrorpage));
         return;
         }
-/*
       int all = 0;
       int the = 0;
       int i = extparm.indexOf("####nrall####");
@@ -804,19 +857,17 @@ public class MCRStartEditorServlet extends MCRServlet
         the = Integer.parseInt(extparm.substring(i+13,j));
         }
       if (all > 1) {
-        String derpath = WFM.getDirectoryPath(mytype);
         i = extparm.indexOf("####filename####");
         if (i != -1) {
           String filename = extparm.substring(i+16,extparm.length());
           try {
-            File fi = new File(derpath,filename);
-            fi.delete();
+            MCRDirectory rootdir = MCRDirectory.getRootDirectory(mysemcrid);
+            rootdir.getChildByPath(filename).delete();
             }
           catch (Exception ex) {
             LOGGER.warn("Can't remove file "+filename); }
           }
         }
-*/
       sb = new StringBuffer();
       sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(mysemcrid).append("/?hosts=local");
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));

@@ -466,11 +466,22 @@ protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in,
   for (int j=0;j<servicelistlen;j++) {
     org.jdom.Element datatag = (org.jdom.Element)servicelist.get(j);
     if (datatag.getName().equals("servflags")) {
+      // get current user
       MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-      String userid = mcrSession.getCurrentUserID();
-      MCRMetaLangText line = new MCRMetaLangText("servflags","servflag",
-        "de","",0,"plain","User:"+userid);
-      datatag.addContent(line.createXML());
+      String userid = "User:"+mcrSession.getCurrentUserID();
+      // is the a new editor?
+      List servflaglist = datatag.getChildren();
+      int servflaglistlen = servflaglist.size();
+      boolean test = true;
+      for (int h=0; h<servflaglistlen;h++) {
+        org.jdom.Element servflag = (org.jdom.Element)servflaglist.get(h);
+        if (servflag.getText().equals(userid)) { test=false; break; }
+        }
+      if (test) {
+        MCRMetaLangText line = new MCRMetaLangText("servflags","servflag",
+          "de","",0,"plain",userid);
+        datatag.addContent(line.createXML());
+        }
       }
     String mcrclass = datatag.getAttributeValue("class");
     List datataglist = datatag.getChildren();
