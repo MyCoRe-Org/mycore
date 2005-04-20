@@ -29,8 +29,11 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.StringTokenizer;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +48,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.common.*;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * This servlet handles form submissions from
@@ -60,12 +64,12 @@ public class MCREditorServlet extends MCRServlet
   protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
   protected final static MCRCache sessions = new MCRCache( 100 );
 
-  public void init()
+  public void init() 
   {
     super.init();
-    MCREditorResolver.init( getServletContext(), getBaseURL() );
+    MCRURIResolver.init( getServletContext(), getBaseURL() );
   }
-
+  
   public void doGetPost( MCRServletJob job )
 	throws ServletException, java.io.IOException
   {
@@ -83,10 +87,15 @@ public class MCREditorServlet extends MCRServlet
       processShowPopup( req, res );
     else if( "submit".equals( action ) )
       processSubmit( req, res, parms );
+    else if( "end.subselect".equals( action ) )
+      processEndSubSelect( req, res, parms );
     else
       res.sendError( HttpServletResponse.SC_BAD_REQUEST );
   }
 
+  /**
+   * Shows a help popup window 
+   **/
   private void processShowPopup( HttpServletRequest  req, 
                                  HttpServletResponse res )
 	throws ServletException, java.io.IOException
@@ -103,6 +112,9 @@ public class MCREditorServlet extends MCRServlet
     sendToDisplay( req, res, new Document( clone ) );
   }
 
+  /**
+   * Loads existing editor session data into webpage
+   **/
   private void processLoadSession( HttpServletRequest  req,
                                    HttpServletResponse res )
     throws ServletException, java.io.IOException
@@ -115,7 +127,10 @@ public class MCREditorServlet extends MCRServlet
     req.setAttribute( "XSL.Style", "xml" );
     sendToDisplay( req, res, editor.getDocument() );
   }
-  
+
+  /**
+   * Starts a new editor session in webpage
+   **/
   private void processStartSession( HttpServletRequest  req, 
                                     HttpServletResponse res )
     throws ServletException, java.io.IOException
@@ -269,6 +284,29 @@ public class MCREditorServlet extends MCRServlet
     return sb.toString();
   }
   
+  private void processEndSubSelect( HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms )
+    throws ServletException, java.io.IOException
+  {
+    String root = "root";
+    List variables = new ArrayList();
+    Enumeration e = req.getParameterNames();
+    while( e.hasMoreElements() )
+    {
+      String name = (String)( e.nextElement() );
+      String value = req.getParameter( name );
+
+      if( ! name.startsWith( "_var_" ) ) continue;
+      
+      if( name.length() > 5 )
+        name = "/" + root + "/" + name.substring( 5 );
+      else 
+        name = "/" + root;
+      
+      variables.add( new MCREditorVariable( name, value ) );
+    }
+    sendToSubSelect( req, res, parms, variables, root );
+  }
+  
   private void processSubmit( HttpServletRequest req, HttpServletResponse res, 
                               MCRRequestParameters parms )
 	throws ServletException, java.io.IOException
@@ -282,7 +320,7 @@ public class MCREditorServlet extends MCRServlet
     {
       String name = (String)( e.nextElement() );
       if( name.startsWith( "_p-" ) || name.startsWith( "_m-" ) ||
-          name.startsWith( "_u-" ) || name.startsWith( "_d-" ) )
+          name.startsWith( "_u-" ) || name.startsWith( "_d-" ) || name.startsWith( "_s-" ) )
       {
         button = name;
         break;
@@ -293,6 +331,51 @@ public class MCREditorServlet extends MCRServlet
     { 
       logger.info( "Editor session " + sessionID + " submitting form data" );
       processTargetSubmission( req, res, parms, editor );
+    }
+    else if( button.startsWith( "_s-" ) )
+    {
+      StringTokenizer sst = new StringTokenizer( button.substring( 3 ), "-" );
+      String id  = sst.nextToken();
+      String var = sst.nextToken();
+      logger.info( "Editor start subselect " + id + " at position " + var );
+
+      Element subselect = MCREditorDefReader.findElementByID( id, editor );
+      StringBuffer sb = new StringBuffer( getBaseURL() );
+      if( "editor".equals( subselect.getAttributeValue( "type" ) ) )
+      {
+        sb.append( subselect.getAttributeValue( "href" ) );
+        sb.append( "?subselect.session=" ).append( sessionID );
+        sb.append( "&subselect.varpath=" ).append( var );
+        sb.append( "&subselect.webpage=" ).append( parms.getParameter( "_webpage" ) );
+        sb.append( "&XSL.editor.cancel.url=" ).append( getBaseURL() );
+        sb.append( parms.getParameter( "_webpage" ) );
+        sb.append( "?XSL.editor.session.id=" ).append( sessionID );
+      }
+      else if( "webpage".equals( subselect.getAttributeValue( "type" ) ) )
+      {
+        sb.append( subselect.getAttributeValue( "href" ) );
+        sb.append( "?XSL.subselect.session=" ).append( sessionID );
+        sb.append( "&XSL.subselect.varpath=" ).append( var );
+        sb.append( "&XSL.subselect.webpage=" ).append( parms.getParameter( "_webpage" ) );
+      } 
+      else if( "servlet".equals( subselect.getAttributeValue( "type" ) ) )
+      {
+        sb.append( subselect.getAttributeValue( "href" ) );
+        sb.append( "?subselect.session=" ).append( sessionID );
+        sb.append( "&subselect.varpath=" ).append( var );
+        sb.append( "&subselect.webpage=" ).append( parms.getParameter( "_webpage" ) );
+      } 
+      String url = sb.toString();
+      
+      editor.removeChild( "input" );
+      editor.removeChild( "repeats" );
+
+      MCREditorSubmission sub = new MCREditorSubmission( parms, editor );
+      editor.addContent( sub.buildInputElements()  );
+      editor.addContent( sub.buildRepeatElements() );
+      
+      logger.info( "Editor goto subselect at " + url );
+      res.sendRedirect( url );
     }
     else
     {
@@ -357,6 +440,12 @@ public class MCREditorServlet extends MCRServlet
       sendToDebug( req, res, sub );
     else if( targetType.equals( "display" ) )
       sendToDisplay( req, res, sub.getXML() );
+    else if( targetType.equals( "subselect" ) )
+    {
+      List variables = sub.getVariables();
+      String root = sub.getXML().getRootElement().getName();
+      sendToSubSelect( req, res, parms, variables, root );
+    }
   }
   
   private void sendToServlet( HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub )
@@ -392,6 +481,31 @@ public class MCREditorServlet extends MCRServlet
     req.setAttribute( "MCRLayoutServlet.Input.JDOM", xml );
     RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
     rd.forward( req, res );
+  }
+
+  private void sendToSubSelect( HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms, List variables, String root )
+    throws IOException
+  {
+    String webpage   = parms.getParameter( "subselect.webpage" );
+    String varpath   = parms.getParameter( "subselect.varpath" );
+    String sessionID = parms.getParameter( "subselect.session" );
+    
+    Element editor = (Element)( sessions.get( sessionID ) );
+    MCREditorSubmission subnew = new MCREditorSubmission( editor, variables, root, varpath );
+    
+    editor.removeChild( "input" );
+    editor.removeChild( "repeats" );
+    editor.addContent( subnew.buildInputElements()  );
+    editor.addContent( subnew.buildRepeatElements() );
+    
+    // Redirect to webpage to reload editor form
+    StringBuffer sb = new StringBuffer( getBaseURL() );
+    sb.append( webpage );
+    sb.append( "?XSL.editor.session.id=" );
+    sb.append( sessionID );
+
+    logger.debug( "Editor redirect to " + sb.toString() );
+    res.sendRedirect( sb.toString() );
   }
 
   private void sendToDebug( HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub )

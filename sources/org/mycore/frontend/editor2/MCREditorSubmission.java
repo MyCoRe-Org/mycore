@@ -67,6 +67,35 @@ public class MCREditorSubmission
     Collections.sort( variables );
     setRepeatsFromSubmission();
   }
+  
+  MCREditorSubmission( Element saved, List submitted, String root, String varpath )
+  {
+    Element input = saved.getChild( "input" );
+    List children = input.getChildren();
+    for( int i = 0; i < children.size(); i++ )
+    {
+      Element var = (Element)( children.get( i ) );
+      String path = var.getAttributeValue( "name" );
+      String value = var.getAttributeValue( "value" );
+      
+      if( path.equals( varpath ) || path.startsWith( varpath + "/" ) )
+        continue;
+      else
+        addVariable( path, value );
+    }
+    
+    for( int i = 0; i < submitted.size(); i++ )
+    {
+      MCREditorVariable var = (MCREditorVariable)( submitted.get( i ) );
+      String path = var.getPath(); 
+      String value = var.getValue();
+      path = varpath + path.substring( root.length() + 1 );
+      addVariable( path, value );
+    }
+
+    Collections.sort( variables );
+    setRepeatsFromVariables();
+  }
 
   private void setVariablesFromElement( Element element, String prefix, String suffix )
   {
