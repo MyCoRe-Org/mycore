@@ -452,7 +452,7 @@ public class MCRStartEditorServlet extends MCRServlet
 
     // action WEDITDER in the database
     if (mytodo.equals("weditder")) {
-      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,true)) {
+      if (!checkAccess(mysemcrid,userid,privs,"modify-"+mytype,false)) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
         }
