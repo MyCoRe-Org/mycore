@@ -276,7 +276,7 @@ public final void createInDatastore() throws MCRPersistenceException
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
   // check the data
-  createXML();
+  Document jdom=createXML();
   // prepare this object with parent metadata
   MCRObjectID parent_id = mcr_struct.getParentID();
   if (parent_id != null) {
@@ -294,7 +294,7 @@ public final void createInDatastore() throws MCRPersistenceException
       }
     }
   // build this object
-  mcr_xmltable.create(mcr_id,createXML());
+  mcr_xmltable.create(mcr_id,jdom);
   mcr_persist.create(this);
   
   deleteLinksFromTable();
