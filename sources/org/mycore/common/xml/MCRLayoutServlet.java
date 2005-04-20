@@ -46,7 +46,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -99,6 +98,7 @@ public class MCRLayoutServlet extends MCRServlet {
         super.init();
         buildTransformerFactory();
         CACHE = new MCRCache(100);
+  		MCRURIResolver.init( getServletContext(), getBaseURL() );
     }
 
     protected String parseDocumentType(InputStream in) {
@@ -430,7 +430,7 @@ public class MCRLayoutServlet extends MCRServlet {
 
         factory = (SAXTransformerFactory) (tf);
 
-        factory.setURIResolver(new MCRURIResolver()); // Useful for debugging
+        factory.setURIResolver( MCRURIResolver.instance() ); 
     }
 
     /**
@@ -539,16 +539,6 @@ public class MCRLayoutServlet extends MCRServlet {
             throw new MCRException(msg, ex);
         } finally {
             out.close();
-        }
-    }
-
-    class MCRURIResolver implements URIResolver {
-        public Source resolve(String href, String base)
-                throws TransformerException {
-            LOGGER.debug("MCRURIResolver href = " + href);
-            LOGGER.debug("MCRURIResolver base = " + base);
-
-            return null;
         }
     }
 }
