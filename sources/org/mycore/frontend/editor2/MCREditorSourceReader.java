@@ -26,6 +26,7 @@ package org.mycore.frontend.editor2;
 
 import java.util.Map;
 import org.mycore.common.*;
+import org.mycore.common.xml.*;
 import org.mycore.frontend.servlets.*;
 import org.jdom.Element;
 
@@ -100,7 +101,7 @@ public class MCREditorSourceReader
       }
 
       MCREditorServlet.logger.info( "Editor reading XML input from " + url );
-      Element input = MCREditorResolver.readXML( url );
+      Element input = MCRURIResolver.instance().resolve( url );
       return new MCREditorSubmission( input );
     }
   }

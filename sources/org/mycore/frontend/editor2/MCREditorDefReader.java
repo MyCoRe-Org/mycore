@@ -25,7 +25,7 @@
 package org.mycore.frontend.editor2;
 
 import java.util.List;
-
+import org.mycore.common.xml.*;
 import org.jdom.Element;
 import org.mycore.common.MCRCache;
 
@@ -101,7 +101,7 @@ public class MCREditorDefReader
     }
 
     // Get the elements to include from uri
-    Element container = MCREditorResolver.readXML( uri );
+    Element container = MCRURIResolver.instance().resolve( uri );
     
     // If idref is given, include contents of element with that id
     if( idref.length() > 0 ) 
