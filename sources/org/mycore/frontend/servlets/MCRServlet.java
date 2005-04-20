@@ -71,7 +71,7 @@ public class MCRServlet extends HttpServlet {
 
 	/** Initialisation of the servlet */
 	public void init() {
-		System.err.println("Initializing MCRServlet...");
+		LOGGER.debug( "Initializing servlet " + getClass().getName() );
 		MCRConfiguration.instance().reload(true);
 		CONFIG = MCRConfiguration.instance();
 	}
