@@ -69,10 +69,17 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver
     int cacheSize = config.getInt( prefix + "StaticFiles.CacheSize", 100 );
     fileCache = new MCRCache( cacheSize );
   }
-  
+
+  /**
+   * URI Resolver that resolves XSL document() calls 
+   **/  
   public Source resolve( String href, String base ) 
     throws TransformerException
   {
+    LOGGER.debug( "MCRURIResolver resolving " + href + " @ " + base );
+
+    if( href.indexOf( ":" ) == -1 ) return null;
+
     String scheme = getScheme( href );
     if( "resource webapp file session".indexOf( scheme ) != -1 )
       return new JDOMSource( resolve( href ) );

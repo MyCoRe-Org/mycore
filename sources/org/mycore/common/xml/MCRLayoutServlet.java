@@ -96,9 +96,9 @@ public class MCRLayoutServlet extends MCRServlet {
 
     public void init() {
         super.init();
+        MCRURIResolver.init( getServletContext(), getBaseURL() );
         buildTransformerFactory();
         CACHE = new MCRCache(100);
-  		MCRURIResolver.init( getServletContext(), getBaseURL() );
     }
 
     protected String parseDocumentType(InputStream in) {
@@ -429,7 +429,6 @@ public class MCRLayoutServlet extends MCRServlet {
                     "Could not load a SAXTransformerFactory for use with XSLT");
 
         factory = (SAXTransformerFactory) (tf);
-
         factory.setURIResolver( MCRURIResolver.instance() ); 
     }
 
