@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.34 $ $Date: 2005-04-08 07:22:36 $ -->
+<!-- $Revision: 1.35 $ $Date: 2005-04-20 07:36:47 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -835,6 +835,24 @@
 
   <input type="password" size="{@width}" value="{$source}" name="{$var}"
     style="{$editor.font} height: {$editor.textinput.height}; border: {$editor.textinput.border};"/>
+</xsl:template>
+
+<!-- ======== subselect ======== -->
+<xsl:template match="subselect">
+  <xsl:param name="var" />
+
+  <xsl:variable name="label">
+    <xsl:call-template name="output.label" />
+  </xsl:variable>
+
+  <input type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}">
+    <xsl:attribute name="style">
+      <xsl:value-of select="concat($editor.font,' ',$editor.button.style)"/>
+      <xsl:if test="@width">
+        <xsl:value-of select="concat(' width: ',@width,';')"/>
+      </xsl:if>
+    </xsl:attribute>
+  </input>
 </xsl:template>
 
 <!-- ======== cancel ======== -->
