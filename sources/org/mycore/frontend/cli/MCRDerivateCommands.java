@@ -48,19 +48,80 @@ import org.mycore.datamodel.ifs.*;
  * @version $Revision$ $Date$
  **/
 
-public class MCRDerivateCommands
+public class MCRDerivateCommands extends MCRAbstractCommands
   {
-  private static String SLASH = System.getProperty( "file.separator" );
-  private static Logger LOGGER =
-    Logger.getLogger(MCRDerivateCommands.class.getName());
+
+ /** The logger */
+  private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
 
  /**
-  * Initialize common data.
-  **/
-  private static void init()
-    {
-    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
-    }
+   * The constructor.
+   */
+  public MCRDerivateCommands()
+  {
+    super();
+    MCRCommand com = null;
+
+    com = new MCRCommand("delete derivate from {0} to {1}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.delete String String",
+      "The command remove derivates in the number range between the MCRObjectID {0} and {1}."
+      );
+    command.add(com);
+
+    com = new MCRCommand("delete derivate {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.delete String",
+      "The command remove a derivate with the MCRObjectID {0}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("load derivate from file {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String",
+      "The command add a derivate form the file {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update derivate from file {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String",
+      "The command update a derivate form the file {0} in the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("load all derivates from directory {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String",
+      "The command load all derivates form the directory {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update all derivates from directory {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String",
+      "The command update all derivates form the directory {0} in the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("save derivate of {0} to directory {1}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.save String String",
+      "The command store the derivate with the MCRObjectID {0} to the directory {1}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("save derivate from {0} to {1} to directory {2}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.save String String String",
+      "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("get next derivate ID for base {0}",
+      "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String",
+      "The command return the next free MCRObjectID for the ID base."
+      );
+    command.add(com);
+
+    com = new MCRCommand("repair derivate search",
+      "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch",
+      "The command read the SQL store table of derivate XML files and restore them to the search store."
+      );
+    command.add(com);
+  }
 
  /**
   * Delete an MCRDerivate from the datastore.
@@ -69,7 +130,6 @@ public class MCRDerivateCommands
   **/
   public static void delete( String ID )
     {
-    init();
     MCRDerivate mycore_obj = new MCRDerivate();
     try {
       mycore_obj.deleteFromDatastore( ID );
@@ -91,7 +151,6 @@ public class MCRDerivateCommands
   **/
   public static void delete( String IDfrom, String IDto )
     {
-    init();
     int from_i = 0;
     int to_i = 0;
     try {
@@ -136,7 +195,6 @@ public class MCRDerivateCommands
   **/
   private static void processFromDirectory( String directory, boolean update )
     {
-    init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
       LOGGER.warn( directory + " ignored, is not a directory." );
@@ -181,7 +239,6 @@ public class MCRDerivateCommands
   **/
   private static boolean processFromFile( String file, boolean update )
     {
-    init();
     if( ! file.endsWith( ".xml" ) ) {
       LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
@@ -418,7 +475,6 @@ xml,false)),sr);
   **/
   public static void repairDerivateSearch()
     {
-    init();
     LOGGER.info("Start the repair for type derivate");
     // XML table manager
     MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();

@@ -26,6 +26,7 @@ package org.mycore.frontend.cli;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -51,13 +52,41 @@ import org.mycore.services.query.MCRQueryCollector;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  **/
-final class MCRQueryCommands
+final class MCRQueryCommands extends MCRAbstractCommands
 {
 
 // logger
 private static final Logger LOGGER=Logger.getLogger(MCRQueryCommands.class);
 
 private static MCRQueryCollector COLLECTOR;
+
+/**
+ * The constructor.
+ */
+public MCRQueryCommands()
+{
+  super();
+  MCRCommand com = null;
+
+  com = new MCRCommand("query host {0} {1} {2}",
+    "org.mycore.frontend.cli.MCRQueryCommands.query String String String",
+    "The command start a search against the host {0} for search type {1} with query {2}"
+    );
+  command.add(com);
+
+  com = new MCRCommand("query local {0} {1}",
+    "org.mycore.frontend.cli.MCRQueryCommands.queryLocal String String",
+    "The command start a search against the local host for search type {0} with query {1}"
+    
+    );
+  command.add(com);
+
+  com = new MCRCommand("query remote {0} {1}",
+    "org.mycore.frontend.cli.MCRQueryCommands.queryRemote String String",
+    "The command start a search against all remote hosts for search type {0} with query {1}"
+    );
+  command.add(com);
+  }
 
 /** Executes a local query */
 public static void queryLocal( String type, String query )

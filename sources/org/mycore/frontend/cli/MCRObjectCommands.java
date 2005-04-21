@@ -44,28 +44,100 @@ import org.mycore.datamodel.metadata.*;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
-<<<<<<< MCRObjectCommands.java
  * @version $Revision$ $Date$
-=======
- * @version $Revision$ $Date$
->>>>>>> 1.29.2.2
  **/
 
-public class MCRObjectCommands
+public class MCRObjectCommands extends MCRAbstractCommands
 {
-  private static String SLASH = System.getProperty( "file.separator" );
   private static Logger LOGGER =
     Logger.getLogger(MCRClassificationCommands.class.getName());
-  private static MCRConfiguration CONFIG;
 
- /**
-  * Initialize common data.
-  **/
-  private static void init()
-    {
-  	if (CONFIG==null)
-  		CONFIG = MCRConfiguration.instance();
-    }
+  /**
+   * The empty constructor.
+   */
+  public MCRObjectCommands()
+  {
+    super();
+    MCRCommand com = null;
+
+    com = new MCRCommand("delete object from {0} to {1}",
+      "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String",
+      "The command remove MCRObjects in the number range between the MCRObjectID {0} and {1}."
+      );
+    command.add(com);
+
+    com = new MCRCommand("delete object {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.delete String",
+      "The command remove a MCRObject with the MCRObjectID {0}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("load object from file {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
+      "The command add a MCRObject form the file {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update object from file {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String",
+      "The command update a MCRObject form the file {0} in the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("load all objects from directory {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String",
+      "The command load all MCRObjects form the directory {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update all objects from directory {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
+      "The command update all MCRObjects form the directory {0} in the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("save object from {0} to {1} to directory {2}",
+      "org.mycore.frontend.cli.MCRObjectCommands.save String String String",
+      "The command store all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("save object of {0} to directory {1}",
+      "org.mycore.frontend.cli.MCRObjectCommands.save String String",
+      "The command store the MCRObject with the MCRObjectID {0} to the directory {1}"
+      );
+    command.add(com);
+
+    com = new MCRCommand("get last object ID for base {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.getLastID String",
+      "The command return the last used MCRObjectID for the ID base."
+      );
+    command.add(com);
+
+    com = new MCRCommand("get next object ID for base {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.getNextID String",
+      "The command return the next free MCRObjectID for the ID base."
+      );
+    command.add(com);
+
+    com = new MCRCommand("check file {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String",
+      "The command check the data file {0} against the XML Schema."
+      );
+    command.add(com);
+
+    com = new MCRCommand("repair metadata search of type {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String",
+      "The command read the SQL store table of MCRObject XML files for the type {0} and restore them to the search store."
+      );
+    command.add(com);
+
+    com = new MCRCommand("repair metadata search of ID {0}",
+      "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
+      "The command read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store."
+      );
+    command.add(com);
+  }
 
  /**
   * Deletes an MCRObject from the datastore.
@@ -75,7 +147,6 @@ public class MCRObjectCommands
   public static void delete( String ID )
     throws Exception
     {
-    init();
     MCRObject mycore_obj = new MCRObject();
     try {
       mycore_obj.deleteFromDatastore( ID );
@@ -98,7 +169,6 @@ public class MCRObjectCommands
   public static void deleteFromTo( String IDfrom, String IDto )
     throws Exception
     {
-    init();
     int from_i = 0;
     int to_i = 0;
     try {
@@ -143,7 +213,6 @@ public class MCRObjectCommands
   **/
   private static void processFromDirectory( String directory, boolean update )
     {
-    init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
       LOGGER.warn( directory + " ignored, is not a directory." );
@@ -188,7 +257,6 @@ public class MCRObjectCommands
   **/
   private static boolean processFromFile( String file, boolean update )
     {
-    init();
     if( ! file.endsWith( ".xml" ) ) {
       LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
@@ -433,7 +501,6 @@ public class MCRObjectCommands
   **/
   public static boolean checkXMLFile( String file )
     {
-    init();
     if( ! file.endsWith( ".xml" ) ) {
       LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
@@ -456,7 +523,6 @@ public class MCRObjectCommands
   **/
   public static void repairMetadataSearch(String type)
     {
-    init();
     LOGGER.info("Start the repair for type "+type);
     String typetest = CONFIG.getString("MCR.type_"+type,"");
     if (typetest.length()==0) {
@@ -485,7 +551,6 @@ public class MCRObjectCommands
   **/
   public static void repairMetadataSearchForID(String id)
     {
-    init();
     LOGGER.info("Start the repair for the ID "+id);
     MCRObjectID mid = null;
     try {

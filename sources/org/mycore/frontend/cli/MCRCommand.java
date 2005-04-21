@@ -37,6 +37,7 @@ import org.mycore.common.*;
  * @see MCRCommandLineInterface
  *
  * @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRCommand
@@ -62,17 +63,17 @@ public class MCRCommand
   /** The beginning of the message format up to the first parameter */
   protected String suffix;
 
-  /** The session context */
-  protected MCRSession session;
+  /** The help text String */
+  protected String help;
 
  /** 
   * Creates a new MCRCommand.
   *
-  * @param session         the session data
   * @param format          the command syntax, e.g. "save document {0} to directory {1}"
   * @param methodSignature the method to invoke, e.g. "miless.commandline.DocumentCommands.saveDoc int String"
+  * @param helpText        the helpt text for this command
   **/
-  MCRCommand( MCRSession session, String format, String methodSignature )
+  MCRCommand(String format, String methodSignature, String helpText )
   {
     StringTokenizer st = new StringTokenizer( methodSignature, " " );
 
@@ -84,7 +85,6 @@ public class MCRCommand
     numParameters  = st.countTokens();
     parameterTypes = new Class[ numParameters ];
     messageFormat  = new MessageFormat( format );
-    this.session   = session;
 
     for( int i = 0; i < numParameters; i++ )
     {
@@ -101,11 +101,6 @@ public class MCRCommand
         parameterTypes[ i ] = String.class;
         f = null;
       }
-      else if( token.equals( "MCRSession" ) ) 
-      {
-        parameterTypes[ i ] = MCRSession.class;
-        f = null;
-      }
       else 
       {
         throw new MCRConfigurationException
@@ -118,6 +113,11 @@ public class MCRCommand
 
     int pos = format.indexOf( "{" );
     suffix = ( pos == -1 ? format : format.substring( 0, pos ) );
+
+    if (helpText != null) 
+      help = helpText;
+    else 
+      help = "";
   }
 
  /** 
@@ -134,6 +134,16 @@ public class MCRCommand
       method = Class.forName( className ).getMethod( methodName, parameterTypes );
 
     return method;
+  }
+
+ /**
+  * The method return the helpt text of this command.
+  *
+  * @return the help text as String
+  */
+  protected String getHelpText()
+  { 
+    return help;
   }
 
  /** 
@@ -167,8 +177,6 @@ public class MCRCommand
         j++; continue; }
       if( parameterTypes[ i ] == String.class ) {
         parameters[ i ] = commandParameters[ j ]; j++; continue; }
-      if( parameterTypes[ i ] == MCRSession.class ) {
-        parameters[ i ] = session; continue; }
     }
     return parameters;
   }

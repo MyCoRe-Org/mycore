@@ -92,35 +92,57 @@ public class MCRCommandLineInterface
     // Built-in commands
     // **************************************
 
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "process {0}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
+      "Execute the shell command {0}."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
+      "help {0}",
+      "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands String",
+      "List the helpt text for the command under {0}."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "help",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands",
+      "List current all possible commands."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "exit",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.exit" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+      "Stop the commandline tool."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "quit",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.exit" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+      "Stop the commandline tool."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "! {0}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
+      "Execute the shell command {0}."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "change to user {0} with {1}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
+      "Change the user {0} with the given password in {1}."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "login {0}",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.login String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
+      "org.mycore.frontend.cli.MCRCommandLineInterface.login String",
+      "Start the login dialog for the user {0}."
+      );
+    knownCommands[ numCommands++ ] = new MCRCommand(
       "whoami",
-      "org.mycore.frontend.cli.MCRCommandLineInterface.whoami" );
+      "org.mycore.frontend.cli.MCRCommandLineInterface.whoami",
+      "Print the current user."
+      );
 
     // *************************************************
     // Commands for object management
     // *************************************************
 
+/*
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "delete object from {0} to {1}",
       "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String" );
@@ -166,87 +188,8 @@ public class MCRCommandLineInterface
     knownCommands[ numCommands++ ] = new MCRCommand(session,
       "repair metadata search of ID {0}",
       "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String" );
+*/
 
-    // *************************************************
-    // Commands for derivate management
-    // *************************************************
-
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-	  "delete derivate from {0} to {1}",
-	  "org.mycore.frontend.cli.MCRDerivateCommands.delete String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "delete derivate {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "load derivate from file {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update derivate from file {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "load all derivates from directory {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update all derivates from directory {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save derivate of {0} to directory {1}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.save String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save derivate from {0} to {1} to directory {2}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.save String String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "get next derivate ID for base {0}",
-      "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "repair derivate search",
-      "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch" );
-
-    // **************************************
-    // Commands for classification management
-    // **************************************
-
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "delete classification {0}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.delete String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "load classification from file {0}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.loadFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update classification from file {0}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.updateFromFile String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "load all classifications from directory {0}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.loadFromDirectory String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "update all classifications from directory {0}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.updateFromDirectory String"
-      );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "save classification {0} to {1}",
-      "org.mycore.frontend.cli.MCRClassificationCommands.save String String" );
-
-    // *************************************
-    // Commands for executing configurations
-    // *************************************
-
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "create database for {0}",
-      "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String" );
-
-    // ******************************
-    // Commands for executing queries
-    // ******************************
-
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "query host {0} {1} {2}",
-      "org.mycore.frontend.cli.MCRQueryCommands.query String String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "query local {0} {1}",
-      "org.mycore.frontend.cli.MCRQueryCommands.queryLocal String String" );
-    knownCommands[ numCommands++ ] = new MCRCommand(session,
-      "query remote {0} {1}",
-      "org.mycore.frontend.cli.MCRQueryCommands.queryRemote String String" );
 
     // Read internal commands
     String internals = config.getString("MCR.internal_command_classes","");
@@ -259,10 +202,9 @@ public class MCRCommandLineInterface
       try {
         obj = Class.forName(classname).newInstance();
         ArrayList ar = ((MCRExternalCommandInterface)obj).getPossibleCommands();
-        for (int i=0;i<ar.size();i+=2) {
-          knownCommands[ numCommands++ ] = new MCRCommand(session,
-            (String)ar.get(i),(String)ar.get(i+1));
-          logger.debug("Add command '"+(String)ar.get(i)+"'");
+        for (int i=0;i<ar.size();i++) {
+          knownCommands[ numCommands++ ] = ((MCRCommand)ar.get(i));
+          logger.debug("Add command '"+knownCommands[ numCommands-1 ].showSyntax()+"'");
           }
         }
       catch (ClassNotFoundException e) {
@@ -284,10 +226,9 @@ public class MCRCommandLineInterface
       try {
         obj = Class.forName(classname).newInstance();
         ArrayList ar = ((MCRExternalCommandInterface)obj).getPossibleCommands();
-        for (int i=0;i<ar.size();i+=2) {
-          knownCommands[ numCommands++ ] = new MCRCommand(session,
-            (String)ar.get(i),(String)ar.get(i+1));
-          logger.debug("Add command '"+(String)ar.get(i)+"'");
+        for (int i=0;i<ar.size();i++) {
+          knownCommands[ numCommands++ ] = ((MCRCommand)ar.get(i));
+          logger.debug("Add command '"+knownCommands[ numCommands-1 ].showSyntax()+"'");
           }
         }
       catch (ClassNotFoundException e) {
@@ -308,20 +249,22 @@ public class MCRCommandLineInterface
     config = MCRConfiguration.instance();
     session = MCRSessionMgr.getCurrentSession();
 
-    logger.info( "" );
-    logger.info( "MyCoRe Command Line Interface. Type 'help' to get help!" );
-    logger.info( "Initializing: " );
+    System.out.println();
+    System.out.println("MyCoRe 1.1 Command Line Interface.");
+    System.out.println();
+    System.out.println("MyCoRe Type 'help' to get help!" );
+    System.out.println("MyCoRe Initializing: " );
 
     try{
       initCommands(); }
     catch( MCRException ex ) {
       logger.debug( ex.getStackTraceAsString() );
-      logger.error( ex.getMessage() );
-      logger.error( "" );
+      logger.error(ex.getMessage());
+      System.out.println();
       System.exit( 1 );
       }
-    logger.info( "Done." );
-    logger.info( "" );
+    System.out.println( "MyCoRe Done." );
+    System.out.println();
 
     if( args.length > 0 ) {
       StringBuffer cmd = new StringBuffer();
@@ -361,7 +304,7 @@ public class MCRCommandLineInterface
   {
     String line = "";
     do {
-      logger.info( "MyCoRe:> " );
+      System.out.print( "MyCoRe > " );
       try{ line = console.readLine(); }catch( IOException ex ){}
       }
     while( ( line = line.trim() ).length() == 0 );
@@ -380,12 +323,13 @@ public class MCRCommandLineInterface
     {
       for( int i = 0; i < numCommands; i++ )
       {
-        if( knownCommands[ i ].invoke( command ) ) return;
+        if( knownCommands[ i ].invoke( command ) ) {
+          System.out.println("MyCoRe Done."); return; }
       }
-      logger.error( "Command not understood. Enter 'help' to get a list of commands." );
+      System.out.println( "MyCoRe Command not understood. Enter 'help' to get a list of commands." );
     }
     catch( Throwable t1 )
-    { t1.printStackTrace();
+    { //t1.printStackTrace();
       if( t1 instanceof MCRException )
         logMCRException( (MCRException)t1 );
       else if( ( t1 instanceof InvocationTargetException ) || ( t1 instanceof ExceptionInInitializerError ) )
@@ -412,10 +356,10 @@ public class MCRCommandLineInterface
   **/
   private static void logMCRException( MCRException mex )
   {
-    logger.error( mex.getClass().getName() );
-    logger.error( mex.getMessage () );
     logger.debug( mex.getStackTraceAsString() );
-    logger.error( "" );
+    logger.debug( mex.getClass().getName() );
+    logger.error(mex.getMessage() );
+    logger.error(" ");
 
     if( mex.getException() != null ) logException( mex.getException() );
   }
@@ -425,10 +369,10 @@ public class MCRCommandLineInterface
   **/
   private static void logException( Exception ex )
   {
-    logger.error( ex.getClass().getName() );
-    logger.error( ex.getMessage () );
+    logger.error(ex.getClass().getName());
+    logger.error(ex.getMessage ());
     logger.debug( MCRException.getStackTraceAsString( ex ) );
-    logger.error( "" );
+    logger.error(" ");
   }
 
  /**
@@ -436,9 +380,9 @@ public class MCRCommandLineInterface
   **/
   private static void logThrowable( Throwable t )
   {
-    logger.error( t.getClass().getName() );
-    logger.error( t.getMessage () );
-    logger.error( "" );
+    logger.error(t.getClass().getName() );
+    logger.error(t.getMessage () );
+    logger.error(" ");
   }
 
  /**
@@ -454,7 +398,7 @@ public class MCRCommandLineInterface
     throws IOException, FileNotFoundException
     {
     BufferedReader reader = new BufferedReader( new FileReader( file ) );
-    logger.info( "Reading commands from file " + file );
+    System.out.println( "MyCoRe Reading commands from file " + file );
     String line;
     int pos = 0;
     while( ( line = reader.readLine() ) != null ) {
@@ -473,9 +417,30 @@ public class MCRCommandLineInterface
   */
   public static void listKnownCommands()
     {
-    logger.info( "The following is a list of known commands:\n" );
+    System.out.println( "MyCoRe "+"The following is a list of known commands:\n" );
     for( int i = 0; i < numCommands; i++ ) {
-      logger.info(knownCommands[ i ].showSyntax()); }
+      System.out.println( "MyCoRe "+knownCommands[ i ].showSyntax()); }
+    }
+ 
+ /**
+  * Shows the help text of one command.
+  *
+  * @param the command
+  */
+  public static void listKnownCommands(String com)
+    {
+    boolean test = false;
+    for( int i = 0; i < numCommands; i++ ) {
+      if (knownCommands[ i ].showSyntax().indexOf(com) != -1) {
+        System.out.println("MyCoRe help for command \'"+knownCommands[ i ].showSyntax()+"\'");
+        System.out.println();
+        System.out.println("       "+knownCommands[ i ].getHelpText());
+        System.out.println();
+        test = true;
+        }
+      }
+    if (!test)
+      System.out.println("MyCoRe Unknown command.");
     }
 
  /**
@@ -500,7 +465,7 @@ public class MCRCommandLineInterface
   * The method print the current user.
   **/
   public static void whoami()
-    { logger.info("You are user "+session.getCurrentUserID()); }
+    { System.out.println( "MyCoRe You are user "+session.getCurrentUserID()); }
 
  /**
   * This command change the user of the session context to a new user.
@@ -510,10 +475,10 @@ public class MCRCommandLineInterface
   **/
   public static void changeToUser( String user, String password )
     {
-    logger.info("The old user is "+session.getCurrentUserID());
+    System.out.println( "MyCoRe The old user is "+session.getCurrentUserID());
     if (org.mycore.user.MCRUserMgr.instance().login(user.trim(), password.trim())) {
       session.setCurrentUserID(user);
-      logger.info("The new user is "+session.getCurrentUserID());
+      System.out.println( "MyCoRe The new user is "+session.getCurrentUserID());
       }
     else {
       logger.error("The password was wrong, no changes of session context!"); }
@@ -526,10 +491,10 @@ public class MCRCommandLineInterface
   **/
   public static void login( String user )
     {
-    logger.info("The old user is "+session.getCurrentUserID());
+    System.out.println( "MyCoRe The old user is "+session.getCurrentUserID());
     String password = "";
     do {
-      logger.info( "Enter the password for user "+user+" > " );
+      System.out.print( "MyCoRe Enter the password for user "+user+" > " );
       try{ password = console.readLine(); }catch( IOException ex ){}
       }
     while( ( password = password.trim() ).length() == 0 );
@@ -548,7 +513,7 @@ public class MCRCommandLineInterface
     StringBuffer sb = new StringBuffer(1024);
     while( ( c = in.read() ) != -1 ) {
       sb.append( (char)c ); }
-    logger.info(sb.toString());
+    System.out.println( "MyCoRe "+sb.toString());
     }
 
  /**
@@ -557,7 +522,7 @@ public class MCRCommandLineInterface
   */
   public static void exit()
     {
-    logger.info( "Goodbye, and remember: \"Alles wird gut.\"\n" );
+    System.out.println( "MyCoRe Goodbye, and remember: \"Alles wird gut.\"\n" );
     System.exit( 0 );
     }
   }

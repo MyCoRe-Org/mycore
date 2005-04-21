@@ -25,6 +25,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.jdom.input.SAXBuilder;
@@ -42,29 +43,35 @@ import org.mycore.datamodel.metadata.MCRObject;
  *
  * @version $Revision$ $Date$
  **/
-public class MCRBaseCommands
+public class MCRBaseCommands extends MCRAbstractCommands
 {
-  private static Logger logger = Logger.getLogger( MCRBaseCommands.class );
-  private static MCRConfiguration config;
+  private static Logger logger = Logger.getLogger( MCRBaseCommands.class.getName());
 
-  /**
-   * Initialize common data.
-   **/
-  static
+ /**
+   * The constructor.
+   */
+  public MCRBaseCommands()
   {
-    config = MCRConfiguration.instance();
+    super();
+    MCRCommand com = null;
+
+    com = new MCRCommand("create database for {0}",
+      "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String",
+      "The command create the search store for the given MCRObjectID type."
+      );
+    command.add(com);
   }
 
  /**
-  * Create a new data base file for the MCRObjectId type.
+  * Create a new data base file for the MCRObjectID type.
   *
-  * @param mcr_type the MCRObjectId type
+  * @param mcr_type the MCRObjectID type
   * @return true if all is okay, else false
   **/
   public static boolean createDataBase( String mcr_type )
   {
     // Read config file
-    String conf_filename = config.getString( "MCR.persistence_config_" + mcr_type );
+    String conf_filename = CONFIG.getString( "MCR.persistence_config_" + mcr_type );
     if( ! conf_filename.endsWith( ".xml" ) ) 
       throw new MCRException( "Configuration " + mcr_type + " does not end with .xml" ); 
 

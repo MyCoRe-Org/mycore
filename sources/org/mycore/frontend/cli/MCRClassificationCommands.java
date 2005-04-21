@@ -27,6 +27,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -44,12 +45,57 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  **/
 
-public class MCRClassificationCommands
+public class MCRClassificationCommands extends MCRAbstractCommands
   {
-  private static Logger LOGGER = 
-    Logger.getLogger(MCRClassificationCommands.class.getName());
-  private static String SLASH = System.getProperty( "file.separator" );
-  
+
+  /** The logger */
+  private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+
+  /**
+   * The empty constructor.
+   */
+  public MCRClassificationCommands()
+  {
+    super();
+    MCRCommand com = null;
+
+    com = new MCRCommand("delete classification {0}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.delete String",
+      "The command remove the classification with MCRObjectID {0} from the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("load classification from file {0}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.loadFromFile String",
+      "The command add a new classification form file {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update classification from file {0}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.updateFromFile String",
+      "The command update a classification form file {0} in the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("load all classifications from directory {0}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.loadFromDirectory String",
+      "The command add all classifications in the directory {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("update all classifications from directory {0}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.updateFromDirectory String",
+      "The command update all classifications in the directory {0} to the system."
+      );
+    command.add(com);
+
+    com = new MCRCommand("save classification {0} to {1}",
+      "org.mycore.frontend.cli.MCRClassificationCommands.save String String",
+      "The command store the classification with MCRObjectID {0} to the file with name {1}."
+      );
+    command.add(com);
+
+  }
 
  /**
   * Initialize common data.
