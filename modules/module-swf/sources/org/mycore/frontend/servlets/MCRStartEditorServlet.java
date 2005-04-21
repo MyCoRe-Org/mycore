@@ -957,13 +957,15 @@ public class MCRStartEditorServlet extends MCRServlet
     for (int i=0; i<ar.size(); i++) {
       String primaryGroupID = MCRUserMgr.instance().
         getPrimaryGroupIDOfUser((String)ar.get(i));
-      MCRGroup primaryGroup = MCRUserMgr.instance().
-        retrieveGroup(primaryGroupID);
-      if (primaryGroup.hasMember(currentUser)) { return true; }
-      ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup.getMemberGroupIDs();
-      for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
-        if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) {
-          return true;
+      if (primaryGroupID != null) {
+        MCRGroup primaryGroup = MCRUserMgr.instance().
+          retrieveGroup(primaryGroupID);
+        if (primaryGroup.hasMember(currentUser)) { return true; }
+        ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup.getMemberGroupIDs();
+        for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
+          if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) {
+            return true;
+          }
         }
       }
     }
