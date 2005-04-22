@@ -1,3 +1,12 @@
+Version 1.1
+===========
+- Add a first version of the EventHandler to reorganized the store and search
+  in the persitence layers.
+- Add a SimpleWorkflow module to administrate the content objects in simple 
+  form
+- Refactoring the commandline tool. Now the commands are all extern defined.
+  Add a simple help mechanism.
+
 Version 1.0
 ===========
 - 2005/02/17 initial release
