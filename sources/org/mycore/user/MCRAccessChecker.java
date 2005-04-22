@@ -151,11 +151,11 @@ public class MCRAccessChecker {
         getPrimaryGroupIDOfUser((String)it.next());
       MCRGroup primaryGroup = MCRUserMgr.instance().
         retrieveGroup(primaryGroupID);
-      if (primaryGroup.hasMember(currentUser)) { return true; }
+      if (primaryGroup.hasUserMember(currentUser)) { return true; }
       ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup.getMemberGroupIDs();
       for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
-        if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) {
-          return true; }
+        if (primaryGroup.hasGroupMember((String)allCurrentUserGroupIDs.get(j))) { return true; }
+        if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) { return true; }
         }
       }
     // access deny

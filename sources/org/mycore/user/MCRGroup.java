@@ -355,8 +355,44 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
    * @param user Is this user a member of the group?
    * @return Returns true if the given user is a member of this group.
    */
-  public boolean hasMember (MCRUser user) {
+  public boolean hasUserMember (MCRUser user) {
     if ((admUserIDs.contains(user.getID())) || (mbrUserIDs.contains(user.getID())))
+      return true;
+    return false;
+  }
+
+  /**
+   * This method checks if a user is a member of this group.
+   *
+   * @param user Is this user a member of the group?
+   * @return Returns true if the given user is a member of this group.
+   */
+  public boolean hasUserMember (String user) {
+    if ((admUserIDs.contains(user)) || (mbrUserIDs.contains(user)))
+      return true;
+    return false;
+  }
+
+  /**
+   * This method checks if a group is a member of this group.
+   *
+   * @param group Is this group a member of the group?
+   * @return Returns true if the given group is a member of this group.
+   */
+  public boolean hasGroupMember (MCRGroup group) {
+    if ((admGroupIDs.contains(group.getID())) || (mbrGroupIDs.contains(group.getID())))
+      return true;
+    return false;
+  }
+
+  /**
+   * This method checks if a group is a member of this group.
+   *
+   * @param group Is this group a member of the group?
+   * @return Returns true if the given group is a member of this group.
+   */
+  public boolean hasGroupMember (String group) {
+    if ((admGroupIDs.contains(group)) || (mbrGroupIDs.contains(group)))
       return true;
     return false;
   }

@@ -738,7 +738,7 @@ public class MCRUserMgr
       Object element = iterator.next();
       if (element instanceof MCRGroup) {
         MCRGroup group = (MCRGroup)element;
-        if (group.hasMember(user))
+        if (group.hasUserMember(user))
           set.add(group);
       }
     }
