@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRSession;
@@ -74,10 +75,13 @@ private static MCRWorkflowManager WFM = null;
 // The file slash
 private static String SLASH = System.getProperty("file.separator");
 
+private static String DefaultLang = null;
+
 /** Initialisation of the servlet */
 public void init() throws MCRConfigurationException {
     super.init();
     WFM = MCRWorkflowManager.instance();
+    DefaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang","en");
 }
 
 /** 
@@ -98,6 +102,9 @@ public void doGetPost(MCRServletJob job) throws Exception
   // get the step
   String step = getProperty(job.getRequest(),"step").trim();
   LOGGER.debug( "MCRListWorkflowServlet : step = " + step );
+  // get the lang
+  String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+  LOGGER.debug( "MCRListWorkflowServlet : lang = " + lang );
   
   // check the privileg
   boolean haspriv = false;
@@ -115,17 +122,68 @@ public void doGetPost(MCRServletJob job) throws Exception
     workfiles = WFM.getAllObjectFileNames(type);
     derifiles = WFM.getAllDerivateFileNames(type);
     }
+  String dirname = WFM.getDirectoryPath(type);
+
+  // read the derivate XML files
+  ArrayList derobjid = new ArrayList();
+  ArrayList derderid = new ArrayList();
+  ArrayList dermain = new ArrayList();
+  ArrayList derlabel = new ArrayList();
+  org.jdom.Document der_in;
+  org.jdom.Element der;
+  String mainfile ;
+  String label;
+  String derid;
+  String objid;
+  String dername;
+  for (int i=0;i<derifiles.size();i++) {
+    dername = (String)derifiles.get(i);
+    StringBuffer sd = (new StringBuffer(dirname)).append(SLASH).append(dername);
+    mainfile = "";
+    label = "Derivate of "+dername.substring(0,dername.length()-4);
+    objid = "";
+    try {
+      der_in = MCRXMLHelper.parseURI(sd.toString(),false);
+      //LOGGER.debug("Derivate file "+dername+" was readed.");
+      der = der_in.getRootElement();
+      label = der.getAttributeValue("label");
+      derid = der.getAttributeValue("ID");
+      org.jdom.Element s1 = der.getChild("derivate");
+      if (s1 != null) {
+        org.jdom.Element s2 = s1.getChild("linkmetas");
+        if (s2 != null) {
+          org.jdom.Element s3 = s2.getChild("linkmeta");
+          if (s3 != null) {
+            objid = s3.getAttributeValue("href",org.jdom.Namespace.getNamespace("xlink",MCRDefaults.XLINK_URL)); }
+          }
+        s2 = s1.getChild("internals");
+        if (s2 != null) {
+          org.jdom.Element s3 = s2.getChild("internal");
+          if (s3 != null) {
+            mainfile = s3.getAttributeValue("maindoc"); }
+          } 
+        }
+      derobjid.add(objid);
+      derderid.add(derid);
+      derlabel.add(label);
+      dermain.add(mainfile);
+      }
+    catch( Exception ex ) {
+      LOGGER.warn( "Can't parse workflow file "+dername); }
+    }
 
   // create a XML JDOM tree with master tag mcr_workflow
   // prepare the transformer stylesheet
   String xslfile = "mycoreobject-" + type + "-to-workflow.xsl";
   InputStream in = MCRListWorkflowServlet.class.getResourceAsStream("/"+xslfile); 
-  if( in == null ) {
+  if ( in == null ) {
     throw new MCRConfigurationException("Can't read stylesheet " + xslfile ); }
-  org.jdom.transform.XSLTransformer trans = null;
-  org.jdom.Document xslstylesheet = (new org.jdom.input.SAXBuilder()).build(in);
+  javax.xml.transform.Transformer transformer = null;
   try {
-    trans = new org.jdom.transform.XSLTransformer (xslstylesheet); }
+    transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer(new javax.xml.transform.stream.StreamSource(in));
+    transformer.setParameter("DefaultLang",DefaultLang);
+    transformer.setParameter("CurrentLang",lang);
+    }
   catch( Exception ex ) {
     throw new MCRConfigurationException("Can't initialize transformer.",ex ); }
   LOGGER.debug(xslfile+" readed.");
@@ -137,24 +195,23 @@ public void doGetPost(MCRServletJob job) throws Exception
   root.setAttribute("type",type);
   root.setAttribute("step",step);
   org.jdom.Document workflow_in = null;
-  String dirname = WFM.getDirectoryPath(type);
   // run the loop over all objects in the workflow
   for (int i=0; i<workfiles.size();i++) {
-    String fname = dirname+SLASH+(String)workfiles.get(i);
     String wfile = (String)workfiles.get(i);
-    org.jdom.Document workflow_out = null;
+    StringBuffer sb = (new StringBuffer(dirname)).append(SLASH).append(wfile);
     org.jdom.Element elm = null;
     try {
-      workflow_in = MCRXMLHelper.parseURI(fname,false);
-      LOGGER.debug("Workflow file "+wfile+" was readed.");
+      workflow_in = MCRXMLHelper.parseURI(sb.toString(),false);
+      //LOGGER.debug("Workflow file "+wfile+" was readed.");
       }
     catch( Exception ex ) {
       LOGGER.warn( "Can't parse workflow file "+wfile);
       continue; 
       }
     try {
-      workflow_out = trans.transform(workflow_in); 
-      elm = workflow_out.getRootElement();
+      org.jdom.transform.JDOMResult workflow_out = new org.jdom.transform.JDOMResult();
+      transformer.transform(new org.jdom.transform.JDOMSource(workflow_in),workflow_out); 
+      elm = workflow_out.getDocument().getRootElement();
       elm.detach();
       }
     catch( Exception ex ) {
@@ -162,39 +219,17 @@ public void doGetPost(MCRServletJob job) throws Exception
       continue; 
       }
     String ID = elm.getAttributeValue("ID");
-    LOGGER.debug("The data ID is "+ID);
+    //LOGGER.debug("The data ID is "+ID);
     try {
       for (int j=0;j<derifiles.size();j++) {
-        String dername = (String)derifiles.get(j);
-        LOGGER.debug("Check the derivate file "+dername);
-        if (WFM.isDerivateOfObject(type,dername,ID)) {
-          org.jdom.Document der_in = null;
-          String dname = dirname+SLASH+dername;
-          org.jdom.Element der = null;
-          String mainfile = "";
-          String label = "Derivate of "+ID;
-          try {
-            der_in = MCRXMLHelper.parseURI(dname,false);
-            LOGGER.debug("Derivate file "+dername+" was readed.");
-            der = der_in.getRootElement();
-            label = der.getAttributeValue("label");
-            org.jdom.Element s1 = der.getChild("derivate");
-            if (s1 != null) {
-              org.jdom.Element s2 = s1.getChild("internals");
-              if (s2 != null) {
-                org.jdom.Element s3 = s2.getChild("internal");
-                if (s3 != null) {
-                  mainfile = s3.getAttributeValue("maindoc"); }
-                }
-              }
-            LOGGER.debug("The maindoc name is "+mainfile);
-            }
-          catch( Exception ex ) {
-            LOGGER.warn( "Can't parse workflow file "+dername); }
-          String derpath = dername.substring(0,dername.length()-4);
+        if (ID.equals((String)derobjid.get(j))) {
+          dername = (String)derifiles.get(j);
+          LOGGER.debug("Check the derivate file "+dername);
+          String derpath = (String)derderid.get(j);
+          mainfile = (String)dermain.get(j);
           org.jdom.Element deriv = new org.jdom.Element("derivate");
-          deriv.setAttribute("ID",derpath);
-          deriv.setAttribute("label",label);
+          deriv.setAttribute("ID",(String)derderid.get(j));
+          deriv.setAttribute("label",(String)derlabel.get(j));
           File dir = new File(dirname,derpath);
           LOGGER.debug("Derivate under "+dir.getName());
           if (dir.isDirectory()) {
@@ -210,7 +245,12 @@ public void doGetPost(MCRServletJob job) throws Exception
                 file.setAttribute("main","false"); }
               deriv.addContent(file);
               }
-            derifiles.remove(j); j--;
+            derifiles.remove(j); 
+            derobjid.remove(j);
+            derderid.remove(j);
+            dermain.remove(j);
+            derlabel.remove(j);
+            j--;
             }
           elm.addContent(deriv);
           }

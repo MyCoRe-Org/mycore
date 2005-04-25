@@ -176,8 +176,6 @@ public final ArrayList getAllObjectFileNames(String type)
         }
       }
     java.util.Collections.sort(workfiles);
-    for (int i=0; i<workfiles.size();i++) {
-      logger.debug("After the sort workflow "+(String)workfiles.get(i)); }
     }
   return workfiles;
   }
@@ -203,8 +201,6 @@ public final ArrayList getAllDerivateFileNames(String type)
         }
       }
     java.util.Collections.sort(workfiles);
-    for (int i=0; i<workfiles.size();i++) {
-      logger.debug("After the sort workflow "+(String)workfiles.get(i)); }
     }
   return workfiles;
   }
