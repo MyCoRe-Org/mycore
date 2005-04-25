@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.35 $ $Date: 2005-04-20 07:36:47 $ -->
+<!-- $Revision: 1.36 $ $Date: 2005-04-25 14:47:46 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -273,18 +273,29 @@
   </xsl:variable>
 
   <tr>
-    <xsl:call-template name="repeater.pmud">
-      <xsl:with-param name="var"    select="$var" />
-      <xsl:with-param name="num"    select="$num" />
-      <xsl:with-param name="min"    select="$min" />
-      <xsl:with-param name="max"    select="$max" />
-      <xsl:with-param name="row.nr" select="$row.nr" />
-    </xsl:call-template>
+    <xsl:if test="@pos != 'right'">
+      <xsl:call-template name="repeater.pmud">
+        <xsl:with-param name="var"    select="$var" />
+        <xsl:with-param name="num"    select="$num" />
+        <xsl:with-param name="min"    select="$min" />
+        <xsl:with-param name="max"    select="$max" />
+        <xsl:with-param name="row.nr" select="$row.nr" />
+      </xsl:call-template>
+    </xsl:if>
     <xsl:call-template name="repeated.component">
       <xsl:with-param name="var"    select="$var" />
       <xsl:with-param name="pos"    select="$pos" />
       <xsl:with-param name="row.nr" select="$row.nr" />
     </xsl:call-template>
+    <xsl:if test="@pos = 'right'">
+      <xsl:call-template name="repeater.pmud">
+        <xsl:with-param name="var"    select="$var" />
+        <xsl:with-param name="num"    select="$num" />
+        <xsl:with-param name="min"    select="$min" />
+        <xsl:with-param name="max"    select="$max" />
+        <xsl:with-param name="row.nr" select="$row.nr" />
+      </xsl:call-template>
+    </xsl:if>
   </tr>
 
   <!-- ======== output another repeated row ======== -->
