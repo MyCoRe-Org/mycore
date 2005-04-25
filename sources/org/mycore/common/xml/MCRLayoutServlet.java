@@ -32,7 +32,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -347,6 +351,19 @@ public class MCRLayoutServlet extends MCRServlet {
                 lang = mcrSession.getCurrentLanguage();
             }
         }
+        // set type mapping
+        StringBuffer typeParam=new StringBuffer();
+  			Set entries=getTypeMapping().entrySet();
+  			Iterator it=entries.iterator();
+  			Map.Entry entry;
+  			while (it.hasNext()){
+  				entry=(Map.Entry)it.next();
+  				typeParam.append(entry.getKey())
+  				.append(":")
+  				.append(entry.getValue())
+  				.append(";");
+  			}
+        
 
         LOGGER.debug("LayoutServlet XSL.MCRSessionID="
                 + parameters.getProperty("MCRSessionID"));
@@ -354,6 +371,7 @@ public class MCRLayoutServlet extends MCRServlet {
         LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
         LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
         LOGGER.debug("LayoutServlet RefererURL =" + referer);
+        LOGGER.debug("LayoutServlet TypeMapping =" + typeParam);
 
         parameters.put("CurrentUser", user);
         parameters.put("RequestURL", getCompleteURL(request));
@@ -362,6 +380,7 @@ public class MCRLayoutServlet extends MCRServlet {
         parameters.put("DefaultLang", defaultLang);
         parameters.put("CurrentLang", lang);
         parameters.put("Referer", referer);
+        parameters.put("TypeMapping", typeParam.toString());
 
         return parameters;
     }
@@ -540,4 +559,21 @@ public class MCRLayoutServlet extends MCRServlet {
             out.close();
         }
     }
+    
+    private static Map getTypeMapping() {
+		Hashtable map = new Hashtable();
+		final String prefix = "MCR.type_";
+		Properties prop = MCRConfiguration.instance().getProperties(prefix);
+		Enumeration names = prop.propertyNames();
+		while (names.hasMoreElements()) {
+			String name = (String) (names.nextElement());
+			String name_in = name + "_in";
+			if (MCRConfiguration.instance().getBoolean(name)
+					&& MCRConfiguration.instance().getProperties().containsKey(name_in)) {
+				map.put(name.substring(prefix.length()), MCRConfiguration
+						.instance().getString(name_in));
+			}
+		}
+		return map;
+	}
 }
