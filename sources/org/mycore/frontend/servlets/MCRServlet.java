@@ -59,7 +59,7 @@ public class MCRServlet extends HttpServlet {
 	// Some configuration details
 	protected static MCRConfiguration CONFIG;
 
-	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
+	private static Logger LOGGER;
 	private static String BASE_URL, SERVLET_URL;
 
 	// These values serve to remember if we have a GET or POST request
@@ -67,11 +67,17 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean POST = false;
 
 	protected String ReqCharEncoding;
+	
+	static
+	{
+	  MCRConfiguration.instance(); // This will init log4j logging
+	  LOGGER = Logger.getLogger( MCRServlet.class );
+	}
 
 	/** Initialisation of the servlet */
 	public void init() {
+		MCRConfiguration.instance().reload( true );
 		LOGGER.debug( "Initializing servlet " + getClass().getName() );
-		MCRConfiguration.instance().reload(true);
 		CONFIG = MCRConfiguration.instance();
 	}
 

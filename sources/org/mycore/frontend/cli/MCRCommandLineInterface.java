@@ -62,7 +62,7 @@ public class MCRCommandLineInterface
   {
 
   /** The Logger **/
-  static Logger logger=Logger.getLogger(MCRCommandLineInterface.class.getName());
+  static Logger logger;
 
   /** The configuration **/
   private static MCRConfiguration config = null;
@@ -246,7 +246,8 @@ public class MCRCommandLineInterface
   */
   public static void main( String[] args )
     {
-    config = MCRConfiguration.instance();
+    config = MCRConfiguration.instance(); // This will init log4j logging, too!
+    logger = Logger.getLogger(MCRCommandLineInterface.class.getName());
     session = MCRSessionMgr.getCurrentSession();
 
     System.out.println();
