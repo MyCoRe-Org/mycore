@@ -54,9 +54,8 @@ String NL = System.getProperty("file.separator");
 /** Initialisation of the servlet */
 public void init()
   {
-  MCRConfiguration.instance().reload(true);
   CONFIG = MCRConfiguration.instance();
-  PropertyConfigurator.configure(CONFIG.getLoggingProperties());
+  CONFIG.reload( true );
   }
 
 /**
