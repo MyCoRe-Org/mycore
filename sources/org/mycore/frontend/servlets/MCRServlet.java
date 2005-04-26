@@ -25,7 +25,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -154,8 +153,6 @@ public class MCRServlet extends HttpServlet {
 			req.setCharacterEncoding(ReqCharEncoding);
 			LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
 		}
-		String c = getClass().getName();
-		c = c.substring(c.lastIndexOf(".") + 1);
 
 		if (BASE_URL == null)
 			prepareURLs(req);
@@ -192,21 +189,18 @@ public class MCRServlet extends HttpServlet {
 			// Forward MCRSessionID to XSL Stylesheets
 			req.setAttribute("XSL.MCRSessionID", session.getID());
 
-			String s =
-				(theSession.isNew() ? "new" : "old")
-					+ " HttpSession="
-					+ theSession.getId()
-					+ " MCRSession="
-					+ session.getID();
-			String u = session.getCurrentUserID();
-			String h = req.getRemoteHost();
-
-			if ((h == null) || (h.trim().length() == 0)) {
-				h = getRemoteAddr( req );
-				h = InetAddress.getByName(h).getHostName();
-			}
-			h = h.toLowerCase();
-			LOGGER.info(c + " request from " + h + " : " + s + " user " + u);
+			String c = getClass().getName();
+			c = c.substring( c.lastIndexOf(".") + 1);
+			
+			StringBuffer msg = new StringBuffer();
+			msg.append( c );
+			msg.append( " ip=" );
+			msg.append( getRemoteAddr( req ) );
+			msg.append( theSession.isNew() ? " new" : " old" );
+			msg.append( " http=" ).append( theSession.getId() );
+			msg.append( " mcr=" ).append( session.getID() );
+			msg.append( " user=" ).append( session.getCurrentUserID() );
+			LOGGER.info( msg.toString() );
 
 			MCRServletJob job = new MCRServletJob(req, res);
 
