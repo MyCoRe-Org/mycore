@@ -83,7 +83,11 @@ public class MCRSession implements Cloneable
    * Returns the MCRSession for the given sessionID.
    **/
   public static MCRSession getSession( String sessionID )
-  { return (MCRSession)( sessions.get( sessionID ) ); }
+  {
+    MCRSession s = (MCRSession)( sessions.get( sessionID ) );
+    if( s == null ) logger.warn( "MCRSession with ID " + sessionID + " not cached any more" );
+    return s;
+  }
 
   /**
    * Constructs a unique session ID for this session, based on
