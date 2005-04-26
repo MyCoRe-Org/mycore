@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.36 $ $Date: 2005-04-25 14:47:46 $ -->
+<!-- $Revision: 1.37 $ $Date: 2005-04-26 09:57:45 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -273,7 +273,7 @@
   </xsl:variable>
 
   <tr>
-    <xsl:if test="@pos != 'right'">
+    <xsl:if test="@pos = 'left'">
       <xsl:call-template name="repeater.pmud">
         <xsl:with-param name="var"    select="$var" />
         <xsl:with-param name="num"    select="$num" />
@@ -287,7 +287,7 @@
       <xsl:with-param name="pos"    select="$pos" />
       <xsl:with-param name="row.nr" select="$row.nr" />
     </xsl:call-template>
-    <xsl:if test="@pos = 'right'">
+    <xsl:if test="( string-length(@pos) = 0 ) or (@pos = 'right')">
       <xsl:call-template name="repeater.pmud">
         <xsl:with-param name="var"    select="$var" />
         <xsl:with-param name="num"    select="$num" />
