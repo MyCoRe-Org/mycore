@@ -932,7 +932,7 @@ public class MCRStartEditorServlet extends MCRServlet
         org.jdom.Element servflag = (org.jdom.Element)list.get(i);
         text = servflag.getText();
         if (text.startsWith("User:")) {
-          ar.add(text.substring(5,text.length())); }
+          ar.add(text.substring(5,text.length()).toLowerCase()); }
         }
       }
     for (int i=0;i<ar.size();i++) {
@@ -967,7 +967,9 @@ public class MCRStartEditorServlet extends MCRServlet
           if (memberGroupIDsOfPrimaryGroup.contains((String)allCurrentUserGroupIDs.get(j))) { return true; } 
         }
       }
-    }
+      else { ar.remove(i); i--; }
+    } 
+    if ((ar.size() == 0) && (privs.contains("editor"))) { return true; }
     return false;
   }
 
