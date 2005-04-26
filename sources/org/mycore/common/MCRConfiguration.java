@@ -94,9 +94,7 @@ public class MCRConfiguration
  * The single instance of this class that will be used at runtime
  */    
   protected static MCRConfiguration singleton;
-	private static final Logger logger =
-			Logger.getLogger(MCRConfiguration.class);
-
+  
 /**
  * Returns the single instance of this class that can be used to
  * read and manage the configuration properties.
@@ -159,8 +157,8 @@ public class MCRConfiguration
         if( value != null ) set( name, value );
       }
     }
-    // set the logger property
-    PropertyConfigurator.configure(getLoggingProperties());
+    
+    configureLogging();
  }
     
 /**
@@ -256,22 +254,22 @@ public class MCRConfiguration
   }
   
   /**
-   * Returns all the properties required for logging purposes
-   *
-   * @return the list of properties starting with log4j
-   */
-  public Properties getLoggingProperties() {
-      Properties properties = new Properties();
-      
-      Enumeration names = this.properties.propertyNames();      
-      while (names.hasMoreElements()) {
-          String name = (String) (names.nextElement());
-          if (name.startsWith("MCR.log4j")) {
-              String value = this.properties.getProperty(name);
-              properties.setProperty(name.substring(4), value);
-          }
+   * Configures Log4J based on the MCR.log4j properties
+   **/
+  public synchronized void configureLogging()
+  {
+    Properties prop = new Properties();
+    Enumeration names = this.properties.propertyNames();      
+    while( names.hasMoreElements() )
+    {
+      String name = (String)( names.nextElement() );
+      if( name.startsWith( "MCR.log4j" ) ) 
+      {
+        String value = this.properties.getProperty( name );
+        properties.setProperty( name.substring( 4 ), value );
       }
-      return properties;
+    }
+    PropertyConfigurator.configure( prop );
   }
   
 /**
@@ -293,9 +291,9 @@ public class MCRConfiguration
       ( "Configuration property " + name + " is not set!" );
     
     Class cl;
-    //TODO:
-    //remove the following debug output, shouldn't be needed
-    logger.debug("Loading Class: "+classname);
+    
+    Logger.getLogger( this.getClass() ).debug( "Loading Class: " + classname );
+    
     try {
         cl = Class.forName(classname);
     }
