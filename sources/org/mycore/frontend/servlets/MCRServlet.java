@@ -159,6 +159,9 @@ public class MCRServlet extends HttpServlet {
 			req.setCharacterEncoding(ReqCharEncoding);
 			LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
 		}
+		
+		if( "true".equals( req.getParameter( "reload.properties" ) ) )
+		  MCRConfiguration.instance().reload( true );
 
 		if (BASE_URL == null)
 			prepareURLs(req);
