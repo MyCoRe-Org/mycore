@@ -61,8 +61,8 @@ import org.mycore.common.xml.MCRURIResolver;
  **/
 public class MCREditorServlet extends MCRServlet
 {
-  protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
-  protected final static MCRCache sessions = new MCRCache( 100 );
+  private final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
+  private final static MCRCache sessions = new MCRCache( 200 );
 
   public void init() 
   {
@@ -330,6 +330,7 @@ public class MCREditorServlet extends MCRServlet
     if( button == null )
     { 
       logger.info( "Editor session " + sessionID + " submitting form data" );
+      sessions.remove( sessionID );
       processTargetSubmission( req, res, parms, editor );
     }
     else if( button.startsWith( "_s-" ) )
