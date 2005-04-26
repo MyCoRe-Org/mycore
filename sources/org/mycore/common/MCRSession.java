@@ -151,10 +151,10 @@ public class MCRSession implements Cloneable
   { return map.get( key ); }
 
   /** 
-   * a cache used to store the request parameters of the last max. 10
+   * a cache used to store the request parameters of the last max. 20
    * http requests to static XML files in the web application against this
    * MCRSession
    **/
-  public MCRCache requestParamCache = new MCRCache( 10 );
+  public MCRCache requestParamCache = new MCRCache( 20 );
 }
 
