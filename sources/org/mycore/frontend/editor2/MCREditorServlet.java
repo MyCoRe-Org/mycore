@@ -61,8 +61,8 @@ import org.mycore.common.xml.MCRURIResolver;
  **/
 public class MCREditorServlet extends MCRServlet
 {
-  private final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
-  private final static MCRCache sessions = new MCRCache( 200 );
+  protected final static Logger logger = Logger.getLogger( MCREditorServlet.class );
+  protected final static MCRCache sessions = new MCRCache( 200 );
 
   public void init() 
   {
