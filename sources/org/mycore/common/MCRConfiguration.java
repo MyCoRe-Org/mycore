@@ -179,7 +179,8 @@ public class MCRConfiguration
   { 
     if( clear ) properties.clear();
     String fn = System.getProperty( "MCR.configuration.file", "mycore.properties" );
-    loadFromFile( fn ); 
+    loadFromFile( fn );
+    configureLogging();
   }
 
 /**
@@ -258,6 +259,8 @@ public class MCRConfiguration
    **/
   public synchronized void configureLogging()
   {
+    System.out.println( "MCRConfiguration reconfiguring Log4J logging..." );
+    
     Properties prop = new Properties();
     Enumeration names = this.properties.propertyNames();      
     while( names.hasMoreElements() )
@@ -266,9 +269,11 @@ public class MCRConfiguration
       if( name.startsWith( "MCR.log4j" ) ) 
       {
         String value = this.properties.getProperty( name );
-        properties.setProperty( name.substring( 4 ), value );
+        prop.setProperty( name.substring( 4 ), value );
       }
     }
+    
+    org.apache.log4j.LogManager.resetConfiguration();
     PropertyConfigurator.configure( prop );
   }
   
