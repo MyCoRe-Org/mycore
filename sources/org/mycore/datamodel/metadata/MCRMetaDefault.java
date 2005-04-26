@@ -25,9 +25,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -72,7 +70,6 @@ protected String datapart;
  */
 public MCRMetaDefault()
   {
-  initLogger();
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
@@ -91,7 +88,6 @@ public MCRMetaDefault()
  */
 public MCRMetaDefault(String default_lang)
   {
-  initLogger();
   lang = DEFAULT_LANGUAGE;
   if ((default_lang != null) && 
     ((default_lang = default_lang.trim()).length() !=0)) {
@@ -124,7 +120,6 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
   String default_lang, String set_type, int set_inherited)
   throws MCRException
   {
-  initLogger();
   lang = DEFAULT_LANGUAGE;
   subtag = "";
   type = "";
@@ -140,15 +135,6 @@ public MCRMetaDefault(String set_datapart, String set_subtag,
   if ((set_datapart != null) &&
     ((set_datapart = set_datapart.trim()).length() !=0)) {
     datapart = set_datapart; }
-  }
-
-/**
- * The method initialized the Logger.
- **/
-private void initLogger()
-  {
-  // set the logger property
-  PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
   }
 
 /**

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
@@ -64,14 +63,8 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 	/**
 	 * Method MCRSQLNBNManager. Creates a new MCRNBNManager.
 	 */
-	public MCRSQLNBNManager() {
-		// set the logger property
-		PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
-		
-		if (!tableExists()) {
-			createTable();
-		}
-	}  
+	public MCRSQLNBNManager() 
+	{ if( ! tableExists() ) createTable(); }
     
 	/**
 	 * Method tableExists. look, if NBN persistency table exists.

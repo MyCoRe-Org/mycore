@@ -30,13 +30,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -81,7 +79,6 @@ public class MCROAIQueryService implements MCROAIQuery {
 	static {
 		MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
-		PropertyConfigurator.configure(config.getLoggingProperties());
 		maxReturns = config.getInt(STR_OAI_MAXRETURNS);
 	}
 	

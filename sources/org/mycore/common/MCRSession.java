@@ -25,7 +25,6 @@
 package org.mycore.common;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import java.util.Map;
 import java.util.HashMap;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
@@ -140,10 +139,9 @@ public class MCRSession implements Cloneable
   /** Write data to the logger for debugging purposes */
   public final void debug()
   {
-    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
-    logger.debug("SessionID          = "+sessionID);
-    logger.debug("UserID             = "+userID);
-    logger.debug("language           = "+language);
+    logger.debug( "SessionID = " + sessionID );
+    logger.debug( "UserID    = " + userID );
+    logger.debug( "language  = " + language );
   }
 
   /** Stores an object under the given key within the session **/

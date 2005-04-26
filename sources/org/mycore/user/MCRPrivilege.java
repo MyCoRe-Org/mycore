@@ -27,10 +27,8 @@ package org.mycore.user;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRConfiguration;
 
 /**
  * This class defines a privilege of the MyCoRe user management system. Privileges
@@ -123,8 +121,7 @@ public class MCRPrivilege
    */
   public final void debug()
   {
-    Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
-    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
+    Logger logger = Logger.getLogger( MCRPrivilege.class.getName() );
     logger.debug("privName           = "+privName);
     logger.debug("privDescription    = "+privDescription);
   }

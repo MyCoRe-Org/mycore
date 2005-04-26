@@ -27,11 +27,8 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -98,14 +95,6 @@ public class MCRClassificationCommands extends MCRAbstractCommands
   }
 
  /**
-  * Initialize common data.
-  **/
-  private static void init()
-    {
-    PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
-    }
-
- /**
   * Deletes an MCRClassification from the datastore.
   * 
   * @param ID the ID of the MCRClassification that should be deleted
@@ -113,7 +102,6 @@ public class MCRClassificationCommands extends MCRAbstractCommands
   public static void delete( String ID )
     throws Exception
     {
-    init();
     MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
     try {
@@ -153,7 +141,6 @@ public class MCRClassificationCommands extends MCRAbstractCommands
   **/
   private static void processFromDirectory( String directory, boolean update )
     {
-    init();
     File dir = new File( directory );
     if( ! dir.isDirectory() ) {
       LOGGER.warn( directory + " ignored, is not a directory." );
@@ -198,7 +185,6 @@ public class MCRClassificationCommands extends MCRAbstractCommands
   **/
   private static boolean processFromFile( String file, boolean update )
     {
-    init();
     if( ! file.endsWith( ".xml" ) ) {
       LOGGER.warn( file + " ignored, does not end with *.xml" );
       return false;
@@ -235,7 +221,6 @@ public class MCRClassificationCommands extends MCRAbstractCommands
   **/
   public static void save( String ID, String filename )
   {
-    init();
     MCRObjectID mcr_id = new MCRObjectID(ID);
     MCRClassification cl = new MCRClassification();
     byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());

@@ -32,7 +32,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,13 +59,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -154,7 +151,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	static {
     	MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
-    	PropertyConfigurator.configure(config.getLoggingProperties());
 		resumptionTokenDir = config.getString(
 				STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
 	}

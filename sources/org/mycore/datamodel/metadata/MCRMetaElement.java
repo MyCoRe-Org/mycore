@@ -533,9 +533,6 @@ public final Object clone()
  **/
 public final void debug()
   {
-  // set the logger property
-  PropertyConfigurator.configure(MCRConfiguration.instance().getLoggingProperties());
-  // the output
   logger.debug("ClassName          = "+classname);
   logger.debug("Tag                = "+tag);
   logger.debug("Language           = "+lang);
