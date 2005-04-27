@@ -178,6 +178,8 @@ public class MCRSQLUserStore implements MCRUserStore
        .addColumn("PRIMARY KEY(UID)")
        .addColumn("UNIQUE (NUMID)")
        .toCreateTableStatement());
+      c.doUpdate (new MCRSQLStatement(SQLUsersTable)
+       .addColumn("UID").toIndexStatement());
       }
     finally {c.release();}
     }
@@ -197,6 +199,8 @@ public class MCRSQLUserStore implements MCRUserStore
        .addColumn("DESCRIPTION VARCHAR("+Integer.toString(MCRUser.description_len)+")")
        .addColumn("PRIMARY KEY(GID)")
        .toCreateTableStatement());
+      c.doUpdate (new MCRSQLStatement(SQLGroupsTable)
+       .addColumn("GID").toIndexStatement());
       }
     finally {c.release();}
     }
@@ -235,6 +239,7 @@ public class MCRSQLUserStore implements MCRUserStore
 
   /**
    * This method creates the table named SQLPrivilegesTable.
+   * The method build also an index over the column NAME.
    */
   private final void createSQLPrivilegesTable()
     {
@@ -247,6 +252,8 @@ public class MCRSQLUserStore implements MCRUserStore
          Integer.toString(MCRPrivilege.description_len)+")")
        .addColumn("PRIMARY KEY(NAME)")
        .toCreateTableStatement());
+      c.doUpdate (new MCRSQLStatement(SQLPrivilegesTable)
+       .addColumn("NAME").toIndexStatement());
       }
     finally {c.release();}
     }
@@ -263,6 +270,8 @@ public class MCRSQLUserStore implements MCRUserStore
        .addColumn("NAME VARCHAR("+
          Integer.toString(MCRPrivilege.privilege_len)+") NOT NULL")
        .toCreateTableStatement());
+      c.doUpdate (new MCRSQLStatement(SQLPrivsLookupTable)
+       .addColumn("GID").addColumn("NAME").toIndexStatement());
       }
     finally {c.release();}
     }

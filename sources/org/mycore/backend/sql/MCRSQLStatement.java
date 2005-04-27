@@ -201,6 +201,20 @@ public class MCRSQLStatement
     return statement.toString();
   }
   
+  public final String toIndexStatement()
+  {
+    StringBuffer statement = new StringBuffer( "CREATE INDEX " );  
+    statement.append( tableName ).append("_INDEX ON ")
+      .append( tableName ).append( " (" );
+    for( int i = 0; i < columns.size(); i++ )
+     {
+      statement.append( " " ).append( columns.elementAt( i ) );
+      if( i < columns.size() - 1 ) statement.append( "," );
+    }
+    statement.append( " )" );
+    return statement.toString();
+  }
+
   public final String toRowSelector()
   { return new StringBuffer( tableName ).append( condition() ).toString(); }
   

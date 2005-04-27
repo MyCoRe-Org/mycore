@@ -118,7 +118,9 @@ private final void createLinkTable()
          Integer.toString(lengthClassID+lengthCategID+2)+
          ") NOT NULL" )
        .addColumn( "PRIMARY KEY (MCRFROM,MCRTO)" )
-      .toCreateTableStatement() );
+       .toCreateTableStatement() );
+      c.doUpdate (new MCRSQLStatement(tableName)
+       .addColumn("MCRFROM").addColumn("MCRTO").toIndexStatement());
       }
     else {
       c.doUpdate( new MCRSQLStatement( tableName )
@@ -127,7 +129,9 @@ private final void createLinkTable()
        .addColumn( "MCRTO VARCHAR("+
          Integer.toString(lengthObjectID)+") NOT NULL" )
        .addColumn( "PRIMARY KEY (MCRFROM,MCRTO)" )
-      .toCreateTableStatement() );
+       .toCreateTableStatement() );
+      c.doUpdate (new MCRSQLStatement(tableName)
+       .addColumn("MCRFROM").addColumn("MCRTO").toIndexStatement());
       }
     }
   finally{ c.release(); }

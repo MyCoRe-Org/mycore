@@ -70,6 +70,8 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore
       .addColumn( "NUMCHTF INTEGER" ) // total files
       .toCreateTableStatement() 
     );
+   MCRSQLConnection.justDoUpdate (new MCRSQLStatement(table)
+    .addColumn("ID").toIndexStatement());
   }
     
   public void storeNode( MCRFilesystemNode node )

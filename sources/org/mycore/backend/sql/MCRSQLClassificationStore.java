@@ -146,6 +146,8 @@ private final void createCateg()
      .addColumn( "URL VARCHAR("+Integer.toString(lengthURL)+")" )
      .addColumn( "PRIMARY KEY ( CLID, ID )" )
      .toCreateTableStatement() );
+    c.doUpdate (new MCRSQLStatement(tableCateg)
+     .addColumn("CLID").addColumn("ID").toIndexStatement());
     }
   finally{ c.release(); }
   }
@@ -169,6 +171,8 @@ private final void createClassLabel()
        ")" )
      .addColumn( "PRIMARY KEY ( ID, LANG )" )
      .toCreateTableStatement() );
+    c.doUpdate (new MCRSQLStatement(tableClassLabel)
+     .addColumn("ID").addColumn("LANG").toIndexStatement());
     }
   finally{ c.release(); }
   }
@@ -194,6 +198,8 @@ private final void createCategLabel()
        ")" )
      .addColumn( "PRIMARY KEY ( CLID, ID, LANG )" )
      .toCreateTableStatement() );
+    c.doUpdate (new MCRSQLStatement(tableCategLabel)
+     .addColumn("CLID").addColumn("ID").addColumn("LANG").toIndexStatement());
     }
   finally{ c.release(); }
   }

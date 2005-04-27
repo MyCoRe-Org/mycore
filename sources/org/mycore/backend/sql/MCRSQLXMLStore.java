@@ -107,6 +107,8 @@ private synchronized final void createXMLTable()
      .addColumn( "MCRXML BLOB" )
      .addColumn("PRIMARY KEY(MCRID,MCRVERSION)")
      .toCreateTableStatement() );
+    c.doUpdate (new MCRSQLStatement(tableName)
+     .addColumn("MCRID").addColumn("MCRVERSION").toIndexStatement());
     }
   finally{ c.release(); }
   }
