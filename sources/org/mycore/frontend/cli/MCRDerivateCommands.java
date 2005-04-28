@@ -258,7 +258,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands
         path = path.replace( '/', File.separatorChar )
           .replace( '\\', File.separatorChar );
         String prefix = new File( file ).getParent();
-        path = prefix + File.separator + path;
+        if (prefix != null) {
+          path = prefix + File.separator + path; }
         mycore_obj.getDerivate().getInternals().setSourcePath( path );
         LOGGER.info( "Source path --> " + path );
         }
