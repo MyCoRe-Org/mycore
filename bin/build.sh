@@ -22,7 +22,11 @@ fi
 
 # Directory where Ant is installed on your machine, if not already set
 if [ "$ANT_HOME" = "" ]; then
-  ANT_HOME=/opt/jakarta-ant-1.5.1
+  ANT_HOME=/usr/share/ant
+fi
+if [ -d $ANT_HOME/bin ]; then
+  PATH=$PATH:$ANT_HOME
+  export PATH
 fi
 
 #######################################################################
@@ -34,5 +38,5 @@ fi
 export JAVA_HOME
 export ANT_HOME
 
-$ANT_HOME/bin/ant -logger org.apache.tools.ant.NoBannerLogger -find build.xml $*
+ant -logger org.apache.tools.ant.NoBannerLogger -find build.xml $*
 
