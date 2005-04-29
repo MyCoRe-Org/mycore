@@ -1,0 +1,35 @@
+##############################################################################
+# Workflow                                                                   #
+##############################################################################
+
+# The project ID
+MCR.default_project_id=DocPortal
+MCR.default_project_type=document
+MCR.document_project_id=DocPortal
+
+# Editor path
+MCR.editor_document_directory=/home/mcradmin/mycoresample/workflow/document
+
+MCR.editor_document_wnewobj_mail=user@domain.xyz
+MCR.editor_document_wnewder_mail=
+MCR.editor_document_waddfile_mail=
+MCR.editor_document_weditobj_mail=
+MCR.editor_document_weditder_mail=
+MCR.editor_document_wcommit_mail=user@domain.xyz
+MCR.editor_document_wdelobj_mail=
+MCR.editor_document_wdelder_mail=
+MCR.editor_document_seditobj_mail=user@domain.xyz
+MCR.editor_document_sdelobj_mail=user@domain.xyz
+
+MCR.editor_mail_sender=user@domain.xyz
+MCR.editor_mail_application_id=MyCoReSample
+
+# Generic mail configuration for MCRMailer
+MCR.mail.server=myhost.de
+MCR.mail.protocol=smtp
+MCR.mail.debug=false
+
+# Editor HostAlias for Classification
+MCR.editor_baseurl=local
+
+##############################################################################

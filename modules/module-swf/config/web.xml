@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+  <display-name>MyCoRe SimpleWorkflow</display-name>
+
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping from the modules application                -->
+  <!-- **************************************************************** -->
+
+  <servlet id="MCRStartEditor">
+    <servlet-name>MCRStartEditorServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRStartEditorServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckNewDataServlet">
+    <servlet-name>MCRCheckNewDataServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckNewDataServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckEditDataServlet">
+    <servlet-name>MCRCheckEditDataServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckEditDataServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckCommitDataServlet">
+    <servlet-name>MCRCheckCommitDataServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDataServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckNewDerivServlet">
+    <servlet-name>MCRCheckNewDerivServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckNewDerivServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckNewFileServlet">
+    <servlet-name>MCRCheckNewFileServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckNewFileServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRCheckCommitFileServlet">
+    <servlet-name>MCRCheckCommitFileServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitFileServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRListWorkflowServlet">
+    <servlet-name>MCRListWorkflowServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRListWorkflowServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRFileListWorkflowServlet">
+    <servlet-name>MCRFileListWorkflowServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRFileListWorkflowServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRFileViewWorkflowServlet">
+    <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRFileViewWorkflowServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRListDerivateServlet">
+    <servlet-name>MCRListDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRListDerivateServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRStartEditorServlet</servlet-name>
+    <url-pattern>/servlets/MCRStartEditorServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckNewDataServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckNewDataServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckEditDataServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckEditDataServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckCommitDataServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckCommitDataServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckNewDerivServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckNewDerivServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckNewFileServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckNewFileServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckCommitFileServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckCommitFileServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRListWorkflowServlet</servlet-name>
+    <url-pattern>/servlets/MCRListWorkflowServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRFileListWorkflowServlet</servlet-name>
+    <url-pattern>/servlets/MCRFileListWorkflowServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
+    <url-pattern>/servlets/MCRFileViewWorkflowServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRListDerivateServlet</servlet-name>
+    <url-pattern>/servlets/MCRListDerivateServlet</url-pattern>
+  </servlet-mapping>
+
+</web-app>
