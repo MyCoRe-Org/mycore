@@ -259,7 +259,7 @@ public class MCRUserCommands extends MCRAbstractCommands
     command.add(com);
 
     com = new MCRCommand("save user {0} to file {1}",
-      "org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile String String",
+      "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile String String",
       ""
       );
     command.add(com);
