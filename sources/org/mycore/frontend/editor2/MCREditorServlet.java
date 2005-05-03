@@ -298,9 +298,9 @@ public class MCREditorServlet extends MCRServlet
       if( ! name.startsWith( "_var_" ) ) continue;
       
       if( name.length() > 5 )
-        name = "/" + root + "/" + name.substring( 5 );
+        name = root + "/" + name.substring( 5 );
       else 
-        name = "/" + root;
+        name = root;
       
       variables.add( new MCREditorVariable( name, value ) );
     }

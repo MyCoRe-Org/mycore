@@ -89,7 +89,7 @@ public class MCREditorSubmission
       MCREditorVariable var = (MCREditorVariable)( submitted.get( i ) );
       String path = var.getPath(); 
       String value = var.getValue();
-      path = varpath + path.substring( root.length() + 1 );
+      path = varpath + path.substring( root.length() );
       addVariable( path, value );
     }
 
