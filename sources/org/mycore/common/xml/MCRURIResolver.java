@@ -76,7 +76,15 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver
   public Source resolve( String href, String base ) 
     throws TransformerException
   {
-    LOGGER.debug( "MCRURIResolver resolving " + href + " @ " + base );
+    if( base != null )
+    {
+      int posA = base.lastIndexOf( "/"  );
+      int posB = base.lastIndexOf( "\\" );
+      int pos = ( posA == -1 ? posB : posA );
+      String file = ( pos == -1 ? base : base.substring( pos + 1 ) );
+      LOGGER.debug( "Including " + href + " from " + file );
+    }
+    else LOGGER.debug( "Including " + href );
 
     if( href.indexOf( ":" ) == -1 ) return null;
 
