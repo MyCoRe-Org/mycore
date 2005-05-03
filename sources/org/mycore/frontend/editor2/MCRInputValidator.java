@@ -31,9 +31,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 import java.util.Date; 
+import java.util.Locale;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -47,8 +49,6 @@ import org.jdom.transform.JDOMSource;
 
 /**
  * This class provides input validation methods for editor data.
- * 
- * TODO: Use Locale when parsing decimal values
  * 
  * @author Frank Lützenkirchen
  **/
@@ -91,7 +91,8 @@ public class MCRInputValidator
     if( xsl == null )
     {
       xsl = (Document)( stylesheet.clone() );
-      Element when = xsl.getRootElement().getChild( "template" ).getChild( "choose" ).getChild( "when" );
+      Element when = xsl.getRootElement().getChild( "template", xslns )
+        .getChild( "choose", xslns ).getChild( "when", xslns );
       when.setAttribute( "test", condition );
       xslcondCache.put( condition, xsl );
     }
@@ -127,11 +128,12 @@ public class MCRInputValidator
     }
   }
   
+  private Namespace xslns = Namespace.getNamespace( "xsl", "http://www.w3.org/1999/XSL/Transform" );
+  
   /** Prepares a template stylesheet that is used for checking XSL conditions **/
   private Document prepareStylesheet()
   {
     Element stylesheet = new Element( "stylesheet" ).setAttribute( "version", "1.0" );
-    Namespace xslns = Namespace.getNamespace( "xsl", "http://www.w3.org/1999/XSL/Transform" );
     stylesheet.setNamespace( xslns );
 
     Element output = new Element( "output", xslns );
@@ -223,7 +225,7 @@ public class MCRInputValidator
    * @return false if input is null or empty or just blanks
    **/
   public boolean validateRequired( String input )
-  { return ( ( input != null ) || ( input.trim().length() > 0 ) ); }
+  { return ( ( input != null ) && ( input.trim().length() > 0 ) ); }
  
   /**
    * Checks input for correct data type and minimum/maximum value. 
@@ -231,23 +233,28 @@ public class MCRInputValidator
    * The min and max arguments are optional and must be expressed as strings.
    * The min and max value are used inclusive in the allowed range of values. 
    * If no check for min or max value should be performed, null can be given for that argument. 
-   * For datetime input, the format of the string must be given, 
-   * for other data types null should be used.
+   * For datetime input, the format of the string must be given as defined in SimpleDateFormat.
+   * For decimal input, the format argument should contain a two-character, lowercase language code
+   * as defined by ISO 639. This code determines the locale that is used to parse decimal values.
+   * If null is given, the default locale will be used.  
+   * Ffor other data types null should be used as the format argument.
    * 
    * Usage examples:
    * <ul>
    * <li>validateMinMaxType( input, "integer", "15", "20", null )</li>
    * <li>validateMinMaxType( input, "datetime", "01.01.2000", null, "dd.MM.yyyy" )</li>
-   * <li>validateMinMaxType( input, "decimal", "3.1", "4.0", null )</li>
+   * <li>validateMinMaxType( input, "decimal", "3,1", "4,0", "de" )</li>
    * </ul>
    * 
    * @see java.text.SimpleDateFormat
+   * @see java.util.Locale
+   * @see java.text.NumberFormat#getInstance(java.util.Locale)
    * 
    * @param input the input string to check
    * @param type one of "string", "integer", "decimal" or "datetime"
    * @param min the minimum value as a string, or null if min should not be tested
    * @param max the maximum value as a string, or null if max should not be tested
-   * @param format the format of datetime input, as a java.text.SimpleDateFormat pattern
+   * @param format for datetime input, a java.text.SimpleDateFormat pattern; for decimal input, a ISO-639 language code
    * @return true if input matches the given data type, min, max value and date time format
    **/
   public boolean validateMinMaxType( String input, String type, String min, String max, String format )
@@ -263,47 +270,98 @@ public class MCRInputValidator
     }
     else if( type.equals( "integer" ) )
     {
+      long lmin = Long.MIN_VALUE;
+      long lmax = Long.MAX_VALUE;
+      long lval = 0;
+      
       try
       {
-        long lmin = ( min == null ? Long.MIN_VALUE : Long.parseLong( min ) );
-        long lmax = ( max == null ? Long.MAX_VALUE : Long.parseLong( max ) );
-        long lval = Long.parseLong( input );
-        return ( lmin <= lval ) && ( lmax >= lval );
+        if( min != null ) lmin = Long.parseLong( min );
+        if( max != null ) lmax = Long.parseLong( max );
       }
+      catch( NumberFormatException ex )
+      {
+        String msg = "Could not parse min/max value for input validation";
+        throw new MCRConfigurationException( msg, ex );
+      }
+      
+      try
+      { lval = Long.parseLong( input ); }
       catch( NumberFormatException ex ){ return false; }
+      
+      return ( lmin <= lval ) && ( lmax >= lval );
     }
     else if( type.equals( "decimal" ) )
     {
+      Locale locale = ( format == null ? Locale.getDefault() : new Locale( format ) );
+      NumberFormat nf = NumberFormat.getNumberInstance( locale );
+        
+      double dmin = Double.MIN_VALUE;
+      double dval = Double.MAX_VALUE;
+      double dmax = 0.0;
       try
       {
-        double dmin = ( min == null ? Double.MIN_VALUE : Double.parseDouble( min ) );
-        double dmax = ( max == null ? Double.MAX_VALUE : Double.parseDouble( max ) );
-        double dval = Double.parseDouble( input );
-        return ( dmin <= dval ) && ( dmax >= dval );
+        if( min != null ) dmin = nf.parse( min ).doubleValue();
+        if( max != null ) dmax = nf.parse( max ).doubleValue();
       }
-      catch( NumberFormatException ex ){ return false; }
+      catch( ParseException ex )
+      {
+        String msg = "Could not parse min/max value for input validation";
+        throw new MCRConfigurationException( msg, ex );
+      }
+        
+      try
+      { dval = nf.parse( input ).doubleValue(); }
+      catch( ParseException e )
+      { return false; }
+       
+      return ( dmin <= dval ) && ( dmax >= dval );
     }
     else if( type.equals( "datetime" ) )
     {
+      DateFormat df = getDateTimeFormat( format );
+      
+      Date dmin = null;
+      Date dmax = null;
+      Date dval = null;
+      
+      try
+      { dval = df.parse( input ); }
+      catch( ParseException ex ){ return false; }
+
       try
       {
-        DateFormat df = getDateTimeFormat( format );
-        Date dval = df.parse( input );
-      
-        if( min != null )
-        {
-          Date dmin = df.parse( min );
-          if( dmin.after( dval ) ) return false;
-        }
-        if( max != null )
-        {
-          Date dmax = df.parse( max );
-          if( dmax.before( dval ) ) return false;
-        }
-        return true;
+        if( min != null ) dmin = df.parse( min );
+        if( max != null ) dmax = df.parse( max );
       }
-      catch( ParseException ex ){ return false; }
+      catch( ParseException ex )
+      {
+        String msg = "Could not parse min/max value for input validation";
+        throw new MCRConfigurationException( msg, ex );
+      }
+      
+      if( ( dmin != null ) && ( dmin.after ( dval ) ) ) return false;
+      if( ( dmax != null ) && ( dmax.before( dval ) ) ) return false;
+        
+      return true;
     }
-    else return false;
+    else throw new MCRConfigurationException( "Unknown input data type: " + type );
+  }
+  
+  public static void main( String[] args )
+  {
+    MCRInputValidator iv = new MCRInputValidator();
+    System.out.println( true  == iv.validateXSLCondition( "bingo@bongo.com", "contains(.,'@')" ) );
+    System.out.println( false == iv.validateLength( "john doe", "20", null ) );
+    System.out.println( false == iv.validateRequired( " \t" ) );
+    System.out.println( false == iv.validateRegularExpression( "aacab", "a*b" ) );
+    System.out.println( true  == iv.validateMinMaxType( "4711", "integer", "100", null, null ) );
+    System.out.println( true  == iv.validateMinMaxType( "Frank", "string", "AAAAA", "zzzzz", null ) );
+    System.out.println( true  == iv.validateMinMaxType( "13:58", "datetime", null, "14:00", "HH:mm" ) );
+    System.out.println( false == iv.validateMinMaxType( "27:58", "datetime", null, null, "HH:mm" ) );
+    System.out.println( false == iv.validateMinMaxType( "30.02.2005", "datetime", null, null, "dd.MM.yyyy" ) );
+    System.out.println( true  == iv.validateMinMaxType( "26.02.2005", "datetime", null, null, "dd.MM.yyyy" ) );
+    System.out.println( true  == iv.validateMinMaxType( "3,5", "decimal", "1", "4", "de" ) );
+    System.out.println( true  == iv.validateMinMaxType( "3.5", "decimal", "1", "4", "en" ) );
   }
 }
