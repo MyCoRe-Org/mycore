@@ -275,14 +275,13 @@ public final void createInDatastore() throws MCRPersistenceException
   // create this object in datastore
   mcr_service.setDate("createdate");
   mcr_service.setDate("modifydate");
-  // check the data
-  Document jdom=createXML();
   // prepare this object with parent metadata
   MCRObjectID parent_id = mcr_struct.getParentID();
+  MCRObject parent = null;
   if (parent_id != null) {
     logger.debug("Parent ID = "+parent_id.getId());
     try {
-      MCRObject parent = new MCRObject();
+      parent = new MCRObject();
       parent.receiveFromDatastore(parent_id);
       mcr_metadata.appendMetadata(parent.getMetadata()
         .getHeritableMetadata());
@@ -294,7 +293,7 @@ public final void createInDatastore() throws MCRPersistenceException
       }
     }
   // build this object
-  mcr_xmltable.create(mcr_id,jdom);
+  mcr_xmltable.create(mcr_id,createXML());
   mcr_persist.create(this);
   
   deleteLinksFromTable();
@@ -308,8 +307,6 @@ public final void createInDatastore() throws MCRPersistenceException
   // add the MCRObjectID to the child list in the parent object
   if (parent_id != null) {
     try {
-      MCRObject parent = new MCRObject();
-      parent.receiveFromDatastore(parent_id);
       parent.getStructure().addChild(mcr_id,mcr_struct.getParent()
         .getXLinkLabel(),mcr_label);
       parent.updateThisInDatastore();
