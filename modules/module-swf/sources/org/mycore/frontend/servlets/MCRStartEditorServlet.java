@@ -915,7 +915,7 @@ public class MCRStartEditorServlet extends MCRServlet
         jdom = MCRXMLHelper.parseURI(sb.toString(),false);
         }
       catch (Exception e) {
-        LOGGER.debug("Parse error in file "+sb.toString()); return true; }
+        LOGGER.debug("Parse error in file "+sb.toString()); return false; }
       }
     if (jdom == null) { return false; }
     org.jdom.Element root = jdom.getRootElement();
@@ -932,7 +932,9 @@ public class MCRStartEditorServlet extends MCRServlet
         org.jdom.Element servflag = (org.jdom.Element)list.get(i);
         text = servflag.getText();
         if (text.startsWith("User:")) {
-          ar.add(text.substring(5,text.length()).toLowerCase()); }
+          ar.add(text.substring(5,text.length()).toLowerCase());
+          ar.add(text.substring(5,text.length()));
+          }
         }
       }
     for (int i=0;i<ar.size();i++) {
