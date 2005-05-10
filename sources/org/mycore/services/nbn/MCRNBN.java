@@ -68,7 +68,6 @@ public class MCRNBN {
 
 	/** Initializes the class */
 	static {
-		MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
     	
 		codes = new Properties();

@@ -51,13 +51,6 @@ protected static MCRConfiguration CONFIG;
 protected static Logger logger=Logger.getLogger(MCRCheckBase.class);
 String NL = System.getProperty("file.separator");
 
-/** Initialisation of the servlet */
-public void init()
-  {
-  CONFIG = MCRConfiguration.instance();
-  CONFIG.reload( true );
-  }
-
 /**
  * The method check the privileg of this action.
  *

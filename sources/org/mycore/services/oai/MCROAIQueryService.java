@@ -77,7 +77,6 @@ public class MCROAIQueryService implements MCROAIQuery {
 	private Object[] resultArray;
 	
 	static {
-		MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
 		maxReturns = config.getInt(STR_OAI_MAXRETURNS);
 	}

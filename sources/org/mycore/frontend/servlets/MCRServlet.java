@@ -57,7 +57,7 @@ import org.mycore.common.xml.MCRLayoutServlet;
  **/
 public class MCRServlet extends HttpServlet {
 	// Some configuration details
-	protected static MCRConfiguration CONFIG;
+	protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
 	private static Logger LOGGER;
 	private static String BASE_URL, SERVLET_URL;
@@ -69,17 +69,7 @@ public class MCRServlet extends HttpServlet {
 	protected String ReqCharEncoding;
 	
 	static
-	{
-	  MCRConfiguration.instance(); // This will init log4j logging
-	  LOGGER = Logger.getLogger( MCRServlet.class );
-	}
-
-	/** Initialisation of the servlet */
-	public void init() {
-		MCRConfiguration.instance().reload( true );
-		LOGGER.debug( "Initializing servlet " + getClass().getName() );
-		CONFIG = MCRConfiguration.instance();
-	}
+	{ LOGGER = Logger.getLogger( MCRServlet.class ); }
 
 	/** returns the base URL of the mycore system */
 	public static String getBaseURL() {

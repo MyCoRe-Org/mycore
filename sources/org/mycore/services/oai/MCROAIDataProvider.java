@@ -149,7 +149,6 @@ public class MCROAIDataProvider extends HttpServlet {
 	private static String resumptionTokenDir;
 	
 	static {
-    	MCRConfiguration.instance().reload(true);
 		config = MCRConfiguration.instance();
 		resumptionTokenDir = config.getString(
 				STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;

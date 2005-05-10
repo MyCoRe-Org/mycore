@@ -55,10 +55,7 @@ public class MCRNBNResolver extends HttpServlet
 
 	/** Initializes the URN Resolver */    
 	public void init() {
-		MCRConfiguration.instance().reload(true);
-		MCRConfiguration config = MCRConfiguration.instance();
-    
-		resolver = config.getString( "MCR.NBN.TopLevelResolver" );  
+		resolver = MCRConfiguration.instance().getString( "MCR.NBN.TopLevelResolver" );  
 	}
 
 	/** Handles HTTP GET requests to resolve a given URN */    
