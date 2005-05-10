@@ -34,6 +34,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.ServletException;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
@@ -84,7 +86,7 @@ public class MCRStartEditorServlet extends MCRServlet
   private static String SLASH = System.getProperty("file.separator");;
 
   /** Initialisation of the servlet */
-  public void init()
+  public void init() throws ServletException
     {
     super.init();
     // Workflow Manager
