@@ -59,12 +59,11 @@ public class MCRParserXerces
   private static boolean FLAG_SCHEMA_FULL_SUPPORT = true;
   private static boolean FLAG_NO_SCHEMA_FULL_SUPPORT = false;
   private static boolean FLAG_DEFERRED_DOM = true;
-  private static MCREntityResolver ENTITY_RESOLVER;
 
   private static String SET_VALIDATION = "http://xml.org/sax/features/validation";
-	private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
-	private static String SET_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
-	private static String SET_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
+  private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
+  private static String SET_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
+  private static String SET_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
 
   /**
    * Constructor for the xerces parser. Sets default validation flag as
@@ -76,7 +75,6 @@ public class MCRParserXerces
       .getBoolean( "MCR.parser_schema_validation", FLAG_VALIDATION );
 	builderValid=new SAXBuilder("org.apache.xerces.parsers.SAXParser",true);
 	builder=new SAXBuilder("org.apache.xerces.parsers.SAXParser",false);
-	ENTITY_RESOLVER=new MCREntityResolver();
 
 	builder.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
 	builder.setFeature(SET_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_SUPPORT);
@@ -88,11 +86,11 @@ public class MCRParserXerces
 	builder.setReuseParser(true);
 	builderValid.setReuseParser(true);
     
-	builder.setErrorHandler  ( this );
-	builderValid.setErrorHandler  ( this );
+	builder.setErrorHandler( this );
+	builderValid.setErrorHandler( this );
 
-	builder.setEntityResolver( ENTITY_RESOLVER );
-	builderValid.setEntityResolver( ENTITY_RESOLVER );
+	builder.setEntityResolver( MCRURIResolver.instance() );
+	builderValid.setEntityResolver( MCRURIResolver.instance() );
   }
 
   /**
@@ -184,19 +182,14 @@ public class MCRParserXerces
    **/
   private synchronized Document parse( InputSource source, boolean validate )
   {
-  	SAXBuilder builder;
-  	if (validate)
-  		builder=this.builderValid;
-  	else
-  		builder=this.builder;
-    try
-    {
-      return builder.build(source);
-    }
+  	SAXBuilder builder = ( validate ? this.builderValid : this.builder );
+
+  	try
+    { return builder.build( source ); }
     catch( Exception ex ) 
     {
       logger.error( "Error while parsing XML document", ex );
-      throw new MCRException( "Error parsing XML document", ex );
+      throw new MCRException( "Error while parsing XML document", ex );
     }
   }
 
