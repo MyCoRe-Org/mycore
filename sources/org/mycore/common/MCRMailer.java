@@ -47,7 +47,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.AddressException;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * This class is a simple basic mailer class for mycore.
@@ -63,14 +62,12 @@ public class MCRMailer {
 	/** Logger */
 	static Logger logger = Logger.getLogger(MCRMailer.class);
 	
-	protected static MCRConfiguration config;
 	protected static Properties mailProperties;
 	protected static Session mailSession;
 
 	/** Initializes the class */
 	static {
-		MCRConfiguration.instance().reload(true);
-		config = MCRConfiguration.instance();
+		MCRConfiguration config = MCRConfiguration.instance();
     	
     mailProperties = new Properties();
     	
