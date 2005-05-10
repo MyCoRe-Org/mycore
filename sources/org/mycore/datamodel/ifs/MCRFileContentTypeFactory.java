@@ -27,9 +27,7 @@ package org.mycore.datamodel.ifs;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.jdom.*;
-import org.jdom.input.*;
 import java.util.*;
-import java.io.*;
 
 /**
  * Provides methods to get the file content type with a given ID, or to
@@ -66,49 +64,30 @@ public class MCRFileContentTypeFactory
     detector   = (MCRFileContentTypeDetector)( obj );
 
     String file = config.getString( "MCR.IFS.FileContentTypes.DefinitionFile" );
-        
-    InputStream in = MCRFileContentType.class.getResourceAsStream( "/" + file );
-    if( in == null )
-    {
-      String msg = "Configuration file " + file + " not found in CLASSPATH";
-      throw new MCRConfigurationException( msg );
-    }
-    
-    try
-    {
-      SAXBuilder builder = new SAXBuilder();
-      builder.setEntityResolver( new MCREntityResolver() );
 
-      Document xml = builder.build( in );
-      // TODO: Validate and provide a DTD/Schema file
-      
-      List types = xml.getRootElement().getChildren( "type" );
-      for( int i = 0; i < types.size(); i++ )
-      {
-        // Build file content type from XML element
-        Element xType = (Element)( types.get( i ) );
-        String ID    = xType.getAttributeValue( "ID" );
-        String label = xType.getChildTextTrim( "label" );
-        String url   = xType.getChildTextTrim( "url"   );
-        String mime  = xType.getChildTextTrim( "mime"  );
-      
-        MCRFileContentType type = new MCRFileContentType( ID, label, url, mime );
-        typesTable.put( ID, type );
-        
-        // Add a detection rule for this file content type
-        Element xRules = xType.getChild( "rules" );
-        if( xRules != null ) detector.addRule( type, xRules );
-      }
-      
-      // Set default file content type from attribute "default"
-      String defaultID = xml.getRootElement().getAttributeValue( "default" );
-      defaultType = getType( defaultID );
-    }
-    catch( Exception exc )
+    Element xml = MCRURIResolver.instance().resolve( "resource:" + file );
+    List types = xml.getChildren( "type" );
+    
+    for( int i = 0; i < types.size(); i++ )
     {
-      String msg = "Error processing list of defined file content types";
-      throw new MCRConfigurationException( msg, exc );
+      // Build file content type from XML element
+      Element xType = (Element)( types.get( i ) );
+      String ID    = xType.getAttributeValue( "ID" );
+      String label = xType.getChildTextTrim( "label" );
+      String url   = xType.getChildTextTrim( "url"   );
+      String mime  = xType.getChildTextTrim( "mime"  );
+      
+      MCRFileContentType type = new MCRFileContentType( ID, label, url, mime );
+      typesTable.put( ID, type );
+        
+      // Add a detection rule for this file content type
+      Element xRules = xType.getChild( "rules" );
+      if( xRules != null ) detector.addRule( type, xRules );
     }
+      
+    // Set default file content type from attribute "default"
+    String defaultID = xml.getAttributeValue( "default" );
+    defaultType = getType( defaultID );
   }
   
   /** 

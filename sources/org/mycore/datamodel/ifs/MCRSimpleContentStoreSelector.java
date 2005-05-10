@@ -24,17 +24,13 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Decides which MCRContentStore implementation should be used to store the
@@ -59,52 +55,35 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
   {
     MCRConfiguration config = MCRConfiguration.instance();
     String file = config.getString( "MCR.IFS.ContentStoreSelector.ConfigFile" );
+    System.out.println( "Before reading config file... " );
+    Element xml = MCRURIResolver.instance().resolve( "resource:" + file );
+
+    table = new Hashtable();
+      
+    List stores = xml.getChildren( "store" );
+    storeIDs= new String[stores.size()+1];
+
+    for( int i = 0; i < stores.size(); i++ )
+    {
+      Element store = (Element)( stores.get( i ) );
+      String storeID = store.getAttributeValue( "ID" );
+      storeIDs[i]=storeID;
         
-    InputStream in = this.getClass().getResourceAsStream( "/" + file );
-    if( in == null )
-    {
-      String msg = "Configuration file " + file + " not found in CLASSPATH";
-      throw new MCRConfigurationException( msg );
-    }
-    
-    try
-    {
-      SAXBuilder builder = new SAXBuilder();
-      builder.setEntityResolver( new MCREntityResolver() );
-
-      Document xml = builder.build( in );
-      // TODO: Validate and provide a DTD/Schema file
-      
-      table = new Hashtable();
-      
-      List stores = xml.getRootElement().getChildren( "store" );
-      storeIDs= new String[stores.size()+1];
-
-      for( int i = 0; i < stores.size(); i++ )
+      List types = store.getChildren();
+      for( int j = 0; j < types.size(); j++ )
       {
-        Element store = (Element)( stores.get( i ) );
-        String storeID = store.getAttributeValue( "ID" );
-        storeIDs[i]=storeID;
-        
-        List types = store.getChildren();
-        for( int j = 0; j < types.size(); j++ )
-        {
-          Element type = (Element)( types.get( j ) );
-          String typeID = type.getTextTrim();
+        Element type = (Element)( types.get( j ) );
+        String typeID = type.getTextTrim();
 
-          table.put( typeID, storeID );
-        }
+        table.put( typeID, storeID );
       }
+    }
       
-      defaultID = xml.getRootElement().getAttributeValue( "default" );
-      //NOTE: if defaultID is listed as a <store> it's inserted twice here
-      storeIDs[storeIDs.length-1]=defaultID;
-    }
-    catch( Exception exc )
-    {
-      String msg = "Error processing content store selector configuration";
-      throw new MCRConfigurationException( msg, exc );
-    }
+    defaultID = xml.getAttributeValue( "default" );
+    //NOTE: if defaultID is listed as a <store> it's inserted twice here
+    storeIDs[storeIDs.length-1]=defaultID;
+    
+    System.out.println( "After building table: " + defaultID );
   }
   
   public String selectStore( MCRFile file ) 

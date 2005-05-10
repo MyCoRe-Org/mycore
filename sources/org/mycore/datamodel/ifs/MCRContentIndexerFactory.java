@@ -27,9 +27,7 @@ package org.mycore.datamodel.ifs;
 import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.jdom.*;
-import org.jdom.input.*;
 import java.util.*;
-import java.io.*;
 
 import org.apache.log4j.Logger;
 
@@ -57,55 +55,33 @@ public class MCRContentIndexerFactory
     MCRConfiguration config = MCRConfiguration.instance();
     
     String file = config.getString( "MCR.IFS.FileContentHandler.DefinitionFile", "FileContentHandler.xml" );
-        
-    InputStream in = MCRFileContentType.class.getResourceAsStream( "/" + file );
-    if( in == null )
-    {
-      String msg = "Configuration file " + file + " not found in CLASSPATH";
-      logger.info( msg );
-//      throw new MCRConfigurationException( msg );
-    }
-    else
-    try
-    {
-      SAXBuilder builder = new SAXBuilder();
-      builder.setEntityResolver( new MCREntityResolver() );
+    
+    Element xml = MCRURIResolver.instance().resolve( "resource:" + file );
 
-      Document xml = builder.build( in );
-      // TODO: Validate and provide a DTD/Schema file
-      
-      List types = xml.getRootElement().getChildren( "fcttype" );
-      for( int i = 0; i < types.size(); i++ )              // handle all fcttypes
-      {
-        Element xType    = (Element)( types.get( i ) );
-        String fcttype   = xType.getAttributeValue( "type" );
-      
-        List handler = xType.getChildren( "handler" );
-        for( int j = 0; j < handler.size(); j++ )          // handle all handlers
-        {
-          org.jdom.Element xAttribute = (org.jdom.Element)handler.get(j);
-          List attribute = xAttribute.getChildren( "attribute" );
-          Hashtable attr = new Hashtable();
-          for( int k = 0; k < attribute.size(); k++ )      // handle all attributes of handler
-          {
-            org.jdom.Element xValue = (org.jdom.Element)attribute.get(k);
-            logger.info("FCTTYPE: " + fcttype + " " + 
-                                xAttribute.getAttributeValue( "ID" ) + " " + 
-                                xAttribute.getAttributeValue( "type" ) + " " +
-                                xValue.getAttributeValue( "type" ) + " " +
-                                xValue.getTextTrim() );
-            attr.put( xValue.getAttributeValue( "type" ), xValue.getTextTrim( ) );
-          }
-          handlers.put( fcttype + "/" + xAttribute.getAttributeValue( "ID" ) + "/", attr ); 
-        } 
-        
-      }
-      
-    }
-    catch( Exception exc )
+    List types = xml.getChildren( "fcttype" );
+    for( int i = 0; i < types.size(); i++ )              // handle all fcttypes
     {
-      String msg = "Error processing list of defined file content handlers";
-      throw new MCRConfigurationException( msg, exc );
+      Element xType    = (Element)( types.get( i ) );
+      String fcttype   = xType.getAttributeValue( "type" );
+      
+      List handler = xType.getChildren( "handler" );
+      for( int j = 0; j < handler.size(); j++ )          // handle all handlers
+      {
+        org.jdom.Element xAttribute = (org.jdom.Element)handler.get(j);
+        List attribute = xAttribute.getChildren( "attribute" );
+        Hashtable attr = new Hashtable();
+        for( int k = 0; k < attribute.size(); k++ )      // handle all attributes of handler
+        {
+          org.jdom.Element xValue = (org.jdom.Element)attribute.get(k);
+          logger.info("FCTTYPE: " + fcttype + " " + 
+                              xAttribute.getAttributeValue( "ID" ) + " " + 
+                              xAttribute.getAttributeValue( "type" ) + " " +
+                              xValue.getAttributeValue( "type" ) + " " +
+                              xValue.getTextTrim() );
+          attr.put( xValue.getAttributeValue( "type" ), xValue.getTextTrim( ) );
+        }
+        handlers.put( fcttype + "/" + xAttribute.getAttributeValue( "ID" ) + "/", attr ); 
+      } 
     }
   }
   
