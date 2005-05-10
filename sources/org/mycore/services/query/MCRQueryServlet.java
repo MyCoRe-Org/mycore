@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -67,9 +66,6 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRQueryServlet extends MCRServlet {
 	//TODO: we should invent something here!!
 	private static final long serialVersionUID = 1L;
-
-	// The configuration
-	private static MCRConfiguration MCR_CONFIG = null;
 
 	private MCRQueryCollector collector;
 
@@ -125,14 +121,14 @@ public class MCRQueryServlet extends MCRServlet {
 	 * The initialization method for this servlet. This read the default
 	 * language from the configuration.
 	 */
-	public void init() throws MCRConfigurationException {
+	public void init() throws MCRConfigurationException, ServletException {
 		super.init();
-		MCR_CONFIG = super.CONFIG;
+		
 		collector = (MCRQueryCollector) this.getServletContext().getAttribute(
 				"QueryCollector");
 		if (collector == null)
-			collector = new MCRQueryCollector(MCR_CONFIG.getInt(
-					"MCR.Collector_Thread_num", 2), MCR_CONFIG.getInt(
+			collector = new MCRQueryCollector( CONFIG.getInt(
+					"MCR.Collector_Thread_num", 2), CONFIG.getInt(
 					"MCR.Agent_Thread_num", 6));
 		this.getServletContext().setAttribute("QueryCollector", collector);
 	}
@@ -413,7 +409,7 @@ public class MCRQueryServlet extends MCRServlet {
 	private final MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang) {
         MCRXMLSortInterface sorter = null;
         try {
-            sorter = (MCRXMLSortInterface) (Class.forName(MCR_CONFIG.getString(
+            sorter = (MCRXMLSortInterface) (Class.forName( CONFIG.getString(
                     "MCR.XMLSorter." + type + ".InterfaceImpl",
                     MCR_STANDARD_SORTER))).newInstance();
         } catch (InstantiationException e) {
@@ -436,7 +432,7 @@ public class MCRQueryServlet extends MCRServlet {
             StringBuffer prop = new StringBuffer();
             prop.append(MCR_SORTER_CONFIG_PREFIX).append('.').append(type)
                     .append(".keys.count");
-            int keynum = Integer.parseInt(MCR_CONFIG.getString(prop.toString(),
+            int keynum = Integer.parseInt(CONFIG.getString(prop.toString(),
                     "0"));
             boolean inorder = true;
             int prefix = MCR_SORTER_CONFIG_PREFIX.length() + 1 + type.length()
@@ -446,9 +442,9 @@ public class MCRQueryServlet extends MCRServlet {
                 // for title
                 prop.delete(prefix, prop.length()).append(key)
                         .append(".inorder");
-                inorder = MCR_CONFIG.getBoolean(prop.toString(), true);
+                inorder = CONFIG.getBoolean(prop.toString(), true);
                 prop.delete(prefix, prop.length()).append(key);
-                sorter.addSortKey(replString(MCR_CONFIG.getString(prop
+                sorter.addSortKey(replString( CONFIG.getString(prop
                         .toString(), "./*/*/*/title[lang('" + lang + "')]"),
                         MCR_SORTER_CONFIG_DELIMITER, lang), inorder);
             }
@@ -495,13 +491,13 @@ public class MCRQueryServlet extends MCRServlet {
 	private static final boolean isInstanceOfLocal(String host,
 			String servletHost, String servletPath, int servletPort) {
 		final String confPrefix = "MCR.remoteaccess_";
-		String RemoteHost = MCR_CONFIG.getString(confPrefix + host + "_host");
+		String RemoteHost = CONFIG.getString(confPrefix + host + "_host");
 		String queryServletPath = servletPath.substring(0, servletPath
 				.lastIndexOf("/"))
 				+ "/MCRQueryServlet";
-		String remotePath = MCR_CONFIG.getString(confPrefix + host
+		String remotePath = CONFIG.getString(confPrefix + host
 				+ "_query_servlet");
-		int remotePort = Integer.parseInt(MCR_CONFIG.getString(confPrefix
+		int remotePort = Integer.parseInt(CONFIG.getString(confPrefix
 				+ host + "_port"));
 		return ((RemoteHost.equals(servletHost))
 				&& (remotePath.equals(queryServletPath)) && (servletPort == remotePort)) ? true
@@ -663,7 +659,7 @@ public class MCRQueryServlet extends MCRServlet {
 
 	private final Document queryClassification(String host, String type,
 			String query) {
-		String squence = MCR_CONFIG.getString(
+		String squence = CONFIG.getString(
 				"MCR.classifications_search_sequence", "remote-local");
 		MCRXMLContainer resarray = new MCRXMLContainer();
 		if (squence.equalsIgnoreCase("local-remote")) {
