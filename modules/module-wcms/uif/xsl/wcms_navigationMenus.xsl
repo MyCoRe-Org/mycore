@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
-	
+
 	<!-- ================================================================================= -->
 	<xsl:template match="TOC | toc">
             <!--
 		<xsl:param name="browserAddress" />
             -->
 		<xsl:for-each 
-			select="document($navigationBase)/navigation//item[@href=$browserAddress]">
+			select="$loaded_navigation_xml//item[@href=$browserAddress]">
 			<xsl:for-each select="child::item">
 				<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" />
 				<xsl:call-template name="addLink"/>
@@ -22,11 +22,11 @@
             -->
 		<!-- get href of starting page -->
 		<xsl:variable name="hrefStartingPage" 
-			select="document($navigationBase)/navigation/@hrefStartingPage" />
+			select="$loaded_navigation_xml/@hrefStartingPage" />
 		<!-- END OF: get href of starting page -->
 				Navigation:
 				<xsl:for-each 
-					select="document($navigationBase)/navigation//item[@href]">
+					select="$loaded_navigation_xml//item[@href]">
 					<xsl:if test="@href = $browserAddress ">
 						<a>
                             <xsl:attribute name="href">

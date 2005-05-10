@@ -10,6 +10,7 @@ These strategies are embarked on:
 
 3. Root element ?= item//dynamicContentBinding/rootTag
 -->
+  
       <xsl:template name="wcms.getBrowserAddress">
 		
             <xsl:variable name="RequestURL.langDel" >
@@ -27,12 +28,10 @@ These strategies are embarked on:
 	                  <xsl:with-param name="par" select="'lang'" /> 
                   </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="completeRootNode" select="document($navigationBase)/navigation" />
-
             <!-- test if navigation.xml contains the current browser address -->
             <xsl:variable name="browserAddress_href" >
                   <!-- verify each item  -->
-                  <xsl:for-each select="$completeRootNode//item[@href]" >
+                  <xsl:for-each select="$loaded_navigation_xml//item[@href]" >
                         <!-- remove par lang from @href -->
                         <xsl:variable name="href.langDel">
 					<xsl:call-template name="UrlDelParam"> 
@@ -56,7 +55,7 @@ These strategies are embarked on:
                   <xsl:if test=" $browserAddress_href = '' " >
                         <!-- assign name of rootTag -> $rootTag -->
                         <xsl:variable name="rootTag" select="name(*)" />
-                        <xsl:for-each select="$completeRootNode//dynamicContentBinding/rootTag" >
+                        <xsl:for-each select="$loaded_navigation_xml//dynamicContentBinding/rootTag" >
                               <xsl:if test=" current() = $rootTag " >
                                     <xsl:for-each select="ancestor-or-self::*[@href]">
                                           <xsl:if test="position()=last()" >
@@ -88,7 +87,7 @@ These strategies are embarked on:
            
            <xsl:variable name="template_tmp">
 	            <!-- point to rigth item -->
-	            <xsl:for-each select="document($navigationBase) /navigation//item[@href = $browserAddress]" >
+	            <xsl:for-each select="$loaded_navigation_xml//item[@href = $browserAddress]" >
 	                  <!-- collect @template !='' entries along the choosen axis -->
 	                  <xsl:for-each select="ancestor-or-self::*[  @template != '' ]">
 	                        <xsl:if test="position()=last()" >
@@ -107,7 +106,7 @@ These strategies are embarked on:
                   </xsl:when>
                   <!-- default template -->
                   <xsl:otherwise>
-                        <xsl:value-of select="document($navigationBase) /navigation/@template" />
+                        <xsl:value-of select="$loaded_navigation_xml/@template" />
                   </xsl:otherwise>
             </xsl:choose>
             

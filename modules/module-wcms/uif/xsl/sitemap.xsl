@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
+
 	<xsl:variable name="PageTitle">
 		<xsl:value-of select="'Sitemap'"/>
 	</xsl:variable>
@@ -57,7 +58,7 @@
 			<!-- menu left -->
 			<xsl:call-template name="createSitemap">
 				<xsl:with-param name="myRootNode" 
-					select="document($navigationBase) /navigation/navi-main" />
+					select="$loaded_navigation_xml/navi-main" />
 				<xsl:with-param name="typeOfMenu" select="'tree'" />
 			</xsl:call-template>
 			<!-- END OF: menu left -->
@@ -70,7 +71,7 @@
 			<!-- menu on top -->
 			<xsl:call-template name="createSitemap">
 				<xsl:with-param name="myRootNode" 
-					select="document($navigationBase) /navigation/navi-below" />
+					select="$loaded_navigation_xml/navigation/navi-below" />
 				<xsl:with-param name="typeOfMenu" select="'horizontal'" />
 			</xsl:call-template>
 			<!-- END OF: menu on top -->
