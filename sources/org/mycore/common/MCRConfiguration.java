@@ -180,7 +180,7 @@ public class MCRConfiguration
     if( clear ) properties.clear();
     String fn = System.getProperty( "MCR.configuration.file", "mycore.properties" );
     loadFromFile( fn );
-    configureLogging();
+    if( clear ) configureLogging();
   }
 
 /**
