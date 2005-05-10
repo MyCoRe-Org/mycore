@@ -98,7 +98,7 @@ public class MCRLayoutServlet extends MCRServlet {
 
     public static final String STREAM_ATTR = "MCRLayoutServlet.Input.STREAM";
 
-    public void init() {
+    public void init() throws ServletException {
         super.init();
         MCRURIResolver.init( getServletContext(), getBaseURL() );
         buildTransformerFactory();

@@ -92,7 +92,7 @@ public class MCRFileNodeServlet extends MCRServlet
   * Initializes the servlet and reads the default
   * language and the remote host list from the configuration.
   **/
-  public void init() throws MCRConfigurationException
+  public void init() throws MCRConfigurationException, ServletException
   {
     super.init();
  

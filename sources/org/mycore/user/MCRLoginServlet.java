@@ -54,7 +54,9 @@ public class MCRLoginServlet extends MCRServlet
   private static String GUEST_ID;
   private static String GUEST_PWD;
   
-  public void init(){
+  public void init()
+    throws ServletException
+  {
   	super.init();
   	if (GUEST_ID==null || GUEST_PWD==null){
   		 GUEST_ID  = CONFIG.getString( "MCR.users_guestuser_username"   );

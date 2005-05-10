@@ -78,7 +78,7 @@ private static String SLASH = System.getProperty("file.separator");
 private static String DefaultLang = null;
 
 /** Initialisation of the servlet */
-public void init() throws MCRConfigurationException {
+public void init() throws MCRConfigurationException, javax.servlet.ServletException {
     super.init();
     WFM = MCRWorkflowManager.instance();
     DefaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang","en");

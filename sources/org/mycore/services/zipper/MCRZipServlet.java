@@ -102,7 +102,7 @@ public class MCRZipServlet extends MCRServlet
   * Initializes the servlet and reads the transforming
   * stylesheet from the configuration.
   **/
-  public void init() throws MCRConfigurationException
+  public void init() throws MCRConfigurationException, ServletException
   {
     super.init();
     xmltable = MCRXMLTableManager.instance();

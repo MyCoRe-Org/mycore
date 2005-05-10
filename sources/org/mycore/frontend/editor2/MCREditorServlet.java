@@ -64,7 +64,8 @@ public class MCREditorServlet extends MCRServlet
   protected final static Logger logger = Logger.getLogger( MCREditorServlet.class );
   protected final static MCRCache sessions = new MCRCache( 200 );
 
-  public void init() 
+  public void init()
+    throws ServletException
   {
     super.init();
     MCRURIResolver.init( getServletContext(), getBaseURL() );
