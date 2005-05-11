@@ -55,7 +55,6 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
   {
     MCRConfiguration config = MCRConfiguration.instance();
     String file = config.getString( "MCR.IFS.ContentStoreSelector.ConfigFile" );
-    System.out.println( "Before reading config file... " );
     Element xml = MCRURIResolver.instance().resolve( "resource:" + file );
 
     table = new Hashtable();
@@ -82,8 +81,6 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
     defaultID = xml.getAttributeValue( "default" );
     //NOTE: if defaultID is listed as a <store> it's inserted twice here
     storeIDs[storeIDs.length-1]=defaultID;
-    
-    System.out.println( "After building table: " + defaultID );
   }
   
   public String selectStore( MCRFile file ) 
