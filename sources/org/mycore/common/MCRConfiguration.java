@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -94,6 +95,8 @@ public class MCRConfiguration
  * The single instance of this class that will be used at runtime
  */    
   protected static MCRConfiguration singleton;
+  
+  private static Hashtable instanceHolder; 
   
 /**
  * Returns the single instance of this class that can be used to
@@ -277,66 +280,92 @@ public class MCRConfiguration
     PropertyConfigurator.configure( prop );
   }
   
-/**
- * Returns a new instance of the class specified in the configuration property
- * with the given name.
- *
- * @param name the non-null and non-empty name of the configuration property
- * @return the value of the configuration property as a String, or null
- * @throws MCRConfigurationException if the property is not set or the class can not be loaded or instantiated
- */  
-  public Object getInstanceOf( String name )
-    throws MCRConfigurationException
-  {   
-    MCRArgumentChecker.ensureNotEmpty( name, "name" );  
-    
-    String classname = properties.getProperty( name );
-    if(  classname == null ) 
-      throw new MCRConfigurationException
-      ( "Configuration property " + name + " is not set!" );
-    
-    Class cl;
-    
-    Logger.getLogger( this.getClass() ).debug( "Loading Class: " + classname );
-    
-    try {
-        cl = Class.forName(classname);
-    }
-    catch (Exception ex) {
-        throw new MCRConfigurationException("Could not load class "
-                    + classname, ex);
-    }
-    Object o;
-    try
-    { o = cl.newInstance(); }
-    catch( Throwable t )
-    { 
-      String msg = "Could not instantiate class " + classname;
-      if( t instanceof ExceptionInInitializerError )
-      {
-        Throwable t2 = ((ExceptionInInitializerError)t).getException();
-        if( t2 instanceof Exception )
-          throw new MCRConfigurationException( msg, (Exception)t2 );
-        throw new MCRConfigurationException( msg + ": " + t2.getClass().getName() + " - " + t2.getMessage() );
+  /**
+   * Returns a new instance of the class specified in the configuration property
+   * with the given name.
+   *
+   * @param name the non-null and non-empty name of the configuration property
+   * @return the value of the configuration property as a String, or null
+   * @throws MCRConfigurationException if the property is not set or the class can not be loaded or instantiated
+   */  
+    public Object getInstanceOf( String name )
+      throws MCRConfigurationException
+    {   
+      MCRArgumentChecker.ensureNotEmpty( name, "name" );  
+      
+      String classname = properties.getProperty( name );
+      if(  classname == null ) 
+        throw new MCRConfigurationException
+        ( "Configuration property " + name + " is not set!" );
+      
+      Class cl;
+      
+      Logger.getLogger( this.getClass() ).debug( "Loading Class: " + classname );
+      
+      try {
+          cl = Class.forName(classname);
       }
-      else if( t instanceof Exception )
-        throw new MCRConfigurationException( msg, (Exception)t ); 
-      else
-      {
-      	msg += " because of: " + t.getMessage();
-        msg += "\n" + MCRException.getStackTraceAsString( t );
-        throw new MCRConfigurationException( msg );
+      catch (Exception ex) {
+          throw new MCRConfigurationException("Could not load class "
+                      + classname, ex);
       }
-    }    
-    return o;
-  }
+      Object o;
+      try
+      { o = cl.newInstance(); }
+      catch( Throwable t )
+      { 
+        String msg = "Could not instantiate class " + classname;
+        if( t instanceof ExceptionInInitializerError )
+        {
+          Throwable t2 = ((ExceptionInInitializerError)t).getException();
+          if( t2 instanceof Exception )
+            throw new MCRConfigurationException( msg, (Exception)t2 );
+          throw new MCRConfigurationException( msg + ": " + t2.getClass().getName() + " - " + t2.getMessage() );
+        }
+        else if( t instanceof Exception )
+          throw new MCRConfigurationException( msg, (Exception)t ); 
+        else
+        {
+        	msg += " because of: " + t.getMessage();
+          msg += "\n" + MCRException.getStackTraceAsString( t );
+          throw new MCRConfigurationException( msg );
+        }
+      }    
+      return o;
+    }
+
+    /**
+	 * Returns a instance of the class specified in the configuration property
+	 * with the given name. If the class was prevously instantiated by this
+	 * method this instance is returned.
+	 * 
+	 * @param name
+	 *                    the non-null and non-empty name of the configuration property
+	 * @return the instance of the class named by the value of the configuration
+	 *               propertyl
+	 * @throws MCRConfigurationException
+	 *                    if the property is not set or the class can not be loaded or
+	 *                    instantiated
+	 */
+	public Object getSingleInstanceOf(String name)
+			throws MCRConfigurationException {
+		if (instanceHolder == null)
+			instanceHolder = new Hashtable(); //initialize the hashtable if it's not yet
+		else if (instanceHolder.containsKey(name))
+			return instanceHolder.get(name); //we have an instance allready, return it
+		Object inst = getInstanceOf(name); //we need a new instance, get it
+		instanceHolder.put(name, inst); //save the instance in the hashtable
+		return inst;
+	}
 
 /**
  * Returns the configuration property with the specified name as a String.
- *
- * @param name the non-null and non-empty name of the configuration property
+ * 
+ * @param name
+ *                    the non-null and non-empty name of the configuration property
  * @return the value of the configuration property as a String
- * @throws MCRConfigurationException if the property with this name is not set
+ * @throws MCRConfigurationException
+ *                    if the property with this name is not set
  */  
   public String getString( String name )
   {   
