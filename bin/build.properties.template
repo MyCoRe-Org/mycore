@@ -100,15 +100,12 @@ MCR.JDBCStore.Type=mysql
 # MCR.XMLStore.BaseDir=d:\\_Kannweg\\taminomcr\\libs
 # MCR.XMLStore.Jars=tamino_xmldb.jar TaminoAPI4J.jar
 
-# Lucene under Linux
-# MCR.XMLStore.Type=lucene
-# MCR.XMLStore.BaseDir=d:/usr/local/src/lucene-1.3-rc2
-# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
+#######################################################################
+# End of Experimental state DO NOT USE THIS !!!
+#######################################################################
 
-# Lucene under Windows
+# Lucene 
 # MCR.XMLStore.Type=lucene
-# MCR.XMLStore.BaseDir=d:\\_Kannweg\\lucene-1.3-rc2
-# MCR.XMLStore.Jars=lucene-1.3-rc2.jar
 
 # Native JDOM store in memory
   MCR.XMLStore.Type=jdom
