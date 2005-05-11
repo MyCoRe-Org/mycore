@@ -46,8 +46,6 @@ import org.mycore.datamodel.metadata.*;
 
 abstract public class MCRCheckBase extends MCRServlet
 {
-// The configuration
-protected static MCRConfiguration CONFIG;
 protected static Logger logger=Logger.getLogger(MCRCheckBase.class);
 String NL = System.getProperty("file.separator");
 
