@@ -27,7 +27,6 @@ package org.mycore.backend.sql;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
@@ -46,7 +45,7 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface
 {
 
 // logger
-static Logger logger=Logger.getLogger(MCRSQLClassificationStore.class.getName());
+static Logger logger=Logger.getLogger(MCRSQLClassificationStore.class);
 
 // internal data
 private String tableClass;
