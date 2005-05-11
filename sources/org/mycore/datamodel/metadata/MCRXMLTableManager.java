@@ -48,7 +48,9 @@ public class MCRXMLTableManager
 protected static MCRXMLTableManager SINGLETON;
 
 // logger
-static Logger LOGGER=Logger.getLogger(MCRLinkTableManager.class.getName());
+static Logger LOGGER=Logger.getLogger(MCRLinkTableManager.class);
+
+static MCRConfiguration CONFIG=MCRConfiguration.instance();
 
 // the list of link table 
 private String persistclassname = null;
@@ -68,46 +70,29 @@ public static synchronized MCRXMLTableManager instance()
  **/
 protected MCRXMLTableManager()
   {
-  MCRConfiguration config = MCRConfiguration.instance();
-  // Load the persistence class
-  persistclassname = config.getString("MCR.xml_store_class");
   tablelist = new Hashtable();
   }
 
 
 /**
- * The method check the type.
- *
- * @param type the table type
- * @exception if the store for the given type could not find or loaded.
- **/
-private final MCRXMLTableInterface getXMLTable(String type)
-  {
-  if ((type == null) || ((type = type.trim()).length() ==0)) {
-    throw new MCRException("The type is null or empty."); }
-  MCRXMLTableInterface store = (MCRXMLTableInterface)tablelist.get(type);
-  if (store != null) { return store; }
-  Object obj = new Object();
-  try {
-    obj = Class.forName(persistclassname).newInstance(); }
-  catch (ClassNotFoundException e) {
-    throw new MCRException(persistclassname+" ClassNotFoundException for "+
-      type); }
-  catch (IllegalAccessException e) {
-    throw new MCRException(persistclassname+" IllegalAccessException for "+
-      type); }
-  catch (InstantiationException e) {
-    throw new MCRException(persistclassname+" InstantiationException for "+
-      type); }
-  try {
-    ((MCRXMLTableInterface)obj).init(type); }
-  catch (Exception e) {
-    throw new MCRException("Could not find or loaded a XML store for the type "
-    +type,e); 
-    }
-  tablelist.put(type,obj);
-  return (MCRXMLTableInterface)obj;
-  }
+ * returns a MCRXMLTableInterface handling MyCoRe object of type <code>type</code>
+ * 
+ * @param type
+ *                    the table type
+ * @exception if
+ *                         the store for the given type could not find or loaded.
+ */
+	private final MCRXMLTableInterface getXMLTable(String type) {
+		if ((type == null) || (type.length() == 0)) {
+			throw new MCRException("The type is null or empty.");
+		} else if (tablelist.containsKey(type))
+			return (MCRXMLTableInterface) tablelist.get(type);
+		MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG
+				.getInstanceOf("MCR.xml_store_class");
+		inst.init(type);
+		tablelist.put(type, inst);
+		return inst;
+	}
 
 /**
  * The method create a new item in the datastore.
