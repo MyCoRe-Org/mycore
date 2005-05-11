@@ -24,16 +24,20 @@
 
 package org.mycore.datamodel.classifications;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.mycore.common.*;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRDefaults;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class implements all methods for a classification and extended
@@ -64,84 +68,55 @@ private ArrayList cat;
 
   /**
    * The method fill the instance of this class with a given JODM tree.
-   *
-   * @param jdom the classification as jdom tree
-   **/
-  private final void setFromJDOM( org.jdom.Document jdom ) 
-    { 
-    org.jdom.Element root = jdom.getRootElement();
-    String ID = (String)root.getAttribute("ID").getValue();
-    MCRObjectID mcr_id = new MCRObjectID(ID);
-    cl = new MCRClassificationItem(mcr_id.getId());
-    List element_list = root.getChildren();
-    org.jdom.Element categories = null;
-    int len = element_list.size();
-    for (int i=0;i<len;i++) {
-      org.jdom.Element tag = (org.jdom.Element)element_list.get(i);
-      if (tag.getName().equals("label")) {
-        String text = tag.getAttributeValue("text");
-        String desc = tag.getAttributeValue("description");
-        String lang = tag.getAttributeValue("lang",
-          org.jdom.Namespace.XML_NAMESPACE);
-        cl.addData(lang,text,desc);
-        }
-      else {
-        categories = (org.jdom.Element)tag.clone(); }
-      }
-    LOGGER.debug(cl.toString());
-    LOGGER.debug("Element name = "+categories.getName());
-    cat = new ArrayList();
-    MCRClassificationObject [] pid = new 
-      MCRClassificationObject[MAX_CATEGORY_DEEP];
-    int [] pos = new int[MAX_CATEGORY_DEEP];
-    List [] list = new List[MAX_CATEGORY_DEEP];
-    pid[0] = cl;
-    pos[0] = 0;
-    list[0] = categories.getChildren();
-    int deep = 0;
-    while(deep != -1) {
-      if (pos[deep] >= list[deep].size()) { 
-        deep--; if(deep < 0) {break;}
-        pos[deep]++; continue; }
-      org.jdom.Element cattag = (org.jdom.Element)list[deep].get(pos[deep]);
-      String name = cattag.getName();
-      if (name.equals("label")) { pos[deep]++; continue; }
-      if (!name.equals("category")) { pos[deep]++; continue; }
-      String theID = cattag.getAttribute("ID").getValue();
-      MCRCategoryItem ci = new MCRCategoryItem(theID,pid[deep]);
-      List catlist = cattag.getChildren();
-      int catlen = catlist.size();
-      boolean catflag = false;
-      for (int i=0;i<catlen;i++) {
-        org.jdom.Element tag = (org.jdom.Element)catlist.get(i);
-        if (tag.getName().equals("label")) {
-          String text = tag.getAttributeValue("text");
-          String desc = tag.getAttributeValue("description");
-          String lang = tag.getAttributeValue("lang",
-            org.jdom.Namespace.XML_NAMESPACE);
-          ci.addData(lang,text,desc);
-          }
-        else {
-          if (tag.getName().equals("url")) {
-            String url = tag.getAttributeValue("href",
-              org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            ci.setURL(url);
-            }
-          else {
-            catflag = true; }
-          }
-        }
-      cat.add(ci);
-      if (catflag) {
-        pos[deep+1] = 0;
-        pid[deep+1] = ci;
-        list[deep+1] = catlist;
-        deep++;
-        }
-      else {
-        pos[deep]++; }
-      }
-    }
+   * 
+   * @param jdom
+   *                    the classification as jdom tree
+   */
+	private final void setFromJDOM(org.jdom.Document jdom) {
+		cl = new MCRClassificationItem(new MCRObjectID(jdom.getRootElement()
+				.getAttributeValue("ID")).getId());
+		List tagList = jdom.getRootElement().getChildren("label");
+		Element tag;
+		for (int i = 0; i < tagList.size(); i++) {
+			tag = (Element) tagList.get(i);
+			cl.addData(tag.getAttributeValue("text"), tag
+					.getAttributeValue("description"), tag
+					.getAttributeValue("lang"));
+		}
+		LOGGER.debug("processing Classification:" + cl.toString());
+		cat = new ArrayList();
+		tagList = jdom.getRootElement().getChild("categories").getChildren(
+				"category");
+		for (int i = 0; i < tagList.size(); i++) {
+			breakDownCategories((Element) tagList.get(i), cl);
+		}
+	}
+
+	private void breakDownCategories(Element category,
+			MCRClassificationObject parent) {
+		//process labels
+		MCRCategoryItem ci = new MCRCategoryItem(category
+				.getAttributeValue("ID"), parent);
+		List tagList = category.getChildren("label");
+		Element element;
+		for (int i = 0; i < tagList.size(); i++) {
+			element = (Element) tagList.get(i);
+			ci.addData(element.getAttributeValue("text"), element
+					.getAttributeValue("description"), element
+					.getAttributeValue("lang"));
+		}
+		//process url, if given
+		element = category.getChild("url");
+		if (element != null) {
+			ci.setURL(element.getAttributeValue("href", Namespace.getNamespace(
+					"xlink", MCRDefaults.XLINK_URL)));
+		}
+		cat.add(ci); //add to list of categories
+		tagList = category.getChildren("category");
+		for (int i = 0; i < tagList.size(); i++) {
+			breakDownCategories((Element) tagList.get(i), ci); //process children
+		}
+	}
    
   /**
    * The method create a MCRClassification from the given JDOM tree.
