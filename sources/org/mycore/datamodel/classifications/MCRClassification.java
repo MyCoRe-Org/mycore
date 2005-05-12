@@ -79,9 +79,9 @@ private ArrayList cat;
 		Element tag;
 		for (int i = 0; i < tagList.size(); i++) {
 			tag = (Element) tagList.get(i);
-			cl.addData(tag.getAttributeValue("text"), tag
-					.getAttributeValue("description"), tag
-					.getAttributeValue("lang"));
+			cl.addData(tag.getAttributeValue("lang",Namespace.XML_NAMESPACE), tag
+					.getAttributeValue("text"), tag
+					.getAttributeValue("description"));
 		}
 		LOGGER.debug("processing Classification:" + cl.toString());
 		cat = new ArrayList();
@@ -101,9 +101,9 @@ private ArrayList cat;
 		Element element;
 		for (int i = 0; i < tagList.size(); i++) {
 			element = (Element) tagList.get(i);
-			ci.addData(element.getAttributeValue("text"), element
-					.getAttributeValue("description"), element
-					.getAttributeValue("lang"));
+			ci.addData(element.getAttributeValue("lang",Namespace.XML_NAMESPACE), element
+					.getAttributeValue("text"), element
+					.getAttributeValue("description"));
 		}
 		//process url, if given
 		element = category.getChild("url");
