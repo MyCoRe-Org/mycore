@@ -25,12 +25,19 @@
 package org.mycore.datamodel.classifications;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -38,6 +45,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * This class implements all methods for a classification and extended
@@ -123,21 +131,33 @@ private ArrayList cat;
    *
    * @param jdom the classification as jdom tree
    **/
-  public final String createFromJDOM( org.jdom.Document jdom ) 
-    { 
-    setFromJDOM(jdom);
-    cl.create();
-    for (int i=0;i<cat.size();i++) {
-      ((MCRCategoryItem)cat.get(i)).create(); }
-    return cl.getClassificationID();
-    }
+  public final String createFromJDOM(org.jdom.Document jdom) {
+		setFromJDOM(jdom);
+		XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		try {
+			xout.output(jdom, bout);
+		} catch (IOException e) {
+			throw new MCRException("Ooops", e);
+		}
+		String ID = jdom.getRootElement().getAttributeValue("ID");
+		MCRObjectID mcr_id = new MCRObjectID(ID);
+		MCRXMLTableManager.instance().create(mcr_id, bout.toByteArray());
+		cl.create();
+		for (int i = 0; i < cat.size(); i++) {
+			((MCRCategoryItem) cat.get(i)).create();
+		}
+		return cl.getClassificationID();
+	}
   
   /**
    * The method create a MCRClassification from the given XML array.
-   *
-   * @param xml the classification as byte array XML tree
-   * @exception MCRException if the parser can't build a JDOM tree
-   **/
+   * 
+   * @param xml
+   *                    the classification as byte array XML tree
+   * @exception MCRException
+   *                         if the parser can't build a JDOM tree
+   */
   public final String createFromXML( byte [] xml ) throws MCRException
     { 
     try {
@@ -174,6 +194,7 @@ private ArrayList cat;
     { 
     if (cl == null) { cl = new MCRClassificationItem(ID); }
     cl.delete(ID);
+    MCRXMLTableManager.instance().delete(new MCRObjectID(ID));
     }
 
   /**
@@ -189,6 +210,14 @@ private ArrayList cat;
     cl = new MCRClassificationItem(mcr_id.getId());
     cl.delete(cl.getClassificationID());
     setFromJDOM(jdom);
+		XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		try {
+			xout.output(jdom, bout);
+		} catch (IOException e) {
+			throw new MCRException("Ooops", e);
+		}
+		MCRXMLTableManager.instance().create(mcr_id, bout.toByteArray());
     cl.create();
     for (int i=0;i<cat.size();i++) {
       ((MCRCategoryItem)cat.get(i)).create(); }
@@ -228,72 +257,56 @@ private ArrayList cat;
       throw new MCRException(e.getMessage(),e); }
     }
   
+  private Document getClassification(String ID) throws MCRException, JDOMException, IOException{
+  	SAXBuilder builder=new SAXBuilder(false);
+  	MCRObjectID classID=new MCRObjectID(ID);
+  	LOGGER.debug("Loading Classification "+ID+" of MCRType: "+classID.getTypeId());
+  	MCRXMLTableManager tm=MCRXMLTableManager.instance();
+  	byte[] xml=tm.retrieve(classID);
+  	return builder.build(new ByteArrayInputStream(xml));
+  }
+  
+  private void countDocuments(String classID, Element cat){
+  	final String cAttr="counter";
+  	List tagList=cat.getChildren("category");
+  	int docs=0;
+  	if (tagList.size()==0){
+  		//we reached the leaves and count the documents
+  		docs=MCRLinkTableManager.instance().countCategoryReferencesSharp(classID,cat.getAttributeValue("ID"));
+  	} else {
+  		for (int i=0;i<tagList.size();i++){
+  			Element child=(Element)tagList.get(i);
+  			countDocuments(classID,child);
+    		//all children are calculated
+  			docs+=Integer.parseInt(child.getAttributeValue(cAttr));
+  		}
+  	}
+		cat.setAttribute(cAttr,Integer.toString(docs));
+  }
+  
   /**
    * The method return the classification as JDOM tree.
    *
    * @param ID the classification ID to delete
    * @return the classification as JDOM
    **/
-  public final org.jdom.Document receiveClassificationAsJDOM(String ID)
-    {
-    MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
-    // create the XML tree
-    org.jdom.Element elm = new org.jdom.Element("mycoreclass");
-    org.jdom.Document doc = new org.jdom.Document(elm);
-    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
-      MCRDefaults.XSI_URL));
-    elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
-      MCRDefaults.XLINK_URL));
-    String mcr_schema_path = "MCRClassification.xsd";
-    elm.setAttribute("noNamespaceSchemaLocation",mcr_schema_path,
-      org.jdom.Namespace.getNamespace("xsi",MCRDefaults.XSI_URL));
-    elm.setAttribute("ID",ID);
-    try {
-      cl = MCRClassificationItem.getClassificationItem(ID); }
-    catch (Exception e) { return doc; }
-    for (int i=0;i<cl.getSize();i++) {
-      elm.addContent(cl.getJDOMElement(i)); }
-    // get all categories
-    MCRCategoryItem [] [] catlist = new MCRCategoryItem[MAX_CATEGORY_DEEP][];
-    int [] pos = new int[MAX_CATEGORY_DEEP];
-    int [] len = new int[MAX_CATEGORY_DEEP];
-    org.jdom.Element [] list = new org.jdom.Element[MAX_CATEGORY_DEEP];
-    catlist [0] = cl.getChildren();
-    pos[0] = 0;
-    len[0] = cl.getNumChildren();
-    list[0] = new org.jdom.Element("categories");
-    int deep = 0;
-    while (deep > -1) {
-      if (pos[deep] >= len[deep]) { 
-        deep--; if(deep < 0) {break;}
-        pos[deep]++; continue; }
-      MCRCategoryItem ci = catlist[deep][pos[deep]];
-      list[deep+1] = new org.jdom.Element("category");
-      list[deep+1].setAttribute("ID",ci.getID());
-      int cou = mcr_linktable.countCategoryReferencesFuzzy(ID,ci.getID());
-      list[deep+1].setAttribute("counter",Integer.toString(cou));
-      for (int i=0;i<ci.getSize();i++) {
-        list[deep+1].addContent(ci.getJDOMElement(i)); }
-      if (ci.getURL().length() != 0) {
-        org.jdom.Element u = new org.jdom.Element("url");
-        u.setAttribute("href",ci.getURL(),
-         org.jdom.Namespace.getNamespace("xlink",MCRDefaults.XLINK_URL));
-        list[deep+1].addContent(u);
-        }
-      list[deep].addContent(list[deep+1]);
-      if (ci.hasChildren()) {
-        catlist [deep+1] = ci.getChildren();
-        len [deep+1] = ci.getNumChildren();
-        pos[deep+1] = 0;
-        deep++;
-        }
-      else {
-        pos[deep]++; }
-      }
-    elm.addContent(list[0]);
-    return doc;
-    }
-
+  public final Document receiveClassificationAsJDOM(String classID) {
+		Document classification = null;
+		try {
+			classification = getClassification(classID);
+		} catch (MCRException e) {
+			LOGGER.error("Oops", e);
+		} catch (JDOMException e) {
+			LOGGER.error("Oops", e);
+		} catch (IOException e) {
+			LOGGER.error("Oops", e);
+		}
+		List tagList=classification.getRootElement().getChild("categories").getChildren("category");
+		for (int i=0; i<tagList.size();i++){
+			countDocuments(classID,(Element)tagList.get(i));
+		}
+		return classification;
+	}
   /**
    * The method return the classification as XML byte array.
    *
