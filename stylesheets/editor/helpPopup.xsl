@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2004-12-15 15:02:44 $ -->
+<!-- $Revision: 1.2 $ $Date: 2005-05-12 13:39:48 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -28,7 +28,7 @@
       <title>Hilfe zum Formular</title>
     </head>
     <style type="text/css"><xsl:text>
-      . {</xsl:text><xsl:value-of select="$editor.font"/><xsl:text>}
+      body, html {</xsl:text><xsl:value-of select="$editor.font"/><xsl:text>}
     </xsl:text>
     </style>
     <body>
