@@ -275,7 +275,7 @@ public class MCRStartEditorServlet extends MCRServlet
       params.put( "XSL.editor.cancel.url", getBaseURL()+cancelpage);
       params.put( "mcrid",mytfmcrid );
       params.put( "type",mytype );
-      params.put( "step=",mystep );
+      params.put( "step",mystep );
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
       }
