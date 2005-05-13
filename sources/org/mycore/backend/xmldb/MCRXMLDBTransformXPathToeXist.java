@@ -137,6 +137,12 @@ private String handleQueryStringExist(String root, String query, String type) {
 	query = MCRUtils.replaceString(query, "contains(", "&=");
 	query = MCRUtils.replaceString(query, "contains (", "&=");
 	query = MCRUtils.replaceString(query, ")", "");
+
+	// Workaround for interpreting categids as String
+	// insert  a dummy "X" before the following strange operation
+	// and delete it at the end again
+	query = query.replaceAll("@categid[ ]*([&]{0,1}=)[ ]*\"(.+)\"","@categid$1\"X$2\"")   ;	
+	
         // select numbers and remove ""
         int i = 0;
         int l = query.length();
@@ -177,8 +183,10 @@ private String handleQueryStringExist(String root, String query, String type) {
             }
           else { break; }
           }
-    // back-convert @categid=610 to @categid="610"
-    query = query.replaceAll("@categid[ ]*=[ ]*([0-9]+)","@categid=\"$1\"")   ;
+    // Workaround for interpreting categids as String
+    // remove the above inserted dummy "X" 
+    // from the category ID
+    query = query.replaceAll("@categid[ ]*([&]{0,1}=)[ ]*\"X(.+)\"","@categid $1\"$2\"")   ;
 	// combine the separated queries
 	query = root + "[" + query + "]";
 	return query;
