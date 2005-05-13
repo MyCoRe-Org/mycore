@@ -280,6 +280,8 @@ private ArrayList cat;
     		//all children are calculated
   			docs+=Integer.parseInt(child.getAttributeValue(cAttr));
   		}
+  		//childrens are counted make a "sharp" search on this category
+  		docs+=MCRLinkTableManager.instance().countCategoryReferencesSharp(classID,cat.getAttributeValue("ID"));
   	}
 		cat.setAttribute(cAttr,Integer.toString(docs));
   }

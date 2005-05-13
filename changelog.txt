@@ -6,6 +6,8 @@ Version 1.1
   form
 - Refactoring the commandline tool. Now the commands are all extern defined.
   Add a simple help mechanism.
+- MCRClassification methods where redesigned. This change require an update
+  of all classifications to put them in an additional database table.
 
 Version 1.0
 ===========
