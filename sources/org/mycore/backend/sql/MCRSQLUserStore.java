@@ -657,6 +657,18 @@ public class MCRSQLUserStore implements MCRUserStore
   }
 
   /**
+   * This method returns the maximum value of the numerical user IDs
+   * @return   maximum value of the numerical user IDs
+   */
+  public synchronized int getMaxUserNumID() throws MCRException
+  {
+    String select = "SELECT MAX(NUMID) FROM " + SQLUsersTable;
+    String nr = MCRSQLConnection.justGetSingleValue(select);
+    int iMax = Integer.parseInt(nr);
+    return iMax;
+  }
+  
+  /**
    * This method gets all user IDs with a given primary group and returns them as a
    * ArrayList of strings.
    *

@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
@@ -745,6 +745,21 @@ public class MCRUserMgr
     return set;
   }
 
+  /**
+   * This method returns the maximum value of the numerical user IDs
+   * @return   maximum value of the numerical user IDs
+   */
+  public final int getMaxUserNumID() throws MCRException
+  {
+      // Check the privileges
+      MCRSession session = MCRSessionMgr.getCurrentSession();
+      MCRUser admin = retrieveUser(session.getCurrentUserID(), false);
+      if ((!admin.hasPrivilege("create user")) && (!admin.hasPrivilege("user administrator"))) {
+        throw new MCRException("The current user does not have the privilege to create a user!");
+      }    
+      return mcrUserStore.getMaxUserNumID();
+  }
+  
   /**
    * The access control subsystem needs to know the group whose members have the
    * privilege to change the owner of an object in the repository.

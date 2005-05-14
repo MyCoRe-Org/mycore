@@ -25,6 +25,8 @@
 package org.mycore.user;
 
 import java.util.ArrayList;
+
+import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRException;
 
 /**
@@ -112,6 +114,12 @@ public interface MCRUserStore
    * @return  ArrayList of strings including the group IDs of the system
    */
   public ArrayList getAllGroupIDs() throws MCRException;
+  
+  /**
+   * This method returns the maximum value of the numerical user IDs
+   * @return   maximum value of the numerical user IDs
+   */
+  public int getMaxUserNumID() throws MCRException;
 
   /**
    * This method gets all group IDs where a given user ID can manage the group (i.e. is
