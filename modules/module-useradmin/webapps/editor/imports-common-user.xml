@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<imports>
+
+  <!-- *** Definitions of text fields *** -->
+
+  <textfield id="TFzeile10"   width="10" maxlength="10"   />
+  <textfield id="TFzeile20"   width="20" maxlength="20"   />
+  <textfield id="TFzeile32"   width="32" maxlength="32"   />
+  <textfield id="TFzeile48"   width="48" maxlength="48"   />
+  <textfield id="TFzeile64"   width="64" maxlength="64"   />
+  <textfield id="TFzeile128"  width="64" maxlength="128"  />
+  <textfield id="TFzeile1024" width="64" maxlength="1024" />
+  
+  <!-- *** Definitions of text area fields *** -->
+
+  <textarea id="TFarea4096"  width="64" height="3" maxlength="4096"  />
+
+  <!-- *** Definitions of Spaces  *** -->
+
+  <space id="VSpace5"   width="0px" height="5px" />
+  <space id="VSpace10"  width="0px" height="10px" />
+  <space id="VSpace25"  width="0px" height="25px" />
+  <space id="VSpace50"  width="0px" height="50px" />
+  <space id="VSpace100" width="0px" height="100px" />
+
+  <!-- *** Definitions of buttons *** -->
+
+  <submitButton id="BSubmit" width="100px" >
+    <label xml:lang="de">[Speichern]</label>
+    <label xml:lang="en">[Save]</label>
+  </submitButton>
+  <cancelButton id="BCancel" width="100px" >
+    <label xml:lang="de">[Abbrechen]</label>
+    <label xml:lang="en">[Cancel]</label>
+  </cancelButton>
+
+  <panel id="TwoButtons">
+    <cell col="1" row="1" anchor="WEST" ref="BCancel"            />
+    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save" />
+  </panel>
+
+  <!-- *** End *** -->
+
+</imports>

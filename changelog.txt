@@ -1,5 +1,8 @@
 Version 1.1
 ===========
+
+- Added a module which will contain the editors for the user management GUI.
+  The first editor for creating new users is funtional. More are upcoming.
 - Add a first version of the EventHandler to reorganized the store and search
   in the persitence layers.
 - Add a SimpleWorkflow module to administrate the content objects in simple 

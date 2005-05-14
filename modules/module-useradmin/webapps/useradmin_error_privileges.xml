@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+  <head>
+    <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
+    <maintitle xml:lang="en">User administration</maintitle>
+    <pagetitle xml:lang="de">Unzureichende Privilegien</pagetitle>
+    <pagetitle xml:lang="en">Unsufficient privileges</pagetitle>
+  </head>
+
+  <section title="Keine ausreichenden Privilegien" xml:lang="de">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  <font color="red">
+                    Dieser Nutzer bzw. diese Nutzerin besitzt für die gewünschte 
+                    Aktion nicht die notwendigen Privilegien!
+                  </font>
+                </td>
+              </tr>
+            </table>
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td> 
+      </tr>
+    </table>
+  </section>
+
+  <section title="Insufficient privileges" xml:lang="en">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  <font color="red">
+                    This login has insufficient privileges to perform the desired action!
+                  </font>
+                </td>
+              </tr>
+            </table> 
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td>
+      </tr>
+    </table>
+  </section>
+</MyCoReWebPage>
+
+

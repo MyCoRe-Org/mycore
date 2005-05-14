@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<head>
+  <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
+  <maintitle xml:lang="en">User management</maintitle>
+  <pagetitle xml:lang="de">Editieren einer bestehenden Benutzerkennung</pagetitle>
+  <pagetitle xml:lang="en">Modify an existing user account</pagetitle>
+  <buttons xml:lang="de">
+  </buttons>
+</head>
+
+<section title="Editieren eines Benutzers" xml:lang="de">
+  <p></p>
+  <br />
+  <editor id="modifyuser"><include uri="webapp:editor/editor-modifyuser.xml" /></editor>
+  <p></p>
+  <br />
+</section>
+
+<section title="Modify an existing user account" xml:lang="en">
+  <p></p>
+  <br />
+  <editor id="modifyuser"><include uri="webapp:editor/editor-modifyuser.xml" /></editor>
+  <p></p>
+  <br />
+</section>
+
+</MyCoReWebPage>

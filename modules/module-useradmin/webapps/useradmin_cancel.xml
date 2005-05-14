@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+  <head>
+    <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
+    <maintitle xml:lang="en">User administration</maintitle>
+    <pagetitle xml:lang="de">Bearbeitung abgebrochen</pagetitle>
+    <pagetitle xml:lang="en">Action canceled</pagetitle>
+  </head>
+
+  <section title="Bearbeitung abgebrochen" xml:lang="de">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  Die Bearbeitung wurde nutzerseitig abgebrochen. 
+                </td>
+              </tr>
+            </table>
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td> 
+      </tr>
+    </table>
+  </section>
+
+  <section title="Action canceled" xml:lang="en">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  The action was canceled by the user.
+                </td>
+              </tr>
+            </table> 
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td>
+      </tr>
+    </table>
+  </section>
+</MyCoReWebPage>
+
+

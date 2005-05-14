@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE editor>
+
+<editor id="modifyuser">
+
+    <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> -->
+    <components root="modify-user" var="/mycoreuser">
+        <include uri="webapp:editor/imports-common-user.xml" />
+        <headline anchor="CENTER">
+            <text>
+                <label xml:lang="de">Die mit * gekennzeichneten Felder sind Plichtfelder.<p/></label>
+                <label xml:lang="en">Required fields are labeled with a star (*).<p/></label>
+            </text>
+        </headline>
+
+        <panel id="modify-user" lines="off">
+            <cell row="1" col="1" ref="VSpace5" anchor="EAST" />
+
+            <!-- *** User account data *** -->
+            <cell row="2" col="1" anchor="EAST">
+                <text id="LAccount">
+                    <label xml:lang="de">
+                        <span class="editorlabel">&#160;&#160;Benutzerkennung&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">&#160;&#160;User&#160;account&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="2" col="2" anchor="WEST" ref="TFzeile20" var="user/@ID" sortnr="1" />
+            <cell row="2" col="3" anchor="EAST" >
+                <helpPopup id="HAccount" width="400px" height="200px">
+                    <label xml:lang="de">
+                        In diesem Feld geben Sie bitte die Benutzerkennung (user-ID) des neu
+                        anzulegenden Benutzers ein. Die ID darf nicht länger als 20 Zeichen sein.
+                    </label>
+                    <label xml:lang="en">
+                        Please specify the account (user-ID) of the new user. This ID must not
+                        be larger than 20 characters.
+                    </label>
+                </helpPopup>
+            </cell>
+
+            <!-- *** Password *** -->
+            <cell row="3" col="1" anchor="EAST">
+                <text id="LPassword">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Passwort&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Password&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="3" col="2" anchor="WEST" var="user/user.password" sortnr="2">
+                <password width="48" maxlength="128" />
+            </cell>
+            
+            <!-- *** Description *** -->
+            <cell row="4" col="1" anchor="EAST">
+                <text id="LDescription">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Beschreibung:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Description:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="4" col="2" anchor="WEST" ref="TFzeile48" var="user/user.description" sortnr="3"/>
+            <cell row="4" col="3" anchor="EAST">
+                <helpPopup id="HDescription" width="400px" height="200px">
+                    <label xml:lang="de">
+                        In diesem Feld können Sie einen Text zur Beschreibung des neuen
+                        Benutzers bzw. der neuen Benutzerin eingeben.
+                    </label>
+                    <label xml:lang="en">
+                        Here you can specify a description of the new user account.
+                    </label>
+                </helpPopup>
+            </cell>
+
+            <!-- *** ID enabled? *** -->
+            <cell row="5" col="1" anchor="EAST"></cell>
+            <cell row="5" col="2" anchor="WEST" var="user/@id_enabled">
+                <checkbox value="true" checked="true"> 
+                    <label xml:lang="de">&#160;&#160;Die Benutzerkennung soll aktiviert sein.</label>
+                    <label xml:lang="en">&#160;&#160;The user account is enabled. </label>
+                </checkbox>
+            </cell>
+
+            <!-- *** Update allowed? *** -->
+            <cell row="6" col="1" anchor="EAST"></cell>
+            <cell row="6" col="2" anchor="WEST" var="user/@update_allowed">
+                <checkbox value="true" checked="true"> 
+                    <label xml:lang="de">&#160;&#160;Eigene Accountdaten sind änderbar.</label>
+                    <label xml:lang="en">&#160;&#160;The user may change the account information. </label>
+                </checkbox>
+            </cell>
+
+            <!-- *** Primary group *** -->
+            <cell row="7" col="1" anchor="EAST">
+                <text id="LPrimaryGroup">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Primäre&#160;Gruppe&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Primary&#160;group&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="7" col="2" anchor="WEST" var="user/user.primary_group" sortnr="4">
+                <list width="150" type="dropdown">
+                    <item value="">
+                        <label xml:lang="de">(bitte auswählen)</label>
+                        <label xml:lang="en">(choose a value)</label>
+                    </item>
+                    <!--
+                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser"  cacheable="false" />
+                    -->
+                </list>
+            </cell>
+            <cell row="7" col="3" anchor="EAST">
+                <helpPopup id="HPrimaryGroup" width="400px" height="200px">
+                    <label xml:lang="de">
+                        Jede(r) Benutzer(in) muß mindestens einer Gruppe angehören, da 
+                        Privilegien im System durch die Gruppenzugehörigkeit geregelt wird.
+                    </label>
+                    <label xml:lang="en">
+                        Each user must belong to at least one group since the privileges
+                        a user has in the system is managed by the group affiliations.
+                    </label>
+                </helpPopup>
+            </cell>
+
+            <!-- *** Additional groups *** -->
+            <cell row="8" col="1" anchor="EAST">
+                <text id="LAdditionalGroups">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Weitere&#160;Gruppen&#160;:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Additional&#160;groups&#160;:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="8" col="2" anchor="WEST" var="user/user.groups/groups.groupID" sortnr="20">
+                <list width="150" type="multirow" multiple="true" rows="5">
+                    <item value="">
+                        <label xml:lang="de">(Mehrfachauswahl)</label>
+                        <label xml:lang="en">(multiple choice)</label>
+                    </item>
+                    <!--
+                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser"  cacheable="false" />
+                    -->
+                </list>
+            </cell>
+            <cell row="8" col="3" anchor="EAST">
+                <helpPopup id="HAdditionalGroups" width="400px" height="200px">
+                    <label xml:lang="de">
+                        Privilegien im System (Rollen) werden durch die Gruppenzugehörigkeit 
+                        geregelt. Durch zusätzliche Gruppenzugehörigkeiten können die möglichen
+                        Rollen eines Benutzers / einer Benutzerin genau geregelt werden.
+                    </label>
+                    <label xml:lang="en">
+                        The privileges a user has in the system (roles) are managed by the
+                        group affiliations. Therefore the roles a user can take can be exactly
+                        defined by assigning the user to different groups.
+                    </label>
+                </helpPopup>
+            </cell>
+
+            <!-- *** Contact information *** -->
+            <cell row="9" col="1" ref="VSpace50" anchor="EAST" />
+            <cell row="9" col="2" anchor="WEST">
+                <text id="LContactInfo">
+                    <label xml:lang="de">
+                        <span class="editorlabel"><b>Kontaktinformationen:</b></span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel"><b>Contact&#160;information:</b></span>
+                    </label>
+                </text>
+            </cell>
+
+            <!-- *** Salutation *** -->
+            <cell row="10" col="1" anchor="EAST">
+                <text id="LSalutation">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Anrede&#160;/&#160;Titel:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Salutation:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="10" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.salutation" sortnr="5" />
+
+            <!-- *** First name *** -->
+            <cell row="11" col="1" anchor="EAST">
+                <text id="LFirstName">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Vorname&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">First&#160;name&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="11" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.firstname" sortnr="6" />
+
+            <!-- *** Last name *** -->
+            <cell row="12" col="1" anchor="EAST">
+                <text id="LLastName">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Nachname&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Last&#160;name&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="12" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.lastname" sortnr="7" />
+
+            <!-- *** Street *** -->
+            <cell row="13" col="1" anchor="EAST">
+                <text id="LStreet">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Strasse:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Street:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="13" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.street" sortnr="8" />
+
+            <!-- *** City *** -->
+            <cell row="14" col="1" anchor="EAST">
+                <text id="LCity">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Stadt:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">City:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="14" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.city" sortnr="9" />
+
+            <!-- *** Postal code *** -->
+            <cell row="15" col="1" anchor="EAST">
+                <text id="LPostalCode">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Postleitzahl:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Postal code:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="15" col="2" anchor="WEST" ref="TFzeile10" var="user/user.contact/contact.postalcode" sortnr="10" />
+
+            <!-- *** Country *** -->
+            <cell row="16" col="1" anchor="EAST">
+                <text id="LCountry">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Land:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Country:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="16" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.country" sortnr="11" />
+
+            <!-- *** Institution *** -->
+            <cell row="17" col="1" anchor="EAST">
+                <text id="LInstitution">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Institution:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Institution:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="17" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.institution" sortnr="12" />
+
+            <!-- *** Faculty *** -->
+            <cell row="18" col="1" anchor="EAST">
+                <text id="LFaculty">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Fakultät/Fachbereich:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Faculty:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="18" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.faculty" sortnr="13" />
+
+            <!-- *** Department *** -->
+            <cell row="19" col="1" anchor="EAST">
+                <text id="LDepartment">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Abteilung:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Department:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="19" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.department" sortnr="14" />
+
+            <!-- *** Institute *** -->
+            <cell row="20" col="1" anchor="EAST">
+                <text id="LInstitute">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Institut/Einrichtung:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Institute:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="20" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.institute" sortnr="15" />
+
+            <!-- *** Email *** -->
+            <cell row="21" col="1" anchor="EAST">
+                <text id="LEmail">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Email:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Email:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="21" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.email" sortnr="16" />
+
+            <!-- *** Telephone *** -->
+            <cell row="22" col="1" anchor="EAST">
+                <text id="LTelephone">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Telefon:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Telephone:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="22" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.telephone" sortnr="17" />
+
+            <!-- *** Fax *** -->
+            <cell row="23" col="1" anchor="EAST">
+                <text id="LFax">
+                    <label xml:lang="de">
+                        <span class="editorlabel">FAX-Nummer:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">FAX&#160;number:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="23" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.fax" sortnr="18" />
+
+            <!-- *** Cellphone *** -->
+            <cell row="24" col="1" anchor="EAST">
+                <text id="LCellPhone">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Mobiles&#160;Telefon:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Cellular&#160;phone:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="24" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.cellphone" sortnr="19" />
+
+            <!-- *** Buttons *** -->
+            <cell row="99"  col="1" ref="VSpace25" anchor="WEST" />
+            <cell row="100" col="1" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="2" ref="BCancel"  anchor="WEST" />
+            <cell row="101" col="1" ref="VSpace5"  anchor="WEST" />
+        </panel>
+    </components>
+</editor>
