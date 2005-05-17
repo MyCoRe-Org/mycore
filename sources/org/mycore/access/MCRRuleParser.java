@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
  * @author   Matthias Kramm
  **/
 
-class MCRParser
+class MCRRuleParser
 {
     private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
     private static Pattern and = Pattern.compile("\\band\\b");
