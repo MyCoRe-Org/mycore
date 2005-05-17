@@ -217,7 +217,11 @@ private ArrayList cat;
 		} catch (IOException e) {
 			throw new MCRException("Ooops", e);
 		}
-		MCRXMLTableManager.instance().update(mcr_id, bout.toByteArray());
+		MCRXMLTableManager mgr = MCRXMLTableManager.instance();
+		if (mgr.exist(mcr_id)) {
+			mgr.update(mcr_id, bout.toByteArray()); }
+		else {
+			mgr.create(mcr_id, bout.toByteArray()); }
     cl.create();
     for (int i=0;i<cat.size();i++) {
       ((MCRCategoryItem)cat.get(i)).create(); }
