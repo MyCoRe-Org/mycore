@@ -217,7 +217,7 @@ private ArrayList cat;
 		} catch (IOException e) {
 			throw new MCRException("Ooops", e);
 		}
-		MCRXMLTableManager.instance().create(mcr_id, bout.toByteArray());
+		MCRXMLTableManager.instance().update(mcr_id, bout.toByteArray());
     cl.create();
     for (int i=0;i<cat.size();i++) {
       ((MCRCategoryItem)cat.get(i)).create(); }
