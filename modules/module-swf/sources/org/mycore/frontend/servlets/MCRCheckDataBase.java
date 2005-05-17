@@ -404,7 +404,7 @@ protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in,
           if (!test.isValid()) throw new MCRException("");
           }
         catch (Exception e) {
-          errorlog.add("Element "+datasubtag.getName()+" is not valid.");
+          //errorlog.add("Element "+datasubtag.getName()+" is not valid.");
           datatag.removeContent(datasubtag); k--; datataglistlen--;
           continue;
           }
