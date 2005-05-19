@@ -73,7 +73,7 @@ public class MCRCommand
   * @param methodSignature the method to invoke, e.g. "miless.commandline.DocumentCommands.saveDoc int String"
   * @param helpText        the helpt text for this command
   **/
-  MCRCommand(String format, String methodSignature, String helpText )
+  public MCRCommand(String format, String methodSignature, String helpText )
   {
     StringTokenizer st = new StringTokenizer( methodSignature, " " );
 
