@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.37 $ $Date: 2005-04-26 09:57:45 $ -->
+<!-- $Revision: 1.38 $ $Date: 2005-05-19 12:20:57 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -578,7 +578,7 @@
       </xsl:if>
 
     </xsl:if>
-    <xsl:if test="( local-name() != 'panel' ) and (position() = 1)">
+    <xsl:if test="( local-name() != 'panel' ) and ( local-name() != 'repeater' ) and (position() = 1)">
       <xsl:attribute name="style">
         <xsl:if test="$outer.border='on'">
           <xsl:value-of select="concat('border-right: ',$editor.border,'; ')" />
