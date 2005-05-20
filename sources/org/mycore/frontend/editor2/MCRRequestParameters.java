@@ -62,11 +62,10 @@ public class MCRRequestParameters
   
   public MCRRequestParameters( HttpServletRequest req )
   {
-    logger.debug( "Request character encoding = " + req.getCharacterEncoding() );
-
     if( FileUpload.isMultipartContent( req ) )
     {
       DiskFileUpload parser = new DiskFileUpload();
+      parser.setHeaderEncoding( "UTF-8" );
       parser.setSizeThreshold( threshold );
       parser.setSizeMax( maxSize );
       parser.setRepositoryPath( tmpPath );
@@ -83,27 +82,16 @@ public class MCRRequestParameters
       {
         FileItem item = (FileItem)( items.get( i ) );
 
-        String name = item.getFieldName();
-        String value;
-        
+        String name  = item.getFieldName();
+        String value = null;
+
         if( item.isFormField() )
         {
-          String enc = req.getCharacterEncoding();
-          if( enc == null )
-            value = item.getString();
-          else
-          {         
-            try
-            { value = item.getString( enc ); }
-            catch( UnsupportedEncodingException ex )
-            { 
-              logger.warn( "Unsupported character encoding " + enc + ", using default" );
-              value = item.getString(); 
-            }
-          }
+          try{ value = item.getString( "UTF-8" ); }
+          catch( UnsupportedEncodingException ex )
+          { throw new MCRConfigurationException( "UTF-8 is unsupported encoding !?", ex ); }
         }
-        else
-          value = item.getName();
+        else value = item.getName();
 
         if( ( value != null ) && ( value.trim().length() > 0 ) && ( ! files.containsKey( name ) ) )
         {
