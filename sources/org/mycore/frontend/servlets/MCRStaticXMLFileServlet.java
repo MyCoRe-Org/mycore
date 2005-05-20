@@ -75,7 +75,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet
     Map map = new HashMap();
     map.putAll( job.getRequest().getParameterMap() );
     String key = buildRequestParamKey();
-    MCRSessionMgr.getCurrentSession().requestParamCache.put( key, map );
+    MCRServlet.requestParamCache.put( key, map );
 
     job.getRequest().setAttribute( "XSL.RequestParamKey", key );
     job.getRequest().setAttribute( "XSL.StaticFilePath", requestedPath.substring( 1 ) );

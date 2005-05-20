@@ -38,6 +38,7 @@ import org.jdom.Content;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -67,6 +68,8 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean POST = false;
 
 	protected String ReqCharEncoding;
+	
+	protected static MCRCache requestParamCache = new MCRCache( 40 );
 	
 	static
 	{ LOGGER = Logger.getLogger( MCRServlet.class ); }
