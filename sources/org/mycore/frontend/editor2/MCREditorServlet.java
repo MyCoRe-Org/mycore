@@ -25,6 +25,7 @@
 package org.mycore.frontend.editor2;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
@@ -124,9 +125,20 @@ public class MCREditorServlet extends MCRServlet
     logger.info( "Editor session " + sessionID + " reload form data" );
 
     Element editor = (Element)( sessions.get( sessionID ) );
-
-    req.setAttribute( "XSL.Style", "xml" );
-    sendToDisplay( req, res, editor.getDocument() );
+    sendXML( res, editor.getDocument() );
+  }
+  
+  /**
+   * @param res
+   * @param editor
+   **/
+  private void sendXML( HttpServletResponse res, Document doc ) throws IOException
+  {
+    res.setContentType("text/xml");
+    OutputStream out = res.getOutputStream();
+    new org.jdom.output.XMLOutputter().output( doc, out );
+    out.flush();
+    out.close();
   }
 
   /**
@@ -162,13 +174,12 @@ public class MCREditorServlet extends MCRServlet
 
     logger.info( "Editor session " + sessionID + " created" );
 
-    req.setAttribute( "XSL.Style", "xml" );
-    sendToDisplay( req, res, new Document( editor ) );
+    sendXML( res, new Document( editor ) );
   }
 
   private Map getRequestParameters( String key )
   { 
-    MCRCache cache = MCRSessionMgr.getCurrentSession().requestParamCache;
+    MCRCache cache = MCRServlet.requestParamCache;
     Map parameters = (Map)( cache.get( key ) );
     return parameters;
   }
