@@ -35,7 +35,7 @@ class MCRCATEG
     * not-null="true"
     * update="true"
     */
-    public String getId {
+    public String getId() {
         return id;
     }
     public void setId(String id) {
@@ -48,7 +48,7 @@ class MCRCATEG
     * not-null="true"
     * update="true"
     */
-    public String getClid {
+    public String getClid() {
         return clid;
     }
     public void setClid(String clid) {
@@ -61,7 +61,7 @@ class MCRCATEG
     * not-null="true"
     * update="true"
     */
-    public String getPid {
+    public String getPid() {
         return pid;
     }
     public void setPid(String pid) {
@@ -74,7 +74,7 @@ class MCRCATEG
     * not-null="true"
     * update="true"
     */
-    public String getUrl {
+    public String getUrl() {
         return url;
     }
     public void setUrl(String url) {

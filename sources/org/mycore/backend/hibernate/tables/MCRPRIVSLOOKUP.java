@@ -33,7 +33,7 @@ class MCRPRIVSLOOKUP
     * not-null="true"
     * update="true"
     */
-    public String getGid {
+    public String getGid() {
         return gid;
     }
     public void setGid(String gid) {
@@ -46,7 +46,7 @@ class MCRPRIVSLOOKUP
     * not-null="true"
     * update="true"
     */
-    public String getName {
+    public String getName() {
         return name;
     }
     public void setName(String name) {

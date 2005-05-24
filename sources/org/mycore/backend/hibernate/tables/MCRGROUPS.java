@@ -36,7 +36,7 @@ class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public String getGid {
+    public String getGid() {
         return gid;
     }
     public void setGid(String gid) {
@@ -49,7 +49,7 @@ class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public String getCreator {
+    public String getCreator() {
         return creator;
     }
     public void setCreator(String creator) {
@@ -62,7 +62,7 @@ class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public String getCreationDate {
+    public String getCreationDate() {
         return creationDate;
     }
     public void setCreationDate(String creationDate) {
@@ -75,7 +75,7 @@ class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public String getModifiedDate {
+    public String getModifiedDate() {
         return modifiedDate;
     }
     public void setModifiedDate(String modifiedDate) {
@@ -88,7 +88,7 @@ class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public String getDescription {
+    public String getDescription() {
         return description;
     }
     public void setDescription(String description) {

@@ -34,7 +34,7 @@ class MCRGROUPADMINS
     * not-null="true"
     * update="true"
     */
-    public String getGid {
+    public String getGid() {
         return gid;
     }
     public void setGid(String gid) {
@@ -47,7 +47,7 @@ class MCRGROUPADMINS
     * not-null="true"
     * update="true"
     */
-    public String getUserid {
+    public String getUserid() {
         return userid;
     }
     public void setUserid(String userid) {
@@ -60,7 +60,7 @@ class MCRGROUPADMINS
     * not-null="true"
     * update="true"
     */
-    public String getGroupid {
+    public String getGroupid() {
         return groupid;
     }
     public void setGroupid(String groupid) {

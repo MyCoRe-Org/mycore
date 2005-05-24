@@ -47,7 +47,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getId {
+    public String getId() {
         return id;
     }
     public void setId(String id) {
@@ -60,7 +60,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getPid {
+    public String getPid() {
         return pid;
     }
     public void setPid(String pid) {
@@ -73,7 +73,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getType {
+    public String getType() {
         return type;
     }
     public void setType(String type) {
@@ -86,7 +86,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getOwner {
+    public String getOwner() {
         return owner;
     }
     public void setOwner(String owner) {
@@ -99,7 +99,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getName {
+    public String getName() {
         return name;
     }
     public void setName(String name) {
@@ -112,7 +112,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getLabel {
+    public String getLabel() {
         return label;
     }
     public void setLabel(String label) {
@@ -125,7 +125,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public long getSize {
+    public long getSize() {
         return size;
     }
     public void setSize(long size) {
@@ -138,7 +138,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public Date getDate {
+    public Date getDate() {
         return date;
     }
     public void setDate(Date date) {
@@ -151,7 +151,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getStoreid {
+    public String getStoreid() {
         return storeid;
     }
     public void setStoreid(String storeid) {
@@ -164,7 +164,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getStorageid {
+    public String getStorageid() {
         return storageid;
     }
     public void setStorageid(String storageid) {
@@ -177,7 +177,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getFctid {
+    public String getFctid() {
         return fctid;
     }
     public void setFctid(String fctid) {
@@ -190,7 +190,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public String getMd5 {
+    public String getMd5() {
         return md5;
     }
     public void setMd5(String md5) {
@@ -203,7 +203,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public int getNumchdd {
+    public int getNumchdd() {
         return numchdd;
     }
     public void setNumchdd(int numchdd) {
@@ -216,7 +216,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public int getNumchdf {
+    public int getNumchdf() {
         return numchdf;
     }
     public void setNumchdf(int numchdf) {
@@ -229,7 +229,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public int getNumchtd {
+    public int getNumchtd() {
         return numchtd;
     }
     public void setNumchtd(int numchtd) {
@@ -242,7 +242,7 @@ class MCRFSNODES
     * not-null="true"
     * update="true"
     */
-    public int getNumchtf {
+    public int getNumchtf() {
         return numchtf;
     }
     public void setNumchtf(int numchtf) {

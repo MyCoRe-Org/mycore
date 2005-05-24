@@ -33,7 +33,7 @@ class MCRLINKHREF
     * not-null="true"
     * update="true"
     */
-    public String getFrom {
+    public String getFrom() {
         return from;
     }
     public void setFrom(String from) {
@@ -46,7 +46,7 @@ class MCRLINKHREF
     * not-null="true"
     * update="true"
     */
-    public String getTo {
+    public String getTo() {
         return to;
     }
     public void setTo(String to) {

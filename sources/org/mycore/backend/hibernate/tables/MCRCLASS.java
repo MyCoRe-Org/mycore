@@ -32,7 +32,7 @@ class MCRCLASS
     * not-null="true"
     * update="true"
     */
-    public String getId {
+    public String getId() {
         return id;
     }
     public void setId(String id) {

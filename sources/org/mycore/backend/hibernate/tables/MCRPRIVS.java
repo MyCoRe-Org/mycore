@@ -33,7 +33,7 @@ class MCRPRIVS
     * not-null="true"
     * update="true"
     */
-    public String getName {
+    public String getName() {
         return name;
     }
     public void setName(String name) {
@@ -46,7 +46,7 @@ class MCRPRIVS
     * not-null="true"
     * update="true"
     */
-    public String getDescription {
+    public String getDescription() {
         return description;
     }
     public void setDescription(String description) {

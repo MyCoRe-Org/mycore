@@ -57,7 +57,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public int getNumid {
+    public int getNumid() {
         return numid;
     }
     public void setNumid(int numid) {
@@ -70,7 +70,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getUid {
+    public String getUid() {
         return uid;
     }
     public void setUid(String uid) {
@@ -83,7 +83,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getCreator {
+    public String getCreator() {
         return creator;
     }
     public void setCreator(String creator) {
@@ -96,7 +96,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public Date getCreationDate {
+    public Date getCreationDate() {
         return creationDate;
     }
     public void setCreationDate(Date creationDate) {
@@ -109,7 +109,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public Date getModifiedDate {
+    public Date getModifiedDate() {
         return modifiedDate;
     }
     public void setModifiedDate(Date modifiedDate) {
@@ -122,7 +122,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getDescription {
+    public String getDescription() {
         return description;
     }
     public void setDescription(String description) {
@@ -135,7 +135,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getPasswd {
+    public String getPasswd() {
         return passwd;
     }
     public void setPasswd(String passwd) {
@@ -148,7 +148,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getEnabled {
+    public String getEnabled() {
         return enabled;
     }
     public void setEnabled(String enabled) {
@@ -161,7 +161,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getUpd {
+    public String getUpd() {
         return upd;
     }
     public void setUpd(String upd) {
@@ -174,7 +174,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getSalutation {
+    public String getSalutation() {
         return salutation;
     }
     public void setSalutation(String salutation) {
@@ -187,7 +187,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getFirstname {
+    public String getFirstname() {
         return firstname;
     }
     public void setFirstname(String firstname) {
@@ -200,7 +200,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getLastname {
+    public String getLastname() {
         return lastname;
     }
     public void setLastname(String lastname) {
@@ -213,7 +213,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getStreet {
+    public String getStreet() {
         return street;
     }
     public void setStreet(String street) {
@@ -226,7 +226,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getCity {
+    public String getCity() {
         return city;
     }
     public void setCity(String city) {
@@ -239,7 +239,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getPostalcode {
+    public String getPostalcode() {
         return postalcode;
     }
     public void setPostalcode(String postalcode) {
@@ -252,7 +252,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getCountry {
+    public String getCountry() {
         return country;
     }
     public void setCountry(String country) {
@@ -265,7 +265,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getState {
+    public String getState() {
         return state;
     }
     public void setState(String state) {
@@ -278,7 +278,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getInstitution {
+    public String getInstitution() {
         return institution;
     }
     public void setInstitution(String institution) {
@@ -291,7 +291,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getFaculty {
+    public String getFaculty() {
         return faculty;
     }
     public void setFaculty(String faculty) {
@@ -304,7 +304,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getDepartment {
+    public String getDepartment() {
         return department;
     }
     public void setDepartment(String department) {
@@ -317,7 +317,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getInstitute {
+    public String getInstitute() {
         return institute;
     }
     public void setInstitute(String institute) {
@@ -330,7 +330,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getTelephone {
+    public String getTelephone() {
         return telephone;
     }
     public void setTelephone(String telephone) {
@@ -343,7 +343,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getFax {
+    public String getFax() {
         return fax;
     }
     public void setFax(String fax) {
@@ -356,7 +356,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getEmail {
+    public String getEmail() {
         return email;
     }
     public void setEmail(String email) {
@@ -369,7 +369,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getCellphone {
+    public String getCellphone() {
         return cellphone;
     }
     public void setCellphone(String cellphone) {
@@ -382,7 +382,7 @@ class MCRUSERS
     * not-null="true"
     * update="true"
     */
-    public String getPrimgroup {
+    public String getPrimgroup() {
         return primgroup;
     }
     public void setPrimgroup(String primgroup) {

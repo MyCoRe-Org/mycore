@@ -36,7 +36,7 @@ class MCRCATEGLABEL
     * not-null="true"
     * update="true"
     */
-    public String getId {
+    public String getId() {
         return id;
     }
     public void setId(String id) {
@@ -49,7 +49,7 @@ class MCRCATEGLABEL
     * not-null="true"
     * update="true"
     */
-    public String getClid {
+    public String getClid() {
         return clid;
     }
     public void setClid(String clid) {
@@ -62,7 +62,7 @@ class MCRCATEGLABEL
     * not-null="true"
     * update="true"
     */
-    public String getLang {
+    public String getLang() {
         return lang;
     }
     public void setLang(String lang) {
@@ -75,7 +75,7 @@ class MCRCATEGLABEL
     * not-null="true"
     * update="true"
     */
-    public String getText {
+    public String getText() {
         return text;
     }
     public void setText(String text) {
@@ -88,7 +88,7 @@ class MCRCATEGLABEL
     * not-null="true"
     * update="true"
     */
-    public String getMcrdesc {
+    public String getMcrdesc() {
         return mcrdesc;
     }
     public void setMcrdesc(String mcrdesc) {
