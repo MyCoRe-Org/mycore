@@ -99,7 +99,7 @@ public class MCRObjectStructure
    * This method clean the data lists derivate of this class.
    **/
   final void clearDerivate()
-    { children.clear(); }
+    { derivates.clear(); }
 
   /**
    * The method returns the parent link.
