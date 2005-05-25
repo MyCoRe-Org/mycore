@@ -86,6 +86,19 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
   }
 
   /**
+   * Copy contructor- creates a copy of a given MCRUser object.
+   */
+  public MCRUser(MCRUser u)
+  {
+    this.numID = u.getNumID();
+    this.idEnabled = u.idEnabled;
+    this.updateAllowed = u.updateAllowed;
+    this.passwd = u.passwd;
+    this.primaryGroupID = u.primaryGroupID;
+    this.userContact = u.getUserContact();
+  }
+
+  /**
    * This minimal constructor only takes the user ID as a parameter. For all
    * other attributes the default constructor is invoked. This constructor is
    * used by the access control system.
