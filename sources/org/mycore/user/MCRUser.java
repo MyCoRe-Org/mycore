@@ -49,22 +49,22 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRUser extends MCRUserObject implements MCRPrincipal
 {
   /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
-  private int numID = -1;
+  protected int numID = -1;
 
   /** Specify whether the user ID is enabled or disabled */
-  private boolean idEnabled = false;
+  protected boolean idEnabled = false;
 
   /** Specify whether the user is allowed to update the user object */
-  private boolean updateAllowed = false;
+  protected boolean updateAllowed = false;
 
   /** The password of the MyCoRe user */
-  private String passwd = "";
+  protected String passwd = "";
 
   /** The primary group ID of the user */
-  private String primaryGroupID = "";
+  protected String primaryGroupID = "";
 
   /** Object representing user address information */
-  private MCRUserContact userContact;
+  protected MCRUserContact userContact;
 
   /**
    * Default constructor. It is used to create a user object with empty fields.
@@ -156,7 +156,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
     this.primaryGroupID = trim(primaryGroupID,id_len);
     super.groupIDs = groupIDs;
 
-    userContact = new MCRUserContact(salutation,firstname,lastname,
+    this.userContact = new MCRUserContact(salutation,firstname,lastname,
       street, city,postalcode,country,state,institution,faculty,department,
       institute,telephone,fax,email,cellphone);
   }
@@ -237,7 +237,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal
    *   This method returns the contact object of the user
    */
   public MCRUserContact getUserContact()
-  { return userContact; }
+  { return (MCRUserContact)userContact.clone(); }
 
   /**
    * @return
