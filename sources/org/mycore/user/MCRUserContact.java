@@ -145,6 +145,15 @@ public class MCRUserContact
     this.cellphone   = MCRUserObject.trim(cellphone,cellphone_len);
   }
 
+  public Object clone()
+  {
+    return new MCRUserContact(this.salutation, this.firstname, this.lastname, 
+			      this.street, this.city, this.postalcode, this.country, 
+			      this.state, this.institution, this.faculty, this.department,
+	                      this.institute, this.telephone, this.fax,
+	                      this.email, this.cellphone);
+  }
+
   /**
    * Constructor. All address and contact attributes are provided as a JDOM Element.
    * @param elm the JDOM Element
@@ -254,6 +263,54 @@ public class MCRUserContact
 
   public final String getCellphone()
   { return cellphone; }
+  
+  public final void setSalutation(String v)
+  { this.salutation = v; }
+
+  public final void setFirstName(String v)
+  { this.firstname = v; }
+
+  public final void setLastName(String v)
+  { this.lastname = v; }
+
+  public final void setStreet(String v)
+  { this.street = v; }
+
+  public final void setCity(String v)
+  { this.city = v; }
+
+  public final void setPostalCode(String v)
+  { this.postalcode = v; }
+
+  public final void setCountry(String v)
+  { this.country = v; }
+
+  public final void setState(String v)
+  { this.state = v; }
+
+  public final void setInstitution(String v)
+  { this.institution = v; }
+
+  public final void setFaculty(String v)
+  { this.faculty = v; }
+
+  public final void setDepartment(String v)
+  { this.department = v; }
+
+  public final void setInstitute(String v)
+  { this.institute = v; }
+
+  public final void setTelephone(String v)
+  { this.telephone = v; }
+
+  public final void setFax(String v)
+  { this.fax = v; }
+
+  public final void setEmail(String v)
+  { this.email = v; }
+
+  public final void setCellphone(String v)
+  { this.cellphone = v; }
 
   /**
    * This method returns the user contact information as a JDOM Element. This output
