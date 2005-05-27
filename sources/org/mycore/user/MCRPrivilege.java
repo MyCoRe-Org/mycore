@@ -50,10 +50,10 @@ public class MCRPrivilege
   public static final int privilege_len = MCRUserObject.privilege_len;
 
   /** The name of the privilege */
-  private String privName;
+  protected String privName;
 
   /** The description of the privilege */
-  private String privDescription;
+  protected String privDescription;
 
   /**
    * constructor
