@@ -165,6 +165,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements MCRU
 public void finishUpload( )  throws Exception
   {
   // add the mainfile entry
+  try {
   MCRDerivate der = new MCRDerivate();
   der.setFromURI(dirname+".xml");
   if (der.getDerivate().getInternals().getMainDoc().equals("#####")) {
@@ -180,5 +181,8 @@ public void finishUpload( )  throws Exception
       logger.error( "Exception while store to file "+dirname+".xml");
       }
     }
+    }
+  catch (Exception e) { }
   }
+
 }
