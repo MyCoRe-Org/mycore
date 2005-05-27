@@ -174,7 +174,7 @@ public class MCRStartEditorServlet extends MCRServlet
       !mytodo.equals("saddfile")&& !mytodo.equals("snewfile") &&
       !mytodo.equals("sdelfile")&& !mytodo.equals("ssetlabel") &&
       !mytodo.equals("ssetfile")) {
-      mytodo = "wnewobj"; }
+      mytodo = "wrongtodo"; }
     LOGGER.info("TODO = "+mytodo);
     // get the MCRObjectID from the text filed (TF)
     String mytfmcrid = getProperty(job.getRequest(), "tf_mcrid");
@@ -702,7 +702,11 @@ public class MCRStartEditorServlet extends MCRServlet
       MCRUploadHandlerManager fum = MCRUploadHandlerManager.instance();
       MCRUploadHandlerInterface fuh = fum.getNewHandle();
       sb = new StringBuffer("/servlets/MCRStartEditorServlet?");
-      sb.append("tf_mcrid=").append(mytfmcrid).append("&amp;type=").append(mytype).append("&amp;step=").append(mystep).append("&amp;todo=scommitder");
+      sb.append("se_mcrid=").append(mysemcrid)
+        .append("&re_mcrid=").append(myremcrid)
+        .append("&amp;type=").append(mytype)
+        .append("&amp;step=").append(mystep)
+        .append("&amp;todo=scommitder");
       fuh.set(myremcrid,mysemcrid,"new",getBaseURL()+sb.toString());
       String fuhid = fum.register(fuh);
       mymcrid = mysemcrid;
