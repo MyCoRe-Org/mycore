@@ -23,10 +23,6 @@
     <servlet-name>MCRCheckCommitDataServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDataServlet</servlet-class>
   </servlet>
-  <servlet id="MCRCheckNewDerivServlet">
-    <servlet-name>MCRCheckNewDerivServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRCheckNewDerivServlet</servlet-class>
-  </servlet>
   <servlet id="MCRCheckNewFileServlet">
     <servlet-name>MCRCheckNewFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckNewFileServlet</servlet-class>
@@ -47,10 +43,6 @@
     <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRFileViewWorkflowServlet</servlet-class>
   </servlet>
-  <servlet id="MCRListDerivateServlet">
-    <servlet-name>MCRListDerivateServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRListDerivateServlet</servlet-class>
-  </servlet>
 
   <servlet-mapping>
     <servlet-name>MCRStartEditorServlet</servlet-name>
@@ -67,10 +59,6 @@
   <servlet-mapping>
     <servlet-name>MCRCheckCommitDataServlet</servlet-name>
     <url-pattern>/servlets/MCRCheckCommitDataServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRCheckNewDerivServlet</servlet-name>
-    <url-pattern>/servlets/MCRCheckNewDerivServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRCheckNewFileServlet</servlet-name>
@@ -91,10 +79,6 @@
   <servlet-mapping>
     <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
     <url-pattern>/servlets/MCRFileViewWorkflowServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRListDerivateServlet</servlet-name>
-    <url-pattern>/servlets/MCRListDerivateServlet</url-pattern>
   </servlet-mapping>
 
 </web-app>
