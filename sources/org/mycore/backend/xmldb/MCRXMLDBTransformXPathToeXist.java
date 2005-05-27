@@ -187,8 +187,18 @@ private String handleQueryStringExist(String root, String query, String type) {
     // remove the above inserted dummy "X" 
     // from the category ID
     query = query.replaceAll("@categid[ ]*([&]{0,1}=)[ ]*\"X(.+)\"","@categid $1\"$2\"")   ;
-	// combine the separated queries
-	query = root + "[" + query + "]";
+    // fix a eXist-Bug
+    // for handling the correct
+    // xpath-query 
+    //  "mycoreobject[metadata/*/*[@classid="DocPortal_class_000000000000006"
+    //		and @categid="510"] ]
+    if (root.equals("/mycoreobject") && 
+            query.matches("\\A[ ]*metadata/[*]{1}/[*]{1}.*")) {
+        query = root + "/" + query.trim() ;
+    } else {
+    	// combine the separated queries
+    	query = root + "[" + query + "]";        
+    }
 	return query;
 }
   
