@@ -33,364 +33,431 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
 /**
  * This class is an abstract class for the implementation of the classes
  * classification an category.
- *
+ * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
-public abstract class MCRClassificationObject
-  {
-  /** The number of the languages **/
-  public static final int MAX_CLASSIFICATION_LANG = 8;
-  /** The length of the text **/
-  public static final int MAX_CLASSIFICATION_TEXT = 254;
-  /** The length of the description **/
-  public static final int MAX_CLASSIFICATION_DESCRIPTION = 254;
-  /** The length of the URL **/
-  public static final int MAX_CATEGORY_URL = 254;
+ */
+public abstract class MCRClassificationObject {
+    /** The number of the languages * */
+    public static final int MAX_CLASSIFICATION_LANG = 8;
 
-  protected String    ID;
-  protected ArrayList lang;
-  protected ArrayList text;
-  protected ArrayList description;
-  protected String [] childrenIDs;
+    /** The length of the text * */
+    public static final int MAX_CLASSIFICATION_TEXT = 254;
 
-  protected boolean deleted = false;
+    /** The length of the description * */
+    public static final int MAX_CLASSIFICATION_DESCRIPTION = 254;
 
-  protected static String default_lang = "en";
+    /** The length of the URL * */
+    public static final int MAX_CATEGORY_URL = 254;
 
-  /**
-   * Load static data for all MCRClassificationObject
-   **/
-  static
-    {
-    default_lang = MCRConfiguration.instance()
-      .getString("MCR.metadata_default_lang",default_lang);
+    protected String ID;
+
+    protected ArrayList lang;
+
+    protected ArrayList text;
+
+    protected ArrayList description;
+
+    protected String[] childrenIDs;
+
+    protected boolean deleted = false;
+
+    protected static String default_lang = "en";
+
+    /**
+     * Load static data for all MCRClassificationObject
+     */
+    static {
+        default_lang = MCRConfiguration.instance().getString(
+                "MCR.metadata_default_lang", default_lang);
     }
 
-  /**
-   * The method get the MCRClassificationManager instance.
-   *
-   * @return the MCRClassificationManager instance.
-   **/
-  protected static MCRClassificationManager manager()
-    { return MCRClassificationManager.instance(); }
-
-  /**
-   * The abstract constructor of a classififcation or a category.
-   *
-   * @param ID an identifier String
-   **/
-  public MCRClassificationObject( String ID )
-    {
-    MCRArgumentChecker.ensureNotEmpty( ID, "ID" );
-    this.ID    = ID;
-    this.text = new ArrayList();
-    this.lang = new ArrayList();
-    this.description = new ArrayList();
-    this.childrenIDs = null;
-    this.deleted = false;
+    /**
+     * The method get the MCRClassificationManager instance.
+     * 
+     * @return the MCRClassificationManager instance.
+     */
+    protected static MCRClassificationManager manager() {
+        return MCRClassificationManager.instance();
     }
 
-  /**
-   * The method ensure that the classification is not deleted.
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  protected void ensureNotDeleted() throws MCRUsageException
-    {
-    if( this.deleted ) throw new MCRUsageException
-    ( "This classification object is invalid because it has been deleted" );
+    /**
+     * The abstract constructor of a classififcation or a category.
+     * 
+     * @param ID
+     *            an identifier String
+     */
+    public MCRClassificationObject(String ID) {
+        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        this.ID = ID;
+        this.text = new ArrayList();
+        this.lang = new ArrayList();
+        this.description = new ArrayList();
+        this.childrenIDs = null;
+        this.deleted = false;
     }
 
-  /**
-   * This method get the ID.
-   * @return the ID
-   * @exception MCRUsageException if the object is deleted.
-   **/
-  public String getID() throws MCRUsageException
-    { ensureNotDeleted(); return ID; }
-
-  /**
-   * This method get the classification ID.
-   * @return the classification ID
-   **/
-  protected abstract String getClassificationID();
-
-  /**
-   * The method return the text ArrayList.
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public ArrayList getTextArray() throws MCRUsageException
-    { ensureNotDeleted(); return text; }
-
-  /**
-   * The method return the text String for a given index.
-   *
-   * @param index a index in the ArrayList
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public String getText(int index) throws MCRUsageException
-    {
-    ensureNotDeleted();
-    if ((index<0)||(index>text.size())) { return ""; }
-    return ((String)text.get(index));
+    /**
+     * The method ensure that the classification is not deleted.
+     * 
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    protected void ensureNotDeleted() throws MCRUsageException {
+        if (this.deleted)
+            throw new MCRUsageException(
+                    "This classification object is invalid because it has been deleted");
     }
 
-  /**
-   * The method returns the text String for a given language.
-   *
-   * @param index a language
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public String getText(String lang) throws MCRUsageException
-    {
-    ensureNotDeleted();
-    if (this.text.size()==0) { return ""; }
-    if (!MCRUtils.isSupportedLang(lang)) {
-      return (String)this.text.get(0); }
-    for (int i=0;i<this.lang.size();i++) {
-      if (((String)this.lang.get(i)).equals(lang)) {
-        return (String)this.text.get(i); }
-      }
-    return (String)this.text.get(0);
+    /**
+     * This method get the ID.
+     * 
+     * @return the ID
+     * @exception MCRUsageException
+     *                if the object is deleted.
+     */
+    public String getID() throws MCRUsageException {
+        ensureNotDeleted();
+        return ID;
     }
 
-  /**
-   * The method return the lang ArrayList.
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public ArrayList getLangArray() throws MCRUsageException
-    { ensureNotDeleted(); return lang; }
+    /**
+     * This method get the classification ID.
+     * 
+     * @return the classification ID
+     */
+    protected abstract String getClassificationID();
 
-  /**
-   * The method return the lang String for a given index.
-   *
-   * @param index a index in the ArrayList
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public String getLang(int index) throws MCRUsageException
-    {
-    ensureNotDeleted();
-    if ((index<0)||(index>text.size())) { return default_lang; }
-    return ((String)lang.get(index));
+    /**
+     * The method return the text ArrayList.
+     * 
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public ArrayList getTextArray() throws MCRUsageException {
+        ensureNotDeleted();
+        return text;
     }
 
-  /**
-   * The method return the description ArrayList.
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public ArrayList getDescriptionArray() throws MCRUsageException
-    { ensureNotDeleted(); return description; }
-
-  /**
-   * The method return the description String for a given index.
-   *
-   * @param index a index in the ArrayList
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public String getDescription(int index) throws MCRUsageException
-    {
-    ensureNotDeleted();
-    if ((index<0)||(index>text.size())) { return ""; }
-    return ((String)description.get(index));
+    /**
+     * The method return the text String for a given index.
+     * 
+     * @param index
+     *            a index in the ArrayList
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public String getText(int index) throws MCRUsageException {
+        ensureNotDeleted();
+        if ((index < 0) || (index > text.size())) {
+            return "";
+        }
+        return ((String) text.get(index));
     }
 
-  /**
-   * The method returns the description String for a given language.
-   *
-   * @param index a language
-   * @exception MCRUsageException if the classification is deleted.
-   **/
-  public String getDescription(String lang) throws MCRUsageException
-    {
-    ensureNotDeleted();
-    if (this.description.size()==0) { return ""; }
-    if (!MCRUtils.isSupportedLang(lang)) {
-      return (String)this.description.get(0); }
-    for (int i=0;i<this.lang.size();i++) {
-      if (((String)this.lang.get(i)).equals(lang)) {
-        return (String)this.description.get(i); }
-      }
-    return (String)this.description.get(0);
+    /**
+     * The method returns the text String for a given language.
+     * 
+     * @param index
+     *            a language
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public String getText(String lang) throws MCRUsageException {
+        ensureNotDeleted();
+        if (this.text.size() == 0) {
+            return "";
+        }
+        if (!MCRUtils.isSupportedLang(lang)) {
+            return (String) this.text.get(0);
+        }
+        for (int i = 0; i < this.lang.size(); i++) {
+            if (((String) this.lang.get(i)).equals(lang)) {
+                return (String) this.text.get(i);
+            }
+        }
+        return (String) this.text.get(0);
     }
 
-  /**
-   * The method add a triple of a lang with a lable and a description
-   * to the object. The text and the description can be an empty string.
-   *
-   * @param lang a language in form of a 'xml:lang' attribute
-   * @param text a text String
-   * @param description a description String
-   **/
-  public void addData( String lang, String text, String description )
-    {
-    ensureNotDeleted();
-    if (lang==null) { lang = default_lang; }
-    if (text==null) { text = ""; }
-    if (text.length() > MAX_CLASSIFICATION_TEXT) {
-      text = text.substring(0,MAX_CLASSIFICATION_TEXT); }
-    if (description==null) { description = ""; }
-    if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
-      description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
-    this.text.add(text);
-    this.lang.add(lang);
-    this.description.add(description);
+    /**
+     * The method return the lang ArrayList.
+     * 
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public ArrayList getLangArray() throws MCRUsageException {
+        ensureNotDeleted();
+        return lang;
     }
 
-  /**
-   * The method set a triple of a lang with a lable and a description
-   * to the object. The text and the description can be an empty string.
-   *
-   * @param lang a language in form of a 'xml:lang' attribute
-   * @param text a text String
-   * @param description a description String
-   **/
-  public void setData( String lang, String text, String description )
-    {
-    ensureNotDeleted();
-    if (lang==null) { lang = default_lang; }
-    if (text==null) { text = ""; }
-    if (text.length() > MAX_CLASSIFICATION_TEXT) {
-      text = text.substring(0,MAX_CLASSIFICATION_TEXT); }
-    if (description==null) { description = ""; }
-    if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
-      description = description.substring(0,MAX_CLASSIFICATION_DESCRIPTION); }
-    int i = -1;
-    for (int j=0;j<this.lang.size();j++) {
-      if (((String)this.lang.get(i)).equals(lang)) { i = j; break; }
-      }
-    if (i != -1) {
-      this.text.add(i,text);
-      this.lang.add(i,lang);
-      this.description.add(i,description);
-      return;
-      }
-    this.text.add(text);
-    this.lang.add(lang);
-    this.description.add(description);
+    /**
+     * The method return the lang String for a given index.
+     * 
+     * @param index
+     *            a index in the ArrayList
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public String getLang(int index) throws MCRUsageException {
+        ensureNotDeleted();
+        if ((index < 0) || (index > text.size())) {
+            return default_lang;
+        }
+        return ((String) lang.get(index));
     }
 
-  /**
-   * The method return the size of the lang/text/description triple.
-   *
-   * @return the size
-   **/
-  public int getSize()
-    { return text.size(); }
-
-  /**
-   * The method return the text tag as an JDOM element
-   *
-   * @param index the index of the text
-   * @return the text as JDOM element
-   **/
-  public final org.jdom.Element getJDOMElement(int index)
-    {
-    if ((index<0) || (index>getSize())) return null;
-    org.jdom.Element elm = new org.jdom.Element("label");
-    elm.setAttribute("lang",getLang(index),Namespace.XML_NAMESPACE);
-    elm.setAttribute("text",getText(index));
-    elm.setAttribute("description",getDescription(index));
-    return elm;
+    /**
+     * The method return the description ArrayList.
+     * 
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public ArrayList getDescriptionArray() throws MCRUsageException {
+        ensureNotDeleted();
+        return description;
     }
 
-  /**
-   * The method check that this instance has children.
-   *
-   * @return true if it is, else false
-   **/
-  public boolean hasChildren()
-    {
-    ensureNotDeleted();
-    return( getNumChildren() > 0 );
+    /**
+     * The method return the description String for a given index.
+     * 
+     * @param index
+     *            a index in the ArrayList
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public String getDescription(int index) throws MCRUsageException {
+        ensureNotDeleted();
+        if ((index < 0) || (index > text.size())) {
+            return "";
+        }
+        return ((String) description.get(index));
     }
 
-  /**
-   * The method return the number of chlidren.
-   *
-   * @return the number of chlidren
-   **/
-  public int getNumChildren()
-    {
-    ensureNotDeleted();
-    if( childrenIDs != null )
-      return childrenIDs.length;
-    else
-      return manager().retrieveNumberOfChildren( getClassificationID(), ID );
+    /**
+     * The method returns the description String for a given language.
+     * 
+     * @param index
+     *            a language
+     * @exception MCRUsageException
+     *                if the classification is deleted.
+     */
+    public String getDescription(String lang) throws MCRUsageException {
+        ensureNotDeleted();
+        if (this.description.size() == 0) {
+            return "";
+        }
+        if (!MCRUtils.isSupportedLang(lang)) {
+            return (String) this.description.get(0);
+        }
+        for (int i = 0; i < this.lang.size(); i++) {
+            if (((String) this.lang.get(i)).equals(lang)) {
+                return (String) this.description.get(i);
+            }
+        }
+        return (String) this.description.get(0);
     }
 
-	/**
-	  * The method return the number of Documents from a Cassification or Category
-	  * for the Classification ID  with the Category ID
-	  * @return int
-	  **/
+    /**
+     * The method add a triple of a lang with a lable and a description to the
+     * object. The text and the description can be an empty string.
+     * 
+     * @param lang
+     *            a language in form of a 'xml:lang' attribute
+     * @param text
+     *            a text String
+     * @param description
+     *            a description String
+     */
+    public void addData(String lang, String text, String description) {
+        ensureNotDeleted();
+        if (lang == null) {
+            lang = default_lang;
+        }
+        if (text == null) {
+            text = "";
+        }
+        if (text.length() > MAX_CLASSIFICATION_TEXT) {
+            text = text.substring(0, MAX_CLASSIFICATION_TEXT);
+        }
+        if (description == null) {
+            description = "";
+        }
+        if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
+            description = description.substring(0,
+                    MAX_CLASSIFICATION_DESCRIPTION);
+        }
+        this.text.add(text);
+        this.lang.add(lang);
+        this.description.add(description);
+    }
 
-   public int countDocLinks()
-   {
+    /**
+     * The method set a triple of a lang with a lable and a description to the
+     * object. The text and the description can be an empty string.
+     * 
+     * @param lang
+     *            a language in form of a 'xml:lang' attribute
+     * @param text
+     *            a text String
+     * @param description
+     *            a description String
+     */
+    public void setData(String lang, String text, String description) {
+        ensureNotDeleted();
+        if (lang == null) {
+            lang = default_lang;
+        }
+        if (text == null) {
+            text = "";
+        }
+        if (text.length() > MAX_CLASSIFICATION_TEXT) {
+            text = text.substring(0, MAX_CLASSIFICATION_TEXT);
+        }
+        if (description == null) {
+            description = "";
+        }
+        if (description.length() > MAX_CLASSIFICATION_DESCRIPTION) {
+            description = description.substring(0,
+                    MAX_CLASSIFICATION_DESCRIPTION);
+        }
+        int i = -1;
+        for (int j = 0; j < this.lang.size(); j++) {
+            if (((String) this.lang.get(i)).equals(lang)) {
+                i = j;
+                break;
+            }
+        }
+        if (i != -1) {
+            this.text.add(i, text);
+            this.lang.add(i, lang);
+            this.description.add(i, description);
+            return;
+        }
+        this.text.add(text);
+        this.lang.add(lang);
+        this.description.add(description);
+    }
+
+    /**
+     * The method return the size of the lang/text/description triple.
+     * 
+     * @return the size
+     */
+    public int getSize() {
+        return text.size();
+    }
+
+    /**
+     * The method return the text tag as an JDOM element
+     * 
+     * @param index
+     *            the index of the text
+     * @return the text as JDOM element
+     */
+    public final org.jdom.Element getJDOMElement(int index) {
+        if ((index < 0) || (index > getSize()))
+            return null;
+        org.jdom.Element elm = new org.jdom.Element("label");
+        elm.setAttribute("lang", getLang(index), Namespace.XML_NAMESPACE);
+        elm.setAttribute("text", getText(index));
+        elm.setAttribute("description", getDescription(index));
+        return elm;
+    }
+
+    /**
+     * The method check that this instance has children.
+     * 
+     * @return true if it is, else false
+     */
+    public boolean hasChildren() {
+        ensureNotDeleted();
+        return (getNumChildren() > 0);
+    }
+
+    /**
+     * The method return the number of chlidren.
+     * 
+     * @return the number of chlidren
+     */
+    public int getNumChildren() {
+        ensureNotDeleted();
+        if (childrenIDs != null)
+            return childrenIDs.length;
+        else
+            return manager()
+                    .retrieveNumberOfChildren(getClassificationID(), ID);
+    }
+
+    /**
+     * The method return the number of Documents from a Cassification or
+     * Category for the Classification ID with the Category ID
+     * 
+     * @return int
+     */
+
+    public int countDocLinks() {
 
         ensureNotDeleted();
 
         MCRLinkTableManager mcl = MCRLinkTableManager.instance();
-        if ( this.getClassificationID().equals( this.getID()) )
-            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),"");
+        if (this.getClassificationID().equals(this.getID()))
+            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),
+                    "");
         else
-            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),this.getID());
+            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(),
+                    this.getID());
     }
 
-  /**
-   * The method return a list of MCRCategoryItems they are childre
-   * of this.
-   *
-   * @return a list of children
-   **/
-  public MCRCategoryItem[] getChildren()
-    {
-    ensureNotDeleted();
-    MCRCategoryItem[] children;
-    if( childrenIDs == null ) {
-      String parentID = ( this instanceof MCRCategoryItem ? ID : null );
-      children = manager().retrieveChildren( getClassificationID(), parentID );
-      childrenIDs = new String[ children.length ];
-      for( int i = 0; i < children.length; i++ )
-        childrenIDs[ i ] = children[ i ].getID();
-      }
-    else {
-      children = new MCRCategoryItem[ childrenIDs.length ];
-      for( int i = 0; i < children.length; i++ )
-        children[ i ] = manager().retrieveCategoryItem( getClassificationID(),
-          childrenIDs[ i ] );
-      }
-    return children;
+    /**
+     * The method return a list of MCRCategoryItems they are childre of this.
+     * 
+     * @return a list of children
+     */
+    public MCRCategoryItem[] getChildren() {
+        ensureNotDeleted();
+        MCRCategoryItem[] children;
+        if (childrenIDs == null) {
+            String parentID = (this instanceof MCRCategoryItem ? ID : null);
+            children = manager().retrieveChildren(getClassificationID(),
+                    parentID);
+            childrenIDs = new String[children.length];
+            for (int i = 0; i < children.length; i++)
+                childrenIDs[i] = children[i].getID();
+        } else {
+            children = new MCRCategoryItem[childrenIDs.length];
+            for (int i = 0; i < children.length; i++)
+                children[i] = manager().retrieveCategoryItem(
+                        getClassificationID(), childrenIDs[i]);
+        }
+        return children;
     }
 
-  /**
-   * The method remove this.
-   **/
-  public void delete()
-    {
-    ensureNotDeleted();
-    MCRCategoryItem[] children = getChildren();
-    for( int i = 0; i < children.length; i++ )
-      children[ i ].delete();
-    deleted = true;
+    /**
+     * The method remove this.
+     */
+    public void delete() {
+        ensureNotDeleted();
+        MCRCategoryItem[] children = getChildren();
+        for (int i = 0; i < children.length; i++)
+            children[i].delete();
+        deleted = true;
     }
 
-  /**
-   * Put all data to a string
-   **/
-  public String toString()
-  {
-    StringBuffer sb = new StringBuffer( getClass().getName() ).append( "\n" );
-    sb.append( "ID:             " ).append( ID    ).append( "\n" );
-    for (int i=0;i<text.size();i++) {
-      sb.append( "Lang:           " ).append( ((String)lang.get(i)) )
-        .append( "\n" )
-        .append( "Text:          " ).append( ((String)text.get(i)) )
-        .append( "\n" )
-        .append( "Description:    " ).append( ((String)description.get(i)) )
-        .append( "\n" );
-      }
-    sb.append( "\n" );
-    return sb.toString();
-  }
+    /**
+     * Put all data to a string
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer(getClass().getName()).append("\n");
+        sb.append("ID:             ").append(ID).append("\n");
+        for (int i = 0; i < text.size(); i++) {
+            sb.append("Lang:           ").append(((String) lang.get(i)))
+                    .append("\n").append("Text:          ").append(
+                            ((String) text.get(i))).append("\n").append(
+                            "Description:    ").append(
+                            ((String) description.get(i))).append("\n");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
 }

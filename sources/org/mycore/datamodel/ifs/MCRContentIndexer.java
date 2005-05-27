@@ -30,152 +30,147 @@ import java.util.*;
 import java.text.*;
 
 /**
- * Builds an Index for the content of MCRFiles. This can be
- * a lucene, IBM Content Manager, xml:db, depending on the class that implements
- * this interface. The MCRContentIndexer provides methods to build, delete
- * and serach the index. It uses a storage ID and the indexer ID to identify 
- * the place where the content of a file is indexed.
- *
+ * Builds an Index for the content of MCRFiles. This can be a lucene, IBM
+ * Content Manager, xml:db, depending on the class that implements this
+ * interface. The MCRContentIndexer provides methods to build, delete and serach
+ * the index. It uses a storage ID and the indexer ID to identify the place
+ * where the content of a file is indexed.
+ * 
  * @author Harald Richter
  * @version $Revision$ $Date$
  */
-public abstract class MCRContentIndexer
-{
-  /** The unique indexer ID for this MCRContentIndexer implementation */
-  protected String indexerID;
+public abstract class MCRContentIndexer {
+    /** The unique indexer ID for this MCRContentIndexer implementation */
+    protected String indexerID;
 
-  /** The prefix of all properties in mycore.properties for this indexer */
-  protected String prefix;
+    /** The prefix of all properties in mycore.properties for this indexer */
+    protected String prefix;
 
-  /** Default constructor **/
-  public MCRContentIndexer(){}
-  
-  /** 
-   * Initializes the indexer and sets its unique indexer ID. MCRFiles must remember 
-   * this ID to indentify the indexer that holds their file content. The indexer 
-   * ID is set by MCRContentIndexerFactory when a new indexer instance is built.
-   * Subclasses should override this method.
-   *
-   * @param indexerID the non-null unique indexer ID for this indexer instance
-   **/
-  public void init( String indexerID, Hashtable attribute )
-  { 
-    this.indexerID = indexerID; 
-    this.prefix = "MCR.IFS.ContentIndexer." + indexerID + ".";
-  }
-  
-  /** 
-   * Returns the unique indexer ID that was set for this indexer instance
-   *
-   * @return the unique indexer ID that was set for this indexer instance
-   **/
-  public String getID()
-  { return indexerID; }
-
-  /**
-   * Builds an index of the content of an MCRFile by reading from an MCRContentInputStream.
-   *
-   * @param file the MCRFile thats content is to be indexed
-   * @param source the ContentInputStream where the file content is read from
-   **/
-  public void indexContent( MCRFile file )
-    throws MCRPersistenceException
-  {
-    try
-    { doIndexContent( file ); }
-    catch( Exception exc )
-    {
-      if( ! ( exc instanceof MCRException ) )
-      {
-        StringBuffer msg = new StringBuffer();
-        msg.append( "Could not index content of file [" );
-        msg.append( file.getPath() ).append( "] in indexer [" );
-        msg.append( indexerID ).append( "]" );
-        throw new MCRPersistenceException( msg.toString(), exc );
-      }
-      else throw (MCRException)exc;
+    /** Default constructor * */
+    public MCRContentIndexer() {
     }
-  }
-  
-  /**
-   * Builds an index of the content of an MCRFile by reading from an MCRContentInputStream.
-   *
-   * @param file the MCRFile thats content is to be indexed
-   * @param source the ContentInputStream where the file content is read from
-   **/
-  protected abstract void doIndexContent( MCRFile file )
-    throws Exception;
 
-  /**
-   * Deletes the index of an MCRFile object that is indexed under the given
-   * Storage ID in this indexer instance.
-   *
-   * @param the MCRFile object to delete
-   */
-  public void deleteIndex( MCRFile file )
-    throws MCRException
-  {
-    try
-    { doDeleteIndex( file ); }
-    catch( Exception exc )
-    {
-      if( ! ( exc instanceof MCRException ) )
-      {
-        StringBuffer msg = new StringBuffer();
-        String storageID = file.getStoreID( );
-        msg.append( "Could not delete index of file with storage ID [" );
-        msg.append( storageID ).append( "] in indexer [" );
-        msg.append( indexerID ).append( "]" );
-        throw new MCRPersistenceException( msg.toString(), exc );
-      }
-      else throw (MCRException)exc;
+    /**
+     * Initializes the indexer and sets its unique indexer ID. MCRFiles must
+     * remember this ID to indentify the indexer that holds their file content.
+     * The indexer ID is set by MCRContentIndexerFactory when a new indexer
+     * instance is built. Subclasses should override this method.
+     * 
+     * @param indexerID
+     *            the non-null unique indexer ID for this indexer instance
+     */
+    public void init(String indexerID, Hashtable attribute) {
+        this.indexerID = indexerID;
+        this.prefix = "MCR.IFS.ContentIndexer." + indexerID + ".";
     }
-  }
-    
-  /**
-   * Deletes the index of an MCRFile object that is indexed under the given
-   * Storage ID in this indexer instance.
-   *
-   * @param the MCRFile object to delete
-   */
-  protected abstract void doDeleteIndex( MCRFile file )
-    throws Exception;
 
-  /**
-   * Search in Index with query
-   *
-   * @param query
-   *
-   * @return the hits of the query (ifs IDs)
-   *
-   */
-  public abstract String[] doSearchIndex( String query )
-    throws Exception;
-
-  /**
-   * Search in Index with query
-   *
-   * @param query the query for the serch
-   *
-   * @return the hits of the query (ifs IDs)
-   *
-   */
-  public String[] searchIndex( String query )
-    throws MCRException
-  {
-    try
-    { return doSearchIndex( query ); }
-    catch( Exception exc )
-    {
-      if( ! ( exc instanceof MCRException ) )
-      {
-        StringBuffer msg = new StringBuffer();
-        msg.append( "Could not build search with indexer [" );
-        msg.append( indexerID ).append( "]" );
-        throw new MCRPersistenceException( msg.toString(), exc );
-      }
-      else throw (MCRException)exc;
+    /**
+     * Returns the unique indexer ID that was set for this indexer instance
+     * 
+     * @return the unique indexer ID that was set for this indexer instance
+     */
+    public String getID() {
+        return indexerID;
     }
-  }
-    
+
+    /**
+     * Builds an index of the content of an MCRFile by reading from an
+     * MCRContentInputStream.
+     * 
+     * @param file
+     *            the MCRFile thats content is to be indexed
+     * @param source
+     *            the ContentInputStream where the file content is read from
+     */
+    public void indexContent(MCRFile file) throws MCRPersistenceException {
+        try {
+            doIndexContent(file);
+        } catch (Exception exc) {
+            if (!(exc instanceof MCRException)) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("Could not index content of file [");
+                msg.append(file.getPath()).append("] in indexer [");
+                msg.append(indexerID).append("]");
+                throw new MCRPersistenceException(msg.toString(), exc);
+            } else
+                throw (MCRException) exc;
+        }
+    }
+
+    /**
+     * Builds an index of the content of an MCRFile by reading from an
+     * MCRContentInputStream.
+     * 
+     * @param file
+     *            the MCRFile thats content is to be indexed
+     * @param source
+     *            the ContentInputStream where the file content is read from
+     */
+    protected abstract void doIndexContent(MCRFile file) throws Exception;
+
+    /**
+     * Deletes the index of an MCRFile object that is indexed under the given
+     * Storage ID in this indexer instance.
+     * 
+     * @param the
+     *            MCRFile object to delete
+     */
+    public void deleteIndex(MCRFile file) throws MCRException {
+        try {
+            doDeleteIndex(file);
+        } catch (Exception exc) {
+            if (!(exc instanceof MCRException)) {
+                StringBuffer msg = new StringBuffer();
+                String storageID = file.getStoreID();
+                msg.append("Could not delete index of file with storage ID [");
+                msg.append(storageID).append("] in indexer [");
+                msg.append(indexerID).append("]");
+                throw new MCRPersistenceException(msg.toString(), exc);
+            } else
+                throw (MCRException) exc;
+        }
+    }
+
+    /**
+     * Deletes the index of an MCRFile object that is indexed under the given
+     * Storage ID in this indexer instance.
+     * 
+     * @param the
+     *            MCRFile object to delete
+     */
+    protected abstract void doDeleteIndex(MCRFile file) throws Exception;
+
+    /**
+     * Search in Index with query
+     * 
+     * @param query
+     * 
+     * @return the hits of the query (ifs IDs)
+     *  
+     */
+    public abstract String[] doSearchIndex(String query) throws Exception;
+
+    /**
+     * Search in Index with query
+     * 
+     * @param query
+     *            the query for the serch
+     * 
+     * @return the hits of the query (ifs IDs)
+     *  
+     */
+    public String[] searchIndex(String query) throws MCRException {
+        try {
+            return doSearchIndex(query);
+        } catch (Exception exc) {
+            if (!(exc instanceof MCRException)) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("Could not build search with indexer [");
+                msg.append(indexerID).append("]");
+                throw new MCRPersistenceException(msg.toString(), exc);
+            } else
+                throw (MCRException) exc;
+        }
+    }
+
 }

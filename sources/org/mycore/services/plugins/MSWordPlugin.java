@@ -36,91 +36,101 @@ import org.textmining.text.extraction.WordExtractor;
  * @author Thomas Scheffler (yagee)
  * 
  * Need to insert some things here
- *
+ *  
  */
 public class MSWordPlugin implements TextFilterPlugin {
 
-	private static final int MAJOR = 0;
-	private static final int MINOR = 1;
+    private static final int MAJOR = 0;
 
-	private static HashSet contentTypes;
-	private static String info = null;
+    private static final int MINOR = 1;
 
-	/**
-	 * 
-	 */
-	public MSWordPlugin() {
-		super();
-		if (contentTypes == null) {
-			contentTypes = new HashSet();
-			if (MCRFileContentTypeFactory.isTypeAvailable("msword95"))
-				contentTypes.add(MCRFileContentTypeFactory.getType("msword95"));
-			if (MCRFileContentTypeFactory.isTypeAvailable("msword97"))
-				contentTypes.add(MCRFileContentTypeFactory.getType("msword97"));
-		}
-		if (info == null)
-			info =
-				new StringBuffer("This filter extracts the text out of a Word Document")
-					.toString();
+    private static HashSet contentTypes;
 
-	}
+    private static String info = null;
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getName()
-	 */
-	public String getName() {
-		return "Yagee's amazing Microsoft(R) Word(R) Text Filter";
-	}
+    /**
+     *  
+     */
+    public MSWordPlugin() {
+        super();
+        if (contentTypes == null) {
+            contentTypes = new HashSet();
+            if (MCRFileContentTypeFactory.isTypeAvailable("msword95"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("msword95"));
+            if (MCRFileContentTypeFactory.isTypeAvailable("msword97"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("msword97"));
+        }
+        if (info == null)
+            info = new StringBuffer(
+                    "This filter extracts the text out of a Word Document")
+                    .toString();
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
-	 */
-	public String getInfo() {
-		return info;
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getSupportedContentTypes()
-	 */
-	public HashSet getSupportedContentTypes() {
-		return contentTypes;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getName()
+     */
+    public String getName() {
+        return "Yagee's amazing Microsoft(R) Word(R) Text Filter";
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
-	 */
-	public Reader transform(MCRFileContentType ct, InputStream input)
-		throws FilterPluginTransformException {
-		if (getSupportedContentTypes().contains(ct)) {
-			try {
-				System.out.println("Reading Word-Document");
-				return getTextReader(input);
-			} catch (Exception e) {
-				throw new FilterPluginTransformException(
-					"Error while parsing Word Document document.",
-					e);
-			}
-		} else
-			throw new FilterPluginTransformException(
-				"ContentType " + ct + " is not supported by " + getName() + "!");
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
+     */
+    public String getInfo() {
+        return info;
+    }
 
-	/**
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
-	 */
-	public int getMajorNumber() {
-		return MAJOR;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getSupportedContentTypes()
+     */
+    public HashSet getSupportedContentTypes() {
+        return contentTypes;
+    }
 
-	/**
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
-	 */
-	public int getMinorNumber() {
-		return MINOR;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream,
+     *      java.io.OutputStream)
+     */
+    public Reader transform(MCRFileContentType ct, InputStream input)
+            throws FilterPluginTransformException {
+        if (getSupportedContentTypes().contains(ct)) {
+            try {
+                System.out.println("Reading Word-Document");
+                return getTextReader(input);
+            } catch (Exception e) {
+                throw new FilterPluginTransformException(
+                        "Error while parsing Word Document document.", e);
+            }
+        } else
+            throw new FilterPluginTransformException("ContentType " + ct
+                    + " is not supported by " + getName() + "!");
+    }
 
-	private Reader getTextReader(InputStream word) throws Exception{
-		return new StringReader(new WordExtractor().extractText(word));
-	}
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
+     */
+    public int getMajorNumber() {
+        return MAJOR;
+    }
+
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
+     */
+    public int getMinorNumber() {
+        return MINOR;
+    }
+
+    private Reader getTextReader(InputStream word) throws Exception {
+        return new StringReader(new WordExtractor().extractText(word));
+    }
 
 }

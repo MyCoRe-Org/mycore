@@ -35,66 +35,71 @@ import java.io.*;
 
 /**
  * This class queries remote or local in a thread.
- *
+ * 
  * @author Mathias Zarick
  * @version $Revision$ $Date$
  */
 class MCRQueryThread extends Thread {
     private int vec_max_length;
+
     private MCRConfiguration config;
+
     private MCRQueryInterface mcr_queryint;
+
     private MCRXMLContainer mcr_result;
+
     private String mcr_type;
+
     private String mcr_query;
+
     private String hostAlias;
 
-// constructor
+    // constructor
     public MCRQueryThread(ThreadGroup threadGroup, String hostAlias,
-                          String mcr_query, String mcr_type,
-                          MCRXMLContainer mcr_result) {
-	super(threadGroup,hostAlias);
+            String mcr_query, String mcr_type, MCRXMLContainer mcr_result) {
+        super(threadGroup, hostAlias);
         this.hostAlias = hostAlias;
         this.mcr_query = mcr_query;
         this.mcr_type = mcr_type;
         this.mcr_result = mcr_result;
         config = MCRConfiguration.instance();
-        vec_max_length = config.getInt("MCR.query_max_results",10);
+        vec_max_length = config.getInt("MCR.query_max_results", 10);
     }
 
-// lets the thread run
-public void run() 
-  {
-  if (hostAlias.equalsIgnoreCase("local")) {
-    try {
-      if (mcr_type.equalsIgnoreCase("class")) {
-        MCRClassification cl = new MCRClassification();
-        org.jdom.Document jdom = cl.search(mcr_query);
-        if (jdom != null) {
-          org.jdom.Element el = jdom.getRootElement();
-          String id = el.getAttributeValue("ID");
-          MCRXMLContainer res = new MCRXMLContainer();
-          res.add("local",id,1,el);
-          mcr_result.importElements(res);
-          }
+    // lets the thread run
+    public void run() {
+        if (hostAlias.equalsIgnoreCase("local")) {
+            try {
+                if (mcr_type.equalsIgnoreCase("class")) {
+                    MCRClassification cl = new MCRClassification();
+                    org.jdom.Document jdom = cl.search(mcr_query);
+                    if (jdom != null) {
+                        org.jdom.Element el = jdom.getRootElement();
+                        String id = el.getAttributeValue("ID");
+                        MCRXMLContainer res = new MCRXMLContainer();
+                        res.add("local", id, 1, el);
+                        mcr_result.importElements(res);
+                    }
+                } else {
+                    String persist_type = config.getString("MCR.XMLStore.Type");
+                    String proppers = "MCR.persistence_"
+                            + persist_type.toLowerCase() + "_merger_name";
+                    mcr_queryint = (MCRQueryInterface) config
+                            .getInstanceOf(proppers);
+                    mcr_result.importElements(mcr_queryint.getResultList(
+                            mcr_query, mcr_type, vec_max_length));
+                }
+            } catch (Exception e) {
+                throw new MCRException(e.getMessage(), e);
+            }
+        } else {
+            MCRRemoteAccessInterface comm = null;
+            comm = (MCRRemoteAccessInterface) config
+                    .getInstanceOf("MCR.remoteaccess_" + hostAlias
+                            + "_query_class");
+            mcr_result.importElements(comm.requestQuery(hostAlias, mcr_type,
+                    mcr_query));
         }
-      else {
-        String persist_type = config.getString( "MCR.XMLStore.Type" );
-        String proppers = "MCR.persistence_"+persist_type.toLowerCase()+
-          "_merger_name";
-        mcr_queryint = (MCRQueryInterface)config.getInstanceOf(proppers);
-        mcr_result.importElements(mcr_queryint.getResultList(mcr_query,mcr_type,
-          vec_max_length));
-        }
     }
-    catch (Exception e) {
-       throw new MCRException(e.getMessage(),e); }
-    }
-  else {
-    MCRRemoteAccessInterface comm = null;
-    comm = (MCRRemoteAccessInterface)
-      config.getInstanceOf("MCR.remoteaccess_"+hostAlias+"_query_class");
-    mcr_result.importElements(comm.requestQuery(hostAlias,mcr_type,mcr_query));
-    }
-  }
 
 }

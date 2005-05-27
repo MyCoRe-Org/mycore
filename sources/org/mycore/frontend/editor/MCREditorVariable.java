@@ -28,55 +28,60 @@ import java.util.*;
 import org.mycore.common.*;
 
 /**
- * Represents a variable that is read from/to an XML document
- * and edited with EditorServlet in HTML forms.
- *
+ * Represents a variable that is read from/to an XML document and edited with
+ * EditorServlet in HTML forms.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-class MCREditorVariable
-{
-  String   path;
-  String   value;
-  String   attribute;
-  String[] pathElements;
+ */
+class MCREditorVariable {
+    String path;
 
-  MCREditorVariable( String path, String value )
-  {
-    setPath ( path  );
-    setValue( value );
-  }
-    
-  void setPath( String path )
-  {
-    this.path      = path;
-    this.attribute = null;
-      
-    ArrayList elements = new ArrayList();
-    for( StringTokenizer st = new StringTokenizer( path, "/" ); st.hasMoreTokens(); )
-    {
-      String token = st.nextToken();
-      if( ( ! st.hasMoreTokens() ) && ( token.startsWith( "@" ) ) )
-        attribute = token.substring( 1 );
-      else
-        elements.add( token ); 
+    String value;
+
+    String attribute;
+
+    String[] pathElements;
+
+    MCREditorVariable(String path, String value) {
+        setPath(path);
+        setValue(value);
     }
-    pathElements = ( String[] )( elements.toArray( new String[ 0 ] ) );
-  }
-    
-  String getPath()
-  { return path; }
-    
-  void setValue( String value )
-  { this.value = value; }
-    
-  String getValue()
-  { return value; }
-    
-  String[] getPathElements()
-  { return pathElements; }
-    
-  String getAttributeName()
-  { return attribute; }
+
+    void setPath(String path) {
+        this.path = path;
+        this.attribute = null;
+
+        ArrayList elements = new ArrayList();
+        for (StringTokenizer st = new StringTokenizer(path, "/"); st
+                .hasMoreTokens();) {
+            String token = st.nextToken();
+            if ((!st.hasMoreTokens()) && (token.startsWith("@")))
+                attribute = token.substring(1);
+            else
+                elements.add(token);
+        }
+        pathElements = (String[]) (elements.toArray(new String[0]));
+    }
+
+    String getPath() {
+        return path;
+    }
+
+    void setValue(String value) {
+        this.value = value;
+    }
+
+    String getValue() {
+        return value;
+    }
+
+    String[] getPathElements() {
+        return pathElements;
+    }
+
+    String getAttributeName() {
+        return attribute;
+    }
 }
 

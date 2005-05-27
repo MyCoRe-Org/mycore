@@ -35,10 +35,10 @@ import com.enterprisedt.net.ftp.*;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
- * MCRFile objects in IBM VideoCharger Server. This allows the content to be 
+ * MCRFile objects in IBM VideoCharger Server. This allows the content to be
  * streamed. This implementation uses FTP to manage the files in VideoCharger.
  * The FTP connection parameters are configured in mycore.properties:
- *
+ * 
  * <code>
  *   MCR.IFS.ContentStore.<StoreID>.Hostname   Hostname of VideoCharger Server
  *   MCR.IFS.ContentStore.<StoreID>.FTPPort    Port of VideoCharger FTP interface, default is 4324
@@ -46,143 +46,144 @@ import com.enterprisedt.net.ftp.*;
  *   MCR.IFS.ContentStore.<StoreID>.Password   Password for this user
  *   MCR.IFS.ContentStore.<StoreID>.DebugFTP   If true, FTP debug messages are written to stdout, default is false
  * </code>
- *
+ * 
  * This class also provides a method to backup all assets stored in VideoCharger
  * to a directory.
- *
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- *
+ * 
  * @see MCRAVExtVideoCharger
  */
-public class MCRCStoreVideoCharger extends MCRContentStore
-{ 
-  private static Logger logger = Logger.getLogger( MCRCStoreVideoCharger.class.getName() );
+public class MCRCStoreVideoCharger extends MCRContentStore {
+    private static Logger logger = Logger.getLogger(MCRCStoreVideoCharger.class
+            .getName());
 
-  /** Hostname of VideoCharger server */
-  protected String host;
-  
-  /** Port of VideoCharger server FTP interface */
-  protected int port;
+    /** Hostname of VideoCharger server */
+    protected String host;
 
-  /** User ID for FTP login */
-  protected String user;
+    /** Port of VideoCharger server FTP interface */
+    protected int port;
 
-  /** Password for FTP login */
-  protected String password;
+    /** User ID for FTP login */
+    protected String user;
 
-  /** If true, FTP debug messages are written to stdout */
-  protected boolean debugFTP;
+    /** Password for FTP login */
+    protected String password;
 
-  /** FTP Return code if "quote site avs attr" is successful */
-  protected final static String[] ok = { "200" };
+    /** If true, FTP debug messages are written to stdout */
+    protected boolean debugFTP;
 
-  public void init( String storeID )
-  { 
-    super.init( storeID );
-      
-    MCRConfiguration config = MCRConfiguration.instance();  
-      
-    host     = config.getString ( prefix + "Hostname"        );
-    port     = config.getInt    ( prefix + "FTPPort", 4324   );
-    user     = config.getString ( prefix + "UserID"          );
-    password = config.getString ( prefix + "Password"        );
-    debugFTP = config.getBoolean( prefix + "DebugFTP", false );
-  }
+    /** FTP Return code if "quote site avs attr" is successful */
+    protected final static String[] ok = { "200" };
 
-  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
-    throws Exception
-  {
-    String storageID = buildNextID( file );
+    public void init(String storeID) {
+        super.init(storeID);
 
-    FTPClient connection = connect();
-    try
-    {
-      connection.quote( "site avs attr title=" + storageID, ok );
-      connection.put( source, storageID );
-      return storageID;
+        MCRConfiguration config = MCRConfiguration.instance();
+
+        host = config.getString(prefix + "Hostname");
+        port = config.getInt(prefix + "FTPPort", 4324);
+        user = config.getString(prefix + "UserID");
+        password = config.getString(prefix + "Password");
+        debugFTP = config.getBoolean(prefix + "DebugFTP", false);
     }
-    finally{ disconnect( connection ); }
-  }
 
-  protected void doDeleteContent( String storageID )
-    throws Exception
-  {
-    FTPClient connection = connect();
-    try{ connection.delete( storageID ); }
-    finally{ disconnect( connection ); }
-  }
+    protected String doStoreContent(MCRFileReader file,
+            MCRContentInputStream source) throws Exception {
+        String storageID = buildNextID(file);
 
-  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
-    throws Exception
-  { retrieveContent( file.getStorageID(), target ); }
-  
-  protected void retrieveContent( String assetID, OutputStream target )
-    throws Exception
-  {
-    FTPClient connection = connect();
-    try{ connection.get( target, assetID ); }
-    finally{ disconnect( connection ); }
-  }
-  
-  /**
-   * Reads all assets stored in VideoCharger server and writes the contents
-   * to a directory for backup. If the directory already contains an asset
-   * with the same name, that assets is skipped and not backed up.
-   *
-   * @param storeID the store ID fo the VideoCharger store to be backed up
-   * @param directory the local directory to write the assets to
-   **/
-  public static void backupContentTo( String storeID, String directory )
-    throws MCRPersistenceException, Exception
-  {
-    MCRAVExtVideoCharger extender = new MCRAVExtVideoCharger();
-    extender.readConfig( storeID );
-    String[] list = extender.listAssets();
-
-    for( int i = 0; i < list.length; i++ )
-    {
-      logger.info( "Backup of asset with ID = " + list[ i ] );
-      
-      File local = new File( directory, list[ i ] );
-      if( local.exists() ) continue;
-      
-      FileOutputStream target = new FileOutputStream( local );
-      new MCRCStoreVideoCharger().retrieveContent( list[ i ], target );
-      target.close();
+        FTPClient connection = connect();
+        try {
+            connection.quote("site avs attr title=" + storageID, ok);
+            connection.put(source, storageID);
+            return storageID;
+        } finally {
+            disconnect(connection);
+        }
     }
-  }
 
-  /**
-   * Connects to IBM VideoCharger Server via FTP
-   */
-  protected FTPClient connect() 
-    throws MCRPersistenceException
-  {
-    try
-    {
-      FTPClient connection =  new FTPClient( host, port );
-      connection.debugResponses( debugFTP );
-      connection.login( user, password );
-      connection.setType( FTPTransferType.BINARY );
-      return connection;
+    protected void doDeleteContent(String storageID) throws Exception {
+        FTPClient connection = connect();
+        try {
+            connection.delete(storageID);
+        } finally {
+            disconnect(connection);
+        }
     }
-    catch( Exception exc )
-    {
-      String msg = "Could not connect to " + host + ":" + port + " via FTP";
-      throw new MCRPersistenceException( msg, exc );
-    }
-  }
 
-  /**
-   * Closes the FTP connection to VideoCharger server
-   *
-   * @param connection the FTP connection to close
-   */
-  protected void disconnect( FTPClient connection )
-  {
-    try{ connection.quit(); }
-    catch( Exception ignored ){}
-  }
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target)
+            throws Exception {
+        retrieveContent(file.getStorageID(), target);
+    }
+
+    protected void retrieveContent(String assetID, OutputStream target)
+            throws Exception {
+        FTPClient connection = connect();
+        try {
+            connection.get(target, assetID);
+        } finally {
+            disconnect(connection);
+        }
+    }
+
+    /**
+     * Reads all assets stored in VideoCharger server and writes the contents to
+     * a directory for backup. If the directory already contains an asset with
+     * the same name, that assets is skipped and not backed up.
+     * 
+     * @param storeID
+     *            the store ID fo the VideoCharger store to be backed up
+     * @param directory
+     *            the local directory to write the assets to
+     */
+    public static void backupContentTo(String storeID, String directory)
+            throws MCRPersistenceException, Exception {
+        MCRAVExtVideoCharger extender = new MCRAVExtVideoCharger();
+        extender.readConfig(storeID);
+        String[] list = extender.listAssets();
+
+        for (int i = 0; i < list.length; i++) {
+            logger.info("Backup of asset with ID = " + list[i]);
+
+            File local = new File(directory, list[i]);
+            if (local.exists())
+                continue;
+
+            FileOutputStream target = new FileOutputStream(local);
+            new MCRCStoreVideoCharger().retrieveContent(list[i], target);
+            target.close();
+        }
+    }
+
+    /**
+     * Connects to IBM VideoCharger Server via FTP
+     */
+    protected FTPClient connect() throws MCRPersistenceException {
+        try {
+            FTPClient connection = new FTPClient(host, port);
+            connection.debugResponses(debugFTP);
+            connection.login(user, password);
+            connection.setType(FTPTransferType.BINARY);
+            return connection;
+        } catch (Exception exc) {
+            String msg = "Could not connect to " + host + ":" + port
+                    + " via FTP";
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
+
+    /**
+     * Closes the FTP connection to VideoCharger server
+     * 
+     * @param connection
+     *            the FTP connection to close
+     */
+    protected void disconnect(FTPClient connection) {
+        try {
+            connection.quit();
+        } catch (Exception ignored) {
+        }
+    }
 }
 

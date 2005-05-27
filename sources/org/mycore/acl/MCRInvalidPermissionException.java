@@ -18,33 +18,33 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
 /**
- * Exceptions of this class are thrown when some operation related 
- * to permissions is illegal during administration of ACLs. 
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
-
+ * Exceptions of this class are thrown when some operation related to
+ * permissions is illegal during administration of ACLs.
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRInvalidPermissionException extends MCRAclException {
-///============================================================================/
-  
-  /**
-   * Constructs an exception with an error message.
-   *
-   * @param   message The error message describíng the cause of the exception.
-   */
-   
-   public MCRInvalidPermissionException (String message) {
-   
-      super(message);
+    ///============================================================================/
 
-     }
-     
-//>============================================================================\
+    /**
+     * Constructs an exception with an error message.
+     * 
+     * @param message
+     *            The error message describíng the cause of the exception.
+     */
+
+    public MCRInvalidPermissionException(String message) {
+
+        super(message);
+
+    }
+
+    //>============================================================================\
 }

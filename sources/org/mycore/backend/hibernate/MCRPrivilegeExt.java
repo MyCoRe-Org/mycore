@@ -33,27 +33,29 @@ import java.util.Date;
 import org.mycore.user.MCRPrivilege;
 
 /**
- * Class which extends MCRPrivilege with setters and getters in order to be usable for Hibernate.
- *
+ * Class which extends MCRPrivilege with setters and getters in order to be
+ * usable for Hibernate.
+ * 
  * @see org.mycore.user.MCRPrivilege
- *
+ * 
  * @author Matthias Kramm
  */
-class MCRPrivilegeExt extends MCRPrivilege
-{
-    MCRPrivilegeExt()
-    { 
-	super(null,null); 
+class MCRPrivilegeExt extends MCRPrivilege {
+    MCRPrivilegeExt() {
+        super(null, null);
     }
+
     MCRPrivilegeExt(MCRPrivilege u) {
-	super(u);
+        super(u);
     }
 
     /** @return sets the name of the privilege */
-    void setName(String privName)
-    { this.privName = privName; }
+    void setName(String privName) {
+        this.privName = privName;
+    }
 
     /** @return sets the description of the privilege */
-    void setDescription(String privDescription)
-    { this.privDescription = privDescription; }
+    void setDescription(String privDescription) {
+        this.privDescription = privDescription;
+    }
 }

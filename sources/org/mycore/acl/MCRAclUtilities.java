@@ -20,8 +20,8 @@
  *
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
 import java.util.Map;
@@ -31,257 +31,267 @@ import java.util.Iterator;
 import org.mycore.user.MCRPrincipal;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRGroup;
+
 ///============================================================================|
 
 /**
  * This class defines some utility methods for ACLs.
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRAclUtilities {
-///============================================================================/
+    ///============================================================================/
 
-   private final static String SEPARATOR = ": ";
-   private final static String NEWLINE = "\n";
-   private static String ENTRY_PREFIX = "  ";
+    private final static String SEPARATOR = ": ";
 
-   private static String GENERIC_TITLE = "Generic entries";
-   private static String USER_TITLE    = "User entries";
-   private static String GROUP_TITLE   = "Group entries";
-   
+    private final static String NEWLINE = "\n";
 
-//------------------------------------------------------------------------------
+    private static String ENTRY_PREFIX = "  ";
 
-   private static void printEntry (MCRPrincipal principal, MCRAcl acl, StringBuffer buffer) {
-   
-       if (!acl.containsPrincipal(principal)) return;
-   
-       buffer.append(ENTRY_PREFIX);
-       buffer.append(principal.getID());
-       buffer.append(SEPARATOR);
-       buffer.append(acl.getPermissions(principal).toString());
-       buffer.append(NEWLINE);
-   
-     }
+    private static String GENERIC_TITLE = "Generic entries";
 
-//------------------------------------------------------------------------------
+    private static String USER_TITLE = "User entries";
 
-   private static void printCategory (Set category, MCRAcl acl, StringBuffer buffer) {
-         
-      Iterator iterator = category.iterator();
-      
-      while (iterator.hasNext()) {
-      
-         Object element = iterator.next();
- 
-         if (element instanceof MCRPrincipal) {
-         
-            MCRPrincipal principal = (MCRPrincipal)element;
+    private static String GROUP_TITLE = "Group entries";
 
-            printEntry(principal, acl, buffer);
+    //------------------------------------------------------------------------------
 
-           }
-   
-        }
+    private static void printEntry(MCRPrincipal principal, MCRAcl acl,
+            StringBuffer buffer) {
 
-     }
-  
-//------------------------------------------------------------------------------
+        if (!acl.containsPrincipal(principal))
+            return;
 
-  /**
-   * Returns a string representation of an ACL
-   * 
-   * @return a string used for printing an ACL..   
-   */
+        buffer.append(ENTRY_PREFIX);
+        buffer.append(principal.getID());
+        buffer.append(SEPARATOR);
+        buffer.append(acl.getPermissions(principal).toString());
+        buffer.append(NEWLINE);
 
-   public static String printAcl(MCRAcl acl) {
-   
-      StringBuffer buffer = new StringBuffer(); 
-  
-      buffer.append(GENERIC_TITLE);
-      buffer.append(SEPARATOR);
-      buffer.append(NEWLINE);
-      printEntry(MCRAclCategory.OWNER,       acl, buffer);
-      printEntry(MCRAclCategory.OWNER_GROUP, acl, buffer);
-      printEntry(MCRAclCategory.OTHER,       acl, buffer);
-      printEntry(MCRAclCategory.ANY_OTHER,   acl, buffer);
-  
-  
-      buffer.append(USER_TITLE);
-      buffer.append(SEPARATOR);
-      buffer.append(NEWLINE);
-      printCategory(acl.getUsers(), acl, buffer);
-      
-      buffer.append(GROUP_TITLE);
-      buffer.append(SEPARATOR);
-      buffer.append(NEWLINE);
-      printCategory(acl.getGroups(), acl, buffer);	       
+    }
 
-      return buffer.toString();
-  
-     }
+    //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
+    private static void printCategory(Set category, MCRAcl acl,
+            StringBuffer buffer) {
 
-   public static String toXML (MCRAcl acl) {
+        Iterator iterator = category.iterator();
 
-      StringBuffer buffer = new StringBuffer();
-      addXML(buffer,acl);
-      return buffer.toString();
-   
-     }
+        while (iterator.hasNext()) {
 
-//------------------------------------------------------------------------------
+            Object element = iterator.next();
 
-   private static final void addXML (StringBuffer buffer, MCRAcl acl) {
+            if (element instanceof MCRPrincipal) {
 
-      buffer.append("<acl>"); 
-      buffer.append("\n");
+                MCRPrincipal principal = (MCRPrincipal) element;
 
+                printEntry(principal, acl, buffer);
 
-      if (acl.containsPrincipal(MCRAclCategory.OWNER))
-      buffer.append("<owner>");
-      buffer.append("\n");
-      addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER));
-      buffer.append("</owner>");
-      buffer.append("\n");
-
-      if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-      buffer.append("<owner_group>");
-      buffer.append("\n");
-      addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER_GROUP));
-      buffer.append("</owner_group>");
-      buffer.append("\n");
-
-      addUsers(buffer, acl);
-      addGroups(buffer, acl);
-
-      if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-      buffer.append("<other>");
-      buffer.append("\n");
-      addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER_GROUP));
-      buffer.append("</other>");
-      buffer.append("\n");
-
-      if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-      buffer.append("<any_other>");
-      buffer.append("\n");
-      addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER_GROUP));
-      buffer.append("</any_other>");
-      buffer.append("\n");
-
-
-      buffer.append("</acl>");
-      buffer.append("\n");      
-
-     }
-
-//------------------------------------------------------------------------------
-
-   private static final void addUsers (StringBuffer buffer, MCRAcl acl) {
-
-      Set users = acl.getUsers();
-
-      Iterator iterator = users.iterator();
-
-      while (iterator.hasNext()) {
-
-         MCRUser user = (MCRUser) iterator.next();
-         MCRPermissionRing permissions = acl.getPermissions(user);
-
-         addUser(buffer, user, permissions);
+            }
 
         }
 
-     }
+    }
 
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 
-   private static final void addGroups (StringBuffer buffer, MCRAcl acl) {
+    /**
+     * Returns a string representation of an ACL
+     * 
+     * @return a string used for printing an ACL..
+     */
 
-      Set groups = acl.getGroups();
+    public static String printAcl(MCRAcl acl) {
 
-      Iterator iterator = groups.iterator();
+        StringBuffer buffer = new StringBuffer();
 
-      while (iterator.hasNext()) {
+        buffer.append(GENERIC_TITLE);
+        buffer.append(SEPARATOR);
+        buffer.append(NEWLINE);
+        printEntry(MCRAclCategory.OWNER, acl, buffer);
+        printEntry(MCRAclCategory.OWNER_GROUP, acl, buffer);
+        printEntry(MCRAclCategory.OTHER, acl, buffer);
+        printEntry(MCRAclCategory.ANY_OTHER, acl, buffer);
 
-         MCRGroup group = (MCRGroup) iterator.next();
-         MCRPermissionRing permissions = acl.getPermissions(group);
+        buffer.append(USER_TITLE);
+        buffer.append(SEPARATOR);
+        buffer.append(NEWLINE);
+        printCategory(acl.getUsers(), acl, buffer);
 
-         addGroup(buffer, group, permissions);
+        buffer.append(GROUP_TITLE);
+        buffer.append(SEPARATOR);
+        buffer.append(NEWLINE);
+        printCategory(acl.getGroups(), acl, buffer);
+
+        return buffer.toString();
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    public static String toXML(MCRAcl acl) {
+
+        StringBuffer buffer = new StringBuffer();
+        addXML(buffer, acl);
+        return buffer.toString();
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    private static final void addXML(StringBuffer buffer, MCRAcl acl) {
+
+        buffer.append("<acl>");
+        buffer.append("\n");
+
+        if (acl.containsPrincipal(MCRAclCategory.OWNER))
+            buffer.append("<owner>");
+        buffer.append("\n");
+        addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER));
+        buffer.append("</owner>");
+        buffer.append("\n");
+
+        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+            buffer.append("<owner_group>");
+        buffer.append("\n");
+        addPermissionRing(buffer, acl
+                .getPermissions(MCRAclCategory.OWNER_GROUP));
+        buffer.append("</owner_group>");
+        buffer.append("\n");
+
+        addUsers(buffer, acl);
+        addGroups(buffer, acl);
+
+        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+            buffer.append("<other>");
+        buffer.append("\n");
+        addPermissionRing(buffer, acl
+                .getPermissions(MCRAclCategory.OWNER_GROUP));
+        buffer.append("</other>");
+        buffer.append("\n");
+
+        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+            buffer.append("<any_other>");
+        buffer.append("\n");
+        addPermissionRing(buffer, acl
+                .getPermissions(MCRAclCategory.OWNER_GROUP));
+        buffer.append("</any_other>");
+        buffer.append("\n");
+
+        buffer.append("</acl>");
+        buffer.append("\n");
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    private static final void addUsers(StringBuffer buffer, MCRAcl acl) {
+
+        Set users = acl.getUsers();
+
+        Iterator iterator = users.iterator();
+
+        while (iterator.hasNext()) {
+
+            MCRUser user = (MCRUser) iterator.next();
+            MCRPermissionRing permissions = acl.getPermissions(user);
+
+            addUser(buffer, user, permissions);
 
         }
 
-     }
+    }
 
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 
-   private static final void addUser (StringBuffer buffer, MCRUser user, MCRPermissionRing permissions) {
+    private static final void addGroups(StringBuffer buffer, MCRAcl acl) {
 
-      buffer.append("<user id=\"" + user.getID() + "\">");
-      buffer.append("\n");
-      addPermissionRing(buffer, permissions);
-      buffer.append("</user>");
-      buffer.append("\n");
+        Set groups = acl.getGroups();
 
-     }
+        Iterator iterator = groups.iterator();
 
-//------------------------------------------------------------------------------
+        while (iterator.hasNext()) {
 
-   private static final void addGroup (StringBuffer buffer, MCRGroup group, MCRPermissionRing permissions) {
+            MCRGroup group = (MCRGroup) iterator.next();
+            MCRPermissionRing permissions = acl.getPermissions(group);
 
-      buffer.append("<group id=\"" + group.getID() + "\">");
-      buffer.append("\n");
-      addPermissionRing(buffer, permissions);
-      buffer.append("</group>");
-      buffer.append("\n");
-
-     }
-
-//------------------------------------------------------------------------------
-
-   private static final void addPermissionRing(StringBuffer buffer, MCRPermissionRing permissionRing) {
-
-      Iterator iterator = permissionRing.iterator();  
-
-      while (iterator.hasNext() ) {
-
-         Object object = iterator.next();
-
-         if (object instanceof MCRPermission) {
-
-            MCRPermission permission = (MCRPermission) object;
-         
-            if (permissionRing.containsPermission(permission)) {
-
-               String name = permission.getName();
-               boolean status = permissionRing.isPermissionGranted(permission);
-
-               addPermission(buffer, name, status);
-
-              }
-
-           }
+            addGroup(buffer, group, permissions);
 
         }
 
-     }
+    }
 
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 
-   private final static void addPermission (StringBuffer buffer, String name, boolean status) {
+    private static final void addUser(StringBuffer buffer, MCRUser user,
+            MCRPermissionRing permissions) {
 
-      if (name == null || "".equals(name))
-         return;
+        buffer.append("<user id=\"" + user.getID() + "\">");
+        buffer.append("\n");
+        addPermissionRing(buffer, permissions);
+        buffer.append("</user>");
+        buffer.append("\n");
 
-      buffer.append("<permission " + 
-                    "name=\"" + name + "\" " +
-                    "status=\"" + (status?"granted":"denied") + "\"" + 
-                    "/>\n");      
-      
-     }
+    }
 
-//-============================================================================\
+    //------------------------------------------------------------------------------
+
+    private static final void addGroup(StringBuffer buffer, MCRGroup group,
+            MCRPermissionRing permissions) {
+
+        buffer.append("<group id=\"" + group.getID() + "\">");
+        buffer.append("\n");
+        addPermissionRing(buffer, permissions);
+        buffer.append("</group>");
+        buffer.append("\n");
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    private static final void addPermissionRing(StringBuffer buffer,
+            MCRPermissionRing permissionRing) {
+
+        Iterator iterator = permissionRing.iterator();
+
+        while (iterator.hasNext()) {
+
+            Object object = iterator.next();
+
+            if (object instanceof MCRPermission) {
+
+                MCRPermission permission = (MCRPermission) object;
+
+                if (permissionRing.containsPermission(permission)) {
+
+                    String name = permission.getName();
+                    boolean status = permissionRing
+                            .isPermissionGranted(permission);
+
+                    addPermission(buffer, name, status);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    private final static void addPermission(StringBuffer buffer, String name,
+            boolean status) {
+
+        if (name == null || "".equals(name))
+            return;
+
+        buffer.append("<permission " + "name=\"" + name + "\" " + "status=\""
+                + (status ? "granted" : "denied") + "\"" + "/>\n");
+
+    }
+
+    //-============================================================================\
 }

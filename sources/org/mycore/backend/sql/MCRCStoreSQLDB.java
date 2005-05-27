@@ -33,104 +33,99 @@ import java.sql.*;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
- * MCRFile objects in a sql database. 
- *
+ * MCRFile objects in a sql database.
+ * 
  * @author Harald Richter
  * @version $Revision$ $Date$
  */
-public class MCRCStoreSQLDB extends MCRContentStore
-{ 
-  public void init( String storeID )
-  {
-    super.init( storeID );
+public class MCRCStoreSQLDB extends MCRContentStore {
+    public void init(String storeID) {
+        super.init(storeID);
 
-//    System.out.println("### INIT " + storeID );
-//    MCRConfiguration config = MCRConfiguration.instance();  
-  }
-
-  private synchronized int getNextFreeID( String tableName )
-    throws Exception
-  {
-    String sql = "SELECT MAX( ID ) FROM " + tableName;
-    String id  = MCRSQLConnection.justGetSingleValue( sql );
-
-    int result = ( id == null ? 0 : Integer.parseInt( id ) );
-
-    return result + 1;
-  }
-  
-  protected String doStoreContent( MCRFileReader file, MCRContentInputStream source )
-    throws Exception
-  {
-    String tableName = file.getContentTypeID();
-    int           ID = getNextFreeID( tableName );
-    String storageID = tableName + ":" + ID;
-
-    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
-
-    try
-    {
-      connection.getJDBCConnection().setAutoCommit( false );
-
-      String insert = "INSERT INTO " + tableName + " VALUES (?, ?)";
-      PreparedStatement statement = connection.getJDBCConnection().prepareStatement( insert );
-      statement.setInt   ( 1, ID );
-      statement.setBinaryStream( 2, source , source.available());
-//      System.out.println("##### SIZE " + source.available() );
-      statement.execute();
-      statement.close();
-     
-      connection.getJDBCConnection().commit();
-      connection.getJDBCConnection().setAutoCommit( true );
+        //    System.out.println("### INIT " + storeID );
+        //    MCRConfiguration config = MCRConfiguration.instance();
     }
-    catch( Exception ex )
-    {
-      try{ connection.getJDBCConnection().rollback(); } 
-      catch( SQLException ignored ){}
-      throw ex;
+
+    private synchronized int getNextFreeID(String tableName) throws Exception {
+        String sql = "SELECT MAX( ID ) FROM " + tableName;
+        String id = MCRSQLConnection.justGetSingleValue(sql);
+
+        int result = (id == null ? 0 : Integer.parseInt(id));
+
+        return result + 1;
     }
-    finally
-    { connection.release(); }
-    
-    return storageID;
-  }
-  
-  protected void doDeleteContent( String storageID )
-    throws Exception
-  {
-    int i            = storageID.indexOf( ':' );
-    String tableName = storageID.substring( 0, i);
-    String ID        = storageID.substring( i+1 );
-    String sql       = "DELETE FROM " + tableName + " WHERE ID = " + ID;
-//    System.out.println("###### DELETE " + sql );
-    MCRSQLConnection.justDoUpdate( sql );
-  }
 
-  protected void doRetrieveContent( MCRFileReader file, OutputStream target )
-    throws Exception
-  {
-    MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+    protected String doStoreContent(MCRFileReader file,
+            MCRContentInputStream source) throws Exception {
+        String tableName = file.getContentTypeID();
+        int ID = getNextFreeID(tableName);
+        String storageID = tableName + ":" + ID;
 
-    try
-    {
-      String storageID    = file.getStorageID();
-      int i               = storageID.indexOf( ':' );
-      String tableName    = storageID.substring( 0, i);
-      String ID           = storageID.substring( i+1 );
-      String select       = "SELECT XML FROM " + tableName + " WHERE ID = " + ID;
-      Statement statement = connection.getJDBCConnection().createStatement();
-      ResultSet rs = statement.executeQuery( select );
+        MCRSQLConnection connection = MCRSQLConnectionPool.instance()
+                .getConnection();
 
-      if( ! rs.next() )
-      {
-        String msg = ID + " is not in table  " + tableName;
-        throw new MCRUsageException( msg );
-      }
+        try {
+            connection.getJDBCConnection().setAutoCommit(false);
 
-      MCRUtils.copyStream( rs.getBinaryStream( 1 ), target );
-      rs.close();
+            String insert = "INSERT INTO " + tableName + " VALUES (?, ?)";
+            PreparedStatement statement = connection.getJDBCConnection()
+                    .prepareStatement(insert);
+            statement.setInt(1, ID);
+            statement.setBinaryStream(2, source, source.available());
+            //      System.out.println("##### SIZE " + source.available() );
+            statement.execute();
+            statement.close();
+
+            connection.getJDBCConnection().commit();
+            connection.getJDBCConnection().setAutoCommit(true);
+        } catch (Exception ex) {
+            try {
+                connection.getJDBCConnection().rollback();
+            } catch (SQLException ignored) {
+            }
+            throw ex;
+        } finally {
+            connection.release();
+        }
+
+        return storageID;
     }
-    finally{ connection.release(); }
-  }
+
+    protected void doDeleteContent(String storageID) throws Exception {
+        int i = storageID.indexOf(':');
+        String tableName = storageID.substring(0, i);
+        String ID = storageID.substring(i + 1);
+        String sql = "DELETE FROM " + tableName + " WHERE ID = " + ID;
+        //    System.out.println("###### DELETE " + sql );
+        MCRSQLConnection.justDoUpdate(sql);
+    }
+
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target)
+            throws Exception {
+        MCRSQLConnection connection = MCRSQLConnectionPool.instance()
+                .getConnection();
+
+        try {
+            String storageID = file.getStorageID();
+            int i = storageID.indexOf(':');
+            String tableName = storageID.substring(0, i);
+            String ID = storageID.substring(i + 1);
+            String select = "SELECT XML FROM " + tableName + " WHERE ID = "
+                    + ID;
+            Statement statement = connection.getJDBCConnection()
+                    .createStatement();
+            ResultSet rs = statement.executeQuery(select);
+
+            if (!rs.next()) {
+                String msg = ID + " is not in table  " + tableName;
+                throw new MCRUsageException(msg);
+            }
+
+            MCRUtils.copyStream(rs.getBinaryStream(1), target);
+            rs.close();
+        } finally {
+            connection.release();
+        }
+    }
 }
 

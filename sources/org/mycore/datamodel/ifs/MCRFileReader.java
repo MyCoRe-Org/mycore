@@ -27,59 +27,57 @@ package org.mycore.datamodel.ifs;
 import org.mycore.common.*;
 
 /**
- * Represents a read-only view of MCRFile metadata. This interface
- * was introduced as a mechanism to be able to use the same code
- * with MyCoRe Sample that uses the new class MCRFile 
- * and current MILESS code that still uses the class MCROldFile.
- * The interface will be obsolete in the future.
- *
- * @author Frank Lützenkirchen 
+ * Represents a read-only view of MCRFile metadata. This interface was
+ * introduced as a mechanism to be able to use the same code with MyCoRe Sample
+ * that uses the new class MCRFile and current MILESS code that still uses the
+ * class MCROldFile. The interface will be obsolete in the future.
+ * 
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public interface MCRFileReader
-{
-  /**
-   * Returns the ID of this file
-   *
-   * @return the ID of this file
-   **/
-  public String getID();
+public interface MCRFileReader {
+    /**
+     * Returns the ID of this file
+     * 
+     * @return the ID of this file
+     */
+    public String getID();
 
-  /**
-   * Returns the relative path of this file
-   **/
-  public String getPath();
-  
-  /**
-   * Returns the file extension of this file, or an empty string if
-   * the file has no extension
-   **/
-  public String getExtension();
+    /**
+     * Returns the relative path of this file
+     */
+    public String getPath();
 
-  /**
-   * Returns the file size as number of bytes
-   **/
-  public long getSize();
-  
-  /**
-   * Returns the ID of the MCRContentStore implementation that holds the
-   * content of this file
-   **/
-  public String getStoreID();
-  
-  /**
-   * Returns the storage ID that identifies the place where the MCRContentStore 
-   * has stored the content of this file
-   **/
-  public String getStorageID();
-  
-  /**
-   * Returns the content type of the content of this file
-   **/
-  public String getContentTypeID();
-  
-  /**
-   * Returns the content type of this file
-   **/
-  public MCRFileContentType getContentType();
+    /**
+     * Returns the file extension of this file, or an empty string if the file
+     * has no extension
+     */
+    public String getExtension();
+
+    /**
+     * Returns the file size as number of bytes
+     */
+    public long getSize();
+
+    /**
+     * Returns the ID of the MCRContentStore implementation that holds the
+     * content of this file
+     */
+    public String getStoreID();
+
+    /**
+     * Returns the storage ID that identifies the place where the
+     * MCRContentStore has stored the content of this file
+     */
+    public String getStorageID();
+
+    /**
+     * Returns the content type of the content of this file
+     */
+    public String getContentTypeID();
+
+    /**
+     * Returns the content type of this file
+     */
+    public MCRFileContentType getContentType();
 }

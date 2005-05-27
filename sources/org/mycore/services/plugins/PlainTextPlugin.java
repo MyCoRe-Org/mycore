@@ -35,89 +35,95 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
  * @author Thomas Scheffler (yagee)
  * 
  * Need to insert some things here
- *
+ *  
  */
 public class PlainTextPlugin implements TextFilterPlugin {
 
-	private static final int MAJOR=0;
-	private static final int MINOR=4;
-	
-	private static HashSet contentTypes;
-	private static String info = null;
+    private static final int MAJOR = 0;
 
-	/**
-	 * 
-	 */
-	public PlainTextPlugin() {
-		super();
-		if (contentTypes == null) {
-			contentTypes = new HashSet();
-			if (MCRFileContentTypeFactory.isTypeAvailable("txt"))
-				contentTypes.add(MCRFileContentTypeFactory.getType("txt"));
-			if (MCRFileContentTypeFactory.isTypeAvailable("asc"))
-				contentTypes.add(MCRFileContentTypeFactory.getType("asc"));
-		}
-		if (info == null)
-			info =
-				new StringBuffer("This filter just forwards a plain text Inputstream\n")
-					.append("it's just to demonstrate the functionality of the mycore\n")
-					.append("TextFilterPlugins. Use this as a basis for your own and more\n")
-					.append("complex FilterPlugins.")
-					.toString();
+    private static final int MINOR = 4;
 
-	}
+    private static HashSet contentTypes;
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getName()
-	 */
-	public String getName() {
-		return "Yagee's amazing Plain Text Filter";
-	}
+    private static String info = null;
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
-	 */
-	public String getInfo() {
-		return info;
-	}
+    /**
+     *  
+     */
+    public PlainTextPlugin() {
+        super();
+        if (contentTypes == null) {
+            contentTypes = new HashSet();
+            if (MCRFileContentTypeFactory.isTypeAvailable("txt"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("txt"));
+            if (MCRFileContentTypeFactory.isTypeAvailable("asc"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("asc"));
+        }
+        if (info == null)
+            info = new StringBuffer(
+                    "This filter just forwards a plain text Inputstream\n")
+                    .append(
+                            "it's just to demonstrate the functionality of the mycore\n")
+                    .append(
+                            "TextFilterPlugins. Use this as a basis for your own and more\n")
+                    .append("complex FilterPlugins.").toString();
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getSupportedContentTypes()
-	 */
-	public HashSet getSupportedContentTypes() {
-		return contentTypes;
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream, java.io.OutputStream)
-	 */
-	public Reader transform(
-		MCRFileContentType ct,
-		InputStream input)
-		throws FilterPluginTransformException {
-		if (getSupportedContentTypes().contains(ct)) {
-			return new InputStreamReader(input);
-		} else
-			throw new FilterPluginTransformException(
-				"ContentType "
-					+ ct
-					+ " is not supported by "
-					+ getName()
-					+ "!");
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getName()
+     */
+    public String getName() {
+        return "Yagee's amazing Plain Text Filter";
+    }
 
-	/**
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
-	 */
-	public int getMajorNumber() {
-		return MAJOR;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
+     */
+    public String getInfo() {
+        return info;
+    }
 
-	/**
-	 * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
-	 */
-	public int getMinorNumber() {
-		return MINOR;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getSupportedContentTypes()
+     */
+    public HashSet getSupportedContentTypes() {
+        return contentTypes;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream,
+     *      java.io.OutputStream)
+     */
+    public Reader transform(MCRFileContentType ct, InputStream input)
+            throws FilterPluginTransformException {
+        if (getSupportedContentTypes().contains(ct)) {
+            return new InputStreamReader(input);
+        } else
+            throw new FilterPluginTransformException("ContentType " + ct
+                    + " is not supported by " + getName() + "!");
+    }
+
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
+     */
+    public int getMajorNumber() {
+        return MAJOR;
+    }
+
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
+     */
+    public int getMinorNumber() {
+        return MINOR;
+    }
 
 }

@@ -28,30 +28,28 @@ import org.mycore.common.*;
 
 /**
  * Decides which MCRContentStore implementation should be used to store the
- * content of a given file. The system configuration sets the 
- * MCRContentStoreSelector implementation that is used to make this decision
- * by the property "MCR.IFS.ContentStoreSelector.Class". MyCoRe provides
- * a simple implementation of this interface in the class 
- * MCRSimpleContentStoreSelector that decides based on the file content type.
- *
+ * content of a given file. The system configuration sets the
+ * MCRContentStoreSelector implementation that is used to make this decision by
+ * the property "MCR.IFS.ContentStoreSelector.Class". MyCoRe provides a simple
+ * implementation of this interface in the class MCRSimpleContentStoreSelector
+ * that decides based on the file content type.
+ * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public interface MCRContentStoreSelector
-{
-  /**
-   * Returns the ID of the file content store to be used to store
-   * the content of the given file. The store selector can make the
-   * decision based on the properties of the given file or based on
-   * system configuration.
-   **/
-  public String selectStore( MCRFile file ) throws MCRException;
-  
-  /**
-   * Returns the IDs of all ContentStores available to MyCoRe
-   * 
-   * @return Array of StoreIDs
-   */
-  public String[] getAvailableStoreIDs();
+public interface MCRContentStoreSelector {
+    /**
+     * Returns the ID of the file content store to be used to store the content
+     * of the given file. The store selector can make the decision based on the
+     * properties of the given file or based on system configuration.
+     */
+    public String selectStore(MCRFile file) throws MCRException;
+
+    /**
+     * Returns the IDs of all ContentStores available to MyCoRe
+     * 
+     * @return Array of StoreIDs
+     */
+    public String[] getAvailableStoreIDs();
 }

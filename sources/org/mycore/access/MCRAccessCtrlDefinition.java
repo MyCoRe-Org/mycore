@@ -24,14 +24,13 @@ import java.util.Date;
 import org.mycore.user.MCRUser;
 
 /**
- * This interface provides a method for checking access rights for a
- * document (or number of documents).
+ * This interface provides a method for checking access rights for a document
+ * (or number of documents).
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-interface MCRAccessCtrlDefinition
-{
+interface MCRAccessCtrlDefinition {
     boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip);
 };
 

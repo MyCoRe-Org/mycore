@@ -35,69 +35,71 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * Provides static methods that implement commands for the
- * MyCoRe command line interface.
- *
+ * Provides static methods that implement commands for the MyCoRe command line
+ * interface.
+ * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- *
+ * 
  * @version $Revision$ $Date$
- **/
-public class MCRBaseCommands extends MCRAbstractCommands
-{
-  private static Logger logger = Logger.getLogger( MCRBaseCommands.class.getName());
+ */
+public class MCRBaseCommands extends MCRAbstractCommands {
+    private static Logger logger = Logger.getLogger(MCRBaseCommands.class
+            .getName());
 
- /**
-   * The constructor.
-   */
-  public MCRBaseCommands()
-  {
-    super();
-    MCRCommand com = null;
+    /**
+     * The constructor.
+     */
+    public MCRBaseCommands() {
+        super();
+        MCRCommand com = null;
 
-    com = new MCRCommand("create database for {0}",
-      "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String",
-      "The command create the search store for the given MCRObjectID type."
-      );
-    command.add(com);
-  }
-
- /**
-  * Create a new data base file for the MCRObjectID type.
-  *
-  * @param mcr_type the MCRObjectID type
-  * @return true if all is okay, else false
-  **/
-  public static boolean createDataBase( String mcr_type )
-  {
-    // Read config file
-    String conf_filename = CONFIG.getString( "MCR.persistence_config_" + mcr_type );
-    if( ! conf_filename.endsWith( ".xml" ) ) 
-      throw new MCRException( "Configuration " + mcr_type + " does not end with .xml" ); 
-
-    logger.info( "Reading file " + conf_filename + " ..." );
-    InputStream conf_file = MCRBaseCommands.class.getResourceAsStream( "/" + conf_filename );
-    if( conf_file == null )
-      throw new MCRException( "Can't read configuration file " + conf_filename );
-
-    org.jdom.Document confdoc = null;
-    try 
-    { confdoc = new SAXBuilder().build( conf_file ); }
-    catch( Exception ex ) 
-    { throw new MCRException( "Can't parse configuration file " + conf_file ); }
-    // create the database
-
-    if( mcr_type.equals( "derivate" ) ) 
-    {
-      MCRDerivate der = new MCRDerivate();
-      der.createDataBase( mcr_type, confdoc ); 
+        com = new MCRCommand(
+                "create database for {0}",
+                "org.mycore.frontend.cli.MCRBaseCommands.createDataBase String",
+                "The command create the search store for the given MCRObjectID type.");
+        command.add(com);
     }
-    else 
-    {
-      MCRObject obj = new MCRObject();
-      obj.createDataBase( mcr_type, confdoc ); 
+
+    /**
+     * Create a new data base file for the MCRObjectID type.
+     * 
+     * @param mcr_type
+     *            the MCRObjectID type
+     * @return true if all is okay, else false
+     */
+    public static boolean createDataBase(String mcr_type) {
+        // Read config file
+        String conf_filename = CONFIG.getString("MCR.persistence_config_"
+                + mcr_type);
+        if (!conf_filename.endsWith(".xml"))
+            throw new MCRException("Configuration " + mcr_type
+                    + " does not end with .xml");
+
+        logger.info("Reading file " + conf_filename + " ...");
+        InputStream conf_file = MCRBaseCommands.class.getResourceAsStream("/"
+                + conf_filename);
+        if (conf_file == null)
+            throw new MCRException("Can't read configuration file "
+                    + conf_filename);
+
+        org.jdom.Document confdoc = null;
+        try {
+            confdoc = new SAXBuilder().build(conf_file);
+        } catch (Exception ex) {
+            throw new MCRException("Can't parse configuration file "
+                    + conf_file);
+        }
+        // create the database
+
+        if (mcr_type.equals("derivate")) {
+            MCRDerivate der = new MCRDerivate();
+            der.createDataBase(mcr_type, confdoc);
+        } else {
+            MCRObject obj = new MCRObject();
+            obj.createDataBase(mcr_type, confdoc);
+        }
+        return true;
     }
-    return true;
-  }
 }
 

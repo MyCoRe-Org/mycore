@@ -31,107 +31,114 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
- * This class defines a privilege of the MyCoRe user management system. Privileges
- * must not be confused with access control lists (ACL) which control if some
- * principal (user, host, subnet etc) is allowed to access data in the system.
- * Privileges are used to define roles in the user management component of the
- * mycore system.
- *
+ * This class defines a privilege of the MyCoRe user management system.
+ * Privileges must not be confused with access control lists (ACL) which control
+ * if some principal (user, host, subnet etc) is allowed to access data in the
+ * system. Privileges are used to define roles in the user management component
+ * of the mycore system.
+ * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRPrivilege
-{
-  /** The length of the decription */
-  public static final int description_len = MCRUserObject.description_len;
+public class MCRPrivilege {
+    /** The length of the decription */
+    public static final int description_len = MCRUserObject.description_len;
 
-  /** The length of the privilege */
-  public static final int privilege_len = MCRUserObject.privilege_len;
+    /** The length of the privilege */
+    public static final int privilege_len = MCRUserObject.privilege_len;
 
-  /** The name of the privilege */
-  protected String privName;
+    /** The name of the privilege */
+    protected String privName;
 
-  /** The description of the privilege */
-  protected String privDescription;
+    /** The description of the privilege */
+    protected String privDescription;
 
-  /**
-   * constructor
-   * @param name The name of the privilege
-   * @param description The description of the privilege
-   */
-  public MCRPrivilege (String name, String description)
-  {
-    privName = MCRUserObject.trim(name,privilege_len);
-    privDescription = MCRUserObject.trim(description,description_len);
-  }
-  
-  /**
-   * copy constructor
-   */
-  public MCRPrivilege(MCRPrivilege priv)
-  {
-    this.privName = priv.privName;
-    this.privDescription = priv.privDescription;
-  }
-
-  /**
-   * constructor
-   * @param priv  the jdom.element representation of the privilege
-   */
-  public MCRPrivilege (org.jdom.Element priv)
-  {
-    privName = "";
-    privDescription = "";
-    if (!priv.getName().equals("privilege")) return;
-    privName = MCRUserObject.trim(priv.getAttributeValue("name"),
-      privilege_len);
-    List listelm = priv.getChildren();
-    for (int i=0;i<listelm.size();i++) {
-      org.jdom.Element elm = (org.jdom.Element)listelm.get(i);
-      if (!elm.getName().equals("privilege.description")) return;
-      privDescription = MCRUserObject.trim(elm.getText(),
-        description_len);
+    /**
+     * constructor
+     * 
+     * @param name
+     *            The name of the privilege
+     * @param description
+     *            The description of the privilege
+     */
+    public MCRPrivilege(String name, String description) {
+        privName = MCRUserObject.trim(name, privilege_len);
+        privDescription = MCRUserObject.trim(description, description_len);
     }
-  }
 
-  /** @return returns the name of the privilege */
-  public String getName()
-  { return privName; }
+    /**
+     * copy constructor
+     */
+    public MCRPrivilege(MCRPrivilege priv) {
+        this.privName = priv.privName;
+        this.privDescription = priv.privDescription;
+    }
 
-  /** @return returns the description of the privilege */
-  public String getDescription()
-  { return privDescription; }
+    /**
+     * constructor
+     * 
+     * @param priv
+     *            the jdom.element representation of the privilege
+     */
+    public MCRPrivilege(org.jdom.Element priv) {
+        privName = "";
+        privDescription = "";
+        if (!priv.getName().equals("privilege"))
+            return;
+        privName = MCRUserObject.trim(priv.getAttributeValue("name"),
+                privilege_len);
+        List listelm = priv.getChildren();
+        for (int i = 0; i < listelm.size(); i++) {
+            org.jdom.Element elm = (org.jdom.Element) listelm.get(i);
+            if (!elm.getName().equals("privilege.description"))
+                return;
+            privDescription = MCRUserObject
+                    .trim(elm.getText(), description_len);
+        }
+    }
 
-  /**
-   * @return
-   *   This method returns the privilege object as a JDOM element. This is needed if
-   *   one wants to get a representation of several privileges in one xml document.
-   */
-  public org.jdom.Element toJDOMElement() throws MCRException
-  {
-    org.jdom.Element priv = new org.jdom.Element("privilege").setAttribute("name", privName);
-    org.jdom.Element Description = new org.jdom.Element("privilege.description").setText(privDescription);
+    /** @return returns the name of the privilege */
+    public String getName() {
+        return privName;
+    }
 
-    // Aggregate privilege element
-    priv.addContent(Description);
-    return priv;
-  }
+    /** @return returns the description of the privilege */
+    public String getDescription() {
+        return privDescription;
+    }
 
-  /**
-   * The method check the validation of this class.
-   * @return true if name is not null or empty, else return false
-   **/
-  public boolean isValid()
-  { return (privName.length()==0) ? false : true; }
+    /**
+     * @return This method returns the privilege object as a JDOM element. This
+     *         is needed if one wants to get a representation of several
+     *         privileges in one xml document.
+     */
+    public org.jdom.Element toJDOMElement() throws MCRException {
+        org.jdom.Element priv = new org.jdom.Element("privilege").setAttribute(
+                "name", privName);
+        org.jdom.Element Description = new org.jdom.Element(
+                "privilege.description").setText(privDescription);
 
-  /**
-   * This method puts debug data to the logger (if it is set to debug mode).
-   */
-  public final void debug()
-  {
-    Logger logger = Logger.getLogger( MCRPrivilege.class.getName() );
-    logger.debug("privName           = "+privName);
-    logger.debug("privDescription    = "+privDescription);
-  }
+        // Aggregate privilege element
+        priv.addContent(Description);
+        return priv;
+    }
+
+    /**
+     * The method check the validation of this class.
+     * 
+     * @return true if name is not null or empty, else return false
+     */
+    public boolean isValid() {
+        return (privName.length() == 0) ? false : true;
+    }
+
+    /**
+     * This method puts debug data to the logger (if it is set to debug mode).
+     */
+    public final void debug() {
+        Logger logger = Logger.getLogger(MCRPrivilege.class.getName());
+        logger.debug("privName           = " + privName);
+        logger.debug("privDescription    = " + privDescription);
+    }
 }

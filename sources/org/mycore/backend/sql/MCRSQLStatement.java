@@ -35,220 +35,222 @@ import org.mycore.common.MCRConfiguration;
 /**
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
  */
-public class MCRSQLStatement
-{
-  protected final static String NULL = "NULL";
+public class MCRSQLStatement {
+    protected final static String NULL = "NULL";
 
-  protected Properties values;
-  protected Properties conditions;
-  protected Vector     columns;
-  protected String     tableName;
+    protected Properties values;
 
-	private static char MASK_CHAR;
-  
-  static{
-    MCRConfiguration config = MCRConfiguration.instance();
-  	if (config.getString("MCR.persistence_sql_database_url").indexOf(":db2:")>0){
-  		MASK_CHAR='\'';
-  	}
-  	else {
-  		MASK_CHAR='\\';
-  	}
-  	
-  }
-  
-  public MCRSQLStatement( String tableName )
-  { 
-    this.tableName  = tableName;
-    this.values     = new Properties(); 
-    this.conditions = new Properties(); 
-    this.columns    = new Vector();
-  }
-  
-  public final MCRSQLStatement setValue( String columnName, String columnValue )
-  { 
-    MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
+    protected Properties conditions;
 
-    if( columnValue == null )
-      values.put( columnName, NULL );
-    else
-      values.put( columnName, mask(columnValue) ); 
+    protected Vector columns;
 
-    return this;
-  }
-  
-  public final MCRSQLStatement setCondition( String columnName, 
-    String columnValue )
-  { 
-    MCRArgumentChecker.ensureNotEmpty( columnName, "columnName" );
+    protected String tableName;
 
-    if( columnValue == null ) 
-      conditions.put( columnName, NULL );
-    else
-      conditions.put( columnName, mask(columnValue) ); 
+    private static char MASK_CHAR;
 
-    return this;
-  }
-  
-  public final MCRSQLStatement addColumn( String columnDefinition )
-  {
-    MCRArgumentChecker.ensureNotEmpty( columnDefinition, "columnDefinition" );
-    columns.addElement( columnDefinition );
-    return this;
-  }
-  
-  protected final String getSQLValue( String key )
-  {
-    String value = values.getProperty( key );
-    return ( value == NULL ? "NULL" : "'" + value + "'" );
-  }
-  
-  protected final String condition()
-  {
-    if( conditions.isEmpty() ) return "";
-    
-    StringBuffer sql = new StringBuffer( " WHERE " );
-    
-    Enumeration keys = conditions.keys();
-    while( keys.hasMoreElements() )
-    {
-      String key   = (String)( keys.nextElement() );
-      String value = conditions.getProperty( key );
-      
-      sql.append( key ).append( " " );
-      
-      if( value == NULL ) {
-        sql.append( "IS NULL" ); }
-      else {
-        if (value.indexOf("%") == -1) {
-          sql.append( "= '" ).append( value ).append( "'" ); }
-        else {
-          sql.append( "LIKE '" ).append( value ).append( "'" ); }
+    static {
+        MCRConfiguration config = MCRConfiguration.instance();
+        if (config.getString("MCR.persistence_sql_database_url").indexOf(
+                ":db2:") > 0) {
+            MASK_CHAR = '\'';
+        } else {
+            MASK_CHAR = '\\';
         }
-      
-      if( keys.hasMoreElements() ) sql.append( " AND " );
-    }
-    return sql.toString();
-  }
-  
-  public final String toInsertStatement()
-  {
-    StringBuffer statement = new StringBuffer( "INSERT INTO " );  
-    statement.append( tableName ).append( " (" );
 
-    StringBuffer columnList = new StringBuffer();
-    StringBuffer valueList  = new StringBuffer();
-    
-    Enumeration keys = values.keys();
-    while( keys.hasMoreElements() )
-    {
-      String column = (String)( keys.nextElement() );
-      String value  = getSQLValue( column );
-      
-      columnList.append( " " ).append( column );
-      valueList .append( " " ).append( value  );
-      
-      if( keys.hasMoreElements() )
-      {
-        columnList.append( "," );
-        valueList .append( "," );
-      }
     }
-    
-    statement.append( columnList.toString() ).append( " ) VALUES (" );
-    statement.append( valueList .toString() ).append( " )" );
-    
-    return statement.toString();
-  }
-  
-  public final String toUpdateStatement()
-  {
-    StringBuffer statement = new StringBuffer( "UPDATE " );  
-    statement.append( tableName ).append( " SET" );
-    
-    Enumeration keys = values.keys();
-    while( keys.hasMoreElements() )
-    {
-      String key   = (String)( keys.nextElement() );
-      String value = getSQLValue( key );
 
-      statement.append( " " ).append( key   ).append( " =" );
-      statement.append( " " ).append( value );
-      if( keys.hasMoreElements() ) statement.append( ", "  );
+    public MCRSQLStatement(String tableName) {
+        this.tableName = tableName;
+        this.values = new Properties();
+        this.conditions = new Properties();
+        this.columns = new Vector();
     }
-    
-    statement.append( condition() );
-    
-    return statement.toString();
-  }
-  
-  public final String toCreateTableStatement()
-  {
-    StringBuffer statement = new StringBuffer( "CREATE TABLE " );  
-    statement.append( tableName ).append( " (" );
 
-    for( int i = 0; i < columns.size(); i++ )
-    {
-      statement.append( " " ).append( columns.elementAt( i ) );
-      if( i < columns.size() - 1 ) statement.append( "," );
+    public final MCRSQLStatement setValue(String columnName, String columnValue) {
+        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
+
+        if (columnValue == null)
+            values.put(columnName, NULL);
+        else
+            values.put(columnName, mask(columnValue));
+
+        return this;
     }
-    
-    statement.append( " )" );
-    
-    return statement.toString();
-  }
-  
-  public final String toIndexStatement()
-  {
-    StringBuffer statement = new StringBuffer( "CREATE INDEX " );  
-    statement.append( tableName ).append("_INDEX ON ")
-      .append( tableName ).append( " (" );
-    for( int i = 0; i < columns.size(); i++ )
-     {
-      statement.append( " " ).append( columns.elementAt( i ) );
-      if( i < columns.size() - 1 ) statement.append( "," );
+
+    public final MCRSQLStatement setCondition(String columnName,
+            String columnValue) {
+        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
+
+        if (columnValue == null)
+            conditions.put(columnName, NULL);
+        else
+            conditions.put(columnName, mask(columnValue));
+
+        return this;
     }
-    statement.append( " )" );
-    return statement.toString();
-  }
 
-  public final String toRowSelector()
-  { return new StringBuffer( tableName ).append( condition() ).toString(); }
-  
-  public final String toSelectStatement()
-  { return "SELECT * FROM " + toRowSelector(); }
-  
-  public final String toSelectStatement(String columns){
-		MCRArgumentChecker.ensureNotEmpty( columns, "Columns" );
-		return new StringBuffer("SELECT ").append(columns).append(" FROM ").append(toRowSelector()).toString();
-  }
-  
-  public final String toDeleteStatement()
-  { return "DELETE FROM " + toRowSelector(); }
+    public final MCRSQLStatement addColumn(String columnDefinition) {
+        MCRArgumentChecker.ensureNotEmpty(columnDefinition, "columnDefinition");
+        columns.addElement(columnDefinition);
+        return this;
+    }
 
-  public final String toCountStatement()
-  { return "SELECT COUNT( DISTINCT MCRFROM ) AS NUMBER FROM " + toRowSelector(); }
-  
-  /**
-   * masks the character ' in an sql statement
-   * @param value to be masked
-   * @return value with masked '
-   */
-  private final String mask(String value){
-  	final char mask='\'';
-  	if (value.indexOf(mask)==-1)
-  		return value;
-  	else{
-  		StringTokenizer tok=new StringTokenizer(value,String.valueOf(mask));
-  		StringBuffer returning=new StringBuffer();
-  		while (tok.hasMoreTokens()){
-  			returning.append(tok.nextToken()).append(MASK_CHAR).append(mask);
-  		}
-  		return returning.toString();
-  	}
-  }
-  
+    protected final String getSQLValue(String key) {
+        String value = values.getProperty(key);
+        return (value == NULL ? "NULL" : "'" + value + "'");
+    }
+
+    protected final String condition() {
+        if (conditions.isEmpty())
+            return "";
+
+        StringBuffer sql = new StringBuffer(" WHERE ");
+
+        Enumeration keys = conditions.keys();
+        while (keys.hasMoreElements()) {
+            String key = (String) (keys.nextElement());
+            String value = conditions.getProperty(key);
+
+            sql.append(key).append(" ");
+
+            if (value == NULL) {
+                sql.append("IS NULL");
+            } else {
+                if (value.indexOf("%") == -1) {
+                    sql.append("= '").append(value).append("'");
+                } else {
+                    sql.append("LIKE '").append(value).append("'");
+                }
+            }
+
+            if (keys.hasMoreElements())
+                sql.append(" AND ");
+        }
+        return sql.toString();
+    }
+
+    public final String toInsertStatement() {
+        StringBuffer statement = new StringBuffer("INSERT INTO ");
+        statement.append(tableName).append(" (");
+
+        StringBuffer columnList = new StringBuffer();
+        StringBuffer valueList = new StringBuffer();
+
+        Enumeration keys = values.keys();
+        while (keys.hasMoreElements()) {
+            String column = (String) (keys.nextElement());
+            String value = getSQLValue(column);
+
+            columnList.append(" ").append(column);
+            valueList.append(" ").append(value);
+
+            if (keys.hasMoreElements()) {
+                columnList.append(",");
+                valueList.append(",");
+            }
+        }
+
+        statement.append(columnList.toString()).append(" ) VALUES (");
+        statement.append(valueList.toString()).append(" )");
+
+        return statement.toString();
+    }
+
+    public final String toUpdateStatement() {
+        StringBuffer statement = new StringBuffer("UPDATE ");
+        statement.append(tableName).append(" SET");
+
+        Enumeration keys = values.keys();
+        while (keys.hasMoreElements()) {
+            String key = (String) (keys.nextElement());
+            String value = getSQLValue(key);
+
+            statement.append(" ").append(key).append(" =");
+            statement.append(" ").append(value);
+            if (keys.hasMoreElements())
+                statement.append(", ");
+        }
+
+        statement.append(condition());
+
+        return statement.toString();
+    }
+
+    public final String toCreateTableStatement() {
+        StringBuffer statement = new StringBuffer("CREATE TABLE ");
+        statement.append(tableName).append(" (");
+
+        for (int i = 0; i < columns.size(); i++) {
+            statement.append(" ").append(columns.elementAt(i));
+            if (i < columns.size() - 1)
+                statement.append(",");
+        }
+
+        statement.append(" )");
+
+        return statement.toString();
+    }
+
+    public final String toIndexStatement() {
+        StringBuffer statement = new StringBuffer("CREATE INDEX ");
+        statement.append(tableName).append("_INDEX ON ").append(tableName)
+                .append(" (");
+        for (int i = 0; i < columns.size(); i++) {
+            statement.append(" ").append(columns.elementAt(i));
+            if (i < columns.size() - 1)
+                statement.append(",");
+        }
+        statement.append(" )");
+        return statement.toString();
+    }
+
+    public final String toRowSelector() {
+        return new StringBuffer(tableName).append(condition()).toString();
+    }
+
+    public final String toSelectStatement() {
+        return "SELECT * FROM " + toRowSelector();
+    }
+
+    public final String toSelectStatement(String columns) {
+        MCRArgumentChecker.ensureNotEmpty(columns, "Columns");
+        return new StringBuffer("SELECT ").append(columns).append(" FROM ")
+                .append(toRowSelector()).toString();
+    }
+
+    public final String toDeleteStatement() {
+        return "DELETE FROM " + toRowSelector();
+    }
+
+    public final String toCountStatement() {
+        return "SELECT COUNT( DISTINCT MCRFROM ) AS NUMBER FROM "
+                + toRowSelector();
+    }
+
+    /**
+     * masks the character ' in an sql statement
+     * 
+     * @param value
+     *            to be masked
+     * @return value with masked '
+     */
+    private final String mask(String value) {
+        final char mask = '\'';
+        if (value.indexOf(mask) == -1)
+            return value;
+        else {
+            StringTokenizer tok = new StringTokenizer(value, String
+                    .valueOf(mask));
+            StringBuffer returning = new StringBuffer();
+            while (tok.hasMoreTokens()) {
+                returning.append(tok.nextToken()).append(MASK_CHAR)
+                        .append(mask);
+            }
+            return returning.toString();
+        }
+    }
+
 }

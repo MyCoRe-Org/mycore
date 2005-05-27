@@ -26,23 +26,19 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of "true", meaning everybody has access.
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRTrueClause implements MCRAccessCtrlDefinition
-{
-    MCRTrueClause()
-    {
+class MCRTrueClause implements MCRAccessCtrlDefinition {
+    MCRTrueClause() {
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	return true;
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return true;
     }
-    
-    public String toString()
-    {
-	return "true\n";
+
+    public String toString() {
+        return "true\n";
     }
 };
 

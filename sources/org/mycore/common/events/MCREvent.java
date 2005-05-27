@@ -27,40 +27,48 @@ package org.mycore.common.events;
 /**
  * Represents an event that occured in the MyCoRe system. Events are of a
  * predefined type like create, update, delete and can be handled by
- * MCREventHandler implementations. Events are automatically created by some 
- * MyCoRe components and are forwarded to the handlers by MCREventManager. 
+ * MCREventHandler implementations. Events are automatically created by some
+ * MyCoRe components and are forwarded to the handlers by MCREventManager.
  * 
  * @author Frank Lützenkirchen
- **/
-public class MCREvent extends java.util.Hashtable
-{
-  /** Predefined event type metadata object created **/
-  public static final int OBJECT_CREATED = 0;
-  /** Predefined event type metadata object updated **/
-  public static final int OBJECT_UPDATED = 1;
-  /** Predefined event type metadata object deleted **/
-  public static final int OBJECT_DELETED = 2;
+ */
+public class MCREvent extends java.util.Hashtable {
+    /** Predefined event type metadata object created * */
+    public static final int OBJECT_CREATED = 0;
 
-  private String[] typeStrings = { "object created", "object updated", "object deleted" };
-  private int type;
-  
-  /**
-   * Creates a new event object of the given type
-   **/
-  public MCREvent( int type )
-  { this.type = type; }
-  
-  /**
-   * Returns the type of this event
-   * @return the type of this event
-   **/
-  public int getType()
-  { return type; }
-  
-  /**
-   * Returns the type of this event as a String for debugging
-   * @return the type of this event as a String for debugging
-   **/
-  public String getTypeString()
-  { return typeStrings[ type ]; }
+    /** Predefined event type metadata object updated * */
+    public static final int OBJECT_UPDATED = 1;
+
+    /** Predefined event type metadata object deleted * */
+    public static final int OBJECT_DELETED = 2;
+
+    private String[] typeStrings = { "object created", "object updated",
+            "object deleted" };
+
+    private int type;
+
+    /**
+     * Creates a new event object of the given type
+     */
+    public MCREvent(int type) {
+        this.type = type;
+    }
+
+    /**
+     * Returns the type of this event
+     * 
+     * @return the type of this event
+     */
+    public int getType() {
+        return type;
+    }
+
+    /**
+     * Returns the type of this event as a String for debugging
+     * 
+     * @return the type of this event as a String for debugging
+     */
+    public String getTypeString() {
+        return typeStrings[type];
+    }
 }

@@ -28,20 +28,20 @@ import java.util.*;
 
 /**
  * This interface is designed to incude external application commands.
- *
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
-public interface MCRExternalCommandInterface
-{
+ */
+public interface MCRExternalCommandInterface {
 
-/**
- * The method return the list of possible commands of this class.
- * Each command has TWO Strings, a String of the user command syntax and
- * a String of the called method.
- * @return a command pair RArrayList
- **/
-public ArrayList getPossibleCommands();
+    /**
+     * The method return the list of possible commands of this class. Each
+     * command has TWO Strings, a String of the user command syntax and a String
+     * of the called method.
+     * 
+     * @return a command pair RArrayList
+     */
+    public ArrayList getPossibleCommands();
 
 }
 

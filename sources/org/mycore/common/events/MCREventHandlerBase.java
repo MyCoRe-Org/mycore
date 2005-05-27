@@ -28,65 +28,70 @@ import org.apache.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * Abstract helper class that can be subclassed to implement event handlers
- * more easily.
+ * Abstract helper class that can be subclassed to implement event handlers more
+ * easily.
  * 
  * @author Frank Lützenkirchen
- **/
-public abstract class MCREventHandlerBase implements MCREventHandler
-{
-  private static Logger logger = Logger.getLogger( MCREventHandlerBase.class );
-  
-  public void doHandleEvent( MCREvent evt )
-  {
-    MCRObject obj = (MCRObject)( evt.get( "object" ) );
-    if( obj != null )
-    {
-      logger.debug( getClass().getName() + " handling " + 
-        obj.getId().getId() + evt.getTypeString() );
+ */
+public abstract class MCREventHandlerBase implements MCREventHandler {
+    private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
+
+    public void doHandleEvent(MCREvent evt) {
+        MCRObject obj = (MCRObject) (evt.get("object"));
+        if (obj != null) {
+            logger.debug(getClass().getName() + " handling "
+                    + obj.getId().getId() + evt.getTypeString());
+        }
+
+        switch (evt.getType()) {
+        case MCREvent.OBJECT_CREATED:
+            handleObjectCreated(evt, obj);
+            break;
+        case MCREvent.OBJECT_UPDATED:
+            handleObjectUpdated(evt, obj);
+            break;
+        case MCREvent.OBJECT_DELETED:
+            handleObjectDeleted(evt, obj);
+            break;
+        }
     }
-    
-    switch( evt.getType() )
-    {
-      case MCREvent.OBJECT_CREATED:
-        handleObjectCreated( evt, obj );
-        break;
-      case MCREvent.OBJECT_UPDATED:
-        handleObjectUpdated( evt, obj );
-        break;
-      case MCREvent.OBJECT_DELETED:
-        handleObjectDeleted( evt, obj );
-        break;
+
+    /**
+     * Handles object created events. This implementation does nothing and
+     * should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
     }
-  }
-  
-  /**
-   * Handles object created events. This implementation does nothing and
-   * should be overwritted by subclasses.
-   * 
-   * @param evt the event that occured
-   * @param obj the MCRObject that caused the event
-   **/
-  protected void handleObjectCreated( MCREvent evt, MCRObject obj )
-  { logger.debug( "This default handler implementation does nothing"); }
-  
-  /**
-   * Handles object updated events. This implementation does nothing and
-   * should be overwritted by subclasses.
-   * 
-   * @param evt the event that occured
-   * @param obj the MCRObject that caused the event
-   **/
-  protected void handleObjectUpdated( MCREvent evt, MCRObject obj )
-  { logger.debug( "This default handler implementation does nothing"); }
-  
-  /**
-   * Handles object deleted events. This implementation does nothing and
-   * should be overwritted by subclasses.
-   * 
-   * @param evt the event that occured
-   * @param obj the MCRObject that caused the event
-   **/
-  protected void handleObjectDeleted( MCREvent evt, MCRObject obj )
-  { logger.debug( "This default handler implementation does nothing"); }
+
+    /**
+     * Handles object updated events. This implementation does nothing and
+     * should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles object deleted events. This implementation does nothing and
+     * should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
+    }
 }

@@ -25,31 +25,36 @@
 package org.mycore.common;
 
 /**
- * Instances of this class represent a general exception thrown by the persistency layer of the 
- * MyCoRe implementation. This will be the case when the datastore reports an error, for example.
- *
+ * Instances of this class represent a general exception thrown by the
+ * persistency layer of the MyCoRe implementation. This will be the case when
+ * the datastore reports an error, for example.
+ * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCRPersistenceException extends MCRException
-{
-  /**
-   * Creates a new MCRPersistenceException with an error message
-   *
-   * @param message the error message for this exception
-   */  
-  public MCRPersistenceException( String message )
-  { super( message ); }
-  
-  /**
-   * Creates a new MCRPersistenceException with an error message and a reference 
-   * to an exception thrown by an underlying system.
-   *
-   * @param message the error message for this exception
-   * @param exception the exception that was thrown by an underlying system
-   */  
-  public MCRPersistenceException( String message, Exception exception )
-  { super( message, exception ); };
-} 
+ */
+public class MCRPersistenceException extends MCRException {
+    /**
+     * Creates a new MCRPersistenceException with an error message
+     * 
+     * @param message
+     *            the error message for this exception
+     */
+    public MCRPersistenceException(String message) {
+        super(message);
+    }
+
+    /**
+     * Creates a new MCRPersistenceException with an error message and a
+     * reference to an exception thrown by an underlying system.
+     * 
+     * @param message
+     *            the error message for this exception
+     * @param exception
+     *            the exception that was thrown by an underlying system
+     */
+    public MCRPersistenceException(String message, Exception exception) {
+        super(message, exception);
+    };
+}
 

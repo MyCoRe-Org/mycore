@@ -100,7 +100,7 @@ public class MCRLayoutServlet extends MCRServlet {
 
     public void init() throws ServletException {
         super.init();
-        MCRURIResolver.init( getServletContext(), getBaseURL() );
+        MCRURIResolver.init(getServletContext(), getBaseURL());
         buildTransformerFactory();
         CACHE = new MCRCache(100);
     }
@@ -238,10 +238,13 @@ public class MCRLayoutServlet extends MCRServlet {
         String styleDir = "/WEB-INF/stylesheets/";
         File styleFile = getStylesheetFile(styleDir, styleName);
         if ((styleFile == null)
-                && ((style.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage())))){
-            /* We are here because we tried StaticFileServlet tried
-             * to get a stylesheet for a specific language */
-            style="default";
+                && ((style.equals(MCRSessionMgr.getCurrentSession()
+                        .getCurrentLanguage())))) {
+            /*
+             * We are here because we tried StaticFileServlet tried to get a
+             * stylesheet for a specific language
+             */
+            style = "default";
             styleName = buildStylesheetName(style, docType, type);
             styleFile = getStylesheetFile(styleDir, styleName);
         }
@@ -261,7 +264,8 @@ public class MCRLayoutServlet extends MCRServlet {
                  */
                 String mode = getProperty(request, "mode");
                 String layout = getProperty(request, "layout");
-                String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+                String lang = MCRSessionMgr.getCurrentSession()
+                        .getCurrentLanguage();
                 if ((layout == null) || (layout.equals("")))
                     layout = type;
                 style = mode + "-" + layout + "-" + lang;
@@ -298,10 +302,11 @@ public class MCRLayoutServlet extends MCRServlet {
     }
 
     public static Properties buildXSLParameters(HttpServletRequest request) {
-        Properties parameters = (Properties)( MCRConfiguration.instance().getProperties().clone() );
+        Properties parameters = (Properties) (MCRConfiguration.instance()
+                .getProperties().clone());
 
-	// Read all properties from mycore.properties
-        
+        // Read all properties from mycore.properties
+
         // Read all *.xsl attributes that are stored in the browser session
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -336,14 +341,15 @@ public class MCRLayoutServlet extends MCRServlet {
                 "MCR.users_guestuser_username");
         String lang = defaultLang;
         String referer = request.getHeader("Referer");
-        if (referer==null) referer="";
-        
+        if (referer == null)
+            referer = "";
+
         // handle HttpSession
-        if (session !=null && !request.isRequestedSessionIdFromCookie()){
-        	parameters.put("HttpSession",";jsessionid="+session.getId());
+        if (session != null && !request.isRequestedSessionIdFromCookie()) {
+            parameters.put("HttpSession", ";jsessionid=" + session.getId());
         }
         if (session != null) {
-        		parameters.put("JSessionID",";jsessionid="+session.getId());
+            parameters.put("JSessionID", ";jsessionid=" + session.getId());
             MCRSession mcrSession = (MCRSession) (session
                     .getAttribute("mycore.session"));
             if (mcrSession != null) {
@@ -352,24 +358,23 @@ public class MCRLayoutServlet extends MCRServlet {
             }
         }
         // set type mapping
-        StringBuffer typeParam=new StringBuffer();
-  			Set entries=getTypeMapping().entrySet();
-  			Iterator it=entries.iterator();
-  			Map.Entry entry;
-  			while (it.hasNext()){
-  				entry=(Map.Entry)it.next();
-  				typeParam.append(entry.getKey())
-  				.append(":")
-  				.append(entry.getValue())
-  				.append(";");
-  			}
-        
+        StringBuffer typeParam = new StringBuffer();
+        Set entries = getTypeMapping().entrySet();
+        Iterator it = entries.iterator();
+        Map.Entry entry;
+        while (it.hasNext()) {
+            entry = (Map.Entry) it.next();
+            typeParam.append(entry.getKey()).append(":").append(
+                    entry.getValue()).append(";");
+        }
 
         LOGGER.debug("LayoutServlet XSL.MCRSessionID="
                 + parameters.getProperty("MCRSessionID"));
         LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
-        LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
-        LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
+        LOGGER.debug("LayoutServlet HttpSession ="
+                + parameters.getProperty("HttpSession"));
+        LOGGER.debug("LayoutServlet JSessionID ="
+                + parameters.getProperty("JSessionID"));
         LOGGER.debug("LayoutServlet RefererURL =" + referer);
         LOGGER.debug("LayoutServlet TypeMapping =" + typeParam);
 
@@ -448,7 +453,7 @@ public class MCRLayoutServlet extends MCRServlet {
                     "Could not load a SAXTransformerFactory for use with XSLT");
 
         factory = (SAXTransformerFactory) (tf);
-        factory.setURIResolver( MCRURIResolver.instance() ); 
+        factory.setURIResolver(MCRURIResolver.instance());
     }
 
     /**
@@ -559,21 +564,22 @@ public class MCRLayoutServlet extends MCRServlet {
             out.close();
         }
     }
-    
+
     private static Map getTypeMapping() {
-		Hashtable map = new Hashtable();
-		final String prefix = "MCR.type_";
-		Properties prop = MCRConfiguration.instance().getProperties(prefix);
-		Enumeration names = prop.propertyNames();
-		while (names.hasMoreElements()) {
-			String name = (String) (names.nextElement());
-			String name_in = name + "_in";
-			if (MCRConfiguration.instance().getBoolean(name)
-					&& MCRConfiguration.instance().getProperties().containsKey(name_in)) {
-				map.put(name.substring(prefix.length()), MCRConfiguration
-						.instance().getString(name_in));
-			}
-		}
-		return map;
-	}
+        Hashtable map = new Hashtable();
+        final String prefix = "MCR.type_";
+        Properties prop = MCRConfiguration.instance().getProperties(prefix);
+        Enumeration names = prop.propertyNames();
+        while (names.hasMoreElements()) {
+            String name = (String) (names.nextElement());
+            String name_in = name + "_in";
+            if (MCRConfiguration.instance().getBoolean(name)
+                    && MCRConfiguration.instance().getProperties().containsKey(
+                            name_in)) {
+                map.put(name.substring(prefix.length()), MCRConfiguration
+                        .instance().getString(name_in));
+            }
+        }
+        return map;
+    }
 }

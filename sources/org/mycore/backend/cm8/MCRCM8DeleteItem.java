@@ -40,63 +40,75 @@ import com.ibm.mm.sdk.server.DKDatastoreICM;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 
-public class MCRCM8DeleteItem
-{
+public class MCRCM8DeleteItem {
 
-// The configuration
-static MCRConfiguration conf = null;
+    // The configuration
+    static MCRConfiguration conf = null;
 
-static String database = "";
-static String userid = "";
-static String password = "";
-static String itemtype = "";
-static String select = "";
+    static String database = "";
 
-public static void main(String argv[]) throws DKException, Exception
-  {
-  // Read the arguments
-  if ((argv.length != 1) && (argv.length != 2)) {
-    System.out.println("The number of argument(s) is not 1 or 2 .");
-    System.out.println();
+    static String userid = "";
+
+    static String password = "";
+
+    static String itemtype = "";
+
+    static String select = "";
+
+    public static void main(String argv[]) throws DKException, Exception {
+        // Read the arguments
+        if ((argv.length != 1) && (argv.length != 2)) {
+            System.out.println("The number of argument(s) is not 1 or 2 .");
+            System.out.println();
+        }
+        itemtype = argv[0];
+        if (argv.length == 2) {
+            select = argv[1];
+        }
+
+        // read the configuration
+        conf = MCRConfiguration.instance();
+        database = conf.getString("MCR.persistence_cm8_library_server");
+        userid = conf.getString("MCR.persistence_cm8_user_id");
+        password = conf.getString("MCR.persistence_cm8_password");
+
+        // Open connection
+        DKDatastoreICM dsICM = new DKDatastoreICM(); // Create new datastore
+                                                     // object.
+        dsICM.connect(database, userid, password, ""); // Connect to the
+                                                       // datastore.
+
+        String query = "/" + itemtype + select;
+        System.out.println("Delete all items with " + query + ", server "
+                + database);
+
+        // Specify Search / Query Options
+        DKNVPair options[] = new DKNVPair[3];
+        options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0"); // No
+                                                                           // Maximum
+                                                                           // (Default)
+        options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE, new Integer(
+                DKConstant.DK_CM_CONTENT_YES));
+        options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END, null);
+
+        DKResults results = (DKResults) dsICM.evaluate(query,
+                DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
+        dkIterator iter = results.createIterator();
+        System.out
+                .println("Number of datas to delete " + results.cardinality());
+
+        while (iter.more()) {
+            System.out.print("Delete data ...");
+            DKDDO ddo = (DKDDO) iter.next(); // Move pointer to next element and
+                                             // obtain that object.
+            ddo.del();
+            System.out.println(" done.");
+        }
+
+        dsICM.disconnect();
     }
-  itemtype = argv[0]; 
-  if (argv.length == 2) { select =argv[1]; }
-
-  // read the configuration
-  conf = MCRConfiguration.instance();
-  database = conf.getString("MCR.persistence_cm8_library_server");
-  userid = conf.getString("MCR.persistence_cm8_user_id");
-  password = conf.getString("MCR.persistence_cm8_password");
-
-  // Open connection
-  DKDatastoreICM dsICM = new DKDatastoreICM();  // Create new datastore object.
-  dsICM.connect(database,userid,password,""); // Connect to the datastore.
-
-  String query = "/"+itemtype+select;
-  System.out.println("Delete all items with "+query+", server "+database);
-                
-  // Specify Search / Query Options
-  DKNVPair options[] = new DKNVPair[3];
-  options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0"); // No Maximum (Default)                    
-  options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,new Integer(DKConstant.DK_CM_CONTENT_YES)); 
-  options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END,null);        
-
-  DKResults results = (DKResults)dsICM.evaluate(query, 
-    DKConstantICM.DK_CM_XQPE_QL_TYPE, options);              
-  dkIterator iter = results.createIterator();
-  System.out.println("Number of datas to delete "+results.cardinality());
-                  
-  while(iter.more()) { 
-    System.out.print("Delete data ...");
-    DKDDO ddo= (DKDDO) iter.next();  // Move pointer to next element and obtain that object.                          
-    ddo.del();
-    System.out.println(" done.");
-    }
-
-  dsICM.disconnect();
-  }
 
 }
 

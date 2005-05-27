@@ -35,75 +35,80 @@ import com.ibm.mm.sdk.common.DKTextIndexDefICM;
 import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
- * This class implements the interface for the CM8 persistence layer for
- * the data model type MetaClassification.
- *
+ * This class implements the interface for the CM8 persistence layer for the
+ * data model type MetaClassification.
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 
-public class MCRCM8MetaClassification implements DKConstantICM, 
-  MCRCM8MetaInterface
-{
+public class MCRCM8MetaClassification implements DKConstantICM,
+        MCRCM8MetaInterface {
 
-/**
- * This method create a DKComponentTypeDefICM to create a complete
- * ItemType from the configuration.
- *
- * @param element  a MCR datamodel element as JDOM Element
- * @param connection the connection to the CM8 datastore
- * @param dsDefICM the datastore definition
- * @param prefix the prefix name for the item type
- * @param textindex the definition of the text search index
- * @param textserach the flag to use textsearch as string
- *                   (the value has no effect for this class)
- * @return a DKComponentTypeDefICM for the MCR datamodel element
- * @exception MCRPersistenceException general Exception of MyCoRe CM8
- **/
-public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException
-  {
-  Logger logger = MCRCM8ConnectionPool.getLogger();
-  String subtagname = prefix+(String)element.getAttribute("name").getValue();
-  String classname = prefix+"classid";
-  String categname = prefix+"categid";
-  int clalen = 
-    org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CLASSID_LENGTH;
-  int catlen = 
-    org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CATEGID_LENGTH;
+    /**
+     * This method create a DKComponentTypeDefICM to create a complete ItemType
+     * from the configuration.
+     * 
+     * @param element
+     *            a MCR datamodel element as JDOM Element
+     * @param connection
+     *            the connection to the CM8 datastore
+     * @param dsDefICM
+     *            the datastore definition
+     * @param prefix
+     *            the prefix name for the item type
+     * @param textindex
+     *            the definition of the text search index
+     * @param textserach
+     *            the flag to use textsearch as string (the value has no effect
+     *            for this class)
+     * @return a DKComponentTypeDefICM for the MCR datamodel element
+     * @exception MCRPersistenceException
+     *                general Exception of MyCoRe CM8
+     */
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
+            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
+            String prefix, DKTextIndexDefICM textindex, String textsearch)
+            throws MCRPersistenceException {
+        Logger logger = MCRCM8ConnectionPool.getLogger();
+        String subtagname = prefix
+                + (String) element.getAttribute("name").getValue();
+        String classname = prefix + "classid";
+        String categname = prefix + "categid";
+        int clalen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CLASSID_LENGTH;
+        int catlen = org.mycore.datamodel.metadata.MCRMetaClassification.MAX_CATEGID_LENGTH;
 
-  DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
-  try {
-    // create component child
-    lt.setName(subtagname);
-    lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    DKAttrDefICM attr;
-    // create the classid attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,classname,
-      clalen,false);
-    // add type attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(classname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the categid attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,categname,
-      catlen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(categname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
+        DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
+        try {
+            // create component child
+            lt.setName(subtagname);
+            lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+            DKAttrDefICM attr;
+            // create the classid attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, classname,
+                    clalen, false);
+            // add type attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix + "type");
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(classname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the categid attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, categname,
+                    catlen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(categname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+        } catch (Exception e) {
+            throw new MCRPersistenceException(e.getMessage(), e);
+        }
+        return lt;
     }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  return lt;
-  }
 
 }

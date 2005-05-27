@@ -27,11 +27,11 @@ package org.mycore.packagename;
 import org.mycore.otherpackages;
 
 /**
- *
+ * 
  * @author Autor
+ *
  * @version $Revision$ $Date$
- **/
-public class MCRClass
-{
-}
+ */
+public class MCRClass {
 
+}

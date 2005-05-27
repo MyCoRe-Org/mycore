@@ -33,23 +33,26 @@ import java.util.Date;
 import org.mycore.user.MCRGroup;
 
 /**
- * Class which extends MCRGroup with setters and getters in order to be usable for Hibernate.
- *
+ * Class which extends MCRGroup with setters and getters in order to be usable
+ * for Hibernate.
+ * 
  * @see org.mycore.user.MCRGroup
- *
+ * 
  * @author Matthias Kramm
  */
-class MCRGroupExt extends MCRGroup
-{
+class MCRGroupExt extends MCRGroup {
     MCRGroupExt() {
     }
+
     MCRGroupExt(MCRGroup group) {
-	super(group);
+        super(group);
     }
+
     void setID(String id) {
-	this.ID = id;
+        this.ID = id;
     }
+
     void setDescription(String desc) {
-	this.description = description;
+        this.description = description;
     }
 }

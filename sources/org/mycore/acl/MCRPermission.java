@@ -18,56 +18,53 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
- 
 package org.mycore.acl;
+
 ///============================================================================§
 
 /**
  * This interface defines a permission.
- *
- * <P>
- * A permission is simply a name which corresponds to
- * a method call, a method call with specific arguments or 
- * a group of method calls on a guarded object, e.g
- * the permission "set" could stand for the right to call
- * <code>setXXX</code>-methods with arbitrary arguments for a given class.
- *
- * <P>
- * Permission objects should be immutable, so that they can be shared.
- * In general permissions are defined as static constants in a class.
- * For a given application there should exist exactly one instance 
- * of a permission for a class.
- *
- * <P>
- * In addition to the name a permission may contain a description, 
- * which can be used in help texts and ACL editors.
  * 
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
-
+ * <P>
+ * A permission is simply a name which corresponds to a method call, a method
+ * call with specific arguments or a group of method calls on a guarded object,
+ * e.g the permission "set" could stand for the right to call
+ * <code>setXXX</code> -methods with arbitrary arguments for a given class.
+ * 
+ * <P>
+ * Permission objects should be immutable, so that they can be shared. In
+ * general permissions are defined as static constants in a class. For a given
+ * application there should exist exactly one instance of a permission for a
+ * class.
+ * 
+ * <P>
+ * In addition to the name a permission may contain a description, which can be
+ * used in help texts and ACL editors.
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public interface MCRPermission {
-///============================================================================/
+    ///============================================================================/
 
-  /**
-   * Returns the name of the permission.
-   *
-   * @return string representing the name of the permission.
-   */
+    /**
+     * Returns the name of the permission.
+     * 
+     * @return string representing the name of the permission.
+     */
 
-  public String getName ();
+    public String getName();
 
-   
-//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
 
-  /**
-   * Returns a description of the permission.
-   *
-   * @return string representing the description of the permission.
-   */
+    /**
+     * Returns a description of the permission.
+     * 
+     * @return string representing the description of the permission.
+     */
 
-   public String getDescription ();
+    public String getDescription();
 
-//-============================================================================\
+    //-============================================================================\
 }

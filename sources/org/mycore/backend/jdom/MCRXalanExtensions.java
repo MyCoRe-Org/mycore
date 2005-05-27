@@ -31,48 +31,48 @@ import org.mycore.common.MCRUtils;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRXalanExtensions
-{
-  /**
-   * This method implements a XSLT function to compare two date values.
-   * 
-   * @param date_one
-   *            the date that should be compared with date_two
-   * @param date_two
-   *            the data that date_one is compared with
-   * @param compare_operator
-   *            The operator to compare in the form 'date_one compare_operator
-   *            date_two'
-   * @return true if the test is correct, else return false
-   */
-  public static boolean compareDates( String date_one, String date_two,
-      String compare_operator )
-  {
-    String date1iso = MCRUtils.covertDateToISO( date_one );
-    String date2iso = MCRUtils.covertDateToISO( date_two );
+public class MCRXalanExtensions {
+    /**
+     * This method implements a XSLT function to compare two date values.
+     * 
+     * @param date_one
+     *            the date that should be compared with date_two
+     * @param date_two
+     *            the data that date_one is compared with
+     * @param compare_operator
+     *            The operator to compare in the form 'date_one compare_operator
+     *            date_two'
+     * @return true if the test is correct, else return false
+     */
+    public static boolean compareDates(String date_one, String date_two,
+            String compare_operator) {
+        String date1iso = MCRUtils.covertDateToISO(date_one);
+        String date2iso = MCRUtils.covertDateToISO(date_two);
 
-    if( ( date1iso == null ) || ( date2iso == null )
-        || ( date1iso.length() == 0 ) || ( date2iso.length() == 0 ) )
-        return false;
-    if( ( compare_operator == null )
-        || ( ( compare_operator = compare_operator.trim() ).length() == 0 ) ) { return false; }
+        if ((date1iso == null) || (date2iso == null)
+                || (date1iso.length() == 0) || (date2iso.length() == 0))
+            return false;
+        if ((compare_operator == null)
+                || ((compare_operator = compare_operator.trim()).length() == 0)) {
+            return false;
+        }
 
-    int result = date1iso.compareTo( date2iso );
+        int result = date1iso.compareTo(date2iso);
 
-    if( compare_operator.equals( "=" ) )
-      return ( result == 0 );
-    else if( compare_operator.equals( "!=" ) )
-      return ( result != 0 );
-    else if( compare_operator.equals( "<=" ) )
-      return ( result <= 0 );
-    else if( compare_operator.equals( ">=" ) )
-      return ( result >= 0 );
-    else if( compare_operator.equals( "<" ) )
-      return ( result < 0 );
-    else if( compare_operator.equals( ">" ) )
-      return ( result > 0 );
-    else
-      return false;
-  }
+        if (compare_operator.equals("="))
+            return (result == 0);
+        else if (compare_operator.equals("!="))
+            return (result != 0);
+        else if (compare_operator.equals("<="))
+            return (result <= 0);
+        else if (compare_operator.equals(">="))
+            return (result >= 0);
+        else if (compare_operator.equals("<"))
+            return (result < 0);
+        else if (compare_operator.equals(">"))
+            return (result > 0);
+        else
+            return false;
+    }
 }
 

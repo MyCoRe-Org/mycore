@@ -33,54 +33,54 @@ import org.mycore.common.*;
  * This class simply is a container for objects needed during a Servlet session
  * like the HttpServletRequest and HttpServeltResponse. The class provids only
  * get-methods to return the objects set while constructing the job object.
- *
+ * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
- **/
-public class MCRServletJob
-{
-  /** The HttpServletRequest object */
-  private HttpServletRequest theRequest= null;
+ */
+public class MCRServletJob {
+    /** The HttpServletRequest object */
+    private HttpServletRequest theRequest = null;
 
-  /** The HttpServletResponse object */
-  private HttpServletResponse theResponse = null;
+    /** The HttpServletResponse object */
+    private HttpServletResponse theResponse = null;
 
-  /**
-   * The constructor takes the given objects and stores them in private objects.
-   *
-   * @param theRequest  the HttpServletRequest object for this servlet job
-   * @param theResponse the HttpServletResponse object for this servlet job
-   */
-  public MCRServletJob(HttpServletRequest theRequest,
-                       HttpServletResponse theResponse)
-  {
-    this.theRequest  = theRequest;
-    this.theResponse = theResponse;
-  }
-
-  /** returns the HttpServletRequest object */
-  public HttpServletRequest getRequest()
-  { return theRequest; }
-
-  /** returns the HttpServletResponse object */
-  public HttpServletResponse getResponse()
-  { return theResponse; }
-
-  /** returns true if the current http request was issued from the local host **/
-  public boolean isLocal()
-  {
-    try
-    {
-      String serverName = theRequest.getServerName(); 
-      String serverIP   = InetAddress.getByName( serverName ).getHostAddress();  
-      String remoteIP   = MCRServlet.getRemoteAddr( theRequest );
-      return ( remoteIP.equals( serverIP ) || remoteIP.equals( "127.0.0.1" ) );
+    /**
+     * The constructor takes the given objects and stores them in private
+     * objects.
+     * 
+     * @param theRequest
+     *            the HttpServletRequest object for this servlet job
+     * @param theResponse
+     *            the HttpServletResponse object for this servlet job
+     */
+    public MCRServletJob(HttpServletRequest theRequest,
+            HttpServletResponse theResponse) {
+        this.theRequest = theRequest;
+        this.theResponse = theResponse;
     }
-    catch( Exception ex )
-    {
-      String msg = "Exception while testing if http request was from local host";
-      throw new MCRConfigurationException( msg, ex );
+
+    /** returns the HttpServletRequest object */
+    public HttpServletRequest getRequest() {
+        return theRequest;
     }
-  }
+
+    /** returns the HttpServletResponse object */
+    public HttpServletResponse getResponse() {
+        return theResponse;
+    }
+
+    /** returns true if the current http request was issued from the local host * */
+    public boolean isLocal() {
+        try {
+            String serverName = theRequest.getServerName();
+            String serverIP = InetAddress.getByName(serverName)
+                    .getHostAddress();
+            String remoteIP = MCRServlet.getRemoteAddr(theRequest);
+            return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
+        } catch (Exception ex) {
+            String msg = "Exception while testing if http request was from local host";
+            throw new MCRConfigurationException(msg, ex);
+        }
+    }
 }
 

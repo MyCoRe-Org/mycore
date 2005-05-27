@@ -26,35 +26,33 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of a (x and y) clause
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRAndClause implements MCRAccessCtrlDefinition
-{
-    private MCRAccessCtrlDefinition left,right;
+class MCRAndClause implements MCRAccessCtrlDefinition {
+    private MCRAccessCtrlDefinition left, right;
 
-    MCRAndClause(MCRAccessCtrlDefinition left, MCRAccessCtrlDefinition right)
-    {
-	this.left = left;
-	this.right = right;
+    MCRAndClause(MCRAccessCtrlDefinition left, MCRAccessCtrlDefinition right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	if(!left.hasAccess(user, date, ip))
-	    return false;
-	if(!right.hasAccess(user, date, ip))
-	    return false;
-	return true;
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        if (!left.hasAccess(user, date, ip))
+            return false;
+        if (!right.hasAccess(user, date, ip))
+            return false;
+        return true;
     }
 
-    public String toString()
-    {
-	StringBuffer sb = new StringBuffer();
-	sb.append("AND\n");
-	sb.append("*   "+left.toString().replaceAll("\n", "\n    ").trim()+"\n");
-	sb.append("*   "+right.toString().replaceAll("\n", "\n    ").trim()+"\n");
-	return sb.toString();
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("AND\n");
+        sb.append("*   " + left.toString().replaceAll("\n", "\n    ").trim()
+                + "\n");
+        sb.append("*   " + right.toString().replaceAll("\n", "\n    ").trim()
+                + "\n");
+        return sb.toString();
     }
 };
 

@@ -31,28 +31,26 @@ import org.mycore.common.*;
 
 /**
  * Loads an XML document from a source to edit it with MCREditorServlet.
- *
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public interface MCREditorXMLSource
-{
-  /** 
-   * Returns true, if the current servlet user is allowed to edit
-   * the object with the given ID.
-   **/
-  public boolean isEditingAllowed( HttpServletRequest request,
-                                   ServletContext     context,
-                                   String             objectID )
-    throws Exception;
+ */
+public interface MCREditorXMLSource {
+    /**
+     * Returns true, if the current servlet user is allowed to edit the object
+     * with the given ID.
+     */
+    public boolean isEditingAllowed(HttpServletRequest request,
+            ServletContext context, String objectID) throws Exception;
 
-  /**
-   * Loads the object with the given ID from the underlying system
-   * and returns it as a JDOM XML document.
-   *
-   * @return the input XML document for editing, or null if no such object exists.
-   **/
-  public Document loadDocument( String objectID, ServletContext context )
-    throws Exception;
+    /**
+     * Loads the object with the given ID from the underlying system and returns
+     * it as a JDOM XML document.
+     * 
+     * @return the input XML document for editing, or null if no such object
+     *         exists.
+     */
+    public Document loadDocument(String objectID, ServletContext context)
+            throws Exception;
 }
 

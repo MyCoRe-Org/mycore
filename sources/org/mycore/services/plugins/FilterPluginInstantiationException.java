@@ -26,38 +26,36 @@ package org.mycore.services.plugins;
 import org.mycore.common.MCRException;
 
 /**
- * Thrown when an application tries to create an instance of a 
- * class implementing the TextFilterPlugin interface, but the 
- * specified class object cannot be instantiated because it has 
- * requisites that are no met.
+ * Thrown when an application tries to create an instance of a class
+ * implementing the TextFilterPlugin interface, but the specified class object
+ * cannot be instantiated because it has requisites that are no met.
  * 
  * @author Thomas Scheffler (yagee)
  */
 public class FilterPluginInstantiationException extends MCRException {
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @see MCRException
-	 */
-	public FilterPluginInstantiationException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @see MCRException
+     */
+    public FilterPluginInstantiationException(String message) {
+        super(message);
+        // TODO Auto-generated constructor stub
+    }
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @param exception
- 	 * @see MCRException
-	 */
-	public FilterPluginInstantiationException(
-		String message,
-		Exception exception) {
-		super(message, exception);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @param exception
+     * @see MCRException
+     */
+    public FilterPluginInstantiationException(String message,
+            Exception exception) {
+        super(message, exception);
+        // TODO Auto-generated constructor stub
+    }
 
 }

@@ -26,25 +26,22 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of a dummy clause (useful for debugging)
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRDummyClause implements MCRAccessCtrlDefinition
-{
+class MCRDummyClause implements MCRAccessCtrlDefinition {
     private String s;
-    MCRDummyClause(String s)
-    {
-	this.s = s;
+
+    MCRDummyClause(String s) {
+        this.s = s;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	return false;
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return false;
     }
-    
-    public String toString()
-    {
-	return "\""+s+"\"";
+
+    public String toString() {
+        return "\"" + s + "\"";
     }
 };
 

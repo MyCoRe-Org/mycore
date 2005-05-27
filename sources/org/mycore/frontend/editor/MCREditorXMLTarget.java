@@ -30,32 +30,29 @@ import org.jdom.Document;
 import org.mycore.common.*;
 
 /**
- * Saves an XML document that was edited with EditorServlet
- * to an underlying system.
- *
+ * Saves an XML document that was edited with EditorServlet to an underlying
+ * system.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public interface MCREditorXMLTarget
-{
-  /** 
-   * Returns true, if the current servlet user is allowed to edit
-   * the object with the given ID.
-   **/
-  public boolean isEditingAllowed( HttpServletRequest request,
-                                   ServletContext     context,
-                                   String             objectID )
-    throws Exception;
+ */
+public interface MCREditorXMLTarget {
+    /**
+     * Returns true, if the current servlet user is allowed to edit the object
+     * with the given ID.
+     */
+    public boolean isEditingAllowed(HttpServletRequest request,
+            ServletContext context, String objectID) throws Exception;
 
-  /**
-   * Saves the object with the given ID to the underlying system
-   * and returns a URL to redirect the browser to after saving.
-   * If no URL is returned, EditorServlet will display the XML
-   * object by forwarding it to LayoutServlet.
-   *
-   * @return the URL to redirect the browser to after saving
-   **/
-  public String saveDocument( Document object, String objectID, ServletContext context )
-    throws Exception;
+    /**
+     * Saves the object with the given ID to the underlying system and returns a
+     * URL to redirect the browser to after saving. If no URL is returned,
+     * EditorServlet will display the XML object by forwarding it to
+     * LayoutServlet.
+     * 
+     * @return the URL to redirect the browser to after saving
+     */
+    public String saveDocument(Document object, String objectID,
+            ServletContext context) throws Exception;
 }
 

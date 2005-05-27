@@ -26,35 +26,33 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of an (a or b) clause check
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCROrClause implements MCRAccessCtrlDefinition
-{
-    private MCRAccessCtrlDefinition left,right;
+class MCROrClause implements MCRAccessCtrlDefinition {
+    private MCRAccessCtrlDefinition left, right;
 
-    MCROrClause(MCRAccessCtrlDefinition left, MCRAccessCtrlDefinition right)
-    {
-	this.left = left;
-	this.right = right;
+    MCROrClause(MCRAccessCtrlDefinition left, MCRAccessCtrlDefinition right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	if(left.hasAccess(user, date, ip))
-	    return true;
-	if(right.hasAccess(user, date, ip))
-	    return true;
-	return false;
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        if (left.hasAccess(user, date, ip))
+            return true;
+        if (right.hasAccess(user, date, ip))
+            return true;
+        return false;
     }
-    
-    public String toString()
-    {
-	StringBuffer sb = new StringBuffer();
-	sb.append("OR\n");
-	sb.append("*   "+left.toString().replaceAll("\n", "\n    ").trim()+"\n");
-	sb.append("*   "+right.toString().replaceAll("\n", "\n    ").trim()+"\n");
-	return sb.toString();
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("OR\n");
+        sb.append("*   " + left.toString().replaceAll("\n", "\n    ").trim()
+                + "\n");
+        sb.append("*   " + right.toString().replaceAll("\n", "\n    ").trim()
+                + "\n");
+        return sb.toString();
     }
 };
 

@@ -18,122 +18,120 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
- 
 package org.mycore.acl;
+
 ///============================================================================§
 
 /**
  * This class is an implementation of interface <code>MCRPermission</code>.
- *
+ * 
  * <P>
  * It overrides method <code>equals</code> from <code>java.lang.Object</code>,
  * defining permissions as equal when they are identical.
  * 
  * <P>
- * Classes protected by ACLs containing this type of permission
- * should define their supported permissions as static constants,
- * so that a single instance of this class represents the permission.
- *
+ * Classes protected by ACLs containing this type of permission should define
+ * their supported permissions as static constants, so that a single instance of
+ * this class represents the permission.
+ * 
  * <P>
  * Instances of this class are immutable. This means that multiple ACLs can hold
- * references to the single instance representing
- * a permission for a class.
- *
+ * references to the single instance representing a permission for a class.
+ * 
  * <P>
  * The string representation of a permission is it's name.
  * 
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
- 
 public class MCRDefaultPermission implements MCRPermission {
-///============================================================================/
+    ///============================================================================/
 
-   private String name;
-   private String description;
-   
-//+-----------------------------------------------------------------------------
-   
-  /**
-   * Constructs a permission by name which is also the description.
-   */
+    private String name;
 
-   public MCRDefaultPermission (String name) {
-   
-      this(name, name);
-    
-     }
+    private String description;
 
-//>-----------------------------------------------------------------------------
+    //+-----------------------------------------------------------------------------
 
-  /**
-   * Constructs a permission by name with an additional description.
-   */
-   
-   public MCRDefaultPermission (String name, String description) {
-      
-      this.name = name;
-      this.description = description;
-       
-     }
+    /**
+     * Constructs a permission by name which is also the description.
+     */
 
-//>-----------------------------------------------------------------------------
-     
-  /**
-   * Returns the name of the permission.
-   *
-   * @return string representing the name of the permission. 
-   */
+    public MCRDefaultPermission(String name) {
 
-  public String getName () {
-  
-     return name;
-  
-    }
- 
-//------------------------------------------------------------------------------
-     
-  /**
-   * Returns the description of the permission.
-   *
-   * @return string representing the description of the permission. 
-   */
+        this(name, name);
 
-  public String getDescription () {
-  
-     return description;
-  
-    }
- 
-//------------------------------------------------------------------------------
-    
-  /**
-   * Compares two permissions.
-   *
-   * @return true if both instances are identical!  
-   */
-    
-  public boolean equals (Object object) {
-    
-     return this == object;    
-    
-    }
-    
-//------------------------------------------------------------------------------
-    
-  /**
-   * Returns the string representation of the permission,
-   * which is it's name.
-   *
-   * @return string representing the permission.
-   */
-
-  public String toString () {
-  
-     return getName();
-  
     }
 
-//-=============================================================================
+    //>-----------------------------------------------------------------------------
+
+    /**
+     * Constructs a permission by name with an additional description.
+     */
+
+    public MCRDefaultPermission(String name, String description) {
+
+        this.name = name;
+        this.description = description;
+
+    }
+
+    //>-----------------------------------------------------------------------------
+
+    /**
+     * Returns the name of the permission.
+     * 
+     * @return string representing the name of the permission.
+     */
+
+    public String getName() {
+
+        return name;
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Returns the description of the permission.
+     * 
+     * @return string representing the description of the permission.
+     */
+
+    public String getDescription() {
+
+        return description;
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Compares two permissions.
+     * 
+     * @return true if both instances are identical!
+     */
+
+    public boolean equals(Object object) {
+
+        return this == object;
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Returns the string representation of the permission, which is it's name.
+     * 
+     * @return string representing the permission.
+     */
+
+    public String toString() {
+
+        return getName();
+
+    }
+
+    //-=============================================================================
 }

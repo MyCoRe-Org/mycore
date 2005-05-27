@@ -25,22 +25,18 @@
 package org.mycore.user;
 
 /**
- * A principal is an abstract conception of elements defined in the
- * user management who have certain rights attached. Examples are single
- * users or groups, but also users or groups of users which are only
- * defined by their role, e.g. being the owner of an object in the
- * repository. 
- *
+ * A principal is an abstract conception of elements defined in the user
+ * management who have certain rights attached. Examples are single users or
+ * groups, but also users or groups of users which are only defined by their
+ * role, e.g. being the owner of an object in the repository.
+ * 
  * @author Detlev Degenhardt
  * @author Benno Süselbeck
  * @version $Revision$ $Date$
  */
- 
-public interface MCRPrincipal 
-{
-  /** Principals are stored by their identity in ACLs */
-   public String getID();
+
+public interface MCRPrincipal {
+    /** Principals are stored by their identity in ACLs */
+    public String getID();
 }
-
-
 

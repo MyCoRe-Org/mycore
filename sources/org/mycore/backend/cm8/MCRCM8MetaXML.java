@@ -36,63 +36,75 @@ import com.ibm.mm.sdk.common.DKTextIndexDefICM;
 import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
- * This class implements the interface for the CM8 persistence layer for
- * the data model type MetaLangText.
- *
+ * This class implements the interface for the CM8 persistence layer for the
+ * data model type MetaLangText.
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 
-public class MCRCM8MetaXML implements DKConstantICM, MCRCM8MetaInterface
-{
+public class MCRCM8MetaXML implements DKConstantICM, MCRCM8MetaInterface {
 
-/**
- * This method create a DKComponentTypeDefICM to create a complete
- * ItemType from the configuration.
- *
- * @param element  a MCR datamodel element as JDOM Element
- * @param connection the connection to the CM8 datastore
- * @param dsDefICM the datastore definition
- * @param prefix the prefix name for the item type
- * @param textindex the definition of the text search index
- * @param textserach the flag to use textsearch as string
- * @return a DKComponentTypeDefICM for the MCR datamodel element
- * @exception MCRPersistenceException general Exception of MyCoRe CM8
- **/
-public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException
-  {
-  Logger logger = MCRCM8ConnectionPool.getLogger();
-  String subtagname = prefix+(String)element.getAttribute("name").getValue();
-  // String length
-  String subtaglen = (String)element.getAttribute("length").getValue();
-  int len = MCRMetaDefault.DEFAULT_STRING_LENGTH;
-  try {
-    len = Integer.parseInt(subtaglen); }
-  catch (NumberFormatException e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  // Text search option
-  boolean ts = false;
-  try {
-    if (textsearch.toLowerCase().equals("true")) { ts = true; } }
-  catch (Exception e) { }
-  logger.debug("Set TextSearch for "+subtagname+" to "+ts);
+    /**
+     * This method create a DKComponentTypeDefICM to create a complete ItemType
+     * from the configuration.
+     * 
+     * @param element
+     *            a MCR datamodel element as JDOM Element
+     * @param connection
+     *            the connection to the CM8 datastore
+     * @param dsDefICM
+     *            the datastore definition
+     * @param prefix
+     *            the prefix name for the item type
+     * @param textindex
+     *            the definition of the text search index
+     * @param textserach
+     *            the flag to use textsearch as string
+     * @return a DKComponentTypeDefICM for the MCR datamodel element
+     * @exception MCRPersistenceException
+     *                general Exception of MyCoRe CM8
+     */
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
+            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
+            String prefix, DKTextIndexDefICM textindex, String textsearch)
+            throws MCRPersistenceException {
+        Logger logger = MCRCM8ConnectionPool.getLogger();
+        String subtagname = prefix
+                + (String) element.getAttribute("name").getValue();
+        // String length
+        String subtaglen = (String) element.getAttribute("length").getValue();
+        int len = MCRMetaDefault.DEFAULT_STRING_LENGTH;
+        try {
+            len = Integer.parseInt(subtaglen);
+        } catch (NumberFormatException e) {
+            throw new MCRPersistenceException(e.getMessage(), e);
+        }
+        // Text search option
+        boolean ts = false;
+        try {
+            if (textsearch.toLowerCase().equals("true")) {
+                ts = true;
+            }
+        } catch (Exception e) {
+        }
+        logger.debug("Set TextSearch for " + subtagname + " to " + ts);
 
-  DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
-  try {
-    // create component child
-    lt.setName(subtagname);
-    lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    // add type attribute
-    DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix+"type");
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
+        DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
+        try {
+            // create component child
+            lt.setName(subtagname);
+            lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+            // add type attribute
+            DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix
+                    + "type");
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+        } catch (Exception e) {
+            throw new MCRPersistenceException(e.getMessage(), e);
+        }
+        return lt;
     }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  return lt;
-  }
 
 }

@@ -32,104 +32,106 @@ import java.util.*;
 import javax.servlet.http.*;
 
 /**
- * Wrapper class around an HTTP request that allows to
- * treat both ordinary form submisstion and multipart/form-data 
- * submissions with uploaded files in the same way.
- *
+ * Wrapper class around an HTTP request that allows to treat both ordinary form
+ * submisstion and multipart/form-data submissions with uploaded files in the
+ * same way.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCRRequestParameters
-{
-  protected final static Logger logger = Logger.getLogger(  MCREditorServlet.class );
+ */
+public class MCRRequestParameters {
+    protected final static Logger logger = Logger
+            .getLogger(MCREditorServlet.class);
 
-  private Hashtable parameters = new Hashtable();
-  private Hashtable files      = new Hashtable();
+    private Hashtable parameters = new Hashtable();
 
-  private static int    threshold;
-  private static long   maxSize;  
-  private static String tmpPath;
+    private Hashtable files = new Hashtable();
 
-  static
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    String prefix = "MCR.Editor.";
+    private static int threshold;
 
-    threshold = config.getInt   ( prefix + "FileUpload.MemoryThreshold", 1000000 );
-    maxSize   = config.getLong  ( prefix + "FileUpload.MaxSize", 5000000 );
-    tmpPath   = config.getString( prefix + "FileUpload.TempStoragePath" );
-  }
-  
-  public MCRRequestParameters( HttpServletRequest req )
-  {
-    if( FileUpload.isMultipartContent( req ) )
-    {
-      DiskFileUpload parser = new DiskFileUpload();
-      parser.setHeaderEncoding( "UTF-8" );
-      parser.setSizeThreshold( threshold );
-      parser.setSizeMax( maxSize );
-      parser.setRepositoryPath( tmpPath );
+    private static long maxSize;
 
-      List items = null;
-      try{ items = parser.parseRequest( req ); }
-      catch( FileUploadException ex )
-      {
-        String msg = "Error while parsing http multipart/form-data request from file upload webpage";
-        throw new MCRException( msg, ex );
-      }
- 
-      for( int i = 0; i < items.size(); i++ )
-      {
-        FileItem item = (FileItem)( items.get( i ) );
+    private static String tmpPath;
 
-        String name  = item.getFieldName();
-        String value = null;
+    static {
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.Editor.";
 
-        if( item.isFormField() )
-        {
-          try{ value = item.getString( "UTF-8" ); }
-          catch( UnsupportedEncodingException ex )
-          { throw new MCRConfigurationException( "UTF-8 is unsupported encoding !?", ex ); }
-        }
-        else value = item.getName();
-
-        if( ( value != null ) && ( value.trim().length() > 0 ) && ( ! files.containsKey( name ) ) )
-        {
-          if( ! item.isFormField() ) files.put( name, item );
-          String[] values = new String[ 1 ];
-          values[ 0 ] = value;
-          parameters.put( name, values );
-        }
-      }
+        threshold = config.getInt(prefix + "FileUpload.MemoryThreshold",
+                1000000);
+        maxSize = config.getLong(prefix + "FileUpload.MaxSize", 5000000);
+        tmpPath = config.getString(prefix + "FileUpload.TempStoragePath");
     }
-    else
-    {
-      for( Enumeration e = req.getParameterNames(); e.hasMoreElements(); )
-      {
-        String name = (String)( e.nextElement() );
-        String[] values = req.getParameterValues( name );
-        if( ( values != null ) && ( values.length > 0 ) ) 
-          parameters.put( name, values );
-      }
+
+    public MCRRequestParameters(HttpServletRequest req) {
+        if (FileUpload.isMultipartContent(req)) {
+            DiskFileUpload parser = new DiskFileUpload();
+            parser.setHeaderEncoding("UTF-8");
+            parser.setSizeThreshold(threshold);
+            parser.setSizeMax(maxSize);
+            parser.setRepositoryPath(tmpPath);
+
+            List items = null;
+            try {
+                items = parser.parseRequest(req);
+            } catch (FileUploadException ex) {
+                String msg = "Error while parsing http multipart/form-data request from file upload webpage";
+                throw new MCRException(msg, ex);
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                FileItem item = (FileItem) (items.get(i));
+
+                String name = item.getFieldName();
+                String value = null;
+
+                if (item.isFormField()) {
+                    try {
+                        value = item.getString("UTF-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        throw new MCRConfigurationException(
+                                "UTF-8 is unsupported encoding !?", ex);
+                    }
+                } else
+                    value = item.getName();
+
+                if ((value != null) && (value.trim().length() > 0)
+                        && (!files.containsKey(name))) {
+                    if (!item.isFormField())
+                        files.put(name, item);
+                    String[] values = new String[1];
+                    values[0] = value;
+                    parameters.put(name, values);
+                }
+            }
+        } else {
+            for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
+                String name = (String) (e.nextElement());
+                String[] values = req.getParameterValues(name);
+                if ((values != null) && (values.length > 0))
+                    parameters.put(name, values);
+            }
+        }
     }
-  }
 
-  public Enumeration getParameterNames()
-  { return parameters.keys(); }
+    public Enumeration getParameterNames() {
+        return parameters.keys();
+    }
 
-  public String getParameter( String name )
-  {
-    String[] values = getParameterValues( name ); 
-    if( ( values == null ) || ( values.length == 0 ) )
-      return null;
-    else
-      return values[ 0 ];
-  }
+    public String getParameter(String name) {
+        String[] values = getParameterValues(name);
+        if ((values == null) || (values.length == 0))
+            return null;
+        else
+            return values[0];
+    }
 
-  public String[] getParameterValues( String name )
-  { return (String[])( parameters.get( name ) ); }
-    
-  public FileItem getFileItem( String name )
-  { return (FileItem)( files.get( name ) ); }
+    public String[] getParameterValues(String name) {
+        return (String[]) (parameters.get(name));
+    }
+
+    public FileItem getFileItem(String name) {
+        return (FileItem) (files.get(name));
+    }
 }
 

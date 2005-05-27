@@ -37,214 +37,241 @@ import org.mycore.common.MCRException;
 /**
  * Implements the MCRParserInterface using the Xerces XML to parse XML streams
  * to a DOM document.
- *
+ * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
- **/
-public class MCRParserXerces 
-  implements MCRParserInterface, ErrorHandler
-{
-  // the Xerces parser to be used
-  SAXBuilder builderValid;
-  SAXBuilder builder;
+ */
+public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
+    // the Xerces parser to be used
+    SAXBuilder builderValid;
 
-  // parser configuration flags 
-  private static boolean FLAG_VALIDATION  = false;
-  private static boolean FLAG_NAMESPACES = true;
-  private static boolean FLAG_SCHEMA_SUPPORT = true;
-  private static boolean FLAG_NO_SCHEMA_SUPPORT = false;
-  private static boolean FLAG_SCHEMA_FULL_SUPPORT = true;
-  private static boolean FLAG_NO_SCHEMA_FULL_SUPPORT = false;
-  private static boolean FLAG_DEFERRED_DOM = true;
+    SAXBuilder builder;
 
-  private static String SET_VALIDATION = "http://xml.org/sax/features/validation";
-  private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
-  private static String SET_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
-  private static String SET_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
+    // parser configuration flags
+    private static boolean FLAG_VALIDATION = false;
 
-  /**
-   * Constructor for the xerces parser. Sets default validation flag as
-   * specified by the property MCR.parser_schema_validation in mycore.properties
-   */
-  public MCRParserXerces()
-  {
-    FLAG_VALIDATION = MCRConfiguration.instance()
-      .getBoolean( "MCR.parser_schema_validation", FLAG_VALIDATION );
-	builderValid=new SAXBuilder("org.apache.xerces.parsers.SAXParser",true);
-	builder=new SAXBuilder("org.apache.xerces.parsers.SAXParser",false);
+    private static boolean FLAG_NAMESPACES = true;
 
-	builder.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
-	builder.setFeature(SET_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_SUPPORT);
-	builder.setFeature(SET_FULL_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_FULL_SUPPORT);
-	builderValid.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
-	builderValid.setFeature(SET_SCHEMA_SUPPORT, FLAG_SCHEMA_SUPPORT);
-	builderValid.setFeature(SET_FULL_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_FULL_SUPPORT);
+    private static boolean FLAG_SCHEMA_SUPPORT = true;
 
-	builder.setReuseParser(true);
-	builderValid.setReuseParser(true);
-    
-	builder.setErrorHandler( this );
-	builderValid.setErrorHandler( this );
+    private static boolean FLAG_NO_SCHEMA_SUPPORT = false;
 
-	builder.setEntityResolver( MCRURIResolver.instance() );
-	builderValid.setEntityResolver( MCRURIResolver.instance() );
-  }
+    private static boolean FLAG_SCHEMA_FULL_SUPPORT = true;
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the validation flag from mycore.properties.
-   *
-   * @param uri	the URI of the XML input stream
-   * @param validate if true, will validate against XML Schema
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public Document parseURI( String uri )
-  { return parseURI( uri, FLAG_VALIDATION ); }
+    private static boolean FLAG_NO_SCHEMA_FULL_SUPPORT = false;
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the validation flag given.
-   *
-   * @param uri	the URI of the XML input stream
-   * @param validate if true, will validate against XML Schema
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public synchronized Document parseURI( String uri, boolean validate )
-  { return parse( new InputSource( uri ), validate ); }
+    private static boolean FLAG_DEFERRED_DOM = true;
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the validation flag from
-   * mycore.properties
-   *
-   * @param xml the XML byte stream
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public Document parseXML( String xml )
-  { return parseXML( xml, FLAG_VALIDATION ); }
+    private static String SET_VALIDATION = "http://xml.org/sax/features/validation";
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the validation flag given.
-   *
-   * @param xml the XML byte stream
-   * @param validate if true, will validate against XML Schema
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public Document parseXML( String xml, boolean validate )
-  {
-    InputSource source = new InputSource( new StringReader( xml ) );
-    return parse( source, validate ); 
-  }
+    private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the validation flag from
-   * mycore.properties
-   *
-   * @param xml the XML byte stream
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public Document parseXML( byte[] xml )
-  { return parseXML( xml, FLAG_VALIDATION ); }
+    private static String SET_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
 
-  /**
-   * Parses the XML byte stream with xerces parser and 
-   * returns a DOM document. Uses the given validation flag.
-   *
-   * @param xml the XML byte stream
-   * @param validate if true, will validate against XML Schema
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  public Document parseXML( byte[] xml, boolean validate )
-  {
-    InputSource source = new InputSource( new ByteArrayInputStream( xml ) );
-    return parse( source, validate ); 
-  }
+    private static String SET_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
 
-  /**
-   * Parses the InputSource with xerces parser and 
-   * returns a DOM document. Uses the given validation flag.
-   *
-   * @param source the XML InputSource
-   * @param validate if true, will validate against XML Schema
-   * @throws MCRException if XML could not be parsed
-   * @return the parsed XML stream as a DOM document
-   **/
-  private synchronized Document parse( InputSource source, boolean validate )
-  {
-  	SAXBuilder builder = ( validate ? this.builderValid : this.builder );
+    /**
+     * Constructor for the xerces parser. Sets default validation flag as
+     * specified by the property MCR.parser_schema_validation in
+     * mycore.properties
+     */
+    public MCRParserXerces() {
+        FLAG_VALIDATION = MCRConfiguration.instance().getBoolean(
+                "MCR.parser_schema_validation", FLAG_VALIDATION);
+        builderValid = new SAXBuilder("org.apache.xerces.parsers.SAXParser",
+                true);
+        builder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
 
-  	try
-    { return builder.build( source ); }
-    catch( Exception ex ) 
-    {
-      logger.error( "Error while parsing XML document", ex );
-      throw new MCRException( "Error while parsing XML document", ex );
+        builder.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
+        builder.setFeature(SET_SCHEMA_SUPPORT, FLAG_NO_SCHEMA_SUPPORT);
+        builder
+                .setFeature(SET_FULL_SCHEMA_SUPPORT,
+                        FLAG_NO_SCHEMA_FULL_SUPPORT);
+        builderValid.setFeature(SET_NAMESPACES, FLAG_NAMESPACES);
+        builderValid.setFeature(SET_SCHEMA_SUPPORT, FLAG_SCHEMA_SUPPORT);
+        builderValid.setFeature(SET_FULL_SCHEMA_SUPPORT,
+                FLAG_NO_SCHEMA_FULL_SUPPORT);
+
+        builder.setReuseParser(true);
+        builderValid.setReuseParser(true);
+
+        builder.setErrorHandler(this);
+        builderValid.setErrorHandler(this);
+
+        builder.setEntityResolver(MCRURIResolver.instance());
+        builderValid.setEntityResolver(MCRURIResolver.instance());
     }
-  }
 
-  /** The logger */
-  private Logger logger = Logger.getLogger( MCRParserXerces.class );
-
-  /**
-   * Handles parser warnings
-   **/
-  public void warning( SAXParseException ex )
-  { 
-    logger.warn( getSAXErrorMessage( ex ), ex );
-  }
-
-  /**
-   * Handles fatal parse errors
-   **/
-  public void error( SAXParseException ex )
-  { 
-    logger.error( getSAXErrorMessage( ex ), ex );
-    throw new MCRException( "Error parsing XML document: "+ex.getMessage(), ex );
-  }
-
-  /**
-   * Handles fatal parse errors
-   **/
-  public void fatalError( SAXParseException ex )
-  { 
-    logger.fatal( getSAXErrorMessage( ex ) );
-    throw new MCRException( "Error parsing XML document: "+ex.getMessage(), ex );
-  }
-
- /** 
-  * This methode returns a string of the location.
-  *
-  * @param ex   the SAXParseException exception
-  * @return the location string
-  **/
-  private String getSAXErrorMessage( SAXParseException ex ) 
-  {
-    StringBuffer str = new StringBuffer();
-    String systemId = ex.getSystemId();
-    if (systemId != null) 
-    {
-      int index = systemId.lastIndexOf('/');
-      if( index != -1 ) 
-        systemId = systemId.substring(index + 1);
-      str.append(systemId);
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the validation flag from mycore.properties.
+     * 
+     * @param uri
+     *            the URI of the XML input stream
+     * @param validate
+     *            if true, will validate against XML Schema
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public Document parseURI(String uri) {
+        return parseURI(uri, FLAG_VALIDATION);
     }
-    str.append( ": line=" );
-    str.append( ex.getLineNumber() );
-    str.append( " : column=" );
-    str.append( ex.getColumnNumber() );
-    str.append( " : message=" );
-    str.append( ex.getLocalizedMessage() );
-    return str.toString();
-  }
+
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the validation flag given.
+     * 
+     * @param uri
+     *            the URI of the XML input stream
+     * @param validate
+     *            if true, will validate against XML Schema
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public synchronized Document parseURI(String uri, boolean validate) {
+        return parse(new InputSource(uri), validate);
+    }
+
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the validation flag from mycore.properties
+     * 
+     * @param xml
+     *            the XML byte stream
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public Document parseXML(String xml) {
+        return parseXML(xml, FLAG_VALIDATION);
+    }
+
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the validation flag given.
+     * 
+     * @param xml
+     *            the XML byte stream
+     * @param validate
+     *            if true, will validate against XML Schema
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public Document parseXML(String xml, boolean validate) {
+        InputSource source = new InputSource(new StringReader(xml));
+        return parse(source, validate);
+    }
+
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the validation flag from mycore.properties
+     * 
+     * @param xml
+     *            the XML byte stream
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public Document parseXML(byte[] xml) {
+        return parseXML(xml, FLAG_VALIDATION);
+    }
+
+    /**
+     * Parses the XML byte stream with xerces parser and returns a DOM document.
+     * Uses the given validation flag.
+     * 
+     * @param xml
+     *            the XML byte stream
+     * @param validate
+     *            if true, will validate against XML Schema
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    public Document parseXML(byte[] xml, boolean validate) {
+        InputSource source = new InputSource(new ByteArrayInputStream(xml));
+        return parse(source, validate);
+    }
+
+    /**
+     * Parses the InputSource with xerces parser and returns a DOM document.
+     * Uses the given validation flag.
+     * 
+     * @param source
+     *            the XML InputSource
+     * @param validate
+     *            if true, will validate against XML Schema
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the parsed XML stream as a DOM document
+     */
+    private synchronized Document parse(InputSource source, boolean validate) {
+        SAXBuilder builder = (validate ? this.builderValid : this.builder);
+
+        try {
+            return builder.build(source);
+        } catch (Exception ex) {
+            logger.error("Error while parsing XML document", ex);
+            throw new MCRException("Error while parsing XML document", ex);
+        }
+    }
+
+    /** The logger */
+    private Logger logger = Logger.getLogger(MCRParserXerces.class);
+
+    /**
+     * Handles parser warnings
+     */
+    public void warning(SAXParseException ex) {
+        logger.warn(getSAXErrorMessage(ex), ex);
+    }
+
+    /**
+     * Handles fatal parse errors
+     */
+    public void error(SAXParseException ex) {
+        logger.error(getSAXErrorMessage(ex), ex);
+        throw new MCRException(
+                "Error parsing XML document: " + ex.getMessage(), ex);
+    }
+
+    /**
+     * Handles fatal parse errors
+     */
+    public void fatalError(SAXParseException ex) {
+        logger.fatal(getSAXErrorMessage(ex));
+        throw new MCRException(
+                "Error parsing XML document: " + ex.getMessage(), ex);
+    }
+
+    /**
+     * This methode returns a string of the location.
+     * 
+     * @param ex
+     *            the SAXParseException exception
+     * @return the location string
+     */
+    private String getSAXErrorMessage(SAXParseException ex) {
+        StringBuffer str = new StringBuffer();
+        String systemId = ex.getSystemId();
+        if (systemId != null) {
+            int index = systemId.lastIndexOf('/');
+            if (index != -1)
+                systemId = systemId.substring(index + 1);
+            str.append(systemId);
+        }
+        str.append(": line=");
+        str.append(ex.getLineNumber());
+        str.append(" : column=");
+        str.append(ex.getColumnNumber());
+        str.append(" : message=");
+        str.append(ex.getLocalizedMessage());
+        return str.toString();
+    }
 }

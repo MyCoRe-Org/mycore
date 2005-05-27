@@ -21,17 +21,16 @@
 package org.mycore.access;
 
 import java.util.Date;
+
 /**
  * An exception which is thrown when a Parsing Error occurs
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRParseException extends Exception
-{
-    MCRParseException(String s)
-    {
-	super(s);
+class MCRParseException extends Exception {
+    MCRParseException(String s) {
+        super(s);
     }
 };
 

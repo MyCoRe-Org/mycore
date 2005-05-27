@@ -24,28 +24,33 @@
 package org.mycore.services.query;
 
 /**
- * Contentstores supporting full text searches on derivates should implement this interface
+ * Contentstores supporting full text searches on derivates should implement
+ * this interface
  * 
- * It is optional to the Contentstore which derivates are indexed.
- * So there can be no warrenty that a derivate is indexed at all.
+ * It is optional to the Contentstore which derivates are indexed. So there can
+ * be no warrenty that a derivate is indexed at all.
  * 
  * @author Thomas Scheffler (yagee)
  */
 public interface MCRTextSearchInterface {
 
-	/**
-	 * searches on the index and delivers derivate ids matching the search
-	 * 
-	 * Syntax:
-	 * <pre>
-	 * foo bar   : search for foo AND bar anywhere across the files of the derivate
-	 * foo -bar  : search for foo and no file of the derivate may contain bar
-	 * "foo bar" : any file of the derivate must contain the phrase foo bar.
-	 * </pre>
-	 * 
-	 * @param doctext query
-	 * @return Array of DerivateIDs
-	 */
-	public String[] getDerivateIDs(String doctext);
+    /**
+     * searches on the index and delivers derivate ids matching the search
+     * 
+     * Syntax:
+     * 
+     * <pre>
+     * 
+     *  foo bar   : search for foo AND bar anywhere across the files of the derivate
+     *  foo -bar  : search for foo and no file of the derivate may contain bar
+     *  &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
+     *  
+     * </pre>
+     * 
+     * @param doctext
+     *            query
+     * @return Array of DerivateIDs
+     */
+    public String[] getDerivateIDs(String doctext);
 
 }

@@ -32,14 +32,17 @@ import java.util.HashSet;
  */
 public interface MCRMetaSearchInterface {
 
-/**
- * searches in a metadata store and return a HashSet of MCRObjectID's
- * 
- * @param root                  the query root
- * @param query                 the metadata queries
- * @param type                  the MCRObject type
- * @return the HashSet of MCRObjectID's
- */
-public HashSet getResultIDs(String root, String query, String type);
+    /**
+     * searches in a metadata store and return a HashSet of MCRObjectID's
+     * 
+     * @param root
+     *            the query root
+     * @param query
+     *            the metadata queries
+     * @param type
+     *            the MCRObject type
+     * @return the HashSet of MCRObjectID's
+     */
+    public HashSet getResultIDs(String root, String query, String type);
 
 }

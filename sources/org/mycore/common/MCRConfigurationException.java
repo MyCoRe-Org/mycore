@@ -25,32 +25,36 @@
 package org.mycore.common;
 
 /**
- * Instances of this class represent an exception thrown because of an error in the MyCoRe 
- * configuration. Normally this will be the case when a configuration property that is 
- * required is not set or has an illegal value.
- *
+ * Instances of this class represent an exception thrown because of an error in
+ * the MyCoRe configuration. Normally this will be the case when a configuration
+ * property that is required is not set or has an illegal value.
+ * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCRConfigurationException extends MCRException
-{
-  /**
-   * Creates a new MCRConfigurationException with an error message
-   *
-   * @param message the error message for this exception
-   */  
-  public MCRConfigurationException( String message )
-  { super( message ); }
-  
-  /**
-   * Creates a new MCRConfigurationException with an error message and a reference 
-   * to an exception thrown by an underlying system.
-   *
-   * @param message the error message for this exception
-   * @param exception the exception that was thrown by an underlying system
-   */  
-  public MCRConfigurationException( String message, Exception exception )
-  { super( message, exception ); };
-} 
+ */
+public class MCRConfigurationException extends MCRException {
+    /**
+     * Creates a new MCRConfigurationException with an error message
+     * 
+     * @param message
+     *            the error message for this exception
+     */
+    public MCRConfigurationException(String message) {
+        super(message);
+    }
+
+    /**
+     * Creates a new MCRConfigurationException with an error message and a
+     * reference to an exception thrown by an underlying system.
+     * 
+     * @param message
+     *            the error message for this exception
+     * @param exception
+     *            the exception that was thrown by an underlying system
+     */
+    public MCRConfigurationException(String message, Exception exception) {
+        super(message, exception);
+    };
+}
 

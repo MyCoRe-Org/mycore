@@ -57,287 +57,287 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.queryParser.QueryParser;
 
 /**
- * This class implements all methods for handling searchdata of xml-files with Lucene
- *
+ * This class implements all methods for handling searchdata of xml-files with
+ * Lucene
+ * 
  * @author Harald Richter
- *
+ * 
  * @version $Revision$ $Date$
- **/
-public class MCRContentIndexerXML extends MCRContentIndexer
-{
-  /** Reads properties from configuration file when class first used */
-  static MCRConfiguration config = MCRConfiguration.instance();
+ */
+public class MCRContentIndexerXML extends MCRContentIndexer {
+    /** Reads properties from configuration file when class first used */
+    static MCRConfiguration config = MCRConfiguration.instance();
 
-  static final private Logger logger = Logger.getLogger( MCRContentIndexerXML.class.getName() );
-  
-  String indexDir = "";
-  boolean first   = true; 
-  Hashtable search = new Hashtable();
-  
-  /**
-   * The constructor of this class.
-   **/
-  public MCRContentIndexerXML()
-  {
-  }
-  public void init( String indexerID, Hashtable attribute )
-  { 
-    indexDir         = (String)attribute.get( "dir" );
-    logger.info( "Index directory for indexer " + indexerID + ": " + indexDir);
-    String indexFile = (String)attribute.get( "index" );
-    logger.info( "Index file for indexer " + indexerID + ": " + indexFile);
-    try
-    {
-      InputStream in = this.getClass().getResourceAsStream( "/" + indexFile );
-      if( in == null )
-      {
-        String msg = "Index file for indexer " + indexFile + " not found in CLASSPATH";
-        throw new MCRConfigurationException( msg );
-      }
-    
-      org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-      org.jdom.Document jdom            = builder.build( in );
-      org.jdom.Element root             = jdom.getRootElement();
-      List types                        = root.getChildren( "type" );
-      for( int i = 0; i < types.size(); i++ )
-      {
-        org.jdom.Element xType = (org.jdom.Element)( types.get( i ) );
-        String sea             = xType.getAttributeValue( "search" );
-        String name            = xType.getAttributeValue( "name" );
-        String fieldType       = xType.getAttributeValue( "fieldType" );
-        if ( null != sea && null != name && null != fieldType )
-          if ( sea.equals( "true" ) )
-          {
-            logger.debug("Search: " + sea + " Name: " + name + " fieldType:" + fieldType );
-            search.put( name, fieldType );
-          }
-      }
-      logger.debug("Search size: " + search.size() );
+    static final private Logger logger = Logger
+            .getLogger(MCRContentIndexerXML.class.getName());
+
+    String indexDir = "";
+
+    boolean first = true;
+
+    Hashtable search = new Hashtable();
+
+    /**
+     * The constructor of this class.
+     */
+    public MCRContentIndexerXML() {
     }
-    catch (Exception e)
-    {
-      logger.info(e);
+
+    public void init(String indexerID, Hashtable attribute) {
+        indexDir = (String) attribute.get("dir");
+        logger.info("Index directory for indexer " + indexerID + ": "
+                + indexDir);
+        String indexFile = (String) attribute.get("index");
+        logger.info("Index file for indexer " + indexerID + ": " + indexFile);
+        try {
+            InputStream in = this.getClass().getResourceAsStream(
+                    "/" + indexFile);
+            if (in == null) {
+                String msg = "Index file for indexer " + indexFile
+                        + " not found in CLASSPATH";
+                throw new MCRConfigurationException(msg);
+            }
+
+            org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+            org.jdom.Document jdom = builder.build(in);
+            org.jdom.Element root = jdom.getRootElement();
+            List types = root.getChildren("type");
+            for (int i = 0; i < types.size(); i++) {
+                org.jdom.Element xType = (org.jdom.Element) (types.get(i));
+                String sea = xType.getAttributeValue("search");
+                String name = xType.getAttributeValue("name");
+                String fieldType = xType.getAttributeValue("fieldType");
+                if (null != sea && null != name && null != fieldType)
+                    if (sea.equals("true")) {
+                        logger.debug("Search: " + sea + " Name: " + name
+                                + " fieldType:" + fieldType);
+                        search.put(name, fieldType);
+                    }
+            }
+            logger.debug("Search size: " + search.size());
+        } catch (Exception e) {
+            logger.info(e);
+        }
     }
-  }
 
-/**
- * Adds document to Lucene
- * @param doc lucene document to add to index
- * 
- **/
-private void addDocumentToLucene( Document doc )    
-{
- try
- {
-    IndexWriter writer = null;
-    Analyzer analyzer = new GermanAnalyzer();
-        
-    // does directory for text index exist, if not build it
-    if ( first )
-    {
-      first = false;
-      File file = new File( indexDir );
-	    
-      if ( !file.exists() ) 
-      {
-        logger.info( "The Directory doesn't exist: " + indexDir + " try to build it" );
-        IndexWriter writer2 = new IndexWriter( indexDir, analyzer, true );
-        writer2.close();
-      }   
-    } // if ( first
+    /**
+     * Adds document to Lucene
+     * 
+     * @param doc
+     *            lucene document to add to index
+     *  
+     */
+    private void addDocumentToLucene(Document doc) {
+        try {
+            IndexWriter writer = null;
+            Analyzer analyzer = new GermanAnalyzer();
 
-    if ( null == writer)
-    {  
-      writer = new IndexWriter( indexDir, analyzer, false );
-      writer.mergeFactor  = 200;
-      writer.maxMergeDocs = 2000;
-    }  
-    
-    writer.addDocument( doc );
-    writer.close();
-    writer = null;
-   }
-    catch(Exception e) { logger.info( "error adding to lucene" ); }
-}
+            // does directory for text index exist, if not build it
+            if (first) {
+                first = false;
+                File file = new File(indexDir);
 
-/**
- * Delete document in Lucene
- * @param id string document id
- * @param type string name of textindex
- * 
- **/
-  private void deleteDocument( String id, String type ) throws Exception {
-      
-    IndexSearcher searcher = new IndexSearcher(indexDir);
-    Analyzer analyzer = new GermanAnalyzer();
+                if (!file.exists()) {
+                    logger.info("The Directory doesn't exist: " + indexDir
+                            + " try to build it");
+                    IndexWriter writer2 = new IndexWriter(indexDir, analyzer,
+                            true);
+                    writer2.close();
+                }
+            } // if ( first
 
-    Query qu = QueryParser.parse("key:"+id, "", analyzer);
-    logger.info("Searching for: " + qu.toString(""));
+            if (null == writer) {
+                writer = new IndexWriter(indexDir, analyzer, false);
+                writer.mergeFactor = 200;
+                writer.maxMergeDocs = 2000;
+            }
 
-    Hits hits = searcher.search( qu );
-      
-    logger.info("Number of documents found : " + hits.length());
-    if ( 1 == hits.length() )
-    {    
-      logger.info(" id: " + hits.id(0) 
-      + " score: " + hits.score(0) + " key: " +  hits.doc(0).get("key") );
-      if ( id.equals( hits.doc(0).get("key") ) )
-      {    
-       IndexReader reader = IndexReader.open( indexDir );
-       reader.delete( hits.id(0) ); 
-       reader.close();
-       logger.info("DELETE: " + id);
-      } 
-    }  
-
-  }
-
-  /**
-   * Builds an index of the content of an MCRFile object
-   *
-   * @param file the MCRFile thats content is to be indexed
-   *
-   **/
-  protected void doIndexContent( MCRFile file )
-    throws MCRException
-  {
-    logger.info( "++++ doIndexContent: " + file.getID() + " Store: " + file.getStoreID( ) +
-                          " ContentTypeID: " + file.getContentTypeID() );
-    List list = trans( file ); 
-    if ( null != list)
-    {
-      Document doc = buildLuceneDocument( file.getID(), list );
-      if ( null != doc )
-        addDocumentToLucene( doc );
+            writer.addDocument(doc);
+            writer.close();
+            writer = null;
+        } catch (Exception e) {
+            logger.info("error adding to lucene");
+        }
     }
-  }
 
-  /**
-   * Deletes the index of an MCRFile object
-   *
-   * @param the MCRFile object
-   */
-  protected void doDeleteIndex( MCRFile file )
-    throws MCRException
-  {
-    logger.info( "++++ doDeleteIndex: " + file.getID() + " Store: " + file.getStoreID( ) +
-                          " ContentTypeID: " + file.getContentTypeID() );
-    try
-    {
-      deleteDocument( file.getID(), "String type" );
-    }
-    catch( Exception e){ logger.info( "error deleting from lucene" ); } 
-  }
-  
-/**
- * Transforms xml data with stylesheet mcr_make_types.xsl 
- * @param file the MCRFile to be transformed
- * 
- * @return list of childen (typed content)
- * 
- **/
-private List trans( MCRFile file )    
-{
-  try
-  {
-  ByteArrayOutputStream out = new ByteArrayOutputStream();
-  MCRXSLTransformation transformer = MCRXSLTransformation.getInstance();
-  java.net.URL url      = MCRContentIndexerXML.class.getResource( "/mcr_make_types.xsl" );
-  if ( null == url )
-  {
-    String msg = "File not found in CLASSPATH: " + "mcr_make_types.xsl";
-    logger.error( msg );
-    throw new MCRConfigurationException( msg );
-  }
-  Templates xsl = transformer.getStylesheet( url.getFile() );
-  TransformerHandler handler = transformer.getTransformerHandler( xsl );
-  transformer.transform( file.getContentAsJDOM(), handler, out );
-  out.close();
-  byte[] output = out.toByteArray();
-  org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
-  org.jdom.Document jdom = builder.build( new ByteArrayInputStream( output ) );
-  return jdom.getRootElement().getChildren( "type" );
-  }   
-  catch (Exception e)
-  {
-//    throw new MCRException( "Error transforming MCRFile." );
-    e.printStackTrace();
-    return null;
-  }
-}
+    /**
+     * Delete document in Lucene
+     * 
+     * @param id
+     *            string document id
+     * @param type
+     *            string name of textindex
+     *  
+     */
+    private void deleteDocument(String id, String type) throws Exception {
 
-/**
- * Build lucene document from transformed xml list 
- * @param key MCRFile ID           
- * @param types xml data as list (typed content)
- * 
- * @return The lucene document
- * 
- **/
-private Document buildLuceneDocument( String key, List types )    
-{
-  Document doc = new Document();
-  doc.add( Field.Keyword( "key", key ) );
-  
-  for( int i = 0; i < types.size(); i++ )
-  {
-    org.jdom.Element xType = (org.jdom.Element)( types.get( i ) );
-    String name      = xType.getAttributeValue( "name" );
-    String value     = xType.getAttributeValue( "value" );
-    if ( null != name && null != value )
-    {
-      if ( search.containsKey( name ) )
-      {
-        String field = (String)search.get( name );
-        logger.debug( "Name: " + name + " Value: " + value + " Field: " + field );
-        if ( field.equals( "Keyword" ) )
-          doc.add( Field.Keyword( name, value ) );
-        if ( field.equals( "Text" ) )
-          doc.add( Field.Text( name, value ) );
-        if ( field.equals( "UnStored" ) )
-          doc.add( Field.UnStored( name, value ) );
-      }
-    }
-  }
-  return doc;
-}
+        IndexSearcher searcher = new IndexSearcher(indexDir);
+        Analyzer analyzer = new GermanAnalyzer();
 
-  /**
-   * Search in Index with query
-   *
-   * @param the query
-   *
-   * @return the hits of the query (ifs IDs)
-   *
-   */
-  public String[] doSearchIndex( String query )
-    throws MCRException
-  {
-    String result[] = null; 
-    try
-    {
-      IndexSearcher searcher = new IndexSearcher(indexDir);
-      Analyzer analyzer = new GermanAnalyzer();
+        Query qu = QueryParser.parse("key:" + id, "", analyzer);
+        logger.info("Searching for: " + qu.toString(""));
 
-      Query qu = QueryParser.parse( query, "", analyzer);
-      logger.info("Searching for: " + qu.toString(""));
+        Hits hits = searcher.search(qu);
 
-      Hits hits = searcher.search( qu );
-      
-      int anz = hits.length();
-      result = new String[anz];
-      logger.info("Number of documents found : " + hits.length());
-      for (int i=0; i<anz; i++)
-      {    
-        result[i] = hits.doc(i).get("key");
-//        logger.info(" id: " + hits.id(i) + " score: " + hits.score(i) + " key: " +  hits.doc(i).get("key") );
-      }  
-      return result;
+        logger.info("Number of documents found : " + hits.length());
+        if (1 == hits.length()) {
+            logger.info(" id: " + hits.id(0) + " score: " + hits.score(0)
+                    + " key: " + hits.doc(0).get("key"));
+            if (id.equals(hits.doc(0).get("key"))) {
+                IndexReader reader = IndexReader.open(indexDir);
+                reader.delete(hits.id(0));
+                reader.close();
+                logger.info("DELETE: " + id);
+            }
+        }
 
     }
-    catch( Exception e){ logger.info( "error search with lucene: " + query); } 
-    return result;
-  }
- 
+
+    /**
+     * Builds an index of the content of an MCRFile object
+     * 
+     * @param file
+     *            the MCRFile thats content is to be indexed
+     *  
+     */
+    protected void doIndexContent(MCRFile file) throws MCRException {
+        logger.info("++++ doIndexContent: " + file.getID() + " Store: "
+                + file.getStoreID() + " ContentTypeID: "
+                + file.getContentTypeID());
+        List list = trans(file);
+        if (null != list) {
+            Document doc = buildLuceneDocument(file.getID(), list);
+            if (null != doc)
+                addDocumentToLucene(doc);
+        }
+    }
+
+    /**
+     * Deletes the index of an MCRFile object
+     * 
+     * @param the
+     *            MCRFile object
+     */
+    protected void doDeleteIndex(MCRFile file) throws MCRException {
+        logger.info("++++ doDeleteIndex: " + file.getID() + " Store: "
+                + file.getStoreID() + " ContentTypeID: "
+                + file.getContentTypeID());
+        try {
+            deleteDocument(file.getID(), "String type");
+        } catch (Exception e) {
+            logger.info("error deleting from lucene");
+        }
+    }
+
+    /**
+     * Transforms xml data with stylesheet mcr_make_types.xsl
+     * 
+     * @param file
+     *            the MCRFile to be transformed
+     * 
+     * @return list of childen (typed content)
+     *  
+     */
+    private List trans(MCRFile file) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            MCRXSLTransformation transformer = MCRXSLTransformation
+                    .getInstance();
+            java.net.URL url = MCRContentIndexerXML.class
+                    .getResource("/mcr_make_types.xsl");
+            if (null == url) {
+                String msg = "File not found in CLASSPATH: "
+                        + "mcr_make_types.xsl";
+                logger.error(msg);
+                throw new MCRConfigurationException(msg);
+            }
+            Templates xsl = transformer.getStylesheet(url.getFile());
+            TransformerHandler handler = transformer.getTransformerHandler(xsl);
+            transformer.transform(file.getContentAsJDOM(), handler, out);
+            out.close();
+            byte[] output = out.toByteArray();
+            org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+            org.jdom.Document jdom = builder.build(new ByteArrayInputStream(
+                    output));
+            return jdom.getRootElement().getChildren("type");
+        } catch (Exception e) {
+            //    throw new MCRException( "Error transforming MCRFile." );
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Build lucene document from transformed xml list
+     * 
+     * @param key
+     *            MCRFile ID
+     * @param types
+     *            xml data as list (typed content)
+     * 
+     * @return The lucene document
+     *  
+     */
+    private Document buildLuceneDocument(String key, List types) {
+        Document doc = new Document();
+        doc.add(Field.Keyword("key", key));
+
+        for (int i = 0; i < types.size(); i++) {
+            org.jdom.Element xType = (org.jdom.Element) (types.get(i));
+            String name = xType.getAttributeValue("name");
+            String value = xType.getAttributeValue("value");
+            if (null != name && null != value) {
+                if (search.containsKey(name)) {
+                    String field = (String) search.get(name);
+                    logger.debug("Name: " + name + " Value: " + value
+                            + " Field: " + field);
+                    if (field.equals("Keyword"))
+                        doc.add(Field.Keyword(name, value));
+                    if (field.equals("Text"))
+                        doc.add(Field.Text(name, value));
+                    if (field.equals("UnStored"))
+                        doc.add(Field.UnStored(name, value));
+                }
+            }
+        }
+        return doc;
+    }
+
+    /**
+     * Search in Index with query
+     * 
+     * @param the
+     *            query
+     * 
+     * @return the hits of the query (ifs IDs)
+     *  
+     */
+    public String[] doSearchIndex(String query) throws MCRException {
+        String result[] = null;
+        try {
+            IndexSearcher searcher = new IndexSearcher(indexDir);
+            Analyzer analyzer = new GermanAnalyzer();
+
+            Query qu = QueryParser.parse(query, "", analyzer);
+            logger.info("Searching for: " + qu.toString(""));
+
+            Hits hits = searcher.search(qu);
+
+            int anz = hits.length();
+            result = new String[anz];
+            logger.info("Number of documents found : " + hits.length());
+            for (int i = 0; i < anz; i++) {
+                result[i] = hits.doc(i).get("key");
+                //        logger.info(" id: " + hits.id(i) + " score: " + hits.score(i)
+                // + " key: " + hits.doc(i).get("key") );
+            }
+            return result;
+
+        } catch (Exception e) {
+            logger.info("error search with lucene: " + query);
+        }
+        return result;
+    }
+
 }
 

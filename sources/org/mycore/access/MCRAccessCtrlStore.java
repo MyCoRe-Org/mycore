@@ -30,134 +30,140 @@ import org.apache.log4j.Logger;
 import org.mycore.backend.sql.*;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.access.MCRAccessCtrlStore;
+
+//import org.mycore.access.MCRAccessCtrlStore;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
- * must implement this interface. Which database actually
- * will be used can then be configured by reading the value
- * <code>MCR.userstore_class_name</code> from mycore.properties.
- *
+ * must implement this interface. Which database actually will be used can then
+ * be configured by reading the value <code>MCR.userstore_class_name</code>
+ * from mycore.properties.
+ * 
  * @author Arne Seifert
  * @version $Revision$ $Date$
  */
 public class MCRAccessCtrlStore {
-	
-	/** the logger */
-	static Logger logger=Logger.getLogger(MCRSQLUserStore.class.getName());
 
-	/** name of the sql table containing rule information */
-	private String SQLAccessCtrlRule;
-	  
-	/** name of the sql table containing mapping information */
-	private String SQLAccessCtrlMapping;
-	
-	/** access pool names, comma separated**/
-	private String AccessPools;
-		
-	/**
-	* constructor with initialisation of variables
-	*/
-	public MCRAccessCtrlStore(){
-		MCRConfiguration config = MCRConfiguration.instance();
-	    SQLAccessCtrlRule = config.getString("MCR.access_store_sql_table_rule","MCRACCESSRULE");
-	    SQLAccessCtrlMapping = config.getString("MCR.access_store_sql_table_map","MCRACCESS");
-	    AccessPools = config.getString("MCR.AccessPools","");
-	}
-	
-	public void createTable(){
-		// create tables
-		if (! AccessPools.equals("")){
-			if(! MCRSQLConnection.doesTableExist(SQLAccessCtrlRule)) {
-				logger.info("Create table "+SQLAccessCtrlRule);
-				createAccessRuleTable();
-				logger.info("Done."); }
-	    
-			if(! MCRSQLConnection.doesTableExist(SQLAccessCtrlMapping)) {
-				logger.info("Create table "+SQLAccessCtrlMapping);
-				createAccessMappingTable();
-				logger.info("Done."); }
-		}else{
-			logger.info("Access Control System disabled");
-		}
-	}
-	
-	/**
-	* This method creates the table named SQLRule.
-	*/
-	private void createAccessRuleTable(){
-		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-	    try {
-	      c.doUpdate(new MCRSQLStatement(SQLAccessCtrlRule)
-	      .addColumn("RID VARCHAR(64) NOT NULL")
-	      .addColumn("CREATOR VARCHAR(64) NOT NULL")
-		  .addColumn("CREATIONDATE TIMESTAMP")
-		  .addColumn("RULE Text")
-		  .addColumn("DESCRIPTION VARCHAR(255)")
-	      .toCreateTableStatement());
-	      c.doUpdate (new MCRSQLStatement(SQLAccessCtrlRule)
-	       .addColumn("RID").toIndexStatement());
-	    }finally {
-	    	c.release();
-	    }
-	}
-	
-	/**
-	* This method creates the table named SQLRuleMapping.
-	*/
-	private void createAccessMappingTable(){
-		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-	    try {
-	      c.doUpdate (new MCRSQLStatement(SQLAccessCtrlMapping)
-	      .addColumn("RID VARCHAR(64) NOT NULL")
-	      .addColumn("CREATOR VARCHAR(64) NOT NULL")
-		  .addColumn("CREATIONDATE TIMESTAMP")
-		  .addColumn("OBJID VARCHAR(64) NOT NULL")
-		  .addColumn("ACPOOL VARCHAR(64)")
-	      .toCreateTableStatement());
-	      c.doUpdate (new MCRSQLStatement(SQLAccessCtrlMapping)
-	       .addColumn("RID").toIndexStatement());
-	    }finally{
-	    	c.release();
-	    }
-	}
-		
-	public String getRule(String ruleID) {
-		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-		String strRule = "";
-		try {
-	    	String select = "SELECT * FROM " + SQLAccessCtrlRule + " WHERE RID = '" + ruleID + "'";
-	        Statement statement = c.getJDBCConnection().createStatement();
-	        ResultSet rs = statement.executeQuery(select);
-	        if (rs.next()){
-	            strRule = rs.getString(4);
+    /** the logger */
+    static Logger logger = Logger.getLogger(MCRSQLUserStore.class.getName());
+
+    /** name of the sql table containing rule information */
+    private String SQLAccessCtrlRule;
+
+    /** name of the sql table containing mapping information */
+    private String SQLAccessCtrlMapping;
+
+    /** access pool names, comma separated* */
+    private String AccessPools;
+
+    /**
+     * constructor with initialisation of variables
+     */
+    public MCRAccessCtrlStore() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        SQLAccessCtrlRule = config.getString("MCR.access_store_sql_table_rule",
+                "MCRACCESSRULE");
+        SQLAccessCtrlMapping = config.getString(
+                "MCR.access_store_sql_table_map", "MCRACCESS");
+        AccessPools = config.getString("MCR.AccessPools", "");
+    }
+
+    public void createTable() {
+        // create tables
+        if (!AccessPools.equals("")) {
+            if (!MCRSQLConnection.doesTableExist(SQLAccessCtrlRule)) {
+                logger.info("Create table " + SQLAccessCtrlRule);
+                createAccessRuleTable();
+                logger.info("Done.");
             }
-        }catch (Exception ex){
-            throw new MCRException("RuleID "+ruleID+" not found" + ex.getMessage(),ex);
-	    }finally{
-	    	c.release();
-	    }
-        return strRule;
-	}
-	
-	public String getRuleID(String objID, String ACPool){
-		MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-		String strRuleID = "";
 
-		try {
-	    	String select = "SELECT * FROM " + SQLAccessCtrlMapping + " WHERE OBJID = '" + objID + "' AND ACPOOL = '" + ACPool + "'";
-	        Statement statement = c.getJDBCConnection().createStatement();
-	        ResultSet rs = statement.executeQuery(select);
-            if (rs.next()){
+            if (!MCRSQLConnection.doesTableExist(SQLAccessCtrlMapping)) {
+                logger.info("Create table " + SQLAccessCtrlMapping);
+                createAccessMappingTable();
+                logger.info("Done.");
+            }
+        } else {
+            logger.info("Access Control System disabled");
+        }
+    }
+
+    /**
+     * This method creates the table named SQLRule.
+     */
+    private void createAccessRuleTable() {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        try {
+            c.doUpdate(new MCRSQLStatement(SQLAccessCtrlRule).addColumn(
+                    "RID VARCHAR(64) NOT NULL").addColumn(
+                    "CREATOR VARCHAR(64) NOT NULL").addColumn(
+                    "CREATIONDATE TIMESTAMP").addColumn("RULE Text").addColumn(
+                    "DESCRIPTION VARCHAR(255)").toCreateTableStatement());
+            c.doUpdate(new MCRSQLStatement(SQLAccessCtrlRule).addColumn("RID")
+                    .toIndexStatement());
+        } finally {
+            c.release();
+        }
+    }
+
+    /**
+     * This method creates the table named SQLRuleMapping.
+     */
+    private void createAccessMappingTable() {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        try {
+            c.doUpdate(new MCRSQLStatement(SQLAccessCtrlMapping).addColumn(
+                    "RID VARCHAR(64) NOT NULL").addColumn(
+                    "CREATOR VARCHAR(64) NOT NULL").addColumn(
+                    "CREATIONDATE TIMESTAMP").addColumn(
+                    "OBJID VARCHAR(64) NOT NULL").addColumn(
+                    "ACPOOL VARCHAR(64)").toCreateTableStatement());
+            c.doUpdate(new MCRSQLStatement(SQLAccessCtrlMapping).addColumn(
+                    "RID").toIndexStatement());
+        } finally {
+            c.release();
+        }
+    }
+
+    public String getRule(String ruleID) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        String strRule = "";
+        try {
+            String select = "SELECT * FROM " + SQLAccessCtrlRule
+                    + " WHERE RID = '" + ruleID + "'";
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            if (rs.next()) {
+                strRule = rs.getString(4);
+            }
+        } catch (Exception ex) {
+            throw new MCRException("RuleID " + ruleID + " not found"
+                    + ex.getMessage(), ex);
+        } finally {
+            c.release();
+        }
+        return strRule;
+    }
+
+    public String getRuleID(String objID, String ACPool) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        String strRuleID = "";
+
+        try {
+            String select = "SELECT * FROM " + SQLAccessCtrlMapping
+                    + " WHERE OBJID = '" + objID + "' AND ACPOOL = '" + ACPool
+                    + "'";
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            if (rs.next()) {
                 strRuleID = rs.getString(1);
             }
-	    } catch (Exception ex){
-	        throw new MCRException("No rule defined for object " + objID,ex); 
-	    }finally{
-	    	c.release();
-	    }
-		return strRuleID;
-	}
-	
+        } catch (Exception ex) {
+            throw new MCRException("No rule defined for object " + objID, ex);
+        } finally {
+            c.release();
+        }
+        return strRuleID;
+    }
+
 }

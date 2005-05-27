@@ -28,35 +28,39 @@ import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * This interface is designed to choose the tranformer from XQuery to
- * the used query system of the persistence layer. 
- *
+ * This interface is designed to choose the tranformer from XQuery to the used
+ * query system of the persistence layer.
+ * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
- **/
-public interface MCRQueryInterface
-{
-
-/**
- * This method parse the XQuery string and return the result as
- * MCRXMLContainer. If the type is null or empty or maxresults
- * is lower 1 an empty list was returned.
- *
- * @param query                 the XQuery string
- * @param maxresults            the maximum of results
- * @param type                  a list of the MCRObject types seperated by ,
- * @return                      a result list as MCRXMLContainer
- **/
-public MCRXMLContainer getResultList(String query, String type,
-  int maxresults);
-
-/**
- * returns the ObjectID of the Object containing derivate with given ID
- * @param DerivateID ID of Derivate
- * @return MCRObjectID of data objects
  */
-public MCRObjectID getObjectID(String DerivateID);
+public interface MCRQueryInterface {
+
+    /**
+     * This method parse the XQuery string and return the result as
+     * MCRXMLContainer. If the type is null or empty or maxresults is lower 1 an
+     * empty list was returned.
+     * 
+     * @param query
+     *            the XQuery string
+     * @param maxresults
+     *            the maximum of results
+     * @param type
+     *            a list of the MCRObject types seperated by ,
+     * @return a result list as MCRXMLContainer
+     */
+    public MCRXMLContainer getResultList(String query, String type,
+            int maxresults);
+
+    /**
+     * returns the ObjectID of the Object containing derivate with given ID
+     * 
+     * @param DerivateID
+     *            ID of Derivate
+     * @return MCRObjectID of data objects
+     */
+    public MCRObjectID getObjectID(String DerivateID);
 
 }
 

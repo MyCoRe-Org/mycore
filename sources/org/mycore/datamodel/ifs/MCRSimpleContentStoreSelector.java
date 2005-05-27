@@ -35,65 +35,63 @@ import org.mycore.common.xml.MCRURIResolver;
 /**
  * Decides which MCRContentStore implementation should be used to store the
  * content of a given file, based on the content type of the file.
- *
+ * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector
-{
-  /** the default content store to use if no other rule matches */
-  protected String defaultID;
-  
-  /** store lookup table where keys are file content type IDs, values are content store IDs */
-  protected Hashtable table;
-  
-  /** list of all storeIDs **/
-  protected String[] storeIDs;
-  
-  public MCRSimpleContentStoreSelector()
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    String file = config.getString( "MCR.IFS.ContentStoreSelector.ConfigFile" );
-    Element xml = MCRURIResolver.instance().resolve( "resource:" + file );
+public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
+    /** the default content store to use if no other rule matches */
+    protected String defaultID;
 
-    table = new Hashtable();
-      
-    List stores = xml.getChildren( "store" );
-    storeIDs= new String[stores.size()+1];
+    /**
+     * store lookup table where keys are file content type IDs, values are
+     * content store IDs
+     */
+    protected Hashtable table;
 
-    for( int i = 0; i < stores.size(); i++ )
-    {
-      Element store = (Element)( stores.get( i ) );
-      String storeID = store.getAttributeValue( "ID" );
-      storeIDs[i]=storeID;
-        
-      List types = store.getChildren();
-      for( int j = 0; j < types.size(); j++ )
-      {
-        Element type = (Element)( types.get( j ) );
-        String typeID = type.getTextTrim();
+    /** list of all storeIDs * */
+    protected String[] storeIDs;
 
-        table.put( typeID, storeID );
-      }
+    public MCRSimpleContentStoreSelector() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        String file = config
+                .getString("MCR.IFS.ContentStoreSelector.ConfigFile");
+        Element xml = MCRURIResolver.instance().resolve("resource:" + file);
+
+        table = new Hashtable();
+
+        List stores = xml.getChildren("store");
+        storeIDs = new String[stores.size() + 1];
+
+        for (int i = 0; i < stores.size(); i++) {
+            Element store = (Element) (stores.get(i));
+            String storeID = store.getAttributeValue("ID");
+            storeIDs[i] = storeID;
+
+            List types = store.getChildren();
+            for (int j = 0; j < types.size(); j++) {
+                Element type = (Element) (types.get(j));
+                String typeID = type.getTextTrim();
+
+                table.put(typeID, storeID);
+            }
+        }
+
+        defaultID = xml.getAttributeValue("default");
+        //NOTE: if defaultID is listed as a <store> it's inserted twice here
+        storeIDs[storeIDs.length - 1] = defaultID;
     }
-      
-    defaultID = xml.getAttributeValue( "default" );
-    //NOTE: if defaultID is listed as a <store> it's inserted twice here
-    storeIDs[storeIDs.length-1]=defaultID;
-  }
-  
-  public String selectStore( MCRFile file ) 
-    throws MCRException
-  {
-    String typeID = file.getContentTypeID();
-    
-    if( table.containsKey( typeID ) )
-      return (String)( table.get( typeID ) );
-    return defaultID;
-  }
-  
-  public String[] getAvailableStoreIDs() {
-      return storeIDs;
-  }
+
+    public String selectStore(MCRFile file) throws MCRException {
+        String typeID = file.getContentTypeID();
+
+        if (table.containsKey(typeID))
+            return (String) (table.get(typeID));
+        return defaultID;
+    }
+
+    public String[] getAvailableStoreIDs() {
+        return storeIDs;
+    }
 }

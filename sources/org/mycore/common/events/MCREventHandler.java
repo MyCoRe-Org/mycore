@@ -27,21 +27,21 @@ package org.mycore.common.events;
 import org.mycore.common.*;
 
 /**
- * Objects that implement this interface can react when some kind of
- * predefined event happens in MyCoRe. Implementing classes are registered
- * using the configuration property MCR.EventHandler.X.Class where X is
- * a number starting from 1. Event handlers are called in the same order as they
- * are registered in the properties files. 
+ * Objects that implement this interface can react when some kind of predefined
+ * event happens in MyCoRe. Implementing classes are registered using the
+ * configuration property MCR.EventHandler.X.Class where X is a number starting
+ * from 1. Event handlers are called in the same order as they are registered in
+ * the properties files.
  * 
  * @author Frank Lützenkirchen
- **/
-public interface MCREventHandler
-{
-  /**
-   * Handles an event. The handler is responsible for filtering the event type
-   * it is interested in and wants to react on.
-   * 
-   * @param evt the Event object containing information about the event
-   **/
-  public void doHandleEvent( MCREvent evt ) throws MCRException;
+ */
+public interface MCREventHandler {
+    /**
+     * Handles an event. The handler is responsible for filtering the event type
+     * it is interested in and wants to react on.
+     * 
+     * @param evt
+     *            the Event object containing information about the event
+     */
+    public void doHandleEvent(MCREvent evt) throws MCRException;
 }

@@ -26,23 +26,19 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of "false", meaning no one has access.
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRFalseClause implements MCRAccessCtrlDefinition
-{
-    MCRFalseClause()
-    {
+class MCRFalseClause implements MCRAccessCtrlDefinition {
+    MCRFalseClause() {
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	return false;
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return false;
     }
-    
-    public String toString()
-    {
-	return "false\n";
+
+    public String toString() {
+        return "false\n";
     }
 };
 

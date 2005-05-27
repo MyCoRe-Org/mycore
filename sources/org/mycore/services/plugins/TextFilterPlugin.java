@@ -30,56 +30,60 @@ import java.util.HashSet;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 
 /**
- * The Plugin spec for filtering several documents for the fulltext search.
- * A class implementing this interface may throw a FilterPluginInstantiationException
- * if it fails to initialize correctly and though is not usable.
+ * The Plugin spec for filtering several documents for the fulltext search. A
+ * class implementing this interface may throw a
+ * FilterPluginInstantiationException if it fails to initialize correctly and
+ * though is not usable.
  * 
  * @author Thomas Scheffler (yagee)
  */
 public interface TextFilterPlugin {
 
-	/**
-	 * should return a Name of the plugin
-	 * @return Plugin name
-	 */
-	public String getName();
-	
-	/**
-	 * should return the major version number
-	 * @return major version number
-	 */
-	public int getMajorNumber();
-	
-	/**
-	 * should return the minor version number
-	 * @return minor version number
-	 */
-	public int getMinorNumber();
+    /**
+     * should return a Name of the plugin
+     * 
+     * @return Plugin name
+     */
+    public String getName();
 
-	/**
-	 * may contain some additional Information on the plugin
-	 * @return further Informations on the plugin
-	 */
-	public String getInfo();
+    /**
+     * should return the major version number
+     * 
+     * @return major version number
+     */
+    public int getMajorNumber();
 
-	/**
-	 * returns a list of all supported MCRFileContentTypes.
-	 * 
-	 * These file extensions must be delivered without the leading dot.
-	 * 
-	 * @return HashSet List of file extensions
-		 */
-	public HashSet getSupportedContentTypes();
+    /**
+     * should return the minor version number
+     * 
+     * @return minor version number
+     */
+    public int getMinorNumber();
 
-	/**
-	 * onverts a given Inputstream to Textstream which should contain
-	 * a textual representation of the source.
-	 * 
-	 * @param input  File in foreign format
-	 * @return Inputstream textual representation of input
-	 */
-	public Reader transform(
-		MCRFileContentType ct,
-		InputStream input)
-		throws FilterPluginTransformException;
+    /**
+     * may contain some additional Information on the plugin
+     * 
+     * @return further Informations on the plugin
+     */
+    public String getInfo();
+
+    /**
+     * returns a list of all supported MCRFileContentTypes.
+     * 
+     * These file extensions must be delivered without the leading dot.
+     * 
+     * @return HashSet List of file extensions
+     */
+    public HashSet getSupportedContentTypes();
+
+    /**
+     * onverts a given Inputstream to Textstream which should contain a textual
+     * representation of the source.
+     * 
+     * @param input
+     *            File in foreign format
+     * @return Inputstream textual representation of input
+     */
+    public Reader transform(MCRFileContentType ct, InputStream input)
+            throws FilterPluginTransformException;
 }

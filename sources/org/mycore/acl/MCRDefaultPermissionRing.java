@@ -18,275 +18,286 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
- 
 package org.mycore.acl;
+
 ///============================================================================§
 
 import java.util.Map;
 //import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Iterator;
+
 ///============================================================================|
 
 /**
  * Default implementation of interface <code>MCRPermissionRing</code>
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRDefaultPermissionRing implements MCRPermissionRing {
-///============================================================================/
+    ///============================================================================/
 
-   private Map permissions;
-   
-//+-----------------------------------------------------------------------------
-   
-  /**
-   * Constructs an empty permission list.
-   */
+    private Map permissions;
 
-   public MCRDefaultPermissionRing () {
-   
-//      permissions = new LinkedHashMap();
-      permissions = new HashMap();
+    //+-----------------------------------------------------------------------------
 
-    
-     }
+    /**
+     * Constructs an empty permission list.
+     */
 
-//>-----------------------------------------------------------------------------
-     
-  /**
-   * Constructs a permission ring with initial single entry <code>permission</code>
-   * setting it's status to <code>grant</code>.
-   */
+    public MCRDefaultPermissionRing() {
 
-   public MCRDefaultPermissionRing (MCRPermission permission, boolean grant) {
-   
-      this();
+        //      permissions = new LinkedHashMap();
+        permissions = new HashMap();
 
-      putPermission(permission, grant);
-    
-     }
+    }
 
-//>-----------------------------------------------------------------------------
-     
-  /**
-   * Constructs a permission ring with entries taken from <code>perms</code>.
-   * The status of all entries is set to grant.
-   */
+    //>-----------------------------------------------------------------------------
 
-   public MCRDefaultPermissionRing (MCRPermission[] perms, boolean grant) {
-   
-      this();
+    /**
+     * Constructs a permission ring with initial single entry
+     * <code>permission</code> setting it's status to <code>grant</code>.
+     */
 
-      if (perms == null) 
-         return;
+    public MCRDefaultPermissionRing(MCRPermission permission, boolean grant) {
 
-      for (int i = 0; i < perms.length; i++)
-         putPermission(perms[i], grant);
-    
-     }
+        this();
 
-//>-----------------------------------------------------------------------------
-     
-  /**
-   * Constructs a permission ring from a map.
-   * Used as copy constructor.
-   */
+        putPermission(permission, grant);
 
-   private MCRDefaultPermissionRing (Map permissions) {
-   
-      this.permissions = permissions;
-   
-     }
+    }
 
-//>-----------------------------------------------------------------------------
-     
-  /**
-   * Adds a permission to this set of permissions.
-   *
-   * @param  permission the permission to be added.
-   * @param  grant      if <code>true</code> permission is granted, denied otherwise.
-   */
+    //>-----------------------------------------------------------------------------
 
-   public void putPermission (MCRPermission permission, boolean grant) {
-   
-      permissions.put(permission, grant?GRANTED:DENIED);
-        
-     }
-   
-//------------------------------------------------------------------------------   
+    /**
+     * Constructs a permission ring with entries taken from <code>perms</code>.
+     * The status of all entries is set to grant.
+     */
 
-  /**
-   * Deletes a permission from this set of permissions.
-   *
-   * @param  permission the permission to be deleted.
-   */
+    public MCRDefaultPermissionRing(MCRPermission[] perms, boolean grant) {
 
-   public void deletePermission (MCRPermission permission) {
-   
-      permissions.remove(permission);
-      
-     }
-   
-//------------------------------------------------------------------------------
-     
-  /**
-   * Checks if the given permission is contained in this set of permissions.
-   *
-   * @param   permission  the permission to be checked.
-   *
-   * @return  true if the permission is contained in this set, false otherwise.
-   */
-   
-   public boolean containsPermission (MCRPermission permission) {
-   
-      return permissions.containsKey(permission);
-      
-     }
-     
-//------------------------------------------------------------------------------ 
+        this();
 
-  /**
-   * Checks if the given permission contained in this set of permissions
-   * is granted.
-   *
-   * @param   permission  the permission to be checked.
-   *
-   * @return  true if the permission is contained in this ring and is granted, 
-   *          false if it is not contained or denied explicitly.  
-   */  
-   
-   public boolean isPermissionGranted (MCRPermission permission) {
-   
-      if (!containsPermission(permission)) 
-         return false;
-      else 
-         return ((Boolean)permissions.get(permission)).booleanValue();
-      
-     }
-     
-//------------------------------------------------------------------------------
-     
-  /**
-   * Grants the given permission contained in this set of permissions.
-   *
-   * @param   permission  the permission to be granted.
-   */
-   
-   public void grantPermission (MCRPermission permission) {
-   
-      if (!containsPermission(permission)) 
-         return;
-      else 
-         permissions.put(permission, GRANTED);
-      
-     }
-     
-//------------------------------------------------------------------------------
-     
-  /**
-   * Denies the given permission contained in this set of permissions.
-   *
-   * @param   permission  the permission to be denied.
-   */
-   
-   public void denyPermission (MCRPermission permission) {
-   
-      if (!containsPermission(permission)) 
-         return;
-      else 
-         permissions.put(permission, DENIED);
-      
-     }
-     
-//------------------------------------------------------------------------------
-     
-  /**
-   * Creates a copy of this set of permissions.
-   *
-   * @return  a new set of permissions with identical content.
-   */
+        if (perms == null)
+            return;
 
-   public MCRPermissionRing copyPermissions () {
-   
-      //MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(new LinkedHashMap(permissions));
-      MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(new HashMap(permissions));
-      
-      return newPermissionRing;
-         
-     }
+        for (int i = 0; i < perms.length; i++)
+            putPermission(perms[i], grant);
 
-//------------------------------------------------------------------------------
-     
-  /**
-   * Returns an iterator over the containd permissions.
-   *
-   * @return an iterator over the containd permissions.   
-   */
-   
-   public Iterator iterator () {
-   
-      return permissions.keySet().iterator();
-  
-     }
+    }
 
-//------------------------------------------------------------------------------
+    //>-----------------------------------------------------------------------------
 
-  /**
-   * Adds all permissions of <code>permissionRing</code> to this ring, excluding duplicates
-   *
-   * @param permissionRing the ring to be added   
-   */
+    /**
+     * Constructs a permission ring from a map. Used as copy constructor.
+     */
 
-   public void addRing (MCRPermissionRing permissionRing) {
-   
-      for (Iterator iterator = permissionRing.iterator(); iterator.hasNext(); ) {
-  
-         MCRPermission permission = (MCRPermission)iterator.next();
-         if (!containsPermission(permission))
-            putPermission(permission, permissionRing.isPermissionGranted(permission));
+    private MCRDefaultPermissionRing(Map permissions) {
+
+        this.permissions = permissions;
+
+    }
+
+    //>-----------------------------------------------------------------------------
+
+    /**
+     * Adds a permission to this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be added.
+     * @param grant
+     *            if <code>true</code> permission is granted, denied
+     *            otherwise.
+     */
+
+    public void putPermission(MCRPermission permission, boolean grant) {
+
+        permissions.put(permission, grant ? GRANTED : DENIED);
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Deletes a permission from this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be deleted.
+     */
+
+    public void deletePermission(MCRPermission permission) {
+
+        permissions.remove(permission);
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Checks if the given permission is contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be checked.
+     * 
+     * @return true if the permission is contained in this set, false otherwise.
+     */
+
+    public boolean containsPermission(MCRPermission permission) {
+
+        return permissions.containsKey(permission);
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Checks if the given permission contained in this set of permissions is
+     * granted.
+     * 
+     * @param permission
+     *            the permission to be checked.
+     * 
+     * @return true if the permission is contained in this ring and is granted,
+     *         false if it is not contained or denied explicitly.
+     */
+
+    public boolean isPermissionGranted(MCRPermission permission) {
+
+        if (!containsPermission(permission))
+            return false;
+        else
+            return ((Boolean) permissions.get(permission)).booleanValue();
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Grants the given permission contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be granted.
+     */
+
+    public void grantPermission(MCRPermission permission) {
+
+        if (!containsPermission(permission))
+            return;
+        else
+            permissions.put(permission, GRANTED);
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Denies the given permission contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be denied.
+     */
+
+    public void denyPermission(MCRPermission permission) {
+
+        if (!containsPermission(permission))
+            return;
+        else
+            permissions.put(permission, DENIED);
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Creates a copy of this set of permissions.
+     * 
+     * @return a new set of permissions with identical content.
+     */
+
+    public MCRPermissionRing copyPermissions() {
+
+        //MCRDefaultPermissionRing newPermissionRing = new
+        // MCRDefaultPermissionRing(new LinkedHashMap(permissions));
+        MCRDefaultPermissionRing newPermissionRing = new MCRDefaultPermissionRing(
+                new HashMap(permissions));
+
+        return newPermissionRing;
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Returns an iterator over the containd permissions.
+     * 
+     * @return an iterator over the containd permissions.
+     */
+
+    public Iterator iterator() {
+
+        return permissions.keySet().iterator();
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Adds all permissions of <code>permissionRing</code> to this ring,
+     * excluding duplicates
+     * 
+     * @param permissionRing
+     *            the ring to be added
+     */
+
+    public void addRing(MCRPermissionRing permissionRing) {
+
+        for (Iterator iterator = permissionRing.iterator(); iterator.hasNext();) {
+
+            MCRPermission permission = (MCRPermission) iterator.next();
+            if (!containsPermission(permission))
+                putPermission(permission, permissionRing
+                        .isPermissionGranted(permission));
 
         }
-  
-     }
- 
-//------------------------------------------------------------------------------
-     
-  /**
-   * String representation of permissions.
-   * Every permission is represented by it's name
-   * followed by the status (+) or (-).
-   *
-   * @return string representation of a set of permissions.    
-   */
-   
-   public String toString () {
-   
-      StringBuffer buffer = new StringBuffer();
-      
-      Iterator iterator = iterator();
-  
-      while(iterator.hasNext()) {
-      
-         MCRPermission permission = (MCRPermission)iterator.next();
- 
-         buffer.append(permission.getName());
-         buffer.append("(");
-         buffer.append(isPermissionGranted(permission)?"+":"-");
-         buffer.append(")");
-         buffer.append(", ");
-         
+
+    }
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * String representation of permissions. Every permission is represented by
+     * it's name followed by the status (+) or (-).
+     * 
+     * @return string representation of a set of permissions.
+     */
+
+    public String toString() {
+
+        StringBuffer buffer = new StringBuffer();
+
+        Iterator iterator = iterator();
+
+        while (iterator.hasNext()) {
+
+            MCRPermission permission = (MCRPermission) iterator.next();
+
+            buffer.append(permission.getName());
+            buffer.append("(");
+            buffer.append(isPermissionGranted(permission) ? "+" : "-");
+            buffer.append(")");
+            buffer.append(", ");
+
         }
-        
-      int bufferLength = buffer.length();
-      if (bufferLength > 2)
-         buffer.delete(bufferLength-2, bufferLength);
 
-      return buffer.toString();
-   
-     }
+        int bufferLength = buffer.length();
+        if (bufferLength > 2)
+            buffer.delete(bufferLength - 2, bufferLength);
 
-//-============================================================================\
+        return buffer.toString();
+
+    }
+
+    //-============================================================================\
 }

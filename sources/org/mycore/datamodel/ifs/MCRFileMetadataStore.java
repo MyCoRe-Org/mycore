@@ -21,88 +21,89 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
- 
+
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
 import java.util.Vector;
 
 /**
- * Implementations of this class can be used to store
- * the metadata of all MCRFilesystemNodes in a persistent
- * datastore. While MCRContentStores hold a file's
- * content, this store holds its descriptive data like
- * the directory structure, file type, checksum and size.
- * There can only be one instance to be used in a system,
- * that instance is configured by the property
- * <b>MCR.IFS.FileMetadataStore.Class</b> 
- *
+ * Implementations of this class can be used to store the metadata of all
+ * MCRFilesystemNodes in a persistent datastore. While MCRContentStores hold a
+ * file's content, this store holds its descriptive data like the directory
+ * structure, file type, checksum and size. There can only be one instance to be
+ * used in a system, that instance is configured by the property
+ * <b>MCR.IFS.FileMetadataStore.Class </b>
+ * 
  * @see MCRFileMetadataManager
  * @see MCRFilesystemNode
  * @see MCRContentStore
- *
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public interface MCRFileMetadataStore
-{
-  /** 
-   * Creates or updates the data of the given node
-   * in the persistent store.
-   *
-   * @param node the MCRFilesystemNode to be stored
-   **/
-  public void storeNode( MCRFilesystemNode node )
-    throws MCRPersistenceException;
-  
-  /**
-   * Retrieves the MCRFilesystemNode with that ID from the
-   * persistent store.
-   *
-   * @param the unique ID of the MCRFilesystemNode
-   * @return the node with that ID, or null if no such node exists
-   **/
-  public MCRFilesystemNode retrieveNode( String ID )
-    throws MCRPersistenceException;
+ */
+public interface MCRFileMetadataStore {
+    /**
+     * Creates or updates the data of the given node in the persistent store.
+     * 
+     * @param node
+     *            the MCRFilesystemNode to be stored
+     */
+    public void storeNode(MCRFilesystemNode node)
+            throws MCRPersistenceException;
 
-  /**
-   * Retrieves a child node of an MCRDirectory from the persistent
-   * store.
-   *
-   * @param parentID the unique ID of the parent MCRDirectory
-   * @param name the filename of the child node in that directory
-   * @return the child MCRFilesystemNode, or null if no such node exists
-   **/  
-  public MCRFilesystemNode retrieveChild( String parentID, String name )
-    throws MCRPersistenceException;
+    /**
+     * Retrieves the MCRFilesystemNode with that ID from the persistent store.
+     * 
+     * @param the
+     *            unique ID of the MCRFilesystemNode
+     * @return the node with that ID, or null if no such node exists
+     */
+    public MCRFilesystemNode retrieveNode(String ID)
+            throws MCRPersistenceException;
 
-  /**
-   * Retrieves the root MCRFilesystemNode that has no parent and
-   * is owned by the object with the given owner ID.
-   *
-   * @param ownerID the ID of the owner of the root node.
-   * @return an MCRFilesystemNode that has no parent and this owner ID, or null if no such node exists
-   **/  
-  public String retrieveRootNodeID( String ownerID )
-    throws MCRPersistenceException;
+    /**
+     * Retrieves a child node of an MCRDirectory from the persistent store.
+     * 
+     * @param parentID
+     *            the unique ID of the parent MCRDirectory
+     * @param name
+     *            the filename of the child node in that directory
+     * @return the child MCRFilesystemNode, or null if no such node exists
+     */
+    public MCRFilesystemNode retrieveChild(String parentID, String name)
+            throws MCRPersistenceException;
 
-  /**
-   * Returns a list of the IDs of all children of a given parent
-   * MCRDirectory.
-   *
-   * @param parentID the ID of the parent MCRDirectory
-   * @return a Vector of String objects that are the IDs of all child nodes in that directory
-   **/  
-  public Vector retrieveChildrenIDs( String parentID )
-    throws MCRPersistenceException;
+    /**
+     * Retrieves the root MCRFilesystemNode that has no parent and is owned by
+     * the object with the given owner ID.
+     * 
+     * @param ownerID
+     *            the ID of the owner of the root node.
+     * @return an MCRFilesystemNode that has no parent and this owner ID, or
+     *         null if no such node exists
+     */
+    public String retrieveRootNodeID(String ownerID)
+            throws MCRPersistenceException;
 
-  /**
-   * Deletes all data of a given MCRFilesystemNode in the
-   * persistent metadata store.
-   *
-   * @param ID the unique ID of the MCRFilesystemNode to delete
-   **/ 
-  public void deleteNode( String ID )
-    throws MCRPersistenceException;
+    /**
+     * Returns a list of the IDs of all children of a given parent MCRDirectory.
+     * 
+     * @param parentID
+     *            the ID of the parent MCRDirectory
+     * @return a Vector of String objects that are the IDs of all child nodes in
+     *         that directory
+     */
+    public Vector retrieveChildrenIDs(String parentID)
+            throws MCRPersistenceException;
+
+    /**
+     * Deletes all data of a given MCRFilesystemNode in the persistent metadata
+     * store.
+     * 
+     * @param ID
+     *            the unique ID of the MCRFilesystemNode to delete
+     */
+    public void deleteNode(String ID) throws MCRPersistenceException;
 }
 

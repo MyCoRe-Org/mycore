@@ -26,26 +26,23 @@ import org.mycore.user.MCRUser;
 /**
  * Implementation of a (not y) clause
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRNotClause implements MCRAccessCtrlDefinition
-{
+class MCRNotClause implements MCRAccessCtrlDefinition {
     private MCRAccessCtrlDefinition inverse;
 
-    MCRNotClause(MCRAccessCtrlDefinition inverse)
-    {
-	this.inverse = inverse;
+    MCRNotClause(MCRAccessCtrlDefinition inverse) {
+        this.inverse = inverse;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	return !inverse.hasAccess(user, date, ip);
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return !inverse.hasAccess(user, date, ip);
     }
-    
-    public String toString()
-    {
-	return "NOT\n"+"*   "+inverse.toString().replaceAll("\n", "\n    ").trim()+"\n";
+
+    public String toString() {
+        return "NOT\n" + "*   "
+                + inverse.toString().replaceAll("\n", "\n    ").trim() + "\n";
     }
 };
 

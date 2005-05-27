@@ -39,67 +39,70 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * This servlet displays static *.xml files stored in the web application
- * by sending them to MCRLayoutServlet.
- *
+ * This servlet displays static *.xml files stored in the web application by
+ * sending them to MCRLayoutServlet.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRStaticXMLFileServlet extends MCRServlet
-{
-  protected final static Logger LOGGER = Logger.getLogger(  MCRStaticXMLFileServlet.class );
-  private Random random = new Random();
+public class MCRStaticXMLFileServlet extends MCRServlet {
+    protected final static Logger LOGGER = Logger
+            .getLogger(MCRStaticXMLFileServlet.class);
 
-  public void doGetPost( MCRServletJob job )
-    throws ServletException, java.io.IOException
-  {
-    String requestedPath = job.getRequest().getServletPath();
-    LOGGER.info( "MCRStaticXMLFileServlet " + requestedPath );
-    URL url = null;
-    
-    try{ url = getServletContext().getResource( requestedPath ); }
-    catch( MalformedURLException willNeverBeThrown ){}
-    
-    if( url == null )
-    {
-      String msg = "Could not find file " + requestedPath;
-      job.getResponse().sendError( HttpServletResponse.SC_NOT_FOUND, msg );
-      return;
+    private Random random = new Random();
+
+    public void doGetPost(MCRServletJob job) throws ServletException,
+            java.io.IOException {
+        String requestedPath = job.getRequest().getServletPath();
+        LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
+        URL url = null;
+
+        try {
+            url = getServletContext().getResource(requestedPath);
+        } catch (MalformedURLException willNeverBeThrown) {
+        }
+
+        if (url == null) {
+            String msg = "Could not find file " + requestedPath;
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+            return;
+        }
+
+        String path = getServletContext().getRealPath(requestedPath);
+        File file = new File(path);
+        String documentBaseURL = file.getParent() + File.separator;
+
+        // Store http request parameters into session, for later use
+        Map map = new HashMap();
+        map.putAll(job.getRequest().getParameterMap());
+        String key = buildRequestParamKey();
+        MCRServlet.requestParamCache.put(key, map);
+
+        job.getRequest().setAttribute("XSL.RequestParamKey", key);
+        job.getRequest().setAttribute("XSL.StaticFilePath",
+                requestedPath.substring(1));
+        job.getRequest().setAttribute("XSL.DocumentBaseURL", documentBaseURL);
+        job.getRequest().setAttribute("XSL.FileName", file.getName());
+        job.getRequest().setAttribute("XSL.FilePath", file.getPath());
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
+
+        // Set XSL Style to current language if no XSL.Style present in request:
+        if ((job.getRequest().getParameter("XSL.Style") == null)
+                || (job.getRequest().getParameter("XSL.Style").length() == 0))
+            job.getRequest().setAttribute("XSL.Style",
+                    MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+
+        RequestDispatcher rd = getServletContext().getNamedDispatcher(
+                "MCRLayoutServlet");
+        rd.forward(job.getRequest(), job.getResponse());
     }
 
-    String path = getServletContext().getRealPath( requestedPath );
-    File file = new File( path );
-    String documentBaseURL = file.getParent() + File.separator;
-
-    // Store http request parameters into session, for later use
-    Map map = new HashMap();
-    map.putAll( job.getRequest().getParameterMap() );
-    String key = buildRequestParamKey();
-    MCRServlet.requestParamCache.put( key, map );
-
-    job.getRequest().setAttribute( "XSL.RequestParamKey", key );
-    job.getRequest().setAttribute( "XSL.StaticFilePath", requestedPath.substring( 1 ) );
-    job.getRequest().setAttribute( "XSL.DocumentBaseURL", documentBaseURL );
-    job.getRequest().setAttribute( "XSL.FileName", file.getName() );
-    job.getRequest().setAttribute( "XSL.FilePath", file.getPath() );
-    job.getRequest().setAttribute( "MCRLayoutServlet.Input.FILE", file );
-
-    // Set XSL Style to current language if no XSL.Style present in request:
-    if( (job.getRequest().getParameter("XSL.Style")== null)
-            || (job.getRequest().getParameter("XSL.Style").length()==0))  
-      job.getRequest().setAttribute("XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-
-    RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
-    rd.forward( job.getRequest(), job.getResponse() );
-  }
-
-  /** Helper method to build a unique key for caching http request params **/
-  private synchronized String buildRequestParamKey()
-  {
-    StringBuffer sb = new StringBuffer();
-    sb.append( Long.toString( System.currentTimeMillis(), 36 ) );
-    sb.append( Long.toString( random.nextLong(), 36 ) );
-    sb.reverse();
-    return sb.toString();
-  }
+    /** Helper method to build a unique key for caching http request params * */
+    private synchronized String buildRequestParamKey() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(Long.toString(System.currentTimeMillis(), 36));
+        sb.append(Long.toString(random.nextLong(), 36));
+        sb.reverse();
+        return sb.toString();
+    }
 }

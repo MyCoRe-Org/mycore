@@ -58,60 +58,60 @@ import org.mycore.services.query.MCRQueryCollector;
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery </i>-Interface.
  */
 public class MCROAIQueryService implements MCROAIQuery {
-    static Logger logger = 
-        Logger.getLogger(MCROAIQueryService.class.getName());
+    static Logger logger = Logger.getLogger(MCROAIQueryService.class.getName());
 
     static MCRQueryCollector collector;
 
-    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; 
-    																	   //maximum
-                                                                           // number
-                                                                           // of
-                                                                           // returned
-                                                                           // list
-                                                                           // sets
+    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns";
 
-    private static final String STR_OAI_RESTRICTION_CLASSIFICATION = 
-        "MCR.oai.restriction.classification"; 
-    						//Classification 
-    						// and...
+    //maximum
+    // number
+    // of
+    // returned
+    // list
+    // sets
 
-    private static final String STR_OAI_RESTRICTION_CATEGORY = 
-        "MCR.oai.restriction.category"; 
-    													//...Category
-                                                        // to
-                                                        // restrict
-                                                        // the
-                                                        // access
-                                                        // to
+    private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification";
 
-    private static final String STR_OAI_SETSCHEME = 
-        "MCR.oai.setscheme"; 
-    					// the
-                        // classification
-                        // id
-                        // which
-                        // serves
-                        // as
-                        // scheme
-                        // for
-                        // the
-                        // OAI
-                        // set
-                        // structure
+    //Classification
+    // and...
 
-    private static final String STR_OAI_REPOSITORY_IDENTIFIER = 
-        "MCR.oai.repositoryidentifier"; 
-    					// Identifier
-                        // of
-                        // the
-                        // repository
+    private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category";
 
-    private static final String STR_OAI_QUERYTYPE = 
-        "MCR.oai.querytype"; 
-    					// search
-                        // query
-                        // type
+    //...Category
+    // to
+    // restrict
+    // the
+    // access
+    // to
+
+    private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme";
+
+    // the
+    // classification
+    // id
+    // which
+    // serves
+    // as
+    // scheme
+    // for
+    // the
+    // OAI
+    // set
+    // structure
+
+    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier";
+
+    // Identifier
+    // of
+    // the
+    // repository
+
+    private static final String STR_OAI_QUERYTYPE = "MCR.oai.querytype";
+
+    // search
+    // query
+    // type
 
     private static MCRConfiguration config;
 
@@ -451,8 +451,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         String querytype = null;
 
         if (hasMore()
-                && ((listRecords == lastQuery.equals("listRecords")) || 
-                        (!listRecords == lastQuery
+                && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery
                         .equals("listIdentifiers")))) {
             for (int i = deliveredResults; i < Math.min(maxReturns
                     + deliveredResults, numResults); i++) {

@@ -32,29 +32,27 @@ import org.mycore.common.MCRException;
  */
 public class FilterPluginTransformException extends MCRException {
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @see MCRException
-	 */
-	public FilterPluginTransformException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @see MCRException
+     */
+    public FilterPluginTransformException(String message) {
+        super(message);
+        // TODO Auto-generated constructor stub
+    }
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @param exception
- 	 * @see MCRException
-	 */
-	public FilterPluginTransformException(
-		String message,
-		Exception exception) {
-		super(message, exception);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @param exception
+     * @see MCRException
+     */
+    public FilterPluginTransformException(String message, Exception exception) {
+        super(message, exception);
+        // TODO Auto-generated constructor stub
+    }
 
 }

@@ -18,33 +18,33 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
 /**
- * Exception of this class arethrown when some operation related 
- * to principals is illegal during administration of ACLs. 
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
-
+ * Exception of this class arethrown when some operation related to principals
+ * is illegal during administration of ACLs.
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRInvalidPrincipalException extends MCRAclException {
-///============================================================================/
+    ///============================================================================/
 
-  /**
-   * Constructs an exception with an error message
-   *
-   * @param   message  The error message describíng the cause of the exception
-   */
-   
-   public MCRInvalidPrincipalException (String message) {
-   
-      super(message);
+    /**
+     * Constructs an exception with an error message
+     * 
+     * @param message
+     *            The error message describíng the cause of the exception
+     */
 
-     }
-     
-//>============================================================================\
+    public MCRInvalidPrincipalException(String message) {
+
+        super(message);
+
+    }
+
+    //>============================================================================\
 }

@@ -27,26 +27,22 @@ import org.mycore.user.MCRGroup;
 /**
  * Implementation of a (date &gt; xy) clause
  * 
- * @author   Matthias Kramm
- **/
+ * @author Matthias Kramm
+ */
 
-class MCRDateAfterClause implements MCRAccessCtrlDefinition
-{
+class MCRDateAfterClause implements MCRAccessCtrlDefinition {
     private Date date;
 
-    MCRDateAfterClause(Date date)
-    {
-	this.date = date;
+    MCRDateAfterClause(Date date) {
+        this.date = date;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-	return date.after(this.date);
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return date.after(this.date);
     }
-    
-    public String toString()
-    {
-	return "date > "+date+"\n";
+
+    public String toString() {
+        return "date > " + date + "\n";
     }
 };
 

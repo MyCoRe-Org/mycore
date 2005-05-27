@@ -30,110 +30,114 @@ import java.util.*;
 import java.text.*;
 
 /**
- * A single variable holding a value that was edited 
- * in a MyCoRe XML editor form.
- *
+ * A single variable holding a value that was edited in a MyCoRe XML editor
+ * form.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCREditorVariable implements Comparable
-{
-  // Required attributes
-  private String path;
-  private String value;
-  
-  // Auto-generated attributes
-  private String[] pathElements;
-  private String attributeName;
-  
-  // Optional attributes
-  private FileItem file = null;
-  private String sortPattern = "";
-  
-  MCREditorVariable( String path, String value )
-  {
-    setPath( path );
-    setValue( value );
-  }
+ */
+public class MCREditorVariable implements Comparable {
+    // Required attributes
+    private String path;
 
-  public String getPath()
-  { return path; }
+    private String value;
 
-  void setValue( String value )
-  { this.value = value; }
-  
-  public String getValue()
-  { return value; }
-  
-  Element asInputElement()
-  {
-    Element var = new Element( "var" );
-    var.setAttribute( "name",  path  );
-    var.setAttribute( "value", value );
-    return var;
-  }
-  
-  Element asRepeatElement()
-  {
-    Element var = new Element( "repeat" );
-    var.setAttribute( "path",  path  );
-    var.setAttribute( "value", value );
-    return var;
-  }
-  
-  void setFile( FileItem file )
-  { this.file = file; }
+    // Auto-generated attributes
+    private String[] pathElements;
 
-  public FileItem getFile()
-  { return file; }
-  
-  public boolean isAttribute()
-  { return ( attributeName != null ); }
-  
-  public String getAttributeName()
-  { return attributeName; }
+    private String attributeName;
 
-  public String[] getPathElements()
-  { return pathElements; }
-  
-  void setPath( String path )
-  {
-    this.path = path;
+    // Optional attributes
+    private FileItem file = null;
 
-    ArrayList elements = new ArrayList();
-    for( StringTokenizer st = new StringTokenizer( path, "/" ); st.hasMoreTokens(); )
-    {
-      String token = st.nextToken();
-      if( ( ! st.hasMoreTokens() ) && ( token.startsWith( "@" ) ) )
-        attributeName = token.substring( 1 );
-      else
-        elements.add( token ); 
+    private String sortPattern = "";
+
+    MCREditorVariable(String path, String value) {
+        setPath(path);
+        setValue(value);
     }
-    pathElements = ( String[] )( elements.toArray( new String[ 0 ] ) );
-  }
-  
-  void setSortNr( String sortNr )
-  {
-    StringTokenizer st = new StringTokenizer( sortNr, "." );
-    StringBuffer sb = new StringBuffer();
-    while( st.hasMoreTokens() )
-    {
-      int number = Integer.parseInt( st.nextToken() );
-      sb.append( sortFormatter.format( number ) );
-    }
-    this.sortPattern = sb.toString();
-  }
-  
-  private static DecimalFormat sortFormatter = new DecimalFormat( "0000" );
-  
-  public int compareTo( Object o )
-  {
-    MCREditorVariable other = (MCREditorVariable)o;
 
-    int length = Math.min( other.sortPattern.length(), this.sortPattern.length() );
-    String spo = other.sortPattern.substring( 0, length );
-    String spt = this .sortPattern.substring( 0, length );
-    return spt.compareTo( spo );
-  }
+    public String getPath() {
+        return path;
+    }
+
+    void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    Element asInputElement() {
+        Element var = new Element("var");
+        var.setAttribute("name", path);
+        var.setAttribute("value", value);
+        return var;
+    }
+
+    Element asRepeatElement() {
+        Element var = new Element("repeat");
+        var.setAttribute("path", path);
+        var.setAttribute("value", value);
+        return var;
+    }
+
+    void setFile(FileItem file) {
+        this.file = file;
+    }
+
+    public FileItem getFile() {
+        return file;
+    }
+
+    public boolean isAttribute() {
+        return (attributeName != null);
+    }
+
+    public String getAttributeName() {
+        return attributeName;
+    }
+
+    public String[] getPathElements() {
+        return pathElements;
+    }
+
+    void setPath(String path) {
+        this.path = path;
+
+        ArrayList elements = new ArrayList();
+        for (StringTokenizer st = new StringTokenizer(path, "/"); st
+                .hasMoreTokens();) {
+            String token = st.nextToken();
+            if ((!st.hasMoreTokens()) && (token.startsWith("@")))
+                attributeName = token.substring(1);
+            else
+                elements.add(token);
+        }
+        pathElements = (String[]) (elements.toArray(new String[0]));
+    }
+
+    void setSortNr(String sortNr) {
+        StringTokenizer st = new StringTokenizer(sortNr, ".");
+        StringBuffer sb = new StringBuffer();
+        while (st.hasMoreTokens()) {
+            int number = Integer.parseInt(st.nextToken());
+            sb.append(sortFormatter.format(number));
+        }
+        this.sortPattern = sb.toString();
+    }
+
+    private static DecimalFormat sortFormatter = new DecimalFormat("0000");
+
+    public int compareTo(Object o) {
+        MCREditorVariable other = (MCREditorVariable) o;
+
+        int length = Math.min(other.sortPattern.length(), this.sortPattern
+                .length());
+        String spo = other.sortPattern.substring(0, length);
+        String spt = this.sortPattern.substring(0, length);
+        return spt.compareTo(spo);
+    }
 }
 

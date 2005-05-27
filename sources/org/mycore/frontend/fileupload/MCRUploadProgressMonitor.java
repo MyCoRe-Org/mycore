@@ -29,139 +29,127 @@ import javax.swing.*;
 
 /**
  * This class implements a Dialog that shows messages and a progress bar while
- * creating, updating or deleting the derivates of a document. This class is
- * a singleton, there is only one instance at a time that you get with 
- * getDialog(). The MCRUploadProgressMonitor provides methods to set the next message that 
- * should be displayed and to start, update and finish the progress bar.
- *
+ * creating, updating or deleting the derivates of a document. This class is a
+ * singleton, there is only one instance at a time that you get with
+ * getDialog(). The MCRUploadProgressMonitor provides methods to set the next
+ * message that should be displayed and to start, update and finish the progress
+ * bar.
+ * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRUploadProgressMonitor extends JDialog
-{
-  protected static MCRUploadProgressMonitor dialog;
+public class MCRUploadProgressMonitor extends JDialog {
+    protected static MCRUploadProgressMonitor dialog;
 
-  public static synchronized MCRUploadProgressMonitor getDialog()
-  {
-    if( dialog == null ) dialog = new MCRUploadProgressMonitor();
-    return dialog;
-  }
+    public static synchronized MCRUploadProgressMonitor getDialog() {
+        if (dialog == null)
+            dialog = new MCRUploadProgressMonitor();
+        return dialog;
+    }
 
-  protected JProgressBar progress;
-  protected JTextArea    text;
-  protected JButton      ok;
+    protected JProgressBar progress;
 
-  protected MCRUploadProgressMonitor()
-  {
-    super( (Frame)null, "Nachrichten", true );
-    try 
-    {        
-      UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");    
-    } catch (Exception e) { }
+    protected JTextArea text;
 
-    JPanel content = new JPanel();
-    setContentPane( content );
-    content.setLayout( new BorderLayout( 5, 5 ) );
+    protected JButton ok;
 
-    text = new JTextArea( "" );
-    text.setEditable( false );
-    text.setBackground( new JPanel().getBackground() );
+    protected MCRUploadProgressMonitor() {
+        super((Frame) null, "Nachrichten", true);
+        try {
+            UIManager
+                    .setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (Exception e) {
+        }
 
-    progress = new JProgressBar();
-    progress.setStringPainted( true );
+        JPanel content = new JPanel();
+        setContentPane(content);
+        content.setLayout(new BorderLayout(5, 5));
 
-    ok = new JButton( "OK" );      
-    ok.setEnabled( false );
-    ok.addActionListener( new ActionListener()
-    { public void actionPerformed( ActionEvent e )
-      { 
-        MCRUploadProgressMonitor.this.dispose(); 
-        MCRUploadProgressMonitor.dialog = null;
-      }
-    } );
+        text = new JTextArea("");
+        text.setEditable(false);
+        text.setBackground(new JPanel().getBackground());
 
-    JPanel buttons = new JPanel();
-    buttons.setLayout( new FlowLayout( FlowLayout.RIGHT, 0, 0 ) );
-    buttons.add( ok ); 
+        progress = new JProgressBar();
+        progress.setStringPainted(true);
 
-    JScrollPane scroller = new JScrollPane( text, 
-      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-      JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS );
+        ok = new JButton("OK");
+        ok.setEnabled(false);
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                MCRUploadProgressMonitor.this.dispose();
+                MCRUploadProgressMonitor.dialog = null;
+            }
+        });
 
-    content.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
-    content.add( BorderLayout.NORTH,  progress );
-    content.add( BorderLayout.CENTER, scroller );
-    content.add( BorderLayout.SOUTH,  buttons  );
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        buttons.add(ok);
 
-    setSize( 500, 250 );
+        JScrollPane scroller = new JScrollPane(text,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    setLocation( ( screen.width - 500 ) / 2, ( screen.height - 250 ) / 2 );
-  }
- 
-  public synchronized void setMessage( final String message )
-  {
-    Runnable updater = new Runnable()
-    {
-      public void run()
-      {
-        MCRUploadProgressMonitor.this.show();
-        MCRUploadProgressMonitor.this.requestFocus();
-        text.append( message + "\n" );
-        text.setCaretPosition( text.getText().length() );
-        text.revalidate();
-        repaint();
-      }
-    };
-    SwingUtilities.invokeLater( updater );
-  }
-  
-  public synchronized void startProgressBar( final int maximum )
-  {
-    Runnable updater = new Runnable()
-    {
-      public void run()
-      {
-        progress.setMaximum( maximum );
-        progress.setValue( 0 );
-      }
-    };
-    SwingUtilities.invokeLater( updater );
-  }
+        content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        content.add(BorderLayout.NORTH, progress);
+        content.add(BorderLayout.CENTER, scroller);
+        content.add(BorderLayout.SOUTH, buttons);
 
-  public synchronized void updateProgressBar( final int valueToAdd )
-  {
-    Runnable updater = new Runnable()
-    {
-      public void run()
-      {
-        progress.setValue( progress.getValue() + valueToAdd );
-      }
-    };
-    SwingUtilities.invokeLater( updater );
-  }
+        setSize(500, 250);
 
-  public synchronized void finishProgressBar()
-  {
-    Runnable updater = new Runnable()
-    {
-      public void run()
-      {
-        progress.setValue( progress.getMaximum() );
-      }
-    };
-    SwingUtilities.invokeLater( updater );
-  }
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation((screen.width - 500) / 2, (screen.height - 250) / 2);
+    }
 
-  public synchronized void finish()
-  { 
-    finishProgressBar();
-    Runnable updater = new Runnable()
-    {
-      public void run()
-      { ok.setEnabled( true ); }
-    };
-    SwingUtilities.invokeLater( updater );
-  }
+    public synchronized void setMessage(final String message) {
+        Runnable updater = new Runnable() {
+            public void run() {
+                MCRUploadProgressMonitor.this.show();
+                MCRUploadProgressMonitor.this.requestFocus();
+                text.append(message + "\n");
+                text.setCaretPosition(text.getText().length());
+                text.revalidate();
+                repaint();
+            }
+        };
+        SwingUtilities.invokeLater(updater);
+    }
+
+    public synchronized void startProgressBar(final int maximum) {
+        Runnable updater = new Runnable() {
+            public void run() {
+                progress.setMaximum(maximum);
+                progress.setValue(0);
+            }
+        };
+        SwingUtilities.invokeLater(updater);
+    }
+
+    public synchronized void updateProgressBar(final int valueToAdd) {
+        Runnable updater = new Runnable() {
+            public void run() {
+                progress.setValue(progress.getValue() + valueToAdd);
+            }
+        };
+        SwingUtilities.invokeLater(updater);
+    }
+
+    public synchronized void finishProgressBar() {
+        Runnable updater = new Runnable() {
+            public void run() {
+                progress.setValue(progress.getMaximum());
+            }
+        };
+        SwingUtilities.invokeLater(updater);
+    }
+
+    public synchronized void finish() {
+        finishProgressBar();
+        Runnable updater = new Runnable() {
+            public void run() {
+                ok.setEnabled(true);
+            }
+        };
+        SwingUtilities.invokeLater(updater);
+    }
 }

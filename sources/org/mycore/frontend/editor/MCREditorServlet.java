@@ -35,29 +35,27 @@ import org.mycore.common.*;
 import org.mycore.frontend.servlets.*;
 
 /**
- * This servlet provides funtions to edit XML documents using
- * HTML forms.
- *
+ * This servlet provides funtions to edit XML documents using HTML forms.
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCREditorServlet extends MCRServlet
-{
-  protected void doGetPost( MCRServletJob job )
-  {
-    try
-    {
-      ServletContext context = getServletContext();
-      MCREditorRequest er = new MCREditorRequest( job.getRequest(), job.getResponse(), context );  
-      er.processRequest();
+ */
+public class MCREditorServlet extends MCRServlet {
+    protected void doGetPost(MCRServletJob job) {
+        try {
+            ServletContext context = getServletContext();
+            MCREditorRequest er = new MCREditorRequest(job.getRequest(), job
+                    .getResponse(), context);
+            er.processRequest();
+        } catch (Exception ex) {
+            try {
+                job.getResponse().sendError(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } catch (Exception ignored) {
+            }
+            String msg = "Error while processing EditorServlet request";
+            throw new MCRException(msg, ex);
+        }
     }
-    catch( Exception ex )
-    { 
-      try{ job.getResponse().sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR ); }
-      catch( Exception ignored ){}
-      String msg = "Error while processing EditorServlet request";
-      throw new MCRException( msg, ex ); 
-    }
-  }
 }
 

@@ -26,34 +26,39 @@ package org.mycore.datamodel.ifs;
 
 import org.jdom.Element;
 
-/** 
- * Detects the file content type from filename and file header. The rules
- * to do this are implementation specific, but MyCoRe provides a simple
- * detector implementation in the class MCRSimpleFCTDetector.
- *
+/**
+ * Detects the file content type from filename and file header. The rules to do
+ * this are implementation specific, but MyCoRe provides a simple detector
+ * implementation in the class MCRSimpleFCTDetector.
+ * 
  * @see MCRSimpleFCTDetector
- *
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public interface MCRFileContentTypeDetector
-{
-  /**
-   * Adds a detection rule from the file content type definition XML file.
-   * The detector is responsible for parsing the &lt;rules&gt; element provided
-   * and registering the rules stored there with the content type given.
-   *
-   * @param type the file content type the rule is for
-   * @param rules the rules XML element containing the rules for detecting that type
-   */
-  public void addRule( MCRFileContentType type, Element rules );
-  
-  /**
-   * Detects the file content type from filename and/or file header.
-   *
-   * @param filename the name of the file
-   * @param header the first bytes of the file content
-   * @return the file content type detected, or null if detection was not possible
-   */
-  public MCRFileContentType detectType( String filename, byte[] header );
+public interface MCRFileContentTypeDetector {
+    /**
+     * Adds a detection rule from the file content type definition XML file. The
+     * detector is responsible for parsing the &lt;rules&gt; element provided
+     * and registering the rules stored there with the content type given.
+     * 
+     * @param type
+     *            the file content type the rule is for
+     * @param rules
+     *            the rules XML element containing the rules for detecting that
+     *            type
+     */
+    public void addRule(MCRFileContentType type, Element rules);
+
+    /**
+     * Detects the file content type from filename and/or file header.
+     * 
+     * @param filename
+     *            the name of the file
+     * @param header
+     *            the first bytes of the file content
+     * @return the file content type detected, or null if detection was not
+     *         possible
+     */
+    public MCRFileContentType detectType(String filename, byte[] header);
 }

@@ -32,32 +32,38 @@ import com.ibm.mm.sdk.common.DKTextIndexDefICM;
 import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
- * This interface is designed to choose the datamodel classes for the
- * CM8 persistence layer
- *
+ * This interface is designed to choose the datamodel classes for the CM8
+ * persistence layer
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 
-public interface MCRCM8MetaInterface
-{
+public interface MCRCM8MetaInterface {
 
-/**
- * This method create a DKComponentTypeDefICM to create a complete
- * ItemType from the configuration.
- *
- * @param element  a MCR datamodel element as JDOM Element
- * @param connection the connection to the CM8 datastore
- * @param dsDefICM the datastore definition
- * @param prefix the prefix name for the item type
- * @param textindex the definition of the text search index
- * @param textserach the flag to use textsearch as string
- * @return a DKComponentTypeDefICM for the MCR datamodel element
- * @exception MCRPersistenceException a general Exception of MyCoRe CM8
- **/
-public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex, String textsearch) 
-  throws MCRPersistenceException;
+    /**
+     * This method create a DKComponentTypeDefICM to create a complete ItemType
+     * from the configuration.
+     * 
+     * @param element
+     *            a MCR datamodel element as JDOM Element
+     * @param connection
+     *            the connection to the CM8 datastore
+     * @param dsDefICM
+     *            the datastore definition
+     * @param prefix
+     *            the prefix name for the item type
+     * @param textindex
+     *            the definition of the text search index
+     * @param textserach
+     *            the flag to use textsearch as string
+     * @return a DKComponentTypeDefICM for the MCR datamodel element
+     * @exception MCRPersistenceException
+     *                a general Exception of MyCoRe CM8
+     */
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
+            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
+            String prefix, DKTextIndexDefICM textindex, String textsearch)
+            throws MCRPersistenceException;
 
 }

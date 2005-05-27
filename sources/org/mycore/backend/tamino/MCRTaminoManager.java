@@ -40,97 +40,103 @@ import com.softwareag.tamino.db.api.common.TException;
 import com.softwareag.tamino.db.api.common.TAccessFailureMessage;
 
 /**
- * This class organize the tamino schemes files to be inserted into database
- * It is assumed that a Tamino database has been created and is running.
- * The tamino database uri was defined in Mycore property file.
- * The following tasks are to be preformed:
- *  - establish a connection to the Tamino database
- *  - obtain a system accessor, check Server alive or not, and print out system information
- *  - call class "MCRTaminoSchema" to insert tamino schemes for collection "ino:etc", "legalentity", "document", "derivate".
- *
+ * This class organize the tamino schemes files to be inserted into database It
+ * is assumed that a Tamino database has been created and is running. The tamino
+ * database uri was defined in Mycore property file. The following tasks are to
+ * be preformed: - establish a connection to the Tamino database - obtain a
+ * system accessor, check Server alive or not, and print out system information -
+ * call class "MCRTaminoSchema" to insert tamino schemes for collection
+ * "ino:etc", "legalentity", "document", "derivate".
+ * 
  * @author: lili tan
  * @version 1.0 $ $Date$
  */
 
 public class MCRTaminoManager {
-  public MCRTaminoManager()
-      {
-       }
- public static void main(String[] args) throws Exception  {
+    public MCRTaminoManager() {
+    }
 
-     MCRConfiguration config = MCRConfiguration.instance();
+    public static void main(String[] args) throws Exception {
 
-     /** the database url in Tamino http form that got from properity file  */
-     String TaminoDATABASE_URI=config.getString(  "MCR.persistence_taminoxmldb_TaminoDATABASE_URI" , "");
+        MCRConfiguration config = MCRConfiguration.instance();
 
-      System.out.println( "\nHere is some systeminformation" );
+        /** the database url in Tamino http form that got from properity file */
+        String TaminoDATABASE_URI = config.getString(
+                "MCR.persistence_taminoxmldb_TaminoDATABASE_URI", "");
 
-      // print TaminoDATABASE_URI
-      System.out.println( "The Tamino server hosting " +TaminoDATABASE_URI);
+        System.out.println("\nHere is some systeminformation");
 
-     // Obtain the connection factory
-      TConnectionFactory connectionFactory = TConnectionFactory.getInstance();
-     // and obtain the connection to the database
-      TConnection connection = connectionFactory.newConnection(TaminoDATABASE_URI );
+        // print TaminoDATABASE_URI
+        System.out.println("The Tamino server hosting " + TaminoDATABASE_URI);
 
-      // Obtain a TSystemAccesor
-      TSystemAccessor systemaccessor = connection.newSystemAccessor();
+        // Obtain the connection factory
+        TConnectionFactory connectionFactory = TConnectionFactory.getInstance();
+        // and obtain the connection to the database
+        TConnection connection = connectionFactory
+                .newConnection(TaminoDATABASE_URI);
 
+        // Obtain a TSystemAccesor
+        TSystemAccessor systemaccessor = connection.newSystemAccessor();
 
-       // Check if the connection is available and print out some system information
-        if ( !checkServerAndPrintSystemInformation( systemaccessor ) )
-        return;
+        // Check if the connection is available and print out some system
+        // information
+        if (!checkServerAndPrintSystemInformation(systemaccessor))
+            return;
 
-  /**
-   * call for insert tamino schema file into tamino database
-   *
-   * @param TaminoDATABASE_URI
-   *
-   * @throws TInsertException
-   **/
+        /**
+         * call for insert tamino schema file into tamino database
+         * 
+         * @param TaminoDATABASE_URI
+         * 
+         * @throws TInsertException
+         */
 
-         System.out.println("\n-------------Loading Tamino Schema------------------\n");
+        System.out
+                .println("\n-------------Loading Tamino Schema------------------\n");
 
-         // call for insert tamino schema "xlink.tsd" into tamino database in collection "ino:etc"
-         MCRTaminoSchema.InsertTaminoSchema(
-                    TaminoDATABASE_URI,"ino:etc","./taminoschema/xlink.tsd");
+        // call for insert tamino schema "xlink.tsd" into tamino database in
+        // collection "ino:etc"
+        MCRTaminoSchema.InsertTaminoSchema(TaminoDATABASE_URI, "ino:etc",
+                "./taminoschema/xlink.tsd");
 
-         // call for insert tamino schema "MyCoReDemoDC_LegalEntity.tsd" into tamino database in collection "legalentity"
-         MCRTaminoSchema.InsertTaminoSchema(
-                   TaminoDATABASE_URI,"legalentity","./taminoschema/MyCoReDemoDC_LegalEntity.tsd");
+        // call for insert tamino schema "MyCoReDemoDC_LegalEntity.tsd" into
+        // tamino database in collection "legalentity"
+        MCRTaminoSchema.InsertTaminoSchema(TaminoDATABASE_URI, "legalentity",
+                "./taminoschema/MyCoReDemoDC_LegalEntity.tsd");
 
-        // call for insert tamino schema "MyCoReDemoDC_Document.tsd" into tamino database in collection "document"
-        MCRTaminoSchema.InsertTaminoSchema(
-                   TaminoDATABASE_URI,"document","./taminoschema/MyCoReDemoDC_Document.tsd");
+        // call for insert tamino schema "MyCoReDemoDC_Document.tsd" into tamino
+        // database in collection "document"
+        MCRTaminoSchema.InsertTaminoSchema(TaminoDATABASE_URI, "document",
+                "./taminoschema/MyCoReDemoDC_Document.tsd");
 
-         // call for insert tamino schema "MyCoReDemoDC_Derivate.tsd" into tamino database in collection "derivate"
-         MCRTaminoSchema.InsertTaminoSchema(TaminoDATABASE_URI,
-                                            "derivate","./taminoschema/MyCoReDemoDC_Derivate.tsd");
-          System.out.println("-------------End of Loading Tamino Schema------------------");
-         }
+        // call for insert tamino schema "MyCoReDemoDC_Derivate.tsd" into tamino
+        // database in collection "derivate"
+        MCRTaminoSchema.InsertTaminoSchema(TaminoDATABASE_URI, "derivate",
+                "./taminoschema/MyCoReDemoDC_Derivate.tsd");
+        System.out
+                .println("-------------End of Loading Tamino Schema------------------");
+    }
 
-
-  /**
-   * use a system accessor to check if the database is alive and
-   * print some system information to stdout
-   *
-   * @param systemaccessor
-   * @throws MTAccessorException
-  **/
+    /**
+     * use a system accessor to check if the database is alive and print some
+     * system information to stdout
+     * 
+     * @param systemaccessor
+     * @throws MTAccessorException
+     */
 
     protected static boolean checkServerAndPrintSystemInformation(
-    TSystemAccessor  systemaccessor)
-            throws TAccessorException {
-            if (!systemaccessor.isServerAlive()) {
-                    return false;
-                  }
-            else
-                  {
-                    System.out.println( "server is alive" );
-                    System.out.println( "Version: " + systemaccessor.getServerVersion() );
-                    System.out.println( "Server API version: " +systemaccessor.getServerAPIVersion());
-                    System.out.println( "Tamino API for Java version: " +systemaccessor.getAPIVersion() +"\n" );
-                    return true;
-                    }
-           }
+            TSystemAccessor systemaccessor) throws TAccessorException {
+        if (!systemaccessor.isServerAlive()) {
+            return false;
+        } else {
+            System.out.println("server is alive");
+            System.out.println("Version: " + systemaccessor.getServerVersion());
+            System.out.println("Server API version: "
+                    + systemaccessor.getServerAPIVersion());
+            System.out.println("Tamino API for Java version: "
+                    + systemaccessor.getAPIVersion() + "\n");
+            return true;
+        }
+    }
 }

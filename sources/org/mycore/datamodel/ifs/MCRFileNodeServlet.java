@@ -56,59 +56,57 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * This servlet delivers the contents of an MCRFilesystemNode 
- * to the client browser. If the node is a ordinary MCRFile, 
- * the contents of that file will be sent to the browser. If the
- * node is an MCRFile with a MCRAudioVideoExtender, the message
- * that starts the associated streaming player will be delivered.
- * If the node is a MCRDirectory, the contents of that directory
- * will be forwareded to MCRLayoutServlet as XML data to display
- * a detailed directory listing.
- *
+ * This servlet delivers the contents of an MCRFilesystemNode to the client
+ * browser. If the node is a ordinary MCRFile, the contents of that file will be
+ * sent to the browser. If the node is an MCRFile with a MCRAudioVideoExtender,
+ * the message that starts the associated streaming player will be delivered. If
+ * the node is a MCRDirectory, the contents of that directory will be forwareded
+ * to MCRLayoutServlet as XML data to display a detailed directory listing.
+ * 
  * @author Frank Lützenkirchen
- * @author Jens Kupferschmidt 
+ * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
- **/
-public class MCRFileNodeServlet extends MCRServlet
-{
-  /*
-   * Die folgenden Dinge will ich hier unbedingt raus haben:
-   * - language und damit verbundene Stylesheet Auswahl
-   *   -> gehöhrt ins MCRLayoutServlet und/oder MCRServlet
-   * - remote handling
-   *   -> muss das so kompliziert sein?
-   * Vielleicht nicht, aber ich behebe hier nur Fehler ;o)
-   */
-  
-  // The Log4J logger
-  private static Logger LOGGER = Logger.getLogger( MCRFileNodeServlet.class.getName() );
+ */
+public class MCRFileNodeServlet extends MCRServlet {
+    /*
+     * Die folgenden Dinge will ich hier unbedingt raus haben: - language und
+     * damit verbundene Stylesheet Auswahl -> gehöhrt ins MCRLayoutServlet
+     * und/oder MCRServlet - remote handling -> muss das so kompliziert sein?
+     * Vielleicht nicht, aber ich behebe hier nur Fehler ;o)
+     */
 
-  // The list of hosts from the configuration
-  private ArrayList remoteAliasList = null;
+    // The Log4J logger
+    private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class
+            .getName());
 
- /**
-  * Initializes the servlet and reads the default
-  * language and the remote host list from the configuration.
-  **/
-  public void init() throws MCRConfigurationException, ServletException
-  {
-    super.init();
- 
-    // read host list from configuration
-    String hostconf = CONFIG.getString( "MCR.remoteaccess_hostaliases", "local" );
-    remoteAliasList = new ArrayList();
-    if( hostconf.indexOf( "local" ) < 0 ) remoteAliasList.add( "local" );
-    
-    StringTokenizer st = new StringTokenizer( hostconf, ", " );
-    while( st.hasMoreTokens() ) remoteAliasList.add( st.nextToken() );
-  }
+    // The list of hosts from the configuration
+    private ArrayList remoteAliasList = null;
 
-  /**
-   * Handles the HTTP request
-   **/
-  public void doGetPost(MCRServletJob job) throws IOException,
+    /**
+     * Initializes the servlet and reads the default language and the remote
+     * host list from the configuration.
+     */
+    public void init() throws MCRConfigurationException, ServletException {
+        super.init();
+
+        // read host list from configuration
+        String hostconf = CONFIG.getString("MCR.remoteaccess_hostaliases",
+                "local");
+        remoteAliasList = new ArrayList();
+        if (hostconf.indexOf("local") < 0)
+            remoteAliasList.add("local");
+
+        StringTokenizer st = new StringTokenizer(hostconf, ", ");
+        while (st.hasMoreTokens())
+            remoteAliasList.add(st.nextToken());
+    }
+
+    /**
+     * Handles the HTTP request
+     */
+    public void doGetPost(MCRServletJob job) throws IOException,
             ServletException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -280,186 +278,182 @@ public class MCRFileNodeServlet extends MCRServlet
         }
     }
 
-  /**
-   * Sends the contents of an MCRFile to the client. If the
-   * MCRFile provides an MCRAudioVideoExtender, the file's content
-   * is NOT sended to the client, instead the stream that starts
-   * the associated streaming player is sended to the client.
-   * The HTTP request may then contain StartPos and StopPos parameters
-   * that contain the timecodes where to start and/or stop streaming.
-   **/  
-  private void sendFile( HttpServletRequest req, HttpServletResponse res, MCRFile file )
-    throws IOException, ServletException
-  {
-    LOGGER.info( "MCRFileNodeServlet: Sending file " + file.getName() );
-    
-    if( file.hasAudioVideoExtender() ) // Start streaming player
-    { 
-      MCRAudioVideoExtender ext = file.getAudioVideoExtender();
+    /**
+     * Sends the contents of an MCRFile to the client. If the MCRFile provides
+     * an MCRAudioVideoExtender, the file's content is NOT sended to the client,
+     * instead the stream that starts the associated streaming player is sended
+     * to the client. The HTTP request may then contain StartPos and StopPos
+     * parameters that contain the timecodes where to start and/or stop
+     * streaming.
+     */
+    private void sendFile(HttpServletRequest req, HttpServletResponse res,
+            MCRFile file) throws IOException, ServletException {
+        LOGGER.info("MCRFileNodeServlet: Sending file " + file.getName());
 
-      String startPos = req.getParameter( "StartPos" );
-      String stopPos  = req.getParameter( "StopPos"  );
+        if (file.hasAudioVideoExtender()) // Start streaming player
+        {
+            MCRAudioVideoExtender ext = file.getAudioVideoExtender();
 
-      res.setContentType( ext.getPlayerStarterContentType() );
-      ext.getPlayerStarterTo( res.getOutputStream(), startPos, stopPos );
-    }
-    else // Send contents of ordinary file
-    {
-      res.setContentType( file.getContentType().getMimeType() );
-      res.setContentLength( (int)( file.getSize() ) );
-    
-      OutputStream out = new BufferedOutputStream( res.getOutputStream() );
-      file.getContentTo( out );
-      out.close();
-    }
-  }
+            String startPos = req.getParameter("StartPos");
+            String stopPos = req.getParameter("StopPos");
 
-  /**
-   * Sends the contents of an MCRDirectory as XML data to the client
-   **/  
-  private void sendDirectory( HttpServletRequest req, HttpServletResponse res, 
-                              MCRDirectory dir, String lang ) 
-    throws IOException, ServletException
-  {
-    LOGGER.info( "MCRFileNodeServlet: Sending listing of directory " + dir.getName() );
-    
-    Element root = new Element( "mcr_directory" );
-    Document doc = new org.jdom.Document( root );
-    
-    root.setAttribute( "ID", dir.getID() );
-    
-    addString( root, "path",         dir.getPath() );
-    addString( root, "ownerID",      dir.getOwnerID() );
-    addDate  ( root, "lastModified", dir.getLastModified() );
-    addString( root, "size",         String.valueOf( dir.getSize() ) );
-    
-    Element numChildren = new Element( "numChildren" );
-    root.addContent( numChildren );
-    
-    Element ncHere = new Element( "here" );
-    numChildren.addContent( ncHere );
-    
-    addString( ncHere, "directories", String.valueOf( dir.getNumChildren( MCRDirectory.DIRECTORIES, MCRDirectory.HERE ) ) );
-    addString( ncHere, "files",       String.valueOf( dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.HERE ) ) );
-    
-    Element ncTotal = new Element( "total" );
-    numChildren.addContent( ncTotal );
-    
-    addString( ncTotal, "directories", String.valueOf( dir.getNumChildren( MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL ) ) );
-    addString( ncTotal, "files",       String.valueOf( dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.TOTAL ) ) );
+            res.setContentType(ext.getPlayerStarterContentType());
+            ext.getPlayerStarterTo(res.getOutputStream(), startPos, stopPos);
+        } else // Send contents of ordinary file
+        {
+            res.setContentType(file.getContentType().getMimeType());
+            res.setContentLength((int) (file.getSize()));
 
-    Element nodes = new Element( "children" );
-    root.addContent( nodes );
-    
-    MCRFilesystemNode[] children = dir.getChildren();
-    for( int i = 0; i < children.length; i++ )
-    {
-      Element node = new Element( "child" );
-      node.setAttribute( "ID", children[ i ].getID() );
-      nodes.addContent( node );
-
-      addString( node, "name",         children[ i ].getName() );
-      addString( node, "size",         String.valueOf( children[ i ].getSize() ) );
-      addDate  ( node, "lastModified", children[ i ].getLastModified() );
-      
-      if( children[ i ] instanceof MCRFile )
-      {
-        node.setAttribute( "type", "file" );
-        
-        MCRFile file = (MCRFile)( children[ i ] );
-        addString( node, "contentType", file.getContentTypeID() );
-        addString( node, "md5",         file.getMD5() );
-                
-        if( file.hasAudioVideoExtender() )
-        {  
-          MCRAudioVideoExtender ext = file.getAudioVideoExtender();
-
-          Element xExtender = new Element( "extender" );
-          node.addContent( xExtender );
-          addExtenderData( xExtender, ext );
+            OutputStream out = new BufferedOutputStream(res.getOutputStream());
+            file.getContentTo(out);
+            out.close();
         }
-      }
-      else node.setAttribute( "type", "directory" );
     }
-    
-    // put it in an MCRXMLContainer
-    MCRXMLContainer resarray = new MCRXMLContainer();
-    resarray.add( "local", dir.getOwnerID(), 1, doc.getRootElement() );
-    org.jdom.Document jdom = resarray.exportAllToDocument();
-    
-    // prepare the stylesheet name
-    Properties parameters = MCRLayoutServlet.buildXSLParameters( req );
-    String style = parameters.getProperty( "Style", "IFSMetadata-" + lang );
-    LOGGER.debug( "Style = " + style );
 
-    if( style.equals( "xml" ) ) 
-    {
-      res.setContentType( "text/xml" );
-      OutputStream out = res.getOutputStream();
-      new org.jdom.output.XMLOutputter(Format.getPrettyFormat()).output( jdom, out );
-      out.close();
+    /**
+     * Sends the contents of an MCRDirectory as XML data to the client
+     */
+    private void sendDirectory(HttpServletRequest req, HttpServletResponse res,
+            MCRDirectory dir, String lang) throws IOException, ServletException {
+        LOGGER.info("MCRFileNodeServlet: Sending listing of directory "
+                + dir.getName());
+
+        Element root = new Element("mcr_directory");
+        Document doc = new org.jdom.Document(root);
+
+        root.setAttribute("ID", dir.getID());
+
+        addString(root, "path", dir.getPath());
+        addString(root, "ownerID", dir.getOwnerID());
+        addDate(root, "lastModified", dir.getLastModified());
+        addString(root, "size", String.valueOf(dir.getSize()));
+
+        Element numChildren = new Element("numChildren");
+        root.addContent(numChildren);
+
+        Element ncHere = new Element("here");
+        numChildren.addContent(ncHere);
+
+        addString(ncHere, "directories", String.valueOf(dir.getNumChildren(
+                MCRDirectory.DIRECTORIES, MCRDirectory.HERE)));
+        addString(ncHere, "files", String.valueOf(dir.getNumChildren(
+                MCRDirectory.FILES, MCRDirectory.HERE)));
+
+        Element ncTotal = new Element("total");
+        numChildren.addContent(ncTotal);
+
+        addString(ncTotal, "directories", String.valueOf(dir.getNumChildren(
+                MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL)));
+        addString(ncTotal, "files", String.valueOf(dir.getNumChildren(
+                MCRDirectory.FILES, MCRDirectory.TOTAL)));
+
+        Element nodes = new Element("children");
+        root.addContent(nodes);
+
+        MCRFilesystemNode[] children = dir.getChildren();
+        for (int i = 0; i < children.length; i++) {
+            Element node = new Element("child");
+            node.setAttribute("ID", children[i].getID());
+            nodes.addContent(node);
+
+            addString(node, "name", children[i].getName());
+            addString(node, "size", String.valueOf(children[i].getSize()));
+            addDate(node, "lastModified", children[i].getLastModified());
+
+            if (children[i] instanceof MCRFile) {
+                node.setAttribute("type", "file");
+
+                MCRFile file = (MCRFile) (children[i]);
+                addString(node, "contentType", file.getContentTypeID());
+                addString(node, "md5", file.getMD5());
+
+                if (file.hasAudioVideoExtender()) {
+                    MCRAudioVideoExtender ext = file.getAudioVideoExtender();
+
+                    Element xExtender = new Element("extender");
+                    node.addContent(xExtender);
+                    addExtenderData(xExtender, ext);
+                }
+            } else
+                node.setAttribute("type", "directory");
+        }
+
+        // put it in an MCRXMLContainer
+        MCRXMLContainer resarray = new MCRXMLContainer();
+        resarray.add("local", dir.getOwnerID(), 1, doc.getRootElement());
+        org.jdom.Document jdom = resarray.exportAllToDocument();
+
+        // prepare the stylesheet name
+        Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
+        String style = parameters.getProperty("Style", "IFSMetadata-" + lang);
+        LOGGER.debug("Style = " + style);
+
+        if (style.equals("xml")) {
+            res.setContentType("text/xml");
+            OutputStream out = res.getOutputStream();
+            new org.jdom.output.XMLOutputter(Format.getPrettyFormat()).output(
+                    jdom, out);
+            out.close();
+        } else {
+            req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+            req.setAttribute("XSL.Style", style);
+            RequestDispatcher rd = getServletContext().getNamedDispatcher(
+                    "MCRLayoutServlet");
+            rd.forward(req, res);
+        }
     }
-    else 
-    {
-      req.setAttribute( "MCRLayoutServlet.Input.JDOM", jdom );
-      req.setAttribute( "XSL.Style", style );
-      RequestDispatcher rd = getServletContext().getNamedDispatcher( "MCRLayoutServlet" );
-      rd.forward( req, res );
+
+    private String dateFormat = "dd.MM.yyyy HH:mm:ss";
+
+    private DateFormat dateFormatter = new SimpleDateFormat(dateFormat);
+
+    private void addDate(Element parent, String type, GregorianCalendar date) {
+        Element xDate = new Element("date");
+        parent.addContent(xDate);
+
+        xDate.setAttribute("type", type);
+
+        String time = dateFormatter.format(date.getTime());
+
+        xDate.setAttribute("format", dateFormat);
+        xDate.addContent(time);
     }
-  }
-  
-  private String     dateFormat    = "dd.MM.yyyy HH:mm:ss";
-  private DateFormat dateFormatter = new SimpleDateFormat( dateFormat );
 
-  private void addDate( Element parent, String type, GregorianCalendar date )
-  {
-    Element xDate = new Element( "date" );
-    parent.addContent( xDate );
-    
-    xDate.setAttribute( "type", type );
-    
-    String time = dateFormatter.format( date.getTime() );
-    
-    xDate.setAttribute( "format", dateFormat );
-    xDate.addContent( time );
-  }
-  
-  private String     timeFormat    = "HH:mm:ss";
-  private DateFormat timeFormatter = new SimpleDateFormat( timeFormat );
+    private String timeFormat = "HH:mm:ss";
 
-  private void addTime( Element parent, String type, int hh, int mm, int ss )
-  {
-    Element xTime = new Element( type );
-    parent.addContent( xTime );
+    private DateFormat timeFormatter = new SimpleDateFormat(timeFormat);
 
-    GregorianCalendar date = new GregorianCalendar( 2002, 01, 01, hh, mm, ss );
-    String time = timeFormatter.format( date.getTime() );
-    
-    xTime.setAttribute( "format", timeFormat );
-    xTime.addContent( time );
-  }
-  
-  private void addString( Element parent, String itemName, String content )
-  {
-    if( ( content == null ) || ( content.trim().length() == 0 ) ) return;
-    parent.addContent(new Element( itemName ).addContent( content.trim() ) );
-  }
-  
-  private void addExtenderData( Element parent, MCRAudioVideoExtender ext )
-  {
-    parent.setAttribute( "type", ext.isVideo() ? "video" : "audio" );
+    private void addTime(Element parent, String type, int hh, int mm, int ss) {
+        Element xTime = new Element(type);
+        parent.addContent(xTime);
 
-    int hh = ext.getDurationHours();
-    int mm = ext.getDurationMinutes();
-    int ss = ext.getDurationSeconds();
-    addTime( parent, "duration", hh, mm, ss );
-    
-    addString( parent, "bitRate", String.valueOf( ext.getBitRate() ) );
-    
-    if( ext.isVideo() )
-      addString( parent, "frameRate", String.valueOf( ext.getFrameRate() ) );
-    
-    addString( parent, "playerURL", ext.getPlayerDownloadURL() );
-  }
+        GregorianCalendar date = new GregorianCalendar(2002, 01, 01, hh, mm, ss);
+        String time = timeFormatter.format(date.getTime());
+
+        xTime.setAttribute("format", timeFormat);
+        xTime.addContent(time);
+    }
+
+    private void addString(Element parent, String itemName, String content) {
+        if ((content == null) || (content.trim().length() == 0))
+            return;
+        parent.addContent(new Element(itemName).addContent(content.trim()));
+    }
+
+    private void addExtenderData(Element parent, MCRAudioVideoExtender ext) {
+        parent.setAttribute("type", ext.isVideo() ? "video" : "audio");
+
+        int hh = ext.getDurationHours();
+        int mm = ext.getDurationMinutes();
+        int ss = ext.getDurationSeconds();
+        addTime(parent, "duration", hh, mm, ss);
+
+        addString(parent, "bitRate", String.valueOf(ext.getBitRate()));
+
+        if (ext.isVideo())
+            addString(parent, "frameRate", String.valueOf(ext.getFrameRate()));
+
+        addString(parent, "playerURL", ext.getPlayerDownloadURL());
+    }
 }
 

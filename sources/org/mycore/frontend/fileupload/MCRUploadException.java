@@ -24,33 +24,31 @@
 package org.mycore.frontend.fileupload;
 
 /**
- * This exception is thrown by the UploadCommunicator to
- * indicate that an exception occured on the server side
- * during execution of a servlet task. The applet that is
- * using the UploadCommunicator can examine the exceptions
- * properties to find out what type of exception occured on
- * the server side.
- *
+ * This exception is thrown by the UploadCommunicator to indicate that an
+ * exception occured on the server side during execution of a servlet task. The
+ * applet that is using the UploadCommunicator can examine the exceptions
+ * properties to find out what type of exception occured on the server side.
+ * 
  * @see org.mycore.frontend.fileupload.MCRUploadCommunicator
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRUploadException
-  extends Exception
-{
-  protected String clname;
-  protected String strace;
+public class MCRUploadException extends Exception {
+    protected String clname;
 
-  public MCRUploadException( String clname, String message, String strace )
-  {
-    super( message );
-    this.clname = clname;
-    this.strace = strace;
-  }
+    protected String strace;
 
-  public String getServerSideClassName()
-  { return clname; }
+    public MCRUploadException(String clname, String message, String strace) {
+        super(message);
+        this.clname = clname;
+        this.strace = strace;
+    }
 
-  public String getServerSideStackTrace()
-  { return strace; }
+    public String getServerSideClassName() {
+        return clname;
+    }
+
+    public String getServerSideStackTrace() {
+        return strace;
+    }
 }

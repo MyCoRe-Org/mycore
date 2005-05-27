@@ -18,47 +18,45 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
 /**
- * This class defines some standard permissions which are meaningful
- * for most classes.
- *
+ * This class defines some standard permissions which are meaningful for most
+ * classes.
+ * 
  * <P>
- * The type is not an interface to avoid the constant interface antipattern,
- * so at present the static constants defined in this class will have to be
- * used with there full name.
- * This will change in an upcoming release of java where static imports are available
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
+ * The type is not an interface to avoid the constant interface antipattern, so
+ * at present the static constants defined in this class will have to be used
+ * with there full name. This will change in an upcoming release of java where
+ * static imports are available
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRStandardPermissions {
-///============================================================================/
+    ///============================================================================/
 
-  /**
-   * Permission which allows the modification of an ACL.
-   */
-      
-   public static final MCRPermission ACL_MODIFY = 
-      new MCRDefaultPermission("acl_modify", 
-                               "Permission to modify the ACL of a guarded object"); 
+    /**
+     * Permission which allows the modification of an ACL.
+     */
 
+    public static final MCRPermission ACL_MODIFY = new MCRDefaultPermission(
+            "acl_modify", "Permission to modify the ACL of a guarded object");
 
-  /**
-   * Permission which allows to read parts of an ACL.
-   */
-      
-   public static final MCRPermission ACL_READ = 
-      new MCRDefaultPermission("acl_read", 
-                               "Permission to read the ACL of a guarded object"); 
-   
-//+-----------------------------------------------------------------------------
+    /**
+     * Permission which allows to read parts of an ACL.
+     */
 
-   private MCRStandardPermissions () {}
-   
-//>============================================================================\
+    public static final MCRPermission ACL_READ = new MCRDefaultPermission(
+            "acl_read", "Permission to read the ACL of a guarded object");
+
+    //+-----------------------------------------------------------------------------
+
+    private MCRStandardPermissions() {
+    }
+
+    //>============================================================================\
 }

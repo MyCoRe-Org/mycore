@@ -25,30 +25,34 @@
 package org.mycore.common;
 
 /**
- * Instances of MCRUsageException are thrown when the MyCoRe API is used in an 
- * illegal way. For example, this could happen when you provide illegal 
+ * Instances of MCRUsageException are thrown when the MyCoRe API is used in an
+ * illegal way. For example, this could happen when you provide illegal
  * arguments to a method.
- *
+ * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
- **/
-public class MCRUsageException extends MCRException
-{
-  /**
-   * Creates a new MCRUsageException with an error message
-   *
-   * @param message the error message for this exception
-   */  
-  public MCRUsageException( String message )
-  { super( message); }
-  
-  /**
-   * Creates a new MCRUsageException with an error message and a reference 
-   * to an exception thrown by an underlying system.
-   *
-   * @param message the error message for this exception
-   * @param exception the exception that was thrown by an underlying system
-   */  
-  public MCRUsageException( String message, Exception exception )
-  { super( message, exception ); }
-} 
+ */
+public class MCRUsageException extends MCRException {
+    /**
+     * Creates a new MCRUsageException with an error message
+     * 
+     * @param message
+     *            the error message for this exception
+     */
+    public MCRUsageException(String message) {
+        super(message);
+    }
+
+    /**
+     * Creates a new MCRUsageException with an error message and a reference to
+     * an exception thrown by an underlying system.
+     * 
+     * @param message
+     *            the error message for this exception
+     * @param exception
+     *            the exception that was thrown by an underlying system
+     */
+    public MCRUsageException(String message, Exception exception) {
+        super(message, exception);
+    }
+}

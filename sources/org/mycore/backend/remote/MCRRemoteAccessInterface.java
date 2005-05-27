@@ -30,48 +30,54 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
 
 /**
- * This interface is designed to choose the communication methodes
- * for the connection between a local MyCoRe-Client and remote MyCoRe-Server.
- *
+ * This interface is designed to choose the communication methodes for the
+ * connection between a local MyCoRe-Client and remote MyCoRe-Server.
+ * 
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
  * @version $Revision$ $Date$
- **/
+ */
 
-public interface MCRRemoteAccessInterface
-{
+public interface MCRRemoteAccessInterface {
 
-/**
- * This method represide the XPATH query request to a remote MyCoRe-Server.
- * For the connection parameter would the MCRConfiguration used.
- *
- * @param hostAlias the host alias as string that shall be requested.
- * @param mcrtype  the type value of the MCRObjectId
- * @param query    the query as a stream
- * @return the result of the query as MCRQueryResultArray
- * @exception MCRException general Exception of MyCoRe
- **/
-public MCRXMLContainer requestQuery(String hostAlias, String mcrtype, 
-  String query) throws MCRException;
+    /**
+     * This method represide the XPATH query request to a remote MyCoRe-Server.
+     * For the connection parameter would the MCRConfiguration used.
+     * 
+     * @param hostAlias
+     *            the host alias as string that shall be requested.
+     * @param mcrtype
+     *            the type value of the MCRObjectId
+     * @param query
+     *            the query as a stream
+     * @return the result of the query as MCRQueryResultArray
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    public MCRXMLContainer requestQuery(String hostAlias, String mcrtype,
+            String query) throws MCRException;
 
-/**
- * This methode represide the IFS request methode for the communication.
- * For the connection parameter would the MCRConfiguration used.
- *
- * @param hostAlias the list of hostnames as string they should requested.
- * @param path      the path to the IFS data
- * @exception MCRException general Exception of MyCoRe
- * @return the result of the query as MCRXMLContainer
- **/
-public BufferedInputStream requestIFS(String hostAlias, String path)
-  throws MCRException;
+    /**
+     * This methode represide the IFS request methode for the communication. For
+     * the connection parameter would the MCRConfiguration used.
+     * 
+     * @param hostAlias
+     *            the list of hostnames as string they should requested.
+     * @param path
+     *            the path to the IFS data
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     * @return the result of the query as MCRXMLContainer
+     */
+    public BufferedInputStream requestIFS(String hostAlias, String path)
+            throws MCRException;
 
-/**
- * This method returns the HPPT header content string, if a requestIFS was
- * successful running.
- *
- * @return HPPT header content string
- **/
-public String getHeaderContent();
+    /**
+     * This method returns the HPPT header content string, if a requestIFS was
+     * successful running.
+     * 
+     * @return HPPT header content string
+     */
+    public String getHeaderContent();
 
 }

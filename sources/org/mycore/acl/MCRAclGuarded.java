@@ -18,47 +18,49 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
-
 /**
- * This interface characterize objects
- * which are guarded by an access control list (ACL).
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
+ * This interface characterize objects which are guarded by an access control
+ * list (ACL).
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public interface MCRAclGuarded {
-///============================================================================/
+    ///============================================================================/
 
-  /**
-   * Returns the ACL by which this object is guarded. This should be the only way
-   * to obtain an ACL for modifying. In implementing classes the reference to an ACL
-   * should be final, so that changing an ACL can only be made by modifying
-   * the existing one and not by assigning a new ACL. 
-   *
-   * @return the ACL which guards this objects.
-   *
-   * @throws MCRAccessException if the current user is not allowed to read the ACL.   
-   */
-   
-   public MCRAcl getAcl () throws MCRAccessException;
-   
-//------------------------------------------------------------------------------
+    /**
+     * Returns the ACL by which this object is guarded. This should be the only
+     * way to obtain an ACL for modifying. In implementing classes the reference
+     * to an ACL should be final, so that changing an ACL can only be made by
+     * modifying the existing one and not by assigning a new ACL.
+     * 
+     * @return the ACL which guards this objects.
+     * 
+     * @throws MCRAccessException
+     *             if the current user is not allowed to read the ACL.
+     */
 
-  /**
-   * Checks if the current user can perform the action specified by permission.
-   * 
-   * @param   permission  the permission required to perform the action.
-   *
-   * @throws  MCRAccessException  if the currentUser is not allowed to perform the action.  
-   */
-   
-   public void checkAccess (MCRPermission permission) 
-                           throws MCRAccessException;
-                           
-//-============================================================================\
+    public MCRAcl getAcl() throws MCRAccessException;
+
+    //------------------------------------------------------------------------------
+
+    /**
+     * Checks if the current user can perform the action specified by
+     * permission.
+     * 
+     * @param permission
+     *            the permission required to perform the action.
+     * 
+     * @throws MCRAccessException
+     *             if the currentUser is not allowed to perform the action.
+     */
+
+    public void checkAccess(MCRPermission permission) throws MCRAccessException;
+
+    //-============================================================================\
 }

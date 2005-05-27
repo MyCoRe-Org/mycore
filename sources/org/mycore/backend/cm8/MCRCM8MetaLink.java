@@ -35,108 +35,113 @@ import com.ibm.mm.sdk.common.DKTextIndexDefICM;
 import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
- * This class implements the interface for the CM8 persistence layer for
- * the data model type MetaLink.
- *
+ * This class implements the interface for the CM8 persistence layer for the
+ * data model type MetaLink.
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 //DO NOT DELETE THIS. This class is needed for automatic class invocation!!
+public class MCRCM8MetaLink implements DKConstantICM, MCRCM8MetaInterface {
 
-public class MCRCM8MetaLink implements DKConstantICM, MCRCM8MetaInterface
-{
+    /**
+     * This method create a DKComponentTypeDefICM to create a complete ItemType
+     * from the configuration.
+     * 
+     * @param element
+     *            a MCR datamodel element as JDOM Element
+     * @param connection
+     *            the connection to the CM8 datastore
+     * @param dsDefICM
+     *            the datastore definition
+     * @param prefix
+     *            the prefix name for the item type
+     * @param textindex
+     *            the definition of the text search index
+     * @param textserach
+     *            the flag to use textsearch as string (this is a dummy value)
+     * @return a DKComponentTypeDefICM for the MCR datamodel element
+     * @exception MCRPersistenceException
+     *                general Exception of MyCoRe CM8
+     */
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
+            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
+            String prefix, DKTextIndexDefICM textindex, String textsearch)
+            throws MCRPersistenceException {
+        Logger logger = MCRCM8ConnectionPool.getLogger();
+        String subtagname = prefix
+                + (String) element.getAttribute("name").getValue();
+        String typename = prefix + "xlinktype";
+        String hrefname = prefix + "xlinkhref";
+        String labelname = prefix + "xlinklabel";
+        String titlename = prefix + "xlinktitle";
+        String fromname = prefix + "xlinkfrom";
+        String toname = prefix + "xlinkto";
+        int typelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TYPE_LENGTH;
+        int hreflen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_HREF_LENGTH;
+        int labellen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_LABEL_LENGTH;
+        int titlelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TITLE_LENGTH;
+        int fromlen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_FROM_LENGTH;
+        int tolen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TO_LENGTH;
 
-/**
- * This method create a DKComponentTypeDefICM to create a complete
- * ItemType from the configuration.
- *
- * @param element  a MCR datamodel element as JDOM Element
- * @param connection the connection to the CM8 datastore
- * @param dsDefICM the datastore definition
- * @param prefix the prefix name for the item type
- * @param textindex the definition of the text search index
- * @param textserach the flag to use textsearch as string 
- *                   (this is a dummy value)
- * @return a DKComponentTypeDefICM for the MCR datamodel element
- * @exception MCRPersistenceException general Exception of MyCoRe CM8
- **/
-public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-  DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix,
-  DKTextIndexDefICM textindex,String textsearch) throws MCRPersistenceException
-  {
-  Logger logger = MCRCM8ConnectionPool.getLogger();
-  String subtagname = prefix+(String)element.getAttribute("name").getValue();
-  String typename = prefix+"xlinktype";
-  String hrefname = prefix+"xlinkhref";
-  String labelname = prefix+"xlinklabel";
-  String titlename = prefix+"xlinktitle";
-  String fromname = prefix+"xlinkfrom";
-  String toname = prefix+"xlinkto";
-  int typelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TYPE_LENGTH;
-  int hreflen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_HREF_LENGTH;
-  int labellen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_LABEL_LENGTH;
-  int titlelen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TITLE_LENGTH;
-  int fromlen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_FROM_LENGTH;
-  int tolen = org.mycore.datamodel.metadata.MCRMetaLink.MAX_XLINK_TO_LENGTH;
-
-  DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
-  try {
-    // create component child
-    lt.setName(subtagname);
-    lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-    DKAttrDefICM attr;
-    // create the type attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,typename,
-      typelen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(typename);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the href attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,hrefname,
-      hreflen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(hrefname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the label attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,labelname,
-      labellen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(labelname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the title attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,titlename,
-      titlelen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(titlename);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the from attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,fromname,
-      fromlen,false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(fromname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
-    // create the to attribute for the data content
-    MCRCM8ItemTypeCommon.createAttributeVarChar(connection,toname,tolen,
-      false);
-    // add the value attribute
-    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(toname);
-    attr.setNullable(true);
-    attr.setUnique(false);
-    lt.addAttr(attr);
+        DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
+        try {
+            // create component child
+            lt.setName(subtagname);
+            lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+            DKAttrDefICM attr;
+            // create the type attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, typename,
+                    typelen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(typename);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the href attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, hrefname,
+                    hreflen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(hrefname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the label attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, labelname,
+                    labellen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(labelname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the title attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, titlename,
+                    titlelen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(titlename);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the from attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, fromname,
+                    fromlen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(fromname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+            // create the to attribute for the data content
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, toname,
+                    tolen, false);
+            // add the value attribute
+            attr = (DKAttrDefICM) dsDefICM.retrieveAttr(toname);
+            attr.setNullable(true);
+            attr.setUnique(false);
+            lt.addAttr(attr);
+        } catch (Exception e) {
+            throw new MCRPersistenceException(e.getMessage(), e);
+        }
+        return lt;
     }
-  catch (Exception e) {
-    throw new MCRPersistenceException(e.getMessage(),e); }
-  return lt;
-  }
 
 }

@@ -25,15 +25,13 @@
 package org.mycore.backend.cm8;
 
 /**
- * This class implements the interface for the CM8 persistence layer for
- * the data model type MetaLinkID base on MetaLink.
- *
+ * This class implements the interface for the CM8 persistence layer for the
+ * data model type MetaLinkID base on MetaLink.
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
- **/
+ */
 //DO NOT DELETE THIS. This class is needed for automatic class invocation!!
-
-public class MCRCM8MetaLinkID extends MCRCM8MetaLink
-{
+public class MCRCM8MetaLinkID extends MCRCM8MetaLink {
 
 }

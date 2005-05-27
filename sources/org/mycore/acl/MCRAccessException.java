@@ -18,36 +18,37 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  **/
 
-
 package org.mycore.acl;
+
 ///============================================================================§
 
 import org.mycore.common.MCRException;
+
 ///============================================================================|
 
 /**
- * Exceptions of this class are thrown when access to some resource, 
- * which is guarded by ACLs, fails.
- *
- * @author   Benno Süselbeck
- * @version  1.0.0, 01.11.2003
- **/
-
+ * Exceptions of this class are thrown when access to some resource, which is
+ * guarded by ACLs, fails.
+ * 
+ * @author Benno Süselbeck
+ * @version 1.0.0, 01.11.2003
+ */
 
 public class MCRAccessException extends MCRException {
-///============================================================================/
-  
-  /**
-   * Constructs an exception with an error message.
-   *
-   * @param   message  The error message describíng the cause of the exception.
-   */
-   
-   public MCRAccessException (String message) {
-   
-      super(message);
+    ///============================================================================/
 
-     }
-     
-//>============================================================================\
+    /**
+     * Constructs an exception with an error message.
+     * 
+     * @param message
+     *            The error message describíng the cause of the exception.
+     */
+
+    public MCRAccessException(String message) {
+
+        super(message);
+
+    }
+
+    //>============================================================================\
 }

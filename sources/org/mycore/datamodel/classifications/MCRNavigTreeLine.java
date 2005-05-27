@@ -23,24 +23,23 @@ package org.mycore.datamodel.classifications;
 /**
  * Instances of MCRNavigTreeLine are the building blocks of a navigation tree.
  * Each MCRNavigTreeLine represents a category on a certain level of tree depth.
- *
+ * 
  * @author Frank Lützenkirchen
  * @author Anja Schaar
- *
+ *  
  */
-class MCRNavigTreeLine
-{
-  public MCRCategoryItem cat;
-  public int      level;
-  public String   status;
+class MCRNavigTreeLine {
+    public MCRCategoryItem cat;
 
+    public int level;
 
-  public MCRNavigTreeLine( MCRCategoryItem cat, int level )
-  {
-    this.cat    = cat;
-    this.level  = level;
-    this.status = ( cat.hasChildren() ? "T" : " " );
+    public String status;
 
-  }
+    public MCRNavigTreeLine(MCRCategoryItem cat, int level) {
+        this.cat = cat;
+        this.level = level;
+        this.status = (cat.hasChildren() ? "T" : " ");
+
+    }
 
 }
