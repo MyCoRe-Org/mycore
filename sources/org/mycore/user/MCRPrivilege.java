@@ -65,6 +65,15 @@ public class MCRPrivilege
     privName = MCRUserObject.trim(name,privilege_len);
     privDescription = MCRUserObject.trim(description,description_len);
   }
+  
+  /**
+   * copy constructor
+   */
+  public MCRPrivilege(MCRPrivilege priv)
+  {
+    this.privName = priv.privName;
+    this.privDescription = priv.privDescription;
+  }
 
   /**
    * constructor

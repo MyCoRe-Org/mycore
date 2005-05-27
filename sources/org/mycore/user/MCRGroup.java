@@ -78,6 +78,23 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal
     mbrGroupIDs = new ArrayList();
     privileges = new ArrayList();
   }
+ 
+  /* copy contructor */
+  public MCRGroup(MCRGroup other)
+  {
+    super();
+    this.admUserIDs = new ArrayList(other.admUserIDs);
+    this.admGroupIDs = new ArrayList(other.admGroupIDs);
+    this.mbrUserIDs = new ArrayList(other.mbrUserIDs);
+    this.mbrGroupIDs = new ArrayList(other.mbrGroupIDs);
+    this.privileges = new ArrayList(other.privileges);
+    this.ID = other.ID;
+    this.creator = other.creator;
+    this.creationDate = other.creationDate;
+    this.modifiedDate = other.modifiedDate;
+    this.description = other.description;
+    this.groupIDs = new ArrayList(other.groupIDs);
+  }
 
   /**
    * This minimal constructor only takes the group ID as a parameter. For all
