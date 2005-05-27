@@ -383,9 +383,10 @@ public final boolean commitDerivateObject(String type, String ID)
  * with the same new name. This new derivate ID was returned.
  *
  * @param objmcrid the MCRObjectID of the related object
+ * @param server the flag to show that the data came from a server
  * @return the MCRObjectID of the derivate
  **/
-public String createDerivate(String objmcrid)
+public String createDerivate(String objmcrid, boolean server)
   {
   // prepare the derivate MCRObjectID
   MCRObjectID ID = new MCRObjectID(objmcrid);
@@ -432,7 +433,10 @@ public String createDerivate(String objmcrid)
   der.getDerivate().setInternals(internal);
   MCRObject obj = new MCRObject();
   try {
-    obj.setFromURI(workdir+NL+ID.getId()+".xml");
+    if (server) {
+      obj.receiveFromDatastore(ID); }
+    else {
+      obj.setFromURI(workdir+NL+ID.getId()+".xml"); }
     MCRObjectService serv = obj.getService();
     der.setService(serv);
     }

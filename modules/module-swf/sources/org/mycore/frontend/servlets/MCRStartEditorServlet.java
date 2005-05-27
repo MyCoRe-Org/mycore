@@ -288,7 +288,7 @@ public class MCRStartEditorServlet extends MCRServlet
         return;
         }
       myremcrid = mysemcrid;
-      mysemcrid =  WFM.createDerivate(myremcrid);
+      mysemcrid =  WFM.createDerivate(myremcrid,false);
       mytodo = "waddfile";
       }
 
@@ -674,7 +674,7 @@ public class MCRStartEditorServlet extends MCRServlet
        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
        return;
        }
-     mysemcrid =  WFM.createDerivate(myremcrid);
+     mysemcrid =  WFM.createDerivate(myremcrid,true);
      mystep="addder";
      mytodo = "saddfile";
      }
