@@ -161,7 +161,7 @@ public class MCRStartEditorServlet extends MCRServlet
     // get what is to do
     String mytodo = getProperty(job.getRequest(), "todo");
     if ((mytodo==null) || ((mytodo=mytodo.trim()).length()==0)) {
-      mytodo = "wnewobj"; }
+      mytodo = "wrongtodo"; }
     if (!mytodo.equals("wnewobj") && !mytodo.equals("wnewder") &&
       !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") &&
       !mytodo.equals("weditobj") && !mytodo.equals("weditder") && 
@@ -701,13 +701,14 @@ public class MCRStartEditorServlet extends MCRServlet
       mymcrid = mysemcrid;
       MCRUploadHandlerManager fum = MCRUploadHandlerManager.instance();
       MCRUploadHandlerInterface fuh = fum.getNewHandle();
-      sb = new StringBuffer("/servlets/MCRStartEditorServlet?");
-      sb.append("se_mcrid=").append(mysemcrid)
+      sb = new StringBuffer(getBaseURL());
+      sb.append("servlets/MCRStartEditorServlet?")
+        .append("se_mcrid=").append(mysemcrid)
         .append("&re_mcrid=").append(myremcrid)
-        .append("&amp;type=").append(mytype)
-        .append("&amp;step=").append(mystep)
-        .append("&amp;todo=scommitder");
-      fuh.set(myremcrid,mysemcrid,"new",getBaseURL()+sb.toString());
+        .append("&type=").append(mytype)
+        .append("&step=").append(mystep)
+        .append("&todo=scommitder");
+      fuh.set(myremcrid,mysemcrid,"new",sb.toString());
       String fuhid = fum.register(fuh);
       mymcrid = mysemcrid;
       myfile = pagedir+"fileupload_commit.xml";
