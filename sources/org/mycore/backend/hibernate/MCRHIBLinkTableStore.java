@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.backend.sql;
+package org.mycore.backend.hibernate;
 
 import java.util.List;
 import java.util.ArrayList;
