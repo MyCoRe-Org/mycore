@@ -51,27 +51,11 @@ public class MCRHIBUserStore implements MCRUserStore {
 
     private SessionFactory sessionFactory;
 
-    /* not used yet */
-    private String SQLUsersTable; /* name of the sql table containing user information */
-    private String SQLGroupsTable; /* name of the sql table containing group information */
-    private String SQLGroupMembersTable; /* name of the sql table containing user and group membership information */
-    private String SQLGroupAdminsTable; /* name of the sql table containing group admin information */
-    private String SQLPrivilegesTable; /* name of the sql table containing privilege information */
-    private String SQLPrivsLookupTable; /* name of the sql table containing group-privilege information */
-
     /**
      * The constructor reads the names of the SQL tables which hold the user
      * information data from mycore.properties.
      */
     public MCRHIBUserStore() {
-        // set configuration
-        MCRConfiguration config = MCRConfiguration.instance();
-        SQLUsersTable = config.getString("MCR.users_store_sql_table_users", "MCRUSERS");
-        SQLGroupsTable = config.getString("MCR.users_store_sql_table_groups", "MCRGROUPS");
-        SQLGroupMembersTable = config.getString( "MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS");
-        SQLGroupAdminsTable = config.getString( "MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS");
-        SQLPrivilegesTable = config.getString( "MCR.users_store_sql_table_privileges", "MCRPRIVS");
-        SQLPrivsLookupTable = config.getString( "MCR.users_store_sql_table_privs_lookup", "MCRPRIVSLOOKUP");
     }
 
     private Session getSession() {
