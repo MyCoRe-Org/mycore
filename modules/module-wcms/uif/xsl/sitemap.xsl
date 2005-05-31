@@ -239,18 +239,10 @@
 		<!-- recursive recall -->
 		<xsl:if test="$startValue &lt;= $endValue">
 			<xsl:call-template name="forLoop.createSitemap">
-				<xsl:with-param name="startValue">
-					<xsl:value-of select="$startValue + 1"/>
-				</xsl:with-param>
-				<xsl:with-param name="endValue">
-					<xsl:value-of select="$endValue"/>
-				</xsl:with-param>
-				<xsl:with-param name="columnWidthIcon">
-					<xsl:value-of select="$columnWidthIcon"/>
-				</xsl:with-param>
-				<xsl:with-param name="myRootNode">
-					<xsl:value-of select="$myRootNode"/>
-				</xsl:with-param>
+				<xsl:with-param name="startValue" select="$startValue + 1" />
+				<xsl:with-param name="endValue" select="$endValue" />
+				<xsl:with-param name="columnWidthIcon" select="$columnWidthIcon" />
+				<xsl:with-param name="myRootNode" select="$myRootNode" />
 				<xsl:with-param name="menuPointHeigth" select="$menuPointHeigth" />
 				<xsl:with-param name="depth" select="$depth" />
 				<xsl:with-param name="borderWidthSides" select="$borderWidthSides" />
