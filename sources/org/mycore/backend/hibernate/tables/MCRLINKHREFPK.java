@@ -20,46 +20,53 @@
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRLINKHREF{
-    
-    private MCRLINKHREFPK key;
+import java.io.Serializable;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
-    /**
-     * @hibernate.property
-     * column="Primary Key"
-     * not-null="true"
-     * update="true"
-     */
-    public MCRLINKHREFPK getKey() {
-        return key;
-    }
-    public void setKey(MCRLINKHREFPK key) {
-        this.key = key;
-    }
+public class MCRLINKHREFPK implements Serializable{
+
+    private String mcrfrom;
+    private String mcrto;
     
     /**
-     * @hibernate.property
-     * column="MCRFROM"
-     * not-null="true"
-     * update="true"
+     * @return Returns the mcrfrom.
      */
     public String getMcrfrom() {
-        return key.getMcrfrom();
+        return mcrfrom;
     }
-    public void setMcrfrom(String mcrfrom) {
-        key.setMcrfrom(mcrfrom);
-    }
-    
     /**
-     * @hibernate.property
-     * column="MCRTO"
-     * not-null="true"
-     * update="true"
+     * @param mcrfrom The mcrfrom to set.
+     */
+    public void setMcrfrom(String mcrfrom) {
+        this.mcrfrom = mcrfrom;
+    }
+    /**
+     * @return Returns the mcrto.
      */
     public String getMcrto() {
-        return key.getMcrto();
+        return mcrto;
     }
+    /**
+     * @param mcrto The mcrto to set.
+     */
     public void setMcrto(String mcrto) {
-        key.setMcrto(mcrto);
+        this.mcrto = mcrto;
+    }
+    
+    public boolean equals(Object other){
+        if (! (other instanceof MCRLINKHREFPK)) return false;
+        MCRLINKHREFPK castother =  (MCRLINKHREFPK) other;
+        	return new EqualsBuilder()
+        	.append(this.getMcrfrom(), castother.getMcrfrom())
+        	.append(this.getMcrto(), castother.getMcrto())
+        	.isEquals();	
+    }
+    
+    public int hashCode(){
+        return new HashCodeBuilder()
+        .append(getMcrfrom())
+        .append(getMcrto())
+        .toHashCode();
     }
 }

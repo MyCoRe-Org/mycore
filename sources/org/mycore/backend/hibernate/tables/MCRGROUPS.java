@@ -20,27 +20,16 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.util.Date;
 
-public class MCRGROUPMEMBERS
+public class MCRGROUPS
 {
-    private int id;
     private String gid;
-    private String userid;
-    private String groupid;
+    private String creator;
+    private Date creationDate;
+    private Date modifiedDate;
+    private String description;
 
-    /**
-     * @hibernate.property
-     * column="ID"
-     * not-null="true"
-     * update="true"
-     */
-     public int getId() {
-         return id;
-     }
-     public void setId(int id) {
-         this.id = id;
-     }
-     
     /**
     * @hibernate.property
     * column="GID"
@@ -56,27 +45,53 @@ public class MCRGROUPMEMBERS
 
     /**
     * @hibernate.property
-    * column="USERID"
+    * column="CREATOR"
     * not-null="true"
     * update="true"
     */
-    public String getUserid() {
-        return userid;
+    public String getCreator() {
+        return creator;
     }
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     /**
     * @hibernate.property
-    * column="GROUPID"
+    * column="CREATIONDATE"
     * not-null="true"
     * update="true"
     */
-    public String getGroupid() {
-        return groupid;
+    public Date getCreationdate() {
+        return creationDate;
     }
-    public void setGroupid(String groupid) {
-        this.groupid = groupid;
+    public void setCreationdate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    /**
+    * @hibernate.property
+    * column="MODIFIEDDATE"
+    * not-null="true"
+    * update="true"
+    */
+    public Date getModifieddate() {
+        return modifiedDate;
+    }
+    public void setModifieddate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    /**
+    * @hibernate.property
+    * column="DESCRIPTION"
+    * not-null="true"
+    * update="true"
+    */
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

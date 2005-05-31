@@ -20,46 +20,34 @@
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRLINKHREF{
+public class MCRPRIVS{
     
-    private MCRLINKHREFPK key;
+    private String name;
+    private String description;
 
     /**
-     * @hibernate.property
-     * column="Primary Key"
-     * not-null="true"
-     * update="true"
-     */
-    public MCRLINKHREFPK getKey() {
-        return key;
+    * @hibernate.property
+    * column="NAME"
+    * not-null="true"
+    * update="true"
+    */
+    public String getName() {
+        return name;
     }
-    public void setKey(MCRLINKHREFPK key) {
-        this.key = key;
+    public void setName(String name) {
+        this.name = name;
     }
-    
+
     /**
-     * @hibernate.property
-     * column="MCRFROM"
-     * not-null="true"
-     * update="true"
-     */
-    public String getMcrfrom() {
-        return key.getMcrfrom();
+    * @hibernate.property
+    * column="DESCRIPTION"
+    * not-null="true"
+    * update="true"
+    */
+    public String getDescription() {
+        return description;
     }
-    public void setMcrfrom(String mcrfrom) {
-        key.setMcrfrom(mcrfrom);
-    }
-    
-    /**
-     * @hibernate.property
-     * column="MCRTO"
-     * not-null="true"
-     * update="true"
-     */
-    public String getMcrto() {
-        return key.getMcrto();
-    }
-    public void setMcrto(String mcrto) {
-        key.setMcrto(mcrto);
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

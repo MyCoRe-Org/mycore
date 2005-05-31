@@ -20,75 +20,56 @@
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRCATEG
-{
-    private MCRCATEGPK key;
-    private String pid;
-    private String url;
+import java.io.Serializable;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
-    /**
-     * @hibernate.property
-     * columns="PRIMARY KEY"
-     * not-null="true"
-     * update="true"
-     */
-    public MCRCATEGPK getKey(){
-        return key;
-    }
-    public void setKey(MCRCATEGPK key){
-        this.key = key;
-    }
+public class MCRCATEGPK implements Serializable {
+    public String id; 
+    public String clid;
     
     /**
-     * @hibernate.property
-     * columns="CLID"
-     * not-null="true"
-     * update="true"
+     * @return Returns the cLID.
      */
     public String getClid() {
-        return key.getClid();
+        return clid;
     }
-    public void setClid(String clid) {
-        key.setClid(clid);
-    }
-    
     /**
-     * @hibernate.property
-     * columns="ID"
-     * not-null="true"
-     * update="true"
+     * @param clid The cLID to set.
+     */
+    public void setClid(String clid) {
+        this.clid = clid;
+    }
+    /**
+     * @return Returns the iD.
      */
     public String getId() {
-        return key.getId();
+        return id;        
     }
+    /**
+     * @param id The iD to set.
+     */
+    
     public void setId(String id) {
-        key.setId(id);
+         this.id =  id;
+     }
+   
+    
+    public boolean equals(Object other){
+        if (! (other instanceof MCRCATEGPK)) return false;
+        	MCRCATEGPK castother =  (MCRCATEGPK) other;
+        	return new EqualsBuilder()
+        	.append(this.getClid(),castother.getClid())
+        	.append(this.getId(), castother.getId())
+        	.isEquals();
+        	
     }
     
-    /**
-    * @hibernate.property
-    * column="PID"
-    * not-null="true"
-    * update="true"
-    */
-    public String getPid() {
-        return pid;
+    public int hashCode(){
+        return new HashCodeBuilder()
+        .append(getClid())
+        .append(getId())
+        .toHashCode();
     }
-    public void setPid(String pid) {
-        this.pid = pid;
-    }
-
-    /**
-    * @hibernate.property
-    * column="URL"
-    * not-null="true"
-    * update="true"
-    */
-    public String getUrl() {
-        return url;
-    }
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
+    
 }

@@ -20,63 +20,77 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.sql.Blob;
 
-public class MCRGROUPMEMBERS
-{
-    private int id;
-    private String gid;
-    private String userid;
-    private String groupid;
-
-    /**
-     * @hibernate.property
-     * column="ID"
-     * not-null="true"
-     * update="true"
-     */
-     public int getId() {
-         return id;
-     }
-     public void setId(int id) {
-         this.id = id;
-     }
-     
+public class MCRXMLType{
+    
+    private MCRXMLTypePK key;
+    private String mcrtype;
+    private Blob mcrxml;
+    
     /**
     * @hibernate.property
-    * column="GID"
+    * column="Primary Key"
     * not-null="true"
     * update="true"
     */
-    public String getGid() {
-        return gid;
+    public MCRXMLTypePK getKey() {
+        return key;
     }
-    public void setGid(String gid) {
-        this.gid = gid;
+    public void setKey(MCRXMLTypePK key) {
+        this.key = key;
     }
 
     /**
     * @hibernate.property
-    * column="USERID"
+    * column="MCRID"
     * not-null="true"
     * update="true"
     */
-    public String getUserid() {
-        return userid;
+    public String getMcrid() {
+        return key.getMcrid();
     }
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setMcrid(String mcrid) {
+        key.setMcrid(mcrid);
+    }
+    
+    /**
+    * @hibernate.property
+    * column="MCRTYPE"
+    * not-null="true"
+    * update="true"
+    */
+    public String getMcrtype() {
+        return mcrtype;
+    }
+    public void setMcrtype(String mcrtype) {
+        this.mcrtype = mcrtype;
+    }
+    
+    /**
+    * @hibernate.property
+    * column="MCRVERSION"
+    * not-null="true"
+    * update="true"
+    */
+    public int getMcrversion() {
+        return key.getMcrversion();
+    }
+    public void setMcrversion(int mcrversion) {
+        key.setMcrversion(mcrversion);
     }
 
     /**
     * @hibernate.property
-    * column="GROUPID"
+    * column="MCRXML"
     * not-null="true"
     * update="true"
     */
-    public String getGroupid() {
-        return groupid;
+    public Blob getMcrxml() {
+        return mcrxml;
     }
-    public void setGroupid(String groupid) {
-        this.groupid = groupid;
+    public void setMcrxml(Blob mcrxml) {
+        this.mcrxml = mcrxml;
     }
+ 
 }

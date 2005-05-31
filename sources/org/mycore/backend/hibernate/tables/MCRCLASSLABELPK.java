@@ -20,20 +20,53 @@
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRCLASS
-{
+import java.io.Serializable;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class MCRCLASSLABELPK implements Serializable{
     private String id;
+    private String lang;
 
     /**
-    * @hibernate.property
-    * column="ID"
-    * not-null="true"
-    * update="true"
-    */
+     * @return Returns the id.
+     */
     public String getId() {
         return id;
     }
+    /**
+     * @param id The id to set.
+     */
     public void setId(String id) {
         this.id = id;
+    }
+    /**
+     * @return Returns the lang.
+     */
+    public String getLang() {
+        return lang;
+    }
+    /**
+     * @param lang The lang to set.
+     */
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+    
+    public boolean equals(Object other){
+        if (! (other instanceof MCRCLASSLABELPK)) return false;
+        MCRCLASSLABELPK castother =  (MCRCLASSLABELPK) other;
+        	return new EqualsBuilder()
+        	.append(this.getId(), castother.getId())
+        	.append(this.getLang(), castother.getLang())
+        	.isEquals();
+        	
+    }
+    
+    public int hashCode(){
+        return new HashCodeBuilder()
+        .append(getId())
+        .append(getLang())
+        .toHashCode();
     }
 }
