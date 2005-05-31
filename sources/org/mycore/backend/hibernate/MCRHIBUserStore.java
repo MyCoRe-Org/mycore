@@ -52,24 +52,12 @@ public class MCRHIBUserStore implements MCRUserStore {
     private SessionFactory sessionFactory;
 
     /* not used yet */
-    private String SQLUsersTable;
-
-    /** name of the sql table containing user information */
-    private String SQLGroupsTable;
-
-    /** name of the sql table containing group information */
-    private String SQLGroupMembersTable;
-
-    /** name of the sql table containing user and group membership information */
-    private String SQLGroupAdminsTable;
-
-    /** name of the sql table containing group admin information */
-    private String SQLPrivilegesTable;
-
-    /** name of the sql table containing privilege information */
-    private String SQLPrivsLookupTable;
-
-    /** name of the sql table containing group-privilege information */
+    private String SQLUsersTable; /* name of the sql table containing user information */
+    private String SQLGroupsTable; /* name of the sql table containing group information */
+    private String SQLGroupMembersTable; /* name of the sql table containing user and group membership information */
+    private String SQLGroupAdminsTable; /* name of the sql table containing group admin information */
+    private String SQLPrivilegesTable; /* name of the sql table containing privilege information */
+    private String SQLPrivsLookupTable; /* name of the sql table containing group-privilege information */
 
     /**
      * The constructor reads the names of the SQL tables which hold the user
@@ -78,18 +66,12 @@ public class MCRHIBUserStore implements MCRUserStore {
     public MCRHIBUserStore() {
         // set configuration
         MCRConfiguration config = MCRConfiguration.instance();
-        SQLUsersTable = config.getString("MCR.users_store_sql_table_users",
-                "MCRUSERS");
-        SQLGroupsTable = config.getString("MCR.users_store_sql_table_groups",
-                "MCRGROUPS");
-        SQLGroupMembersTable = config.getString(
-                "MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS");
-        SQLGroupAdminsTable = config.getString(
-                "MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS");
-        SQLPrivilegesTable = config.getString(
-                "MCR.users_store_sql_table_privileges", "MCRPRIVS");
-        SQLPrivsLookupTable = config.getString(
-                "MCR.users_store_sql_table_privs_lookup", "MCRPRIVSLOOKUP");
+        SQLUsersTable = config.getString("MCR.users_store_sql_table_users", "MCRUSERS");
+        SQLGroupsTable = config.getString("MCR.users_store_sql_table_groups", "MCRGROUPS");
+        SQLGroupMembersTable = config.getString( "MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS");
+        SQLGroupAdminsTable = config.getString( "MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS");
+        SQLPrivilegesTable = config.getString( "MCR.users_store_sql_table_privileges", "MCRPRIVS");
+        SQLPrivsLookupTable = config.getString( "MCR.users_store_sql_table_privs_lookup", "MCRPRIVSLOOKUP");
     }
 
     private Session getSession() {
@@ -127,7 +109,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized void deleteUser(String delUserID) throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("MCRID = " + delUserID);
+        session.delete("SELECT FROM MCRUserExt WHERE MCRID = " + delUserID);
         tx.commit();
         session.close();
     }
@@ -143,7 +125,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized boolean existsUser(String userID) throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("MCRID = " + userID).list();
+        List l = session.createQuery("SELECT FROM MCRUserExt WHERE MCRID = " + userID).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
@@ -166,7 +148,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("MCRID = " + userID).list();
+        List l = session.createQuery("SELECT FROM MCRUserExt WHERE MCRID = " + userID).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
@@ -186,7 +168,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized MCRUser retrieveUser(String userID) throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("MCRID = " + userID).list();
+        List l = session.createQuery("SELECT FROM MCRUserExt WHERE MCRID = " + userID).list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = "
                     + userID;
@@ -265,7 +247,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized boolean existsGroup(String groupID) throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("GROUPID = " + groupID).list();
+        List l = session.createQuery("SELECT FROM MCRGroupExt WHERE GROUPID = " + groupID).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
@@ -284,7 +266,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized void deleteGroup(String delGroupID) throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("MCRID = " + delGroupID);
+        session.delete("SELECT FROM MCRGroupExt WHERE MCRID = " + delGroupID);
         tx.commit();
         session.close();
     }
@@ -353,7 +335,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             throws MCRException {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("GROUPID = " + groupID).list();
+        List l = session.createQuery("GSELECT FROM MCRGroupExt WHERE ROUPID = " + groupID).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
@@ -399,7 +381,7 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized boolean existsPrivilege(String privName) {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("NAME = " + privName).list();
+        List l = session.createQuery("SELECT FROM MCRPrivilegeExt WHERE NAME = " + privName).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
