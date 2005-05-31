@@ -33,6 +33,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.classifications.*;
+import org.mycore.backend.hibernate.tables.*;
 
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -122,14 +123,14 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	}
 
 	if(mtype.equals("href")) {
-	    MCRLinkHREF l = new MCRLinkHREF(from, to);
+	    MCRLINKCLASS l = new MCRLINKCLASS(from, to);
 	    Session session = getSession();
 	    Transaction tx = session.beginTransaction();
 	    session.update(l);
 	    tx.commit();
 	    session.close();
 	} else {
-	    MCRLinkCLASS l = new MCRLinkCLASS(from, to);
+	    MCRLINKHREF l = new MCRLINKHREF(from, to);
 	    Session session = getSession();
 	    Transaction tx = session.beginTransaction();
 	    session.update(l);
@@ -147,7 +148,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("select from MCR"+mtype+"Link WHERE from='"+from+"'");
+        session.delete("select from "+classname+" WHERE from='"+from+"'");
         tx.commit();
         session.close();
     }
@@ -162,7 +163,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("SELECT FROM MCR"+mtype+"Link WHERE to = " + to).list();
+        List l = session.createQuery("SELECT FROM "+classname+" WHERE to = " + to).list();
         tx.commit();
         session.close();
         return l.size();

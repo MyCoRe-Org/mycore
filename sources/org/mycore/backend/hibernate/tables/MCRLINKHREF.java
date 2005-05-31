@@ -23,6 +23,19 @@ package org.mycore.backend.hibernate.tables;
 public class MCRLINKHREF{
     
     private MCRLINKHREFPK key;
+    
+    public MCRLINKHREF()
+    {
+	this.key = new MCRLINKHREFPK();
+    }
+
+    public MCRLINKHREF(String from, String to)
+    {
+	this.key = new MCRLINKHREFPK();
+        key.setMcrfrom(from);
+        key.setMcrfrom(to);
+    }
+    
 
     /**
      * @hibernate.property

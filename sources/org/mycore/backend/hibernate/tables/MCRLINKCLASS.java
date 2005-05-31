@@ -23,6 +23,18 @@ package org.mycore.backend.hibernate.tables;
 public class MCRLINKCLASS
 {
     private MCRLINKCLASSPK key;
+
+    public MCRLINKCLASS()
+    {
+	this.key = new MCRLINKCLASSPK();
+    }
+
+    public MCRLINKCLASS(String from, String to)
+    {
+	this.key = new MCRLINKCLASSPK();
+        key.setMcrfrom(from);
+        key.setMcrfrom(to);
+    }
     
     /**
      * @hibernate.property
