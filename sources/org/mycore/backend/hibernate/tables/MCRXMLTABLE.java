@@ -20,14 +20,20 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.sql.Blob;
+
 public class MCRXMLTABLE
 {
     private String id;
     private int version;
     private String type;
-    private String xml;
+    private Blob xml;
 
-    public MCRXMLTABLE(String id, int version, String type, String xml) 
+    public MCRXMLTABLE()
+    {
+    }
+
+    public MCRXMLTABLE(String id, int version, String type, Blob xml) 
     {
 	this.id = id;
 	this.version = version;
@@ -53,10 +59,30 @@ public class MCRXMLTABLE
     public void setType(String type) {
         this.type = type;
     }
-    public String getXml() {
+    public Blob getXml() {
         return xml;
     }
-    public void setXml(String xml) {
+    public byte[] getXmlByteArray() {
+	try {
+	    java.io.InputStream in = xml.getBinaryStream();
+	    byte[] b = new byte[in.available()];
+	    int t;
+	    for(t=0;t<b.length;t++)
+		b[t] = (byte)in.read();
+	    return b;
+	} catch(java.sql.SQLException e) {
+	    e.printStackTrace();
+	    return null;
+	} catch(java.io.IOException e) {
+	    e.printStackTrace();
+	    return null;
+	}
+    }
+    public void setXml(Blob xml) {
         this.xml = xml;
+    }
+    public void setXml(byte[] xml) {
+	/* FIXME */
+        this.xml = null;
     }
 }
