@@ -27,12 +27,12 @@
 #
 #######################################################################
 
-# IBM DB2 Version 8.* under IBM AIX
+# IBM DB2 Version 8.2 under IBM AIX
 # MCR.JDBCStore.Type=db2
 # MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib
-# MCR.JDBCStore.Jars=java/sqlj.zip java12/db2java.zip java/runtime.zip
+# MCR.JDBCStore.Jars=java/sqlj.zip java/db2java.zip java/db2jcc.jar
 # MCR.JDBCStore.ClassesDirs=function
-# MCR.JDBCStore.LibPath=java12 lib
+# MCR.JDBCStore.LibPath=java lib
 
 # MySQL under Linux or Windows: JDBC driver is included in MyCoRe!
 MCR.JDBCStore.Type=mysql
@@ -57,7 +57,7 @@ MCR.JDBCStore.Type=mysql
 #
 #######################################################################
 
-# IBM Content Manager Version 8 under IBM AIX
+# IBM Content Manager Version 8.2 under IBM AIX
 # MCR.XMLStore.Type=cm8
 # MCR.XMLStore.BaseDir=/usr/lpp/cmb
 # MCR.XMLStore.Jars=lib/cmb*8*.jar lib/dtappsrv.jar
