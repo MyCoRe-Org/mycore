@@ -32,7 +32,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
- * This class handles upload of files for miless derivates.
+ * This class handles upload of files for derivates.
  * 
  * @author Harald Richter
  * @author Jens Kupferschmidt
