@@ -56,7 +56,7 @@ public class MCRUploadApplet extends JApplet {
     public void init() {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
-        peerURL = getParameter("ServletsBase") + "UploadServlet";
+        peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
 
         //TODO: Refactor parameters from web page
         //TODO: I18N of strings and messages
