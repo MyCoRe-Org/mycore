@@ -47,6 +47,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXMLSortInterface;
@@ -66,6 +67,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRQueryServlet extends MCRServlet {
     //TODO: we should invent something here!!
     private static final long serialVersionUID = 1L;
+    
+    private static MCRConfiguration conf = MCRConfiguration.instance();
 
     private MCRQueryCollector collector;
 
@@ -639,13 +642,21 @@ public class MCRQueryServlet extends MCRServlet {
 
     private static final void putResult(MCRQueryCollector collector,
             String host, String type, String query, MCRXMLContainer result) {
-        try {
-            synchronized (result) {
-                collector.collectQueryResults(host, type, query, result);
-                result.wait();
-            }
-        } catch (InterruptedException ignored) {
-        }
+	
+	if(host.indexOf(',')<0) {
+	    /* we are querying only a single host- don't bother to put everything
+	       through the two thread pools, but just return the result */
+	    LOGGER.debug("Retrieving query "+query+" from MCRQueryCache (hostlist: "+host+")");
+	    result.importElements(MCRQueryCache.getResultList(host, query, type, conf.getInt("MCR.query_max_results", 10)));
+	} else {
+	    try {
+		synchronized (result) {
+		    collector.collectQueryResults(host, type, query, result);
+		    result.wait();
+		}
+	    } catch (InterruptedException ignored) {
+	    }
+	}
     }
 
     private final int getStatus(HttpServletRequest request) {
