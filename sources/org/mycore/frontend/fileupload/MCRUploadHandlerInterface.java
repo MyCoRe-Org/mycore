@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.util.*;
 import java.io.*;
 
 /**
@@ -83,11 +82,11 @@ public interface MCRUploadHandlerInterface {
      */
     public String getRedirectURL();
 
-    public String startUpload() throws Exception;
+    public void startUpload(int numFiles) throws Exception;
 
     public boolean acceptFile(String path, String checksum) throws Exception;
 
-    public String receiveFile(String path, InputStream in) throws Exception;
+    public void receiveFile(String path, InputStream in) throws Exception;
 
     public void finishUpload() throws Exception;
 

@@ -23,11 +23,8 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.util.*;
 import java.io.*;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * This class handles upload of files. Subclasses handle storage of files.
@@ -104,13 +101,13 @@ public abstract class MCRUploadHandlerBase {
         return url;
     }
 
-    public abstract String startUpload() throws Exception;
+    public abstract void startUpload(int numFiles) throws Exception;
 
     public boolean acceptFile(String path, String checksum) throws Exception {
         return true;
     }
 
-    public abstract String receiveFile(String path, InputStream in)
+    public abstract void receiveFile(String path, InputStream in)
             throws Exception;
 
     public abstract void finishUpload() throws Exception;

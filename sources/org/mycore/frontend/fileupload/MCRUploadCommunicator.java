@@ -39,10 +39,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -65,159 +63,137 @@ import java.util.zip.ZipOutputStream;
  * @version $Revision$ $Date$
  * @see org.mycore.frontend.fileupload.MCRUploadServlet
  */
+public class MCRUploadCommunicator {
+    protected String url;
 
-public final class MCRUploadCommunicator {
-    protected static String URL;
+    protected String uid;
 
-    public static void setPeerURL(String peer) {
-        URL = peer;
+    protected MCRUploadProgressMonitor upm;
+
+    protected MCRUploadApplet applet;
+
+    public MCRUploadCommunicator(String url, String uploadId,
+            MCRUploadApplet applet) {
+        this.url = url;
+        this.uid = uploadId;
+        this.applet = applet;
     }
 
-    public void sendDerivate(String uploadId, File selectedFiles[])
-            throws Exception {
-        int total = 0;
+    public void uploadFiles(File selectedFiles[]) {
+        try {
+            Vector[] list = listFiles(selectedFiles);
+            upm = new MCRUploadProgressMonitor(list[0].size(),
+                    countTotalBytes(list[0]), applet);
+            startUploadSession(list[0].size());
+            loadFiles(list);
+            endUploadSession();
+            upm.finish();
+        } catch (Exception ex) {
+            String msg = ex.getClass().getName() + ": "
+                    + ex.getLocalizedMessage();
 
-        Vector files = listFiles(selectedFiles)[0];
-        for (int i = 0; i < files.size(); i++) {
-            File f = (File) (files.elementAt(i));
-            total += (int) (f.length());
+            if (ex instanceof MCRUploadException) {
+                MCRUploadException uex = (MCRUploadException) ex;
+                msg = "Fehlermeldung des Servers: "
+                        + uex.getServerSideClassName() + ": "
+                        + uex.getMessage();
+            }
+
+            System.out.println("Exception caught: " + msg);
+            ex.printStackTrace(System.out);
+
+            if (upm != null)
+                upm.cancel(ex);
+            else
+                MCRUploadProgressMonitor.reportException(ex);
         }
-
-        total = (int) ((double) total * 1.124);
-
-        MCRUploadProgressMonitor.getDialog().startProgressBar(total);
-        startDerivateSession(uploadId);
-        MCRUploadProgressMonitor.getDialog().updateProgressBar(total / 100);
-
-        xloadFilesFrom(selectedFiles, uploadId);
-        endDerivateSession(uploadId);
-
-        MCRUploadProgressMonitor.getDialog().finishProgressBar();
-        return;
     }
 
-    /**
-     * Imports all files from a given directory on the local filesystem, creates
-     * MCROldFiles for them and stores their content in the system.
-     */
-    public void xloadFilesFrom(File selectedFiles[], String uploadId)
-            throws Exception {
-        Vector[] list = listFiles(selectedFiles);
+    protected long countTotalBytes(Vector files) {
+        long total = 0;
+        for (int i = 0; i < files.size(); i++)
+            total += ((File) files.get(i)).length();
+        return total;
+    }
+
+    public void loadFiles(Vector[] list) throws Exception {
         if (list[0].size() == 0)
             throw new IllegalArgumentException(
-                    "The directory you specified contains no files.");
+                    "Sie haben keine Dateien ausgewählt!");
 
         for (int i = 0; i < list[0].size(); i++) {
-            File file = (File) (list[0].elementAt(i));
-            String path = (String) (list[1].elementAt(i));
+            File file = (File) (list[0].get(i));
+            String path = (String) (list[1].get(i));
 
-            createFile(path, file, uploadId);
+            upm.startFile(file.getName(), file.length());
+            uploadFile(path, file);
+            upm.endFile();
         }
     }
 
-    public void createFile(String path, File file, String uploadId)
-            throws Exception {
-        MCRUploadProgressMonitor.getDialog().setMessage(
-                "\u00dcbertrage Datei " + path + "...");
+    public void uploadFile(String path, File file) throws Exception {
+        System.out.println("--- Starting filetransfer ---");
 
-        try {
-            System.out
-                    .println("---------------------------- Starting filetransfer ---------------------------");
+        String md5 = buildMD5String(file);
+        System.out.println("MD5 checksum is " + md5);
 
-            HashMap request = new HashMap();
-            request.put("method", "createFile String");
-            request.put("path", path);
-            request.put("uploadId", uploadId);
+        //TODO: Refactor method names in communication
+        Hashtable request = new Hashtable();
+        request.put("md5", md5);
+        request.put("method", "createFile String");
+        request.put("path", path);
 
-            String md5 = getMD5String(file);
-            request.put("md5", md5);
+        System.out.println("Sending filename to server: " + path);
+        String reply = (String) (send(request));
+        System.out.println("Received reply from server.");
 
-            System.out.println(md5);
-            System.out.println("Sending filename to server: " + path);
-            String reply = (String) (send(request));
-            if ("skip file".equals(reply)) {
-                MCRUploadProgressMonitor.getDialog().setMessage(
-                        "Datei bereits vorhanden " + path);
-                return;
-            }
-            System.out.println("Received reply from server.");
-
-            StringTokenizer st = new StringTokenizer(reply, ":");
-            String host = st.nextToken();
-            int port = Integer.parseInt(st.nextToken());
-            System.out.println("Server says we should connect to " + host + ":"
-                    + port);
-
-            System.out.println("Trying to create client socket...");
-            Socket socket = new Socket(host, port);
-            System.out.println("Socket created, connected to server.");
-
-            ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-            System.out.println("Created ZipOutputStream and DataInputStream.");
-
-            zos.setLevel(Deflater.NO_COMPRESSION);
-            ZipEntry ze = new ZipEntry("content");
-            zos.putNextEntry(ze);
-            System.out.println("Prepared ZipEntry.");
-
-            int num = 0;
-            byte[] buffer = new byte[65536];
-
-            System.out.println("Starting to send file content...");
-            InputStream fi = new FileInputStream(file);
-            BufferedInputStream bi = new BufferedInputStream(fi);
-            while ((num = bi.read(buffer)) != -1) {
-                zos.write(buffer, 0, num);
-                System.out.println("Sended " + num + " bytes of file content.");
-                MCRUploadProgressMonitor.getDialog().updateProgressBar(num);
-            }
-            zos.closeEntry();
-            bi.close();
-            System.out.println("Finished sending file content.");
-
-            String storageID = dis.readUTF();
-            System.out.println("Received storage location from server: "
-                    + storageID);
-
-            socket.close();
-            System.out
-                    .println("Socket closed, file transfer successfully completed.");
-
+        if ("skip file".equals(reply)) {
+            System.out.println("File skipped.");
             return;
-        } catch (Exception exc) {
-            String exmsg = exc.getClass().getName() + " " + exc.getMessage();
-            System.out.println("Exception caught: " + exmsg);
-            exc.printStackTrace();
-
-            if (exc instanceof IOException) {
-                IOException ioe = (IOException) exc;
-                String msg = "\u00dcbertragungsfehler beim Senden der Datei: ";
-                msg += ioe.getClass().getName() + " " + ioe.getMessage();
-                MCRUploadProgressMonitor.getDialog().setMessage(msg);
-            } else if (exc instanceof MCRUploadException) {
-                MCRUploadException sex = (MCRUploadException) exc;
-                String msg = "Fehlermeldung des Servers: ";
-                msg += sex.getServerSideClassName() + " " + sex.getMessage();
-                MCRUploadProgressMonitor.getDialog().setMessage(msg);
-            } else {
-                String msg = "Fehler beim Senden der Datei: ";
-                msg += exc.getClass().getName() + " " + exc.getMessage();
-                MCRUploadProgressMonitor.getDialog().setMessage(msg);
-            }
-
-            throw exc;
         }
+
+        StringTokenizer st = new StringTokenizer(reply, ":");
+        String host = st.nextToken();
+        int port = Integer.parseInt(st.nextToken());
+        System.out.println("Server says we should connect to " + host + ":"
+                + port);
+
+        System.out.println("Trying to create client socket...");
+        Socket socket = new Socket(host, port);
+        System.out.println("Socket created, connected to server.");
+
+        ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
+
+        zos.setLevel(Deflater.NO_COMPRESSION);
+        ZipEntry ze = new ZipEntry(uid);
+        zos.putNextEntry(ze);
+
+        int num = 0;
+        byte[] buffer = new byte[65536];
+
+        System.out.println("Starting to send file content...");
+        InputStream source = new BufferedInputStream(new FileInputStream(file));
+        while ((num = source.read(buffer)) != -1) {
+            zos.write(buffer, 0, num);
+            System.out.println("Sended " + num + " of " + file.length()
+                    + " bytes.");
+            upm.progressFile(num);
+        }
+        zos.closeEntry();
+        System.out.println("Finished sending file content.");
+
+        socket.close();
+        System.out
+                .println("Socket closed, file transfer successfully completed.");
     }
 
     /**
-     * Creates a list of all files in the filesystem below a given starting
-     * path.
+     * Creates a list of all files in the given directories
      * 
-     * @param location
-     *            a path leading to a file or directory
+     * @param selectedFiles
+     *            list of selected files or directories from filechooser
      */
-    public static Vector[] listFiles(File selectedFiles[]) throws Exception {
+    protected Vector[] listFiles(File selectedFiles[]) throws Exception {
         Vector[] list = new Vector[2];
         list[0] = new Vector();
         list[1] = new Vector();
@@ -242,7 +218,6 @@ public final class MCRUploadCommunicator {
                 Stack baseStack = new Stack();
 
                 dirStack.push(f);
-                //        baseStack.push( "" );
                 baseStack.push(f.getName() + "/");
 
                 while (!dirStack.empty()) {
@@ -269,35 +244,34 @@ public final class MCRUploadCommunicator {
         return list;
     }
 
-    protected void startDerivateSession(String uploadId) throws IOException,
+    protected void startUploadSession(int numFiles) throws IOException,
             MCRUploadException {
-        HashMap request = new HashMap();
-        request.put("method", "startDerivateSession String");
-        request.put("uploadId", uploadId);
+        Hashtable request = new Hashtable();
+        request.put("method", "startDerivateSession String int");
+        request.put("numFiles", String.valueOf(numFiles));
         send(request);
     }
 
-    protected void endDerivateSession(String uploadId) throws IOException,
-            MCRUploadException {
-        HashMap request = new HashMap();
+    protected void endUploadSession() throws IOException, MCRUploadException {
+        Hashtable request = new Hashtable();
         request.put("method", "endDerivateSession String");
-        request.put("uploadId", uploadId);
-        String xml = (String) (send(request));
-        return;
+        send(request);
     }
 
-    protected Object send(Map parameters) throws IOException,
+    protected Object send(Hashtable parameters) throws IOException,
             MCRUploadException {
-        return getResponse(doPost(parameters)).get("return");
+        parameters.put("uploadId", uid);
+        Hashtable response = getResponse(doPost(parameters));
+        return response.get("return");
     }
 
-    protected InputStream doPost(Map parameters) throws IOException {
-        String data = encodeParameters(parameters, "UTF-8");
+    protected InputStream doPost(Hashtable parameters) throws IOException {
+        String data = encodeParameters(parameters);
         String mime = "application/x-www-form-urlencoded";
 
         URLConnection connection = null;
         try {
-            connection = new URL(URL).openConnection();
+            connection = new URL(url).openConnection();
         } catch (MalformedURLException ignored) {
         } // will never happen if base URL is ok
 
@@ -318,36 +292,42 @@ public final class MCRUploadCommunicator {
         return connection.getInputStream();
     }
 
-    protected String encodeParameters(Map parameters, String encoding)
-            throws UnsupportedEncodingException {
+    protected String encodeParameters(Hashtable parameters) {
         StringBuffer data = new StringBuffer();
-        Set entries = parameters.entrySet();
+        Enumeration e = parameters.keys();
 
-        Iterator it = entries.iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            //write out key
-            data.append(URLEncoder.encode(entry.getKey().toString(), encoding))
-                    .append("=").append(
-                            URLEncoder.encode(entry.getValue().toString(),
-                                    encoding)).append("&");
+        while (e.hasMoreElements()) {
+            String name = (String) e.nextElement();
+            String value = (String) parameters.get(name);
+
+            try {
+                data.append(URLEncoder.encode(name, "UTF-8")).append("=")
+                        .append(URLEncoder.encode(value, "UTF-8")).append("&");
+            } catch (UnsupportedEncodingException ex) {
+                System.out.println(ex.getClass().getName());
+                System.out.println(ex.getMessage());
+                throw new RuntimeException("Could not encode parameters");
+            }
         }
         data.setLength(data.length() - 1);
+
         return data.toString();
     }
 
-    protected Map getResponse(InputStream is) throws IOException,
+    protected Hashtable getResponse(InputStream is) throws IOException,
             MCRUploadException {
         DataInputStream dis = new DataInputStream(is);
         String mime = dis.readUTF();
         byte[] dummy = new byte[0];
 
-        HashMap response = new HashMap();
+        Hashtable response = new Hashtable();
         while (dis.read(dummy, 0, 0) != -1) {
             String key = dis.readUTF();
             String clname = dis.readUTF();
             Object value = null;
-            if (clname.equals(Integer.class.getName()))
+            if (clname.equals(String.class.getName()))
+                value = dis.readUTF();
+            else if (clname.equals(Integer.class.getName()))
                 value = new Integer(dis.readInt());
             else
                 value = dis.readUTF();
@@ -355,27 +335,27 @@ public final class MCRUploadCommunicator {
         }
 
         if (mime.equals("upload/exception")) {
-            String clname = response.get("clname").toString();
-            String message = response.get("message").toString();
-            String strace = response.get("strace").toString();
+            String clname = (String) (response.get("clname"));
+            String message = (String) (response.get("message"));
+            String strace = (String) (response.get("strace"));
             throw new MCRUploadException(clname, message, strace);
         }
 
         return response;
     }
 
-    protected String getMD5String(File file) throws Exception {
-        // Obtain a message digest object.
+    /** Calculates the MD5 checksum of the given local file * */
+    protected String buildMD5String(File file) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
-        InputStream source = new FileInputStream(file);
-        BufferedInputStream bi = new BufferedInputStream(source);
-        // Calculate the digest for the given file.
-        DigestInputStream in = new DigestInputStream(bi, digest);
-        byte[] buffer = new byte[8192];
-        while (in.read(buffer) != -1)
+        InputStream fis = new FileInputStream(file);
+        BufferedInputStream bis = new BufferedInputStream(fis, 65536);
+        DigestInputStream in = new DigestInputStream(bis, digest);
+
+        byte[] buffer = new byte[65536];
+        while (in.read(buffer, 0, buffer.length) != -1)
             ;
-        bi.close();
+        in.close();
 
         byte[] bytes = digest.digest();
         StringBuffer sb = new StringBuffer();
@@ -385,6 +365,4 @@ public final class MCRUploadCommunicator {
         }
         return sb.toString();
     }
-
 }
-

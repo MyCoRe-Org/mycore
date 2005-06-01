@@ -26,9 +26,6 @@ package org.mycore.frontend.fileupload;
 import java.io.*;
 import java.util.*;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -88,17 +85,13 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
 
     /**
      * Start Upload for MyCoRe
-     * 
-     * @return derivate id
-     *  
      */
-    public String startUpload() throws Exception {
+    public void startUpload(int numFiles) throws Exception {
         MCRObjectID ID = new MCRObjectID(docId);
         MCRConfiguration config = MCRConfiguration.instance();
         String workdir = config.getString("MCR.editor_" + ID.getTypeId()
                 + "_directory", "/");
         dirname = workdir + SLASH + derId;
-        return derId;
     }
 
     /**
@@ -124,11 +117,9 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
      *            file name
      * @param in
      *            InputStream belongs to socket, do not close!
-     * 
-     * @return storage id of file
      *  
      */
-    public String receiveFile(String path, InputStream in) throws Exception {
+    public void receiveFile(String path, InputStream in) throws Exception {
         // prepare to save
         logger.debug("Upload file path: " + path);
 
@@ -168,7 +159,6 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
         if (mainfile.length() == 0) {
             mainfile = fname;
         }
-        return "";
     }
 
     /**

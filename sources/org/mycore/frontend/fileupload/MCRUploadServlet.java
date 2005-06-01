@@ -26,8 +26,6 @@ package org.mycore.frontend.fileupload;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -82,16 +81,17 @@ public final class MCRUploadServlet extends MCRServlet {
             LOGGER.info("REDIRECT " + url);
             res.sendRedirect(url);
             return;
-        } else if (method.equals("startDerivateSession String")) {
+        } else if (method.equals("startDerivateSession String int")) {
             String uploadId = req.getParameter("uploadId");
-            uploadId = MCRUploadHandlerManager.instance().getHandle(uploadId)
-                    .startUpload();
+            int numFiles = Integer.parseInt(req.getParameter("numFiles"));
+            MCRUploadHandlerManager.instance().getHandle(uploadId)
+                    .startUpload(numFiles);
             LOGGER.info("MCRUploadServlet start session " + uploadId);
-            sendResponse(res, uploadId);
+            sendResponse(res, "OK");
         } else if (method.equals("createFile String")) {
             final String path = req.getParameter("path");
 
-            LOGGER.info("PATH: " + path);
+            LOGGER.info("UploadServlet uploading " + path);
             final String uploadId = req.getParameter("uploadId");
             final String md5 = req.getParameter("md5");
 
@@ -144,14 +144,13 @@ public final class MCRUploadServlet extends MCRServlet {
 
                         zis.getNextEntry();
 
-                        String erg = MCRUploadHandlerManager.instance()
-                                .getHandle(uploadId).receiveFile(path, zis);
-                        LOGGER.debug("Stored incoming file content under "
-                                + erg);
+                        MCRUploadHandlerManager.instance().getHandle(uploadId)
+                                .receiveFile(path, zis);
+                        LOGGER.debug("Stored incoming file content");
                         LOGGER
                                 .debug("Informing applet about location where content was stored...");
 
-                        dos.writeUTF(erg);
+                        dos.writeUTF("OK");
 
                         LOGGER.debug("Sended acknowledgement to applet.");
                         LOGGER.debug("File transfer completed successfully.");
@@ -175,13 +174,13 @@ public final class MCRUploadServlet extends MCRServlet {
             });
 
             thread.start(); // Starts separate thread that will receive and
-                            // store file content
+            // store file content
         } else if (method.equals("endDerivateSession String")) {
             String uploadId = req.getParameter("uploadId");
             MCRUploadHandlerInterface uploadHandler = MCRUploadHandlerManager
                     .instance().getHandle(uploadId);
             uploadHandler.finishUpload();
-            sendResponse(res, "upload finished.");
+            sendResponse(res, "OK");
         }
     }
 
@@ -189,7 +188,7 @@ public final class MCRUploadServlet extends MCRServlet {
             throws Exception {
         HashMap response = new HashMap();
         response.put("clname", ex.getClass().getName());
-        response.put("strace", getStackTrace(ex));
+        response.put("strace", MCRException.getStackTraceAsString(ex));
         if (ex.getLocalizedMessage() != null)
             response.put("message", ex.getLocalizedMessage());
         sendResponse(res, "upload/exception", response);
@@ -232,17 +231,5 @@ public final class MCRUploadServlet extends MCRServlet {
         out.write(response, 0, response.length);
         out.close();
         res.flushBuffer();
-    }
-
-    protected String getStackTrace(Exception ex) {
-        try {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            ex.printStackTrace(pw);
-            pw.close();
-            return sw.toString();
-        } catch (Exception ex2) {
-        }
-        return null;
     }
 }

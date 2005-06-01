@@ -23,224 +23,157 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.applet.AppletContext;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.swing.BorderFactory;
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
+import java.io.*;
 
 /**
- * This class represents the basic applet to start the GUI for transfering files
- * and directories
+ * This applet displays a GUI to upload files and directories to the server.
  * 
  * @author Harald Richter
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
+ * 
  * @version $Revision$ $Date$
  */
-public class MCRUploadApplet extends JApplet implements ActionListener {
+public class MCRUploadApplet extends JApplet {
+    protected String uploadId;
 
-    JPanel exteriorPanel, bottomPanel;
+    protected String peerURL;
 
-    JButton button;
+    protected String targetURL;
 
-    String uploadId;
-
-    File selectedFiles[] = null;
-
-    protected JLabel locationLabel;
+    protected JButton chooserButton;
 
     protected JTextField locationField;
 
     protected JButton locationButton;
 
-    protected static JFileChooser locationChooser;
-
-    static String targetURL;
-
-    protected static AppletContext appletContext;
-
-    protected static String base;
-
-    protected static String servletsBase;
-
-    /** Let the browser return to a given URL */
-    protected static void returnToURL() {
-        try {
-            appletContext.showDocument(new URL(targetURL));
-        } catch (MalformedURLException exc) {
-            System.out.println("MALFORMED URL: " + targetURL);
-        }
-    }
+    protected JFileChooser locationChooser;
 
     public void init() {
+        uploadId = getParameter("uploadId");
+        targetURL = getParameter("url");
+        peerURL = getParameter("ServletsBase") + "UploadServlet";
+
+        //TODO: Refactor parameters from web page
+        //TODO: I18N of strings and messages
+        //TODO: Refactor thread handling
+
         try {
             UIManager
                     .setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
-        uploadId = getParameter("uploadId");
+        chooserButton = new JButton("ausw\u00e4hlen...");
+        chooserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                handleChooserButton();
+            }
+        });
 
-        targetURL = getParameter("url");
-        System.out.println("targetURL " + targetURL);
-        servletsBase = getParameter("ServletsBase");
-        System.out.println("ServletsBase " + servletsBase);
+        locationField = new JTextField(30);
+        locationField.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                locationButton.setEnabled(locationField.getText().length() > 0);
+            }
+        });
 
-        MCRUploadCommunicator.setPeerURL(servletsBase + "MCRUploadServlet");
-
-        appletContext = getAppletContext();
-
-        exteriorPanel = new JPanel();
-        bottomPanel = new JPanel();
-
-        locationButton = new JButton("ausw\u00e4hlen...");
+        locationButton = new JButton("\u00fcbertragen...");
+        locationButton.setEnabled(false);
         locationButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 handleLocationButton();
             }
         });
 
-        bottomPanel.setLayout(new BorderLayout(5, 5));
-        bottomPanel.add(locationButton, BorderLayout.EAST);
-        bottomPanel.setBackground(Color.white);
+        locationChooser = new JFileChooser();
+        locationChooser
+                .setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        locationChooser.setMultiSelectionEnabled(true);
+        File c = new File("C:\\");
+        if (c.exists())
+            locationChooser.setCurrentDirectory(c);
 
-        exteriorPanel.setLayout(new BorderLayout(5, 5));
-        exteriorPanel.setBackground(Color.white);
-        exteriorPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JPanel content = new JPanel();
+        setContentPane(content);
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints gbc = new GridBagConstraints();
+        content.setLayout(gbl);
+        content.setBackground(Color.white);
+        content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JPanel pSouth = new JPanel();
-        pSouth.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        pSouth.add(bottomPanel);
+        JLabel jlChoose = new JLabel(
+                "Wählen Sie Dateien oder Verzeichnisse aus:");
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbl.setConstraints(jlChoose, gbc);
+        content.add(jlChoose);
 
-        exteriorPanel.add(bottomPanel, BorderLayout.SOUTH);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbl.setConstraints(chooserButton, gbc);
+        content.add(chooserButton);
 
-        setContentPane(exteriorPanel);
+        JLabel jlInput = new JLabel("oder geben Sie einen absoluten Pfad ein:");
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbl.setConstraints(jlInput, gbc);
+        content.add(jlInput);
 
-        locationLabel = new JLabel("Datei oder Verzeichnis:");
-        locationField = new JTextField(30);
-        locationField.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                handleLocationField();
-            }
-        });
-        //    button = new JButton( "Dateien \u00fcbertragen..." );
-        button = new JButton("\u00fcbertragen...");
-        button.setEnabled(false);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbl.setConstraints(locationField, gbc);
+        content.add(locationField);
 
-        button.addActionListener(this);
-
-        JPanel panel = new JPanel();
-        panel.add(locationLabel);
-        panel.add(locationField);
-        panel.add(button);
-        panel.setBackground(Color.white);
-
-        exteriorPanel.add(panel, BorderLayout.CENTER);
-    }
-
-    public void handleLocationField() {
-        if (locationField.getText().length() > 0)
-            button.setEnabled(true);
-        else
-            button.setEnabled(false);
-    }
-
-    public void actionPerformed(ActionEvent event) {
-        try {
-            selectedFiles = new File[1];
-            selectedFiles[0] = new File(locationField.getText());
-            doUpload();
-            returnToURL();
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-    }
-
-    protected void doUpload() {
-        button.setEnabled(false);
-        Thread th = new Thread() {
-            public void run() {
-                try {
-                    MCRUploadProgressMonitor.getDialog().setMessage(
-                            "Upload mit ID " + uploadId + " wird gestartet...");
-                    MCRUploadCommunicator comm = new MCRUploadCommunicator();
-                    comm.sendDerivate(uploadId, selectedFiles);
-                    MCRUploadProgressMonitor.getDialog().setMessage(
-                            "Upload mit ID " + uploadId + " wurde beendet.");
-                } catch (Exception ex) {
-                    MCRUploadProgressMonitor.getDialog().setMessage(
-                            handleException(ex));
-                } finally {
-                    MCRUploadProgressMonitor.getDialog().finish();
-                }
-            }
-        };
-        th.start();
-
-        MCRUploadProgressMonitor.getDialog().show();
-    }
-
-    public static String handleException(Exception ex) {
-        StringBuffer message = new StringBuffer();
-        if (ex instanceof IOException) {
-            message.append("Fehler in der Netzwerkkommunikation:\n");
-            message.append("Meldung:\n  ").append(ex.getMessage());
-        } else if (ex instanceof MCRUploadException) {
-            message.append("Fehlermeldung des Servers:\n");
-            MCRUploadException sse = (MCRUploadException) ex;
-            message.append("Meldung:\n  ")
-                    .append(sse.getServerSideStackTrace()).append("\n");
-        } else {
-            message.append("Ein Fehler ist aufgetreten:\n").append(
-                    "Meldung:\n  ").append(ex.getClass().getName())
-                    .append("\n").append(ex.getMessage());
-            ex.printStackTrace();
-        }
-        return message.toString();
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
+        gbl.setConstraints(locationButton, gbc);
+        content.add(locationButton);
     }
 
     protected void handleLocationButton() {
-        if (locationChooser == null) {
-            locationChooser = new JFileChooser();
-            locationChooser
-                    .setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            locationChooser.setMultiSelectionEnabled(true);
+        File[] selectedFiles = new File[1];
+        selectedFiles[0] = new File(locationField.getText());
+        doUpload(selectedFiles);
+    }
 
-            File c = new File("C:\\");
-            if (c.exists())
-                locationChooser.setCurrentDirectory(c);
-        }
-
+    protected void handleChooserButton() {
         int result = locationChooser.showDialog(this,
                 "Datei(en) oder Verzeichnis(se) w\u00e4hlen");
+        if (result == JFileChooser.APPROVE_OPTION)
+            doUpload(locationChooser.getSelectedFiles());
+    }
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            selectedFiles = locationChooser.getSelectedFiles();
-            for (int i = 0, n = selectedFiles.length; i < n; i++) {
-                System.out.println("Selected: " + selectedFiles[i].getParent()
-                        + " --- " + selectedFiles[i].getName() + " "
-                        + selectedFiles[i].getPath());
+    protected void doUpload(final File[] selectedFiles) {
+        chooserButton.setEnabled(false);
+        locationButton.setEnabled(false);
+        locationField.setEnabled(false);
+
+        Thread th = new Thread() {
+            public void run() {
+                MCRUploadCommunicator comm = new MCRUploadCommunicator(peerURL,
+                        uploadId, MCRUploadApplet.this);
+                comm.uploadFiles(selectedFiles);
             }
-            doUpload();
-            returnToURL();
-        }
+        };
+        th.start();
+    }
 
+    void returnToURL() {
+        try {
+            getAppletContext().showDocument(new URL(targetURL));
+        } catch (MalformedURLException exc) {
+            System.out.println("MALFORMED URL: " + targetURL);
+        }
     }
 }
 
