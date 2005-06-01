@@ -27,12 +27,16 @@ package org.mycore.backend.sql;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.sql.Timestamp;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.ifs.*;
 import org.mycore.datamodel.classifications.*;
+import org.mycore.backend.hibernate.tables.*;
 
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -41,10 +45,10 @@ import java.util.Vector;
 import java.util.GregorianCalendar;
 
 /** 
- * This class implements the MCRLinkTableInterface.
+ * This class implements the MCRFileMetadataStore.
  *
  **/
-public class MCRHIBLinkTableStore implements MCRLinkTableInterface
+public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 {
     protected String table;
     
@@ -111,8 +115,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	    NUMCHTF = dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.TOTAL );
 	}
       
-	MCRHIBConnection connection = MCRHIBConnectionPool.instance().getConnection();
-
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
@@ -125,8 +127,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	fs.setLabel(LABEL);
 	fs.setSize(SIZE);
 	fs.setDate(new Timestamp(DATE.getTime().getTime()));
-	fs.setStoreID(STOREID);
-	fs.setStorageID(STORAGEID);
+	fs.setStoreid(STOREID);
+	fs.setStorageid(STORAGEID);
 	fs.setFctid(FCTID);
 	fs.setMd5(MD5);
 	fs.setNumchdd(NUMCHDD); 
@@ -138,21 +140,19 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	session.close();
     }
     
-    public String retrieveRootNodeID(String ownerID)
-      throws MCRPersistenceException
+    public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
         List l = session.createQuery("SELECT FROM MCRFSNODES WHERE OWNER = " + ownerID + " AND PID=NULL").list();
         if (l.size() < 1) {
-            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = "
-                    + userID;
+            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + ownerID;
             throw new MCRException(msg);
         }
         tx.commit();
         session.close();
-        return buildNode((MCRFSNODE)l.get(0));
+	return ((MCRFSNODES)(l.get(0))).getId();
     }
     public MCRFilesystemNode retrieveChild(String parentID, String name)
     {
@@ -162,12 +162,12 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
         List l = session.createQuery("SELECT FROM MCRFSNODES WHERE PARENT = " + parentID  + " AND NAME = "+name).list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = "
-                    + userID;
+                    + parentID;
             throw new MCRException(msg);
         }
         tx.commit();
         session.close();
-        return buildNode((MCRFSNODE)l.get(0));
+        return buildNode((MCRFSNODES)l.get(0));
     }
     
     public Vector retrieveChildrenIDs(String parentID)
@@ -176,15 +176,20 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE PARENT = " + parentID  + " AND NAME = "+name).list();
+        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE PARENT = " + parentID).list();
         if (l.size() < 1) {
-            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = "
-                    + userID;
+            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + parentID;
             throw new MCRException(msg);
         }
         tx.commit();
         session.close();
-        return buildNode((MCRFSNODE)l.get(0));
+
+	int t;
+	Vector v = new Vector(l.size());
+	for(t=0;t<l.size();t++) {
+	    v.set(t, (MCRFSNODES)l.get(0));
+	}
+	return v;
     }
     
     public void deleteNode( String ID )
@@ -195,7 +200,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	session.delete("SELECT FROM MCRFSNODES WHERE ID="+ID);
         tx.commit();
         session.close();
-        return buildNode((MCRFSNODE)l.get(0));
        
     }
     
@@ -206,27 +210,29 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
        
         List l = session.createQuery("SELECT FROM MCRFSNODES WHERE MCRID = " + ID).list();
         if (l.size() < 1) {
-            String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = "
-                    + userID;
+            String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = " + ID;
             throw new MCRException(msg);
         }
         tx.commit();
         session.close();
-        return buildNode((MCRFSNODE)l.get(0));
+        return buildNode((MCRFSNODES)l.get(0));
 
     }
 
-    public MCRFilesystemNode buildNode(MCRFSNODE node)
+    public MCRFilesystemNode buildNode(MCRFSNODES node)
     {
+	GregorianCalendar greg = new GregorianCalendar();
+	greg.setTime(node.getDate());
+
 	return MCRFileMetadataManager.instance().buildNode( 
-		node.getObjectType(),
-		node.getID(),
-		node.getParentID(),
-		node.getOwnerID(),
+		node.getType(),
+		node.getId(),
+		node.getPid(),
+		node.getOwner(),
 		node.getName(),
 		node.getLabel(),
 		node.getSize(),
-		node.getDate(),
+		greg,
 		node.getStoreid(),
 		node.getStorageid(),
 		node.getFctid(),
