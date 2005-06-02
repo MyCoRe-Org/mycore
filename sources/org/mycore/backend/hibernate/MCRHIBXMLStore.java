@@ -120,7 +120,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("select from MCRXMLTABLE WHERE id='"+mcrid+"' and version="+version);
+        session.delete("from MCRXMLTABLE where id='"+mcrid+"' and version='"+version+"'");
         tx.commit();
         session.close();
     }
@@ -151,7 +151,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("SELECT FROM MCRXMLTABLE WHERE ID = " + mcrid + " AND VERSION = "+version).list();
+        List l = session.createQuery("from MCRXMLTABLE where ID = '" + mcrid + "' AND VERSION = "+version).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
