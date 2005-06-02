@@ -26,6 +26,13 @@ public class MCRCATEGLABEL
     private String text;
     private String mcrdesc;
 
+    public MCRCATEGLABEL(String id, String clid, String lang, String text, String mcrdesc)
+    {
+        this.key = new MCRCATEGLABELPK(id, clid, lang);
+        this.text = text;
+        this.mcrdesc = mcrdesc;
+    }
+
     /**
     * @hibernate.property
     * column="Primary Key"

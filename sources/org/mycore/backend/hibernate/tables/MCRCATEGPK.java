@@ -27,7 +27,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class MCRCATEGPK implements Serializable {
     public String id; 
     public String clid;
-    
+
+    public MCRCATEGPK(String id, String clid)
+    {
+        this.id = id;
+        this.clid = id;
+    }
+
     /**
      * @return Returns the cLID.
      */

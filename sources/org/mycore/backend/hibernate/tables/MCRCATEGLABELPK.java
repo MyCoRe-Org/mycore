@@ -29,7 +29,14 @@ public class MCRCATEGLABELPK implements Serializable{
     private String id;
     private String clid;
     private String lang;
-    
+
+    public MCRCATEGLABELPK(String id, String clid, String lang)
+    {
+        this.id = id;
+        this.clid = clid;
+        this.lang = lang;
+    }
+
     /**
      * @return Returns the clid.
      */

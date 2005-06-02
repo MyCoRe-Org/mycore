@@ -24,12 +24,11 @@ public class MCRCLASS
 {
     private String id;
 
-    /**
-    * @hibernate.property
-    * column="ID"
-    * not-null="true"
-    * update="true"
-    */
+    public MCRCLASS(String id)
+    {
+        this.id = id;
+    }
+
     public String getId() {
         return id;
     }

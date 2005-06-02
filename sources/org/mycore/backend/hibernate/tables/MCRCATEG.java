@@ -26,6 +26,12 @@ public class MCRCATEG
     private String pid;
     private String url;
 
+    public MCRCATEG(String id, String clid, String pid, String url)
+    {
+        this.key = new MCRCATEGPK(id, clid);
+        this.pid = pid;
+        this.url = url;
+    }
     /**
      * @hibernate.property
      * columns="PRIMARY KEY"
