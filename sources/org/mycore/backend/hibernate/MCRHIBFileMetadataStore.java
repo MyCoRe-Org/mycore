@@ -132,7 +132,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE OWNER = " + ownerID + " AND PID=NULL").list();
+        List l = session.createQuery("from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + ownerID;
             throw new MCRException(msg);
@@ -146,7 +146,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE PARENT = " + parentID  + " AND NAME = "+name).list();
+        List l = session.createQuery("from MCRFSNODES where PARENT = '" + parentID  + "' and NAME = '"+name+"'").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = "
                     + parentID;
@@ -163,7 +163,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE PARENT = " + parentID).list();
+        List l = session.createQuery("from MCRFSNODES where PARENT = '" + parentID + "'").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + parentID;
             throw new MCRException(msg);
@@ -184,7 +184,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-	session.delete("SELECT FROM MCRFSNODES WHERE ID="+ID);
+	session.delete("from MCRFSNODES where ID='"+ID+"'");
         tx.commit();
         session.close();
        
@@ -195,7 +195,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("SELECT FROM MCRFSNODES WHERE MCRID = " + ID).list();
+        List l = session.createQuery("from MCRFSNODES where MCRID = '" + ID + "'").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = " + ID;
             throw new MCRException(msg);

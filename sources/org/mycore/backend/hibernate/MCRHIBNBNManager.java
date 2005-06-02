@@ -96,7 +96,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
     public MCRNBN getURN(String url)
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + url).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + url + "'").list();
 	session.close();
 	if(l.size() < 1) return null;
 	MCRNBN nbn = new MCRNBN(MCRNBN.getLocalPrefix() + ((MCRNBNS)l.get(0)).getNiss());
@@ -111,7 +111,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public void setURL(MCRNBN urn, String url) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + urn.getURL()).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + urn.getURL() + "'").list();
 	if(l.size() < 1) return;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 
@@ -129,7 +129,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public String getURL(MCRNBN urn) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + urn.getURL()).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + urn.getURL() + "'").list();
 	if(l.size() < 1) return null;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 	return n.getUrl();
@@ -142,7 +142,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public String getAuthor(MCRNBN urn) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + urn.getURL()).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + urn.getURL() + "'").list();
 	if(l.size() < 1) return null;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 	return n.getAuthor();
@@ -155,7 +155,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public String getComment(MCRNBN urn) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + urn.getURL()).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + urn.getURL() + "'").list();
 	if(l.size() < 1) return null;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 	return new String(n.getComment());
@@ -168,7 +168,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public GregorianCalendar getDate(MCRNBN urn) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE URL = " + urn.getURL()).list();
+        List l = session.createQuery("from MCRNBN where URL = '" + urn.getURL() + "'").list();
 	if(l.size() < 1) return null;
 	MCRNBNS n = (MCRNBNS)l.get(0);
         GregorianCalendar greg = new GregorianCalendar();
@@ -184,7 +184,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
-	session.delete("select from MCRNBN where NISS = "+urn.getNISSandChecksum());
+	session.delete("from MCRNBN where NISS = '"+urn.getNISSandChecksum() + "'");
 
 	tx.commit();
 	session.close();
@@ -196,7 +196,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public Set listReservedURNs() {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN where URL = NULL").list();
+        List l = session.createQuery("from MCRNBN where URL = NULL").list();
 	Set results = new HashSet();
 	int t;
 	for(t=0;t<l.size();t++) {
@@ -215,7 +215,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
-        List l = session.createQuery("from MCRNBN where NISS = "+urn.getNISSandChecksum()).list();
+        List l = session.createQuery("from MCRNBN where NISS = '"+urn.getNISSandChecksum() + "'").list();
         if(l.size() < 1)
             return null;
         MCRNBNS n = (MCRNBNS)l.get(0);
@@ -235,7 +235,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
     public void setDocumentId(MCRNBN urn, String documentId) {
 
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE NISS = " + urn.getNISSandChecksum()).list();
+        List l = session.createQuery("from MCRNBN where NISS = '" + urn.getNISSandChecksum() + "'").list();
 	if(l.size() < 1) return;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 
@@ -252,7 +252,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
      */
     public MCRNBN getNBNByDocumentId(String documentId) {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRNBN WHERE DOCUMENTID = " + documentId).list();
+        List l = session.createQuery("from MCRNBN where DOCUMENTID = '" + documentId + "'").list();
 	if(l.size() < 1) return null;
 	MCRNBNS n = (MCRNBNS)l.get(0);
 	session.close();
@@ -273,9 +273,9 @@ public class MCRHIBNBNManager implements MCRNBNManager {
 
 	if (pattern != null) {
 	    String sqlPattern = pattern.replace('?', '_').replace('*', '%');
-	    l = session.createQuery("FROM MCRNBN WHERE NISS like " + sqlPattern).list();
+	    l = session.createQuery("from MCRNBN where NISS like '" + sqlPattern + "'").list();
 	} else {
-	    l = session.createQuery("FROM MCRNBN").list();
+	    l = session.createQuery("from MCRNBN").list();
 	}
 	int t;
 	for(t=0;t<l.size();t++) {
