@@ -22,24 +22,19 @@
  *
  **/
 
-package org.mycore.backend.sql;
+package org.mycore.backend.hibernate;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
-import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.ifs.*;
-import org.mycore.datamodel.classifications.*;
 import org.mycore.backend.hibernate.tables.*;
 
 import org.hibernate.*;
-import org.hibernate.cfg.Configuration;
 
 import java.util.Vector;
 import java.util.GregorianCalendar;
@@ -55,18 +50,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     // logger
     static Logger logger=Logger.getLogger(MCRHIBLinkTableStore.class.getName());
 
-    // internal data
-    private String mtype;
-    private int lengthClassID  = MCRMetaClassification.MAX_CLASSID_LENGTH;
-    private int lengthCategID  = MCRMetaClassification.MAX_CATEGID_LENGTH;
-    private int lengthObjectID = MCRObjectID.MAX_LENGTH;
-
-    private String classname;
-    
-    private SessionFactory sessionFactory;
-    
     private Session getSession() {
-        return sessionFactory.openSession();
+        return null;
     }
 
     public MCRHIBFileMetadataStore() throws MCRPersistenceException
@@ -132,9 +117,11 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	fs.setFctid(FCTID);
 	fs.setMd5(MD5);
 	fs.setNumchdd(NUMCHDD); 
-	fs.setNumchdf(NUMCHDD); 
-	fs.setNumchtd(NUMCHDD); 
-	fs.setNumchtf(NUMCHDD); 
+	fs.setNumchdf(NUMCHDF);
+	fs.setNumchtd(NUMCHTD);
+	fs.setNumchtf(NUMCHTF);
+
+	session.update(fs);
 
 	tx.commit();
 	session.close();
@@ -187,7 +174,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	int t;
 	Vector v = new Vector(l.size());
 	for(t=0;t<l.size();t++) {
-	    v.set(t, (MCRFSNODES)l.get(0));
+	    v.set(t, ((MCRFSNODES)l.get(0)).getId());
 	}
 	return v;
     }
