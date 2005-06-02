@@ -59,7 +59,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 
     public final void dropTables()
     {
-	/* TODO */
+	/* TODO? */
     }
 
     public Session getSession()
@@ -97,10 +97,10 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
-	session.delete("select from MCRCLASS where ID = "+ID);
-	session.delete("select from MCRCLASSLABEL where ID = "+ID);
-	session.delete("select from MCRCATEG where CLID = "+ID);
-	session.delete("select from MCRCATEGLABEL where CLID = "+ID);
+	session.delete("from MCRCLASS where ID = '"+ID+"'");
+	session.delete("from MCRCLASSLABEL where ID = '"+ID+"'");
+	session.delete("from MCRCATEG where CLID = '"+ID+"'");
+	session.delete("from MCRCATEGLABEL where CLID = '"+ID+"'");
 
 	tx.commit();
 	session.close();
@@ -114,7 +114,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
     public final MCRClassificationItem retrieveClassificationItem(String ID)
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCLASS WHERE ID = " + ID).list();
+        List l = session.createQuery("FROM MCRCLASS WHERE ID = '" + ID + "'").list();
 	if(l.size() < 1) {
 	    session.close();
 	    return null;
@@ -122,7 +122,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 
 	MCRClassificationItem c = new MCRClassificationItem(ID);
 
-        l = session.createQuery("FROM MCRCLASSLABEL WHERE ID = " + ID).list();
+        l = session.createQuery("from MCRCLASSLABEL where ID = '" + ID + "'").list();
 	if(l.size() < 1) {
 	    session.close();
 	    return null;
@@ -148,7 +148,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
     public final boolean classificationItemExists( String ID )
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCLASS WHERE ID = " + ID).list();
+        List l = session.createQuery("from MCRCLASS where ID = '" + ID + "'").list();
 	session.close();
 	if(l.size() < 1) return false;
 	return true;
@@ -194,8 +194,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
-	session.delete("select from MCRCATEG where CLID = "+CLID+" and ID = "+ID);
-	session.delete("select from MCRCATEGLABEL where CLID = "+CLID+" and ID = "+ID);
+	session.delete("from MCRCATEG where CLID = '"+CLID+"' and ID = '"+ID+"'");
+	session.delete("from MCRCATEGLABEL where CLID = '"+CLID+"' and ID = '"+ID+"'");
 
 	tx.commit();
 	session.close();
@@ -210,7 +210,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
     public final MCRCategoryItem retrieveCategoryItem( String CLID, String ID )
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCATEG WHERE ID = " + ID + " AND CLID = " + CLID).list();
+        List l = session.createQuery("from MCRCATEG where ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 	if(l.size() < 1) {
 	    session.close();
 	    return null;
@@ -219,7 +219,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	MCRCategoryItem ci = new MCRCategoryItem(ID, CLID, c.getPid());
 	ci.setURL(c.getUrl());
 
-	List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = " + ID + " AND CLID = " + CLID).list();
+	List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
 	if(la.size() < 1) {
 	    session.close();
 	    return null;
@@ -247,7 +247,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
       String labeltext)
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCATEG WHERE TEXT = " + labeltext + " AND CLID = " + CLID).list();
+        List l = session.createQuery("FROM MCRCATEG WHERE TEXT = '" + labeltext + "' AND CLID = '" + CLID + "'").list();
 	if(l.size() < 1) {
 	    session.close();
 	    return null;
@@ -257,7 +257,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	MCRCategoryItem ci = new MCRCategoryItem(ID, CLID, c.getPid());
 	ci.setURL(c.getUrl());
 
-	List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = " + ID + " AND CLID = " + CLID).list();
+	List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 	if(la.size() < 1) {
 	    session.close();
 	    return null;
@@ -285,7 +285,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
     public final boolean categoryItemExists(String CLID, String ID)
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCATEG WHERE ID = " + ID + " AND CLID = " + CLID).list();
+        List l = session.createQuery("from MCRCATEG where ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 	if(l.size() < 1) {
 	    session.close();
 	    return false;
@@ -305,7 +305,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	ArrayList children = new ArrayList();
 
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCATEG WHERE PID = " + PID + " AND CLID = " + CLID).list();
+        List l = session.createQuery("from MCRCATEG where PID = '" + PID + "' and CLID = '" + CLID + "'").list();
 
 	int t;
 	for(t=0;t<l.size();t++) {
@@ -315,7 +315,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	    children.add( child );
 	}
 	for (int i=0;i<children.size();i++) {
-	    List li = session.createQuery("FROM MCRCATEGLABEL WHERE PID = " + PID + " AND CLID = " + CLID).list();
+	    List li = session.createQuery("from MCRCATEGLABEL where PID = '" + PID + "' and CLID = '" + CLID + "'").list();
 	    for(t=0;t<li.size();t++) {
 		MCRCATEGLABEL cl = (MCRCATEGLABEL)li.get(t);
 		((MCRCategoryItem)children.get(i)).addData(cl.getLang(),cl.getText(),cl.getMcrdesc());
@@ -344,7 +344,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
     public final String [] getAllClassificationID()
     {
 	Session session = getSession();
-        List l = session.createQuery("FROM MCRCLASS").list();
+        List l = session.createQuery("from MCRCLASS").list();
 
 	String ID [] = new String[l.size()];
 	int i = 0;
