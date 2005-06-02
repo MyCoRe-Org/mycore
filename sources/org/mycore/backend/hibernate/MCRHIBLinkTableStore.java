@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -25,20 +25,16 @@
 package org.mycore.backend.hibernate;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
-import org.mycore.datamodel.classifications.*;
 import org.mycore.backend.hibernate.tables.*;
 
 import org.hibernate.*;
-import org.hibernate.cfg.Configuration;
 
-/** 
+/**
  * This class implements the MCRLinkTableInterface.
  *
  **/
@@ -50,32 +46,27 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 
     // internal data
     private String mtype;
-    private int lengthClassID  = MCRMetaClassification.MAX_CLASSID_LENGTH;
-    private int lengthCategID  = MCRMetaClassification.MAX_CATEGID_LENGTH;
-    private int lengthObjectID = MCRObjectID.MAX_LENGTH;
 
     private String classname;
-    
-    private SessionFactory sessionFactory;
-    
+
     private Session getSession() {
-        return sessionFactory.openSession();
+        return null;
     }
 
     /**
     * The constructor for the class MCRHIBLinkTableStore.
     **/
     public MCRHIBLinkTableStore()
-    { 
+    {
     }
 
     /**
     * The initializer for the class MCRHIBLinkTableStore.
     *
-    * @exception throws if the type is not correct
+    * @exception MCRPersistenceException if the type is not correct
     **/
     public final void init(String type) throws MCRPersistenceException
-    { 
+    {
 	MCRConfiguration config = MCRConfiguration.instance();
 	if (type == null) {
 	    throw new MCRPersistenceException("The type of the constructor is null");
@@ -90,9 +81,9 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	}
 
 	if("class".equals(type)) {
-	    this.classname = "MCRLinkClass";
+	    this.classname = "org.mycore.backend.hibernate.tables.MCRLINKCLASS";
 	} else if("href".equals(type)) {
-	    this.classname = "MCRLinkHref";
+	    this.classname = "org.mycore.backend.hibernate.tables.MCRLINKHREF";
 	} else throw new MCRPersistenceException("The type of the constructor doesn't match 'class' or 'href'.");
 
 	mtype = type;
@@ -148,7 +139,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("select from "+classname+" WHERE from='"+from+"'");
+        session.delete("from "+classname+" where from='"+from+"'");
         tx.commit();
         session.close();
     }
@@ -163,7 +154,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("SELECT FROM "+classname+" WHERE to = " + to).list();
+        List l = session.createQuery("from "+classname+" where to = " + to).list();
         tx.commit();
         session.close();
         return l.size();
