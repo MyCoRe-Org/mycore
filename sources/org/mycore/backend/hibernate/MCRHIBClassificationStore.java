@@ -64,7 +64,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 
     public Session getSession()
     {
-        return null;
+	return MCRHIBConnection.instance().getSession();
     }
 
     /**

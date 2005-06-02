@@ -60,7 +60,7 @@ public class MCRHIBNBNManager implements MCRNBNManager {
 
     private Session getSession()
     {
-        return null;
+	return MCRHIBConnection.instance().getSession();
     }
 
     /**

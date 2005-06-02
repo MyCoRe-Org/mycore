@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.backend.sql;
+package org.mycore.backend.hibernate;
 
 import java.sql.*;
 import java.util.*;
@@ -54,7 +54,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     }
     
     private Session getSession() {
-        return null;
+	return MCRHIBConnection.instance().getSession();
     }
 
     /**

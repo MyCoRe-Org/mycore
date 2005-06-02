@@ -51,7 +51,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     static Logger logger=Logger.getLogger(MCRHIBLinkTableStore.class.getName());
 
     private Session getSession() {
-        return null;
+	return MCRHIBConnection.instance().getSession();
     }
 
     public MCRHIBFileMetadataStore() throws MCRPersistenceException

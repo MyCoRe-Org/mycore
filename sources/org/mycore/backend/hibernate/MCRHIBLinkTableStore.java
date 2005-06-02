@@ -50,7 +50,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     private String classname;
 
     private Session getSession() {
-        return null;
+	return MCRHIBConnection.instance().getSession();
     }
 
     /**
