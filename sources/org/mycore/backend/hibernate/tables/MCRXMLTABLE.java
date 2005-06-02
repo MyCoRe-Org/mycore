@@ -27,7 +27,7 @@ public class MCRXMLTABLE
     private String id;
     private int version;
     private String type;
-    private Blob xml;
+    private byte[] xml;
 
     public MCRXMLTABLE()
     {
@@ -60,7 +60,7 @@ public class MCRXMLTABLE
         this.type = type;
     }
     public Blob getXml() {
-        return xml;
+        return new XMLBlob(xml);
     }
     public byte[] getXmlByteArray() {
 	try {
@@ -79,10 +79,66 @@ public class MCRXMLTABLE
 	}
     }
     public void setXml(Blob xml) {
-        this.xml = xml;
+	try {
+	    java.io.InputStream in = xml.getBinaryStream();
+	    byte[] b = new byte[in.available()];
+	    int t;
+	    for(t=0;t<b.length;t++)
+		b[t] = (byte)in.read();
+	    this.xml = b;
+	} catch(java.sql.SQLException e) {
+	    e.printStackTrace();
+	    this.xml = null
+	} catch(java.io.IOException e) {
+	    e.printStackTrace();
+	    this.xml = null
+	}
     }
     public void setXml(byte[] xml) {
-	/* FIXME */
-        this.xml = null;
+        this.xml = xml;
+    }
+
+    public class XMLBlob implements java.sql.Blob
+    {
+	byte[] xml;
+	XMLBlob(byte[] xml) {
+	    this.xml = xml;
+	}
+	InputStream getBinaryStream() {
+	    return BinaryInputStream(this.xml);
+	}
+	byte[] getBytes(long pos, int length) {
+	    if(pos + length > xml.length)
+		length = xml.length - pos;
+	    byte[] result = new byte[length];
+	    arraycopy(xml, pos, result, 0, length);
+	    return result;
+	}
+	long length()
+	{
+	    return this.xml.length;
+	}
+        //Determines the byte position at which the specified byte pattern begins within the BLOB value that this Blob object represents. 
+	long position(byte[] pattern, long start)
+	{
+	    int t;
+searchloop: for(t=start;t<xml.length;t++) {
+		int s;
+		int len = xml.length - t;
+		if(pattern.length > xml.length - t)
+		    break searchloop;
+		for(s=0;s<len;s++) {
+		    if(pattern[s] != xml[t]) 
+			continue searchloop;
+		}
+		return t;
+	    }
+	}
+        //Determines the byte position in the BLOB value designated by this Blob object at which pattern begins.
+	long position(Blob pattern, long start)
+	{
+	    byte[] b = pattern.getBytes(0, pattern.length());
+	    return position(b, start);
+	}
     }
 }
