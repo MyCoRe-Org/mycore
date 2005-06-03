@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * of one query. They holds informations about host, rank and the XML byte
  * stream. You can get the complete result or elements of them as XML JDOM
  * Document for transforming with XSLT.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Mathias Zarick
  * @author Thomas Scheffler
@@ -130,7 +130,7 @@ public class MCRXMLContainer implements MCRSortable {
     /**
      * This constructor create the MCRXMLContainer class with a given query
      * result list.
-     * 
+     *
      * @param in
      *            a MCRXMLContainer as input
      */
@@ -147,7 +147,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode return the size of the result list.
-     * 
+     *
      * @return the size of the result list
      */
     public final int size() {
@@ -156,14 +156,14 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode return the host of an element index.
-     * 
+     *
      * @param index
      *            the index in the list
      * @return an empty string if the index is outside the border, else return
      *         the host name
      */
     public final String getHost(int index) {
-        if ((index < 0) || (index > host.size())) {
+        if ((index < 0) || (index >= host.size())) {
             return "";
         }
         return (String) host.get(index);
@@ -171,7 +171,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This method sets a host element at a specified position.
-     * 
+     *
      * @param index
      *            the index in the list
      * @param newhost
@@ -183,14 +183,14 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode return the MCRObjectId of an element index as string.
-     * 
+     *
      * @param index
      *            the index in the list
      * @return an empty string if the index is outside the border, else return
      *         the MCRObjectId as string.
      */
     public final String getId(int index) {
-        if ((index < 0) || (index > mcrId.size())) {
+        if ((index < 0) || (index >= mcrId.size())) {
             return "";
         }
         return (String) mcrId.get(index);
@@ -198,13 +198,13 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode return the rank of an element index.
-     * 
+     *
      * @param index
      *            the index in the list
      * @return -1 if the index is outside the border, else return the rank
      */
     public final int getRank(int index) {
-        if ((index < 0) || (index > rank.size())) {
+        if ((index < 0) || (index >= rank.size())) {
             return -1;
         }
         return ((Integer) rank.get(index)).intValue();
@@ -212,13 +212,13 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This method returns the neighbour status of an element index.
-     * 
+     *
      * @param index
      *            the index in the list
      * @return -1 if the index is outside the border, else return the rank
      */
     public final int getStatus(int index) {
-        if ((index < 0) || (index > status.size())) {
+        if ((index < 0) || (index >= status.size())) {
             return -1;
         }
         return ((Integer) status.get(index)).intValue();
@@ -226,10 +226,10 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This method sets the neighbour status of an element index.
-     * 
+     *
      * @param index
      *            the index in the list
-     * @param status
+     * @param instatus
      *            the new value in the list
      */
     public final void setStatus(int index, int instatus) {
@@ -238,14 +238,14 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode return the mycoreobject as JDOM Element of an element index.
-     * 
+     *
      * @param index
      *            the index in the list
      * @return an null if the index is outside the border, else return the
      *         mycoreobject as JDOM Element
      */
     public final org.jdom.Element getXML(int index) {
-        if ((index < 0) || (index > host.size())) {
+        if ((index < 0) || (index >= host.size())) {
             return null;
         }
         return (org.jdom.Element) xml.get(index);
@@ -253,7 +253,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode add one element to the result list.
-     * 
+     *
      * @param in_host
      *            the host input as a string
      * @param in_id
@@ -284,7 +284,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode add one element to the result list.
-     * 
+     *
      * @param in_host
      *            the host input as a string
      * @param in_id
@@ -318,7 +318,7 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
+     *
      * @return the result collection as a JDOM document.
      */
     public final org.jdom.Document exportAllToDocument() {
@@ -356,7 +356,7 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
+     *
      * @return the result collection as a JDOM document.
      * @exception IOException
      *                if an error in the XMLOutputter was occured
@@ -383,7 +383,7 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
+     *
      * @param index
      *            the index number of the element
      * @return one result as a JDOM document. If index is out of border an empty
@@ -425,7 +425,7 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
+     *
      * @param index
      *            the index number of the element
      * @exception IOException
@@ -447,7 +447,7 @@ public class MCRXMLContainer implements MCRSortable {
     /**
      * This methode return a MCRXMLContainer. <br>
      * &lt;?xml version="1.0"
-     * 
+     *
      * @param index
      *            the index number of the element
      * @return one result as MCRXMLContainer. If index is out of border an
@@ -474,8 +474,8 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
-     * @param the
+     *
+     * @param in
      *            XML input stream as InputStream
      * @exception MCRException
      *                a MyCoRe error is occured
@@ -500,7 +500,7 @@ public class MCRXMLContainer implements MCRSortable {
      * &lt;/mycore...&gt; <br>
      * &lt;/mcr_result&gt; <br>
      * &lt;/mcr_results&gt; <br>
-     * 
+     *
      * @param jdom
      *            the XML input as a JDom Object
      * @exception MCRException
@@ -533,8 +533,8 @@ public class MCRXMLContainer implements MCRSortable {
     /**
      * This method imports another MCRXMLContainer and add it to the existing
      * list.
-     * 
-     * @param the
+     *
+     * @param in
      *            other list as input
      */
     public final void importElements(MCRXMLContainer in) {
@@ -545,7 +545,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * This methode print the content of this MCRXMLContainer as an XML String.
-     * 
+     *
      * @exception IOException
      *                if an error in the XMLOutputter was occured
      */
@@ -577,7 +577,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * sorts the entries in the XMLContainer with ascending order.
-     * 
+     *
      * @see org.mycore.common.MCRSortable#sort(MCRXMLSortInterface)
      * @throws MCRException
      *             if sorting fails
@@ -589,7 +589,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * sorts the entries in the XMLContainer with given order.
-     * 
+     *
      * @param reversed
      *            true if descending order, fals otherwise
      * @see org.mycore.common.MCRSortable#sort(MCRXMLSortInterface, boolean)
@@ -617,8 +617,44 @@ public class MCRXMLContainer implements MCRSortable {
     }
 
     /**
+     * permutates the entries in the XMLContainer
+     *
+     * @param order The new order of the elements. Each entry of the array references the object (by index) of
+     *              the element that should be at this position in the new object.
+     */
+    public synchronized void permutate(int order[]) throws MCRException
+    {
+        /* sanity check */
+        if(order.length != this.host.size() ||
+           order.length != this.mcrId.size() ||
+           order.length != this.rank.size() ||
+           order.length != this.xml.size() ||
+           order.length != this.status.size()) {
+            throw new MCRException("internal error: sizes don't match: "+ order.length + "!=" + this.host.size());
+        }
+        ArrayList host = new ArrayList(order.length);
+        ArrayList mcrId = new ArrayList(order.length);
+        ArrayList rank = new ArrayList(order.length);
+        ArrayList xml = new ArrayList(order.length);
+        ArrayList status = new ArrayList(order.length);
+        int t;
+        for(t=0;t<order.length;t++) {
+            host.add(t, this.host.get(order[t]));
+            mcrId.add(t, this.mcrId.get(order[t]));
+            rank.add(t, this.rank.get(order[t]));
+            xml.add(t, this.xml.get(order[t]));
+            status.add(t, this.status.get(order[t]));
+        }
+        this.host = host;
+        this.mcrId = mcrId;
+        this.rank = rank;
+        this.xml = xml;
+        this.status = status;
+    }
+
+    /**
      * makes a copy of MCRXMLContainer
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     public synchronized Object clone() {
@@ -634,7 +670,7 @@ public class MCRXMLContainer implements MCRSortable {
 
     /**
      * Removes everything after the n-th Element if existing
-     * 
+     *
      * @param newsize
      *            the new size of the MCRXMLContainer
      */
