@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-SimpleWorkflow build file for use with ANT                   -->
-<!-- $Revision: 1.2 $ $Date: 2005-03-01 12:13:58 $                      -->
+<!-- $Revision: 1.3 $ $Date: 2005-06-03 08:56:23 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - SimpleWorkflow" default="usage" basedir=".">
@@ -60,6 +60,9 @@
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
+	       target="${javatarget}"
+	       source="${sourcerelease}"
+	       encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
     <echo>---------------------------------------------------------</echo>

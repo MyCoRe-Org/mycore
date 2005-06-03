@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-UserAdministration build file for use with ANT               -->
-<!-- $Revision: 1.1 $ $Date: 2005-05-14 13:45:48 $                       -->
+<!-- $Revision: 1.2 $ $Date: 2005-06-03 08:56:23 $                       -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - UserAdministration" default="usage" basedir=".">
@@ -60,6 +60,9 @@
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
+	       target="${javatarget}"
+	       source="${sourcerelease}"
+	       encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
     <echo>---------------------------------------------------------</echo>
