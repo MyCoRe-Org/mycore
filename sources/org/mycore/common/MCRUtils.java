@@ -565,6 +565,26 @@ public class MCRUtils {
     }
 
     /**
+     * The method cut an ArrayList for a maximum of items.
+     * 
+     * @arrayin The incoming ArrayList
+     * @maxitem The maximum number of items
+     * @return the cutted ArrayList
+     */
+    public static final ArrayList cutArrayList(ArrayList arrayin, int maxitems) {
+        MCRArgumentChecker.ensureNotNull(arrayin, "Input ArrayList");
+        if (maxitems < 1) {
+            LOGGER.warn("The maximum items are lower then 1.");
+        }
+        ArrayList arrayout = new ArrayList();
+        int i = 0;
+        for (Iterator it = arrayin.iterator(); it.hasNext() && (i < maxitems); i++) {
+            arrayout.add(it.next());
+        }
+        return arrayout;
+    }
+
+    /**
      * Reads exactly <code>len</code> bytes from the input stream into the
      * byte array. This method reads repeatedly from the underlying stream until
      * all the bytes are read. InputStream.read is often documented to block
