@@ -20,14 +20,15 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class MCRGROUPS
 {
     private String gid;
     private String creator;
-    private Date creationDate;
-    private Date modifiedDate;
+    private Timestamp creationDate;
+    private Timestamp modifiedDate;
     private String description;
 
     /**
@@ -62,10 +63,10 @@ public class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public Date getCreationdate() {
+    public Timestamp getCreationdate() {
         return creationDate;
     }
-    public void setCreationdate(Date creationDate) {
+    public void setCreationdate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -75,10 +76,10 @@ public class MCRGROUPS
     * not-null="true"
     * update="true"
     */
-    public Date getModifieddate() {
+    public Timestamp getModifieddate() {
         return modifiedDate;
     }
-    public void setModifieddate(Date modifiedDate) {
+    public void setModifieddate(Timestamp modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 

@@ -20,14 +20,14 @@
 
 package org.mycore.backend.hibernate.tables;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class MCRUSERS{
     
     private MCRUSERSPK key;
     private String creator;
-    private Date creationdate;
-    private Date modifieddate;
+    private Timestamp creationdate;
+    private Timestamp modifieddate;
     private String description;
     private String passwd;
     private String enabled;
@@ -108,10 +108,10 @@ public class MCRUSERS{
     * not-null="true"
     * update="true"
     */
-    public Date getCreationdate() {
+    public Timestamp getCreationdate() {
         return creationdate;
     }
-    public void setCreationdate(Date creationdate) {
+    public void setCreationdate(Timestamp creationdate) {
         this.creationdate = creationdate;
     }
 
@@ -121,10 +121,10 @@ public class MCRUSERS{
     * not-null="true"
     * update="true"
     */
-    public Date getModifieddate() {
+    public Timestamp getModifieddate() {
         return modifieddate;
     }
-    public void setModifieddate(Date modifieddate) {
+    public void setModifieddate(Timestamp modifieddate) {
         this.modifieddate = modifieddate;
     }
 

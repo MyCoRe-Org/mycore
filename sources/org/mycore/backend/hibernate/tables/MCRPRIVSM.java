@@ -20,7 +20,7 @@
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRPRIVS{
+public class MCRPRIVSM{
     
     private String name;
     private String description;
