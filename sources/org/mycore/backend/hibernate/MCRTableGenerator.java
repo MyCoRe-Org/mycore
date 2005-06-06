@@ -45,12 +45,12 @@ public class MCRTableGenerator {
      * Object declaration
      */
     private Element rootOut = new Element("hibernate-mapping");
+   /* private DocType dType= new DocType("hibernate-mapping",
+    		"-//Hibernate/Hibernate Mapping DTD//EN", 
+			"http://hibernate.sourceforge.net/hibernate-mapping.dtd");*/
     private DocType dType= new DocType("hibernate-mapping",
     		"-//Hibernate/Hibernate Mapping DTD//EN", 
-			"http://hibernate.sourceforge.net/hibernate-mapping.dtd");
-    /*private DocType dType= new DocType("hibernate-mapping",
-    		"-//Hibernate/Hibernate Mapping DTD//EN", 
-			"file:///home/seifert/Dokumente/java/jDomParse/hibernate-mapping.dtd");*/
+			"file:///home/seifert/Dokumente/java/jDomParse/hibernate-mapping.dtd");
 
     private Document docOut = new Document(rootOut, dType);
     private Element elclass = new Element("class");

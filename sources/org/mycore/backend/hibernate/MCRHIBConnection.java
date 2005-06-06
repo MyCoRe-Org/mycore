@@ -24,8 +24,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.util.List;
-
 import org.mycore.common.*;
 
 import org.hibernate.Session;
@@ -50,8 +48,7 @@ public class MCRHIBConnection {
     
     private static String url, userID, password;
 	private static int maxUsages = Integer.MAX_VALUE;
-    
-    private List typeList;
+
     MCRConfiguration config = MCRConfiguration.instance();
     
     static {
@@ -69,6 +66,14 @@ public class MCRHIBConnection {
         if (singleton == null){
             singleton = new MCRHIBConnection();
         }
+        try{
+            if (! session.isOpen()){
+                session.reconnect();
+            }
+        }catch(Exception e){
+            buildSessionFactory();
+            buildSession();
+        }
         return singleton;  
     }
     
@@ -82,6 +87,7 @@ public class MCRHIBConnection {
             buildConfiguration();
             genTable.generateTables(cfg);
             buildSessionFactory();
+            buildSession();
             
         }catch (Exception exc) {
             String msg = "Could not connect to database";
@@ -126,8 +132,20 @@ public class MCRHIBConnection {
      * on the database through hibernate
      * @return Session current session object
      */
-    public static Session getSession(){
-        return session;
+    public Session getSession(){
+        try{
+            if (! session.isOpen()){
+                session.reconnect();
+            }
+            return session;
+        }catch(Exception e){
+            System.out.println(e.toString());
+            return null;
+        }
+    }
+    
+    public void closeSession(){
+        session.close();
     }
 	
 }
