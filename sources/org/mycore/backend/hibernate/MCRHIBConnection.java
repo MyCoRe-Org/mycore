@@ -51,7 +51,7 @@ public class MCRHIBConnection {
     protected static MCRHIBMapping genTable = new MCRHIBMapping();
     
     private static String url, userID, password;
-	private static int maxUsages = Integer.MAX_VALUE;
+    private static int maxUsages = Integer.MAX_VALUE;
 
     MCRConfiguration config = MCRConfiguration.instance();
     
@@ -76,7 +76,6 @@ public class MCRHIBConnection {
             }
         }catch(Exception e){
             buildSessionFactory();
-            buildSession();
         }
         return singleton;  
     }
@@ -91,7 +90,6 @@ public class MCRHIBConnection {
             buildConfiguration();
             genTable.generateTables(cfg);
             buildSessionFactory();
-            buildSession();
             
         }catch (Exception exc) {
             String msg = "Could not connect to database";
@@ -104,7 +102,6 @@ public class MCRHIBConnection {
      */
     private void buildConfiguration(){
         cfg = new Configuration()
-
 		.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
 		.setProperty("hibernate.connection.driver_class","com.mysql.jdbc.Driver")
 		.setProperty("hibernate.connection.url", url)
@@ -124,28 +121,12 @@ public class MCRHIBConnection {
     }
     
     /**
-     * This method creates the Session on the current SessionFactory
-     */
-    private static void buildSession(){
-        
-        session = sessions.openSession();
-    }
-    
-    /**
      * This method returns the current session for queries
      * on the database through hibernate
      * @return Session current session object
      */
     public Session getSession(){
-        try{
-            if (! session.isOpen()){
-                session.reconnect();
-            }
-            return session;
-        }catch(Exception e){
-            System.out.println(e.toString());
-            return null;
-        }
+        return sessions.openSession();
     }
 
     public long getID() {
@@ -170,7 +151,6 @@ public class MCRHIBConnection {
 	    
 	    tx.commit();
 	    session.close();
-
 	    return id.getId();
 	}
     }
