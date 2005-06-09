@@ -88,10 +88,10 @@ public class MCRXMLTABLE
 	    this.xml = b;
 	} catch(java.sql.SQLException e) {
 	    e.printStackTrace();
-	    this.xml = null
+	    this.xml = null;
 	} catch(java.io.IOException e) {
 	    e.printStackTrace();
-	    this.xml = null
+	    this.xml = null;
 	}
     }
     public void setXml(byte[] xml) {
