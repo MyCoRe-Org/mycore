@@ -21,13 +21,16 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.sql.Blob;
+import java.sql.SQLException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class MCRXMLTABLE
 {
     private String id;
     private int version;
     private String type;
-    private byte[] xml;
+    private Blob xml;
 
     public MCRXMLTABLE()
     {
@@ -38,7 +41,7 @@ public class MCRXMLTABLE
 	this.id = id;
 	this.version = version;
 	this.type = type;
-	this.xml = xml;
+        this.xml = xml;
     }
 
     public String getId() {
@@ -59,9 +62,6 @@ public class MCRXMLTABLE
     public void setType(String type) {
         this.type = type;
     }
-    public Blob getXml() {
-        return new XMLBlob(xml);
-    }
     public byte[] getXmlByteArray() {
 	try {
 	    java.io.InputStream in = xml.getBinaryStream();
@@ -78,24 +78,11 @@ public class MCRXMLTABLE
 	    return null;
 	}
     }
-    public void setXml(Blob xml) {
-	try {
-	    java.io.InputStream in = xml.getBinaryStream();
-	    byte[] b = new byte[in.available()];
-	    int t;
-	    for(t=0;t<b.length;t++)
-		b[t] = (byte)in.read();
-	    this.xml = b;
-	} catch(java.sql.SQLException e) {
-	    e.printStackTrace();
-	    this.xml = null;
-	} catch(java.io.IOException e) {
-	    e.printStackTrace();
-	    this.xml = null;
-	}
+    public Blob getXml() {
+            return xml;
     }
     public void setXml(byte[] xml) {
-        this.xml = xml;
+        this.xml = new XMLBlob(xml);
     }
 
     public class XMLBlob implements java.sql.Blob
@@ -104,25 +91,40 @@ public class MCRXMLTABLE
 	XMLBlob(byte[] xml) {
 	    this.xml = xml;
 	}
-	InputStream getBinaryStream() {
-	    return BinaryInputStream(this.xml);
+	public InputStream getBinaryStream() {
+	    return new java.io.ByteArrayInputStream(this.xml);
 	}
-	byte[] getBytes(long pos, int length) {
+
+        public OutputStream setBinaryStream(long l) {
+            throw new IllegalArgumentException("not implemented");
+        }
+        public int setBytes(long l, byte[] a, int u, int v) {
+            throw new IllegalArgumentException("not implemented");
+        }
+        public int setBytes(long l, byte[] a) {
+            throw new IllegalArgumentException("not implemented");
+        }
+        public void truncate(long l) {
+            throw new IllegalArgumentException("not implemented");
+        }
+
+
+	public byte[] getBytes(long pos, int length) {
 	    if(pos + length > xml.length)
-		length = xml.length - pos;
+		length = (int)(xml.length - pos);
 	    byte[] result = new byte[length];
-	    arraycopy(xml, pos, result, 0, length);
+	    System.arraycopy(xml, (int)pos, result, 0, length);
 	    return result;
 	}
-	long length()
+	public long length()
 	{
 	    return this.xml.length;
 	}
         //Determines the byte position at which the specified byte pattern begins within the BLOB value that this Blob object represents. 
-	long position(byte[] pattern, long start)
+	public long position(byte[] pattern, long start)
 	{
 	    int t;
-searchloop: for(t=start;t<xml.length;t++) {
+searchloop: for(t=(int)start;t<xml.length;t++) {
 		int s;
 		int len = xml.length - t;
 		if(pattern.length > xml.length - t)
@@ -133,11 +135,12 @@ searchloop: for(t=start;t<xml.length;t++) {
 		}
 		return t;
 	    }
+            return -1;
 	}
         //Determines the byte position in the BLOB value designated by this Blob object at which pattern begins.
-	long position(Blob pattern, long start)
+	public long position(Blob pattern, long start) throws SQLException
 	{
-	    byte[] b = pattern.getBytes(0, pattern.length());
+	    byte[] b = pattern.getBytes(0, (int)pattern.length());
 	    return position(b, start);
 	}
     }
