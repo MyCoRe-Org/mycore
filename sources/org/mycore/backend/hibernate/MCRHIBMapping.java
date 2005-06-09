@@ -156,7 +156,8 @@ public class MCRHIBMapping {
 		    
 		    // Privilegeslookup
 		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_privs_lookup"), "org.mycore.backend.hibernate.tables.MCRPRIVSLOOKUP", "", 1);
-		    map.addIDColumn("gid", "GID", dbString, 20, "assigned");
+		    map.addIDColumn("id", "ID", dbInt, 0, "assigned");
+		    map.addColumn("gid", "GID", dbString, 20, false, false);
 		    map.addColumn("name", "NAME", dbString, 200, false, false);
 		    cfg.addXML(map.getTableXML());
 		    
