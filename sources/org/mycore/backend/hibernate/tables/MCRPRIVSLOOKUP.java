@@ -22,9 +22,24 @@ package org.mycore.backend.hibernate.tables;
 
 public class MCRPRIVSLOOKUP{
     
+    private int id;
     private String gid;
     private String name;
+    
+    /**
+     * @hibernate.property
+     * column="ID"
+     * not-null="true"
+     * update="true"
+     */
+     public int getId() {
+         return id;
+     }
+     public void setId(int id) {
+         this.id = id;
+     }
 
+     
     /**
     * @hibernate.property
     * column="GID"
