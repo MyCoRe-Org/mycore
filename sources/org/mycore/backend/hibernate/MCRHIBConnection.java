@@ -25,10 +25,14 @@
 package org.mycore.backend.hibernate;
 
 import org.mycore.common.*;
+import org.mycore.backend.hibernate.tables.MCRID;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+
+import java.util.List;
 
 /**
  * Class for hibernate connection to selected database 
@@ -143,6 +147,34 @@ public class MCRHIBConnection {
             return null;
         }
     }
+
+    public long getID() {
+	synchronized(singleton) {
+	    Session session = getSession();
+	    Transaction tx = session.beginTransaction();
+	   
+	    /* generate new id */
+	    MCRID id = new MCRID();
+	    session.save(id);
+	   
+	    /* free up previous ids in the ID table */
+	    List result = session.createCriteria(MCRID.class).list();
+	    int t;
+	    for(t=0;t<result.size();t++) {
+		MCRID lid = (MCRID)result.get(t);
+		if(lid.getId() > id.getId()) { //sanity check
+		    throw new IllegalStateException("bad \"native\" database ID generator");
+		} else if(lid.getId() < id.getId())
+		    session.delete(lid);
+	    }
+	    
+	    tx.commit();
+	    session.close();
+
+	    return id.getId();
+	}
+    }
+
     
     public void closeSession(){
         session.close();
