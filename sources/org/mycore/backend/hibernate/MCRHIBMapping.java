@@ -155,15 +155,13 @@ public class MCRHIBMapping {
 		    cfg.addXML(map.getTableXML());
 		    
 		    // Privilegeslookup
-		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_privs_lookup"), "org.mycore.backend.hibernate.tables.MCRPRIVSLOOKUP", "", 1);
-		    map.addIDColumn("id", "ID", dbInt, 0, "assigned");
-		    map.addColumn("gid", "GID", dbString, 20, false, false);
-		    map.addColumn("name", "NAME", dbString, 200, false, false);
+		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_privs_lookup"), "org.mycore.backend.hibernate.tables.MCRPRIVSLOOKUP", "", 2);
+		    map.addIDColumn("gid", "GID", dbString, 20, "assigned");
+		    map.addIDColumn("name", "NAME", dbString, 200, "assigned");
 		    cfg.addXML(map.getTableXML());
 		    
 		    // User
 		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_users"), "org.mycore.backend.hibernate.tables.MCRUSERS", "", 2);
-		    //map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_users"), "org.mycore.backend.hibernate.MCRUserExt", "", 2);
 		    map.addIDColumn("numid", "NUMID", dbInt, 0, "assigned");
 		    map.addIDColumn("uid", "UID", dbString, 20, "assigned");
 		    map.addColumn("creator", "CREATOR", dbString, 20, true, false);

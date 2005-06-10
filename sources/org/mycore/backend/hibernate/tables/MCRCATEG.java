@@ -25,6 +25,10 @@ public class MCRCATEG
     private MCRCATEGPK key;
     private String pid;
     private String url;
+    
+    public MCRCATEG(){
+        this.key = new MCRCATEGPK();
+    }
 
     public MCRCATEG(String id, String clid, String pid, String url)
     {
