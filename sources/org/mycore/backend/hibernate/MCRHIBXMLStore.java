@@ -223,14 +223,14 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRXMLTABLE where type = '"+type+"'").list();
+        List l = session.createQuery("from MCRXMLTABLE where MCRTYPE = '"+type+"'").list();
 	ArrayList a = new ArrayList(l.size());
 	Set s = new HashSet();
         int t;
 	for(t=0;t<l.size();t++) {
             MCRXMLTABLE tab = ((MCRXMLTABLE)l.get(t));
 	    if(!s.contains(tab.getId())) {
-		a.set(t, new MCRObjectID(tab.getId()));
+		a.add(t, tab.getId());
 		s.add(tab.getId());
 	    }
 	}
