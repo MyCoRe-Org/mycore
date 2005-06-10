@@ -21,64 +21,54 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class MCRCATEGPK implements Serializable {
-    public String id; 
-    public String clid;
+public class MCRPRIVSLOOKUPPK implements Serializable{
+
+    private String gid;
+    private String name;
     
-    public MCRCATEGPK(){
+    /**
+    * @hibernate.property
+    * column="GID"
+    * not-null="true"
+    * update="true"
+    */
+    public String getGid() {
+        return gid;
+    }
+    public void setGid(String gid) {
+        this.gid = gid;
     }
 
-    public MCRCATEGPK(String id, String clid)
-    {
-        this.id = id;
-        this.clid = id;
-    }
-
     /**
-     * @return Returns the cLID.
-     */
-    public String getClid() {
-        return clid;
+    * @hibernate.property
+    * column="NAME"
+    * not-null="true"
+    * update="true"
+    */
+    public String getName() {
+        return name;
     }
-    /**
-     * @param clid The cLID to set.
-     */
-    public void setClid(String clid) {
-        this.clid = clid;
+    public void setName(String name) {
+        this.name = name;
     }
-    /**
-     * @return Returns the iD.
-     */
-    public String getId() {
-        return id;        
-    }
-    /**
-     * @param id The iD to set.
-     */
-    
-    public void setId(String id) {
-         this.id =  id;
-     }
-   
     
     public boolean equals(Object other){
-        if (! (other instanceof MCRCATEGPK)) return false;
-        	MCRCATEGPK castother =  (MCRCATEGPK) other;
+        if (! (other instanceof MCRPRIVSLOOKUPPK)) return false;
+        MCRPRIVSLOOKUPPK castother =  (MCRPRIVSLOOKUPPK) other;
         	return new EqualsBuilder()
-        	.append(this.getClid(),castother.getClid())
-        	.append(this.getId(), castother.getId())
-        	.isEquals();
-        	
+        	.append(this.getGid(), castother.getGid())
+        	.append(this.getName(), castother.getName())
+        	.isEquals();	
     }
     
     public int hashCode(){
         return new HashCodeBuilder()
-        .append(getClid())
-        .append(getId())
+        .append(getGid())
+        .append(getName())
         .toHashCode();
     }
-    
 }
