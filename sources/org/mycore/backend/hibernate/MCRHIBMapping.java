@@ -141,7 +141,7 @@ public class MCRHIBMapping {
 		    map.addIDColumn("mcrfrom", "MCRFROM", dbString, 64, "assigned");
 		    map.addIDColumn("mcrto", "MCRTO", dbString, 194, "assigned");
 		    cfg.addXML(map.getTableXML());
-		    
+
 		    // Link Class
 		    map = new MCRTableGenerator(config.getString("MCR.linktable_store_sql_table_href"), "org.mycore.backend.hibernate.tables.MCRLINKHREF", "", 2);
 		    map.addIDColumn("mcrfrom", "MCRFROM", dbString, 64, "assigned");
@@ -191,14 +191,24 @@ public class MCRHIBMapping {
 		    map.addColumn("cellphone", "CELLPHONE", dbString, 32, false, false);
 		    map.addColumn("primgroup", "PRIMGROUP", dbString, 20, true, false);
 		    cfg.addXML(map.getTableXML());
-		    
-		    map = new MCRTableGenerator(config.getString("MCRID"), "org.mycore.backend.hibernate.tables.MCRID", "", 2);
-		    map.addIDColumn("id", "ID", dbInt, 0, "native");
-		    cfg.addXML(map.getTableXML());
-		    
+
+                    // ID Table
+		    map = new MCRTableGenerator("MCRID", "org.mycore.backend.hibernate.tables.MCRID", "", 1);
+                    map.addIDColumn("id", "ID", dbInt, 64, "native");
+                    cfg.addXML(map.getTableXML());
+
+		    // XML Table
+                    map = new MCRTableGenerator("MCRXMLTABLE", "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
+                    map.addIDColumn("id", "MCRID", dbString, 64, "assigned");
+                    map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned");
+                    map.addIDColumn("type", "MCRTYPE", dbString, 64, "assigned");
+                    map.addColumn("xml", "MCRXML", dbBlob, 0, false, false);
+                    cfg.addXML(map.getTableXML());
+
 		    cfg.createMappings();
 		}catch(Exception e){
-			System.out.println(e.toString());
+	            e.printStackTrace();
+                    throw new IllegalStateException("couldn't create hibernate mappings");
 		}
     }    
 }
