@@ -27,41 +27,48 @@ import java.io.OutputStream;
 
 public class MCRXMLTABLE
 {
-    private String id;
-    private int version;
-    private String type;
+    private MCRXMLTABLEPK key;
     private Blob xml;
 
     public MCRXMLTABLE()
     {
+        this.key = new MCRXMLTABLEPK();
     }
 
-    public MCRXMLTABLE(String id, int version, String type, Blob xml) 
+    public MCRXMLTABLE(String id, int version, String type, Blob xml)
     {
-	this.id = id;
-	this.version = version;
-	this.type = type;
+	this.key = new MCRXMLTABLEPK(id, version, type);
         this.xml = xml;
+    }
+    
+    public MCRXMLTABLEPK getKey() {
+        return key;
+    }
+    public void setKey(MCRXMLTABLEPK key) {
+        this.key = key;
     }
 
     public String getId() {
-        return id;
+        return this.key.getId();
     }
     public void setId(String id) {
-        this.id = id;
+        this.key.setId(id);
     }
+
     public int getVersion() {
-        return version;
+        return this.key.getVersion();
     }
     public void setVersion(int version) {
-        this.version = version;
+        this.key.setVersion(version);
     }
+
     public String getType() {
-        return type;
+        return this.key.getType();
     }
     public void setType(String type) {
-        this.type = type;
+        this.key.setType(type);
     }
+
     public byte[] getXmlByteArray() {
 	try {
 	    java.io.InputStream in = xml.getBinaryStream();
@@ -79,9 +86,12 @@ public class MCRXMLTABLE
 	}
     }
     public Blob getXml() {
-            return xml;
+        return xml;
     }
-    public void setXml(byte[] xml) {
+    public void setXml(Blob xml) {
+        this.xml = xml;
+    }
+    public void setXmlByteArray(byte[] xml) {
         this.xml = new XMLBlob(xml);
     }
 
