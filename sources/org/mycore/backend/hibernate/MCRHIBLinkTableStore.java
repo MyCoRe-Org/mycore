@@ -154,7 +154,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from "+classname+" where to = " + to).list();
+        List l = session.createQuery("from "+classname+" where to = '" + to + "'").list();
         tx.commit();
         session.close();
         return l.size();
