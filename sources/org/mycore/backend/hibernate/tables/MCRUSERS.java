@@ -49,6 +49,16 @@ public class MCRUSERS{
     private String email;
     private String cellphone;
     private String primgroup;
+    
+    public MCRUSERS(){
+        this.key = new MCRUSERSPK();
+    }
+    
+    public MCRUSERS(int numid, String uid){
+        this.key = new MCRUSERSPK();
+        key.setNumid(numid);
+        key.setUid(uid);
+    }
 
     /**
     * @hibernate.property

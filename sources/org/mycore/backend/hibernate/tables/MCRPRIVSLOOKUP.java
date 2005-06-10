@@ -22,36 +22,44 @@ package org.mycore.backend.hibernate.tables;
 
 public class MCRPRIVSLOOKUP{
     
-    private int id;
-    private String gid;
-    private String name;
+    private MCRPRIVSLOOKUPPK key;
+
+    public MCRPRIVSLOOKUP(){
+        this.key = new MCRPRIVSLOOKUPPK();
+    }
+    
+    public MCRPRIVSLOOKUP(String gid, String name)
+    {
+	this.key = new MCRPRIVSLOOKUPPK();
+        key.setGid(gid);
+        key.setName(name);
+    }
     
     /**
      * @hibernate.property
-     * column="ID"
+     * column="Primary Key"
      * not-null="true"
      * update="true"
      */
-     public int getId() {
-         return id;
-     }
-     public void setId(int id) {
-         this.id = id;
-     }
-
-     
+    public MCRPRIVSLOOKUPPK getKey() {
+        return key;
+    }
+    public void setKey(MCRPRIVSLOOKUPPK key) {
+        this.key = key;
+    }
+    
     /**
     * @hibernate.property
-    * column="GID"
+    * column="key"
     * not-null="true"
     * update="true"
     */
     public String getGid() {
-        return gid;
+        return key.getGid();
     }
     public void setGid(String gid) {
-        this.gid = gid;
-    }
+        key.setGid(gid);
+   }
 
     /**
     * @hibernate.property
@@ -60,9 +68,9 @@ public class MCRPRIVSLOOKUP{
     * update="true"
     */
     public String getName() {
-        return name;
+        return key.getName();
     }
     public void setName(String name) {
-        this.name = name;
+        key.setName(name);
     }
 }
