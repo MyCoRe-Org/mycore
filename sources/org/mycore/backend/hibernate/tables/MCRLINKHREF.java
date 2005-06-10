@@ -33,7 +33,7 @@ public class MCRLINKHREF{
     {
 	this.key = new MCRLINKHREFPK();
         key.setMcrfrom(from);
-        key.setMcrfrom(to);
+        key.setMcrto(to);
     }
     
 
