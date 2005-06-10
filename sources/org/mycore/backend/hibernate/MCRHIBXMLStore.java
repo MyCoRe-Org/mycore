@@ -29,8 +29,11 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import org.hibernate.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
+import org.mycore.backend.hibernate.tables.MCRXMLTABLEPK;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
@@ -42,6 +45,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
 {
     // logger
     static Logger logger=Logger.getLogger(MCRHIBXMLStore.class.getName());
+
+    private String type;
 
     /**
      * The constructor for the class MCRHIBXMLStore.
@@ -74,6 +79,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
 	   throw new MCRPersistenceException("The type "+type+" of the constructor"+
 	     " is false.");
 	}
+	this.type = type;
     }
 
     /**
@@ -97,10 +103,12 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
 	MCRXMLTABLE tab = new MCRXMLTABLE();
 	tab.setId(mcrid.getId());
 	tab.setVersion(version);
-	tab.setType(mcrid.getTypeId());
-	tab.setXml(xml);
+	tab.setType(this.type);
+	tab.setXmlByteArray(xml);
 
-	session.update(tab);
+        System.out.println("Inserting "+mcrid.getId()+"/"+version+"/"+this.type+" into database");
+
+	session.saveOrUpdate(tab);
 
 	tx.commit();
 	session.close();
@@ -117,7 +125,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("from MCRXMLTABLE where id='"+mcrid+"' and version='"+version+"'");
+        MCRXMLTABLE tab = new MCRXMLTABLE(mcrid.getId(), version, this.type, null);
+        session.delete(tab); //"from MCRXMLTABLE where id='"+mcrid+"' and version='"+version+"' and type='"+type+"'");
         tx.commit();
         session.close();
     }
@@ -148,7 +157,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRXMLTABLE where ID = '" + mcrid + "' AND VERSION = "+version).list();
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version, this.type);
+        List l = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key", pk)).list();
         tx.commit();
         session.close();
         if (l.size() > 0)
@@ -173,7 +183,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     public final int getNextFreeIdInt( String project, String type )
       throws MCRPersistenceException
     {
-        Session session = getSession();
+        /*Session session = getSession();
         Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRXMLTABLE where MCRID like '"+project+"_"+type+"%'").list();
 	String max = "";
@@ -185,7 +195,9 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
 	}
         tx.commit();
         session.close();
-        return new MCRObjectID(max).getNumberAsInteger() + 1;
+        return new MCRObjectID(max).getNumberAsInteger() + 1;*/
+
+	return (int)MCRHIBConnection.instance().getID();
     }
 
     /**
@@ -211,16 +223,30 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRXMLTABLE").list();
+        List l = session.createQuery("from MCRXMLTABLE where type = '"+type+"'").list();
 	ArrayList a = new ArrayList(l.size());
+	Set s = new HashSet();
         int t;
 	for(t=0;t<l.size();t++) {
             MCRXMLTABLE tab = ((MCRXMLTABLE)l.get(t));
-	    a.set(t, new MCRObjectID(tab.getId()));
+	    if(!s.contains(tab.getId())) {
+		a.set(t, new MCRObjectID(tab.getId()));
+		s.add(tab.getId());
+	    }
 	}
         tx.commit();
         session.close();
         return a;
+    }
+
+    public static void test()
+    {
+	MCRHIBXMLStore store = new MCRHIBXMLStore();
+	List l = store.retrieveAllIDs(null);
+	int t;
+	for(t=0;t<l.size();t++) {
+	    System.out.println(l.get(0).toString());
+	}
     }
 }
 
