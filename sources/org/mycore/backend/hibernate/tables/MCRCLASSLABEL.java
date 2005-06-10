@@ -28,6 +28,10 @@ public class MCRCLASSLABEL{
     
     private String id;
     private String lang;
+    
+    public MCRCLASSLABEL(){
+        
+    }
 
     public MCRCLASSLABEL(String text, String mcrdesc, String id, String lang)
     {

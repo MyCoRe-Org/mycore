@@ -23,6 +23,9 @@ package org.mycore.backend.hibernate.tables;
 public class MCRCLASS
 {
     private String id;
+    
+    public MCRCLASS(){
+    }
 
     public MCRCLASS(String id)
     {

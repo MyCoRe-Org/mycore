@@ -25,6 +25,10 @@ public class MCRCATEGLABEL
     private MCRCATEGLABELPK key;
     private String text;
     private String mcrdesc;
+    
+    public MCRCATEGLABEL(){
+        this.key = new MCRCATEGLABELPK();
+    }
 
     public MCRCATEGLABEL(String id, String clid, String lang, String text, String mcrdesc)
     {

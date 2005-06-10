@@ -30,6 +30,10 @@ public class MCRCATEGLABELPK implements Serializable{
     private String clid;
     private String lang;
 
+    public MCRCATEGLABELPK(){
+        
+    }
+    
     public MCRCATEGLABELPK(String id, String clid, String lang)
     {
         this.id = id;
