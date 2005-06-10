@@ -138,7 +138,7 @@
 										<!-- allowed -->
 										<xsl:when test=" position() = last() " >
 											<option value="2{@dir}">
-												<xsl:value-of select="@label" />
+												<xsl:value-of select="label[lang($DefaultLang)]" />
 											</option>
 										</xsl:when>
 										<!-- forbidden -->
@@ -154,7 +154,7 @@
 														</xsl:if>
 													</xsl:for-each>
 												</xsl:variable>
-												<xsl:value-of select="concat(@label,$labelPath)" />
+												<xsl:value-of select="concat(label[lang($DefaultLang)],$labelPath)" />
 											</option>
 										</xsl:otherwise>
 									</xsl:choose>

@@ -11,7 +11,7 @@
 					<xsl:for-each select="document($navigationBase)/navigation/*">
 						<xsl:variable name="dirPath" select="concat( parent::node()/@dir , @dir )"/>
 						<xsl:if test=" $dirPath = $href ">
-							<xsl:value-of select="@label"/>
+							<xsl:value-of select="label[lang($DefaultLang)]"/>
 						</xsl:if>
 					</xsl:for-each>
 				</xsl:when>
@@ -27,7 +27,7 @@
 							<xsl:for-each select="ancestor-or-self::*">
 								<xsl:choose>
 									<xsl:when test="position() = 2">
-										<xsl:value-of select="@label"/>
+										<xsl:value-of select="label[lang($DefaultLang)]"/>
 									</xsl:when>
 									<xsl:when test="position() > 2 and position() != last()">
 										<xsl:value-of select="concat(' > ',./label)"/>

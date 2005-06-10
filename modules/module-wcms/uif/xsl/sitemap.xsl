@@ -8,33 +8,7 @@
 	
 	<!-- ================================================================================= -->
 	<xsl:template match="sitemap">
-		<xsl:param name="template" />
-		<!-- temp. take care of template='template_docportal to provide old layout -->
-		<xsl:choose>
-			<xsl:when test="$template='template_docportal'">
-				<div id="help" >
-					<div class="resultcmd" style="padding-left:20px;">
-						<table style="width:100%;" cellpadding="0" cellspacing="0">
-							<tr style="height:20px;">
-								<td class="resultcmd">
-									<xsl:value-of select="$MainTitle"/>
-								</td>
-								<td class="resultcmd" style="text-align:right;padding-right:5px;vertical-align:bottom;">
-									<xsl:value-of select="$PageTitle"/>
-								</td>
-							</tr>
-						</table>
-					</div>
-					<div style="padding:20px;">
-						<xsl:call-template name="sitemap.index" />
-					</div>
-				</div>
-			</xsl:when>
-			<!-- end of: temp. take care of template='template_docportal to provide old layout -->
-			<xsl:otherwise>
-				<xsl:call-template name="sitemap.index" />
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:call-template name="sitemap.index" />
 	</xsl:template>
 	
 	<!-- ================================================================================= -->
@@ -71,7 +45,7 @@
 			<!-- menu on top -->
 			<xsl:call-template name="createSitemap">
 				<xsl:with-param name="myRootNode" 
-					select="$loaded_navigation_xml/navigation/navi-below" />
+					select="$loaded_navigation_xml/navi-below" />
 				<xsl:with-param name="typeOfMenu" select="'horizontal'" />
 			</xsl:call-template>
 			<!-- END OF: menu on top -->
@@ -97,7 +71,7 @@
 		<tr>
 			<td></td>
 			<th colspan="3">
-				<xsl:value-of select="$myRootNode/@label" />
+				<xsl:value-of select="$myRootNode/label[lang($CurrentLang)]" />
 			</th>
 			<td></td>
 		</tr>
