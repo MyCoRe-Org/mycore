@@ -87,7 +87,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	} else throw new MCRPersistenceException("The type of the constructor doesn't match 'class' or 'href'.");
 
 	mtype = type;
-
     }
 
     /**
@@ -113,18 +112,18 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 	   throw new MCRPersistenceException("The to value is null or empty.");
 	}
 
-	if(mtype.equals("href")) {
+	if(mtype.equals("class")) {
 	    MCRLINKCLASS l = new MCRLINKCLASS(from, to);
 	    Session session = getSession();
 	    Transaction tx = session.beginTransaction();
-	    session.update(l);
+	    session.saveOrUpdate(l);
 	    tx.commit();
 	    session.close();
 	} else {
 	    MCRLINKHREF l = new MCRLINKHREF(from, to);
 	    Session session = getSession();
 	    Transaction tx = session.beginTransaction();
-	    session.update(l);
+	    session.saveOrUpdate(l);
 	    tx.commit();
 	    session.close();
 	}
@@ -139,7 +138,12 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        session.delete("from "+classname+" where from='"+from+"'");
+        List l = session.createQuery("from "+classname+" where MCRFROM = '" + from + "'").list();
+        int t;
+        for(t=0;t<l.size();t++) {
+            session.delete(l.get(t));
+        }
+        //session.delete("from "+classname+" where from='"+from+"'");
         tx.commit();
         session.close();
     }
@@ -154,7 +158,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from "+classname+" where to = '" + to + "'").list();
+        List l = session.createQuery("from "+classname+" where MCRTO = '" + to + "'").list();
         tx.commit();
         session.close();
         return l.size();
