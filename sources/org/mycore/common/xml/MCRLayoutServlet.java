@@ -345,11 +345,12 @@ public class MCRLayoutServlet extends MCRServlet {
             referer = "";
 
         // handle HttpSession
+        String jSessionID=CONFIG.getString("MCR.session.param", ";jsessionid=");
         if (session != null && !request.isRequestedSessionIdFromCookie()) {
-            parameters.put("HttpSession", ";jsessionid=" + session.getId());
+            parameters.put("HttpSession", jSessionID + session.getId());
         }
         if (session != null) {
-            parameters.put("JSessionID", ";jsessionid=" + session.getId());
+            parameters.put("JSessionID", jSessionID + session.getId());
             MCRSession mcrSession = (MCRSession) (session
                     .getAttribute("mycore.session"));
             if (mcrSession != null) {
