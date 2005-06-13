@@ -22,24 +22,31 @@ package org.mycore.backend.hibernate.tables;
 
 public class MCRGROUPADMINS
 {
-    private int id;
-    private String gid;
-    private String userid;
-    private String groupid;
+
+    private MCRGROUPADMINSPK key;
+    
+    public MCRGROUPADMINS(){
+        this.key = new MCRGROUPADMINSPK();
+    }
+
+    public MCRGROUPADMINS(String gid, String userid, String groupid)
+    {
+        this.key = new MCRGROUPADMINSPK(gid, userid, groupid);
+    }
 
     /**
      * @hibernate.property
-     * column="ID"
+     * column="Primary Key"
      * not-null="true"
      * update="true"
      */
-     public int getId() {
-         return id;
+     public MCRGROUPADMINSPK getKey() {
+         return key;
      }
-     public void setId(int id) {
-         this.id = id;
+     public void setKey(MCRGROUPADMINSPK key) {
+         this.key = key;
      }
-    
+     
     /**
     * @hibernate.property
     * column="GID"
@@ -47,10 +54,10 @@ public class MCRGROUPADMINS
     * update="true"
     */
     public String getGid() {
-        return gid;
+        return key.getGid();
     }
     public void setGid(String gid) {
-        this.gid = gid;
+        key.setGid(gid);
     }
 
     /**
@@ -60,10 +67,10 @@ public class MCRGROUPADMINS
     * update="true"
     */
     public String getUserid() {
-        return userid;
+        return key.getUserid();
     }
     public void setUserid(String userid) {
-        this.userid = userid;
+        key.setUserid(userid);
     }
 
     /**
@@ -73,9 +80,9 @@ public class MCRGROUPADMINS
     * update="true"
     */
     public String getGroupid() {
-        return groupid;
+        return key.getGroupid();
     }
     public void setGroupid(String groupid) {
-        this.groupid = groupid;
+        key.setGroupid(groupid);
     }
 }

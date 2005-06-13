@@ -21,7 +21,6 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 public class MCRGROUPS
 {
