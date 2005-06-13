@@ -32,7 +32,11 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -42,7 +46,7 @@ import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet read a digital object from the workflow and put it to the web.<br />
- * Call this servlet with <b>.../servlets/MCRFileViewWorkflowServlet/type=...&amp;file=...</b>
+ * Call this servlet with <b>.../servlets/MCRFileViewWorkflowServlet/<em>path_to_file</em>?type=...</b>
  *
  * @author  Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -58,9 +62,32 @@ private static Logger LOGGER=Logger.getLogger(MCRFileViewWorkflowServlet.class.g
  */
 public void doGetPost(MCRServletJob job) throws Exception
   {
+  HttpServletRequest req = job.getRequest();
+  HttpServletResponse res = job.getResponse();
+
+  // check the request path
+  String requestPath = req.getPathInfo();
+  LOGGER.info("MCRFileViewWorkflowServlet: request path = " + requestPath);
+
+  if (requestPath == null) {
+    String msg = "Error: HTTP request path is null";
+    LOGGER.error(msg);
+    generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+      msg, new MCRException("No path was given in the request"),false);
+    return;
+    }
+
+  if (requestPath.length() <= 1) {
+    String msg = "Error: HTTP request path is empty";
+    LOGGER.error(msg);
+    generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,msg,
+      new MCRException("Empty path was given in the request"),false);
+    return;
+    }
+
+  String file = requestPath.substring(1,requestPath.length());
+
   // get the type
-  String file = getProperty(job.getRequest(),"file").trim();
-  LOGGER.debug( "MCRFileViewWorkflowServlet : file = " + file );
   String type = getProperty(job.getRequest(),"type").trim();
   LOGGER.debug( "MCRFileViewWorkflowServlet : type = " + type );
   

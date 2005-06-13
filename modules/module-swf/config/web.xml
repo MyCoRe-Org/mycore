@@ -74,7 +74,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRFileListWorkflowServlet</servlet-name>
-    <url-pattern>/servlets/MCRFileListWorkflowServlet</url-pattern>
+    <url-pattern>/servlets/MCRFileListWorkflowServlet/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
