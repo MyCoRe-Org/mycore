@@ -89,7 +89,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	    FCTID     = file.getContentTypeID();
 	    MD5       = file.getMD5();
 	}
-	else
+	else if(node instanceof MCRDirectory)
 	{
 	    MCRDirectory dir = (MCRDirectory)node;
 	    
@@ -99,7 +99,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	    NUMCHTD = dir.getNumChildren( MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL );
 	    NUMCHTF = dir.getNumChildren( MCRDirectory.FILES,       MCRDirectory.TOTAL );
 	}
-      
+        else throw new MCRPersistenceException("MCRFilesystemNode must be either MCRFile or MCRDirectory");
+
 	Session session = getSession();
 	Transaction tx = session.beginTransaction();
 
@@ -121,7 +122,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	fs.setNumchtd(NUMCHTD);
 	fs.setNumchtf(NUMCHTF);
 
-	session.update(fs);
+	session.saveOrUpdate(fs);
 
 	tx.commit();
 	session.close();
@@ -146,10 +147,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("from MCRFSNODES where PARENT = '" + parentID  + "' and NAME = '"+name+"'").list();
+        List l = session.createQuery("from MCRFSNODES where PID = '" + parentID  + "' and NAME = '"+name+"'").list();
         if (l.size() < 1) {
-            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = "
-                    + parentID;
+            String msg = "MCRHIBFileMetadataStore.retrieveChild(): There is no node with ID = " + parentID;
             throw new MCRException(msg);
         }
         tx.commit();
@@ -163,7 +163,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("from MCRFSNODES where PARENT = '" + parentID + "'").list();
+        List l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + parentID;
             throw new MCRException(msg);
@@ -174,7 +174,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
 	int t;
 	Vector v = new Vector(l.size());
 	for(t=0;t<l.size();t++) {
-	    v.set(t, ((MCRFSNODES)l.get(0)).getId());
+	    v.add(t, ((MCRFSNODES)l.get(0)).getId());
 	}
 	return v;
     }
@@ -184,7 +184,12 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-	session.delete("from MCRFSNODES where ID='"+ID+"'");
+        List l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
+        int t;
+        for(t=0;t<l.size();t++) {
+            MCRFSNODES node = (MCRFSNODES)l.get(t);
+	    session.delete(node);
+        }
         tx.commit();
         session.close();
        
@@ -195,7 +200,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         Session session = getSession();
         Transaction tx = session.beginTransaction();
        
-        List l = session.createQuery("from MCRFSNODES where MCRID = '" + ID + "'").list();
+        List l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
         if (l.size() < 1) {
             String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = " + ID;
             throw new MCRException(msg);
