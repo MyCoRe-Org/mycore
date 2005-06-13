@@ -30,6 +30,7 @@ import org.hibernate.type.BlobType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
+import org.hibernate.type.LongType;
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -46,6 +47,7 @@ public class MCRHIBMapping {
     private BigIntegerType dbBigInt = new BigIntegerType();
     private BlobType dbBlob = new BlobType();
     private TimestampType dbTimestamp = new TimestampType();
+    private LongType dbLong = new LongType();
     
     MCRConfiguration config = MCRConfiguration.instance();
     
@@ -112,19 +114,17 @@ public class MCRHIBMapping {
 		    cfg.addXML(map.getTableXML());
 		    
 		    // Group Admins
-		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_admins"), "org.mycore.backend.hibernate.tables.MCRGROUPADMINS", "", 1);
-		    map.addIDColumn("id", "ID", dbInt, 0, "assigned");
-		    map.addColumn("gid", "GID", dbString, 20, true, false);
-		    map.addColumn("userid", "USERID", dbString, 20, true, false);
-		    map.addColumn("groupid", "GROUPID", dbString, 20, true, false);
+		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_admins"), "org.mycore.backend.hibernate.tables.MCRGROUPADMINS", "", 3);
+		    map.addIDColumn("gid", "GID", dbString, 20, "native");
+		    map.addIDColumn("userid", "USERID", dbString, 20, "native");
+		    map.addIDColumn("groupid", "GROUPID", dbString, 20, "native");
 		    cfg.addXML(map.getTableXML());
 		   
 		    // Group Members
-		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_members"), "org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS", "", 1);
-		    map.addIDColumn("id", "ID", dbInt, 0, "assigned");
-		    map.addColumn("gid", "GID", dbString, 20, true, false);
-		    map.addColumn("userid", "USERID", dbString, 20, true, false);
-		    map.addColumn("groupid", "GROUPID", dbString, 20, true, false);
+		    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_members"), "org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS", "", 3);
+		    map.addIDColumn("gid", "GID", dbString, 20, "native");
+		    map.addIDColumn("userid", "USERID", dbString, 20, "native");
+		    map.addIDColumn("groupid", "GROUPID", dbString, 20, "native");
 		    cfg.addXML(map.getTableXML());
 		    
 		    // Group
@@ -190,18 +190,18 @@ public class MCRHIBMapping {
 		    map.addColumn("primgroup", "PRIMGROUP", dbString, 20, true, false);
 		    cfg.addXML(map.getTableXML());
 
-                    // ID Table
+            // ID Table
 		    map = new MCRTableGenerator("MCRID", "org.mycore.backend.hibernate.tables.MCRID", "", 1);
-                    map.addIDColumn("id", "ID", dbInt, 64, "native");
-                    cfg.addXML(map.getTableXML());
+            map.addIDColumn("id", "ID", dbLong, 64, "native");
+            cfg.addXML(map.getTableXML());
 
 		    // XML Table
-                    map = new MCRTableGenerator("MCRXMLTABLE", "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
-                    map.addIDColumn("id", "MCRID", dbString, 64, "assigned");
-                    map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned");
-                    map.addIDColumn("type", "MCRTYPE", dbString, 64, "assigned");
-                    map.addColumn("xml", "MCRXML", dbBlob, 0, false, false);
-                    cfg.addXML(map.getTableXML());
+            map = new MCRTableGenerator("MCRXMLTABLE", "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
+            map.addIDColumn("id", "MCRID", dbString, 64, "assigned");
+            map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned");
+            map.addIDColumn("type", "MCRTYPE", dbString, 64, "assigned");
+            map.addColumn("xml", "MCRXML", dbBlob, 0, false, false);
+            cfg.addXML(map.getTableXML());
 
 		    cfg.createMappings();
 		}catch(Exception e){
