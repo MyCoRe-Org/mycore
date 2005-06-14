@@ -34,7 +34,7 @@ public class MCRCATEGPK implements Serializable {
     public MCRCATEGPK(String id, String clid)
     {
         this.id = id;
-        this.clid = id;
+        this.clid = clid;
     }
 
     /**
