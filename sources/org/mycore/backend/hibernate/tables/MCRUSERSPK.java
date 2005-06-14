@@ -28,6 +28,15 @@ public class MCRUSERSPK implements Serializable{
     
     private int numid;
     private String uid;
+    
+    public MCRUSERSPK(){
+        
+    }
+    
+    public MCRUSERSPK(int numid, String uid){
+        this.numid = numid;
+        this.uid = uid;
+    }
 
     /**
      * @return Returns the numid.

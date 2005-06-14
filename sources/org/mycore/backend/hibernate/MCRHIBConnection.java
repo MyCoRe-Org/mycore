@@ -87,6 +87,7 @@ public class MCRHIBConnection {
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
         try{
+            String fn = System.getProperty("MCR.configuration.file", "mycore.properties");          
             buildConfiguration();
             genTable.generateTables(cfg);
             buildSessionFactory();

@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.apache.log4j.Logger;
 import org.hibernate.type.*;
 
 /**
@@ -45,12 +46,11 @@ public class MCRTableGenerator {
      * Object declaration
      */
     private Element rootOut = new Element("hibernate-mapping");
-   /* private DocType dType= new DocType("hibernate-mapping",
-    		"-//Hibernate/Hibernate Mapping DTD//EN", 
-			"http://hibernate.sourceforge.net/hibernate-mapping.dtd");*/
     private DocType dType= new DocType("hibernate-mapping",
     		"-//Hibernate/Hibernate Mapping DTD//EN", 
-			"file:///home/seifert/Dokumente/java/jDomParse/hibernate-mapping.dtd");
+			"lib/hibernate-mapping.dtd");
+    
+    private static Logger logger = Logger.getLogger("org.mycore.backend.hibernate");
 
     private Document docOut = new Document(rootOut, dType);
     private Element elclass = new Element("class");
@@ -70,8 +70,6 @@ public class MCRTableGenerator {
             net.sf.ehcache.CacheManager.create(new ByteArrayInputStream(
             	    "<?xml version=\"1.0\"?><ehcache><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>"
             	    .getBytes()));
-
-            
             this.intPKColumns = intPKColumns;
             this.classname = sqlName;
             elclass.setAttribute("name", sqlName);
@@ -206,15 +204,12 @@ public class MCRTableGenerator {
            Format format = Format.getPrettyFormat();             
            XMLOutputter outputter = new XMLOutputter(format);
            FileOutputStream output;
-           output = new FileOutputStream("./file.xml");
-           outputter.output(docOut , output); 
            ret = outputter.outputString(docOut).toString();
-           System.out.println(ret);
+           logger.debug(ret);
        }
        catch (Exception e) {
-         System.err.println(e);
+         e.printStackTrace();
        }      
-       //System.out.println(docOut.toString());
        return ret;
    }
     

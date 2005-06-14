@@ -55,9 +55,7 @@ public class MCRUSERS{
     }
     
     public MCRUSERS(int numid, String uid){
-        this.key = new MCRUSERSPK();
-        key.setNumid(numid);
-        key.setUid(uid);
+        this.key = new MCRUSERSPK(numid, uid);
     }
 
     /**

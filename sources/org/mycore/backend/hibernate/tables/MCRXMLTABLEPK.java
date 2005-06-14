@@ -22,7 +22,6 @@ package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MCRXMLTABLEPK implements Serializable{

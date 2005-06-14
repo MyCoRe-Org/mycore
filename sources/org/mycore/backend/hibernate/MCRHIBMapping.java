@@ -25,7 +25,6 @@
 package org.mycore.backend.hibernate;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.type.BigIntegerType;
 import org.hibernate.type.BlobType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;

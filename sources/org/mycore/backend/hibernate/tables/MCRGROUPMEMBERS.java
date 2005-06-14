@@ -89,9 +89,9 @@ public class MCRGROUPMEMBERS
     * update="true"
     */
     public String getGroupid() {
-        return this.groupid;
+        return key.getGroupid();
     }
     public void setGroupid(String groupid) {
-        this.groupid = groupid;
+        key.setGroupid(groupid);
     }
 }
