@@ -32,6 +32,8 @@ import org.hibernate.type.TimestampType;
 import org.hibernate.type.LongType;
 import org.mycore.common.MCRConfiguration;
 
+import java.util.Date;
+
 /**
  * Creater class for mapping files
  * This class generates the xml mapping for the hibernate configuration and
@@ -46,7 +48,7 @@ public class MCRHIBMapping {
     private LongType dbLong = new LongType();
     private BlobType dbBlob = new BlobType();
     private TimestampType dbTimestamp = new TimestampType();
-    
+
     MCRConfiguration config = MCRConfiguration.instance();
 
     public void generateTables(Configuration cfg)
@@ -159,6 +161,16 @@ public class MCRHIBMapping {
 	    map.addIDColumn("name", "NAME", dbString, 200, "assigned");
 	    cfg.addXML(map.getTableXML());
 
+            // NBN Manager
+            map = new MCRTableGenerator(config.getString("MCR.NBN.PersistenceStore.TableName"), "org.mycore.backend.hibernate.tables.MCRNBNS", "", 1);
+            map.addIDColumn("niss", "NISS", dbString, 32, "assigned");
+            map.addColumn("url", "URL", dbString, 250, false, false);
+            map.addColumn("author", "AUTHOR", dbString, 80, true, false);
+            map.addColumn("comment", "COMMENT", dbBlob, 1024, false, false);
+            map.addColumn("date", "DATE", dbTimestamp, 32, true, false);
+            map.addColumn("documentid", "DOCUMENTID", dbString, 64, false, false);
+            cfg.addXML(map.getTableXML());
+
 	    // User
 	    map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_users"), "org.mycore.backend.hibernate.tables.MCRUSERS", "", 2);
 	    map.addIDColumn("numid", "NUMID", dbInt, 0, "assigned");
@@ -203,7 +215,7 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
 	    cfg.createMappings();
-		
+
 	}catch(Exception e){
 	    e.printStackTrace();
             throw new IllegalStateException("couldn't create hibernate mappings");
