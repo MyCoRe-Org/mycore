@@ -70,20 +70,7 @@ public class MCRXMLTABLE
     }
 
     public byte[] getXmlByteArray() {
-	try {
-	    java.io.InputStream in = xml.getBinaryStream();
-	    byte[] b = new byte[in.available()];
-	    int t;
-	    for(t=0;t<b.length;t++)
-		b[t] = (byte)in.read();
-	    return b;
-	} catch(java.sql.SQLException e) {
-	    e.printStackTrace();
-	    return null;
-	} catch(java.io.IOException e) {
-	    e.printStackTrace();
-	    return null;
-	}
+        return MCRBlob.getBytes(this.xml);
     }
     public Blob getXml() {
         return xml;
@@ -92,66 +79,6 @@ public class MCRXMLTABLE
         this.xml = xml;
     }
     public void setXmlByteArray(byte[] xml) {
-        this.xml = new XMLBlob(xml);
-    }
-
-    public class XMLBlob implements java.sql.Blob
-    {
-	byte[] xml;
-	XMLBlob(byte[] xml) {
-	    this.xml = xml;
-	}
-	public InputStream getBinaryStream() {
-	    return new java.io.ByteArrayInputStream(this.xml);
-	}
-
-        public OutputStream setBinaryStream(long l) {
-            throw new IllegalArgumentException("not implemented");
-        }
-        public int setBytes(long l, byte[] a, int u, int v) {
-            throw new IllegalArgumentException("not implemented");
-        }
-        public int setBytes(long l, byte[] a) {
-            throw new IllegalArgumentException("not implemented");
-        }
-        public void truncate(long l) {
-            throw new IllegalArgumentException("not implemented");
-        }
-
-
-	public byte[] getBytes(long pos, int length) {
-	    if(pos + length > xml.length)
-		length = (int)(xml.length - pos);
-	    byte[] result = new byte[length];
-	    System.arraycopy(xml, (int)pos, result, 0, length);
-	    return result;
-	}
-	public long length()
-	{
-	    return this.xml.length;
-	}
-        //Determines the byte position at which the specified byte pattern begins within the BLOB value that this Blob object represents. 
-	public long position(byte[] pattern, long start)
-	{
-	    int t;
-searchloop: for(t=(int)start;t<xml.length;t++) {
-		int s;
-		int len = xml.length - t;
-		if(pattern.length > xml.length - t)
-		    break searchloop;
-		for(s=0;s<len;s++) {
-		    if(pattern[s] != xml[t]) 
-			continue searchloop;
-		}
-		return t;
-	    }
-            return -1;
-	}
-        //Determines the byte position in the BLOB value designated by this Blob object at which pattern begins.
-	public long position(Blob pattern, long start) throws SQLException
-	{
-	    byte[] b = pattern.getBytes(0, (int)pattern.length());
-	    return position(b, start);
-	}
+        this.xml = new MCRBlob(xml);
     }
 }
