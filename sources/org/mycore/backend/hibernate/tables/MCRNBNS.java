@@ -21,22 +21,27 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.util.Date;
+import java.sql.Blob;
 
 public class MCRNBNS
 {
     private String niss;
     private String url;
     private String author;
-    private byte[] comment;
+    private Blob comment;
     private Date date;
     private String documentid;
 
+    public MCRNBNS()
+    {
+
+    }
     public MCRNBNS(String niss, String url, String author, String comment, Date date, String documentid)
     {
         this.niss = niss;
         this.url = url;
         this.author = author;
-        this.comment = comment.getBytes();
+        this.comment = new MCRBlob(comment.getBytes());
         this.date = date;
         this.documentid = documentid;
     }
@@ -61,13 +66,19 @@ public class MCRNBNS
         this.author = author;
     }
 
-    public byte[] getComment() {
+    public Blob getComment() {
         return comment;
     }
-    public void setComment(byte[] comment) {
+    public void setComment(Blob comment) {
         this.comment = comment;
     }
-    
+    public byte[] getCommentBytes() {
+        return MCRBlob.getBytes(this.comment);
+    }
+    public String getCommentString() {
+        return new String(getCommentBytes());
+    }
+
     public Date getDate() {
         return date;
     }
