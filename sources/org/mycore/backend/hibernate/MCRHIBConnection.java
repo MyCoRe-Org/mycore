@@ -109,7 +109,7 @@ public class MCRHIBConnection {
 		.setProperty("hibernate.connection.username", userID)
 		.setProperty("hibernate.connection.password", password)
 		.setProperty("hibernate.connection.pool_size", ""+maxUsages)
-		.setProperty("hibernate.hbm2ddl.auto","update")
+		/*.setProperty("hibernate.hbm2ddl.auto","update")*/
 		.setProperty("hibernate.show_sql", "false");
     }
     
