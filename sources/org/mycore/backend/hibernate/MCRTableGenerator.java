@@ -93,19 +93,30 @@ public class MCRTableGenerator {
      * @param Unique identifier for unique columns
      * @return boolean as indicator for errors
      */
-    public boolean addColumn(String Name, String Column, Type Type, int Length, boolean NotNull, boolean Unique){
+    public boolean addColumn(String Name, String Column, Type Type, int Length, boolean NotNull, boolean Unique, boolean Index){
     	Element prop = new Element("property");
+    	Element elColumn = new Element("column");
     	try{
             prop.setAttribute("name", Name);
-            prop.setAttribute("column", Column);
             prop.setAttribute("type", Type.getName());
-            if (Length>0){
-                prop.setAttribute("length", ""+Length);
+            if (Index){
+                elColumn.setAttribute("index",getTableName() + "_INDEX");
+                elColumn.setAttribute("name",Name);
+                if (Length>0){
+                    elColumn.setAttribute("length", ""+Length);
+                }
+                elColumn.setAttribute("not-null",Boolean.toString(NotNull));
+                elColumn.setAttribute("unique", Boolean.toString(Unique));
+                prop.addContent(elColumn); 
+            }else{
+                prop.setAttribute("column", Column);
+                if (Length>0){
+                    prop.setAttribute("length", ""+Length);
+                }
+                prop.setAttribute("not-null",Boolean.toString(NotNull));
+                prop.setAttribute("unique", Boolean.toString(Unique));
             }
-            prop.setAttribute("not-null",Boolean.toString(NotNull));
-            prop.setAttribute("unique", Boolean.toString(Unique));
             elclass.addContent(prop);
-            prop = null;
             return true;
     	}catch(Exception e){
     		System.out.println(e.toString());
@@ -122,9 +133,10 @@ public class MCRTableGenerator {
      * @param Generator attribute for the table id
      * @return boolean as indicator for errors
      */
-    public boolean addIDColumn(String Name, String Column, Type Type, int Length,  String Generator){
+    public boolean addIDColumn(String Name, String Column, Type Type, int Length,  String Generator, boolean Index){
         Element elid = new Element("id");
         Element elgenerator = new Element("generator");
+        Element elColumn = new Element("column");
         try{
             if (this.intPKColumns > 1){
                 //more then one PK column
@@ -142,23 +154,33 @@ public class MCRTableGenerator {
                     elComposite = elclass.getChild("composite-id");
                 }
                 elKeyProp.setAttribute("name",Name);
-                elKeyProp.setAttribute("column", Column);
                 elKeyProp.setAttribute("type", Type.getName());
-                if (Length > 0){
-                    elKeyProp.setAttribute("length", ""+Length);
+                if (Index){
+                    elColumn.setAttribute("name",Name);
+                    elColumn.setAttribute("index", getTableName() + "_INDEX");
+                    if (Length > 0){
+                        elColumn.setAttribute("length", ""+Length);
+                    }
+                    elKeyProp.addContent(elColumn);
+                }else{
+                    elKeyProp.setAttribute("column", Column);
+                    if (Length > 0){
+                        elKeyProp.setAttribute("length", ""+Length);
+                    }
                 }
                 elComposite.addContent(elKeyProp);
                 
             }else{
-               // only one PK column
+                // only one PK column
                 elid.setAttribute("column", Column);
                 elid.setAttribute("name", Name);
                 elid.setAttribute("type", Type.getName());
+                if (Length > 0){
+                    elColumn.setAttribute("length", ""+Length);
+                }
                 elgenerator.setAttribute("class",Generator);
                 elid.addContent(elgenerator);
                 elclass.addContent(elid);
-                elid = null;
-                elgenerator = null;
             }
             return true;
         }catch(Exception e){

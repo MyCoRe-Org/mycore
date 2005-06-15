@@ -109,6 +109,7 @@ public class MCRHIBConnection {
 		.setProperty("hibernate.connection.username", userID)
 		.setProperty("hibernate.connection.password", password)
 		.setProperty("hibernate.connection.pool_size", ""+maxUsages)
+		.setProperty("hibernate.hbm2ddl.auto","update")
 		.setProperty("hibernate.show_sql", "false");
     }
     
@@ -128,6 +129,10 @@ public class MCRHIBConnection {
      */
     public Session getSession(){
         return sessions.openSession();
+    }
+    
+    public Configuration getConfiguration(){
+        return cfg;
     }
 
     public long getID() {

@@ -1001,5 +1001,9 @@ public class MCRHIBUserStore implements MCRUserStore {
         throw new IllegalStateException(
                 "Hibernate backend doesn't support direct SQL queries");
     }
+    
+    public void createUserTables(){
+        System.out.println("Create all user tables for hibernate User Store");
+    }
 
 }
