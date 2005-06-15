@@ -11,6 +11,9 @@ Version 1.1
   Add a simple help mechanism.
 - MCRClassification methods where redesigned. This change require an update
   of all classifications to put them in an additional database table.
+- Bugfix: (#1211852) WebSphere is able to track the session now
+- MCRURIResolver now handles the 'query:' protocol to save http request to the
+  MCRQueryServlet
 
 Version 1.0
 ===========
