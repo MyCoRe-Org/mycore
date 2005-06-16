@@ -38,26 +38,26 @@ import org.mycore.common.MCRException;
  * Creator class for hibernte mapping file
  * This class generates a jDOM mapping file for hibernate
  * to map a sql-table with a java class
- * 
+ *
  * @author Arne Seifert
  */
 public class MCRTableGenerator {
-    
+
     /**
      * Object declaration
      */
     private Element rootOut;
 
     private DocType dType;
-    
+
     private static Logger logger = Logger.getLogger("org.mycore.backend.hibernate");
 
     private Document docOut;
     private Element elclass;
     private int intPKColumns =1;
     private int intIdSet = 0;
-    private String classname = ""; 
-    
+    private String classname = "";
+
     /**
      * Constructor for table
      * @param tableName name of the table/class
@@ -102,7 +102,6 @@ public class MCRTableGenerator {
                 output.close();
                 input.close();
                 doctype_url = ""+docFile;
-                System.out.println("--------------------> "+ doctype_url);
             } catch(IOException e) {
                 throw new MCRException("couldn't create temporary hibernate docType file", e);
             }
@@ -112,11 +111,11 @@ public class MCRTableGenerator {
 
     /**
      * This method adds a new column in the mapping table
-     * 
+     *
      * @param Name name of the class-attribute
      * @param Column name of the table-column
      * @param Type datatype of sql-column
-     * @param Notnull NotNull-value of column
+     * @param NotNull NotNull-value of column
      * @param Unique identifier for unique columns
      * @return boolean as indicator for errors
      */
@@ -134,7 +133,7 @@ public class MCRTableGenerator {
                 }
                 elColumn.setAttribute("not-null",Boolean.toString(NotNull));
                 elColumn.setAttribute("unique", Boolean.toString(Unique));
-                prop.addContent(elColumn); 
+                prop.addContent(elColumn);
             }else{
                 prop.setAttribute("column", Column);
                 if (Length>0){
@@ -150,10 +149,10 @@ public class MCRTableGenerator {
     		return false;
     	}
     }
-    
+
     /**
      * This method adds a new ID column in the mapping table
-     * 
+     *
      * @param Name name of the class-attribute
      * @param Column name of the table-column
      * @param Type datatype of sql-column
@@ -168,7 +167,7 @@ public class MCRTableGenerator {
             if (this.intPKColumns > 1){
                 //more then one PK column
                 Element elComposite;
-                Element elKeyProp = new Element("property"); 
+                Element elKeyProp = new Element("property");
                 if (intIdSet == 0){
                     // 1st id column
                     elComposite = new Element("composite-id");
@@ -196,7 +195,7 @@ public class MCRTableGenerator {
                     }
                 }
                 elComposite.addContent(elKeyProp);
-                
+
             }else{
                 // only one PK column
                 elid.setAttribute("column", Column);
@@ -214,9 +213,9 @@ public class MCRTableGenerator {
             System.out.println(e.toString());
             return false;
         }
-    	
+
     }
-    
+
     /**
      * This method returns the name of the table
      * @return tablename as string
@@ -229,7 +228,7 @@ public class MCRTableGenerator {
     		return "";
     	}
     }
-    
+
     /**
      * This methos returns the java class table name
      * @return classname for table as string
@@ -242,23 +241,22 @@ public class MCRTableGenerator {
     		return "";
     	}
     }
-   
+
    /**
     * This method converts the mapping jdom to a string
     * @return complete mapping defifnition as xml-string
-    */   
+    */
    public String getTableXML(){
    		String ret="";
        try {
-           Format format = Format.getPrettyFormat();             
+           Format format = Format.getPrettyFormat();
            XMLOutputter outputter = new XMLOutputter(format);
-           FileOutputStream output;
            ret = outputter.outputString(docOut).toString();
            logger.debug(ret);
        }
        catch (Exception e) {
          e.printStackTrace();
-       }      
+       }
        return ret;
    }
 }
