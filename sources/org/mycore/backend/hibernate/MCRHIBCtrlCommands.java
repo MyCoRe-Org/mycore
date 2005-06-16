@@ -64,16 +64,8 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
      */
     public static void createTables() {
         try { 
-           // Table tbml = new Table();
-           // Index ind = new Index();
-
-            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
-
-           // ind = tbml.getOrCreateIndex("MCRCATEG_INDEX");
-           // System.out.println("Index: "+ind.getName());
-            
-            
-            
+            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);       
+                 
             LOGGER.info("tables created.");
         } catch (MCRPersistenceException e) {
             throw new MCRException("error while creating tables.", e);
