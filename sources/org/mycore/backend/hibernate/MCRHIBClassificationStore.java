@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import org.hibernate.*;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
@@ -102,9 +103,9 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	Transaction tx = session.beginTransaction();
 
 	delete(session, "from MCRCLASS where id = '"+ID+"'");
-	delete(session, "from MCRCLASSLABEL where id = '"+ID+"'");
+	delete(session, "from MCRCLASSLABEL where ID = '"+ID+"'");
 	delete(session, "from MCRCATEG where clid = '"+ID+"'");
-	delete(session, "from MCRCATEGLABEL where clid = '"+ID+"'");
+	delete(session, "from MCRCATEGLABEL where CLID = '"+ID+"'");
 
 	tx.commit();
 	session.close();
