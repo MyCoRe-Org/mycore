@@ -35,37 +35,38 @@ import org.hibernate.cfg.Configuration;
 import java.util.List;
 
 /**
- * Class for hibernate connection to selected database 
- * 
+ * Class for hibernate connection to selected database
+ *
  * @author  Arne Seifert
  *
  */
 public class MCRHIBConnection {
 
-    protected static Configuration cfg;	
+    protected static Configuration cfg;
     protected static SessionFactory sessions;
     protected static Session session;
-    
+
     protected static MCRHIBConnection singleton;
-    
+
     protected static MCRHIBMapping genTable = new MCRHIBMapping();
-    
-    private static String url, userID, password;
+
+    private static String url, userID, password, driver;
     private static int maxUsages = Integer.MAX_VALUE;
 
     MCRConfiguration config = MCRConfiguration.instance();
-    
+
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         url = config.getString("MCR.persistence_sql_database_url");
         userID = config.getString("MCR.persistence_sql_database_userid", "");
         password = config.getString("MCR.persistence_sql_database_passwd", "");
-        
+        driver = config.getString("MCR.persistence_sql_driver", "");
+
         maxUsages = config.getInt(
                 "MCR.persistence_sql_database_connection_max_usages",
                 Integer.MAX_VALUE);
     }
-   
+
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException{
         if (singleton == null){
             singleton = new MCRHIBConnection();
@@ -77,42 +78,57 @@ public class MCRHIBConnection {
         }catch(Exception e){
             buildSessionFactory();
         }
-        return singleton;  
+        return singleton;
     }
-    
+
     /**
      * This method initializes the connection to the database
-     * 
+     *
      * @throws MCRPersistenceException
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
         try{
-            String fn = System.getProperty("MCR.configuration.file", "mycore.properties");          
+            String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
             buildConfiguration();
             genTable.generateTables(cfg);
             buildSessionFactory();
-            
+
         }catch (Exception exc) {
             String msg = "Could not connect to database";
             throw new MCRPersistenceException(msg, exc);
         }
     }
-    
+
     /**
      * This method creates the configuration needed by hibernate
      */
     private void buildConfiguration(){
+
+        String dialect;
+	if(url.toLowerCase().indexOf("mysql") >= 0)
+            dialect = "org.hibernate.dialect.MySQLDialect";
+        else if(url.toLowerCase().indexOf("db2") >= 0)
+            dialect = "org.hibernate.dialect.DB2Dialect";
+        else if(url.toLowerCase().indexOf("hyper") >= 0 || url.toLowerCase().indexOf("hsql") >=0)
+            dialect = "org.hibernate.dialect.HSQLDialect";
+        else if(url.toLowerCase().indexOf("oracle") >= 0)
+            dialect = "org.hibernate.dialect.OracleDialect"; // Oracle9Dialect
+        else if(url.toLowerCase().indexOf("post") >= 0)
+            dialect = "org.hibernate.dialect.PostgreSQLDialect ";
+        else
+            throw new MCRException("Couldn't determine database type from connection string: \""+url+"\"");
+
         cfg = new Configuration()
-		.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
-		.setProperty("hibernate.connection.driver_class","com.mysql.jdbc.Driver")
+		.setProperty("hibernate.dialect", dialect)
+		.setProperty("hibernate.connection.driver_class", driver)
 		.setProperty("hibernate.connection.url", url)
 		.setProperty("hibernate.connection.username", userID)
 		.setProperty("hibernate.connection.password", password)
 		.setProperty("hibernate.connection.pool_size", ""+maxUsages)
 		/*.setProperty("hibernate.hbm2ddl.auto","update")*/
-		.setProperty("hibernate.show_sql", "false");
+		.setProperty("hibernate.show_sql", "true");
     }
-    
+
     /**
      * This method creates the SessionFactory for hiberante
      */
@@ -121,7 +137,7 @@ public class MCRHIBConnection {
             sessions = cfg.buildSessionFactory();
         }
     }
-    
+
     /**
      * This method returns the current session for queries
      * on the database through hibernate
@@ -130,7 +146,7 @@ public class MCRHIBConnection {
     public Session getSession(){
         return sessions.openSession();
     }
-    
+
     public Configuration getConfiguration(){
         return cfg;
     }
@@ -139,11 +155,11 @@ public class MCRHIBConnection {
 	synchronized(singleton) {
 	    Session session = getSession();
 	    Transaction tx = session.beginTransaction();
-	   
+
 	    /* generate new id */
 	    MCRID id = new MCRID();
 	    session.save(id);
-	   
+
 	    /* free up previous ids in the ID table */
 	    List result = session.createCriteria(MCRID.class).list();
 	    int t;
@@ -154,16 +170,16 @@ public class MCRHIBConnection {
 		} else if(lid.getId() < id.getId())
 		    session.delete(lid);
 	    }
-	    
+
 	    tx.commit();
 	    session.close();
 	    return id.getId();
 	}
     }
 
-    
+
     public void closeSession(){
         session.close();
     }
-	
+
 }
