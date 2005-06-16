@@ -24,14 +24,15 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 
 import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.apache.log4j.Logger;
 import org.hibernate.type.*;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRException;
 
 /**
  * Creator class for hibernte mapping file
@@ -45,15 +46,14 @@ public class MCRTableGenerator {
     /**
      * Object declaration
      */
-    private Element rootOut = new Element("hibernate-mapping");
-    private DocType dType= new DocType("hibernate-mapping",
-    		"-//Hibernate/Hibernate Mapping DTD//EN", 
-			"lib/hibernate-mapping.dtd");
+    private Element rootOut;
+
+    private DocType dType;
     
     private static Logger logger = Logger.getLogger("org.mycore.backend.hibernate");
 
-    private Document docOut = new Document(rootOut, dType);
-    private Element elclass = new Element("class");
+    private Document docOut;
+    private Element elclass;
     private int intPKColumns =1;
     private int intIdSet = 0;
     private String classname = ""; 
@@ -67,11 +67,17 @@ public class MCRTableGenerator {
      */
     public MCRTableGenerator(String tableName, String sqlName, String Package, int intPKColumns){
         try{
+            this.dType = createDoctype();
+            this.rootOut =  new Element("hibernate-mapping");
+            this.docOut = new Document(rootOut, dType);
+            this.elclass = new Element("class");
+
             net.sf.ehcache.CacheManager.create(new ByteArrayInputStream(
             	    "<?xml version=\"1.0\"?><ehcache><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>"
             	    .getBytes()));
             this.intPKColumns = intPKColumns;
             this.classname = sqlName;
+
             elclass.setAttribute("name", sqlName);
             elclass.setAttribute("table", tableName);
             rootOut.addContent(elclass);
@@ -82,7 +88,28 @@ public class MCRTableGenerator {
         	System.out.println(e.toString());
         }
     }
-    
+
+    private static String doctype_url;
+
+    private DocType createDoctype()
+    {
+        if(doctype_url==null) {
+            try {
+                File docFile = new File(new File(System.getProperties().getProperty("java.io.tmpdir")), "hibernate-mapping.dtd");
+                InputStream input = this.getClass().getResourceAsStream("/hibernate-mapping.dtd");
+                FileOutputStream output = new FileOutputStream(docFile);
+                MCRUtils.copyStream(input, output);
+                output.close();
+                input.close();
+                doctype_url = ""+docFile;
+                System.out.println("--------------------> "+ doctype_url);
+            } catch(IOException e) {
+                throw new MCRException("couldn't create temporary hibernate docType file", e);
+            }
+        }
+        return new DocType("hibernate-mapping", "-//Hibernate/Hibernate Mapping DTD//EN", doctype_url);
+    }
+
     /**
      * This method adds a new column in the mapping table
      * 
@@ -234,5 +261,4 @@ public class MCRTableGenerator {
        }      
        return ret;
    }
-    
 }
