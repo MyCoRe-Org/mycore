@@ -51,7 +51,7 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
         super();
         MCRCommand com = null;
 
-        com = new MCRCommand("hibernate init",
+        com = new MCRCommand("init hibernate",
                 "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
                 "The command creates all tables for MyCoRe by hibernate.");
         command.add(com);

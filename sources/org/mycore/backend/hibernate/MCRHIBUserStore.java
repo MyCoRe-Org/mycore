@@ -401,29 +401,30 @@ public class MCRHIBUserStore implements MCRUserStore {
                 MCRGROUPMEMBERS member = new MCRGROUPMEMBERS();
                 member.setGid(newGroup.getID());
                 member.setUserid((String) newGroup.getMemberUserIDs().get(i));
-                member.setUserid(""+i);
+                member.setGroupid("");
                 session.save(member);
             }
-
             for (int i = 0; i < newGroup.getMemberGroupIDs().size(); i++){
                 MCRGROUPMEMBERS member = new MCRGROUPMEMBERS();
                 member.setGid(newGroup.getID());
                 member.setGroupid((String) newGroup.getMemberGroupIDs().get(i));
+                member.setUserid("");
                 session.saveOrUpdate(member);
             }
-
             // Groupadmins
             for (int i = 0; i < newGroup.getMemberUserIDs().size(); i++){
                 MCRGROUPADMINS admin = new MCRGROUPADMINS();
                 admin.setGid(newGroup.getID());
                 admin.setUserid((String) newGroup.getMemberUserIDs().get(i));
+                admin.setGroupid("");
                 session.saveOrUpdate(admin);
             }
 
             for (int i = 0; i < newGroup.getMemberGroupIDs().size(); i++){
                 MCRGROUPADMINS admin = new MCRGROUPADMINS();
                 admin.setGid(newGroup.getID());
-                admin.setUserid((String) newGroup.getMemberGroupIDs().get(i));
+                admin.setGroupid((String) newGroup.getMemberGroupIDs().get(i));
+                admin.setUserid("");
                 session.saveOrUpdate(admin);
             }
 
