@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.38 $ $Date: 2005-05-19 12:20:57 $ -->
+<!-- $Revision: 1.39 $ $Date: 2005-06-16 10:03:45 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -667,9 +667,29 @@
     <xsl:text>top=100, left=100, scrollbars=yes, status=no</xsl:text>
   </xsl:variable>
 
-  <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');"
-    style="{$editor.font} {$editor.button.style}" 
-  />
+  <xsl:choose>
+    <xsl:when test="button">
+      <input type="button" onClick="window.open('{$url}','help','{$properties}');" style="{$editor.font} {$editor.button.style}" >
+        <xsl:attribute name="value">
+          <xsl:choose>
+            <xsl:when test="button[lang($CurrentLang)]">
+              <xsl:value-of select="button[lang($CurrentLang)]"/>
+            </xsl:when>
+            <xsl:when test="button[lang($DefaultLang)]">
+              <xsl:value-of select="button[lang($DefaultLang)]"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="button"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </input>
+    </xsl:when>
+    <xsl:otherwise>
+      <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');" style="{$editor.font} {$editor.button.style}" />
+    </xsl:otherwise>
+  </xsl:choose>
+
 </xsl:template>
 
 <!-- ======== hidden ======== -->
