@@ -123,9 +123,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
                 ZipEntry ze = zis.getNextEntry();
                 String path = URLDecoder.decode(ze.getName(), "UTF-8");
-                String uploadId = new String( ze.getExtra(), "UTF-8" );
-                LOGGER.debug( "Received path = " + path );
-                LOGGER.debug( "Received uploadID = " + uploadId );
+                String uploadId = new String(ze.getExtra(), "UTF-8");
+                LOGGER.debug("Received path = " + path);
+                LOGGER.debug("Received uploadID = " + uploadId);
 
                 MCRUploadHandlerManager.instance().getHandle(uploadId)
                         .receiveFile(path, zis);
@@ -188,7 +188,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.info("UploadServlet uploading " + path);
             final String uploadId = req.getParameter("uploadId");
             final String md5 = req.getParameter("md5");
-            LOGGER.debug( "XXXXX idStarted=" + uploadId );
             LOGGER.debug("MCRUploadServlet receives file " + path
                     + " with md5 " + md5);
             if (!MCRUploadHandlerManager.instance().getHandle(uploadId)

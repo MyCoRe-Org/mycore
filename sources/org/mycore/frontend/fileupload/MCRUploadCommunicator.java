@@ -167,9 +167,9 @@ public class MCRUploadCommunicator {
 
         zos.setLevel(Deflater.NO_COMPRESSION);
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
-        ze.setExtra( uid.getBytes( "UTF-8" ) );
+        ze.setExtra(uid.getBytes("UTF-8"));
         zos.putNextEntry(ze);
-        
+
         int num = 0;
         byte[] buffer = new byte[65536];
 
