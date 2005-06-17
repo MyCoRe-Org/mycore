@@ -22,7 +22,7 @@
  *  
  */
 
-package org.mycore.frontend.editor2;
+package org.mycore.frontend.editor;
 
 import java.util.List;
 import org.mycore.common.xml.*;

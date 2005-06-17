@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.frontend.editor2;
+package org.mycore.frontend.editor;
 
 import org.mycore.common.*;
 import org.apache.log4j.*;

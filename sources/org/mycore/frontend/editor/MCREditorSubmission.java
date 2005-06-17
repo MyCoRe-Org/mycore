@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.frontend.editor2;
+package org.mycore.frontend.editor;
 
 import org.apache.commons.fileupload.*;
 import org.jdom.*;

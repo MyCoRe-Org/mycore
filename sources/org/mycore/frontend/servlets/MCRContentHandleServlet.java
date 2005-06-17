@@ -41,7 +41,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.frontend.editor2.MCREditorSubmission;
+import org.mycore.frontend.editor.MCREditorSubmission;
 
 /**
  * This class handles: searches on arbitrary xml files and generates resultset
@@ -255,4 +255,3 @@ public final class MCRContentHandleServlet extends MCRServlet {
 
         return true;
     }
-}

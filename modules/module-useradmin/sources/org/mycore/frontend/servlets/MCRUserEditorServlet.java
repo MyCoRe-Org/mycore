@@ -35,8 +35,8 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.frontend.editor2.MCREditorSubmission;
-import org.mycore.frontend.editor2.MCRRequestParameters;
+import org.mycore.frontend.editor.MCREditorSubmission;
+import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.user.MCRUserMgr;
 import org.mycore.user.MCRUser;
 

@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.frontend.editor2;
+package org.mycore.frontend.editor;
 
 import java.util.Map;
 import org.mycore.common.*;

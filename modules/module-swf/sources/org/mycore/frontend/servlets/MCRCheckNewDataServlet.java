@@ -37,7 +37,7 @@ import org.jdom.*;
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.frontend.servlets.*;
-import org.mycore.frontend.editor2.*;
+import org.mycore.frontend.editor.*;
 import org.mycore.frontend.workflow.*;
 import org.mycore.user.*;
 

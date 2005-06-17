@@ -39,7 +39,7 @@ import org.mycore.common.*;
 import org.mycore.common.xml.*;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.frontend.servlets.*;
-import org.mycore.frontend.editor2.*;
+import org.mycore.frontend.editor.*;
 import org.mycore.user.*;
 
 /**
