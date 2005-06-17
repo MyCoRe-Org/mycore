@@ -255,3 +255,4 @@ public final class MCRContentHandleServlet extends MCRServlet {
 
         return true;
     }
+}    

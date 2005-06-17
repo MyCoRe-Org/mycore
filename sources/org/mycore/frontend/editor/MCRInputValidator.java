@@ -392,3 +392,4 @@ public class MCRInputValidator {
         System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1",
                 "4", "en"));
     }
+}
