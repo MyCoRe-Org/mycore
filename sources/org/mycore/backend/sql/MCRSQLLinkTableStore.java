@@ -2,7 +2,7 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  *** 
+ * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
@@ -34,7 +34,7 @@ import org.mycore.datamodel.classifications.*;
 /**
  * This class implements the MCRLinkTableInterface as a presistence layer for
  * the store of a table with link connections under the SQL database.
- * 
+ *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -64,7 +64,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
     /**
      * The initializer for the class MCRSQLLinkTableStore. It reads the
      * classification configuration and checks the table names.
-     * 
+     *
      * @exception throws
      *                if the type is not correct
      */
@@ -147,7 +147,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method create a new item in the datastore.
-     * 
+     *
      * @param from
      *            a string with the link ID MCRFROM
      * @param to
@@ -167,7 +167,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method remove a item for the from ID from the datastore.
-     * 
+     *
      * @param from
      *            a string with the link ID MCRFROM
      */
@@ -182,7 +182,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method count the number of references to the 'to' value of the table.
-     * 
+     *
      * @param to
      *            the object ID as String, they was referenced
      * @return the number of references
@@ -201,6 +201,51 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         } finally {
             reader.close();
         }
+    }
+
+
+    /**
+	 * The method count the number of references to the 'to' value of the table.
+	 *
+	 * @param to the object ID as String, they was referenced
+	 * @return the number of references
+	 *
+	 */
+	 public final int countTo( String to , String doctype, String restriction )	    {
+
+	    if ( (doctype == null || doctype.trim().length()==0)
+	    		&& (restriction == null || restriction.trim().length() ==0 ) )
+	    	return countTo( to );
+
+	    StringBuffer select = new StringBuffer();
+
+        select.append( "SELECT COUNT( DISTINCT A.MCRFROM ) AS NUMBER FROM " );
+        select.append( tableName ).append( " A " );
+        if( restriction != null )	        {
+	          select.append( ", " );
+	          select.append( tableName ).append( " B " );
+	    }
+	    select.append( " WHERE " );
+	    select.append(  "A.MCRTO like '"+to+"'"  );
+
+        if( restriction != null )    {
+          select.append( " AND " );
+          select.append(  "B.MCRTO like '"+restriction+"%'"  );
+          select.append( " AND ( A.MCRFROM = B.MCRFROM )" );
+        }
+
+        if ( doctype != null)
+        	select.append( " AND A.MCRFROM like '%_"+doctype+"_%'");
+
+        logger.info("STATEMENT:    "  + select);
+        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery( select.toString() );
+        int num = 0;
+        try     {
+          if( reader.next() ) num = reader.getInt( "NUMBER" );
+	          return num;
+        }   catch( Exception e )    {
+	        	throw new MCRException("SQL counter error",e);
+        } finally{ reader.close(); }
     }
 }
 
