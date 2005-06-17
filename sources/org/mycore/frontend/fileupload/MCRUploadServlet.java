@@ -102,53 +102,67 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         super.finalize();
     }
 
+    public void handleUpload(Socket socket) {
+        LOGGER.info("Client applet connected to socket now.");
+        try {
+            DataOutputStream dos = new DataOutputStream(socket
+                    .getOutputStream());
+            ZipInputStream zis = new ZipInputStream(socket.getInputStream());
+
+            LOGGER
+                    .debug("Constructed ZipInputStream and DataOutputStream, receiving data soon.");
+
+            ZipEntry ze = zis.getNextEntry();
+            String path = URLDecoder.decode(ze.getName(), "UTF-8");
+            String uploadId = new String(ze.getExtra(), "UTF-8");
+
+            LOGGER.debug("Received path = " + path);
+            LOGGER.debug("Received uploadID = " + uploadId);
+
+            MCRUploadHandlerManager.instance().getHandle(uploadId).receiveFile(
+                    path, zis);
+
+            LOGGER.debug("Stored incoming file content");
+
+            dos.writeUTF("OK");
+            dos.flush();
+
+            LOGGER.info("File transfer completed successfully.");
+        } catch (Exception ex) {
+            LOGGER
+                    .error(
+                            "Exception while receiving and storing file content from applet:",
+                            ex);
+        } finally {
+            try {
+                if (socket != null)
+                    socket.close();
+            } catch (Exception ignored) {
+            }
+
+            LOGGER.debug("Socket closed.");
+        }
+    }
+
     public void run() {
         LOGGER.debug("Server socket thread startet.");
         while (true) {
-            Socket socket = null;
-
+            LOGGER.debug("Listening on " + serverIP + ":" + serverPort
+                    + " for incoming data...");
             try {
-                LOGGER.debug("Listening on " + serverIP + ":" + serverPort
-                        + " for incoming data...");
-                socket = server.accept();
-
-                LOGGER.info("Client applet connected to socket now.");
-
-                DataOutputStream dos = new DataOutputStream(socket
-                        .getOutputStream());
-                ZipInputStream zis = new ZipInputStream(socket.getInputStream());
-
-                LOGGER
-                        .debug("Constructed ZipInputStream and DataOutputStream, receiving data soon.");
-
-                ZipEntry ze = zis.getNextEntry();
-                String path = URLDecoder.decode(ze.getName(), "UTF-8");
-                String uploadId = new String(ze.getExtra(), "UTF-8");
-                LOGGER.debug("Received path = " + path);
-                LOGGER.debug("Received uploadID = " + uploadId);
-
-                MCRUploadHandlerManager.instance().getHandle(uploadId)
-                        .receiveFile(path, zis);
-                LOGGER.debug("Stored incoming file content");
-
-                dos.writeUTF("OK");
-                dos.flush();
-
-                LOGGER.info("File transfer completed successfully.");
+                final Socket socket = server.accept();
+                Thread handlerThread = new Thread(new Runnable() {
+                    public void run() {
+                        handleUpload(socket);
+                    }
+                });
+                handlerThread.start();
             } catch (Exception ex) {
-                LOGGER
-                        .error(
-                                "Exception while receiving and storing file content from applet:",
-                                ex);
-            } finally {
-                try {
-                    if (socket != null)
-                        socket.close();
-                } catch (Exception ignored) {
-                }
-
-                LOGGER.debug("Socket closed.");
+                LOGGER.error(
+                        "Exception while waiting for client connect to socket",
+                        ex);
             }
+
         }
     }
 
