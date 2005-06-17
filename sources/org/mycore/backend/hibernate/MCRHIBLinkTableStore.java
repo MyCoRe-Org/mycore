@@ -163,5 +163,10 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
         session.close();
         return l.size();
     }
+
+    public final int countTo(String to, String docType, String restriction)
+    {
+	throw new MCRException("countTo(String,String,String) not implemented yet for hibernate");
+    }
 }
 
