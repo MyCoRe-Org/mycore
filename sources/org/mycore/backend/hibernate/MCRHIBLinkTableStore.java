@@ -166,7 +166,20 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
 
     public final int countTo(String to, String docType, String restriction)
     {
-	throw new MCRException("countTo(String,String,String) not implemented yet for hibernate");
+        Session session = getSession();
+
+	String query = "from "+classname+" where MCRTO like '" + to + "'";
+	if(restriction != null) {
+	    query += " and MCRTO like '"+restriction+"%'";
+	}
+        if ( docType != null) {
+	    query += " and MCRFROM like '%_"+docType+"_%'";
+	}
+        
+	List l = session.createQuery(query).list();
+
+        session.close();
+        return l.size();
     }
 }
 
