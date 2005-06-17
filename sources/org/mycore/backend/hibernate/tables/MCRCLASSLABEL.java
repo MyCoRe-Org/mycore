@@ -26,19 +26,15 @@ public class MCRCLASSLABEL{
     private String text;
     private String mcrdesc;
     
-    private String id;
-    private String lang;
-    
     public MCRCLASSLABEL(){
-        
+        this.key = new MCRCLASSLABELPK();
     }
 
     public MCRCLASSLABEL(String text, String mcrdesc, String id, String lang)
     {
         this.text = text;
         this.mcrdesc = mcrdesc;
-        this.id = id;
-        this.lang = lang;
+        this.key = new MCRCLASSLABELPK(id, lang);
     }
 
     /**

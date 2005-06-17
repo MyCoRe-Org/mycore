@@ -28,6 +28,15 @@ public class MCRCLASSLABELPK implements Serializable{
     private String id;
     private String lang;
 
+    public MCRCLASSLABELPK()
+    {
+    }
+    public MCRCLASSLABELPK(String id, String lang)
+    {
+        this.id = id;
+        this.lang = lang;
+    }
+
     /**
      * @return Returns the id.
      */
