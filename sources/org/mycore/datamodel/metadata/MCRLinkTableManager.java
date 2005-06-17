@@ -34,7 +34,7 @@ import org.mycore.common.*;
 /**
  * This class manage all accesses to the link table database. This database
  * holds all informations about links between MCRObjects/MCRClassifications.
- * 
+ *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -99,7 +99,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method check the type.
-     * 
+     *
      * @param type
      *            the table type
      * @return true if the type is in the list, else return false
@@ -118,7 +118,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method add a reference link pair for the given type to the store.
-     * 
+     *
      * @param type
      *            the table type
      * @param from
@@ -132,7 +132,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method add a reference link pair for the given type to the store.
-     * 
+     *
      * @param type
      *            the table type
      * @param from
@@ -173,7 +173,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method delete a reference link pair for the given type to the store.
-     * 
+     *
      * @param type
      *            the table type
      * @param from
@@ -185,7 +185,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method delete a reference link pair for the given type to the store.
-     * 
+     *
      * @param type
      *            the table type
      * @param from
@@ -216,7 +216,7 @@ public class MCRLinkTableManager {
     /**
      * The method add a classification link pair for the given type to the
      * store.
-     * 
+     *
      * @param from
      *            the source of the reference as MCRObjectID
      * @param classid
@@ -233,7 +233,7 @@ public class MCRLinkTableManager {
     /**
      * The method add a classification link pair for the given type to the
      * store.
-     * 
+     *
      * @param from
      *            the source of the reference as String
      * @param classid
@@ -249,7 +249,7 @@ public class MCRLinkTableManager {
     /**
      * The method delete a classification link pair for the given type to the
      * store.
-     * 
+     *
      * @param from
      *            the source of the reference as MCRObjectID
      */
@@ -260,7 +260,7 @@ public class MCRLinkTableManager {
     /**
      * The method delete a classification link pair for the given type to the
      * store.
-     * 
+     *
      * @param from
      *            the source of the reference as String
      */
@@ -270,7 +270,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method coutn the reference links for a given object ID.
-     * 
+     *
      * @param type
      *            the table type
      * @param to
@@ -301,8 +301,49 @@ public class MCRLinkTableManager {
     }
 
     /**
+ 	* The method coutn the reference links for a given object ID.
+ 	*
+	 * @param type the table type
+ 	* @param to the object ID as String, they was referenced
+	* @param to document_type Array
+ 	* @param to the restricion of a category id
+ 	* @return the number of references
+ 	**/
+    public int countReferenceLinkTo(String type, String to, String[] doctypes,String restriction )  {
+
+  		int i = checkType(type);
+  		if (i == -1) {
+  	    logger.warn("The type value of a reference link is false, the link was "+
+      				"not added to the link table");
+    	return 0;
+    	}
+  		if ((to == null) || ((to = to.trim()).length() ==0)) {
+  		  logger.warn("The to value of a reference link is false, the link was "+
+  		    "not added to the link table");
+  		  return 0;
+  		}
+  		try {
+ 			if ( (doctypes != null && doctypes.length >0) ){
+  				String mydoctype= "";
+  				int cnt = 0, idt=0;
+  				for ( idt=0; idt< doctypes.length; idt++ ){
+  					mydoctype=doctypes[idt];
+  					cnt+=((MCRLinkTableInterface)tablelist.get(i)).countTo(to,mydoctype,restriction);
+  				}
+  		  		return cnt;
+  			}else{
+  				return((MCRLinkTableInterface)tablelist.get(i)).countTo(to,"", restriction);
+  			}
+  		}
+  	  catch (Exception e) {
+  	  logger.warn("An error was occured while search for references of "+  to+".");
+  	  }
+  	return 0;
+  	}
+
+    /**
      * The method coutn the reference links for a given object ID.
-     * 
+     *
      * @param type
      *            the table type
      * @param to
@@ -316,7 +357,7 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification without sub ID's.
-     * 
+     *
      * @param classid
      *            the classification ID as MCRObjectID
      * @param caregid
@@ -330,7 +371,7 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification without sub ID's.
-     * 
+     *
      * @param classid
      *            the classification ID as String
      * @param caregid
@@ -344,7 +385,7 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification including sub ID's.
-     * 
+     *
      * @param classid
      *            the classification ID as MCRObjectID
      * @param caregid
@@ -359,7 +400,7 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification including sub ID's.
-     * 
+     *
      * @param classid
      *            the classification ID as String
      * @param caregid
@@ -369,6 +410,20 @@ public class MCRLinkTableManager {
     public int countCategoryReferencesFuzzy(String classid, String categid) {
         return countReferenceLinkTo("class", classid + "##" + categid + "%");
     }
+
+    /**
+	 * The method count the number of references to a category of a classification
+	 * including sub ID's.
+	 *
+	 * @param classid the classification ID as String
+	 * @param categid the category ID as String
+	 * @param doctypes Array of document type slected by the mcrfrom content
+	 * @return the number of references
+	 **/
+	public int countCategoryReferencesFuzzy(String classid, String categid, String[] doctypes, String restriction) {
+		return countReferenceLinkTo("class",classid+"##"+categid+"%", doctypes, restriction);
+	}
+
 
 }
 
