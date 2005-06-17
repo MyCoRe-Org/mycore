@@ -82,9 +82,6 @@ public interface MCRLinkTableInterface {
 	public int countTo( String to, String doctype, String to2 ) ;
 
 
-	}
-
-
 
 }
 
