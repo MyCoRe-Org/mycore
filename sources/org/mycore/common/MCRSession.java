@@ -32,11 +32,11 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 /**
  * Instances of this class collect information kept during a session like the
  * currently active user, the preferred language etc.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * 
+ *
  * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
@@ -60,6 +60,8 @@ public class MCRSession implements Cloneable {
 
     /** -ASC- für MCRClassificationBrowser Class session daten */
     public MCRClassificationBrowserData BData = null;
+    private String FullName = null;
+    private String CurrentDocumentID = null;
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
@@ -139,6 +141,22 @@ public class MCRSession implements Cloneable {
     public final void setCurrentLanguage(String language) {
         this.language = language;
     }
+
+    /** returns the current document ID */
+    public final String getCurrentDocumentID()
+    { return CurrentDocumentID; }
+
+    /** returns the current document ID */
+    public final String getCurrentUserName()
+    { return FullName; }
+
+    /** sets the current user fullname */
+    public final void setCurrentUserName(String userName)
+    { this.FullName = userName; }
+
+    /** sets the current document ID */
+    public final void setCurrentDocumentID(String DocumentID)
+    { this.CurrentDocumentID = DocumentID; }
 
     /** Write data to the logger for debugging purposes */
     public final void debug() {
