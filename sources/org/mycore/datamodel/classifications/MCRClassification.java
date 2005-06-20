@@ -35,7 +35,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
@@ -78,7 +77,7 @@ public class MCRClassification {
      * The method fill the instance of this class with a given JODM tree.
      * 
      * @param jdom
-     *            the classification as jdom tree
+     *                    the classification as jdom tree
      */
     private final void setFromJDOM(org.jdom.Document jdom) {
         cl = new MCRClassificationItem(new MCRObjectID(jdom.getRootElement()
@@ -124,7 +123,7 @@ public class MCRClassification {
         tagList = category.getChildren("category");
         for (int i = 0; i < tagList.size(); i++) {
             breakDownCategories((Element) tagList.get(i), ci); //process
-                                                               // children
+            // children
         }
     }
 
@@ -132,7 +131,7 @@ public class MCRClassification {
      * The method create a MCRClassification from the given JDOM tree.
      * 
      * @param jdom
-     *            the classification as jdom tree
+     *                    the classification as jdom tree
      */
     public final String createFromJDOM(org.jdom.Document jdom) {
         setFromJDOM(jdom);
@@ -157,9 +156,9 @@ public class MCRClassification {
      * The method create a MCRClassification from the given XML array.
      * 
      * @param xml
-     *            the classification as byte array XML tree
+     *                    the classification as byte array XML tree
      * @exception MCRException
-     *                if the parser can't build a JDOM tree
+     *                         if the parser can't build a JDOM tree
      */
     public final String createFromXML(byte[] xml) throws MCRException {
         try {
@@ -176,9 +175,9 @@ public class MCRClassification {
      * The method create a MCRClassification from the given URI.
      * 
      * @param uri
-     *            the classification URI
+     *                    the classification URI
      * @exception MCRException
-     *                if the parser can't build a JDOM tree
+     *                         if the parser can't build a JDOM tree
      */
     public final String createFromURI(String uri) throws MCRException {
         try {
@@ -193,7 +192,7 @@ public class MCRClassification {
      * The method delete the MCRClassification for the given ID.
      * 
      * @param ID
-     *            the classification ID to delete
+     *                    the classification ID to delete
      */
     public final void delete(String ID) {
         if (cl == null) {
@@ -207,7 +206,7 @@ public class MCRClassification {
      * The method update a MCRClassification from the given JDOM tree.
      * 
      * @param jdom
-     *            the classification as jdom tree
+     *                    the classification as jdom tree
      */
     public final String updateFromJDOM(org.jdom.Document jdom) {
         org.jdom.Element root = jdom.getRootElement();
@@ -240,9 +239,9 @@ public class MCRClassification {
      * The method update a MCRClassification from the given XML array.
      * 
      * @param xml
-     *            the classification as byte array XML tree
+     *                    the classification as byte array XML tree
      * @exception MCRException
-     *                if the parser can't build a JDOM tree
+     *                         if the parser can't build a JDOM tree
      */
     public final String updateFromXML(byte[] xml) throws MCRException {
         try {
@@ -259,9 +258,9 @@ public class MCRClassification {
      * The method update a MCRClassification from the given URI.
      * 
      * @param uri
-     *            the classification URI
+     *                    the classification URI
      * @exception MCRException
-     *                if the parser can't build a JDOM tree
+     *                         if the parser can't build a JDOM tree
      */
     public final String updateFromURI(String uri) throws MCRException {
         try {
@@ -274,13 +273,11 @@ public class MCRClassification {
 
     private Document getClassification(String ID) throws MCRException,
             JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder(false);
         MCRObjectID classID = new MCRObjectID(ID);
         LOGGER.debug("Loading Classification " + ID + " of MCRType: "
                 + classID.getTypeId());
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        byte[] xml = tm.retrieve(classID);
-        return builder.build(new ByteArrayInputStream(xml));
+        return tm.readDocument(classID);
     }
 
     private void countDocuments(String classID, Element cat) {
@@ -310,7 +307,7 @@ public class MCRClassification {
      * The method return the classification as JDOM tree.
      * 
      * @param ID
-     *            the classification ID to delete
+     *                    the classification ID to delete
      * @return the classification as JDOM
      */
     public final Document receiveClassificationAsJDOM(String classID) {
@@ -336,7 +333,7 @@ public class MCRClassification {
      * The method return the classification as XML byte array.
      * 
      * @param classID
-     *            the classification ID
+     *                    the classification ID
      * @return the classification as XML
      */
     public final byte[] receiveClassificationAsXML(String classID) {
@@ -349,9 +346,9 @@ public class MCRClassification {
      * The method return the category as XML byte array.
      * 
      * @param classID
-     *            the classification ID
+     *                    the classification ID
      * @param categID
-     *            the category ID
+     *                    the category ID
      * @return the classification as XML
      */
     public final org.jdom.Document receiveCategoryAsJDOM(String classID,
@@ -403,9 +400,9 @@ public class MCRClassification {
      * The method return the category as XML byte array.
      * 
      * @param classID
-     *            the classification ID
+     *                    the classification ID
      * @param categID
-     *            the category ID
+     *                    the category ID
      * @return the classification as XML
      */
     public final byte[] receiveCategoryAsXML(String classID, String categID) {
@@ -418,7 +415,7 @@ public class MCRClassification {
      * The method get a XQuery and responds a JDOM document.
      * 
      * @param query
-     *            the query string
+     *                    the query string
      * @return a JDOM document
      */
     public final org.jdom.Document search(String query) {
@@ -471,9 +468,9 @@ public class MCRClassification {
      * classification.
      * 
      * @param classid
-     *            the classification id as MCRObjectID
+     *                    the classification id as MCRObjectID
      * @param labeltext
-     *            the text of a categoy label
+     *                    the text of a categoy label
      * @return the correspondig category ID
      */
     public static final String getCategoryID(MCRObjectID classid,

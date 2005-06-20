@@ -60,9 +60,9 @@ final public class MCRObject extends MCRBase {
      * </ul>
      * 
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      * @exception MCRConfigurationException
-     *                a special exception for configuartion data
+     *                         a special exception for configuartion data
      */
     public MCRObject() throws MCRException, MCRConfigurationException {
         super();
@@ -108,7 +108,7 @@ final public class MCRObject extends MCRBase {
      * metadata.
      * 
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     private final void set() throws MCRException {
         if (jdom_document == null) {
@@ -146,9 +146,9 @@ final public class MCRObject extends MCRBase {
      * MyCoRe-Object.
      * 
      * @param uri
-     *            an URI
+     *                    an URI
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     public final void setFromURI(String uri) throws MCRException {
         setFromJDOM(MCRXMLHelper.parseURI(uri));
@@ -159,9 +159,9 @@ final public class MCRObject extends MCRBase {
      * MyCoRe-Object.
      * 
      * @param xml
-     *            a XML string
+     *                    a XML string
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
         setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
@@ -171,9 +171,9 @@ final public class MCRObject extends MCRBase {
      * This methode gets a JDOM-Document to build up the MyCoRe-Object.
      * 
      * @param doc
-     *            an JDOM Object
+     *                    an JDOM Object
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     public final void setFromJDOM(Document doc) throws MCRException {
         jdom_document = doc;
@@ -184,9 +184,9 @@ final public class MCRObject extends MCRBase {
      * This methode set the object metadata part named by a tag.
      * 
      * @param obj
-     *            the class object of a metadata part
+     *                    the class object of a metadata part
      * @param tag
-     *            the tag of a metadata part
+     *                    the tag of a metadata part
      * @return true if set was succesful, otherwise false
      */
     public final boolean setMetadataElement(MCRMetaElement obj, String tag) {
@@ -203,7 +203,7 @@ final public class MCRObject extends MCRBase {
      * This methode set the object MCRObjectStructure.
      * 
      * @param structure
-     *            the object MCRObjectStructure part
+     *                    the object MCRObjectStructure part
      */
     public final void setStructure(MCRObjectStructure structure) {
         if (structure != null) {
@@ -215,7 +215,7 @@ final public class MCRObject extends MCRBase {
      * This methode create a XML stream for all object data.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
     public final org.jdom.Document createXML() throws MCRException {
@@ -242,7 +242,7 @@ final public class MCRObject extends MCRBase {
      * This methode create a typed content list for all MCRObject data.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a MCRTypedContent with the data of the MCRObject data
      */
     public final MCRTypedContent createTypedContent() throws MCRException {
@@ -265,7 +265,7 @@ final public class MCRObject extends MCRBase {
      * instance.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a String with the text values from the metadata object
      */
     public final String createTextSearch() throws MCRException {
@@ -285,7 +285,7 @@ final public class MCRObject extends MCRBase {
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void createInDatastore() throws MCRPersistenceException {
         // exist the object?
@@ -345,17 +345,16 @@ final public class MCRObject extends MCRBase {
      * the object with the ID in the data store.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @param derivate
-     *            a link to a derivate as MCRMetaLinkID
+     *                    a link to a derivate as MCRMetaLinkID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void addDerivateInDatastore(String id, MCRMetaLinkID link)
             throws MCRPersistenceException {
         mcr_id = new MCRObjectID(id);
-        byte[] xmlarray = mcr_xmltable.retrieve(mcr_id);
-        setFromXML(xmlarray, false);
+        setFromJDOM(mcr_xmltable.readDocument(mcr_id));
         mcr_service.setDate("modifydate");
         getStructure().addDerivate(link);
         mcr_persist.update(this);
@@ -367,17 +366,17 @@ final public class MCRObject extends MCRBase {
      * update the object with the ID in the data store.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @param derivate
-     *            a link to a derivate as MCRMetaLinkID
+     *                    a link to a derivate as MCRMetaLinkID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void removeDerivateInDatastore(String id, MCRMetaLinkID link)
             throws MCRPersistenceException {
         mcr_id = new MCRObjectID(id);
-        byte[] xmlarray = mcr_xmltable.retrieve(mcr_id);
-        setFromXML(xmlarray, false);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        setFromJDOM(doc);
         mcr_service.setDate("modifydate");
         int j = getStructure().searchForDerivate(link);
         if (j != -1) {
@@ -394,9 +393,9 @@ final public class MCRObject extends MCRBase {
      * The methode delete the object for the given ID from the data store.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void deleteFromDatastore(String id)
             throws MCRPersistenceException {
@@ -408,20 +407,20 @@ final public class MCRObject extends MCRBase {
      * The methode delete the object from the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     private final void deleteFromDatastore() throws MCRPersistenceException {
         if (mcr_id == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
         // get the Item
-        byte[] xmlarray = mcr_xmltable.retrieve(mcr_id);
-        if (xmlarray == null) {
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc == null) {
             logger.info("The MCRObjectID " + mcr_id.getId()
                     + " does not exist.");
             return;
         }
-        setFromXML(xmlarray, false);
+        setFromJDOM(doc);
         // set the derivate data in structure
         MCRDerivate der = null;
         for (int i = 0; i < mcr_struct.getDerivateSize(); i++) {
@@ -453,9 +452,9 @@ final public class MCRObject extends MCRBase {
         if (parent_id != null) {
             logger.debug("Parent ID = " + parent_id.getId());
             try {
-                xmlarray = mcr_xmltable.retrieve(parent_id);
+                Document parentDoc = mcr_xmltable.readDocument(mcr_id);
                 MCRObject parent = new MCRObject();
-                parent.setFromXML(xmlarray, false);
+                parent.setFromJDOM(parentDoc);
                 parent.mcr_struct.removeChild(mcr_id);
                 parent.updateThisInDatastore();
             } catch (Exception e) {
@@ -482,9 +481,9 @@ final public class MCRObject extends MCRBase {
      * false.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final static boolean existInDatastore(String id)
             throws MCRPersistenceException {
@@ -497,9 +496,9 @@ final public class MCRObject extends MCRBase {
      * this MCRObject.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void receiveFromDatastore(String id)
             throws MCRPersistenceException {
@@ -511,16 +510,16 @@ final public class MCRObject extends MCRBase {
      * this MCRObject.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void receiveFromDatastore(MCRObjectID id)
             throws MCRPersistenceException {
         mcr_id = id;
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
-        if (xml != null) {
-            setFromXML(xml, false);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc != null) {
+            setFromJDOM(doc);
         } else {
             throw new MCRPersistenceException("The XML file for ID "
                     + mcr_id.getId() + " was not retrieved.");
@@ -532,10 +531,10 @@ final public class MCRObject extends MCRBase {
      * as XML stream.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @return the XML stream of the object as string
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final byte[] receiveXMLFromDatastore(String id)
             throws MCRPersistenceException {
@@ -553,27 +552,27 @@ final public class MCRObject extends MCRBase {
      * as JDOM Document.
      * 
      * @param id
-     *            the object ID
-     * @return the JDOM Document of the object as string
+     *                    the object ID
+     * @return the JDOM Document of the object
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final org.jdom.Document receiveJDOMFromDatastore(String id)
             throws MCRPersistenceException {
         mcr_id = new MCRObjectID(id);
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
-        if (xml == null) {
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc == null) {
             throw new MCRPersistenceException("The XML file for ID "
                     + mcr_id.getId() + " was not retrieved.");
         }
-        return MCRXMLHelper.parseXML(xml, false);
+        return doc;
     }
 
     /**
      * The methode update the object in the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void updateInDatastore() throws MCRPersistenceException {
         // get the old Item
@@ -595,7 +594,6 @@ final public class MCRObject extends MCRBase {
         }
         // set the parent from the original and this update
         boolean setparent = false;
-        byte[] xmlarray;
         if ((old.mcr_struct.getParent() != null)
                 && (mcr_struct.getParent() != null)) {
             String oldparent = old.mcr_struct.getParent().getXLinkHref();
@@ -604,10 +602,10 @@ final public class MCRObject extends MCRBase {
                 // remove child from the old parent
                 logger.debug("Parent ID = " + oldparent);
                 try {
-                    MCRObjectID parent_id = new MCRObjectID(oldparent);
-                    xmlarray = mcr_xmltable.retrieve(parent_id);
+                    MCRObjectID parentID = new MCRObjectID(oldparent);
+                    Document parentDoc = mcr_xmltable.readDocument(mcr_id);
                     MCRObject parent = new MCRObject();
-                    parent.setFromXML(xmlarray, false);
+                    parent.setFromJDOM(parentDoc);
                     parent.mcr_struct.removeChild(mcr_id);
                     parent.updateThisInDatastore();
                     setparent = true;
@@ -626,10 +624,10 @@ final public class MCRObject extends MCRBase {
             // remove child from the old parent
             logger.debug("Parent ID = " + oldparent);
             try {
-                MCRObjectID parent_id = new MCRObjectID(oldparent);
-                xmlarray = mcr_xmltable.retrieve(parent_id);
+                MCRObjectID parentID = new MCRObjectID(oldparent);
+                Document parentDoc = mcr_xmltable.readDocument(mcr_id);
                 MCRObject parent = new MCRObject();
-                parent.setFromXML(xmlarray, false);
+                parent.setFromJDOM(parentDoc);
                 parent.mcr_struct.removeChild(mcr_id);
                 parent.updateThisInDatastore();
                 setparent = true;
@@ -712,9 +710,9 @@ final public class MCRObject extends MCRBase {
      * inherited data from the parent.
      * 
      * @param child_id
-     *            the MCRObjectID of the parent as string
+     *                    the MCRObjectID of the parent as string
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     private final void updateMetadataInDatastore(MCRObjectID child_id)
             throws MCRPersistenceException {
@@ -808,7 +806,7 @@ final public class MCRObject extends MCRBase {
      * store.
      * 
      * @param id
-     *            the MCRObjectID as string
+     *                    the MCRObjectID as string
      */
     public final void repairPersitenceDatastore(String id)
             throws MCRPersistenceException {
@@ -820,14 +818,14 @@ final public class MCRObject extends MCRBase {
      * store.
      * 
      * @param id
-     *            the MCRObjectID
+     *                    the MCRObjectID
      */
     public final void repairPersitenceDatastore(MCRObjectID id)
             throws MCRPersistenceException {
         mcr_id = id;
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
-        if (xml != null) {
-            setFromXML(xml, false);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc != null) {
+            setFromJDOM(doc);
         } else {
             throw new MCRPersistenceException("The XML file for ID "
                     + mcr_id.getId() + " was not retrieved.");

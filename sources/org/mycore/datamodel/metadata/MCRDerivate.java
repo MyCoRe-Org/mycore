@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 
 import java.io.File;
 //import java.util.Vector;
+import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -57,9 +58,9 @@ final public class MCRDerivate extends MCRBase {
      * the parser class and the metadata class.
      * 
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      * @exception MCRConfigurationException
-     *                a special exception for configuartion data
+     *                         a special exception for configuartion data
      */
     public MCRDerivate() throws MCRException, MCRConfigurationException {
         super();
@@ -83,7 +84,7 @@ final public class MCRDerivate extends MCRBase {
      * metadata.
      * 
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     private final void set() throws MCRException {
         if (jdom_document == null) {
@@ -116,9 +117,9 @@ final public class MCRDerivate extends MCRBase {
      * and check it with XSchema file.
      * 
      * @param uri
-     *            an URI
+     *                    an URI
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     public final void setFromURI(String uri) throws MCRException {
         try {
@@ -134,9 +135,9 @@ final public class MCRDerivate extends MCRBase {
      * check it with XSchema file.
      * 
      * @param xml
-     *            a XML string
+     *                    a XML string
      * @exception MCRException
-     *                general Exception of MyCoRe
+     *                         general Exception of MyCoRe
      */
     public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
         try {
@@ -151,7 +152,7 @@ final public class MCRDerivate extends MCRBase {
      * This methode set the object MCRObjectDerivate.
      * 
      * @param service
-     *            the object MCRObjectDerivate part
+     *                    the object MCRObjectDerivate part
      */
     public final void setDerivate(MCRObjectDerivate derivate) {
         if (derivate != null) {
@@ -163,7 +164,7 @@ final public class MCRDerivate extends MCRBase {
      * This methode create a XML stream for all object data.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
     public final org.jdom.Document createXML() throws MCRException {
@@ -189,7 +190,7 @@ final public class MCRDerivate extends MCRBase {
      * This methode create a typed content list for all MCRObject data.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a MCRTypedContent with the data of the MCRObject data
      */
     public final MCRTypedContent createTypedContent() throws MCRException {
@@ -210,7 +211,7 @@ final public class MCRDerivate extends MCRBase {
      * This methode create an empty String. They exist only for the interface.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                         if the content of this class is not valid
      * @return a String with the text values from the metadata object
      */
     public final String createTextSearch() throws MCRException {
@@ -222,7 +223,7 @@ final public class MCRDerivate extends MCRBase {
      * data table for storing MCRObjects with the same MCRObjectID type.
      * 
      * @param confdoc
-     *            the configuration XML document
+     *                    the configuration XML document
      */
     public final void createDataBase(String mcr_type, org.jdom.Document confdoc) {
         setId(new MCRObjectID("Template_derivate_1"));
@@ -233,7 +234,7 @@ final public class MCRDerivate extends MCRBase {
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void createInDatastore() throws MCRPersistenceException {
         // exist the derivate?
@@ -309,9 +310,9 @@ final public class MCRDerivate extends MCRBase {
      * The methode delete the object in the data store.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void deleteFromDatastore(String id)
             throws MCRPersistenceException {
@@ -322,10 +323,11 @@ final public class MCRDerivate extends MCRBase {
             throw new MCRPersistenceException(
                     "ID error in deleteFromDatastore for " + id + ".", e);
         }
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
         // remove the link from metadata object
-        if (xml != null) {
-            setFromXML(xml, false);
+        if (doc != null) {
+            jdom_document = doc;
+            set();
             MCRObject obj;
             for (int i = 0; i < getDerivate().getLinkMetaSize(); i++) {
                 MCRMetaLinkID meta = getDerivate().getLinkMeta(i);
@@ -346,7 +348,7 @@ final public class MCRDerivate extends MCRBase {
             MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
             difs.delete();
         } catch (Exception e) {
-            if (xml != null) {
+            if (doc != null) {
                 if (getDerivate().getInternals() != null) {
                     logger.warn("Error while delete from IFS for ID "
                             + getDerivate().getInternals().getIFSID());
@@ -362,7 +364,7 @@ final public class MCRDerivate extends MCRBase {
             logger.warn(e.getMessage());
         }
         // delete derivate from XML table
-        if (xml != null) {
+        if (doc != null) {
             mcr_xmltable.delete(mcr_id);
         }
     }
@@ -372,9 +374,9 @@ final public class MCRDerivate extends MCRBase {
      * false.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final static boolean existInDatastore(String id)
             throws MCRPersistenceException {
@@ -387,13 +389,13 @@ final public class MCRDerivate extends MCRBase {
      * this MCRDerivate
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void receiveFromDatastore(String id)
             throws MCRPersistenceException {
-        receiveFromDatastore(new MCRObjectID(id));
+        setFromDatastore(new MCRObjectID(id));
     }
 
     /**
@@ -401,16 +403,17 @@ final public class MCRDerivate extends MCRBase {
      * this MCRDerivate
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
-    public final void receiveFromDatastore(MCRObjectID id)
+    public final void setFromDatastore(MCRObjectID id)
             throws MCRPersistenceException {
         mcr_id = id;
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
-        if (xml != null) {
-            setFromXML(xml, false);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc != null) {
+            jdom_document = doc;
+            set();
         } else {
             throw new MCRPersistenceException("The XML file for ID "
                     + mcr_id.getId() + " was not retrieved.");
@@ -424,10 +427,10 @@ final public class MCRDerivate extends MCRBase {
      * as XML stream.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @return the XML stream of the object as string
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final byte[] receiveXMLFromDatastore(String id)
             throws MCRPersistenceException {
@@ -445,10 +448,10 @@ final public class MCRDerivate extends MCRBase {
      * and returned it as MCRDirectory.
      * 
      * @param id
-     *            the object ID
+     *                    the object ID
      * @return the MCRDirectory of the multimedia object
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final MCRDirectory receiveDirectoryFromIFS(String id)
             throws MCRPersistenceException {
@@ -468,7 +471,7 @@ final public class MCRDerivate extends MCRBase {
      * The methode update the object in the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void updateInDatastore() throws MCRPersistenceException {
         // get the old Item
@@ -536,7 +539,7 @@ final public class MCRDerivate extends MCRBase {
      * The methode update only the XML part of the object in the data store.
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      */
     public final void updateXMLInDatastore() throws MCRPersistenceException {
         mcr_service.setDate("modifydate");
@@ -549,7 +552,7 @@ final public class MCRDerivate extends MCRBase {
      * store.
      * 
      * @param id
-     *            the MCRObjectID as string
+     *                    the MCRObjectID as string
      */
     public final void repairPersitenceDatastore(String id)
             throws MCRPersistenceException {
@@ -561,14 +564,15 @@ final public class MCRDerivate extends MCRBase {
      * store.
      * 
      * @param id
-     *            the MCRObjectID
+     *                    the MCRObjectID
      */
     public final void repairPersitenceDatastore(MCRObjectID id)
             throws MCRPersistenceException {
         mcr_id = id;
-        byte[] xml = mcr_xmltable.retrieve(mcr_id);
-        if (xml != null) {
-            setFromXML(xml, false);
+        Document doc = mcr_xmltable.readDocument(mcr_id);
+        if (doc != null) {
+            jdom_document = doc;
+            set();
         } else {
             throw new MCRPersistenceException("The XML file for ID "
                     + mcr_id.getId() + " was not retrieved.");

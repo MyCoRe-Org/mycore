@@ -910,8 +910,7 @@ public class MCRStartEditorServlet extends MCRServlet
     org.jdom.Document jdom = null;
     MCRObjectID id = new MCRObjectID(mcrid);
     if (source) {
-      byte [] xml = MCR_XMLTABLE.retrieve(id);
-      jdom = MCRXMLHelper.parseXML(xml,false);
+      jdom = MCR_XMLTABLE.readDocument(id);
       }
     else {
       String dirname = WFM.getDirectoryPath(id.getTypeId());

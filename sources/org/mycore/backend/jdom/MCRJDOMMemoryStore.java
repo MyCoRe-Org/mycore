@@ -24,19 +24,19 @@
 
 package org.mycore.backend.jdom;
 
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.jdom.*;
+import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * This class implements the memory store based on JDOM documents.
@@ -66,7 +66,8 @@ public class MCRJDOMMemoryStore {
 
     private long tsdiff = 0;
 
-    private static final long tsdiffdefault = 3600; // 1 hour
+    private static final long tsdiffdefault = 3600; // 1
+                                                                           // hour
 
     /**
      * Returns the singleton.
@@ -106,7 +107,7 @@ public class MCRJDOMMemoryStore {
      * Returns a stylesheet that will execute a query on the JDOM store.
      * 
      * @param query
-     *            the XSLT String that represents the search condition
+     *                    the XSLT String that represents the search condition
      * @return a org.jdom.Document of the stylesheet
      */
     org.jdom.Document getStylesheet(String query) {
@@ -157,17 +158,15 @@ public class MCRJDOMMemoryStore {
         MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
         ArrayList ar = mcr_xml.retrieveAllIDs(type);
         Hashtable objects = new Hashtable();
-
-        for (int i = 0; i < ar.size(); i++) {
-            String stid = (String) ar.get(i);
-            MCRObjectID mid = new MCRObjectID(stid);
-            byte[] xml = mcr_xml.retrieve(mid);
-            try {
-                Document jdom_document = MCRXMLHelper.parseXML(xml, false);
-                objects.put(mid, jdom_document.detachRootElement());
-            } catch (Exception e) {
-                logger.warn("Can't add " + stid + " to JDOM tree!");
-            }
+        int size = ar.size();
+        String stid;
+        MCRObjectID mid;
+        Document jdom_document;
+        for (int i = 0; i < size; i++) {
+            stid = (String) ar.get(i);
+            mid = new MCRObjectID(stid);
+            jdom_document = mcr_xml.readDocument(mid);
+            objects.put(mid, jdom_document.detachRootElement());
             logger.debug("Load to JDOM tree " + stid);
         }
         long stopdate = System.currentTimeMillis();

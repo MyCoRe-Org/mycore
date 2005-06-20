@@ -28,10 +28,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class manage all accesses to the XML table database. This database holds
@@ -50,6 +53,8 @@ public class MCRXMLTableManager {
     static Logger LOGGER = Logger.getLogger(MCRLinkTableManager.class);
 
     static MCRConfiguration CONFIG = MCRConfiguration.instance();
+
+    static MCRCache jdomCache;
 
     // the list of link table
     private String persistclassname = null;
@@ -70,6 +75,8 @@ public class MCRXMLTableManager {
      */
     protected MCRXMLTableManager() {
         tablelist = new Hashtable();
+        jdomCache = new MCRCache(CONFIG.getInt(
+                "MCR.xml.tablemanager.cache.size", 100));
     }
 
     /**
@@ -77,11 +84,11 @@ public class MCRXMLTableManager {
      * <code>type</code>
      * 
      * @param type
-     *            the table type
+     *                    the table type
      * @exception if
-     *                the store for the given type could not find or loaded.
+     *                         the store for the given type could not find or loaded.
      */
-    private final MCRXMLTableInterface getXMLTable(String type) {
+    private MCRXMLTableInterface getXMLTable(String type) {
         if ((type == null) || (type.length() == 0)) {
             throw new MCRException("The type is null or empty.");
         } else if (tablelist.containsKey(type))
@@ -97,31 +104,32 @@ public class MCRXMLTableManager {
      * The method create a new item in the datastore.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * @param xml
-     *            a JDOM Document
+     *                    a JDOM Document
      * 
      * @exception if
-     *                the method arguments are not correct
+     *                         the method arguments are not correct
      */
-    public final void create(MCRObjectID mcrid, org.jdom.Document xml)
+    public void create(MCRObjectID mcrid, org.jdom.Document xml)
             throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid,
                 MCRUtils.getByteArray(xml), 1);
+        jdomCache.put(mcrid, xml);
     }
 
     /**
      * The method create a new item in the datastore.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * @param xml
-     *            a byte array with the XML file
+     *                    a byte array with the XML file
      * 
      * @exception if
-     *                the method arguments are not correct
+     *                         the method arguments are not correct
      */
-    public final void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
+    public void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid, xml, 1);
     }
 
@@ -129,45 +137,48 @@ public class MCRXMLTableManager {
      * The method remove a item for the MCRObjectID from the datastore.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * 
      * @exception if
-     *                the method argument is not correct
+     *                         the method argument is not correct
      */
-    public final void delete(MCRObjectID mcrid) throws MCRException {
+    public void delete(MCRObjectID mcrid) throws MCRException {
         getXMLTable(mcrid.getTypeId()).delete(mcrid, 1);
+        jdomCache.remove(mcrid);
     }
 
     /**
      * The method update an item in the datastore.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * @param xml
-     *            a byte array with the XML file
+     *                    a byte array with the XML file
      * 
      * @exception if
-     *                the method arguments are not correct
+     *                         the method arguments are not correct
      */
-    public final void update(MCRObjectID mcrid, org.jdom.Document xml)
+    public void update(MCRObjectID mcrid, org.jdom.Document xml)
             throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid,
                 MCRUtils.getByteArray(xml), 1);
+        jdomCache.put(mcrid, xml);
     }
 
     /**
      * The method update an item in the datastore.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * @param xml
-     *            a byte array with the XML file
+     *                    a byte array with the XML file
      * 
      * @exception if
-     *                the method arguments are not correct
+     *                         the method arguments are not correct
      */
-    public final void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
+    public void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid, xml, 1);
+        jdomCache.remove(mcrid);
     }
 
     /**
@@ -175,12 +186,12 @@ public class MCRXMLTableManager {
      * corresponding XML file as byte array.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * 
      * @exception if
-     *                the method arguments are not correct
+     *                         the method arguments are not correct
      */
-    public final byte[] retrieve(MCRObjectID mcrid) throws MCRException {
+    public byte[] retrieve(MCRObjectID mcrid) throws MCRException {
         return getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
     }
 
@@ -191,16 +202,16 @@ public class MCRXMLTableManager {
      * highest ID stored in the related index class.
      * 
      * @param project_ID
-     *            the project ID part of the MCRObjectID base
+     *                    the project ID part of the MCRObjectID base
      * @param type_ID
-     *            the type ID part of the MCRObjectID base
+     *                    the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                         if a persistence problem is occured
      * 
      * @return the next free ID number as a String
      */
-    public final int getNextFreeIdInt(String idproject, String idtype)
+    public int getNextFreeIdInt(String idproject, String idtype)
             throws MCRPersistenceException {
         return getXMLTable(idtype).getNextFreeIdInt(idproject, idtype);
     }
@@ -209,11 +220,11 @@ public class MCRXMLTableManager {
      * This method check that the MCRObjectID exist in this store.
      * 
      * @param mcrid
-     *            a MCRObjectID
+     *                    a MCRObjectID
      * 
      * @return true if the MCRObjectID exist, else return false
      */
-    public final boolean exist(MCRObjectID mcrid) {
+    public boolean exist(MCRObjectID mcrid) {
         return getXMLTable(mcrid.getTypeId()).exist(mcrid, 1);
     }
 
@@ -222,11 +233,34 @@ public class MCRXMLTableManager {
      * table of a MCRObjectID type.
      * 
      * @param type
-     *            a MCRObjectID type string
+     *                    a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
     public ArrayList retrieveAllIDs(String type) {
         return getXMLTable(type).retrieveAllIDs(type);
+    }
+
+    /**
+     * returns the JDOM-Document of the given MCRObjectID. This method uses
+     * caches to save database connections. Use this if you want to get a JDOM
+     * Document not just plain xml.
+     * 
+     * @param id
+     *                    ObjectID of MyCoRe Document
+     * @return MyCoRe Document as JDOM
+     */
+    public Document readDocument(MCRObjectID id) {
+        Document jDoc = (Document) jdomCache.get(id);
+        if (jDoc == null) {
+            jDoc = MCRXMLHelper.parseXML(retrieve(id), false);
+            if (jDoc != null) {
+                jdomCache.put(id, jDoc);
+            }
+        } else {
+            LOGGER.debug(new StringBuffer("read ").append(id).append(
+                    " from MCRCache..."));
+        }
+        return jDoc;
     }
 
 }

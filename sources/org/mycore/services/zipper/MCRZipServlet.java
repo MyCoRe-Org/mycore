@@ -24,54 +24,43 @@
 
 package org.mycore.services.zipper;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.*;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
 import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRLayoutServlet;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRLayoutServlet;
-import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.user.MCRAccessChecker;
-import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * This servlet delivers the contents of MycoreObects to the client as
@@ -167,10 +156,10 @@ public class MCRZipServlet extends MCRServlet {
         }
 
         MCRXMLContainer result = new MCRXMLContainer();
-        byte[] xml = xmltable.retrieve(mcrid);
 
         try {
-            result.add("local", mcrid.getId(), 0, xml);
+            result.add("local", mcrid.getId(), 0, (Element) xmltable
+                    .readDocument(mcrid).getRootElement().clone());
             Document jdom = result.exportAllToDocument();
             if (jdom.getRootElement().getChild("mcr_result").getChild(
                     "mycorederivate") != null) {
@@ -197,7 +186,7 @@ public class MCRZipServlet extends MCRServlet {
      * sendZipped adds a single File to the ZipOutputStream,
      * 
      * @param file
-     *            MCRFile, that has to be zipped
+     *                    MCRFile, that has to be zipped
      */
     protected void sendZipped(MCRFile file, ZipOutputStream out)
             throws IOException {
@@ -213,7 +202,7 @@ public class MCRZipServlet extends MCRServlet {
      * sendZipped adds a whole Directory of an Derivate to the ZipOutputStream
      * 
      * @param directory
-     *            MCRDirectory, that has to be zipped
+     *                    MCRDirectory, that has to be zipped
      */
     protected void sendZipped(MCRDirectory directory, ZipOutputStream out)
             throws IOException {
@@ -235,10 +224,10 @@ public class MCRZipServlet extends MCRServlet {
      * XSL-Transformation with the Metadata
      * 
      * @param jdom
-     *            MycoreObject-ResultContainer as org.jdom.Document
+     *                    MycoreObject-ResultContainer as org.jdom.Document
      * @param parameters
-     *            Parameters, that can be needed in the transforming
-     *            XSL-Stylesheet
+     *                    Parameters, that can be needed in the transforming
+     *                    XSL-Stylesheet
      */
     protected void sendZipped(Document jdom, Properties parameters,
             ZipOutputStream out) throws IOException {
@@ -262,10 +251,10 @@ public class MCRZipServlet extends MCRServlet {
      * derivate
      * 
      * @param ownerID
-     *            the derivateID that should be zipped
+     *                    the derivateID that should be zipped
      * @param dirpath
-     *            relative path zu a special folder, if given, only this folder
-     *            is zipped
+     *                    relative path zu a special folder, if given, only this folder
+     *                    is zipped
      */
     protected void sendDerivate(String ownerID, String dirpath,
             HttpServletRequest req, HttpServletResponse res, ZipOutputStream out)
@@ -317,7 +306,7 @@ public class MCRZipServlet extends MCRServlet {
      * was built via a given xsl-stylesheet
      * 
      * @param jdom
-     *            the JDOM of the given MycoreObject
+     *                    the JDOM of the given MycoreObject
      *  
      */
     protected void sendObject(Document jdom, HttpServletRequest req,
@@ -350,10 +339,10 @@ public class MCRZipServlet extends MCRServlet {
      * Returns the ZipOutputStream
      * 
      * @param id
-     *            the id of the object or derivate that is zipped, builds the
-     *            name
+     *                    the id of the object or derivate that is zipped, builds the
+     *                    name
      * @param dirpath
-     *            if given, it is concatenated to the name of the zip-file
+     *                    if given, it is concatenated to the name of the zip-file
      *  
      */
     protected ZipOutputStream buildZipOutputStream(HttpServletResponse res,

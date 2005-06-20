@@ -103,11 +103,11 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
      * 1 an empty list was returned.
      * 
      * @param query
-     *            the XQuery string
+     *                    the XQuery string
      * @param maxresults
-     *            the maximum of results
+     *                    the maximum of results
      * @param type
-     *            a list of the MCRObject types seperated by ,
+     *                    a list of the MCRObject types seperated by ,
      * @return a result list as MCRXMLContainer
      */
     public MCRXMLContainer getResultList(String query, String type,
@@ -246,8 +246,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
                 for (int p = 0; p < subqueries.size(); p++) {
                     if (onetype.equals(testid[p].getTypeId())) {
                         try {
-                            byte[] xml = xmltable.retrieve(testid[p]);
-                            result.add("local", testid[p].getId(), 0, xml);
+                            result.add("local", testid[p].getId(), 0,
+                                    (Element) xmltable.readDocument(testid[p])
+                                            .getRootElement().clone());
                         } catch (Exception e) {
                         }
                     }
@@ -278,7 +279,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
      * returns the ObjectID of the Object containing derivate with given ID
      * 
      * @param DerivateID
-     *            ID of Derivate
+     *                    ID of Derivate
      * @return ObjectID if found, else null
      */
     public MCRObjectID getObjectID(String DerivateID) {
@@ -303,7 +304,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
      * XML, nothing will be add for this MCRObjectID.
      * 
      * @param objectIDs
-     *            the set of MCRObjectID's
+     *                    the set of MCRObjectID's
      * @return a MCRResultContainer
      */
     protected MCRXMLContainer createResultContainer(HashSet objectIDs) {
@@ -314,8 +315,8 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
         for (Iterator it = objectIDs.iterator(); it.hasNext();) {
             try {
                 MCRObjectID s = (MCRObjectID) it.next();
-                byte[] xml = xmltable.retrieve(s);
-                result.add("local", s.getId(), 0, xml);
+                result.add("local", s.getId(), 0, (Element) xmltable
+                        .readDocument(s).getRootElement().clone());
             } catch (Exception e) {
             }
         }
@@ -328,7 +329,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
      * persitence layer.
      * 
      * @param type
-     *            the MCRObject type
+     *                    the MCRObject type
      * @return a result list as MCRXMLContainer
      */
     abstract protected MCRXMLContainer startQuery(String type);
