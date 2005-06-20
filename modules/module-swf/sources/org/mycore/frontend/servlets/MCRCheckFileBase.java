@@ -95,11 +95,12 @@ public void doGetPost(MCRServletJob job) throws Exception
   MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
   String userid = mcrSession.getCurrentUserID();
   //userid = "administrator";
-  logger.debug("Curren user for edit check = "+userid);
+  logger.debug("Current user for edit check = "+userid);
   ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
   if (!hasPrivileg(privs,type)) {
-    String pagedir = CONFIG.getString( "MCR.editor_page_dir","" );
-    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+pagedir+"editor_error_user.xml"));
+	String usererrorpage = CONFIG.getString( "MCR.editor_page_dir","" ) +
+		CONFIG.getString( "MCR.editor_page_error_user", "editor_error_user.xml" );
+    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
     return;
     }
   String mylang = mcrSession.getCurrentLanguage();
