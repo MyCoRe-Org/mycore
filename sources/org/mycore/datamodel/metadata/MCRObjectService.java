@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * changes. The service class holds two types of data, dates and flags. The
  * flags are text strings and are optional.
  * <p>
- * 
+ *
  * The dates are represent by a date and a type. Two types are in service data
  * at every time and can't remove:
  * <ul>
@@ -53,7 +53,7 @@ import org.mycore.common.MCRException;
  * <li>validtodate - for the date of the object, at this the object is no more
  * valid to use</li>
  * </ul>
- * 
+ *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -90,7 +90,7 @@ public class MCRObjectService {
     /**
      * This methode read the XML input stream part from a DOM part for the
      * structure data of the document.
-     * 
+     *
      * @param dom_element_list
      *            a list of relevant DOM elements for the metadata
      */
@@ -150,7 +150,7 @@ public class MCRObjectService {
     /**
      * This method get a date for a given type. If the type was not found, an
      * null was returned.
-     * 
+     *
      * @param type
      *            the type of the date
      * @return the date as GregorianCalendar
@@ -174,7 +174,7 @@ public class MCRObjectService {
 
     /**
      * This method remove a date for a given type.
-     * 
+     *
      * @param type
      *            the type of the date
      */
@@ -197,7 +197,7 @@ public class MCRObjectService {
     /**
      * This methode set a date element in the dates list to a actual date value.
      * If the given type exists, the date was update.
-     * 
+     *
      * @param type
      *            the type of the date
      */
@@ -225,7 +225,7 @@ public class MCRObjectService {
     /**
      * This methode set a date element in the dates list to a given date value.
      * If the given type exists, the date was update.
-     * 
+     *
      * @param type
      *            the type of the date
      * @param date
@@ -257,7 +257,7 @@ public class MCRObjectService {
 
     /**
      * This methode add a flag to the flag list.
-     * 
+     *
      * @param value -
      *            the new flag as string
      */
@@ -272,7 +272,7 @@ public class MCRObjectService {
 
     /**
      * This methode get all flags from the flag list as a string.
-     * 
+     *
      * @return the flags string
      */
     public final String getFlags() {
@@ -285,7 +285,7 @@ public class MCRObjectService {
 
     /**
      * This methode get a single flag from the flag list as a string.
-     * 
+     *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a flag string
@@ -299,7 +299,7 @@ public class MCRObjectService {
 
     /**
      * This methode return a boolean value if the given flag is set or not.
-     * 
+     *
      * @param value
      *            a searched flag
      * @return true if the flag was found in the list
@@ -318,7 +318,7 @@ public class MCRObjectService {
 
     /**
      * This methode remove a flag from the flag list.
-     * 
+     *
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
@@ -333,7 +333,7 @@ public class MCRObjectService {
 
     /**
      * This methode set a flag in the flag list.
-     * 
+     *
      * @param index
      *            a index in the list
      * @param value
@@ -356,7 +356,7 @@ public class MCRObjectService {
 
     /**
      * This methode create a XML stream for all structure data.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
@@ -395,7 +395,7 @@ public class MCRObjectService {
 
     /**
      * This methode create a typed content list for all structure data.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a MCRTypedContent with the data of the metadata part
@@ -431,7 +431,7 @@ public class MCRObjectService {
      * <li>the date value of "modifydate" is not null or empty
      * </ul>
      * otherwise the method return <em>false</em>
-     * 
+     *
      * @return a boolean value
      */
     public final boolean isValid() {
@@ -443,6 +443,25 @@ public class MCRObjectService {
         }
         return true;
     }
+
+    /**
+    * This methode returns the index for the given flag value.
+    *
+    * @param value                 the value of a flag as string
+    *
+    **/
+    public final int getFlagIndex(String value)       {
+
+      if ((value == null) || ((value = value.trim()).length() == 0)) {
+          return -1;
+      }
+      for (int i = 0; i < flags.size(); i++) {
+         if (((MCRMetaLangText) flags.get(i)).getText().equals(value)) {
+               return i;
+         }
+      }
+      return -1;
+     }
 
 }
 
