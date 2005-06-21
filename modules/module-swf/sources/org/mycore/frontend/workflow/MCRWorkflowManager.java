@@ -342,7 +342,11 @@ public final boolean commitMetadataObject(String type, String ID)
   {
   // commit metadata
   String fn = getDirectoryPath(type)+SLASH+ID+".xml";
-  MCRObjectCommands.updateFromFile(fn);
+  if (MCRObject.existInDatastore(ID)){
+      MCRObjectCommands.updateFromFile(fn);
+  } else {
+      MCRObjectCommands.loadFromFile(fn);
+  }
   logger.info("The metadata objekt was "+fn+" loaded.");
   // commit derivates
   if (!MCRObject.existInDatastore(ID)) { return false; }
