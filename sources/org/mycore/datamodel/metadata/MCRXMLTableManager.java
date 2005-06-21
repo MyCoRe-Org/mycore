@@ -188,6 +188,8 @@ public class MCRXMLTableManager {
      * @param mcrid
      *                    a MCRObjectID
      * 
+     * @return
+     *                         the byte array of data or NULL
      * @exception if
      *                         the method arguments are not correct
      */
@@ -247,18 +249,23 @@ public class MCRXMLTableManager {
      * 
      * @param id
      *                    ObjectID of MyCoRe Document
-     * @return MyCoRe Document as JDOM
+     * @return MyCoRe Document as JDOM or NULL
      */
     public Document readDocument(MCRObjectID id) {
         Document jDoc = (Document) jdomCache.get(id);
         if (jDoc == null) {
-            jDoc = MCRXMLHelper.parseXML(retrieve(id), false);
-            if (jDoc != null) {
-                jdomCache.put(id, jDoc);
+            try {
+                jDoc = MCRXMLHelper.parseXML(retrieve(id), false);
+                if (jDoc != null) {
+                    jdomCache.put(id, jDoc);
+                    LOGGER.debug(new StringBuffer("write ").append(id).append(" to MCRCache..."));
+                }
+            }
+            catch (Exception ex) {
+                jDoc = null;
             }
         } else {
-            LOGGER.debug(new StringBuffer("read ").append(id).append(
-                    " from MCRCache..."));
+            LOGGER.debug(new StringBuffer("read ").append(id).append(" from MCRCache..."));
         }
         return jDoc;
     }
