@@ -35,7 +35,10 @@
 # MCR.JDBCStore.LibPath=java lib
 
 # MySQL under Linux or Windows: JDBC driver is included in MyCoRe!
-MCR.JDBCStore.Type=mysql
+  MCR.JDBCStore.Type=mysql
+
+# Hibernate for Linux or Windows: the Hibernate access to SQL DB's is included!
+# MCR.JDBCStore.Type=hibernate
 
 ####################################################################### 
 #
@@ -56,6 +59,12 @@ MCR.JDBCStore.Type=mysql
 #   relative to BaseDir, separated by blanks
 #
 #######################################################################
+
+# Native JDOM store in memory
+  MCR.XMLStore.Type=jdom
+
+# Lucene store
+# MCR.XMLStore.Type=lucene
 
 # IBM Content Manager Version 8.2 under IBM AIX
 # MCR.XMLStore.Type=cm8
@@ -103,13 +112,4 @@ MCR.JDBCStore.Type=mysql
 #######################################################################
 # End of Experimental state DO NOT USE THIS !!!
 #######################################################################
-
-# Lucene 
-# MCR.XMLStore.Type=lucene
-
-# Native JDOM store in memory
-  MCR.XMLStore.Type=jdom
-
-#######################################################################
-
 

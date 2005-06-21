@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.95 $ $Date: 2005-06-17 11:19:23 $                      -->
+  <!-- $Revision: 1.96 $ $Date: 2005-06-21 06:52:46 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -23,8 +23,8 @@
   <!-- Read in all environment variables -->
   <property environment="env" />
 
-  <!-- Read in properties from bin/build.properties -->
-  <property file="${basedir}/bin/build.properties" />
+  <!-- Read in properties from config/build.properties -->
+  <property file="${basedir}/config/build.properties" />
 
   <!-- MyCoRe CVS repository root -->
   <property name="CVSRoot" value="/cvs" />
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.95 $ $Date: 2005-06-17 11:19:23 $</echo>
+    <echo>Ant build file   : $Revision: 1.96 $ $Date: 2005-06-21 06:52:46 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -159,7 +159,7 @@
       <fileset dir="${basedir}/classes" includes="**/*.class"          />
       <fileset dir="${basedir}/classes" includes="META-INF/services/*" />
       <fileset dir="${basedir}/schema"  includes="*.xsd *.dtd"         />
-      <fileset dir="${basedir}/bin"     includes="build.properties"    />
+      <fileset dir="${basedir}/config"  includes="build.properties"    />
     </jar>
     <echo>---------------------------------------------------------</echo>
   </target>
