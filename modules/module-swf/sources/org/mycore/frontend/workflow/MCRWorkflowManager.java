@@ -374,7 +374,11 @@ public final boolean commitMetadataObject(String type, String ID)
 public final boolean commitDerivateObject(String type, String ID)
   {
   String fn = getDirectoryPath(type)+SLASH+ID+".xml";
-  MCRDerivateCommands.updateFromFile(fn);
+  if (MCRDerivate.existInDatastore(ID)){
+      MCRDerivateCommands.updateFromFile(fn);
+  } else {
+      MCRDerivateCommands.loadFromFile(fn);
+  }
   if (!MCRDerivate.existInDatastore(ID)) { return false; }
   logger.debug("Commit the derivate "+fn);
   return true;
