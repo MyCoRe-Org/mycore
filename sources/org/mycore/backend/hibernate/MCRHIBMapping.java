@@ -95,7 +95,7 @@ public class MCRHIBMapping {
 	    // CStore
 	    map = new MCRTableGenerator("MCRCSTORE", "org.mycore.backend.hibernate.tables.MCRCSTORE", "", 1);
 	    map.addIDColumn("storageid","STORAGEID", dbString, 64, "assigned", true);
-	    map.addColumn("content", "CONTENT",dbBlob,256, false, false, false);
+	    map.addColumn("content", "CONTENT",dbBlob,0, false, false, false);
 	    cfg.addXML(map.getTableXML());
 
 	    // FS Nodes
