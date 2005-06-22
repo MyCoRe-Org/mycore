@@ -255,8 +255,7 @@ public class MCRXMLTableManager {
         if (jDoc == null) {
             byte[] xml = retrieve(id);
             if (xml == null || xml.length == 0) {
-                LOGGER
-                        .error("Error while retrieving XML from MCRXMLTableInterface");
+                LOGGER.error("Error while retrieving XML with id "+id+" from MCRXMLTableInterface");
                 return null;
             }
             jDoc = MCRXMLHelper.parseXML(xml, false); //read from MCRXMLTable
