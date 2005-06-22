@@ -91,6 +91,12 @@ public class MCRHIBMapping {
 	    map.addColumn("text", "TEXT",dbString,254, false, false, false);
 	    map.addColumn("mcrdesc", "MCRDESC", dbString, 254, false, false, false);
 	    cfg.addXML(map.getTableXML());
+	    
+	    // CStore
+	    map = new MCRTableGenerator("MCRCSTORE", "org.mycore.backend.hibernate.tables.MCRCSTORE", "", 1);
+	    map.addIDColumn("storageid","STORAGEID", dbString, 64, "assigned", true);
+	    map.addColumn("content", "CONTENT",dbBlob,256, false, false, false);
+	    cfg.addXML(map.getTableXML());
 
 	    // FS Nodes
 	    map = new MCRTableGenerator(config.getString("MCR.IFS.FileMetadataStore.SQL.TableName"), "org.mycore.backend.hibernate.tables.MCRFSNODES", "", 1);
