@@ -54,14 +54,6 @@ public class MCRHIBMapping {
 	try {
 	    MCRTableGenerator map;
 
-	    // derivate
-	    map = new MCRTableGenerator( "MCRXMLTYPE", "org.mycore.backend.hibernate.tables.MCRXMLType", "", 2);
-            map.addIDColumn("mcrid","MCRID", dbString, 64, "assigned", false);
-	    map.addIDColumn("mcrversion", "MCRVERSION", dbInt, 0, "assigned", false);
-	    map.addColumn("mcrtype", "MCRTYPE", dbString, 64, false, false, false);
-	    map.addColumn("mcrxml", "MCRXML", dbBlob, 0, false, false, false);
-	    cfg.addXML(map.getTableXML());
-
 	    // Category
 	    map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_categ"), "org.mycore.backend.hibernate.tables.MCRCATEG","", 2);
 	    map.addIDColumn("id","ID",dbString, 128, "assigned", true);
