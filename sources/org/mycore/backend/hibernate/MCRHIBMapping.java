@@ -58,7 +58,7 @@ public class MCRHIBMapping {
 	    map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_categ"), "org.mycore.backend.hibernate.tables.MCRCATEG","", 2);
 	    map.addIDColumn("id","ID",dbString, 128, "assigned", true);
 	    map.addIDColumn("clid","CLID",dbString, 64, "assigned", true);
-	    map.addColumn("pid","PID",dbString, 128, true,false, false);
+	    map.addColumn("pid","PID",dbString, 128, false,false, false);
 	    map.addColumn("url","URL",dbString, 254, true,false, false);
 	    cfg.addXML(map.getTableXML());
 
