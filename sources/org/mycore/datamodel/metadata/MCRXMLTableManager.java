@@ -267,7 +267,7 @@ public class MCRXMLTableManager {
             LOGGER.debug(new StringBuffer("read ").append(id).append(
                     " from MCRCache..."));
         }
-        return jDoc;
+        return (Document)jDoc.clone();
     }
 
 }
