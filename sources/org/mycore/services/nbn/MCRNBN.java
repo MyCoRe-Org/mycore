@@ -43,8 +43,8 @@ import org.mycore.common.MCRConfigurationException;
  * 
  * <code>urn:nbn:de:hbz:465-123456788</code>
  * 
- * @author Frank Lützenkirchen
- * @author Werner Greßhoff
+ * @author Frank L&uuml;tzenkirchen
+ * @author Werner Gre&szlig;hoff
  * @version $Revision$ $Date$
  */
 public class MCRNBN {
@@ -115,7 +115,7 @@ public class MCRNBN {
             manager = (MCRNBNManager) config
                     .getInstanceOf("MCR.NBN.ManagerImplementation");
         } catch (MCRConfigurationException mcrx) {
-            String msg = "Missing configuration data.";
+            String msg = "Missing configuration data: MCR.NBN.NamespacePrefix / MCR.NBN.ManagerImplementation";
             logger.fatal(msg);
         }
     }
