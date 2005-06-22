@@ -316,7 +316,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	ArrayList children = new ArrayList();
 
 	Session session = getSession();
-        List l = session.createQuery("from MCRCATEG where PID = '" + PID + "' and CLID = '" + CLID + "'").list();
+
+        List l = session.createQuery("from MCRCATEG where PID = "+(PID!=null?"'"+PID+"'":"null")+" and CLID = '" + CLID + "'").list();
 
 	int t;
 	for(t=0;t<l.size();t++) {
