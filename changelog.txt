@@ -15,6 +15,7 @@ Version 1.1
 - MCRURIResolver now handles the 'query:' protocol to save http request to the
   MCRQueryServlet
 - Move the configuration from bin to the config directory.
+- Add the MCRIndexServlet to create searchable pages for robots.
 
 
 Version 1.0
