@@ -44,7 +44,6 @@ public class MCRHIBConnection {
 
     protected static Configuration cfg;
     protected static SessionFactory sessions;
-    protected static Session session;
 
     protected static MCRHIBConnection singleton;
 
@@ -70,13 +69,6 @@ public class MCRHIBConnection {
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException{
         if (singleton == null){
             singleton = new MCRHIBConnection();
-        }
-        try{
-            if (! session.isOpen()){
-                session.reconnect();
-            }
-        }catch(Exception e){
-            buildSessionFactory();
         }
         return singleton;
     }
@@ -175,10 +167,4 @@ public class MCRHIBConnection {
 	    return id.getId();
 	}
     }
-
-
-    public void closeSession(){
-        session.close();
-    }
-
 }
