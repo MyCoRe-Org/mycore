@@ -79,6 +79,7 @@ public class MCRSearchMerger extends MCRQueryBase {
         MCRXMLContainer result = new MCRXMLContainer();
         boolean hasts = false; // true if we have a full text search
         boolean hasmeta = false; // true if we have a metadata search
+        int doctextpos = -1;
 
         // Make all document searches
         HashSet idts = new HashSet();
@@ -86,6 +87,7 @@ public class MCRSearchMerger extends MCRQueryBase {
             if (((String) subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
                 hasts = true;
                 flags.set(i, Boolean.TRUE);
+                doctextpos = i;
                 logger
                         .debug("TextSearch query : "
                                 + (String) subqueries.get(i));
@@ -148,8 +150,16 @@ public class MCRSearchMerger extends MCRQueryBase {
             myresult = idts;
         }
         if ((hasts) && (hasmeta)) {
-            myresult = MCRUtils.mergeHashSets(idts, idmeta,
-                    MCRUtils.COMMAND_AND);
+            char logic = MCRUtils.COMMAND_AND;
+            if (doctextpos >= 1) {
+              if (((String)andor.get(doctextpos-1)).equals("or")) {
+                 logic = MCRUtils.COMMAND_OR; }
+              }
+            else {
+              if (((String)andor.get(doctextpos)).equals("or")) {
+                 logic = MCRUtils.COMMAND_OR; }
+              }
+            myresult = MCRUtils.mergeHashSets(idts, idmeta, logic);
         }
         logger.debug("Number of items in HashSet befor cutting "
                 + Integer.toString(myresult.size()));
