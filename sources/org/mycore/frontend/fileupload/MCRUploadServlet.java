@@ -187,7 +187,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             String url = MCRUploadHandlerManager.instance().getHandle(uploadId)
                     .getRedirectURL();
             LOGGER.info("REDIRECT " + url);
-            res.sendRedirect(url);
+            res.sendRedirect(res.encodeRedirectURL(url));
             return;
         } else if (method.equals("startDerivateSession String int")) {
             String uploadId = req.getParameter("uploadId");
