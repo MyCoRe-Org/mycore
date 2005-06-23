@@ -497,6 +497,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements
             INDEX_WRITER.optimize();
         }
         INDEX_WRITER.close();
+        loadIndexReader();
         loadIndexSearcher();
     }
 
