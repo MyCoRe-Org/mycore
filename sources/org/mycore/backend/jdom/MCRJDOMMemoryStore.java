@@ -165,7 +165,7 @@ public class MCRJDOMMemoryStore {
         for (int i = 0; i < size; i++) {
             stid = (String) ar.get(i);
             mid = new MCRObjectID(stid);
-            jdom_document = mcr_xml.readDocument(mid);
+            jdom_document = (Document)mcr_xml.readDocument(mid).clone();
             objects.put(mid, jdom_document.detachRootElement());
             logger.debug("Load to JDOM tree " + stid);
         }
