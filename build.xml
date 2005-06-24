@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.97 $ $Date: 2005-06-21 13:06:08 $                      -->
+  <!-- $Revision: 1.98 $ $Date: 2005-06-24 13:50:20 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.97 $ $Date: 2005-06-21 13:06:08 $</echo>
+    <echo>Ant build file   : $Revision: 1.98 $ $Date: 2005-06-24 13:50:20 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -573,14 +573,17 @@
     <antcall target="distribution.module">
       <param name="Distrib.Module" value="mycoresample" />
     </antcall>
+    <antcall target="distribution.module">
+      <param name="Distrib.Module" value="content" />
+    </antcall>
   </target>
 
   <target name="distribution.module">
     <property name="Distrib.TmpDir"     value="tmp"      />
     <property name="Distrib.TargetDir"  value="/mcr/www/download" />
     <property name="Distrib.CVSRoot"    value=":pserver:anoncvs@server.mycore.de:/cvs" />
-    <property name="Distrib.ReleaseTag" value="release_1_0" />
-    <property name="Distrib.ReleaseNr"  value="1.0" />
+    <property name="Distrib.ReleaseTag" value="release_1_1_fixes" />
+    <property name="Distrib.ReleaseNr"  value="1.1" />
 
     <delete dir="${Distrib.TmpDir}" />
 
