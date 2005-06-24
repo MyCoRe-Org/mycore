@@ -575,6 +575,8 @@ public class MCRHIBUserStore implements MCRUserStore {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         try {
+            ArrayList newPrivs = group.getPrivileges();
+            
             List l = session.createQuery("from MCRGROUPS where GID = '" + group.getID() + "'").list();
             MCRGROUPS dbgroup = new MCRGROUPS();
             if (l.size() >= 0){
@@ -587,7 +589,7 @@ public class MCRHIBUserStore implements MCRUserStore {
                 }
             }
         
-            // update groupadmins
+            // prepare groupadmin arraylist
             ArrayList oldAdminUserIDs = new ArrayList();
             ArrayList oldAdminGroupIDs = new ArrayList();
             ArrayList newAdminGroupIDs = group.getAdminGroupIDs();
@@ -603,10 +605,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             	}
             }
             
-            // Now we update the membership lookup table. First we collect
-            // information about which users have been added or removed.
-            // Therefore we compare the list of users this group has as members
-            // before and after the update.
+            // prepare groupmember arraylist
             ArrayList oldUserIDs = new ArrayList();
             ArrayList newUserIDs = group.getMemberUserIDs();
             l = session.createQuery("from MCRGROUPMEMBERS where GID='" + group.getID() + "'").list();
@@ -631,18 +630,8 @@ public class MCRHIBUserStore implements MCRUserStore {
                     oldGroupIDs.add((String) grpmembers.getGroupid());
                 }
             }
-            
-            // Now we collect information about which privileges have been added
-            // or removed. Therefor we compare the list of privileges this group
-            // has before and after the update.
-            ArrayList oldPrivs = new ArrayList();
-            ArrayList newPrivs = group.getPrivileges();
-            l = session.createQuery("from MCRPRIVSLOOKUP where GID='" + group.getID() + "'").list();
-            for (int i = 0; i < l.size(); i++){
-                MCRPRIVSLOOKUP privsLookup = new MCRPRIVSLOOKUP();
-                oldPrivs.add((String) privsLookup.getName());
-            }
-            
+
+            // after selection close commit transaction
             tx.commit();
             session.close();
             session = MCRHIBConnection.instance().getSession();
@@ -736,27 +725,17 @@ public class MCRHIBUserStore implements MCRUserStore {
                 }
             }
 
-            // We search for new privileges and insert them into the lookup
-            // table
-            tx = session.beginTransaction();
-            for (int i = 0; i < newPrivs.size(); i++) {
-                if (!oldPrivs.contains(newPrivs.get(i))) {
-                    MCRPRIVSLOOKUP privsLookup = new MCRPRIVSLOOKUP();
-                    privsLookup.setGid(group.getID());
-                    privsLookup.setName((String) newPrivs.get(i));
-                    session.saveOrUpdate(privsLookup);
-                }
-            }
-
-            // We search for the privileges which have been removed from this
-            // group and delete the entries from the privilege lookup table
-            for (int i = 0; i < oldPrivs.size(); i++) {
-                if (!newPrivs.contains(oldPrivs.get(i))) {
-                    int deletedEntities = session.createQuery(
-                            "delete MCRPRIVSLOOKUP where GID = '" + group.getID() + "' " +
-                            		"and NAME ='"+ (String) oldPrivs.get(i) +"'")
+            // update lookup privileges of group (delete and re-insert)
+            int deletedEntities = session.createQuery(
+                    "delete MCRPRIVSLOOKUP where GID = '" + group.getID() + "' ")
                     .executeUpdate();
-                }
+            session.flush();
+            for (int i = 0; i < newPrivs.size(); i++) {
+                MCRPRIVSLOOKUP privsLookup = new MCRPRIVSLOOKUP();
+                privsLookup.setGid(group.getID());
+                privsLookup.setName((String) newPrivs.get(i));
+                session.save(privsLookup);
+                session.flush();
             }
             tx.commit();
             
@@ -996,12 +975,11 @@ public class MCRHIBUserStore implements MCRUserStore {
      * @param privilegeSet
      *            the privilege set object to be updated
      */
-    public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) {       
+    public void updatePrivilegeSet(MCRPrivilegeSet privilegeSet) {    
+        ArrayList privileges = privilegeSet.getPrivileges();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
-        
-        ArrayList privileges = privilegeSet.getPrivileges();
-        try{
+        try{          
             for(int i = 0; i < privileges.size(); i++){
                 MCRPrivilege thePrivilege = (MCRPrivilege) privileges.get(i);
                 MCRPRIVSM priv = new MCRPRIVSM();
