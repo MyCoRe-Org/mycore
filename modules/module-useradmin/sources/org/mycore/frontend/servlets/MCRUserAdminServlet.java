@@ -48,7 +48,11 @@ import org.mycore.user.MCRUserMgr;
 
 public class MCRUserAdminServlet extends MCRUserAdminGUICommons
 {
-    private static final Logger LOGGER = Logger.getLogger(MCRUserAdminServlet.class);
+    /**
+	 * Comment for <code>serialVersionUID</code>
+	 */
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(MCRUserAdminServlet.class);
     private static String SLASH = System.getProperty("file.separator");
     
     /** Initialisation of the servlet */
@@ -83,6 +87,9 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons
             createUser(job, currentPrivs); 
         else if (mode.equals("modifyuser")) 
             modifyUser(job, currentPrivs);
+        else if (mode.equals("listalluser")) 
+            listallUser(job, currentPrivs);
+        
         else { // no valid mode
             String msg = "The request did not contain a valid mode for this servlet!"; 
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
@@ -117,11 +124,37 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons
         params.put( "XSL.editor.source.new", "true" );
         params.put( "XSL.editor.cancel.url", getBaseURL() + cancelPage);
         params.put( "usecase", "create-user");
-        job.getResponse().sendRedirect(job.getResponse()
-           .encodeRedirectURL(buildRedirectURL(base, params)));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
         return;
     }
     
+    /**
+     * This method handles the list all users use case. The result is the XML of userlist
+     * 
+     * @param  job
+     *             The MCRServletJob instance
+     * @throws IOException
+     *             for java I/O errors.
+     * @throws ServletException
+     *             for errors from the servlet engine.
+     */
+     
+     private void listallUser(MCRServletJob job, ArrayList currentPrivs) 
+    throws IOException, ServletException
+    {
+        // We first check the privileges for this use case
+        if (!currentPrivs.contains("user administrator") && 
+            !currentPrivs.contains("list all users")) {
+            showNoPrivsPage(job);
+            return;
+        }
+        
+        // Now we redirect the browser to the userlist formular
+        String UserServlet = getBaseURL() + "servlets/MCRUserEditorServlet?mode=retrievealluserxml" ;
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(UserServlet));
+        return;
+    }
+
     /**
      *  This method is still experimental !
      */
@@ -137,15 +170,13 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons
         
         // Now we redirect the browser to the modify-user formular
         String editorFormular = pageDir + "editor_form_modify-user.xml";
+        String uid = getProperty(job.getRequest(), "uid");
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
-        //params.put( "XSL.editor.source.url", "file://d:/u.xml" );
-        params.put( "XSL.editor.source.url", 
-            "servlets/MCRUserEditorServlet?mode=retrieveuserxml&uid=author1A" );
+        params.put( "XSL.editor.source.url", "servlets/MCRUserEditorServlet?mode=retrieveuserxml&uid="+uid );        
         params.put( "XSL.editor.cancel.url", getBaseURL() + cancelPage);
         params.put( "usecase", "modify-user");
-        job.getResponse().sendRedirect(job.getResponse()
-           .encodeRedirectURL(buildRedirectURL(base, params)));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
         return;
     }
 }

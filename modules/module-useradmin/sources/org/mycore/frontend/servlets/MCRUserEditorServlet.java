@@ -82,11 +82,16 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons
         ArrayList currentPrivs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(currentUserID);
 
         String mode = getProperty(job.getRequest(), "mode");
+        
         if (mode == null) {mode = "xml";}
         if (mode.equals("getAssignableGroupsForUser"))
             getAssignableGroupsForUser(job, currentPrivs);
         else if (mode.equals("retrieveuserxml")) 
             retrieveUserXML(job, currentPrivs);
+         
+        else if (mode.equals("retrievealluserxml"))  
+        	retrieveAllUserXML(job, currentPrivs);
+        
         else if (mode.equals("xml"))
             getEditorSubmission(job);
         else { // no valid mode
@@ -160,6 +165,44 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons
         forwardXML(job, jdomDoc);
     }
 
+
+    
+    /**
+     * This method retrieves the all users list 
+     *   
+     * @param  job
+     *             The MCRServletJob instance
+     * @param  currentPrivs
+     *             The current privlegs in ArrayList
+     *             
+     * @throws IOException
+     *             for java I/O errors.
+     * @throws ServletException
+     *             for errors from the servlet engine.
+     */
+    private void retrieveAllUserXML(MCRServletJob job, ArrayList currentPrivs) 
+    throws IOException, ServletException
+    {
+        // We first check the privileges for this use case
+        if (!currentPrivs.contains("user administrator") && 
+            !currentPrivs.contains("list all user")) {
+            showNoPrivsPage(job);
+            return;
+        }
+        
+        try {
+        	org.jdom.Document userlist = MCRUserMgr.instance().getAllUsers();
+            doLayout(job, "ListAllUser", userlist, false);
+            
+        }
+        catch (MCRException ex) {   
+            // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
+            String msg = "An error occured while retrieving a user object from the store!"; 
+            job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+        }
+        return;
+    }
+    
     /**
      *  This method is still experimental! It is needed in the use case "modify user".
      */
@@ -173,8 +216,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons
             return;
         }
         
-        String userID = getProperty(job.getRequest(), "uid");
         try {
+        	String userID=getProperty(job.getRequest(), "uid");
             MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
             org.jdom.Document jdomDoc = user.toJDOMDocument();
             forwardXML (job, jdomDoc);
@@ -217,7 +260,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons
         String useCase = parms.getParameter("usecase");
         
         // Determine the use case 
-        if (useCase.equals("create-user") && 
+        if ( (useCase.equals("create-user")|| useCase.equals("modify-user")) && 
             jdomDoc.getRootElement().getName().equals("mycoreuser"))
         {
             String numID = Integer.toString(MCRUserMgr.instance().getMaxUserNumID() + 1);
@@ -232,12 +275,16 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons
             org.jdom.Element userElement = jdomDoc.getRootElement().getChild("user"); 
             
             try {
-                MCRUser newUser = new MCRUser(userElement, true);
-                MCRUserMgr.instance().createUser(newUser);
+            	if ( useCase.equals("create-user") ) {
+            		MCRUser newUser = new MCRUser(userElement, true);
+            		MCRUserMgr.instance().createUser(newUser);
                 
-                LOGGER.info("User "+currentUserID+" has successfully created the new user: "
+            		LOGGER.info("User "+currentUserID+" has successfully created the new user: "
                             +newUser.getID());
-                
+            	} else {
+            		MCRUser thisUser = new MCRUser(userElement, true);
+            		MCRUserMgr.instance().updateUser(thisUser);
+            	}
                 //doLayout(job, "xml", jdomDoc, true);
                 showOkPage(job);
             }
