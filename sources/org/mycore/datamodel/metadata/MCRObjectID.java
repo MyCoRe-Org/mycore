@@ -27,6 +27,7 @@ package org.mycore.datamodel.metadata;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -34,9 +35,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 
 /**
- * This class holds all information an methode to handle the MyCoRe Object ID.
- * The MyCoRe Object ID is a special ID with three parts, they are a project
- * identifier, a type identifier and a string with a number.
+ * This class holds all informations and methods to handle the 
+ * MyCoRe Object ID.
+ * The MyCoRe Object ID is a special ID to identify each metadata 
+ * object with three parts, they are the project
+ * identifier, the type identifier and a string with a number.
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -44,23 +47,23 @@ import org.mycore.common.MCRUsageException;
  */
 public final class MCRObjectID {
 
-    protected static MCRConfiguration CONFIG;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
-
-    private static int lastnumber = -1;
-
     /**
-     * constant value for the object id length
+     * public constant value for the MCRObjectID length
      */
     public static final int MAX_LENGTH = 64;
 
     // constant definitions
-    private static final String NL = new String((System.getProperties())
-            .getProperty("line.separator"));
+    private static final String NL = new String((System.getProperties()).getProperty("line.separator"));
 
-    private static MCRConfiguration conf = null;
+    // configuration values
+    protected static MCRConfiguration CONFIG;
 
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+
+    // counter for the next IDs per project base ID
+    private static HashMap lastnumber = new HashMap();
+
+    // data of the ID
     private String mcr_project_id = null;
 
     private String mcr_type_id = null;
@@ -76,12 +79,11 @@ public final class MCRObjectID {
     private static DecimalFormat number_format = null;
 
     /**
-     * Static mthode to load the configuration.
+     * Static method to load the configuration.
      */
     static {
-        conf = MCRConfiguration.instance();
-        number_pattern = conf.getString("MCR.metadata_objectid_number_pattern",
-                "0000000000");
+        CONFIG = MCRConfiguration.instance();
+        number_pattern = CONFIG.getString("MCR.metadata_objectid_number_pattern","0000000000");
         number_format = new DecimalFormat(number_pattern);
     }
 
@@ -89,62 +91,65 @@ public final class MCRObjectID {
      * The constructor for an empty MCRObjectId.
      */
     public MCRObjectID() {
-        init();
     }
 
     /**
-     * The constructor for MCRObjectId with a given string.
+     * The constructor for MCRObjectID from a given string.
      * 
      * @exception MCRException
      *                if the given string is not valid.
      */
     public MCRObjectID(String id) throws MCRException {
-        init();
+        mcr_valid_id = false;
         if (!setID(id)) {
             throw new MCRException("The ID is not valid: " + id);
         }
         mcr_valid_id = true;
     }
 
-    private void init() {
-        if (CONFIG == null)
-            CONFIG = MCRConfiguration.instance();
-    }
-
     /**
-     * The methode set the MCRObjectId with a given base ID string. A base ID is
-     * <em>project_id</em>_<em>type_id</em>. The number was computet from
+     * The method set the MCRObjectID from a given base ID string. A base ID is
+     * <em>project_id</em>_<em>type_id</em>. The number was computed from
      * this methode. It is the next free number of an item in the database for
      * the given project ID and type ID.
      * 
      * @param base_id
      *            the basic ID
-     * @exception MCRUsageException
-     *                if the given string is not valid.
+     * @exception MCRException
+     *                if the given string is not valid or can't connect to the MCRXMLTableManager.
      */
     public synchronized void setNextFreeId(String base_id)
-            throws MCRUsageException {
+            throws MCRException {
+        // check the base_id
         mcr_valid_id = false;
         StringBuffer mcrid = new StringBuffer(base_id).append('_').append(1);
-        MCRObjectID test = new MCRObjectID(mcrid.toString());
+        if (!setID(mcrid.toString()))
+            throw new MCRException("Error in project base string for the new ID:" + mcrid)
+;
         mcrid.deleteCharAt(mcrid.length() - 1);
+        // get the next number
         try {
             MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-            int i = xmltable.getNextFreeIdInt(test.mcr_project_id,
-                    test.mcr_type_id);
-            if (lastnumber < i) {
-                mcrid.append(i);
-                lastnumber = i;
-            } else {
-                mcrid.append(lastnumber + 1);
-                lastnumber += 1;
+            int i = xmltable.getNextFreeIdInt(mcr_project_id,
+                    mcr_type_id);
+            Integer j = (Integer)lastnumber.get(base_id);
+            int mylastnumber = -1;
+            if (j != null) { 
+                mylastnumber = j.intValue();
             }
-            test = null;
-            if (!setID(mcrid.toString()))
-                throw new MCRException("Error setting to new ID:" + mcrid);
+            if (mylastnumber < i) {
+                mcrid.append(i);
+                mylastnumber = i;
+            } else {
+                mylastnumber += 1;
+                mcrid.append(mylastnumber);
+            }
+            lastnumber.put(base_id,new Integer(mylastnumber));
         } catch (Exception e) {
-            throw new MCRUsageException(e.getMessage(), e);
+            throw new MCRException(e.getMessage(), e);
         }
+        if (!setID(mcrid.toString()))
+            throw new MCRException("Error setting to new ID:" + mcrid);
         mcr_valid_id = true;
     }
 
@@ -158,7 +163,7 @@ public final class MCRObjectID {
         if (type == null)
             return false;
         String test = type.toLowerCase().intern();
-        if (!conf.getBoolean("MCR.type_" + test, false)) {
+        if (!CONFIG.getBoolean("MCR.type_" + test, false)) {
             return false;
         }
         mcr_type_id = test;
@@ -184,7 +189,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the string with <em>project_id</em>. If the Id is not
+     * This method get the string with <em>project_id</em>. If the ID is not
      * valid, an empty string was returned.
      * 
      * @return the string of the project id
@@ -197,7 +202,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode get the string with <em>type_id</em>. If the Id is not
+     * This method get the string with <em>type_id</em>. If the ID is not
      * valid, an empty string was returned.
      * 
      * @return the string of the type id
@@ -210,7 +215,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode get the string with <em>number</em>. If the Id is not
+     * This method get the string with <em>number</em>. If the ID is not
      * valid, an empty string was returned.
      * 
      * @return the string of the number
@@ -223,7 +228,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode get the integer with <em>number</em>. If the Id is not
+     * This method get the integer with <em>number</em>. If the ID is not
      * valid, a -1 was returned.
      * 
      * @return the number as integer
@@ -236,7 +241,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode get the basic string with <em>project_id</em>_
+     * This method get the basic string with <em>project_id</em>_
      * <em>type_id</em>. If the Id is not valid, an empty string was
      * returned.
      * 
@@ -250,8 +255,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode get the ID string with <em>project_id</em>_
-     * <em>type_id</em>_<em>number</em>. If the Id is not valid, an empty
+     * This method get the ID string with <em>project_id</em>_
+     * <em>type_id</em>_<em>number</em>. If the ID is not valid, an empty
      * string was returned.
      * 
      * @return the string of the schema name
@@ -269,8 +274,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This methode return the validation value of a MCRObjectId. The
-     * MCRObjectId is valid if:
+     * This method return the validation value of a MCRObjectId. The
+     * MCRObjectID is valid if:
      * <ul>
      * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
      * <em>number</em> as <em>String_String_Integer</em>.
@@ -287,13 +292,13 @@ public final class MCRObjectID {
     /**
      * This method return the validation value of a MCRObjectId and store the
      * components in this class. The <em>type_id</em> was set to lower case.
-     * The MCRObjectId is valid if:
+     * The MCRObjectID is valid if:
      * <ul>
      * <li>The argument is not null.
      * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
      * <em>number</em> as <em>String_String_Integer</em>.
-     * <li>The ID is not longer as MAX_LENGTH. >li> The ID has only characters,
-     * they must not encoded.
+     * <li>The ID is not longer as MAX_LENGTH. 
+     * <li>The ID has only characters, they must not encoded.
      * </ul>
      * 
      * @param id
@@ -334,7 +339,7 @@ public final class MCRObjectID {
             return false;
         }
         mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase().intern();
-        if (!conf.getBoolean("MCR.type_" + mcr_type_id.toLowerCase(), false)) {
+        if (!CONFIG.getBoolean("MCR.type_" + mcr_type_id.toLowerCase(), false)) {
             return false;
         }
         mcr_number = -1;
