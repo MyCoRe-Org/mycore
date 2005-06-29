@@ -172,10 +172,33 @@ public class MCRSearchMaskServlet extends MCRServlet {
             return;
         if (layout == null)
             layout = type;
+
+        String query = createQueryString(layout, request);
+
+        // start Query servlet
+        request.setAttribute("saveResults", "true");
+        request.removeAttribute("mode");
+        request.setAttribute("mode", "ResultList");
+        request.removeAttribute("type");
+        request.setAttribute("type", type);
+        layout = type;
+        request.removeAttribute("layout");
+        request.setAttribute("layout", layout);
+        request.removeAttribute("hosts");
+        request.setAttribute("hosts", host);
+        request.removeAttribute("lang");
+        request.removeAttribute("query");
+        request.setAttribute("query", query);
+        RequestDispatcher rd = getServletContext().getNamedDispatcher(
+                "MCRQueryServlet");
+        rd.forward(request, response);
+    }
+
+    public String createQueryString(String layout, HttpServletRequest request) throws IOException
+    {
         StringBuffer query = new StringBuffer("");
 
-        String smc = CONFIG.getString("MCR.searchmask_config_"
-                + layout.toLowerCase());
+        String smc = CONFIG.getString("MCR.searchmask_config_" + layout.toLowerCase());
         try {
             InputStream in = MCRSearchMaskServlet.class.getResourceAsStream("/"
                     + smc);
@@ -270,24 +293,7 @@ public class MCRSearchMaskServlet extends MCRServlet {
             }
             query.append(tempquery);
         }
-
-        // start Query servlet
-        request.setAttribute("saveResults", "true");
-        request.removeAttribute("mode");
-        request.setAttribute("mode", "ResultList");
-        request.removeAttribute("type");
-        request.setAttribute("type", type);
-        layout = type;
-        request.removeAttribute("layout");
-        request.setAttribute("layout", layout);
-        request.removeAttribute("hosts");
-        request.setAttribute("hosts", host);
-        request.removeAttribute("lang");
-        request.removeAttribute("query");
-        request.setAttribute("query", query.toString());
-        RequestDispatcher rd = getServletContext().getNamedDispatcher(
-                "MCRQueryServlet");
-        rd.forward(request, response);
+        return query.toString();
     }
 }
 
