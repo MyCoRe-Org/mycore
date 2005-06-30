@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -44,7 +46,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * This servlet provides a web interface to create a search mask and analyze the
  * output of them to create a XQuery and start the MCRQueryServlet
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
@@ -58,15 +60,12 @@ public class MCRSearchMaskServlet extends MCRServlet {
     // The default mode for this class
     String mode = "CreateSearchMask";
 
-    // The configuration XML files
-    org.jdom.Document jdom = null;
-
     /**
      * This method handles HTTP requests and resolves them to output. The method
      * can get two modi : 'CreateSearchMask' to generate a new search mask or
      * 'CreateQuery' to read the data from the search mask and start the
      * MCRQueryServlet.
-     * 
+     *
      * @exception IOException
      *                for java I/O errors.
      * @exception ServletException
@@ -88,10 +87,35 @@ public class MCRSearchMaskServlet extends MCRServlet {
         }
     }
 
+    private static Map jdomCache = new HashMap();
+    /**
+     * This method returns a search mask definition jdom for a given
+     * layout.
+     */
+    public static org.jdom.Document getJDOM(String layout) throws IOException {
+        org.jdom.Document jdom = (org.jdom.Document)jdomCache.get(layout);
+        if(jdom!=null)
+            return jdom;
+
+        String smc = CONFIG.getString("MCR.searchmask_config_" + layout.toLowerCase());
+        try {
+            InputStream in = MCRSearchMaskServlet.class.getResourceAsStream("/" + smc);
+            if (in == null)
+                throw new MCRConfigurationException("Can't read config file " + smc);
+            jdom = new org.jdom.input.SAXBuilder().build(in);
+            jdomCache.put(layout, jdom);
+        } catch (org.jdom.JDOMException e) {
+            throw new MCRException(
+                    "SearchMaskServlet : Can't read config file " + smc + " or it has a parse error.", e);
+        }
+        return jdom;
+    }
+
+
     /**
      * This method handles the CreateSearchMask mode. It create the request for
      * MCRLayoutServlet and starts them.
-     * 
+     *
      * @param request
      *            the HTTP request instance
      * @param response
@@ -111,20 +135,7 @@ public class MCRSearchMaskServlet extends MCRServlet {
             layout = type;
         type = type.toLowerCase();
 
-        String smc = CONFIG.getString("MCR.searchmask_config_"
-                + layout.toLowerCase());
-        try {
-            InputStream in = MCRSearchMaskServlet.class.getResourceAsStream("/"
-                    + smc);
-            if (in == null)
-                throw new MCRConfigurationException("Can't read config file "
-                        + smc);
-            jdom = new org.jdom.input.SAXBuilder().build(in);
-        } catch (org.jdom.JDOMException e) {
-            throw new MCRException(
-                    "SearchMaskServlet : Can't read config file " + smc
-                            + " or it has a parse error.", e);
-        }
+        org.jdom.Document jdom = getJDOM(layout);
 
         // prepare the stylesheet name
         String style = mode + "-" + layout + "-"
@@ -138,10 +149,11 @@ public class MCRSearchMaskServlet extends MCRServlet {
         rd.forward(request, response);
     }
 
+
     /**
      * This method handles the CreateQuery mode. It create the request for
      * MCRQueryServlet and starts them.
-     * 
+     *
      * @param request
      *            the HTTP request instance
      * @param response
@@ -194,27 +206,21 @@ public class MCRSearchMaskServlet extends MCRServlet {
         rd.forward(request, response);
     }
 
-    public String createQueryString(String layout, HttpServletRequest request) throws IOException
+    /**
+     * This method creates a query string from a number of request parameters
+     * and the xml definition of the corresponding search mask (read from the
+     * configuration via the layout parameter).
+     */
+    public static String createQueryString(String layout, HttpServletRequest request) throws IOException
     {
         StringBuffer query = new StringBuffer("");
 
-        String smc = CONFIG.getString("MCR.searchmask_config_" + layout.toLowerCase());
-        try {
-            InputStream in = MCRSearchMaskServlet.class.getResourceAsStream("/"
-                    + smc);
-            if (in == null)
-                throw new MCRConfigurationException("Can't read config file "
-                        + smc);
-            jdom = new org.jdom.input.SAXBuilder().build(in);
-        } catch (org.jdom.JDOMException e) {
-            throw new MCRException(
-                    "SearchMaskServlet : Can't read config file " + smc
-                            + " or it has a parse error.");
-        }
-        org.jdom.Element searchpage = jdom.getRootElement().getChild(
-                "searchpage");
+        org.jdom.Document jdom = getJDOM(layout);
+
+        org.jdom.Element searchpage = jdom.getRootElement().getChild("searchpage");
         List element_list = searchpage.getChildren();
         int len = element_list.size();
+        System.out.println("searchpage has "+len+" childs");
         for (int i = 0; i < len; i++) {
             org.jdom.Element element = (org.jdom.Element) element_list.get(i);
             if (!element.getName().equals("element")) {
@@ -226,6 +232,7 @@ public class MCRSearchMaskServlet extends MCRServlet {
             String name = element.getAttributeValue("name");
             String tempquery = (element.getAttributeValue("query")).replace(
                     '\'', '\"');
+            System.out.println("name:"+name+" tempquery:"+tempquery);
             int tempfields = 1;
             try {
                 tempfields = (new Integer(element.getAttributeValue("fields")))
@@ -291,6 +298,7 @@ public class MCRSearchMaskServlet extends MCRServlet {
             if (query.length() != 0) {
                 query.append(" and ");
             }
+            System.out.println("query:"+query.toString()+" tempquery:"+tempquery);
             query.append(tempquery);
         }
         return query.toString();
