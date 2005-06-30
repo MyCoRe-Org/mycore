@@ -566,7 +566,8 @@ private final void errorHandlerValid(MCRServletJob job, ArrayList logtext,
     logger.error((String)logtext.get(i)); }
   // prepare editor with error messages
   String pagedir = CONFIG.getString( "MCR.editor_page_dir","" );
-  String myfile = pagedir+"editor_error_formular.xml";
+  String myfile = pagedir+CONFIG.getString( "MCR.editor_page_error_formular",
+      "editor_error_formular.xml" );
   org.jdom.Document jdom = null;
   try {
     InputStream in = (new URL(getBaseURL()+myfile+"?XSL.Style=xml"))
