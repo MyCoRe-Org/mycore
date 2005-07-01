@@ -47,10 +47,7 @@ public interface MCRDefaults {
     public final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
 
     /** The default encoding */
-    public final static String ENCODING = "ISO_8859-1";
-
-    /** The maximum of the metadata XML files * */
-    public final static int MAX_XML_FILE_LENGTH = 100 * 1024;
+    public final static String ENCODING = "UTF-8";
 
     /** The supported language codes (like xml:lang definition) * */
     public static String[] SUPPORTED_LANG = {

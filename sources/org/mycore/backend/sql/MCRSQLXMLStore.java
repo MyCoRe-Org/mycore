@@ -48,11 +48,11 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
     // internal data
     private String tableName;
 
+    private String blobsize;
+
     private String mytype;
 
     private int lengthObjectID = MCRObjectID.MAX_LENGTH;
-
-    private int lengthXML = MCRDefaults.MAX_XML_FILE_LENGTH;
 
     /**
      * The constructor for the class MCRSQLXMLStore.
@@ -85,8 +85,10 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
         // set configuration
         tableName = config.getString("MCR.xml_store_sql_table_" + mytype,
                 "MCRXMLTABLE");
+        blobsize = config.getString("MCR.xml_store_sql_size_" + mytype,
+                "BLOB");
         if (!MCRSQLConnection.doesTableExist(tableName)) {
-            logger.info("Create table " + tableName);
+            logger.info("Create table " + tableName + " with size "+blobsize);
             createXMLTable();
             logger.info("Done.");
         }
@@ -103,7 +105,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
                             + ") NOT NULL").addColumn(
                     "MCRVERSION INTEGER NOT NULL").addColumn(
                     "MCRTYPE VARCHAR(" + Integer.toString(lengthObjectID)
-                            + ") NOT NULL").addColumn("MCRXML BLOB").addColumn(
+                            + ") NOT NULL").addColumn("MCRXML "+blobsize).addColumn(
                     "PRIMARY KEY(MCRID,MCRVERSION)").toCreateTableStatement());
             c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRID")
                     .addColumn("MCRVERSION").toIndexStatement());
