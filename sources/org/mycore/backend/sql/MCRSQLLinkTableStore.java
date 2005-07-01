@@ -161,8 +161,14 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         if ((to == null) || ((to = to.trim()).length() == 0)) {
             throw new MCRPersistenceException("The to value is null or empty.");
         }
-        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableName).setValue(
+        try {
+          MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableName).setValue(
                 "MCRFROM", from).setValue("MCRTO", to).toInsertStatement());
+          }
+        catch (Exception e) {
+          logger.debug("SQL Exception while store link table with message : "+
+            e.getMessage());
+          }
     }
 
     /**

@@ -187,8 +187,8 @@ public class MCRSQLConnection {
             stmt.close();
         } catch (SQLException ex) {
             Logger logger = MCRSQLConnectionPool.getLogger();
-            logger.error("MCRSQLConnection doUpdate: " + statement);
-            logger.error(ex.getMessage());
+            logger.debug("MCRSQLConnection doUpdate: " + statement);
+            logger.debug(ex.getMessage());
             throw new MCRPersistenceException(
                     "Error while executing SQL update statement: " + statement,
                     ex);
