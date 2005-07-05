@@ -49,8 +49,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
 abstract public class MCRQueryBase implements MCRQueryInterface {
 
     // the logger
-    protected static Logger logger = Logger.getLogger(MCRQueryBase.class
-            .getName());
+    protected static Logger logger = Logger.getLogger(MCRQueryBase.class.getName());
 
     // defaults
     /** The default maximum of resultes */
@@ -236,6 +235,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
                                         b));
                                 isid++;
                             } catch (Exception e) {
+				logger.error("Error while extracting id from query "+q, e);
                             }
                         }
                     }
@@ -250,6 +250,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
                                     (Element) xmltable.readDocument(testid[p])
                                             .getRootElement().clone());
                         } catch (Exception e) {
+			    logger.error("Error while retrieving data", e);
                         }
                     }
                 }
@@ -315,9 +316,9 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
         for (Iterator it = objectIDs.iterator(); it.hasNext();) {
             try {
                 MCRObjectID s = (MCRObjectID) it.next();
-                result.add("local", s.getId(), 0, (Element) xmltable
-                        .readDocument(s).getRootElement().clone());
+                result.add("local", s.getId(), 0, (Element) xmltable.readDocument(s).getRootElement().clone());
             } catch (Exception e) {
+		logger.error("Error merging search results", e);
             }
         }
         return result;
