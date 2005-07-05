@@ -72,7 +72,7 @@ import org.mycore.common.xml.MCRXSLTransformation;
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
  * 
- * @author Werner Gresshoff
+ * @author Werner Greﬂhoff
  * 
  * @version $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  */
