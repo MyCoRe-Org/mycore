@@ -43,7 +43,7 @@ import org.jdom.*;
  * This is the implementation of the MCRMetaSearchInterface for the JDOM tree
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * 
  * @version $Revision$ $Date$
  */
@@ -92,6 +92,7 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
         // prepare the stylesheet for query
         MCRJDOMMemoryStore store = MCRJDOMMemoryStore.instance();
         Hashtable objects = store.getObjects(type);
+        logger.debug(""+objects.size()+" objects of type "+type+" available");
         org.jdom.Document stylesheet = store.getStylesheet(xsltquery);
 
         javax.xml.transform.Transformer trans = null;
