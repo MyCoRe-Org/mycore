@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
@@ -64,7 +65,7 @@ import org.xml.sax.InputSource;
  * resource, webapp, file or session. MyCoRe editor include declarations can
  * read XML files from resource, webapp, file, session, http or https URIs.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public class MCRURIResolver implements javax.xml.transform.URIResolver,
@@ -423,8 +424,12 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 
 		try {
 			return builder.build(in).getRootElement();
+                } catch(MalformedURLException e) {
+                        e.printStackTrace();
+                        String msg = "Exception while reading and parsing XML InputStream: "+e.getMessage();
+			throw new MCRUsageException(msg, e);
 		} catch (Exception ex) {
-			String msg = "Exception while reading and parsing XML InputStream";
+			String msg = "Exception while reading and parsing XML InputStream: "+ex.getMessage();
 			throw new MCRUsageException(msg, ex);
 		}
 	}
