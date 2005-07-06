@@ -50,13 +50,15 @@ import org.mycore.common.*;
  * @see #justDoQuery( String )
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * @author Johannes Buehler
  * @version $Revision$ $Date$
  */
 public class MCRSQLConnection {
     /** The wrapped JDBC connection */
     protected Connection connection;
+    
+    protected static Logger logger = Logger.getLogger(MCRSQLConnection.class.getName());
 
     /** The number of usages of this connection so far * */
     private int numUsages = 0;
@@ -164,6 +166,7 @@ public class MCRSQLConnection {
     public MCRSQLRowReader doQuery(String query) throws MCRPersistenceException {
         MCRArgumentChecker.ensureNotEmpty(query, "query");
 
+        logger.debug(query);
         try {
             ResultSet rs = connection.createStatement().executeQuery(query);
             return new MCRSQLRowReader(rs);
@@ -181,6 +184,7 @@ public class MCRSQLConnection {
      */
     public void doUpdate(String statement) throws MCRPersistenceException {
         MCRArgumentChecker.ensureNotEmpty(statement, "statement");
+        logger.debug(statement);
         try {
             Statement stmt = connection.createStatement();
             stmt.executeUpdate(statement);
@@ -210,7 +214,7 @@ public class MCRSQLConnection {
         return value;
     }
 
-    /**
+     /**
      * Executes an SQL "SELECT COUNT(*) FROM" statement on this connection,
      * returning the number of rows that match the condition.
      * 
