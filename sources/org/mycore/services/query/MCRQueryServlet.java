@@ -58,7 +58,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * This servlet provides a web interface to query the datastore using XQueries
  * and deliver the result list
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
@@ -646,7 +646,7 @@ public class MCRQueryServlet extends MCRServlet {
 	if(host.indexOf(',')<0) {
 	    /* we are querying only a single host- don't bother to put everything
 	       through the two thread pools, but just return the result */
-	    LOGGER.debug("Retrieving query "+query+" from MCRQueryCache (hostlist: "+host+")");
+	    LOGGER.debug("Retrieving query "+query+" from MCRQueryCache (hostlist: "+host+") type="+type+" maxresults="+conf.getInt("MCR.query_max_results", 10));
 	    result.importElements(MCRQueryCache.getResultList(host, query, type, conf.getInt("MCR.query_max_results", 10)));
 	} else {
 	    try {
