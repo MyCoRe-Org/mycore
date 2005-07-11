@@ -48,6 +48,7 @@ import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.query.MCRQueryCollector;
+import org.mycore.services.query.MCRQueryCache;
 
 /**
  * @author Werner Gresshoff
@@ -426,10 +427,7 @@ public class MCROAIQueryService implements MCROAIQuery {
 
         try {
             MCRXMLContainer qra = new MCRXMLContainer();
-            synchronized (qra) {
-                collector.collectQueryResults("local", querytype, query, qra);
-                qra.wait();
-            }
+	    qra.importElements(MCRQueryCache.getResultList("local", query, querytype, MCRConfiguration.instance().getInt("MCR.query_max_results", 10)));
 
             for (int j = 0; j < qra.size(); j++) {
                 results.add(qra.getId(j));
