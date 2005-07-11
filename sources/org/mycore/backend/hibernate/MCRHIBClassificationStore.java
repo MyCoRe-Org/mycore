@@ -328,7 +328,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	}
 	for (int i=0;i<children.size();i++) {
             MCRCategoryItem child = (MCRCategoryItem)(children.get(i));
-	    List li = session.createQuery("from MCRCATEGLABEL where ID = '" +  child.getClassificationID() + "' and CLID = '" + CLID + "'").list();
+	    List li = session.createQuery("from MCRCATEGLABEL where ID = '" +  child.getID() + "' and CLID = '" + CLID + "'").list();
 	    for(t=0;t<li.size();t++) {
 		MCRCATEGLABEL cl = (MCRCATEGLABEL)li.get(t);
 		child.addData(cl.getLang(),cl.getText(),cl.getMcrdesc());
