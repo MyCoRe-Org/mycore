@@ -102,8 +102,10 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
         this.orderList = new ArrayList();
         this.sortKeys = new ArrayList();
         prepareStylesheets();
-        if (FACTORY == null)
+        if (FACTORY == null){
             FACTORY = TransformerFactory.newInstance();
+            FACTORY.setURIResolver(MCRURIResolver.instance());
+        }
     }
 
     /**
