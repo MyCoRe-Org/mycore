@@ -56,7 +56,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * converts the submitted data into a JDOM XML document for further processing.
  * It can also handle file uploads.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCREditorServlet extends MCRServlet {
@@ -74,6 +74,8 @@ public class MCREditorServlet extends MCRServlet {
             java.io.IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
+
+        logger.debug("doGetPost in EditorServlet");
 
         MCRRequestParameters parms = new MCRRequestParameters(req);
 
@@ -164,7 +166,13 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         String sessionID = buildSessionID();
-        sessions.put(sessionID, editor);
+        if(editor!=null) {
+            sessions.put(sessionID, editor);
+            logger.debug("Storing editor sessions under id "+sessionID);
+        } else {
+            logger.debug("Not storing null editor session (id "+sessionID+")");
+        }
+
         editor.setAttribute("session", sessionID);
 
         logger.info("Editor session " + sessionID + " created");
@@ -318,8 +326,13 @@ public class MCREditorServlet extends MCRServlet {
     private void processSubmit(HttpServletRequest req, HttpServletResponse res,
             MCRRequestParameters parms) throws ServletException,
             java.io.IOException {
+        logger.debug("Editor: process submit");
         String sessionID = parms.getParameter("_session");
         Element editor = (Element) (sessions.get(sessionID));
+        if(editor==null) {
+            logger.error("No editor for session <"+sessionID+">");
+            throw new ServletException("invalid session");
+        }
 
         String button = null;
 
@@ -337,7 +350,17 @@ public class MCREditorServlet extends MCRServlet {
             logger
                     .info("Editor session " + sessionID
                             + " submitting form data");
+
+            /* we remove this session from the session->editor
+               table. This means subsequent calls to the edit
+               formula will fail with an "invalid session" exception.
+               This is necessary to prevent inconsistencies between
+               what the user has entered in the formula and the current
+               state of the editor xml.
+               It also means, however, that the browser "back" button
+               will not work in the editor. */
             sessions.remove(sessionID);
+
             processTargetSubmission(req, res, parms, editor);
         } else if (button.startsWith("_s-")) {
             StringTokenizer sst = new StringTokenizer(button.substring(3), "-");
@@ -421,10 +444,14 @@ public class MCREditorServlet extends MCRServlet {
     private void processTargetSubmission(HttpServletRequest req,
             HttpServletResponse res, MCRRequestParameters parms, Element editor)
             throws ServletException, java.io.IOException {
+
+	logger.debug("Editor: processTargetSubmission ");
+
         MCREditorSubmission sub = new MCREditorSubmission(parms, editor);
 
         // If there is no input, handle as if "cancel" button was pressed
         if (sub.getVariables().size() == 0) {
+	    logger.debug("Editor: cancel");
             Element cancel = editor.getChild("cancel");
             String cancelURL = (cancel != null ? cancel.getAttributeValue(
                     "url", (String) null) : null);
@@ -434,6 +461,7 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         String targetType = parms.getParameter("_target-type");
+	logger.debug("Editor: targettype="+targetType);
         if (targetType.equals("servlet"))
             sendToServlet(req, res, sub);
         else if (targetType.equals("url"))
@@ -446,7 +474,10 @@ public class MCREditorServlet extends MCRServlet {
             List variables = sub.getVariables();
             String root = sub.getXML().getRootElement().getName();
             sendToSubSelect(req, res, parms, variables, root);
-        }
+        } else {
+	    logger.debug("Unknown targettype");
+	}
+	logger.debug("Editor: processTargetSubmission DONE");
     }
 
     private void sendToServlet(HttpServletRequest req, HttpServletResponse res,
@@ -454,11 +485,15 @@ public class MCREditorServlet extends MCRServlet {
         String name = sub.getParameters().getParameter("_target-name");
         String url = sub.getParameters().getParameter("_target-url");
 
+	logger.debug("name="+name+" url="+url);
+
         RequestDispatcher rd = null;
         if ((name != null) && (name.trim().length() > 0))
             rd = getServletContext().getNamedDispatcher(name);
         else if ((url != null) && (url.trim().length() > 0))
             rd = getServletContext().getRequestDispatcher(url);
+
+	logger.debug("rd="+rd);
 
         if (rd != null) {
             req.setAttribute("MCREditorSubmission", sub);
