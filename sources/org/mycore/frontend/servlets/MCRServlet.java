@@ -48,10 +48,10 @@ import org.mycore.common.xml.MCRLayoutServlet;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank Lützenkirchen.
+ * taken from MilessServlet.java written by Frank L?tzenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank L?tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -127,6 +127,42 @@ public class MCRServlet extends HttpServlet {
         doGetPost(job);
     }
 
+    public static MCRSession getSession(HttpServletRequest req)
+    {
+	HttpSession theSession = req.getSession(true);
+	MCRSession session = null;
+
+	String sessionID = req.getParameter("MCRSessionID");
+	MCRSession fromRequest = null;
+	if (sessionID != null)
+	    fromRequest = MCRSession.getSession(sessionID);
+
+	MCRSession fromHttpSession = (MCRSession) theSession
+		.getAttribute("mycore.session");
+
+	// Choose:
+	if (fromRequest != null)
+	    session = fromRequest;
+	// Take session from http request parameter MCRSessionID
+	else if (fromHttpSession != null)
+	    session = fromHttpSession;
+	// Take session from HttpSession with servlets
+	else
+	    session = MCRSessionMgr.getCurrentSession();
+	// Create a new session
+
+	// Store current session in HttpSession
+	theSession.setAttribute("mycore.session", session);
+
+	// Bind current session to this thread:
+	MCRSessionMgr.setCurrentSession(session);
+
+	// Forward MCRSessionID to XSL Stylesheets
+	req.setAttribute("XSL.MCRSessionID", session.getID());
+
+        return session;
+    }
+
     /**
      * This private method handles both GET and POST requests and is invoked by
      * doGet() and doPost().
@@ -167,36 +203,7 @@ public class MCRServlet extends HttpServlet {
             prepareURLs(req);
 
         try {
-            HttpSession theSession = req.getSession(true);
-            MCRSession session = null;
-
-            String sessionID = req.getParameter("MCRSessionID");
-            MCRSession fromRequest = null;
-            if (sessionID != null)
-                fromRequest = MCRSession.getSession(sessionID);
-
-            MCRSession fromHttpSession = (MCRSession) theSession
-                    .getAttribute("mycore.session");
-
-            // Choose:
-            if (fromRequest != null)
-                session = fromRequest;
-            // Take session from http request parameter MCRSessionID
-            else if (fromHttpSession != null)
-                session = fromHttpSession;
-            // Take session from HttpSession with servlets
-            else
-                session = MCRSessionMgr.getCurrentSession();
-            // Create a new session
-
-            // Store current session in HttpSession
-            theSession.setAttribute("mycore.session", session);
-
-            // Bind current session to this thread:
-            MCRSessionMgr.setCurrentSession(session);
-
-            // Forward MCRSessionID to XSL Stylesheets
-            req.setAttribute("XSL.MCRSessionID", session.getID());
+	    MCRSession session = getSession(req);
 
             String c = getClass().getName();
             c = c.substring(c.lastIndexOf(".") + 1);
@@ -205,8 +212,8 @@ public class MCRServlet extends HttpServlet {
             msg.append(c);
             msg.append(" ip=");
             msg.append(getRemoteAddr(req));
-            msg.append(theSession.isNew() ? " new" : " old");
-            msg.append(" http=").append(theSession.getId());
+            /*msg.append(theSession.isNew() ? " new" : " old");
+            msg.append(" http=").append(theSession.getId());*/
             msg.append(" mcr=").append(session.getID());
             msg.append(" user=").append(session.getCurrentUserID());
             LOGGER.info(msg.toString());
