@@ -301,6 +301,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 	    session.close();
 	    return false;
 	}
+	session.close();
 	return true;
     }
 
@@ -334,6 +335,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
 		child.addData(cl.getLang(),cl.getText(),cl.getMcrdesc());
 	    }
 	}
+	session.close();
 	return children;
     }
 
