@@ -410,6 +410,7 @@ public class MCRSQLUserStore implements MCRUserStore {
                 connection.getJDBCConnection().rollback();
             } catch (SQLException ignored) {
             }
+	    logger.error("Error in Userstore", ex);
             throw new MCRException("Error in UserStore.", ex);
         }
 
