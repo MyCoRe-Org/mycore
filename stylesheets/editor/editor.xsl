@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.39 $ $Date: 2005-06-16 10:03:45 $ -->
+<!-- $Revision: 1.40 $ $Date: 2005-07-20 12:23:12 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -388,6 +388,7 @@
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
+  <xsl:if test="$cells">
   <table border="0" cellspacing="0" cellpadding="0">
 
     <!-- If panel is last component in parent panel, this table must be width 100% -->
@@ -402,6 +403,7 @@
       <xsl:with-param name="pos"   select="$pos"   />
     </xsl:call-template>
   </table>
+  </xsl:if>
 
   <!-- ======== handle hidden fields ======== -->
   <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
