@@ -572,12 +572,10 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements
         DKDatastoreICM connection = MCRCM8ConnectionPool.instance()
                 .getConnection();
         try {
-            DKNVPair options[] = new DKNVPair[3];
+            DKNVPair options[] = new DKNVPair[2];
             options[0] = new DKNVPair(DKConstant.DK_CM_PARM_MAX_RESULTS, "0");
             // No Maximum (Default)
-            options[1] = new DKNVPair(DKConstant.DK_CM_PARM_RETRIEVE,
-                    new Integer(DKConstant.DK_CM_CONTENT_YES));
-            options[2] = new DKNVPair(DKConstant.DK_CM_PARM_END, null);
+            options[1] = new DKNVPair(DKConstant.DK_CM_PARM_END, null);
             DKResults results = (DKResults) connection.evaluate(sb.toString(),
                     DKConstantICM.DK_CM_XQPE_QL_TYPE, options);
             dkIterator iter = results.createIterator();
