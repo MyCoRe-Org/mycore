@@ -724,7 +724,7 @@
 				<tr>
 					<th valign="top" align="left">
 						<!-- list of available imaages --> Bilder:<br/>
-						<input type="hidden" name="JavaScriptImagePath_hidden" value="{concat($WebApplicationBaseURL,/cms/imagePath)}"/>
+						<input type="hidden" name="JavaScriptImagePath_hidden" value="{concat($WebApplicationBaseURL, substring-after( /cms/imagePath,'/' )   )}"/>                                    
 						<select size="1" name="selectPicturePreview" onchange="previewPicture(document.editContent.JavaScriptImagePath_hidden.value)">
 							<xsl:for-each select="/cms/images/image">
 								<option>
