@@ -149,8 +149,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
        
         List l = session.createQuery("from MCRFSNODES where PID = '" + parentID  + "' and NAME = '"+name+"'").list();
         if (l.size() < 1) {
-            String msg = "MCRHIBFileMetadataStore.retrieveChild(): There is no node with ID = " + parentID;
-            throw new MCRException(msg);
+	    return null;
         }
         tx.commit();
         session.close();
@@ -165,7 +164,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
        
         List l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
         if (l.size() < 1) {
-            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + parentID;
+            String msg = "MCRSQLUserStore.retrieveUser(): There is no node with PID = " + parentID;
             throw new MCRException(msg);
         }
         tx.commit();
