@@ -188,7 +188,7 @@ public class MCRFileMetadataManager {
      *            the file name of the child in that directory
      * @return the child MCRFilesystemNode, or null, if no such child exists
      */
-    MCRFilesystemNode retrieveChild(String parentID, String name)
+    public MCRFilesystemNode retrieveChild(String parentID, String name)
             throws MCRPersistenceException {
         return store.retrieveChild(parentID, name);
     }
