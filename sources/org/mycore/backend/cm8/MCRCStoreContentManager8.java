@@ -583,7 +583,6 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements
             outgo = new String[results.cardinality()];
             for (int i = 0; iter.more(); i++) {
                 DKDDO resitem = (DKDDO) iter.next();
-                resitem.retrieve();
                 short dataId = resitem.dataId(DK_CM_NAMESPACE_ATTR,
                         attributeOwner);
                 outgo[i] = (String) resitem.getData(dataId);
