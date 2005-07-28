@@ -378,6 +378,25 @@ protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in,
           }
         continue;
         }
+      // MCRMetaHistoryDate
+      if (mcrclass.equals("MCRMetaHistoryDate")) {
+        String text = datasubtag.getTextNormalize();
+        if ((text == null) || ((text = text.trim()).length() ==0)) { 
+          datatag.removeContent(datasubtag); k--; datataglistlen--; continue; }
+        if (datasubtag.getAttribute("lang") != null) {
+          datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE); }
+        try {
+          MCRMetaHistoryDate test = new MCRMetaHistoryDate();
+          test.setFromDOM(datasubtag);
+          if (!test.isValid()) throw new MCRException("");
+          }
+        catch (Exception e) {
+          errorlog.add("Element "+datasubtag.getName()+" is not valid.");
+          datatag.removeContent(datasubtag); k--; datataglistlen--;
+          continue;
+          }
+        continue;
+        }
       // MCRMetaNumber
       if (mcrclass.equals("MCRMetaNumber")) {
         String text = datasubtag.getTextNormalize();

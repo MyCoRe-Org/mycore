@@ -49,7 +49,6 @@ private GregorianCalendar default_bis;
 private String            text;
 private GregorianCalendar von;
 private GregorianCalendar bis;
-private String rv;
 private int ivon;
 private int ibis;
 
@@ -73,7 +72,6 @@ public MCRMetaHistoryDate()
   try { default_bis = getAntikDate(max,true); }
   catch (MCRException e) {
     throw new MCRException("The default_bis date is false.",e); }
-  rv = "recto";
   text       = "";
   von        = default_von;
   ivon       = getIntDate(von);
@@ -96,11 +94,10 @@ public MCRMetaHistoryDate()
  * @param default_lang    the default language
  * @param set_type        the optional type string
  * @param set_inherted    a value >= 0
- * @param set_rv           a String with 'recto' or 'verso'
  * @exception MCRException if the parameter values are invalid
  **/
 public MCRMetaHistoryDate(String set_datapart, String set_subtag, 
-  String default_lang, String set_type, int set_inherted, String set_rv)
+  String default_lang, String set_type, int set_inherted)
   throws MCRException
   {
   super(set_datapart,set_subtag,default_lang,set_type,set_inherted);
@@ -113,7 +110,6 @@ public MCRMetaHistoryDate(String set_datapart, String set_subtag,
   try { default_bis = getAntikDate(max,true); }
   catch (MCRException e) {
     throw new MCRException("The default_bis date is false.",e); }
-  setRV(set_rv);
   text       = "";
   von        = default_von;
   ivon       = getIntDate(von);
@@ -214,18 +210,6 @@ public static final GregorianCalendar getAntikDate(String datestr, boolean last)
   }
   catch (Exception e) { 
     throw new MCRException("The ancient date is false.",e); }
-  }
-
-/**
- * This method set the RV attribute. Default is 'recto'.
- *
- * @param set_rv           a String with 'recto' or 'verso'
- **/
-public final void setRV(String set_rv)
-  {
-  if (set_rv == null) { rv = "recto"; return; }
-  if (set_rv.toLowerCase().equals("verso")) { rv = "verso"; return; }
-  rv = "recto";
   }
 
 /**
@@ -373,7 +357,6 @@ public final String getBisToString()
 public final void setFromDOM(org.jdom.Element element)
   {
   super.setFromDOM(element);
-  setRV(element.getAttributeValue("rv"));
   setText(element.getChildTextTrim("text"));
   setVonDate(element.getChildTextTrim("von"));
   setBisDate(element.getChildTextTrim("bis"));
@@ -396,8 +379,6 @@ public final org.jdom.Element createXML() throws MCRException
   elm.setAttribute("inherited",(new Integer(inherited)).toString()); 
   if ((type != null) && ((type = type.trim()).length() !=0)) {
     elm.setAttribute("type",type); }
-  if ((rv != null) && ((rv = rv.trim()).length() !=0)) {
-    elm.setAttribute("rv",rv); }
   if ((text = text.trim()).length() !=0) {
     elm.addContent((org.jdom.Content)new org.jdom.Element("text").addContent(text)); }
   if (von != null) {
@@ -457,7 +438,6 @@ public final String createTextSearch(boolean textsearch)
  * <li> the text       is empty and
  * <li> the von        is empty and
  * <li> the bis        is empty and
- * <li> the rv is not null or empty
  * </ul>
  * otherwise the method returns <em>true</em>.
  *
@@ -467,8 +447,6 @@ public final boolean isValid()
   {
   if (((text=text.trim()).length() ==0) && (von == null) && (bis == null) ) {
     return false; }
-  if ((rv == null) || ((rv = rv.trim()).length() ==0)) { return false; }
-  if (!rv.equals("recto") && !rv.equals("verso")) { return false; }
   return true;
   }
 
@@ -498,7 +476,7 @@ public static final int getIntDate(GregorianCalendar date)
 public final Object clone()
   {
   MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart,subtag,lang,type,
-    inherited,rv);
+    inherited);
   out.setText(text);
   out.setVonDate(von);
   out.setBisDate(bis);
@@ -512,7 +490,6 @@ public final void debug()
   {
   logger.debug("Start Class : MCRMetaHistoryDate");
   super.debugDefault();
-  logger.debug("RV                 = "+rv);
   logger.debug("Text               = "+text);
   logger.debug("Von                = "+getVonToString());
   logger.debug("Bis                = "+getBisToString());
