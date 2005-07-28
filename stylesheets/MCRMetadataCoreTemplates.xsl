@@ -260,6 +260,8 @@
   fixed="MCRMetaCorporation"/>
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaBoolean -->
+
 <xsl:template match="mcrmetaboolean">
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
@@ -276,6 +278,29 @@
 </xsd:sequence>
 <xsd:attribute name="class" type="xsd:string" use="required"
   fixed="MCRMetaBoolean" />
+</xsl:template>
+
+<!-- Template for the metadata MCRMetaHistoryDate -->
+
+<xsl:template match="mcrmetahistorydate">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element name="text" type="xsd:string" minOccurs='1' maxOccurs='1'/>
+    <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="ibis"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name="type" use="optional" type="xsd:string" />
+   <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+   <xsd:attribute ref="xml:lang" />
+  </xsd:complexType>
+ </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaHistoryDate"/>
 </xsl:template>
 
 </xsl:stylesheet>
