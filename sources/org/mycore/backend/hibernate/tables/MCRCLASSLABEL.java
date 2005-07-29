@@ -30,7 +30,7 @@ public class MCRCLASSLABEL{
         this.key = new MCRCLASSLABELPK();
     }
 
-    public MCRCLASSLABEL(String text, String mcrdesc, String id, String lang)
+    public MCRCLASSLABEL(String id, String lang, String text, String mcrdesc)
     {
         this.text = text;
         this.mcrdesc = mcrdesc;
