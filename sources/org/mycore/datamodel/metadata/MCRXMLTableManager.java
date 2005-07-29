@@ -61,6 +61,8 @@ public class MCRXMLTableManager {
 
     private Hashtable tablelist;
 
+    private static int number_distance = 1;
+
     /**
      * Returns the link table manager singleton.
      */
@@ -77,6 +79,7 @@ public class MCRXMLTableManager {
         tablelist = new Hashtable();
         jdomCache = new MCRCache(CONFIG.getInt(
                 "MCR.xml.tablemanager.cache.size", 100));
+        number_distance = CONFIG.getInt("MCR.metadata_objectid_number_distance",1);
     }
 
     /**
@@ -214,7 +217,9 @@ public class MCRXMLTableManager {
      */
     public int getNextFreeIdInt(String idproject, String idtype)
             throws MCRPersistenceException {
-        return getXMLTable(idtype).getNextFreeIdInt(idproject, idtype);
+        int i = getXMLTable(idtype).getNextFreeIdInt(idproject, idtype);
+        while (i % number_distance != 0) { i += 1; }
+        return i;
     }
 
     /**

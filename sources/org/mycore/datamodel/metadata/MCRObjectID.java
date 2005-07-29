@@ -74,6 +74,8 @@ public final class MCRObjectID {
 
     private boolean mcr_valid_id = false;
 
+    private static int number_distance = 1;
+
     private static String number_pattern = null;
 
     private static DecimalFormat number_format = null;
@@ -83,6 +85,7 @@ public final class MCRObjectID {
      */
     static {
         CONFIG = MCRConfiguration.instance();
+        number_distance = CONFIG.getInt("MCR.metadata_objectid_number_distance",1);
         number_pattern = CONFIG.getString("MCR.metadata_objectid_number_pattern","0000000000");
         number_format = new DecimalFormat(number_pattern);
     }
@@ -142,6 +145,7 @@ public final class MCRObjectID {
                 mylastnumber = i;
             } else {
                 mylastnumber += 1;
+                while (mylastnumber % number_distance != 0) { mylastnumber += 1;} 
                 mcrid.append(mylastnumber);
             }
             lastnumber.put(base_id,new Integer(mylastnumber));
