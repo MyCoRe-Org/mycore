@@ -380,9 +380,6 @@ protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in,
         }
       // MCRMetaHistoryDate
       if (mcrclass.equals("MCRMetaHistoryDate")) {
-        String text = datasubtag.getTextNormalize();
-        if ((text == null) || ((text = text.trim()).length() ==0)) { 
-          datatag.removeContent(datasubtag); k--; datataglistlen--; continue; }
         if (datasubtag.getAttribute("lang") != null) {
           datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE); }
         try {
