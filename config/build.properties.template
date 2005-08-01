@@ -35,10 +35,10 @@
 # MCR.JDBCStore.LibPath=java lib
 
 # MySQL under Linux or Windows: JDBC driver is included in MyCoRe!
-  MCR.JDBCStore.Type=mysql
+#  MCR.JDBCStore.Type=mysql
 
 # Hibernate for Linux or Windows: the Hibernate access to SQL DB's is included!
-# MCR.JDBCStore.Type=hibernate
+MCR.JDBCStore.Type=hibernate
 
 ####################################################################### 
 #
