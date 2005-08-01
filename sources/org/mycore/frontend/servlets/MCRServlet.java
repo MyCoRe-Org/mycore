@@ -235,7 +235,10 @@ public class MCRServlet extends HttpServlet {
             else if (ex instanceof IOException)
                 throw (IOException) ex;
             else
+            {
                 handleException(ex);
+                generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
+            }
         } finally {
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
@@ -283,29 +286,36 @@ public class MCRServlet extends HttpServlet {
             boolean xmlstyle) throws IOException, ServletException {
         LOGGER.error(getClass().getName() + ": Error " + error
                 + " occured. The following message was given: " + msg, ex);
-        String rootname = "mcr_error";
+
         String defaultLang = CONFIG
                 .getString("MCR.metadata_default_lang", "de");
         String lang = (getProperty(request, "lang") != null) ? getProperty(
                 request, "lang") : defaultLang;
         String style = (xmlstyle) ? "xml" : ("query-" + lang);
+
+        String rootname = "mcr_error";
         Element root = new Element(rootname);
-        Element exception = new Element("exception");
-        Document errorDoc = new Document(root, new DocType(rootname));
         root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
-        if (ex != null) {
+        Document errorDoc = new Document(root, new DocType(rootname));
+
+        while (ex != null) {
+            Element exception = new Element("exception");
             Element trace = new Element("trace");
             Element message = new Element("message");
             trace.setText(MCRException.getStackTraceAsString(ex));
             message.setText(ex.getMessage());
-            exception.addContent((Content) message).addContent((Content) trace);
+            exception.addContent(message).addContent(trace);
+            root.addContent(exception);
+            if (ex instanceof MCRException)
+              ex = ((MCRException)ex).getException();
+            else
+              ex = null;
         }
-        root.addContent((Content) exception);
+
         request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
         request.setAttribute("XSL.Style", style);
         RequestDispatcher rd = getServletContext().getNamedDispatcher(
                 "MCRLayoutServlet");
-        LOGGER.info("MCRQueryServlet: forward to MCRLayoutServlet!");
         rd.forward(request, response);
     }
 
