@@ -58,6 +58,9 @@ public class MCRSQLConnectionPool {
     /** The maximum number of connections that will be built */
     protected int maxNumConnections;
 
+    /** The maximum age a connection can be before it is discarded */
+    protected static long maxAge = 3600*1000;
+
     /** The logger */
     private static Logger logger = Logger.getLogger("org.mycore.backend.sql");
 
@@ -118,8 +121,7 @@ public class MCRSQLConnectionPool {
      * @throws MCRPersistenceException
      *             if there was a problem while building the connection
      */
-    public synchronized MCRSQLConnection getConnection()
-            throws MCRPersistenceException {
+    public synchronized MCRSQLConnection getConnection() throws MCRPersistenceException {
         // Wait for a free connection
         while (usedConnections.size() == maxNumConnections)
             try {
@@ -128,13 +130,17 @@ public class MCRSQLConnectionPool {
             }
 
         MCRSQLConnection connection;
-        // Do we have to build a connection or is there already one?
-        if (freeConnections.isEmpty())
-            connection = new MCRSQLConnection();
-        else {
+	while(!freeConnections.isEmpty()) {
             connection = (MCRSQLConnection) (freeConnections.firstElement());
             freeConnections.removeElement(connection);
-        }
+	    if(System.currentTimeMillis() - connection.lastUse() < maxAge) {
+		connection.use();
+		usedConnections.addElement(connection);
+		return connection;
+	    }
+	}
+        connection = new MCRSQLConnection();
+	connection.use();
         usedConnections.addElement(connection);
         return connection;
     }
@@ -153,6 +159,8 @@ public class MCRSQLConnectionPool {
     synchronized void releaseConnection(MCRSQLConnection connection) {
         if (connection == null)
             return;
+
+	connection.use();
 
         if (usedConnections.contains(connection))
             usedConnections.removeElement(connection);

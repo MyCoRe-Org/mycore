@@ -68,15 +68,14 @@ public class MCRSQLConnection {
 
     private static String url, userID, password;
 
+    long lastUse;
+
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         url = config.getString("MCR.persistence_sql_database_url");
         userID = config.getString("MCR.persistence_sql_database_userid", "");
         password = config.getString("MCR.persistence_sql_database_passwd", "");
-
-        maxUsages = config.getInt(
-                "MCR.persistence_sql_database_connection_max_usages",
-                Integer.MAX_VALUE);
+        maxUsages = config.getInt("MCR.persistence_sql_database_connection_max_usages",Integer.MAX_VALUE);
     }
 
     /**
@@ -87,6 +86,15 @@ public class MCRSQLConnection {
      */
     MCRSQLConnection() throws MCRPersistenceException {
         buildJDBCConnection();
+	lastUse = System.currentTimeMillis();
+    }
+
+    void use() {
+	lastUse = System.currentTimeMillis();
+    }
+    
+    long lastUse() {
+	return lastUse;
     }
 
     private void buildJDBCConnection() throws MCRPersistenceException {
