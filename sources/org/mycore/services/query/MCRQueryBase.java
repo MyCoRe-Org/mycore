@@ -217,6 +217,7 @@ abstract public class MCRQueryBase implements MCRQueryInterface {
                     continue;
                 }
             } catch (MCRConfigurationException ce) {
+                logger.error(ce);
                 continue;
             }
             logger.debug("T: The separated query type is " + onetype);
