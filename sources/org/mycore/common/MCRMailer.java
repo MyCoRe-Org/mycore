@@ -248,7 +248,7 @@ public class MCRMailer {
             for (int i = 0; i < to.size(); i++)
                 msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
                         (String) to.get(i)));
-            for (int i = 0; i < bcc.size(); i++)
+            if (bcc != null) for (int i = 0; i < bcc.size(); i++)
                 msg.addRecipient(Message.RecipientType.BCC,
                         new InternetAddress((String) bcc.get(i)));
             msg.setSentDate(new Date());
