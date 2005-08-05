@@ -24,7 +24,6 @@
 
 package org.mycore.common;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,21 +34,18 @@ import javax.activation.DataSource;
 import javax.activation.URLDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.AddressException;
-
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 
 /**
- * This class is a simple basic mailer class for mycore.
+ * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
  * @author Frank Lützenkirchen
@@ -62,15 +58,13 @@ public class MCRMailer {
     /** Logger */
     static Logger logger = Logger.getLogger(MCRMailer.class);
 
-    protected static Properties mailProperties;
-
     protected static Session mailSession;
 
     /** Initializes the class */
     static {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        mailProperties = new Properties();
+        Properties mailProperties = new Properties();
 
         try {
             mailProperties.setProperty("mail.smtp.host", config
@@ -80,38 +74,8 @@ public class MCRMailer {
             mailSession = Session.getDefaultInstance(mailProperties, null);
             mailSession.setDebug(config.getBoolean("MCR.mail.debug", false));
         } catch (MCRConfigurationException mcrx) {
-            String msg = "Missing configuration data.";
-            logger.fatal(msg);
-        }
-    }
-
-    public MCRMailer() {
-    }
-
-    /**
-     * Returns the mail session for this class.
-     * 
-     * @return the current mail session
-     */
-    protected Session getSession() {
-        return mailSession;
-    }
-
-    /**
-     * Internal method for sending a message with given session.
-     * 
-     * @param msg
-     *            the message to be sent
-     */
-    private static void send(Message msg) {
-        try {
-            Transport.send(msg);
-        } catch (SendFailedException sfe) {
-            logger.error(sfe.getMessage());
-            throw new MCRException("The message could not be sent.", sfe);
-        } catch (MessagingException me) {
-            logger.error(me.getMessage());
-            throw new MCRException("The message could not be sent.", me);
+            String msg = "Missing email configuration data.";
+            logger.fatal(msg, mcrx);
         }
     }
 
@@ -132,7 +96,7 @@ public class MCRMailer {
         logger.debug("Called plaintext send method with single recipient.");
         ArrayList recipients = new ArrayList();
         recipients.add(recipient);
-        send(sender, recipients, subject, body, false);
+        send(sender, null, recipients, null, subject, body, null);
     }
 
     /**
@@ -154,36 +118,12 @@ public class MCRMailer {
             String body, boolean bcc) {
         logger.debug("Called plaintext send method with multiple recipients.");
 
-        MimeMessage msg = new MimeMessage(mailSession);
-        try {
-            msg.setFrom(new InternetAddress(sender));
-
-            for (int i = 0; i < recipients.size(); i++) {
-                String recipient = (String) (recipients.get(i));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                        recipient));
-            }
-
-            if (bcc) {
-                msg.addRecipient(Message.RecipientType.BCC,
-                        new InternetAddress(sender));
-            }
-
-            msg.setSubject(subject);
-            msg.setSentDate(new Date());
-            msg.setText(body);
-
-            Transport.send(msg);
-        } catch (AddressException ae) {
-            logger.error(ae.getMessage());
-            throw new MCRException("The message could not be sent.", ae);
-        } catch (SendFailedException sfe) {
-            logger.error(sfe.getMessage());
-            throw new MCRException("The message could not be sent.", sfe);
-        } catch (MessagingException me) {
-            logger.error(me.getMessage());
-            throw new MCRException("The message could not be sent.", me);
+        List bccList = null;
+        if (bcc) {
+            bccList = new ArrayList();
+            bccList.add(sender);
         }
+        send(sender, null, recipients, bccList, subject, body, null);
     }
 
     /**
@@ -205,7 +145,7 @@ public class MCRMailer {
         logger.debug("Called multipart send method with single recipient.");
         ArrayList recipients = new ArrayList();
         recipients.add(recipient);
-        send(sender, recipients, subject, body, parts, false);
+        send(sender, null, recipients, null, subject, body, parts);
     }
 
     /**
@@ -223,63 +163,125 @@ public class MCRMailer {
      * @param parts
      *            a List of URL strings which should be added as parts
      * @param bcc
-     *            if true, sender will also get a copy as cc recipient
+     *            if true, sender will also get a copy as bcc recipient
      */
     public static void send(String sender, List recipients, String subject,
             String body, List parts, boolean bcc) {
         logger.debug("Called multipart send method with multiple recipients.");
 
-        MimeMessage msg = new MimeMessage(mailSession);
-        try {
-            msg.setFrom(new InternetAddress(sender));
-
-            for (int i = 0; i < recipients.size(); i++) {
-                String recipient = (String) (recipients.get(i));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                        recipient));
-            }
-
-            if (bcc) {
-                msg.addRecipient(Message.RecipientType.BCC,
-                        new InternetAddress(sender));
-            }
-
-            msg.setSubject(subject);
-            msg.setSentDate(new Date());
-
-            // Create the message part
-            BodyPart messagePart = new MimeBodyPart();
-
-            // Fill the message
-            messagePart.setText(body);
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(messagePart);
-
-            for (int i = 0; i < parts.size(); i++) {
-                String part = (String) (parts.get(i));
-                messagePart = new MimeBodyPart();
-                DataSource source = new URLDataSource(new URL(part));
-                messagePart.setDataHandler(new DataHandler(source));
-                multipart.addBodyPart(messagePart);
-            }
-
-            // Put parts in message
-            msg.setContent(multipart);
-
-            Transport.send(msg);
-        } catch (AddressException ae) {
-            logger.error(ae.getMessage());
-            throw new MCRException("The message could not be sent.", ae);
-        } catch (SendFailedException sfe) {
-            logger.error(sfe.getMessage());
-            throw new MCRException("The message could not be sent.", sfe);
-        } catch (MessagingException me) {
-            logger.error(me.getMessage());
-            throw new MCRException("The message could not be sent.", me);
-        } catch (MalformedURLException mue) {
-            logger.error(mue.getMessage());
-            throw new MCRException("Error in URL of message parts.", mue);
+        List bccList = null;
+        if (bcc) {
+            bccList = new ArrayList();
+            bccList.add(sender);
         }
+
+        send(sender, null, recipients, bccList, subject, body, parts);
     }
 
+    /**
+     * Send email from a given XML document. See the sample mail below:
+     * 
+     * <email>
+     *   <from>bingo@bongo.com</from>
+     *   <to>jim.knopf@lummerland.de</to>
+     *   <bcc>frau.waas@lummerland.de</bcc>
+     *   <subject>Grüße aus der Stadt der Drachen</subject>
+     *   <body>Es ist recht bewölkt. Alles Gute, Jim.</body>
+     *   <part>http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg</part>
+     * </email>
+     * 
+     * @param email the email as JDOM element.
+     **/
+    public static void send(Element email) {
+        String from = email.getChildTextTrim("from");
+        String replyTo = email.getChildTextTrim("replyTo");
+
+        List toList = email.getChildren("to");
+        List to = new ArrayList();
+        for (int i = 0; i < toList.size(); i++)
+            to.add(((Element) toList.get(i)).getTextTrim());
+
+        List bccList = email.getChildren("bcc");
+        List bcc = new ArrayList();
+        for (int i = 0; i < bccList.size(); i++)
+            bcc.add(((Element) bccList.get(i)).getTextTrim());
+
+        String subject = email.getChildTextTrim("subject");
+        String body = email.getChildTextTrim("body");
+
+        List partsList = email.getChildren("part");
+        List parts = new ArrayList();
+        for( int i = 0; i < partsList.size(); i++)
+            parts.add(((Element)partsList.get(i)).getTextTrim());
+        
+        send(from, replyTo, to, bcc, subject, body, parts);
+    }
+
+    /**
+     * Sends email.
+     *  
+     * @param from
+     *            the sender of the email
+     * @param replyTo
+     *            the reply-to address, may be null
+     * @param to
+     *            the recipients of the email as a List of Strings
+     * @param bcc
+     *            the bcc recipients of the email as a List of Strings
+     * @param subject
+     *            the subject of the email
+     * @param body
+     *            the text of the email
+     * @param parts
+     *            a List of URL strings which should be added as parts
+     */
+    public static void send(String from, String replyTo, List to, List bcc,
+            String subject, String body, List parts) {
+        try {
+            MimeMessage msg = new MimeMessage(mailSession);
+            msg.setFrom(new InternetAddress(from));
+            if ((replyTo != null) && (replyTo.trim().length() > 0)) {
+                InternetAddress[] adrs = new InternetAddress[1];
+                adrs[0] = new InternetAddress(replyTo);
+                msg.setReplyTo(adrs);
+            }
+            for (int i = 0; i < to.size(); i++)
+                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+                        (String) to.get(i)));
+            for (int i = 0; i < bcc.size(); i++)
+                msg.addRecipient(Message.RecipientType.BCC,
+                        new InternetAddress((String) bcc.get(i)));
+            msg.setSentDate(new Date());
+            msg.setSubject(subject);
+            if ((parts == null) || (parts.size() == 0))
+                msg.setText(body);
+            else if ((parts != null) && (parts.size() > 0)) {
+
+                // Create the message part
+                BodyPart messagePart = new MimeBodyPart();
+
+                // Fill the message
+                messagePart.setText(body);
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(messagePart);
+
+                for (int i = 0; i < parts.size(); i++) {
+                    messagePart = new MimeBodyPart();
+                    DataSource source = new URLDataSource(new URL(
+                            (String) parts.get(i)));
+                    messagePart.setDataHandler(new DataHandler(source));
+                    multipart.addBodyPart(messagePart);
+                }
+
+                // Put parts in message
+                msg.setContent(multipart);
+
+            }
+
+            Transport.send(msg);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+            throw new MCRException("Email could not be sent.", ex);
+        }
+    }
 }
