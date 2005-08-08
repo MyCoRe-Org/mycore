@@ -181,8 +181,7 @@ public class MCRMailer {
     /**
      * Send email from a given XML document. See the sample mail below:
      * 
-     * <email>
-     *   <from>bingo@bongo.com</from>
+     * <email><from>bingo@bongo.com</from>
      *   <to>jim.knopf@lummerland.de</to>
      *   <bcc>frau.waas@lummerland.de</bcc>
      *   <subject>Grüße aus der Stadt der Drachen</subject>
@@ -191,10 +190,14 @@ public class MCRMailer {
      * </email>
      * 
      * @param email the email as JDOM element.
-     **/
+     */
     public static void send(Element email) {
         String from = email.getChildTextTrim("from");
-        String replyTo = email.getChildTextTrim("replyTo");
+
+        List rptList = email.getChildren("replyTo");
+        List replyTo = new ArrayList();
+        for (int i = 0; i < rptList.size(); i++)
+            replyTo.add(((Element) rptList.get(i)).getTextTrim());
 
         List toList = email.getChildren("to");
         List to = new ArrayList();
@@ -211,51 +214,56 @@ public class MCRMailer {
 
         List partsList = email.getChildren("part");
         List parts = new ArrayList();
-        for( int i = 0; i < partsList.size(); i++)
-            parts.add(((Element)partsList.get(i)).getTextTrim());
-        
+        for (int i = 0; i < partsList.size(); i++)
+            parts.add(((Element) partsList.get(i)).getTextTrim());
+
         send(from, replyTo, to, bcc, subject, body, parts);
     }
 
     /**
      * Sends email.
-     *  
+     * 
      * @param from
      *            the sender of the email
      * @param replyTo
-     *            the reply-to address, may be null
+     *            the reply-to addresses as a List of Strings, may be null
      * @param to
      *            the recipients of the email as a List of Strings
      * @param bcc
-     *            the bcc recipients of the email as a List of Strings
+     *            the bcc recipients of the email as a List of Strings, may be
+     *            null
      * @param subject
      *            the subject of the email
      * @param body
      *            the text of the email
      * @param parts
-     *            a List of URL strings which should be added as parts
+     *            a List of URL strings which should be added as parts, may be
+     *            null
      */
-    public static void send(String from, String replyTo, List to, List bcc,
+    public static void send(String from, List replyTo, List to, List bcc,
             String subject, String body, List parts) {
         try {
             MimeMessage msg = new MimeMessage(mailSession);
-            msg.setFrom(new InternetAddress(from));
-            if ((replyTo != null) && (replyTo.trim().length() > 0)) {
-                InternetAddress[] adrs = new InternetAddress[1];
-                adrs[0] = new InternetAddress(replyTo);
+            msg.setFrom(buildAddress(from));
+            if (replyTo != null) {
+                InternetAddress[] adrs = new InternetAddress[replyTo.size()];
+                for (int i = 0; i < replyTo.size(); i++)
+                    adrs[i] = buildAddress((String) (replyTo.get(i)));
                 msg.setReplyTo(adrs);
             }
             for (int i = 0; i < to.size(); i++)
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                        (String) to.get(i)));
-            if (bcc != null) for (int i = 0; i < bcc.size(); i++)
-                msg.addRecipient(Message.RecipientType.BCC,
-                        new InternetAddress((String) bcc.get(i)));
+                msg.addRecipient(Message.RecipientType.TO,
+                        buildAddress((String) to.get(i)));
+            if (bcc != null)
+                for (int i = 0; i < bcc.size(); i++)
+                    msg.addRecipient(Message.RecipientType.BCC,
+                            buildAddress((String) bcc.get(i)));
+
             msg.setSentDate(new Date());
             msg.setSubject(subject);
             if ((parts == null) || (parts.size() == 0))
                 msg.setText(body);
-            else if ((parts != null) && (parts.size() > 0)) {
+            else {
 
                 // Create the message part
                 BodyPart messagePart = new MimeBodyPart();
@@ -284,4 +292,20 @@ public class MCRMailer {
             throw new MCRException("Email could not be sent.", ex);
         }
     }
+
+    /**
+     * Builds email address from a string. The string may be a single email
+     * address or a combination of a personal name and address, like "John Doe
+     * <john@doe.com>"
+     */
+    private static InternetAddress buildAddress(String s) throws Exception {
+        if (!s.endsWith(">"))
+            return new InternetAddress(s.trim());
+
+        String name = s.substring(0, s.lastIndexOf("<")).trim();
+        String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1)
+                .trim();
+        return new InternetAddress(addr, name);
+    }
 }
+
