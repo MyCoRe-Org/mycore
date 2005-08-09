@@ -80,7 +80,6 @@ public class MCRHIBConnection {
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
         try{
-            String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
             buildConfiguration();
             genTable.generateTables(cfg);
             buildSessionFactory();
@@ -127,6 +126,12 @@ public class MCRHIBConnection {
         if (sessions == null){
             sessions = cfg.buildSessionFactory();
         }
+    }
+    
+    public void buildSessionFactory(Configuration config){
+        sessions.close();
+        sessions = config.buildSessionFactory();
+        cfg = config;
     }
 
     /**
