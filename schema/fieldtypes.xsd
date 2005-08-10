@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mcr="http://www.mycore.org/" targetNamespace="http://www.mycore.org/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="fieldtypes">
+		<xs:annotation>
+			<xs:documentation>defines supported datatypes and search operatores of search fields</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="type" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="operator" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="token" type="mcr:operator" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:NCName" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="operator">
+		<xs:annotation>
+			<xs:documentation>operators may consist of any character except whitespace</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\S*"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

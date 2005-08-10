@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fieldtypes xmlns="http://www.mycore.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mycore.org/
+fieldtypes.xsd">
+
+	<type name="identifier">
+		<!-- exact string or id, should be indexed unchanged -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+		<operator token="like"/>
+		<!-- allows wildcard search using * and ? -->
+	</type>
+	<type name="name">
+		<!-- name of a person or place, umlauts etc. should be normalized -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+		<operator token="like"/>
+		<!-- allows wildcard search using * and ? -->
+		<operator token="contains"/>
+		<!-- searches words at any position in the text -->
+	</type>
+	<type name="text">
+		<!-- free text like title, abstract ect., stemming and linguistic processing applied -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+		<operator token="like"/>
+		<!-- allows wildcard search using * and ? -->
+		<operator token="contains"/>
+		<!-- searches words at any position in the text -->
+		<operator token="phrase"/>
+		<!-- searches a phrase at any position in the text -->
+	</type>
+	<type name="date">
+		<!-- date value in fixed format "yyyy-mm-dd" -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+	</type>
+	<type name="time">
+		<!-- time or duration value in fixed format "hh:mm:ss" -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+	</type>
+	<type name="timestamp">
+		<!-- date and time value in fixed format "yyyy-mm-dd hh:mm:ss" -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+	</type>
+	<type name="boolean">
+		<!-- values "true" or "false" -->
+		<operator token="="/>
+	</type>
+	<type name="decimal">
+		<!-- decimal value with "." as separator -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+	</type>
+	<type name="integer">
+		<!-- integer value -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+	</type>
+</fieldtypes>
