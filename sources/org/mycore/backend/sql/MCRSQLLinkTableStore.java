@@ -194,8 +194,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      * @return the number of references
      */
     public final int countTo(String to) {
-        String sql = new MCRSQLStatement(tableName).setCondition("MCRTO", to)
-                .toCountStatement();
+        String sql = new MCRSQLStatement(tableName).setCondition("MCRTO", to).toCountStatement("MCRFROM");
         MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(sql);
         int num = 0;
         try {

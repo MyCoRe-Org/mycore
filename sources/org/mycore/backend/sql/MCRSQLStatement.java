@@ -225,8 +225,8 @@ public class MCRSQLStatement {
         return "DELETE FROM " + toRowSelector();
     }
 
-    public final String toCountStatement() {
-        return "SELECT COUNT( DISTINCT MCRFROM ) AS NUMBER FROM "
+    public final String toCountStatement(String column) {
+        return "SELECT COUNT( DISTINCT "+column+" ) AS NUMBER FROM "
                 + toRowSelector();
     }
 
@@ -239,18 +239,7 @@ public class MCRSQLStatement {
      */
     private final String mask(String value) {
         final char mask = '\'';
-        if (value.indexOf(mask) == -1)
-            return value;
-        else {
-            StringTokenizer tok = new StringTokenizer(value, String
-                    .valueOf(mask));
-            StringBuffer returning = new StringBuffer();
-            while (tok.hasMoreTokens()) {
-                returning.append(tok.nextToken()).append(MASK_CHAR)
-                        .append(mask);
-            }
-            return returning.toString();
-        }
+	return value.replaceAll(""+mask, ""+MASK_CHAR+mask);
     }
 
 }
