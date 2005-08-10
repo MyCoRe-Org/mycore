@@ -26,14 +26,9 @@ package org.mycore.backend.lucene;
 
 import org.mycore.common.*;
 import org.mycore.datamodel.metadata.*;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.*;
 
-import org.jdom.input.*;
-import org.jdom.output.*;
-
 import org.apache.log4j.Logger;
-import org.jdom.output.*;
 
 import java.util.*;
 import java.io.*;
@@ -223,8 +218,7 @@ public final class MCRLUCENESearchStore implements
 
             String stylesheet = "/mcr_object2lucene_fields.xsl";
 
-            java.net.URL url = MCRContentIndexerXML.class
-                    .getResource(stylesheet);
+            java.net.URL url = MCRLUCENESearchStore.class.getResource(stylesheet);
             if (null == url) {
                 String msg = "File not found in CLASSPATH: " + stylesheet;
                 logger.error(msg);
