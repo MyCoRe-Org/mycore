@@ -24,8 +24,6 @@
 
 package org.mycore.datamodel.ifs;
 
-import org.mycore.common.*;
-
 /**
  * Represents a read-only view of MCRFile metadata. This interface was
  * introduced as a mechanism to be able to use the same code with MyCoRe Sample

@@ -25,8 +25,6 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.*;
-import java.util.*;
-import java.security.*;
 
 /**
  * This class implements a special kind of BufferedInputStream that blocks

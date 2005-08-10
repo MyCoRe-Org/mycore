@@ -25,9 +25,7 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
-import java.io.*;
 import java.util.*;
-import java.text.*;
 
 /**
  * Builds an Index for the content of MCRFiles. This can be a lucene, IBM

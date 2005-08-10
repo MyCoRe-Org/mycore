@@ -27,7 +27,6 @@ package org.mycore.datamodel.ifs;
 import org.mycore.common.*;
 import java.util.*;
 import java.io.*;
-import javax.servlet.http.*;
 
 /**
  * Represents a stored file with its metadata and content. USED BY MILESS 1.3

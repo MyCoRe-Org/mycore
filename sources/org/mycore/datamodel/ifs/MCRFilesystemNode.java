@@ -24,7 +24,6 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.File;
 import java.util.*;
 import java.text.*;
 import org.mycore.common.*;

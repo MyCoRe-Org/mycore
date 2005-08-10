@@ -28,7 +28,6 @@ import org.mycore.common.*;
 import java.util.*;
 import java.io.*;
 import java.security.*;
-import javax.servlet.http.*;
 
 /**
  * Represents a stored file with its metadata and content.
