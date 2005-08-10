@@ -42,8 +42,17 @@ public class MCREvent extends java.util.Hashtable {
     /** Predefined event type metadata object deleted * */
     public static final int OBJECT_DELETED = 2;
 
+    /** Predefined event type file content created * */
+    public static final int FILE_CREATED = 3;
+
+    /** Predefined event type file content updated * */
+    public static final int FILE_UPDATED = 4;
+
+    /** Predefined event type file content deleted * */
+    public static final int FILE_DELETED = 5;
+
     private String[] typeStrings = { "object created", "object updated",
-            "object deleted" };
+            "object deleted", "file created", "file updated", "file deleted" };
 
     private int type;
 
