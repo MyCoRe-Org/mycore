@@ -26,6 +26,7 @@ package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * Abstract helper class that can be subclassed to implement event handlers more
@@ -42,6 +43,12 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             logger.debug(getClass().getName() + " handling "
                     + obj.getId().getId() + evt.getTypeString());
         }
+        MCRFile file = (MCRFile) (evt.get("file"));
+        if (file != null) {
+            logger.debug(getClass().getName() + " handling "
+                    + file.getOwnerID() + "/" + file.getAbsolutePath() + " "
+                    + evt.getTypeString());
+        }
 
         switch (evt.getType()) {
         case MCREvent.OBJECT_CREATED:
@@ -52,6 +59,15 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             break;
         case MCREvent.OBJECT_DELETED:
             handleObjectDeleted(evt, obj);
+            break;
+        case MCREvent.FILE_CREATED:
+            handleFileCreated(evt, file);
+            break;
+        case MCREvent.FILE_UPDATED:
+            handleFileUpdated(evt, file);
+            break;
+        case MCREvent.FILE_DELETED:
+            handleFileDeleted(evt, file);
             break;
         }
     }
@@ -92,6 +108,45 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles file created events. This implementation does nothing and should
+     * be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileCreated(MCREvent evt, MCRFile file) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles file updated events. This implementation does nothing and should
+     * be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileUpdated(MCREvent evt, MCRFile file) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles file deleted events. This implementation does nothing and should
+     * be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
         logger.debug("This default handler implementation does nothing");
     }
 }
