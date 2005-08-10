@@ -343,13 +343,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             
             if (hasParent())
                 getParent().sizeOfChildChanged(size, 0);
-            MCRContentIndexer indexer = MCRContentIndexerFactory
-                    .getIndexerFromFCT(contentTypeID);
-            try {
-                if (null != indexer)
-                    indexer.doDeleteIndex(this);
-            } catch (Exception ex) {
-            }
         }
 
         super.delete();
