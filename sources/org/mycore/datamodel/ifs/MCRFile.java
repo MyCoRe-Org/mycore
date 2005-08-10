@@ -25,6 +25,7 @@
 package org.mycore.datamodel.ifs;
 
 import org.mycore.common.*;
+import org.mycore.common.events.*;
 import java.util.*;
 import java.io.*;
 import java.security.*;
@@ -51,6 +52,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /** The optional extender for streaming audio/video files */
     protected MCRAudioVideoExtender avExtender;
 
+    /** Is true if this file is a new MCRFile and not retrieved from store **/
+    protected boolean isNew;
+    
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging
      * to the given ownerID. The file is assumed to be a standalone "root file"
@@ -64,6 +68,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public MCRFile(String name, String ownerID) {
         super(name, ownerID);
         initContentFields();
+        isNew = true;
         storeNew();
     }
 
@@ -82,6 +87,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public MCRFile(String name, MCRDirectory parent) {
         super(name, parent);
         initContentFields();
+        isNew = true;
         storeNew();
     }
 
@@ -97,6 +103,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         this.storeID = storeID;
         this.contentTypeID = fctID;
         this.md5 = md5;
+        this.isNew = false;
     }
 
     /**
@@ -307,14 +314,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         if (old_storageID.length() != 0)
             old_store.deleteContent(old_storageID);
 
-        MCRContentIndexer indexer = MCRContentIndexerFactory
-                .getIndexerFromFCT(contentTypeID);
-        if (null != indexer) {
-            try {
-                indexer.doIndexContent(this);
-            } catch (Exception ex) {
-            }
+        // If file content has changed, call event handlers to index content
+        if( changed )
+        {
+          int type = ( isNew ? MCREvent.FILE_CREATED : MCREvent.FILE_UPDATED );
+          MCREvent event = new MCREvent( type );
+          event.put( "file", this );
+          MCREventManager.instance().handleEvent( event );
         }
+        isNew = false;
     }
 
     /**
@@ -327,6 +335,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         if (storageID.length() != 0) {
             getContentStore().deleteContent(storageID);
+            
+            // Call event handlers to update indexed content
+            MCREvent event = new MCREvent( MCREvent.FILE_DELETED );
+            event.put( "file", this );
+            MCREventManager.instance().handleEvent( event );
+            
             if (hasParent())
                 getParent().sizeOfChildChanged(size, 0);
             MCRContentIndexer indexer = MCRContentIndexerFactory
