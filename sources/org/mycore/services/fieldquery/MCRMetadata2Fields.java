@@ -143,11 +143,18 @@ public class MCRMetadata2Fields {
             Namespace xslns = Namespace.getNamespace("xsl",
                     "http://www.w3.org/1999/XSL/Transform");
             Namespace mcrns = Namespace.getNamespace("mcr",
-                    "http://www.mycore.org/");
+            "http://www.mycore.org/");
+            Namespace xmlns = Namespace.getNamespace("xml",
+            "http://www.w3.org/XML/1998/namespace");
+            Namespace xlinkns = Namespace.getNamespace("xlink",
+            "http://www.w3.org/1999/xlink");
 
             Element stylesheet = new Element("stylesheet");
             stylesheet.setAttribute("version", "1.0");
             stylesheet.setNamespace(xslns);
+            stylesheet.addNamespaceDeclaration( xmlns );
+            stylesheet.addNamespaceDeclaration( xlinkns );
+            
             xsl = new Document(stylesheet);
 
             Element template = new Element("template", xslns);
