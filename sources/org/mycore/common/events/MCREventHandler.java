@@ -29,7 +29,7 @@ import org.mycore.common.*;
 /**
  * Objects that implement this interface can react when some kind of predefined
  * event happens in MyCoRe. Implementing classes are registered using the
- * configuration property MCR.EventHandler.X.Class where X is a number starting
+ * configuration property MCR.EventHandler.X.class where X is a number starting
  * from 1. Event handlers are called in the same order as they are registered in
  * the properties files.
  * 
