@@ -26,15 +26,19 @@ package org.mycore.services.fieldquery;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
@@ -42,6 +46,7 @@ import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -143,18 +148,26 @@ public class MCRMetadata2Fields {
             Namespace xslns = Namespace.getNamespace("xsl",
                     "http://www.w3.org/1999/XSL/Transform");
             Namespace mcrns = Namespace.getNamespace("mcr",
-            "http://www.mycore.org/");
+                    "http://www.mycore.org/");
             Namespace xmlns = Namespace.getNamespace("xml",
-            "http://www.w3.org/XML/1998/namespace");
+                    "http://www.w3.org/XML/1998/namespace");
             Namespace xlinkns = Namespace.getNamespace("xlink",
-            "http://www.w3.org/1999/xlink");
+                    "http://www.w3.org/1999/xlink");
+            Namespace xalanns = Namespace.getNamespace("xalan",
+                    "http://xml.apache.org/xalan");
+            Namespace extns = Namespace
+                    .getNamespace("ext",
+                            "xalan://org.mycore.services.fieldquery.MCRMetadata2Fields");
 
             Element stylesheet = new Element("stylesheet");
             stylesheet.setAttribute("version", "1.0");
             stylesheet.setNamespace(xslns);
-            stylesheet.addNamespaceDeclaration( xmlns );
-            stylesheet.addNamespaceDeclaration( xlinkns );
-            
+            stylesheet.addNamespaceDeclaration(xmlns);
+            stylesheet.addNamespaceDeclaration(xlinkns);
+            stylesheet.addNamespaceDeclaration(xalanns);
+            stylesheet.addNamespaceDeclaration(extns);
+            stylesheet.setAttribute("extension-element-prefixes", "ext");
+
             xsl = new Document(stylesheet);
 
             Element template = new Element("template", xslns);
@@ -199,6 +212,38 @@ public class MCRMetadata2Fields {
             }
         }
         return xsl;
+    }
+
+    /** Standard format for a date value, as defined in fieldtypes.xml * */
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    /**
+     * Xalan XSL extension to convert MyCoRe date values to standard format. To
+     * be used in a stylesheet or searchfields.xml configuration. Usage example:
+     * 
+     * &lt;field name="date" type="date"
+     * xpath="/mycoreobject/metadata/dates/date"
+     * value="ext:normalizeDate(string(normalize-space(text())),string(@xml:lang))"
+     * &gt;
+     * 
+     * @param date
+     *            the date string in a locale-dependent format
+     * @param lang
+     *            the xml:lang attribute of the date element
+     */
+    public static String normalizeDate(String date, String lang) {
+        GregorianCalendar cal = new GregorianCalendar();
+        try {
+            DateFormat df = MCRUtils.getDateFormat(lang);
+            cal.setTime(df.parse(date));
+        } catch (ParseException e) {
+            try {
+                cal.setTime(sdf.parse(date));
+            } catch (ParseException ex) {
+                return "";
+            }
+        }
+        return sdf.format(cal.getTime());
     }
 
     /**
