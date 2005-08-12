@@ -52,9 +52,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /** The optional extender for streaming audio/video files */
     protected MCRAudioVideoExtender avExtender;
 
-    /** Is true if this file is a new MCRFile and not retrieved from store **/
+    /** Is true if this file is a new MCRFile and not retrieved from store * */
     protected boolean isNew;
-    
+
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging
      * to the given ownerID. The file is assumed to be a standalone "root file"
@@ -315,12 +315,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             old_store.deleteContent(old_storageID);
 
         // If file content has changed, call event handlers to index content
-        if( changed )
-        {
-          int type = ( isNew ? MCREvent.FILE_CREATED : MCREvent.FILE_UPDATED );
-          MCREvent event = new MCREvent( type );
-          event.put( "file", this );
-          MCREventManager.instance().handleEvent( event );
+        if (changed) {
+            int type = (isNew ? MCREvent.FILE_CREATED : MCREvent.FILE_UPDATED);
+            MCREvent event = new MCREvent(type);
+            event.put("file", this);
+            MCREventManager.instance().handleEvent(event);
         }
         isNew = false;
     }
@@ -335,12 +334,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         if (storageID.length() != 0) {
             getContentStore().deleteContent(storageID);
-            
+
             // Call event handlers to update indexed content
-            MCREvent event = new MCREvent( MCREvent.FILE_DELETED );
-            event.put( "file", this );
-            MCREventManager.instance().handleEvent( event );
-            
+            MCREvent event = new MCREvent(MCREvent.FILE_DELETED);
+            event.put("file", this);
+            MCREventManager.instance().handleEvent(event);
+
             if (hasParent())
                 getParent().sizeOfChildChanged(size, 0);
         }
@@ -352,6 +351,27 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         this.storageID = null;
         this.storeID = null;
         this.avExtender = null;
+    }
+
+    /**
+     * Gets an InputStream to read the content of this file from the underlying
+     * store. Whenever possible, you should use the method getContentTo(
+     * OutputStream ) method instead, because this implementation uses a
+     * separate Thread and PipedOutputStream, which may not result in good
+     * performance and error handling. But it works :-).
+     * 
+     * @return an InputStream to read the file's content from
+     * @throws IOException
+     **/
+    public InputStream getInputStream() throws IOException {
+        final PipedInputStream in = new PipedInputStream();
+        final PipedOutputStream out = new PipedOutputStream(in);
+        new Thread(new Runnable() {
+            public void run() {
+                MCRFile.this.getContentTo(out);
+            }
+        }).start();
+        return in;
     }
 
     /**
