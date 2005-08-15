@@ -354,15 +354,12 @@ public class MCREditorServlet extends MCRServlet {
 					.info("Editor session " + sessionID
 							+ " submitting form data");
 
-			/*
-			 * we remove this session from the session->editor table. This means
-			 * subsequent calls to the edit formula will fail with an "invalid
-			 * session" exception. This is necessary to prevent inconsistencies
-			 * between what the user has entered in the formula and the current
-			 * state of the editor xml. It also means, however, that the browser
-			 * "back" button will not work in the editor.
-			 */
-			sessions.remove(sessionID);
+			// We do not remove the editor session from cache, because
+			// the user may use the back button and re-submit if an error
+			// occured. In nearly all editor states this is safe, but sometimes
+			// may result in ugly behaviour in conjunction with repeaters.
+			//
+			// sessions.remove(sessionID); // no good idea
 
 			processTargetSubmission(req, res, parms, editor);
 		} else if (button.startsWith("_s-")) {
