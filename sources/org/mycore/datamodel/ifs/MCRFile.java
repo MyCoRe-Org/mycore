@@ -355,23 +355,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
     /**
      * Gets an InputStream to read the content of this file from the underlying
-     * store. Whenever possible, you should use the method getContentTo(
-     * OutputStream ) method instead, because this implementation uses a
-     * separate Thread and PipedOutputStream, which may not result in good
-     * performance and error handling. But it works :-).
+     * store. It is important that you close() the stream when you are
+     * finished reading content from it.
      * 
      * @return an InputStream to read the file's content from
      * @throws IOException
      **/
-    public InputStream getInputStream() throws IOException {
-        final PipedInputStream in = new PipedInputStream();
-        final PipedOutputStream out = new PipedOutputStream(in);
-        new Thread(new Runnable() {
-            public void run() {
-                MCRFile.this.getContentTo(out);
-            }
-        }).start();
-        return in;
+    public InputStream getContentAsInputStream() throws IOException {
+      return getContentStore().retrieveContent( this );
     }
 
     /**
@@ -445,10 +436,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public String getContentAsString(String encoding)
             throws MCRPersistenceException, UnsupportedEncodingException {
         return new String(getContentAsByteArray(), encoding);
-    }
-
-    public InputStream getContentAsInputStream() throws MCRPersistenceException {
-        return new ByteArrayInputStream(getContentAsByteArray());
     }
 
     public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException,

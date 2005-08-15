@@ -28,7 +28,6 @@ import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
 import java.util.*;
 import java.io.*;
-import java.net.*;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
@@ -141,6 +140,12 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore {
         File local = new File(baseDir, file.getStorageID());
         InputStream in = new BufferedInputStream(new FileInputStream(local));
         MCRUtils.copyStream(in, target);
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file)
+            throws Exception {
+        File local = new File(baseDir, file.getStorageID());
+        return new BufferedInputStream(new FileInputStream(local));
     }
 }
 

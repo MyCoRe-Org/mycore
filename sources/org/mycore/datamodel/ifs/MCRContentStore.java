@@ -187,6 +187,27 @@ public abstract class MCRContentStore {
     protected abstract void doRetrieveContent(MCRFileReader file,
             OutputStream target) throws Exception;
 
+    /**
+     * Retrieves the content of an MCRFile as an InputStream. The default 
+     * implementation buffers all bytes in memory to implement this
+     * functionality, so subclasses should overwrite this method to
+     * get better performance and less memory consumption.
+     * 
+     * @param file
+     *            the MCRFile thats content should be retrieved
+     * @param target
+     *            the OutputStream to write the file content to
+     */
+    public InputStream retrieveContent(MCRFileReader file)
+      throws MCRException, IOException
+    {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      retrieveContent( file, baos );
+      baos.close();
+      byte[] content = baos.toByteArray();
+      return new ByteArrayInputStream( content );
+    }
+    
     /** DateFormat used to construct new unique IDs based on timecode */
     protected static DateFormat formatter = new SimpleDateFormat(
             "yyMMdd-HHmmss-SSS");

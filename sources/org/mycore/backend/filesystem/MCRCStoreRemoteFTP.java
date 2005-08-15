@@ -28,7 +28,6 @@ import org.mycore.common.*;
 import org.mycore.datamodel.ifs.*;
 import java.util.*;
 import java.io.*;
-import java.net.*;
 import com.enterprisedt.net.ftp.*;
 
 /**
