@@ -136,15 +136,10 @@ public class MCREventHandlerIndexText extends MCREventHandlerBase {
        */
       Field content = Field.Text("content", in);
       doc.add(content);
-    } catch (FilterPluginTransformException fe)
+    } catch (Exception fe)
     {
       //no transformation was done because of an error
       logger.error("Error while transforming document.", fe);
-      return doc;
-    } catch (NullPointerException ne)
-    {
-      //maybe ContentType is unsupported?
-      logger.error("Error while transforming document.", ne);
       return doc;
     }
     logger.debug("returning document");
