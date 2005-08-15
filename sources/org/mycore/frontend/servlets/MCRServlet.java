@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.jdom.Content;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -57,286 +57,286 @@ import org.mycore.common.xml.MCRLayoutServlet;
  * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
-    // Some configuration details
-    protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
+	// Some configuration details
+	protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private static Logger LOGGER;
+	private static Logger LOGGER;
 
-    private static String BASE_URL, SERVLET_URL;
+	private static String BASE_URL, SERVLET_URL;
 
-    // These values serve to remember if we have a GET or POST request
-    private final static boolean GET = true;
+	// These values serve to remember if we have a GET or POST request
+	private final static boolean GET = true;
 
-    private final static boolean POST = false;
+	private final static boolean POST = false;
 
-    protected String ReqCharEncoding;
+	protected String ReqCharEncoding;
 
-    protected static MCRCache requestParamCache = new MCRCache(40);
+	protected static MCRCache requestParamCache = new MCRCache(40);
 
-    static {
-        LOGGER = Logger.getLogger(MCRServlet.class);
-    }
+	static {
+		LOGGER = Logger.getLogger(MCRServlet.class);
+	}
 
-    /** returns the base URL of the mycore system */
-    public static String getBaseURL() {
-        return BASE_URL;
-    }
+	/** returns the base URL of the mycore system */
+	public static String getBaseURL() {
+		return BASE_URL;
+	}
 
-    /** returns the servlet base URL of the mycore system */
-    public static String getServletBaseURL() {
-        return SERVLET_URL;
-    }
+	/** returns the servlet base URL of the mycore system */
+	public static String getServletBaseURL() {
+		return SERVLET_URL;
+	}
 
-    /**
-     * Initialisation of the static values for the base URL and servlet URL of
-     * the mycore system.
-     */
-    private static synchronized void prepareURLs(HttpServletRequest req)
-            throws ServletException, IOException {
-        String contextPath = req.getContextPath();
-        if (contextPath == null)
-            contextPath = "";
-        contextPath += "/";
+	/**
+	 * Initialisation of the static values for the base URL and servlet URL of
+	 * the mycore system.
+	 */
+	private static synchronized void prepareURLs(HttpServletRequest req)
+			throws ServletException, IOException {
+		String contextPath = req.getContextPath();
+		if (contextPath == null)
+			contextPath = "";
+		contextPath += "/";
 
-        String requestURL = req.getRequestURL().toString();
-        int pos = requestURL.indexOf(contextPath, 9);
-        BASE_URL = requestURL.substring(0, pos) + contextPath;
+		String requestURL = req.getRequestURL().toString();
+		int pos = requestURL.indexOf(contextPath, 9);
+		BASE_URL = requestURL.substring(0, pos) + contextPath;
 
-        SERVLET_URL = BASE_URL + "servlets/";
-    }
+		SERVLET_URL = BASE_URL + "servlets/";
+	}
 
-    // The methods doGet() and doPost() simply call the private method
-    // doGetPost(),
-    // i.e. GET- and POST requests are handled by one method only.
+	// The methods doGet() and doPost() simply call the private method
+	// doGetPost(),
+	// i.e. GET- and POST requests are handled by one method only.
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
-        doGetPost(req, res, GET);
-    }
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
+		doGetPost(req, res, GET);
+	}
 
-    protected void doGet(MCRServletJob job) throws Exception {
-        doGetPost(job);
-    }
+	protected void doGet(MCRServletJob job) throws Exception {
+		doGetPost(job);
+	}
 
-    public void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
-        doGetPost(req, res, POST);
-    }
+	public void doPost(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
+		doGetPost(req, res, POST);
+	}
 
-    protected void doPost(MCRServletJob job) throws Exception {
-        doGetPost(job);
-    }
+	protected void doPost(MCRServletJob job) throws Exception {
+		doGetPost(job);
+	}
 
-    public static MCRSession getSession(HttpServletRequest req)
-    {
-	HttpSession theSession = req.getSession(true);
-	MCRSession session = null;
+	public static MCRSession getSession(HttpServletRequest req) {
+		HttpSession theSession = req.getSession(true);
+		MCRSession session = null;
 
-	String sessionID = req.getParameter("MCRSessionID");
-	MCRSession fromRequest = null;
-	if (sessionID != null)
-	    fromRequest = MCRSession.getSession(sessionID);
+		String sessionID = req.getParameter("MCRSessionID");
+		MCRSession fromRequest = null;
+		if (sessionID != null)
+			fromRequest = MCRSession.getSession(sessionID);
 
-	MCRSession fromHttpSession = (MCRSession) theSession
-		.getAttribute("mycore.session");
+		MCRSession fromHttpSession = (MCRSession) theSession
+				.getAttribute("mycore.session");
 
-	// Choose:
-	if (fromRequest != null)
-	    session = fromRequest;
-	// Take session from http request parameter MCRSessionID
-	else if (fromHttpSession != null)
-	    session = fromHttpSession;
-	// Take session from HttpSession with servlets
-	else
-	    session = MCRSessionMgr.getCurrentSession();
-	// Create a new session
+		// Choose:
+		if (fromRequest != null)
+			session = fromRequest;
+		// Take session from http request parameter MCRSessionID
+		else if (fromHttpSession != null)
+			session = fromHttpSession;
+		// Take session from HttpSession with servlets
+		else
+			session = MCRSessionMgr.getCurrentSession();
+		// Create a new session
 
-	// Store current session in HttpSession
-	theSession.setAttribute("mycore.session", session);
+		// Store current session in HttpSession
+		theSession.setAttribute("mycore.session", session);
 
-	// Bind current session to this thread:
-	MCRSessionMgr.setCurrentSession(session);
+		// Bind current session to this thread:
+		MCRSessionMgr.setCurrentSession(session);
 
-	// Forward MCRSessionID to XSL Stylesheets
-	req.setAttribute("XSL.MCRSessionID", session.getID());
+		// Forward MCRSessionID to XSL Stylesheets
+		req.setAttribute("XSL.MCRSessionID", session.getID());
 
-        return session;
-    }
+		return session;
+	}
 
-    /**
-     * This private method handles both GET and POST requests and is invoked by
-     * doGet() and doPost().
-     * 
-     * @param req
-     *            the HTTP request instance
-     * @param res
-     *            the HTTP response instance
-     * @param GETorPOST
-     *            boolean value to remember if we have a GET or POST request
-     * 
-     * @exception IOException
-     *                for java I/O errors.
-     * @exception ServletException
-     *                for errors from the servlet engine.
-     */
-    private void doGetPost(HttpServletRequest req, HttpServletResponse res,
-            boolean GETorPOST) throws ServletException, IOException {
-        if (CONFIG == null) {
-            //removes NullPointerException below, if somehow Servlet is not yet
-            // intialized
-            init();
-        }
-        // Try to set encoding of form values
-        ReqCharEncoding = req.getCharacterEncoding();
-        if (ReqCharEncoding == null) {
-            // Set default to UTF-8
-            ReqCharEncoding = CONFIG.getString("MCR.request_charencoding",
-                    "UTF-8");
-            req.setCharacterEncoding(ReqCharEncoding);
-            LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
-        }
+	/**
+	 * This private method handles both GET and POST requests and is invoked by
+	 * doGet() and doPost().
+	 * 
+	 * @param req
+	 *            the HTTP request instance
+	 * @param res
+	 *            the HTTP response instance
+	 * @param GETorPOST
+	 *            boolean value to remember if we have a GET or POST request
+	 * 
+	 * @exception IOException
+	 *                for java I/O errors.
+	 * @exception ServletException
+	 *                for errors from the servlet engine.
+	 */
+	private void doGetPost(HttpServletRequest req, HttpServletResponse res,
+			boolean GETorPOST) throws ServletException, IOException {
+		if (CONFIG == null) {
+			//removes NullPointerException below, if somehow Servlet is not yet
+			// intialized
+			init();
+		}
+		// Try to set encoding of form values
+		ReqCharEncoding = req.getCharacterEncoding();
+		if (ReqCharEncoding == null) {
+			// Set default to UTF-8
+			ReqCharEncoding = CONFIG.getString("MCR.request_charencoding",
+					"UTF-8");
+			req.setCharacterEncoding(ReqCharEncoding);
+			LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
+		}
 
-        if ("true".equals(req.getParameter("reload.properties")))
-            MCRConfiguration.instance().reload(true);
+		if ("true".equals(req.getParameter("reload.properties")))
+			MCRConfiguration.instance().reload(true);
 
-        if (BASE_URL == null)
-            prepareURLs(req);
+		if (BASE_URL == null)
+			prepareURLs(req);
 
-        try {
-	    MCRSession session = getSession(req);
+		try {
+			MCRSession session = getSession(req);
 
-            String c = getClass().getName();
-            c = c.substring(c.lastIndexOf(".") + 1);
+			String c = getClass().getName();
+			c = c.substring(c.lastIndexOf(".") + 1);
 
-            StringBuffer msg = new StringBuffer();
-            msg.append(c);
-            msg.append(" ip=");
-            msg.append(getRemoteAddr(req));
-            /*msg.append(theSession.isNew() ? " new" : " old");
-            msg.append(" http=").append(theSession.getId());*/
-            msg.append(" mcr=").append(session.getID());
-            msg.append(" user=").append(session.getCurrentUserID());
-            LOGGER.info(msg.toString());
+			StringBuffer msg = new StringBuffer();
+			msg.append(c);
+			msg.append(" ip=");
+			msg.append(getRemoteAddr(req));
+			/*
+			 * msg.append(theSession.isNew() ? " new" : " old"); msg.append("
+			 * http=").append(theSession.getId());
+			 */
+			msg.append(" mcr=").append(session.getID());
+			msg.append(" user=").append(session.getCurrentUserID());
+			LOGGER.info(msg.toString());
 
-            MCRServletJob job = new MCRServletJob(req, res);
+			MCRServletJob job = new MCRServletJob(req, res);
 
-            // Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal
-            // nur als Test!!!
-            String lang = getProperty(req, "lang");
-            if (lang != null && lang.trim().length() != 0)
-                session.setCurrentLanguage(lang.trim());
-            if (GETorPOST == GET)
-                doGet(job);
-            else
-                doPost(job);
-        } catch (Exception ex) {
-            if (ex instanceof ServletException)
-                throw (ServletException) ex;
-            else if (ex instanceof IOException)
-                throw (IOException) ex;
-            else
-            {
-                handleException(ex);
-                generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
-            }
-        } finally {
-            // Release current MCRSession from current Thread,
-            // in case that Thread pooling will be used by servlet engine
-            MCRSessionMgr.releaseCurrentSession();
-        }
-    }
+			// Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal
+			// nur als Test!!!
+			String lang = getProperty(req, "lang");
+			if (lang != null && lang.trim().length() != 0)
+				session.setCurrentLanguage(lang.trim());
+			if (GETorPOST == GET)
+				doGet(job);
+			else
+				doPost(job);
+		} catch (Exception ex) {
+			if (ex instanceof ServletException)
+				throw (ServletException) ex;
+			else if (ex instanceof IOException)
+				throw (IOException) ex;
+			else {
+				handleException(ex);
+				generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
+			}
+		} finally {
+			// Release current MCRSession from current Thread,
+			// in case that Thread pooling will be used by servlet engine
+			MCRSessionMgr.releaseCurrentSession();
+		}
+	}
 
-    /**
-     * This method should be overwritten by other servlets. As a default
-     * response we indicate the HTTP 1.1 status code 501 (Not Implemented).
-     */
-    protected void doGetPost(MCRServletJob job) throws Exception {
-        job.getResponse().sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-    }
+	/**
+	 * This method should be overwritten by other servlets. As a default
+	 * response we indicate the HTTP 1.1 status code 501 (Not Implemented).
+	 */
+	protected void doGetPost(MCRServletJob job) throws Exception {
+		job.getResponse().sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	}
 
-    /** Handles an exception by reporting it and its embedded exception */
-    protected void handleException(Exception ex) {
-        try {
-            reportException(ex);
-            if (ex instanceof MCRException) {
-                ex = ((MCRException) ex).getException();
-                if (ex != null)
-                    handleException(ex);
-            }
-        } catch (Exception ignored) {
-        }
-    }
+	/** Handles an exception by reporting it and its embedded exception */
+	protected void handleException(Exception ex) {
+		try {
+			reportException(ex);
+			if (ex instanceof MCRException) {
+				ex = ((MCRException) ex).getException();
+				if (ex != null)
+					handleException(ex);
+			}
+		} catch (Exception ignored) {
+		}
+	}
 
-    /** Reports an exception to the log */
-    protected void reportException(Exception ex) throws Exception {
-        String msg = (ex.getMessage() == null ? "" : ex.getMessage());
-        String type = ex.getClass().getName();
-        String cname = this.getClass().getName();
-        String servlet = cname.substring(cname.lastIndexOf(".") + 1);
-        String trace = MCRException.getStackTraceAsString(ex);
+	/** Reports an exception to the log */
+	protected void reportException(Exception ex) throws Exception {
+		String msg = (ex.getMessage() == null ? "" : ex.getMessage());
+		String type = ex.getClass().getName();
+		String cname = this.getClass().getName();
+		String servlet = cname.substring(cname.lastIndexOf(".") + 1);
+		String trace = MCRException.getStackTraceAsString(ex);
 
-        LOGGER.warn("Exception caught in : " + servlet);
-        LOGGER.warn("Exception type      : " + type);
-        LOGGER.warn("Exception message   : " + msg);
-        LOGGER.debug(trace);
-    }
+		LOGGER.warn("Exception caught in : " + servlet);
+		LOGGER.warn("Exception type      : " + type);
+		LOGGER.warn("Exception message   : " + msg);
+		LOGGER.debug(trace);
+	}
 
-    protected void generateErrorPage(HttpServletRequest request,
-            HttpServletResponse response, int error, String msg, Exception ex,
-            boolean xmlstyle) throws IOException, ServletException {
-        LOGGER.error(getClass().getName() + ": Error " + error
-                + " occured. The following message was given: " + msg, ex);
+	protected void generateErrorPage(HttpServletRequest request,
+			HttpServletResponse response, int error, String msg, Exception ex,
+			boolean xmlstyle) throws IOException, ServletException {
+		LOGGER.error(getClass().getName() + ": Error " + error
+				+ " occured. The following message was given: " + msg, ex);
 
-        String defaultLang = CONFIG
-                .getString("MCR.metadata_default_lang", "de");
-        String lang = (getProperty(request, "lang") != null) ? getProperty(
-                request, "lang") : defaultLang;
-        String style = (xmlstyle) ? "xml" : ("query-" + lang);
+		String defaultLang = CONFIG
+				.getString("MCR.metadata_default_lang", "de");
+		String lang = (getProperty(request, "lang") != null) ? getProperty(
+				request, "lang") : defaultLang;
+		String style = (xmlstyle) ? "xml" : ("query-" + lang);
 
-        String rootname = "mcr_error";
-        Element root = new Element(rootname);
-        root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
-        Document errorDoc = new Document(root, new DocType(rootname));
+		String rootname = "mcr_error";
+		Element root = new Element(rootname);
+		root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
+		Document errorDoc = new Document(root, new DocType(rootname));
 
-        while (ex != null) {
-            Element exception = new Element("exception");
-            Element trace = new Element("trace");
-            Element message = new Element("message");
-            trace.setText(MCRException.getStackTraceAsString(ex));
-            message.setText(ex.getMessage());
-            exception.addContent(message).addContent(trace);
-            root.addContent(exception);
-            if (ex instanceof MCRException)
-              ex = ((MCRException)ex).getException();
-            else
-              ex = null;
-        }
+		while (ex != null) {
+			Element exception = new Element("exception");
+			Element trace = new Element("trace");
+			Element message = new Element("message");
+			trace.setText(MCRException.getStackTraceAsString(ex));
+			message.setText(ex.getMessage());
+			exception.addContent(message).addContent(trace);
+			root.addContent(exception);
+			if (ex instanceof MCRException)
+				ex = ((MCRException) ex).getException();
+			else
+				ex = null;
+		}
 
-        request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
-        request.setAttribute("XSL.Style", style);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher(
-                "MCRLayoutServlet");
-        rd.forward(request, response);
-    }
+		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
+		request.setAttribute("XSL.Style", style);
+		RequestDispatcher rd = getServletContext().getNamedDispatcher(
+				"MCRLayoutServlet");
+		rd.forward(request, response);
+	}
 
-    protected static String getProperty(HttpServletRequest request, String name) {
-        String value = (String) request.getAttribute(name);
-        //if Attribute not given try Parameter
-        if (value == null || value.length() == 0)
-            value = request.getParameter(name);
-        return value;
-    }
+	protected static String getProperty(HttpServletRequest request, String name) {
+		String value = (String) request.getAttribute(name);
+		//if Attribute not given try Parameter
+		if (value == null || value.length() == 0)
+			value = request.getParameter(name);
+		return value;
+	}
 
-    /**
-     * Returns the IP address of the client that made the request. When a proxy
-     * server was used, e. g. Apache mod_proxy in front of Tomcat, the value of
-     * the HTTP header X_FORWARDED_FOR is returned, otherwise the REMOTE_ADDR is
-     * returned
-     */
-    public static String getRemoteAddr(HttpServletRequest req) {
-        String addr = req.getHeader("X_FORWARDED_FOR");
-        if ((addr == null) || (addr.trim().length() == 0))
-            addr = req.getRemoteAddr();
-        return addr;
-    }
+	/**
+	 * Returns the IP address of the client that made the request. When a proxy
+	 * server was used, e. g. Apache mod_proxy in front of Tomcat, the value of
+	 * the HTTP header X_FORWARDED_FOR is returned, otherwise the REMOTE_ADDR is
+	 * returned
+	 */
+	public static String getRemoteAddr(HttpServletRequest req) {
+		String addr = req.getHeader("X_FORWARDED_FOR");
+		if ((addr == null) || (addr.trim().length() == 0))
+			addr = req.getRemoteAddr();
+		return addr;
+	}
 }

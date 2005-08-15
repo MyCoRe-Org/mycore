@@ -25,64 +25,64 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.util.StringTokenizer;
-import javax.servlet.http.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Frank Lützenkirchen
  */
 class MCRBrowseRequest {
-    String index;
+	String index;
 
-    int from = 1;
+	int from = 1;
 
-    int to = Integer.MAX_VALUE;
+	int to = Integer.MAX_VALUE;
 
-    StringBuffer path;
+	StringBuffer path;
 
-    String search;
+	String search;
 
-    String mode;
+	String mode;
 
-    MCRBrowseRequest(HttpServletRequest req) {
-        StringTokenizer st = new StringTokenizer(req.getPathInfo(), "/-");
-        if (!st.hasMoreTokens())
-            throw new RuntimeException();
+	MCRBrowseRequest(HttpServletRequest req) {
+		StringTokenizer st = new StringTokenizer(req.getPathInfo(), "/-");
+		if (!st.hasMoreTokens())
+			throw new RuntimeException();
 
-        index = st.nextToken();
+		index = st.nextToken();
 
-        path = new StringBuffer(index);
-        path.append("/");
+		path = new StringBuffer(index);
+		path.append("/");
 
-        while (st.countTokens() > 1)
-            addRange(st.nextToken(), st.nextToken());
+		while (st.countTokens() > 1)
+			addRange(st.nextToken(), st.nextToken());
 
-        search = req.getParameter("search");
-        mode = req.getParameter("mode");
-    }
+		search = req.getParameter("search");
+		mode = req.getParameter("mode");
+	}
 
-    void addRange(String from, String to) {
-        this.from = Integer.parseInt(from);
-        this.to = Integer.parseInt(to);
-        path.append(this.from);
-        path.append("-");
-        path.append(this.to);
-        path.append("/");
-    }
+	void addRange(String from, String to) {
+		this.from = Integer.parseInt(from);
+		this.to = Integer.parseInt(to);
+		path.append(this.from);
+		path.append("-");
+		path.append(this.to);
+		path.append("/");
+	}
 
-    String getCanonicalRequestPath() {
-        return "index/" + path.toString();
-    }
+	String getCanonicalRequestPath() {
+		return "index/" + path.toString();
+	}
 
-    int getFrom() {
-        return from;
-    }
+	int getFrom() {
+		return from;
+	}
 
-    int getTo() {
-        return to;
-    }
+	int getTo() {
+		return to;
+	}
 
-    String getIndex() {
-        return index;
-    }
+	String getIndex() {
+		return index;
+	}
 }
-

@@ -32,9 +32,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
@@ -46,6 +46,9 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -53,8 +56,6 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.query.MCRQueryCache;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read
@@ -87,9 +88,9 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Initializes the MCRURIResolver for servlet applications.
 	 * 
 	 * @param ctx
-	 *                   the servlet context of this web application
+	 *            the servlet context of this web application
 	 * @param webAppBase
-	 *                   the base URL of this web application
+	 *            the base URL of this web application
 	 */
 	public static synchronized void init(ServletContext ctx, String webAppBase) {
 		context = ctx;
@@ -131,7 +132,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Returns the filename part of a path.
 	 * 
 	 * @param path
-	 *                   the path of a file
+	 *            the path of a file
 	 * @return the part after the last / or \\
 	 */
 	private String getFileName(String path) {
@@ -188,7 +189,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Returns the protocol or scheme for the given URI.
 	 * 
 	 * @param uri
-	 *                   the URI to parse
+	 *            the URI to parse
 	 * @return the protocol/scheme part before the ":"
 	 */
 	public String getScheme(String uri) {
@@ -199,7 +200,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from URIs of various type.
 	 * 
 	 * @param uri
-	 *                   the URI where to read the XML from
+	 *            the URI where to read the XML from
 	 * @return the root element of the XML document
 	 */
 	public Element resolve(String uri) {
@@ -231,7 +232,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from the CLASSPATH of the application.
 	 * 
 	 * @param uri
-	 *                   the location of the file in the format resource:path/to/file
+	 *            the location of the file in the format resource:path/to/file
 	 * @return the root element of the XML document
 	 */
 	private Element readFromResource(String uri) {
@@ -265,7 +266,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from a static file in the current web application.
 	 * 
 	 * @param uri
-	 *                   the path to the file in the format webapp:path/to/file
+	 *            the path to the file in the format webapp:path/to/file
 	 * @return the root element of the XML document
 	 */
 	private Element readFromWebapp(String uri) {
@@ -279,7 +280,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from a file URL.
 	 * 
 	 * @param uri
-	 *                   the URL of the file in the format file://path/to/file
+	 *            the URL of the file in the format file://path/to/file
 	 * @return the root element of the xml document
 	 */
 	private Element readFromFile(String uri) {
@@ -305,7 +306,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from a http or https URL.
 	 * 
 	 * @param url
-	 *                   the URL of the xml document
+	 *            the URL of the xml document
 	 * @return the root element of the xml document
 	 */
 	private Element readFromHTTP(String url) {
@@ -326,7 +327,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads XML from a HTTP request to this web application.
 	 * 
 	 * @param uri
-	 *                   the URI in the format request:path/to/servlet
+	 *            the URI in the format request:path/to/servlet
 	 * @return the root element of the xml document
 	 */
 	private Element readFromRequest(String uri) {
@@ -354,7 +355,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * @see org.mycore.common.MCRSession#get( java.lang.String )
 	 * 
 	 * @param uri
-	 *                   the URI in the format session:key
+	 *            the URI in the format session:key
 	 * @return the root element of the xml document
 	 */
 	private Element readFromSession(String uri) {
@@ -414,7 +415,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads xml from an InputStream and returns the parsed root element.
 	 * 
 	 * @param in
-	 *                   the InputStream that contains the XML document
+	 *            the InputStream that contains the XML document
 	 * @return the root element of the parsed input stream
 	 */
 	public Element parseStream(InputStream in) {
@@ -424,12 +425,14 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 
 		try {
 			return builder.build(in).getRootElement();
-                } catch(MalformedURLException e) {
-                        e.printStackTrace();
-                        String msg = "Exception while reading and parsing XML InputStream: "+e.getMessage();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			String msg = "Exception while reading and parsing XML InputStream: "
+					+ e.getMessage();
 			throw new MCRUsageException(msg, e);
 		} catch (Exception ex) {
-			String msg = "Exception while reading and parsing XML InputStream: "+ex.getMessage();
+			String msg = "Exception while reading and parsing XML InputStream: "
+					+ ex.getMessage();
 			throw new MCRUsageException(msg, ex);
 		}
 	}

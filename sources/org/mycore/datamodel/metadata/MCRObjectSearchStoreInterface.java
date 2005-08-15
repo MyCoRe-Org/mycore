@@ -24,7 +24,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.*;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 
@@ -36,61 +35,60 @@ import org.mycore.common.MCRPersistenceException;
  */
 public interface MCRObjectSearchStoreInterface {
 
-    /**
-     * The methode create a new datastore based of given configuration. It
-     * create a new data table for storing MCRObjects with the same MCRObjectID
-     * type.
-     * 
-     * @param mcr_type
-     *            the MCRObjectID type as string
-     * @param mcr_conf
-     *            the configuration XML stream as JDOM tree
-     * @exception MCRConfigurationException
-     *                if the configuration is not correct
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
-            throws MCRConfigurationException, MCRPersistenceException;
+	/**
+	 * The methode create a new datastore based of given configuration. It
+	 * create a new data table for storing MCRObjects with the same MCRObjectID
+	 * type.
+	 * 
+	 * @param mcr_type
+	 *            the MCRObjectID type as string
+	 * @param mcr_conf
+	 *            the configuration XML stream as JDOM tree
+	 * @exception MCRConfigurationException
+	 *                if the configuration is not correct
+	 * @exception MCRPersistenceException
+	 *                if a persistence problem is occured
+	 */
+	public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
+			throws MCRConfigurationException, MCRPersistenceException;
 
-    /**
-     * The methode create a object in the search stores.
-     * 
-     * @param obj
-     *            the MCRBase to put in the search stores
-     * @exception MCRConfigurationException
-     *                if the configuration is not correct
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public void create(MCRBase obj) throws MCRConfigurationException,
-            MCRPersistenceException;
+	/**
+	 * The methode create a object in the search stores.
+	 * 
+	 * @param obj
+	 *            the MCRBase to put in the search stores
+	 * @exception MCRConfigurationException
+	 *                if the configuration is not correct
+	 * @exception MCRPersistenceException
+	 *                if a persistence problem is occured
+	 */
+	public void create(MCRBase obj) throws MCRConfigurationException,
+			MCRPersistenceException;
 
-    /**
-     * The methode delete a object from the search store.
-     * 
-     * @param mcr_id
-     *            the MyCoRe object ID
-     * @exception MCRConfigurationException
-     *                if the configuration is not correct
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public void delete(MCRObjectID mcr_id) throws MCRConfigurationException,
-            MCRPersistenceException;
+	/**
+	 * The methode delete a object from the search store.
+	 * 
+	 * @param mcr_id
+	 *            the MyCoRe object ID
+	 * @exception MCRConfigurationException
+	 *                if the configuration is not correct
+	 * @exception MCRPersistenceException
+	 *                if a persistence problem is occured
+	 */
+	public void delete(MCRObjectID mcr_id) throws MCRConfigurationException,
+			MCRPersistenceException;
 
-    /**
-     * The methode update a object in the search store.
-     * 
-     * @param obj
-     *            the MCRObject to put in the search stores
-     * @exception MCRConfigurationException
-     *                if the configuration is not correct
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public void update(MCRBase obj) throws MCRConfigurationException,
-            MCRPersistenceException;
+	/**
+	 * The methode update a object in the search store.
+	 * 
+	 * @param obj
+	 *            the MCRObject to put in the search stores
+	 * @exception MCRConfigurationException
+	 *                if the configuration is not correct
+	 * @exception MCRPersistenceException
+	 *                if a persistence problem is occured
+	 */
+	public void update(MCRBase obj) throws MCRConfigurationException,
+			MCRPersistenceException;
 
 }
-

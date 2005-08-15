@@ -43,47 +43,47 @@ package org.mycore.acl;
  */
 
 public interface MCRPermissionContext {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Checks if permission is valid for this context. This method is useful
-     * when editing ACLs to prevent inconsistent entries.
-     * 
-     * @return true if the permission is valid for this context.
-     */
+	/**
+	 * Checks if permission is valid for this context. This method is useful
+	 * when editing ACLs to prevent inconsistent entries.
+	 * 
+	 * @return true if the permission is valid for this context.
+	 */
 
-    public boolean isValidPermission(MCRPermission permission);
+	public boolean isValidPermission(MCRPermission permission);
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the valid permissions within this context.
-     * 
-     * This method can be used to provide choices for legal permissions when
-     * building an ACL editor.
-     * 
-     * @return an array of permissions which are valid with this context
-     */
+	/**
+	 * Returns the valid permissions within this context.
+	 * 
+	 * This method can be used to provide choices for legal permissions when
+	 * building an ACL editor.
+	 * 
+	 * @return an array of permissions which are valid with this context
+	 */
 
-    public MCRPermission[] getValidPermissions();
+	public MCRPermission[] getValidPermissions();
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the single instance of the permission within this context which
-     * has the corresponding name.
-     * 
-     * This method is used when creating permissions from external
-     * representations.
-     * 
-     * @return a permission valid within this context
-     * 
-     * @throws MCRInvalidPermissionException
-     *             when no such permission exists
-     */
+	/**
+	 * Returns the single instance of the permission within this context which
+	 * has the corresponding name.
+	 * 
+	 * This method is used when creating permissions from external
+	 * representations.
+	 * 
+	 * @return a permission valid within this context
+	 * 
+	 * @throws MCRInvalidPermissionException
+	 *             when no such permission exists
+	 */
 
-    public MCRPermission getPermission(String name)
-            throws MCRInvalidPermissionException;
+	public MCRPermission getPermission(String name)
+			throws MCRInvalidPermissionException;
 
-    //-============================================================================\
+	//-============================================================================\
 }

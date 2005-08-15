@@ -31,36 +31,36 @@ package org.mycore.acl;
  */
 
 public interface MCRAclGuarded {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Returns the ACL by which this object is guarded. This should be the only
-     * way to obtain an ACL for modifying. In implementing classes the reference
-     * to an ACL should be final, so that changing an ACL can only be made by
-     * modifying the existing one and not by assigning a new ACL.
-     * 
-     * @return the ACL which guards this objects.
-     * 
-     * @throws MCRAccessException
-     *             if the current user is not allowed to read the ACL.
-     */
+	/**
+	 * Returns the ACL by which this object is guarded. This should be the only
+	 * way to obtain an ACL for modifying. In implementing classes the reference
+	 * to an ACL should be final, so that changing an ACL can only be made by
+	 * modifying the existing one and not by assigning a new ACL.
+	 * 
+	 * @return the ACL which guards this objects.
+	 * 
+	 * @throws MCRAccessException
+	 *             if the current user is not allowed to read the ACL.
+	 */
 
-    public MCRAcl getAcl() throws MCRAccessException;
+	public MCRAcl getAcl() throws MCRAccessException;
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Checks if the current user can perform the action specified by
-     * permission.
-     * 
-     * @param permission
-     *            the permission required to perform the action.
-     * 
-     * @throws MCRAccessException
-     *             if the currentUser is not allowed to perform the action.
-     */
+	/**
+	 * Checks if the current user can perform the action specified by
+	 * permission.
+	 * 
+	 * @param permission
+	 *            the permission required to perform the action.
+	 * 
+	 * @throws MCRAccessException
+	 *             if the currentUser is not allowed to perform the action.
+	 */
 
-    public void checkAccess(MCRPermission permission) throws MCRAccessException;
+	public void checkAccess(MCRPermission permission) throws MCRAccessException;
 
-    //-============================================================================\
+	//-============================================================================\
 }

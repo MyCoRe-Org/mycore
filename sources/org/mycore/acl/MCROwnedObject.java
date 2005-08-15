@@ -22,8 +22,8 @@ package org.mycore.acl;
 
 ///============================================================================§
 
-import org.mycore.user.MCRUser;
 import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
 
 ///============================================================================|
 
@@ -35,48 +35,48 @@ import org.mycore.user.MCRGroup;
  */
 
 public interface MCROwnedObject {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Returns the owner of this guarded object.
-     * 
-     * @return the owner of this object.
-     */
+	/**
+	 * Returns the owner of this guarded object.
+	 * 
+	 * @return the owner of this object.
+	 */
 
-    public MCRUser getOwner();
+	public MCRUser getOwner();
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Sets a new owner for this guarded object.
-     * 
-     * @throws MCRAccessException
-     *             if the currentUser is not allowed to set a new owner.
-     */
+	/**
+	 * Sets a new owner for this guarded object.
+	 * 
+	 * @throws MCRAccessException
+	 *             if the currentUser is not allowed to set a new owner.
+	 */
 
-    public void changeOwner(MCRUser newOwner) throws MCRAccessException;
+	public void changeOwner(MCRUser newOwner) throws MCRAccessException;
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the owner of this guarded object.
-     * 
-     * @return the owner of this object.
-     */
+	/**
+	 * Returns the owner of this guarded object.
+	 * 
+	 * @return the owner of this object.
+	 */
 
-    public MCRGroup getOwnerGroup();
+	public MCRGroup getOwnerGroup();
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Sets a new owner group for this guarded object.
-     * 
-     * @throws MCRAccessException
-     *             if the currentUser is not allowed to set a new owner.
-     */
+	/**
+	 * Sets a new owner group for this guarded object.
+	 * 
+	 * @throws MCRAccessException
+	 *             if the currentUser is not allowed to set a new owner.
+	 */
 
-    public void changeOwnerGroup(MCRGroup newOwnerGroup)
-            throws MCRAccessException;
+	public void changeOwnerGroup(MCRGroup newOwnerGroup)
+			throws MCRAccessException;
 
-    //-============================================================================\
+	//-============================================================================\
 }

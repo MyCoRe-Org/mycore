@@ -37,26 +37,26 @@ package org.mycore.acl;
  */
 
 public class MCRStandardPermissions {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Permission which allows the modification of an ACL.
-     */
+	/**
+	 * Permission which allows the modification of an ACL.
+	 */
 
-    public static final MCRPermission ACL_MODIFY = new MCRDefaultPermission(
-            "acl_modify", "Permission to modify the ACL of a guarded object");
+	public static final MCRPermission ACL_MODIFY = new MCRDefaultPermission(
+			"acl_modify", "Permission to modify the ACL of a guarded object");
 
-    /**
-     * Permission which allows to read parts of an ACL.
-     */
+	/**
+	 * Permission which allows to read parts of an ACL.
+	 */
 
-    public static final MCRPermission ACL_READ = new MCRDefaultPermission(
-            "acl_read", "Permission to read the ACL of a guarded object");
+	public static final MCRPermission ACL_READ = new MCRDefaultPermission(
+			"acl_read", "Permission to read the ACL of a guarded object");
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    private MCRStandardPermissions() {
-    }
+	private MCRStandardPermissions() {
+	}
 
-    //>============================================================================\
+	//>============================================================================\
 }

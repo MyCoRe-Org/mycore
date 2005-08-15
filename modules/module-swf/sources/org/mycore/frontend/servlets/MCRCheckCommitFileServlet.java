@@ -24,86 +24,75 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.commons.fileupload.*;
-import org.jdom.*;
-
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.frontend.servlets.*;
-import org.mycore.frontend.editor.*;
-import org.mycore.user.*;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
  * output XML and store the XML in a file or if an error was occured start the
  * editor again.
- *
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 
-public class MCRCheckCommitFileServlet extends MCRCheckFileBase
-{
+public class MCRCheckCommitFileServlet extends MCRCheckFileBase {
 
-/**
- * The method check the privileg of this action.
- *
- * @param privs the ArrayList  of privilegs
- * @return true if the privileg exist, else return false
- **/
-public final boolean hasPrivileg(ArrayList privs, String type)
-  {
-  if (!privs.contains("modify-"+type)) return false;
-  return true;
-  }
+	/**
+	 * The method check the privileg of this action.
+	 * 
+	 * @param privs
+	 *            the ArrayList of privilegs
+	 * @return true if the privileg exist, else return false
+	 */
+	public final boolean hasPrivileg(ArrayList privs, String type) {
+		if (!privs.contains("modify-" + type))
+			return false;
+		return true;
+	}
 
-/**
- * The method is a dummy and return an URL with the next working step.
- *
- * @param ID the MCRObjectID of the MCRObject
- * @return the next URL as String
- **/
-public final String getNextURL(MCRObjectID ID) throws Exception
-  {
-  // return all is ready
-  return "";
-  }
+	/**
+	 * The method is a dummy and return an URL with the next working step.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 * @return the next URL as String
+	 */
+	public final String getNextURL(MCRObjectID ID) throws Exception {
+		// return all is ready
+		return "";
+	}
 
-/**
- * The method is a dummy and return an URL with the next working step.
- *
- * @param ID the MCRObjectID of the MCRObject
- * @param DD the MCRObjectID of the MCRDerivate
- * @param step the step text String
- * @return the next URL as String
- **/
-public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception
-  {
-  // return all is ready
-  StringBuffer sb = new StringBuffer();
-  sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=")
-    .append(ID.getTypeId()).append("&step=").append(step).append("&se_mcrid=")
-    .append(DD.getId()).append("&re_mcrid=").append(ID.getId())
-    .append("&tf_mcrid=").append(DD.getId());
-  return sb.toString();
-  }
+	/**
+	 * The method is a dummy and return an URL with the next working step.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 * @param DD
+	 *            the MCRObjectID of the MCRDerivate
+	 * @param step
+	 *            the step text String
+	 * @return the next URL as String
+	 */
+	public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step)
+			throws Exception {
+		// return all is ready
+		StringBuffer sb = new StringBuffer();
+		sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=")
+				.append(ID.getTypeId()).append("&step=").append(step).append(
+						"&se_mcrid=").append(DD.getId()).append("&re_mcrid=")
+				.append(ID.getId()).append("&tf_mcrid=").append(DD.getId());
+		return sb.toString();
+	}
 
-/**
- * The method send a message to the mail address for the MCRObjectType.
- *
- * @param ID the MCRObjectID of the MCRObject
- **/
- public final void sendMail(MCRObjectID ID)
-   {
-   }
+	/**
+	 * The method send a message to the mail address for the MCRObjectType.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 */
+	public final void sendMail(MCRObjectID ID) {
+	}
 
 }

@@ -39,51 +39,51 @@ import java.io.InputStream;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRInputStreamCloner {
-    private final File streamSource;
+	private final File streamSource;
 
-    /**
-     * default constructor reading InputStream and close him
-     * 
-     * @param source
-     *            InputStream to be cloned
-     * @throws IOException
-     *             if write access to temp directory fails
-     */
-    public MCRInputStreamCloner(InputStream source) throws IOException {
-        super();
-        //File tmpdir = new File(System.getProperty("java.io.tmpdir"));
-        streamSource = File.createTempFile("JavaStream", ".mycore");
-        //File is new and created
-        BufferedOutputStream fout = new BufferedOutputStream(
-                new FileOutputStream(streamSource));
-        if (!MCRUtils.copyStream(source, fout)) {
-            source.close(); //you can't use it safely again
-            fout.close();
-            streamSource.delete();
-            throw new IOException("Could not save InputStream to file "
-                    + streamSource.getName());
-        }
-        //we don't need the streams any longer
-        fout.close();
-        source.close();
-        //all went well to this point
-        streamSource.setReadOnly();
-        streamSource.deleteOnExit();
-    }
+	/**
+	 * default constructor reading InputStream and close him
+	 * 
+	 * @param source
+	 *            InputStream to be cloned
+	 * @throws IOException
+	 *             if write access to temp directory fails
+	 */
+	public MCRInputStreamCloner(InputStream source) throws IOException {
+		super();
+		//File tmpdir = new File(System.getProperty("java.io.tmpdir"));
+		streamSource = File.createTempFile("JavaStream", ".mycore");
+		//File is new and created
+		BufferedOutputStream fout = new BufferedOutputStream(
+				new FileOutputStream(streamSource));
+		if (!MCRUtils.copyStream(source, fout)) {
+			source.close(); //you can't use it safely again
+			fout.close();
+			streamSource.delete();
+			throw new IOException("Could not save InputStream to file "
+					+ streamSource.getName());
+		}
+		//we don't need the streams any longer
+		fout.close();
+		source.close();
+		//all went well to this point
+		streamSource.setReadOnly();
+		streamSource.deleteOnExit();
+	}
 
-    public InputStream getNewInputStream() throws IOException {
-        if (!streamSource.exists())
-            throw new IOException("Access denied(file does not exist): "
-                    + streamSource.getName());
-        return new FileInputStream(streamSource);
-    }
+	public InputStream getNewInputStream() throws IOException {
+		if (!streamSource.exists())
+			throw new IOException("Access denied(file does not exist): "
+					+ streamSource.getName());
+		return new FileInputStream(streamSource);
+	}
 
-    public void close() {
-        streamSource.delete();
-    }
+	public void close() {
+		streamSource.delete();
+	}
 
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
-    }
+	protected void finalize() throws Throwable {
+		close();
+		super.finalize();
+	}
 }

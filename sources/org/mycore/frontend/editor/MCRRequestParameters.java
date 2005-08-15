@@ -24,12 +24,22 @@
 
 package org.mycore.frontend.editor;
 
-import org.mycore.common.*;
-import org.apache.log4j.*;
-import org.apache.commons.fileupload.*;
-import java.io.*;
-import java.util.*;
-import javax.servlet.http.*;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Logger;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * Wrapper class around an HTTP request that allows to treat both ordinary form
@@ -40,98 +50,97 @@ import javax.servlet.http.*;
  * @version $Revision$ $Date$
  */
 public class MCRRequestParameters {
-    protected final static Logger logger = Logger
-            .getLogger(MCREditorServlet.class);
+	protected final static Logger logger = Logger
+			.getLogger(MCREditorServlet.class);
 
-    private Hashtable parameters = new Hashtable();
+	private Hashtable parameters = new Hashtable();
 
-    private Hashtable files = new Hashtable();
+	private Hashtable files = new Hashtable();
 
-    private static int threshold;
+	private static int threshold;
 
-    private static long maxSize;
+	private static long maxSize;
 
-    private static String tmpPath;
+	private static String tmpPath;
 
-    static {
-        MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = "MCR.Editor.";
+	static {
+		MCRConfiguration config = MCRConfiguration.instance();
+		String prefix = "MCR.Editor.";
 
-        threshold = config.getInt(prefix + "FileUpload.MemoryThreshold",
-                1000000);
-        maxSize = config.getLong(prefix + "FileUpload.MaxSize", 5000000);
-        tmpPath = config.getString(prefix + "FileUpload.TempStoragePath");
-    }
+		threshold = config.getInt(prefix + "FileUpload.MemoryThreshold",
+				1000000);
+		maxSize = config.getLong(prefix + "FileUpload.MaxSize", 5000000);
+		tmpPath = config.getString(prefix + "FileUpload.TempStoragePath");
+	}
 
-    public MCRRequestParameters(HttpServletRequest req) {
-        if (FileUpload.isMultipartContent(req)) {
-            DiskFileUpload parser = new DiskFileUpload();
-            parser.setHeaderEncoding("UTF-8");
-            parser.setSizeThreshold(threshold);
-            parser.setSizeMax(maxSize);
-            parser.setRepositoryPath(tmpPath);
+	public MCRRequestParameters(HttpServletRequest req) {
+		if (FileUpload.isMultipartContent(req)) {
+			DiskFileUpload parser = new DiskFileUpload();
+			parser.setHeaderEncoding("UTF-8");
+			parser.setSizeThreshold(threshold);
+			parser.setSizeMax(maxSize);
+			parser.setRepositoryPath(tmpPath);
 
-            List items = null;
-            try {
-                items = parser.parseRequest(req);
-            } catch (FileUploadException ex) {
-                String msg = "Error while parsing http multipart/form-data request from file upload webpage";
-                throw new MCRException(msg, ex);
-            }
+			List items = null;
+			try {
+				items = parser.parseRequest(req);
+			} catch (FileUploadException ex) {
+				String msg = "Error while parsing http multipart/form-data request from file upload webpage";
+				throw new MCRException(msg, ex);
+			}
 
-            for (int i = 0; i < items.size(); i++) {
-                FileItem item = (FileItem) (items.get(i));
+			for (int i = 0; i < items.size(); i++) {
+				FileItem item = (FileItem) (items.get(i));
 
-                String name = item.getFieldName();
-                String value = null;
+				String name = item.getFieldName();
+				String value = null;
 
-                if (item.isFormField()) {
-                    try {
-                        value = item.getString("UTF-8");
-                    } catch (UnsupportedEncodingException ex) {
-                        throw new MCRConfigurationException(
-                                "UTF-8 is unsupported encoding !?", ex);
-                    }
-                } else
-                    value = item.getName();
+				if (item.isFormField()) {
+					try {
+						value = item.getString("UTF-8");
+					} catch (UnsupportedEncodingException ex) {
+						throw new MCRConfigurationException(
+								"UTF-8 is unsupported encoding !?", ex);
+					}
+				} else
+					value = item.getName();
 
-                if ((value != null) && (value.trim().length() > 0)
-                        && (!files.containsKey(name))) {
-                    if (!item.isFormField())
-                        files.put(name, item);
-                    String[] values = new String[1];
-                    values[0] = value;
-                    parameters.put(name, values);
-                }
-            }
-        } else {
-            for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
-                String name = (String) (e.nextElement());
-                String[] values = req.getParameterValues(name);
-                if ((values != null) && (values.length > 0))
-                    parameters.put(name, values);
-            }
-        }
-    }
+				if ((value != null) && (value.trim().length() > 0)
+						&& (!files.containsKey(name))) {
+					if (!item.isFormField())
+						files.put(name, item);
+					String[] values = new String[1];
+					values[0] = value;
+					parameters.put(name, values);
+				}
+			}
+		} else {
+			for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
+				String name = (String) (e.nextElement());
+				String[] values = req.getParameterValues(name);
+				if ((values != null) && (values.length > 0))
+					parameters.put(name, values);
+			}
+		}
+	}
 
-    public Enumeration getParameterNames() {
-        return parameters.keys();
-    }
+	public Enumeration getParameterNames() {
+		return parameters.keys();
+	}
 
-    public String getParameter(String name) {
-        String[] values = getParameterValues(name);
-        if ((values == null) || (values.length == 0))
-            return null;
-        else
-            return values[0];
-    }
+	public String getParameter(String name) {
+		String[] values = getParameterValues(name);
+		if ((values == null) || (values.length == 0))
+			return null;
+		else
+			return values[0];
+	}
 
-    public String[] getParameterValues(String name) {
-        return (String[]) (parameters.get(name));
-    }
+	public String[] getParameterValues(String name) {
+		return (String[]) (parameters.get(name));
+	}
 
-    public FileItem getFileItem(String name) {
-        return (FileItem) (files.get(name));
-    }
+	public FileItem getFileItem(String name) {
+		return (FileItem) (files.get(name));
+	}
 }
-

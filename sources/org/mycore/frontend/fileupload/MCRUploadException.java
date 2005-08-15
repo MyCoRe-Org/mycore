@@ -35,21 +35,21 @@ package org.mycore.frontend.fileupload;
  * @version $Revision$ $Date$
  */
 public class MCRUploadException extends Exception {
-    protected String clname;
+	protected String clname;
 
-    protected String strace;
+	protected String strace;
 
-    public MCRUploadException(String clname, String message, String strace) {
-        super(message);
-        this.clname = clname;
-        this.strace = strace;
-    }
+	public MCRUploadException(String clname, String message, String strace) {
+		super(message);
+		this.clname = clname;
+		this.strace = strace;
+	}
 
-    public String getServerSideClassName() {
-        return clname;
-    }
+	public String getServerSideClassName() {
+		return clname;
+	}
 
-    public String getServerSideStackTrace() {
-        return strace;
-    }
+	public String getServerSideStackTrace() {
+		return strace;
+	}
 }

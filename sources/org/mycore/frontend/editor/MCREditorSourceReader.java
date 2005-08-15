@@ -25,10 +25,12 @@
 package org.mycore.frontend.editor;
 
 import java.util.Map;
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.frontend.servlets.*;
+
 import org.jdom.Element;
+
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This class contains the functionality to read XML input that should be editor
@@ -37,68 +39,67 @@ import org.jdom.Element;
  * @author Frank Lützenkirchen
  */
 public class MCREditorSourceReader {
-    /**
-     * Reads XML input from an url and builds a list of source variable elements
-     * that can be processed by editor.xsl
-     */
-    static MCREditorSubmission readSource(Element editor, Map parameters) {
-        Element source = editor.getChild("source");
-        String[] urlFromRequest = (String[]) (parameters
-                .get("XSL.editor.source.url"));
-        String[] tokenFromRequest = (String[]) (parameters
-                .get("XSL.editor.source.id"));
-        String[] newFromRequest = (String[]) (parameters
-                .get("XSL.editor.source.new"));
+	/**
+	 * Reads XML input from an url and builds a list of source variable elements
+	 * that can be processed by editor.xsl
+	 */
+	static MCREditorSubmission readSource(Element editor, Map parameters) {
+		Element source = editor.getChild("source");
+		String[] urlFromRequest = (String[]) (parameters
+				.get("XSL.editor.source.url"));
+		String[] tokenFromRequest = (String[]) (parameters
+				.get("XSL.editor.source.id"));
+		String[] newFromRequest = (String[]) (parameters
+				.get("XSL.editor.source.new"));
 
-        String url = null;
+		String url = null;
 
-        if ((newFromRequest != null) && (newFromRequest[0].equals("true"))) {
-            url = null;
-        } else if ((urlFromRequest != null)
-                && (urlFromRequest[0].trim().length() > 0)) {
-            url = urlFromRequest[0].trim();
-        } else if ((tokenFromRequest != null)
-                && (tokenFromRequest[0].trim().length() > 0)
-                && (source != null)) {
-            String urlFromDef = source.getAttributeValue("url");
-            String tokenFromDef = source.getAttributeValue("token");
-            if ((urlFromDef != null) && (tokenFromDef != null)) {
-                int pos = urlFromDef.indexOf(tokenFromDef);
-                if (pos != -1) {
-                    String before = urlFromDef.substring(0, pos);
-                    String after = urlFromDef.substring(pos
-                            + tokenFromDef.length());
-                    url = before + tokenFromRequest[0].trim() + after;
-                }
-            }
-        } else if ((source != null)
-                && (source.getAttributeValue("url", "").trim().length() > 0)) {
-            url = source.getAttributeValue("url");
-        }
+		if ((newFromRequest != null) && (newFromRequest[0].equals("true"))) {
+			url = null;
+		} else if ((urlFromRequest != null)
+				&& (urlFromRequest[0].trim().length() > 0)) {
+			url = urlFromRequest[0].trim();
+		} else if ((tokenFromRequest != null)
+				&& (tokenFromRequest[0].trim().length() > 0)
+				&& (source != null)) {
+			String urlFromDef = source.getAttributeValue("url");
+			String tokenFromDef = source.getAttributeValue("token");
+			if ((urlFromDef != null) && (tokenFromDef != null)) {
+				int pos = urlFromDef.indexOf(tokenFromDef);
+				if (pos != -1) {
+					String before = urlFromDef.substring(0, pos);
+					String after = urlFromDef.substring(pos
+							+ tokenFromDef.length());
+					url = before + tokenFromRequest[0].trim() + after;
+				}
+			}
+		} else if ((source != null)
+				&& (source.getAttributeValue("url", "").trim().length() > 0)) {
+			url = source.getAttributeValue("url");
+		}
 
-        if ((url == null) || (url.trim().length() == 0)) {
-            MCREditorServlet.logger
-                    .info("Editor is started empty without XML input");
-            return null;
-        } else {
-            if (!(url.startsWith("http://") || url.startsWith("https://") || url
-                    .startsWith("file://"))) {
-                url = MCRServlet.getBaseURL() + url;
-            }
+		if ((url == null) || (url.trim().length() == 0)) {
+			MCREditorServlet.logger
+					.info("Editor is started empty without XML input");
+			return null;
+		} else {
+			if (!(url.startsWith("http://") || url.startsWith("https://") || url
+					.startsWith("file://"))) {
+				url = MCRServlet.getBaseURL() + url;
+			}
 
-            if (!url.startsWith("file:")) {
-                StringBuffer sb = new StringBuffer(url);
-                sb.append(url.indexOf("?") == -1 ? "?" : "&");
-                sb.append("MCRSessionID=");
-                sb.append(MCRSessionMgr.getCurrentSession().getID());
-                url = sb.toString();
-            }
+			if (!url.startsWith("file:")) {
+				StringBuffer sb = new StringBuffer(url);
+				sb.append(url.indexOf("?") == -1 ? "?" : "&");
+				sb.append("MCRSessionID=");
+				sb.append(MCRSessionMgr.getCurrentSession().getID());
+				url = sb.toString();
+			}
 
-            MCREditorServlet.logger
-                    .info("Editor reading XML input from " + url);
-            Element input = MCRURIResolver.instance().resolve(url);
-            return new MCREditorSubmission(input);
-        }
-    }
+			MCREditorServlet.logger
+					.info("Editor reading XML input from " + url);
+			Element input = MCRURIResolver.instance().resolve(url);
+			return new MCREditorSubmission(input);
+		}
+	}
 }
-

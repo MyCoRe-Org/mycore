@@ -24,13 +24,20 @@
 
 package org.mycore.backend.xmldb;
 
-import org.mycore.common.*;
-import org.mycore.datamodel.ifs.*;
-import java.util.*;
-import java.io.*;
-import org.xmldb.api.base.*;
-import org.xmldb.api.modules.*;
-import org.xmldb.api.*;
+import java.io.OutputStream;
+
+import org.xmldb.api.DatabaseManager;
+import org.xmldb.api.base.Database;
+import org.xmldb.api.base.Resource;
+import org.xmldb.api.modules.BinaryResource;
+import org.xmldb.api.modules.CollectionManagementService;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRContentStore;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileReader;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
@@ -43,135 +50,135 @@ import org.xmldb.api.*;
  * @version $Revision$ $Date$
  */
 public class MCRXMLDBObjectStore extends MCRContentStore {
-    protected int segmentSize;
+	protected int segmentSize;
 
-    /** The unique store ID for this MCRContentStore implementation */
-    protected String storeID;
+	/** The unique store ID for this MCRContentStore implementation */
+	protected String storeID;
 
-    /** The database we use to store our content */
-    protected Database database;
+	/** The database we use to store our content */
+	protected Database database;
 
-    /** The root collection for our whole content */
-    protected org.xmldb.api.base.Collection rootCollection;
+	/** The root collection for our whole content */
+	protected org.xmldb.api.base.Collection rootCollection;
 
-    /**
-     * Creates a new MCRCStoreXMLDB instance. This instance has to be
-     * initialized by calling init() before it can be used.
-     */
-    public MCRXMLDBObjectStore() {
-    }
+	/**
+	 * Creates a new MCRCStoreXMLDB instance. This instance has to be
+	 * initialized by calling init() before it can be used.
+	 */
+	public MCRXMLDBObjectStore() {
+	}
 
-    public void init(String storeID) throws MCRPersistenceException {
-        this.storeID = storeID;
-        String prefix = "MCR.IFS.ContentStore." + storeID + ".";
+	public void init(String storeID) throws MCRPersistenceException {
+		this.storeID = storeID;
+		String prefix = "MCR.IFS.ContentStore." + storeID + ".";
 
-        MCRConfiguration config = MCRConfiguration.instance();
-        String drivername = config.getString(prefix + "DriverName");
-        String dbvendor = config.getString(prefix + "Vendor");
-        String host = config.getString(prefix + "Hostname", "");
-        int port = config.getInt(prefix + "Port", 0);
-        String rootCollectionName = config.getString(prefix + "RootCollection");
-        try {
-            Class driverclass = Class.forName(drivername);
-            database = (Database) driverclass.newInstance();
-            DatabaseManager.registerDatabase(database);
+		MCRConfiguration config = MCRConfiguration.instance();
+		String drivername = config.getString(prefix + "DriverName");
+		String dbvendor = config.getString(prefix + "Vendor");
+		String host = config.getString(prefix + "Hostname", "");
+		int port = config.getInt(prefix + "Port", 0);
+		String rootCollectionName = config.getString(prefix + "RootCollection");
+		try {
+			Class driverclass = Class.forName(drivername);
+			database = (Database) driverclass.newInstance();
+			DatabaseManager.registerDatabase(database);
 
-            String connString = "xmldb:" + dbvendor + "://" + host;
-            if (port != 0)
-                connString = connString + ":" + port;
-            connString = connString + "/" + rootCollectionName;
-            System.out.println(connString);
-            rootCollection = DatabaseManager.getCollection(connString);
-        } catch (Exception e) {
-            String msg = "Unable to initialize XMLDB database";
-            throw new MCRPersistenceException(msg, e);
-        }
-    }
+			String connString = "xmldb:" + dbvendor + "://" + host;
+			if (port != 0)
+				connString = connString + ":" + port;
+			connString = connString + "/" + rootCollectionName;
+			System.out.println(connString);
+			rootCollection = DatabaseManager.getCollection(connString);
+		} catch (Exception e) {
+			String msg = "Unable to initialize XMLDB database";
+			throw new MCRPersistenceException(msg, e);
+		}
+	}
 
-    public String getID() {
-        return storeID;
-    }
+	public String getID() {
+		return storeID;
+	}
 
-    public String storeContent(MCRFile file, MCRContentInputStream source)
-            throws MCRPersistenceException {
-        try {
-            org.xmldb.api.base.Collection storageCollection = rootCollection
-                    .getChildCollection(file.getOwnerID());
-            if (storageCollection == null) {
-                CollectionManagementService cmservice = (CollectionManagementService) rootCollection
-                        .getService("CollectionManagementService", "1.0");
+	public String storeContent(MCRFile file, MCRContentInputStream source)
+			throws MCRPersistenceException {
+		try {
+			org.xmldb.api.base.Collection storageCollection = rootCollection
+					.getChildCollection(file.getOwnerID());
+			if (storageCollection == null) {
+				CollectionManagementService cmservice = (CollectionManagementService) rootCollection
+						.getService("CollectionManagementService", "1.0");
 
-                cmservice.createCollection(file.getOwnerID());
-                storageCollection = rootCollection.getChildCollection(file
-                        .getOwnerID());
-            }
-            if (storageCollection != null) {
-                BinaryResource res = (BinaryResource) storageCollection
-                        .createResource(file.getStorageID(),
-                                BinaryResource.RESOURCE_TYPE);
-                // Read content!
-                //		res.setContent( content );
-                storageCollection.storeResource(res);
-                return res.getId();
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            throw new MCRPersistenceException(e.getMessage(), e);
-        }
-    }
+				cmservice.createCollection(file.getOwnerID());
+				storageCollection = rootCollection.getChildCollection(file
+						.getOwnerID());
+			}
+			if (storageCollection != null) {
+				BinaryResource res = (BinaryResource) storageCollection
+						.createResource(file.getStorageID(),
+								BinaryResource.RESOURCE_TYPE);
+				// Read content!
+				//		res.setContent( content );
+				storageCollection.storeResource(res);
+				return res.getId();
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
 
-    public void deleteContent(MCRFile file) throws MCRPersistenceException {
-        try {
-            org.xmldb.api.base.Collection storageCollection = rootCollection
-                    .getChildCollection(file.getOwnerID());
-            Resource res = storageCollection.getResource(file.getStorageID());
-            storageCollection.removeResource(res);
-        } catch (Exception e) {
-            throw new MCRPersistenceException(e.getMessage(), e);
-        }
-    }
+	public void deleteContent(MCRFile file) throws MCRPersistenceException {
+		try {
+			org.xmldb.api.base.Collection storageCollection = rootCollection
+					.getChildCollection(file.getOwnerID());
+			Resource res = storageCollection.getResource(file.getStorageID());
+			storageCollection.removeResource(res);
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
 
-    public void doDeleteContent(String storageID)
-            throws MCRPersistenceException {
-        try {
-            org.xmldb.api.base.Collection storageCollection = rootCollection
-                    .getChildCollection(storageID);
-            Resource res = storageCollection.getResource(storageID);
-            storageCollection.removeResource(res);
-        } catch (Exception e) {
-            throw new MCRPersistenceException(e.getMessage(), e);
-        }
-    }
+	public void doDeleteContent(String storageID)
+			throws MCRPersistenceException {
+		try {
+			org.xmldb.api.base.Collection storageCollection = rootCollection
+					.getChildCollection(storageID);
+			Resource res = storageCollection.getResource(storageID);
+			storageCollection.removeResource(res);
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
 
-    public void retrieveContent(MCRFile file, OutputStream target)
-            throws MCRPersistenceException {
-        try {
-            org.xmldb.api.base.Collection storageCollection = rootCollection
-                    .getChildCollection(file.getOwnerID());
-            Resource res = storageCollection.getResource(file.getStorageID());
-            if (res.getContent() instanceof byte[]) {
-                target.write((byte[]) res.getContent());
-            }
-        } catch (Exception e) {
-            throw new MCRPersistenceException(e.getMessage(), e);
-        }
-    }
+	public void retrieveContent(MCRFile file, OutputStream target)
+			throws MCRPersistenceException {
+		try {
+			org.xmldb.api.base.Collection storageCollection = rootCollection
+					.getChildCollection(file.getOwnerID());
+			Resource res = storageCollection.getResource(file.getStorageID());
+			if (res.getContent() instanceof byte[]) {
+				target.write((byte[]) res.getContent());
+			}
+		} catch (Exception e) {
+			throw new MCRPersistenceException(e.getMessage(), e);
+		}
+	}
 
-    /*
-     * protected void doDeleteContent(String storageID) throws Exception { }
-     */
-    protected void doRetrieveContent(MCRFileReader file, OutputStream target)
-            throws Exception {
-        System.out
-                .println("MCRXMLDBObjectStore method doRetrieveContent not implemented!!!!!");
-    }
+	/*
+	 * protected void doDeleteContent(String storageID) throws Exception { }
+	 */
+	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
+			throws Exception {
+		System.out
+				.println("MCRXMLDBObjectStore method doRetrieveContent not implemented!!!!!");
+	}
 
-    protected String doStoreContent(MCRFileReader file,
-            MCRContentInputStream source) throws Exception {
-        System.out
-                .println("MCRXMLDBObjectStore method doStoreContent not implemented!!!!!");
-        return null;
-    }
+	protected String doStoreContent(MCRFileReader file,
+			MCRContentInputStream source) throws Exception {
+		System.out
+				.println("MCRXMLDBObjectStore method doStoreContent not implemented!!!!!");
+		return null;
+	}
 
 }

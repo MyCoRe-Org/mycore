@@ -28,15 +28,14 @@ package org.mycore.frontend.indexbrowser;
  * @author Frank Lützenkirchen
  */
 class MCRRangeDelim {
-    int pos;
+	int pos;
 
-    String value;
+	String value;
 
-    String diff;
+	String diff;
 
-    MCRRangeDelim(int pos, String value) {
-        this.pos = pos;
-        this.value = value;
-    }
+	MCRRangeDelim(int pos, String value) {
+		this.pos = pos;
+		this.value = value;
+	}
 }
-

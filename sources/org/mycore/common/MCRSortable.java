@@ -1,6 +1,5 @@
 package org.mycore.common;
 
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLSortInterface;
 
 /**
@@ -13,29 +12,29 @@ import org.mycore.common.xml.MCRXMLSortInterface;
  */
 public interface MCRSortable {
 
-    /**
-     * sorts some Objects of implementing class.
-     * 
-     * @param sorter
-     *            Object responsible for sorting
-     * @throws MCRException
-     *             if sorting fails somehow
-     * @author Thomas Scheffler
-     */
-    public void sort(MCRXMLSortInterface sorter) throws MCRException;
+	/**
+	 * sorts some Objects of implementing class.
+	 * 
+	 * @param sorter
+	 *            Object responsible for sorting
+	 * @throws MCRException
+	 *             if sorting fails somehow
+	 * @author Thomas Scheffler
+	 */
+	public void sort(MCRXMLSortInterface sorter) throws MCRException;
 
-    /**
-     * 
-     * @param sorter
-     *            Object responsible for sorting
-     * @param order
-     *            true if reversed sorting order
-     * @see MCRXMLSortInterface#sort(boolean) sorting method.
-     * @throws MCRException
-     *             if sorting fails somehow
-     * @author Thomas Scheffler
-     */
-    public void sort(MCRXMLSortInterface sorter, boolean reversed)
-            throws MCRException;
+	/**
+	 * 
+	 * @param sorter
+	 *            Object responsible for sorting
+	 * @param order
+	 *            true if reversed sorting order
+	 * @see MCRXMLSortInterface#sort(boolean) sorting method.
+	 * @throws MCRException
+	 *             if sorting fails somehow
+	 * @author Thomas Scheffler
+	 */
+	public void sort(MCRXMLSortInterface sorter, boolean reversed)
+			throws MCRException;
 
 }

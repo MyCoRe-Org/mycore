@@ -24,7 +24,7 @@
 
 package org.mycore.datamodel.ifs;
 
-import org.mycore.common.*;
+import org.mycore.common.MCRException;
 
 /**
  * Decides which MCRContentStore implementation should be used to store the
@@ -39,17 +39,17 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  */
 public interface MCRContentStoreSelector {
-    /**
-     * Returns the ID of the file content store to be used to store the content
-     * of the given file. The store selector can make the decision based on the
-     * properties of the given file or based on system configuration.
-     */
-    public String selectStore(MCRFile file) throws MCRException;
+	/**
+	 * Returns the ID of the file content store to be used to store the content
+	 * of the given file. The store selector can make the decision based on the
+	 * properties of the given file or based on system configuration.
+	 */
+	public String selectStore(MCRFile file) throws MCRException;
 
-    /**
-     * Returns the IDs of all ContentStores available to MyCoRe
-     * 
-     * @return Array of StoreIDs
-     */
-    public String[] getAvailableStoreIDs();
+	/**
+	 * Returns the IDs of all ContentStores available to MyCoRe
+	 * 
+	 * @return Array of StoreIDs
+	 */
+	public String[] getAvailableStoreIDs();
 }

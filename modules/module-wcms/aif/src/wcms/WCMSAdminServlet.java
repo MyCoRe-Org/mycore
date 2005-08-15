@@ -39,14 +39,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRLayoutServlet;
 
 public class WCMSAdminServlet extends WCMSServlet {
 
@@ -55,13 +55,13 @@ public class WCMSAdminServlet extends WCMSServlet {
 	 * methods.
 	 * 
 	 * @param request
-	 *                 servlet request
+	 *            servlet request
 	 * @param response
-	 *                 servlet response
+	 *            servlet response
 	 */
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		
+
 		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 		String action = request.getParameter("action");
 		List rootNodes = (List) mcrSession.get("rootNodes");
@@ -77,23 +77,24 @@ public class WCMSAdminServlet extends WCMSServlet {
 				"userClass").toString()));
 
 		if (action.equals("choose")) {
-			generateXML_managPage(mcrSession, rootOut, rootNodes, contentTemplates);
+			generateXML_managPage(mcrSession, rootOut, rootNodes,
+					contentTemplates);
+		} else if (action.equals("logs")) {
+			generateXML_logs(request, rootOut);
+		} else if (action.equals("managGlobal")
+				&& mcrSession.get("userClass").equals("admin")) {
+			generateXML_managGlobal(rootOut);
+		} else if (action.equals("saveGlobal")
+				&& mcrSession.get("userClass").equals("admin")) {
+			generateXML_saveGlobal(request, response);
 		}
-			else if (action.equals("logs")) {
-				generateXML_logs(request, rootOut);
-			}
-				else if (action.equals("managGlobal") && mcrSession.get("userClass").equals("admin") ) {
-					generateXML_managGlobal(rootOut);					
-				}
-					else if (action.equals("saveGlobal") && mcrSession.get("userClass").equals("admin") ) {
-						generateXML_saveGlobal(request, response);						
-					}
-		
+
 		// Transfer content of jdom object to MCRLayoutServlet.
 		request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
- 
+
 		//request.setAttribute("XSL.Style", "xml");
-		RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+		RequestDispatcher rd = getServletContext().getNamedDispatcher(
+				"MCRLayoutServlet");
 		rd.forward(request, response);
 	}
 
@@ -122,15 +123,15 @@ public class WCMSAdminServlet extends WCMSServlet {
 		templates.addContent(contentTemp);
 		rootOut.addContent(templates);
 	}
-	
-	public void generateXML_logs(HttpServletRequest request, Element rootOut) {		
+
+	public void generateXML_logs(HttpServletRequest request, Element rootOut) {
 		String sort = request.getParameter("sort");
 		String sortOrder = request.getParameter("sortOrder");
 		char fs = File.separatorChar;
 		String error;
 		try {
-			File logFile = new File(super.CONFIG.getString(
-					"MCR.WCMS.logFile").replace('/', File.separatorChar));
+			File logFile = new File(super.CONFIG.getString("MCR.WCMS.logFile")
+					.replace('/', File.separatorChar));
 			if (!logFile.exists())
 				error = "Logfile nicht gefunden!";
 			Element root = new SAXBuilder().build(logFile).getRootElement();
@@ -143,50 +144,60 @@ public class WCMSAdminServlet extends WCMSServlet {
 			//System.out.println(error);
 		}
 
-		rootOut.addContent(new Element("sort").setAttribute("order",
-				sortOrder).setText(sort));
-	}	
-
-	public void generateXML_managGlobal(Element rootOut)  {
-			// generate template list
-			rootOut.addContent(getTemplates());
+		rootOut.addContent(new Element("sort").setAttribute("order", sortOrder)
+				.setText(sort));
 	}
 
-	public void generateXML_saveGlobal(HttpServletRequest request, HttpServletResponse response)  {
+	public void generateXML_managGlobal(Element rootOut) {
+		// generate template list
+		rootOut.addContent(getTemplates());
+	}
+
+	public void generateXML_saveGlobal(HttpServletRequest request,
+			HttpServletResponse response) {
 		try {
-			String pathToNavi = new String(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+			String pathToNavi = new String(super.CONFIG.getString(
+					"MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 			Document naviBase = new Document();
 			naviBase = XMLFile2JDOM(pathToNavi);
 			Element NaviBaseRoot = naviBase.getRootElement();
-			
+
 			//save default template if changed
-				//get default template from navigatioBase
-			String defaultTemplateNaviBase = XPath.newInstance("/navigation/@template").valueOf(naviBase);			
-				//get set def. templ. by aif
+			//get default template from navigatioBase
+			String defaultTemplateNaviBase = XPath.newInstance(
+					"/navigation/@template").valueOf(naviBase);
+			//get set def. templ. by aif
 			String defaultTemplateAIF = new String();
-			if ((request.getParameter("defTempl") != null) && !(request.getParameter("defTempl").equals("")) ) defaultTemplateAIF = request.getParameter("defTempl");
-			
+			if ((request.getParameter("defTempl") != null)
+					&& !(request.getParameter("defTempl").equals("")))
+				defaultTemplateAIF = request.getParameter("defTempl");
+
 			if (!(defaultTemplateNaviBase.equals(defaultTemplateAIF))) {
 				//save changed naviBase
-				NaviBaseRoot.setAttribute("template",defaultTemplateAIF);
-				
-				File navigationBase = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
-				XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+				NaviBaseRoot.setAttribute("template", defaultTemplateAIF);
+
+				File navigationBase = new File(super.CONFIG.getString(
+						"MCR.WCMS.navigationFile").replace('/',
+						File.separatorChar));
+				XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat()
+						.setTextMode(Format.TextMode.PRESERVE).setEncoding(
+								"UTF-8"));
 				xmlOut.output(naviBase, new FileOutputStream(navigationBase));
 			}
-			
+
 			//forward to strarting page
 			String address = new String();
 			StringBuffer buffer = request.getRequestURL();
-	        String queryString = request.getQueryString();
-	        if (queryString != null)
-	            buffer.append("?").append(queryString);
-	        address = buffer.toString();
-	        String contextPath = request.getContextPath() + "/";
-	        int pos = address.indexOf(contextPath, 9);
-	        address = address.substring(0, pos) + contextPath + "servlets/WCMSLoginServlet" ;
-			response.sendRedirect(response.encodeURL(address));			
-			
+			String queryString = request.getQueryString();
+			if (queryString != null)
+				buffer.append("?").append(queryString);
+			address = buffer.toString();
+			String contextPath = request.getContextPath() + "/";
+			int pos = address.indexOf(contextPath, 9);
+			address = address.substring(0, pos) + contextPath
+					+ "servlets/WCMSLoginServlet";
+			response.sendRedirect(response.encodeURL(address));
+
 		} catch (JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,5 +207,5 @@ public class WCMSAdminServlet extends WCMSServlet {
 		}
 
 	}
-	
+
 }

@@ -25,53 +25,53 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.util.StringTokenizer;
+
 import org.mycore.common.MCRConfiguration;
 
 /**
  * @author Frank Lützenkirchen
  */
 class MCRIndexConfiguration {
-    String table;
+	String table;
 
-    boolean distinct;
+	boolean distinct;
 
-    String browseField;
+	String browseField;
 
-    String fields;
+	String fields;
 
-    String[] extraFields;
+	String[] extraFields;
 
-    String order;
+	String order;
 
-    String filter;
+	String filter;
 
-    String style;
+	String style;
 
-    int maxPerPage;
+	int maxPerPage;
 
-    MCRIndexConfiguration(String ID) {
-        MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = "MCR.IndexBrowser." + ID + ".";
+	MCRIndexConfiguration(String ID) {
+		MCRConfiguration config = MCRConfiguration.instance();
+		String prefix = "MCR.IndexBrowser." + ID + ".";
 
-        table = config.getString(prefix + "Table");
-        distinct = config.getBoolean(prefix + "Distinct", true);
-        browseField = config.getString(prefix + "FieldToBrowse");
-        filter = config.getString(prefix + "FilterCondition", null);
-        maxPerPage = config.getInt(prefix + "MaxPerPage");
-        style = config.getString(prefix + "Style");
-        fields = config.getString(prefix + "ExtraOutputFields", null);
-        order = config.getString(prefix + "Order", "asc");
-        buildFieldList(fields);
-    }
+		table = config.getString(prefix + "Table");
+		distinct = config.getBoolean(prefix + "Distinct", true);
+		browseField = config.getString(prefix + "FieldToBrowse");
+		filter = config.getString(prefix + "FilterCondition", null);
+		maxPerPage = config.getInt(prefix + "MaxPerPage");
+		style = config.getString(prefix + "Style");
+		fields = config.getString(prefix + "ExtraOutputFields", null);
+		order = config.getString(prefix + "Order", "asc");
+		buildFieldList(fields);
+	}
 
-    void buildFieldList(String fields) {
-        if ((fields == null) || (fields.trim().length() == 0))
-            extraFields = new String[0];
+	void buildFieldList(String fields) {
+		if ((fields == null) || (fields.trim().length() == 0))
+			extraFields = new String[0];
 
-        StringTokenizer st = new StringTokenizer(fields, " ,");
-        extraFields = new String[st.countTokens()];
-        for (int i = 0; i < extraFields.length; i++)
-            extraFields[i] = st.nextToken();
-    }
+		StringTokenizer st = new StringTokenizer(fields, " ,");
+		extraFields = new String[st.countTokens()];
+		for (int i = 0; i < extraFields.length; i++)
+			extraFields[i] = st.nextToken();
+	}
 }
-

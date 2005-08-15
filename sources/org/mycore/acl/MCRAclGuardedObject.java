@@ -22,8 +22,10 @@ package org.mycore.acl;
 
 ///============================================================================§
 
-import org.mycore.user.MCRUser;
+import java.rmi.AccessException;
+
 import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 
 ///============================================================================|
@@ -43,228 +45,228 @@ import org.mycore.user.MCRUserMgr;
  */
 
 public class MCRAclGuardedObject implements MCROwnedObject,
-        MCRPermissionContext, MCRAclGuarded {
-    ///============================================================================/
+		MCRPermissionContext, MCRAclGuarded {
+	///============================================================================/
 
-    private MCRUser owner;
+	private MCRUser owner;
 
-    private MCRGroup ownerGroup;
+	private MCRGroup ownerGroup;
 
-    private MCRPermission[] supportedPermissions;
+	private MCRPermission[] supportedPermissions;
 
-    private MCRAcl acl;
+	private MCRAcl acl;
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    /**
-     * Constructs a guarded object with the specified owner and owning group.
-     */
+	/**
+	 * Constructs a guarded object with the specified owner and owning group.
+	 */
 
-    public MCRAclGuardedObject(MCRUser owner, MCRGroup ownerGroup,
-            MCRPermission[] supportedPermissions) {
+	public MCRAclGuardedObject(MCRUser owner, MCRGroup ownerGroup,
+			MCRPermission[] supportedPermissions) {
 
-        this.owner = owner;
-        this.ownerGroup = ownerGroup;
-        this.acl = new MCRDefaultAcl(this, this);
-        this.supportedPermissions = supportedPermissions;
+		this.owner = owner;
+		this.ownerGroup = ownerGroup;
+		this.acl = new MCRDefaultAcl(this, this);
+		this.supportedPermissions = supportedPermissions;
 
-    }
+	}
 
-    //>-----------------------------------------------------------------------------
-    // Implementation of MCROwnedObject
-    //------------------------------------------------------------------------------
+	//>-----------------------------------------------------------------------------
+	// Implementation of MCROwnedObject
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the owner of this guarded object.
-     * 
-     * @return the owner of this object.
-     */
+	/**
+	 * Returns the owner of this guarded object.
+	 * 
+	 * @return the owner of this object.
+	 */
 
-    public final MCRUser getOwner() {
+	public final MCRUser getOwner() {
 
-        return owner;
+		return owner;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Sets a new owner for this guarded object.
-     * 
-     * @throws AccessException
-     *             if the currentUser is not allowed to set a new owner.
-     */
+	/**
+	 * Sets a new owner for this guarded object.
+	 * 
+	 * @throws AccessException
+	 *             if the currentUser is not allowed to set a new owner.
+	 */
 
-    public final void changeOwner(MCRUser newOwner) throws MCRAccessException {//@
+	public final void changeOwner(MCRUser newOwner) throws MCRAccessException {//@
 
-        if (newOwner == null)
-            return;
+		if (newOwner == null)
+			return;
 
-        MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
+		MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
 
-        if (currentUser == null)
-            throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
+		if (currentUser == null)
+			throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
 
-        if (currentUser.isMemberOf(MCRUserMgr.instance()
-                .getOwnerAdministrationGroup()))
-            owner = newOwner;
-        else
-            throw new MCRAccessException(MCRAclMessages.CHANGE_OWNER_MESSAGE);
+		if (currentUser.isMemberOf(MCRUserMgr.instance()
+				.getOwnerAdministrationGroup()))
+			owner = newOwner;
+		else
+			throw new MCRAccessException(MCRAclMessages.CHANGE_OWNER_MESSAGE);
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the owner of this guarded object.
-     * 
-     * @return the owner of this object.
-     */
+	/**
+	 * Returns the owner of this guarded object.
+	 * 
+	 * @return the owner of this object.
+	 */
 
-    public final MCRGroup getOwnerGroup() {
+	public final MCRGroup getOwnerGroup() {
 
-        return ownerGroup;
+		return ownerGroup;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Sets a new owner group for this guarded object.
-     * 
-     * @throws AccessException
-     *             if the currentUser is not allowed to set a new owner.
-     */
+	/**
+	 * Sets a new owner group for this guarded object.
+	 * 
+	 * @throws AccessException
+	 *             if the currentUser is not allowed to set a new owner.
+	 */
 
-    public final void changeOwnerGroup(MCRGroup newOwnerGroup)
-            throws MCRAccessException {
+	public final void changeOwnerGroup(MCRGroup newOwnerGroup)
+			throws MCRAccessException {
 
-        if (newOwnerGroup == null)
-            return;
+		if (newOwnerGroup == null)
+			return;
 
-        MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
+		MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
 
-        if (currentUser == null)
-            throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
+		if (currentUser == null)
+			throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
 
-        if (currentUser.isMemberOf(MCRUserMgr.instance()
-                .getOwnerAdministrationGroup()))
-            ownerGroup = newOwnerGroup;
-        else
-            throw new MCRAccessException(
-                    MCRAclMessages.CHANGE_OWNER_GROUP_MESSAGE);
+		if (currentUser.isMemberOf(MCRUserMgr.instance()
+				.getOwnerAdministrationGroup()))
+			ownerGroup = newOwnerGroup;
+		else
+			throw new MCRAccessException(
+					MCRAclMessages.CHANGE_OWNER_GROUP_MESSAGE);
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
-    // Implementation of MCRPermissionContext
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Implementation of MCRPermissionContext
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the allowed permissions of this guarded object.
-     * 
-     * When ACL are modified they should check their entries for supported
-     * permissions of the objects they guard.
-     * 
-     * @return a set of permissions which are meaningful for this object.
-     */
+	/**
+	 * Returns the allowed permissions of this guarded object.
+	 * 
+	 * When ACL are modified they should check their entries for supported
+	 * permissions of the objects they guard.
+	 * 
+	 * @return a set of permissions which are meaningful for this object.
+	 */
 
-    public final MCRPermission[] getValidPermissions() {
+	public final MCRPermission[] getValidPermissions() {
 
-        return (MCRPermission[]) supportedPermissions.clone();
+		return (MCRPermission[]) supportedPermissions.clone();
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Checks if permission is valid for this context. This method is useful
-     * when editing ACLs to prevent inconsistent entries.
-     * 
-     * @return true if the permission is valid for this context.
-     */
+	/**
+	 * Checks if permission is valid for this context. This method is useful
+	 * when editing ACLs to prevent inconsistent entries.
+	 * 
+	 * @return true if the permission is valid for this context.
+	 */
 
-    public boolean isValidPermission(MCRPermission permission) {
+	public boolean isValidPermission(MCRPermission permission) {
 
-        for (int i = 0; i < supportedPermissions.length; i++)
-            if (supportedPermissions[i].equals(permission))
-                return true;
+		for (int i = 0; i < supportedPermissions.length; i++)
+			if (supportedPermissions[i].equals(permission))
+				return true;
 
-        return false;
+		return false;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the single instance of the permission within this context which
-     * has the corresponding name.
-     * 
-     * This method is used when creating permissions from external
-     * representations.
-     * 
-     * @return a permissions valid within this context.
-     * 
-     * @throws MCRInvalidPermissionException
-     *             when no such permission exists
-     */
+	/**
+	 * Returns the single instance of the permission within this context which
+	 * has the corresponding name.
+	 * 
+	 * This method is used when creating permissions from external
+	 * representations.
+	 * 
+	 * @return a permissions valid within this context.
+	 * 
+	 * @throws MCRInvalidPermissionException
+	 *             when no such permission exists
+	 */
 
-    public MCRPermission getPermission(String name)
-            throws MCRInvalidPermissionException {
+	public MCRPermission getPermission(String name)
+			throws MCRInvalidPermissionException {
 
-        for (int i = 0; i < supportedPermissions.length; i++)
-            if (supportedPermissions[i].getName().equals(name))
-                return supportedPermissions[i];
+		for (int i = 0; i < supportedPermissions.length; i++)
+			if (supportedPermissions[i].getName().equals(name))
+				return supportedPermissions[i];
 
-        throw new MCRInvalidPermissionException(
-                MCRAclMessages.INVALID_PERMISSION_MESSAGE);
+		throw new MCRInvalidPermissionException(
+				MCRAclMessages.INVALID_PERMISSION_MESSAGE);
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
-    // Implementation of MCRAclGuarded
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Implementation of MCRAclGuarded
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns the ACL by which this object is guarded.
-     * 
-     * @return the ACL which guards this objects.
-     */
+	/**
+	 * Returns the ACL by which this object is guarded.
+	 * 
+	 * @return the ACL which guards this objects.
+	 */
 
-    public final MCRAcl getAcl() {
+	public final MCRAcl getAcl() {
 
-        checkAccess(MCRStandardPermissions.ACL_READ);
+		checkAccess(MCRStandardPermissions.ACL_READ);
 
-        return acl;
+		return acl;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Checks if the given user can perform the action specified by permission.
-     * 
-     * @param permission
-     *            the permission required to perform the action.
-     * 
-     * @throws MCRAccessException
-     *             if the current user is not allowed to perform the action.
-     */
+	/**
+	 * Checks if the given user can perform the action specified by permission.
+	 * 
+	 * @param permission
+	 *            the permission required to perform the action.
+	 * 
+	 * @throws MCRAccessException
+	 *             if the current user is not allowed to perform the action.
+	 */
 
-    public final void checkAccess(MCRPermission permission)
-            throws MCRAccessException {
+	public final void checkAccess(MCRPermission permission)
+			throws MCRAccessException {
 
-        MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
+		MCRUser currentUser = MCRUserMgr.instance().getCurrentUser();
 
-        if (currentUser == null)
-            throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
+		if (currentUser == null)
+			throw new MCRAccessException(MCRAclMessages.NO_USER_MESSAGE);
 
-        if (!acl.isAccessPermitted(currentUser, this, permission))
-            throw new MCRAccessException(MCRAclMessages.ACCESS_MESSAGE
-                    + MCRAclMessages.userMessage(currentUser)
-                    + MCRAclMessages.permissionMessage(permission));
+		if (!acl.isAccessPermitted(currentUser, this, permission))
+			throw new MCRAccessException(MCRAclMessages.ACCESS_MESSAGE
+					+ MCRAclMessages.userMessage(currentUser)
+					+ MCRAclMessages.permissionMessage(permission));
 
-    }
+	}
 
-    //-============================================================================\
+	//-============================================================================\
 }

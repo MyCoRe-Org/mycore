@@ -21,6 +21,7 @@
 package org.mycore.access;
 
 import java.util.Date;
+
 import org.mycore.user.MCRUser;
 
 /**
@@ -31,6 +32,5 @@ import org.mycore.user.MCRUser;
  */
 
 interface MCRAccessCtrlDefinition {
-    boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip);
+	boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip);
 };
-

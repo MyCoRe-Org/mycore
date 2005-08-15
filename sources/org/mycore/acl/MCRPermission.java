@@ -46,25 +46,25 @@ package org.mycore.acl;
  */
 
 public interface MCRPermission {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Returns the name of the permission.
-     * 
-     * @return string representing the name of the permission.
-     */
+	/**
+	 * Returns the name of the permission.
+	 * 
+	 * @return string representing the name of the permission.
+	 */
 
-    public String getName();
+	public String getName();
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 
-    /**
-     * Returns a description of the permission.
-     * 
-     * @return string representing the description of the permission.
-     */
+	/**
+	 * Returns a description of the permission.
+	 * 
+	 * @return string representing the description of the permission.
+	 */
 
-    public String getDescription();
+	public String getDescription();
 
-    //-============================================================================\
+	//-============================================================================\
 }

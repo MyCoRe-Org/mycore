@@ -24,70 +24,66 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
-import org.mycore.common.*;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
  * output XML for metadata object and derivate objects.
- *
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 
-abstract public class MCRCheckBase extends MCRServlet
-{
-protected static Logger logger=Logger.getLogger(MCRCheckBase.class);
-String NL = System.getProperty("file.separator");
+abstract public class MCRCheckBase extends MCRServlet {
+	protected static Logger logger = Logger.getLogger(MCRCheckBase.class);
 
-/**
- * The method check the privileg of this action.
- *
- * @param privs the ArrayList  of privilegs
- * @return true if the privileg exist, else return false
- **/
-abstract public boolean hasPrivileg(ArrayList privs, String type);
+	String NL = System.getProperty("file.separator");
 
-/**
- * The method is a dummy or works with the data and return an URL with the 
- * next working step.
- *
- * @param ID the MCRObjectID of the MCRObject
- * @return the next URL as String
- **/
-abstract public String getNextURL(MCRObjectID ID) throws Exception;
+	/**
+	 * The method check the privileg of this action.
+	 * 
+	 * @param privs
+	 *            the ArrayList of privilegs
+	 * @return true if the privileg exist, else return false
+	 */
+	abstract public boolean hasPrivileg(ArrayList privs, String type);
 
-/**
- * The method send a message to the mail address for the MCRObjectType.
- *
- * @param ID the MCRObjectID of the MCRObject
- **/
-abstract public void sendMail(MCRObjectID ID);
+	/**
+	 * The method is a dummy or works with the data and return an URL with the
+	 * next working step.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 * @return the next URL as String
+	 */
+	abstract public String getNextURL(MCRObjectID ID) throws Exception;
 
-/**
- * A method to handle IO errors.
- *
- * @param jab the MCRServletJob
- * @param lang the current language
- **/
-protected void errorHandlerIO(MCRServletJob job, String lang)
-  throws Exception
-  {
-  String pagedir = CONFIG.getString( "MCR.editor_page_dir","" );
-  job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL(
-)+pagedir+"editor_error_store.xml"));
-  }
+	/**
+	 * The method send a message to the mail address for the MCRObjectType.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 */
+	abstract public void sendMail(MCRObjectID ID);
+
+	/**
+	 * A method to handle IO errors.
+	 * 
+	 * @param jab
+	 *            the MCRServletJob
+	 * @param lang
+	 *            the current language
+	 */
+	protected void errorHandlerIO(MCRServletJob job, String lang)
+			throws Exception {
+		String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
+		job.getResponse().sendRedirect(
+				job.getResponse().encodeRedirectURL(
+						getBaseURL() + pagedir + "editor_error_store.xml"));
+	}
 
 }
-
-
-

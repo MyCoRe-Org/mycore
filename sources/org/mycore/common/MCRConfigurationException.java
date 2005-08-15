@@ -34,27 +34,26 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRConfigurationException extends MCRException {
-    /**
-     * Creates a new MCRConfigurationException with an error message
-     * 
-     * @param message
-     *            the error message for this exception
-     */
-    public MCRConfigurationException(String message) {
-        super(message);
-    }
+	/**
+	 * Creates a new MCRConfigurationException with an error message
+	 * 
+	 * @param message
+	 *            the error message for this exception
+	 */
+	public MCRConfigurationException(String message) {
+		super(message);
+	}
 
-    /**
-     * Creates a new MCRConfigurationException with an error message and a
-     * reference to an exception thrown by an underlying system.
-     * 
-     * @param message
-     *            the error message for this exception
-     * @param exception
-     *            the exception that was thrown by an underlying system
-     */
-    public MCRConfigurationException(String message, Exception exception) {
-        super(message, exception);
-    };
+	/**
+	 * Creates a new MCRConfigurationException with an error message and a
+	 * reference to an exception thrown by an underlying system.
+	 * 
+	 * @param message
+	 *            the error message for this exception
+	 * @param exception
+	 *            the exception that was thrown by an underlying system
+	 */
+	public MCRConfigurationException(String message, Exception exception) {
+		super(message, exception);
+	};
 }
-

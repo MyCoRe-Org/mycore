@@ -31,20 +31,20 @@ package org.mycore.acl;
  */
 
 public class MCRInvalidPermissionException extends MCRAclException {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Constructs an exception with an error message.
-     * 
-     * @param message
-     *            The error message describíng the cause of the exception.
-     */
+	/**
+	 * Constructs an exception with an error message.
+	 * 
+	 * @param message
+	 *            The error message describíng the cause of the exception.
+	 */
 
-    public MCRInvalidPermissionException(String message) {
+	public MCRInvalidPermissionException(String message) {
 
-        super(message);
+		super(message);
 
-    }
+	}
 
-    //>============================================================================\
+	//>============================================================================\
 }

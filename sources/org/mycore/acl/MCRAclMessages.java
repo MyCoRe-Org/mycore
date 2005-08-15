@@ -37,51 +37,51 @@ import org.mycore.user.MCRUser;
  */
 
 public class MCRAclMessages {
-    ///============================================================================/
+	///============================================================================/
 
-    public final static String ACL_MODIFY_MESSAGE = "Modifying ACL not allowed for user ";
+	public final static String ACL_MODIFY_MESSAGE = "Modifying ACL not allowed for user ";
 
-    public final static String UNSUPPORTED_PRINCIPAL_MESSAGE = "Unsupported principal";
+	public final static String UNSUPPORTED_PRINCIPAL_MESSAGE = "Unsupported principal";
 
-    public final static String MISSING_PRINCIPAL_MESSAGE = "Principal not contained in this ACL";
+	public final static String MISSING_PRINCIPAL_MESSAGE = "Principal not contained in this ACL";
 
-    public final static String INVALID_CATEGORY_MESSAGE = "Invalid category";
+	public final static String INVALID_CATEGORY_MESSAGE = "Invalid category";
 
-    public final static String NO_USER_MESSAGE = "current user undefined";
+	public final static String NO_USER_MESSAGE = "current user undefined";
 
-    public final static String INVALID_PERMISSION_MESSAGE = "Permission not valid within this context";
+	public final static String INVALID_PERMISSION_MESSAGE = "Permission not valid within this context";
 
-    public final static String ACCESS_MESSAGE = "Access failed";
+	public final static String ACCESS_MESSAGE = "Access failed";
 
-    public final static String CHANGE_OWNER_GROUP_MESSAGE = "changing owner group not allowed";
+	public final static String CHANGE_OWNER_GROUP_MESSAGE = "changing owner group not allowed";
 
-    public final static String CHANGE_OWNER_MESSAGE = "changing owner not allowed";
+	public final static String CHANGE_OWNER_MESSAGE = "changing owner not allowed";
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    public final static String PERMISSION_PREFIX = "Permission \"";
+	public final static String PERMISSION_PREFIX = "Permission \"";
 
-    public final static String PERMISSION_POSTFIX = "\" denied.";
+	public final static String PERMISSION_POSTFIX = "\" denied.";
 
-    public final static String USER_PREFIX = " for user \"";
+	public final static String USER_PREFIX = " for user \"";
 
-    public final static String USER_POSTFIX = "\": ";
+	public final static String USER_POSTFIX = "\": ";
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    public static String permissionMessage(MCRPermission permission) {
+	public static String permissionMessage(MCRPermission permission) {
 
-        return PERMISSION_PREFIX + permission + PERMISSION_POSTFIX;
+		return PERMISSION_PREFIX + permission + PERMISSION_POSTFIX;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    public static String userMessage(MCRUser user) {
+	public static String userMessage(MCRUser user) {
 
-        return USER_PREFIX + user.getID() + USER_POSTFIX;
+		return USER_PREFIX + user.getID() + USER_POSTFIX;
 
-    }
+	}
 
-    //-============================================================================\
+	//-============================================================================\
 }

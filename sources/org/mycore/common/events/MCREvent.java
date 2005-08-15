@@ -33,51 +33,51 @@ package org.mycore.common.events;
  * @author Frank Lützenkirchen
  */
 public class MCREvent extends java.util.Hashtable {
-    /** Predefined event type metadata object created * */
-    public static final int OBJECT_CREATED = 0;
+	/** Predefined event type metadata object created * */
+	public static final int OBJECT_CREATED = 0;
 
-    /** Predefined event type metadata object updated * */
-    public static final int OBJECT_UPDATED = 1;
+	/** Predefined event type metadata object updated * */
+	public static final int OBJECT_UPDATED = 1;
 
-    /** Predefined event type metadata object deleted * */
-    public static final int OBJECT_DELETED = 2;
+	/** Predefined event type metadata object deleted * */
+	public static final int OBJECT_DELETED = 2;
 
-    /** Predefined event type file content created * */
-    public static final int FILE_CREATED = 3;
+	/** Predefined event type file content created * */
+	public static final int FILE_CREATED = 3;
 
-    /** Predefined event type file content updated * */
-    public static final int FILE_UPDATED = 4;
+	/** Predefined event type file content updated * */
+	public static final int FILE_UPDATED = 4;
 
-    /** Predefined event type file content deleted * */
-    public static final int FILE_DELETED = 5;
+	/** Predefined event type file content deleted * */
+	public static final int FILE_DELETED = 5;
 
-    private String[] typeStrings = { "object created", "object updated",
-            "object deleted", "file created", "file updated", "file deleted" };
+	private String[] typeStrings = { "object created", "object updated",
+			"object deleted", "file created", "file updated", "file deleted" };
 
-    private int type;
+	private int type;
 
-    /**
-     * Creates a new event object of the given type
-     */
-    public MCREvent(int type) {
-        this.type = type;
-    }
+	/**
+	 * Creates a new event object of the given type
+	 */
+	public MCREvent(int type) {
+		this.type = type;
+	}
 
-    /**
-     * Returns the type of this event
-     * 
-     * @return the type of this event
-     */
-    public int getType() {
-        return type;
-    }
+	/**
+	 * Returns the type of this event
+	 * 
+	 * @return the type of this event
+	 */
+	public int getType() {
+		return type;
+	}
 
-    /**
-     * Returns the type of this event as a String for debugging
-     * 
-     * @return the type of this event as a String for debugging
-     */
-    public String getTypeString() {
-        return typeStrings[type];
-    }
+	/**
+	 * Returns the type of this event as a String for debugging
+	 * 
+	 * @return the type of this event as a String for debugging
+	 */
+	public String getTypeString() {
+		return typeStrings[type];
+	}
 }

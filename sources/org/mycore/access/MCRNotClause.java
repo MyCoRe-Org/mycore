@@ -21,6 +21,7 @@
 package org.mycore.access;
 
 import java.util.Date;
+
 import org.mycore.user.MCRUser;
 
 /**
@@ -30,19 +31,18 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRNotClause implements MCRAccessCtrlDefinition {
-    private MCRAccessCtrlDefinition inverse;
+	private MCRAccessCtrlDefinition inverse;
 
-    MCRNotClause(MCRAccessCtrlDefinition inverse) {
-        this.inverse = inverse;
-    }
+	MCRNotClause(MCRAccessCtrlDefinition inverse) {
+		this.inverse = inverse;
+	}
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return !inverse.hasAccess(user, date, ip);
-    }
+	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+		return !inverse.hasAccess(user, date, ip);
+	}
 
-    public String toString() {
-        return "NOT\n" + "*   "
-                + inverse.toString().replaceAll("\n", "\n    ").trim() + "\n";
-    }
+	public String toString() {
+		return "NOT\n" + "*   "
+				+ inverse.toString().replaceAll("\n", "\n    ").trim() + "\n";
+	}
 };
-

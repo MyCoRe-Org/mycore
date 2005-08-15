@@ -46,6 +46,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -80,282 +81,281 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRZipServlet extends MCRServlet {
 
-    // The Log4J logger
-    private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class
-            .getName());
+	// The Log4J logger
+	private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class
+			.getName());
 
-    protected MCRXMLTableManager xmltable = null;
+	protected MCRXMLTableManager xmltable = null;
 
-    protected String stylesheet;
+	protected String stylesheet;
 
-    /**
-     * Initializes the servlet and reads the transforming stylesheet from the
-     * configuration.
-     */
-    public void init() throws MCRConfigurationException, ServletException {
-        super.init();
-        xmltable = MCRXMLTableManager.instance();
-        stylesheet = MCRConfiguration.instance().getString(
-                "MCR.zip.metadata.transformer");
-    }
+	/**
+	 * Initializes the servlet and reads the transforming stylesheet from the
+	 * configuration.
+	 */
+	public void init() throws MCRConfigurationException, ServletException {
+		super.init();
+		xmltable = MCRXMLTableManager.instance();
+		stylesheet = MCRConfiguration.instance().getString(
+				"MCR.zip.metadata.transformer");
+	}
 
-    /**
-     * Handles the HTTP request
-     */
-    public void doGetPost(MCRServletJob job) throws IOException,
-            ServletException {
-        HttpServletRequest req = job.getRequest();
-        HttpServletResponse res = job.getResponse();
+	/**
+	 * Handles the HTTP request
+	 */
+	public void doGetPost(MCRServletJob job) throws IOException,
+			ServletException {
+		HttpServletRequest req = job.getRequest();
+		HttpServletResponse res = job.getResponse();
 
-        String id;
-        String path;
-        ZipOutputStream out = null;
-        HttpSession session = req.getSession(false);
-        //get the user
-        String user = MCRConfiguration.instance().getString(
-                "MCR.users_guestuser_username");
-        if (session != null) {
-            MCRSession mcrSession = (MCRSession) (session
-                    .getAttribute("mycore.session"));
-            if (mcrSession != null) {
-                user = mcrSession.getCurrentUserID();
-            }
-        }
-        // get Parameter
-        String paramid = getProperty(req, "id");
+		String id;
+		String path;
+		ZipOutputStream out = null;
+		HttpSession session = req.getSession(false);
+		//get the user
+		String user = MCRConfiguration.instance().getString(
+				"MCR.users_guestuser_username");
+		if (session != null) {
+			MCRSession mcrSession = (MCRSession) (session
+					.getAttribute("mycore.session"));
+			if (mcrSession != null) {
+				user = mcrSession.getCurrentUserID();
+			}
+		}
+		// get Parameter
+		String paramid = getProperty(req, "id");
 
-        Matcher ma = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z").matcher(
-                paramid);
-        if (ma.find()) {
-            id = ma.group(1);
-            path = ma.group(2);
-        } else {
-            id = paramid;
-            path = null;
-        }
+		Matcher ma = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z").matcher(
+				paramid);
+		if (ma.find()) {
+			id = ma.group(1);
+			path = ma.group(2);
+		} else {
+			id = paramid;
+			path = null;
+		}
 
-        // TODO
-        // ACCESS-CONTROL-CHECK
-        // WARTEN AUF ACLs
-        // Momentan werden alle Files gezipped ausgeliefert
-        MCRObjectID mcrid = null;
-        try {
-            mcrid = new MCRObjectID(id);
-        } catch (MCRException e1) {
-            String msg = "Error: HTTP request id is not in the allowed id-list";
-            LOGGER.error(msg + ":" + id);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
-                    msg, new MCRException(id + " is a wrong ID!"), false);
-            return;
-        } catch (NullPointerException e2) {
-            String msg = "Error: Wrong Parameters given";
-            LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
-                    msg, new MCRException(" wrong Parameters!"), false);
-            return;
-        }
+		// TODO
+		// ACCESS-CONTROL-CHECK
+		// WARTEN AUF ACLs
+		// Momentan werden alle Files gezipped ausgeliefert
+		MCRObjectID mcrid = null;
+		try {
+			mcrid = new MCRObjectID(id);
+		} catch (MCRException e1) {
+			String msg = "Error: HTTP request id is not in the allowed id-list";
+			LOGGER.error(msg + ":" + id);
+			generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+					msg, new MCRException(id + " is a wrong ID!"), false);
+			return;
+		} catch (NullPointerException e2) {
+			String msg = "Error: Wrong Parameters given";
+			LOGGER.error(msg);
+			generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+					msg, new MCRException(" wrong Parameters!"), false);
+			return;
+		}
 
-        MCRXMLContainer result = new MCRXMLContainer();
+		MCRXMLContainer result = new MCRXMLContainer();
 
-        try {
-            result.add("local", mcrid.getId(), 0, (Element) xmltable
-                    .readDocument(mcrid).getRootElement().clone());
-            Document jdom = result.exportAllToDocument();
-            if (jdom.getRootElement().getChild("mcr_result").getChild(
-                    "mycorederivate") != null) {
-                out = buildZipOutputStream(res, id, path);
-                sendDerivate(id, path, req, res, out);
-                out.close();
-            } else {
-                out = buildZipOutputStream(res, id, path);
-                sendObject(jdom, req, res, out);
-                out.close();
-            }
-        } catch (Exception e) {
+		try {
+			result.add("local", mcrid.getId(), 0, (Element) xmltable
+					.readDocument(mcrid).getRootElement().clone());
+			Document jdom = result.exportAllToDocument();
+			if (jdom.getRootElement().getChild("mcr_result").getChild(
+					"mycorederivate") != null) {
+				out = buildZipOutputStream(res, id, path);
+				sendDerivate(id, path, req, res, out);
+				out.close();
+			} else {
+				out = buildZipOutputStream(res, id, path);
+				sendObject(jdom, req, res, out);
+				out.close();
+			}
+		} catch (Exception e) {
 
-            LOGGER.warn(e.getMessage());
-            String msg = "Das Zip-File konnte nicht ordnungsgemäss erstellt werden, "
-                    + "Bitte überprüfen Sie die eingegebenen Parameter";
-            res.reset();
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
-                    msg, new MCRException("zip-Error!"), false);
-        }
-    }
+			LOGGER.warn(e.getMessage());
+			String msg = "Das Zip-File konnte nicht ordnungsgemäss erstellt werden, "
+					+ "Bitte überprüfen Sie die eingegebenen Parameter";
+			res.reset();
+			generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST,
+					msg, new MCRException("zip-Error!"), false);
+		}
+	}
 
-    /**
-     * sendZipped adds a single File to the ZipOutputStream,
-     * 
-     * @param file
-     *                    MCRFile, that has to be zipped
-     */
-    protected void sendZipped(MCRFile file, ZipOutputStream out)
-            throws IOException {
+	/**
+	 * sendZipped adds a single File to the ZipOutputStream,
+	 * 
+	 * @param file
+	 *            MCRFile, that has to be zipped
+	 */
+	protected void sendZipped(MCRFile file, ZipOutputStream out)
+			throws IOException {
 
-        ZipEntry ze = new ZipEntry(file.getPath());
-        ze.setTime(file.getLastModified().getTime().getTime());
-        out.putNextEntry(ze);
-        file.getContentTo(out);
-        out.closeEntry();
-    }
+		ZipEntry ze = new ZipEntry(file.getPath());
+		ze.setTime(file.getLastModified().getTime().getTime());
+		out.putNextEntry(ze);
+		file.getContentTo(out);
+		out.closeEntry();
+	}
 
-    /**
-     * sendZipped adds a whole Directory of an Derivate to the ZipOutputStream
-     * 
-     * @param directory
-     *                    MCRDirectory, that has to be zipped
-     */
-    protected void sendZipped(MCRDirectory directory, ZipOutputStream out)
-            throws IOException {
+	/**
+	 * sendZipped adds a whole Directory of an Derivate to the ZipOutputStream
+	 * 
+	 * @param directory
+	 *            MCRDirectory, that has to be zipped
+	 */
+	protected void sendZipped(MCRDirectory directory, ZipOutputStream out)
+			throws IOException {
 
-        MCRFilesystemNode[] nodeArray;
-        nodeArray = directory.getChildren();
-        for (int i = 0; i < nodeArray.length; i++) {
-            if (nodeArray[i] instanceof MCRFile) {
-                sendZipped((MCRFile) nodeArray[i], out);
-            } else {
-                sendZipped((MCRDirectory) nodeArray[i], out);
-            }
+		MCRFilesystemNode[] nodeArray;
+		nodeArray = directory.getChildren();
+		for (int i = 0; i < nodeArray.length; i++) {
+			if (nodeArray[i] instanceof MCRFile) {
+				sendZipped((MCRFile) nodeArray[i], out);
+			} else {
+				sendZipped((MCRDirectory) nodeArray[i], out);
+			}
 
-        }
-    }
+		}
+	}
 
-    /**
-     * sendZipped zips a File with the Metadata of the Object, makes a
-     * XSL-Transformation with the Metadata
-     * 
-     * @param jdom
-     *                    MycoreObject-ResultContainer as org.jdom.Document
-     * @param parameters
-     *                    Parameters, that can be needed in the transforming
-     *                    XSL-Stylesheet
-     */
-    protected void sendZipped(Document jdom, Properties parameters,
-            ZipOutputStream out) throws IOException {
-        ZipEntry ze = new ZipEntry("metadata.xml");
-        ze.setTime(new Date().getTime());
-        out.putNextEntry(ze);
-        String stylesheetFullPath = getServletContext().getRealPath(
-                "/WEB-INF/stylesheets/" + stylesheet);
-        MCRXSLTransformation transformation = MCRXSLTransformation
-                .getInstance();
-        Templates templates = transformation.getStylesheet(stylesheetFullPath);
-        TransformerHandler th = transformation.getTransformerHandler(templates);
-        transformation.setParameters(th, parameters);
-        transformation.transform(jdom, th, out);
-        out.closeEntry();
-        return;
-    }
+	/**
+	 * sendZipped zips a File with the Metadata of the Object, makes a
+	 * XSL-Transformation with the Metadata
+	 * 
+	 * @param jdom
+	 *            MycoreObject-ResultContainer as org.jdom.Document
+	 * @param parameters
+	 *            Parameters, that can be needed in the transforming
+	 *            XSL-Stylesheet
+	 */
+	protected void sendZipped(Document jdom, Properties parameters,
+			ZipOutputStream out) throws IOException {
+		ZipEntry ze = new ZipEntry("metadata.xml");
+		ze.setTime(new Date().getTime());
+		out.putNextEntry(ze);
+		String stylesheetFullPath = getServletContext().getRealPath(
+				"/WEB-INF/stylesheets/" + stylesheet);
+		MCRXSLTransformation transformation = MCRXSLTransformation
+				.getInstance();
+		Templates templates = transformation.getStylesheet(stylesheetFullPath);
+		TransformerHandler th = transformation.getTransformerHandler(templates);
+		transformation.setParameters(th, parameters);
+		transformation.transform(jdom, th, out);
+		out.closeEntry();
+		return;
+	}
 
-    /**
-     * sendDerivate sends all files of a derivate or of a special folder of the
-     * derivate
-     * 
-     * @param ownerID
-     *                    the derivateID that should be zipped
-     * @param dirpath
-     *                    relative path zu a special folder, if given, only this folder
-     *                    is zipped
-     */
-    protected void sendDerivate(String ownerID, String dirpath,
-            HttpServletRequest req, HttpServletResponse res, ZipOutputStream out)
-            throws IOException, ServletException {
+	/**
+	 * sendDerivate sends all files of a derivate or of a special folder of the
+	 * derivate
+	 * 
+	 * @param ownerID
+	 *            the derivateID that should be zipped
+	 * @param dirpath
+	 *            relative path zu a special folder, if given, only this folder
+	 *            is zipped
+	 */
+	protected void sendDerivate(String ownerID, String dirpath,
+			HttpServletRequest req, HttpServletResponse res, ZipOutputStream out)
+			throws IOException, ServletException {
 
-        MCRFilesystemNode root;
-        MCRDirectory rootdirectory;
-        MCRFilesystemNode zipdirectory;
-        MCRFilesystemNode[] nodeArray;
-        root = MCRFilesystemNode.getRootNode(ownerID);
-        if (root == null) {
-            String msg = "Error: No root node found for owner ID " + ownerID;
-            LOGGER.error(msg);
-            return;
-        }
-        if (root instanceof MCRFile) {
-            sendZipped((MCRFile) root, out);
-            LOGGER.debug("file " + root.getName() + " zipped");
-            return;
-        } else {
-            // root is a directory
-            if ((dirpath == null) || (dirpath.equals(""))) {
-                sendZipped((MCRDirectory) root, out);
-                LOGGER.debug("directory " + root.getName() + " zipped");
-                return;
-            } else {
-                rootdirectory = (MCRDirectory) root;
-                zipdirectory = rootdirectory.getChildByPath(dirpath);
-                if (zipdirectory == null) {
-                    String msg = "Error: No such file or directory " + dirpath;
-                    LOGGER.error(msg);
-                    return;
-                } else if (zipdirectory instanceof MCRFile) {
-                    sendZipped((MCRFile) zipdirectory, out);
-                } else if (zipdirectory instanceof MCRDirectory) {
-                    sendZipped((MCRDirectory) zipdirectory, out);
-                } else {
-                    String msg = "Error: could not found the dir: " + dirpath;
-                    LOGGER.error(msg);
-                    return;
-                }
-                return;
-            }
-        }
-    }
+		MCRFilesystemNode root;
+		MCRDirectory rootdirectory;
+		MCRFilesystemNode zipdirectory;
+		MCRFilesystemNode[] nodeArray;
+		root = MCRFilesystemNode.getRootNode(ownerID);
+		if (root == null) {
+			String msg = "Error: No root node found for owner ID " + ownerID;
+			LOGGER.error(msg);
+			return;
+		}
+		if (root instanceof MCRFile) {
+			sendZipped((MCRFile) root, out);
+			LOGGER.debug("file " + root.getName() + " zipped");
+			return;
+		} else {
+			// root is a directory
+			if ((dirpath == null) || (dirpath.equals(""))) {
+				sendZipped((MCRDirectory) root, out);
+				LOGGER.debug("directory " + root.getName() + " zipped");
+				return;
+			} else {
+				rootdirectory = (MCRDirectory) root;
+				zipdirectory = rootdirectory.getChildByPath(dirpath);
+				if (zipdirectory == null) {
+					String msg = "Error: No such file or directory " + dirpath;
+					LOGGER.error(msg);
+					return;
+				} else if (zipdirectory instanceof MCRFile) {
+					sendZipped((MCRFile) zipdirectory, out);
+				} else if (zipdirectory instanceof MCRDirectory) {
+					sendZipped((MCRDirectory) zipdirectory, out);
+				} else {
+					String msg = "Error: could not found the dir: " + dirpath;
+					LOGGER.error(msg);
+					return;
+				}
+				return;
+			}
+		}
+	}
 
-    /**
-     * sendObject: zips all derivates of a Object and a metadata-xml file, that
-     * was built via a given xsl-stylesheet
-     * 
-     * @param jdom
-     *                    the JDOM of the given MycoreObject
-     *  
-     */
-    protected void sendObject(Document jdom, HttpServletRequest req,
-            HttpServletResponse res, ZipOutputStream out)
-            throws ServletException, IOException {
+	/**
+	 * sendObject: zips all derivates of a Object and a metadata-xml file, that
+	 * was built via a given xsl-stylesheet
+	 * 
+	 * @param jdom
+	 *            the JDOM of the given MycoreObject
+	 *  
+	 */
+	protected void sendObject(Document jdom, HttpServletRequest req,
+			HttpServletResponse res, ZipOutputStream out)
+			throws ServletException, IOException {
 
-        // zip the object's Metadata
-        Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
-        sendZipped(jdom, parameters, out);
-        // zip all derivates
-        List li = jdom.getRootElement().getChild("mcr_result").getChild(
-                "mycoreobject").getChild("structure").getChild("derobjects")
-                .getChildren("derobject");
-        for (Iterator it = li.iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
-            LOGGER.debug(el.getName());
-            if (el.getAttributeValue("inherited").equals("0")) {
-                String ownerID = el.getAttributeValue("href",
-                        org.jdom.Namespace.getNamespace("xlink",
-                                MCRDefaults.XLINK_URL));
-                String dir = null;
-                sendDerivate(ownerID, dir, req, res, out);
-            }
-        }
-        return;
-    }
+		// zip the object's Metadata
+		Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
+		sendZipped(jdom, parameters, out);
+		// zip all derivates
+		List li = jdom.getRootElement().getChild("mcr_result").getChild(
+				"mycoreobject").getChild("structure").getChild("derobjects")
+				.getChildren("derobject");
+		for (Iterator it = li.iterator(); it.hasNext();) {
+			Element el = (Element) it.next();
+			LOGGER.debug(el.getName());
+			if (el.getAttributeValue("inherited").equals("0")) {
+				String ownerID = el.getAttributeValue("href",
+						org.jdom.Namespace.getNamespace("xlink",
+								MCRDefaults.XLINK_URL));
+				String dir = null;
+				sendDerivate(ownerID, dir, req, res, out);
+			}
+		}
+		return;
+	}
 
-    /**
-     * buildZipOutputStream sets the contenttype and name of the zip-file
-     * Returns the ZipOutputStream
-     * 
-     * @param id
-     *                    the id of the object or derivate that is zipped, builds the
-     *                    name
-     * @param dirpath
-     *                    if given, it is concatenated to the name of the zip-file
-     *  
-     */
-    protected ZipOutputStream buildZipOutputStream(HttpServletResponse res,
-            String id, String dirpath) throws IOException {
-        String filename = (dirpath == null || dirpath.equals("")) ? id + ".zip"
-                : id + "-" + dirpath.replaceAll("/", "-") + ".zip";
-        res.setContentType("multipart/x-zip");
-        res.addHeader("Content-Disposition", "atachment; filename=\""
-                + filename + "\"");
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(res
-                .getOutputStream()));
-        out.setLevel(Deflater.BEST_COMPRESSION);
-        return out;
-    }
+	/**
+	 * buildZipOutputStream sets the contenttype and name of the zip-file
+	 * Returns the ZipOutputStream
+	 * 
+	 * @param id
+	 *            the id of the object or derivate that is zipped, builds the
+	 *            name
+	 * @param dirpath
+	 *            if given, it is concatenated to the name of the zip-file
+	 *  
+	 */
+	protected ZipOutputStream buildZipOutputStream(HttpServletResponse res,
+			String id, String dirpath) throws IOException {
+		String filename = (dirpath == null || dirpath.equals("")) ? id + ".zip"
+				: id + "-" + dirpath.replaceAll("/", "-") + ".zip";
+		res.setContentType("multipart/x-zip");
+		res.addHeader("Content-Disposition", "atachment; filename=\""
+				+ filename + "\"");
+		ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(res
+				.getOutputStream()));
+		out.setLevel(Deflater.BEST_COMPRESSION);
+		return out;
+	}
 }
-

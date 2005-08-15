@@ -31,45 +31,45 @@ package org.mycore.acl;
  */
 
 public interface MCRAclStore {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Retrieves an ACL from a persistence layer.
-     * 
-     * <P>
-     * Implementations will extract some information from the guarded object,
-     * e.g. an object ID, and use this as key in database table to obtain a
-     * description for the ACL, e.g. as XML. The ACL is created from this
-     * description and returned.
-     * 
-     * <P>
-     * This method is normally called in a contructor of an object which is
-     * itself retrieved from persistant storage. The internal ACL is then
-     * modified with information retrieved form the persistance layer.
-     * 
-     * @param object
-     *            the guarded object which wants to retrieve it's ACL
-     */
+	/**
+	 * Retrieves an ACL from a persistence layer.
+	 * 
+	 * <P>
+	 * Implementations will extract some information from the guarded object,
+	 * e.g. an object ID, and use this as key in database table to obtain a
+	 * description for the ACL, e.g. as XML. The ACL is created from this
+	 * description and returned.
+	 * 
+	 * <P>
+	 * This method is normally called in a contructor of an object which is
+	 * itself retrieved from persistant storage. The internal ACL is then
+	 * modified with information retrieved form the persistance layer.
+	 * 
+	 * @param object
+	 *            the guarded object which wants to retrieve it's ACL
+	 */
 
-    public boolean retrieveAcl(MCRAclGuarded object);
+	public boolean retrieveAcl(MCRAclGuarded object);
 
-    //-------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------
 
-    /**
-     * Stores an ACL in a persistence layer.
-     * 
-     * This method is normally called when objects are serialized to persistant
-     * storage. The ACL is made persistent, e.g. in XML format, and then stored
-     * as part of the object description or in a separate database table
-     * connecting object IDs with´ACLs.
-     * 
-     * @param object
-     *            the guarded object which wants to store it's ACL
-     * 
-     * @return true if storing was successful.
-     */
+	/**
+	 * Stores an ACL in a persistence layer.
+	 * 
+	 * This method is normally called when objects are serialized to persistant
+	 * storage. The ACL is made persistent, e.g. in XML format, and then stored
+	 * as part of the object description or in a separate database table
+	 * connecting object IDs with´ACLs.
+	 * 
+	 * @param object
+	 *            the guarded object which wants to store it's ACL
+	 * 
+	 * @return true if storing was successful.
+	 */
 
-    public boolean storeAcl(MCRAclGuarded object);
+	public boolean storeAcl(MCRAclGuarded object);
 
-    //-============================================================================\
+	//-============================================================================\
 }

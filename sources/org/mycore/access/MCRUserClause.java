@@ -21,8 +21,8 @@
 package org.mycore.access;
 
 import java.util.Date;
+
 import org.mycore.user.MCRUser;
-import org.mycore.user.MCRGroup;
 
 /**
  * Implementation of a (user xy) clause
@@ -31,18 +31,17 @@ import org.mycore.user.MCRGroup;
  */
 
 class MCRUserClause implements MCRAccessCtrlDefinition {
-    private String user;
+	private String user;
 
-    MCRUserClause(String user) {
-        this.user = user;
-    }
+	MCRUserClause(String user) {
+		this.user = user;
+	}
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return this.user.equals(user.getID());
-    }
+	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+		return this.user.equals(user.getID());
+	}
 
-    public String toString() {
-        return "user " + user + "\n";
-    }
+	public String toString() {
+		return "user " + user + "\n";
+	}
 };
-

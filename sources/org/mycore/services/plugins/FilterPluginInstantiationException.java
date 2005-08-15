@@ -34,28 +34,28 @@ import org.mycore.common.MCRException;
  */
 public class FilterPluginInstantiationException extends MCRException {
 
-    /**
-     * just uses super Constructor yet...
-     * 
-     * @param message
-     * @see MCRException
-     */
-    public FilterPluginInstantiationException(String message) {
-        super(message);
-        // TODO Auto-generated constructor stub
-    }
+	/**
+	 * just uses super Constructor yet...
+	 * 
+	 * @param message
+	 * @see MCRException
+	 */
+	public FilterPluginInstantiationException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
 
-    /**
-     * just uses super Constructor yet...
-     * 
-     * @param message
-     * @param exception
-     * @see MCRException
-     */
-    public FilterPluginInstantiationException(String message,
-            Exception exception) {
-        super(message, exception);
-        // TODO Auto-generated constructor stub
-    }
+	/**
+	 * just uses super Constructor yet...
+	 * 
+	 * @param message
+	 * @param exception
+	 * @see MCRException
+	 */
+	public FilterPluginInstantiationException(String message,
+			Exception exception) {
+		super(message, exception);
+		// TODO Auto-generated constructor stub
+	}
 
 }

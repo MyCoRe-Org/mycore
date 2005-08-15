@@ -25,9 +25,10 @@ package org.mycore.services.query;
 
 import java.util.HashSet;
 
-import org.mycore.common.*;
-import org.mycore.common.xml.*;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This is the implementation of the MCRQueryInterface for the default case
@@ -38,138 +39,139 @@ import org.mycore.datamodel.metadata.*;
  */
 public class MCRSearchMerger extends MCRQueryBase {
 
-    /** The default query * */
-    public static final String DEFAULT_QUERY = "";
+	/** The default query * */
+	public static final String DEFAULT_QUERY = "";
 
-    private String metaclassname = null;
+	private String metaclassname = null;
 
-    private MCRMetaSearchInterface msif;
+	private MCRMetaSearchInterface msif;
 
-    /**
-     * The constructor.
-     */
-    public MCRSearchMerger() {
-        super();
-        String temp = config.getString("MCR.XMLStore.Type", "");
-        metaclassname = config.getString("MCR.persistence_" + temp
-                + "_query_name");
-        logger.debug("MCR.persistence_" + temp + "_query_name");
-        logger.debug("Load the metadata search class " + metaclassname);
-        try {
-            msif = (MCRMetaSearchInterface) Class.forName(metaclassname)
-                    .newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(metaclassname + " ClassNotFoundException");
-        } catch (IllegalAccessException e) {
-            throw new MCRException(metaclassname + " IllegalAccessException");
-        } catch (InstantiationException e) {
-            throw new MCRException(metaclassname + " InstantiationException");
-        }
-    }
+	/**
+	 * The constructor.
+	 */
+	public MCRSearchMerger() {
+		super();
+		String temp = config.getString("MCR.XMLStore.Type", "");
+		metaclassname = config.getString("MCR.persistence_" + temp
+				+ "_query_name");
+		logger.debug("MCR.persistence_" + temp + "_query_name");
+		logger.debug("Load the metadata search class " + metaclassname);
+		try {
+			msif = (MCRMetaSearchInterface) Class.forName(metaclassname)
+					.newInstance();
+		} catch (ClassNotFoundException e) {
+			throw new MCRException(metaclassname + " ClassNotFoundException");
+		} catch (IllegalAccessException e) {
+			throw new MCRException(metaclassname + " IllegalAccessException");
+		} catch (InstantiationException e) {
+			throw new MCRException(metaclassname + " InstantiationException");
+		}
+	}
 
-    /**
-     * This method start the Query over one object type and return the result as
-     * MCRXMLContainer.
-     * 
-     * @param type
-     *            the MCRObject type
-     * @return a result list as MCRXMLContainer
-     */
-    protected final MCRXMLContainer startQuery(String type) {
-        MCRXMLContainer result = new MCRXMLContainer();
-        boolean hasts = false; // true if we have a full text search
-        boolean hasmeta = false; // true if we have a metadata search
-        int doctextpos = -1;
+	/**
+	 * This method start the Query over one object type and return the result as
+	 * MCRXMLContainer.
+	 * 
+	 * @param type
+	 *            the MCRObject type
+	 * @return a result list as MCRXMLContainer
+	 */
+	protected final MCRXMLContainer startQuery(String type) {
+		MCRXMLContainer result = new MCRXMLContainer();
+		boolean hasts = false; // true if we have a full text search
+		boolean hasmeta = false; // true if we have a metadata search
+		int doctextpos = -1;
 
-        // Make all document searches
-        HashSet idts = new HashSet();
-        for (int i = 0; i < subqueries.size(); i++) {
-            if (((String) subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
-                hasts = true;
-                flags.set(i, Boolean.TRUE);
-                doctextpos = i;
-                logger
-                        .debug("TextSearch query : "
-                                + (String) subqueries.get(i));
-                // start the query against the textsearch
-                if (searchfulltext) {
-                    for (int j = 0; j < tsint.length; j++) {
-                        String[] der = tsint[j]
-                                .getDerivateIDs((String) subqueries.get(i));
-                        for (int k = 0; k < der.length; k++) {
-                            MCRObjectID oid = getObjectID(der[k]);
-                            if (oid != null) {
-                                idts.add(oid);
-                            } else
-                                logger.warn("Ignoring ObjectID=null");
-                        }
-                    }
-                }
-            }
-        }
+		// Make all document searches
+		HashSet idts = new HashSet();
+		for (int i = 0; i < subqueries.size(); i++) {
+			if (((String) subqueries.get(i)).indexOf(XPATH_ATTRIBUTE_DOCTEXT) != -1) {
+				hasts = true;
+				flags.set(i, Boolean.TRUE);
+				doctextpos = i;
+				logger
+						.debug("TextSearch query : "
+								+ (String) subqueries.get(i));
+				// start the query against the textsearch
+				if (searchfulltext) {
+					for (int j = 0; j < tsint.length; j++) {
+						String[] der = tsint[j]
+								.getDerivateIDs((String) subqueries.get(i));
+						for (int k = 0; k < der.length; k++) {
+							MCRObjectID oid = getObjectID(der[k]);
+							if (oid != null) {
+								idts.add(oid);
+							} else
+								logger.warn("Ignoring ObjectID=null");
+						}
+					}
+				}
+			}
+		}
 
-        // prepare the query over the rest of the metadata
-        HashSet idmeta = new HashSet();
-        String metaquery = "";
-        if (subqueries.size() == 0) {
-            metaquery = DEFAULT_QUERY;
-            hasmeta = true;
-        } else {
-            StringBuffer qsb = new StringBuffer(1024);
-            for (int i = 0; i < subqueries.size(); i++) {
-                if (((Boolean) flags.get(i)).booleanValue()) {
-                    continue;
-                }
-                hasmeta = true;
-                qsb.append(" #####").append((String) subqueries.get(i)).append(
-                        "#####");
-                boolean fl = false;
-                for (int j = i + 1; j < subqueries.size(); j++) {
-                    if (!((Boolean) flags.get(j)).booleanValue()) {
-                        fl = true;
-                    }
-                }
-                if (fl) {
-                    qsb.append(' ').append((String) andor.get(i));
-                }
-                flags.set(i, Boolean.TRUE);
-            }
-            metaquery = qsb.toString();
-            logger.debug("Metadate query : " + metaquery);
-        }
-        if (hasmeta) {
-            idmeta = msif.getResultIDs(root, metaquery, type);
-        }
+		// prepare the query over the rest of the metadata
+		HashSet idmeta = new HashSet();
+		String metaquery = "";
+		if (subqueries.size() == 0) {
+			metaquery = DEFAULT_QUERY;
+			hasmeta = true;
+		} else {
+			StringBuffer qsb = new StringBuffer(1024);
+			for (int i = 0; i < subqueries.size(); i++) {
+				if (((Boolean) flags.get(i)).booleanValue()) {
+					continue;
+				}
+				hasmeta = true;
+				qsb.append(" #####").append((String) subqueries.get(i)).append(
+						"#####");
+				boolean fl = false;
+				for (int j = i + 1; j < subqueries.size(); j++) {
+					if (!((Boolean) flags.get(j)).booleanValue()) {
+						fl = true;
+					}
+				}
+				if (fl) {
+					qsb.append(' ').append((String) andor.get(i));
+				}
+				flags.set(i, Boolean.TRUE);
+			}
+			metaquery = qsb.toString();
+			logger.debug("Metadate query : " + metaquery);
+		}
+		if (hasmeta) {
+			idmeta = msif.getResultIDs(root, metaquery, type);
+		}
 
-        // merge the results
-        HashSet myresult = null;
-        if (!hasts) {
-            myresult = idmeta;
-        }
-        if (!hasmeta) {
-            myresult = idts;
-        }
-        if ((hasts) && (hasmeta)) {
-            char logic = MCRUtils.COMMAND_AND;
-            if (doctextpos >= 1) {
-              if (((String)andor.get(doctextpos-1)).equals("or")) {
-                 logic = MCRUtils.COMMAND_OR; }
-              }
-            else {
-              if (((String)andor.get(doctextpos)).equals("or")) {
-                 logic = MCRUtils.COMMAND_OR; }
-              }
-            myresult = MCRUtils.mergeHashSets(idts, idmeta, logic);
-        }
-        logger.debug("Number of items in HashSet befor cutting "
-                + Integer.toString(myresult.size()));
-        myresult = MCRUtils.cutHashSet(myresult, maxresults);
-        logger.debug("Number of items in HashSet after cutting "
-                + Integer.toString(myresult.size()));
+		// merge the results
+		HashSet myresult = null;
+		if (!hasts) {
+			myresult = idmeta;
+		}
+		if (!hasmeta) {
+			myresult = idts;
+		}
+		if ((hasts) && (hasmeta)) {
+			char logic = MCRUtils.COMMAND_AND;
+			if (doctextpos >= 1) {
+				if (((String) andor.get(doctextpos - 1)).equals("or")) {
+					logic = MCRUtils.COMMAND_OR;
+				}
+			} else {
+				if (((String) andor.get(doctextpos)).equals("or")) {
+					logic = MCRUtils.COMMAND_OR;
+				}
+			}
+			myresult = MCRUtils.mergeHashSets(idts, idmeta, logic);
+		}
+		logger.debug("Number of items in HashSet befor cutting "
+				+ Integer.toString(myresult.size()));
+		myresult = MCRUtils.cutHashSet(myresult, maxresults);
+		logger.debug("Number of items in HashSet after cutting "
+				+ Integer.toString(myresult.size()));
 
-        // put the XML files in the result container
-        result = createResultContainer(myresult);
-        return result;
-    }
+		// put the XML files in the result container
+		result = createResultContainer(myresult);
+		return result;
+	}
 
 }

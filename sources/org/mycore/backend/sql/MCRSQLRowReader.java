@@ -24,10 +24,12 @@
 
 package org.mycore.backend.sql;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.GregorianCalendar;
-import org.mycore.common.*;
-import org.apache.log4j.Logger;
+
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * Instances of this class are used to read the rows of a result set when an SQL
@@ -43,174 +45,174 @@ import org.apache.log4j.Logger;
  * @see MCRSQLConnection#justDoQuery( String )
  */
 public class MCRSQLRowReader {
-    /** The wrapped JDBC result set */
-    protected ResultSet rs;
+	/** The wrapped JDBC result set */
+	protected ResultSet rs;
 
-    /**
-     * Creates a new MCRSQLRowReader. This constructor is called by
-     * MCRSQLConnection methods that execute an SQL query.
-     * 
-     * @see MCRSQLConnection#doQuery( String )
-     * @see MCRSQLConnection#justDoQuery( String )
-     */
-    MCRSQLRowReader(ResultSet rs) {
-        this.rs = rs;
-    }
+	/**
+	 * Creates a new MCRSQLRowReader. This constructor is called by
+	 * MCRSQLConnection methods that execute an SQL query.
+	 * 
+	 * @see MCRSQLConnection#doQuery( String )
+	 * @see MCRSQLConnection#justDoQuery( String )
+	 */
+	MCRSQLRowReader(ResultSet rs) {
+		this.rs = rs;
+	}
 
-    /**
-     * Points the cursor to the next result row, returning true if there is such
-     * a next row.
-     * 
-     * @see java.sql.ResultSet#next()
-     * 
-     * @return true, if there was a next row; false, if the end is reached
-     */
-    public boolean next() throws MCRPersistenceException {
-        try {
-            return rs.next();
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get next() on JDBC result set", ex);
-        }
-    }
+	/**
+	 * Points the cursor to the next result row, returning true if there is such
+	 * a next row.
+	 * 
+	 * @see java.sql.ResultSet#next()
+	 * 
+	 * @return true, if there was a next row; false, if the end is reached
+	 */
+	public boolean next() throws MCRPersistenceException {
+		try {
+			return rs.next();
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get next() on JDBC result set", ex);
+		}
+	}
 
-    /**
-     * Returns the value of a column in the current result row as a String, or
-     * null.
-     * 
-     * @param index
-     *            the number of the column in the result row
-     * @return the String value of a column in the current result row, or null
-     */
-    public String getString(int index) throws MCRPersistenceException {
-        try {
-            String value = rs.getString(index);
-            return (rs.wasNull() ? null : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	/**
+	 * Returns the value of a column in the current result row as a String, or
+	 * null.
+	 * 
+	 * @param index
+	 *            the number of the column in the result row
+	 * @return the String value of a column in the current result row, or null
+	 */
+	public String getString(int index) throws MCRPersistenceException {
+		try {
+			String value = rs.getString(index);
+			return (rs.wasNull() ? null : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    public GregorianCalendar getDate(int index) throws MCRPersistenceException {
-        try {
-            Timestamp value = rs.getTimestamp(index);
-            if (rs.wasNull())
-                return null;
+	public GregorianCalendar getDate(int index) throws MCRPersistenceException {
+		try {
+			Timestamp value = rs.getTimestamp(index);
+			if (rs.wasNull())
+				return null;
 
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(value);
-            return cal;
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.setTime(value);
+			return cal;
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    /**
-     * Returns the value of a column in the current result row as a String, or
-     * null.
-     * 
-     * @param columnName
-     *            the name of the column in the result row
-     * @return the String value of a column in the current result row, or null
-     */
-    public String getString(String columnName) throws MCRPersistenceException {
-        try {
-            String value = rs.getString(columnName);
-            return (rs.wasNull() ? null : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	/**
+	 * Returns the value of a column in the current result row as a String, or
+	 * null.
+	 * 
+	 * @param columnName
+	 *            the name of the column in the result row
+	 * @return the String value of a column in the current result row, or null
+	 */
+	public String getString(String columnName) throws MCRPersistenceException {
+		try {
+			String value = rs.getString(columnName);
+			return (rs.wasNull() ? null : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    public GregorianCalendar getDate(String columnName)
-            throws MCRPersistenceException {
-        try {
-            Timestamp value = rs.getTimestamp(columnName);
-            if (rs.wasNull())
-                return null;
+	public GregorianCalendar getDate(String columnName)
+			throws MCRPersistenceException {
+		try {
+			Timestamp value = rs.getTimestamp(columnName);
+			if (rs.wasNull())
+				return null;
 
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(value);
-            return cal;
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.setTime(value);
+			return cal;
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    /**
-     * Returns the value of a column in the current result rowa as an int.
-     * 
-     * @param index
-     *            the number of the column in the result row
-     * @return the int value of a column in the current result row, or
-     *         Integer.MIN_VALUE if the column was null
-     */
-    public int getInt(int index) throws MCRPersistenceException {
-        try {
-            int value = rs.getInt(index);
-            return (rs.wasNull() ? Integer.MIN_VALUE : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	/**
+	 * Returns the value of a column in the current result rowa as an int.
+	 * 
+	 * @param index
+	 *            the number of the column in the result row
+	 * @return the int value of a column in the current result row, or
+	 *         Integer.MIN_VALUE if the column was null
+	 */
+	public int getInt(int index) throws MCRPersistenceException {
+		try {
+			int value = rs.getInt(index);
+			return (rs.wasNull() ? Integer.MIN_VALUE : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    public long getLong(int index) throws MCRPersistenceException {
-        try {
-            long value = rs.getLong(index);
-            return (rs.wasNull() ? Long.MIN_VALUE : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	public long getLong(int index) throws MCRPersistenceException {
+		try {
+			long value = rs.getLong(index);
+			return (rs.wasNull() ? Long.MIN_VALUE : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    /**
-     * Returns the value of a column in the current result rowa as an int.
-     * 
-     * @param columnName
-     *            the name of the column in the result row
-     * @return the int value of a column in the current result row, or
-     *         Integer.MIN_VALUE if the column was null
-     */
-    public int getInt(String columnName) throws MCRPersistenceException {
-        try {
-            int value = rs.getInt(columnName);
-            return (rs.wasNull() ? Integer.MIN_VALUE : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	/**
+	 * Returns the value of a column in the current result rowa as an int.
+	 * 
+	 * @param columnName
+	 *            the name of the column in the result row
+	 * @return the int value of a column in the current result row, or
+	 *         Integer.MIN_VALUE if the column was null
+	 */
+	public int getInt(String columnName) throws MCRPersistenceException {
+		try {
+			int value = rs.getInt(columnName);
+			return (rs.wasNull() ? Integer.MIN_VALUE : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    public long getLong(String columnName) throws MCRPersistenceException {
-        try {
-            long value = rs.getLong(columnName);
-            return (rs.wasNull() ? Long.MIN_VALUE : value);
-        } catch (SQLException ex) {
-            throw new MCRPersistenceException(
-                    "Could not get value from JDBC result set", ex);
-        }
-    }
+	public long getLong(String columnName) throws MCRPersistenceException {
+		try {
+			long value = rs.getLong(columnName);
+			return (rs.wasNull() ? Long.MIN_VALUE : value);
+		} catch (SQLException ex) {
+			throw new MCRPersistenceException(
+					"Could not get value from JDBC result set", ex);
+		}
+	}
 
-    public synchronized void close() {
-        if (rs == null)
-            return;
+	public synchronized void close() {
+		if (rs == null)
+			return;
 
-        try {
-            rs.close();
-            rs = null;
-        } catch (SQLException ex) {
-            // Logger logger = MCRSQLConnectionPool.getLogger();
-            // logger.warn( "Could not close result set: " + ex.getMessage() );
-        }
-    }
+		try {
+			rs.close();
+			rs = null;
+		} catch (SQLException ex) {
+			// Logger logger = MCRSQLConnectionPool.getLogger();
+			// logger.warn( "Could not close result set: " + ex.getMessage() );
+		}
+	}
 
-    public void finalize() throws Throwable {
-        close();
-    }
+	public void finalize() throws Throwable {
+		close();
+	}
 }

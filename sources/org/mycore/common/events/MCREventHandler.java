@@ -24,7 +24,7 @@
 
 package org.mycore.common.events;
 
-import org.mycore.common.*;
+import org.mycore.common.MCRException;
 
 /**
  * Objects that implement this interface can react when some kind of predefined
@@ -36,12 +36,12 @@ import org.mycore.common.*;
  * @author Frank Lützenkirchen
  */
 public interface MCREventHandler {
-    /**
-     * Handles an event. The handler is responsible for filtering the event type
-     * it is interested in and wants to react on.
-     * 
-     * @param evt
-     *            the Event object containing information about the event
-     */
-    public void doHandleEvent(MCREvent evt) throws MCRException;
+	/**
+	 * Handles an event. The handler is responsible for filtering the event type
+	 * it is interested in and wants to react on.
+	 * 
+	 * @param evt
+	 *            the Event object containing information about the event
+	 */
+	public void doHandleEvent(MCREvent evt) throws MCRException;
 }

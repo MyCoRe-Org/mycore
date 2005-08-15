@@ -37,28 +37,28 @@ import org.jdom.Element;
  * @version $Revision$ $Date$
  */
 public interface MCRFileContentTypeDetector {
-    /**
-     * Adds a detection rule from the file content type definition XML file. The
-     * detector is responsible for parsing the &lt;rules&gt; element provided
-     * and registering the rules stored there with the content type given.
-     * 
-     * @param type
-     *            the file content type the rule is for
-     * @param rules
-     *            the rules XML element containing the rules for detecting that
-     *            type
-     */
-    public void addRule(MCRFileContentType type, Element rules);
+	/**
+	 * Adds a detection rule from the file content type definition XML file. The
+	 * detector is responsible for parsing the &lt;rules&gt; element provided
+	 * and registering the rules stored there with the content type given.
+	 * 
+	 * @param type
+	 *            the file content type the rule is for
+	 * @param rules
+	 *            the rules XML element containing the rules for detecting that
+	 *            type
+	 */
+	public void addRule(MCRFileContentType type, Element rules);
 
-    /**
-     * Detects the file content type from filename and/or file header.
-     * 
-     * @param filename
-     *            the name of the file
-     * @param header
-     *            the first bytes of the file content
-     * @return the file content type detected, or null if detection was not
-     *         possible
-     */
-    public MCRFileContentType detectType(String filename, byte[] header);
+	/**
+	 * Detects the file content type from filename and/or file header.
+	 * 
+	 * @param filename
+	 *            the name of the file
+	 * @param header
+	 *            the first bytes of the file content
+	 * @return the file content type detected, or null if detection was not
+	 *         possible
+	 */
+	public MCRFileContentType detectType(String filename, byte[] header);
 }

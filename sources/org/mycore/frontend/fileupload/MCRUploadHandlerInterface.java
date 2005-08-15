@@ -24,7 +24,7 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.io.*;
+import java.io.InputStream;
 
 /**
  * This is an interface for a file upload handler.
@@ -35,60 +35,60 @@ import java.io.*;
  */
 public interface MCRUploadHandlerInterface {
 
-    /**
-     * The method set the logger.
-     * 
-     * @param logger
-     *            the log4j logger
-     */
-    public void setLogger(org.apache.log4j.Logger logger);
+	/**
+	 * The method set the logger.
+	 * 
+	 * @param logger
+	 *            the log4j logger
+	 */
+	public void setLogger(org.apache.log4j.Logger logger);
 
-    /**
-     * set the data of MCRUploadHandler for MyCoRe
-     * 
-     * @param docId
-     *            document to which derivate belongs
-     * @param derId
-     *            derivate used to add files, if id="0" a new derivate is create
-     *            d
-     * @param mode
-     *            "append" add files to derivate, replace old files "replace"
-     *            add files to derivate, delete old files "create" add files to
-     *            new derivate
-     * @param url
-     *            when MCRUploadApplet is finished this url will be shown
-     */
-    public void set(String docId, String derId, String mode, String url);
+	/**
+	 * set the data of MCRUploadHandler for MyCoRe
+	 * 
+	 * @param docId
+	 *            document to which derivate belongs
+	 * @param derId
+	 *            derivate used to add files, if id="0" a new derivate is create
+	 *            d
+	 * @param mode
+	 *            "append" add files to derivate, replace old files "replace"
+	 *            add files to derivate, delete old files "create" add files to
+	 *            new derivate
+	 * @param url
+	 *            when MCRUploadApplet is finished this url will be shown
+	 */
+	public void set(String docId, String derId, String mode, String url);
 
-    /**
-     * Get the ID of the handler
-     * 
-     * @return the handler ID
-     */
-    public String getId();
+	/**
+	 * Get the ID of the handler
+	 * 
+	 * @return the handler ID
+	 */
+	public String getId();
 
-    /**
-     * Set the ID of the handler
-     * 
-     * @param id
-     *            the handler ID as String
-     */
-    public void setId(String id);
+	/**
+	 * Set the ID of the handler
+	 * 
+	 * @param id
+	 *            the handler ID as String
+	 */
+	public void setId(String id);
 
-    /**
-     * The method return the redirect URL they should use after finish the
-     * applet.
-     * 
-     * @return the redirect URL
-     */
-    public String getRedirectURL();
+	/**
+	 * The method return the redirect URL they should use after finish the
+	 * applet.
+	 * 
+	 * @return the redirect URL
+	 */
+	public String getRedirectURL();
 
-    public void startUpload(int numFiles) throws Exception;
+	public void startUpload(int numFiles) throws Exception;
 
-    public boolean acceptFile(String path, String checksum) throws Exception;
+	public boolean acceptFile(String path, String checksum) throws Exception;
 
-    public void receiveFile(String path, InputStream in) throws Exception;
+	public void receiveFile(String path, InputStream in) throws Exception;
 
-    public void finishUpload() throws Exception;
+	public void finishUpload() throws Exception;
 
 }

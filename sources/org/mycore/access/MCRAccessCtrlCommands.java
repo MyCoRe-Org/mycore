@@ -21,7 +21,10 @@
 package org.mycore.access;
 
 import org.apache.log4j.Logger;
-import org.mycore.frontend.cli.*;
+
+import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRClassificationCommands;
+import org.mycore.frontend.cli.MCRCommand;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
@@ -32,68 +35,68 @@ import org.mycore.frontend.cli.*;
 
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
 
-    /** The logger */
-    public static Logger LOGGER = Logger
-            .getLogger(MCRClassificationCommands.class.getName());
+	/** The logger */
+	public static Logger LOGGER = Logger
+			.getLogger(MCRClassificationCommands.class.getName());
 
-    /**
-     * constructor with commands.
-     */
+	/**
+	 * constructor with commands.
+	 */
 
-    public MCRAccessCtrlCommands() {
-        super();
-        MCRCommand com = null;
+	public MCRAccessCtrlCommands() {
+		super();
+		MCRCommand com = null;
 
-        com = new MCRCommand("create accesstable",
-                "org.mycore.access.MCRAccessCtrlCommands.createTables",
-                "The command creates all tables for the Access Control System.");
-        command.add(com);
+		com = new MCRCommand("create accesstable",
+				"org.mycore.access.MCRAccessCtrlCommands.createTables",
+				"The command creates all tables for the Access Control System.");
+		command.add(com);
 
-        com = new MCRCommand("get access rule for ruleid {0}",
-                "org.mycore.access.MCRAccessCtrlCommands.getRule String",
-                "Returns the rule (string) for given ruleid.");
-        command.add(com);
+		com = new MCRCommand("get access rule for ruleid {0}",
+				"org.mycore.access.MCRAccessCtrlCommands.getRule String",
+				"Returns the rule (string) for given ruleid.");
+		command.add(com);
 
-        com = new MCRCommand(
-                "get ruleid for objectid {0} in pool {1}",
-                "org.mycore.access.MCRAccessCtrlCommands.getRuleID String String",
-                "Returns the ruleID for given object and access pool.");
-        command.add(com);
+		com = new MCRCommand(
+				"get ruleid for objectid {0} in pool {1}",
+				"org.mycore.access.MCRAccessCtrlCommands.getRuleID String String",
+				"Returns the ruleID for given object and access pool.");
+		command.add(com);
 
-    }
+	}
 
-    /**
-     * method creates sql tables
-     */
-    public static void createTables() {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
-        mcr_accessctrl.createTable();
-    }
+	/**
+	 * method creates sql tables
+	 */
+	public static void createTables() {
+		MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
+		mcr_accessctrl.createTable();
+	}
 
-    /**
-     * This method returns the rule as string for a given id
-     * 
-     * @param ruleID
-     *            internal database ruleid
-     * @return string with rule definition
-     */
-    public static void getRule(String ruleID) {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
-        LOGGER.info(mcr_accessctrl.getRule(ruleID));
-        //return mcr_accessctrl.getRule(ruleID);
-    }
+	/**
+	 * This method returns the rule as string for a given id
+	 * 
+	 * @param ruleID
+	 *            internal database ruleid
+	 * @return string with rule definition
+	 */
+	public static void getRule(String ruleID) {
+		MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
+		LOGGER.info(mcr_accessctrl.getRule(ruleID));
+		//return mcr_accessctrl.getRule(ruleID);
+	}
 
-    /**
-     * This method returns the ruleid as string for a given object and
-     * accesspool
-     * 
-     * @param objID
-     *            identificator for object, acPool name of accesspool
-     * @return string with ruleid
-     */
-    public static void getRuleID(String objID, String acPool) {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
-        LOGGER.info(mcr_accessctrl.getRuleID(objID, acPool));
-        //return mcr_accessctrl.getRuleID(objID, acPool);
-    }
+	/**
+	 * This method returns the ruleid as string for a given object and
+	 * accesspool
+	 * 
+	 * @param objID
+	 *            identificator for object, acPool name of accesspool
+	 * @return string with ruleid
+	 */
+	public static void getRuleID(String objID, String acPool) {
+		MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
+		LOGGER.info(mcr_accessctrl.getRuleID(objID, acPool));
+		//return mcr_accessctrl.getRuleID(objID, acPool);
+	}
 }

@@ -36,7 +36,6 @@ package org.mycore.user;
  */
 
 public interface MCRPrincipal {
-    /** Principals are stored by their identity in ACLs */
-    public String getID();
+	/** Principals are stored by their identity in ACLs */
+	public String getID();
 }
-

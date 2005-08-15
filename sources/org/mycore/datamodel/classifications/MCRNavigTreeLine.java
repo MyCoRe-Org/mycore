@@ -29,17 +29,17 @@ package org.mycore.datamodel.classifications;
  *  
  */
 class MCRNavigTreeLine {
-    public MCRCategoryItem cat;
+	public MCRCategoryItem cat;
 
-    public int level;
+	public int level;
 
-    public String status;
+	public String status;
 
-    public MCRNavigTreeLine(MCRCategoryItem cat, int level) {
-        this.cat = cat;
-        this.level = level;
-        this.status = (cat.hasChildren() ? "T" : " ");
+	public MCRNavigTreeLine(MCRCategoryItem cat, int level) {
+		this.cat = cat;
+		this.level = level;
+		this.status = (cat.hasChildren() ? "T" : " ");
 
-    }
+	}
 
 }

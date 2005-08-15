@@ -35,138 +35,137 @@ import org.mycore.common.MCRException;
  */
 public interface MCRMetaInterface {
 
-    /**
-     * This method get the inherited element.
-     * 
-     * @return the inherited flag as int
-     */
-    public int getInherited();
+	/**
+	 * This method get the inherited element.
+	 * 
+	 * @return the inherited flag as int
+	 */
+	public int getInherited();
 
-    /**
-     * This method get the inherited element.
-     * 
-     * @return the inherited value as string
-     */
-    public String getInheritedToString();
+	/**
+	 * This method get the inherited element.
+	 * 
+	 * @return the inherited value as string
+	 */
+	public String getInheritedToString();
 
-    /**
-     * This method get the language element.
-     * 
-     * @return the language
-     */
-    public String getLang();
+	/**
+	 * This method get the language element.
+	 * 
+	 * @return the language
+	 */
+	public String getLang();
 
-    /**
-     * This method get the subtag element.
-     * 
-     * @return the subtag
-     */
-    public String getSubTag();
+	/**
+	 * This method get the subtag element.
+	 * 
+	 * @return the subtag
+	 */
+	public String getSubTag();
 
-    /**
-     * This method get the type element.
-     * 
-     * @return the type
-     */
-    public String getType();
+	/**
+	 * This method get the type element.
+	 * 
+	 * @return the type
+	 */
+	public String getType();
 
-    /**
-     * This method set the inherited level. This can be 0 or an integer higher
-     * 0.
-     * 
-     * @param value
-     *            the inherited level value, if it is < 0, 0 was set
-     */
-    public void setInherited(int value);
+	/**
+	 * This method set the inherited level. This can be 0 or an integer higher
+	 * 0.
+	 * 
+	 * @param value
+	 *            the inherited level value, if it is < 0, 0 was set
+	 */
+	public void setInherited(int value);
 
-    /**
-     * This method increments the inherited value with 1.
-     */
-    public void incrementInherited();
+	/**
+	 * This method increments the inherited value with 1.
+	 */
+	public void incrementInherited();
 
-    /**
-     * This method decrements the inherited value with 1.
-     */
-    public void decrementInherited();
+	/**
+	 * This method decrements the inherited value with 1.
+	 */
+	public void decrementInherited();
 
-    /**
-     * This methode set the default language to the class.
-     * 
-     * @param default_lang
-     *            the default language
-     */
-    public void setLang(String default_lang);
+	/**
+	 * This methode set the default language to the class.
+	 * 
+	 * @param default_lang
+	 *            the default language
+	 */
+	public void setLang(String default_lang);
 
-    /**
-     * This method set the subtag element. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed.
-     * 
-     * @param set_subtag
-     *            the subtag
-     * @exception MCRException
-     *                if the set_subtag value is null or empty
-     */
-    public void setSubTag(String set_subtag) throws MCRException;
+	/**
+	 * This method set the subtag element. If the value of <em>set_subtag</em>
+	 * is null or empty an exception was throwed.
+	 * 
+	 * @param set_subtag
+	 *            the subtag
+	 * @exception MCRException
+	 *                if the set_subtag value is null or empty
+	 */
+	public void setSubTag(String set_subtag) throws MCRException;
 
-    /**
-     * This method set the type element. If the value of <em>set_type</em> is
-     * null or empty nothing was changed.
-     * 
-     * @param set_type
-     *            the optional type
-     */
-    public void setType(String set_type);
+	/**
+	 * This method set the type element. If the value of <em>set_type</em> is
+	 * null or empty nothing was changed.
+	 * 
+	 * @param set_type
+	 *            the optional type
+	 */
+	public void setType(String set_type);
 
-    /**
-     * This methode read the XML input stream part from a DOM part for the
-     * metadata of the document.
-     * 
-     * @param element
-     *            a relevant JDOM element for the metadata
-     */
-    public void setFromDOM(org.jdom.Element element);
+	/**
+	 * This methode read the XML input stream part from a DOM part for the
+	 * metadata of the document.
+	 * 
+	 * @param element
+	 *            a relevant JDOM element for the metadata
+	 */
+	public void setFromDOM(org.jdom.Element element);
 
-    /**
-     * This methode create a XML stream for a metadata part.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a JDOM Element with the XML data of the metadata part
-     */
-    public org.jdom.Element createXML() throws MCRException;
+	/**
+	 * This methode create a XML stream for a metadata part.
+	 * 
+	 * @exception MCRException
+	 *                if the content of this class is not valid
+	 * @return a JDOM Element with the XML data of the metadata part
+	 */
+	public org.jdom.Element createXML() throws MCRException;
 
-    /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public MCRTypedContent createTypedContent(boolean parasearch)
-            throws MCRException;
+	/**
+	 * This methode create a typed content list for all data in this instance.
+	 * 
+	 * @param parasearch
+	 *            true if the data should parametric searchable
+	 * @exception MCRException
+	 *                if the content of this class is not valid
+	 * @return a MCRTypedContent with the data of the MCRObject data
+	 */
+	public MCRTypedContent createTypedContent(boolean parasearch)
+			throws MCRException;
 
-    /**
-     * This abstract method create a String for the text searchable data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text search data
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException;
+	/**
+	 * This abstract method create a String for the text searchable data.
+	 * 
+	 * @exception MCRException
+	 *                if the content of this class is not valid
+	 * @return a String with the text search data
+	 */
+	public String createTextSearch(boolean textsearch) throws MCRException;
 
-    /**
-     * This methode check the validation of the content of this class.
-     * 
-     * @return a boolean value
-     */
-    public boolean isValid();
+	/**
+	 * This methode check the validation of the content of this class.
+	 * 
+	 * @return a boolean value
+	 */
+	public boolean isValid();
 
-    /**
-     * This method make a clone of this class.
-     */
-    public Object clone();
+	/**
+	 * This method make a clone of this class.
+	 */
+	public Object clone();
 
 }
-

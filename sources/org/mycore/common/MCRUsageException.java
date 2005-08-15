@@ -33,26 +33,26 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRUsageException extends MCRException {
-    /**
-     * Creates a new MCRUsageException with an error message
-     * 
-     * @param message
-     *            the error message for this exception
-     */
-    public MCRUsageException(String message) {
-        super(message);
-    }
+	/**
+	 * Creates a new MCRUsageException with an error message
+	 * 
+	 * @param message
+	 *            the error message for this exception
+	 */
+	public MCRUsageException(String message) {
+		super(message);
+	}
 
-    /**
-     * Creates a new MCRUsageException with an error message and a reference to
-     * an exception thrown by an underlying system.
-     * 
-     * @param message
-     *            the error message for this exception
-     * @param exception
-     *            the exception that was thrown by an underlying system
-     */
-    public MCRUsageException(String message, Exception exception) {
-        super(message, exception);
-    }
+	/**
+	 * Creates a new MCRUsageException with an error message and a reference to
+	 * an exception thrown by an underlying system.
+	 * 
+	 * @param message
+	 *            the error message for this exception
+	 * @param exception
+	 *            the exception that was thrown by an underlying system
+	 */
+	public MCRUsageException(String message, Exception exception) {
+		super(message, exception);
+	}
 }

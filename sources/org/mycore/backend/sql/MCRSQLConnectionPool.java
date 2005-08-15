@@ -24,14 +24,13 @@
 
 package org.mycore.backend.sql;
 
-import java.sql.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.sql.Connection;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
-import org.mycore.common.*;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * This class implements a pool of database connections to a relational database
@@ -46,149 +45,150 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  */
 public class MCRSQLConnectionPool {
-    /** The connection pool singleton */
-    protected static MCRSQLConnectionPool singleton;
+	/** The connection pool singleton */
+	protected static MCRSQLConnectionPool singleton;
 
-    /** The internal list of free connections */
-    protected Vector freeConnections = new Vector();
+	/** The internal list of free connections */
+	protected Vector freeConnections = new Vector();
 
-    /** The internal list of connections that are currently in use */
-    protected Vector usedConnections = new Vector();
+	/** The internal list of connections that are currently in use */
+	protected Vector usedConnections = new Vector();
 
-    /** The maximum number of connections that will be built */
-    protected int maxNumConnections;
+	/** The maximum number of connections that will be built */
+	protected int maxNumConnections;
 
-    /** The maximum age a connection can be before it is discarded */
-    protected static long maxAge = 3600*1000;
+	/** The maximum age a connection can be before it is discarded */
+	protected static long maxAge = 3600 * 1000;
 
-    /** The logger */
-    private static Logger logger = Logger.getLogger("org.mycore.backend.sql");
+	/** The logger */
+	private static Logger logger = Logger.getLogger("org.mycore.backend.sql");
 
-    /**
-     * Returns the connection pool singleton.
-     * 
-     * @throws MCRPersistenceException
-     *             if the JDBC driver could not be loaded or initial connections
-     *             could not be created
-     */
-    public static synchronized MCRSQLConnectionPool instance()
-            throws MCRPersistenceException {
-        if (singleton == null)
-            singleton = new MCRSQLConnectionPool();
-        return singleton;
-    }
+	/**
+	 * Returns the connection pool singleton.
+	 * 
+	 * @throws MCRPersistenceException
+	 *             if the JDBC driver could not be loaded or initial connections
+	 *             could not be created
+	 */
+	public static synchronized MCRSQLConnectionPool instance()
+			throws MCRPersistenceException {
+		if (singleton == null)
+			singleton = new MCRSQLConnectionPool();
+		return singleton;
+	}
 
-    /**
-     * Builds the connection pool singleton.
-     * 
-     * @throws MCRPersistenceException
-     *             if the JDBC driver could not be loaded
-     */
-    protected MCRSQLConnectionPool() throws MCRPersistenceException {
-        MCRConfiguration config = MCRConfiguration.instance();
+	/**
+	 * Builds the connection pool singleton.
+	 * 
+	 * @throws MCRPersistenceException
+	 *             if the JDBC driver could not be loaded
+	 */
+	protected MCRSQLConnectionPool() throws MCRPersistenceException {
+		MCRConfiguration config = MCRConfiguration.instance();
 
-        logger.info("Building JDBC connection pool...");
-        maxNumConnections = config.getInt(
-                "MCR.persistence_sql_max_connections", 1);
-        int initNumConnections = config.getInt(
-                "MCR.persistence_sql_init_connections", maxNumConnections);
-        String driver = config.getString("MCR.persistence_sql_driver");
-        logger.debug("MCR.persistence_sql_driver: " + driver);
+		logger.info("Building JDBC connection pool...");
+		maxNumConnections = config.getInt(
+				"MCR.persistence_sql_max_connections", 1);
+		int initNumConnections = config.getInt(
+				"MCR.persistence_sql_init_connections", maxNumConnections);
+		String driver = config.getString("MCR.persistence_sql_driver");
+		logger.debug("MCR.persistence_sql_driver: " + driver);
 
-        try {
-            Class.forName(driver);
-        } // Load the JDBC driver
-        catch (Exception exc) {
-            String msg = "Could not load JDBC driver class " + driver;
-            throw new MCRPersistenceException(msg, exc);
-        }
+		try {
+			Class.forName(driver);
+		} // Load the JDBC driver
+		catch (Exception exc) {
+			String msg = "Could not load JDBC driver class " + driver;
+			throw new MCRPersistenceException(msg, exc);
+		}
 
-        // Build the initial number of JDBC connections
-        for (int i = 0; i < initNumConnections; i++) {
-            freeConnections.addElement(new MCRSQLConnection());
-            logger.info("Initialize a MCRSQLConnection.");
-        }
-    }
+		// Build the initial number of JDBC connections
+		for (int i = 0; i < initNumConnections; i++) {
+			freeConnections.addElement(new MCRSQLConnection());
+			logger.info("Initialize a MCRSQLConnection.");
+		}
+	}
 
-    /**
-     * Gets a free connection from the pool. When this connection is not used
-     * any more by the invoker, he is responsible for returning it into the pool
-     * by invoking the <code>release()</code> method of the connection.
-     * 
-     * @see MCRSQLConnection#release()
-     * 
-     * @return a free connection for your personal use
-     * @throws MCRPersistenceException
-     *             if there was a problem while building the connection
-     */
-    public synchronized MCRSQLConnection getConnection() throws MCRPersistenceException {
-        // Wait for a free connection
-        while (usedConnections.size() == maxNumConnections)
-            try {
-                wait();
-            } catch (InterruptedException ignored) {
-            }
+	/**
+	 * Gets a free connection from the pool. When this connection is not used
+	 * any more by the invoker, he is responsible for returning it into the pool
+	 * by invoking the <code>release()</code> method of the connection.
+	 * 
+	 * @see MCRSQLConnection#release()
+	 * 
+	 * @return a free connection for your personal use
+	 * @throws MCRPersistenceException
+	 *             if there was a problem while building the connection
+	 */
+	public synchronized MCRSQLConnection getConnection()
+			throws MCRPersistenceException {
+		// Wait for a free connection
+		while (usedConnections.size() == maxNumConnections)
+			try {
+				wait();
+			} catch (InterruptedException ignored) {
+			}
 
-        MCRSQLConnection connection;
-	while(!freeConnections.isEmpty()) {
-            connection = (MCRSQLConnection) (freeConnections.firstElement());
-            freeConnections.removeElement(connection);
-	    if(System.currentTimeMillis() - connection.lastUse() < maxAge) {
+		MCRSQLConnection connection;
+		while (!freeConnections.isEmpty()) {
+			connection = (MCRSQLConnection) (freeConnections.firstElement());
+			freeConnections.removeElement(connection);
+			if (System.currentTimeMillis() - connection.lastUse() < maxAge) {
+				connection.use();
+				usedConnections.addElement(connection);
+				return connection;
+			}
+		}
+		connection = new MCRSQLConnection();
 		connection.use();
 		usedConnections.addElement(connection);
 		return connection;
-	    }
 	}
-        connection = new MCRSQLConnection();
-	connection.use();
-        usedConnections.addElement(connection);
-        return connection;
-    }
 
-    /**
-     * Releases a connection, indicating that it is not used any more and should
-     * be returned to to pool of free connections. This method is invoked when
-     * you call the method <code>release()</code> of the
-     * <code>MCRSQLConnection</code> object.
-     * 
-     * @see MCRSQLConnection#release()
-     * 
-     * @param connection
-     *            the connection that has been used
-     */
-    synchronized void releaseConnection(MCRSQLConnection connection) {
-        if (connection == null)
-            return;
+	/**
+	 * Releases a connection, indicating that it is not used any more and should
+	 * be returned to to pool of free connections. This method is invoked when
+	 * you call the method <code>release()</code> of the
+	 * <code>MCRSQLConnection</code> object.
+	 * 
+	 * @see MCRSQLConnection#release()
+	 * 
+	 * @param connection
+	 *            the connection that has been used
+	 */
+	synchronized void releaseConnection(MCRSQLConnection connection) {
+		if (connection == null)
+			return;
 
-	connection.use();
+		connection.use();
 
-        if (usedConnections.contains(connection))
-            usedConnections.removeElement(connection);
-        if (!freeConnections.contains(connection))
-            freeConnections.addElement(connection);
-        notifyAll();
-    }
+		if (usedConnections.contains(connection))
+			usedConnections.removeElement(connection);
+		if (!freeConnections.contains(connection))
+			freeConnections.addElement(connection);
+		notifyAll();
+	}
 
-    /**
-     * Finalizer, closes all connections in this connection pool
-     */
-    public void finalize() {
-        try {
-            for (int i = 0; i < usedConnections.size(); i++)
-                ((Connection) (usedConnections.elementAt(i))).close();
-            for (int i = 0; i < freeConnections.size(); i++)
-                ((Connection) (freeConnections.elementAt(i))).close();
-        } catch (Exception ignored) {
-        }
-    }
+	/**
+	 * Finalizer, closes all connections in this connection pool
+	 */
+	public void finalize() {
+		try {
+			for (int i = 0; i < usedConnections.size(); i++)
+				((Connection) (usedConnections.elementAt(i))).close();
+			for (int i = 0; i < freeConnections.size(); i++)
+				((Connection) (freeConnections.elementAt(i))).close();
+		} catch (Exception ignored) {
+		}
+	}
 
-    /**
-     * The method return the logger for org.mycore.backend.cm8 .
-     * 
-     * @return the logger.
-     */
-    static final Logger getLogger() {
-        return logger;
-    }
+	/**
+	 * The method return the logger for org.mycore.backend.cm8 .
+	 * 
+	 * @return the logger.
+	 */
+	static final Logger getLogger() {
+		return logger;
+	}
 
 }

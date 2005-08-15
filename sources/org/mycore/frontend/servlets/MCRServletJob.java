@@ -24,10 +24,12 @@
 
 package org.mycore.frontend.servlets;
 
-import java.net.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.mycore.common.*;
+import java.net.InetAddress;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.mycore.common.MCRConfigurationException;
 
 /**
  * This class simply is a container for objects needed during a Servlet session
@@ -38,49 +40,48 @@ import org.mycore.common.*;
  * @version $Revision$ $Date$
  */
 public class MCRServletJob {
-    /** The HttpServletRequest object */
-    private HttpServletRequest theRequest = null;
+	/** The HttpServletRequest object */
+	private HttpServletRequest theRequest = null;
 
-    /** The HttpServletResponse object */
-    private HttpServletResponse theResponse = null;
+	/** The HttpServletResponse object */
+	private HttpServletResponse theResponse = null;
 
-    /**
-     * The constructor takes the given objects and stores them in private
-     * objects.
-     * 
-     * @param theRequest
-     *            the HttpServletRequest object for this servlet job
-     * @param theResponse
-     *            the HttpServletResponse object for this servlet job
-     */
-    public MCRServletJob(HttpServletRequest theRequest,
-            HttpServletResponse theResponse) {
-        this.theRequest = theRequest;
-        this.theResponse = theResponse;
-    }
+	/**
+	 * The constructor takes the given objects and stores them in private
+	 * objects.
+	 * 
+	 * @param theRequest
+	 *            the HttpServletRequest object for this servlet job
+	 * @param theResponse
+	 *            the HttpServletResponse object for this servlet job
+	 */
+	public MCRServletJob(HttpServletRequest theRequest,
+			HttpServletResponse theResponse) {
+		this.theRequest = theRequest;
+		this.theResponse = theResponse;
+	}
 
-    /** returns the HttpServletRequest object */
-    public HttpServletRequest getRequest() {
-        return theRequest;
-    }
+	/** returns the HttpServletRequest object */
+	public HttpServletRequest getRequest() {
+		return theRequest;
+	}
 
-    /** returns the HttpServletResponse object */
-    public HttpServletResponse getResponse() {
-        return theResponse;
-    }
+	/** returns the HttpServletResponse object */
+	public HttpServletResponse getResponse() {
+		return theResponse;
+	}
 
-    /** returns true if the current http request was issued from the local host * */
-    public boolean isLocal() {
-        try {
-            String serverName = theRequest.getServerName();
-            String serverIP = InetAddress.getByName(serverName)
-                    .getHostAddress();
-            String remoteIP = MCRServlet.getRemoteAddr(theRequest);
-            return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
-        } catch (Exception ex) {
-            String msg = "Exception while testing if http request was from local host";
-            throw new MCRConfigurationException(msg, ex);
-        }
-    }
+	/** returns true if the current http request was issued from the local host * */
+	public boolean isLocal() {
+		try {
+			String serverName = theRequest.getServerName();
+			String serverIP = InetAddress.getByName(serverName)
+					.getHostAddress();
+			String remoteIP = MCRServlet.getRemoteAddr(theRequest);
+			return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
+		} catch (Exception ex) {
+			String msg = "Exception while testing if http request was from local host";
+			throw new MCRConfigurationException(msg, ex);
+		}
+	}
 }
-

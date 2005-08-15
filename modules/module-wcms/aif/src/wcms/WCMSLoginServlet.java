@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -51,149 +52,157 @@ import wcms.util.HashCipher;
  * Loginprocess for Web-Content-Management-System (WCMS).
  */
 public class WCMSLoginServlet extends WCMSServlet {
-	private static Logger LOGGER=Logger.getLogger(WCMSLoginServlet.class);
-    /**
-     * Identify and assign the system dependent file seperator character.
-     */
-    char fs = File.separatorChar;
+	private static Logger LOGGER = Logger.getLogger(WCMSLoginServlet.class);
 
-    /*
-  	 * (non-Javadoc)
-  	 * 
-  	 * @see org.mycore.frontend.servlets.MCRServlet#doGetPost(org.mycore.frontend.servlets.MCRServletJob)
-  	 */
-  	protected void doGetPost(MCRServletJob job) throws Exception {
-  		/*This method is overwritten from WCMSServlet, because ther is no user yet */
- 			processRequest(job.getRequest(), job.getResponse());
-  	}
+	/**
+	 * Identify and assign the system dependent file seperator character.
+	 */
+	char fs = File.separatorChar;
 
-    /**
-     * Main program called by doGet and doPost.
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mycore.frontend.servlets.MCRServlet#doGetPost(org.mycore.frontend.servlets.MCRServletJob)
+	 */
+	protected void doGetPost(MCRServletJob job) throws Exception {
+		/*
+		 * This method is overwritten from WCMSServlet, because ther is no user
+		 * yet
+		 */
+		processRequest(job.getRequest(), job.getResponse());
+	}
 
-   		MCRSession mcrSession= MCRSessionMgr.getCurrentSession();
-        String userID = null;
-        String userPassword = null;
-        String userRealName = null;
-        String userClass = null;
-        List rootNodes = (List)mcrSession.get("rootNodes");
-        boolean loginOk = false;
-        MCRConfiguration mcrConf = MCRConfiguration.instance();
+	/**
+	 * Main program called by doGet and doPost.
+	 */
+	protected void processRequest(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        try {
-            userID = request.getParameter("userID").trim();
-            userPassword = request.getParameter("userPassword").trim();
-            userPassword = HashCipher.crypt(userPassword);
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+		String userID = null;
+		String userPassword = null;
+		String userRealName = null;
+		String userClass = null;
+		List rootNodes = (List) mcrSession.get("rootNodes");
+		boolean loginOk = false;
+		MCRConfiguration mcrConf = MCRConfiguration.instance();
 
-        if (mcrSession.get("status") != null && userPassword == null && userID == null) {
-            if (mcrSession.get("status").equals("loggedIn")) {
-                userID = (String)mcrSession.get("userID");
-                userRealName = (String)mcrSession.get("userRealName");
-                userClass = (String)mcrSession.get("userClass");
-                loginOk = true;
-            }
-        }
-        if (mcrSession.get("status") == null && userPassword == null && userID == null) {
-        		System.err.println("\n\n\nstatus==null\n\n\n");
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
+		try {
+			userID = request.getParameter("userID").trim();
+			userPassword = request.getParameter("userPassword").trim();
+			userPassword = HashCipher.crypt(userPassword);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
 
-        /**
-         * Look into the WCMSUserDB.xml file and check for the given User.
-         * If the check was successful, loginOk is set to true.
-         */
-        try {
-            File dbfile = new File(mcrConf.getString("MCR.WCMS.wcmsUserDBFile").replace('/', File.separatorChar));
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(dbfile);
-            Element root = doc.getRootElement();
-            List users = root.getChildren();
-            Iterator userIterator = users.iterator();
+		if (mcrSession.get("status") != null && userPassword == null
+				&& userID == null) {
+			if (mcrSession.get("status").equals("loggedIn")) {
+				userID = (String) mcrSession.get("userID");
+				userRealName = (String) mcrSession.get("userRealName");
+				userClass = (String) mcrSession.get("userClass");
+				loginOk = true;
+			}
+		}
+		if (mcrSession.get("status") == null && userPassword == null
+				&& userID == null) {
+			System.err.println("\n\n\nstatus==null\n\n\n");
+			response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
+		}
 
-            while (userIterator.hasNext() && loginOk == false) {
-                Element iter = (Element)userIterator.next();
-                if (iter.getAttribute("userID").getValue().equals(userID) && iter.getAttribute("userPassword").getValue().equals(userPassword)) {
-                    userRealName = iter.getAttributeValue("userRealName");
-                    userClass = iter.getAttributeValue("userClass");
-                    rootNodes = iter.getChildren();
-                    loginOk = true;
-                }
-            }
-        }
-        catch (Exception e) {
-        	LOGGER.error(e);
-        }
+		/**
+		 * Look into the WCMSUserDB.xml file and check for the given User. If
+		 * the check was successful, loginOk is set to true.
+		 */
+		try {
+			File dbfile = new File(mcrConf.getString("MCR.WCMS.wcmsUserDBFile")
+					.replace('/', File.separatorChar));
+			SAXBuilder builder = new SAXBuilder();
+			Document doc = builder.build(dbfile);
+			Element root = doc.getRootElement();
+			List users = root.getChildren();
+			Iterator userIterator = users.iterator();
 
-        //System.out.println("loginValue = "+loginOk);
+			while (userIterator.hasNext() && loginOk == false) {
+				Element iter = (Element) userIterator.next();
+				if (iter.getAttribute("userID").getValue().equals(userID)
+						&& iter.getAttribute("userPassword").getValue().equals(
+								userPassword)) {
+					userRealName = iter.getAttributeValue("userRealName");
+					userClass = iter.getAttributeValue("userClass");
+					rootNodes = iter.getChildren();
+					loginOk = true;
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
 
-        /**
-         * Build jdom object dependence on the given login data.
-         */
-        Element rootOut = new Element("cms");
-        Document jdom = new Document(rootOut);
+		//System.out.println("loginValue = "+loginOk);
 
-        /**
-         * loginOk:
-         * <cms>
-         *     <session>choose</session>
-         *     <userID>userID<userID>
-         *     <userRealName>userRealName</userRealName>
-         *     <userClass>userClass</userClass>
-         *     <error></error>
-         *     <rootNode href="no"|"yes">rootNode</rootNode>{0,*}
-         * </cms>
-         *
-         * and add some attributes to the session object:
-         * <session ... uid=uid userClass="admin"|"editor"|"autor" rootNodes=rootNodes />
-         */
+		/**
+		 * Build jdom object dependence on the given login data.
+		 */
+		Element rootOut = new Element("cms");
+		Document jdom = new Document(rootOut);
 
-        if (loginOk) {
-            //System.out.println(session+" - "+userID+" - "+userRealName+" - "+userClass);
-            mcrSession.put("status", "loggedIn");
-            if (!userID.equals(mcrSession.get("userID"))) mcrSession.put("userID", userID);
-            if (!userRealName.equals(mcrSession.get("userRealName"))) mcrSession.put("userRealName", userRealName);
-            if (!userClass.equals(mcrSession.get("userClass"))) mcrSession.put("userClass", userClass);
-            if (!rootNodes.equals(mcrSession.get("rootNodes"))) mcrSession.put("rootNodes", rootNodes);
-            rootOut.addContent(new Element("session").setText("welcome"));
-            rootOut.addContent(new Element("userID").setText(userID));
-            rootOut.addContent(new Element("userRealName").setText(userRealName));
-            rootOut.addContent(new Element("userClass").setText(userClass));
-            rootOut.addContent(new Element("error").setText(""));
-            Iterator rootNodesIterator = rootNodes.iterator();
-            while (rootNodesIterator.hasNext()) {
-                Element rootNode = (Element)rootNodesIterator.next();
-                rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
-            }
-        }
+		/**
+		 * loginOk: <cms><session>choose </session> <userID>userID <userID>
+		 * <userRealName>userRealName </userRealName> <userClass>userClass
+		 * </userClass> <error></error> <rootNode href="no"|"yes">rootNode
+		 * </rootNode>{0,*} </cms>
+		 * 
+		 * and add some attributes to the session object: <session ... uid=uid
+		 * userClass="admin"|"editor"|"autor" rootNodes=rootNodes />
+		 */
 
-        /**
-         * !loginOk:
-         * <cms>
-         *     <session>login</session>
-         *     <error>denied</error>
-         * </cms>
-         */
-        else {
-            rootOut.addContent(new Element("session").setText("login"));
-            rootOut.addContent(new Element("error").setText("denied"));
-        }
+		if (loginOk) {
+			//System.out.println(session+" - "+userID+" - "+userRealName+" -
+			// "+userClass);
+			mcrSession.put("status", "loggedIn");
+			if (!userID.equals(mcrSession.get("userID")))
+				mcrSession.put("userID", userID);
+			if (!userRealName.equals(mcrSession.get("userRealName")))
+				mcrSession.put("userRealName", userRealName);
+			if (!userClass.equals(mcrSession.get("userClass")))
+				mcrSession.put("userClass", userClass);
+			if (!rootNodes.equals(mcrSession.get("rootNodes")))
+				mcrSession.put("rootNodes", rootNodes);
+			rootOut.addContent(new Element("session").setText("welcome"));
+			rootOut.addContent(new Element("userID").setText(userID));
+			rootOut.addContent(new Element("userRealName")
+					.setText(userRealName));
+			rootOut.addContent(new Element("userClass").setText(userClass));
+			rootOut.addContent(new Element("error").setText(""));
+			Iterator rootNodesIterator = rootNodes.iterator();
+			while (rootNodesIterator.hasNext()) {
+				Element rootNode = (Element) rootNodesIterator.next();
+				rootOut.addContent(new Element("rootNode").setAttribute("href",
+						rootNode.getAttributeValue("href")).setText(
+						rootNode.getTextTrim()));
+			}
+		}
 
-        /**
-         * Transfer content of jdom object to MCRLayoutServlet.
-         */
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+		/**
+		 * !loginOk: <cms><session>login </session> <error>denied </error>
+		 * </cms>
+		 */
+		else {
+			rootOut.addContent(new Element("session").setText("login"));
+			rootOut.addContent(new Element("error").setText("denied"));
+		}
 
-        /**
-         * Activate the following Line to see the XML output of the jdom object.
-         */
-        //req.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
-        }
-    }
+		/**
+		 * Transfer content of jdom object to MCRLayoutServlet.
+		 */
+		request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+
+		/**
+		 * Activate the following Line to see the XML output of the jdom object.
+		 */
+		//req.setAttribute("XSL.Style", "xml");
+		RequestDispatcher rd = getServletContext().getNamedDispatcher(
+				"MCRLayoutServlet");
+		rd.forward(request, response);
+	}
+}

@@ -24,8 +24,6 @@ package org.mycore.acl;
 
 import org.mycore.user.MCRPrincipal;
 
-import java.util.Set;
-
 ///============================================================================|
 
 /**
@@ -40,180 +38,180 @@ import java.util.Set;
  */
 
 public class MCRAclCategory implements MCRPrincipal {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * IDs for generic principal. These ids must not be used for other
-     * principals.
-     */
+	/**
+	 * IDs for generic principal. These ids must not be used for other
+	 * principals.
+	 */
 
-    public static final int OWNER_ID = 0;
+	public static final int OWNER_ID = 0;
 
-    public static final int OWNER_GROUP_ID = 1;
+	public static final int OWNER_GROUP_ID = 1;
 
-    public static final int OTHER_ID = 2;
+	public static final int OTHER_ID = 2;
 
-    public static final int ANY_OTHER_ID = 3;
+	public static final int ANY_OTHER_ID = 3;
 
-    public static final int USERS_ID = 4;
+	public static final int USERS_ID = 4;
 
-    public static final int GROUPS_ID = 5;
+	public static final int GROUPS_ID = 5;
 
-    //+----------------------------------------------------------------------------
+	//+----------------------------------------------------------------------------
 
-    /**
-     * Names for the principal.
-     */
+	/**
+	 * Names for the principal.
+	 */
 
-    public static final String OWNER_NAME = "OWNER";
+	public static final String OWNER_NAME = "OWNER";
 
-    public static final String OWNER_GROUP_NAME = "OWNER_GROUP";
+	public static final String OWNER_GROUP_NAME = "OWNER_GROUP";
 
-    public static final String OTHER_NAME = "OTHER";
+	public static final String OTHER_NAME = "OTHER";
 
-    public static final String ANY_OTHER_NAME = "ANY_OTHER";
+	public static final String ANY_OTHER_NAME = "ANY_OTHER";
 
-    public static final String USERS_NAME = "USERS";
+	public static final String USERS_NAME = "USERS";
 
-    public static final String GROUPS_NAME = "GROUPS";
+	public static final String GROUPS_NAME = "GROUPS";
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    /**
-     * The principal representing owners of an object.
-     */
+	/**
+	 * The principal representing owners of an object.
+	 */
 
-    public static final MCRAclCategory OWNER = new MCRAclCategory(OWNER_ID,
-            OWNER_NAME);
+	public static final MCRAclCategory OWNER = new MCRAclCategory(OWNER_ID,
+			OWNER_NAME);
 
-    /**
-     * The principal representing owner groups of an object.
-     */
+	/**
+	 * The principal representing owner groups of an object.
+	 */
 
-    public static final MCRAclCategory OWNER_GROUP = new MCRAclCategory(
-            OWNER_GROUP_ID, OWNER_GROUP_NAME);
+	public static final MCRAclCategory OWNER_GROUP = new MCRAclCategory(
+			OWNER_GROUP_ID, OWNER_GROUP_NAME);
 
-    /**
-     * The principal representing other principals (not owner and not member of
-     * owner group).
-     */
+	/**
+	 * The principal representing other principals (not owner and not member of
+	 * owner group).
+	 */
 
-    public static final MCRAclCategory OTHER = new MCRAclCategory(OTHER_ID,
-            OTHER_NAME);
+	public static final MCRAclCategory OTHER = new MCRAclCategory(OTHER_ID,
+			OTHER_NAME);
 
-    /**
-     * The principal representing the category "any other" (unknown user,
-     * guest).
-     */
+	/**
+	 * The principal representing the category "any other" (unknown user,
+	 * guest).
+	 */
 
-    public static final MCRAclCategory ANY_OTHER = new MCRAclCategory(
-            ANY_OTHER_ID, ANY_OTHER_NAME);
+	public static final MCRAclCategory ANY_OTHER = new MCRAclCategory(
+			ANY_OTHER_ID, ANY_OTHER_NAME);
 
-    /**
-     * The principal representing the category of all individual users.
-     */
+	/**
+	 * The principal representing the category of all individual users.
+	 */
 
-    public static final MCRAclCategory USERS = new MCRAclCategory(USERS_ID,
-            USERS_NAME);
+	public static final MCRAclCategory USERS = new MCRAclCategory(USERS_ID,
+			USERS_NAME);
 
-    /**
-     * The principal representing the category of all individual groups.
-     */
+	/**
+	 * The principal representing the category of all individual groups.
+	 */
 
-    public static final MCRAclCategory GROUPS = new MCRAclCategory(GROUPS_ID,
-            GROUPS_NAME);
+	public static final MCRAclCategory GROUPS = new MCRAclCategory(GROUPS_ID,
+			GROUPS_NAME);
 
-    //+------------------------------------------------------------------------------
+	//+------------------------------------------------------------------------------
 
-    private String name;
+	private String name;
 
-    private int id;
+	private int id;
 
-    //+-----------------------------------------------------------------------------
+	//+-----------------------------------------------------------------------------
 
-    /**
-     * Constructor is private so that no instances other than the ones in the
-     * enumeration can be created.
-     * 
-     * @see #readResolve
-     */
+	/**
+	 * Constructor is private so that no instances other than the ones in the
+	 * enumeration can be created.
+	 * 
+	 * @see #readResolve
+	 */
 
-    private MCRAclCategory(int id, String name) {
+	private MCRAclCategory(int id, String name) {
 
-        this.name = name;
-        this.id = id;
+		this.name = name;
+		this.id = id;
 
-    }
+	}
 
-    //>-----------------------------------------------------------------------------
+	//>-----------------------------------------------------------------------------
 
-    /**
-     * @return the name of the category
-     */
+	/**
+	 * @return the name of the category
+	 */
 
-    public String getID() {
+	public String getID() {
 
-        return name;
+		return name;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * @return string representation of principal
-     */
+	/**
+	 * @return string representation of principal
+	 */
 
-    public String toString() {
+	public String toString() {
 
-        return getID();
+		return getID();
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * The numerical id of the principal.
-     * 
-     * Can be used in switching i.e. switch(aclPrincipal.getNumID()){ case
-     * MCRAclPrincipal.OWNER_ID: .... case MCRAclPrincipal.ANY_OTHER_ID:
-     * 
-     * @return the id of the principal
-     */
+	/**
+	 * The numerical id of the principal.
+	 * 
+	 * Can be used in switching i.e. switch(aclPrincipal.getNumID()){ case
+	 * MCRAclPrincipal.OWNER_ID: .... case MCRAclPrincipal.ANY_OTHER_ID:
+	 * 
+	 * @return the id of the principal
+	 */
 
-    public int getNumID() {
+	public int getNumID() {
 
-        return id;
+		return id;
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * This method is called by the serialization code before it returns an
-     * unserialized object. To provide for unicity of instances, the instance
-     * that was read is replaced by its static equivalent
-     * 
-     * @return Object instance after unserializing
-     */
+	/**
+	 * This method is called by the serialization code before it returns an
+	 * unserialized object. To provide for unicity of instances, the instance
+	 * that was read is replaced by its static equivalent
+	 * 
+	 * @return Object instance after unserializing
+	 */
 
-    public Object readResolve() {
+	public Object readResolve() {
 
-        switch (id) {
+		switch (id) {
 
-        case OWNER_ID:
-            return MCRAclCategory.OWNER;
-        case OWNER_GROUP_ID:
-            return MCRAclCategory.OWNER_GROUP;
-        case OTHER_ID:
-            return MCRAclCategory.OTHER;
-        case ANY_OTHER_ID:
-            return MCRAclCategory.ANY_OTHER;
-        default:
-            throw new Error("Unknown MCRAclPrincipal value");
+		case OWNER_ID:
+			return MCRAclCategory.OWNER;
+		case OWNER_GROUP_ID:
+			return MCRAclCategory.OWNER_GROUP;
+		case OTHER_ID:
+			return MCRAclCategory.OTHER;
+		case ANY_OTHER_ID:
+			return MCRAclCategory.ANY_OTHER;
+		default:
+			throw new Error("Unknown MCRAclPrincipal value");
 
-        }
+		}
 
-    }
+	}
 
-    //-=============================================================================
+	//-=============================================================================
 }

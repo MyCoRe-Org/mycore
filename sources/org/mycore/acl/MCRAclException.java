@@ -37,20 +37,20 @@ import org.mycore.common.MCRException;
  */
 
 public class MCRAclException extends MCRException {
-    ///============================================================================/
+	///============================================================================/
 
-    /**
-     * Constructs an exception with an error message.
-     * 
-     * @param message
-     *            The error message describíng the cause of the exception.
-     */
+	/**
+	 * Constructs an exception with an error message.
+	 * 
+	 * @param message
+	 *            The error message describíng the cause of the exception.
+	 */
 
-    public MCRAclException(String message) {
+	public MCRAclException(String message) {
 
-        super(message);
+		super(message);
 
-    }
+	}
 
-    //>============================================================================\
+	//>============================================================================\
 }

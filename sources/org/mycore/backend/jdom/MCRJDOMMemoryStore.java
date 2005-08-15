@@ -30,6 +30,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -47,148 +48,148 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRJDOMMemoryStore {
-    /** The connection pool singleton */
-    private static MCRJDOMMemoryStore singleton;
+	/** The connection pool singleton */
+	private static MCRJDOMMemoryStore singleton;
 
-    /** The logger */
-    private static Logger logger = Logger.getLogger("org.mycore.backend.jdom");
+	/** The logger */
+	private static Logger logger = Logger.getLogger("org.mycore.backend.jdom");
 
-    /** A hashtable of the JDOM trees */
-    private Hashtable trees = new Hashtable();
+	/** A hashtable of the JDOM trees */
+	private Hashtable trees = new Hashtable();
 
-    private org.jdom.Document xslorig = null;
+	private org.jdom.Document xslorig = null;
 
-    /** The XSL namespace */
-    private org.jdom.Namespace ns = null;
+	/** The XSL namespace */
+	private org.jdom.Namespace ns = null;
 
-    /** Timestamp of the last SQL read and the default reload time in seconds */
-    private long tslast = 0;
+	/** Timestamp of the last SQL read and the default reload time in seconds */
+	private long tslast = 0;
 
-    private long tsdiff = 0;
+	private long tsdiff = 0;
 
-    private static final long tsdiffdefault = 3600; // 1
-                                                                           // hour
+	private static final long tsdiffdefault = 3600; // 1
 
-    /**
-     * Returns the singleton.
-     */
-    public static synchronized MCRJDOMMemoryStore instance() {
-        if (singleton == null)
-            singleton = new MCRJDOMMemoryStore();
-        return singleton;
-    }
+	// hour
 
-    /**
-     * Creates a new JDOM memory store
-     */
-    private MCRJDOMMemoryStore() {
-        // XSL Namespace
-        ns = org.jdom.Namespace.getNamespace("xsl", MCRDefaults.XSL_URL);
+	/**
+	 * Returns the singleton.
+	 */
+	public static synchronized MCRJDOMMemoryStore instance() {
+		if (singleton == null)
+			singleton = new MCRJDOMMemoryStore();
+		return singleton;
+	}
 
-        // Read stylesheet
-        InputStream searchxsl = MCRJDOMMemoryStore.class
-                .getResourceAsStream("/MCRJDOMSearch.xsl");
-        if (searchxsl == null)
-            throw new MCRConfigurationException(
-                    "Can't find stylesheet file MCRJDOMSearch.xsl");
-        try {
-            xslorig = (new org.jdom.input.SAXBuilder()).build(searchxsl);
-        } catch (Exception e) {
-            throw new MCRException(
-                    "Error while parsing file MCRJDOMSearch.xsl.");
-        }
-        // set the start time and the diff from the config
-        MCRConfiguration config = MCRConfiguration.instance();
-        tslast = System.currentTimeMillis();
-        tsdiff = (config.getLong("MCR.persistence_jdom_reload", tsdiffdefault)) * 1000;
-    }
+	/**
+	 * Creates a new JDOM memory store
+	 */
+	private MCRJDOMMemoryStore() {
+		// XSL Namespace
+		ns = org.jdom.Namespace.getNamespace("xsl", MCRDefaults.XSL_URL);
 
-    /**
-     * Returns a stylesheet that will execute a query on the JDOM store.
-     * 
-     * @param query
-     *                    the XSLT String that represents the search condition
-     * @return a org.jdom.Document of the stylesheet
-     */
-    org.jdom.Document getStylesheet(String query) {
-        org.jdom.Document xslfile = (org.jdom.Document) (xslorig.clone());
-        xslfile.getRootElement().getChild("template", ns).getChild("result")
-                .getChild("choose", ns).getChild("when", ns).setAttribute(
-                        "test", query);
+		// Read stylesheet
+		InputStream searchxsl = MCRJDOMMemoryStore.class
+				.getResourceAsStream("/MCRJDOMSearch.xsl");
+		if (searchxsl == null)
+			throw new MCRConfigurationException(
+					"Can't find stylesheet file MCRJDOMSearch.xsl");
+		try {
+			xslorig = (new org.jdom.input.SAXBuilder()).build(searchxsl);
+		} catch (Exception e) {
+			throw new MCRException(
+					"Error while parsing file MCRJDOMSearch.xsl.");
+		}
+		// set the start time and the diff from the config
+		MCRConfiguration config = MCRConfiguration.instance();
+		tslast = System.currentTimeMillis();
+		tsdiff = (config.getLong("MCR.persistence_jdom_reload", tsdiffdefault)) * 1000;
+	}
 
-        // debug
-        //org.jdom.output.XMLOutputter outputter = new
-        // org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        //outputter.output(xslfile, System.out);
-        return xslfile;
-    }
+	/**
+	 * Returns a stylesheet that will execute a query on the JDOM store.
+	 * 
+	 * @param query
+	 *            the XSLT String that represents the search condition
+	 * @return a org.jdom.Document of the stylesheet
+	 */
+	org.jdom.Document getStylesheet(String query) {
+		org.jdom.Document xslfile = (org.jdom.Document) (xslorig.clone());
+		xslfile.getRootElement().getChild("template", ns).getChild("result")
+				.getChild("choose", ns).getChild("when", ns).setAttribute(
+						"test", query);
 
-    /**
-     * Returns a list of all object metadata for a given object type
-     */
-    Hashtable getObjects(String type) {
-        // return the JDOM tree if it is in the store
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            throw new MCRPersistenceException("The type is null or empty.");
-        }
+		// debug
+		//org.jdom.output.XMLOutputter outputter = new
+		// org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+		//outputter.output(xslfile, System.out);
+		return xslfile;
+	}
 
-        // check the reload
-        Hashtable store = null;
-        if (System.currentTimeMillis() <= (tslast + tsdiff)) {
-            store = (Hashtable) trees.get(type);
-        }
-        if (store != null) {
-            return store;
-        }
+	/**
+	 * Returns a list of all object metadata for a given object type
+	 */
+	Hashtable getObjects(String type) {
+		// return the JDOM tree if it is in the store
+		if ((type == null) || ((type = type.trim()).length() == 0)) {
+			throw new MCRPersistenceException("The type is null or empty.");
+		}
 
-        tslast = System.currentTimeMillis();
+		// check the reload
+		Hashtable store = null;
+		if (System.currentTimeMillis() <= (tslast + tsdiff)) {
+			store = (Hashtable) trees.get(type);
+		}
+		if (store != null) {
+			return store;
+		}
 
-        // fill the store form the SQL store of the type
-        store = readObjectsFromPersistentStore(type);
-        trees.put(type, store);
+		tslast = System.currentTimeMillis();
 
-        return store;
-    }
+		// fill the store form the SQL store of the type
+		store = readObjectsFromPersistentStore(type);
+		trees.put(type, store);
 
-    /**
-     * Reads all objects metadata from the persistent store into memory
-     */
-    private Hashtable readObjectsFromPersistentStore(String type) {
-        long startdate = System.currentTimeMillis();
-        MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
-        ArrayList ar = mcr_xml.retrieveAllIDs(type);
-        Hashtable objects = new Hashtable();
-        int size = ar.size();
-        String stid;
-        MCRObjectID mid;
-        Document jdom_document;
-        for (int i = 0; i < size; i++) {
-            stid = (String) ar.get(i);
-            mid = new MCRObjectID(stid);
-            jdom_document = (Document)mcr_xml.readDocument(mid).clone();
-            objects.put(mid, jdom_document.detachRootElement());
-            logger.debug("Load to JDOM tree " + stid);
-        }
-        long stopdate = System.currentTimeMillis();
-        double diff = (double) (stopdate - startdate) / 1000.0;
-        logger.debug("Read " + Integer.toString(ar.size())
-                + " SQL data sets for type " + type + " in " + diff
-                + " seconds");
-        return objects;
-    }
+		return store;
+	}
 
-    /**
-     * Adds an objects xml metadata to the memory store.
-     */
-    void addElement(MCRObjectID id, org.jdom.Element elm) {
-        getObjects(id.getTypeId()).put(id, elm);
-    }
+	/**
+	 * Reads all objects metadata from the persistent store into memory
+	 */
+	private Hashtable readObjectsFromPersistentStore(String type) {
+		long startdate = System.currentTimeMillis();
+		MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+		ArrayList ar = mcr_xml.retrieveAllIDs(type);
+		Hashtable objects = new Hashtable();
+		int size = ar.size();
+		String stid;
+		MCRObjectID mid;
+		Document jdom_document;
+		for (int i = 0; i < size; i++) {
+			stid = (String) ar.get(i);
+			mid = new MCRObjectID(stid);
+			jdom_document = (Document) mcr_xml.readDocument(mid).clone();
+			objects.put(mid, jdom_document.detachRootElement());
+			logger.debug("Load to JDOM tree " + stid);
+		}
+		long stopdate = System.currentTimeMillis();
+		double diff = (double) (stopdate - startdate) / 1000.0;
+		logger.debug("Read " + Integer.toString(ar.size())
+				+ " SQL data sets for type " + type + " in " + diff
+				+ " seconds");
+		return objects;
+	}
 
-    /**
-     * Removes an object from the memory store.
-     */
-    void removeElement(MCRObjectID id) {
-        getObjects(id.getTypeId()).remove(id);
-    }
+	/**
+	 * Adds an objects xml metadata to the memory store.
+	 */
+	void addElement(MCRObjectID id, org.jdom.Element elm) {
+		getObjects(id.getTypeId()).put(id, elm);
+	}
+
+	/**
+	 * Removes an object from the memory store.
+	 */
+	void removeElement(MCRObjectID id) {
+		getObjects(id.getTypeId()).remove(id);
+	}
 }
-

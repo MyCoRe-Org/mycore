@@ -29,283 +29,322 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
+import org.mycore.backend.hibernate.tables.MCRNBNS;
 import org.mycore.services.nbn.MCRNBN;
 import org.mycore.services.nbn.MCRNBNManager;
 
-import org.hibernate.*;
-import org.hibernate.criterion.Restrictions;
-
-import java.util.List;
-
-import org.mycore.backend.hibernate.tables.*;
-import org.mycore.common.MCRException;
-
 /**
- * Provides persistency functions for managing NBN URNs, * using tables in SQL for persistent storage.
+ * Provides persistency functions for managing NBN URNs, * using tables in SQL
+ * for persistent storage.
  */
-public class
-        MCRHIBNBNManager implements MCRNBNManager {
+public class MCRHIBNBNManager implements MCRNBNManager {
 
-    // logger
-    static Logger logger = Logger.getLogger(MCRHIBNBNManager.class);
+	// logger
+	static Logger logger = Logger.getLogger(MCRHIBNBNManager.class);
 
-    /**
-     * Method MCRSQLNBNManager. Creates a new MCRNBNManager.
-     */
-    public MCRHIBNBNManager()
-    {
-    }
-
-    private Session getSession()
-    {
-	return MCRHIBConnection.instance().getSession();
-    }
-
-    /**
-     * Method reserveURN. Reserves a NBN for later use. In a later step, that NBN can be
-     * 		assigned to a document.
-     * @param urn the NBN URN to be reserved.
-     */
-    public void reserveURN(MCRNBN urn) {
-	Date now = new Date();
-
-	Session session = getSession();
-	Transaction tx = session.beginTransaction();
-
-	MCRNBNS c = new MCRNBNS(
-		urn.getNISSandChecksum(),
-		null,
-		urn.getAuthor(),
-		urn.getComment(),
-		new Timestamp(now.getTime()),
-		null);
-
-	session.saveOrUpdate(c);
-
-	tx.commit();
-	session.close();
-    }
-
-    public void freeTable() {
-        Session session = getSession();
-        Transaction tx = session.beginTransaction();
-
-        List l = session.createCriteria(MCRNBNS.class).list();
-        int t;
-        for(t=0;t<l.size();t++) {
-            MCRNBNS n = (MCRNBNS)l.get(t);
-            session.delete(n);
-        }
-        tx.commit();
-        session.close();
-    }
-
-    /**
-     * Method getURN. Gets an URN for a given URL
-     * @param url the URL of the given document
-     * @return MCRNBN the NBN URN for the given URL, or null
-     */
-    public MCRNBN getURN(String url)
-    {
-	Session session = getSession();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("url", url)).list();
-	session.close();
-	if(l.size() < 1) return null;
-	MCRNBN nbn = new MCRNBN(MCRNBN.getLocalPrefix() + ((MCRNBNS)l.get(0)).getNiss());
-	return nbn;
-    }
-
-    /**
-     * Method setURL. Sets the URL for the NBN URN given. This is the URL that
-     * 		the NBN points to. The NBN has to be already reserved.
-     * @param urn the NBN URN that represents the URL
-     * @param url the URL the NBN points to
-     */
-    public void setURL(MCRNBN urn, String url) {
-	Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-	if(l.size() < 1)
-            throw new IllegalStateException("MCRNBN doesn't exist in database");
-	MCRNBNS n = (MCRNBNS)l.get(0);
-	n.setUrl(url);
-        session.update(n);
-        tx.commit();
-        session.close();
-    }
-
-    /**
-     * Method getURL. Gets the URL for the NBN URN given. This is the URL that
-     * 		the NBN points to. If there is no URL for this NBN, the
-     * 		method returns null.
-     * @param urn the NBN URN that represents a URL
-     * @return String the URL the NBN points to, or null
-     */
-    public String getURL(MCRNBN urn) {
-	Session session = getSession();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-	if(l.size() < 1) return null;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-	return n.getUrl();
-    }
-
-    /**
-     * Method getAuthor. Gets the Author for the NBN URN given.
-     * @param urn the NBN URN that represents a URL
-     * @return String the author
-     */
-    public String getAuthor(MCRNBN urn) {
-	Session session = getSession();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-	if(l.size() < 1) return null;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-	return n.getAuthor();
-    }
-
-    /**
-     * Method getComment. Gets the Comment for the NBN URN given.
-     * @param urn the NBN URN that represents a URL
-     * @return String the Comment
-     */
-    public String getComment(MCRNBN urn) {
-	Session session = getSession();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-	if(l.size() < 1) return null;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-	return new String(n.getCommentBytes());
-    }
-
-    /**
-     * Method getDate. Gets the timestamp for the NBN
-     * @param urn the NBN
-     * @return GregorianCalendar the date
-     */
-    public GregorianCalendar getDate(MCRNBN urn) {
-	Session session = getSession();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-	if(l.size() < 1) return null;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-        GregorianCalendar greg = new GregorianCalendar();
-	greg.setTime(n.getDate());
-	return greg;
-    }
-
-    /**
-     * Method removeURN. Removes a stored NBN URN from the persistent datastore.
-     * @param urn the NBN URN that should be removed
-     */
-    public void removeURN(MCRNBN urn) {
-	Session session = getSession();
-	Transaction tx = session.beginTransaction();
-        List l = session.createCriteria(MCRNBNS.class).add(Restrictions.eq("niss", urn.getNISSandChecksum())).list();
-        int t;
-        for(t=0;t<l.size();t++) {
-	    session.delete(l.get(t));
-        }
-	tx.commit();
-	session.close();
-    }
-
-    /**
-     * Method listReservedURNs. Returns all URNs that are reserved for later use with a document.
-     * @return a Set containing the URNs
-     */
-    public Set listReservedURNs() {
-	Session session = getSession();
-        List l = session.createQuery("from MCRNBNS where URL = NULL").list();
-	Set results = new HashSet();
-	int t;
-	for(t=0;t<l.size();t++) {
-	    MCRNBNS n = (MCRNBNS)l.get(t);
-	    results.add(n.getNiss());
+	/**
+	 * Method MCRSQLNBNManager. Creates a new MCRNBNManager.
+	 */
+	public MCRHIBNBNManager() {
 	}
-	return results;
-    }
 
-    /**
-     * Method getDocumentId. Gets the document id for the NBN
-     * @param urn the NBN
-     * @return String the document id
-     */
-    public String getDocumentId(MCRNBN urn) {
-	Session session = getSession();
-	Transaction tx = session.beginTransaction();
-
-        List l = session.createQuery("from MCRNBNS where niss = '"+urn.getNISSandChecksum() + "'").list();
-        if(l.size() < 1)
-            return null;
-        MCRNBNS n = (MCRNBNS)l.get(0);
-
-	tx.commit();
-	session.close();
-
-	return n.getDocumentid();
-    }
-
-    /**
-     * Sets the document id for the NBN URN given.
-     *
-     * @param urn the NBN URN that represents the URL
-     * @param documentId the document id the NBN points to
-     **/
-    public void setDocumentId(MCRNBN urn, String documentId) {
-
-	Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRNBNS where niss = '" + urn.getNISSandChecksum() + "'").list();
-	if(l.size() < 1) return;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-
-	n.setDocumentid(documentId);
-
-	session.update(n);
-        tx.commit();
-	session.close();
-    }
-
-    /**
-     * Finds the urn for a given document id
-     * @param documentId the document id
-     * @return the nbn or null
-     */
-    public MCRNBN getNBNByDocumentId(String documentId) {
-	Session session = getSession();
-        List l = session.createQuery("from MCRNBNS where DOCUMENTID = '" + documentId + "'").list();
-	if(l.size() < 1) return null;
-	MCRNBNS n = (MCRNBNS)l.get(0);
-	session.close();
-	return new MCRNBN(MCRNBN.getLocalPrefix() + n.getNiss());
-    }
-
-    /**
-     * Method listURNs. Returns all URNs that match the given pattern. The pattern
-     * 		may be null to select all stored URNs, or may be a pattern
-     * 		containing '*' or '?' wildcard characters.
-     * @param pattern the pattern the URNs should match, or null
-     * @return a Map containing the matched URNs as keys, and their URLs as values
-     */
-    public Map listURNs(String pattern) {
-	Map results = new HashMap();
-	Session session = getSession();
-        List l;
-
-	if (pattern != null) {
-	    String sqlPattern = pattern.replace('?', '_').replace('*', '%');
-	    l = session.createQuery("from MCRNBNS where niss like '" + sqlPattern + "'").list();
-	} else {
-	    l = session.createQuery("from MCRNBNS").list();
+	private Session getSession() {
+		return MCRHIBConnection.instance().getSession();
 	}
-	int t;
-	for(t=0;t<l.size();t++) {
-	    MCRNBNS n = (MCRNBNS)l.get(t);
-	    results.put(n.getNiss(), n.getUrl());
+
+	/**
+	 * Method reserveURN. Reserves a NBN for later use. In a later step, that
+	 * NBN can be assigned to a document.
+	 * 
+	 * @param urn
+	 *            the NBN URN to be reserved.
+	 */
+	public void reserveURN(MCRNBN urn) {
+		Date now = new Date();
+
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		MCRNBNS c = new MCRNBNS(urn.getNISSandChecksum(), null,
+				urn.getAuthor(), urn.getComment(),
+				new Timestamp(now.getTime()), null);
+
+		session.saveOrUpdate(c);
+
+		tx.commit();
+		session.close();
 	}
-	session.close();
-	return results;
-    }
+
+	public void freeTable() {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List l = session.createCriteria(MCRNBNS.class).list();
+		int t;
+		for (t = 0; t < l.size(); t++) {
+			MCRNBNS n = (MCRNBNS) l.get(t);
+			session.delete(n);
+		}
+		tx.commit();
+		session.close();
+	}
+
+	/**
+	 * Method getURN. Gets an URN for a given URL
+	 * 
+	 * @param url
+	 *            the URL of the given document
+	 * @return MCRNBN the NBN URN for the given URL, or null
+	 */
+	public MCRNBN getURN(String url) {
+		Session session = getSession();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("url", url)).list();
+		session.close();
+		if (l.size() < 1)
+			return null;
+		MCRNBN nbn = new MCRNBN(MCRNBN.getLocalPrefix()
+				+ ((MCRNBNS) l.get(0)).getNiss());
+		return nbn;
+	}
+
+	/**
+	 * Method setURL. Sets the URL for the NBN URN given. This is the URL that
+	 * the NBN points to. The NBN has to be already reserved.
+	 * 
+	 * @param urn
+	 *            the NBN URN that represents the URL
+	 * @param url
+	 *            the URL the NBN points to
+	 */
+	public void setURL(MCRNBN urn, String url) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		if (l.size() < 1)
+			throw new IllegalStateException("MCRNBN doesn't exist in database");
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		n.setUrl(url);
+		session.update(n);
+		tx.commit();
+		session.close();
+	}
+
+	/**
+	 * Method getURL. Gets the URL for the NBN URN given. This is the URL that
+	 * the NBN points to. If there is no URL for this NBN, the method returns
+	 * null.
+	 * 
+	 * @param urn
+	 *            the NBN URN that represents a URL
+	 * @return String the URL the NBN points to, or null
+	 */
+	public String getURL(MCRNBN urn) {
+		Session session = getSession();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		return n.getUrl();
+	}
+
+	/**
+	 * Method getAuthor. Gets the Author for the NBN URN given.
+	 * 
+	 * @param urn
+	 *            the NBN URN that represents a URL
+	 * @return String the author
+	 */
+	public String getAuthor(MCRNBN urn) {
+		Session session = getSession();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		return n.getAuthor();
+	}
+
+	/**
+	 * Method getComment. Gets the Comment for the NBN URN given.
+	 * 
+	 * @param urn
+	 *            the NBN URN that represents a URL
+	 * @return String the Comment
+	 */
+	public String getComment(MCRNBN urn) {
+		Session session = getSession();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		return new String(n.getCommentBytes());
+	}
+
+	/**
+	 * Method getDate. Gets the timestamp for the NBN
+	 * 
+	 * @param urn
+	 *            the NBN
+	 * @return GregorianCalendar the date
+	 */
+	public GregorianCalendar getDate(MCRNBN urn) {
+		Session session = getSession();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		GregorianCalendar greg = new GregorianCalendar();
+		greg.setTime(n.getDate());
+		return greg;
+	}
+
+	/**
+	 * Method removeURN. Removes a stored NBN URN from the persistent datastore.
+	 * 
+	 * @param urn
+	 *            the NBN URN that should be removed
+	 */
+	public void removeURN(MCRNBN urn) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		List l = session.createCriteria(MCRNBNS.class).add(
+				Restrictions.eq("niss", urn.getNISSandChecksum())).list();
+		int t;
+		for (t = 0; t < l.size(); t++) {
+			session.delete(l.get(t));
+		}
+		tx.commit();
+		session.close();
+	}
+
+	/**
+	 * Method listReservedURNs. Returns all URNs that are reserved for later use
+	 * with a document.
+	 * 
+	 * @return a Set containing the URNs
+	 */
+	public Set listReservedURNs() {
+		Session session = getSession();
+		List l = session.createQuery("from MCRNBNS where URL = NULL").list();
+		Set results = new HashSet();
+		int t;
+		for (t = 0; t < l.size(); t++) {
+			MCRNBNS n = (MCRNBNS) l.get(t);
+			results.add(n.getNiss());
+		}
+		return results;
+	}
+
+	/**
+	 * Method getDocumentId. Gets the document id for the NBN
+	 * 
+	 * @param urn
+	 *            the NBN
+	 * @return String the document id
+	 */
+	public String getDocumentId(MCRNBN urn) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List l = session.createQuery(
+				"from MCRNBNS where niss = '" + urn.getNISSandChecksum() + "'")
+				.list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+
+		tx.commit();
+		session.close();
+
+		return n.getDocumentid();
+	}
+
+	/**
+	 * Sets the document id for the NBN URN given.
+	 * 
+	 * @param urn
+	 *            the NBN URN that represents the URL
+	 * @param documentId
+	 *            the document id the NBN points to
+	 */
+	public void setDocumentId(MCRNBN urn, String documentId) {
+
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		List l = session.createQuery(
+				"from MCRNBNS where niss = '" + urn.getNISSandChecksum() + "'")
+				.list();
+		if (l.size() < 1)
+			return;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+
+		n.setDocumentid(documentId);
+
+		session.update(n);
+		tx.commit();
+		session.close();
+	}
+
+	/**
+	 * Finds the urn for a given document id
+	 * 
+	 * @param documentId
+	 *            the document id
+	 * @return the nbn or null
+	 */
+	public MCRNBN getNBNByDocumentId(String documentId) {
+		Session session = getSession();
+		List l = session.createQuery(
+				"from MCRNBNS where DOCUMENTID = '" + documentId + "'").list();
+		if (l.size() < 1)
+			return null;
+		MCRNBNS n = (MCRNBNS) l.get(0);
+		session.close();
+		return new MCRNBN(MCRNBN.getLocalPrefix() + n.getNiss());
+	}
+
+	/**
+	 * Method listURNs. Returns all URNs that match the given pattern. The
+	 * pattern may be null to select all stored URNs, or may be a pattern
+	 * containing '*' or '?' wildcard characters.
+	 * 
+	 * @param pattern
+	 *            the pattern the URNs should match, or null
+	 * @return a Map containing the matched URNs as keys, and their URLs as
+	 *         values
+	 */
+	public Map listURNs(String pattern) {
+		Map results = new HashMap();
+		Session session = getSession();
+		List l;
+
+		if (pattern != null) {
+			String sqlPattern = pattern.replace('?', '_').replace('*', '%');
+			l = session.createQuery(
+					"from MCRNBNS where niss like '" + sqlPattern + "'").list();
+		} else {
+			l = session.createQuery("from MCRNBNS").list();
+		}
+		int t;
+		for (t = 0; t < l.size(); t++) {
+			MCRNBNS n = (MCRNBNS) l.get(t);
+			results.put(n.getNiss(), n.getUrl());
+		}
+		session.close();
+		return results;
+	}
 }

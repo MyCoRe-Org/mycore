@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -44,192 +45,192 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 
 public class MCRAccessServlet extends MCRServlet {
-    private static Logger LOGGER = Logger.getLogger(MCRAccessServlet.class);
+	private static Logger LOGGER = Logger.getLogger(MCRAccessServlet.class);
 
-    /**
-     * This method overrides doGetPost of MCRServlet. <br />
-     * The method looks for the parameters ip and privilege. As minimum one
-     * parameter must be set, else the servlet retuns false. <br />
-     * The servlet get the privilages of the user of the current session context
-     * and check them against the value of access. Then it looks for the own IP
-     * address and compares them with the given host or domain name. If both (or
-     * one it it is only one parameter) are true the result of the retuned XML
-     * stream is the following. The syntax of the stream is <br />
-     * <br />
-     * &lt;mycoreaccess&gt; <br />
-     * &lt;access return="true"&gt; <br />
-     * &lt;/mycoreaccess&gt; <br />
-     */
-    public void doGetPost(MCRServletJob job) throws Exception {
-        boolean retpriv = false;
-        boolean retip = false;
-        boolean retuser = false;
-        boolean result = false;
+	/**
+	 * This method overrides doGetPost of MCRServlet. <br />
+	 * The method looks for the parameters ip and privilege. As minimum one
+	 * parameter must be set, else the servlet retuns false. <br />
+	 * The servlet get the privilages of the user of the current session context
+	 * and check them against the value of access. Then it looks for the own IP
+	 * address and compares them with the given host or domain name. If both (or
+	 * one it it is only one parameter) are true the result of the retuned XML
+	 * stream is the following. The syntax of the stream is <br />
+	 * <br />
+	 * &lt;mycoreaccess&gt; <br />
+	 * &lt;access return="true"&gt; <br />
+	 * &lt;/mycoreaccess&gt; <br />
+	 */
+	public void doGetPost(MCRServletJob job) throws Exception {
+		boolean retpriv = false;
+		boolean retip = false;
+		boolean retuser = false;
+		boolean result = false;
 
-        // read the parameter
-        // mode parameter 'reader' or 'editor'
-        String mode = getProperty(job.getRequest(), "mode");
-        if (mode == null) {
-            mode = "reader";
-        }
-        mode.trim().toLowerCase();
-        if ((!mode.equals("reader")) && (!mode.equals("editor"))) {
-            mode = "reader";
-        }
-        // ip parameter 'ip' or 'ipmask/subnetmask'
-        String ip = getProperty(job.getRequest(), "ip");
-        if (ip == null) {
-            ip = "";
-        } else
-            ip = ip.trim();
-        if (ip.length() == 0) {
-            retip = true;
-        }
-        // privilege parameter
-        String privilege = getProperty(job.getRequest(), "privilege");
-        if (privilege == null) {
-            privilege = "";
-        } else
-            privilege = privilege.trim();
-        if (privilege.length() == 0) {
-            retpriv = true;
-        }
-        // list of user parameter
-        String userlist = getProperty(job.getRequest(), "userlist");
-        if (userlist == null) {
-            userlist = "";
-        } else
-            userlist = userlist.trim();
-        if (userlist.length() == 0) {
-            retuser = true;
-        }
-        HashSet userset = new HashSet();
-        StringTokenizer st = new StringTokenizer(userlist, "_");
-        while (st.hasMoreTokens()) {
-            userset.add(st.nextToken());
-        }
+		// read the parameter
+		// mode parameter 'reader' or 'editor'
+		String mode = getProperty(job.getRequest(), "mode");
+		if (mode == null) {
+			mode = "reader";
+		}
+		mode.trim().toLowerCase();
+		if ((!mode.equals("reader")) && (!mode.equals("editor"))) {
+			mode = "reader";
+		}
+		// ip parameter 'ip' or 'ipmask/subnetmask'
+		String ip = getProperty(job.getRequest(), "ip");
+		if (ip == null) {
+			ip = "";
+		} else
+			ip = ip.trim();
+		if (ip.length() == 0) {
+			retip = true;
+		}
+		// privilege parameter
+		String privilege = getProperty(job.getRequest(), "privilege");
+		if (privilege == null) {
+			privilege = "";
+		} else
+			privilege = privilege.trim();
+		if (privilege.length() == 0) {
+			retpriv = true;
+		}
+		// list of user parameter
+		String userlist = getProperty(job.getRequest(), "userlist");
+		if (userlist == null) {
+			userlist = "";
+		} else
+			userlist = userlist.trim();
+		if (userlist.length() == 0) {
+			retuser = true;
+		}
+		HashSet userset = new HashSet();
+		StringTokenizer st = new StringTokenizer(userlist, "_");
+		while (st.hasMoreTokens()) {
+			userset.add(st.nextToken());
+		}
 
-        // get the MCRSession for the current thread from the session manager.
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
-        LOGGER.debug("Access check for user " + userid);
+		// get the MCRSession for the current thread from the session manager.
+		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+		String userid = mcrSession.getCurrentUserID();
+		LOGGER.debug("Access check for user " + userid);
 
-        // check for mode reader
-        if (mode.equals("reader")) {
-            if (LOGGER.isDebugEnabled()) {
-                StringBuffer sb = new StringBuffer();
-                sb.append("Access check in mode ").append(mode).append(
-                        " for ip [").append(ip).append("](").append(!retip)
-                        .append(") and privilege [").append(privilege).append(
-                                "](").append(!retpriv).append(')');
-                LOGGER.debug(sb.toString());
-            }
-            // check the data
-            if (!retip) {
-                retip = checkIP(ip, job);
-            }
-            if (!retpriv) {
-                retpriv = checkPrivileg(privilege, userid);
-            }
-            result = retip && retpriv;
-        }
+		// check for mode reader
+		if (mode.equals("reader")) {
+			if (LOGGER.isDebugEnabled()) {
+				StringBuffer sb = new StringBuffer();
+				sb.append("Access check in mode ").append(mode).append(
+						" for ip [").append(ip).append("](").append(!retip)
+						.append(") and privilege [").append(privilege).append(
+								"](").append(!retpriv).append(')');
+				LOGGER.debug(sb.toString());
+			}
+			// check the data
+			if (!retip) {
+				retip = checkIP(ip, job);
+			}
+			if (!retpriv) {
+				retpriv = checkPrivileg(privilege, userid);
+			}
+			result = retip && retpriv;
+		}
 
-        // check for mode editor
-        if (mode.equals("editor")) {
-            if (LOGGER.isDebugEnabled()) {
-                StringBuffer sb = new StringBuffer();
-                sb.append("Access check in mode ").append(mode).append(
-                        " for ip [").append(ip).append("](").append(!retip)
-                        .append(" and users [").append(userlist).append("](")
-                        .append(!retuser).append(") and privilege [").append(
-                                privilege).append("](").append(!retpriv)
-                        .append(')');
-                LOGGER.debug(sb.toString());
-            }
-            // check the data
-            if (!retip) {
-                retip = checkIP(ip, job);
-            }
-            if (!retpriv) {
-                retpriv = checkPrivileg(privilege, userid);
-            }
-            if (!retuser) {
-                retuser = checkGroupMember(userid, userset);
-            }
-            result = retip && retpriv && retuser;
-        }
+		// check for mode editor
+		if (mode.equals("editor")) {
+			if (LOGGER.isDebugEnabled()) {
+				StringBuffer sb = new StringBuffer();
+				sb.append("Access check in mode ").append(mode).append(
+						" for ip [").append(ip).append("](").append(!retip)
+						.append(" and users [").append(userlist).append("](")
+						.append(!retuser).append(") and privilege [").append(
+								privilege).append("](").append(!retpriv)
+						.append(')');
+				LOGGER.debug(sb.toString());
+			}
+			// check the data
+			if (!retip) {
+				retip = checkIP(ip, job);
+			}
+			if (!retpriv) {
+				retpriv = checkPrivileg(privilege, userid);
+			}
+			if (!retuser) {
+				retuser = checkGroupMember(userid, userset);
+			}
+			result = retip && retpriv && retuser;
+		}
 
-        // prepare the document
-        org.jdom.Element root = new org.jdom.Element("mycoreaccess");
-        org.jdom.Document jdom = new org.jdom.Document(root);
-        org.jdom.Element access = new org.jdom.Element("access");
-        access.setAttribute("return", String.valueOf(result));
-        root.addContent(access);
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        job.getRequest().setAttribute("XSL.Style", "xml");
+		// prepare the document
+		org.jdom.Element root = new org.jdom.Element("mycoreaccess");
+		org.jdom.Document jdom = new org.jdom.Document(root);
+		org.jdom.Element access = new org.jdom.Element("access");
+		access.setAttribute("return", String.valueOf(result));
+		root.addContent(access);
+		job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+		job.getRequest().setAttribute("XSL.Style", "xml");
 
-        RequestDispatcher rd = getServletContext().getNamedDispatcher(
-                "MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
-    }
+		RequestDispatcher rd = getServletContext().getNamedDispatcher(
+				"MCRLayoutServlet");
+		rd.forward(job.getRequest(), job.getResponse());
+	}
 
-    /**
-     * The method check the given host or domain name against the current ip of
-     * this session.
-     * 
-     * @param ip
-     *            the host or domain name
-     * @param job
-     *            the current job
-     * @return true if the current session is in the host or domain name.
-     */
-    boolean checkIP(String ip, MCRServletJob job) {
-        String ipAddr, subNet;
-        int i = ip.indexOf("/");
-        if (i >= 0) {
-            //subnet mask present
-            ipAddr = ip.substring(0, i).trim();
-            subNet = ip.substring(i + 1, ip.length()).trim();
-        } else {
-            ipAddr = ip.trim();
-            subNet = "255.255.255.255";
-        }
-        String remAddr = getRemoteAddr(job.getRequest());
-        try {
-            return MCRAccessChecker.isInetAddressInSubnet(remAddr, ipAddr,
-                    subNet);
-        } catch (UnknownHostException e) {
-            LOGGER.info("Unknown Host while checking ip : " + ip, e);
-            return false;
-        }
-    }
+	/**
+	 * The method check the given host or domain name against the current ip of
+	 * this session.
+	 * 
+	 * @param ip
+	 *            the host or domain name
+	 * @param job
+	 *            the current job
+	 * @return true if the current session is in the host or domain name.
+	 */
+	boolean checkIP(String ip, MCRServletJob job) {
+		String ipAddr, subNet;
+		int i = ip.indexOf("/");
+		if (i >= 0) {
+			//subnet mask present
+			ipAddr = ip.substring(0, i).trim();
+			subNet = ip.substring(i + 1, ip.length()).trim();
+		} else {
+			ipAddr = ip.trim();
+			subNet = "255.255.255.255";
+		}
+		String remAddr = getRemoteAddr(job.getRequest());
+		try {
+			return MCRAccessChecker.isInetAddressInSubnet(remAddr, ipAddr,
+					subNet);
+		} catch (UnknownHostException e) {
+			LOGGER.info("Unknown Host while checking ip : " + ip, e);
+			return false;
+		}
+	}
 
-    /**
-     * The method check the given privilege against the privilege of the user.
-     * 
-     * @param privilege
-     *            the given privilege
-     * @param userid
-     *            the user with his privileges
-     * @return true if the user has the privilege, else false
-     */
-    boolean checkPrivileg(String privilege, String userid) {
-        return MCRAccessChecker.hasUserThePrivilege(privilege, userid);
-    }
+	/**
+	 * The method check the given privilege against the privilege of the user.
+	 * 
+	 * @param privilege
+	 *            the given privilege
+	 * @param userid
+	 *            the user with his privileges
+	 * @return true if the user has the privilege, else false
+	 */
+	boolean checkPrivileg(String privilege, String userid) {
+		return MCRAccessChecker.hasUserThePrivilege(privilege, userid);
+	}
 
-    /**
-     * The method check that the given user is in the same group or in a group
-     * that is a member of the users group.
-     * 
-     * @param user
-     *            the user which should be checked
-     * @param list
-     *            the list of group users in which the user should be a member
-     *            of himself group. return true if the user is in the same group
-     *            or subgroup like one of the li st
-     */
-    boolean checkGroupMember(String user, HashSet list) {
-        return MCRAccessChecker.isUserLikeListedUsers(user, list);
-    }
+	/**
+	 * The method check that the given user is in the same group or in a group
+	 * that is a member of the users group.
+	 * 
+	 * @param user
+	 *            the user which should be checked
+	 * @param list
+	 *            the list of group users in which the user should be a member
+	 *            of himself group. return true if the user is in the same group
+	 *            or subgroup like one of the li st
+	 */
+	boolean checkGroupMember(String user, HashSet list) {
+		return MCRAccessChecker.isUserLikeListedUsers(user, list);
+	}
 
 }

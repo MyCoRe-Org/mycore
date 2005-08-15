@@ -34,23 +34,25 @@ package org.mycore.services.query;
  */
 public interface MCRTextSearchInterface {
 
-    /**
-     * searches on the index and delivers derivate ids matching the search
-     * 
-     * Syntax:
-     * 
-     * <pre>
-     * 
-     *  foo bar   : search for foo AND bar anywhere across the files of the derivate
-     *  foo -bar  : search for foo and no file of the derivate may contain bar
-     *  &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
-     *  
-     * </pre>
-     * 
-     * @param doctext
-     *            query
-     * @return Array of DerivateIDs
-     */
-    public String[] getDerivateIDs(String doctext);
+	/**
+	 * searches on the index and delivers derivate ids matching the search
+	 * 
+	 * Syntax:
+	 * 
+	 * <pre>
+	 * 
+	 *  
+	 *   foo bar   : search for foo AND bar anywhere across the files of the derivate
+	 *   foo -bar  : search for foo and no file of the derivate may contain bar
+	 *   &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
+	 *   
+	 *  
+	 * </pre>
+	 * 
+	 * @param doctext
+	 *            query
+	 * @return Array of DerivateIDs
+	 */
+	public String[] getDerivateIDs(String doctext);
 
 }

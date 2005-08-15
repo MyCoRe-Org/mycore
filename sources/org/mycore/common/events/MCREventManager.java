@@ -24,10 +24,13 @@
 
 package org.mycore.common.events;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.*;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 /**
  * Acts as a multiplexer to forward events that are created to all registered
@@ -39,57 +42,57 @@ import org.mycore.common.*;
  * @author Frank Lützenkirchen
  */
 public class MCREventManager {
-    private static Logger logger = Logger.getLogger(MCREventManager.class);
+	private static Logger logger = Logger.getLogger(MCREventManager.class);
 
-    private static MCREventManager instance;
+	private static MCREventManager instance;
 
-    /**
-     * The singleton manager instance
-     * 
-     * @return the single event manager
-     */
-    public static synchronized MCREventManager instance() {
-        if (instance == null)
-            instance = new MCREventManager();
-        return instance;
-    }
+	/**
+	 * The singleton manager instance
+	 * 
+	 * @return the single event manager
+	 */
+	public static synchronized MCREventManager instance() {
+		if (instance == null)
+			instance = new MCREventManager();
+		return instance;
+	}
 
-    /** Ordered list of all configured event handlers * */
-    private List handlers;
+	/** Ordered list of all configured event handlers * */
+	private List handlers;
 
-    private MCREventManager() {
-        handlers = new ArrayList();
-        MCRConfiguration config = MCRConfiguration.instance();
+	private MCREventManager() {
+		handlers = new ArrayList();
+		MCRConfiguration config = MCRConfiguration.instance();
 
-        String prefix = "MCR.EventHandler.";
-        String suffix = ".class";
+		String prefix = "MCR.EventHandler.";
+		String suffix = ".class";
 
-        for (int i = 1;; i++) {
-            String prop = prefix + i + suffix;
-            String name = config.getString(prop, null);
-            if (name == null)
-                break;
-            logger.debug("EventManager instantiating handler " + name);
-            handlers.add(config.getInstanceOf(prop));
-        }
-    }
+		for (int i = 1;; i++) {
+			String prop = prefix + i + suffix;
+			String name = config.getString(prop, null);
+			if (name == null)
+				break;
+			logger.debug("EventManager instantiating handler " + name);
+			handlers.add(config.getInstanceOf(prop));
+		}
+	}
 
-    /**
-     * This method is called by the component that created the event and acts as
-     * a multiplexer that invokes all registered event handlers doHandleEvent
-     * methods.
-     * 
-     * @see MCREvent#doHandleEvent
-     * 
-     * @param evt
-     *            the event that happened
-     */
-    public void handleEvent(MCREvent evt) throws MCRException {
-        for (int i = 0; i < handlers.size(); i++) {
-            MCREventHandler eh = (MCREventHandler) (handlers.get(i));
-            logger.debug("EventManager calling handler "
-                    + eh.getClass().getName());
-            eh.doHandleEvent(evt);
-        }
-    }
+	/**
+	 * This method is called by the component that created the event and acts as
+	 * a multiplexer that invokes all registered event handlers doHandleEvent
+	 * methods.
+	 * 
+	 * @see MCREvent#doHandleEvent
+	 * 
+	 * @param evt
+	 *            the event that happened
+	 */
+	public void handleEvent(MCREvent evt) throws MCRException {
+		for (int i = 0; i < handlers.size(); i++) {
+			MCREventHandler eh = (MCREventHandler) (handlers.get(i));
+			logger.debug("EventManager calling handler "
+					+ eh.getClass().getName());
+			eh.doHandleEvent(evt);
+		}
+	}
 }

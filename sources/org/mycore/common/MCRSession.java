@@ -24,155 +24,162 @@
 
 package org.mycore.common;
 
-import org.apache.log4j.Logger;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 
 /**
  * Instances of this class collect information kept during a session like the
  * currently active user, the preferred language etc.
- *
+ * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- *
+ * 
  * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
-    /** A map storing arbitrary session data * */
-    private Map map = new HashMap();
+	/** A map storing arbitrary session data * */
+	private Map map = new HashMap();
 
-    /** the logger */
-    static Logger logger = Logger.getLogger(MCRSession.class.getName());
+	/** the logger */
+	static Logger logger = Logger.getLogger(MCRSession.class.getName());
 
-    /** The user ID of the session */
-    private String userID = null;
+	/** The user ID of the session */
+	private String userID = null;
 
-    /** The language for this session as upper case character */
-    private String language = null;
+	/** The language for this session as upper case character */
+	private String language = null;
 
-    /** The unique ID of this session */
-    private String sessionID = null;
+	/** The unique ID of this session */
+	private String sessionID = null;
 
-    /** A cache of MCRSession objects, used for method getSession( String ) */
-    private static MCRCache sessions = new MCRCache(1000);
+	/** A cache of MCRSession objects, used for method getSession( String ) */
+	private static MCRCache sessions = new MCRCache(1000);
 
-    /** -ASC- für MCRClassificationBrowser Class session daten */
-    public MCRClassificationBrowserData BData = null;
-    private String FullName = null;
-    private String CurrentDocumentID = null;
+	/** -ASC- für MCRClassificationBrowser Class session daten */
+	public MCRClassificationBrowserData BData = null;
 
-    /**
-     * The constructor of a MCRSession. As default the user ID is set to the
-     * value of the property variable named 'MCR.users_guestuser_username'.
-     */
-    public MCRSession() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        userID = config.getString("MCR.users_guestuser_username", "gast");
-        language = config.getString("MCR.metadata_default_lang", "de");
-        sessionID = buildSessionID();
-        sessions.put(sessionID, this);
+	private String FullName = null;
 
-        logger.debug("MCRSession created " + sessionID);
-    }
+	private String CurrentDocumentID = null;
 
-    /**
-     * Returns the MCRSession for the given sessionID.
-     */
-    public static MCRSession getSession(String sessionID) {
-        MCRSession s = (MCRSession) (sessions.get(sessionID));
-        if (s == null)
-            logger.warn("MCRSession with ID " + sessionID
-                    + " not cached any more");
-        return s;
-    }
+	/**
+	 * The constructor of a MCRSession. As default the user ID is set to the
+	 * value of the property variable named 'MCR.users_guestuser_username'.
+	 */
+	public MCRSession() {
+		MCRConfiguration config = MCRConfiguration.instance();
+		userID = config.getString("MCR.users_guestuser_username", "gast");
+		language = config.getString("MCR.metadata_default_lang", "de");
+		sessionID = buildSessionID();
+		sessions.put(sessionID, this);
 
-    /**
-     * Constructs a unique session ID for this session, based on current time
-     * and IP address of host where the code runs.
-     */
-    private static synchronized String buildSessionID() {
-        String ip = "127.0.0.1";
-        try {
-            ip = java.net.InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException ignored) {
-        }
+		logger.debug("MCRSession created " + sessionID);
+	}
 
-        java.util.StringTokenizer st = new java.util.StringTokenizer(ip, ".");
+	/**
+	 * Returns the MCRSession for the given sessionID.
+	 */
+	public static MCRSession getSession(String sessionID) {
+		MCRSession s = (MCRSession) (sessions.get(sessionID));
+		if (s == null)
+			logger.warn("MCRSession with ID " + sessionID
+					+ " not cached any more");
+		return s;
+	}
 
-        long sum = Integer.parseInt(st.nextToken());
-        while (st.hasMoreTokens())
-            sum = (sum << 8) + Integer.parseInt(st.nextToken());
+	/**
+	 * Constructs a unique session ID for this session, based on current time
+	 * and IP address of host where the code runs.
+	 */
+	private static synchronized String buildSessionID() {
+		String ip = "127.0.0.1";
+		try {
+			ip = java.net.InetAddress.getLocalHost().getHostAddress();
+		} catch (java.net.UnknownHostException ignored) {
+		}
 
-        String address = Long.toString(sum, 36);
-        address = "000000" + address;
-        String prefix = address.substring(address.length() - 6);
+		java.util.StringTokenizer st = new java.util.StringTokenizer(ip, ".");
 
-        long now = System.currentTimeMillis();
-        String suffix = Long.toString(now, 36);
+		long sum = Integer.parseInt(st.nextToken());
+		while (st.hasMoreTokens())
+			sum = (sum << 8) + Integer.parseInt(st.nextToken());
 
-        return prefix + "-" + suffix;
-    }
+		String address = Long.toString(sum, 36);
+		address = "000000" + address;
+		String prefix = address.substring(address.length() - 6);
 
-    /**
-     * Returns the unique ID of this session
-     */
-    public String getID() {
-        return sessionID;
-    }
+		long now = System.currentTimeMillis();
+		String suffix = Long.toString(now, 36);
 
-    /** returns the current user ID */
-    public final String getCurrentUserID() {
-        return userID.trim();
-    }
+		return prefix + "-" + suffix;
+	}
 
-    /** sets the current user ID */
-    public final void setCurrentUserID(String userID) {
-        this.userID = userID;
-    }
+	/**
+	 * Returns the unique ID of this session
+	 */
+	public String getID() {
+		return sessionID;
+	}
 
-    /** returns the current language */
-    public final String getCurrentLanguage() {
-        return language.trim();
-    }
+	/** returns the current user ID */
+	public final String getCurrentUserID() {
+		return userID.trim();
+	}
 
-    /** sets the current language */
-    public final void setCurrentLanguage(String language) {
-        this.language = language;
-    }
+	/** sets the current user ID */
+	public final void setCurrentUserID(String userID) {
+		this.userID = userID;
+	}
 
-    /** returns the current document ID */
-    public final String getCurrentDocumentID()
-    { return CurrentDocumentID; }
+	/** returns the current language */
+	public final String getCurrentLanguage() {
+		return language.trim();
+	}
 
-    /** returns the current document ID */
-    public final String getCurrentUserName()
-    { return FullName; }
+	/** sets the current language */
+	public final void setCurrentLanguage(String language) {
+		this.language = language;
+	}
 
-    /** sets the current user fullname */
-    public final void setCurrentUserName(String userName)
-    { this.FullName = userName; }
+	/** returns the current document ID */
+	public final String getCurrentDocumentID() {
+		return CurrentDocumentID;
+	}
 
-    /** sets the current document ID */
-    public final void setCurrentDocumentID(String DocumentID)
-    { this.CurrentDocumentID = DocumentID; }
+	/** returns the current document ID */
+	public final String getCurrentUserName() {
+		return FullName;
+	}
 
-    /** Write data to the logger for debugging purposes */
-    public final void debug() {
-        logger.debug("SessionID = " + sessionID);
-        logger.debug("UserID    = " + userID);
-        logger.debug("language  = " + language);
-    }
+	/** sets the current user fullname */
+	public final void setCurrentUserName(String userName) {
+		this.FullName = userName;
+	}
 
-    /** Stores an object under the given key within the session * */
-    public Object put(Object key, Object value) {
-        return map.put(key, value);
-    }
+	/** sets the current document ID */
+	public final void setCurrentDocumentID(String DocumentID) {
+		this.CurrentDocumentID = DocumentID;
+	}
 
-    /** Returns the object that was stored in the session under the given key * */
-    public Object get(Object key) {
-        return map.get(key);
-    }
+	/** Write data to the logger for debugging purposes */
+	public final void debug() {
+		logger.debug("SessionID = " + sessionID);
+		logger.debug("UserID    = " + userID);
+		logger.debug("language  = " + language);
+	}
+
+	/** Stores an object under the given key within the session * */
+	public Object put(Object key, Object value) {
+		return map.put(key, value);
+	}
+
+	/** Returns the object that was stored in the session under the given key * */
+	public Object get(Object key) {
+		return map.get(key);
+	}
 }
-

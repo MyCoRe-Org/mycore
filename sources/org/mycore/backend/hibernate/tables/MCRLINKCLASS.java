@@ -1,80 +1,72 @@
 /*
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * This file is part of ** M y C o R e ** Visit our homepage at
+ * http://www.mycore.de/ for details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, normally in the file license.txt. If not, write to the Free
+ * Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307
+ * USA
  */
 
 package org.mycore.backend.hibernate.tables;
 
-public class MCRLINKCLASS
-{
-    private MCRLINKCLASSPK key;
+public class MCRLINKCLASS {
+	private MCRLINKCLASSPK key;
 
-    public MCRLINKCLASS()
-    {
-	this.key = new MCRLINKCLASSPK();
-    }
+	public MCRLINKCLASS() {
+		this.key = new MCRLINKCLASSPK();
+	}
 
-    public MCRLINKCLASS(String from, String to)
-    {
-	this.key = new MCRLINKCLASSPK();
-        key.setMcrfrom(from);
-        key.setMcrto(to);
-    }
-    
-    /**
-     * @hibernate.property
-     * column="Primary Key"
-     * not-null="true"
-     * update="true"
-     */
-    public MCRLINKCLASSPK getKey() {
-        return key;
-    }
-    public void setKey(MCRLINKCLASSPK key) {
-        this.key = key;
-    }
-    
-    /**
-     * @hibernate.property
-     * column="MCRFROM"
-     * not-null="true"
-     * update="true"
-     */
-    public String getMcrfrom() {
-        return key.getMcrfrom();
-    }
-    public void setMcrfrom(String mcrfrom) {
-        key.setMcrfrom(mcrfrom);
-    }
-    
-    /**
-     * @hibernate.property
-     * column="MCRTO"
-     * not-null="true"
-     * update="true"
-     */
-    public String getMcrto() {
-        return key.getMcrto();
-    }
-    /**
-     * @param mcrto The mcrto to set.
-     */
-    public void setMcrto(String mcrto) {
-        key.setMcrto(mcrto);
-    }
+	public MCRLINKCLASS(String from, String to) {
+		this.key = new MCRLINKCLASSPK();
+		key.setMcrfrom(from);
+		key.setMcrto(to);
+	}
+
+	/**
+	 * @hibernate.property column="Primary Key" not-null="true" update="true"
+	 */
+	public MCRLINKCLASSPK getKey() {
+		return key;
+	}
+
+	public void setKey(MCRLINKCLASSPK key) {
+		this.key = key;
+	}
+
+	/**
+	 * @hibernate.property column="MCRFROM" not-null="true" update="true"
+	 */
+	public String getMcrfrom() {
+		return key.getMcrfrom();
+	}
+
+	public void setMcrfrom(String mcrfrom) {
+		key.setMcrfrom(mcrfrom);
+	}
+
+	/**
+	 * @hibernate.property column="MCRTO" not-null="true" update="true"
+	 */
+	public String getMcrto() {
+		return key.getMcrto();
+	}
+
+	/**
+	 * @param mcrto
+	 *            The mcrto to set.
+	 */
+	public void setMcrto(String mcrto) {
+		key.setMcrto(mcrto);
+	}
 }

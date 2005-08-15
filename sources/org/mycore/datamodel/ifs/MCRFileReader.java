@@ -34,48 +34,48 @@ package org.mycore.datamodel.ifs;
  * @version $Revision$ $Date$
  */
 public interface MCRFileReader {
-    /**
-     * Returns the ID of this file
-     * 
-     * @return the ID of this file
-     */
-    public String getID();
+	/**
+	 * Returns the ID of this file
+	 * 
+	 * @return the ID of this file
+	 */
+	public String getID();
 
-    /**
-     * Returns the relative path of this file
-     */
-    public String getPath();
+	/**
+	 * Returns the relative path of this file
+	 */
+	public String getPath();
 
-    /**
-     * Returns the file extension of this file, or an empty string if the file
-     * has no extension
-     */
-    public String getExtension();
+	/**
+	 * Returns the file extension of this file, or an empty string if the file
+	 * has no extension
+	 */
+	public String getExtension();
 
-    /**
-     * Returns the file size as number of bytes
-     */
-    public long getSize();
+	/**
+	 * Returns the file size as number of bytes
+	 */
+	public long getSize();
 
-    /**
-     * Returns the ID of the MCRContentStore implementation that holds the
-     * content of this file
-     */
-    public String getStoreID();
+	/**
+	 * Returns the ID of the MCRContentStore implementation that holds the
+	 * content of this file
+	 */
+	public String getStoreID();
 
-    /**
-     * Returns the storage ID that identifies the place where the
-     * MCRContentStore has stored the content of this file
-     */
-    public String getStorageID();
+	/**
+	 * Returns the storage ID that identifies the place where the
+	 * MCRContentStore has stored the content of this file
+	 */
+	public String getStorageID();
 
-    /**
-     * Returns the content type of the content of this file
-     */
-    public String getContentTypeID();
+	/**
+	 * Returns the content type of the content of this file
+	 */
+	public String getContentTypeID();
 
-    /**
-     * Returns the content type of this file
-     */
-    public MCRFileContentType getContentType();
+	/**
+	 * Returns the content type of this file
+	 */
+	public MCRFileContentType getContentType();
 }

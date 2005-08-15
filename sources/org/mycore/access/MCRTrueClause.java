@@ -21,6 +21,7 @@
 package org.mycore.access;
 
 import java.util.Date;
+
 import org.mycore.user.MCRUser;
 
 /**
@@ -30,15 +31,14 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRTrueClause implements MCRAccessCtrlDefinition {
-    MCRTrueClause() {
-    }
+	MCRTrueClause() {
+	}
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return true;
-    }
+	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+		return true;
+	}
 
-    public String toString() {
-        return "true\n";
-    }
+	public String toString() {
+		return "true\n";
+	}
 };
-

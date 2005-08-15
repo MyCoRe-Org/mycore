@@ -20,14 +20,13 @@
 
 package org.mycore.access;
 
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import org.mycore.user.MCRUser;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class for parsing Access Control Definitions.
@@ -36,167 +35,167 @@ import java.text.SimpleDateFormat;
  */
 
 class MCRRuleParser {
-    private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
+	private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
 
-    private static Pattern and = Pattern.compile("\\band\\b");
+	private static Pattern and = Pattern.compile("\\band\\b");
 
-    private static Pattern or = Pattern.compile("\\bor\\b");
+	private static Pattern or = Pattern.compile("\\bor\\b");
 
-    private static Pattern not = Pattern.compile("\\s*\\bnot\\b\\s*");
+	private static Pattern not = Pattern.compile("\\s*\\bnot\\b\\s*");
 
-    private static Pattern marker = Pattern.compile("@<([0-9]*)>@");
+	private static Pattern marker = Pattern.compile("@<([0-9]*)>@");
 
-    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
+	private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
 
-    private static String extendClauses(String s, List l) {
-        while (true) {
-            Matcher m = marker.matcher(s);
-            if (m.find()) {
-                String c = m.group();
-                String clause = (String) l.get(Integer.parseInt(m.group(1)));
-                s = s.replaceAll(c, clause);
-            } else {
-                break;
-            }
-        }
-        return s;
-    }
+	private static String extendClauses(String s, List l) {
+		while (true) {
+			Matcher m = marker.matcher(s);
+			if (m.find()) {
+				String c = m.group();
+				String clause = (String) l.get(Integer.parseInt(m.group(1)));
+				s = s.replaceAll(c, clause);
+			} else {
+				break;
+			}
+		}
+		return s;
+	}
 
-    private static MCRAccessCtrlDefinition parse(String s)
-            throws MCRParseException {
-        s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
-        return parse(s, null);
-    }
+	private static MCRAccessCtrlDefinition parse(String s)
+			throws MCRParseException {
+		s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
+		return parse(s, null);
+	}
 
-    private static MCRAccessCtrlDefinition parse(String s, List l)
-            throws MCRParseException {
-        if (l == null) {
-            l = new ArrayList();
-        }
-        s = s.trim();
+	private static MCRAccessCtrlDefinition parse(String s, List l)
+			throws MCRParseException {
+		if (l == null) {
+			l = new ArrayList();
+		}
+		s = s.trim();
 
-        /* replace all bracket expressions with $n */
-        while (true) {
-            /* remove outer brackets () */
-            while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
-                    && s.substring(1, s.length() - 1).indexOf('(') < 0
-                    && s.substring(1, s.length() - 1).indexOf(')') < 0) {
-                s = s.substring(1, s.length() - 1).trim();
-            }
-            Matcher m = bracket.matcher(s);
-            if (m.find()) {
-                String clause = m.group();
-                s = s.substring(0, m.start()) + "@<" + l.size() + ">@"
-                        + s.substring(m.end());
-                l.add(extendClauses(clause, l));
-            } else {
-                break;
-            }
-        }
+		/* replace all bracket expressions with $n */
+		while (true) {
+			/* remove outer brackets () */
+			while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
+					&& s.substring(1, s.length() - 1).indexOf('(') < 0
+					&& s.substring(1, s.length() - 1).indexOf(')') < 0) {
+				s = s.substring(1, s.length() - 1).trim();
+			}
+			Matcher m = bracket.matcher(s);
+			if (m.find()) {
+				String clause = m.group();
+				s = s.substring(0, m.start()) + "@<" + l.size() + ">@"
+						+ s.substring(m.end());
+				l.add(extendClauses(clause, l));
+			} else {
+				break;
+			}
+		}
 
-        /* handle OR */
-        Matcher m = or.matcher(s);
-        if (m.find()) {
-            if (m.start() <= 0)
-                throw new MCRParseException(
-                        "left side of OR missing while parsing \"" + s + "\"");
-            if (m.end() >= s.length() - 1)
-                throw new MCRParseException(
-                        "right side of OR missing while parsing \"" + s + "\"");
-            MCRAccessCtrlDefinition left = parse(extendClauses(s.substring(0, m
-                    .start()), l), l);
-            MCRAccessCtrlDefinition right = parse(extendClauses(s.substring(m
-                    .end()), l), l);
-            return new MCROrClause(left, right);
-        }
-        /* handle AND */
-        m = and.matcher(s);
-        if (m.find()) {
-            if (m.start() <= 0)
-                throw new MCRParseException(
-                        "left side of AND missing while parsing \"" + s + "\"");
-            if (m.end() >= s.length() - 1)
-                throw new MCRParseException(
-                        "right side of AND missing while parsing \"" + s + "\"");
-            MCRAccessCtrlDefinition left = parse(extendClauses(s.substring(0, m
-                    .start()), l), l);
-            MCRAccessCtrlDefinition right = parse(extendClauses(s.substring(m
-                    .end()), l), l);
-            return new MCRAndClause(left, right);
-        }
-        /* handle NOT */
-        s = s.trim();
-        if (s.toLowerCase().startsWith("not ")) {
-            MCRAccessCtrlDefinition inverse = parse(extendClauses(s
-                    .substring(4), l), l);
-            return new MCRNotClause(inverse);
-        }
-        /* handle specific rules */
-        if (s.equalsIgnoreCase("false"))
-            return new MCRFalseClause();
-        if (s.equalsIgnoreCase("true"))
-            return new MCRTrueClause();
-        if (s.startsWith("group "))
-            return new MCRGroupClause(s.substring(6).trim());
-        if (s.startsWith("user "))
-            return new MCRUserClause(s.substring(5).trim());
-        if (s.startsWith("ip ")) {
-            return new MCRIPClause(s.substring(3).trim());
-        }
-        if (s.startsWith("date ")) {
-            s = s.substring(5).trim();
-            if (s.startsWith(">="))
-                return new MCRDateAfterClause(parseDate(s.substring(2).trim(),
-                        false));
-            else if (s.startsWith("<="))
-                return new MCRDateBeforeClause(parseDate(s.substring(2).trim(),
-                        true));
-            else if (s.startsWith(">"))
-                return new MCRDateAfterClause(parseDate(s.substring(1).trim(),
-                        true));
-            else if (s.startsWith("<"))
-                return new MCRDateBeforeClause(parseDate(s.substring(1).trim(),
-                        false));
-        }
+		/* handle OR */
+		Matcher m = or.matcher(s);
+		if (m.find()) {
+			if (m.start() <= 0)
+				throw new MCRParseException(
+						"left side of OR missing while parsing \"" + s + "\"");
+			if (m.end() >= s.length() - 1)
+				throw new MCRParseException(
+						"right side of OR missing while parsing \"" + s + "\"");
+			MCRAccessCtrlDefinition left = parse(extendClauses(s.substring(0, m
+					.start()), l), l);
+			MCRAccessCtrlDefinition right = parse(extendClauses(s.substring(m
+					.end()), l), l);
+			return new MCROrClause(left, right);
+		}
+		/* handle AND */
+		m = and.matcher(s);
+		if (m.find()) {
+			if (m.start() <= 0)
+				throw new MCRParseException(
+						"left side of AND missing while parsing \"" + s + "\"");
+			if (m.end() >= s.length() - 1)
+				throw new MCRParseException(
+						"right side of AND missing while parsing \"" + s + "\"");
+			MCRAccessCtrlDefinition left = parse(extendClauses(s.substring(0, m
+					.start()), l), l);
+			MCRAccessCtrlDefinition right = parse(extendClauses(s.substring(m
+					.end()), l), l);
+			return new MCRAndClause(left, right);
+		}
+		/* handle NOT */
+		s = s.trim();
+		if (s.toLowerCase().startsWith("not ")) {
+			MCRAccessCtrlDefinition inverse = parse(extendClauses(s
+					.substring(4), l), l);
+			return new MCRNotClause(inverse);
+		}
+		/* handle specific rules */
+		if (s.equalsIgnoreCase("false"))
+			return new MCRFalseClause();
+		if (s.equalsIgnoreCase("true"))
+			return new MCRTrueClause();
+		if (s.startsWith("group "))
+			return new MCRGroupClause(s.substring(6).trim());
+		if (s.startsWith("user "))
+			return new MCRUserClause(s.substring(5).trim());
+		if (s.startsWith("ip ")) {
+			return new MCRIPClause(s.substring(3).trim());
+		}
+		if (s.startsWith("date ")) {
+			s = s.substring(5).trim();
+			if (s.startsWith(">="))
+				return new MCRDateAfterClause(parseDate(s.substring(2).trim(),
+						false));
+			else if (s.startsWith("<="))
+				return new MCRDateBeforeClause(parseDate(s.substring(2).trim(),
+						true));
+			else if (s.startsWith(">"))
+				return new MCRDateAfterClause(parseDate(s.substring(1).trim(),
+						true));
+			else if (s.startsWith("<"))
+				return new MCRDateBeforeClause(parseDate(s.substring(1).trim(),
+						false));
+		}
 
-        throw new MCRParseException("syntax error: " + extendClauses(s, l));
-    }
+		throw new MCRParseException("syntax error: " + extendClauses(s, l));
+	}
 
-    private static Date parseDate(String s, boolean dayafter)
-            throws MCRParseException {
-        try {
-            long time = dateformat.parse(s).getTime();
-            if (dayafter)
-                time += 1000 * 60 * 60 * 24;
-            return new Date(time);
-        } catch (java.text.ParseException e) {
-            throw new MCRParseException("unable to parse date " + s);
-        }
-    }
+	private static Date parseDate(String s, boolean dayafter)
+			throws MCRParseException {
+		try {
+			long time = dateformat.parse(s).getTime();
+			if (dayafter)
+				time += 1000 * 60 * 60 * 24;
+			return new Date(time);
+		} catch (java.text.ParseException e) {
+			throw new MCRParseException("unable to parse date " + s);
+		}
+	}
 
-    public static void main(String args[]) throws Exception {
-        //constants (true, false)
-        MCRAccessCtrlDefinition access1 = parse("(true or false) and (false or true)");
-        System.out.println(access1.toString());
-        MCRAccessCtrlDefinition access2 = parse("((true or false) and (false or true))");
-        System.out.println(access2.toString());
-        //access only in the year 2005
-        MCRAccessCtrlDefinition access3 = parse("((date >= 01.01.2005) and (date < 01.01.2006))");
-        System.out.println(access3.toString());
-        //access only on the 30.2.2005
-        MCRAccessCtrlDefinition access35 = parse("((date >= 30.02.2005) and (date <= 30.02.2005))");
-        System.out.println(access35.toString());
-        // access for all users except two
-        MCRAccessCtrlDefinition access4 = parse("not (user wichtel or (user waldmeister))");
-        System.out.println(access4.toString());
-        // access for three users
-        MCRAccessCtrlDefinition access5 = parse("(user wichtel) or (user waldmeister) or user schlumpf");
-        System.out.println(access5.toString());
-        // two groups (user must be in both groups)
-        MCRAccessCtrlDefinition access6 = parse("group admins and group interne");
-        System.out.println(access6.toString());
-        // "not admins" and "false" as group names
-        MCRAccessCtrlDefinition access7 = parse("group not admins and group false");
-        System.out.println(access7.toString());
-    }
+	public static void main(String args[]) throws Exception {
+		//constants (true, false)
+		MCRAccessCtrlDefinition access1 = parse("(true or false) and (false or true)");
+		System.out.println(access1.toString());
+		MCRAccessCtrlDefinition access2 = parse("((true or false) and (false or true))");
+		System.out.println(access2.toString());
+		//access only in the year 2005
+		MCRAccessCtrlDefinition access3 = parse("((date >= 01.01.2005) and (date < 01.01.2006))");
+		System.out.println(access3.toString());
+		//access only on the 30.2.2005
+		MCRAccessCtrlDefinition access35 = parse("((date >= 30.02.2005) and (date <= 30.02.2005))");
+		System.out.println(access35.toString());
+		// access for all users except two
+		MCRAccessCtrlDefinition access4 = parse("not (user wichtel or (user waldmeister))");
+		System.out.println(access4.toString());
+		// access for three users
+		MCRAccessCtrlDefinition access5 = parse("(user wichtel) or (user waldmeister) or user schlumpf");
+		System.out.println(access5.toString());
+		// two groups (user must be in both groups)
+		MCRAccessCtrlDefinition access6 = parse("group admins and group interne");
+		System.out.println(access6.toString());
+		// "not admins" and "false" as group names
+		MCRAccessCtrlDefinition access7 = parse("group not admins and group false");
+		System.out.println(access7.toString());
+	}
 }

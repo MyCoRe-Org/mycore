@@ -32,6 +32,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.VFS;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
@@ -62,118 +63,118 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  */
 public class MCRStoreVFS extends MCRContentStore {
 
-    private String method;
+	private String method;
 
-    private String host;
+	private String host;
 
-    private String user;
+	private String user;
 
-    private String password;
+	private String password;
 
-    private String baseDirectory;
+	private String baseDirectory;
 
-    private String domain;
+	private String domain;
 
-    private boolean buildSlots;
+	private boolean buildSlots;
 
-    private boolean debug;
+	private boolean debug;
 
-    private FileSystemManager fsManager;
+	private FileSystemManager fsManager;
 
-    private FileObject baseDir;
+	private FileObject baseDir;
 
-    protected String doStoreContent(MCRFileReader file,
-            MCRContentInputStream source) throws Exception {
-        StringBuffer storageId = new StringBuffer();
-        if (buildSlots) {
-            String[] slots = buildSlotPath();
+	protected String doStoreContent(MCRFileReader file,
+			MCRContentInputStream source) throws Exception {
+		StringBuffer storageId = new StringBuffer();
+		if (buildSlots) {
+			String[] slots = buildSlotPath();
 
-            // Recursively create directory name
-            for (int i = 0; i < slots.length; i++) {
-                storageId.append(slots[i]).append("/");
-            }
-        }
+			// Recursively create directory name
+			for (int i = 0; i < slots.length; i++) {
+				storageId.append(slots[i]).append("/");
+			}
+		}
 
-        String fileId = buildNextID(file);
-        storageId.append(fileId);
-        FileObject targetObject = fsManager.resolveFile(baseDir, storageId
-                .toString());
-        FileContent targetContent = targetObject.getContent();
-        OutputStream out = targetContent.getOutputStream();
-        MCRUtils.copyStream(source, out);
-        out.close();
+		String fileId = buildNextID(file);
+		storageId.append(fileId);
+		FileObject targetObject = fsManager.resolveFile(baseDir, storageId
+				.toString());
+		FileContent targetContent = targetObject.getContent();
+		OutputStream out = targetContent.getOutputStream();
+		MCRUtils.copyStream(source, out);
+		out.close();
 
-        return storageId.toString();
-    }
+		return storageId.toString();
+	}
 
-    protected void doDeleteContent(String storageId) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, storageId);
-        FileObject parent = targetObject.getParent();
-        targetObject.delete();
-        while (!parent.getName().getPathDecoded().equals(
-                baseDir.getName().getPathDecoded())) {
-            targetObject = parent;
-            parent = targetObject.getParent();
-            targetObject.delete();
-        }
-    }
+	protected void doDeleteContent(String storageId) throws Exception {
+		FileObject targetObject = fsManager.resolveFile(baseDir, storageId);
+		FileObject parent = targetObject.getParent();
+		targetObject.delete();
+		while (!parent.getName().getPathDecoded().equals(
+				baseDir.getName().getPathDecoded())) {
+			targetObject = parent;
+			parent = targetObject.getParent();
+			targetObject.delete();
+		}
+	}
 
-    protected void doRetrieveContent(MCRFileReader file, OutputStream target)
-            throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, file
-                .getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        InputStream in = targetContent.getInputStream();
-        MCRUtils.copyStream(in, target);
-    }
+	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
+			throws Exception {
+		FileObject targetObject = fsManager.resolveFile(baseDir, file
+				.getStorageID());
+		FileContent targetContent = targetObject.getContent();
+		InputStream in = targetContent.getInputStream();
+		MCRUtils.copyStream(in, target);
+	}
 
-    protected InputStream doRetrieveContent(MCRFileReader file)
-            throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, file
-                .getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        return targetContent.getInputStream();
-    }
+	protected InputStream doRetrieveContent(MCRFileReader file)
+			throws Exception {
+		FileObject targetObject = fsManager.resolveFile(baseDir, file
+				.getStorageID());
+		FileContent targetContent = targetObject.getContent();
+		return targetContent.getInputStream();
+	}
 
-    public void init(String storeId) {
-        super.init(storeId);
-        MCRConfiguration config = MCRConfiguration.instance();
+	public void init(String storeId) {
+		super.init(storeId);
+		MCRConfiguration config = MCRConfiguration.instance();
 
-        method = config.getString(prefix + "Method");
-        host = config.getString(prefix + "Hostname");
-        user = config.getString(prefix + "UserID", "");
-        password = config.getString(prefix + "Password", "");
-        baseDirectory = config.getString(prefix + "BaseDirectory");
-        domain = config.getString(prefix + "Domain", "");
-        buildSlots = config.getBoolean(prefix + "buildSlots", false);
-        debug = config.getBoolean(prefix + "Debug", false);
+		method = config.getString(prefix + "Method");
+		host = config.getString(prefix + "Hostname");
+		user = config.getString(prefix + "UserID", "");
+		password = config.getString(prefix + "Password", "");
+		baseDirectory = config.getString(prefix + "BaseDirectory");
+		domain = config.getString(prefix + "Domain", "");
+		buildSlots = config.getBoolean(prefix + "buildSlots", false);
+		debug = config.getBoolean(prefix + "Debug", false);
 
-        try {
-            fsManager = VFS.getManager();
-            StringBuffer baseDirName = new StringBuffer(method).append("://");
-            if (method.equals("smb") && domain.length() > 0) {
-                baseDirName.append(domain).append(";");
-            }
-            baseDirName.append(user);
-            if (user.length() > 0) {
-                baseDirectory = "@" + baseDirectory;
-                if (password.length() > 0) {
-                    baseDirName.append(":").append(password);
-                }
-            }
-            baseDirName.append(baseDirectory);
-            baseDir = fsManager.resolveFile(baseDirName.toString());
-            // Create a folder, if it does not exist or throw an
-            // exception, if baseDir is not a folder
-            baseDir.createFolder();
-            if (!baseDir.isWriteable()) {
-                String msg = "Content store base directory must be writable: "
-                        + baseDirectory;
-                throw new MCRConfigurationException(msg);
-            }
-        } catch (FileSystemException ignored) {
-            ignored.printStackTrace();
-            throw new MCRConfigurationException(ignored.getCode());
-        }
-    }
+		try {
+			fsManager = VFS.getManager();
+			StringBuffer baseDirName = new StringBuffer(method).append("://");
+			if (method.equals("smb") && domain.length() > 0) {
+				baseDirName.append(domain).append(";");
+			}
+			baseDirName.append(user);
+			if (user.length() > 0) {
+				baseDirectory = "@" + baseDirectory;
+				if (password.length() > 0) {
+					baseDirName.append(":").append(password);
+				}
+			}
+			baseDirName.append(baseDirectory);
+			baseDir = fsManager.resolveFile(baseDirName.toString());
+			// Create a folder, if it does not exist or throw an
+			// exception, if baseDir is not a folder
+			baseDir.createFolder();
+			if (!baseDir.isWriteable()) {
+				String msg = "Content store base directory must be writable: "
+						+ baseDirectory;
+				throw new MCRConfigurationException(msg);
+			}
+		} catch (FileSystemException ignored) {
+			ignored.printStackTrace();
+			throw new MCRConfigurationException(ignored.getCode());
+		}
+	}
 }

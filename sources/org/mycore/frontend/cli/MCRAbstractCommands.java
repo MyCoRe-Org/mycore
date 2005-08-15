@@ -38,39 +38,38 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRAbstractCommands implements MCRExternalCommandInterface {
 
-    /** The configuration instance */
-    protected static MCRConfiguration CONFIG = null;
+	/** The configuration instance */
+	protected static MCRConfiguration CONFIG = null;
 
-    /** the file separator */
-    protected static String SLASH = System.getProperty("file.separator");
+	/** the file separator */
+	protected static String SLASH = System.getProperty("file.separator");
 
-    /** The array holding all known commands */
-    protected ArrayList command = null;
+	/** The array holding all known commands */
+	protected ArrayList command = null;
 
-    /**
-     * Initialize common data.
-     */
-    static {
-        CONFIG = MCRConfiguration.instance();
-    }
+	/**
+	 * Initialize common data.
+	 */
+	static {
+		CONFIG = MCRConfiguration.instance();
+	}
 
-    /**
-     * The constrctor.
-     */
-    protected MCRAbstractCommands() {
-        command = new ArrayList();
-    }
+	/**
+	 * The constrctor.
+	 */
+	protected MCRAbstractCommands() {
+		command = new ArrayList();
+	}
 
-    /**
-     * The method return the list of possible commands of this class. Each
-     * command has TWO Strings, a String of the user command syntax and a String
-     * of the called method.
-     * 
-     * @return a command pair RArrayList
-     */
-    public final ArrayList getPossibleCommands() {
-        return command;
-    }
+	/**
+	 * The method return the list of possible commands of this class. Each
+	 * command has TWO Strings, a String of the user command syntax and a String
+	 * of the called method.
+	 * 
+	 * @return a command pair RArrayList
+	 */
+	public final ArrayList getPossibleCommands() {
+		return command;
+	}
 
 }
-

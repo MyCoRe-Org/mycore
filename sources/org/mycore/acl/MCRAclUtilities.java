@@ -24,13 +24,12 @@ package org.mycore.acl;
 
 ///============================================================================§
 
-import java.util.Map;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 
+import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRPrincipal;
 import org.mycore.user.MCRUser;
-import org.mycore.user.MCRGroup;
 
 ///============================================================================|
 
@@ -42,256 +41,256 @@ import org.mycore.user.MCRGroup;
  */
 
 public class MCRAclUtilities {
-    ///============================================================================/
+	///============================================================================/
 
-    private final static String SEPARATOR = ": ";
+	private final static String SEPARATOR = ": ";
 
-    private final static String NEWLINE = "\n";
+	private final static String NEWLINE = "\n";
 
-    private static String ENTRY_PREFIX = "  ";
+	private static String ENTRY_PREFIX = "  ";
 
-    private static String GENERIC_TITLE = "Generic entries";
+	private static String GENERIC_TITLE = "Generic entries";
 
-    private static String USER_TITLE = "User entries";
+	private static String USER_TITLE = "User entries";
 
-    private static String GROUP_TITLE = "Group entries";
+	private static String GROUP_TITLE = "Group entries";
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static void printEntry(MCRPrincipal principal, MCRAcl acl,
-            StringBuffer buffer) {
+	private static void printEntry(MCRPrincipal principal, MCRAcl acl,
+			StringBuffer buffer) {
 
-        if (!acl.containsPrincipal(principal))
-            return;
+		if (!acl.containsPrincipal(principal))
+			return;
 
-        buffer.append(ENTRY_PREFIX);
-        buffer.append(principal.getID());
-        buffer.append(SEPARATOR);
-        buffer.append(acl.getPermissions(principal).toString());
-        buffer.append(NEWLINE);
+		buffer.append(ENTRY_PREFIX);
+		buffer.append(principal.getID());
+		buffer.append(SEPARATOR);
+		buffer.append(acl.getPermissions(principal).toString());
+		buffer.append(NEWLINE);
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static void printCategory(Set category, MCRAcl acl,
-            StringBuffer buffer) {
+	private static void printCategory(Set category, MCRAcl acl,
+			StringBuffer buffer) {
 
-        Iterator iterator = category.iterator();
+		Iterator iterator = category.iterator();
 
-        while (iterator.hasNext()) {
+		while (iterator.hasNext()) {
 
-            Object element = iterator.next();
+			Object element = iterator.next();
 
-            if (element instanceof MCRPrincipal) {
+			if (element instanceof MCRPrincipal) {
 
-                MCRPrincipal principal = (MCRPrincipal) element;
+				MCRPrincipal principal = (MCRPrincipal) element;
 
-                printEntry(principal, acl, buffer);
+				printEntry(principal, acl, buffer);
 
-            }
+			}
 
-        }
+		}
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    /**
-     * Returns a string representation of an ACL
-     * 
-     * @return a string used for printing an ACL..
-     */
+	/**
+	 * Returns a string representation of an ACL
+	 * 
+	 * @return a string used for printing an ACL..
+	 */
 
-    public static String printAcl(MCRAcl acl) {
+	public static String printAcl(MCRAcl acl) {
 
-        StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer();
 
-        buffer.append(GENERIC_TITLE);
-        buffer.append(SEPARATOR);
-        buffer.append(NEWLINE);
-        printEntry(MCRAclCategory.OWNER, acl, buffer);
-        printEntry(MCRAclCategory.OWNER_GROUP, acl, buffer);
-        printEntry(MCRAclCategory.OTHER, acl, buffer);
-        printEntry(MCRAclCategory.ANY_OTHER, acl, buffer);
+		buffer.append(GENERIC_TITLE);
+		buffer.append(SEPARATOR);
+		buffer.append(NEWLINE);
+		printEntry(MCRAclCategory.OWNER, acl, buffer);
+		printEntry(MCRAclCategory.OWNER_GROUP, acl, buffer);
+		printEntry(MCRAclCategory.OTHER, acl, buffer);
+		printEntry(MCRAclCategory.ANY_OTHER, acl, buffer);
 
-        buffer.append(USER_TITLE);
-        buffer.append(SEPARATOR);
-        buffer.append(NEWLINE);
-        printCategory(acl.getUsers(), acl, buffer);
+		buffer.append(USER_TITLE);
+		buffer.append(SEPARATOR);
+		buffer.append(NEWLINE);
+		printCategory(acl.getUsers(), acl, buffer);
 
-        buffer.append(GROUP_TITLE);
-        buffer.append(SEPARATOR);
-        buffer.append(NEWLINE);
-        printCategory(acl.getGroups(), acl, buffer);
+		buffer.append(GROUP_TITLE);
+		buffer.append(SEPARATOR);
+		buffer.append(NEWLINE);
+		printCategory(acl.getGroups(), acl, buffer);
 
-        return buffer.toString();
+		return buffer.toString();
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    public static String toXML(MCRAcl acl) {
+	public static String toXML(MCRAcl acl) {
 
-        StringBuffer buffer = new StringBuffer();
-        addXML(buffer, acl);
-        return buffer.toString();
+		StringBuffer buffer = new StringBuffer();
+		addXML(buffer, acl);
+		return buffer.toString();
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addXML(StringBuffer buffer, MCRAcl acl) {
+	private static final void addXML(StringBuffer buffer, MCRAcl acl) {
 
-        buffer.append("<acl>");
-        buffer.append("\n");
+		buffer.append("<acl>");
+		buffer.append("\n");
 
-        if (acl.containsPrincipal(MCRAclCategory.OWNER))
-            buffer.append("<owner>");
-        buffer.append("\n");
-        addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER));
-        buffer.append("</owner>");
-        buffer.append("\n");
+		if (acl.containsPrincipal(MCRAclCategory.OWNER))
+			buffer.append("<owner>");
+		buffer.append("\n");
+		addPermissionRing(buffer, acl.getPermissions(MCRAclCategory.OWNER));
+		buffer.append("</owner>");
+		buffer.append("\n");
 
-        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-            buffer.append("<owner_group>");
-        buffer.append("\n");
-        addPermissionRing(buffer, acl
-                .getPermissions(MCRAclCategory.OWNER_GROUP));
-        buffer.append("</owner_group>");
-        buffer.append("\n");
+		if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+			buffer.append("<owner_group>");
+		buffer.append("\n");
+		addPermissionRing(buffer, acl
+				.getPermissions(MCRAclCategory.OWNER_GROUP));
+		buffer.append("</owner_group>");
+		buffer.append("\n");
 
-        addUsers(buffer, acl);
-        addGroups(buffer, acl);
+		addUsers(buffer, acl);
+		addGroups(buffer, acl);
 
-        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-            buffer.append("<other>");
-        buffer.append("\n");
-        addPermissionRing(buffer, acl
-                .getPermissions(MCRAclCategory.OWNER_GROUP));
-        buffer.append("</other>");
-        buffer.append("\n");
+		if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+			buffer.append("<other>");
+		buffer.append("\n");
+		addPermissionRing(buffer, acl
+				.getPermissions(MCRAclCategory.OWNER_GROUP));
+		buffer.append("</other>");
+		buffer.append("\n");
 
-        if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
-            buffer.append("<any_other>");
-        buffer.append("\n");
-        addPermissionRing(buffer, acl
-                .getPermissions(MCRAclCategory.OWNER_GROUP));
-        buffer.append("</any_other>");
-        buffer.append("\n");
+		if (acl.containsPrincipal(MCRAclCategory.OWNER_GROUP))
+			buffer.append("<any_other>");
+		buffer.append("\n");
+		addPermissionRing(buffer, acl
+				.getPermissions(MCRAclCategory.OWNER_GROUP));
+		buffer.append("</any_other>");
+		buffer.append("\n");
 
-        buffer.append("</acl>");
-        buffer.append("\n");
+		buffer.append("</acl>");
+		buffer.append("\n");
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addUsers(StringBuffer buffer, MCRAcl acl) {
+	private static final void addUsers(StringBuffer buffer, MCRAcl acl) {
 
-        Set users = acl.getUsers();
+		Set users = acl.getUsers();
 
-        Iterator iterator = users.iterator();
+		Iterator iterator = users.iterator();
 
-        while (iterator.hasNext()) {
+		while (iterator.hasNext()) {
 
-            MCRUser user = (MCRUser) iterator.next();
-            MCRPermissionRing permissions = acl.getPermissions(user);
+			MCRUser user = (MCRUser) iterator.next();
+			MCRPermissionRing permissions = acl.getPermissions(user);
 
-            addUser(buffer, user, permissions);
+			addUser(buffer, user, permissions);
 
-        }
+		}
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addGroups(StringBuffer buffer, MCRAcl acl) {
+	private static final void addGroups(StringBuffer buffer, MCRAcl acl) {
 
-        Set groups = acl.getGroups();
+		Set groups = acl.getGroups();
 
-        Iterator iterator = groups.iterator();
+		Iterator iterator = groups.iterator();
 
-        while (iterator.hasNext()) {
+		while (iterator.hasNext()) {
 
-            MCRGroup group = (MCRGroup) iterator.next();
-            MCRPermissionRing permissions = acl.getPermissions(group);
+			MCRGroup group = (MCRGroup) iterator.next();
+			MCRPermissionRing permissions = acl.getPermissions(group);
 
-            addGroup(buffer, group, permissions);
+			addGroup(buffer, group, permissions);
 
-        }
+		}
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addUser(StringBuffer buffer, MCRUser user,
-            MCRPermissionRing permissions) {
+	private static final void addUser(StringBuffer buffer, MCRUser user,
+			MCRPermissionRing permissions) {
 
-        buffer.append("<user id=\"" + user.getID() + "\">");
-        buffer.append("\n");
-        addPermissionRing(buffer, permissions);
-        buffer.append("</user>");
-        buffer.append("\n");
+		buffer.append("<user id=\"" + user.getID() + "\">");
+		buffer.append("\n");
+		addPermissionRing(buffer, permissions);
+		buffer.append("</user>");
+		buffer.append("\n");
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addGroup(StringBuffer buffer, MCRGroup group,
-            MCRPermissionRing permissions) {
+	private static final void addGroup(StringBuffer buffer, MCRGroup group,
+			MCRPermissionRing permissions) {
 
-        buffer.append("<group id=\"" + group.getID() + "\">");
-        buffer.append("\n");
-        addPermissionRing(buffer, permissions);
-        buffer.append("</group>");
-        buffer.append("\n");
+		buffer.append("<group id=\"" + group.getID() + "\">");
+		buffer.append("\n");
+		addPermissionRing(buffer, permissions);
+		buffer.append("</group>");
+		buffer.append("\n");
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private static final void addPermissionRing(StringBuffer buffer,
-            MCRPermissionRing permissionRing) {
+	private static final void addPermissionRing(StringBuffer buffer,
+			MCRPermissionRing permissionRing) {
 
-        Iterator iterator = permissionRing.iterator();
+		Iterator iterator = permissionRing.iterator();
 
-        while (iterator.hasNext()) {
+		while (iterator.hasNext()) {
 
-            Object object = iterator.next();
+			Object object = iterator.next();
 
-            if (object instanceof MCRPermission) {
+			if (object instanceof MCRPermission) {
 
-                MCRPermission permission = (MCRPermission) object;
+				MCRPermission permission = (MCRPermission) object;
 
-                if (permissionRing.containsPermission(permission)) {
+				if (permissionRing.containsPermission(permission)) {
 
-                    String name = permission.getName();
-                    boolean status = permissionRing
-                            .isPermissionGranted(permission);
+					String name = permission.getName();
+					boolean status = permissionRing
+							.isPermissionGranted(permission);
 
-                    addPermission(buffer, name, status);
+					addPermission(buffer, name, status);
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
-    }
+	}
 
-    //------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
-    private final static void addPermission(StringBuffer buffer, String name,
-            boolean status) {
+	private final static void addPermission(StringBuffer buffer, String name,
+			boolean status) {
 
-        if (name == null || "".equals(name))
-            return;
+		if (name == null || "".equals(name))
+			return;
 
-        buffer.append("<permission " + "name=\"" + name + "\" " + "status=\""
-                + (status ? "granted" : "denied") + "\"" + "/>\n");
+		buffer.append("<permission " + "name=\"" + name + "\" " + "status=\""
+				+ (status ? "granted" : "denied") + "\"" + "/>\n");
 
-    }
+	}
 
-    //-============================================================================\
+	//-============================================================================\
 }

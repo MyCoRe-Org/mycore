@@ -22,13 +22,13 @@ package org.mycore.backend.hibernate;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.frontend.cli.*;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.mapping.*;
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRClassificationCommands;
+import org.mycore.frontend.cli.MCRCommand;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
@@ -39,40 +39,40 @@ import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
 public class MCRHIBCtrlCommands extends MCRAbstractCommands {
 
-    /** The logger */
-    public static Logger LOGGER = Logger
-            .getLogger(MCRClassificationCommands.class.getName());
+	/** The logger */
+	public static Logger LOGGER = Logger
+			.getLogger(MCRClassificationCommands.class.getName());
 
-    /**
-     * constructor with commands.
-     */
+	/**
+	 * constructor with commands.
+	 */
 
-    public MCRHIBCtrlCommands() {
-        super();
-        MCRCommand com = null;
+	public MCRHIBCtrlCommands() {
+		super();
+		MCRCommand com = null;
 
-        com = new MCRCommand("init hibernate",
-                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
-                "The command creates all tables for MyCoRe by hibernate.");
-        command.add(com);
+		com = new MCRCommand("init hibernate",
+				"org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
+				"The command creates all tables for MyCoRe by hibernate.");
+		command.add(com);
 
+	}
 
-    }
+	/**
+	 * method creates tables using hibernate
+	 */
+	public static void createTables() {
+		try {
+			new SchemaUpdate(MCRHIBConnection.instance().getConfiguration())
+					.execute(true, true);
 
-    /**
-     * method creates tables using hibernate
-     */
-    public static void createTables() {
-        try { 
-            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);       
-                 
-            LOGGER.info("tables created.");
-        } catch (MCRPersistenceException e) {
-            throw new MCRException("error while creating tables.", e);
-        } catch (HibernateException e) {
-            throw new MCRException("Hibernate error while creating database tables.", e);
-        }
-    }
+			LOGGER.info("tables created.");
+		} catch (MCRPersistenceException e) {
+			throw new MCRException("error while creating tables.", e);
+		} catch (HibernateException e) {
+			throw new MCRException(
+					"Hibernate error while creating database tables.", e);
+		}
+	}
 
-  
 }
