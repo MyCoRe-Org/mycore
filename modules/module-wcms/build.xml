@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.7 $ $Date: 2004-12-28 23:38:54 $ -->
+<!-- $Revision: 1.8 $ $Date: 2005-08-15 13:05:20 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -35,32 +35,6 @@
 	        cleanStandalone		remove MyCoReWCMS-Module 
 		</echo>
 	</target>
-
-	<!-- ============================================== -->
-	<!-- ============================================== -->
-	<target name="standalone">
-		<echo>
-           Execute installation procedure to install Module-WCMS as standalone application
-    </echo>
-
-		<subant target="standalone" inheritall="true" inheritrefs="true">
-			<fileset dir="." includes="appsSupport/standalone/build.xml" />
-		</subant>
-
-	</target>
-
-	<!-- ============================================== -->
-	
-	<target name="cleanStandalone">
-		<echo>
-           Execute installation procedure to remove Module-WCMS...
-	    </echo>
-
-		<subant target="clean" inheritall="true" inheritrefs="true">
-			<fileset dir="." includes="appsSupport/standalone/build.xml" />
-		</subant>
-
-	</target>	
 	
   <!-- =================================================================== -->
   <!-- Compiles the sources from directory sources to directory classes    -->

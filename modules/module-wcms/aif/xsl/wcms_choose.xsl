@@ -231,7 +231,7 @@
 					<tr>
 						<td align="right">
 							<img 
-								src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_left.gif" 
+								src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" 
 								width="11" height="22" border="0" alt="" title="" />
 						</td>
 						<td align="right" class="button">
@@ -239,7 +239,7 @@
 						</td>
 						<td align="right">
 							<img 
-								src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_right.gif" 
+								src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" 
 								width="11" height="22" border="0" alt="" title="" />
 						</td>
 					</tr>

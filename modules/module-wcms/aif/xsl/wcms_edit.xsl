@@ -208,7 +208,7 @@
 			<!-- submit -->
 			<tr>
 				<td align="right">
-					<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_left.gif" width="11" height="22" border="0" alt="" title=""/>
+					<img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" width="11" height="22" border="0" alt="" title=""/>
 				</td>
 				<td align="right" class="button_green">
 					<xsl:choose>
@@ -225,7 +225,7 @@
 					</xsl:choose>
 				</td>
 				<td align="right">
-					<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_right.gif" width="11" height="22" border="0" alt="" title=""/>
+					<img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" width="11" height="22" border="0" alt="" title=""/>
 				</td>
 			</tr>
 			<!-- END OF: submit -->
