@@ -388,10 +388,22 @@ final public class MCRMetaAddress extends MCRMetaDefault implements
 	/**
 	 * This method make a clone of this class.
 	 */
-	public final Object clone() {
-		MCRMetaAddress out = new MCRMetaAddress(datapart, subtag, lang, type,
-				inherited, country, state, zipcode, city, street, number);
-		return (Object) out;
+	public Object clone() {
+		/* TODO: Is it really necessary to implement Clonable in this class?
+		 * 
+		 * java-lang.Object.clone() allready clones all simply types of an Object.
+		 * As this class is a collection of simple types like String and int, there should be no need for it.
+		 * Either way I call super.clone() here and leave the rest of the decission process open.
+		 * 
+		 */
+		MCRMetaAddress out = null;
+		try {
+			out = (MCRMetaAddress)super.clone();
+		} catch (CloneNotSupportedException e) {
+			LOGGER.warn(new StringBuffer(MCRMetaAddress.class.getName()).append(" could not be cloned."),e);
+			return null;
+		}
+		return out;
 	}
 
 }
