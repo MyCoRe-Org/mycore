@@ -427,10 +427,6 @@ public class MCRDirectory extends MCRFilesystemNode {
 
 	/** Sorts children by filename, case insensitive * */
 	public final static Comparator SORT_BY_NAME_IGNORECASE = new Comparator() {
-		public boolean equals(Object obj) {
-			return super.equals(obj);
-		}
-
 		public int compare(Object a, Object b) {
 			return ((MCRFilesystemNode) a).getName().compareToIgnoreCase(
 					((MCRFilesystemNode) b).getName());
@@ -439,10 +435,6 @@ public class MCRDirectory extends MCRFilesystemNode {
 
 	/** Sorts children by filename, case sensitive * */
 	public final static Comparator SORT_BY_NAME = new Comparator() {
-		public boolean equals(Object obj) {
-			return super.equals(obj);
-		}
-
 		public int compare(Object a, Object b) {
 			return ((MCRFilesystemNode) a).getName().compareTo(
 					((MCRFilesystemNode) b).getName());
@@ -451,10 +443,6 @@ public class MCRDirectory extends MCRFilesystemNode {
 
 	/** Sorts children by file size or total directory size * */
 	public final static Comparator SORT_BY_SIZE = new Comparator() {
-		public boolean equals(Object obj) {
-			return super.equals(obj);
-		}
-
 		public int compare(Object a, Object b) {
 			return (int) (((MCRFilesystemNode) a).getSize() - ((MCRFilesystemNode) b)
 					.getSize());
@@ -463,10 +451,6 @@ public class MCRDirectory extends MCRFilesystemNode {
 
 	/** Sorts children by date of last modification * */
 	public final static Comparator SORT_BY_DATE = new Comparator() {
-		public boolean equals(Object obj) {
-			return super.equals(obj);
-		}
-
 		public int compare(Object a, Object b) {
 			return ((MCRFilesystemNode) a)
 					.getLastModified()
