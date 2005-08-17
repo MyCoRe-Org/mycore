@@ -230,18 +230,24 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
 	 * This method make a clone of this class.
 	 */
 	public Object clone() {
-		MCRMetaXML out = new MCRMetaXML(datapart, subtag, lang, type,
-				inherited, xmllist);
-		return (Object) out;
+		MCRMetaXML out = null;
+		try {
+			out=(MCRMetaXML)super.clone();
+		} catch (CloneNotSupportedException e){
+			LOGGER.warn(new StringBuffer(MCRMetaXML.class.getName()).append(" could not be cloned."),e);
+			return null;
+		}
+		out.xmllist=(ArrayList)xmllist.clone();
+		return out;
 	}
 
 	/**
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public void debug() {
-		logger.debug("Start Class : MCRMetaXML");
+		LOGGER.debug("Start Class : MCRMetaXML");
 		super.debugDefault();
-		logger.debug("ArrayList size()   = \n" + xmllist.size());
+		LOGGER.debug("ArrayList size()   = \n" + xmllist.size());
 	}
 
 }
