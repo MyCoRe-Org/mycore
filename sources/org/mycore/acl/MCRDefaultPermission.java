@@ -93,6 +93,10 @@ public class MCRDefaultPermission implements MCRPermission {
 
 	//------------------------------------------------------------------------------
 
+	public int hashCode() {
+		return name.hashCode();
+	}
+
 	/**
 	 * Returns the description of the permission.
 	 * 
