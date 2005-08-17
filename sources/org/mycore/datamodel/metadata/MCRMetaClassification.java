@@ -271,10 +271,10 @@ public class MCRMetaClassification extends MCRMetaDefault implements
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public void debug() {
-		logger.debug("Start Class : MCRMetaClassification");
+		LOGGER.debug("Start Class : MCRMetaClassification");
 		super.debugDefault();
-		logger.debug("ClassID            = " + classid);
-		logger.debug("CategID            = " + categid);
+		LOGGER.debug("ClassID            = " + classid);
+		LOGGER.debug("CategID            = " + categid);
 	}
 
 }

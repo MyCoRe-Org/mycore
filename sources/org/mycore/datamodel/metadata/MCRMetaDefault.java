@@ -56,7 +56,7 @@ public abstract class MCRMetaDefault {
 	protected static int DEFAULT_INHERITED = 0;
 
 	// logger
-	static Logger logger = Logger.getLogger(MCRMetaDefault.class.getName());
+	static Logger LOGGER = Logger.getLogger(MCRMetaDefault.class.getName());
 
 	// MetaLangText data
 	protected String subtag;
@@ -391,11 +391,11 @@ public abstract class MCRMetaDefault {
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public final void debugDefault() {
-		logger.debug("SubTag             = " + subtag);
-		logger.debug("Language           = " + lang);
-		logger.debug("Type               = " + type);
-		logger.debug("DataPart           = " + datapart);
-		logger.debug("Inhreited          = " + String.valueOf(inherited));
+		LOGGER.debug("SubTag             = " + subtag);
+		LOGGER.debug("Language           = " + lang);
+		LOGGER.debug("Type               = " + type);
+		LOGGER.debug("DataPart           = " + datapart);
+		LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
 	}
 
 }

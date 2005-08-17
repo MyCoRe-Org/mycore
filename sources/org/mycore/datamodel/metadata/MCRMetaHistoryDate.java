@@ -600,13 +600,13 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public final void debug() {
-		logger.debug("Start Class : MCRMetaHistoryDate");
+		LOGGER.debug("Start Class : MCRMetaHistoryDate");
 		super.debugDefault();
-		logger.debug("Text               = " + text);
-		logger.debug("Von                = " + getVonToString());
-		logger.debug("Bis                = " + getBisToString());
-		logger.debug("Stop");
-		logger.debug("");
+		LOGGER.debug("Text               = " + text);
+		LOGGER.debug("Von                = " + getVonToString());
+		LOGGER.debug("Bis                = " + getBisToString());
+		LOGGER.debug("Stop");
+		LOGGER.debug("");
 	}
 
 }

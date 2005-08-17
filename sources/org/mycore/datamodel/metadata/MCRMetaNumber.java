@@ -424,12 +424,12 @@ final public class MCRMetaNumber extends MCRMetaDefault implements
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public final void debug() {
-		logger.debug("Start Class : MCRMetaNumber");
+		LOGGER.debug("Start Class : MCRMetaNumber");
 		super.debugDefault();
-		logger.debug("Measurement        = " + measurement);
-		logger.debug("Dimension          = " + dimension);
-		logger.debug("Value              = " + number);
-		logger.debug("");
+		LOGGER.debug("Measurement        = " + measurement);
+		LOGGER.debug("Dimension          = " + dimension);
+		LOGGER.debug("Value              = " + number);
+		LOGGER.debug("");
 	}
 
 }

@@ -227,9 +227,9 @@ public class MCRMetaNBN extends MCRMetaDefault implements MCRMetaInterface {
 	 * This method put debug data to the logger (for the debug mode).
 	 */
 	public final void debug() {
-		logger.debug("Start Class : MCRMetaNBN");
+		LOGGER.debug("Start Class : MCRMetaNBN");
 		super.debugDefault();
-		logger.debug("NBN                = " + nbn);
+		LOGGER.debug("NBN                = " + nbn);
 	}
 
 }
