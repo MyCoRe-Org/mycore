@@ -42,45 +42,43 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRObject;
-
-import org.mycore.services.fieldquery.*;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.services.fieldquery.MCRMetadata2Fields;
 
 /**
- * This class builds indexes from mycore meta data.
- * MCRMetadata2Fields is used to generate searchfields.
+ * This class builds indexes from mycore meta data. MCRMetadata2Fields is used
+ * to generate searchfields.
  * 
  * @author Harald Richter
  */
 public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
-	private static Logger logger = Logger.getLogger(MCREventHandlerIndexMeta.class);
+	private static Logger LOGGER = Logger
+			.getLogger(MCREventHandlerIndexMeta.class);
 
-	static final private MCRConfiguration config = MCRConfiguration.instance();
+	static final private MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-	static String indexDir = "";
+	static String INDEX_DIR = "";
 
-	static boolean first = true;
+	static boolean FIRST = true;
 
 	//TODO: read from property file
-	static String dateformat = "yyyy-MM-dd";
+	static String DATE_FORMAT = "yyyy-MM-dd";
 
 	/** Reads properties from configuration file when class first used */
 	static {
 		MCRConfiguration config = MCRConfiguration.instance();
 
-		indexDir = config.getString("MCR.meta_lucene_searchindexdir");
-		logger.info("MCR.meta_lucene_searchindexdir: " + indexDir);
+		INDEX_DIR = config.getString("MCR.meta_lucene_searchindexdir");
+		LOGGER.info("MCR.meta_lucene_searchindexdir: " + INDEX_DIR);
 		String lockDir = config.getString("MCR.meta_lucene_lockdir", "");
-		logger.info("MCR.meta_lucene_lockdir: " + lockDir);
+		LOGGER.info("MCR.meta_lucene_lockdir: " + lockDir);
 		File file = new File(lockDir);
 
 		if (!file.exists()) {
-			logger.info("Lock Directory for Lucene doesn't exist: \"" + lockDir
+			LOGGER.info("Lock Directory for Lucene doesn't exist: \"" + lockDir
 					+ "\" use " + System.getProperty("java.io.tmpdir"));
 		} else if (file.isDirectory()) {
 			System.setProperty("org.apache.lucene.lockdir", lockDir);
@@ -88,8 +86,8 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	}
 
 	/**
-   * This class builds indexes of meta data objects.
-	 * MCRMetadata2Fields is used to generate searchfields.
+	 * This class builds indexes of meta data objects. MCRMetadata2Fields is
+	 * used to generate searchfields.
 	 * 
 	 * @param evt
 	 *            the event that occured
@@ -97,61 +95,58 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	 *            the MCRObject that caused the event
 	 */
 	protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-		List fields =  MCRMetadata2Fields.buildFields(obj);
-		try
-    {
-      Document doc = buildLuceneDocument(fields);
-      logger.debug("####### lucene document build ");
-      addDocumentToLucene(doc);
-    } catch (Exception e)
-    {
-      e.printStackTrace();
-      logger.warn( "xxxxx " + e.getMessage());
-    }
+		List fields = MCRMetadata2Fields.buildFields(obj);
+		try {
+			Document doc = buildLuceneDocument(fields);
+			LOGGER.debug("####### lucene document build ");
+			addDocumentToLucene(doc);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.warn("xxxxx " + e.getMessage());
+		}
 	}
-	
-  /**
-   * Build lucene document from transformed xml list 
-   * @param fields corresponding to lucene fields
-   * 
-   * @return The lucene document
-   * 
-   **/
-  private Document buildLuceneDocument( List fields )
-  throws Exception {
-    Document doc = new Document();
-    
-    for (int i = 0; i < fields.size(); i++)
-    {
-      org.jdom.Element xType = (org.jdom.Element) (fields.get(i));
-      String name = xType.getAttributeValue("name");
-      String type = xType.getAttributeValue("type");
-      String content = xType.getAttributeValue("value");
-      if (null != name && null != type && null != content)
-      {
-        if ("date".equals(type))
-        {
-          DateFormat f1 = new SimpleDateFormat(dateformat);
-          DateFormat f2 = new SimpleDateFormat("yyyyMMdd");
-          Date d;
-          d = f1.parse(content);
-          content = f2.format(d);
-          type = "Text";
-        }
 
-        logger.debug("####### Name: " + name + " Type: " + type + " Content: " + content);
-        if (type.equals("identifier"))
-          doc.add(Field.Keyword(name, content));
-        if (type.equals("Text") || type.equals("name"))
-          doc.add(Field.Text(name, content));
-        if (type.equals("text"))
-          doc.add(Field.UnStored(name, content));
-      }
-    }
-      
-    return doc;
-  }
-  
+	/**
+	 * Build lucene document from transformed xml list
+	 * 
+	 * @param fields
+	 *            corresponding to lucene fields
+	 * 
+	 * @return The lucene document
+	 *  
+	 */
+	private Document buildLuceneDocument(List fields) throws Exception {
+		Document doc = new Document();
+
+		for (int i = 0; i < fields.size(); i++) {
+			org.jdom.Element xType = (org.jdom.Element) (fields.get(i));
+			String name = xType.getAttributeValue("name");
+			String type = xType.getAttributeValue("type");
+			String content = xType.getAttributeValue("value");
+			if (null != name && null != type && null != content) {
+				if ("date".equals(type)) {
+					DateFormat f1 = new SimpleDateFormat(DATE_FORMAT);
+					DateFormat f2 = new SimpleDateFormat("yyyyMMdd");
+					Date d;
+					d = f1.parse(content);
+					content = f2.format(d);
+					type = "Text";
+				}
+
+				LOGGER.debug("####### Name: " + name + " Type: " + type
+						+ " Content: " + content);
+				if (type.equals("identifier"))
+					doc.add(Field.Keyword(name, content));
+				if (type.equals("Text") || type.equals("name"))
+					doc.add(Field.Text(name, content));
+				if (type.equals("text"))
+					doc.add(Field.UnStored(name, content));
+			}
+		}
+
+		return doc;
+	}
+
 	/**
 	 * Adds document to Lucene
 	 * 
@@ -163,22 +158,22 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 		IndexWriter writer = null;
 		Analyzer analyzer = new GermanAnalyzer();
 		// does directory for text index exist, if not build it
-		if (first) {
-			first = false;
-			File file = new File(indexDir);
+		if (FIRST) {
+			FIRST = false;
+			File file = new File(INDEX_DIR);
 
 			if (!file.exists()) {
-				logger.info("The Directory doesn't exist: " + indexDir
+				LOGGER.info("The Directory doesn't exist: " + INDEX_DIR
 						+ " try to build it");
-				IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
+				IndexWriter writer2 = new IndexWriter(INDEX_DIR, analyzer, true);
 				writer2.close();
 			} else if (file.isDirectory()) {
 				String names[] = file.list();
-				
+
 				if (0 == file.list().length) {
-					logger.info("No Entries in Directory, initialize: "
-							+ indexDir);
-					IndexWriter writer2 = new IndexWriter(indexDir, analyzer,
+					LOGGER.info("No Entries in Directory, initialize: "
+							+ INDEX_DIR);
+					IndexWriter writer2 = new IndexWriter(INDEX_DIR, analyzer,
 							true);
 					writer2.close();
 				}
@@ -187,7 +182,7 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 		} // if ( first
 
 		if (null == writer) {
-			writer = new IndexWriter(indexDir, analyzer, false);
+			writer = new IndexWriter(INDEX_DIR, analyzer, false);
 			writer.mergeFactor = 200;
 			writer.maxMergeDocs = 2000;
 		}
@@ -198,13 +193,13 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	}
 
 	/**
-   * Updates Object in lucene index.
-   * 
-   * @param evt
-   *          the event that occured
-   * @param obj
-   *          the MCRObject that caused the event
-   */
+	 * Updates Object in lucene index.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param obj
+	 *            the MCRObject that caused the event
+	 */
 	protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
 		handleObjectDeleted(evt, obj);
 		handleObjectCreated(evt, obj);
@@ -222,9 +217,10 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 		try {
 			deleteLuceneDocument(obj.getId().getId());
 		} catch (Exception e) {
-			logger.warn(e.getMessage());
+			LOGGER.warn(e.getMessage());
 		}
 	}
+
 	/**
 	 * Delete document in Lucene
 	 * 
@@ -234,7 +230,7 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	 */
 	private void deleteLuceneDocument(String id) throws Exception {
 
-		IndexSearcher searcher = new IndexSearcher(indexDir);
+		IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
 
 		if (null == searcher)
 			return;
@@ -242,19 +238,19 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 
 		TermQuery qu = new TermQuery(te1);
 
-		logger.info("Searching for: " + qu.toString(""));
+		LOGGER.info("Searching for: " + qu.toString(""));
 
 		Hits hits = searcher.search(qu);
 
-		logger.info("Number of documents found : " + hits.length());
+		LOGGER.info("Number of documents found : " + hits.length());
 		if (1 == hits.length()) {
-			logger.info(" id: " + hits.id(0) + " score: " + hits.score(0)
+			LOGGER.info(" id: " + hits.id(0) + " score: " + hits.score(0)
 					+ " key: " + hits.doc(0).get("id"));
 			if (id.equals(hits.doc(0).get("id"))) {
-				IndexReader reader = IndexReader.open(indexDir);
+				IndexReader reader = IndexReader.open(INDEX_DIR);
 				reader.delete(hits.id(0));
 				reader.close();
-				logger.info("DELETE: " + id);
+				LOGGER.info("DELETE: " + id);
 			}
 		}
 
