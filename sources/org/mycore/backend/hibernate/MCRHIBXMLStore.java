@@ -172,6 +172,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
         }catch(Exception e){
             tx.rollback();
             logger.error(e);
+	    return null;
         }finally{
             session.close();
         }
@@ -255,6 +256,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface
         }catch(Exception e){
             tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error during retrieveAllIDs("+type+")", e);
         }finally{
             session.close();
         }

@@ -127,6 +127,7 @@ public class
             nbn = new MCRNBN(MCRNBN.getLocalPrefix() + ((MCRNBNS)l.get(0)).getNiss());
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getURN("+url+")", e);
         }finally{
             session.close();
         }
@@ -174,6 +175,7 @@ public class
             n = (MCRNBNS)l.get(0);
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getURL("+urn+")", e);
         }finally{
             session.close();
         }
@@ -195,6 +197,7 @@ public class
              n = (MCRNBNS)l.get(0);
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getAuthor("+urn+")", e);
         }finally{
             session.close();
         }   
@@ -215,6 +218,7 @@ public class
             n = (MCRNBNS)l.get(0);
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getComment("+urn+")", e);
         }finally{
             session.close();
         }
@@ -236,6 +240,7 @@ public class
             greg.setTime(n.getDate());
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getDate("+urn+")", e);
         }finally{
             session.close();
         }
@@ -277,7 +282,8 @@ public class
                 results.add(n.getNiss());
             }
         }catch(Exception e){
-                logger.error(e);
+            logger.error(e);
+	    throw new MCRException("Error during listReservedURNs()", e);
         }finally{
             session.close();
         }
@@ -302,6 +308,7 @@ public class
         }catch(Exception e){
             tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error during getDocumentId()", e);
         }finally{
             session.close();
         }
@@ -347,6 +354,7 @@ public class
             n = (MCRNBNS)l.get(0);
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during getNBNByDocumentId("+documentId+")", e);
         }finally{
             session.close();
         }
@@ -380,6 +388,7 @@ public class
             
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during listURNs("+pattern+")", e);
         }finally{
             session.close();
         }

@@ -158,14 +158,12 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
     **/
     public final int countTo(String to){
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
         List l = new LinkedList();
         try{
             l = session.createQuery("from "+classname+" where MCRTO = '" + to + "'").list();
-            tx.commit();
         }catch(Exception e){
-            tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error during countTo("+to+")", e);
         }finally{
             session.close();
         }
@@ -187,6 +185,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface
             l = session.createQuery(query).list();
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("Error during countTo("+to+","+docType+","+restriction+")", e);
         }finally{
             session.close();
         }

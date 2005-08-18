@@ -141,7 +141,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
                         cl.getMcrdesc());
             }
         }catch(Exception e){
-            
+            logger.error(e);
         }finally{
             session.close();
         }
@@ -161,6 +161,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
             l = session.createQuery("from MCRCLASS where ID = '" + ID + "'").list();
         }catch(Exception e){
             logger.error(e);
+	    return false; // FIXME: should we throw an exception here?
         }finally{
             session.close();
         }
@@ -254,6 +255,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
             }
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("error while reading category item",e);
         }finally{
             session.close();
         }
@@ -294,6 +296,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
             }
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("error while reading categories",e);
         }finally{
             session.close(); 
         }
@@ -316,6 +319,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
                 ret = true;
         }catch(Exception e){
             logger.error(e);
+	    return false;
         }finally{
             session.close();
         }
@@ -351,6 +355,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
             }
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("error while retrieving children of CATEG "+PID,e);
         }finally{
             session.close();
         }
@@ -385,6 +390,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface
             }
         }catch(Exception e){
             logger.error(e);
+	    throw new MCRException("error while retrieving classification IDs",e);
         }finally{
             session.close();
         }

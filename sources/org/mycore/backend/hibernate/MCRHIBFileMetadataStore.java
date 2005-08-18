@@ -133,7 +133,6 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException{
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
         List l = new LinkedList();
         try{
             l = session.createQuery("from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").list();
@@ -141,10 +140,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
                 String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + ownerID;
                 throw new MCRException(msg);
             }
-            tx.commit();
         }catch(Exception e){
-            tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error while retrieving fs node"+ownerID, e);
         }finally{
             session.close();
         }
@@ -154,17 +152,15 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     
     public MCRFilesystemNode retrieveChild(String parentID, String name){
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
         List l = new LinkedList();
         try{
             l = session.createQuery("from MCRFSNODES where PID = '" + parentID  + "' and NAME = '"+name+"'").list();
             if (l.size() < 1) {
                 return null;
             }
-            tx.commit();
         }catch(Exception e){
-            tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error while retrieving fs node "+parentID, e);
         }finally{
             session.close();
         }
@@ -176,7 +172,6 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     throws MCRPersistenceException
     {
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
         List l = new LinkedList();
         try{
             l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
@@ -184,10 +179,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
                 String msg = "MCRSQLUserStore.retrieveUser(): There is no node with PID = " + parentID;
                 throw new MCRException(msg);
             }
-            tx.commit();
         }catch(Exception e){
-            tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error while retrieving fs node "+parentID, e);
         }finally{
             session.close();
         }
@@ -221,7 +215,6 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
     public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException
     {
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
         List l = new LinkedList();
         try{
             l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
@@ -229,10 +222,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
                 String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = " + ID;
                 throw new MCRException(msg);
             }
-            tx.commit();
         }catch(Exception e){
-            tx.rollback();
             logger.error(e);
+	    throw new MCRException("Error while retrieving fsnode "+ID, e);
         }finally{
             session.close();
         }
