@@ -24,74 +24,89 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.OutputStream;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.hibernate.*;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
+import org.mycore.common.*;
+import org.mycore.datamodel.ifs.*;
 import org.mycore.backend.hibernate.tables.MCRCSTORE;
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
-import org.mycore.datamodel.ifs.MCRContentStore;
-import org.mycore.datamodel.ifs.MCRFileReader;
+
+import java.util.*;
+import java.io.*;
 
 /**
  * This class implements the MCRContentStore interface.
  */
 public class MCRHIBCStore extends MCRContentStore {
-	public void init(String storeID) {
-		super.init(storeID);
+    
+    //  logger
+    static Logger logger=Logger.getLogger(MCRHIBCStore.class.getName());
+    
+    public void init(String storeID) {
+        super.init(storeID);
 
-		//    System.out.println("### INIT " + storeID );
-		//    MCRConfiguration config = MCRConfiguration.instance();
-	}
+        //    System.out.println("### INIT " + storeID );
+        //    MCRConfiguration config = MCRConfiguration.instance();
+    }
 
-	private synchronized int getNextFreeID(String tableName) throws Exception {
-		return (int) MCRHIBConnection.instance().getID();
-	}
+    private synchronized int getNextFreeID(String tableName) throws Exception {
+        return (int)MCRHIBConnection.instance().getID();
+    }
 
-	protected String doStoreContent(MCRFileReader file,
-			MCRContentInputStream source) throws Exception {
-		String tableName = file.getContentTypeID();
-		int ID = getNextFreeID(tableName);
-		String storageID = tableName + ":" + ID;
+    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+        String tableName = file.getContentTypeID();
+        int ID = getNextFreeID(tableName);
+        String storageID = tableName + ":" + ID;
+        
+        Session session = MCRHIBConnection.instance().getSession();
+        byte[] b = new byte[source.available()];
+        source.read(b);
+        MCRCSTORE c = new MCRCSTORE(storageID, b);
+        Transaction tx = session.beginTransaction();
+        try{
+            session.saveOrUpdate(c);
+            tx.commit();
+        }catch(Exception e){
+            tx.rollback();
+            logger.error(e);
+        }finally{
+            session.close();
+        }
+        return storageID;
+    }
 
-		Session session = MCRHIBConnection.instance().getSession();
-		byte[] b = new byte[source.available()];
-		source.read(b);
-		MCRCSTORE c = new MCRCSTORE(storageID, b);
-		Transaction tx = session.beginTransaction();
-		session.saveOrUpdate(c);
-		tx.commit();
-		session.close();
+    protected void doDeleteContent(String storageID) throws Exception {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try{
+            List l = session.createQuery("from MCRCSTORE where storageid='"+storageID+"'").list();
+            for(int t=0; t<l.size(); t++) {
+                session.delete(l.get(t));
+            }
+            tx.commit();
+        }catch(Exception e){
+            tx.rollback();
+            logger.error(e);
+        }finally{
+            session.close();
+        }
+    }
 
-		return storageID;
-	}
-
-	protected void doDeleteContent(String storageID) throws Exception {
-		Session session = MCRHIBConnection.instance().getSession();
-		Transaction tx = session.beginTransaction();
-		List l = session.createQuery(
-				"from MCRCSTORE where storageid='" + storageID + "'").list();
-		int t;
-		for (t = 0; t < l.size(); t++) {
-			session.delete(l.get(t));
-		}
-		tx.commit();
-		session.close();
-	}
-
-	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
-			throws Exception {
-		String storageID = file.getStorageID();
-		Session session = MCRHIBConnection.instance().getSession();
-		List l = session.createQuery(
-				"from MCRCSTORE where storageid='" + storageID + "'").list();
-		if (l.size() < 1)
-			throw new MCRException("No such content: " + storageID);
-		MCRCSTORE st = (MCRCSTORE) l.get(0);
-		byte[] c = st.getContentBytes();
-		target.write(c);
-	}
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+        String storageID = file.getStorageID();
+        Session session = MCRHIBConnection.instance().getSession();
+        try{
+            List l = session.createQuery("from MCRCSTORE where storageid='"+storageID+"'").list();
+            if(l.size() < 1)
+                throw new MCRException("No such content: "+ storageID);
+            MCRCSTORE st = (MCRCSTORE)l.get(0);
+            byte[] c = st.getContentBytes();
+            target.write(c);
+        }catch(Exception e){
+            logger.error(e);
+        }finally{
+            session.close();
+        }
+    }
 }
+
