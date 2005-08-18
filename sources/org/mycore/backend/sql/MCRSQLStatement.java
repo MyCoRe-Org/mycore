@@ -149,7 +149,7 @@ public class MCRSQLStatement {
 	}
 
 	public final String toInsertStatement() {
-		/*StringBuffer statement = new StringBuffer("INSERT INTO ");
+		StringBuffer statement = new StringBuffer("INSERT INTO ");
 		statement.append(tableName).append(" (");
 
 		StringBuffer columnList = new StringBuffer();
@@ -172,8 +172,9 @@ public class MCRSQLStatement {
 		statement.append(columnList.toString()).append(" ) VALUES (");
 		statement.append(valueList.toString()).append(" )");
 
-		return statement.toString();*/
-        return toTypedInsertStatement();
+		return statement.toString();
+        // new behaviour - needs more tests
+        // return toTypedInsertStatement();
 	}
 
     public final String toTypedInsertStatement() {
@@ -188,20 +189,26 @@ public class MCRSQLStatement {
             String column = col.getName();
             String value = col.getValue();
 
-            if ( value != null && value !="null"){
+            if ( value != null && value != "null"){
                 if(col.getType().toLowerCase().equals("string")){
                     value = "'" + value + "'";
                 }else if(col.getType().toLowerCase().equals("date") || col.getType().toLowerCase().equals("time") || col.getType().toLowerCase().equals("timestamp")){
+                    // date
                     value = "'" + value + "'";
                 }else if(col.getType().toLowerCase().equals("integer")){
-                    //integer test
+                    //integer
                     try{
                         value = "" + Integer.parseInt(value);
                     }catch(Exception e){
                         value = "0";
                     }
                 }else if(col.getType().toLowerCase().equals("decimal")){
-                    value = "" + value.replaceAll(",",".");
+                    // decimal
+                    try{
+                        value = "" + Double.parseDouble(value.replaceAll(",","."));
+                    }catch(Exception e){
+                        value = "0";
+                    }
                 }else if(col.getType().toLowerCase().equals("boolean")){
                     // boolean
                     if(value.toLowerCase()=="true")

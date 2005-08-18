@@ -1,0 +1,104 @@
+package org.mycore.backend.query.helper;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+
+public class GenClasses{
+
+    private static String pack = "org.mycore.backend.query";
+    private HashMap searchfields = new HashMap();
+    private HashMap typeMapping = new HashMap();
+
+    public static void main(String[] args){
+        GenClasses gen = new GenClasses();
+        try{
+            if (args.length < 2){
+                System.out.println("needs arg:\n" +
+                        "1: filename for queryconfiguration as String\n" +
+                        "2: pathname for output as String\n"+
+                        "3: (optional) package name as String");
+            }else{
+                gen.buildFieldMapping();
+                gen.readDefinition(args[0], args[1]);
+                gen.execute(args[1]);
+                if (args.length == 3)
+                    pack = args[3];
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private  void execute(String dest) {
+        try {
+            JavaClass jc = new JavaClass(pack, "MCRQuery");
+            Iterator it = searchfields.keySet().iterator();
+            
+            jc.addField("String", "mcrid");
+            
+            while(it.hasNext()){
+                Element el = (Element) searchfields.get((String) it.next());
+                jc.addField((String) typeMapping.get(el.getAttributeValue("type")), el.getAttributeValue("name"));
+            }
+
+            jc.write(dest);
+        } catch(Exception e) {
+            e.printStackTrace();
+      }
+    }
+    
+    private void readDefinition(String path, String dest){
+        SAXBuilder builder = new SAXBuilder();
+        try{
+            File d = new File(path);
+            searchfields = loadFields(builder.build(d));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    public static  HashMap loadFields(Document doc){
+        HashMap map = new HashMap();
+        List fields = new LinkedList();
+        fields = doc.getRootElement().getChildren();
+        
+        for (int i=0; i<fields.size(); i++){
+            Element fieldelement = (Element) fields.get(i);
+            map.put(fieldelement.getAttributeValue("name"),fieldelement);
+            
+            List children = new LinkedList();
+            children = fieldelement.getChildren();
+            for (int j=0; j< children.size(); j++){
+                
+                Element addElement= new Element("field");
+                Element childelement = (Element) children.get(j);
+                
+                addElement.setAttribute("name", fieldelement.getAttributeValue("name") + "_" + childelement.getAttributeValue("name"));
+                addElement.setAttribute("xpath", fieldelement.getAttributeValue("xpath"));
+                addElement.setAttribute("type", "text");
+                map.put(addElement.getAttributeValue("name"),addElement);
+            }
+        }
+        return map;
+    }
+    
+    private void buildFieldMapping(){
+        typeMapping.put("text","String");
+        typeMapping.put("name","String");
+        typeMapping.put("identifier","String");
+        typeMapping.put("date","java.sql.Date");
+        typeMapping.put("time","java.sql.Time");
+        typeMapping.put("timestamp","java.sql.Timestamp");
+        typeMapping.put("integer","Integer");
+        typeMapping.put("boolean","Boolean");
+        typeMapping.put("decimal","Double");
+    }
+
+}
