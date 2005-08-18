@@ -25,6 +25,8 @@
 package org.mycore.backend.sql;
 
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -45,6 +47,8 @@ public class MCRSQLStatement {
 	protected Properties conditions;
 
 	protected Vector columns;
+    
+    protected List sqlColumns;
 
 	protected String tableName;
 
@@ -62,10 +66,12 @@ public class MCRSQLStatement {
 	}
 
 	public MCRSQLStatement(String tableName) {
+        MCRArgumentChecker.ensureNotNull(tableName, "tableName");
 		this.tableName = tableName;
 		this.values = new Properties();
 		this.conditions = new Properties();
 		this.columns = new Vector();
+        this.sqlColumns = new LinkedList();
 	}
 
 	public final MCRSQLStatement setValue(String columnName, String columnValue) {
@@ -76,9 +82,20 @@ public class MCRSQLStatement {
 		else
 			values.put(columnName, mask(columnValue));
 
+        // new behaviour
+        sqlColumns.add(new MCRSQLColumn(columnName, columnValue, "string" ));
+        
 		return this;
 	}
 
+
+    public final MCRSQLStatement setValue(MCRSQLColumn column) {
+        if (column != null)
+            sqlColumns.add(column);
+        return this;
+    }
+    
+    
 	public final MCRSQLStatement setCondition(String columnName,
 			String columnValue) {
 		MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
@@ -132,7 +149,7 @@ public class MCRSQLStatement {
 	}
 
 	public final String toInsertStatement() {
-		StringBuffer statement = new StringBuffer("INSERT INTO ");
+		/*StringBuffer statement = new StringBuffer("INSERT INTO ");
 		statement.append(tableName).append(" (");
 
 		StringBuffer columnList = new StringBuffer();
@@ -143,7 +160,7 @@ public class MCRSQLStatement {
 			String column = (String) (keys.nextElement());
 			String value = getSQLValue(column);
 
-			columnList.append(" ").append(column);
+			columnList.append(" ").append("`"+column+"`");
 			valueList.append(" ").append(value);
 
 			if (keys.hasMoreElements()) {
@@ -155,9 +172,59 @@ public class MCRSQLStatement {
 		statement.append(columnList.toString()).append(" ) VALUES (");
 		statement.append(valueList.toString()).append(" )");
 
-		return statement.toString();
+		return statement.toString();*/
+        return toTypedInsertStatement();
 	}
 
+    public final String toTypedInsertStatement() {
+        StringBuffer statement = new StringBuffer("INSERT INTO ");
+        statement.append(tableName).append(" (");
+
+        StringBuffer columnList = new StringBuffer();
+        StringBuffer valueList = new StringBuffer();
+
+        for (int i=0; i<sqlColumns.size(); i++){
+            MCRSQLColumn col = (MCRSQLColumn) sqlColumns.get(i);
+            String column = col.getName();
+            String value = col.getValue();
+
+            if ( value != null && value !="null"){
+                if(col.getType().toLowerCase().equals("string")){
+                    value = "'" + value + "'";
+                }else if(col.getType().toLowerCase().equals("date") || col.getType().toLowerCase().equals("time") || col.getType().toLowerCase().equals("timestamp")){
+                    value = "'" + value + "'";
+                }else if(col.getType().toLowerCase().equals("integer")){
+                    //integer test
+                    try{
+                        value = "" + Integer.parseInt(value);
+                    }catch(Exception e){
+                        value = "0";
+                    }
+                }else if(col.getType().toLowerCase().equals("decimal")){
+                    value = "" + value.replaceAll(",",".");
+                }else if(col.getType().toLowerCase().equals("boolean")){
+                    // boolean
+                    if(value.toLowerCase()=="true")
+                        value = "1";
+                    else if(value.toLowerCase()=="false")
+                        value = "0";
+                }
+
+                columnList.append(" ").append("`"+column+"`");
+                valueList.append(" ").append(value);
+                
+                if (i<sqlColumns.size()-1){
+                    columnList.append(",");
+                    valueList.append(",");
+                }
+            }
+        }
+        statement.append(columnList.toString()).append(" ) VALUES (");
+        statement.append(valueList.toString()).append(" )");
+
+        return statement.toString();
+    }
+    
 	public final String toUpdateStatement() {
 		StringBuffer statement = new StringBuffer("UPDATE ");
 		statement.append(tableName).append(" SET");
