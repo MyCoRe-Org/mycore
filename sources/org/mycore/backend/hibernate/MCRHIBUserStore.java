@@ -180,14 +180,19 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized boolean existsUser(int numID, String userID)
             throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRUSERS where NUMID = '" + numID + "' or UID = '" + userID + "'").list();
-        tx.commit();
-        session.close();
-        if (l.size() > 0)
-            return true;
-        else
-            return false;
+	List l = null;
+        try {
+	    l = session.createQuery("from MCRUSERS where NUMID = '" + numID + "' or UID = '" + userID + "'").list();
+	} catch(Exception e) {
+	    logger.error(e);
+	    throw new MCRException("error during existsUser()", e);
+	} finally {
+	    session.close();
+	}
+	if (l.size() > 0)
+	    return true;
+	else
+	    return false;
     }
 
     /**
@@ -343,15 +348,22 @@ public class MCRHIBUserStore implements MCRUserStore {
     public synchronized ArrayList getAllUserIDs() throws MCRException {        
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRUSERS").list();
-        ArrayList list = new ArrayList();
-        
-        for (int i=0; i<l.size(); i++){
-            MCRUSERS user = (MCRUSERS) l.get(i);
-            list.add(user.getUid()); 
-        }
-        tx.commit();
-        session.close();
+	List l = null;
+	ArrayList list = new ArrayList();
+	try {
+	    l = session.createQuery("from MCRUSERS").list();
+	    
+	    for (int i=0; i<l.size(); i++){
+		MCRUSERS user = (MCRUSERS) l.get(i);
+		list.add(user.getUid()); 
+	    }
+	    tx.commit();
+	} catch(Exception e) {
+	    logger.error(e);
+	    tx.rollback();
+	} finally {
+	    session.close();
+	}
         return list;
     }
 
@@ -364,10 +376,15 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         int ret = 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRUSERS").list();
-        tx.commit();
-        session.close();
+	List l = null;
+	try {
+	    l = session.createQuery("from MCRUSERS").list();
+	} catch(Exception e) {
+	    logger.error(e);
+	    throw new MCRException("error during getMaxUserNumID()", e);
+	} finally {
+	    session.close();
+	}
         if (l.size() > 0){
             MCRUSERS user = (MCRUSERS) l.get(l.size()-1);
             ret = user.getNumid();
@@ -525,9 +542,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             throws MCRException {
         ArrayList retList = new ArrayList();
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        List l = session.createQuery("from MCRGROUPADMINS where USERID = '" + userID + "'").list();
-        tx.commit();
+	List l = session.createQuery("from MCRGROUPADMINS where USERID = '" + userID + "'").list();
         if (l.size() > 0){ 
             for (int i=0;i<l.size();i++){
                 MCRGROUPADMINS groupadmins = (MCRGROUPADMINS) l.get(i);
@@ -551,9 +566,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             throws MCRException {
         ArrayList retList = new ArrayList();
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRUSERS where PRIMGROUP = '" + groupID + "'").list();
-        tx.commit();
         if (l.size() > 0){
             for (int i=0;i<l.size();i++){
                 MCRUSERS users = (MCRUSERS) l.get(i);
@@ -932,9 +945,7 @@ public class MCRHIBUserStore implements MCRUserStore {
      */
     public boolean existsPrivilegeSet() throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRPRIVSM").list();
-        tx.commit();
         session.close();
         if (l.size() > 0)
             return true;
