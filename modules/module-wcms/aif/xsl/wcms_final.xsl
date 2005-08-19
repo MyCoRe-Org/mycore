@@ -73,27 +73,27 @@
 							<td colspan="2">
 								<xsl:if test=" /cms/action != 'delete' and /cms/action[@mode = 'extern'] " >
 									<img 
-										src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
+										src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" 
 										width="16" height="8" border="0" alt="" title="" />
 									<a href="{$href}" target="_blank">Seite ansehen</a>
 									<br/>
 								</xsl:if>
 								<xsl:if test=" /cms/action != 'delete' and /cms/action[@mode = 'intern'] " >
 									<img 
-										src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
+										src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" 
 										width="16" height="8" border="0" alt="" title="" />
 									<a href="{concat($WebApplicationBaseURL, substring-after($href,'/') )}" 
 										target="_blank">Seite ansehen</a>
 									<br/>
 								</xsl:if>
 								<img 
-									src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
+									src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" 
 									width="16" height="8" border="0" alt="" title="" />
 								<a href="javascript: document.useAgain.submit()">DBT-WCMS nochmals nutzen</a>
 								<br/>
 								<br/>
 								<img 
-									src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" 
+									src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" 
 									width="16" height="8" border="0" alt="" title="" />
 								<a href="javascript: window.close()">abmelden</a>
 							</td>

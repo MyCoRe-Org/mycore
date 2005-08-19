@@ -32,27 +32,27 @@
       </xsl:call-template>
       <tr>
             <td colspan="2"> <br/> Die folgenden Optionen stehen für sie zur Verfügung: <br/><br/> <img 
-                  src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
+                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
                   height="8" border="0" alt="" title=""/> <a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">Pflege von Webseiten</a> 
                      
                      <xsl:if test=" /cms/userClass = 'admin' ">
                         <br/> 
                          <img 
-		                  src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
+		                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
 		                  height="8" border="0" alt="" title=""/> 
 		                    <a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">Globale Einstellungen</a>                                       
                      </xsl:if>   
 
 		       <br/>                    
                    <img 
-	                  src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
+	                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
 	                  height="8" border="0" alt="" title="" />                                       
                    <a 
                   href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">Nutzungsstatistik einsehen</a> 
                   <br/><br/> 
 
                    <img 
-	                  src="{$WebApplicationBaseURL}modules/module-wcms/uif/web/common/images/naviMenu/greenArrow.gif" width="16" 
+	                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
 	                  height="8" border="0" alt="" title="" /> 
                     <a href="javascript: window.close()">Abmelden</a> 
 
@@ -158,7 +158,7 @@ WCMS-Nutzer:
 	    <table cellspacing="0" cellpadding="0" align="right">
 		  <tr>
 				<td align="right">
-					<img src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_left.gif" 
+					<img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" 
 						width="11" height="22" border="0" alt="" title="" />
 				</td>
 				 <td align="right" class="button">
@@ -166,7 +166,7 @@ WCMS-Nutzer:
 				 </td>
 				<td align="right">
 					<img 
-						src="{$WebApplicationBaseURL}modules/module-wcms/uif/templates/master/template_wcms/IMAGES/box_right.gif" 
+						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" 
 						width="11" height="22" border="0" alt="" title="" />
 				</td>
 		  </tr>
