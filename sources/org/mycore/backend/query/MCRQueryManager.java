@@ -155,9 +155,9 @@ public class MCRQueryManager {
                 while ( tokenizer.hasMoreTokens() ){
                     path="." + tokenizer.nextToken();
 
-                    if (el.getAttributeValue("value").contains("normalize-space(text())")){
+                    if (el.getAttributeValue("value").indexOf("normalize-space(text())") != -1){
                         path += "/text()";
-                    }else if(el.getAttributeValue("value").contains(":")){
+                    }else if(el.getAttributeValue("value").indexOf(":") != -1){
                         path +=  "/@" + el.getAttributeValue("value").substring(el.getAttributeValue("value").indexOf(":")+1);
                     }else{
                         path += "/" + el.getAttributeValue("value");
