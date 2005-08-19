@@ -123,7 +123,7 @@ public class MCRHIBConnection {
 						"hibernate.connection.username", userID).setProperty(
 						"hibernate.connection.password", password).setProperty(
 						"hibernate.connection.pool_size", "" + maxUsages)
-				.setProperty("hibernate.show_sql", "false");
+				.setProperty("hibernate.show_sql", ""+config.getBoolean("MCR.hibernate.show_sql", false));
 	}
 
 	/**
