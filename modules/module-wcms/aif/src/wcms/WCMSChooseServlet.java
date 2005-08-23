@@ -114,6 +114,8 @@ public class WCMSChooseServlet extends WCMSServlet {
 									   // with its subelements. Can be "true" or
 									   // "false".
 
+	private String constrainPopUp = null; // menu must be open	
+	
 	char c, d; //representing the errorcodes {1,2,5,6,7,8,9,0}
 
 	char fs = File.separatorChar;
@@ -427,6 +429,7 @@ public class WCMSChooseServlet extends WCMSServlet {
 			rootOut.addContent(new Element("addAtPosition")
 					.setText(addAtPosition));
 			rootOut.addContent(new Element("replaceMenu").setText(replaceMenu));
+			
 		}
 		if (action.equals("edit") && mode != null) {
 			rootOut.addContent(new Element("action").setAttribute("mode", mode)
@@ -434,6 +437,8 @@ public class WCMSChooseServlet extends WCMSServlet {
 			if (mode.equals("intern"))
 				rootOut.addContent(new Element("replaceMenu")
 						.setText(replaceMenu));
+				rootOut.addContent(new Element("constrainPopUp")
+					.setText(constrainPopUp));			
 		}
 		if (action.equals("delete") && mode != null)
 			rootOut.addContent(new Element("action").setAttribute("mode", mode)
@@ -632,6 +637,8 @@ public class WCMSChooseServlet extends WCMSServlet {
 						style = child.getAttributeValue("style");
 					if (child.getAttributeValue("replaceMenu") != null)
 						replaceMenu = child.getAttributeValue("replaceMenu");
+					if (child.getAttributeValue("constrainPopUp") != null)
+						constrainPopUp = child.getAttributeValue("constrainPopUp");					
 					else
 						replaceMenu = "false";
 					return;

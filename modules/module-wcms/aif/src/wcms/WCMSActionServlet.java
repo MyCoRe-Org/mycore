@@ -116,6 +116,8 @@ public class WCMSActionServlet extends WCMSServlet {
 									   // with its subelements. Can be "true" or
 									   // "false".
 
+	private String constrainPopUp = null; // 
+	
 	private String masterTemplate = null; // Represents the action of templates
 										  // (set, change, remove)
 
@@ -631,6 +633,7 @@ public class WCMSActionServlet extends WCMSServlet {
 											"target", target).setAttribute(
 											"style", style).setAttribute(
 											"replaceMenu", replaceMenu)
+											.setAttribute("constrainPopUp", constrainPopUp)											
 									.setAttribute("template", masterTemplate)
 									.addContent(
 											new Element("label").setAttribute(
@@ -643,6 +646,7 @@ public class WCMSActionServlet extends WCMSServlet {
 											"target", target).setAttribute(
 											"style", style).setAttribute(
 											"replaceMenu", replaceMenu)
+												.setAttribute("constrainPopUp", constrainPopUp)
 									.addContent(
 											new Element("label").setAttribute(
 													"lang", defaultLang, ns)
@@ -658,6 +662,7 @@ public class WCMSActionServlet extends WCMSServlet {
 								.setAttribute("target", target).setAttribute(
 										"style", style).setAttribute(
 										"replaceMenu", replaceMenu)
+		.setAttribute("constrainPopUp", constrainPopUp)
 								.setAttribute("template", masterTemplate);
 						itemElement.addContent(new Element("label")
 								.setAttribute("lang", defaultLang, ns).setText(
@@ -668,7 +673,8 @@ public class WCMSActionServlet extends WCMSServlet {
 								"href", fileName).setAttribute("type", mode)
 								.setAttribute("target", target).setAttribute(
 										"style", style).setAttribute(
-										"replaceMenu", replaceMenu);
+										"replaceMenu", replaceMenu)
+											.setAttribute("constrainPopUp", constrainPopUp);
 						itemElement.addContent(new Element("label")
 								.setAttribute("lang", defaultLang, ns).setText(
 										label));
@@ -727,7 +733,7 @@ public class WCMSActionServlet extends WCMSServlet {
 					//fileName = link;
 				} else {
 					actElem.setAttribute("replaceMenu", replaceMenu);
-
+					actElem.setAttribute("constrainPopUp", constrainPopUp);
 					if (!masterTemplate.equals("noAction")) {
 						if (masterTemplate.equals("delete")) {
 							actElem.removeAttribute("template");
@@ -1563,8 +1569,11 @@ public class WCMSActionServlet extends WCMSServlet {
 
 		labelPath = request.getParameter("labelPath");
 		replaceMenu = request.getParameter("replaceMenu");
+		constrainPopUp = request.getParameter("constrainPopUp");
 		if (replaceMenu == null)
 			replaceMenu = "false";
+		if (constrainPopUp == null)
+			constrainPopUp = "false";		
 		masterTemplate = request.getParameter("masterTemplate");
 
 		fileName = href;

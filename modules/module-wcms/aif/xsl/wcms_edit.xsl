@@ -272,6 +272,7 @@
 								<br/>
 								<xsl:call-template name="buildInterface.general.metaData.target"/>
 								<xsl:call-template name="buildInterface.general.metaData.replaceMenu"/>
+								<xsl:call-template name="buildInterface.general.metaData.constrainPopUp"/>                                                
 								<xsl:call-template name="buildInterface.general.metaData.forwardToChildren"/>
 								<xsl:call-template name="buildInterface.general.metaData.acl"/>	                                          
 	                                    </xsl:if>                                          
@@ -387,10 +388,28 @@
 							<input type="checkbox" name="replaceMenu" value="true"/>
 						</xsl:otherwise>
 					</xsl:choose> Ausgangspunkt für 
-                                          neues Menü: </xsl:if>
+                                          neues Menü </xsl:if>
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
+	<!-- ============================================================================================================ -->
+	<xsl:template name="buildInterface.general.metaData.constrainPopUp">
+		<xsl:choose>
+			<xsl:when test="/cms/action = 'edit' or /cms/action = 'add' ">
+
+					<br/>
+					<xsl:choose>
+						<xsl:when test="/cms/replaceMenu = 'true' ">
+							<input type="checkbox" name="constrainPopUp" value="true" checked="checked"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<input type="checkbox" name="constrainPopUp" value="true"/>
+						</xsl:otherwise>
+					</xsl:choose> 
+                              alle Untermenüpunkte automatisch aufklappen
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>      
 	<!-- ============================================================================================================ -->
 	<xsl:template name="buildInterface.general.metaData.selectTemplate">
 		<xsl:param name="href"/>

@@ -39,7 +39,9 @@
 								<!-- left column -->
 								<th align="left" valign="top"> <xsl:call-template name="chooseAction" /> <xsl:call-template 
 									name="addAtPosition" /> <xsl:call-template name="template" /> <br/><br/> &lt;m&gt; 
-									... neues Menü<br/> &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
+									... neues Menü<br/>
+                                                      &lt;a&gt; ... neues Menü<br/>
+                                                       &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
 									Inhalt zugewiesen<br/> <xsl:if test="$CurrentLang != $DefaultLang"> <br/><br/> 
 									&lt;!&gt; ... Seite bisher nicht übersetzt<br/> </xsl:if> </th>
 								<!-- right column -->
@@ -63,8 +65,8 @@
 	<!-- END OF: cmsChooseAction  ================================================================================= -->
 	<!-- ================================================================================= -->
 	<!-- creates identifiers how the site will be build (template and change menu) -->
-	<xsl:template name="siteStructureInfo"> &lt;<xsl:if test="@replaceMenu='true' " >m</xsl:if><xsl:if test="@template != '' " 
-		>t</xsl:if><xsl:if test=" count(child::dynamicContentBinding) &gt; 0 " >d</xsl:if>&gt; </xsl:template>
+	<xsl:template name="siteStructureInfo"> &lt;<xsl:if test="@replaceMenu='true' " >m</xsl:if><xsl:if test="@constrainPopUp='true' " >a</xsl:if><xsl:if test="@template != '' " >t</xsl:if><xsl:if test=" count(child::dynamicContentBinding) &gt; 0 " >d</xsl:if>&gt; 
+           </xsl:template>
 	<!-- ================================================================================= -->
 	<xsl:template name="error">
 		<tr>
@@ -171,7 +173,7 @@
 									<option value="1{@href}">
 										<xsl:for-each select="ancestor::item"> - </xsl:for-each>
 										<xsl:if 
-											test=" @replaceMenu = 'true' or @template != '' or count(child::dynamicContentBinding) &gt; 0 " 
+											test=" @replaceMenu = 'true' or @constrainPopUp = 'true' or @template != '' or count(child::dynamicContentBinding) &gt; 0 " 
 											>
 											<xsl:call-template name="siteStructureInfo" />
 										</xsl:if>
