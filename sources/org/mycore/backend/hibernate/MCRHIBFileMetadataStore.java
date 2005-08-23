@@ -137,7 +137,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         try{
             l = session.createQuery("from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").list();
             if (l.size() < 1) {
-                String msg = "MCRSQLUserStore.retrieveUser(): There is no node with ID = " + ownerID;
+                String msg = "MCRHIBFileMetadataStore.retrieveRootNodeID(): There is no fsnode with OWNER = " + ownerID;
                 throw new MCRException(msg);
             }
         }catch(Exception e){
@@ -176,7 +176,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         try{
             l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
             if (l.size() < 1) {
-                String msg = "MCRSQLUserStore.retrieveUser(): There is no node with PID = " + parentID;
+                String msg = "MCRHIBFileMetadataStore.retrieveChildrenIDs(): There are no nodes with PID = " + parentID;
                 throw new MCRException(msg);
             }
         }catch(Exception e){
@@ -187,7 +187,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         }
         Vector v = new Vector(l.size());
         for(int t=0; t<l.size(); t++) {
-            v.add(t, ((MCRFSNODES)l.get(0)).getId());
+            v.add(t, ((MCRFSNODES)l.get(t)).getId());
         }
         return v;
     }
@@ -219,7 +219,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore
         try{
             l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
             if (l.size() < 1) {
-                String msg = "MCRSQLUserStore.retrieveUser(): There is no user with ID = " + ID;
+                String msg = "MCRHIBFileMetadataStore.retrieveNode(): There is no FSNODE with ID = " + ID;
                 throw new MCRException(msg);
             }
         }catch(Exception e){
