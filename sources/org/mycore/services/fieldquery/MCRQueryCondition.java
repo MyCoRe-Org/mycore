@@ -33,4 +33,9 @@ public interface MCRQueryCondition
 {
   public String toString();
   public Element toXML();
+  
+  public Element info();
+  
+  public void accept(MCRQueryConditionVisitor visitor);
+
 }

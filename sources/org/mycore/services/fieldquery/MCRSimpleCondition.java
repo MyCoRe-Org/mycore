@@ -31,30 +31,39 @@ import org.jdom.Element;
  **/
 public class MCRSimpleCondition implements MCRQueryCondition
 {
-  private String field;
-  private String operator;
-  private String value;
-  
-  public MCRSimpleCondition(String field, String operator, String value) 
-  {
-    this.field = field;
-    this.operator = operator;
-    this.value = value;
-  }
-  
-  public String getField()    { return field; }
-  public String getOperator() { return operator; }
-  public String getValue()    { return value; }
-  
-  public String toString()
-  { return field + " " + operator + " \"" + value + "\""; }
-  
-  public Element toXML()
-  {
-    Element condition = new Element( "condition" );
-    condition.setAttribute( "field", field );
-    condition.setAttribute( "operator", operator );
-    condition.setAttribute( "value", value );
-    return condition;
-  }
+    private String field;
+    private String operator;
+    private String value;
+    
+    public MCRSimpleCondition(String field, String operator, String value) 
+    {
+        this.field = field;
+        this.operator = operator;
+        this.value = value;
+    }
+    
+    public String getField()    { return field; }
+    public String getOperator() { return operator; }
+    public String getValue()    { return value; }
+    
+    public String toString()
+    { return field + " " + operator + " \"" + value + "\""; }
+    
+    public Element toXML()
+    {
+        Element condition = new Element( "condition" );
+        condition.setAttribute( "field", field );
+        condition.setAttribute( "operator", operator );
+        condition.setAttribute( "value", value );
+        return condition;
+    }
+    
+    public Element info() {
+        return toXML();
+    }
+    
+    public void accept(MCRQueryConditionVisitor visitor) {
+        visitor.visitQuery(this); 
+    }
+    
 }

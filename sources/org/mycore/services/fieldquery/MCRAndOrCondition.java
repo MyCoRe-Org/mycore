@@ -27,6 +27,7 @@ package org.mycore.services.fieldquery;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
@@ -34,51 +35,70 @@ import org.jdom.Element;
  **/
 public class MCRAndOrCondition implements MCRQueryCondition
 {
-  private List children;
-  private String type;
-  
-  public final static String AND = "and";
-  public final static String OR  = "or";
-  
-  public MCRAndOrCondition( String type, MCRQueryCondition firstChild )
-  {
-    if( ! ( type.equals( AND ) || type.equals( OR ) ) )
-      throw new IllegalArgumentException( "and|or expected as condition type" );
+    private List children;
+    private String type;
     
-    this.type = type;
-    this.children = new ArrayList();
-    this.children.add( firstChild );
-  }
-  
-  public void addChild( MCRQueryCondition child )
-  { this.children.add( child ); }
-  
-  public List getChildren()
-  { return children; }
-  
-  public String getType()
-  { return type; }
-  
-  public String toString()
-  {
-    StringBuffer sb = new StringBuffer();
-    for( int i = 0; i < children.size(); i++ )
+    public final static String AND = "and";
+    public final static String OR  = "or";
+    
+    public MCRAndOrCondition( String type, MCRQueryCondition firstChild )
     {
-      sb.append( "(" ).append( children.get(i) ).append( ")" );
-      if( i < ( children.size() - 1 ) )
-        sb.append( " " + type + " " );
+        if( ! ( type.equals( AND ) || type.equals( OR ) ) )
+            throw new IllegalArgumentException( "and|or expected as condition type" );
+        
+        this.type = type;
+        this.children = new ArrayList();
+        this.children.add( firstChild );
     }
-    return sb.toString();
-  }
-  
-  public Element toXML()
-  {
-    Element cond = new Element( type );
-    for( int i = 0; i < children.size(); i++ )
+    
+    public void addChild( MCRQueryCondition child )
+    { this.children.add( child ); }
+    
+    public List getChildren()
+    { return children; }
+    
+    public String getType()
+    { return type; }
+    
+    public String toString()
     {
-      MCRQueryCondition child = (MCRQueryCondition)( children.get(i) );
-      cond.addContent( child.toXML() );
+        StringBuffer sb = new StringBuffer();
+        for( int i = 0; i < children.size(); i++ )
+        {
+            sb.append( "(" ).append( children.get(i) ).append( ")" );
+            if( i < ( children.size() - 1 ) )
+                sb.append( " " + type + " " );
+        }
+        return sb.toString();
     }
-    return cond;
-  }
+    
+    public Element toXML()
+    {
+        Element cond = new Element( type );
+        for( int i = 0; i < children.size(); i++ )
+        {
+            MCRQueryCondition child = (MCRQueryCondition)( children.get(i) );
+            cond.addContent( child.toXML() );
+        }
+        return cond;
+    }
+    
+    public Element info() {
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", type));
+        el.setAttribute(new Attribute("children", "" + children.size()));
+
+        return el;
+    }
+    
+    public void accept(MCRQueryConditionVisitor visitor)
+    {
+        visitor.visitType(info());
+        for( int i = 0; i < children.size(); i++ )
+        {
+            ((MCRQueryCondition) children.get(i)).accept(visitor);
+        }
+    }
+
+ 
 }

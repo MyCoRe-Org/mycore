@@ -24,6 +24,7 @@
 
 package org.mycore.services.fieldquery;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
@@ -31,21 +32,35 @@ import org.jdom.Element;
  **/
 public class MCRNotCondition implements MCRQueryCondition
 {
-  private MCRQueryCondition child;
-  
-  public MCRNotCondition( MCRQueryCondition child )
-  { this.child = child; }
-  
-  public MCRQueryCondition getChild()
-  { return child; }
-  
-  public String toString()
-  { return "not (" + child + ")"; }
-  
-  public Element toXML()
-  {
-    Element not = new Element( "not" );
-    not.addContent( child.toXML() );
-    return not;
-  }
+    private MCRQueryCondition child;
+    
+    public MCRNotCondition( MCRQueryCondition child )
+    { this.child = child; }
+    
+    public MCRQueryCondition getChild()
+    { return child; }
+    
+    public String toString()
+    { return "not (" + child + ")"; }
+    
+    public Element toXML()
+    {
+        Element not = new Element( "not" );
+        not.addContent( child.toXML() );
+        return not;
+    }
+    
+    public Element info()
+    {
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", "not"));
+        el.setAttribute(new Attribute("children", "1"));
+        return el;
+    }
+    
+    public void accept(MCRQueryConditionVisitor visitor)
+    {
+        child.accept(visitor);
+    }
+
 }
