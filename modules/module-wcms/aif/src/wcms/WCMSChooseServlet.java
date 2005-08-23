@@ -610,10 +610,10 @@ public class WCMSChooseServlet extends WCMSServlet {
 					if (action.equals("delete")
 							&& !child.getChildren("item").isEmpty())
 						c = '7';
-					else if (action.equals("add")
+					/*else if (action.equals("add")
 							&& child.getAttributeValue("type").equals("extern")
 							&& addAtPosition.equals("child"))
-						c = '6';
+						c = '6';*/
 					else
 						c = d;
 					if (child.getAttributeValue("type") != null)
