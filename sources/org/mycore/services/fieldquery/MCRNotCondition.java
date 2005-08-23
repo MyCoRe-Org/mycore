@@ -60,6 +60,7 @@ public class MCRNotCondition implements MCRQueryCondition
     
     public void accept(MCRQueryConditionVisitor visitor)
     {
+        visitor.visitType(info());
         child.accept(visitor);
     }
 
