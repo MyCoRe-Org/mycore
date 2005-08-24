@@ -23,6 +23,7 @@
  **/
 package org.mycore.backend.sql;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,17 +36,23 @@ import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
 
+/**
+ * 
+ * @author Arne Seifert
+ *
+ */
 public class MCRSQLQuery implements MCRQueryConditionVisitor{
     
     public static Logger LOGGER = Logger.getLogger(MCRSQLQuery.class.getName());
 
     private StringBuffer sbquery = new StringBuffer();
-    private String type = "";
-    private int count = 0;
-    private int closer = 0;
-    private String close = "";
-    private Document querydoc;
-    MCRQueryCondition cond;
+    private String type = "";               //variable for type (and/or/not)
+    private int count = 0;                  //number of children to proceed
+    private Document querydoc;              //xmlQuery-Document
+    private MCRQueryCondition cond;         //query-condition
+    private List elList = new LinkedList(); //stack for type-elements
+    private int bracket = 0;                //counts correct number of ')'
+
     
     /**
      * initialise query with xml-document containing complete query
@@ -79,21 +86,42 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      * @param doc document with xml query
      */
     private void init(Document doc){
-        querydoc = doc;
-        cond = MCRQueryParser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
-        cond.accept(this);
+        try{
+            querydoc = doc;
+            cond = MCRQueryParser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
+            cond.accept(this);
+        }catch(Exception e){
+            LOGGER.error(e);
+        }
     }
     
     
     /**
-     * interface implementation (visitor pattern) for condition types
+     * interface implementation (visitor pattern) for condition types:
+     * on each new type a xml-element will be added to an internal stack which
+     * holds the number of children to process
      */
-    public void visitType(Element element) {        
-        type = element.getAttributeValue("type");
-        count = Integer.parseInt(element.getAttributeValue("children"));
-        closer += 1;
-        sbquery.append("(");
-        close += ")";
+    public void visitType(Element element) {   
+        
+        try{
+            /** update child status **/
+            if (elList.size()>0){
+                int intel = elList.size()-1;
+                Element tmp= (Element) elList.get(intel);
+                tmp.setAttribute("children", "" + (count-1) );
+                elList.remove(intel);
+                elList.add(intel, tmp);
+            }
+            sbquery.append(" (");
+            bracket +=1;
+            /** set new values **/
+            type = element.getAttributeValue("type");
+            count = Integer.parseInt(element.getAttributeValue("children"));
+            elList.add(element);
+        }catch(Exception e){
+            LOGGER.error(e);
+        }
+        
     }
 
     
@@ -101,25 +129,46 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      * interface implementation (visitor pattern) for field type
      */
     public void visitQuery(MCRQueryCondition entry) {
-        Element el = entry.info();
-        String fieldtype = MCRQueryManager.getInstance().getField(el.getAttributeValue("field")).getAttributeValue("type");
-        String fieldname = el.getAttributeValue("field");
-        String operator = el.getAttributeValue("operator");
-        String value = el.getAttributeValue("value");
-        
-        /** transform values and operators **/
-        if (fieldtype.equals("text") || fieldtype.equals("name") || fieldtype.equals("identifier")){
-            if (operator.equals("=") || operator.equals("contains")){
-                operator = "like";
+        try{
+            Element el = entry.info();
+            String fieldtype = MCRQueryManager.getInstance().getField(el.getAttributeValue("field")).getAttributeValue("type");
+            String fieldname = el.getAttributeValue("field");
+            String operator = el.getAttributeValue("operator");
+            String value = el.getAttributeValue("value");
+   
+            /** transform values and operators **/
+            if (fieldtype.equals("text") || fieldtype.equals("name") || fieldtype.equals("identifier"))
+            {
+                if (operator.equals("=") || operator.equals("contains"))
+                {
+                    operator = "like";
+                }
+                value = "\'%" + value + "%\'";
             }
-            value = "\'%" + value + "%\'";
-        }
+            if (type.equals("not"))
+                sbquery.append("`"+ fieldname + "` not " + operator + " " + value );
+            else
+                sbquery.append("`"+ fieldname + "` " + operator + " " + value );
 
-        sbquery.append("`"+ fieldname + "` " + operator + " " + value );
-        
-        if (count > 1)
-            sbquery.append(" " + type + " ");
-        count -= 1;
+            count -=1;
+            if (count>=1)
+                sbquery.append(" " + type + " ");
+
+            if (count==0){
+                sbquery.append(") ");
+                bracket -=1;
+                if (elList.size()>1)
+                {
+                    elList.remove(elList.size()-1);
+                    type = ((Element) elList.get(elList.size()-1)).getAttributeValue("type");
+                    count = Integer.parseInt(((Element) elList.get(elList.size()-1)).getAttributeValue("children"));
+                    if (elList.size()>0 && count>0)
+                        sbquery.append(" " + type + " ");
+                }
+            }
+        }catch(Exception e){
+            LOGGER.error(e);
+        }
     }
     
     
@@ -128,7 +177,11 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      * @return sql where clause as string
      */
     private String getWhereClause(){
-        return sbquery.toString() + close;
+        for (int i=0; i< bracket; i++){
+            sbquery.append(")");
+        }
+        bracket=0;
+        return sbquery.toString();
     }
     
     
@@ -138,18 +191,23 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      */
     private String getOrderClause(){
         StringBuffer sb = new StringBuffer();
-        List l = querydoc.getRootElement().getChild("sortby").getChildren();
-        for(int i=0; i<l.size(); i++){
-            sb.append("`" + ((Element) l.get(i)).getAttributeValue("field") + "`");
-            if (((Element) l.get(i)).getAttributeValue("order").equals("descending")){
-                sb.append(" desc ");
-            }else{
-                sb.append(" asc ");
+        try{
+            List l = querydoc.getRootElement().getChild("sortby").getChildren();
+            for(int i=0; i<l.size(); i++){
+                sb.append("`" + ((Element) l.get(i)).getAttributeValue("field") + "`");
+                if (((Element) l.get(i)).getAttributeValue("order").equals("descending")){
+                    sb.append(" desc ");
+                }else{
+                    sb.append(" asc ");
+                }
+                if (i<l.size()-1)
+                    sb.append(", ");
             }
-            if (i<l.size()-1)
-                sb.append(", ");
+            return sb.toString();
+        }catch(Exception e){
+            LOGGER.error(e);
+            return "";
         }
-        return sb.toString();
     }
     
     
@@ -159,15 +217,20 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      */
     public String getSQLQuery(){
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT MCRID FROM ");
-        sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
-        sb.append(" WHERE ");
-        sb.append(getWhereClause());
-        if (! getOrderClause().equals("")){
-            sb.append(" ORDER BY ");
-            sb.append(getOrderClause());
+        try{
+            sb.append("SELECT MCRID FROM ");
+            sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
+            sb.append(" WHERE ");
+            sb.append(getWhereClause());
+            if (! getOrderClause().equals("")){
+                sb.append(" ORDER BY ");
+                sb.append(getOrderClause());
+            }
+            return sb.toString();
+        }catch(Exception e){
+            LOGGER.error(e);
+            return "";
         }
-        return sb.toString();
     }
     
     
