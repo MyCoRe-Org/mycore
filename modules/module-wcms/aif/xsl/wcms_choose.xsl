@@ -40,7 +40,7 @@
 								<th align="left" valign="top"> <xsl:call-template name="chooseAction" /> <xsl:call-template 
 									name="addAtPosition" /> <xsl:call-template name="template" /> <br/><br/> &lt;m&gt; 
 									... neues Menü<br/>
-                                                      &lt;a&gt; ... neues Menü<br/>
+                                                      &lt;a&gt; ... alle Untermenüpunkte aut. aufklappen<br/>
                                                        &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
 									Inhalt zugewiesen<br/> <xsl:if test="$CurrentLang != $DefaultLang"> <br/><br/> 
 									&lt;!&gt; ... Seite bisher nicht übersetzt<br/> </xsl:if> </th>

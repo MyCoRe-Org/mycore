@@ -399,7 +399,7 @@
 
 					<br/>
 					<xsl:choose>
-						<xsl:when test="/cms/replaceMenu = 'true' ">
+						<xsl:when test="/cms/constrainPopUp = 'true' ">
 							<input type="checkbox" name="constrainPopUp" value="true" checked="checked"/>
 						</xsl:when>
 						<xsl:otherwise>
