@@ -1,4 +1,7 @@
 /**
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.
  *
@@ -16,42 +19,46 @@
  * along with this program, normally in the file license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
  **/
-
 package org.mycore.access;
 
-import java.util.Date;
-import org.mycore.common.MCRCache;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import org.apache.log4j.Logger;
+
+import org.mycore.backend.sql.MCRSQLConnection;
+import org.mycore.backend.sql.MCRSQLConnectionPool;
+import org.mycore.backend.sql.MCRSQLStatement;
+import org.mycore.backend.sql.MCRSQLUserStore;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+
+//import org.mycore.access.MCRAccessCtrlStore;
 
 /**
- * Maps object ids to rules
+ * The purpose of this interface is to make the choice of the persistence layer
+ * configurable. Any concrete database-class which stores MyCoRe Access control
+ * must implement this interface. Which database actually will be used can then
+ * be configured by reading the value <code>MCR.accessstore_class_name</code>
+ * from mycore.properties.
  * 
- * @author   Matthias Kramm
- **/
+ * @author Arne Seifert
+ * @version $Revision$ $Date$
+ */
+public abstract class MCRAccessStore {
 
-public class MCRAccessStore
-{
-    MCRAccessCtrlStore store;
-    MCRCache cache;
+    public abstract void createTables();
+    public abstract MCRAccessRule getRule(String ruleID);
+    public abstract String getRuleID(String objID, String ACPool);
 
-    public MCRAccessStore()
+    static private MCRAccessStore implementation;
+    public static MCRAccessStore getInstance() 
     {
-        MCRConfiguration config = MCRConfiguration.instance();
-        int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
-        cache = new MCRCache(size);
-        store = new MCRAccessCtrlStore();
-        //MCRAccessCtrlStore 
-    }
-
-    public MCRAccessRule getAccess(String id)
-    {
-        MCRAccessRule a = (MCRAccessRule)cache.get(id);
-        if(a==null) {
-            a = store.getRule(id);
-            cache.put(id, a);
+        if(implementation == null) {
+            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name");
         }
-        return a;
+        return implementation;
     }
-};
-
+}
