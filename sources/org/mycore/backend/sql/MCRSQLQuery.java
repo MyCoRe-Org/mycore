@@ -121,7 +121,6 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
         }catch(Exception e){
             LOGGER.error(e);
         }
-        
     }
 
     
@@ -173,6 +172,30 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
     
     
     /**
+     * method uses the type definition and creates a string for the where clause
+     * @return empty string for type * or no type restriction; ohterwise returns
+     *         a sql where clause part to be included in the where clause
+     */
+    private String getTypeList(){
+        StringBuffer sbtype = new StringBuffer();
+        List l = querydoc.getRootElement().getChild("types").getChildren();
+        if (l.size()<1) return "";
+        
+        for (int i=0; i<l.size(); i++){
+            if (((Element)l.get(i)).getAttributeValue("field").equals("*")){
+                return "";
+            }
+            sbtype.append("`MCRTYPE` = \'" + ((Element) l.get(i)).getAttributeValue("field") + "\'");
+            
+            if (i<l.size()-1)
+                sbtype.append(" or ");
+        }
+        
+        return sbtype.toString();
+    }
+    
+    
+    /**
      * method creates where clause for given xml query
      * @return sql where clause as string
      */
@@ -181,7 +204,11 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
             sbquery.append(")");
         }
         bracket=0;
-        return sbquery.toString();
+        if (getTypeList().equals("")){
+            return sbquery.toString();
+        }else{
+           return "(" + sbquery.toString() + ") and (" +getTypeList() + ")";  
+        }
     }
     
     
