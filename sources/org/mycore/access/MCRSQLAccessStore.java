@@ -47,7 +47,7 @@ import org.mycore.common.MCRException;
  * @author Arne Seifert
  * @version $Revision$ $Date$
  */
-class MCRSQLAccessStore {
+class MCRSQLAccessStore extends MCRAccessStore {
 
     /** the logger */
     static Logger logger = Logger.getLogger(MCRSQLUserStore.class.getName());
@@ -73,7 +73,7 @@ class MCRSQLAccessStore {
         AccessPools = config.getString("MCR.AccessPools", "");
     }
 
-    public void createTable() {
+    public void createTables() {
         // create tables
         if (!AccessPools.equals("")) {
             if (!MCRSQLConnection.doesTableExist(SQLAccessCtrlRule)) {
