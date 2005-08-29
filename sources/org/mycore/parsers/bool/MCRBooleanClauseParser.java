@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 /**
  * Class for parsing Boolean clauses
- * 
+ *
  * @author Matthias Kramm
  */
 
@@ -167,7 +167,7 @@ public class MCRBooleanClauseParser {
         return parseSimpleCondition(s);
     }
 
-    public MCRCondition parseSimpleCondition(String s) throws MCRParseException
+    protected MCRCondition parseSimpleCondition(String s) throws MCRParseException
     {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false"))
@@ -176,8 +176,8 @@ public class MCRBooleanClauseParser {
             return new MCRTrueCondition();
         throw new MCRParseException("syntax error: " + s); //extendClauses(s, l));
     }
-    
-    public MCRCondition parseSimpleCondition(Element e) throws MCRParseException
+
+    protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException
     {
         String name = e.getName();
         if(name.equals("true"))
