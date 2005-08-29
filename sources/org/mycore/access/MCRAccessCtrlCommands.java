@@ -69,8 +69,8 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * method creates sql tables
      */
     public static void createTables() {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
-        mcr_accessctrl.createTable();
+        MCRAccessStore mcr_accessctrl = MCRAccessStore.getInstance();
+        mcr_accessctrl.createTables();
     }
 
     /**
@@ -81,7 +81,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * @return string with rule definition
      */
     public static void getRule(String ruleID) {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
+        MCRAccessStore mcr_accessctrl = MCRAccessStore.getInstance();
         LOGGER.info(mcr_accessctrl.getRule(ruleID));
         //return mcr_accessctrl.getRule(ruleID);
     }
@@ -95,7 +95,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * @return string with ruleid
      */
     public static void getRuleID(String objID, String acPool) {
-        MCRAccessCtrlStore mcr_accessctrl = new MCRAccessCtrlStore();
+        MCRAccessStore mcr_accessctrl = MCRAccessStore.getInstance();
         LOGGER.info(mcr_accessctrl.getRuleID(objID, acPool));
         //return mcr_accessctrl.getRuleID(objID, acPool);
     }
