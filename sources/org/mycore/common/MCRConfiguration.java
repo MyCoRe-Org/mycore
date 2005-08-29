@@ -305,7 +305,7 @@ public class MCRConfiguration {
         String classname = properties.getProperty(name);
         if (classname == null) {
             if(defaultname!=null) {
-                classname = properties.getProperty(defaultname);
+                classname = defaultname;
             }
             if (classname == null) {
                 throw new MCRConfigurationException("Configuration property "
