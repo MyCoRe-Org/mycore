@@ -40,16 +40,27 @@ import org.mycore.backend.query.helper.GenClasses;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
-
-public class MCRQueryManager {
+/**
+ * MCRQueryManager handles all Events needed für the sql/hibernate-indexer
+ * (create/update/delete objects of the index)
+ * 
+ * @author Arne Seifert
+ *
+ */
+public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSearchStoreInterface{
     
     /** the logger */
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
-    
+    private Document doc = new Document();
     
     private static MCRQueryIndexerInterface indexer;
     private static MCRQuerySearcherInterface searcher;
@@ -68,7 +79,7 @@ public class MCRQueryManager {
         return singleton;
     }
     
-    public MCRQueryManager(){
+    private MCRQueryManager(){
         try {
             config = MCRConfiguration.instance();
             indexer = (MCRQueryIndexerInterface) Class.forName(config.getString("MCR.QueryIndexer_class_name")).newInstance();
@@ -79,64 +90,21 @@ public class MCRQueryManager {
             LOGGER.error(e);
             throw new MCRException("MCRQueryManager error", e);
         }
-
     }
-
-    public static void initialLoad(){
+    
+    public void createDataBase(String mcr_type, Document mcr_conf){
         getInstance();
         indexer.initialLoad();
     }
     
-    public static void refreshObject(String objectID){
-        getInstance();
-        indexer.updateObject(new MCRObjectID(objectID));
-    }
-    
-    public static void deleteObject(String objectID){
-        getInstance();
-        indexer.deleteObject(new MCRObjectID(objectID));
-    }
-    
-    public static void runQuery(int no){
-        getInstance();
-        searcher.runQuery(no);
-    }
-    
-    private void loadFields(){
-        try{
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = new Document();
-            InputStream in = this.getClass().getResourceAsStream("/" + searchfield);
-
-            if (in == null) {
-                String msg = "Could not find configuration file " + searchfield + " in CLASSPATH";
-                throw new MCRConfigurationException(msg);
-            }
-            doc = builder.build(in);
-            in.close();
-            searchfields = GenClasses.loadFields(doc);
-        }catch(Exception e){
-            LOGGER.error(e);
-        }
-    }
-    
-    public Element getField(String name){
-        if (searchfields.containsKey(name)){
-            return (Element) searchfields.get(name);
-        }else{
-            return null;
-        }
-    }
-
-    public HashMap getQueryFields(){
-        return searchfields;
-    }
-    
-    
-    public void insertObject(MCRObjectID objectid){
-        LOGGER.info("  insert object with id: "+ objectid.getId());
+    /**
+     * interface implementation of create
+     * @param objBase
+     */
+    public void create(MCRBase objBase){
+        LOGGER.info("  insert object with id: "+ objBase.getId().getId());
         MCRXMLTableManager manager = MCRXMLTableManager.instance();
-        Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(objectid), false);
+        Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(objBase.getId()), false);
         Iterator it = searchfields.keySet().iterator();
         List values = new LinkedList();
         
@@ -192,9 +160,69 @@ public class MCRQueryManager {
             values.add(strValue);
         }
         // save values in db
-        indexer.insertInQuery((String) objectid.getId(), values);
+        indexer.insertInQuery((String) objBase.getId().getId(), values);
     }
     
+    
+    /**
+     * interface implementation of delete
+     * @param objectID
+     */
+    public void delete(MCRObjectID objectID){
+        getInstance();
+        indexer.deleteObject(objectID);
+    }
+    
+    
+    /**
+     * interface impelementation of update
+     * @param objectID
+     */
+    public void update(MCRBase base){
+        getInstance();
+        indexer.updateObject(base.getId());
+    }
+
+    
+    public static void runQuery(int no){
+        getInstance();
+        searcher.runQuery(no);
+    }
+    
+    private void loadFields(){
+        try{
+            SAXBuilder builder = new SAXBuilder();
+            
+            InputStream in = this.getClass().getResourceAsStream("/" + searchfield);
+
+            if (in == null) {
+                String msg = "Could not find configuration file " + searchfield + " in CLASSPATH";
+                throw new MCRConfigurationException(msg);
+            }
+            doc = builder.build(in);
+            in.close();
+            searchfields = GenClasses.loadFields(doc);
+        }catch(Exception e){
+            LOGGER.error(e);
+        }
+    }
+    
+    public Element getField(String name){
+        if (searchfields.containsKey(name)){
+            return (Element) searchfields.get(name);
+        }else{
+            return null;
+        }
+    }
+
+    public HashMap getQueryFields(){
+        return searchfields;
+    }
+    
+    public Document getSearchDefinition(){
+        return doc;
+    }
+
     public void loadType(String type){
         try{
             ArrayList objectID = new ArrayList();
@@ -203,7 +231,13 @@ public class MCRQueryManager {
             // object loop
             for (int i=0; i< objectID.size(); i++){
                 MCRObjectID objectid = new MCRObjectID ((String) objectID.get(i));
-                insertObject(objectid);
+                MCRObject obj = new MCRObject();
+                //  try{
+                obj.receiveFromDatastore(objectid);
+                create(obj);
+                //  }catch(Exception e){
+                
+                //  }
             }
         }catch(Exception e){
             LOGGER.error(e);
@@ -211,4 +245,41 @@ public class MCRQueryManager {
         }  
     }
 
+    /**
+     * This class builds indexes of meta data objects.
+     * @param evt the event that occured
+     * @param obj the MCRObject that caused the event
+     */
+    protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
+        try {
+            create(obj);
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+    }
+    
+    
+    /**
+     * Updates Object in SQL index.
+     * @param evt the event that occured
+     * @param obj the MCRObject that caused the event
+     */
+    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        handleObjectDeleted(evt, obj);
+        handleObjectCreated(evt, obj);
+    }
+    
+    
+    /**
+     * Deletes Object in SQL index.
+     * @param evt the event that occured
+     * @param obj the MCRObject that caused the event
+     */
+    protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+        try {
+            delete(obj.getId());
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+    }
 }

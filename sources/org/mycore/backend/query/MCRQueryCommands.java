@@ -40,7 +40,7 @@ public class MCRQueryCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("initial load querytable",
-                "org.mycore.backend.query.MCRQueryManager.initialLoad",
+                "org.mycore.backend.query.MCRQueryCommands.init",
                 "The command imports objects of given type into querytable.");
         command.add(com);
         
@@ -59,6 +59,11 @@ public class MCRQueryCommands extends MCRAbstractCommands {
                 "lists all MCRID for query");
         command.add(com);
         
+    }
+    
+    public static void init(){
+        MCRQueryManager querymanager =  MCRQueryManager.getInstance();
+        querymanager.createDataBase("", querymanager.getSearchDefinition());
     }
 
 }
