@@ -30,7 +30,7 @@ import org.jdom.Attribute;
  * @author Matthias Kramm
  */
 
-class MCRFalseCondition implements MCRCondition {
+public class MCRFalseCondition implements MCRCondition {
     public MCRFalseCondition() {
     }
 

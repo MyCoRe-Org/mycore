@@ -29,7 +29,7 @@ import org.jdom.Attribute;
  * @author Matthias Kramm
  */
 
-class MCRTrueCondition implements MCRCondition {
+public class MCRTrueCondition implements MCRCondition {
     public MCRTrueCondition() {
     }
 
