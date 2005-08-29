@@ -31,7 +31,7 @@ import org.jdom.Attribute;
  */
 
 class MCRFalseCondition implements MCRCondition {
-    MCRFalseCondition() {
+    public MCRFalseCondition() {
     }
 
     public boolean evaluate(Object o) {

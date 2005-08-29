@@ -30,7 +30,7 @@ import org.jdom.Attribute;
  */
 
 class MCRTrueCondition implements MCRCondition {
-    MCRTrueCondition() {
+    public MCRTrueCondition() {
     }
 
     public boolean evaluate(Object o) {
