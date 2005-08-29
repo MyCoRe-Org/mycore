@@ -33,8 +33,14 @@ import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.backend.sql.MCRSQLConnectionPool;
 import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * 
+ * @author Arne Seifert
+ *
+ */
 
 public class MCRSQLIndexer implements MCRQueryIndexerInterface{
    
@@ -50,7 +56,7 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
     public MCRSQLIndexer() {
             config = MCRConfiguration.instance();
             SQLQueryTable = config.getString("MCR.QueryTableName", "MCRQuery");
-            querytypes = config.getString("MCR.QueryTypes", "document,derivate,author");
+            querytypes = config.getString("MCR.QueryTypes", "document,author");
             LOGGER.info("indexer loaded");
     }
     
@@ -65,18 +71,20 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
         createSQLQueryTable();
         while ( tokenizer.hasMoreTokens() )
             queryManager.loadType(tokenizer.nextToken());
-
     }
+    
     
     /**
      * method to update entries of given objectid
      * @param objectid as MCRObjectID
      */
     public void updateObject(MCRObjectID objectid){
-        queryManager = MCRQueryManager.getInstance();
         deleteObject(objectid);
-        queryManager.insertObject(objectid);
+        MCRObject obj = null;
+        obj.receiveFromDatastore(objectid.getId());
+        MCRQueryManager.getInstance().create(obj);
     }
+    
     
     /**
      * method to delete all entries of given objectid
@@ -106,7 +114,8 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
         MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
         
         query.setValue(new MCRSQLColumn("MCRID", mcrid, "string"));
-
+        query.setValue(new MCRSQLColumn("MCRTYPE", new MCRObjectID(mcrid).getTypeId(), "string"));
+        
         Iterator it = queryManager.getQueryFields().keySet().iterator();
         for(int i=0; i< values.size(); i++){
             String field = (String) it.next();
@@ -145,6 +154,7 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
         try {
             MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
             query.addColumn("MCRID VARCHAR(64) NOT NULL");
+            query.addColumn("MCRTYPE VARCHAR(64) NOT NULL");
             Iterator it = MCRQueryManager.getInstance().getQueryFields().keySet().iterator();
             
             while (it.hasNext()){
