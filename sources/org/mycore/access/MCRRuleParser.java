@@ -54,6 +54,12 @@ class MCRRuleParser extends MCRBooleanClauseParser {
 
     public MCRCondition parseSimpleCondition(String s)
     {
+        /* handle specific rules */
+        if (s.equalsIgnoreCase("false"))
+            return new MCRFalseCondition();
+        if (s.equalsIgnoreCase("true"))
+            return new MCRTrueCondition();
+
         if (s.startsWith("group "))
             return new MCRGroupClause(s.substring(6).trim());
         if (s.startsWith("user "))
