@@ -30,6 +30,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.type.BooleanType;
+import org.hibernate.type.DateType;
+import org.hibernate.type.DoubleType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimeType;
+import org.hibernate.type.TimestampType;
 
 import org.mycore.backend.hibernate.tables.MCRID;
 import org.mycore.common.MCRConfiguration;
@@ -181,4 +188,29 @@ public class MCRHIBConnection {
 			return id.getId();
 		}
 	}
+    
+    /**
+     * helper mehtod: translates fieldtypes into hibernate types
+     * @param type typename as string
+     * @return hibernate type
+     */
+    public org.hibernate.type.Type getHibType(String type){
+        
+        if(type.equals("integer")){
+            return new IntegerType();
+        }else if(type.equals("date")){
+            return new DateType();
+        }else if(type.equals("time")){
+            return new TimeType();
+        }else if(type.equals("timestamp")){
+            return new TimestampType();
+        }else if(type.equals("decimal")){
+            return new DoubleType();
+        }else if(type.equals("boolean")){
+            return new BooleanType();
+        }else{
+            return new StringType();
+        }
+
+    }
 }
