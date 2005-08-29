@@ -30,56 +30,56 @@ import java.net.UnknownHostException;
  */
 
 public class MCRIPAddress {
-	byte[] address;
+    byte[] address;
 
-	byte[] mask;
+    byte[] mask;
 
-	public MCRIPAddress(String ip) throws UnknownHostException {
-		int i = ip.indexOf('/');
-		if (i >= 0) {
-			String ipstr = ip.substring(0, i);
-			String maskstr = ip.substring(i + 1);
-			InetAddress address = InetAddress.getByName(ipstr);
-			InetAddress mask = InetAddress.getByName(maskstr);
-			init(address, mask);
-		} else {
-			InetAddress address = InetAddress.getByName(ip);
-			init(address);
-		}
-	}
+    public MCRIPAddress(String ip) throws UnknownHostException {
+        int i = ip.indexOf('/');
+        if (i >= 0) {
+            String ipstr = ip.substring(0, i);
+            String maskstr = ip.substring(i + 1);
+            InetAddress address = InetAddress.getByName(ipstr);
+            InetAddress mask = InetAddress.getByName(maskstr);
+            init(address, mask);
+        } else {
+            InetAddress address = InetAddress.getByName(ip);
+            init(address);
+        }
+    }
 
-	public MCRIPAddress(InetAddress address, InetAddress mask) {
-		init(address, mask);
-	}
+    public MCRIPAddress(InetAddress address, InetAddress mask) {
+        init(address, mask);
+    }
 
-	public MCRIPAddress(InetAddress address) {
-		init(address);
-	}
+    public MCRIPAddress(InetAddress address) {
+        init(address);
+    }
 
-	public void init(InetAddress address, InetAddress mask) {
-		int t;
-		this.address = address.getAddress();
-		this.mask = mask.getAddress();
-	}
+    public void init(InetAddress address, InetAddress mask) {
+        int t;
+        this.address = address.getAddress();
+        this.mask = mask.getAddress();
+    }
 
-	public void init(InetAddress address) {
-		int t;
-		this.address = address.getAddress();
-		this.mask = new byte[this.address.length];
-		for (t = 0; t < this.address.length; t++)
-			this.mask[t] = (byte) 255;
-	}
+    public void init(InetAddress address) {
+        int t;
+        this.address = address.getAddress();
+        this.mask = new byte[this.address.length];
+        for (t = 0; t < this.address.length; t++)
+            this.mask[t] = (byte) 255;
+    }
 
-	boolean contains(MCRIPAddress other) {
-		int t;
-		if (this.address.length != other.address.length)
-			throw new IllegalStateException(
-					"can't map IPv6 to IPv4 and vice versa");
-		for (t = 0; t < address.length; t++) {
-			if ((this.address[t] & this.mask[t]) != (other.address[t] & this.mask[t])) {
-				return false;
-			}
-		}
-		return true;
-	}
+    boolean contains(MCRIPAddress other) {
+        int t;
+        if (this.address.length != other.address.length)
+            throw new IllegalStateException(
+                    "can't map IPv6 to IPv4 and vice versa");
+        for (t = 0; t < address.length; t++) {
+            if ((this.address[t] & this.mask[t]) != (other.address[t] & this.mask[t])) {
+                return false;
+            }
+        }
+        return true;
+    }
 };

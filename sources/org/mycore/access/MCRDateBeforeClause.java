@@ -31,17 +31,17 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRDateBeforeClause implements MCRAccessCtrlDefinition {
-	private Date date;
+    private Date date;
 
-	MCRDateBeforeClause(Date date) {
-		this.date = date;
-	}
+    MCRDateBeforeClause(Date date) {
+        this.date = date;
+    }
 
-	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-		return date.before(this.date);
-	}
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return date.before(this.date);
+    }
 
-	public String toString() {
-		return "date < " + date + "\n";
-	}
+    public String toString() {
+        return "date < " + date + "\n";
+    }
 };

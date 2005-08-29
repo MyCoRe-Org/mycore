@@ -31,21 +31,21 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRIPClause implements MCRAccessCtrlDefinition {
-	private MCRIPAddress ip;
+    private MCRIPAddress ip;
 
-	MCRIPClause(String ip) throws MCRParseException {
-		try {
-			this.ip = new MCRIPAddress(ip);
-		} catch (java.net.UnknownHostException e) {
-			throw new MCRParseException("Couldn't parse/resolve host " + ip);
-		}
-	}
+    MCRIPClause(String ip) throws MCRParseException {
+        try {
+            this.ip = new MCRIPAddress(ip);
+        } catch (java.net.UnknownHostException e) {
+            throw new MCRParseException("Couldn't parse/resolve host " + ip);
+        }
+    }
 
-	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-		return this.ip.contains(ip);
-	}
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return this.ip.contains(ip);
+    }
 
-	public String toString() {
-		return "ip " + ip + "\n";
-	}
+    public String toString() {
+        return "ip " + ip + "\n";
+    }
 };

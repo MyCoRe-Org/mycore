@@ -31,14 +31,14 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRFalseClause implements MCRAccessCtrlDefinition {
-	MCRFalseClause() {
-	}
+    MCRFalseClause() {
+    }
 
-	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-		return false;
-	}
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return false;
+    }
 
-	public String toString() {
-		return "false\n";
-	}
+    public String toString() {
+        return "false\n";
+    }
 };

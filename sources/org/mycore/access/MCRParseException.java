@@ -27,7 +27,7 @@ package org.mycore.access;
  */
 
 class MCRParseException extends Exception {
-	MCRParseException(String s) {
-		super(s);
-	}
+    MCRParseException(String s) {
+        super(s);
+    }
 };

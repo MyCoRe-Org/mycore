@@ -32,20 +32,20 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRGroupClause implements MCRAccessCtrlDefinition {
-	private MCRGroup group;
+    private MCRGroup group;
 
-	private String groupname;
+    private String groupname;
 
-	MCRGroupClause(String group) {
-		this.groupname = group;
-		this.group = new MCRGroup(group);
-	}
+    MCRGroupClause(String group) {
+        this.groupname = group;
+        this.group = new MCRGroup(group);
+    }
 
-	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-		return user.isMemberOf(group);
-	}
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return user.isMemberOf(group);
+    }
 
-	public String toString() {
-		return "group " + group + "\n";
-	}
+    public String toString() {
+        return "group " + group + "\n";
+    }
 };

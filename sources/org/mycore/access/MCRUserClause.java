@@ -31,17 +31,17 @@ import org.mycore.user.MCRUser;
  */
 
 class MCRUserClause implements MCRAccessCtrlDefinition {
-	private String user;
+    private String user;
 
-	MCRUserClause(String user) {
-		this.user = user;
-	}
+    MCRUserClause(String user) {
+        this.user = user;
+    }
 
-	public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-		return this.user.equals(user.getID());
-	}
+    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        return this.user.equals(user.getID());
+    }
 
-	public String toString() {
-		return "user " + user + "\n";
-	}
+    public String toString() {
+        return "user " + user + "\n";
+    }
 };
