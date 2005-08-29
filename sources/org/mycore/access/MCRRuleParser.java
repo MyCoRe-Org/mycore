@@ -61,7 +61,7 @@ class MCRRuleParser {
 		return s;
 	}
 
-	private static MCRAccessCtrlDefinition parse(String s)
+	public static MCRAccessCtrlDefinition parse(String s)
 			throws MCRParseException {
 		s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
 		return parse(s, null);
