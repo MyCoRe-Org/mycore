@@ -29,13 +29,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.DateType;
-import org.hibernate.type.DoubleType;
-import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.TimeType;
-import org.hibernate.type.TimestampType;
 import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.MCRHIBMapping;
@@ -44,6 +38,7 @@ import org.mycore.backend.query.MCRQueryIndexerInterface;
 import org.mycore.backend.query.MCRQueryManager;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRHIBIndexer implements MCRQueryIndexerInterface {
@@ -99,7 +94,9 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
      */
     public void updateObject(MCRObjectID objectid) {
         try{
-            MCRQueryManager.getInstance().insertObject(objectid);
+            MCRObject obj = new MCRObject();
+            obj.receiveFromDatastore(objectid);
+            MCRQueryManager.getInstance().create(obj);
         }catch(Exception e){
             LOGGER.error(e);
         }
@@ -137,6 +134,8 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
         MCRHIBQuery query = new MCRHIBQuery();
 
         query.setValue("setmcrid", mcrid);
+        query.setValue("setmcrtype",new MCRObjectID(mcrid).getTypeId());
+        
         Iterator it = queryManager.getQueryFields().keySet().iterator();
         for(int i=0; i< values.size(); i++){
             Element el = queryManager.getField((String) it.next());
@@ -175,11 +174,13 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
                 
                 Iterator it = MCRQueryManager.getInstance().getQueryFields().keySet().iterator();
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
+                map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
+                
                 while (it.hasNext()){
                     Element el = (Element) MCRQueryManager.getInstance().getQueryFields().get((String) it.next());              
                     map.addColumn(el.getAttributeValue("name"),
                             el.getAttributeValue("name"),
-                            getHibType(el.getAttributeValue("type")),
+                            hibconnection.getHibType(el.getAttributeValue("type")),
                             2147483647, false, false, false);
                 }
                 
@@ -193,31 +194,6 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
         }catch(Exception e){
             LOGGER.error(e);
         }
-    }
-    
-    /**
-     * internal helper mehtod: translates fieldtypes into hibernate types
-     * @param type typename as string
-     * @return hibernate type
-     */
-    private static org.hibernate.type.Type getHibType(String type){
-        
-        if(type.equals("integer")){
-            return new IntegerType();
-        }else if(type.equals("date")){
-            return new DateType();
-        }else if(type.equals("time")){
-            return new TimeType();
-        }else if(type.equals("timestamp")){
-            return new TimestampType();
-        }else if(type.equals("decimal")){
-            return new DoubleType();
-        }else if(type.equals("boolean")){
-            return new BooleanType();
-        }else{
-            return new StringType();
-        }
-
     }
 
 }

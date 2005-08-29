@@ -20,52 +20,61 @@
  **/
 package org.mycore.backend.hibernate;
 
-import java.util.LinkedList;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.jdom.input.SAXBuilder;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.query.MCRQuerySearcherInterface;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 
+/**
+ * 
+ * @author Arne Seifert
+ *
+ */
 public class MCRHIBSearcher implements MCRQuerySearcherInterface{
 
     /** The logger */
     public static Logger LOGGER = Logger.getLogger(MCRHIBSearcher.class.getName());
-    
-    private static String SQLQueryTable; 
-    private static MCRConfiguration config;
-    
+
     public MCRHIBSearcher(){
-        config = MCRConfiguration.instance();
-        SQLQueryTable = config.getString("MCR.QueryTableName", "MCRQuery");
-    }
-    
-    public void runQuery(int no) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        List l = new LinkedList();       
-
-        if (no==0){
-            l = session.createQuery("from " + SQLQueryTable + " where title like '%Ein%' and author like '%Jens Kupferschmidt%'").list();
-        }else if(no==1){
-            l = session.createQuery("from " + SQLQueryTable + " where author like '%Jens Kupferschmidt%'").list();
-        }else if(no==2){
-            l = session.createQuery("from " + SQLQueryTable + " where title like '%Ein%'").list();
-        }else if(no==3){
-            l = session.createQuery("from " + SQLQueryTable + " where title like '%Ein%' and author like '%Heiko Helmbrecht%'").list();
-        }
-        System.out.println("Ergebnis: "+ l.size());
-
-        for(int i=0; i<l.size(); i++){
-            MCRHIBQuery res = new MCRHIBQuery(l.get(i));
-            System.out.println("ID: " + res.getValue("getmcrid") + "  author: " + res.getValue("getauthor"));
-        }
-        tx.commit();
-        session.close();
         
     }
+
+    public void runQuery(int no){
+        try{
+            System.out.println("read document");
+            SAXBuilder builder = new SAXBuilder();
+            InputStream in = this.getClass().getResourceAsStream("/query1.xml");
+
+            if (in == null) {
+                String msg = "Could not find configuration file";
+                throw new MCRConfigurationException(msg);
+            }
+            
+            MCRHIBQuery query = new MCRHIBQuery(builder.build(in));
+            in.close();
+
+            Session session = MCRHIBConnection.instance().getSession();
+            Transaction tx = session.beginTransaction();
+
+            List l = session.createQuery(query.getHIBQuery()).list();
     
+            LOGGER.info("Ergebnis: "+ l.size());
+
+            for(int i=0; i<l.size(); i++){
+                MCRHIBQuery res = new MCRHIBQuery(l.get(i));
+                System.out.println("ID: " + res.getValue("getmcrid"));
+            }
+            tx.commit();
+            session.close();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
