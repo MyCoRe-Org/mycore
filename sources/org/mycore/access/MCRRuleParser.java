@@ -29,6 +29,10 @@ import java.text.SimpleDateFormat;
 
 class MCRRuleParser extends MCRBooleanClauseParser {
 
+    MCRRuleParser()
+    {
+    }
+
     private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
     private static Date parseDate(String s, boolean dayafter)
             throws MCRParseException {
@@ -40,10 +44,6 @@ class MCRRuleParser extends MCRBooleanClauseParser {
         } catch (java.text.ParseException e) {
             throw new MCRParseException("unable to parse date " + s);
         }
-    }
-
-    MCRRuleParser()
-    {
     }
 
     public MCRCondition parseSimpleCondition(Element e) throws MCRParseException
