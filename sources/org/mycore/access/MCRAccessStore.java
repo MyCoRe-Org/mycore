@@ -23,15 +23,8 @@
  **/
 package org.mycore.access;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 import org.apache.log4j.Logger;
 
-import org.mycore.backend.sql.MCRSQLConnection;
-import org.mycore.backend.sql.MCRSQLConnectionPool;
-import org.mycore.backend.sql.MCRSQLStatement;
-import org.mycore.backend.sql.MCRSQLUserStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -57,7 +50,7 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() 
     {
         if(implementation == null) {
-            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name");
+            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.access.MCRSQLAccessStore");
         }
         return implementation;
     }
