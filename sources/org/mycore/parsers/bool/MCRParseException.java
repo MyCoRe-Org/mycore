@@ -26,7 +26,7 @@ package org.mycore.parsers.bool;
 
 public class MCRParseException extends org.mycore.common.MCRException
 {
-    MCRParseException(String text)
+    public MCRParseException(String text)
     {
         super(text);
     }
