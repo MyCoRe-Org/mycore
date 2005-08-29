@@ -26,7 +26,6 @@ package org.mycore.access;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 
 //import org.mycore.access.MCRAccessCtrlStore;
 
@@ -36,7 +35,7 @@ import org.mycore.common.MCRException;
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.accessstore_class_name</code>
  * from mycore.properties.
- * 
+ *
  * @author Arne Seifert
  * @version $Revision$ $Date$
  */
@@ -47,7 +46,7 @@ public abstract class MCRAccessStore {
     public abstract String getRuleID(String objID, String ACPool);
 
     static private MCRAccessStore implementation;
-    public static MCRAccessStore getInstance() 
+    public static MCRAccessStore getInstance()
     {
         if(implementation == null) {
             implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");

@@ -23,25 +23,33 @@ package org.mycore.access;
 import java.util.Date;
 
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.jdom.Element;
 
 /**
  * Implementation of a dummy clause (useful for debugging)
- * 
+ *
  * @author Matthias Kramm
  */
 
-class MCRDummyClause implements MCRAccessCtrlDefinition {
+class MCRDummyClause implements MCRCondition {
     private String s;
 
     MCRDummyClause(String s) {
         this.s = s;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
+    public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData)o;
         return false;
     }
 
     public String toString() {
         return "\"" + s + "\"";
     }
+
+    public Element toXML() {return null; /* TODO */}
+    public Element info() {return null; /* TODO */}
+    public void accept(MCRConditionVisitor visitor) {/* TODO */}
 };

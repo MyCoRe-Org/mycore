@@ -23,25 +23,33 @@ package org.mycore.access;
 import java.util.Date;
 
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.jdom.Element;
 
 /**
  * Implementation of a (user xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
 
-class MCRUserClause implements MCRAccessCtrlDefinition {
+class MCRUserClause implements MCRCondition {
     private String user;
 
     MCRUserClause(String user) {
         this.user = user;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return this.user.equals(user.getID());
+    public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData)o;
+        return this.user.equals(data.user.getID());
     }
 
     public String toString() {
         return "user " + user + "\n";
     }
+
+    public Element toXML() {return null; /* TODO */}
+    public Element info() {return null; /* TODO */}
+    public void accept(MCRConditionVisitor visitor) {/* TODO */}
 };

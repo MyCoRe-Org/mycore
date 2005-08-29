@@ -23,14 +23,18 @@ package org.mycore.access;
 import java.util.Date;
 
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.parsers.bool.MCRCondition;
+import org.jdom.Element;
 
 /**
  * Implementation of a (ip xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
 
-class MCRIPClause implements MCRAccessCtrlDefinition {
+class MCRIPClause implements MCRCondition {
     private MCRIPAddress ip;
 
     MCRIPClause(String ip) throws MCRParseException {
@@ -41,11 +45,16 @@ class MCRIPClause implements MCRAccessCtrlDefinition {
         }
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return this.ip.contains(ip);
+    public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData)o;
+        return this.ip.contains(data.ip);
     }
 
     public String toString() {
         return "ip " + ip + "\n";
     }
+
+    public Element toXML() {return null; /* TODO */}
+    public Element info() {return null; /* TODO */}
+    public void accept(MCRConditionVisitor visitor) {/* TODO */}
 };

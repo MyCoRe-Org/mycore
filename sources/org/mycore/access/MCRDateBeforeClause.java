@@ -23,25 +23,33 @@ package org.mycore.access;
 import java.util.Date;
 
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.jdom.Element;
 
 /**
  * Implementation of a (date &lt; x) clause
- * 
+ *
  * @author Matthias Kramm
  */
 
-class MCRDateBeforeClause implements MCRAccessCtrlDefinition {
+class MCRDateBeforeClause implements MCRCondition {
     private Date date;
 
     MCRDateBeforeClause(Date date) {
         this.date = date;
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return date.before(this.date);
+    public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData)o;
+        return data.date.before(this.date);
     }
 
     public String toString() {
         return "date < " + date + "\n";
     }
+
+    public Element toXML() {return null; /* TODO */}
+    public Element info() {return null; /* TODO */}
+    public void accept(MCRConditionVisitor visitor) {/* TODO */}
 };

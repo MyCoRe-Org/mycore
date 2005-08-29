@@ -34,6 +34,7 @@ import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.backend.sql.MCRSQLUserStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.parsers.bool.MCRParseException;
 
 //import org.mycore.access.MCRAccessCtrlStore;
 
@@ -43,7 +44,7 @@ import org.mycore.common.MCRException;
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.userstore_class_name</code>
  * from mycore.properties.
- * 
+ *
  * @author Arne Seifert
  * @version $Revision$ $Date$
  */

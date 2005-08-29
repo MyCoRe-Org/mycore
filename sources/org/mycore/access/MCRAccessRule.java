@@ -23,16 +23,20 @@ package org.mycore.access;
 import java.util.Date;
 
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRParseException;
 
 class MCRAccessRule {
-    
+
     String id;
     String creator;
     Date creationTime;
     String rule;
     String description;
 
-    MCRAccessCtrlDefinition parsedRule;
+    MCRCondition parsedRule;
+
+    static MCRRuleParser parser = new MCRRuleParser();
 
     MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException
     {
@@ -41,15 +45,21 @@ class MCRAccessRule {
         this.creationTime = creationTime;
         this.rule = rule;
         this.description = description;
-            
-        this.parsedRule = MCRRuleParser.parse(this.rule);
+
+        this.parsedRule = parser.parse(this.rule);
+    }
+
+    public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip)
+    {
+        MCRAccessData data = new MCRAccessData(user,date,ip);
+        return this.parsedRule.evaluate(data);
     }
 
     public String getRuleString()
     {
         return rule;
     }
-    public MCRAccessCtrlDefinition getRule()
+    public MCRCondition getRule()
     {
         return this.parsedRule;
     }

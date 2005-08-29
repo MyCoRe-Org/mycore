@@ -76,9 +76,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     /**
      * This method returns the rule as string for a given id
      * 
-     * @param ruleID
-     *            internal database ruleid
-     * @return string with rule definition
+     * @param ruleID internal database ruleid
      */
     public static void getRule(String ruleID) {
         MCRAccessStore mcr_accessctrl = MCRAccessStore.getInstance();
@@ -90,9 +88,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * This method returns the ruleid as string for a given object and
      * accesspool
      * 
-     * @param objID
-     *            identificator for object, acPool name of accesspool
-     * @return string with ruleid
+     * @param objID identificator for object, acPool name of accesspool
      */
     public static void getRuleID(String objID, String acPool) {
         MCRAccessStore mcr_accessctrl = MCRAccessStore.getInstance();

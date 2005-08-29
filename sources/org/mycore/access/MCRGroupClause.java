@@ -24,14 +24,17 @@ import java.util.Date;
 
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
+import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.jdom.Element;
 
 /**
  * Implementation of a (group xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
 
-class MCRGroupClause implements MCRAccessCtrlDefinition {
+class MCRGroupClause implements MCRCondition {
     private MCRGroup group;
 
     private String groupname;
@@ -41,11 +44,15 @@ class MCRGroupClause implements MCRAccessCtrlDefinition {
         this.group = new MCRGroup(group);
     }
 
-    public boolean hasAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        return user.isMemberOf(group);
+    public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData)o;
+        return data.user.isMemberOf(group);
     }
 
     public String toString() {
         return "group " + group + "\n";
     }
+    public Element toXML() {return null; /* TODO */}
+    public Element info() {return null; /* TODO */}
+    public void accept(MCRConditionVisitor visitor) {/* TODO */}
 };

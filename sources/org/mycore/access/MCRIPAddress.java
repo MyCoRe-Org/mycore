@@ -25,7 +25,7 @@ import java.net.UnknownHostException;
 
 /**
  * A class for representing an IP Address, or a range of IP addresses
- * 
+ *
  * @author Matthias Kramm
  */
 
@@ -57,7 +57,6 @@ public class MCRIPAddress {
     }
 
     public void init(InetAddress address, InetAddress mask) {
-        int t;
         this.address = address.getAddress();
         this.mask = mask.getAddress();
     }
