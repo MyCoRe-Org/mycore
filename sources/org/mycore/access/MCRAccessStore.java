@@ -50,7 +50,7 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() 
     {
         if(implementation == null) {
-            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.access.MCRSQLAccessStore");
+            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");
         }
         return implementation;
     }
