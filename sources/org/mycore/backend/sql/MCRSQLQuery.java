@@ -32,8 +32,8 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.services.fieldquery.MCRQueryConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
 
 /**
@@ -41,7 +41,7 @@ import org.mycore.services.fieldquery.MCRQueryParser;
  * @author Arne Seifert
  *
  */
-public class MCRSQLQuery implements MCRQueryConditionVisitor{
+public class MCRSQLQuery implements MCRConditionVisitor{
     
     public static Logger LOGGER = Logger.getLogger(MCRSQLQuery.class.getName());
 
@@ -49,7 +49,7 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
     private String type = "";               //variable for type (and/or/not)
     private int count = 0;                  //number of children to proceed
     private Document querydoc;              //xmlQuery-Document
-    private MCRQueryCondition cond;         //query-condition
+    private MCRCondition cond;         //query-condition
     private List elList = new LinkedList(); //stack for type-elements
     private int bracket = 0;                //counts correct number of ')'
 
@@ -130,7 +130,7 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
     /**
      * interface implementation (visitor pattern) for field type
      */
-    public void visitQuery(MCRQueryCondition entry) {
+    public void visitQuery(MCRCondition entry) {
         try{
             Element el = entry.info();
             String fieldtype = MCRQueryManager.getInstance().getField(el.getAttributeValue("field")).getAttributeValue("type");
