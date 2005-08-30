@@ -53,12 +53,14 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
     private List elList = new LinkedList(); //stack for type-elements
     private int bracket = 0;                //counts correct number of ')'
 
+    private MCRQueryParser parser;
     
     /**
      * initialise query with xml-document containing complete query
      * @param document xml query docuement
      */
     public MCRSQLQuery(Document document){
+        this.parser = new MCRQueryParser();
         try{
             init(document);
         }catch(Exception e){
@@ -72,6 +74,7 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
      * @param xmlString
      */
     public MCRSQLQuery(String xmlString){
+        this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
             init(builder.build(xmlString));
@@ -88,7 +91,7 @@ public class MCRSQLQuery implements MCRQueryConditionVisitor{
     private void init(Document doc){
         try{
             querydoc = doc;
-            cond = MCRQueryParser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
+            cond = this.parser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
             cond.accept(this);
         }catch(Exception e){
             LOGGER.error(e);
