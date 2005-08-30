@@ -61,10 +61,7 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     /** the logger */
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
     private Document doc = new Document();
-    
-    private static MCRQueryIndexerInterface indexer;
-    private static MCRQuerySearcherInterface searcher;
-    
+
     private static String searchfield = "";
     protected HashMap searchfields = new HashMap();
     
@@ -74,7 +71,7 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     public static MCRQueryManager getInstance(){
         if (singleton == null){
             singleton = new MCRQueryManager();
-            indexer.updateConfiguration();
+            MCRQueryIndexer.getInstance().updateConfiguration();
         }
         return singleton;
     }
@@ -82,9 +79,7 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     private MCRQueryManager(){
         try {
             config = MCRConfiguration.instance();
-            indexer = (MCRQueryIndexerInterface) Class.forName(config.getString("MCR.QueryIndexer_class_name")).newInstance();
             searchfield = config.getString("MCR.QuerySearchFields", "searchfields.xml");
-            searcher = (MCRQuerySearcherInterface) Class.forName(config.getString("MCR.QuerySearcher_class_name")).newInstance();
             loadFields();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -93,18 +88,17 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     }
     
     public void createDataBase(String mcr_type, Document mcr_conf){
-        getInstance();
-        indexer.initialLoad();
+        MCRQueryIndexer.getInstance().initialLoad();
     }
     
     /**
      * interface implementation of create
      * @param objBase
      */
-    public void create(MCRBase objBase){
-        LOGGER.info("  insert object with id: "+ objBase.getId().getId());
+    public void create(MCRBase obj){
+        LOGGER.info("  insert object with id: "+ obj.getId().getId());
         MCRXMLTableManager manager = MCRXMLTableManager.instance();
-        Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(objBase.getId()), false);
+        Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
         Iterator it = searchfields.keySet().iterator();
         List values = new LinkedList();
         
@@ -138,8 +132,8 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
                         // element loop: children of given xpath in metadata
                         if (list.size()>0){
                             for (int k=0; k<list.size(); k++){
-                                Object obj = list.get(k);
-                                if(obj.getClass().getName().equals("org.jdom.Text")){
+                                Object tmpobj = list.get(k);
+                                if(tmpobj.getClass().getName().equals("org.jdom.Text")){
                                     Text t = (Text) list.get(k);
                                     strValue += t.getText();
                                 }else{
@@ -154,23 +148,11 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
                         //strValue="";
                     }
                 }
-                
             }
-            
             values.add(strValue);
         }
         // save values in db
-        indexer.insertInQuery((String) objBase.getId().getId(), values);
-    }
-    
-    
-    /**
-     * interface implementation of delete
-     * @param objectID
-     */
-    public void delete(MCRObjectID objectID){
-        getInstance();
-        indexer.deleteObject(objectID);
+        MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
     }
     
     
@@ -179,14 +161,22 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
      * @param objectID
      */
     public void update(MCRBase base){
-        getInstance();
-        indexer.updateObject(base.getId());
+        MCRQueryIndexer.getInstance().updateObject(base);
     }
+    
+    
+    /**
+     * interface implementation of delete
+     * @param objectID
+     */
+    public void delete(MCRObjectID objectID){
+        MCRQueryIndexer.getInstance().deleteObject(objectID);
+    }
+    
 
     
-    public static void runQuery(int no){
-        getInstance();
-        searcher.runQuery(no);
+    public static void runQuery(){
+        MCRQuerySearcher.getInstance().runQuery();
     }
     
     private void loadFields(){
