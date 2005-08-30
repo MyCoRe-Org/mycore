@@ -37,7 +37,7 @@ import org.mycore.parsers.bool.MCRParseException;
 
 public class MCRQueryParser extends MCRBooleanClauseParser
 {
-    public MCRCondition parseSimpleCondition(Element e) throws MCRParseException
+    protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException
     {
         String name = e.getName();
         if( name.equals( "condition" ) )
