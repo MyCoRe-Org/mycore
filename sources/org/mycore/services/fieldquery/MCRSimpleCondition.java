@@ -25,11 +25,13 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * @author Frank Lützenkirchen
  **/
-public class MCRSimpleCondition implements MCRQueryCondition
+public class MCRSimpleCondition implements MCRCondition
 {
     private String field;
     private String operator;
@@ -62,8 +64,9 @@ public class MCRSimpleCondition implements MCRQueryCondition
         return toXML();
     }
     
-    public void accept(MCRQueryConditionVisitor visitor) {
+    public void accept(MCRConditionVisitor visitor) {
         visitor.visitQuery(this); 
     }
-    
+    public boolean evaluate(Object o) {return false;}
+
 }

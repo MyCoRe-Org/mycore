@@ -1,223 +1,102 @@
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, normally in the file license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
+ */
+
 package org.mycore.services.fieldquery;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import org.jdom.Element;
 import org.jdom.output.*;
+import org.mycore.parsers.bool.MCRBooleanClauseParser;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRParseException;
 
-public class MCRQueryParser 
+public class MCRQueryParser extends MCRBooleanClauseParser
 {
-  private int pos;
-  private int last;
-  private String expr;
-  
-  private final static String NOT = "not";
-  private final static char QUOTE = '\"';
+    public MCRCondition parseSimpleCondition(Element e) throws MCRParseException
+    {
+        String name = e.getName();
+        if( name.equals( "condition" ) )
+        {
+            String field = e.getAttributeValue( "field" );
+            String opera = e.getAttributeValue( "operator" );
+            String value = e.getAttributeValue( "value" );
+            return new MCRSimpleCondition( field, opera, value );
+        } else {
+            throw new MCRParseException("Not a valid <"+name+">");
+        }
+    }
 
-  private MCRQueryParser( String expr )
-  { 
-    this.expr = expr.trim();
-    this.last = this.expr.length() - 1;
-    this.pos  = 0;
-  }
-  
-  public static MCRQueryCondition parse( Element condition )
-  {
-    String name = condition.getName();
-    if( name.equals( "condition" ) )
-    {
-      String field = condition.getAttributeValue( "field" );
-      String opera = condition.getAttributeValue( "operator" );
-      String value = condition.getAttributeValue( "value" );
-      return new MCRSimpleCondition( field, opera, value );
-    }
-    else if( name.equals( "not" ) )
-    {
-      Element child = (Element)( condition.getChildren().get( 0 ) );
-      return new MCRNotCondition( parse( child ) );
-    }
-    else
-    {
-      List conditions = new ArrayList();
-      List children = condition.getChildren();
-      
-      for( int i = 0; i < children.size(); i++ )
-      {
-        Element child = (Element)( children.get( i ) );
-        conditions.add( parse( child ) );
-      }
-      MCRQueryCondition first = (MCRQueryCondition)( conditions.get(0) );
-      MCRAndOrCondition cond = new MCRAndOrCondition( name, first );
-      for( int i = 1; i < conditions.size(); i++ )
-      {
-        MCRQueryCondition next = (MCRQueryCondition)( conditions.get( i ) );
-        cond.addChild( next );
-      }
-      return cond;
-    }
-  }
-  
-  public static MCRQueryCondition parse( String queryExpression )
-  {
-    MCRQueryParser parser = new MCRQueryParser( queryExpression );
-    return parser.parseCondition();
-  }
-  
-  private void parseWhitespace( boolean optional )
-  { 
-    int begin = pos;
-    while( (pos<=last) && Character.isWhitespace(expr.charAt(pos))) pos++;
-    
-    if( ( ! optional ) && ( pos == begin ) )
-      throw new MCRParseException( "whitespace", pos, expr );
-  }
+    private static Pattern pattern= Pattern.compile(
+    "([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
 
-  private String parseIdentifier( String type )
-  {
-    int begin = pos;
-    while( ( pos <= last ) && Character.isLetterOrDigit(expr.charAt(pos)) ) pos++;
-    
-    if( begin == pos ) 
-      throw new MCRParseException( type, pos, expr );
-    
-    return expr.substring( begin, pos );
-  }
-  
-  private String parseToken( String type )
-  {
-    int begin = pos;
-    while( ( pos <= last ) && ! Character.isWhitespace(expr.charAt(pos)) ) pos++;
-    
-    if( begin == pos ) 
-      throw new MCRParseException( type, pos, expr );
-    
-    return expr.substring( begin, pos );
-  }
-  
-  // field operator value
-  private MCRSimpleCondition parseSingleCond()
-  {
-    String field = parseIdentifier( "field name" );
-    parseWhitespace( false );
-    String operator = parseToken( "operator" );
-    parseWhitespace( false );
-    String value = parseValue();
-    
-    return new MCRSimpleCondition( field, operator, value );
-  }
-  
-  private MCRQueryCondition parseCondition()
-  {
-    if( expr.substring( pos ).startsWith( NOT ) )
-      return parseNot();
-    else if ( expr.substring( pos ).startsWith( "(" ))
-      return parseAndOr( null );
-    else
-      return parseSingleCond();
-  }
-  
-  //( condition ) [ and ( condition )]*
-  //( condition ) [ or ( condition )]*
-  private MCRAndOrCondition parseAndOr( MCRAndOrCondition cond )
-  {
-    expect( "(" );
-    parseWhitespace( true );
-    MCRQueryCondition child = parseCondition();
-    parseWhitespace( true );
-    expect( ")" );
-    
-    parseWhitespace( true );
-    
-    if( pos >= last )
+    private void parseSimpleCondition(String s) throws Exception
     {
-      if( cond == null )
-        throw new MCRParseException( "and/or", pos, expr );
-      else
-      {
-        cond.addChild( child );
-        return cond;
-      }
+        Matcher m = pattern.matcher(s);
+        if (m.find()) {
+            String field  = m.group(1);
+            String operator = m.group(2);
+            String value = m.group(3);
+            if(value.startsWith("\"") || value.endsWith("\""))
+                value = value.substring(1, value.length()-1);
+            return new MCRSimpleCondition(field, operator, value);
+        } else {
+            throw new MCRParseException("Not a valid condition: "+s);
+        }
     }
-    else
-    {
-      String type = parseIdentifier( "and/or" );
-      if( ! ( type.equals( MCRAndOrCondition.AND ) || 
-              type.equals( MCRAndOrCondition.OR ) ) )
-        throw new MCRParseException( "and/or", pos, expr );
-      
-      if( cond == null ) 
-        cond = new MCRAndOrCondition( type, child );
-      else if( ! type.equals( cond.getType() ) )
-        throw new MCRParseException( cond.getType(), pos, expr );
-      else cond.addChild( child );
-      
-      parseWhitespace( true );
-      return parseAndOr( cond );
-    }
-  }
-  
-  // not ( condition )
-  private MCRNotCondition parseNot()
-  {
-    expect( NOT );
-    parseWhitespace( true );
-    expect( "(" );
-    parseWhitespace( true );
-    MCRQueryCondition child = parseCondition();
-    parseWhitespace( true );
-    expect( ")" );
-    
-    return new MCRNotCondition( child );
-  }
-  
-  private String parseValue()
-  {
-    if( expr.charAt( pos ) == QUOTE )
-    {
-      int begin = ++pos;
-      while( (pos<=last) &&  ! ( expr.charAt(pos)==QUOTE ) ) pos++;
-      
-      if( pos == last )
-        throw new MCRParseException( "\"", pos, expr );
-      
-      return expr.substring( begin, pos++ ).trim();
-    }
-    else return parseIdentifier( "value" );
-  }
-  
-  private void expect( String expected )
-  {
-    if( ! expr.substring( pos ).startsWith( expected ) )
-      throw new MCRParseException( expected, pos, expr );
-    pos += expected.length();
-  }
-  
-  public static void main( String[] args )
-  {
-    MCRQueryCondition cond;
-    String query;
-    XMLOutputter out = new XMLOutputter( Format.getPrettyFormat() );
-    
-    query = "title contains Optik";
-    cond  = MCRQueryParser.parse( query );
-    System.out.println( "input: " + query );
-    System.out.println( "parsed: " + cond );
-    System.out.println( out.outputString( cond.toXML() ) );
-    System.out.println();
-    
-    query = " not (  title   contains  \"Magnetische Wellen\"\t\t)  ";
-    cond  = MCRQueryParser.parse( query );
-    System.out.println( "input: " + query );
-    System.out.println( "parsed: " + cond );
-    System.out.println( out.outputString( cond.toXML() ) );
-    System.out.println();
 
-    query = "(title contains Optik ) and ( x = y) and (a  < b)";
-    cond  = MCRQueryParser.parse( query );
-    System.out.println( "input: " + query );
-    System.out.println( "parsed: " + cond );
-    System.out.println( out.outputString( cond.toXML() ) );
-    System.out.println();
-  }
+    public static void main( String[] args )
+    {
+        MCRCondition cond;
+        String query;
+        XMLOutputter out = new XMLOutputter( Format.getPrettyFormat() );
+        MCRQueryParser parser = new MCRQueryParser();
+
+        query = "title contains Optik";
+        cond  = parser.parse( query );
+        System.out.println( "input: " + query );
+        System.out.println( "parsed: " + cond );
+        System.out.println( out.outputString( cond.toXML() ) );
+        System.out.println();
+
+        query = " not (  title   contains  \"Magnetische Wellen\"\t\t)  ";
+        cond  = parser.parse( query );
+        System.out.println( "input: " + query );
+        System.out.println( "parsed: " + cond );
+        System.out.println( out.outputString( cond.toXML() ) );
+        System.out.println();
+
+        query = "(title contains Optik ) and ( x = y) and (a  < b)";
+        cond  = parser.parse( query );
+        System.out.println( "input: " + query );
+        System.out.println( "parsed: " + cond );
+        System.out.println( out.outputString( cond.toXML() ) );
+        System.out.println();
+
+    }
 }
 
