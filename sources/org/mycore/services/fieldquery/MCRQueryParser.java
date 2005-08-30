@@ -54,7 +54,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser
     private static Pattern pattern= Pattern.compile(
     "([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
 
-    private void parseSimpleCondition(String s) throws Exception
+    protected MCRCondition parseSimpleCondition(String s) throws MCRParseException
     {
         Matcher m = pattern.matcher(s);
         if (m.find()) {
