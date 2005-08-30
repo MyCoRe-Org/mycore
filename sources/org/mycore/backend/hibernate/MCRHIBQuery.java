@@ -59,12 +59,15 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
     private MCRQueryCondition cond;         //query-condition
     private List elList = new LinkedList(); //stack for type-elements
     private int bracket = 0;                //counts correct number of ')'
+
+    private MCRQueryParser parser;
     
     /**
      * constructor creates a reference on the Hibernate Getter/Setter class by
      * an internal object
      */
     public MCRHIBQuery(){
+        this.parser = new MCRQueryParser();
         try{
             queryclass = Class.forName("org.mycore.backend.query.MCRQuery");
             queryobject = queryclass.newInstance();
@@ -80,6 +83,7 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
      * @param document xml query docuement
      */
     public MCRHIBQuery(Document document){
+        this.parser = new MCRQueryParser();
         try{
             init(document);
         }catch(Exception e){
@@ -93,6 +97,7 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
      * @param xmlString
      */
     public MCRHIBQuery(String xmlString){
+        this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
             init(builder.build(xmlString));
