@@ -23,21 +23,13 @@ package org.mycore.backend.sql;
 
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
 import org.jdom.input.SAXBuilder;
-import org.mycore.backend.query.MCRQuerySearcherInterface;
+import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRConfigurationException;
 
-public class MCRSQLSearcher implements MCRQuerySearcherInterface{
-    
-    /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRSQLSearcher.class.getName());
-    
-    public MCRSQLSearcher(){
+public class MCRSQLSearcher extends MCRQuerySearcher{
 
-    }
-    
-    public void runQuery(int no){
+    public void runQuery(){
         try{
             System.out.println("read document");
             SAXBuilder builder = new SAXBuilder();
@@ -51,7 +43,6 @@ public class MCRSQLSearcher implements MCRQuerySearcherInterface{
             MCRSQLQuery query = new MCRSQLQuery(builder.build(in));
             in.close();
 
-
             MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
             
             try {
@@ -62,7 +53,7 @@ public class MCRSQLSearcher implements MCRQuerySearcherInterface{
                 }
                
            }catch(Exception e){
-               LOGGER.error(e);
+               logger.error(e);
            }
 
         }catch(Exception e){

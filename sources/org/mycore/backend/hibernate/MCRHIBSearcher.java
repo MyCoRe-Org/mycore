@@ -23,12 +23,11 @@ package org.mycore.backend.hibernate;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jdom.input.SAXBuilder;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.query.MCRQuerySearcherInterface;
+import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -36,16 +35,10 @@ import org.mycore.common.MCRConfigurationException;
  * @author Arne Seifert
  *
  */
-public class MCRHIBSearcher implements MCRQuerySearcherInterface{
+public class MCRHIBSearcher extends MCRQuerySearcher{
 
-    /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRHIBSearcher.class.getName());
 
-    public MCRHIBSearcher(){
-        
-    }
-
-    public void runQuery(int no){
+    public void runQuery(){
         try{
             System.out.println("read document");
             SAXBuilder builder = new SAXBuilder();
@@ -63,8 +56,6 @@ public class MCRHIBSearcher implements MCRQuerySearcherInterface{
             Transaction tx = session.beginTransaction();
 
             List l = session.createQuery(query.getHIBQuery()).list();
-    
-            LOGGER.info("Ergebnis: "+ l.size());
 
             for(int i=0; i<l.size(); i++){
                 MCRHIBQuery res = new MCRHIBQuery(l.get(i));

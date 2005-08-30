@@ -24,52 +24,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.jdom.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.MCRHIBMapping;
+import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.backend.hibernate.MCRTableGenerator;
-import org.mycore.backend.query.MCRQueryIndexerInterface;
-import org.mycore.backend.query.MCRQueryManager;
-
-import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-public class MCRHIBIndexer implements MCRQueryIndexerInterface {
+public class MCRHIBIndexer extends MCRQueryIndexer {
 
-    /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRHIBIndexer.class.getName());
-    
     protected static MCRHIBMapping genTable = new MCRHIBMapping();
     protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
-    
-    private static String SQLQueryTable = "";
-    private static String querytypes = "";
-    private static MCRConfiguration config;
-    private static boolean updated = false;
 
-
-    protected MCRQueryManager queryManager;
-    
-    public MCRHIBIndexer() {
-        config = MCRConfiguration.instance();
-        SQLQueryTable = config.getString("MCR.QueryTableName", "MCRQuery");
-        querytypes = config.getString("MCR.QueryTypes", "document,derivate,author");
-        LOGGER.info("indexer loaded");
-    }
-    
     /**
      * method loads all searchfield values into database after clearing old values.
      * needs to be done after changes in the fielddefinition 
      */
     public void initialLoad() {
-        queryManager = MCRQueryManager.getInstance();       
         StringTokenizer tokenizer = new StringTokenizer(querytypes,",");
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -78,7 +53,7 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
             tx.commit();
         }catch(Exception e){
             tx.rollback();
-            LOGGER.error(e);
+            logger.error(e);
         }finally{
             session.close();
         }
@@ -92,13 +67,11 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
      * method updates all search values for a single object
      * @param objectid identifier for single object
      */
-    public void updateObject(MCRObjectID objectid) {
+    public void updateObject(MCRBase object) {
         try{
-            MCRObject obj = new MCRObject();
-            obj.receiveFromDatastore(objectid);
-            MCRQueryManager.getInstance().create(obj);
+            queryManager.create(object);
         }catch(Exception e){
-            LOGGER.error(e);
+            logger.error(e);
         }
 
     }
@@ -111,13 +84,13 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         try{
-            MCRHIBQuery query = new MCRHIBQuery();
-            query.setValue("setMcrid", objectid.getId());
-            session.delete(query);
-            tx.commit();
+            session.createQuery("delete MCRQuery where MCRID =\'" + objectid.getId() + "\'") 
+                 .executeUpdate(); 
+            tx.commit(); 
         }catch(Exception e){
             tx.rollback();
-            LOGGER.error(e);
+            logger.error(e);
+            e.printStackTrace();
         }finally{
             session.close();
         }
@@ -144,7 +117,7 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
                    query.setValue("set" + el.getAttributeValue("name"), (String) values.get(i) );                    
                 }
             }catch(Exception e){
-                LOGGER.error(e);
+                logger.error(e);
             }
         }
         
@@ -154,7 +127,7 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
             session.saveOrUpdate( query.getQueryObject());
             tx.commit();   
         }catch(Exception e){
-            LOGGER.error(e);
+            logger.error(e);
             tx.rollback();
         } finally {
             session.close();
@@ -167,32 +140,30 @@ public class MCRHIBIndexer implements MCRQueryIndexerInterface {
      */
     public void updateConfiguration() {
         try {
-            if(! updated){
-                // update schema -> first time create table
-                Configuration cfg = hibconnection.getConfiguration();
-                MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
-                
-                Iterator it = MCRQueryManager.getInstance().getQueryFields().keySet().iterator();
-                map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
-                map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
-                
-                while (it.hasNext()){
-                    Element el = (Element) MCRQueryManager.getInstance().getQueryFields().get((String) it.next());              
-                    map.addColumn(el.getAttributeValue("name"),
-                            el.getAttributeValue("name"),
-                            hibconnection.getHibType(el.getAttributeValue("type")),
-                            2147483647, false, false, false);
-                }
-                
-                cfg.addXML(map.getTableXML());
-                cfg.createMappings();
-                hibconnection.buildSessionFactory(cfg);
-                updated = true;
-                
-                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
+            // update schema -> first time create table
+            Configuration cfg = hibconnection.getConfiguration();
+            MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
+            
+            Iterator it = queryManager.getQueryFields().keySet().iterator();
+            map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
+            map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
+            
+            while (it.hasNext()){
+                Element el = (Element) queryManager.getQueryFields().get((String) it.next());              
+                map.addColumn(el.getAttributeValue("name"),
+                        el.getAttributeValue("name"),
+                        hibconnection.getHibType(el.getAttributeValue("type")),
+                        2147483647, false, false, false);
             }
+            
+            cfg.addXML(map.getTableXML());
+            cfg.createMappings();
+            hibconnection.buildSessionFactory(cfg);
+
+            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
+            
         }catch(Exception e){
-            LOGGER.error(e);
+            logger.error(e);
         }
     }
 

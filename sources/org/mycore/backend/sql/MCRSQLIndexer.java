@@ -24,16 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.backend.query.MCRQueryIndexerInterface;
-import org.mycore.backend.query.MCRQueryManager;
+import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.backend.sql.MCRSQLColumn;
 import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.backend.sql.MCRSQLConnectionPool;
-import org.mycore.backend.sql.MCRSQLStatement;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -42,31 +38,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 
-public class MCRSQLIndexer implements MCRQueryIndexerInterface{
-   
-    /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRSQLIndexer.class.getName());
-    
-    private static String SQLQueryTable = "";
-    private static String querytypes = "";
-    private static MCRConfiguration config;
-    
-    protected MCRQueryManager queryManager;
-
-    public MCRSQLIndexer() {
-            config = MCRConfiguration.instance();
-            SQLQueryTable = config.getString("MCR.QueryTableName", "MCRQuery");
-            querytypes = config.getString("MCR.QueryTypes", "document,author");
-            LOGGER.info("indexer loaded");
-    }
-    
+public class MCRSQLIndexer extends MCRQueryIndexer{
     
     /**
      * method loads all searchfield values into database after clearing old values.
      * needs to be done after changes in the fielddefinition 
      */
     public void initialLoad(){
-        queryManager = MCRQueryManager.getInstance();
+        
         StringTokenizer tokenizer = new StringTokenizer(querytypes,",");
         createSQLQueryTable();
         while ( tokenizer.hasMoreTokens() )
@@ -78,11 +57,13 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
      * method to update entries of given objectid
      * @param objectid as MCRObjectID
      */
-    public void updateObject(MCRObjectID objectid){
-        deleteObject(objectid);
-        MCRObject obj = null;
-        obj.receiveFromDatastore(objectid.getId());
-        MCRQueryManager.getInstance().create(obj);
+    public void updateObject(MCRBase object){
+        try{
+            deleteObject(object.getId());
+            queryManager.create(object);
+        }catch(Exception e){
+            logger.error(e);
+        }
     }
     
     
@@ -97,7 +78,7 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
         try {
             c.doUpdate(query.toDeleteStatement());
         }catch(Exception e){
-            LOGGER.error(e);
+            logger.error(e);
         } finally {
             c.release();
         }
@@ -139,7 +120,7 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
         try {
             c.doUpdate(query.toTypedInsertStatement());
         }catch(Exception e){
-            LOGGER.error("e: "+e);
+            logger.error("e: "+e);
             e.printStackTrace();
         } finally {
             c.release();
@@ -155,11 +136,11 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
             MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
             query.addColumn("MCRID VARCHAR(64) NOT NULL");
             query.addColumn("MCRTYPE VARCHAR(64) NOT NULL");
-            Iterator it = MCRQueryManager.getInstance().getQueryFields().keySet().iterator();
+            Iterator it = queryManager.getQueryFields().keySet().iterator();
             
             while (it.hasNext()){
                 
-                query.addColumn(addcolumn((Element) MCRQueryManager.getInstance().getQueryFields().get((String) it.next())));
+                query.addColumn(addcolumn((Element) queryManager.getQueryFields().get((String) it.next())));
             }
             
             if (MCRSQLConnection.doesTableExist(SQLQueryTable)) {
@@ -171,7 +152,7 @@ public class MCRSQLIndexer implements MCRQueryIndexerInterface{
                     .addColumn("MCRID")
                     .toIndexStatement());
         }catch(Exception e){
-            LOGGER.error("Fehler", e);
+            logger.error("Fehler", e);
         } finally {
             c.release();
         }
