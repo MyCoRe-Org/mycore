@@ -86,14 +86,14 @@ public class JavaClass
         po.println("");
         po.println("import java.sql.Types.*;");
         po.println("");
-        po.println("class "+name);
+        po.println("public class "+name);
         po.println("{");
         Iterator it = fields.iterator();
         while(it.hasNext()) {
             Field field = (Field)it.next();
             po.println("    private "+field.type+" "+field.name+";");
         }
-        
+
         it = fields.iterator();
         
         po.println("");
