@@ -36,7 +36,7 @@ import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.backend.sql.MCRSQLUserStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.services.fieldquery.MCRParseException;
+import org.mycore.parsers.bool.MCRParseException;
 
 //import org.mycore.access.MCRAccessCtrlStore;
 

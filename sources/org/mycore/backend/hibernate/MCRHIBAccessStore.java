@@ -35,7 +35,7 @@ import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.services.fieldquery.MCRParseException;
+import org.mycore.parsers.bool.MCRParseException;
 
 public class MCRHIBAccessStore extends MCRAccessStore{
 

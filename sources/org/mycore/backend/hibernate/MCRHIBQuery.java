@@ -30,8 +30,8 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.services.fieldquery.MCRQueryConditionVisitor;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
 
 /**
@@ -43,7 +43,7 @@ import org.mycore.services.fieldquery.MCRQueryParser;
  * @author Arne Seifert
  *
  */
-public class MCRHIBQuery implements MCRQueryConditionVisitor{
+public class MCRHIBQuery implements MCRConditionVisitor{
 
     /** The logger */
     public static Logger LOGGER = Logger.getLogger(MCRHIBIndexer.class.getName());
@@ -56,7 +56,7 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
     private String type = "";               //variable for type (and/or/not)
     private int count = 0;                  //number of children to proceed
     private Document querydoc;              //xmlQuery-Document
-    private MCRQueryCondition cond;         //query-condition
+    private MCRCondition cond;         //query-condition
     private List elList = new LinkedList(); //stack for type-elements
     private int bracket = 0;                //counts correct number of ')'
 
@@ -114,7 +114,7 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
     private void init(Document doc){
         try{
             querydoc = doc;
-            cond = MCRQueryParser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
+            cond = parser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
             cond.accept(this);
         }catch(Exception e){
             LOGGER.error(e);
@@ -240,7 +240,7 @@ public class MCRHIBQuery implements MCRQueryConditionVisitor{
     /**
      * interface implementation (visitor pattern) for field type
      */
-    public void visitQuery(MCRQueryCondition entry) {
+    public void visitQuery(MCRCondition entry) {
         try{
             Element el = entry.info();
             String fieldtype = MCRQueryManager.getInstance().getField(el.getAttributeValue("field")).getAttributeValue("type");
