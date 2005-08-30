@@ -26,7 +26,7 @@ import org.mycore.user.MCRUser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
-class MCRAccessRule {
+public class MCRAccessRule {
 
     String id;
     String creator;
@@ -38,7 +38,7 @@ class MCRAccessRule {
 
     static MCRRuleParser parser = new MCRRuleParser();
 
-    MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException
+    public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException
     {
         this.id = id;
         this.creator = creator;
