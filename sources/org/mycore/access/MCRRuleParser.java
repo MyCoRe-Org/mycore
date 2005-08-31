@@ -46,13 +46,13 @@ class MCRRuleParser extends MCRBooleanClauseParser {
         }
     }
 
-    public MCRCondition parseSimpleCondition(Element e) throws MCRParseException
+    protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException
     {
         /* XML parsing not implemented yet for access rules */
         return null;
     }
 
-    public MCRCondition parseSimpleCondition(String s) throws MCRParseException
+    protected MCRCondition parseSimpleCondition(String s) throws MCRParseException
     {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false"))
