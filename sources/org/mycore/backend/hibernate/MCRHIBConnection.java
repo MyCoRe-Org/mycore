@@ -24,12 +24,14 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Table;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.DateType;
 import org.hibernate.type.DoubleType;
@@ -161,6 +163,22 @@ public class MCRHIBConnection {
 	public Configuration getConfiguration() {
 		return cfg;
 	}
+
+    
+    /**
+     * This method checks existance of mapping for given sql-tablename
+     * @param tablename sql-table name as string
+     * @return boolean
+     */
+    public boolean containsMapping(String tablename){
+        Iterator it = cfg.getTableMappings();
+        while(it.hasNext()){
+            if (((Table) it.next()).getName().equals(tablename)){
+                return true;
+            }
+        }
+        return false;
+    }
 
 	public long getID() {
 		synchronized (singleton) {
