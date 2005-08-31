@@ -28,16 +28,16 @@ import org.mycore.parsers.bool.MCRParseException;
 
 public class MCRAccessRule {
 
-    String id;
-    String creator;
-    Date creationTime;
-    String rule;
-    String description;
+    String id = "";
+    String creator = "";
+    Date creationTime =  new Date();
+    String rule = "";
+    String description = "";
 
     MCRCondition parsedRule;
 
     static MCRRuleParser parser = new MCRRuleParser();
-
+    
     public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException
     {
         this.id = id;
@@ -55,12 +55,64 @@ public class MCRAccessRule {
         return this.parsedRule.evaluate(data);
     }
 
-    public String getRuleString()
-    {
-        return rule;
-    }
     public MCRCondition getRule()
     {
         return this.parsedRule;
     }
-};
+    
+    /**
+     * rule
+     * @param rule
+     */
+    public void setRule(String rule) {
+        this.rule = rule;
+    }
+    public String getRuleString()
+    {
+        return rule;
+    }
+
+    /**
+     * creationtime
+     * @return
+     */
+    public Date getCreationTime() {
+        return creationTime;
+    }
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    /**
+     * creator
+     * @return
+     */
+    public String getCreator() {
+        return creator;
+    }
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * description
+     * @return
+     */
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * id
+     * @return
+     */
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+}
