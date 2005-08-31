@@ -52,7 +52,7 @@ class MCRRuleParser extends MCRBooleanClauseParser {
         return null;
     }
 
-    public MCRCondition parseSimpleCondition(String s)
+    public MCRCondition parseSimpleCondition(String s) throws MCRParseException
     {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false"))
