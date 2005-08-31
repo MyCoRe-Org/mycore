@@ -179,4 +179,32 @@ public class MCRHIBRuleStore extends MCRRuleStore{
         }
     }
 
+    /**
+     * Method returns MCRAccessRule by given id
+     * @param ruleid as string
+     * @return MCRAccessRule
+     */
+    public MCRAccessRule getRule(String ruleid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        MCRAccessRule rule = null;
+        try {
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '"+ruleid+"'").list().get(0));
+            if (hibrule != null){
+                try {
+                    rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
+                } catch(Exception e) {
+                    throw new MCRException("Rule "+ruleid+" can't be parsed", e);
+                }
+            }
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+        return rule;
+    }
+
 }

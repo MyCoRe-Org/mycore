@@ -130,4 +130,36 @@ public class MCRSQLRuleStore extends MCRRuleStore{
         }
         return rule;
     }
+    
+    
+    /**
+     * Method returns MCRAccessRule by given id
+     * @param ruleid as string
+     * @return MCRAccessRule
+     */
+    public MCRAccessRule getRule(String ruleid) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        MCRAccessRule rule;
+        try {
+            String select = "SELECT CREATOR,CREATIONDATE,DESCRIPTION FROM " + ruletablename
+                    + " WHERE RID = '" + ruleid + "'";
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            if (rs.next()) {
+                try {
+                    rule = new MCRAccessRule(ruleid, rs.getString(1), rs.getTimestamp(2), rs.getString(3), "");
+                } catch(Exception e) {
+                    throw new MCRException("Rule "+ruleid+" can't be parsed", e);
+                }
+            } else {
+                throw new Exception("No such row: RID="+ruleid);
+            }
+        } catch (Exception ex) {
+            throw new MCRException("RuleID " + ruleid + " not found"
+                    + ex.getMessage(), ex);
+        } finally {
+            c.release();
+        }
+        return rule;
+    }
 }

@@ -24,17 +24,14 @@
 package org.mycore.access;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
-
-//import org.mycore.access.MCRAccessCtrlStore;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.accessstore_class_name</code>
- * from mycore.properties.
+ * from mycore.properties.access
  *
  * @author Arne Seifert
  * @version $Revision$ $Date$
@@ -42,14 +39,30 @@ import org.mycore.common.MCRConfiguration;
 public abstract class MCRAccessStore {
 
     public abstract void createTables();
-    public abstract MCRAccessRule getRule(String ruleID);
     public abstract String getRuleID(String objID, String ACPool);
+    public abstract void createAccessDefinition(MCRAccessData accessdata);
+    public abstract void deleteAccessDefinition(MCRAccessData accessdata);
+    public abstract void updateAccessDefinition(MCRAccessData accessdata);
+    public abstract MCRAccessData getAccessDefinition(String ruleid, String pool, String objid);
 
+    public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
+    
+    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
+    
+    final protected static String SQLAccessCtrlRule= MCRConfiguration.instance().getString("MCR.access_store_sql_table_rule","MCRACCESSRULE");
+    final protected static  String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.access_store_sql_table_map", "MCRACCESS");
+    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", ""); 
+    
     static private MCRAccessStore implementation;
     public static MCRAccessStore getInstance()
     {
-        if(implementation == null) {
-            implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");
+        try{
+            if(implementation == null) {
+                System.out.println(MCRConfiguration.instance().getString("MCR.accessstore_class_name"));
+                implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");
+            }
+        }catch(Exception e){
+            logger.error(e);
         }
         return implementation;
     }

@@ -42,7 +42,7 @@ class MCRUserClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData)o;
-        return this.user.equals(data.user.getID());
+        return this.user.equals(data.getUser().getID());
     }
 
     public String toString() {

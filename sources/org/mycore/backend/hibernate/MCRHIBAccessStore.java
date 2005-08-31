@@ -20,44 +20,33 @@
  **/
 package org.mycore.backend.hibernate;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
-import org.mycore.access.MCRAccessRule;
+import org.mycore.access.MCRAccessData;
 import org.mycore.access.MCRAccessStore;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
-import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
-import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.backend.hibernate.tables.MCRACCESSPK;
+import org.mycore.user.MCRUser;
 
+/**
+ * Hibernate implementation of acceess store to manage access rights
+ * @author Arne Seifert
+ *
+ */
 public class MCRHIBAccessStore extends MCRAccessStore{
 
-    /** the logger */
-    static Logger logger = Logger.getLogger(MCRHIBAccessStore.class.getName());
+    final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
     
-    protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
-
-    /** name of the sql table containing rule information */
-    private String SQLAccessCtrlRule;
-
-    /** name of the sql table containing mapping information */
-    private String SQLAccessCtrlMapping;
-    
-    public MCRHIBAccessStore(){
-        MCRConfiguration config = MCRConfiguration.instance();
-        SQLAccessCtrlRule = config.getString("MCR.access_store_sql_table_rule",
-                "MCRACCESSRULE");
-        SQLAccessCtrlMapping = config.getString(
-                "MCR.access_store_sql_table_map", "MCRACCESS");
-    }
-
     public String getRuleID(String objID, String ACPool) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -65,7 +54,7 @@ public class MCRHIBAccessStore extends MCRAccessStore{
         try {
             List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
             if (l.size()==1){
-                strRuleID = ((MCRACCESS) l.get(0)).getRid();
+                strRuleID = ((MCRACCESS) l.get(0)).getKey().getRid();
             }
             tx.commit();
         } catch (Exception e) {
@@ -77,60 +66,157 @@ public class MCRHIBAccessStore extends MCRAccessStore{
         return strRuleID;
     }
 
-    public MCRAccessRule getRule(String ruleID) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        MCRAccessRule rule = null;
-        try {
-            List l = session.createQuery("from MCRACCESSRULE where RID = '"+ruleID+"'").list();
-            if (l.size()==1){
-                //strRule = ((MCRACCESSRULE) l.get(0)).getRule();
-                MCRACCESSRULE hibrule = (MCRACCESSRULE) l.get(0);
-                try {
-                    rule = new MCRAccessRule(ruleID, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
-                } catch(MCRParseException e) {
-                    throw new MCRException("Rule "+ruleID+" can't be parsed", e);
-                }
-            }
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-        } finally {
-            session.close();
-        }
-        return rule;
-    }
 
-    
     public void createTables() {
         try {
             // update schema -> first time create table
             Configuration cfg = hibconnection.getConfiguration();
-            MCRTableGenerator map = new MCRTableGenerator(SQLAccessCtrlMapping, "org.mycore.backend.hibernate.tables.MCRACCESS", "", 1);
-            map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
-            map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
-            map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
-            map.addColumn("objid", "OBJID", new StringType(), 64, true, false, false);
-            map.addColumn("acpool", "ACPOOL", new StringType(), 64, false, false, false);
-            cfg.addXML(map.getTableXML());
-
-            map = new MCRTableGenerator(SQLAccessCtrlRule, "org.mycore.backend.hibernate.tables.MCRACCESSRULE", "", 1);
-            map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
-            map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
-            map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
-            map.addColumn("rule", "RULE", new StringType(), 2147483647, false, false, false);
-            map.addColumn("description", "DESCRIPTION", new StringType(), 255, false, false, false);
-            cfg.addXML(map.getTableXML());
-            cfg.createMappings();
-
+            MCRTableGenerator map = null;
+            if (! hibconnection.containsMapping(SQLAccessCtrlMapping)){
+                map = new MCRTableGenerator(SQLAccessCtrlMapping, "org.mycore.backend.hibernate.tables.MCRACCESS", "", 3);
+                map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
+                map.addIDColumn("acpool", "ACPOOL", new StringType(), 64, "assigned", false);
+                map.addIDColumn("objid", "OBJID", new StringType(), 64, "assigned", false);
+                map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
+                map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
+                cfg.addXML(map.getTableXML());
+            }
+            
+            if (! hibconnection.containsMapping(SQLAccessCtrlRule)){
+                map = new MCRTableGenerator(SQLAccessCtrlRule, "org.mycore.backend.hibernate.tables.MCRACCESSRULE", "", 1);
+                map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
+                map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
+                map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
+                map.addColumn("rule", "RULE", new StringType(), 2147483647, false, false, false);
+                map.addColumn("description", "DESCRIPTION", new StringType(), 255, false, false, false);
+                cfg.addXML(map.getTableXML());
+                cfg.createMappings();
+            }
             hibconnection.buildSessionFactory(cfg);
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
-
         }catch(Exception e){
             e.printStackTrace();
             logger.error(e);
         }
+    }
+
+
+    /**
+     * method creates a new AccessDefinition in db
+     * @param MCRAccessData with values
+     */
+    public void createAccessDefinition(MCRAccessData accessdata) {
+        createTables();
+        if (! existAccessDefinition(accessdata.getRuleId(), accessdata.getPool(), accessdata.getObjId())){
+            Session session = MCRHIBConnection.instance().getSession();
+            Transaction tx = session.beginTransaction();
+            MCRACCESS accdef = new MCRACCESS();
+            try{
+                DateFormat df = new SimpleDateFormat(sqlDateformat);
+                accdef.setKey(new MCRACCESSPK(accessdata.getRuleId(), accessdata.getPool(), accessdata.getObjId()));
+                accdef.setCreator(accessdata.getUser().getID());
+                accdef.setCreationdate(Timestamp.valueOf(df.format(accessdata.getDate())));
+                session.saveOrUpdate(accdef);          
+                tx.commit();         
+            }catch(Exception e){
+                tx.rollback();
+                logger.error(e);
+            }finally{
+                session.close();
+            }
+        }
+    }
+    
+    /**
+     * internal helper method to check existance of object
+     * @param ruleid
+     * @param pool
+     * @param objid
+     * @return boolean value
+     */
+    private boolean existAccessDefinition(String ruleid, String pool, String objid){
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try{
+            MCRACCESSPK key = new MCRACCESSPK(ruleid,pool,objid);
+            List l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
+            tx.commit();
+            if (l.size()==1)
+                return true;
+            else
+                return false;
+        }catch(Exception e){
+            tx.rollback();
+            logger.error(e);
+            return true;
+        }finally{
+            session.close();
+        }
+    }
+
+
+    /**
+     * delete given definition in db
+     * @param accessdata MCRAccessData containing key;
+     */
+    public void deleteAccessDefinition(MCRAccessData accessdata) {
+        createTables();
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try{
+            session.createQuery("delete MCRACCESS " +
+                    "where RID = '" + accessdata.getRuleId() + "'" +
+                    " AND ACPOOL = '" + accessdata.getPool() + "'" +
+                    " AND OBJID = '" + accessdata.getObjId() + "'") 
+                 .executeUpdate(); 
+            tx.commit(); 
+        }catch(Exception e){
+            tx.rollback();
+            logger.error(e);
+            e.printStackTrace();
+        }finally{
+            session.close();
+        }
+        
+    }
+
+
+    /**
+     * update AccessDefinition in db for given MCRAccessData
+     */
+    public void updateAccessDefinition(MCRAccessData accessdata) {
+        deleteAccessDefinition(accessdata);
+        createAccessDefinition(accessdata);
+    }
+
+    /**
+     * method returns AccessDefinition for given key values
+     * @param  ruleid name of rule
+     * @param  pool name of accesspool
+     * @param  objid objectid of MCRObject
+     * @return MCRAccessData
+     */
+    public MCRAccessData getAccessDefinition(String ruleid, String pool, String objid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        MCRAccessData accessdata = new MCRAccessData();
+        try{
+            MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(ruleid, pool, objid))).list().get(0));
+            tx.commit();
+            if (data != null){
+                accessdata.setDate(data.getCreationdate());
+                accessdata.setUser(new MCRUser(data.getCreator()));
+                accessdata.setObjId(data.getKey().getObjid());
+                accessdata.setPool(data.getKey().getAcpool());
+                accessdata.setRuleId(data.getKey().getRid());
+            }
+        }catch(Exception e){
+            tx.rollback();
+            logger.error(e);
+        }finally{
+            session.close();
+        }
+        return accessdata;
     }
 
 }

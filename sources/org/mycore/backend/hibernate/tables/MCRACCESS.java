@@ -22,20 +22,32 @@ package org.mycore.backend.hibernate.tables;
 import java.sql.Timestamp;
 
 public class MCRACCESS {
-    
-    private String rid;
+    private MCRACCESSPK key;
     private String creator;
     private Timestamp creationdate;
-    private String objid;
-    private String acpool;
     
+    public MCRACCESS(){
+        
+    }
     
-    public String getAcpool() {
-        return acpool;
+    public MCRACCESS(MCRACCESSPK key) {
+        this.key = new MCRACCESSPK(key.getRid(), key.getAcpool(), key.getObjid());
     }
-    public void setAcpool(String acpool) {
-        this.acpool = acpool;
+    
+    public MCRACCESS(String rid, String acpool, String objid, String creator, Timestamp creationdate){
+        this.key = new MCRACCESSPK(rid, acpool, objid);
+        this.creator = creator;
+        this.creationdate = creationdate;
     }
+    
+    public MCRACCESSPK getKey(){
+        return this.key;
+    }
+    
+    public void setKey(MCRACCESSPK key){
+        this.key = key;
+    }
+    
     public Timestamp getCreationdate() {
         return creationdate;
     }
@@ -48,19 +60,4 @@ public class MCRACCESS {
     public void setCreator(String creator) {
         this.creator = creator;
     }
-    public String getObjid() {
-        return objid;
-    }
-    public void setObjid(String objid) {
-        this.objid = objid;
-    }
-    public String getRid() {
-        return rid;
-    }
-    public void setRid(String rid) {
-        this.rid = rid;
-    }
-    
-    
-
 }

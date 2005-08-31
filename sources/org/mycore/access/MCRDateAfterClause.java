@@ -41,7 +41,7 @@ class MCRDateAfterClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData)o;
-        return data.date.after(this.date);
+        return data.getDate().after(this.date);
     }
 
     public String toString() {

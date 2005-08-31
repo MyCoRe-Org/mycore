@@ -20,7 +20,6 @@
 
 package org.mycore.access;
 
-import java.util.Date;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 
@@ -32,7 +31,7 @@ import org.mycore.common.MCRConfiguration;
 
 public class MCRRuleCache
 {
-    MCRAccessStore store;
+    MCRRuleStore store;
     MCRCache cache;
 
     public MCRRuleCache()
@@ -40,8 +39,7 @@ public class MCRRuleCache
         MCRConfiguration config = MCRConfiguration.instance();
         int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
         cache = new MCRCache(size);
-        store = MCRAccessStore.getInstance();
-        //MCRAccessCtrlStore 
+        store = MCRRuleStore.getInstance();
     }
 
     public MCRAccessRule getAccess(String id)

@@ -37,6 +37,7 @@ public abstract class MCRRuleStore {
     public abstract void createRule(MCRAccessRule rule);
     public abstract void updateRule(MCRAccessRule rule);
     public abstract void deleteRule(String ruleid);
+    public abstract MCRAccessRule getRule(String ruleid);
     
     public abstract MCRAccessRule retrieveRule(String ruleid);
 

@@ -42,7 +42,7 @@ class MCRDateBeforeClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData)o;
-        return data.date.before(this.date);
+        return data.getDate().before(this.date);
     }
 
     public String toString() {

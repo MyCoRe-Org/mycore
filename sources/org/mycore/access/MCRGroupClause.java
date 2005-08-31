@@ -46,7 +46,7 @@ class MCRGroupClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData)o;
-        return data.user.isMemberOf(group);
+        return data.getUser().isMemberOf(group);
     }
 
     public String toString() {

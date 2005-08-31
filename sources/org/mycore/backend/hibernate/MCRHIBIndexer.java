@@ -142,29 +142,33 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
         try {
             // update schema -> first time create table
             Configuration cfg = hibconnection.getConfiguration();
-            MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
             
-            Iterator it = queryManager.getQueryFields().keySet().iterator();
-            map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
-            map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
-            
-            while (it.hasNext()){
-                Element el = (Element) queryManager.getQueryFields().get((String) it.next());              
-                map.addColumn(el.getAttributeValue("name"),
-                        el.getAttributeValue("name"),
-                        hibconnection.getHibType(el.getAttributeValue("type")),
-                        2147483647, false, false, false);
+            if(! hibconnection.containsMapping(SQLQueryTable)){
+                MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
+                
+                Iterator it = queryManager.getQueryFields().keySet().iterator();
+                map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
+                map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
+                
+                while (it.hasNext()){
+                    Element el = (Element) queryManager.getQueryFields().get((String) it.next());              
+                    map.addColumn(el.getAttributeValue("name"),
+                            el.getAttributeValue("name"),
+                            hibconnection.getHibType(el.getAttributeValue("type")),
+                            2147483647, false, false, false);
+                }
+                
+                cfg.addXML(map.getTableXML());
+                cfg.createMappings();
+                hibconnection.buildSessionFactory(cfg);
+                
+                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
+                
             }
-            
-            cfg.addXML(map.getTableXML());
-            cfg.createMappings();
-            hibconnection.buildSessionFactory(cfg);
-
-            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
             
         }catch(Exception e){
             logger.error(e);
         }
     }
-
+    
 }
