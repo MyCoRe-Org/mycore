@@ -20,8 +20,11 @@
 
 package org.mycore.access;
 
+import java.util.Date;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.user.MCRUser;
 
 /**
  * Maps object ids to rules
@@ -42,11 +45,11 @@ public class MCRAccessManager
         store = MCRRuleStore.getInstance();
     }
 
-    private MCRRuleStore singleton;
-    public synchronized MCRRuleCache instance()
+    private static MCRAccessManager singleton;
+    public static synchronized MCRAccessManager instance()
     {
         if(singleton==null)
-            singleton = new MCRRuleCache();
+            singleton = new MCRAccessManager();
         return singleton;
     }
 
@@ -66,7 +69,7 @@ public class MCRAccessManager
         MCRAccessRule rule = instance().getAccess(objid);
         if(rule == null)
             return true; //no rule: everybody can access this
-        return rule.checkAccess(user, date, ip)
+        return rule.checkAccess(user, date, ip);
     }
 };
 
