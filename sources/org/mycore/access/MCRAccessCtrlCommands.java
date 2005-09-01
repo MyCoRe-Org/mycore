@@ -103,7 +103,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     
     public static void temp(String val){
         
-        MCRAccessData data = new MCRAccessData();
+        MCRRuleMapping data = new MCRRuleMapping();
         data.setDate(new Date());
         data.setRuleId("Test");
         data.setObjId("12345_wee");
