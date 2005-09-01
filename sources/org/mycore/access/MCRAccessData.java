@@ -9,9 +9,6 @@ public class MCRAccessData
     private MCRUser user;
     private Date date;
     private MCRIPAddress ip;
-    private String ruleid;
-    private String objid;
-    private String pool;
 
     MCRAccessData(MCRUser user, Date date, MCRIPAddress ip)
     {
@@ -55,38 +52,5 @@ public class MCRAccessData
     }
     public void setUser(MCRUser user) {
         this.user = user;
-    }
-
-    /**
-     * objid = MCRObjectID as string
-     * @return
-     */
-    public String getObjId() {
-        return objid;
-    }
-    public void setObjId(String objid) {
-        this.objid = objid;
-    }
-
-    /**
-     * pool
-     * @return
-     */
-    public String getPool() {
-        return pool;
-    }
-    public void setPool(String pool) {
-        this.pool = pool;
-    }
-
-    /**
-     * ruleid
-     * @return
-     */
-    public String getRuleId() {
-        return ruleid;
-    }
-    public void setRuleId(String ruleid) {
-        this.ruleid = ruleid;
     }
 }
