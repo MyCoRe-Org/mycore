@@ -20,15 +20,15 @@
  **/
 package org.mycore.backend.hibernate;
 
-import java.io.InputStream;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jdom.input.SAXBuilder;
+import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.backend.query.MCRResults;
 
 /**
  * 
@@ -37,35 +37,38 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRHIBSearcher extends MCRQuerySearcher{
 
-
-    public void runQuery(){
+    public MCRResults runQuery(String query) {
+        this.query = query;
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        MCRResults result = new MCRResults();
         try{
-            System.out.println("read document");
-            SAXBuilder builder = new SAXBuilder();
-            InputStream in = this.getClass().getResourceAsStream("/query1.xml");
-
-            if (in == null) {
-                String msg = "Could not find configuration file";
-                throw new MCRConfigurationException(msg);
-            }
-            
-            MCRHIBQuery query = new MCRHIBQuery(builder.build(in));
-            in.close();
-
-            Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
-
-            List l = session.createQuery(query.getHIBQuery()).list();
-
+            MCRHIBQuery hibquery = new MCRHIBQuery(query);
+            List l = session.createQuery(hibquery.getHIBQuery()).list();
+            List order = hibquery.getOrderFields();
             for(int i=0; i<l.size(); i++){
-                MCRHIBQuery res = new MCRHIBQuery(l.get(i));
-                System.out.println("ID: " + res.getValue("getmcrid"));
+                MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
+                MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
+                
+                // fill hit meta
+                for (int j=0; j<order.size(); j++){
+                    String key = ((Element) order.get(j)).getAttributeValue("field") +"_" +
+                        ((Element) order.get(j)).getAttributeValue("order");
+                    String value = (String) tmpquery.getValue("get" + ((Element) order.get(j)).getAttributeValue("field"));
+                    hit.addMetaValue(key,value);
+                }
+                result.addHit(hit);
             }
             tx.commit();
-            session.close();
-
+            if (order.size()>0)
+                result.setSorted(true);
         }catch(Exception e){
-            e.printStackTrace();
+            tx.rollback();
+            logger.error(e);
+        }finally{
+            session.close();
         }
+        return result;
     }
+
 }

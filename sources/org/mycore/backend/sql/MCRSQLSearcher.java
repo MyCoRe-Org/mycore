@@ -21,44 +21,45 @@
 
 package org.mycore.backend.sql;
 
-import java.io.InputStream;
+import java.util.List;
 
-import org.jdom.input.SAXBuilder;
+import org.jdom.Element;
+import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.backend.query.MCRResults;
+
 
 public class MCRSQLSearcher extends MCRQuerySearcher{
 
-    public void runQuery(){
+    public MCRResults runQuery(String query) {
+        this.query = query;
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        MCRResults result = new MCRResults();
         try{
-            System.out.println("read document");
-            SAXBuilder builder = new SAXBuilder();
-            InputStream in = this.getClass().getResourceAsStream("/query1.xml");
-
-            if (in == null) {
-                String msg = "Could not find configuration file";
-                throw new MCRConfigurationException(msg);
-            }
-            
-            MCRSQLQuery query = new MCRSQLQuery(builder.build(in));
-            in.close();
-
-            MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-            
-            try {
-                MCRSQLRowReader reader;
-                reader = c.doQuery(query.getSQLQuery());
-                while (reader.next()){
-                    System.out.println("ID: " + reader.getString("MCRID"));
+            MCRSQLRowReader reader;
+            MCRSQLQuery sqlquery = new MCRSQLQuery(query);
+            reader = c.doQuery(sqlquery.getSQLQuery());
+            List order = sqlquery.getOrderFields();
+            while (reader.next()){
+                MCRHit hit = new MCRHit(reader.getString("MCRID"));
+                
+                // fill hit meta
+                for (int j=0; j<order.size(); j++){
+                    String key = ((Element) order.get(j)).getAttributeValue("field") +"_" +
+                        ((Element) order.get(j)).getAttributeValue("order");
+                    String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
+                    hit.addMetaValue(key,value);
                 }
-               
-           }catch(Exception e){
-               logger.error(e);
-           }
-
+                result.addHit(hit);
+            }
+            if (order.size()>0)
+                result.setSorted(true);
         }catch(Exception e){
-            e.printStackTrace();
+            logger.error(e);
+        }finally{
+            c.release();
         }
+        return result;
     }
 
 }

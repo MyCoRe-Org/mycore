@@ -56,7 +56,7 @@ public class MCRQueryCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("run query",
-                "org.mycore.backend.query.MCRQueryManager.runQuery",
+                "org.mycore.backend.query.MCRQueryCommands.runQuery",
                 "lists all MCRID for query");
         command.add(com);
         
@@ -76,5 +76,11 @@ public class MCRQueryCommands extends MCRAbstractCommands {
             base.receiveFromDatastore(id);
             MCRQueryManager.getInstance().update(base);
     }
+    
+    public static void runQuery(){
+        MCRResults res = MCRQueryManager.getInstance().runQuery(MCRQueryManager.getInstance().getQuery());
+        System.out.println( res.toString());
+    }
+
 
 }

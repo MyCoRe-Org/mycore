@@ -23,6 +23,7 @@
  **/
 package org.mycore.backend.sql;
 
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
+import org.xml.sax.InputSource;
 
 /**
  * 
@@ -77,7 +79,7 @@ public class MCRSQLQuery implements MCRConditionVisitor{
         this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
-            init(builder.build(xmlString));
+            init(builder.build(new InputSource(new StringReader(xmlString))));
         }catch(Exception e){
             LOGGER.error(e);
         }
@@ -240,6 +242,10 @@ public class MCRSQLQuery implements MCRConditionVisitor{
         }
     }
     
+    public List getOrderFields(){
+        return querydoc.getRootElement().getChild("sortby").getChildren();
+    }
+    
     
     /**
      * method creates complete sql string for given query 
@@ -248,7 +254,11 @@ public class MCRSQLQuery implements MCRConditionVisitor{
     public String getSQLQuery(){
         StringBuffer sb = new StringBuffer();
         try{
-            sb.append("SELECT MCRID FROM ");
+            sb.append("SELECT MCRID");
+            for (int i=0; i<querydoc.getRootElement().getChild("sortby").getChildren().size(); i++){
+                sb.append(", "+((Element)querydoc.getRootElement().getChild("sortby").getChildren().get(i)).getAttributeValue("field"));
+            }
+            sb.append(" FROM ");
             sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
             sb.append(" WHERE ");
             sb.append(getWhereClause());
@@ -269,7 +279,11 @@ public class MCRSQLQuery implements MCRConditionVisitor{
      */
     public String toString(){
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT MCRID \nFROM ");
+        sb.append("SELECT MCRID");
+        for (int i=0; i<querydoc.getRootElement().getChild("sortby").getChildren().size(); i++){
+            sb.append(", "+((Element)querydoc.getRootElement().getChild("sortby").getChildren().get(i)).getAttributeValue("field"));
+        }
+        sb.append("\nFROM ");
         sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
         sb.append("\nWHERE ");
         sb.append(getWhereClause());

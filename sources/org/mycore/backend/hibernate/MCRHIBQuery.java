@@ -20,6 +20,7 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
+import org.xml.sax.InputSource;
 
 /**
  * Helper class for easy use of refelction given by hibernate.
@@ -56,7 +58,7 @@ public class MCRHIBQuery implements MCRConditionVisitor{
     private String type = "";               //variable for type (and/or/not)
     private int count = 0;                  //number of children to proceed
     private Document querydoc;              //xmlQuery-Document
-    private MCRCondition cond;         //query-condition
+    private MCRCondition cond;              //query-condition
     private List elList = new LinkedList(); //stack for type-elements
     private int bracket = 0;                //counts correct number of ')'
 
@@ -100,7 +102,7 @@ public class MCRHIBQuery implements MCRConditionVisitor{
         this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
-            init(builder.build(xmlString));
+            init(builder.build(new InputSource(new StringReader(xmlString))));
         }catch(Exception e){
             LOGGER.error(e);
         }
@@ -348,6 +350,10 @@ public class MCRHIBQuery implements MCRConditionVisitor{
             LOGGER.error(e);
             return "";
         }
+    }
+    
+    public List getOrderFields(){
+        return querydoc.getRootElement().getChild("sortby").getChildren();
     }
     
     

@@ -35,6 +35,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.backend.query.helper.GenClasses;
 import org.mycore.common.MCRConfiguration;
@@ -173,16 +174,19 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
         MCRQueryIndexer.getInstance().deleteObject(objectID);
     }
     
-
+    public MCRResults runQuery(Document doc){
+        XMLOutputter out = new XMLOutputter();
+        return runQuery(out.outputString(doc));
+    }
     
-    public static void runQuery(){
-        MCRQuerySearcher.getInstance().runQuery();
+    public MCRResults runQuery(String xml){
+        MCRResults res = MCRQuerySearcher.getInstance().runQuery(xml);
+        return res;
     }
     
     private void loadFields(){
         try{
             SAXBuilder builder = new SAXBuilder();
-            
             InputStream in = this.getClass().getResourceAsStream("/" + searchfield);
 
             if (in == null) {
@@ -222,16 +226,11 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
             for (int i=0; i< objectID.size(); i++){
                 MCRObjectID objectid = new MCRObjectID ((String) objectID.get(i));
                 MCRObject obj = new MCRObject();
-                //  try{
                 obj.receiveFromDatastore(objectid);
                 create(obj);
-                //  }catch(Exception e){
-                
-                //  }
             }
         }catch(Exception e){
             LOGGER.error(e);
-            e.printStackTrace();
         }  
     }
 
@@ -271,5 +270,24 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
         } catch (Exception e) {
             LOGGER.error(e);
         }
+    }
+    
+    /**
+     * temporary Method
+     * 
+     */
+    public String getQuery(){
+        String ret = "";
+        SAXBuilder builder = new SAXBuilder();
+        InputStream in = this.getClass().getResourceAsStream("/query1.xml");
+        try{
+            XMLOutputter out = new XMLOutputter();
+            Document doc = builder.build(in);
+            in.close();
+            ret = out.outputString(doc);
+        }catch(Exception e){
+            
+        }
+        return ret;
     }
 }
