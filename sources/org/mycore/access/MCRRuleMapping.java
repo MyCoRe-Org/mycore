@@ -25,6 +25,7 @@
 package org.mycore.access;
 
 import org.mycore.user.MCRUser;
+import java.util.Date;
 
 public class MCRRuleMapping
 {
@@ -32,11 +33,10 @@ public class MCRRuleMapping
     private String objid;
     private String pool;
     private MCRUser creator;
+    private Date date;
 
-    /**
-     * objid = MCRObjectID as string
-     * @return
-     */
+    /* getters and setters */
+
     public String getObjId() {
         return objid;
     }
@@ -44,10 +44,6 @@ public class MCRRuleMapping
         this.objid = objid;
     }
 
-    /**
-     * pool
-     * @return
-     */
     public String getPool() {
         return pool;
     }
@@ -55,10 +51,6 @@ public class MCRRuleMapping
         this.pool = pool;
     }
 
-    /**
-     * ruleid
-     * @return
-     */
     public String getRuleId() {
         return ruleid;
     }
@@ -66,14 +58,17 @@ public class MCRRuleMapping
         this.ruleid = ruleid;
     }
     
-    /**
-     * user
-     * @return
-     */
     public MCRUser getUser() {
         return creator;
     }
     public void setUser(MCRUser user) {
         this.creator = user;
+    }
+    
+    public Date getDate() {
+        return date;
+    }
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
