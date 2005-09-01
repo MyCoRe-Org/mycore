@@ -32,11 +32,10 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
-import org.mycore.access.MCRAccessData;
+import org.mycore.access.MCRRuleMapping;
 import org.mycore.access.MCRAccessStore;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
-import org.mycore.user.MCRUser;
 
 /**
  * Hibernate implementation of acceess store to manage access rights
@@ -105,17 +104,17 @@ public class MCRHIBAccessStore extends MCRAccessStore{
      * method creates a new AccessDefinition in db
      * @param MCRAccessData with values
      */
-    public void createAccessDefinition(MCRAccessData accessdata) {
+    public void createAccessDefinition(MCRRuleMapping rulemapping) {
         createTables();
-        if (! existAccessDefinition(accessdata.getRuleId(), accessdata.getPool(), accessdata.getObjId())){
+        if (! existAccessDefinition(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId())){
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             MCRACCESS accdef = new MCRACCESS();
             try{
                 DateFormat df = new SimpleDateFormat(sqlDateformat);
-                accdef.setKey(new MCRACCESSPK(accessdata.getRuleId(), accessdata.getPool(), accessdata.getObjId()));
-                accdef.setCreator(accessdata.getUser().getID());
-                accdef.setCreationdate(Timestamp.valueOf(df.format(accessdata.getDate())));
+                accdef.setKey(new MCRACCESSPK(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId()));
+                accdef.setCreator(rulemapping.getCreator());
+                accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
                 session.saveOrUpdate(accdef);          
                 tx.commit();         
             }catch(Exception e){
@@ -159,15 +158,15 @@ public class MCRHIBAccessStore extends MCRAccessStore{
      * delete given definition in db
      * @param accessdata MCRAccessData containing key;
      */
-    public void deleteAccessDefinition(MCRAccessData accessdata) {
+    public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
         createTables();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         try{
             session.createQuery("delete MCRACCESS " +
-                    "where RID = '" + accessdata.getRuleId() + "'" +
-                    " AND ACPOOL = '" + accessdata.getPool() + "'" +
-                    " AND OBJID = '" + accessdata.getObjId() + "'") 
+                    "where RID = '" + rulemapping.getRuleId() + "'" +
+                    " AND ACPOOL = '" + rulemapping.getPool() + "'" +
+                    " AND OBJID = '" + rulemapping.getObjId() + "'") 
                  .executeUpdate(); 
             tx.commit(); 
         }catch(Exception e){
@@ -184,9 +183,9 @@ public class MCRHIBAccessStore extends MCRAccessStore{
     /**
      * update AccessDefinition in db for given MCRAccessData
      */
-    public void updateAccessDefinition(MCRAccessData accessdata) {
-        deleteAccessDefinition(accessdata);
-        createAccessDefinition(accessdata);
+    public void updateAccessDefinition(MCRRuleMapping rulemapping) {
+        deleteAccessDefinition(rulemapping);
+        createAccessDefinition(rulemapping);
     }
 
     /**
@@ -196,19 +195,19 @@ public class MCRHIBAccessStore extends MCRAccessStore{
      * @param  objid objectid of MCRObject
      * @return MCRAccessData
      */
-    public MCRAccessData getAccessDefinition(String ruleid, String pool, String objid) {
+    public MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
-        MCRAccessData accessdata = new MCRAccessData();
+        MCRRuleMapping rulemapping = new MCRRuleMapping();
         try{
             MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(ruleid, pool, objid))).list().get(0));
             tx.commit();
             if (data != null){
-                accessdata.setDate(data.getCreationdate());
-                accessdata.setUser(new MCRUser(data.getCreator()));
-                accessdata.setObjId(data.getKey().getObjid());
-                accessdata.setPool(data.getKey().getAcpool());
-                accessdata.setRuleId(data.getKey().getRid());
+                rulemapping.setCreationdate(data.getCreationdate());
+                rulemapping.setCreator(data.getCreator());
+                rulemapping.setObjId(data.getKey().getObjid());
+                rulemapping.setPool(data.getKey().getAcpool());
+                rulemapping.setRuleId(data.getKey().getRid());
             }
         }catch(Exception e){
             tx.rollback();
@@ -216,7 +215,7 @@ public class MCRHIBAccessStore extends MCRAccessStore{
         }finally{
             session.close();
         }
-        return accessdata;
+        return rulemapping;
     }
 
 }

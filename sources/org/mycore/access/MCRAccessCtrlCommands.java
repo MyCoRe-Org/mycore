@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
-import org.mycore.user.MCRUser;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
@@ -104,11 +103,11 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     public static void temp(String val){
         
         MCRRuleMapping data = new MCRRuleMapping();
-        data.setDate(new Date());
+        data.setCreationdate(new Date());
         data.setRuleId("Test");
         data.setObjId("12345_wee");
         data.setPool("read");
-        data.setUser(new MCRUser("test"));
+        data.setCreator("test");
         
         if (val.equals("create")){
 

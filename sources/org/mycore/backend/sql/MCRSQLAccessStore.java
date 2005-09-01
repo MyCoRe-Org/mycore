@@ -28,13 +28,12 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.mycore.access.MCRAccessData;
 import org.mycore.access.MCRAccessStore;
+import org.mycore.access.MCRRuleMapping;
 import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.backend.sql.MCRSQLConnectionPool;
 import org.mycore.backend.sql.MCRSQLStatement;
 import org.mycore.common.MCRException;
-import org.mycore.user.MCRUser;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
@@ -137,17 +136,17 @@ public class MCRSQLAccessStore extends MCRAccessStore {
      * method creates new access definition in db
      * @param MCRAccessDefinition data-object
      */
-    public void createAccessDefinition(MCRAccessData accessdata) {
-        if (! existAccessDefinition(accessdata.getRuleId(), accessdata.getPool(), accessdata.getObjId())){
+    public void createAccessDefinition(MCRRuleMapping rulemapping) {
+        if (! existAccessDefinition(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId())){
             DateFormat df = new SimpleDateFormat(sqlDateformat);
             MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
             MCRSQLStatement query = new MCRSQLStatement(SQLAccessCtrlMapping);
             
-            query.setValue(new MCRSQLColumn("RID", accessdata.getRuleId(), "string"));
-            query.setValue(new MCRSQLColumn("ACPOOL", accessdata.getPool(), "string"));
-            query.setValue(new MCRSQLColumn("OBJID", accessdata.getObjId(), "string"));
-            query.setValue(new MCRSQLColumn("CREATOR", accessdata.getUser().getID(), "string"));
-            query.setValue(new MCRSQLColumn("CREATIONDATE", df.format(accessdata.getDate()), "date"));
+            query.setValue(new MCRSQLColumn("RID", rulemapping.getRuleId(), "string"));
+            query.setValue(new MCRSQLColumn("ACPOOL", rulemapping.getPool(), "string"));
+            query.setValue(new MCRSQLColumn("OBJID", rulemapping.getObjId(), "string"));
+            query.setValue(new MCRSQLColumn("CREATOR", rulemapping.getCreator(), "string"));
+            query.setValue(new MCRSQLColumn("CREATIONDATE", df.format(rulemapping.getCreationdate()), "date"));
             try{
                 c.doUpdate(query.toTypedInsertStatement());
             }catch(Exception e){
@@ -186,25 +185,25 @@ public class MCRSQLAccessStore extends MCRAccessStore {
     }
 
     
-    public void deleteAccessDefinition(MCRAccessData accessdata) {
+    public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
         try{
             MCRSQLConnection.justDoUpdate("DELETE FROM " + SQLAccessCtrlMapping + 
-                    " WHERE RID = '" + accessdata.getRuleId() + "' AND ACPOOL = '" + accessdata.getPool() + "'" +
-                    " AND OBJID = '" + accessdata.getObjId() + "'");
+                    " WHERE RID = '" + rulemapping.getRuleId() + "' AND ACPOOL = '" + rulemapping.getPool() + "'" +
+                    " AND OBJID = '" + rulemapping.getObjId() + "'");
         }catch(Exception e){
             logger.error(e);
         }
         
     }
 
-    public void updateAccessDefinition(MCRAccessData accessdata) {
-        deleteAccessDefinition(accessdata);
-        createAccessDefinition(accessdata);
+    public void updateAccessDefinition(MCRRuleMapping rulemapping) {
+        deleteAccessDefinition(rulemapping);
+        createAccessDefinition(rulemapping);
     }
 
-    public MCRAccessData getAccessDefinition(String ruleid, String pool, String objid) {
+    public MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-        MCRAccessData accessdata = new MCRAccessData();
+        MCRRuleMapping rulemapping = new MCRRuleMapping();
         try{
             String select = "SELECT RID FROM " + SQLAccessCtrlMapping
                     + " WHERE OBJID = '" + objid + "' AND ACPOOL = '" + pool
@@ -212,18 +211,18 @@ public class MCRSQLAccessStore extends MCRAccessStore {
             Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
             if (rs.next()){
-                accessdata.setDate(rs.getDate(5));
-                accessdata.setUser(new MCRUser(rs.getString(4)));
-                accessdata.setObjId(rs.getString(3));
-                accessdata.setPool(rs.getString(2));
-                accessdata.setRuleId(rs.getString(1));
+                rulemapping.setCreationdate(rs.getDate(5));
+                rulemapping.setCreator(rs.getString(4));
+                rulemapping.setObjId(rs.getString(3));
+                rulemapping.setPool(rs.getString(2));
+                rulemapping.setRuleId(rs.getString(1));
             }
         }catch(Exception e){
             logger.error(e);
         }finally{
             c.release();
         }
-        return accessdata;
+        return rulemapping;
     }
 
 }
