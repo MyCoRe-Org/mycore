@@ -40,10 +40,10 @@ public abstract class MCRAccessStore {
 
     public abstract void createTables();
     public abstract String getRuleID(String objID, String ACPool);
-    public abstract void createAccessDefinition(MCRAccessData accessdata);
-    public abstract void deleteAccessDefinition(MCRAccessData accessdata);
-    public abstract void updateAccessDefinition(MCRAccessData accessdata);
-    public abstract MCRAccessData getAccessDefinition(String ruleid, String pool, String objid);
+    public abstract void createAccessDefinition(MCRRuleMapping accessdata);
+    public abstract void deleteAccessDefinition(MCRRuleMapping accessdata);
+    public abstract void updateAccessDefinition(MCRRuleMapping accessdata);
+    public abstract MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid);
 
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
     
