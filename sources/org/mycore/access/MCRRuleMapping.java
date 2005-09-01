@@ -22,6 +22,10 @@
  *
  */
 
+package org.mycore.access;
+
+import org.mycore.user.MCRUser;
+
 public class MCRRuleMapping
 {
     private String ruleid;
