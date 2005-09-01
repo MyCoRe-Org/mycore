@@ -46,11 +46,14 @@ public class MCRAccessRule {
         this.rule = rule;
         this.description = description;
 
-        this.parsedRule = parser.parse(this.rule);
+        if(this.rule!=null)
+            this.parsedRule = parser.parse(this.rule);
     }
 
     public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip)
     {
+        if(this.parsedRule == null)
+            return true;
         MCRAccessData data = new MCRAccessData(user,date,ip);
         return this.parsedRule.evaluate(data);
     }
