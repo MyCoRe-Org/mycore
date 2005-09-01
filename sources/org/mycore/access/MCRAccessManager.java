@@ -34,15 +34,20 @@ import org.mycore.user.MCRUser;
 
 public class MCRAccessManager
 {
-    MCRRuleStore store;
     MCRCache cache;
+    MCRAccessStore accessStore;
+    MCRRuleStore ruleStore;
+    MCRAccessRule dummyRule;
 
     public MCRAccessManager()
     {
         MCRConfiguration config = MCRConfiguration.instance();
         int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
         cache = new MCRCache(size);
-        store = MCRRuleStore.getInstance();
+        accessStore = MCRAccessStore.getInstance();
+        ruleStore = MCRRuleStore.getInstance();
+
+        dummyRule = new MCRAccessRule(null,null,null,null,"dummy rule, always true");
     }
 
     private static MCRAccessManager singleton;
@@ -53,23 +58,35 @@ public class MCRAccessManager
         return singleton;
     }
 
-    public MCRAccessRule getAccess(String id)
+    public MCRAccessRule getAccess(String pool, String objID)
     {
-        MCRAccessRule a = (MCRAccessRule)cache.get(id);
+        MCRAccessRule a = (MCRAccessRule)cache.get(pool + "#" + objID);
         if(a==null) {
-            a = store.getRule(id);
-            cache.put(id, a);
+            String ruleID = accessStore.getRuleID(pool, objID);
+            if(ruleID != null) {
+                a = ruleStore.getRule(ruleID);
+            } else {
+                a = null;
+            }
+            if(a == null) {
+                a = dummyRule;
+            }
+            cache.put(pool + "#" + objID, a);
         }
         return a;
     }
 
-    public static boolean checkAccess(String objid, MCRUser user, MCRIPAddress ip)
+    public static boolean checkAccess(String pool, String objID, MCRUser user, MCRIPAddress ip)
     {
         Date date = new Date();
-        MCRAccessRule rule = instance().getAccess(objid);
+        MCRAccessRule rule = instance().getAccess(pool, objID);
         if(rule == null)
             return true; //no rule: everybody can access this
         return rule.checkAccess(user, date, ip);
+    }
+    public static boolean checkReadAccess(String objID, MCRUser user, MCRIPAddress ip)
+    {
+        return checkAccess("READ", objID, user, ip);
     }
 };
 
