@@ -22,12 +22,12 @@
  *
  */
 
-class MCRRuleMapping
+public class MCRRuleMapping
 {
     private String ruleid;
     private String objid;
     private String pool;
-    private MCRUser user;
+    private MCRUser creator;
 
     /**
      * objid = MCRObjectID as string
@@ -60,5 +60,16 @@ class MCRRuleMapping
     }
     public void setRuleId(String ruleid) {
         this.ruleid = ruleid;
+    }
+    
+    /**
+     * user
+     * @return
+     */
+    public MCRUser getUser() {
+        return creator;
+    }
+    public void setUser(MCRUser user) {
+        this.creator = user;
     }
 }
