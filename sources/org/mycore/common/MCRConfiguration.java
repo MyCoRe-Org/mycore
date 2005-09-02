@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -323,9 +324,22 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Could not load class "
                     + classname, ex);
         }
-        Object o;
-        try {
-            o = cl.newInstance();
+        Object o = null;
+        try { 
+            try{
+                o = cl.newInstance();
+            }catch(Exception e){
+                // check for singleton
+                Method[] querymethods = cl.getMethods();
+                for (int i=0; i<querymethods.length; i++){
+                    if(querymethods[i].getName().toLowerCase().equals("instance") ||
+                            querymethods[i].getName().toLowerCase().equals("getinstance")){
+                        Object[] ob = new Object[0];
+                        o = querymethods[i].invoke(cl, ob);
+                        break;
+                    }
+                } 
+            }
         } catch (Throwable t) {
             String msg = "Could not instantiate class " + classname;
             if (t instanceof ExceptionInInitializerError) {
