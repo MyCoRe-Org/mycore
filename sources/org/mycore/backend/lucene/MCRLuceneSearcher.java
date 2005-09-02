@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQuerySearcher;
+import org.mycore.backend.query.MCRResults;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -65,5 +66,10 @@ public class MCRLuceneSearcher extends MCRQuerySearcher{
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public MCRResults runQuery(String query) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
