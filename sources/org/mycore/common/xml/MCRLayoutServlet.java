@@ -292,9 +292,10 @@ public class MCRLayoutServlet extends MCRServlet {
 						.error("IO Error while XSL transforming XML Document",
 								ex);
 			} catch (MCRException ex) {
-				if (errorPage)
-					throw new MCRException("Error while genrating error page!",
-							ex);
+				if (errorPage) {
+                                    response.getWriter().write("Error while generating error page!");
+                                    return;
+                                }
 				generateErrorPage(request, response,
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex
 								.getMessage(), ex, false);
