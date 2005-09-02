@@ -24,8 +24,6 @@
 
 package org.mycore.frontend.editor;
 
-import org.mycore.common.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -252,34 +250,41 @@ public class MCREditorSubmission {
     
     private boolean checkCondition( Element condition, String value )
     {
-      if( "true".equals( condition.getAttributeValue( "required", "false" ) ) )
-        return MCRInputValidator.instance().validateRequired( value );
+      boolean required = "true".equals( condition.getAttributeValue( "required" ) );
       
-      String type   = condition.getAttributeValue( "type",   (String)null );
-      String min    = condition.getAttributeValue( "min",    (String)null );
-      String max    = condition.getAttributeValue( "max",    (String)null );
-      String format = condition.getAttributeValue( "format", (String)null );
-      
-      if( type != null )
-        return MCRInputValidator.instance().validateMinMaxType( value, type, min, max, format );
-      
-      String minLength = condition.getAttributeValue( "minLength", (String)null );
-      String maxLength = condition.getAttributeValue( "maxLength", (String)null );
-      if( ( maxLength != null ) || ( minLength != null ) )
-        return MCRInputValidator.instance().validateLength( value, minLength, maxLength );
+      if( required && ! MCRInputValidator.instance().validateRequired( value ) )
+        return false; // field is required but empty, this is an error
         
-      String regexp = condition.getAttributeValue( "regexp", (String)null );
-      if( regexp != null )
-        return MCRInputValidator.instance().validateRegularExpression( value, regexp );
+      if( (! required ) && ( value.trim().length() == 0 ) ) 
+        return true; // field is not required and empty, this is OK
+            
+      String type   = condition.getAttributeValue( "type" );
+      String min    = condition.getAttributeValue( "min" );
+      String max    = condition.getAttributeValue( "max" );
+      String format = condition.getAttributeValue( "format" );
       
-      String xsl = condition.getAttributeValue( "xsl", (String)null );
-      if( xsl != null )
-        return MCRInputValidator.instance().validateXSLCondition( value, xsl );
+      if( ( type != null ) && ! MCRInputValidator.instance().validateMinMaxType( value, type, min, max, format ) )
+        return false; // field type, data format and/or min max value is illegal  
       
-      String cond = new XMLOutputter( Format.getCompactFormat() ).outputString( condition );
-      throw new MCRConfigurationException( "Unsupported validate condition:" + cond );
-    }
+      String minLength = condition.getAttributeValue( "minLength" );
+      String maxLength = condition.getAttributeValue( "maxLength" );
+      if( ( ( maxLength != null ) || ( minLength != null ) ) &&
+        ! MCRInputValidator.instance().validateLength( value, minLength, maxLength ) )
+        return false; // field min/max length is illegal
+        
+      String regexp = condition.getAttributeValue( "regexp" );
+      if( ( regexp != null ) &&
+        ! MCRInputValidator.instance().validateRegularExpression( value, regexp ) )
+        return false; // field does not match given regular expression
+      
+      String xsl = condition.getAttributeValue( "xsl" );
+      if( ( xsl != null ) &&
+        ! MCRInputValidator.instance().validateXSLCondition( value, xsl ) )
+        return false; // field does not match given xsl condition
 
+      return true;
+    }
+    
     private void addVariable(String path, String text) {
         if ((text == null) || (text.trim().length() == 0))
             return;
