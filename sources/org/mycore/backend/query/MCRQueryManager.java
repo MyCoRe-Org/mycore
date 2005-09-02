@@ -47,7 +47,6 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
@@ -57,7 +56,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @author Arne Seifert
  *
  */
-public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSearchStoreInterface{
+public class MCRQueryManager  extends MCREventHandlerBase{
     
     /** the logger */
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
@@ -67,12 +66,11 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     protected HashMap searchfields = new HashMap();
     
     private static MCRConfiguration config;
-    protected static MCRQueryManager singleton;
+    private static MCRQueryManager singleton;
     
     public static MCRQueryManager getInstance(){
         if (singleton == null){
             singleton = new MCRQueryManager();
-            MCRQueryIndexer.getInstance().updateConfiguration();
         }
         return singleton;
     }
@@ -82,6 +80,7 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
             config = MCRConfiguration.instance();
             searchfield = config.getString("MCR.QuerySearchFields", "searchfields.xml");
             loadFields();
+            MCRQueryIndexer.getInstance().updateConfiguration();
         } catch (Exception e) {
             LOGGER.error(e);
             throw new MCRException("MCRQueryManager error", e);
@@ -91,9 +90,10 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     public void createDataBase(String mcr_type, Document mcr_conf){
         MCRQueryIndexer.getInstance().initialLoad();
     }
+
     
     /**
-     * interface implementation of create
+     * method creates new object for indexer
      * @param objBase
      */
     public void create(MCRBase obj){
@@ -154,24 +154,6 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
         }
         // save values in db
         MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
-    }
-    
-    
-    /**
-     * interface impelementation of update
-     * @param objectID
-     */
-    public void update(MCRBase base){
-        MCRQueryIndexer.getInstance().updateObject(base);
-    }
-    
-    
-    /**
-     * interface implementation of delete
-     * @param objectID
-     */
-    public void delete(MCRObjectID objectID){
-        MCRQueryIndexer.getInstance().deleteObject(objectID);
     }
     
     public MCRResults runQuery(Document doc){
@@ -235,13 +217,32 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
     }
 
     /**
+     * temporary Method
+     * 
+     */
+    public String getQuery(){
+        String ret = "";
+        SAXBuilder builder = new SAXBuilder();
+        InputStream in = this.getClass().getResourceAsStream("/query1.xml");
+        try{
+            XMLOutputter out = new XMLOutputter();
+            Document doc = builder.build(in);
+            in.close();
+            ret = out.outputString(doc);
+        }catch(Exception e){
+            
+        }
+        return ret;
+    }
+    
+    /**
      * This class builds indexes of meta data objects.
      * @param evt the event that occured
      * @param obj the MCRObject that caused the event
      */
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         try {
-            create(obj);
+            MCRQueryManager.getInstance().create(obj);
         } catch (Exception e) {
             LOGGER.error(e);
         }
@@ -266,28 +267,9 @@ public class MCRQueryManager extends MCREventHandlerBase implements MCRObjectSea
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
-            delete(obj.getId());
+            MCRQueryIndexer.getInstance().deleteObject(obj.getId());
         } catch (Exception e) {
             LOGGER.error(e);
         }
-    }
-    
-    /**
-     * temporary Method
-     * 
-     */
-    public String getQuery(){
-        String ret = "";
-        SAXBuilder builder = new SAXBuilder();
-        InputStream in = this.getClass().getResourceAsStream("/query1.xml");
-        try{
-            XMLOutputter out = new XMLOutputter();
-            Document doc = builder.build(in);
-            in.close();
-            ret = out.outputString(doc);
-        }catch(Exception e){
-            
-        }
-        return ret;
     }
 }
