@@ -397,7 +397,7 @@ public class MCREditorServlet extends MCRServlet {
 			editor.removeChild("input");
 			editor.removeChild("repeats");
 
-			MCREditorSubmission sub = new MCREditorSubmission(parms, editor);
+			MCREditorSubmission sub = new MCREditorSubmission(parms, editor, false);
 			editor.addContent(sub.buildInputElements());
 			editor.addContent(sub.buildRepeatElements());
 
@@ -416,7 +416,7 @@ public class MCREditorServlet extends MCRServlet {
 			editor.removeChild("input");
 			editor.removeChild("repeats");
 
-			MCREditorSubmission sub = new MCREditorSubmission(parms, editor);
+			MCREditorSubmission sub = new MCREditorSubmission(parms, editor, false);
 
 			if ("p".equals(action))
 				sub.doPlus(path, nr);
@@ -447,7 +447,7 @@ public class MCREditorServlet extends MCRServlet {
 
 		logger.debug("Editor: processTargetSubmission ");
 
-		MCREditorSubmission sub = new MCREditorSubmission(parms, editor);
+		MCREditorSubmission sub = new MCREditorSubmission(parms, editor, true);
 
 		// If there is no input, handle as if "cancel" button was pressed
 		if (sub.getVariables().size() == 0) {

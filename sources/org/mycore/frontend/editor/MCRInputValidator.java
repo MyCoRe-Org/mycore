@@ -63,9 +63,17 @@ public class MCRInputValidator {
 	private TransformerFactory factory = null;
 
 	/** Creates a new, reusable input validator * */
-	public MCRInputValidator() {
+	private MCRInputValidator() {
 		stylesheet = prepareStylesheet();
 		factory = TransformerFactory.newInstance();
+	}
+	
+	private static MCRInputValidator singleton;
+	
+	public static synchronized MCRInputValidator instance()
+	{
+	  if( singleton == null ) singleton = new MCRInputValidator();
+	  return singleton;
 	}
 
 	/** Cache of reusable stylesheets for checking XSL conditions * */
@@ -130,7 +138,7 @@ public class MCRInputValidator {
 			"http://www.w3.org/1999/XSL/Transform");
 
 	/** Prepares a template stylesheet that is used for checking XSL conditions * */
-	private Document prepareStylesheet() {
+	private synchronized Document prepareStylesheet() {
 		Element stylesheet = new Element("stylesheet").setAttribute("version",
 				"1.0");
 		stylesheet.setNamespace(xslns);
@@ -371,7 +379,7 @@ public class MCRInputValidator {
 	}
 
 	public static void main(String[] args) {
-		MCRInputValidator iv = new MCRInputValidator();
+		MCRInputValidator iv = MCRInputValidator.instance();
 		System.out.println(true == iv.validateXSLCondition("bingo@bongo.com",
 				"contains(.,'@')"));
 		System.out.println(false == iv.validateLength("john doe", "20", null));
