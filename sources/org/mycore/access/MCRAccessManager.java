@@ -21,9 +21,13 @@
 package org.mycore.access;
 
 import java.util.Date;
+import java.net.UnknownHostException;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRException;
+import org.mycore.user.MCRUserMgr;
 import org.mycore.user.MCRUser;
 
 /**
@@ -94,5 +98,22 @@ public class MCRAccessManager
     {
         return checkAccess("READ", objID, user, ip);
     }
+    public static boolean checkAccess(String pool, String objID, MCRSession session)
+    {
+	MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
+        try {
+            MCRIPAddress ip = new MCRIPAddress(session.getIp());
+        } catch(UnknownHostException e) {
+            /* this should never happen */
+            throw new MCRException("unknown host", e);
+        }
+        return checkAccess(pool, objID, session);
+    }
+    public static boolean checkReadAccess(String objID, MCRSession session)
+    {
+        return checkAccess("READ", objID, session);
+    }
+
 };
+
 
