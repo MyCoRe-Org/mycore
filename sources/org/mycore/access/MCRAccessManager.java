@@ -38,11 +38,15 @@ public class MCRAccessManager
     MCRAccessStore accessStore;
     MCRRuleStore ruleStore;
     MCRAccessRule dummyRule;
+    boolean disabled = false;
 
     public MCRAccessManager()
     {
         MCRConfiguration config = MCRConfiguration.instance();
         int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
+        String pools = config.getString("MCR.AccessPools","");
+        if(pools.trim().length() == 0)
+            disabled = true;
         cache = new MCRCache(size);
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
@@ -60,6 +64,8 @@ public class MCRAccessManager
 
     public MCRAccessRule getAccess(String pool, String objID)
     {
+        if(disabled)
+            return dummyRule;
         MCRAccessRule a = (MCRAccessRule)cache.get(pool + "#" + objID);
         if(a==null) {
             String ruleID = accessStore.getRuleID(objID,pool);
