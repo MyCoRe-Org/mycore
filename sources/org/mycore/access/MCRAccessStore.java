@@ -58,7 +58,6 @@ public abstract class MCRAccessStore {
     {
         try{
             if(implementation == null) {
-                System.out.println(MCRConfiguration.instance().getString("MCR.accessstore_class_name"));
                 implementation = (MCRAccessStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");
             }
         }catch(Exception e){
