@@ -47,6 +47,7 @@ public class MCRHIBAccessStore extends MCRAccessStore{
     final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
     
     public String getRuleID(String objID, String ACPool) {
+        createTables();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         String strRuleID = "";
@@ -196,6 +197,7 @@ public class MCRHIBAccessStore extends MCRAccessStore{
      * @return MCRAccessData
      */
     public MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid) {
+        createTables();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
