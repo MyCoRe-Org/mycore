@@ -81,6 +81,9 @@ public class MCRResults {
     public Document toXML(){
         Document doc = new Document();
         doc.setRootElement(new Element("mcrresults"));
+        doc.getRootElement().addContent(new Element("resultmeta"));
+        doc.getRootElement().getChild("resultmeta").addContent(new Element("sorted").setText(Boolean.toString(isSorted())));
+
         doc.getRootElement().addContent(new Element("mcrhits"));
         
         for (int i=0; i<mcrhits.size(); i++){
