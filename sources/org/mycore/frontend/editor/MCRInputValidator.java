@@ -393,55 +393,56 @@ public class MCRInputValidator {
      *            for datetime input, a java.text.SimpleDateFormat pattern; for
      *            decimal input, a ISO-639 language code
      * 
-     * @return true if the compare result is true OR one of the input fields is empty.
-     **/
+     * @return true if the compare result is true OR one of the input fields is
+     *         empty OR one of the input fields is in wrong format.
+     */
     public boolean compare(String valueA, String valueB, String operator,
             String type, String format) {
-        if (valueA == null || valueA.trim().length() == 0)
-            return true;
-        if (valueB == null || valueB.trim().length() == 0)
-            return true;
-        if (type.equals("string")) {
-            int res = valueA.compareTo(valueB);
-            if ("=".equals(operator))
-                return (res == 0);
-            else if ("<".equals(operator))
-                return (res < 0);
-            else if (">".equals(operator))
-                return (res > 0);
-            else if ("<=".equals(operator))
-                return (res <= 0);
-            else if (">=".equals(operator))
-                return (res >= 0);
-            else if ("!=".equals(operator))
-                return !(res == 0);
-            else
-                throw new MCRConfigurationException(
-                        "Unknown compare operator: " + operator);
-        } else if (type.equals("integer")) {
-            long vA = Long.parseLong(valueA);
-            long vB = Long.parseLong(valueB);
+        try {
+            if (valueA == null || valueA.trim().length() == 0)
+                return true;
+            if (valueB == null || valueB.trim().length() == 0)
+                return true;
+            if (type.equals("string")) {
+                int res = valueA.compareTo(valueB);
+                if ("=".equals(operator))
+                    return (res == 0);
+                else if ("<".equals(operator))
+                    return (res < 0);
+                else if (">".equals(operator))
+                    return (res > 0);
+                else if ("<=".equals(operator))
+                    return (res <= 0);
+                else if (">=".equals(operator))
+                    return (res >= 0);
+                else if ("!=".equals(operator))
+                    return !(res == 0);
+                else
+                    throw new MCRConfigurationException(
+                            "Unknown compare operator: " + operator);
+            } else if (type.equals("integer")) {
+                long vA = Long.parseLong(valueA);
+                long vB = Long.parseLong(valueB);
 
-            if ("=".equals(operator))
-                return (vA == vB);
-            else if ("<".equals(operator))
-                return (vA < vB);
-            else if (">".equals(operator))
-                return (vA > vB);
-            else if ("<=".equals(operator))
-                return (vA <= vB);
-            else if (">=".equals(operator))
-                return (vA >= vB);
-            else if ("!=".equals(operator))
-                return !(vA == vB);
-            else
-                throw new MCRConfigurationException(
-                        "Unknown compare operator: " + operator);
-        } else if (type.equals("decimal")) {
-            Locale locale = (format == null ? Locale.getDefault() : new Locale(
-                    format));
-            NumberFormat nf = NumberFormat.getNumberInstance(locale);
-            try {
+                if ("=".equals(operator))
+                    return (vA == vB);
+                else if ("<".equals(operator))
+                    return (vA < vB);
+                else if (">".equals(operator))
+                    return (vA > vB);
+                else if ("<=".equals(operator))
+                    return (vA <= vB);
+                else if (">=".equals(operator))
+                    return (vA >= vB);
+                else if ("!=".equals(operator))
+                    return !(vA == vB);
+                else
+                    throw new MCRConfigurationException(
+                            "Unknown compare operator: " + operator);
+            } else if (type.equals("decimal")) {
+                Locale locale = (format == null ? Locale.getDefault()
+                        : new Locale(format));
+                NumberFormat nf = NumberFormat.getNumberInstance(locale);
                 double vA = nf.parse(valueA).doubleValue();
                 double vB = nf.parse(valueB).doubleValue();
 
@@ -460,13 +461,8 @@ public class MCRInputValidator {
                 else
                     throw new MCRConfigurationException(
                             "Unknown compare operator: " + operator);
-            } catch (ParseException ex) {
-                String msg = "Could not parse decimal value for input validation";
-                throw new MCRConfigurationException(msg, ex);
-            }
-        } else if (type.equals("datetime")) {
-            DateFormat df = getDateTimeFormat(format);
-            try {
+            } else if (type.equals("datetime")) {
+                DateFormat df = getDateTimeFormat(format);
                 Date vA = df.parse(valueA);
                 Date vB = df.parse(valueB);
 
@@ -485,13 +481,12 @@ public class MCRInputValidator {
                 else
                     throw new MCRConfigurationException(
                             "Unknown compare operator: " + operator);
-            } catch (ParseException ex) {
-                String msg = "Could not parse decimal value for input validation";
-                throw new MCRConfigurationException(msg, ex);
-            }
-        } else
-            throw new MCRConfigurationException("Unknown input data type: "
-                    + type);
+            } else
+                throw new MCRConfigurationException("Unknown input data type: "
+                        + type);
+        } catch (ParseException ex) {
+            return true;
+        }
     }
 
     public static void main(String[] args) {
