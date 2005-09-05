@@ -34,8 +34,6 @@ public abstract class MCRQuerySearcher {
     protected static String querytypes = MCRConfiguration.instance().getString("MCR.QueryTypes", "document,author");
 
     protected String query = ""; // has to be filled while processing query
-    
-    public static MCRQueryManager queryManager = MCRQueryManager.getInstance();
 
     static private MCRQuerySearcher implementation;
     public static MCRQuerySearcher getInstance() 
