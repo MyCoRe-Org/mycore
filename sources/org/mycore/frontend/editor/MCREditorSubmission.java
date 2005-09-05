@@ -239,13 +239,11 @@ public class MCREditorSubmission {
             for (int i = 0; i < conditions.size(); i++) {
                 Element condition = (Element) (conditions.get(i));
                 for (int j = 0; j < values.length; j++) {
-                    boolean ok = checkCondition(condition, values[j]);
+                    String nname = (j == 0 ? name : name + "[" + (j + 1) + "]");
+                    boolean ok = checkCondition(condition, nname, values[j]);
                     if (!ok) {
                         String sortNr = parms.getParameter("_sortnr-" + name);
                         failed.put(sortNr, condition);
-
-                        String nname = (j == 0 ? name : name + "[" + (j + 1)
-                                + "]");
 
                         LOGGER.info("Validation condition failed:");
                         LOGGER.info(nname + " = \"" + values[j] + "\"");
@@ -258,14 +256,18 @@ public class MCREditorSubmission {
         }
     }
 
-    private boolean checkCondition(Element condition, String value) {
+    private boolean checkCondition(Element condition, String name, String value) {
         boolean required = "true".equals(condition
                 .getAttributeValue("required"));
 
-        if (required && !MCRInputValidator.instance().validateRequired(value))
-            return false; // field is required but empty, this is an error
-
-        if ((!required) && (value.trim().length() == 0))
+        if (required) {
+            if (name.endsWith("]")
+                    && (value == null || value.trim().length() == 0))
+                return true; // repeated field is required but missing, this is
+                             // ok
+            else if (!MCRInputValidator.instance().validateRequired(value))
+                return false; // field is required but empty, this is an error
+        } else if ((!required) && (value.trim().length() == 0))
             return true; // field is not required and empty, this is OK
 
         String type = condition.getAttributeValue("type");
