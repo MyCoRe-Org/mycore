@@ -248,7 +248,7 @@ public class MCRHIBUserStore implements MCRUserStore {
                 ArrayList groups = new ArrayList();
                 l = session.createQuery("from MCRGROUPMEMBERS where USERID = '" + userID +"'").list();
                 
-                if (l.size() < 1) {
+                if (l.size() >= 1) {
                     MCRGROUPMEMBERS group;
                     for (int i=0; i< l.size();i++){
                         group =(MCRGROUPMEMBERS) l.get(i);
