@@ -178,21 +178,23 @@ public class MCRAccessChecker {
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String primaryGroupID = MCRUserMgr.instance()
 					.getPrimaryGroupIDOfUser((String) it.next());
-			MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(
+			if (primaryGroupID != null) {
+				MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(
 					primaryGroupID);
-			if (primaryGroup.hasUserMember(currentUser)) {
-				return true;
-			}
-			ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup
-					.getMemberGroupIDs();
-			for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
-				if (primaryGroup.hasGroupMember((String) allCurrentUserGroupIDs
-						.get(j))) {
+				if (primaryGroup.hasUserMember(currentUser)) {
 					return true;
 				}
-				if (memberGroupIDsOfPrimaryGroup
+				ArrayList memberGroupIDsOfPrimaryGroup = primaryGroup
+					.getMemberGroupIDs();
+				for (int j = 0; j < allCurrentUserGroupIDs.size(); j++) {
+					if (primaryGroup.hasGroupMember((String) allCurrentUserGroupIDs
+						.get(j))) {
+						return true;
+					}
+					if (memberGroupIDsOfPrimaryGroup
 						.contains((String) allCurrentUserGroupIDs.get(j))) {
-					return true;
+						return true;
+					}
 				}
 			}
 		}

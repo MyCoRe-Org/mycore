@@ -140,7 +140,7 @@ public class MCRAccessServlet extends MCRServlet {
 			if (LOGGER.isDebugEnabled()) {
 				StringBuffer sb = new StringBuffer();
 				sb.append("Access check in mode ").append(mode).append(
-						" for ip [").append(ip).append("](").append(!retip)
+						" for ip [").append(ip).append("](").append(!retip).append(')')
 						.append(" and users [").append(userlist).append("](")
 						.append(!retuser).append(") and privilege [").append(
 								privilege).append("](").append(!retpriv)
