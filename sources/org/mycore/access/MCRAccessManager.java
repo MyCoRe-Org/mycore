@@ -107,7 +107,7 @@ public class MCRAccessManager
             /* this should never happen */
             throw new MCRException("unknown host", e);
         }
-        return checkAccess(pool, objID, session);
+        return checkAccess(pool, objID, user, ip);
     }
     public static boolean checkReadAccess(String objID, MCRSession session)
     {
