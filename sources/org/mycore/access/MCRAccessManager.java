@@ -62,7 +62,7 @@ public class MCRAccessManager
     {
         MCRAccessRule a = (MCRAccessRule)cache.get(pool + "#" + objID);
         if(a==null) {
-            String ruleID = accessStore.getRuleID(pool, objID);
+            String ruleID = accessStore.getRuleID(objID,pool);
             if(ruleID != null) {
                 a = ruleStore.getRule(ruleID);
             } else {
