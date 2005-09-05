@@ -254,6 +254,55 @@ public class MCREditorSubmission {
                 }
             }
         }
+
+        for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
+            String name = (String) (e.nextElement());
+            if (!name.startsWith("_cond-"))
+                continue;
+
+            String path = name.substring(6);
+            String[] ids = parms.getParameterValues(name);
+            if (ids != null)
+                for (int i = 0; i < ids.length; i++) {
+                    String id = ids[i];
+                    Element condition = MCREditorDefReader.findElementByID(id,
+                            editor);
+                    if (condition == null)
+                        continue;
+
+                    String pathA = path + "/"
+                            + condition.getAttributeValue("field1");
+                    String pathB = path + "/"
+                            + condition.getAttributeValue("field2");
+                    String type = condition.getAttributeValue("type");
+                    String oper = condition.getAttributeValue("operator");
+                    String format = condition.getAttributeValue("format");
+
+                    System.out.println("XXXXX checking " + pathA + " " + oper
+                            + " " + pathB);
+
+                    String valueA = parms.getParameter(pathA);
+                    String valueB = parms.getParameter(pathB);
+                    boolean ok = MCRInputValidator.instance().compare(valueA,
+                            valueB, oper, type, format);
+                    System.out.println("XXXXX " + valueA + " oper " + valueB
+                            + " = " + ok);
+
+                    if (!ok) {
+                        String sortNrA = parms.getParameter("_sortnr-" + pathA);
+                        failed.put(sortNrA, condition);
+
+                        String sortNrB = parms.getParameter("_sortnr-" + pathB);
+                        failed.put(sortNrB, condition);
+
+                        LOGGER.info("Validation condition failed:");
+                        LOGGER.info(pathA + " " + oper + " " + pathB);
+                        String cond = new XMLOutputter(Format
+                                .getCompactFormat()).outputString(condition);
+                        LOGGER.info(cond);
+                    }
+                }
+        }
     }
 
     private boolean checkCondition(Element condition, String name, String value) {
@@ -264,7 +313,7 @@ public class MCREditorSubmission {
             if (name.endsWith("]")
                     && (value == null || value.trim().length() == 0))
                 return true; // repeated field is required but missing, this is
-                             // ok
+            // ok
             else if (!MCRInputValidator.instance().validateRequired(value))
                 return false; // field is required but empty, this is an error
         } else if ((!required) && (value.trim().length() == 0))
