@@ -66,6 +66,8 @@ public class MCRSession implements Cloneable {
 	private String FullName = null;
 
 	private String CurrentDocumentID = null;
+    
+    private String ip = null;
 
 	/**
 	 * The constructor of a MCRSession. As default the user ID is set to the
@@ -75,7 +77,11 @@ public class MCRSession implements Cloneable {
 		MCRConfiguration config = MCRConfiguration.instance();
 		userID = config.getString("MCR.users_guestuser_username", "gast");
 		language = config.getString("MCR.metadata_default_lang", "de");
-		sessionID = buildSessionID();
+        try {
+            ip = java.net.InetAddress.getLocalHost().getHostAddress();
+        } catch (java.net.UnknownHostException ignored) {
+        }
+        sessionID = buildSessionID();
 		sessions.put(sessionID, this);
 
 		logger.debug("MCRSession created " + sessionID);
@@ -182,4 +188,12 @@ public class MCRSession implements Cloneable {
 	public Object get(Object key) {
 		return map.get(key);
 	}
+    
+    public final void setIP(String ip){
+        this.ip = ip;
+    }
+    
+    public String getIp(){
+        return ip;
+    }
 }
