@@ -24,13 +24,27 @@ package org.mycore.backend.sql;
 import java.util.List;
 
 import org.jdom.Element;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRIPAddress;
 import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.backend.query.MCRResults;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.user.MCRUser;
 
-
+/**
+ * SQL implementation of the searcher
+ * @author Arne Seifert
+ *
+ */
 public class MCRSQLSearcher extends MCRQuerySearcher{
 
+    /**
+     * method runs given query-string
+     * access-control included: id of object will testet for rules of the "READ"-pool
+     * @param query  query string
+     * @return MCRResults with MCRHit-objects
+     */
     public MCRResults runQuery(String query) {
         this.query = query;
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
@@ -41,16 +55,18 @@ public class MCRSQLSearcher extends MCRQuerySearcher{
             reader = c.doQuery(sqlquery.getSQLQuery());
             List order = sqlquery.getOrderFields();
             while (reader.next()){
-                MCRHit hit = new MCRHit(reader.getString("MCRID"));
-                
-                // fill hit meta
-                for (int j=0; j<order.size(); j++){
-                    String key = ((Element) order.get(j)).getAttributeValue("field") +"_" +
-                        ((Element) order.get(j)).getAttributeValue("order");
-                    String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
-                    hit.addMetaValue(key,value);
+                String id = reader.getString("MCRID");
+                /*check access rule for object against the READ pool*/
+                if (MCRAccessManager.checkReadAccess(id,new MCRUser(MCRSessionMgr.getCurrentSession().getCurrentUserID()),new MCRIPAddress(MCRSessionMgr.getCurrentSession().getIp()))){
+                    MCRHit hit = new MCRHit(id);
+                    /*fill hit meta*/
+                    for (int j=0; j<order.size(); j++){
+                        String key = ((Element) order.get(j)).getAttributeValue("field");
+                        String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
+                        hit.addMetaValue(key,value);
+                    }
+                    result.addHit(hit);
                 }
-                result.addHit(hit);
             }
             if (order.size()>0)
                 result.setSorted(true);

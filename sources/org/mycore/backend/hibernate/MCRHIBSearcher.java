@@ -25,13 +25,17 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRIPAddress;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.backend.query.MCRResults;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.user.MCRUser;
 
 /**
- * 
+ * Hibernate implementation of the searcher
  * @author Arne Seifert
  *
  */
@@ -48,16 +52,18 @@ public class MCRHIBSearcher extends MCRQuerySearcher{
             List order = hibquery.getOrderFields();
             for(int i=0; i<l.size(); i++){
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
-                MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
-                
-                // fill hit meta
-                for (int j=0; j<order.size(); j++){
-                    String key = ((Element) order.get(j)).getAttributeValue("field") +"_" +
-                        ((Element) order.get(j)).getAttributeValue("order");
-                    String value = (String) tmpquery.getValue("get" + ((Element) order.get(j)).getAttributeValue("field"));
-                    hit.addMetaValue(key,value);
+                /*check access rule for object against the READ pool*/
+                if (MCRAccessManager.checkReadAccess((String) tmpquery.getValue("getmcrid"),new MCRUser(MCRSessionMgr.getCurrentSession().getCurrentUserID()),new MCRIPAddress(MCRSessionMgr.getCurrentSession().getIp()))){
+                    MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
+                    
+                    // fill hit meta
+                    for (int j=0; j<order.size(); j++){
+                        String key = ((Element) order.get(j)).getAttributeValue("field");
+                        String value = (String) tmpquery.getValue("get" + ((Element) order.get(j)).getAttributeValue("field"));
+                        hit.addMetaValue(key,value);
+                    }
+                    result.addHit(hit);
                 }
-                result.addHit(hit);
             }
             tx.commit();
             if (order.size()>0)
