@@ -101,8 +101,9 @@ public class MCRAccessManager
     public static boolean checkAccess(String pool, String objID, MCRSession session)
     {
 	MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
+        MCRIPAddress ip;
         try {
-            MCRIPAddress ip = new MCRIPAddress(session.getIp());
+            ip = new MCRIPAddress(session.getIp());
         } catch(UnknownHostException e) {
             /* this should never happen */
             throw new MCRException("unknown host", e);
