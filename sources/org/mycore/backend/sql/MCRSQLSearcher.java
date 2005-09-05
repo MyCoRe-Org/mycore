@@ -25,12 +25,10 @@ import java.util.List;
 
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.access.MCRIPAddress;
 import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.backend.query.MCRResults;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
 
 /**
  * SQL implementation of the searcher
@@ -57,7 +55,7 @@ public class MCRSQLSearcher extends MCRQuerySearcher{
             while (reader.next()){
                 String id = reader.getString("MCRID");
                 /*check access rule for object against the READ pool*/
-                if (MCRAccessManager.checkReadAccess(id,new MCRUser(MCRSessionMgr.getCurrentSession().getCurrentUserID()),new MCRIPAddress(MCRSessionMgr.getCurrentSession().getIp()))){
+                if (MCRAccessManager.checkReadAccess(id, MCRSessionMgr.getCurrentSession())){
                     MCRHit hit = new MCRHit(id);
                     /*fill hit meta*/
                     for (int j=0; j<order.size(); j++){

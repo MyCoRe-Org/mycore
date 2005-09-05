@@ -26,13 +26,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.access.MCRIPAddress;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.backend.query.MCRResults;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
 
 /**
  * Hibernate implementation of the searcher
@@ -53,7 +51,7 @@ public class MCRHIBSearcher extends MCRQuerySearcher{
             for(int i=0; i<l.size(); i++){
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
                 /*check access rule for object against the READ pool*/
-                if (MCRAccessManager.checkReadAccess((String) tmpquery.getValue("getmcrid"),new MCRUser(MCRSessionMgr.getCurrentSession().getCurrentUserID()),new MCRIPAddress(MCRSessionMgr.getCurrentSession().getIp()))){
+                if (MCRAccessManager.checkReadAccess((String) tmpquery.getValue("getmcrid"), MCRSessionMgr.getCurrentSession())){
                     MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
                     
                     // fill hit meta
