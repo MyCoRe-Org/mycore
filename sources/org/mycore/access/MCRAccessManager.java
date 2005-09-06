@@ -65,6 +65,10 @@ public class MCRAccessManager
             singleton = new MCRAccessManager();
         return singleton;
     }
+    
+    public boolean isDisabled(){
+        return disabled;
+    }
 
     public MCRAccessRule getAccess(String pool, String objID)
     {
@@ -86,6 +90,14 @@ public class MCRAccessManager
         return a;
     }
 
+    /**
+     * Validator methods to validate access definition for given object and pool
+     * @param pool poolname as string
+     * @param objID MCRObjectID as string
+     * @param user MCRUser
+     * @param ip ip-Address
+     * @return
+     */
     public static boolean checkAccess(String pool, String objID, MCRUser user, MCRIPAddress ip)
     {
         Date date = new Date();

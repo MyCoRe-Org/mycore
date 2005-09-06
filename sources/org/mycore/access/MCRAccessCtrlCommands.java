@@ -20,12 +20,10 @@
 
 package org.mycore.access;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
 /**
@@ -37,14 +35,12 @@ import org.mycore.frontend.cli.MCRCommand;
 
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
 
-    /** The logger */
-    public static Logger LOGGER = Logger
-            .getLogger(MCRClassificationCommands.class.getName());
+    public static Logger logger = Logger
+            .getLogger(MCRAccessCtrlCommands.class.getName());
 
     /**
      * constructor with commands.
      */
-
     public MCRAccessCtrlCommands() {
         super();
         MCRCommand com = null;
@@ -54,21 +50,10 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
                 "The command creates all tables for the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("get access rule for ruleid {0}",
-                "org.mycore.access.MCRAccessCtrlCommands.getRule String",
-                "Returns the rule (string) for given ruleid.");
-        command.add(com);
-
         com = new MCRCommand(
-                "get ruleid for objectid {0} in pool {1}",
-                "org.mycore.access.MCRAccessCtrlCommands.getRuleID String String",
-                "Returns the ruleID for given object and access pool.");
-        command.add(com);
-        
-        com = new MCRCommand(
-                "access tmp {0}",
-                "org.mycore.access.MCRAccessCtrlCommands.temp String",
-                "delete me");
+                "validate objectid {0} in pool {1}",
+                "org.mycore.access.MCRAccessCtrlCommands.validate String String",
+                "Validates access for given object and given pool");
         command.add(com);
 
     }
@@ -85,51 +70,10 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * 
      * @param ruleID internal database ruleid
      */
-    public static void getRule(String ruleID) {
-        LOGGER.info(MCRRuleStore.getInstance().getRule(ruleID));
+    public static void validate(String objid, String pool) {
+        System.out.println("current user has access: "
+                + MCRAccessManager.checkAccess(pool, objid, MCRSessionMgr.getCurrentSession()));
     }
 
-    /**
-     * This method returns the ruleid as string for a given object and
-     * accesspool
-     * 
-     * @param objID identificator for object, acPool name of accesspool
-     */
-    public static void getRuleID(String objID, String acPool) {
-        LOGGER.info(MCRAccessStore.getInstance().getRuleID(objID, acPool));
-    }
-    
-    
-    public static void temp(String val){
-        
-        MCRRuleMapping data = new MCRRuleMapping();
-        data.setCreationdate(new Date());
-        data.setRuleId("Test");
-        data.setObjId("12345_wee");
-        data.setPool("read");
-        data.setCreator("test");
-        
-        if (val.equals("create")){
-
-            MCRAccessStore.getInstance().createAccessDefinition(data);
-        }else if (val.equals("delete")){
-            MCRAccessStore.getInstance().deleteAccessDefinition(data);
-        }
-        
-        /*
-        try{
-            MCRAccessRule rule = new MCRAccessRule();
-            rule.setId("test");
-            rule.setCreationTime(new Date());
-            rule.setCreator("TEst");
-            rule.setRule("sdfösfölskföslfksölk");
-            rule.setDescription("asdd");
-            MCRRuleStore rStore= MCRRuleStore.getInstance();
-            rStore.createRule(rule);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        */
-        
-    }
+   
 }
