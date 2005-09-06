@@ -20,13 +20,8 @@
  **/
 package org.mycore.backend.lucene;
 
-import java.io.InputStream;
-import java.util.List;
-
-import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.backend.query.MCRResults;
-import org.mycore.common.MCRConfigurationException;
 
 /**
  * 
@@ -35,41 +30,15 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRLuceneSearcher extends MCRQuerySearcher{
 
-
-    public void runQuery(){
+      public MCRResults runQuery(String query) {
+        this.query = query;
+        MCRResults result = null;
         try{
-            System.out.println("read document for Lucene Query");
-            SAXBuilder builder = new SAXBuilder();
-            InputStream in = this.getClass().getResourceAsStream("/query1.xml");
-
-            if (in == null) {
-                String msg = "Could not find configuration file";
-                throw new MCRConfigurationException(msg);
-            }
-            
-            MCRLuceneQuery query = new MCRLuceneQuery(builder.build(in));
-            in.close();
-/*
-            Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
-
-            List l = session.createQuery(query.getHIBQuery()).list();
-
-            for(int i=0; i<l.size(); i++){
-                MCRHIBQuery res = new MCRHIBQuery(l.get(i));
-                System.out.println("ID: " + res.getValue("getmcrid"));
-            }
-*/            
-//            tx.commit();
-//            session.close();
-
+            MCRLuceneQuery lucenequery = new MCRLuceneQuery( query );
+            result = lucenequery.getLuceneHits(); 
         }catch(Exception e){
             e.printStackTrace();
         }
-    }
-
-    public MCRResults runQuery(String query) {
-        // TODO Auto-generated method stub
-        return null;
+        return result;
     }
 }

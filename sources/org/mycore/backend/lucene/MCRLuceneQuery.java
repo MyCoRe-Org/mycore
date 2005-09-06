@@ -20,19 +20,26 @@
 
 package org.mycore.backend.lucene;
 
+import java.io.StringReader;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Hits;
+//import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.TopDocs;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.query.MCRHit;
+import org.mycore.backend.query.MCRResults;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryParser;
+import org.xml.sax.InputSource;
 
 /**
  * Helper class for generating lucene query from mycore query
@@ -61,6 +68,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
     private MCRCondition cond;                //query-condition
 
     private MCRQueryParser parser;
+    private int maxResults = 200;
    
     /**
      * initialise query with xml-document containing complete query
@@ -84,7 +92,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
         this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
-            init(builder.build(xmlString));
+            init(builder.build(new InputSource(new StringReader(xmlString))));
         }catch(Exception e){
             LOGGER.error(e);
         }
@@ -98,8 +106,11 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
     private void init(Document doc){
         try{
             querydoc = doc;
-            cond = parser.parse( (Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0) );
+            org.jdom.Element root = querydoc.getRootElement();
+            cond = parser.parse( (Element)root.getChild("conditions").getChildren().get(0) );
 //            cond.accept(this);
+            maxResults   = Integer.parseInt(root.getAttributeValue("maxResults", "200"));
+            LOGGER.debug("maxResults " + maxResults);
             Element x = cond.toXML();
             org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
             LOGGER.debug( outputter.outputString( x ) );
@@ -108,17 +119,46 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
             boolean reqf = true;    // required flag Term with AND (true) or OR (false) combined
             luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString() );
-
-            IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
-            Hits hits = searcher.search( luceneQuery );
-            int found = hits.length();
-            searcher.close();
-        
-            LOGGER.info("Number of documents found : " + found);
-        
+       
         }catch(Exception e){
             LOGGER.error(e);
         }
+    }
+    
+    /**
+     * method does lucene query 
+     * @return result set
+     */
+    public MCRResults getLuceneHits() throws Exception {
+      IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
+//    Hits hits = searcher.search( luceneQuery );
+//    int found = hits.length();
+      TopDocs hits = searcher.search( luceneQuery, null, maxResults );
+      int found = hits.scoreDocs.length;
+
+      LOGGER.info("Number of documents found : " + found);
+      
+      MCRResults result = new MCRResults();
+      for (int i=0; i<found;i++)
+      {
+//        org.apache.lucene.document.Document doc    = hits.doc(i);
+        org.apache.lucene.document.Document doc    = searcher.doc(hits.scoreDocs[i].doc);        
+        String id = doc.get("id");
+        LOGGER.debug("ID of found document: " + doc.get("id"));
+/*TODO        if (MCRAccessManager.checkReadAccess( id, MCRSessionMgr.getCurrentSession()))*/{
+          MCRHit hit = new MCRHit( id );
+          
+          // fill hit meta
+//          for (int j=0; j<order.size(); j++){
+              String key = "author";
+              String value = doc.get("author");
+              hit.addMetaValue(key,value);
+//          }
+          result.addHit(hit);
+      } // MCRAccessManager
+      }
+      searcher.close();
+      return result;
     }
     
     /**
@@ -136,15 +176,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
       }
     
     /**
-     * method returns generated lucene query 
-     * @return lucene query as string
-     */
-    public Query getLuceneQuery(){
-      return luceneQuery;
-    }
-    
-    /**
-     * method returns the string reresentation of given query
+     * method returns the string representation of given query
      */
     public String toString(){
       return  luceneQuery.toString();
