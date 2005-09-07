@@ -27,17 +27,28 @@
 #
 #######################################################################
 
-# IBM DB2 Version 8.2 under IBM AIX
+# IBM DB2 Version 8.2 under IBM AIX without Hibernate
+# Use package: org.mycore.backend.sql
+# Hint: the JDBC driver is in the DB2 package
 # MCR.JDBCStore.Type=db2
 # MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib
 # MCR.JDBCStore.Jars=java/sqlj.zip java/db2java.zip java/db2jcc.jar
 # MCR.JDBCStore.ClassesDirs=function
 # MCR.JDBCStore.LibPath=java lib
 
-# MySQL under Linux or Windows: JDBC driver is included in MyCoRe!
-#  MCR.JDBCStore.Type=mysql
+# HSQLDB native under Linux or Windows without Hibernate
+# Use package: org.mycore.backend.sql
+# Hint: JDBC driver is included in MyCoRe!
+# MCR.JDBCStore.Type=hsqldb
 
-# Hibernate for Linux or Windows: the Hibernate access to SQL DB's is included!
+# MySQL native under Linux or Windows without Hibernate
+# Use package: org.mycore.backend.sql
+# Hint: JDBC driver is included in MyCoRe!
+# MCR.JDBCStore.Type=mysql
+
+# Hibernate for Linux or Windows
+# Use package: org.mycore.backend.hibernate
+# Hint: the Hibernate access to SQL DB's is included!
 MCR.JDBCStore.Type=hibernate
 
 ####################################################################### 
@@ -45,7 +56,7 @@ MCR.JDBCStore.Type=hibernate
 # Persistent Store for XML data of MCRObject and MCRDerivate 
 #
 # MCR.XMLStore.Type
-#   one of [cm7 cm8 xmldb]
+#   one of [jdom lucene cm8 xmldb]
 # MCR.XMLStore.BaseDir
 #   base directory where jar's, class files and libraries are installed
 # MCR.XMLStore.Jars
@@ -75,14 +86,14 @@ MCR.JDBCStore.Type=hibernate
 
 # XML:DB eXist under Linux
 # MCR.XMLStore.Type=xmldb
-# MCR.XMLStore.BaseDir=/home/mcradmin/eXist-1.0b2
-# MCR.XMLStore.Jars=exist.jar lib/core/xmlrpc-1.2.jar
+# MCR.XMLStore.BaseDir=/home/mcradmin/eXist
+# MCR.XMLStore.Jars=/home/mcradmin/eXist/exist.jar:/home/mcradmin/eXist/lib/core/xmlrpc-1.2-patched.jar
 # MCR.XMLStore.LibPath=lib/core
 
 # XML:DB eXist under Windows
 # MCR.XMLStore.Type=xmldb
-# MCR.XMLStore.BaseDir=C:\\Java\\eXist-1.0b1
-# MCR.XMLStore.Jars=exist.jar lib/core/xmlrpc-1.2.jar
+# MCR.XMLStore.BaseDir=C:\\Java\\eXist
+# MCR.XMLStore.Jars=C:\\Java\\eXist\exist.jar:C:\\Java\\eXist\lib\core\xmlrpc-1.2-patched.jar
 
 #######################################################################
 # 
