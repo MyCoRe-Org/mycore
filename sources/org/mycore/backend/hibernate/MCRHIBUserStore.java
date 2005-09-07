@@ -254,6 +254,8 @@ public class MCRHIBUserStore implements MCRUserStore {
                         group =(MCRGROUPMEMBERS) l.get(i);
                         groups.add(group.getGid());
                     }
+                 }
+                 else {
                     throw new MCRException("User with ID = " + userID + " is no groupmember.");
                 }
                 // set some boolean values
