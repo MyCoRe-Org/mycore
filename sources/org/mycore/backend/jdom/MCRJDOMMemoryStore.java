@@ -27,6 +27,7 @@ package org.mycore.backend.jdom;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -184,6 +185,8 @@ public class MCRJDOMMemoryStore {
 	 */
 	void addElement(MCRObjectID id, org.jdom.Element elm) {
 		getObjects(id.getTypeId()).put(id, elm);
+		logger.debug("MRJDOMMemoryStore addElement "+id.getTypeId());
+		debug(id.getTypeId());	
 	}
 
 	/**
@@ -191,5 +194,18 @@ public class MCRJDOMMemoryStore {
 	 */
 	void removeElement(MCRObjectID id) {
 		getObjects(id.getTypeId()).remove(id);
+		logger.debug("MRJDOMMemoryStore removeElement "+id.getTypeId());
+		debug(id.getTypeId());	
 	}
+
+	/**
+	 * Debug the content of the Hashtable.
+	 */
+	void debug(String type) {
+		Hashtable h = getObjects(type);
+		for (Enumeration e = h.keys() ; e.hasMoreElements() ;) {
+			logger.info((String)(e.nextElement().toString())); 
+		}
+	}
+
 }
