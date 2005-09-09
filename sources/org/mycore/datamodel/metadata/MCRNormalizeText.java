@@ -87,7 +87,30 @@ public class MCRNormalizeText {
         for (int j=0;j<le;j++) {
           org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
           metaelm.setText(normalizeString(metaelm.getText()));
-          System.out.println(metaname+" "+metaelm.getText());
+          }
+        }
+      if (metaname.equals("MCRMetaPersonName")) {
+        java.util.List metaelms  = metaitem.getChildren();
+        int le = metaelms.size();
+        for (int j=0;j<le;j++) {
+          org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
+          org.jdom.Element sub = metaelm.getChild("firstname");
+          sub.setText(normalizeString(sub.getText()));
+          sub = metaelm.getChild("callname");
+          sub.setText(normalizeString(sub.getText()));
+          sub = metaelm.getChild("fullname");
+          sub.setText(normalizeString(sub.getText()));
+          sub = metaelm.getChild("surname");
+          sub.setText(normalizeString(sub.getText()));
+          }
+        }
+      if (metaname.equals("MCRMetaInstitutionName")) {
+        java.util.List metaelms  = metaitem.getChildren();
+        int le = metaelms.size();
+        for (int j=0;j<le;j++) {
+          org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
+          org.jdom.Element sub = metaelm.getChild("fullname");
+          sub.setText(normalizeString(sub.getText()));
           }
         }
       }
@@ -111,6 +134,28 @@ public class MCRNormalizeText {
         for (int j=0;j<metaelm.size();j++) {
           MCRMetaLangText item = (MCRMetaLangText)metaelm.getElement(j);
           item.setText(normalizeString(item.getText()));
+          }
+        }
+      if (metaelm.getClassName().equals("MCRMetaPersonName")) {
+        for (int j=0;j<metaelm.size();j++) {
+          MCRMetaPersonName item = (MCRMetaPersonName)metaelm.getElement(j);
+          String a = item.getAcademic();
+          String c = normalizeString(item.getCallName());
+          String v = normalizeString(item.getFirstName());
+          String f = normalizeString(item.getFullName());
+          String s = normalizeString(item.getSurName());
+          String p = item.getPeerage();
+          String z = item.getPrefix();
+          item.set(v,c,s,f,a,p,z);
+          }
+        }
+      if (metaelm.getClassName().equals("MCRMetaInstitutionName")) {
+        for (int j=0;j<metaelm.size();j++) {
+          MCRMetaInstitutionName item = (MCRMetaInstitutionName)metaelm.getElement(j);
+          String f = normalizeString(item.getFullName());
+          String p = item.getProperty();
+          String n = item.getNickname();
+          item.set(f,n,p);
           }
         }
       }
