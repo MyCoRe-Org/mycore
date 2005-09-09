@@ -1,3 +1,10 @@
+
+Version 1.2
+===========
+
+- Implement a first model of EventHandler for the backend solutions.
+- Add a character normalization for the XML:DB and JDOM backend.
+
 Version 1.1
 ===========
 
