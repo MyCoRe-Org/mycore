@@ -30,7 +30,6 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -39,6 +38,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class implements the memory store based on JDOM documents.
@@ -164,11 +164,12 @@ public class MCRJDOMMemoryStore {
 		int size = ar.size();
 		String stid;
 		MCRObjectID mid;
-		Document jdom_document;
+		org.jdom.Document jdom_document;
 		for (int i = 0; i < size; i++) {
 			stid = (String) ar.get(i);
 			mid = new MCRObjectID(stid);
-			jdom_document = (Document) mcr_xml.readDocument(mid).clone();
+			jdom_document = (org.jdom.Document) mcr_xml.readDocument(mid).clone();
+			MCRNormalizeText.normalizeJDOM(jdom_document);
 			objects.put(mid, jdom_document.detachRootElement());
 			logger.debug("Load to JDOM tree " + stid);
 		}

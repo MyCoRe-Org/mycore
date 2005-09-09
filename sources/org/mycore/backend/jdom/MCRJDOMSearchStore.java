@@ -31,6 +31,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class is the persistence layer for a nativ memory JDOM databases.
@@ -64,10 +65,11 @@ public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface {
 	public void create(MCRBase obj) throws MCRConfigurationException,
 			MCRPersistenceException {
 		MCRObjectID mcr_id = obj.getId();
-		logger.debug("MCRJDOMSearchStore create: MCRObjectID : "
-				+ mcr_id.getId());
+		MCRNormalizeText.normalizeMCRObject(obj);
 		org.jdom.Element root = obj.createXML().detachRootElement();
 		store.addElement(mcr_id, root);
+		logger.debug("MCRJDOMSearchStore create: MCRObjectID : "
+				+ mcr_id.getId());
 	}
 
 	/**
@@ -91,11 +93,12 @@ public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface {
 	public void update(MCRBase obj) throws MCRConfigurationException,
 			MCRPersistenceException {
 		MCRObjectID mcr_id = obj.getId();
-		logger.debug("MCRJDOMSearchStore update: MCRObjectID : "
-				+ mcr_id.getId());
+		MCRNormalizeText.normalizeMCRObject(obj);
 		org.jdom.Element root = obj.createXML().detachRootElement();
 		store.removeElement(mcr_id);
 		store.addElement(mcr_id, root);
+		logger.debug("MCRJDOMSearchStore update: MCRObjectID : "
+				+ mcr_id.getId());
 	}
 
 	/**

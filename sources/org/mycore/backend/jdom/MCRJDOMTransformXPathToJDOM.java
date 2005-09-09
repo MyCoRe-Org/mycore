@@ -36,6 +36,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
 /**
@@ -186,11 +187,13 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
 
 			i = j + 5;
 		}
+                // normalize the strings
+                String cst = MCRNormalizeText.normalizeString(cond.toString());
 		// build the XSLT argument
-		if (cond.toString().trim().length() == 0) {
+		if (cst.trim().length() == 0) {
 			return DEFAULT_QUERY;
 		}
-		return (new StringBuffer(DEFAULT_QUERY)).append('[').append(cond)
+		return (new StringBuffer(DEFAULT_QUERY)).append('[').append(cst)
 				.append(']').toString();
 	}
 
