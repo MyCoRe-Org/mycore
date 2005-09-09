@@ -37,6 +37,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class is the persistence layer for XML:DB databases.
@@ -70,6 +71,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 *                if an error was occured
 	 */
 	public final void create(MCRBase obj) throws MCRPersistenceException {
+		MCRNormalizeText.normalizeMCRObject(obj);
 		Collection collection = null;
 		try {
 			logger.debug("MCRXMLDBSearchStore create: MCRObjectID    : "
@@ -128,6 +130,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 *                if an error was occured
 	 */
 	public void update(MCRBase obj) throws MCRPersistenceException {
+		MCRNormalizeText.normalizeMCRObject(obj);
 		Collection collection = null;
 		try {
 			logger.debug("MCRXMLDBSearchStore create: MCRObjectID    : "

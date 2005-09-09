@@ -36,6 +36,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
 /**
@@ -205,7 +206,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 			query = root + "/" + query.trim();
 		} else {
 			// combine the separated queries
-			query = root + "[" + query + "]";
+			query = MCRNormalizeText.normalizeString(root + "[" + query + "]");
 		}
 		return query;
 	}
@@ -228,7 +229,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 					" and /mycoreobject/"); // 031002
 		}
 
-		query = root + "[" + query + "]";
+		query = MCRNormalizeText.normalizeString(root + "[" + query + "]");
 		return query;
 	}
 }
