@@ -87,13 +87,13 @@ MCR.JDBCStore.Type=hibernate
 # XML:DB eXist under Linux
 # MCR.XMLStore.Type=xmldb
 # MCR.XMLStore.BaseDir=/home/mcradmin/eXist
-# MCR.XMLStore.Jars=/home/mcradmin/eXist/exist.jar:/home/mcradmin/eXist/lib/core/xmlrpc-1.2-patched.jar
+# MCR.XMLStore.Jars=exist.jar lib/core/xmlrpc-1.2-patched.jar
 # MCR.XMLStore.LibPath=lib/core
 
 # XML:DB eXist under Windows
 # MCR.XMLStore.Type=xmldb
 # MCR.XMLStore.BaseDir=C:\\Java\\eXist
-# MCR.XMLStore.Jars=C:\\Java\\eXist\exist.jar:C:\\Java\\eXist\lib\core\xmlrpc-1.2-patched.jar
+# MCR.XMLStore.Jars=exist.jar lib\core\xmlrpc-1.2-patched.jar
 
 #######################################################################
 # 
