@@ -50,8 +50,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.frontend.fileupload.MCRUploadHandlerInterface;
-import org.mycore.frontend.fileupload.MCRUploadHandlerManager;
+import org.mycore.frontend.fileupload.*;
 import org.mycore.frontend.workflow.MCRWorkflowManager;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
@@ -444,12 +443,9 @@ public class MCRStartEditorServlet extends MCRServlet {
 				return;
 			}
 			mymcrid = mysemcrid;
-			MCRUploadHandlerManager fum = MCRUploadHandlerManager.instance();
-			MCRUploadHandlerInterface fuh = fum.getNewHandle();
 			sb = new StringBuffer(pagedir);
 			sb.append("editor_").append(mytype).append("_editor.xml");
-			fuh.set(myremcrid, mysemcrid, "new", getBaseURL() + sb.toString());
-			String fuhid = fum.register(fuh);
+			String fuhid = new MCRUploadHandlerMyCoRe( myremcrid, mysemcrid, "new", getBaseURL() + sb.toString() ).getID();
 			mymcrid = mysemcrid;
 			myfile = pagedir + "fileupload_new.xml";
 			String base = getBaseURL() + myfile;
@@ -954,15 +950,13 @@ public class MCRStartEditorServlet extends MCRServlet {
 				return;
 			}
 			mymcrid = mysemcrid;
-			MCRUploadHandlerManager fum = MCRUploadHandlerManager.instance();
-			MCRUploadHandlerInterface fuh = fum.getNewHandle();
+			MCRUploadHandlerMyCoRe fuh = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", sb.toString());
 			sb = new StringBuffer(getBaseURL());
 			sb.append("servlets/MCRStartEditorServlet?").append("se_mcrid=")
 					.append(mysemcrid).append("&re_mcrid=").append(myremcrid)
 					.append("&type=").append(mytype).append("&step=").append(
 							mystep).append("&todo=scommitder");
-			fuh.set(myremcrid, mysemcrid, "new", sb.toString());
-			String fuhid = fum.register(fuh);
+			String fuhid = fuh.getID();
 			mymcrid = mysemcrid;
 			myfile = pagedir + "fileupload_commit.xml";
 			String base = getBaseURL() + myfile;
