@@ -86,7 +86,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 					.getId());
 			if (res != null) {
 				logger.debug("Check this!");
-				throw new MCRPersistenceException("A object with ID "
+				throw new MCRPersistenceException("An object with ID "
 						+ obj.getId().getId() + " exists.");
 			}
 			// create a new item
@@ -114,7 +114,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 * @exception MCRPersistenceException
 	 *                if a persistence problem is occured
 	 */
-	public void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
+	public final void createDataBase(String mcr_type, org.jdom.Document mcr_conf)
 			throws MCRConfigurationException, MCRPersistenceException {
 		logger.info("This feature exist not for this store.");
 	}
@@ -129,7 +129,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 * @exception MCRPersistenceException
 	 *                if an error was occured
 	 */
-	public void update(MCRBase obj) throws MCRPersistenceException {
+	public final void update(MCRBase obj) throws MCRPersistenceException {
 		MCRNormalizeText.normalizeMCRObject(obj);
 		Collection collection = null;
 		try {
@@ -144,7 +144,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 			XMLResource res = (XMLResource) collection.getResource(obj.getId()
 					.getId());
 			if (res == null) {
-				logger.warn("A object with ID " + obj.getId().getId()
+				logger.warn("An object with ID " + obj.getId().getId()
 						+ " does not exist.");
 			} else {
 				// delete the old item
@@ -170,7 +170,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 * @throws MCRPersistenceException
 	 *             something goes wrong during delete
 	 */
-	public void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
+	public final void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
 		Collection collection = null;
 		logger.debug("MCRXMLDBPersistence delete: MCRObjectID    : "
 				+ mcr_id.getId());
@@ -181,7 +181,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 			if (null != document) {
 				collection.removeResource(document);
 			} else {
-				logger.warn("A object with ID " + mcr_id.getId()
+				logger.warn("An object with ID " + mcr_id.getId()
 						+ " does not exist.");
 			}
 		} catch (Exception e) {
@@ -198,7 +198,7 @@ public final class MCRXMLDBSearchStore implements MCRObjectSearchStoreInterface 
 	 *                if an error was occured
 	 * @return the DOM tree
 	 */
-	public static org.jdom.Document convertResToDoc(XMLResource res) {
+	static final org.jdom.Document convertResToDoc(XMLResource res) {
 		try {
 			SAXHandler handler = new SAXHandler();
 			res.getContentAsSAX(handler);
