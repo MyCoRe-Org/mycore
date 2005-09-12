@@ -62,8 +62,10 @@ public class MCRBooleanClauseParser {
 
     public MCRCondition parse( Element condition )
     {
+        if(condition==null)
+            return defaultRule();
         String name = condition.getName();
-        if( name.equals( "not" ) )
+        if(name.equals( "not" ) )
         {
             Element child = (Element)( condition.getChildren().get( 0 ) );
             return new MCRNotCondition( parse( child ) );
@@ -97,6 +99,8 @@ public class MCRBooleanClauseParser {
     public MCRCondition parse(String s)
             throws MCRParseException {
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
+        if(s.trim().length() == 0)
+            return defaultRule();
         return parse(s, null);
     }
 
@@ -170,10 +174,10 @@ public class MCRBooleanClauseParser {
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException
     {
         /* handle specific rules */
-        if (s.equalsIgnoreCase("false"))
-            return new MCRFalseCondition();
         if (s.equalsIgnoreCase("true"))
             return new MCRTrueCondition();
+        if (s.equalsIgnoreCase("false"))
+            return new MCRFalseCondition();
         throw new MCRParseException("syntax error: " + s); //extendClauses(s, l));
     }
 
@@ -182,8 +186,13 @@ public class MCRBooleanClauseParser {
         String name = e.getName();
         if(name.equals("true"))
             return new MCRTrueCondition();
-        if(name.equals("true"))
+        if(name.equals("false"))
             return new MCRFalseCondition();
         throw new MCRParseException("syntax error: <" + name + ">");
+    }
+
+    protected MCRCondition defaultRule()
+    {
+        return new MCRTrueCondition();
     }
 }
