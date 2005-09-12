@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -51,14 +50,14 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet implements the server side of communication with the upload
- * applet The content of the uploaded files is handled by an upload handler
- * derived from AppletCommunicator
+ * applet. The content of the uploaded files are handled by a MCRUploadHandler
+ * subclass.
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
- * @see org.mycore.frontend.fileupload.MCRMCRUploadHandlerInterface
+ * @see org.mycore.frontend.fileupload.MCRMCRUploadHandler
  */
 public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
@@ -122,7 +121,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 			LOGGER.debug("Received path = " + path);
 			LOGGER.debug("Received uploadID = " + uploadId);
 
-			MCRUploadHandlerManager.instance().getHandle(uploadId).receiveFile(
+			MCRUploadHandlerManager.getHandler(uploadId).receiveFile(
 					path, zis);
 
 			LOGGER.debug("Stored incoming file content");
@@ -187,17 +186,17 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
 		if (method.equals("redirecturl")) {
 			String uploadId = req.getParameter("uploadId");
-			String url = MCRUploadHandlerManager.instance().getHandle(uploadId)
-					.getRedirectURL();
-			LOGGER.info("REDIRECT " + url);
+			MCRUploadHandler handler = MCRUploadHandlerManager.getHandler( uploadId ); 
+			String url = handler.getRedirectURL();
+			LOGGER.info("UploadServlet redirect to " + url);
 			res.sendRedirect(res.encodeRedirectURL(url));
+			handler.unregister();
 			return;
 		} else if (method.equals("startDerivateSession String int")) {
 			String uploadId = req.getParameter("uploadId");
 			int numFiles = Integer.parseInt(req.getParameter("numFiles"));
-			MCRUploadHandlerManager.instance().getHandle(uploadId).startUpload(
-					numFiles);
-			LOGGER.info("MCRUploadServlet start session " + uploadId);
+			MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
+			LOGGER.info("UploadServlet start session " + uploadId);
 			sendResponse(res, "OK");
 		} else if (method.equals("createFile String")) {
 			final String path = req.getParameter("path");
@@ -205,10 +204,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 			LOGGER.info("UploadServlet uploading " + path);
 			final String uploadId = req.getParameter("uploadId");
 			final String md5 = req.getParameter("md5");
-			LOGGER.debug("MCRUploadServlet receives file " + path
+			LOGGER.debug("UploadServlet receives file " + path
 					+ " with md5 " + md5);
-			if (!MCRUploadHandlerManager.instance().getHandle(uploadId)
-					.acceptFile(path, md5)) {
+			if (!MCRUploadHandlerManager.getHandler(uploadId).acceptFile(path, md5)) {
 				LOGGER.debug("Skip file " + path);
 				sendResponse(res, "skip file");
 				return;
@@ -219,8 +217,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
 		} else if (method.equals("endDerivateSession String")) {
 			String uploadId = req.getParameter("uploadId");
-			MCRUploadHandlerInterface uploadHandler = MCRUploadHandlerManager
-					.instance().getHandle(uploadId);
+			MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
 			uploadHandler.finishUpload();
 			sendResponse(res, "OK");
 		}

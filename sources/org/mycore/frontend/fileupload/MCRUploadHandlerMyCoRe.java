@@ -36,26 +36,27 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * This class handles upload of files for derivates.
+ * This class stores files uploaded from the client applet as derivates into
+ * the workflow.
  * 
  * @author Harald Richter
  * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ * 
  * @version $Revision$ $Date$
- * @see org.mycore.frontend.fileupload.MCRUploadHandlerMyCoReBase
- * @see org.mycore.frontend.fileupload.MCRUploadHandlerMyCoReInterface
- */
-public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
-		MCRUploadHandlerInterface {
-
+ * 
+ * @see MCRUploadHandler
+ **/
+public class MCRUploadHandlerMyCoRe extends MCRUploadHandler
+{
+  private String mainfile = "";
+  private String dirname;
+  private String docId;
+  private String derId;
+  private String mode;
+  
 	/**
-	 * The constructor.
-	 */
-	public MCRUploadHandlerMyCoRe() {
-		super();
-	}
-
-	/**
-	 * set the data of MCRUploadHandlerMyCoRe for MyCoRe
+	 * Creates MCRUploadHandler for MyCoRe
 	 * 
 	 * @param docId
 	 *            document to which derivate belongs
@@ -69,7 +70,8 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
 	 * @param url
 	 *            when MCRUploadApplet is finished this url will be shown
 	 */
-	public void set(String docId, String derId, String mode, String url) {
+  public MCRUploadHandlerMyCoRe(String docId, String derId, String mode, String url) 
+  {
 		this.url = url;
 		logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: "
 				+ derId + " Mode: " + mode);
@@ -95,23 +97,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
 		MCRConfiguration config = MCRConfiguration.instance();
 		String workdir = config.getString("MCR.editor_" + ID.getTypeId()
 				+ "_directory", "/");
-		dirname = workdir + SLASH + derId;
-	}
-
-	/**
-	 * Message from UploadApplet If you want all files transfered omit this
-	 * method
-	 * 
-	 * @param path
-	 *            file name
-	 * @param chechsum
-	 *            md5 chechsum of of file
-	 * 
-	 * @return true transfer file false don't send file
-	 *  
-	 */
-	public boolean acceptFile(String path, String checksum) throws Exception {
-		return true;
+		dirname = workdir + File.separator + derId;
 	}
 
 	/**
@@ -135,7 +121,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
 		int i = st.countTokens();
 		int j = 0;
 		while (j < i - 1) {
-			newdir = newdir + SLASH + st.nextToken();
+			newdir = newdir + File.separatorChar + st.nextToken();
 			j++;
 			try {
 				fdir = new File(newdir);
@@ -191,5 +177,4 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandlerBase implements
 		} catch (Exception e) {
 		}
 	}
-
 }
