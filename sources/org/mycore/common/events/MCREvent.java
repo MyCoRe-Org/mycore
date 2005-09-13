@@ -35,6 +35,14 @@ package org.mycore.common.events;
  **/
 public class MCREvent extends java.util.Hashtable 
 {
+    /** Pre-defined event types **/
+    final static public String CREATE_EVENT = "create";
+    final static public String UPDATE_EVENT = "update";
+    final static public String DELETE_EVENT = "delete";
+    
+    final static public String OBJECT_TYPE = "MCRObject";
+    final static public String FILE_TYPE   = "MCRFile";
+
     /** The object type like object or file **/
     private String objType;
     
