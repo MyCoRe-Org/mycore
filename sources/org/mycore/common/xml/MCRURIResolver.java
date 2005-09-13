@@ -65,9 +65,9 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * Editor include declarations. DTDs and Schema files are read from the
  * CLASSPATH of the application when XML is parsed. XML document() calls and
  * xsl:include calls within XSL stylesheets can be read from URIs of type
- * resource, webapp, file, session, query or object. MyCoRe editor include 
+ * resource, webapp, file, session, query or mcrobject. MyCoRe editor include 
  * declarations can read XML files from resource, webapp, file, session, 
- * http or https, query, or object URIs.
+ * http or https, query, or mcrobject URIs.
  * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -160,7 +160,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 			return null;
 
 		String scheme = getScheme(href);
-		if ("resource webapp file session query object".indexOf(scheme) != -1)
+		if ("resource webapp file session query mcrobject".indexOf(scheme) != -1)
 			return new JDOMSource(resolve(href));
 		else
 			return null;
@@ -219,7 +219,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 			return readFromFile(uri);
 		else if ("query".equals(scheme))
 			return readFromQuery(uri);
-		else if ("object".equals(scheme))
+		else if ("mcrobject".equals(scheme))
 			return readFromObject(uri);
 		else if ("http".equals(scheme) || "https".equals(scheme))
 			return readFromHTTP(uri);
@@ -375,7 +375,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver,
 	 * Reads local MCRObject with a given ID from the store
 	 * and returns its XML representation within MCRXMLContainer.
 	 * 
-	 * @param uri
+	 * @param uri for example, "mcrobject:DocPortal_document_07910401"
 	 * @return
 	 **/
 	private Element readFromObject(String uri) {
