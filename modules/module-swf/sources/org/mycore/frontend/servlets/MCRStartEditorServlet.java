@@ -950,12 +950,12 @@ public class MCRStartEditorServlet extends MCRServlet {
 				return;
 			}
 			mymcrid = mysemcrid;
-			MCRUploadHandlerMyCoRe fuh = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", sb.toString());
 			sb = new StringBuffer(getBaseURL());
 			sb.append("servlets/MCRStartEditorServlet?").append("se_mcrid=")
 					.append(mysemcrid).append("&re_mcrid=").append(myremcrid)
 					.append("&type=").append(mytype).append("&step=").append(
 							mystep).append("&todo=scommitder");
+			MCRUploadHandlerMyCoRe fuh = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", sb.toString());
 			String fuhid = fuh.getID();
 			mymcrid = mysemcrid;
 			myfile = pagedir + "fileupload_commit.xml";
