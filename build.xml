@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.99 $ $Date: 2005-08-19 08:06:28 $                      -->
+  <!-- $Revision: 1.100 $ $Date: 2005-09-13 08:24:48 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.99 $ $Date: 2005-08-19 08:06:28 $</echo>
+    <echo>Ant build file   : $Revision: 1.100 $ $Date: 2005-09-13 08:24:48 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -387,6 +387,7 @@
     <path id="sourcepath">
       <dirset dir="${basedir}" includes="sources" />
       <dirset dir="${basedir}" includes="modules/module-*/**/src" />
+      <dirset dir="${basedir}" includes="modules/module-*/sources" />
     </path>
 
     <condition property="javadocs.outdated">
