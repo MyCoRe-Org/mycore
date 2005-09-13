@@ -68,13 +68,15 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-    // normalize text fields
-    MCRNormalizeText.normalizeMCRObject(obj);
+    // save the start time
+    long t1 = System.currentTimeMillis();
     // store in the collection
     Collection collection = null;
     try {
       MCRObjectID mcr_id = obj.getId();
       LOGGER.debug("MCRXMLDBEventHandlerIndexMeta create: MCRObjectID : "+ mcr_id.getId()+" - "+obj.getLabel());
+      // normalize text fields
+      MCRNormalizeText.normalizeMCRObject(obj);
       // open the collection
       collection = MCRXMLDBConnectionPool.instance().getConnection(obj.getId().getTypeId());
       // check that the item not exist
@@ -90,6 +92,10 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
       } catch (Exception e) {
         throw new MCRPersistenceException(e.getMessage(), e);
       }
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta create: done in "+diff+" sec.");
     }
 
   /**
@@ -99,13 +105,15 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-    // normalize text fields
-    MCRNormalizeText.normalizeMCRObject(obj);
+    // save the start time
+    long t1 = System.currentTimeMillis();
     // store in the collection
     Collection collection = null;
     try {
       MCRObjectID mcr_id = obj.getId();
       LOGGER.debug("MCRXMLDBEventHandlerIndexMeta update: MCRObjectID : "+ mcr_id.getId()+" - "+obj.getLabel());
+      // normalize text fields
+      MCRNormalizeText.normalizeMCRObject(obj);
       // open the collection
       collection = MCRXMLDBConnectionPool.instance().getConnection(obj.getId().getTypeId());
       // check that the item not exist
@@ -124,6 +132,10 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
       } catch (Exception e) {
         throw new MCRPersistenceException(e.getMessage(), e);
       }
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta update: done in "+diff+" sec.");
     }
 
   /**
@@ -133,10 +145,13 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+    // save the start time
+    long t1 = System.currentTimeMillis();
+    // delete the item
     Collection collection = null;
     try {
       MCRObjectID mcr_id = obj.getId();
-      LOGGER.debug("MCRXMLDBPersistence delete: MCRObjectID    : " + mcr_id.getId());
+      LOGGER.debug("MCRXMLDBEventHandlerIndexMeta delete: MCRObjectID : " + mcr_id.getId());
       collection = MCRXMLDBConnectionPool.instance().getConnection(mcr_id.getTypeId());
       Resource document = collection.getResource(mcr_id.getId());
       if (null != document) {
@@ -147,7 +162,10 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
       } catch (Exception e) {
         throw new MCRPersistenceException(e.getMessage(), e);
       }
-
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta delete: done in "+diff+" sec.");
     }
 
   /**

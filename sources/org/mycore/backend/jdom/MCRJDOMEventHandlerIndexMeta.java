@@ -51,10 +51,17 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
+    // save the start time
+    long t1 = System.currentTimeMillis();
+    // create
     MCRObjectID mcr_id = obj.getId();
     LOGGER.debug("MCRJDOMEventHandlerIndexMeta create: MCRObjectID : "+ mcr_id.getId());
     org.jdom.Element root = obj.createXML().detachRootElement();
     store.addElement(mcr_id, root);
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta create: done in "+diff+" sec.");
     }
 
   /**
@@ -64,11 +71,18 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+    // save the start time
+    long t1 = System.currentTimeMillis();
+    // update
     MCRObjectID mcr_id = obj.getId();
     LOGGER.debug("MCRJDOMEventHandlerIndexMeta update: MCRObjectID : "+ mcr_id.getId());
     org.jdom.Element root = obj.createXML().detachRootElement();
     store.removeElement(mcr_id);
     store.addElement(mcr_id, root);
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta update: done in "+diff+" sec.");
     }
 
   /**
@@ -78,9 +92,16 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
    * @param obj the MCRObject that caused the event
    */
   protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+    // save the start time
+    long t1 = System.currentTimeMillis();
+    // delete
     MCRObjectID mcr_id = obj.getId();
     LOGGER.debug("MCRJDOMEventHandlerIndexMeta delete: MCRObjectID : "+ mcr_id.getId());
     store.removeElement(mcr_id);
+    // save the stop time
+    long t2 = System.currentTimeMillis();
+    double diff = (double) (t2 - t1) / 1000.0;
+    LOGGER.debug("MCRXMLDBEventHandlerIndexMeta delete: done in "+diff+" sec.");
     }
 
   }
