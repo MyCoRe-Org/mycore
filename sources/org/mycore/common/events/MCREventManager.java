@@ -25,10 +25,13 @@
 package org.mycore.common.events;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -38,6 +41,7 @@ import org.mycore.common.MCRException;
  * information how to configure, see MCREventHandler javadocs.
  * 
  * @see MCREventHandler
+ * @see MCREventHandlerBase
  * 
  * @author Frank Lützenkirchen
  */
@@ -57,23 +61,45 @@ public class MCREventManager {
 		return instance;
 	}
 
-	/** Ordered list of all configured event handlers * */
-	private List handlers;
+	/** Table of all configured event handlers * */
+	private Hashtable handlers;
 
 	private MCREventManager() {
-		handlers = new ArrayList();
+		handlers = new Hashtable();
 		MCRConfiguration config = MCRConfiguration.instance();
 
 		String prefix = "MCR.EventHandler.";
 		String suffix = ".class";
 
-		for (int i = 1;; i++) {
-			String prop = prefix + i + suffix;
-			String name = config.getString(prop, null);
-			if (name == null)
-				break;
-			logger.debug("EventManager instantiating handler " + name);
-			handlers.add(config.getInstanceOf(prop));
+		Properties props = config.getProperties(prefix);
+		if( props == null ) return;
+		
+		List names = new ArrayList();
+		names.addAll( props.keySet() );
+		Collections.sort( names );
+		List instances = null;
+		
+		for( int i = 0; i < names.size(); i++ )
+		{
+		  String name = (String)( names.get(i) );
+		  if( ! name.endsWith( ".class" ) ) continue;
+		  
+		  StringTokenizer st = new StringTokenizer( name, "." );
+		  st.nextToken(); 
+		  st.nextToken();
+		  String type = st.nextToken();
+		  int nr = Integer.parseInt( st.nextToken() );
+		  
+		  if( nr == 1 )
+		  {
+		    instances = new ArrayList();
+		    handlers.put(type,instances); 
+		  }
+		  
+		  MCREventHandler handler = (MCREventHandler)(config.getSingleInstanceOf(name));
+ 		  logger.debug("EventManager instantiating handler " + config.getString(name)
+ 		      + " for type " + type );
+		  instances.add(handler);
 		}
 	}
 
@@ -82,14 +108,16 @@ public class MCREventManager {
 	 * a multiplexer that invokes all registered event handlers doHandleEvent
 	 * methods.
 	 * 
-	 * @see MCREvent#doHandleEvent
+	 * @see MCREventHandler#doHandleEvent
+	 * @see MCREventHandlerBase
 	 * 
 	 * @param evt
 	 *            the event that happened
 	 */
 	public void handleEvent(MCREvent evt) throws MCRException {
-		for (int i = 0; i < handlers.size(); i++) {
-			MCREventHandler eh = (MCREventHandler) (handlers.get(i));
+	    List list = (List)(handlers.get(evt.getObjectType()));
+		for (int i = 0; (list != null) && (i < list.size()); i++) {
+			MCREventHandler eh = (MCREventHandler) (list.get(i));
 			logger.debug("EventManager calling handler "
 					+ eh.getClass().getName());
 			eh.doHandleEvent(evt);

@@ -26,58 +26,45 @@ package org.mycore.common.events;
 
 /**
  * Represents an event that occured in the MyCoRe system. Events are of a
- * predefined type like create, update, delete and can be handled by
- * MCREventHandler implementations. Events are automatically created by some
- * MyCoRe components and are forwarded to the handlers by MCREventManager.
+ * predefined event type like create, update, delete and an object type like
+ * object or file. They can be handled by MCREventHandler implementations. 
+ * Events are automatically created by some MyCoRe components and are 
+ * forwarded to the handlers by MCREventManager.
  * 
  * @author Frank Lützenkirchen
- */
-public class MCREvent extends java.util.Hashtable {
-	/** Predefined event type metadata object created * */
-	public static final int OBJECT_CREATED = 0;
-
-	/** Predefined event type metadata object updated * */
-	public static final int OBJECT_UPDATED = 1;
-
-	/** Predefined event type metadata object deleted * */
-	public static final int OBJECT_DELETED = 2;
-
-	/** Predefined event type file content created * */
-	public static final int FILE_CREATED = 3;
-
-	/** Predefined event type file content updated * */
-	public static final int FILE_UPDATED = 4;
-
-	/** Predefined event type file content deleted * */
-	public static final int FILE_DELETED = 5;
-
-	private String[] typeStrings = { "object created", "object updated",
-			"object deleted", "file created", "file updated", "file deleted" };
-
-	private int type;
+ **/
+public class MCREvent extends java.util.Hashtable 
+{
+    /** The object type like object or file **/
+    private String objType;
+    
+    /** The event type like create, update or delete **/
+	private String evtType;
 
 	/**
-	 * Creates a new event object of the given type
+	 * Creates a new event object of the given object type (object, file) 
+	 * and event type (create, update, delete)
 	 */
-	public MCREvent(int type) {
-		this.type = type;
+	public MCREvent( String objType, String evtType ) {
+		this.objType = objType;
+		this.evtType = evtType;
 	}
 
 	/**
-	 * Returns the type of this event
+	 * Returns the object type of this event
 	 * 
-	 * @return the type of this event
-	 */
-	public int getType() {
-		return type;
+	 * @return the object type of this event
+	 **/
+	public String getObjectType() {
+		return objType;
 	}
 
 	/**
-	 * Returns the type of this event as a String for debugging
+	 * Returns the event type of this event
 	 * 
-	 * @return the type of this event as a String for debugging
-	 */
-	public String getTypeString() {
-		return typeStrings[type];
+	 * @return the event type of this event
+	 **/
+	public String getEventType() {
+		return evtType;
 	}
 }

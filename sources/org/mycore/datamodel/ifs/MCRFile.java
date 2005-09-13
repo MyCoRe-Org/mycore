@@ -330,8 +330,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
 		// If file content has changed, call event handlers to index content
 		if (changed) {
-			int type = (isNew ? MCREvent.FILE_CREATED : MCREvent.FILE_UPDATED);
-			MCREvent event = new MCREvent(type);
+			String type = (isNew ? "create" : "update" );
+			MCREvent event = new MCREvent("MCRFile", type);
 			event.put("file", this);
 			MCREventManager.instance().handleEvent(event);
 		}
@@ -350,7 +350,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 			getContentStore().deleteContent(storageID);
 
 			// Call event handlers to update indexed content
-			MCREvent event = new MCREvent(MCREvent.FILE_DELETED);
+			MCREvent event = new MCREvent("MCRFile", "delete");
 			event.put("file", this);
 			MCREventManager.instance().handleEvent(event);
 

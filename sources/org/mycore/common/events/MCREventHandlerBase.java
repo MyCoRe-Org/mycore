@@ -39,37 +39,32 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 	private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
 
 	public void doHandleEvent(MCREvent evt) {
-		MCRObject obj = (MCRObject) (evt.get("object"));
-		if (obj != null) {
-			logger.debug(getClass().getName() + " handling "
-					+ obj.getId().getId() + evt.getTypeString());
+		if (evt.getObjectType().equals("MCRObject")) 
+		{
+		  MCRObject obj = (MCRObject) (evt.get("object"));  
+		  logger.debug(getClass().getName() + " handling "
+					+ obj.getId().getId() + evt.getEventType() );
+		  
+		  if( evt.getEventType().equals( "create" ) )
+		    handleObjectCreated(evt, obj);
+		  else if( evt.getEventType().equals( "update" ) )
+		    handleObjectUpdated(evt, obj);
+		  else if( evt.getEventType().equals( "delete" ) )
+		    handleObjectDeleted(evt, obj);
 		}
-		MCRFile file = (MCRFile) (evt.get("file"));
-		if (file != null) {
+		else if (evt.getObjectType().equals("MCRFile")) 
+		{
+		    MCRFile file = (MCRFile) (evt.get("file"));
 			logger.debug(getClass().getName() + " handling "
 					+ file.getOwnerID() + "/" + file.getAbsolutePath() + " "
-					+ evt.getTypeString());
-		}
+					+ evt.getEventType());
 
-		switch (evt.getType()) {
-		case MCREvent.OBJECT_CREATED:
-			handleObjectCreated(evt, obj);
-			break;
-		case MCREvent.OBJECT_UPDATED:
-			handleObjectUpdated(evt, obj);
-			break;
-		case MCREvent.OBJECT_DELETED:
-			handleObjectDeleted(evt, obj);
-			break;
-		case MCREvent.FILE_CREATED:
-			handleFileCreated(evt, file);
-			break;
-		case MCREvent.FILE_UPDATED:
-			handleFileUpdated(evt, file);
-			break;
-		case MCREvent.FILE_DELETED:
-			handleFileDeleted(evt, file);
-			break;
+		  if( evt.getEventType().equals( "create" ) )
+		    handleFileCreated(evt, file);
+		  else if( evt.getEventType().equals( "update" ) )
+		    handleFileUpdated(evt, file);
+		  else if( evt.getEventType().equals( "delete" ) )
+		    handleFileDeleted(evt, file);
 		}
 	}
 

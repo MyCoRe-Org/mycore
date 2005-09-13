@@ -322,7 +322,7 @@ final public class MCRObject extends MCRBase {
 		addLinksToTable();
 
 		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_CREATED);
+		MCREvent evt = new MCREvent( "MCRObject", "create" );
 		evt.put("object", this);
 		MCREventManager.instance().handleEvent(evt);
 
@@ -472,7 +472,7 @@ final public class MCRObject extends MCRBase {
 		mcr_xmltable.delete(mcr_id);
 
 		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_DELETED);
+		MCREvent evt = new MCREvent("MCRObject","delete");
 		evt.put("object", this);
 		MCREventManager.instance().handleEvent(evt);
 
@@ -702,7 +702,7 @@ final public class MCRObject extends MCRBase {
 		addLinksToTable();
 
 		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_UPDATED);
+		MCREvent evt = new MCREvent("MCRObject","update");
 		evt.put("object", this);
 		MCREventManager.instance().handleEvent(evt);
 	}

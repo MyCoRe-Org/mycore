@@ -29,9 +29,10 @@ import org.mycore.common.MCRException;
 /**
  * Objects that implement this interface can react when some kind of predefined
  * event happens in MyCoRe. Implementing classes are registered using the
- * configuration property MCR.EventHandler.X.class where X is a number starting
- * from 1. Event handlers are called in the same order as they are registered in
- * the properties files.
+ * configuration property MCR.EventHandler.[objType].X.class where [objType] is the
+ * object type like "object" or "file" and X is a number starting from 1. 
+ * Event handlers are called in the same order as they are registered in
+ * the properties file.
  * 
  * @author Frank Lützenkirchen
  */
