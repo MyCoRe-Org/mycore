@@ -136,26 +136,44 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
       TopDocs hits = searcher.search( luceneQuery, null, maxResults );
       int found = hits.scoreDocs.length;
 
-      LOGGER.info("Number of documents found : " + found);
+      LOGGER.info("Number of Objects found : " + found);
       
       MCRResults result = new MCRResults();
       for (int i=0; i<found;i++)
       {
 //        org.apache.lucene.document.Document doc    = hits.doc(i);
-        org.apache.lucene.document.Document doc    = searcher.doc(hits.scoreDocs[i].doc);        
-        String id = doc.get("id");
-        LOGGER.debug("ID of found document: " + doc.get("id"));
-/*TODO        if (MCRAccessManager.checkReadAccess( id, MCRSessionMgr.getCurrentSession()))*/{
-          MCRHit hit = new MCRHit( id );
-          
-          // fill hit meta
-//          for (int j=0; j<order.size(); j++){
-              String key = "author";
-              String value = doc.get("author");
-              hit.addMetaValue(key,value);
-//          }
+        org.apache.lucene.document.Document doc    = searcher.doc(hits.scoreDocs[i].doc); 
+        String mcrtype  = doc.get("mcrtype");
+        String id;
+        if ( "f".equals(mcrtype) )     // MCRFile found
+        {
+          id = doc.get("FileID");
+          LOGGER.debug("ID of MCRFile found: " + id );
+          MCRHit hit = new MCRHit(id);
+          hit.addMetaValue("type", "MCRFile");
+
+          String key = "OwnnerID";
+          String value = doc.get("OwnnerID");
+          hit.addMetaValue(key, value);
           result.addHit(hit);
-      } // MCRAccessManager
+        }
+        else                           // MCRObject found
+        {
+          id = doc.get("mcrid");
+          LOGGER.debug("ID of MCRObject found: " + id );
+  /*TODO        if (MCRAccessManager.checkReadAccess( id, MCRSessionMgr.getCurrentSession()))*/{
+            MCRHit hit = new MCRHit( id );
+            hit.addMetaValue("type", "MCRObject");
+            
+            // fill hit meta
+//            for (int j=0; j<order.size(); j++){
+                String key = "author";
+                String value = doc.get("author");
+                hit.addMetaValue(key,value);
+//            }
+            result.addHit(hit);
+        } // MCRAccessManager
+        }
       }
       searcher.close();
       return result;

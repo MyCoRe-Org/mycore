@@ -45,6 +45,7 @@ import org.apache.lucene.search.TermQuery;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.fieldquery.MCRMetadata2Fields;
 
@@ -66,6 +67,8 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 
 	//TODO: read from property file
 	static String DATE_FORMAT = "yyyy-MM-dd";
+	static String TIME_FORMAT = "HH:mm:ss";
+	static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	/** Reads properties from configuration file when class first used */
 	static {
@@ -95,10 +98,12 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	 *            the MCRObject that caused the event
 	 */
 	protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-		List fields = MCRMetadata2Fields.buildFields(obj);
 		try {
+		    List fields = MCRMetadata2Fields.buildFields(obj);
 			Document doc = buildLuceneDocument(fields);
-			LOGGER.debug("####### lucene document build ");
+            doc.add(Field.Keyword( "mcrid", obj.getId().getId()));
+            doc.add(Field.Keyword( "mcrtype", "m"));
+			LOGGER.debug("lucene document build " + obj.getId().getId());
 			addDocumentToLucene(doc);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -125,13 +130,19 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 			String content = xType.getAttributeValue("value");
 			if (null != name && null != type && null != content) {
 				if ("date".equals(type)) {
-					DateFormat f1 = new SimpleDateFormat(DATE_FORMAT);
-					DateFormat f2 = new SimpleDateFormat("yyyyMMdd");
-					Date d;
-					d = f1.parse(content);
-					content = f2.format(d);
+					content = handleDate( content, DATE_FORMAT, "yyyyMMdd");
 					type = "Text";
+				} else if("time".equals(type)) {
+					content = handleDate( content, TIME_FORMAT, "HHmmss");
+					type = "Text";
+				} else if("timestamp".equals(type)) {
+					content = handleDate( content, TIMESTAMP_FORMAT, "yyyyMMddHHmmss");
+					type = "Text";
+				} else if("boolean".equals(type)) {
+					content = "true".equals(content) ? "1" : "0";
+					type = "indentifier";
 				}
+				//TODO handle decimal and integer
 
 				LOGGER.debug("####### Name: " + name + " Type: " + type
 						+ " Content: " + content);
@@ -147,6 +158,14 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 		return doc;
 	}
 
+	private String handleDate(String content, String informat, String outformat) throws Exception {
+		DateFormat f1 = new SimpleDateFormat( informat );
+		DateFormat f2 = new SimpleDateFormat( outformat );
+		Date d;
+		d = f1.parse(content);
+		return f2.format(d);
+	}
+	
 	/**
 	 * Adds document to Lucene
 	 * 
@@ -215,7 +234,7 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	 */
 	protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
 		try {
-			deleteLuceneDocument(obj.getId().getId());
+			deleteLuceneDocument("mcrid", obj.getId().getId());
 		} catch (Exception e) {
 			LOGGER.warn(e.getMessage());
 		}
@@ -224,17 +243,19 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	/**
 	 * Delete document in Lucene
 	 * 
+     * @param fieldname
+     *            string name of lucene field to store id 
 	 * @param id
 	 *            string document id
 	 *  
 	 */
-	private void deleteLuceneDocument(String id) throws Exception {
+	private void deleteLuceneDocument(String fieldname, String id) throws Exception {
 
 		IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
 
 		if (null == searcher)
 			return;
-		Term te1 = new Term("id", id);
+		Term te1 = new Term(fieldname, id);
 
 		TermQuery qu = new TermQuery(te1);
 
@@ -244,9 +265,9 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 
 		LOGGER.info("Number of documents found : " + hits.length());
 		if (1 == hits.length()) {
-			LOGGER.info(" id: " + hits.id(0) + " score: " + hits.score(0)
-					+ " key: " + hits.doc(0).get("id"));
-			if (id.equals(hits.doc(0).get("id"))) {
+			LOGGER.info(fieldname + ": " + hits.id(0) + " score: " + hits.score(0)
+					+ " key: " + hits.doc(0).get(fieldname));
+			if (id.equals(hits.doc(0).get(fieldname))) {
 				IndexReader reader = IndexReader.open(INDEX_DIR);
 				reader.delete(hits.id(0));
 				reader.close();
@@ -255,5 +276,66 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 		}
 
 	}
+    
+    /**
+     * Handles file created events. Files are of Type xml.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileCreated(MCREvent evt, MCRFile file)
+  {
+    try
+    {
+      List fields = MCRMetadata2Fields.buildFields( file );
+      Document doc = buildLuceneDocument(fields);
+      Field ownerID = new Field("OwnnerID", file.getOwnerID(), true, true, false);
+      Field fileID  = new Field("FileID", file.getID(), true, true, false);
+//      Field type    = new Field("FileID", file.getContentTypeID(), true, true, false);
+      doc.add(Field.Keyword( "mcrtype", "f"));
+
+      LOGGER.debug("adding fields to document FileID: " + file.getID());
+      doc.add(ownerID);
+      doc.add(fileID);
+      addDocumentToLucene(doc);
+    } catch (Exception e)
+    {
+      e.printStackTrace();
+      LOGGER.warn("xxxxx " + e.getMessage());
+    }
+  }
+    
+    /**
+     * Handles file updated events. 
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileUpdated(MCREvent evt, MCRFile file) {
+        handleFileDeleted(evt, file);
+        handleFileCreated(evt, file);
+    }
+
+    
+    /**
+     * Handles file deleted events. This implementation deletes entry in index.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
+
+        try {
+            deleteLuceneDocument("FileID", file.getID());
+        } catch (Exception e) {
+            LOGGER.warn(e.getMessage());
+        }
+    }
 
 }
