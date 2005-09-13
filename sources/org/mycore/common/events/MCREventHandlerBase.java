@@ -68,6 +68,36 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 		}
 	}
 
+	public void undoHandleEvent(MCREvent evt) {
+		if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) 
+		{
+		  MCRObject obj = (MCRObject) (evt.get("object"));  
+		  logger.debug(getClass().getName() + " handling "
+					+ obj.getId().getId() + evt.getEventType() );
+		  
+		  if( evt.getEventType().equals(MCREvent.CREATE_EVENT))
+		    undoObjectCreated(evt, obj);
+		  else if( evt.getEventType().equals(MCREvent.UPDATE_EVENT))
+		    undoObjectUpdated(evt, obj);
+		  else if( evt.getEventType().equals(MCREvent.DELETE_EVENT))
+		    undoObjectDeleted(evt, obj);
+		}
+		else if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) 
+		{
+		    MCRFile file = (MCRFile) (evt.get("file"));
+			logger.debug(getClass().getName() + " handling "
+					+ file.getOwnerID() + "/" + file.getAbsolutePath() + " "
+					+ evt.getEventType());
+
+		  if( evt.getEventType().equals(MCREvent.CREATE_EVENT))
+		    undoFileCreated(evt, file);
+		  else if( evt.getEventType().equals(MCREvent.UPDATE_EVENT))
+		    undoFileUpdated(evt, file);
+		  else if( evt.getEventType().equals(MCREvent.DELETE_EVENT))
+		    undoFileDeleted(evt, file);
+		}
+	}
+
 	/**
 	 * Handles object created events. This implementation does nothing and
 	 * should be overwritted by subclasses.
@@ -143,6 +173,84 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 	 *            the MCRFile that caused the event
 	 */
 	protected void handleFileDeleted(MCREvent evt, MCRFile file) {
+		logger.debug("This default handler implementation does nothing");
+	}
+	
+	/**
+	 * Handles undo of object created events. This implementation does nothing and
+	 * should be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param obj
+	 *            the MCRObject that caused the event
+	 */
+	protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
+		logger.debug("This default handler implementation does nothing");
+	}
+
+	/**
+	 * Handles undo of object updated events. This implementation does nothing and
+	 * should be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param obj
+	 *            the MCRObject that caused the event
+	 */
+	protected void undoObjectUpdated(MCREvent evt, MCRObject obj) {
+		logger.debug("This default handler implementation does nothing");
+	}
+
+	/**
+	 * Handles undo of object deleted events. This implementation does nothing and
+	 * should be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param obj
+	 *            the MCRObject that caused the event
+	 */
+	protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
+		logger.debug("This default handler implementation does nothing");
+	}
+
+	/**
+	 * Handles undo of file created events. This implementation does nothing and should
+	 * be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param file
+	 *            the MCRFile that caused the event
+	 */
+	protected void undoFileCreated(MCREvent evt, MCRFile file) {
+		logger.debug("This default handler implementation does nothing");
+	}
+
+	/**
+	 * Handles undo of file updated events. This implementation does nothing and should
+	 * be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param file
+	 *            the MCRFile that caused the event
+	 */
+	protected void undoFileUpdated(MCREvent evt, MCRFile file) {
+		logger.debug("This default handler implementation does nothing");
+	}
+
+	/**
+	 * Handles undo of file deleted events. This implementation does nothing and should
+	 * be overwritted by subclasses.
+	 * 
+	 * @param evt
+	 *            the event that occured
+	 * @param file
+	 *            the MCRFile that caused the event
+	 */
+	protected void undoFileDeleted(MCREvent evt, MCRFile file) {
 		logger.debug("This default handler implementation does nothing");
 	}
 }

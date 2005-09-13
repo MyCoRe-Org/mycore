@@ -106,7 +106,9 @@ public class MCREventManager {
 	/**
 	 * This method is called by the component that created the event and acts as
 	 * a multiplexer that invokes all registered event handlers doHandleEvent
-	 * methods.
+	 * methods. If something goes wrong and an exception is caught, the undoHandleEvent
+	 * methods of all event handlers that are at a position BEFORE the failed one, will
+	 * be called in reversed order.
 	 * 
 	 * @see MCREventHandler#doHandleEvent
 	 * @see MCREventHandlerBase
@@ -116,11 +118,39 @@ public class MCREventManager {
 	 */
 	public void handleEvent(MCREvent evt) throws MCRException {
 	    List list = (List)(handlers.get(evt.getObjectType()));
+	    
+	    int undoPos = 0;
+	    
 		for (int i = 0; (list != null) && (i < list.size()); i++) {
 			MCREventHandler eh = (MCREventHandler) (list.get(i));
-			logger.debug("EventManager calling handler "
+			logger.debug("EventManager "+ evt.getObjectType() + 
+			    " " + evt.getEventType() + " calling handler "
 					+ eh.getClass().getName());
-			eh.doHandleEvent(evt);
+			
+			try{ eh.doHandleEvent(evt); }
+			catch( Exception ex )
+			{
+			  logger.info( "Exception caught while calling event handler", ex );
+			  logger.info( "Trying rollback by calling undo method of event handlers" );
+			  
+			  undoPos = i;
+			  break;
+			}
 		}
+		
+		// Rollback by calling undo of successfull handlers
+ 	    for( int i = undoPos - 1; i >= 0; i-- )
+ 	    {
+ 	        MCREventHandler eh = (MCREventHandler) (list.get(i));
+			logger.debug("EventManager "+ evt.getObjectType() + 
+			    " " + evt.getEventType() + " calling undo of handler "
+					+ eh.getClass().getName());
+
+			try{ eh.undoHandleEvent(evt); }
+			catch( Exception ex )
+			{
+			  logger.info( "Exception caught while calling undo of event handler", ex );
+			}
+ 	    }
 	}
 }

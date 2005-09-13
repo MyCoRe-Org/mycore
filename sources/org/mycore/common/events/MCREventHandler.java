@@ -45,4 +45,14 @@ public interface MCREventHandler {
 	 *            the Event object containing information about the event
 	 */
 	public void doHandleEvent(MCREvent evt) throws MCRException;
+	
+	/**
+	 * Handles rollback of event handling. The handler should roll back the changes
+	 * that previously were made for this event, because a successor in the event
+	 * handler list caused an exception.
+	 * 
+	 * @param evt
+	 *            the Event object containing information about the event
+	 */
+	public void undoHandleEvent(MCREvent evt) throws MCRException;
 }
