@@ -286,7 +286,8 @@ public class MCRHIBMapping {
 			cfg.addXML(map.getTableXML());
 
 			// XML Table
-			map = new MCRTableGenerator("MCRXMLTABLE",
+			map = new MCRTableGenerator(config
+					.getString("MCR.xml_store_sql_table","MCRXMLTABLE"),
 					"org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
 			map.addIDColumn("id", "MCRID", dbString, 64, "assigned", false);
 			map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned",
