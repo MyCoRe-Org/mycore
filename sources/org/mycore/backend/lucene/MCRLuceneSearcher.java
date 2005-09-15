@@ -21,7 +21,7 @@
 package org.mycore.backend.lucene;
 
 import org.mycore.backend.query.MCRQuerySearcher;
-import org.mycore.backend.query.MCRResults;
+import org.mycore.services.fieldquery.MCRResults;
 
 /**
  * 

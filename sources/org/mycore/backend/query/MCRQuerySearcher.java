@@ -23,6 +23,7 @@ package org.mycore.backend.query;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.services.fieldquery.MCRResults;
 
 public abstract class MCRQuerySearcher {
 

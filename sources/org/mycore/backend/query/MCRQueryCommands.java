@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.services.fieldquery.*;
 
 public class MCRQueryCommands extends MCRAbstractCommands {
     

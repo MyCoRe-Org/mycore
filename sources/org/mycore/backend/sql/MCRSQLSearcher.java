@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.query.MCRHit;
 import org.mycore.backend.query.MCRQuerySearcher;
-import org.mycore.backend.query.MCRResults;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRResults;
 
 /**
  * SQL implementation of the searcher
@@ -61,7 +61,7 @@ public class MCRSQLSearcher extends MCRQuerySearcher{
                     for (int j=0; j<order.size(); j++){
                         String key = ((Element) order.get(j)).getAttributeValue("field");
                         String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
-                        hit.addMetaValue(key,value);
+                        hit.setDataValue(key,value);
                     }
                     result.addHit(hit);
                 }

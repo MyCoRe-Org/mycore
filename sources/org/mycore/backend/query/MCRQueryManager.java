@@ -48,6 +48,7 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.fieldquery.*;
 
 /**
  * MCRQueryManager handles all Events needed für the sql/hibernate-indexer
