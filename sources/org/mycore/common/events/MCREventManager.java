@@ -33,7 +33,9 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.services.fieldquery.MCRSearcherFactory;
 
 /**
  * Acts as a multiplexer to forward events that are created to all registered
@@ -69,7 +71,6 @@ public class MCREventManager {
 		MCRConfiguration config = MCRConfiguration.instance();
 
 		String prefix = "MCR.EventHandler.";
-		String suffix = ".class";
 
 		Properties props = config.getProperties(prefix);
 		if( props == null ) return;
@@ -82,13 +83,13 @@ public class MCREventManager {
 		for( int i = 0; i < names.size(); i++ )
 		{
 		  String name = (String)( names.get(i) );
-		  if( ! name.endsWith( ".class" ) ) continue;
 		  
 		  StringTokenizer st = new StringTokenizer( name, "." );
 		  st.nextToken(); 
 		  st.nextToken();
 		  String type = st.nextToken();
 		  int nr = Integer.parseInt( st.nextToken() );
+          String mode = st.nextToken(); // "class" or "indexer"
 		  
 		  if( nr == 1 )
 		  {
@@ -96,10 +97,22 @@ public class MCREventManager {
 		    handlers.put(type,instances); 
 		  }
 		  
-		  MCREventHandler handler = (MCREventHandler)(config.getSingleInstanceOf(name));
  		  logger.debug("EventManager instantiating handler " + config.getString(name)
  		      + " for type " + type );
-		  instances.add(handler);
+
+ 		  Object handler = null;
+ 		  if( "class".equals( mode ) )
+		    handler = config.getSingleInstanceOf(name);
+		  else // "indexer"
+		    handler = MCRSearcherFactory.getSearcher( config.getString(name) );
+ 		  
+ 		  if( ! (handler instanceof MCREventHandler ))
+	      {
+		      String msg = "Error: Class does not implement MCREventHandler: " + name;
+		      throw new MCRConfigurationException( msg );
+		  }
+ 		  
+	      instances.add( handler );
 		}
 	}
 
