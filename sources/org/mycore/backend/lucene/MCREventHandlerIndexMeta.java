@@ -66,9 +66,9 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
 	static boolean FIRST = true;
 
 	//TODO: read from property file
-	static String DATE_FORMAT = "yyyy-MM-dd";
-	static String TIME_FORMAT = "HH:mm:ss";
-	static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    static String DATE_FORMAT = "yyyy-mm-dd";
+    static String TIME_FORMAT = "hh:mm:ss";
+    static String TIMESTAMP_FORMAT = "yyyy-mm-dd hh:mm:ss";
 
 	/** Reads properties from configuration file when class first used */
 	static {
