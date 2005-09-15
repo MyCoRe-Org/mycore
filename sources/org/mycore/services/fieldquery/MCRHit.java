@@ -21,6 +21,8 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Iterator;
 
@@ -39,7 +41,10 @@ public class MCRHit
   private String id;
   
   /** Data for sorting this hit or hit metadata like rank, score **/
-  private Properties map = new Properties();
+  private Properties sortData = new Properties();
+  
+  /** List of Properties objects that contain technical hit metadata from the backend searcher **/
+  private List metaData = new LinkedList();
   
   /**
    * Creates a new result hit with the given object ID
@@ -62,8 +67,8 @@ public class MCRHit
    * 
    * @return hit metadata as name-value pairs of Strings
    **/
-  public Properties getData()
-  { return map; }
+  public Properties getSortData()
+  { return sortData; }
   
   /**
    * Set data value of the hit
@@ -71,8 +76,28 @@ public class MCRHit
    * @param key the name of the data value
    * @param value the value as string
    **/
-  public void setDataValue(String key, String value)
-  { map.put( key, value ); }
+  public void addSortData(String key, String value)
+  { if( ! sortData.containsKey( key ) ) sortData.put( key, value ); }
+
+  /**
+   * Adds metadata about the hit. This metadata comes from the searcher and 
+   * may contain additional information like score, rank, derivate ID, file path,
+   * position where something was found in the content etc. There may be more than 
+   * just one set of such metadata because the same criteria may have been found
+   * in more than just one MCRFile of the same MCRObject etc. 
+   * 
+   * @param metadata a Properties object containing hit metadata as name-value pairs
+   **/
+  public void addMetaData( Properties metadata )
+  { if( metadata != null ) metaData.add( metadata ); }
+  
+  /**
+   * Returns technical metadata about the hit that was provided by the searcher.
+   * 
+   * @return a List of Properties objects containing hit metadata as name-value pairs
+   **/
+  public List getMetaData()
+  { return metaData; }
   
   /**
    * Creates an XML representation of this hit and its data
@@ -84,17 +109,36 @@ public class MCRHit
     Element el = new Element("mcrhit");
     el.setAttribute(new Attribute("mcrid", this.id));
     
-    if( ! map.isEmpty() )
+    if( ! sortData.isEmpty() )
+      addDataProperties( el, "sortData", sortData );
+
+    if( ! metaData.isEmpty() )
     {
-      Iterator it = map.keySet().iterator();   
-      while(it.hasNext())
+      for( int i = 0; i < metaData.size(); i++ )
       {
-        String key = (String) it.next();
-        el.addContent( new Element("data")
-          .setAttribute("name", key)
-          .setAttribute("value", map.getProperty(key) ) );
+        Properties prop = (Properties)( metaData.get(i) );
+        if( ! prop.isEmpty() ) 
+          addDataProperties( el, "metaData", prop );
       }
     }
+    
     return el;
+  }
+
+  private void addDataProperties( Element parent, String name, Properties data )
+  {
+    Element coll = new Element( name );
+    parent.addContent(coll);
+    
+    Iterator it = data.keySet().iterator();   
+    while(it.hasNext())
+    {
+      String key = (String) it.next();
+      
+      Element d = new Element( "data" );
+      coll.addContent( d );
+      d.setAttribute( "name", key );
+      d.addContent( data.getProperty(key) );
+    }
   }
 }
