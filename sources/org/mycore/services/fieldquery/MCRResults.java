@@ -207,7 +207,7 @@ public class MCRResults
     Element root = new Element("mcrresults");
     doc.setRootElement( root );
     root.setAttribute( "sorted", Boolean.toString(isSorted()) );
-    for( int i=0; i<numHits; i++)
+    for( int i=0; i<getNumHits(); i++)
       root.addContent(((MCRHit)hits.get(i)).buildXML());
     return doc;
   }
