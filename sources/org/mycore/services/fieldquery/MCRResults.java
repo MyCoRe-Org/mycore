@@ -151,8 +151,8 @@ public class MCRResults
         for( int i = 0; (result==0) && (i<fields.size()); i++ )
         {
           MCRSearchField field = (MCRSearchField)( fields.get(i) );
-          String va = a.getData().getProperty( field.name );
-          String vb = b.getData().getProperty( field.name );
+          String va = a.getSortData().getProperty( field.name );
+          String vb = b.getSortData().getProperty( field.name );
           
           if( "decimal".equals( field.type ) )
             result = (int)( ( Double.parseDouble( va ) - Double.parseDouble( vb ) ) * 10.0 );

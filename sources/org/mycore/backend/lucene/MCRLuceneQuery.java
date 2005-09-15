@@ -149,11 +149,11 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
           id = doc.get("FileID");
           LOGGER.debug("ID of MCRFile found: " + id );
           MCRHit hit = new MCRHit(id);
-          hit.setDataValue("type", "MCRFile");
+          hit.addSortData("type", "MCRFile");
 
           String key = "OwnnerID";
           String value = doc.get("OwnnerID");
-          hit.setDataValue(key, value);
+          hit.addSortData(key, value);
           result.addHit(hit);
         }
         else                           // MCRObject found
@@ -162,13 +162,13 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
           LOGGER.debug("ID of MCRObject found: " + id );
   /*TODO        if (MCRAccessManager.checkReadAccess( id, MCRSessionMgr.getCurrentSession()))*/{
             MCRHit hit = new MCRHit( id );
-            hit.setDataValue("type", "MCRObject");
+            hit.addSortData("type", "MCRObject");
             
             // fill hit meta
 //            for (int j=0; j<order.size(); j++){
                 String key = "author";
                 String value = doc.get("author");
-                hit.setDataValue(key,value);
+                hit.addSortData(key,value);
 //            }
             result.addHit(hit);
         } // MCRAccessManager

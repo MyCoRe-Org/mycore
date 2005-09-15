@@ -61,7 +61,7 @@ public class MCRSQLSearcher extends MCRQuerySearcher{
                     for (int j=0; j<order.size(); j++){
                         String key = ((Element) order.get(j)).getAttributeValue("field");
                         String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
-                        hit.setDataValue(key,value);
+                        hit.addSortData(key,value);
                     }
                     result.addHit(hit);
                 }
