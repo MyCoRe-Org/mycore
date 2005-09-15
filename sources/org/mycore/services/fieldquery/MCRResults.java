@@ -61,7 +61,9 @@ public class MCRResults
   {}
   
   /**
-   * Adds a hit.
+   * Adds a hit. If there is already a hit with the same ID, the
+   * sort data and meta data of both hits are merged and the merged
+   * hit replaces the existing hit.
    * 
    * @param hit the MCRHit to add
    */
@@ -70,8 +72,20 @@ public class MCRResults
     if( isComplete() )
       throw new IllegalStateException();
     
-    hits.add(hit);
-    map.put( hit.getID(), null );
+    if( ! map.containsKey( hit.getID() ) )
+    {
+      // This is a new entry with new ID
+      hits.add( hit );
+      map.put( hit.getID(), null );
+    }
+    else
+    {
+      // Merge data of existing hit with new one with the same ID
+      MCRHit existing = getHit( hit.getID() );
+      MCRHit merged = MCRHit.buildMergedHitData( hit, existing );
+      hits.remove( existing );
+      hits.add( merged );
+    }
   }
     
   /**
@@ -85,6 +99,20 @@ public class MCRResults
   {
     if( i>0 && i < hits.size() )
       return (MCRHit) hits.get(i);
+    else
+      return null;
+  }
+  
+  /**
+   * Returns the MCRHit with the given ID, if it is in this results.
+   * 
+   * @param ID the ID of the hit
+   * @return the MCRHit, if it exists
+   */
+  public MCRHit getHit( String ID )
+  {
+    if( map.containsKey( ID ) )
+      return (MCRHit)( map.get( ID ) );
     else
       return null;
   }
@@ -203,8 +231,13 @@ public class MCRResults
   {
     MCRResults res = new MCRResults();
     for( int i = 0; i < a.numHits; i++ )
-      if( b.map.containsKey( a.getHit(i).getID() ) )
-        res.addHit( a.getHit( i ));
+    {
+      MCRHit hitA = a.getHit( i );
+      MCRHit hitB = b.getHit( hitA.getID() );
+
+      if( hitB != null )
+        res.addHit( MCRHit.buildMergedHitData( hitA, hitB ) );
+    }
         
     res.setComplete();
     return res;
@@ -223,7 +256,14 @@ public class MCRResults
   {
     MCRResults res = new MCRResults();
     for( int i = 0; i < a.numHits; i++ )
-      res.addHit( a.getHit( i ) );
+    {
+      MCRHit hitA = a.getHit( i );
+      MCRHit hitB = b.getHit( hitA.getID() );
+
+      MCRHit hitC = MCRHit.buildMergedHitData( hitA, hitB );
+      res.addHit( hitC );
+    }
+    
     for( int i = 0; i < b.numHits; i++ )
       if( ! res.map.containsKey( b.getHit(i).getID() ) )
         res.addHit( b.getHit( i ));

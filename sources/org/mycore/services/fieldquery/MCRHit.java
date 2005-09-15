@@ -98,6 +98,34 @@ public class MCRHit
    **/
   public List getMetaData()
   { return metaData; }
+
+  /**
+   * Combines the data of two MCRHit objects with the same ID, but
+   * from different searchers result sets by copying the sort data and
+   * hit metadata of both objects. 
+   * 
+   * @param a the first hit from the first searcher
+   * @param b the other hit from the other searcher
+   * @return
+   **/
+  static MCRHit buildMergedHitData( MCRHit a, MCRHit b )
+  {
+    // If there is nothing to merge, return existing hit
+    if( b == null ) return a;
+    if( a == null ) return b;
+    
+    // Copy ID
+    MCRHit c = new MCRHit( a.getID() );
+    
+    // Copy sort data
+    c.sortData = ( a.sortData.isEmpty() ? b.sortData : a.sortData );
+    
+    // Copy metadata sets
+    c.metaData.addAll( a.metaData );
+    c.metaData.addAll( b.metaData );
+    
+    return c;
+  }
   
   /**
    * Creates an XML representation of this hit and its data
