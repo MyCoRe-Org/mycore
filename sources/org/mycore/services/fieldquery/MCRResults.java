@@ -182,7 +182,11 @@ public class MCRResults
           String va = a.getSortData().getProperty( field.name );
           String vb = b.getSortData().getProperty( field.name );
           
-          if( "decimal".equals( field.type ) )
+          if( va == null )
+            result = ( vb == null ? 0 : -1 );
+          else if ( vb == null )
+            result = ( va == null ? 0 : 1 );
+          else if( "decimal".equals( field.type ) )
             result = (int)( ( Double.parseDouble( va ) - Double.parseDouble( vb ) ) * 10.0 );
           else if( "integer".equals( field.type ) )
             result = (int)( Long.parseLong( va ) - Long.parseLong( vb ) );
