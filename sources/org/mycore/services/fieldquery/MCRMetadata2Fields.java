@@ -54,7 +54,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * Transforms XML metadata to search field values for indexing searchable data.
- * Reads search field configuration from file searchfields-[TYPE].xml. This file
+ * Reads search field configuration from file searchfields.xml. This file
  * and the result of the transformation are described by the schema
  * searchfields.xsd.
  * 
@@ -100,13 +100,12 @@ public class MCRMetadata2Fields {
 	 * @param input
 	 *            the XML document
 	 * @param type
-	 *            the type of metadata which determines the configuration file
-	 *            searchfields-[TYPE].xml that will be used
+	 *            the type of metadata
 	 * @return a List of JDOM field elements with values, see searchfields.xsd
 	 *         for schema
 	 */
 	public static List buildFields(Document input, String type) {
-		String uri = "resource:searchfields-" + type + ".xml";
+		String uri = "resource:searchfields.xml";
 		Element def = MCRURIResolver.instance().resolve(uri);
 		Document xsl = buildStylesheet(type, def);
 
