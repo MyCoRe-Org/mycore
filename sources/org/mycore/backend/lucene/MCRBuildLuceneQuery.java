@@ -61,6 +61,8 @@ public class MCRBuildLuceneQuery
 
 	//TODO: read from property file
 	static String DATE_FORMAT = "yyyy-MM-dd";
+    static String TIME_FORMAT = "HH:mm:ss";
+    static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
   
   static Analyzer analyzer = new GermanAnalyzer();
   static Hashtable search  = null;
@@ -205,8 +207,15 @@ public class MCRBuildLuceneQuery
     }
     else if ( "date".equals(fieldtype) )
     {
-      String text = getCondDate( DATE_FORMAT, operator, value);
-      return QueryParser.parse(field + ":" + text, "", analyzer);
+      return DateQuery( field, DATE_FORMAT, "yyyyMMdd", operator, value);
+    }
+    else if ( "time".equals(fieldtype) )
+    {
+      return DateQuery( field, TIME_FORMAT, "HHmmss", operator, value);
+    }
+    else if ( "timestamp".equals(fieldtype) )
+    {
+      return DateQuery( field, TIMESTAMP_FORMAT, "yyyyMMddHHmmss", operator, value);
     }
     else if ( "identifier".equals(fieldtype) && "=".equals(operator) )
     {
@@ -284,53 +293,68 @@ public class MCRBuildLuceneQuery
   }
   
   /*****************************************************************************
-   * getCondDate ()
+   * DateQuery ()
    ****************************************************************************/
 
-  private static String getCondDate(String format, String dateOp, String date) throws Exception
+  private static Query DateQuery(String fieldname, String informat, String outformat, String dateOp, String date) throws Exception
   {
     if (date.length() == 0)
-      return "";
+      return null;
 
     dateOp = dateOp.trim();
     if (dateOp.equals("=="))
       dateOp = "=";
     try
     {
-      DateFormat f1 = new SimpleDateFormat(format);
-      DateFormat f2 = new SimpleDateFormat("yyyyMMdd");
+      DateFormat f1 = new SimpleDateFormat(informat);
+      DateFormat f2 = new SimpleDateFormat(outformat);
       Date d = f1.parse(date);
       GregorianCalendar gc = new GregorianCalendar();
       gc.setTime(d);
 
+      int len = outformat.length();
+      
+      String lower   = "00000000000000";
+      lower  = lower.substring(0, len);
+      String upper   = "99999999999999";
+      upper  = upper.substring(0, len);
+      
       if (dateOp.equals(">"))
       {
-        gc.add(Calendar.DAY_OF_MONTH, 1);
+        if ( 8 == len )   // date
+          gc.add(Calendar.DAY_OF_MONTH, 1);
+        else              // time or timestamp 
+          gc.add(Calendar.SECOND, 1);
         d = gc.getTime();
-        return "[" + f2.format(d) + " TO 99999999]";
+        lower = f2.format(d);
       } else if (dateOp.equals("<"))
       {
-        gc.add(Calendar.DAY_OF_MONTH, -1);
+        if ( 8 == len )   // date
+          gc.add(Calendar.DAY_OF_MONTH, -1);
+        else              // time or timestamp 
+          gc.add(Calendar.SECOND, -1);
         d = gc.getTime();
-        return "[00000000 TO " + f2.format(d) + "]";
+        upper = f2.format(d);
       } else if (dateOp.equals("="))
       {
-        return f2.format(d);
+        return new TermQuery(new Term(fieldname, f2.format(d)));
+
       } else if (dateOp.equals(">="))
       {
-        return "[" + f2.format(d) + " TO 99999999]";
+        lower = f2.format(d);
       } else if (dateOp.equals("<="))
       {
-        return "[00000000 TO " + f2.format(d) + "]";
+        upper = f2.format(d);
       } else
       {
         LOGGER.info("Invalid operator for date: " + dateOp);
-        return "";
+        return null;
       }
+      return new RangeQuery(new Term(fieldname, lower), new Term(fieldname, upper), true);
     } catch (ParseException e)
     {
       LOGGER.info("invalid date: " + date);
-      return "";
+      return null;
     }
   }
 }
