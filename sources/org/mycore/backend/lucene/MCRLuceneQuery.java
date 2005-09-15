@@ -26,14 +26,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-//import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.TopDocs;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.query.MCRHit;
-import org.mycore.backend.query.MCRResults;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
@@ -150,11 +149,11 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
           id = doc.get("FileID");
           LOGGER.debug("ID of MCRFile found: " + id );
           MCRHit hit = new MCRHit(id);
-          hit.addMetaValue("type", "MCRFile");
+          hit.setDataValue("type", "MCRFile");
 
           String key = "OwnnerID";
           String value = doc.get("OwnnerID");
-          hit.addMetaValue(key, value);
+          hit.setDataValue(key, value);
           result.addHit(hit);
         }
         else                           // MCRObject found
@@ -163,13 +162,13 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
           LOGGER.debug("ID of MCRObject found: " + id );
   /*TODO        if (MCRAccessManager.checkReadAccess( id, MCRSessionMgr.getCurrentSession()))*/{
             MCRHit hit = new MCRHit( id );
-            hit.addMetaValue("type", "MCRObject");
+            hit.setDataValue("type", "MCRObject");
             
             // fill hit meta
 //            for (int j=0; j<order.size(); j++){
                 String key = "author";
                 String value = doc.get("author");
-                hit.addMetaValue(key,value);
+                hit.setDataValue(key,value);
 //            }
             result.addHit(hit);
         } // MCRAccessManager
