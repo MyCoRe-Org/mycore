@@ -63,7 +63,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
     
     private Query luceneQuery;
 
-    private Document querydoc;                //xmlQuery-Document
+    private Element querydoc;                //xmlQuery-Document
     private MCRCondition cond;                //query-condition
 
     private MCRQueryParser parser;
@@ -73,7 +73,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
      * initialise query with xml-document containing complete query
      * @param document xml query docuement
      */
-    public MCRLuceneQuery(Document document){
+    public MCRLuceneQuery(Element document){
         this.parser = new MCRQueryParser();
         try{
             init(document);
@@ -91,7 +91,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
         this.parser = new MCRQueryParser();
         try{
             SAXBuilder builder = new SAXBuilder();
-            init(builder.build(new InputSource(new StringReader(xmlString))));
+            init(builder.build(new InputSource(new StringReader(xmlString))).getRootElement());
         }catch(Exception e){
             LOGGER.error(e);
         }
@@ -102,10 +102,10 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
      * fill internal fields with query and build lucene query
      * @param doc document with xml query
      */
-    private void init(Document doc){
+    private void init(Element root){
         try{
-            querydoc = doc;
-            org.jdom.Element root = querydoc.getRootElement();
+            querydoc = root;
+//            org.jdom.Element root = querydoc.getRootElement();
             cond = parser.parse( (Element)root.getChild("conditions").getChildren().get(0) );
 //            cond.accept(this);
             maxResults   = Integer.parseInt(root.getAttributeValue("maxResults", "200"));
@@ -114,7 +114,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
             org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
             LOGGER.debug( outputter.outputString( x ) );
             
-            List f = querydoc.getRootElement().getChild("conditions").getChildren();
+            List f = root.getChild("conditions").getChildren();
             boolean reqf = true;    // required flag Term with AND (true) or OR (false) combined
             luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString() );

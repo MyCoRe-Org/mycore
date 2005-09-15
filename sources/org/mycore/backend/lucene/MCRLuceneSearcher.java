@@ -36,6 +36,7 @@ public class MCRLuceneSearcher extends MCRQuerySearcher{
         try{
             MCRLuceneQuery lucenequery = new MCRLuceneQuery( query );
             result = lucenequery.getLuceneHits(); 
+            result.setComplete();
         }catch(Exception e){
             e.printStackTrace();
         }

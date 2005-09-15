@@ -47,7 +47,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.services.fieldquery.MCRMetadata2Fields;
+import org.mycore.services.fieldquery.*;
 
 /**
  * This class builds indexes from mycore meta data. MCRMetadata2Fields is used
@@ -55,7 +55,7 @@ import org.mycore.services.fieldquery.MCRMetadata2Fields;
  * 
  * @author Harald Richter
  */
-public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
+public class MCREventHandlerIndexMeta extends MCRSearcherBase {
 	private static Logger LOGGER = Logger
 			.getLogger(MCREventHandlerIndexMeta.class);
 
@@ -338,4 +338,15 @@ public class MCREventHandlerIndexMeta extends MCREventHandlerBase {
         }
     }
 
+    public MCRResults search(org.jdom.Element query) {
+      MCRResults result = null;
+      try{
+          MCRLuceneQuery lucenequery = new MCRLuceneQuery( query );
+          result = lucenequery.getLuceneHits(); 
+          result.setComplete();
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+      return result;
+  }
 }
