@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import org.mycore.access.MCRAccessRule;
 import org.mycore.access.MCRRuleStore;
@@ -120,8 +121,9 @@ public class MCRSQLRuleStore extends MCRRuleStore{
                 String msg = "There is no rule with ID = " + ruleid;
                 throw new MCRException(msg);
             }
-            
-            rule = new MCRAccessRule(rs.getString(1),rs.getString(2),rs.getDate(3),rs.getString(4),rs.getString(5));           
+            DateFormat df = new SimpleDateFormat(sqlDateformat);
+           // df.parse(rs.getString(3));
+            rule = new MCRAccessRule(rs.getString(1),rs.getString(2),df.parse(rs.getString(3)),rs.getString(4),rs.getString(5));           
             rs.close();
         }catch(Exception e){
             logger.error(e);
@@ -161,4 +163,44 @@ public class MCRSQLRuleStore extends MCRRuleStore{
         }
         return rule;
     }
+
+
+    public ArrayList retrieveAllIDs() {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
+        try {
+            String select = "SELECT RID FROM " + ruletablename;
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            while (rs.next()){
+                ret.add(rs.getString(1));
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            c.release();
+        }
+        return ret;
+    }
+
+
+    public boolean existRule(String ruleid) {
+        MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+        boolean ret = false;
+        try {
+            String select = "SELECT * FROM " + ruletablename + " WHERE RID = '" + ruleid + "'";
+            Statement statement = connection.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            if (rs.next()) {
+                ret= true;
+            }           
+            rs.close();
+        }catch(Exception e){
+            logger.error(e);
+        }finally{
+            connection.release();
+        }
+        return ret;
+    }
+
 }
