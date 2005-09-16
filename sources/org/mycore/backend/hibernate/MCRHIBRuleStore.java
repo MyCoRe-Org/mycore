@@ -23,6 +23,7 @@ package org.mycore.backend.hibernate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -205,6 +206,45 @@ public class MCRHIBRuleStore extends MCRRuleStore{
             session.close();
         }
         return rule;
+    }
+
+
+    public ArrayList retrieveAllIDs() {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        ArrayList ret = new ArrayList();
+        try {
+            List l = session.createQuery("from MCRACCESSRULE").list();
+            tx.commit();
+            for (int i=0; i<l.size(); i++){
+                ret.add(((MCRACCESSRULE) l.get(i)).getRid());
+            }
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+        return ret;
+    }
+
+
+    public boolean existRule(String ruleid) {
+        init();
+        boolean ret = false;
+        try{
+            Session session = MCRHIBConnection.instance().getSession();
+            Transaction tx = session.beginTransaction();
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
+            tx.commit();
+            session.close();
+            if (hibrule != null){
+                ret = true;
+            }
+        }catch(Exception e){
+            logger.error(e);
+        }
+        return ret;
     }
 
 }
