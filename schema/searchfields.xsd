@@ -7,44 +7,53 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="field" maxOccurs="unbounded">
+				<xs:element name="index" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="field" maxOccurs="unbounded">
 								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:attribute name="name" type="xs:NCName" use="required">
+													<xs:annotation>
+														<xs:documentation>name of this attribute, e. g. "lang"</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="value" type="xs:string" use="required">
+													<xs:annotation>
+														<xs:documentation>xpath expression for building the value of this field, e.g. "@xml:lang"</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
 									<xs:attribute name="name" type="xs:NCName" use="required">
 										<xs:annotation>
-											<xs:documentation>name of this attribute, e. g. "lang"</xs:documentation>
+											<xs:documentation>unique name of this search field, e. g. "title"</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
-									<xs:attribute name="value" type="xs:string" use="required">
+									<xs:attribute name="type" type="xs:NCName" use="required">
 										<xs:annotation>
-											<xs:documentation>xpath expression for building the value of this field, e.g. "@xml:lang"</xs:documentation>
+											<xs:documentation>data type of searchfield as defined in fieldtypes.xml, e. g. "text"</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
+									<xs:attribute name="xpath" type="xs:string" use="optional">
+										<xs:annotation>
+											<xs:documentation>xpath in xml metadata that will be used to extract field values with automatically built stylesheet, e.g. /mycoreobject/metadata/titles/title</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="value" type="xs:string" use="optional">
+										<xs:annotation>
+											<xs:documentation>xpath expression for building the value of this field, e.g. "text()"</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="source" type="xs:string" use="optional"/>
+									<xs:attribute name="objects" type="xs:string" use="optional"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
-						<xs:attribute name="name" type="xs:NCName" use="required">
-							<xs:annotation>
-								<xs:documentation>unique name of this search field, e. g. "title"</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attribute name="type" type="xs:NCName" use="required">
-							<xs:annotation>
-								<xs:documentation>data type of searchfield as defined in fieldtypes.xml, e. g. "text"</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attribute name="xpath" type="xs:string" use="optional">
-							<xs:annotation>
-								<xs:documentation>xpath in xml metadata that will be used to extract field values with automatically built stylesheet, e.g. /mycoreobject/metadata/titles/title</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
-						<xs:attribute name="value" type="xs:string" use="optional">
-							<xs:annotation>
-								<xs:documentation>xpath expression for building the value of this field, e.g. "text()"</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
+						<xs:attribute name="id" type="xs:ID" use="required"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
