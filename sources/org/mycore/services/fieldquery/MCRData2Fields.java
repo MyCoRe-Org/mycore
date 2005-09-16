@@ -68,7 +68,7 @@ public class MCRData2Fields
   private static final Logger LOGGER = Logger.getLogger( MCRData2Fields.class );
 
   /** Table indexID to List of search field elements from searchfields.xml */
-  private static Hashtable indexTable;
+  private static Hashtable indexTable = new Hashtable();
   
   /** Reads searchfields.xml and fills the internal table of index definitions **/
   private static synchronized void buildIndexTable()
