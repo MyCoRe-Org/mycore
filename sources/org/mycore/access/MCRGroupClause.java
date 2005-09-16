@@ -20,10 +20,7 @@
 
 package org.mycore.access;
 
-import java.util.Date;
-
 import org.mycore.user.MCRGroup;
-import org.mycore.user.MCRUser;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.parsers.bool.MCRCondition;
 import org.jdom.Element;

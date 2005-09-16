@@ -44,7 +44,6 @@ import org.apache.lucene.search.TermQuery;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.fieldquery.*;

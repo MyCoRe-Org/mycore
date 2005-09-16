@@ -23,10 +23,8 @@ package org.mycore.frontend.servlets;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;

@@ -33,7 +33,6 @@ import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
