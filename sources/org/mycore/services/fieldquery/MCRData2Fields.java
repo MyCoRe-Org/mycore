@@ -73,14 +73,17 @@ public class MCRData2Fields
   /** Reads searchfields.xml and fills the internal table of index definitions **/
   private static synchronized void buildIndexTable()
   {
+    Namespace mcrns = Namespace.getNamespace( "mcr", "http://www.mycore.org/" );
+
     String uri = "resource:searchfields.xml";
     Element def = MCRURIResolver.instance().resolve(uri);
-    List children = def.getChildren( "index" );
+    
+    List children = def.getChildren( "index", mcrns );
     for( int i = 0; i < children.size(); i++ )
     {
       Element index = (Element)( children.get(i));
       String id = index.getAttributeValue( "id" );
-      indexTable.put( id, index.getChildren("field"));
+      indexTable.put( id, index.getChildren("field",mcrns));
     }
   }
 
@@ -199,7 +202,7 @@ public class MCRData2Fields
   private static void addTransformedFields( Document xml, String index, List fields, List values )
   {
     List fieldValues = transform( xml, index, fields );
-    for( int i = 0; i < fields.size(); i++ )
+    for( int i = 0; i < fieldValues.size(); i++ )
     {
       Element fv = (Element)( fieldValues.get( i ) );
       MCRSearchField field = new MCRSearchField();
