@@ -33,6 +33,13 @@ import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
+/**
+ * Parses query conditions for use in MCRSearcher.
+ * 
+ * @see MCRSearcher
+ * 
+ * @author Frank Lützenkirchen
+ **/
 public class MCRQueryParser extends MCRBooleanClauseParser
 {
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException
@@ -67,6 +74,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser
         }
     }
 
+    /** A test program with some usage samples **/
     public static void main( String[] args )
     {
         MCRCondition cond;

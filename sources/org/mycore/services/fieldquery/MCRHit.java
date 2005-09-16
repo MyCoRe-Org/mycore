@@ -30,7 +30,14 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
- * Represents a single result hit of a query
+ * Represents a single result hit of a query. The hit has an ID which is the
+ * MCRObjectID of the document that matched the query. The hit may have sort data
+ * which is a set of name-value pairs of fields that must be used for sorting the
+ * hits in the current query. The hit may have 0-n sets of metadata name-value pairs
+ * that represent technical hit metadata like score, rank, position where something was
+ * found etc. provided by the backend searcher.
+ * 
+ * @see MCRResults
  * 
  * @author Arne Seifert
  * @author Frank Lützenkirchen
@@ -153,6 +160,7 @@ public class MCRHit
     return el;
   }
 
+  /** Helper method to add data values to the xml representation of the hit **/
   private void addDataProperties( Element parent, String name, Properties data )
   {
     Element coll = new Element( name );

@@ -33,7 +33,7 @@ import org.jdom.Element;
 public interface MCRSearcher
 {
   /**
-   * Executes a query and returns the result list
+   * The heart of the searcher: Executes a query and returns the result list
    * 
    * @param query the query as JDOM XML element
    * @return the result list

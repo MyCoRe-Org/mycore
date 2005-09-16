@@ -46,14 +46,14 @@ public class MCRSearcherFactory
   /** Hashtable SearcherID to MCRSearcher instance */
   protected static Hashtable table = new Hashtable();
 
-  /** The logger * */
+  /** The logger */
   private static final Logger LOGGER = Logger
       .getLogger( MCRSearcherFactory.class );
 
   /**
    * Returns the MCRSearcher instance that is configured for this SearcherID.
    * The instance that is returned is configured by the property
-   * <tt>MCR.FieldQuery.Searcher.<ID>.Class</tt> in mycore.properties.
+   * <tt>MCR.Searcher.<ID>.Class</tt> in mycore.properties.
    * 
    * @param searcherID
    *          the non-null ID of the MCRSearcher implementation
@@ -68,7 +68,7 @@ public class MCRSearcherFactory
     {
       try
       {
-        String searcherClass = "MCR.FieldQuery.Searcher." + searcherID
+        String searcherClass = "MCR.Searcher." + searcherID
             + ".Class";
         LOGGER.debug( "Reading searcher implementation for ID " + searcherID
             + ": " + searcherClass );
