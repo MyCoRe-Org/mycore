@@ -32,7 +32,12 @@ import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
 /**
- * This class represents the results of a query
+ * This class represents the results of a query performed by MCRSearcher.
+ * Searchers add the hits using the addHit() method and finally call
+ * setCompleted() when all hits have been added. Clients can get the hits,
+ * sort the entries and do merge/and/or operations on two different result sets.
+ * 
+ * @see MCRSearcher
  * 
  * @author Arne Seifert
  * @author Frank Lützenkirchen
@@ -126,7 +131,7 @@ public class MCRResults
   { return( isComplete ? numHits : hits.size() ); }
     
   /**
-   * When the searcher added all hits, it must call this
+   * When the searcher added all hits, it MUST call this
    * method to indicate that all hits have been added.
    **/
   public void setComplete()
@@ -164,7 +169,7 @@ public class MCRResults
   /**
    * Sorts the hits using the given list of fields
    * 
-   * @param fields a list of MCRSearchField values that are used as sort criteria
+   * @param fields a list of MCRSearchField objects that are used as sort criteria
    **/
   public void sort( final List fields )
   {
@@ -179,29 +184,31 @@ public class MCRResults
         for( int i = 0; (result==0) && (i<fields.size()); i++ )
         {
           MCRSearchField field = (MCRSearchField)( fields.get(i) );
-          String va = a.getSortData().getProperty( field.name );
-          String vb = b.getSortData().getProperty( field.name );
+          String va = a.getSortData().getProperty( field.getName() );
+          String vb = b.getSortData().getProperty( field.getName() );
           
-          if( va == null )
-            result = ( vb == null ? 0 : -1 );
-          else if ( vb == null )
-            result = ( va == null ? 0 : 1 );
-          else if( "decimal".equals( field.type ) )
+          if( ( va == null ) || ( va.trim().length() == 0 ) )
+            result = ( (vb==null)||(vb.trim().length()==0) ? 0 : -1 );
+          else if( ( vb == null ) || ( vb.trim().length() == 0 ) )
+            result = ( (va==null)||(va.trim().length()==0) ? 0 : 1 );
+          else if( "decimal".equals( field.getDataType() ) )
             result = (int)( ( Double.parseDouble( va ) - Double.parseDouble( vb ) ) * 10.0 );
-          else if( "integer".equals( field.type ) )
+          else if( "integer".equals( field.getDataType() ) )
             result = (int)( Long.parseLong( va ) - Long.parseLong( vb ) );
           else 
             result = va.compareTo( vb );
           
-          if( field.order == MCRSearchField.DESCENDING ) result *= -1;
+          if( field.getSortOrder() == MCRSearchField.DESCENDING ) result *= -1;
         }
         return result;
       }
     } );
+    
+    setSorted( true );
   }
   
   /**
-   * Returns a XML document containing all hits and data
+   * Returns a XML document containing all hits and their data
    * 
    * @return a JDOM document of this results
    */
