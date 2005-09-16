@@ -109,7 +109,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
 		} catch (MCRException ex) {
 			LOGGER.debug(ex.getStackTraceAsString());
 			LOGGER.error(ex.getMessage());
-			LOGGER.error("Can't deltete " + mcr_id.getId() + ".");
+			LOGGER.error("Can't delete " + mcr_id.getId() + ".");
 			LOGGER.error("");
 		}
 	}

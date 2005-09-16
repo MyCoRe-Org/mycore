@@ -138,7 +138,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 		} catch (MCRException ex) {
 			LOGGER.debug(ex.getStackTraceAsString());
 			LOGGER.error(ex.getMessage());
-			LOGGER.error("Can't deltete " + mycore_obj.getId().getId() + ".");
+			LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".");
 			LOGGER.error("");
 		}
 	}
