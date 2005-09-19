@@ -21,6 +21,12 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.List;
+import java.util.Properties;
+
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
@@ -35,6 +41,30 @@ import org.mycore.datamodel.ifs.MCRFile;
  **/
 public class MCRSearchField
 {
+  private static Properties fieldTypes = new Properties();
+  
+  static
+  {
+    Namespace mcrns = Namespace.getNamespace( "mcr", "http://www.mycore.org/" );
+
+    String uri = "resource:searchfields.xml";
+    Element def = MCRURIResolver.instance().resolve(uri);
+    
+    List children = def.getChildren( "index", mcrns );
+    for( int i = 0; i < children.size(); i++ )
+    {
+      Element index = (Element)( children.get(i));
+      List fields = index.getChildren( "field", mcrns );
+      for( int j = 0; j < fields.size(); j++ )
+      {
+        Element field = (Element)( fields.get(j));
+        String name = field.getAttributeValue( "name" );
+        String type = field.getAttributeValue( "type" );
+        fieldTypes.put( name, type );
+      }
+    }
+  }
+  
   /** Sort this field in ascending order **/
   public final static boolean ASCENDING  = true;
   
@@ -45,7 +75,7 @@ public class MCRSearchField
   private String name;
   
   /** Data type of the field as defined in fieldtypes.xml **/
-  private String type = "text";
+  private String type;
   
   /** Sort order of this field if it is part of the sort criteria **/
   private boolean order = ASCENDING;
@@ -74,11 +104,11 @@ public class MCRSearchField
   
   /** Returns the data type of this field as defined in fieldtypes.xml **/
   public String getDataType()
-  { return type; }
+  { return fieldTypes.getProperty(name); }
   
-  /** Sets the data type of this field as defined in fieldtypes.xml **/
-  public void setDataType( String type )
-  { this.type = type; }
+  /** Returns the data type of this field as defined in fieldtypes.xml **/
+  public static String getDataType( String fieldName )
+  { return fieldTypes.getProperty(fieldName); }
   
   /** 
    * Returns the value of this field, filled by MCRData2Fields.buildFields method
