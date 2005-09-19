@@ -22,7 +22,7 @@
  *
  **/
 
-package org.mycore.services.fieldquery;
+package org.mycore.backend.jdom;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -46,6 +46,11 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.fieldquery.MCRSimpleCondition;
 
 /**
  * Implements a searcher and indexer for MCRObject metadata using only
@@ -59,10 +64,10 @@ import org.mycore.parsers.bool.MCROrCondition;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRMemorySearcher extends MCRSearcherBase 
+public class MCRJDOMSearcher extends MCRSearcherBase 
 {
   /** The logger */
-  private final static Logger LOGGER = Logger.getLogger( MCRMemorySearcher.class );
+  private final static Logger LOGGER = Logger.getLogger( MCRJDOMSearcher.class );
   
   /** Map where key is entryID and value is XML document containing indexed data */
   private HashMap map = new HashMap();
