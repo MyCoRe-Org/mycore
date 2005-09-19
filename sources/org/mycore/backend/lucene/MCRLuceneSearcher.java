@@ -46,6 +46,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.*;
 
 /**
@@ -337,10 +338,10 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         }
     }
 
-    public MCRResults search(org.jdom.Element query) {
+    public MCRResults search(MCRCondition cond, int maxResults) {
       MCRResults result = null;
       try{
-          MCRLuceneQuery lucenequery = new MCRLuceneQuery( query );
+          MCRLuceneQuery lucenequery = new MCRLuceneQuery( cond, maxResults );
           result = lucenequery.getLuceneHits(); 
           result.setComplete();
       }catch(Exception e){
