@@ -32,6 +32,7 @@ import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for a
@@ -83,13 +84,7 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase
 	public String getIndex()
 	{ return index; }
 
-	/**
-	 * The heart of the searcher: executes a query and returns the result list
-	 * 
-	 * @param query the query as JDOM XML element
-	 * @return the result list
-	 **/
-	public abstract MCRResults search( org.jdom.Element query );
+    public abstract MCRResults search( MCRCondition condition, int maxResults );
 	
     protected void handleFileCreated( MCREvent evt, MCRFile file )
     {

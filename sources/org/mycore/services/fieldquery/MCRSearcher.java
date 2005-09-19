@@ -23,7 +23,7 @@
  **/
 package org.mycore.services.fieldquery;
 
-import org.jdom.Element;
+import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Searchers can execute a query on an index and return a MCRResults object
@@ -35,8 +35,8 @@ public interface MCRSearcher
   /**
    * The heart of the searcher: Executes a query and returns the result list
    * 
-   * @param query the query as JDOM XML element
+   * @param condition the query condition
    * @return the result list
    **/
-  public MCRResults search( Element query );
+  public MCRResults search( MCRCondition condition, int maxResults );
 }
