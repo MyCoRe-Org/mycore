@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.jdom.Document;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -187,13 +188,11 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
 
 			i = j + 5;
 		}
-                // normalize the strings
-                String cst = MCRNormalizeText.normalizeString(cond.toString());
 		// build the XSLT argument
-		if (cst.trim().length() == 0) {
+		if (cond.toString().trim().length() == 0) {
 			return DEFAULT_QUERY;
 		}
-		return (new StringBuffer(DEFAULT_QUERY)).append('[').append(cst)
+		return (new StringBuffer(DEFAULT_QUERY)).append('[').append(cond.toString())
 				.append(']').toString();
 	}
 
@@ -420,9 +419,18 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
 				if (pathin[i].length() != 0) {
 					sbout.append(pathin[i]).append('/');
 				}
+				if (op[i].equals("contains")) {
+				sbout.append(newtag).append(",\'").append(
+					MCRNormalizeText.normalizeString(
+						MCRUtils.replaceString(value[i], "*", "")
+						))
+						.append("\')");
+					}
+				else {
 				sbout.append(newtag).append(",\'").append(
 						MCRUtils.replaceString(value[i], "*", ""))
 						.append("\')");
+					}
 				sbout.append(bool[i]);
 				continue;
 			}
