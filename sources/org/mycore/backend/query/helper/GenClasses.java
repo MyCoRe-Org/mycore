@@ -80,6 +80,7 @@ public class GenClasses{
         SAXBuilder builder = new SAXBuilder();
         try{
             File d = new File(path);
+            builder.setValidation(false);
             searchfields = loadFields(builder.build(d));
         }catch(Exception e){
             e.printStackTrace();
@@ -89,8 +90,14 @@ public class GenClasses{
     public static  HashMap loadFields(Document doc){
         HashMap map = new HashMap();
         List fields = new LinkedList();
-        fields = doc.getRootElement().getChildren();
-        
+
+        for (int i=0; i<doc.getRootElement().getChildren().size(); i++ ){
+            if (((Element)doc.getRootElement().getChildren().get(i)).getAttributeValue("id").equals("metadata")){
+                fields = ((Element)doc.getRootElement().getChildren().get(i)).getChildren();
+                break;
+            }
+         }
+
         for (int i=0; i<fields.size(); i++){
             Element fieldelement = (Element) fields.get(i);
             map.put(fieldelement.getAttributeValue("name"),fieldelement);
