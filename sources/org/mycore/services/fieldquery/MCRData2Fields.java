@@ -147,7 +147,6 @@ public class MCRData2Fields
         {
           MCRSearchField field = new MCRSearchField();
           field.setName( fieldDef.getAttributeValue( "name" ) );
-          field.setDataType( fieldDef.getAttributeValue( "type" ) );
           field.setFile( (MCRFile)obj );
           values.add( field );
         }
@@ -207,7 +206,6 @@ public class MCRData2Fields
       Element fv = (Element)( fieldValues.get( i ) );
       MCRSearchField field = new MCRSearchField();
       field.setName( fv.getAttributeValue( "name" ) );
-      field.setDataType( fv.getAttributeValue( "type" ) );
       field.setValue( fv.getAttributeValue( "value" ) );
       values.add( field );
     }
