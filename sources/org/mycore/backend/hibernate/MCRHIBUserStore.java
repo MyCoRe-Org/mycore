@@ -182,7 +182,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         Session session = MCRHIBConnection.instance().getSession();
 	List l = null;
         try {
-	    l = session.createQuery("from MCRUSERS where NUMID = '" + numID + "' or UID = '" + userID + "'").list();
+	    l = session.createQuery("from MCRUSERS where NUMID = " + numID + " or UID = '" + userID + "'").list();
 	} catch(Exception e) {
 	    logger.error(e);
 	    throw new MCRException("error during existsUser()", e);
