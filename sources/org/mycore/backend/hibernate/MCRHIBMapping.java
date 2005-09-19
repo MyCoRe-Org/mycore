@@ -293,7 +293,7 @@ public class MCRHIBMapping {
 			map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned",
 					false);
 			map.addIDColumn("type", "MCRTYPE", dbString, 64, "assigned", false);
-			map.addColumn("xml", "MCRXML", dbBlob, 0, false, false, false);
+			map.addColumn("xml", "MCRXML", dbBlob, 7000000, false, false, false);
 			cfg.addXML(map.getTableXML());
 
 			cfg.createMappings();
