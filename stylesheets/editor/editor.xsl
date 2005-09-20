@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.40 $ $Date: 2005-07-20 12:23:12 $ -->
+<!-- $Revision: 1.41 $ $Date: 2005-09-20 08:38:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -72,24 +72,24 @@
   <form>
     <xsl:call-template name="editor.set.form.attrib" />    
 
-    <table border="0" cellspacing="0" cellpadding="0">
-
-      <xsl:if test="panel[@id=current()/@root]/@lines='on'">
-        <xsl:attribute name="style">
-          <xsl:value-of select="concat('border-top: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-left: ',$editor.border,'; ')" />
-        </xsl:attribute>
-      </xsl:if>
+    <table border="0" cellpadding="0" cellspacing="0" class="editor">
 
       <!-- ======== if exists, output editor headline ======== -->
       <xsl:apply-templates select="headline" />
 
+      <!-- ======== if validation errors exist, display message ======== -->
+      <xsl:apply-templates select="/editor/failed">
+        <xsl:with-param name="lines" select="panel[@id=current()/@root]/@lines" />
+      </xsl:apply-templates>
+
       <tr>
-        <td style="{concat('background-color: ',$editor.background.color,';')}">
+        <td>
+        
           <!-- ======== start at the root panel ======== -->
           <xsl:apply-templates select="panel[@id=current()/@root]">
             <xsl:with-param name="var" select="@var" />
           </xsl:apply-templates>
+          
         </td>
       </tr>
 
@@ -133,8 +133,7 @@
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
     <xsl:when test="../target/@type">
-      <input type="hidden" name="{$editor.delimiter.internal}target-type"
-             value="{../target/@type}" />
+      <input type="hidden" name="{$editor.delimiter.internal}target-type" value="{../target/@type}" />
     </xsl:when>
     <xsl:otherwise>
       <input type="hidden" name="{$editor.delimiter.internal}target-type" value="display" />
@@ -175,30 +174,37 @@
   <xsl:for-each select="../target-parameters/target-parameter">
     <input type="hidden" name="{@name}" value="{text()}" />
   </xsl:for-each>
+
+  <!-- ======== Cancel URL durchreichen ======== -->
+  <input type="hidden" name="_cancelURL" value="{../cancel/@url}" />
 </xsl:template>
 
 <!-- ======== headline ======== -->
 <xsl:template match="headline">
-  <xsl:variable name="lines" select="../panel[@id=current()/../@root]/@lines"/>
-
   <tr> 
-    <td>
-
-      <xsl:attribute name="style">
-        <xsl:if test="$lines='on'">
-          <xsl:value-of select="concat('border-right: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-bottom: ',$editor.border,'; ')" />
-        </xsl:if>
-        <xsl:value-of select="concat('padding: ',$editor.padding,'; ')" />
-        <xsl:value-of select="concat($editor.headline.style,' ')" />
-        <xsl:value-of select="concat($editor.font,' ')" />
-      </xsl:attribute>
+    <td class="editorHeadline">
 
       <xsl:call-template name="editor.set.anchor" />
+
       <xsl:apply-templates select="text | output">
         <xsl:with-param name="var" select="../@var" />
       </xsl:apply-templates>
 
+    </td>
+  </tr>
+</xsl:template>
+
+<!-- ======== validation errors exist ======== -->
+<xsl:template match="failed">
+  <tr>
+    <td class="editorValidationMessage">
+
+      <xsl:for-each select="/editor/validationMessage">
+        <xsl:call-template name="output.label">
+          <xsl:with-param name="usefont" select="'yes'" />
+        </xsl:call-template>
+      </xsl:for-each>
+      
     </td>
   </tr>
 </xsl:template>
@@ -231,19 +237,15 @@
 
   <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num.visible}" />
 
-  <table border="0" cellspacing="0" cellpadding="0">
+  <table border="0" cellpadding="0" cellspacing="0" class="editorPanel">
   
-    <!-- If repeater is last component in parent panel, this table must be width 100% -->
-    <xsl:if test="$num.next = '0'">
-      <xsl:attribute name="width">100%</xsl:attribute>
-    </xsl:if>
-
     <!-- ======== iterate rows in repeater ======== -->
     <xsl:call-template name="repeater.row">
       <xsl:with-param name="var" select="$var" />
       <xsl:with-param name="pos" select="$pos" />
       <xsl:with-param name="num" select="$num" />
     </xsl:call-template>
+    
   </table>
 </xsl:template>
 
@@ -300,6 +302,13 @@
 
   <!-- ======== output another repeated row ======== -->
   <xsl:if test="($row.nr &lt; $min) or ($row.nr &lt; $num)">
+    <xsl:if test="@lines='on'">
+      <tr>
+        <td width="100%" colspan="2" class="editorHLine">
+          <img src="" height="1" width="1" alt=" "/>
+        </td>
+      </tr>
+    </xsl:if>
     <xsl:call-template name="repeater.row">
       <xsl:with-param name="row.nr" select="1 + $row.nr" />
       <xsl:with-param name="num" select="$num" />
@@ -335,11 +344,14 @@
   </xsl:variable>
  
   <td>
+  
     <xsl:call-template name="cell">
-      <xsl:with-param name="var" select="$var.new" />
-      <xsl:with-param name="pos" select="$pos.new" />
-      <xsl:with-param name="outer.border" select="@lines" />
+      <xsl:with-param name="var"   select="$var.new" />
+      <xsl:with-param name="pos"   select="$pos.new" />
+      <xsl:with-param name="lines" select="@lines" />
+      <xsl:with-param name="first" select="not(@pos='left')" />
     </xsl:call-template>
+    
   </td>
 </xsl:template>
 
@@ -352,30 +364,47 @@
   <xsl:param name="row.nr" />
 
   <td align="left" valign="bottom">
-    <xsl:if test="$num &lt; $max" >
-      <div style="margin-left:2px; margin-bottom:2px;">
-        <input type="image" name="{$editor.delimiter.internal}p-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
-      </div>
-    </xsl:if>
-  </td>
-  <td align="left" valign="bottom">
-      <div style="margin-left:2px;  margin-bottom:2px;">
+  
+    <xsl:attribute name="class">
+      <xsl:choose>
+        <xsl:when test="@lines='on' and not(@pos='left')">editorCellWithCompLinesOn</xsl:when>
+        <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tr>
+  
+      <td align="left" valign="bottom" class="editorRepeaterButton">
+        <xsl:choose>
+          <xsl:when test="$num &lt; $max">
+            <input type="image" name="{$editor.delimiter.internal}p-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
+          </xsl:when>
+          <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
+        </xsl:choose>
+      </td>
+      <td align="left" valign="bottom" class="editorRepeaterButton">
         <input type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
-      </div>
-  </td>
-  <td align="left" valign="bottom">
-    <xsl:if test="($row.nr &lt; $num) or ($row.nr &lt; $min)" >
-      <div style="margin-left:2px;  margin-bottom:2px;">
+      </td>
+      <td align="left" valign="bottom" class="editorRepeaterButton">
+        <xsl:choose>
+          <xsl:when test="($row.nr &lt; $num) or ($row.nr &lt; $min)">
         <input type="image" name="{$editor.delimiter.internal}d-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
-      </div>
-    </xsl:if>
-  </td>
-  <td align="left" valign="bottom">
-    <xsl:if test="$row.nr &gt; 1" >
-      <div style="margin-left:2px;  margin-bottom:2px;">
+          </xsl:when>
+          <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
+        </xsl:choose>
+      </td>
+      <td align="left" valign="bottom" class="editorRepeaterButton">
+        <xsl:choose>
+          <xsl:when test="$row.nr &gt; 1">
         <input type="image" name="{$editor.delimiter.internal}u-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
-      </div>
-    </xsl:if>
+          </xsl:when>
+          <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
+        </xsl:choose>
+      </td>
+      
+      </tr>
+    </table>
   </td>
 </xsl:template>
 
@@ -388,13 +417,7 @@
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
-  <xsl:if test="$cells">
-  <table border="0" cellspacing="0" cellpadding="0">
-
-    <!-- If panel is last component in parent panel, this table must be width 100% -->
-    <xsl:if test="$num.next = '0'">
-      <xsl:attribute name="width">100%</xsl:attribute>
-    </xsl:if>
+  <table border="0" cellpadding="0" cellspacing="0" class="editorPanel">
 
     <!-- ======== iterate rows in panel ======== -->
     <xsl:call-template name="editor.row">
@@ -402,15 +425,21 @@
       <xsl:with-param name="var"   select="$var"   />
       <xsl:with-param name="pos"   select="$pos"   />
     </xsl:call-template>
+    
   </table>
-  </xsl:if>
 
   <!-- ======== handle hidden fields ======== -->
   <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
-    <xsl:with-param name="cells" select="$cells" />
-    <xsl:with-param name="var"   select="$var"   />
-    <xsl:with-param name="pos"   select="$pos"   />
+    <xsl:with-param name="num" select="count($cells)" />
+    <xsl:with-param name="var" select="$var" />
+    <xsl:with-param name="pos" select="$pos" />
   </xsl:apply-templates>
+
+  <!-- ======== handle panel validation conditions ======== -->
+  <xsl:for-each select="ancestor::components/panel[@id = current()/include/@ref]/condition|condition">
+    <input type="hidden" name="{$editor.delimiter.internal}cond-{$var}" value="{@id}" />
+  </xsl:for-each>
+  
 </xsl:template>
 
 <!-- ======== handle row in panel ======== -->
@@ -432,6 +461,14 @@
     </tr>
   </xsl:if>
 
+  <xsl:if test="(count($cells[@row=$row.nr]) &gt; 0) and ($cells[@row &gt; $row.nr]) and (@lines='on')">
+    <tr>
+      <td width="100%" colspan="10" class="editorHLine">
+        <img src="" height="1" width="1" alt=" "/>
+      </td>
+    </tr>
+  </xsl:if>
+  
   <!-- ======== iterate through all rows ======== -->
   <xsl:if test="$cells[@row &gt; $row.nr]">
     <xsl:call-template name="editor.row">
@@ -464,18 +501,13 @@
 
   <!-- ======== is this the last column?  ======== -->
   <xsl:variable name="num.next" select="count($cells[@col &gt; (number($col.nr) + number($col.span) - 1)])"/>
-
+  <xsl:variable name="num.prev" select="count($cells[(@col &lt; number($col.nr)) and (@row = $row.nr)])"/>
+  
   <td colspan="{$col.span}">
     <xsl:variable name="the.cell" select="$cells[(@row=$row.nr) and (@col=$col.nr)][1]" />
 
     <!-- ======== if there is no cell here, add space ======== -->
     <xsl:if test="count($the.cell) = 0">
-      <xsl:if test="@lines='on'">
-        <xsl:attribute name="style">
-          <xsl:value-of select="concat('border-right: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-bottom: ',$editor.border,'; ')" />
-        </xsl:attribute>
-      </xsl:if>
       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
     </xsl:if>
 
@@ -503,15 +535,16 @@
         <xsl:value-of select="$pos.new" />
       </xsl:attribute>
 
-      <xsl:variable name="outer.border" select="@lines" />
-
+      <xsl:variable name="lines" select="@lines" />
+      
       <!-- ======== if there is a cell here, handle it ======== -->
       <xsl:for-each select="$the.cell">
         <xsl:call-template name="cell">
           <xsl:with-param name="var"      select="$var"      />
           <xsl:with-param name="pos"      select="$pos.new"  />
           <xsl:with-param name="num.next" select="$num.next" />
-          <xsl:with-param name="outer.border" select="$outer.border" />
+          <xsl:with-param name="lines"    select="$lines"    />
+          <xsl:with-param name="first"    select="$num.prev = 0" />
         </xsl:call-template>
       </xsl:for-each>
 
@@ -535,7 +568,8 @@
   <xsl:param name="var" />
   <xsl:param name="pos" />
   <xsl:param name="num.next" select="'0'" />
-  <xsl:param name="outer.border" />
+  <xsl:param name="lines" />
+  <xsl:param name="first" />
 
   <!-- ======== build new variable path ======== -->
   <xsl:variable name="var.new">
@@ -549,45 +583,32 @@
 
   <!-- ======== set width / height ======== -->
   <xsl:copy-of select="@height" />
-  <xsl:choose>
-    <xsl:when test="@width">
-      <xsl:copy-of select="@width"/>
-    </xsl:when>
-    <xsl:when test="$num.next = '0'">
-      <xsl:attribute name="width">100%</xsl:attribute>
-    </xsl:when>
-  </xsl:choose>
+  <xsl:copy-of select="@width" />
 
   <!-- ======== handle referenced or embedded component ======== -->
   <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
 
-    <!-- ======== set border style ======== -->
-    <xsl:if test="local-name() = 'panel'">
-      <xsl:variable name="inner.border" select="@lines" />
-      <xsl:variable name="from.to" select="concat( $outer.border, ' to ', $inner.border )" /> 
-
-      <xsl:if test="$from.to = 'on to off'">
-        <xsl:attribute name="style">
-          <xsl:value-of select="concat('border-right: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-bottom: ',$editor.border,'; ')" />
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="$from.to = 'off to on'">
-        <xsl:attribute name="style">
-          <xsl:value-of select="concat('border-top: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-left: ',$editor.border,'; ')" />
-        </xsl:attribute>
-      </xsl:if>
-
-    </xsl:if>
-    <xsl:if test="( local-name() != 'panel' ) and ( local-name() != 'repeater' ) and (position() = 1)">
-      <xsl:attribute name="style">
-        <xsl:if test="$outer.border='on'">
-          <xsl:value-of select="concat('border-right: ',$editor.border,'; ')" />
-          <xsl:value-of select="concat('border-bottom: ',$editor.border,'; ')" />
-        </xsl:if>
-        <xsl:value-of select="concat('padding: ',$editor.padding,'; ')" />
-      </xsl:attribute>
+    <xsl:if test="position() = 1">
+      <xsl:attribute name="class">
+        <xsl:choose>
+          <xsl:when test="/editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">editorCellValidationFailed</xsl:when>
+          <xsl:when test="$first='true'">
+            <xsl:choose>
+			  <xsl:when test="$lines='off' and @lines='on'">editorCellWithPanelLinesOn</xsl:when>
+			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOff</xsl:when>
+              <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+			  <xsl:when test="$lines='on' and contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOn</xsl:when>
+			  <xsl:when test="$lines='on'">editorCellWithCompLinesOn</xsl:when>
+			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOff</xsl:when>
+              <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+  	    </xsl:choose>
+  	  </xsl:attribute>
     </xsl:if>
 
     <!-- ======== handle nested component (textfield, textarea, ...) ======== -->
@@ -597,9 +618,21 @@
       <xsl:with-param name="num.next" select="$num.next" />
     </xsl:apply-templates>
 
-    <!-- ======== hidden field for sorting the entry ======== -->
-    <!-- ======== hidden field for identifying entry ======== -->
-    <xsl:if test="contains('textfield textarea password file list checkbox ', concat(name(),' '))">
+    <!-- ======== show failed input validation message ======== -->
+    <xsl:if test="contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
+      <xsl:if test="/editor/failed/field[@sortnr=$pos]">
+        <xsl:variable name="message">
+          <xsl:for-each select="//condition[@id=/editor/failed/field[@sortnr=$pos]/@condition]">
+            <xsl:call-template name="output.label" />
+          </xsl:for-each>
+        </xsl:variable>
+        <img border="0" align="absbottom" src="{$WebApplicationBaseURL}images/validation-error.png" alt="{$message}" title="{$message}" />
+      </xsl:if>
+    </xsl:if>
+  
+    <xsl:if test="contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
+      <!-- ======== hidden field for sorting the entry ======== -->
+      <!-- ======== hidden field for identifying entry ======== -->
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos}" />
       <input type="hidden" name="{$editor.delimiter.internal}id@{$var.new}" value="{@id}" />
     </xsl:if>
@@ -671,7 +704,7 @@
 
   <xsl:choose>
     <xsl:when test="button">
-      <input type="button" onClick="window.open('{$url}','help','{$properties}');" style="{$editor.font} {$editor.button.style}" >
+      <input type="button" onClick="window.open('{$url}','help','{$properties}');" class="editorButton">
         <xsl:attribute name="value">
           <xsl:choose>
             <xsl:when test="button[lang($CurrentLang)]">
@@ -688,17 +721,16 @@
       </input>
     </xsl:when>
     <xsl:otherwise>
-      <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');" style="{$editor.font} {$editor.button.style}" />
+      <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');" class="editorButton" />
     </xsl:otherwise>
   </xsl:choose>
-
 </xsl:template>
 
 <!-- ======== hidden ======== -->
 <xsl:template match="hidden">
-  <xsl:param name="cells" />
-  <xsl:param name="var"   />
-  <xsl:param name="pos"   />
+  <xsl:param name="num" />
+  <xsl:param name="var" />
+  <xsl:param name="pos" />
 
   <xsl:variable name="var.new">
     <xsl:call-template name="editor.build.new.var">
@@ -717,7 +749,7 @@
         <xsl:value-of select="@sortnr"/>
       </xsl:when>
       <xsl:otherwise> 
-        <xsl:value-of select="count($cells) + position()" />
+        <xsl:value-of select="number($num) + position()" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
@@ -751,6 +783,26 @@
   </xsl:call-template>
 </xsl:template>
 
+<!-- ======== display ======= -->
+<xsl:template match="display">
+  <xsl:param name="var" />
+  
+  <span class="editorText">
+    <xsl:choose>
+      <xsl:when test="ancestor::editor/input/var[@name = $var]">
+        <input type="hidden" name="{$var}" value="{ancestor::editor/input/var[@name = $var]/@value}" />
+        <xsl:value-of select="ancestor::editor/input/var[@name = $var]/@value" />
+      </xsl:when>
+      <xsl:when test="@default">
+        <xsl:value-of select="@default" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>  
+  </span>
+</xsl:template>
+
 <!-- ======== output ======== -->
 <xsl:template match="output">
   <xsl:param name="var" />
@@ -762,10 +814,10 @@
   </xsl:variable>
 
   <!-- ======== get the value of this field from xml source ======== -->
-  <span style="{$editor.font}">
-    <xsl:variable name="selected.cell" 
-      select="ancestor::editor/input/var[@name=$var.new]" 
-    />
+  <xsl:variable name="selected.cell" 
+    select="ancestor::editor/input/var[@name=$var.new]" 
+  />
+  <span class="editorText">
     <xsl:choose>
       <xsl:when test="$selected.cell">
         <xsl:value-of select="$selected.cell/@value" disable-output-escaping="yes" />
@@ -802,8 +854,7 @@
   </xsl:variable>
   
   <xsl:if test="local-name() = 'textfield'">
-    <input type="text" size="{@width}" name="{$var}" value="{$value}" 
-      style="{$editor.font} height: {$editor.textinput.height}; border: {$editor.textinput.border};">
+    <input type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
     </input>
   </xsl:if>
@@ -815,7 +866,6 @@
       <xsl:text>rows="</xsl:text><xsl:value-of select="@height"/><xsl:text>" </xsl:text>
       <xsl:text>wrap="</xsl:text><xsl:value-of select="$wrap"/><xsl:text>" </xsl:text>
       <xsl:text>name="</xsl:text><xsl:value-of select="$var"/><xsl:text>" </xsl:text>
-      <xsl:text>style="</xsl:text><xsl:value-of select="concat($editor.font,' border: ',$editor.textinput.border)"/><xsl:text>" </xsl:text>
       <xsl:text disable-output-escaping="yes">&gt;</xsl:text>
 
       <xsl:value-of select="$value" disable-output-escaping="yes" />
@@ -834,20 +884,17 @@
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
   <xsl:if test="string-length($source) != 0">
-    <span style="{$editor.font}">
-      <xsl:text>Existierende Datei auf dem Server: </xsl:text>
-      <b><xsl:value-of select="$source" /></b>
-      <br/>
-      <input type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
-      <xsl:text> löschen </xsl:text>
-      <input type="hidden" name="{$var}" value="{$source}" />
-      und/oder ersetzen durch diese Datei: <xsl:text/>
-      <br/>
-    </span>
+    <span class="editorText">Existierende Datei auf dem Server: </span>
+    <b><span class="editorText"><xsl:value-of select="$source" /></span></b>
+    <br/>
+    <input type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
+    <span class="editorText"> löschen </span>
+    <input type="hidden" name="{$var}" value="{$source}" />
+    <span class="editorText">und/oder ersetzen durch diese Datei: </span>
+    <br/>
   </xsl:if>
 
-  <input type="file" size="{@width}" name="{$var}"
-    style="{$editor.font} height: {$editor.textinput.height}; border: {$editor.textinput.border};">
+  <input type="file" size="{@width}" name="{$var}">
     <xsl:if test="@accept">
       <xsl:attribute name="accept"><xsl:value-of select="@accept"/></xsl:attribute>
     </xsl:if>
@@ -866,8 +913,7 @@
     <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
   </xsl:variable>
 
-  <input type="password" size="{@width}" value="{$source}" name="{$var}"
-    style="{$editor.font} height: {$editor.textinput.height}; border: {$editor.textinput.border};"/>
+  <input type="password" size="{@width}" value="{$source}" name="{$var}" />
 </xsl:template>
 
 <!-- ======== subselect ======== -->
@@ -878,13 +924,10 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}">
-    <xsl:attribute name="style">
-      <xsl:value-of select="concat($editor.font,' ',$editor.button.style)"/>
-      <xsl:if test="@width">
-        <xsl:value-of select="concat(' width: ',@width,';')"/>
-      </xsl:if>
-    </xsl:attribute>
+  <input type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}" class="editorButton">
+    <xsl:if test="@width">
+      <xsl:attribute name="style">width:<xsl:value-of select="@width" /></xsl:attribute>
+    </xsl:if>
   </input>
 </xsl:template>
 
@@ -927,13 +970,10 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="button" value="{$label}" onClick="self.location.href='{$url}'">
-    <xsl:attribute name="style">
-      <xsl:value-of select="concat($editor.font,' ',$editor.button.style)"/>
-      <xsl:if test="$width">
-        <xsl:value-of select="concat(' width: ',$width,';')"/>
-      </xsl:if>
-    </xsl:attribute>
+  <input type="button" value="{$label}" onClick="self.location.href='{$url}'" class="editorButton">
+    <xsl:if test="$width">
+      <xsl:attribute name="style">width:<xsl:value-of select="$width" /></xsl:attribute>
+    </xsl:if>
   </input>
 </xsl:template>
 
@@ -943,13 +983,10 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="submit" value="{$label}">
-    <xsl:attribute name="style">
-      <xsl:value-of select="concat($editor.font,' ',$editor.button.style)"/>
-      <xsl:if test="@width">
-        <xsl:value-of select="concat(' width: ',@width,';')"/>
-      </xsl:if>
-    </xsl:attribute>
+  <input type="submit" value="{$label}" class="editorButton">
+    <xsl:if test="@width">
+      <xsl:attribute name="style">width:<xsl:value-of select="@width" /></xsl:attribute>
+    </xsl:if>
   </input>
 </xsl:template>
 
@@ -1022,7 +1059,7 @@
 
   <xsl:variable name="type" select="@type" />
 
-  <table border="0" cellpadding="0" cellspacing="0">
+  <table>
     <xsl:for-each select="item">
 
       <xsl:variable name="pxy" select="position() - 1" />
@@ -1093,7 +1130,7 @@
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
   </input>
-  <xsl:for-each select="$item">                                                                                                                                                  
+  <xsl:for-each select="$item">
     <xsl:call-template name="output.label">
       <xsl:with-param name="usefont" select="'yes'" />
     </xsl:call-template>
@@ -1128,7 +1165,7 @@
 
 <!-- ======== space ======== -->
 <xsl:template match="space">
-  <div>
+  <span>
     <xsl:attribute name="style">
       <xsl:text>margin: 0px; </xsl:text>
       <xsl:if test="@width">
@@ -1142,7 +1179,7 @@
         <xsl:text>; </xsl:text>
       </xsl:if>
     </xsl:attribute> 
-  </div>
+  </span>
 </xsl:template>
 
 <!-- ======== handle multirow or dropdown ======== -->
@@ -1158,12 +1195,11 @@
       <xsl:attribute name="multiple">multiple</xsl:attribute>
     </xsl:if>
 
-    <xsl:attribute name="style">
-      <xsl:value-of select="concat($editor.font.select,' border: ',$editor.textinput.border,'; ')"/>
-      <xsl:if test="@width">
-        <xsl:value-of select="concat('width: ',@width,';')"/>
-      </xsl:if>
-    </xsl:attribute>
+    <xsl:if test="@width">
+      <xsl:attribute name="style">
+        <xsl:value-of select="concat('width:',@width)"/>
+      </xsl:attribute>
+    </xsl:if>
 
     <xsl:apply-templates select="item" mode="editor.list">
       <xsl:with-param name="value" select="$value" />
@@ -1208,7 +1244,6 @@
     <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
   </xsl:apply-templates>
 </xsl:template>
-
 
 <!-- ========================================================================= -->
 

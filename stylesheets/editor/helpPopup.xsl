@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2005-06-16 10:03:45 $ -->
+<!-- $Revision: 1.4 $ $Date: 2005-09-20 08:38:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -50,7 +50,7 @@ Hilfe zum Formular
       </xsl:when>
       <xsl:otherwise>
         <style type="text/css"><xsl:text>
-           body, html {</xsl:text><xsl:value-of select="$editor.font"/><xsl:text>}
+           body, html {font-size:12px; font-family:Verdana,Arial,Helvetica,SansSerif; line-height:16px }
           </xsl:text>
         </style>
       </xsl:otherwise>
@@ -68,14 +68,7 @@ Hilfe zum Formular
 
         <tr>
           <td align="right">
-            <xsl:choose>
-              <xsl:when test="helpPopup/close">
-                <input type="button" class="actionButton" value="Fenster schliessen" onClick="window.close();" />
-              </xsl:when>
-              <xsl:otherwise>
-                <input type="button" style="{$editor.font} {$editor.button.style}" value="Fenster schliessen" onClick="window.close();" />
-              </xsl:otherwise>
-            </xsl:choose>
+            <input type="button" class="editorButton" value="Fenster schliessen" onClick="window.close();" />
           </td>
         </tr>
 

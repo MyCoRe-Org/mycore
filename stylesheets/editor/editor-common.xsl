@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2005-06-16 10:03:45 $ -->
+<!-- $Revision: 1.5 $ $Date: 2005-09-20 08:38:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -12,8 +12,6 @@
 >
 
 <!-- ========================================================================= -->
-
-<xsl:include href="editor-config.xsl" />
 
 <!-- ============ Parameter aus MyCoRe LayoutServlet ============ -->
 <xsl:param name="WebApplicationBaseURL"     />
@@ -29,9 +27,7 @@
   <xsl:param name="usefont" select="'no'" />
 
   <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;span style="</xsl:text>
-    <xsl:value-of select="$editor.font" />
-    <xsl:text disable-output-escaping="yes">" &gt;</xsl:text>
+    <xsl:text disable-output-escaping="yes">&lt;span class="editorText" &gt;</xsl:text>
   </xsl:if>
 
   <xsl:choose>
@@ -86,9 +82,7 @@
   <xsl:param name="usefont" select="'no'" />
 
   <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;span style="</xsl:text>
-    <xsl:value-of select="$editor.font" />
-    <xsl:text disable-output-escaping="yes">" &gt;</xsl:text>
+    <xsl:text disable-output-escaping="yes">&lt;span class="editorText" &gt;</xsl:text>
   </xsl:if>
 
   <xsl:choose>

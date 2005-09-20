@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2004-12-30 10:03:18 $ -->
+<!-- $Revision: 1.3 $ $Date: 2005-09-20 08:45:34 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -32,7 +32,7 @@
       <title>Hilfe zum Formular</title>
     </head>
     <style type="text/css"><xsl:text>
-      . {</xsl:text><xsl:value-of select="$editor.font"/><xsl:text>}
+      . {font-size:12px; font-family:Verdana,Arial,Helvetica,SansSerif; line-height:16px }
     </xsl:text>
     </style>
     <body>
@@ -48,7 +48,7 @@
 
         <tr>
           <td align="right">
-            <input type="button" style="{$editor.font} {$editor.button.style}" value="Fenster schliessen" onClick="window.close();" />
+            <input type="button" class="editorButton" value="Fenster schliessen" onClick="window.close();" />
           </td>
         </tr>
 
