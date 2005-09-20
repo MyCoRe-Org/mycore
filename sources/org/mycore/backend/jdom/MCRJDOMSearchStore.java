@@ -27,11 +27,11 @@ package org.mycore.backend.jdom;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
-import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class is the persistence layer for a nativ memory JDOM databases.

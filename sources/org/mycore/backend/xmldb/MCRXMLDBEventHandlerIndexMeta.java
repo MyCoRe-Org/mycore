@@ -33,12 +33,12 @@ import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class builds indexes from mycore meta data in a temporary XMLDB store.

@@ -33,10 +33,10 @@ import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.modules.XPathQueryService;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
 /**

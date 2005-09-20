@@ -22,16 +22,35 @@
  *
  **/
 
-package org.mycore.datamodel.metadata;
+package org.mycore.common;
+
+import java.util.Locale;
+import java.util.regex.Pattern;
+
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaElement;
+import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
+import org.mycore.datamodel.metadata.MCRMetaPersonName;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
 
 /**
  * This class implements only static methods to normalize text values.
  * 
- * @author Frank LÃ¼tzenkirchen
+ * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  */
 public class MCRNormalizeText {
+	
+	static final Pattern AE_PATTERN=Pattern.compile("ä");
+	static final Pattern OE_PATTERN=Pattern.compile("ö");
+	static final Pattern UE_PATTERN=Pattern.compile("ü");
+	static final Pattern SZ_PATTERN=Pattern.compile("ß");
+
 
   /**
    * This methode replace any characters of languages like german to
@@ -42,25 +61,14 @@ public class MCRNormalizeText {
    */
   public static final String normalizeString(String in) {
     if (in == null) { return ""; }
-    StringBuffer sb = new StringBuffer(8192);
-    for (int i = 0; i < in.length(); i++) {
-      if (in.charAt(i) == '\u00c4') {
-        sb.append("Ae"); continue; }
-      if (in.charAt(i) == '\u00e4') {
-        sb.append("ae"); continue; }
-      if (in.charAt(i) == '\u00d6') {
-        sb.append("Oe"); continue; }
-      if (in.charAt(i) == '\u00f6') {
-        sb.append("oe"); continue; }
-      if (in.charAt(i) == '\u00dc') {
-        sb.append("Ue"); continue; }
-      if (in.charAt(i) == '\u00fc') {
-        sb.append("ue"); continue; }
-      if (in.charAt(i) == '\u00df') {
-        sb.append("sz"); continue; }
-      sb.append(in.charAt(i));
-      }
-    return sb.toString().toLowerCase();
+    in = in.toLowerCase(Locale.GERMANY);
+    return AE_PATTERN.matcher( //replace "ä" by "ae"
+				OE_PATTERN.matcher( //replace "ö" by "oe"
+					UE_PATTERN.matcher( //replace "ü" by "ue"
+						SZ_PATTERN.matcher(in).replaceAll("ss")) //replace "ß" by "ss"
+					.replaceAll("ue"))
+			    .replaceAll("oe"))
+		   .replaceAll("ae");
     }
 
   /**

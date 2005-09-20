@@ -34,10 +34,10 @@ import org.jdom.Element;
 import org.jdom.Document;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
 /**

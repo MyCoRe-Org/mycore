@@ -35,10 +35,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.datamodel.metadata.MCRNormalizeText;
 
 /**
  * This class implements the memory store based on JDOM documents.
