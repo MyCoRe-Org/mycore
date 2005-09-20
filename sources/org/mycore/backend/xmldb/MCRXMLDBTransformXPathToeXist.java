@@ -134,6 +134,24 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 	 * Handle query string for exist
 	 */
 	private String handleQueryStringExist(String root, String query, String type) {
+		// Normalize the contains operation values
+		int i = query.length();
+		int j = 0;
+		StringBuffer sb = new StringBuffer(1024);
+		while (j < i) {
+			int k = query.indexOf("contains",j);
+			if (k == -1) { sb.append(query.substring(j,i)); break; }
+			int l = query.indexOf("(",k);
+			int m = query.indexOf(")",k);
+			if ((l != -1) && (m != -1)) {
+				sb.append(query.substring(j,l))
+					.append(MCRNormalizeText.normalizeString(query.substring(l,m+1)));
+				j += m+1;
+				}
+			else { sb.append(query.substring(j,i)); break; }
+                	}
+		query = sb.toString();
+
 		query = MCRUtils.replaceString(query, "#####", "");
 		query = MCRUtils.replaceString(query, "like", "&=");
 		query = MCRUtils.replaceString(query, "text()", ".");
@@ -149,18 +167,18 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 				"@categid$1\"X$2\"");
 
 		// select numbers and remove ""
-		int i = 0;
+		i = 0;
 		int l = query.length();
 		double k = 0;
 		while (i < l) {
 			i = query.indexOf("\"", i);
 			if (i != -1) {
-				int j = query.indexOf("\"", i + 1);
+				j = query.indexOf("\"", i + 1);
 				if (j != -1) {
 					try {
 						k = Double.parseDouble(query.substring(i + 1, j)
 								.replace(',', '.'));
-						StringBuffer sb = new StringBuffer(1024);
+						sb = new StringBuffer(1024);
 						sb.append(query.substring(0, i));
 						if (k == Math.floor(k)) {
 							int m = (int) k;
@@ -175,7 +193,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 					} catch (Exception e) {
 						String s = MCRUtils.covertDateToISO(query.substring(
 								i + 1, j));
-						StringBuffer sb = new StringBuffer(1024);
+						sb = new StringBuffer(1024);
 						if (s != null) {
 							sb.append(query.substring(0, i + 1));
 							sb.append(s);
@@ -206,7 +224,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 			query = root + "/" + query.trim();
 		} else {
 			// combine the separated queries
-			query = MCRNormalizeText.normalizeString(root + "[" + query + "]");
+			query = root + "[" + query + "]";
 		}
 		return query;
 	}
@@ -229,7 +247,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 					" and /mycoreobject/"); // 031002
 		}
 
-		query = MCRNormalizeText.normalizeString(root + "[" + query + "]");
+		query = root + "[" + query + "]";
 		return query;
 	}
 }
