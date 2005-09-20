@@ -22,55 +22,20 @@
  *
  **/
 
-package org.mycore.common;
+package org.mycore.datamodel.metadata;
 
-import java.util.Locale;
-import java.util.regex.Pattern;
-
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
-import org.mycore.datamodel.metadata.MCRMetaLangText;
-import org.mycore.datamodel.metadata.MCRMetaPersonName;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.common.MCRNormalizer;
 
 /**
  * This class implements only static methods to normalize text values.
  * 
- * @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  *
  * @version $Revision$ $Date$
  */
 public class MCRNormalizeText {
 	
-	static final Pattern AE_PATTERN=Pattern.compile("ä");
-	static final Pattern OE_PATTERN=Pattern.compile("ö");
-	static final Pattern UE_PATTERN=Pattern.compile("ü");
-	static final Pattern SZ_PATTERN=Pattern.compile("ß");
-
-
-  /**
-   * This methode replace any characters of languages like german to
-   * normalized values.
-   *
-   * @param in a string
-   * @return the converted string in lower case.
-   */
-  public static final String normalizeString(String in) {
-    if (in == null) { return ""; }
-    in = in.toLowerCase(Locale.GERMANY);
-    return AE_PATTERN.matcher( //replace "ä" by "ae"
-				OE_PATTERN.matcher( //replace "ö" by "oe"
-					UE_PATTERN.matcher( //replace "ü" by "ue"
-						SZ_PATTERN.matcher(in).replaceAll("ss")) //replace "ß" by "ss"
-					.replaceAll("ue"))
-			    .replaceAll("oe"))
-		   .replaceAll("ae");
-    }
-
   /**
    * This methode replace any characters of languages like german to
    * normalized values. It works over a MCRObject JDOM tree. The
@@ -94,7 +59,7 @@ public class MCRNormalizeText {
         int le = metaelms.size();
         for (int j=0;j<le;j++) {
           org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
-          metaelm.setText(normalizeString(metaelm.getText()));
+          metaelm.setText(MCRNormalizer.normalizeString(metaelm.getText()));
           }
         }
       if (metaname.equals("MCRMetaPersonName")) {
@@ -103,13 +68,13 @@ public class MCRNormalizeText {
         for (int j=0;j<le;j++) {
           org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
           org.jdom.Element sub = metaelm.getChild("firstname");
-          sub.setText(normalizeString(sub.getText()));
+          sub.setText(MCRNormalizer.normalizeString(sub.getText()));
           sub = metaelm.getChild("callname");
-          sub.setText(normalizeString(sub.getText()));
+          sub.setText(MCRNormalizer.normalizeString(sub.getText()));
           sub = metaelm.getChild("fullname");
-          sub.setText(normalizeString(sub.getText()));
+          sub.setText(MCRNormalizer.normalizeString(sub.getText()));
           sub = metaelm.getChild("surname");
-          sub.setText(normalizeString(sub.getText()));
+          sub.setText(MCRNormalizer.normalizeString(sub.getText()));
           }
         }
       if (metaname.equals("MCRMetaInstitutionName")) {
@@ -118,7 +83,7 @@ public class MCRNormalizeText {
         for (int j=0;j<le;j++) {
           org.jdom.Element metaelm = (org.jdom.Element)metaelms.get(j);
           org.jdom.Element sub = metaelm.getChild("fullname");
-          sub.setText(normalizeString(sub.getText()));
+          sub.setText(MCRNormalizer.normalizeString(sub.getText()));
           }
         }
       }
@@ -141,17 +106,17 @@ public class MCRNormalizeText {
       if (metaelm.getClassName().equals("MCRMetaLangText")) {
         for (int j=0;j<metaelm.size();j++) {
           MCRMetaLangText item = (MCRMetaLangText)metaelm.getElement(j);
-          item.setText(normalizeString(item.getText()));
+          item.setText(MCRNormalizer.normalizeString(item.getText()));
           }
         }
       if (metaelm.getClassName().equals("MCRMetaPersonName")) {
         for (int j=0;j<metaelm.size();j++) {
           MCRMetaPersonName item = (MCRMetaPersonName)metaelm.getElement(j);
           String a = item.getAcademic();
-          String c = normalizeString(item.getCallName());
-          String v = normalizeString(item.getFirstName());
-          String f = normalizeString(item.getFullName());
-          String s = normalizeString(item.getSurName());
+          String c = MCRNormalizer.normalizeString(item.getCallName());
+          String v = MCRNormalizer.normalizeString(item.getFirstName());
+          String f = MCRNormalizer.normalizeString(item.getFullName());
+          String s = MCRNormalizer.normalizeString(item.getSurName());
           String p = item.getPeerage();
           String z = item.getPrefix();
           item.set(v,c,s,f,a,p,z);
@@ -160,7 +125,7 @@ public class MCRNormalizeText {
       if (metaelm.getClassName().equals("MCRMetaInstitutionName")) {
         for (int j=0;j<metaelm.size();j++) {
           MCRMetaInstitutionName item = (MCRMetaInstitutionName)metaelm.getElement(j);
-          String f = normalizeString(item.getFullName());
+          String f = MCRNormalizer.normalizeString(item.getFullName());
           String p = item.getProperty();
           String n = item.getNickname();
           item.set(f,n,p);

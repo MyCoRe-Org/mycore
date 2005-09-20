@@ -31,12 +31,11 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.Document;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
@@ -421,7 +420,7 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
 				}
 				if (op[i].equals("contains")) {
 				sbout.append(newtag).append(",\'").append(
-					MCRNormalizeText.normalizeString(
+					MCRNormalizer.normalizeString(
 						MCRUtils.replaceString(value[i], "*", "")
 						))
 						.append("\')");

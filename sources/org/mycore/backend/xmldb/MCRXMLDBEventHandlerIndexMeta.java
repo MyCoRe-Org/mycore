@@ -33,10 +33,10 @@ import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 

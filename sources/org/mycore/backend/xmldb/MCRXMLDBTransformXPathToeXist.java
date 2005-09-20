@@ -33,9 +33,9 @@ import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.modules.XPathQueryService;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRNormalizeText;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.query.MCRMetaSearchInterface;
 
@@ -145,7 +145,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 			int m = query.indexOf(")",k);
 			if ((l != -1) && (m != -1)) {
 				sb.append(query.substring(j,l))
-					.append(MCRNormalizeText.normalizeString(query.substring(l,m+1)));
+					.append(MCRNormalizer.normalizeString(query.substring(l,m+1)));
 				j += m+1;
 				}
 			else { sb.append(query.substring(j,i)); break; }
