@@ -46,6 +46,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.TermQuery;
 import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.*;
+import org.mycore.services.fieldquery.*;
 
 /**
  * This class builds a Lucene Query from XML query (specified by Frank Lützenkirchen)
@@ -108,7 +109,8 @@ public class MCRBuildLuceneQuery
         String operator = xEle.getAttributeValue( "operator", "" );
         String value    = xEle.getAttributeValue( "value", "" );
         
-        String fieldtype = MCRQueryManager.getInstance().getField( field ).getAttributeValue("type");
+        LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
+        String fieldtype =  MCRSearchField.getDataType( field );
         
         if ("name".equals( fieldtype ) )
           fieldtype = "text";
