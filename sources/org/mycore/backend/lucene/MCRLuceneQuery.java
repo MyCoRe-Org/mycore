@@ -54,8 +54,8 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
   	/** Reads properties from configuration file when class first used */
   	static {
 
-  		INDEX_DIR = MCRConfiguration.instance().getString("MCR.meta_lucene_searchindexdir");
-  		LOGGER.info("MCR.meta_lucene_searchindexdir: " + INDEX_DIR);
+  		INDEX_DIR = MCRConfiguration.instance().getString("MCR.Searcher.lucene.searchindexdir");
+  		LOGGER.info("MCR.Searcher.lucene.searchindexdir: " + INDEX_DIR);
   	}
     
     private Query luceneQuery;
@@ -124,6 +124,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
             Element x = cond.toXML();
             org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
             LOGGER.debug( outputter.outputString( x ) );
+            LOGGER.debug( "input" + outputter.outputString( root ) );
             
             List f = root.getChild("conditions").getChildren();
             boolean reqf = true;    // required flag Term with AND (true) or OR (false) combined
@@ -131,6 +132,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
             LOGGER.debug("Lucene Query: " + luceneQuery.toString() );
        
         }catch(Exception e){
+          e.printStackTrace();
             LOGGER.error(e);
         }
     }
