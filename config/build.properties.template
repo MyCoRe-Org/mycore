@@ -45,7 +45,8 @@
 # Use package: org.mycore.backend.sql
 # Hint: JDBC driver is included in MyCoRe!
 # MCR.JDBCStore.Type=mysql
-# MCR.JDBCStore.Jars=/usr/share/java/mysql-connector-java.jar
+# MCR.JDBCStore.BaseDir=/usr/share
+# MCR.JDBCStore.Jars=java/mysql-connector-java.jar
 
 # Hibernate for Linux or Windows
 # Use package: org.mycore.backend.hibernate
