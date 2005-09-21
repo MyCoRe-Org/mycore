@@ -146,7 +146,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
 			if ((l != -1) && (m != -1)) {
 				sb.append(query.substring(j,l))
 					.append(MCRNormalizer.normalizeString(query.substring(l,m+1)));
-				j += m+1;
+				j = m+1;
 				}
 			else { sb.append(query.substring(j,i)); break; }
                 	}
