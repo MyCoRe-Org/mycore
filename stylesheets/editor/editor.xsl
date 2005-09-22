@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.41 $ $Date: 2005-09-20 08:38:28 $ -->
+<!-- $Revision: 1.42 $ $Date: 2005-09-22 13:39:32 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1059,7 +1059,7 @@
 
   <xsl:variable name="type" select="@type" />
 
-  <table>
+  <table cellpadding="0" cellspacing="0" border="0">
     <xsl:for-each select="item">
 
       <xsl:variable name="pxy" select="position() - 1" />
@@ -1074,7 +1074,7 @@
         <xsl:text disable-output-escaping="yes">&lt;tr&gt;</xsl:text>
       </xsl:if>
 
-      <td>
+      <td class="editorRepeaterButton">
         <xsl:if test="$type='radio'">
           <xsl:call-template name="editor.radio">
             <xsl:with-param name="var"   select="$var"   />
