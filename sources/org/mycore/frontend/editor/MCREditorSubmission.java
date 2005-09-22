@@ -278,16 +278,10 @@ public class MCREditorSubmission {
                     String oper = condition.getAttributeValue("operator");
                     String format = condition.getAttributeValue("format");
 
-                    System.out.println("XXXXX checking " + pathA + " " + oper
-                            + " " + pathB);
-
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
                     boolean ok = MCRInputValidator.instance().compare(valueA,
                             valueB, oper, type, format);
-                    System.out.println("XXXXX " + valueA + " oper " + valueB
-                            + " = " + ok);
-
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
                         failed.put(sortNrA, condition);
