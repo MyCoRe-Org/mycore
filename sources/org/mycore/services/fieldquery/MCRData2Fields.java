@@ -204,9 +204,13 @@ public class MCRData2Fields
     for( int i = 0; i < fieldValues.size(); i++ )
     {
       Element fv = (Element)( fieldValues.get( i ) );
+      
+      String value = fv.getAttributeValue( "value" );
+      if( ( value == null ) || ( value.trim().length() == 0 ) ) continue;
+      
       MCRSearchField field = new MCRSearchField();
       field.setName( fv.getAttributeValue( "name" ) );
-      field.setValue( fv.getAttributeValue( "value" ) );
+      field.setValue( value );
       values.add( field );
     }
   }
