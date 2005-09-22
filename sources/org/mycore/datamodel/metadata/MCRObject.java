@@ -696,10 +696,10 @@ final public class MCRObject extends MCRBase {
 	 */
 	private final void updateThisInDatastore() throws MCRPersistenceException {
 		mcr_service.setDate("modifydate");
-		mcr_persist.update(this);
 		mcr_xmltable.update(mcr_id, createXML());
 		deleteLinksFromTable();
 		addLinksToTable();
+		mcr_persist.update(this);
 
 		// handle events
 		MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
