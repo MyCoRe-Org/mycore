@@ -416,6 +416,7 @@ public class MCREditorServlet extends MCRServlet {
 
             editor.removeChild("input");
             editor.removeChild("repeats");
+            editor.removeChild("failed");
 
             MCREditorSubmission sub = new MCREditorSubmission(parms, editor,
                     false);
