@@ -236,6 +236,18 @@ public class MCREditorSubmission {
             if (conditions == null)
                 continue;
 
+            // Skip variables with values equal to autofill text
+            String attrib = component.getAttributeValue("autofill");
+            String elem = component.getChildTextTrim("autofill");
+            String autofill = null;
+
+            if ((attrib != null) && (attrib.trim().length() > 0))
+                autofill = attrib.trim();
+            else if ((attrib != null) && (attrib.trim().length() > 0))
+                autofill = elem.trim();
+
+            if (values[0].trim().equals(autofill)) values[0]="";
+
             for (int i = 0; i < conditions.size(); i++) {
                 Element condition = (Element) (conditions.get(i));
                 for (int j = 0; j < values.length; j++) {
