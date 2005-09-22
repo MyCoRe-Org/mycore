@@ -183,7 +183,7 @@ public class MCRData2Fields
     root.setAttribute("extension", file.getExtension() );
 	root.setAttribute("contentTypeID", file.getContentTypeID() );
 	root.setAttribute("contentType", file.getContentType().getLabel() );
-	root.setAttribute("modified", sdf.format( file.getLastModified() ) );
+	root.setAttribute("modified", sdf.format( file.getLastModified().getTime() ) );
 	
 	if( file.hasAudioVideoExtender() )
 	{
