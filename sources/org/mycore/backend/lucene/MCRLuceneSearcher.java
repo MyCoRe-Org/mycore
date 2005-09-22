@@ -24,6 +24,7 @@
 
 package org.mycore.backend.lucene;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -50,6 +51,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearchField;
 import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.plugins.TextFilterPluginManager;
 
 /**
  * This class builds indexes from mycore meta data. 
@@ -68,19 +70,26 @@ public class MCRLuceneSearcher extends MCRSearcherBase
   static boolean FIRST = true;
 
   // TODO: read from property file
-  static String DATE_FORMAT = "yyyy-mm-dd";
+  static String DATE_FORMAT = "yyyy-MM-dd";
 
   static String TIME_FORMAT = "hh:mm:ss";
 
-  static String TIMESTAMP_FORMAT = "yyyy-mm-dd hh:mm:ss";
+  static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+
+  private static final TextFilterPluginManager PLUGIN_MANAGER = TextFilterPluginManager
+      .getInstance();
+  static
+  {
+    PLUGIN_MANAGER.loadPlugins();
+  }
 
    public void init(String ID) 
     {
         super.init( ID );
-        INDEX_DIR = CONFIG.getString(prefix + "searchindexdir");
-        LOGGER.info(prefix + "searchindexdir: " + INDEX_DIR);
-        String lockDir = CONFIG.getString(prefix + "lockdir", "");
-        LOGGER.info(prefix + "lockdir: " + lockDir);
+        INDEX_DIR = CONFIG.getString(prefix + "IndexDir");
+        LOGGER.info(prefix + "indexDir: " + INDEX_DIR);
+        String lockDir = CONFIG.getString("MCR.Lucene.LockDir", "");
+        LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
         File file = new File(lockDir);
 
         if (!file.exists())
@@ -136,11 +145,16 @@ protected void addToIndex( String entryID, List fields )
 
       if ( null != mcrfile )
       {
-        InputStreamReader in = new InputStreamReader( mcrfile.getContentAsInputStream() );
-        Field f = Field.Text( name, in );
-        doc.add( f );
+        if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType()))
+        {
+            LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath() );
+            BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(
+                mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
+            Field f = Field.Text( name, in );
+            doc.add( f );
+        }
       }
-      else if (null != name && null != type && null != content)
+      else if (null != name && null != type && null != content && content.length() > 0)
       {
         if ("date".equals(type))
         {
@@ -285,7 +299,7 @@ protected void addToIndex( String entryID, List fields )
     MCRResults results = new MCRResults();
     try
     {
-      MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults);
+      MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults, INDEX_DIR);
       results = lucenequery.getLuceneHits();
       results.setComplete();
     } catch (Exception e)
