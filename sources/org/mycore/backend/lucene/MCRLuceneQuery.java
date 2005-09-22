@@ -20,6 +20,7 @@
 
 package org.mycore.backend.lucene;
 
+import java.io.File;
 import java.io.StringReader;
 import java.util.List;
 import java.util.ArrayList;
@@ -49,15 +50,8 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
     /** The logger */
     public static Logger LOGGER = Logger.getLogger(MCRLuceneQuery.class.getName());
 
-  	static String INDEX_DIR = "";
+  	private String IndexDir = "";
   	
-  	/** Reads properties from configuration file when class first used */
-  	static {
-
-  		INDEX_DIR = MCRConfiguration.instance().getString("MCR.Searcher.lucene.searchindexdir");
-  		LOGGER.info("MCR.Searcher.lucene.searchindexdir: " + INDEX_DIR);
-  	}
-    
     private Query luceneQuery;
 
     private MCRCondition cond;                //query-condition
@@ -90,12 +84,13 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
         }
     }
     
-    public MCRLuceneQuery( MCRCondition cond, int maxResults )
+    public MCRLuceneQuery( MCRCondition cond, int maxResults, String IndexDir )
     {
       try
       {
         this.cond = cond;
         this.maxResults = maxResults;
+        this.IndexDir = IndexDir;
       
         List f = new ArrayList();
         f.add( cond.toXML() );
@@ -116,6 +111,8 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
      */
     private void init(Element root){
         try{
+            IndexDir = MCRConfiguration.instance().getString("MCR.Searcher.lucenem.IndexDir");
+            LOGGER.info("MCR.Searcher.lucenem.IndexDir: " + IndexDir);
 //            org.jdom.Element root = querydoc.getRootElement();
             cond = new MCRQueryParser().parse( (Element)root.getChild("conditions").getChildren().get(0) );
 //            cond.accept(this);
@@ -142,7 +139,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor{
      * @return result set
      */
     public MCRResults getLuceneHits() throws Exception {
-      IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
+      IndexSearcher searcher = new IndexSearcher(IndexDir);
 //    Hits hits = searcher.search( luceneQuery );
 //    int found = hits.length();
       TopDocs hits = searcher.search( luceneQuery, null, maxResults );
