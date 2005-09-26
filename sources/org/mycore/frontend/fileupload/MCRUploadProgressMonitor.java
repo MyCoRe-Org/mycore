@@ -234,7 +234,7 @@ public class MCRUploadProgressMonitor extends JDialog {
 
 		Runnable updater = new Runnable() {
 			public void run() {
-				MCRUploadProgressMonitor.this.show();
+				MCRUploadProgressMonitor.this.setVisible(true);
 				MCRUploadProgressMonitor.this.requestFocus();
 			}
 		};
@@ -243,7 +243,7 @@ public class MCRUploadProgressMonitor extends JDialog {
 
 	protected void buttonPressed() {
 		button.setEnabled(false);
-		hide();
+		setVisible(false);
 		dispose();
 		if (applet != null)
 			applet.returnToURL();
