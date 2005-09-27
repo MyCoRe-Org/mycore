@@ -186,6 +186,7 @@ public class MCRHIBRuleStore extends MCRRuleStore{
      * @return MCRAccessRule
      */
     public MCRAccessRule getRule(String ruleid) {
+        init();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRAccessRule rule = null;
@@ -210,6 +211,7 @@ public class MCRHIBRuleStore extends MCRRuleStore{
 
 
     public ArrayList retrieveAllIDs() {
+        init();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         ArrayList ret = new ArrayList();
