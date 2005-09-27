@@ -73,7 +73,7 @@ public class XmlHtmlPlugin  implements TextFilterPlugin
      * @see org.mycore.services.plugins.TextFilterPlugin#getName()
      */
     public String getName() {
-        return "Frank's amazing xml and html Filter";
+        return "hfwri's and fluetze's amazing xml and html Filter";
     }
 
     /*
