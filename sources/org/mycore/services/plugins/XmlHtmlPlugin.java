@@ -16,47 +16,177 @@
 package org.mycore.services.plugins;
 
 import org.mycore.datamodel.ifs.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+//import java.io.IOException;
+import java.io.InputStream;
+//import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
-import org.jdom.Element;
+
 import org.jdom.*;
-import org.jdom.input.DOMBuilder;
-import org.w3c.dom.Document;
+//import org.jdom.output.*;
+//import org.jdom.input.DOMBuilder;
+//import org.w3c.dom.Document;
 import org.w3c.tidy.*;
+//import org.xml.sax.InputSource;
+//import org.xml.sax.SAXException;
 
 /**
  * Converts XML, XTHML and HTML to plain text for indexing
  * 
  * @author Frank Lützenkirchen
+ * @author Harald Richter
  */
-public class XmlHtmlPlugin
+public class XmlHtmlPlugin  implements TextFilterPlugin
 {
+    private static final int MAJOR = 1;
 
-  private static String getFullText( MCRFile file )
+    private static final int MINOR = 0;
+
+    private static HashSet contentTypes;
+
+    private static String info = null;
+
+    /**
+     *  
+     */
+    public XmlHtmlPlugin() {
+        super();
+        if (contentTypes == null) {
+            contentTypes = new HashSet();
+            if (MCRFileContentTypeFactory.isTypeAvailable("xml"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("xml"));
+            if (MCRFileContentTypeFactory.isTypeAvailable("html"))
+                contentTypes.add(MCRFileContentTypeFactory.getType("html"));
+        }
+        if (info == null)
+            info = new StringBuffer("This filter converts XML, XTHML and HTML to plain text").toString();
+            
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getName()
+     */
+    public String getName() {
+        return "Frank's amazing xml and html Filter";
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
+     */
+    public String getInfo() {
+        return info;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.XmlHtmlPlugin#getSupportedContentTypes()
+     */
+    public HashSet getSupportedContentTypes() {
+        return contentTypes;
+    }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream,
+     *      java.io.OutputStream)
+     */
+    public Reader transform(MCRFileContentType ct, InputStream input)
+            throws FilterPluginTransformException {
+        if (getSupportedContentTypes().contains(ct)) {
+            String tx = getFullText(ct, input );
+            return new StringReader(tx);
+        } else
+            throw new FilterPluginTransformException("ContentType " + ct
+                    + " is not supported by " + getName() + "!");
+    }
+    
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
+     */
+    public int getMajorNumber() {
+        return MAJOR;
+    }
+
+    /**
+     * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
+     */
+    public int getMinorNumber() {
+        return MINOR;
+    }
+
+  private static String getFullText(MCRFileContentType ct, InputStream input ) 
   {
     try
     {
-      if( file.getContentTypeID().equals( "xml" ) )
-        return getText( file.getContentAsJDOM() );
-      else if( file.getContentTypeID().equals( "html" ) )
-        return getText( tidy( file ) );
+      if( ct.getID().equals( "xml" ) )
+      {
+        org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+        return getText( builder.build(input) );//file.getContentAsJDOM() );
+      }
+      else if( ct.getID().equals( "html" ) )
+      {
+        org.jdom.Document xml = tidy( input );
+        return getText( xml );
+      }
       else
         return null;
     }
     catch( Exception ex )
     {
+      ex.printStackTrace();
       return null;
     }
   }
 
   /** Converts HTML files to XML to be able to extract text nodes * */
-  private static org.jdom.Document tidy( MCRFile file )
+  private static org.jdom.Document tidy( InputStream input )
       throws java.io.IOException
   {
+/*    
+    org.cyberneko.html.parsers.DOMParser parser = new org.cyberneko.html.parsers.DOMParser();
+    
+    try
+    {
+      parser.parse( new InputSource(input) );
+    } catch (SAXException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    DOMBuilder builder = new DOMBuilder();
+    org.jdom.Document document = builder.build( parser.getDocument() );
+    return document;
+*/    
     Tidy tidy = new Tidy();
     tidy.setForceOutput( true );
     tidy.setXmlOut( true );
-    Document doc = tidy.parseDOM( file.getContentAsInputStream(), null );
-    return new DOMBuilder().build( doc );
+    tidy.setShowWarnings(false);
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    tidy.parseDOM( input, out);
+    
+    byte[] output = out.toByteArray();
+    org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+    org.jdom.Document xml = null;
+    try
+    {
+      xml = builder.build(new ByteArrayInputStream(output));
+    } catch (JDOMException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    return xml;
   }
 
   /** Extracts text of text nodes and comment nodes from xml files * */
