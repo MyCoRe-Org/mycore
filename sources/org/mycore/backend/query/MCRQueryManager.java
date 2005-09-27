@@ -42,12 +42,12 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.*;
 
 /**
@@ -57,7 +57,7 @@ import org.mycore.services.fieldquery.*;
  * @author Arne Seifert
  *
  */
-public class MCRQueryManager  extends MCREventHandlerBase{
+public class MCRQueryManager extends MCRSearcherBase {
     
     /** the logger */
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
@@ -98,7 +98,6 @@ public class MCRQueryManager  extends MCREventHandlerBase{
      * @param objBase
      */
     public void create(MCRBase obj){
-        LOGGER.info("  insert object with id: "+ obj.getId().getId());
         MCRXMLTableManager manager = MCRXMLTableManager.instance();
         Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
         Iterator it = searchfields.keySet().iterator();
@@ -176,6 +175,7 @@ public class MCRQueryManager  extends MCREventHandlerBase{
                 String msg = "Could not find configuration file " + searchfield + " in CLASSPATH";
                 throw new MCRConfigurationException(msg);
             }
+            builder.setValidation(false);
             doc = builder.build(in);
             in.close();
             searchfields = GenClasses.loadFields(doc);
@@ -206,7 +206,7 @@ public class MCRQueryManager  extends MCREventHandlerBase{
             objectID = MCRXMLTableManager.instance().retrieveAllIDs(type);
             
             // object loop
-            for (int i=0; i< objectID.size(); i++){
+            for (int i=0; i< objectID.size(); i++){ 
                 MCRObjectID objectid = new MCRObjectID ((String) objectID.get(i));
                 MCRObject obj = new MCRObject();
                 obj.receiveFromDatastore(objectid);
@@ -231,9 +231,24 @@ public class MCRQueryManager  extends MCREventHandlerBase{
             in.close();
             ret = out.outputString(doc);
         }catch(Exception e){
-            
+            LOGGER.error(e.getMessage());
         }
         return ret;
+    }
+    
+    public Element getQueryClause(){
+        Element ret = null;
+        SAXBuilder builder = new SAXBuilder();
+        InputStream in = this.getClass().getResourceAsStream("/query1.xml");
+        try{
+            Document doc1 = builder.build(in);
+            in.close();
+            ret = ((Element)doc1.getRootElement().getChild("conditions").getChildren().get(0));
+        }catch(Exception e){
+            LOGGER.error(e.getMessage());
+        }
+        return ret;
+        
     }
     
     /**
@@ -273,4 +288,10 @@ public class MCRQueryManager  extends MCREventHandlerBase{
             LOGGER.error(e);
         }
     }
+
+    
+    public MCRResults search(MCRCondition condition, int maxResults) {
+        return null;
+    }
+
 }
