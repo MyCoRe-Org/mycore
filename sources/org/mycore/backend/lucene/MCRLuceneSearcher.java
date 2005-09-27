@@ -65,9 +65,9 @@ public class MCRLuceneSearcher extends MCRSearcherBase
 
   static final private MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-  static String INDEX_DIR = "";
+  String IndexDir = "";
 
-  static boolean FIRST = true;
+  boolean FIRST = true;
 
   // TODO: read from property file
   static String DATE_FORMAT = "yyyy-MM-dd";
@@ -86,8 +86,8 @@ public class MCRLuceneSearcher extends MCRSearcherBase
    public void init(String ID) 
     {
         super.init( ID );
-        INDEX_DIR = CONFIG.getString(prefix + "IndexDir");
-        LOGGER.info(prefix + "indexDir: " + INDEX_DIR);
+        IndexDir = CONFIG.getString(prefix + "IndexDir");
+        LOGGER.info(prefix + "indexDir: " + IndexDir);
         String lockDir = CONFIG.getString("MCR.Lucene.LockDir", "");
         LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
         File file = new File(lockDir);
@@ -211,19 +211,19 @@ protected void addToIndex( String entryID, List fields )
     if (FIRST)
     {
       FIRST = false;
-      File file = new File(INDEX_DIR);
+      File file = new File(IndexDir);
 
       if (!file.exists())
       {
-        LOGGER.info("The Directory doesn't exist: " + INDEX_DIR + " try to build it");
-        IndexWriter writer2 = new IndexWriter(INDEX_DIR, analyzer, true);
+        LOGGER.info("The Directory doesn't exist: " + IndexDir + " try to build it");
+        IndexWriter writer2 = new IndexWriter(IndexDir, analyzer, true);
         writer2.close();
       } else if (file.isDirectory())
       {
         if (0 == file.list().length)
         {
-          LOGGER.info("No Entries in Directory, initialize: " + INDEX_DIR);
-          IndexWriter writer2 = new IndexWriter(INDEX_DIR, analyzer, true);
+          LOGGER.info("No Entries in Directory, initialize: " + IndexDir);
+          IndexWriter writer2 = new IndexWriter(IndexDir, analyzer, true);
           writer2.close();
         }
       }
@@ -232,7 +232,7 @@ protected void addToIndex( String entryID, List fields )
 
     if (null == writer)
     {
-      writer = new IndexWriter(INDEX_DIR, analyzer, false);
+      writer = new IndexWriter(IndexDir, analyzer, false);
       writer.mergeFactor = 200;
       writer.maxMergeDocs = 2000;
     }
@@ -266,7 +266,7 @@ protected void addToIndex( String entryID, List fields )
   private void deleteLuceneDocument(String fieldname, String id) throws Exception
   {
 
-    IndexSearcher searcher = new IndexSearcher(INDEX_DIR);
+    IndexSearcher searcher = new IndexSearcher(IndexDir);
 
     if (null == searcher)
       return;
@@ -285,7 +285,7 @@ protected void addToIndex( String entryID, List fields )
           + hits.doc(0).get(fieldname));
       if (id.equals(hits.doc(0).get(fieldname)))
       {
-        IndexReader reader = IndexReader.open(INDEX_DIR);
+        IndexReader reader = IndexReader.open(IndexDir);
         reader.delete(hits.id(0));
         reader.close();
         LOGGER.info("DELETE: " + id);
@@ -299,7 +299,7 @@ protected void addToIndex( String entryID, List fields )
     MCRResults results = new MCRResults();
     try
     {
-      MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults, INDEX_DIR);
+      MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults, IndexDir);
       results = lucenequery.getLuceneHits();
       results.setComplete();
     } catch (Exception e)
