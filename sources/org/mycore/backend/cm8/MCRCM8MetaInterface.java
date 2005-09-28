@@ -1,9 +1,9 @@
-/*
+/**
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,14 +16,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
+ * along with this program, normally in the file license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- */
+ *
+ **/
 
 package org.mycore.backend.cm8;
 
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
+import com.ibm.mm.sdk.common.DKDatastoreDefICM;
+import com.ibm.mm.sdk.common.DKTextIndexDefICM;
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This interface is designed to choose the datamodel classes for the CM8
@@ -32,7 +38,9 @@ import org.mycore.common.MCRPersistenceException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+
 public interface MCRCM8MetaInterface {
+
     /**
      * This method create a DKComponentTypeDefICM to create a complete ItemType
      * from the configuration.
@@ -53,5 +61,9 @@ public interface MCRCM8MetaInterface {
      * @exception MCRPersistenceException
      *                a general Exception of MyCoRe CM8
      */
-    public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException;
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
+            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
+            String prefix, DKTextIndexDefICM textindex, String textsearch)
+            throws MCRPersistenceException;
+
 }

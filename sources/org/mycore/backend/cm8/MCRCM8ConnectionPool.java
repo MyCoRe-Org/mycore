@@ -1,9 +1,9 @@
-/*
+/**
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,18 +16,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
+ * along with this program, normally in the file license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- */
+ *
+ **/
 
 package org.mycore.backend.cm8;
 
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+
+import com.ibm.mm.sdk.server.DKDatastoreICM;
 
 /**
  * This class implements a pool of database connections to IBM Content Manager
@@ -70,10 +74,8 @@ class MCRCM8ConnectionPool {
      *             if connect to CM8 was not successful
      */
     public static synchronized MCRCM8ConnectionPool instance() {
-        if (singleton == null) {
+        if (singleton == null)
             singleton = new MCRCM8ConnectionPool();
-        }
-
         return singleton;
     }
 
@@ -89,14 +91,13 @@ class MCRCM8ConnectionPool {
         serverName = config.getString("MCR.persistence_cm8_library_server");
         uid = config.getString("MCR.persistence_cm8_user_id");
         password = config.getString("MCR.persistence_cm8_password");
-        maxNumConnections = config.getInt("MCR.persistence_cm8_max_connections", 1);
-
-        int initNumConnections = config.getInt("MCR.persistence_cm8_init_connections", maxNumConnections);
-
+        maxNumConnections = config.getInt(
+                "MCR.persistence_cm8_max_connections", 1);
+        int initNumConnections = config.getInt(
+                "MCR.persistence_cm8_init_connections", maxNumConnections);
         // Build the initial number of CM8 connections
         for (int i = 0; i < initNumConnections; i++)
             freeConnections.addElement(buildConnection());
-
         logger.info("");
     }
 
@@ -109,12 +110,11 @@ class MCRCM8ConnectionPool {
      */
     protected DKDatastoreICM buildConnection() {
         logger.info("Building one connection to Content Manager 8 ...");
-
         try {
             DKDatastoreICM connection = new DKDatastoreICM();
-            logger.debug("Server=" + serverName + "  User=" + uid + "  PW=" + password);
+            logger.debug("Server=" + serverName + "  User=" + uid + "  PW="
+                    + password);
             connection.connect(serverName, uid, password, "");
-
             return connection;
         } catch (Exception ex) {
             String msg = "Could not connect to Content Manager 8 library server";
@@ -131,17 +131,16 @@ class MCRCM8ConnectionPool {
      * @throws MCRPersistenceException
      *             if there was a problem connecting to CM
      */
-    public synchronized DKDatastoreICM getConnection() throws MCRPersistenceException {
+    public synchronized DKDatastoreICM getConnection()
+            throws MCRPersistenceException {
         // Wait for a free connection
         while (usedConnections.size() == maxNumConnections)
-
             try {
                 wait();
             } catch (InterruptedException ignored) {
             }
 
         DKDatastoreICM connection;
-
         // Do we have to build a connection or is there already one?
         if (freeConnections.isEmpty()) {
             connection = buildConnection();
@@ -149,9 +148,7 @@ class MCRCM8ConnectionPool {
             connection = (DKDatastoreICM) (freeConnections.firstElement());
             freeConnections.removeElement(connection);
         }
-
         usedConnections.addElement(connection);
-
         return connection;
     }
 
@@ -163,18 +160,12 @@ class MCRCM8ConnectionPool {
      *            the Content Manager connection that has been used
      */
     public synchronized void releaseConnection(DKDatastoreICM connection) {
-        if (connection == null) {
+        if (connection == null)
             return;
-        }
-
-        if (usedConnections.contains(connection)) {
+        if (usedConnections.contains(connection))
             usedConnections.removeElement(connection);
-        }
-
-        if (!freeConnections.contains(connection)) {
+        if (!freeConnections.contains(connection))
             freeConnections.addElement(connection);
-        }
-
         notifyAll();
     }
 
@@ -185,7 +176,6 @@ class MCRCM8ConnectionPool {
         try {
             for (int i = 0; i < usedConnections.size(); i++)
                 ((DKDatastoreICM) (usedConnections.elementAt(i))).disconnect();
-
             for (int i = 0; i < freeConnections.size(); i++)
                 ((DKDatastoreICM) (freeConnections.elementAt(i))).disconnect();
         } catch (Exception ignored) {
@@ -200,4 +190,6 @@ class MCRCM8ConnectionPool {
     static final Logger getLogger() {
         return logger;
     }
+
 }
+
