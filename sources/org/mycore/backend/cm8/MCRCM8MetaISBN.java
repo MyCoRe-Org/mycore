@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.cm8;
 
@@ -42,9 +41,7 @@ import com.ibm.mm.sdk.server.DKDatastoreICM;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-
 public class MCRCM8MetaISBN implements DKConstantICM, MCRCM8MetaInterface {
-
     /**
      * This method create a DKComponentTypeDefICM to create a complete ItemType
      * from the configuration.
@@ -65,64 +62,70 @@ public class MCRCM8MetaISBN implements DKConstantICM, MCRCM8MetaInterface {
      * @exception MCRPersistenceException
      *                general Exception of MyCoRe CM8
      */
-    public DKComponentTypeDefICM createItemType(org.jdom.Element element,
-            DKDatastoreICM connection, DKDatastoreDefICM dsDefICM,
-            String prefix, DKTextIndexDefICM textindex, String textsearch)
-            throws MCRPersistenceException {
+    public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException {
         Logger logger = MCRCM8ConnectionPool.getLogger();
-        String subtagname = prefix
-                + (String) element.getAttribute("name").getValue();
+        String subtagname = prefix + (String) element.getAttribute("name").getValue();
+
         // String length
         String subtaglen = (String) element.getAttribute("length").getValue();
         int len = MCRMetaDefault.DEFAULT_STRING_LENGTH;
+
         try {
             len = Integer.parseInt(subtaglen);
         } catch (NumberFormatException e) {
             throw new MCRPersistenceException(e.getMessage(), e);
         }
+
         // Text search option
         boolean ts = false;
+
         try {
             if (textsearch.toLowerCase().equals("true")) {
                 ts = true;
             }
         } catch (Exception e) {
         }
+
         logger.debug("Set TextSearch for " + subtagname + " to " + ts);
 
         DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
+
         try {
             // create component child
             lt.setName(subtagname);
             lt.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+
             // add lang attribute
-            DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix
-                    + "lang");
+            DKAttrDefICM attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix + "lang");
             attr.setNullable(true);
             attr.setUnique(false);
             lt.addAttr(attr);
+
             // add type attribute
             attr = (DKAttrDefICM) dsDefICM.retrieveAttr(prefix + "type");
             attr.setNullable(true);
             attr.setUnique(false);
             lt.addAttr(attr);
+
             // create the attribute for the data content in string form
             // with given textsearch flag
-            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, subtagname,
-                    len, ts);
+            MCRCM8ItemTypeCommon.createAttributeVarChar(connection, subtagname, len, ts);
+
             // add the value attribute
             attr = (DKAttrDefICM) dsDefICM.retrieveAttr(subtagname);
             attr.setNullable(true);
             attr.setUnique(false);
+
             if (ts) {
                 attr.setTextSearchable(true);
                 attr.setTextIndexDef(textindex);
             }
+
             lt.addAttr(attr);
         } catch (Exception e) {
             throw new MCRPersistenceException(e.getMessage(), e);
         }
+
         return lt;
     }
-
 }
