@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.videocharger;
 
@@ -32,7 +31,6 @@ import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -57,119 +55,122 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
-	protected static MCRConfiguration CONFIG;
+    protected static MCRConfiguration CONFIG;
 
-	private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
 
-	public MCRAVExtVideoCharger() {
-		if (CONFIG == null)
-			CONFIG = MCRConfiguration.instance();
-	}
+    public MCRAVExtVideoCharger() {
+        if (CONFIG == null) {
+            CONFIG = MCRConfiguration.instance();
+        }
+    }
 
-	public void readConfig(String storeID) {
-		String prefix = "MCR.IFS.AVExtender." + storeID + ".";
+    public void readConfig(String storeID) {
+        String prefix = "MCR.IFS.AVExtender." + storeID + ".";
 
-		baseMetadata = CONFIG.getString(prefix + "VSListURL");
-		basePlayerStarter = CONFIG.getString(prefix + "ISCPFSelURL");
-		playerDownloadURL = CONFIG.getString(prefix + "PlayerURL");
-	}
+        baseMetadata = CONFIG.getString(prefix + "VSListURL");
+        basePlayerStarter = CONFIG.getString(prefix + "ISCPFSelURL");
+        playerDownloadURL = CONFIG.getString(prefix + "PlayerURL");
+    }
 
-	public void init(MCRFileReader file) throws MCRPersistenceException {
-		super.init(file);
+    public void init(MCRFileReader file) throws MCRPersistenceException {
+        super.init(file);
 
-		readConfig(file.getStoreID());
+        readConfig(file.getStoreID());
 
-		String assetID;
-		try {
-			assetID = URLEncoder.encode(file.getStorageID(), CONFIG.getString(
-					"MCR.request_charencoding", "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new MCRPersistenceException(
-					"MCR.request_charencoding property does not contain a valid encoding:",
-					e);
-		}
-		String data1 = getMetadata(baseMetadata + "?" + assetID);
-		String data2 = getMetadata(basePlayerStarter + "?VIDEOID=" + assetID);
+        String assetID;
 
-		URLConnection con = getConnection(basePlayerStarter + "?VIDEOID="
-				+ assetID);
-		playerStarterCT = con.getContentType();
+        try {
+            assetID = URLEncoder.encode(file.getStorageID(), CONFIG.getString("MCR.request_charencoding", "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRPersistenceException("MCR.request_charencoding property does not contain a valid encoding:", e);
+        }
 
-		try {
-			String sSize = getBetween("filesize64=", "\n", data2, "0,0");
-			String sBitRate = getBetween("bitRate=", "\n", data1, "0");
-			String sFrameRate = getBetween("frameRate=", "\n", data1, "0");
-			String sDuration = getBetween("duration=", "\n", data1, "0:0:0:0");
-			String sType = getBetween("type=", "\n", data1, "");
+        String data1 = getMetadata(baseMetadata + "?" + assetID);
+        String data2 = getMetadata(basePlayerStarter + "?VIDEOID=" + assetID);
 
-			bitRate = Integer.parseInt(sBitRate);
-			frameRate = Double.valueOf(sFrameRate).doubleValue();
-			mediaType = (frameRate > 0);
+        URLConnection con = getConnection(basePlayerStarter + "?VIDEOID=" + assetID);
+        playerStarterCT = con.getContentType();
 
-			StringTokenizer st1 = new StringTokenizer(sSize, ",");
-			long sizeHi = Long.parseLong(st1.nextToken());
-			long sizeLo = Long.parseLong(st1.nextToken());
-			size = (sizeHi << 32) + sizeLo;
+        try {
+            String sSize = getBetween("filesize64=", "\n", data2, "0,0");
+            String sBitRate = getBetween("bitRate=", "\n", data1, "0");
+            String sFrameRate = getBetween("frameRate=", "\n", data1, "0");
+            String sDuration = getBetween("duration=", "\n", data1, "0:0:0:0");
+            String sType = getBetween("type=", "\n", data1, "");
 
-			StringTokenizer st2 = new StringTokenizer(sDuration, ":");
-			durationHours = Integer.parseInt(st2.nextToken());
-			durationMinutes = Integer.parseInt(st2.nextToken());
-			durationSeconds = Integer.parseInt(st2.nextToken());
+            bitRate = Integer.parseInt(sBitRate);
+            frameRate = Double.valueOf(sFrameRate).doubleValue();
+            mediaType = (frameRate > 0);
 
-			if (sType.indexOf("MPEG1") >= 0)
-				if (frameRate > 0)
-					contentTypeID = "mpegvid";
-				else if (file.getExtension().toLowerCase().equals("mp3"))
-					contentTypeID = "mp3";
-				else
-					contentTypeID = "mpegaud";
-			else if (sType.indexOf("MPEG2") >= 0)
-				contentTypeID = "mpegvid2";
-			else if (sType.indexOf("MOV") >= 0)
-				contentTypeID = "qtvid";
-			else if (sType.indexOf("WAV") >= 0)
-				contentTypeID = "wav";
-			else if (sType.indexOf("AVI") >= 0)
-				contentTypeID = "avi";
-		} catch (Exception exc) {
-			String msg = "Error parsing metadata from VideoCharger asset "
-					+ file.getStorageID();
-			throw new MCRPersistenceException(msg, exc);
-		}
-	}
+            StringTokenizer st1 = new StringTokenizer(sSize, ",");
+            long sizeHi = Long.parseLong(st1.nextToken());
+            long sizeLo = Long.parseLong(st1.nextToken());
+            size = (sizeHi << 32) + sizeLo;
 
-	public void getPlayerStarterTo(OutputStream out, String startPos,
-			String stopPos) throws MCRPersistenceException {
-		try {
-			StringBuffer cgi = new StringBuffer(basePlayerStarter);
-			cgi.append("?VIDEOID=");
-			cgi.append(URLEncoder.encode(file.getStorageID(), CONFIG.getString(
-					"MCR.request_charencoding", "UTF-8")));
+            StringTokenizer st2 = new StringTokenizer(sDuration, ":");
+            durationHours = Integer.parseInt(st2.nextToken());
+            durationMinutes = Integer.parseInt(st2.nextToken());
+            durationSeconds = Integer.parseInt(st2.nextToken());
 
-			if (startPos != null)
-				cgi.append("&StartPos=").append(startPos);
-			if (stopPos != null)
-				cgi.append("&StopPos=").append(stopPos);
+            if (sType.indexOf("MPEG1") >= 0) {
+                if (frameRate > 0) {
+                    contentTypeID = "mpegvid";
+                } else if (file.getExtension().toLowerCase().equals("mp3")) {
+                    contentTypeID = "mp3";
+                } else {
+                    contentTypeID = "mpegaud";
+                }
+            } else if (sType.indexOf("MPEG2") >= 0) {
+                contentTypeID = "mpegvid2";
+            } else if (sType.indexOf("MOV") >= 0) {
+                contentTypeID = "qtvid";
+            } else if (sType.indexOf("WAV") >= 0) {
+                contentTypeID = "wav";
+            } else if (sType.indexOf("AVI") >= 0) {
+                contentTypeID = "avi";
+            }
+        } catch (Exception exc) {
+            String msg = "Error parsing metadata from VideoCharger asset " + file.getStorageID();
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
 
-			URLConnection connection = getConnection(cgi.toString());
-			forwardData(connection, out);
-		} catch (IOException exc) {
-			String msg = "Could not send VideoCharger player starter";
-			throw new MCRPersistenceException(msg, exc);
-		}
-	}
+    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
+        try {
+            StringBuffer cgi = new StringBuffer(basePlayerStarter);
+            cgi.append("?VIDEOID=");
+            cgi.append(URLEncoder.encode(file.getStorageID(), CONFIG.getString("MCR.request_charencoding", "UTF-8")));
 
-	/**
-	 * Lists all assets that are stored in this VideoCharger store.
-	 * 
-	 * @return a String array containing all asset IDs
-	 */
-	public String[] listAssets() throws MCRPersistenceException {
-		String vslist = getMetadata(baseMetadata);
-		StringTokenizer st = new StringTokenizer(vslist, "\n");
-		String[] list = new String[st.countTokens()];
-		for (int i = 0; i < list.length; i++)
-			list[i] = st.nextToken();
-		return list;
-	}
+            if (startPos != null) {
+                cgi.append("&StartPos=").append(startPos);
+            }
+
+            if (stopPos != null) {
+                cgi.append("&StopPos=").append(stopPos);
+            }
+
+            URLConnection connection = getConnection(cgi.toString());
+            forwardData(connection, out);
+        } catch (IOException exc) {
+            String msg = "Could not send VideoCharger player starter";
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
+
+    /**
+     * Lists all assets that are stored in this VideoCharger store.
+     * 
+     * @return a String array containing all asset IDs
+     */
+    public String[] listAssets() throws MCRPersistenceException {
+        String vslist = getMetadata(baseMetadata);
+        StringTokenizer st = new StringTokenizer(vslist, "\n");
+        String[] list = new String[st.countTokens()];
+
+        for (int i = 0; i < list.length; i++)
+            list[i] = st.nextToken();
+
+        return list;
+    }
 }

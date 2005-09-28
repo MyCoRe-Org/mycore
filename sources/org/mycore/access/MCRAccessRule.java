@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,108 +16,121 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.access;
 
 import java.util.Date;
 
-import org.mycore.user.MCRUser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.user.MCRUser;
 
 public class MCRAccessRule {
-
     String id = "";
+
     String creator = "";
-    Date creationTime =  new Date();
+
+    Date creationTime = new Date();
+
     String rule = "";
+
     String description = "";
 
     MCRCondition parsedRule;
 
     static MCRRuleParser parser = new MCRRuleParser();
-    
-    public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException
-    {
+
+    public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException {
         this.id = id;
         this.creator = creator;
         this.creationTime = creationTime;
         this.rule = rule;
         this.description = description;
 
-        if(this.rule!=null)
+        if (this.rule != null) {
             this.parsedRule = parser.parse(this.rule);
+        }
     }
 
-    public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip)
-    {
-        if(this.parsedRule == null)
+    public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip) {
+        if (this.parsedRule == null) {
             return true;
-        MCRAccessData data = new MCRAccessData(user,date,ip);
+        }
+
+        MCRAccessData data = new MCRAccessData(user, date, ip);
+
         return this.parsedRule.evaluate(data);
     }
 
-    public MCRCondition getRule()
-    {
+    public MCRCondition getRule() {
         return this.parsedRule;
     }
-    
+
     /**
      * rule
+     * 
      * @param rule
      */
     public void setRule(String rule) {
         this.rule = rule;
     }
-    public String getRuleString()
-    {
+
+    public String getRuleString() {
         return rule;
     }
 
     /**
      * creationtime
+     * 
      * @return
      */
     public Date getCreationTime() {
         return creationTime;
     }
+
     public void setCreationTime(Date creationTime) {
         this.creationTime = creationTime;
     }
 
     /**
      * creator
+     * 
      * @return
      */
     public String getCreator() {
         return creator;
     }
+
     public void setCreator(String creator) {
         this.creator = creator;
     }
 
     /**
      * description
+     * 
      * @return
      */
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
      * id
+     * 
      * @return
      */
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }

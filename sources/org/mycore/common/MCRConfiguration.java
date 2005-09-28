@@ -1,4 +1,4 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
@@ -19,8 +19,7 @@
  * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.common;
 
@@ -114,8 +113,10 @@ public class MCRConfiguration {
      * @return the single instance of <CODE>MCRConfiguration</CODE> to be used
      */
     public static synchronized MCRConfiguration instance() {
-        if (singleton == null)
+        if (singleton == null) {
             createSingleton();
+        }
+
         return singleton;
     }
 
@@ -129,17 +130,16 @@ public class MCRConfiguration {
      */
     protected static void createSingleton() {
         String name = System.getProperty("MCR.configuration.class");
+
         if (name != null) {
             try {
-                singleton = (MCRConfiguration) (Class.forName(name)
-                        .newInstance());
+                singleton = (MCRConfiguration) (Class.forName(name).newInstance());
             } catch (Exception exc) {
-                throw new MCRConfigurationException(
-                        "Could not create MCR.configuration.class singleton \""
-                                + name + "\"", exc);
+                throw new MCRConfigurationException("Could not create MCR.configuration.class singleton \"" + name + "\"", exc);
             }
-        } else
+        } else {
             singleton = new MCRConfiguration();
+        }
     }
 
     /**
@@ -156,12 +156,16 @@ public class MCRConfiguration {
         reload(false);
 
         Enumeration names = System.getProperties().propertyNames();
+
         while (names.hasMoreElements()) {
             String name = (String) (names.nextElement());
+
             if (name.startsWith("MCR.")) {
                 String value = System.getProperty(name);
-                if (value != null)
+
+                if (value != null) {
                     set(name, value);
+                }
             }
         }
 
@@ -184,13 +188,16 @@ public class MCRConfiguration {
      *             if the config files can not be loaded
      */
     public void reload(boolean clear) {
-        if (clear)
+        if (clear) {
             properties.clear();
-        String fn = System.getProperty("MCR.configuration.file",
-                "mycore.properties");
+        }
+
+        String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
         loadFromFile(fn);
-        if (clear)
+
+        if (clear) {
             configureLogging();
+        }
     }
 
     /**
@@ -211,24 +218,25 @@ public class MCRConfiguration {
         MCRArgumentChecker.ensureNotEmpty(filename, "filename");
 
         InputStream in = this.getClass().getResourceAsStream("/" + filename);
+
         if (in == null) {
-            String msg = "Could not find configuration file " + filename
-                    + " in CLASSPATH";
+            String msg = "Could not find configuration file " + filename + " in CLASSPATH";
             throw new MCRConfigurationException(msg);
         }
+
         try {
             properties.load(in);
             in.close();
         } catch (Exception exc) {
-            throw new MCRConfigurationException(
-                    "Exception while loading configuration file " + filename,
-                    exc);
+            throw new MCRConfigurationException("Exception while loading configuration file " + filename, exc);
         }
 
         String include = getString("MCR.configuration.include", null);
+
         if (include != null) {
             StringTokenizer st = new StringTokenizer(include, ", ");
             set("MCR.configuration.include", null);
+
             while (st.hasMoreTokens())
                 loadFromFile(st.nextToken());
         }
@@ -254,13 +262,16 @@ public class MCRConfiguration {
         Properties properties = new Properties();
 
         Enumeration names = this.properties.propertyNames();
+
         while (names.hasMoreElements()) {
             String name = (String) (names.nextElement());
+
             if (name.startsWith(startsWith)) {
                 String value = this.properties.getProperty(name);
                 properties.setProperty(name, value);
             }
         }
+
         return properties;
     }
 
@@ -271,8 +282,10 @@ public class MCRConfiguration {
         Properties prop = new Properties();
         Enumeration names = this.properties.propertyNames();
         boolean reconfigure = false;
+
         while (names.hasMoreElements()) {
             String name = (String) (names.nextElement());
+
             if (name.startsWith("MCR.log4j")) {
                 String value = this.properties.getProperty(name);
                 prop.setProperty(name.substring(4), value);
@@ -281,8 +294,7 @@ public class MCRConfiguration {
         }
 
         if (reconfigure) {
-            System.out
-                    .println("MCRConfiguration reconfiguring Log4J logging...");
+            System.out.println("MCRConfiguration reconfiguring Log4J logging...");
             org.apache.log4j.LogManager.resetConfiguration();
             PropertyConfigurator.configure(prop);
         }
@@ -299,18 +311,18 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    private Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException 
-    {
+    private Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
 
         String classname = properties.getProperty(name);
+
         if (classname == null) {
-            if(defaultname!=null) {
+            if (defaultname != null) {
                 classname = defaultname;
             }
+
             if (classname == null) {
-                throw new MCRConfigurationException("Configuration property "
-                        + name + " is not set!");
+                throw new MCRConfigurationException("Configuration property " + name + " is not set!");
             }
         }
 
@@ -321,45 +333,51 @@ public class MCRConfiguration {
         try {
             cl = Class.forName(classname);
         } catch (Exception ex) {
-            throw new MCRConfigurationException("Could not load class "
-                    + classname, ex);
+            throw new MCRConfigurationException("Could not load class " + classname, ex);
         }
+
         Object o = null;
-        try { 
-            try{
+
+        try {
+            try {
                 o = cl.newInstance();
-            }catch(Exception e){
+            } catch (Exception e) {
                 // check for singleton
                 Method[] querymethods = cl.getMethods();
-                for (int i=0; i<querymethods.length; i++){
-                    if(querymethods[i].getName().toLowerCase().equals("instance") ||
-                            querymethods[i].getName().toLowerCase().equals("getinstance")){
+
+                for (int i = 0; i < querymethods.length; i++) {
+                    if (querymethods[i].getName().toLowerCase().equals("instance") || querymethods[i].getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
                         o = querymethods[i].invoke(cl, ob);
+
                         break;
                     }
-                } 
+                }
             }
         } catch (Throwable t) {
             String msg = "Could not instantiate class " + classname;
+
             if (t instanceof ExceptionInInitializerError) {
                 Throwable t2 = ((ExceptionInInitializerError) t).getException();
-                if (t2 instanceof Exception)
+
+                if (t2 instanceof Exception) {
                     throw new MCRConfigurationException(msg, (Exception) t2);
-                throw new MCRConfigurationException(msg + ": "
-                        + t2.getClass().getName() + " - " + t2.getMessage());
+                }
+
+                throw new MCRConfigurationException(msg + ": " + t2.getClass().getName() + " - " + t2.getMessage());
             } else if (t instanceof Exception) {
                 t.printStackTrace();
                 throw new MCRConfigurationException(msg, (Exception) t);
             } else {
-                msg += " because of: " + t.getMessage();
-                msg += "\n" + MCRException.getStackTraceAsString(t);
+                msg += (" because of: " + t.getMessage());
+                msg += ("\n" + MCRException.getStackTraceAsString(t));
                 throw new MCRConfigurationException(msg);
             }
         }
+
         return o;
     }
-    
+
     /**
      * Returns a new instance of the class specified in the configuration
      * property with the given name.
@@ -371,8 +389,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getInstanceOf(String name) throws MCRConfigurationException 
-    {
+    public Object getInstanceOf(String name) throws MCRConfigurationException {
         return getInstanceOf(name, null);
     }
 
@@ -389,34 +406,39 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getSingleInstanceOf(String name, String defaultname)
-            throws MCRConfigurationException {
-        if (instanceHolder == null)
-            instanceHolder = new Hashtable(); //initialize the hashtable if
+    public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+        if (instanceHolder == null) {
+            instanceHolder = new Hashtable(); // initialize the hashtable if
+        }
         // it's not yet
-        else if (instanceHolder.containsKey(name))
-            return instanceHolder.get(name); //we have an instance allready,
+        else if (instanceHolder.containsKey(name)) {
+            return instanceHolder.get(name); // we have an instance allready,
+        }
+
         // return it
-        Object inst = getInstanceOf(name, defaultname); //we need a new instance, get it
-        instanceHolder.put(name, inst); //save the instance in the hashtable
+        Object inst = getInstanceOf(name, defaultname); // we need a new
+                                                        // instance, get it
+        instanceHolder.put(name, inst); // save the instance in the hashtable
+
         return inst;
     }
-    
+
     /**
      * Returns a instance of the class specified in the configuration property
      * with the given name. If the class was prevously instantiated by this
      * method this instance is returned.
      * 
-     * @param name non-null and non-empty name of the configuration property
-     * @param default the default if the configuration for name isn't found
+     * @param name
+     *            non-null and non-empty name of the configuration property
+     * @param default
+     *            the default if the configuration for name isn't found
      * @return the instance of the class named by the value of the configuration
      *         propertyl
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getSingleInstanceOf(String name)
-    {
+    public Object getSingleInstanceOf(String name) {
         return getSingleInstanceOf(name, null);
     }
 
@@ -431,10 +453,13 @@ public class MCRConfiguration {
      */
     public String getString(String name) {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
+
         String value = properties.getProperty(name);
-        if (value == null)
-            throw new MCRConfigurationException("Configuration property "
-                    + name + " is not set");
+
+        if (value == null) {
+            throw new MCRConfigurationException("Configuration property " + name + " is not set");
+        }
+
         return value;
     }
 
@@ -450,8 +475,10 @@ public class MCRConfiguration {
      */
     public String getString(String name, String defaultValue) {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
+
         String value = properties.getProperty(name);
-        return (value == null ? defaultValue : value);
+
+        return ((value == null) ? defaultValue : value);
     }
 
     /**
@@ -495,10 +522,10 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not an <CODE>int
      *             </CODE> value
      */
-    public int getInt(String name, int defaultValue)
-            throws NumberFormatException {
+    public int getInt(String name, int defaultValue) throws NumberFormatException {
         String value = getString(name, null);
-        return (value == null ? defaultValue : Integer.parseInt(value));
+
+        return ((value == null) ? defaultValue : Integer.parseInt(value));
     }
 
     /**
@@ -534,10 +561,10 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>long
      *             </CODE> value
      */
-    public long getLong(String name, long defaultValue)
-            throws NumberFormatException {
+    public long getLong(String name, long defaultValue) throws NumberFormatException {
         String value = getString(name, null);
-        return (value == null ? defaultValue : Long.parseLong(value));
+
+        return ((value == null) ? defaultValue : Long.parseLong(value));
     }
 
     /**
@@ -573,10 +600,10 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             float</CODE> value
      */
-    public float getFloat(String name, float defaultValue)
-            throws NumberFormatException {
+    public float getFloat(String name, float defaultValue) throws NumberFormatException {
         String value = getString(name, null);
-        return (value == null ? defaultValue : Float.parseFloat(value));
+
+        return ((value == null) ? defaultValue : Float.parseFloat(value));
     }
 
     /**
@@ -612,10 +639,10 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             double</CODE> value
      */
-    public double getDouble(String name, double defaultValue)
-            throws NumberFormatException {
+    public double getDouble(String name, double defaultValue) throws NumberFormatException {
         String value = getString(name, null);
-        return (value == null ? defaultValue : Double.parseDouble(value));
+
+        return ((value == null) ? defaultValue : Double.parseDouble(value));
     }
 
     /**
@@ -631,6 +658,7 @@ public class MCRConfiguration {
      */
     public boolean getBoolean(String name) {
         String value = getString(name);
+
         return "true".equals(value.trim());
     }
 
@@ -649,7 +677,8 @@ public class MCRConfiguration {
      */
     public boolean getBoolean(String name, boolean defaultValue) {
         String value = getString(name, null);
-        return (value == null ? defaultValue : "true".equals(value.trim()));
+
+        return ((value == null) ? defaultValue : "true".equals(value.trim()));
     }
 
     /**
@@ -666,10 +695,11 @@ public class MCRConfiguration {
     public void set(String name, String value) {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
 
-        if (value == null)
+        if (value == null) {
             properties.remove(name);
-        else
+        } else {
             properties.setProperty(name, value);
+        }
     }
 
     /**

@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,24 +16,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.access;
 
+import org.jdom.Element;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.parsers.bool.MCRParseException;
-import org.mycore.parsers.bool.MCRCondition;
-import org.jdom.Element;
 
 /**
  * Implementation of a (ip xy) clause
- *
+ * 
  * @author Matthias Kramm
  */
-
 class MCRIPClause implements MCRCondition {
     private MCRIPAddress ip;
 
@@ -43,7 +45,8 @@ class MCRIPClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData)o;
+        MCRAccessData data = (MCRAccessData) o;
+
         return this.ip.contains(data.getIp());
     }
 
@@ -51,7 +54,14 @@ class MCRIPClause implements MCRCondition {
         return "ip " + ip + "\n";
     }
 
-    public Element toXML() {return null; /* TODO */}
-    public Element info() {return null; /* TODO */}
-    public void accept(MCRConditionVisitor visitor) {/* TODO */}
+    public Element toXML() {
+        return null; /* TODO */
+    }
+
+    public Element info() {
+        return null; /* TODO */
+    }
+
+    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    }
 };

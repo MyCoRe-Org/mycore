@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.hibernate;
 
@@ -39,7 +38,6 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimeType;
 import org.hibernate.type.TimestampType;
-
 import org.mycore.backend.hibernate.tables.MCRID;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -49,186 +47,187 @@ import org.mycore.common.MCRPersistenceException;
  * Class for hibernate connection to selected database
  * 
  * @author Arne Seifert
- *  
+ * 
  */
 public class MCRHIBConnection {
+    protected static Configuration cfg;
 
-	protected static Configuration cfg;
+    protected static SessionFactory sessions;
 
-	protected static SessionFactory sessions;
+    protected static MCRHIBConnection singleton;
 
-	protected static MCRHIBConnection singleton;
+    protected static MCRHIBMapping genTable = new MCRHIBMapping();
 
-	protected static MCRHIBMapping genTable = new MCRHIBMapping();
+    private static String url;
 
-	private static String url, userID, password, driver;
+    private static String userID;
 
-	private static int maxUsages = Integer.MAX_VALUE;
+    private static String password;
 
-	MCRConfiguration config = MCRConfiguration.instance();
+    private static String driver;
 
-	static {
-		MCRConfiguration config = MCRConfiguration.instance();
-		url = config.getString("MCR.persistence_sql_database_url");
-		userID = config.getString("MCR.persistence_sql_database_userid", "");
-		password = config.getString("MCR.persistence_sql_database_passwd", "");
-		driver = config.getString("MCR.persistence_sql_driver", "");
+    private static int maxUsages = Integer.MAX_VALUE;
 
-		maxUsages = config.getInt(
-				"MCR.persistence_sql_database_connection_max_usages",
-				Integer.MAX_VALUE);
-	}
+    MCRConfiguration config = MCRConfiguration.instance();
 
-	public static synchronized MCRHIBConnection instance()
-			throws MCRPersistenceException {
-		if (singleton == null) {
-			singleton = new MCRHIBConnection();
-		}
-		return singleton;
-	}
+    static {
+        MCRConfiguration config = MCRConfiguration.instance();
+        url = config.getString("MCR.persistence_sql_database_url");
+        userID = config.getString("MCR.persistence_sql_database_userid", "");
+        password = config.getString("MCR.persistence_sql_database_passwd", "");
+        driver = config.getString("MCR.persistence_sql_driver", "");
 
-	/**
-	 * This method initializes the connection to the database
-	 * 
-	 * @throws MCRPersistenceException
-	 */
-	protected MCRHIBConnection() throws MCRPersistenceException {
-		try {
-			buildConfiguration();
-			genTable.generateTables(cfg);
-			buildSessionFactory();
+        maxUsages = config.getInt("MCR.persistence_sql_database_connection_max_usages", Integer.MAX_VALUE);
+    }
 
-		} catch (Exception exc) {
-			String msg = "Could not connect to database";
-			throw new MCRPersistenceException(msg, exc);
-		}
-	}
+    public static synchronized MCRHIBConnection instance() throws MCRPersistenceException {
+        if (singleton == null) {
+            singleton = new MCRHIBConnection();
+        }
 
-	/**
-	 * This method creates the configuration needed by hibernate
-	 */
-	private void buildConfiguration() {
+        return singleton;
+    }
 
-		String dialect;
-		if (url.toLowerCase().indexOf("mysql") >= 0)
-			dialect = "org.hibernate.dialect.MySQLDialect";
-		else if (url.toLowerCase().indexOf("db2") >= 0)
-			dialect = "org.hibernate.dialect.DB2Dialect";
-		else if (url.toLowerCase().indexOf("hyper") >= 0
-				|| url.toLowerCase().indexOf("hsql") >= 0)
-			dialect = "org.hibernate.dialect.HSQLDialect";
-		else if (url.toLowerCase().indexOf("oracle") >= 0)
-			dialect = "org.hibernate.dialect.OracleDialect"; // Oracle9Dialect
-		else if (url.toLowerCase().indexOf("post") >= 0)
-			dialect = "org.hibernate.dialect.PostgreSQLDialect ";
-		else
-			throw new MCRException(
-					"Couldn't determine database type from connection string: \""
-							+ url + "\"");
+    /**
+     * This method initializes the connection to the database
+     * 
+     * @throws MCRPersistenceException
+     */
+    protected MCRHIBConnection() throws MCRPersistenceException {
+        try {
+            buildConfiguration();
+            genTable.generateTables(cfg);
+            buildSessionFactory();
+        } catch (Exception exc) {
+            String msg = "Could not connect to database";
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
 
-		cfg = new Configuration().setProperty("hibernate.dialect", dialect)
-				.setProperty("hibernate.connection.driver_class", driver)
-				.setProperty("hibernate.connection.url", url).setProperty(
-						"hibernate.connection.username", userID).setProperty(
-						"hibernate.connection.password", password).setProperty(
-						"hibernate.connection.pool_size", "" + maxUsages)
-				.setProperty("hibernate.show_sql", ""+config.getBoolean("MCR.hibernate.show_sql", false));
-	}
+    /**
+     * This method creates the configuration needed by hibernate
+     */
+    private void buildConfiguration() {
+        String dialect;
 
-	/**
-	 * This method creates the SessionFactory for hiberante
-	 */
-	private static void buildSessionFactory() {
-		if (sessions == null) {
-			sessions = cfg.buildSessionFactory();
-		}
-	}
+        if (url.toLowerCase().indexOf("mysql") >= 0) {
+            dialect = "org.hibernate.dialect.MySQLDialect";
+        } else if (url.toLowerCase().indexOf("db2") >= 0) {
+            dialect = "org.hibernate.dialect.DB2Dialect";
+        } else if ((url.toLowerCase().indexOf("hyper") >= 0) || (url.toLowerCase().indexOf("hsql") >= 0)) {
+            dialect = "org.hibernate.dialect.HSQLDialect";
+        } else if (url.toLowerCase().indexOf("oracle") >= 0) {
+            dialect = "org.hibernate.dialect.OracleDialect"; // Oracle9Dialect
+        } else if (url.toLowerCase().indexOf("post") >= 0) {
+            dialect = "org.hibernate.dialect.PostgreSQLDialect ";
+        } else {
+            throw new MCRException("Couldn't determine database type from connection string: \"" + url + "\"");
+        }
 
-	public void buildSessionFactory(Configuration config) {
-		sessions.close();
-		sessions = config.buildSessionFactory();
-		cfg = config;
-	}
+        cfg = new Configuration().setProperty("hibernate.dialect", dialect).setProperty("hibernate.connection.driver_class", driver).setProperty("hibernate.connection.url", url).setProperty("hibernate.connection.username", userID).setProperty("hibernate.connection.password", password).setProperty("hibernate.connection.pool_size", "" + maxUsages).setProperty("hibernate.show_sql",
+                "" + config.getBoolean("MCR.hibernate.show_sql", false));
+    }
 
-	/**
-	 * This method returns the current session for queries on the database
-	 * through hibernate
-	 * 
-	 * @return Session current session object
-	 */
-	public Session getSession() {
-		return sessions.openSession();
-	}
+    /**
+     * This method creates the SessionFactory for hiberante
+     */
+    private static void buildSessionFactory() {
+        if (sessions == null) {
+            sessions = cfg.buildSessionFactory();
+        }
+    }
 
-	public Configuration getConfiguration() {
-		return cfg;
-	}
+    public void buildSessionFactory(Configuration config) {
+        sessions.close();
+        sessions = config.buildSessionFactory();
+        cfg = config;
+    }
 
-    
+    /**
+     * This method returns the current session for queries on the database
+     * through hibernate
+     * 
+     * @return Session current session object
+     */
+    public Session getSession() {
+        return sessions.openSession();
+    }
+
+    public Configuration getConfiguration() {
+        return cfg;
+    }
+
     /**
      * This method checks existance of mapping for given sql-tablename
-     * @param tablename sql-table name as string
+     * 
+     * @param tablename
+     *            sql-table name as string
      * @return boolean
      */
-    public boolean containsMapping(String tablename){
+    public boolean containsMapping(String tablename) {
         Iterator it = cfg.getTableMappings();
-        while(it.hasNext()){
-            if (((Table) it.next()).getName().equals(tablename)){
+
+        while (it.hasNext()) {
+            if (((Table) it.next()).getName().equals(tablename)) {
                 return true;
             }
         }
+
         return false;
     }
 
-	public long getID() {
-		synchronized (singleton) {
-			Session session = getSession();
-			Transaction tx = session.beginTransaction();
+    public long getID() {
+        synchronized (singleton) {
+            Session session = getSession();
+            Transaction tx = session.beginTransaction();
 
-			/* generate new id */
-			MCRID id = new MCRID();
-			session.save(id);
+            /* generate new id */
+            MCRID id = new MCRID();
+            session.save(id);
 
-			/* free up previous ids in the ID table */
-			List result = session.createCriteria(MCRID.class).list();
-			int t;
-			for (t = 0; t < result.size(); t++) {
-				MCRID lid = (MCRID) result.get(t);
-				if (lid.getId() > id.getId()) { //sanity check
-					throw new IllegalStateException(
-							"bad \"native\" database ID generator");
-				} else if (lid.getId() < id.getId())
-					session.delete(lid);
-			}
+            /* free up previous ids in the ID table */
+            List result = session.createCriteria(MCRID.class).list();
+            int t;
 
-			tx.commit();
-			session.close();
-			return id.getId();
-		}
-	}
-    
+            for (t = 0; t < result.size(); t++) {
+                MCRID lid = (MCRID) result.get(t);
+
+                if (lid.getId() > id.getId()) { // sanity check
+                    throw new IllegalStateException("bad \"native\" database ID generator");
+                } else if (lid.getId() < id.getId()) {
+                    session.delete(lid);
+                }
+            }
+
+            tx.commit();
+            session.close();
+
+            return id.getId();
+        }
+    }
+
     /**
      * helper mehtod: translates fieldtypes into hibernate types
-     * @param type typename as string
+     * 
+     * @param type
+     *            typename as string
      * @return hibernate type
      */
-    public org.hibernate.type.Type getHibType(String type){
-        
-        if(type.equals("integer")){
+    public org.hibernate.type.Type getHibType(String type) {
+        if (type.equals("integer")) {
             return new IntegerType();
-        }else if(type.equals("date")){
+        } else if (type.equals("date")) {
             return new DateType();
-        }else if(type.equals("time")){
+        } else if (type.equals("time")) {
             return new TimeType();
-        }else if(type.equals("timestamp")){
+        } else if (type.equals("timestamp")) {
             return new TimestampType();
-        }else if(type.equals("decimal")){
+        } else if (type.equals("decimal")) {
             return new DoubleType();
-        }else if(type.equals("boolean")){
+        } else if (type.equals("boolean")) {
             return new BooleanType();
-        }else{
+        } else {
             return new StringType();
         }
-
     }
 }

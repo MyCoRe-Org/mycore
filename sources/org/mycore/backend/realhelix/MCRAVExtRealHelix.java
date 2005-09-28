@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.realhelix;
 
@@ -53,120 +52,127 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
-	public MCRAVExtRealHelix() {
-	}
+    public MCRAVExtRealHelix() {
+    }
 
-	public void init(MCRFileReader file) throws MCRPersistenceException {
-		super.init(file);
+    public void init(MCRFileReader file) throws MCRPersistenceException {
+        super.init(file);
 
-		MCRConfiguration config = MCRConfiguration.instance();
-		String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
 
-		baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
+        baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
 
-		String data = getMetadata(baseMetadata + file.getStorageID());
+        String data = getMetadata(baseMetadata + file.getStorageID());
 
-		try {
-			String sSize = getBetween("File Size:</strong>", "Bytes", data, "0");
-			String sBitRate = getBetween("Bit Rate:</strong>", "Kbps", data,
-					"0.0");
-			String sFrameRate = getBetween("Frame Rate: </strong>", "fps",
-					data, "0.0");
-			String sDuration = getBetween("Duration:</strong>", "<br>", data,
-					"0:0.0");
-			String sType = getBetween("Stream:</strong>", "<br>", data, "");
+        try {
+            String sSize = getBetween("File Size:</strong>", "Bytes", data, "0");
+            String sBitRate = getBetween("Bit Rate:</strong>", "Kbps", data, "0.0");
+            String sFrameRate = getBetween("Frame Rate: </strong>", "fps", data, "0.0");
+            String sDuration = getBetween("Duration:</strong>", "<br>", data, "0:0.0");
+            String sType = getBetween("Stream:</strong>", "<br>", data, "");
 
-			bitRate = Math.round(1024 * Float.valueOf(sBitRate).floatValue());
+            bitRate = Math.round(1024 * Float.valueOf(sBitRate).floatValue());
 
-			StringTokenizer st1 = new StringTokenizer(sFrameRate, " ,");
-			while (st1.hasMoreTokens()) {
-				double value = Double.valueOf(st1.nextToken()).doubleValue();
-				frameRate = Math.max(frameRate, value);
-			}
-			mediaType = (frameRate > 0);
+            StringTokenizer st1 = new StringTokenizer(sFrameRate, " ,");
 
-			StringTokenizer st2 = new StringTokenizer(sDuration, ":.");
-			durationMinutes = Integer.parseInt(st2.nextToken());
-			durationSeconds = Integer.parseInt(st2.nextToken());
+            while (st1.hasMoreTokens()) {
+                double value = Double.valueOf(st1.nextToken()).doubleValue();
+                frameRate = Math.max(frameRate, value);
+            }
 
-			if (Integer.parseInt(st2.nextToken()) > 499) {
-				durationSeconds += 1;
-				if (durationSeconds > 59) {
-					durationMinutes += 1;
-					durationSeconds = 0;
-				}
-			}
+            mediaType = (frameRate > 0);
 
-			StringTokenizer st3 = new StringTokenizer(sSize, ",");
-			StringBuffer sb = new StringBuffer();
-			while (st3.hasMoreTokens())
-				sb.append(st3.nextToken());
-			size = Long.parseLong(sb.toString());
+            StringTokenizer st2 = new StringTokenizer(sDuration, ":.");
+            durationMinutes = Integer.parseInt(st2.nextToken());
+            durationSeconds = Integer.parseInt(st2.nextToken());
 
-			durationHours = (durationMinutes / 60);
-			durationMinutes = durationMinutes - (durationHours * 60);
+            if (Integer.parseInt(st2.nextToken()) > 499) {
+                durationSeconds += 1;
 
-			if (sType.indexOf("MPEG Layer 3") >= 0) {
-				contentTypeID = "mp3";
-				mediaType = AUDIO;
-			} else if (sType.indexOf("MPEG") >= 0) {
-				contentTypeID = "mpegvid";
-				mediaType = VIDEO;
-			} else if (sType.indexOf("RealVideo") >= 0)
-				contentTypeID = "realvid";
-			else if (sType.indexOf("RealAudio") >= 0)
-				contentTypeID = "realaud";
-			else if (sType.indexOf("Wave File") >= 0) {
-				contentTypeID = "wav";
-				mediaType = AUDIO;
-			} else // should be one of "wma" "wmv" "asf"
-			{
-				contentTypeID = file.getContentTypeID();
+                if (durationSeconds > 59) {
+                    durationMinutes += 1;
+                    durationSeconds = 0;
+                }
+            }
 
-				if (contentTypeID.equals("wma"))
-					mediaType = AUDIO;
-				else
-					mediaType = VIDEO;
-			}
+            StringTokenizer st3 = new StringTokenizer(sSize, ",");
+            StringBuffer sb = new StringBuffer();
 
-			if (" wma wmv asf asx ".indexOf(" " + contentTypeID + " ") != -1) {
-				basePlayerStarter = config.getString(prefix + "AsxGenBaseURL");
-				playerDownloadURL = config.getString(prefix + "MediaPlayerURL");
-			} else {
-				basePlayerStarter = config.getString(prefix + "RamGenBaseURL");
-				playerDownloadURL = config.getString(prefix + "RealPlayerURL");
-			}
+            while (st3.hasMoreTokens())
+                sb.append(st3.nextToken());
 
-			URLConnection con = getConnection(basePlayerStarter
-					+ file.getStorageID());
-			playerStarterCT = con.getContentType();
-		} catch (Exception exc) {
-			String msg = "Error parsing metadata from Real Server ViewSource: "
-					+ file.getStorageID();
-			throw new MCRPersistenceException(msg, exc);
-		}
-	}
+            size = Long.parseLong(sb.toString());
 
-	public void getPlayerStarterTo(OutputStream out, String startPos,
-			String stopPos) throws MCRPersistenceException {
-		try {
-			StringBuffer cgi = new StringBuffer(basePlayerStarter);
-			cgi.append(file.getStorageID());
+            durationHours = (durationMinutes / 60);
+            durationMinutes = durationMinutes - (durationHours * 60);
 
-			if ((startPos != null) || (stopPos != null))
-				cgi.append("?");
-			if (startPos != null)
-				cgi.append("start=").append(startPos);
-			if ((startPos != null) && (stopPos != null))
-				cgi.append("&");
-			if (stopPos != null)
-				cgi.append("end=").append(stopPos);
+            if (sType.indexOf("MPEG Layer 3") >= 0) {
+                contentTypeID = "mp3";
+                mediaType = AUDIO;
+            } else if (sType.indexOf("MPEG") >= 0) {
+                contentTypeID = "mpegvid";
+                mediaType = VIDEO;
+            } else if (sType.indexOf("RealVideo") >= 0) {
+                contentTypeID = "realvid";
+            } else if (sType.indexOf("RealAudio") >= 0) {
+                contentTypeID = "realaud";
+            } else if (sType.indexOf("Wave File") >= 0) {
+                contentTypeID = "wav";
+                mediaType = AUDIO;
+            } else // should be one of "wma" "wmv" "asf"
+            {
+                contentTypeID = file.getContentTypeID();
 
-			URLConnection connection = getConnection(cgi.toString());
-			forwardData(connection, out);
-		} catch (IOException exc) {
-			String msg = "Could not send player starter file";
-			throw new MCRPersistenceException(msg, exc);
-		}
-	}
+                if (contentTypeID.equals("wma")) {
+                    mediaType = AUDIO;
+                } else {
+                    mediaType = VIDEO;
+                }
+            }
+
+            if (" wma wmv asf asx ".indexOf(" " + contentTypeID + " ") != -1) {
+                basePlayerStarter = config.getString(prefix + "AsxGenBaseURL");
+                playerDownloadURL = config.getString(prefix + "MediaPlayerURL");
+            } else {
+                basePlayerStarter = config.getString(prefix + "RamGenBaseURL");
+                playerDownloadURL = config.getString(prefix + "RealPlayerURL");
+            }
+
+            URLConnection con = getConnection(basePlayerStarter + file.getStorageID());
+            playerStarterCT = con.getContentType();
+        } catch (Exception exc) {
+            String msg = "Error parsing metadata from Real Server ViewSource: " + file.getStorageID();
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
+
+    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
+        try {
+            StringBuffer cgi = new StringBuffer(basePlayerStarter);
+            cgi.append(file.getStorageID());
+
+            if ((startPos != null) || (stopPos != null)) {
+                cgi.append("?");
+            }
+
+            if (startPos != null) {
+                cgi.append("start=").append(startPos);
+            }
+
+            if ((startPos != null) && (stopPos != null)) {
+                cgi.append("&");
+            }
+
+            if (stopPos != null) {
+                cgi.append("end=").append(stopPos);
+            }
+
+            URLConnection connection = getConnection(cgi.toString());
+            forwardData(connection, out);
+        } catch (IOException exc) {
+            String msg = "Could not send player starter file";
+            throw new MCRPersistenceException(msg, exc);
+        }
+    }
 }

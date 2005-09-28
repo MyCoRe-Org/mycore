@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,54 +16,52 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.query.helper;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.File;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-public class JavaClass
-{
+public class JavaClass {
     private String name;
+
     private String pack;
+
     private List fields;
 
-    public JavaClass(String pack, String name)
-    {
-    this.pack = pack;
-    this.name = name;
-    this.fields = new LinkedList();
+    public JavaClass(String pack, String name) {
+        this.pack = pack;
+        this.name = name;
+        this.fields = new LinkedList();
     }
 
-    public void addField(String type, String name)
-    {
+    public void addField(String type, String name) {
         this.fields.add(new Field(type, name));
     }
-    
-    public String up(String s)
-    {
-        if(s.length()<=0)
+
+    public String up(String s) {
+        if (s.length() <= 0) {
             return s;
-        return s.substring(0,1).toUpperCase() + s.substring(1);
+        }
+
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
-    
-    public void write(String directory) throws IOException
-    {
-        FileOutputStream fo = new FileOutputStream(new File(new File(directory), name+".java"));
+
+    public void write(String directory) throws IOException {
+        FileOutputStream fo = new FileOutputStream(new File(new File(directory), name + ".java"));
         BufferedOutputStream bo = new BufferedOutputStream(fo);
         PrintWriter po = new PrintWriter(fo);
-        
+
         po.println("/*");
         po.println(" * This file is part of ** M y C o R e **");
         po.println(" * Visit our homepage at http://www.mycore.de/ for details.");
@@ -81,52 +82,59 @@ public class JavaClass
         po.println(" * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA");
         po.println(" */");
         po.println("");
-        
-        po.println("package "+pack+";");
+
+        po.println("package " + pack + ";");
         po.println("");
         po.println("import java.sql.Types.*;");
         po.println("");
-        po.println("public class "+name);
+        po.println("public class " + name);
         po.println("{");
+
         Iterator it = fields.iterator();
-        while(it.hasNext()) {
-            Field field = (Field)it.next();
-            po.println("    private "+field.type+" "+field.name+";");
+
+        while (it.hasNext()) {
+            Field field = (Field) it.next();
+            po.println("    private " + field.type + " " + field.name + ";");
         }
 
         it = fields.iterator();
-        
+
         po.println("");
-        while(it.hasNext()) {
-            Field field = (Field)it.next();
+
+        while (it.hasNext()) {
+            Field field = (Field) it.next();
             po.println("    /**");
             po.println("    * @hibernate.property");
-            po.println("    * column=\""+field.name.toUpperCase()+"\"");
+            po.println("    * column=\"" + field.name.toUpperCase() + "\"");
             po.println("    * not-null=\"true\"");
             po.println("    * update=\"true\"");
             po.println("    */");
-            po.println("    public "+field.type+" get"+up(field.name)+"() {");
-            po.println("        return "+field.name+";");
+            po.println("    public " + field.type + " get" + up(field.name) + "() {");
+            po.println("        return " + field.name + ";");
             po.println("    }");
-            po.println("    public void set"+up(field.name)+"("+field.type+" "+field.name+") {");
-            po.println("        this."+field.name+" = "+field.name+";");
+            po.println("    public void set" + up(field.name) + "(" + field.type + " " + field.name + ") {");
+            po.println("        this." + field.name + " = " + field.name + ";");
             po.println("    }");
-            if(it.hasNext()) {
+
+            if (it.hasNext()) {
                 po.println("");
             }
         }
-        
+
         po.println("}");
         po.close();
         bo.close();
         fo.close();
     }
-    
-    private class Field
-    {
+
+    private class Field {
         String type;
+
         String name;
-        Field(String type, String name) {this.type = type;this.name = name;}
+
+        Field(String type, String name) {
+            this.type = type;
+            this.name = name;
+        }
     };
 }
-

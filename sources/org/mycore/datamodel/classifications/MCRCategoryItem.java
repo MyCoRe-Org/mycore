@@ -1,4 +1,4 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
@@ -19,8 +19,7 @@
  * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.datamodel.classifications;
 
@@ -35,162 +34,176 @@ import org.mycore.common.MCRArgumentChecker;
  * @version $Revision$ $Date$
  */
 public class MCRCategoryItem extends MCRClassificationObject {
-	protected String parentID;
+    protected String parentID;
 
-	protected String classifID;
+    protected String classifID;
 
-	protected String URL;
+    protected String URL;
 
-	/**
-	 * The constructor to fill this item.
-	 * 
-	 * @param parent
-	 *            the parent MCRClassificationObject
-	 * @param ID
-	 *            an identifier String
-	 */
-	public MCRCategoryItem(String ID, MCRClassificationObject parent) {
-		super(ID);
-		MCRArgumentChecker.ensureNotNull(parent, "parent");
-		this.classifID = parent.getClassificationID();
-		MCRArgumentChecker.ensureIsFalse(ID.equals(classifID),
-				"A category ID can not be the same as its classification ID");
-		if (parent instanceof MCRCategoryItem)
-			this.parentID = parent.ID;
-		if (parent.childrenIDs != null)
-			parent.childrenIDs = null;
-		URL = "";
-	}
+    /**
+     * The constructor to fill this item.
+     * 
+     * @param parent
+     *            the parent MCRClassificationObject
+     * @param ID
+     *            an identifier String
+     */
+    public MCRCategoryItem(String ID, MCRClassificationObject parent) {
+        super(ID);
+        MCRArgumentChecker.ensureNotNull(parent, "parent");
+        this.classifID = parent.getClassificationID();
+        MCRArgumentChecker.ensureIsFalse(ID.equals(classifID), "A category ID can not be the same as its classification ID");
 
-	/**
-	 * The constructor to fill this item.
-	 * 
-	 * @param ID
-	 *            an identifier String
-	 * @param classifID
-	 *            the ID of the classification
-	 * @param parentID
-	 *            the ID of the parent
-	 */
-	public MCRCategoryItem(String ID, String classifID, String parentID) {
-		super(ID);
-		this.classifID = classifID;
-		this.parentID = parentID;
-		URL = "";
-	}
+        if (parent instanceof MCRCategoryItem) {
+            this.parentID = parent.ID;
+        }
 
-	/**
-	 * The method call the MCRClassificationManager to create this instance.
-	 */
-	public final void create() {
-		manager().createCategoryItem(this);
-	}
+        if (parent.childrenIDs != null) {
+            parent.childrenIDs = null;
+        }
 
-	/**
-	 * The method call the MCRClassificationManager to delete this instance.
-	 */
-	public void delete() {
-		MCRClassificationObject parent = getParent();
-		if (parent == null)
-			parent = getClassificationItem();
-		parent.childrenIDs = null;
-		super.delete();
-		manager().deleteCategoryItem(classifID, ID);
-	}
+        URL = "";
+    }
 
-	/**
-	 * The methode return the classification ID.
-	 * 
-	 * @return the classification ID
-	 */
-	public String getClassificationID() {
-		return classifID;
-	}
+    /**
+     * The constructor to fill this item.
+     * 
+     * @param ID
+     *            an identifier String
+     * @param classifID
+     *            the ID of the classification
+     * @param parentID
+     *            the ID of the parent
+     */
+    public MCRCategoryItem(String ID, String classifID, String parentID) {
+        super(ID);
+        this.classifID = classifID;
+        this.parentID = parentID;
+        URL = "";
+    }
 
-	public MCRClassificationItem getClassificationItem() {
-		ensureNotDeleted();
-		return MCRClassificationItem.getClassificationItem(classifID);
-	}
+    /**
+     * The method call the MCRClassificationManager to create this instance.
+     */
+    public final void create() {
+        manager().createCategoryItem(this);
+    }
 
-	public MCRCategoryItem getParent() {
-		ensureNotDeleted();
-		if (parentID != null)
-			return getCategoryItem(classifID, parentID);
-		else
-			return null;
-	}
+    /**
+     * The method call the MCRClassificationManager to delete this instance.
+     */
+    public void delete() {
+        MCRClassificationObject parent = getParent();
 
-	public String getParentID() {
-		ensureNotDeleted();
-		return parentID;
-	}
+        if (parent == null) {
+            parent = getClassificationItem();
+        }
 
-	/**
-	 * The method return a MCRCategoryItem for the given Classification and
-	 * Category ID.
-	 * 
-	 * @param classifID
-	 *            the classification ID
-	 * @param categID
-	 *            the category ID
-	 * @return a MCRCategoryItem
-	 */
-	public static MCRCategoryItem getCategoryItem(String classifID,
-			String categID) {
-		MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
-		MCRArgumentChecker.ensureNotEmpty(categID, "categID");
-		return manager().retrieveCategoryItem(classifID, categID);
-	}
+        parent.childrenIDs = null;
+        super.delete();
+        manager().deleteCategoryItem(classifID, ID);
+    }
 
-	/**
-	 * The method return a MCRCategoryItem for the given Classification and
-	 * Category label text.
-	 * 
-	 * @param classifID
-	 *            the classification ID
-	 * @param labeltext
-	 *            the category label text
-	 * @return a MCRCategoryItem
-	 */
-	public static MCRCategoryItem getCategoryItemForLabelText(String classifID,
-			String labeltext) {
-		MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
-		MCRArgumentChecker.ensureNotEmpty(labeltext, "labeltext");
-		return manager().retrieveCategoryItemForLabelText(classifID, labeltext);
-	}
+    /**
+     * The methode return the classification ID.
+     * 
+     * @return the classification ID
+     */
+    public String getClassificationID() {
+        return classifID;
+    }
 
-	/**
-	 * The method returns the URL string.
-	 * 
-	 * @return the URL string
-	 */
-	public final String getURL() {
-		return URL;
-	}
+    public MCRClassificationItem getClassificationItem() {
+        ensureNotDeleted();
 
-	/**
-	 * The method set the URL string.
-	 * 
-	 * @param url
-	 *            the URL string
-	 */
-	public final void setURL(String url) {
-		if (url == null) {
-			URL = "";
-			return;
-		}
-		URL = url;
-	}
+        return MCRClassificationItem.getClassificationItem(classifID);
+    }
 
-	/**
-	 * Put all data to a string
-	 */
-	public final String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("Classification: ").append(classifID).append("\n");
-		sb.append("Parent ID:      ").append(parentID).append("\n");
-		sb.append(super.toString());
-		sb.append("URL             ").append(URL).append("\n");
-		return sb.toString();
-	}
+    public MCRCategoryItem getParent() {
+        ensureNotDeleted();
+
+        if (parentID != null) {
+            return getCategoryItem(classifID, parentID);
+        } else {
+            return null;
+        }
+    }
+
+    public String getParentID() {
+        ensureNotDeleted();
+
+        return parentID;
+    }
+
+    /**
+     * The method return a MCRCategoryItem for the given Classification and
+     * Category ID.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param categID
+     *            the category ID
+     * @return a MCRCategoryItem
+     */
+    public static MCRCategoryItem getCategoryItem(String classifID, String categID) {
+        MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
+        MCRArgumentChecker.ensureNotEmpty(categID, "categID");
+
+        return manager().retrieveCategoryItem(classifID, categID);
+    }
+
+    /**
+     * The method return a MCRCategoryItem for the given Classification and
+     * Category label text.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param labeltext
+     *            the category label text
+     * @return a MCRCategoryItem
+     */
+    public static MCRCategoryItem getCategoryItemForLabelText(String classifID, String labeltext) {
+        MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
+        MCRArgumentChecker.ensureNotEmpty(labeltext, "labeltext");
+
+        return manager().retrieveCategoryItemForLabelText(classifID, labeltext);
+    }
+
+    /**
+     * The method returns the URL string.
+     * 
+     * @return the URL string
+     */
+    public final String getURL() {
+        return URL;
+    }
+
+    /**
+     * The method set the URL string.
+     * 
+     * @param url
+     *            the URL string
+     */
+    public final void setURL(String url) {
+        if (url == null) {
+            URL = "";
+
+            return;
+        }
+
+        URL = url;
+    }
+
+    /**
+     * Put all data to a string
+     */
+    public final String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Classification: ").append(classifID).append("\n");
+        sb.append("Parent ID:      ").append(parentID).append("\n");
+        sb.append(super.toString());
+        sb.append("URL             ").append(URL).append("\n");
+
+        return sb.toString();
+    }
 }

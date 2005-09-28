@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.datamodel.ifs;
 
@@ -37,316 +36,338 @@ import org.mycore.common.MCRArgumentChecker;
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {
-	protected static MCRFileMetadataManager manager = MCRFileMetadataManager
-			.instance();
+    protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 
-	public static MCRFilesystemNode getNode(String ID) {
-		MCRArgumentChecker.ensureNotEmpty(ID, "ID");
-		return manager.retrieveNode(ID);
-	}
+    public static MCRFilesystemNode getNode(String ID) {
+        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
 
-	public static MCRFilesystemNode getRootNode(String ownerID) {
-		MCRArgumentChecker.ensureNotEmpty(ownerID, "ownerID");
-		return manager.retrieveRootNode(ownerID);
-	}
+        return manager.retrieveNode(ID);
+    }
 
-	protected String ID;
+    public static MCRFilesystemNode getRootNode(String ownerID) {
+        MCRArgumentChecker.ensureNotEmpty(ownerID, "ownerID");
 
-	/** The ID of the node owner, e .g. a MILESS derivate ID */
-	protected String ownerID;
+        return manager.retrieveRootNode(ownerID);
+    }
 
-	/** The ID of the parent directory, if any */
-	protected String parentID;
+    protected String ID;
 
-	/** The name of this node */
-	protected String name;
+    /** The ID of the node owner, e .g. a MILESS derivate ID */
+    protected String ownerID;
 
-	/** The optional label of this node */
-	protected String label;
+    /** The ID of the parent directory, if any */
+    protected String parentID;
 
-	/** The size in number of bytes */
-	protected long size;
+    /** The name of this node */
+    protected String name;
 
-	/** The date of last modification of this node */
-	protected GregorianCalendar lastModified;
+    /** The optional label of this node */
+    protected String label;
 
-	/** A flag indicating if this node is deleted and therefore invalid */
-	protected boolean deleted = false;
+    /** The size in number of bytes */
+    protected long size;
 
-	protected MCRFilesystemNode(String name, String ownerID) {
-		this(name, null, ownerID);
-	}
+    /** The date of last modification of this node */
+    protected GregorianCalendar lastModified;
 
-	protected MCRFilesystemNode(String name, MCRDirectory parent) {
-		this(name, parent.ID, parent.ownerID);
-	}
+    /** A flag indicating if this node is deleted and therefore invalid */
+    protected boolean deleted = false;
 
-	private MCRFilesystemNode(String name, String parentID, String ownerID) {
-		MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
+    protected MCRFilesystemNode(String name, String ownerID) {
+        this(name, null, ownerID);
+    }
 
-		this.ID = manager.createNodeID();
-		this.parentID = parentID;
-		this.ownerID = ownerID;
-		this.size = 0;
-		this.lastModified = new GregorianCalendar();
-		this.label = null;
+    protected MCRFilesystemNode(String name, MCRDirectory parent) {
+        this(name, parent.ID, parent.ownerID);
+    }
 
-		checkName(name);
-		this.name = name;
-	}
+    private MCRFilesystemNode(String name, String parentID, String ownerID) {
+        MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
 
-	protected MCRFilesystemNode(String ID, String parentID, String ownerID,
-			String name, String label, long size, GregorianCalendar date) {
-		this.ID = ID;
-		this.parentID = parentID;
-		this.ownerID = ownerID;
-		this.name = name;
-		this.label = label;
-		this.size = size;
-		this.lastModified = date;
-		this.deleted = false;
-	}
+        this.ID = manager.createNodeID();
+        this.parentID = parentID;
+        this.ownerID = ownerID;
+        this.size = 0;
+        this.lastModified = new GregorianCalendar();
+        this.label = null;
 
-	protected void storeNew() {
-		manager.storeNode(this);
-		if (hasParent())
-			getParent().addChild(this);
-	}
+        checkName(name);
+        this.name = name;
+    }
 
-	public void delete() {
-		manager.deleteNode(ID);
+    protected MCRFilesystemNode(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date) {
+        this.ID = ID;
+        this.parentID = parentID;
+        this.ownerID = ownerID;
+        this.name = name;
+        this.label = label;
+        this.size = size;
+        this.lastModified = date;
+        this.deleted = false;
+    }
 
-		if (parentID != null)
-			getParent().removeChild(this);
+    protected void storeNew() {
+        manager.storeNode(this);
 
-		this.ID = null;
-		this.ownerID = null;
-		this.name = null;
-		this.label = null;
-		this.size = 0;
-		this.lastModified = null;
-		this.parentID = null;
-		this.deleted = true;
-	}
+        if (hasParent()) {
+            getParent().addChild(this);
+        }
+    }
 
-	protected void checkName(String name) {
-		MCRArgumentChecker.ensureNotEmpty(name, "name");
+    public void delete() {
+        manager.deleteNode(ID);
 
-		boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2;
-		String errorMsg = "Filesystem node name must not contain '\' or '/' characters: "
-				+ name;
-		MCRArgumentChecker.ensureIsFalse(error, errorMsg);
+        if (parentID != null) {
+            getParent().removeChild(this);
+        }
 
-		if (hasParent()) {
-			boolean exists = getParent().hasChild(name);
-			String existsMsg = "A node with this name already exists: " + name;
-			MCRArgumentChecker.ensureIsFalse(exists, existsMsg);
-		}
-	}
+        this.ID = null;
+        this.ownerID = null;
+        this.name = null;
+        this.label = null;
+        this.size = 0;
+        this.lastModified = null;
+        this.parentID = null;
+        this.deleted = true;
+    }
 
-	public String getID() {
-		return ID;
-	}
+    protected void checkName(String name) {
+        MCRArgumentChecker.ensureNotEmpty(name, "name");
 
-	/**
-	 * Returns the ID of the owner of this node
-	 * 
-	 * @return the ID of the owner of this node
-	 */
-	public String getOwnerID() {
-		ensureNotDeleted();
-		return ownerID;
-	}
+        boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2;
+        String errorMsg = "Filesystem node name must not contain '\' or '/' characters: " + name;
+        MCRArgumentChecker.ensureIsFalse(error, errorMsg);
 
-	public String getParentID() {
-		return parentID;
-	}
+        if (hasParent()) {
+            boolean exists = getParent().hasChild(name);
+            String existsMsg = "A node with this name already exists: " + name;
+            MCRArgumentChecker.ensureIsFalse(exists, existsMsg);
+        }
+    }
 
-	public MCRDirectory getParent() {
-		ensureNotDeleted();
+    public String getID() {
+        return ID;
+    }
 
-		if (!hasParent())
-			return null;
-		else
-			return MCRDirectory.getDirectory(parentID);
-	}
+    /**
+     * Returns the ID of the owner of this node
+     * 
+     * @return the ID of the owner of this node
+     */
+    public String getOwnerID() {
+        ensureNotDeleted();
 
-	public boolean hasParent() {
-		ensureNotDeleted();
-		return (parentID != null);
-	}
+        return ownerID;
+    }
 
-	public MCRDirectory getRootDirectory() {
-		ensureNotDeleted();
+    public String getParentID() {
+        return parentID;
+    }
 
-		if (hasParent())
-			return getParent().getRootDirectory();
-		else if (this instanceof MCRDirectory)
-			return (MCRDirectory) this;
-		else
-			return null;
-	}
+    public MCRDirectory getParent() {
+        ensureNotDeleted();
 
-	protected void ensureNotDeleted() {
-		MCRArgumentChecker.ensureIsFalse(deleted,
-				"Do not use this node, it is deleted");
-	}
+        if (!hasParent()) {
+            return null;
+        } else {
+            return MCRDirectory.getDirectory(parentID);
+        }
+    }
 
-	/**
-	 * Sets the name of this node
-	 */
-	public void setName(String name) {
-		ensureNotDeleted();
+    public boolean hasParent() {
+        ensureNotDeleted();
 
-		if (this.name.equals(name))
-			return;
+        return (parentID != null);
+    }
 
-		checkName(name);
-		this.name = name;
-		this.lastModified = new GregorianCalendar();
+    public MCRDirectory getRootDirectory() {
+        ensureNotDeleted();
 
-		manager.storeNode(this);
+        if (hasParent()) {
+            return getParent().getRootDirectory();
+        } else if (this instanceof MCRDirectory) {
+            return (MCRDirectory) this;
+        } else {
+            return null;
+        }
+    }
 
-		if (parentID != null)
-			getParent().touch();
-	}
+    protected void ensureNotDeleted() {
+        MCRArgumentChecker.ensureIsFalse(deleted, "Do not use this node, it is deleted");
+    }
 
-	/**
-	 * Returns the name of this node
-	 * 
-	 * @return the name of this node
-	 */
-	public String getName() {
-		ensureNotDeleted();
-		return name;
-	}
+    /**
+     * Sets the name of this node
+     */
+    public void setName(String name) {
+        ensureNotDeleted();
 
-	/**
-	 * Sets the label of this node
-	 * 
-	 * @param label
-	 *            the label (may be null)
-	 */
-	public void setLabel(String label) {
-		ensureNotDeleted();
+        if (this.name.equals(name)) {
+            return;
+        }
 
-		if ((label != null) && (label.trim().length() == 0))
-			label = null;
-		if (this.label.equals(label))
-			return;
+        checkName(name);
+        this.name = name;
+        this.lastModified = new GregorianCalendar();
 
-		this.label = label;
-		this.lastModified = new GregorianCalendar();
+        manager.storeNode(this);
 
-		manager.storeNode(this);
+        if (parentID != null) {
+            getParent().touch();
+        }
+    }
 
-		if (parentID != null)
-			getParent().touch();
-	}
+    /**
+     * Returns the name of this node
+     * 
+     * @return the name of this node
+     */
+    public String getName() {
+        ensureNotDeleted();
 
-	/**
-	 * Returns the label of this node
-	 * 
-	 * @return the label of this node, or null
-	 */
-	public String getLabel() {
-		ensureNotDeleted();
-		return label;
-	}
+        return name;
+    }
 
-	public String getPath() {
-		ensureNotDeleted();
+    /**
+     * Sets the label of this node
+     * 
+     * @param label
+     *            the label (may be null)
+     */
+    public void setLabel(String label) {
+        ensureNotDeleted();
 
-		if (hasParent())
-			return getParent().getPath() + "/" + name;
-		else
-			return name;
-	}
+        if ((label != null) && (label.trim().length() == 0)) {
+            label = null;
+        }
 
-	public String getAbsolutePath() {
-		ensureNotDeleted();
+        if (this.label.equals(label)) {
+            return;
+        }
 
-		if (hasParent()) {
-			String path = getParent().getAbsolutePath();
-			if (!path.endsWith("/"))
-				path += "/";
-			return path + name;
-		} else
-			return "/";
-	}
+        this.label = label;
+        this.lastModified = new GregorianCalendar();
 
-	/**
-	 * Returns the node size as number of bytes
-	 */
-	public long getSize() {
-		ensureNotDeleted();
-		return size;
-	}
+        manager.storeNode(this);
 
-	/**
-	 * Returns the node size, formatted as a string
-	 */
-	public String getSizeFormatted() {
-		ensureNotDeleted();
-		return getSizeFormatted(size);
-	}
+        if (parentID != null) {
+            getParent().touch();
+        }
+    }
 
-	/**
-	 * Takes a file size in bytes and formats it as a string for output. For
-	 * values &lt; 5 KB the output format is for example "320 Byte". For values
-	 * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
-	 * the output format is for example "3,45 MB".
-	 */
-	public static String getSizeFormatted(long bytes) {
-		String sizeUnit;
-		String sizeText;
-		double sizeValue;
+    /**
+     * Returns the label of this node
+     * 
+     * @return the label of this node, or null
+     */
+    public String getLabel() {
+        ensureNotDeleted();
 
-		if (bytes >= 1024 * 1024) // >= 1 MB
-		{
-			sizeUnit = "MB";
-			sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
-		} else if (bytes >= 5 * 1024) // >= 5 KB
-		{
-			sizeUnit = "KB";
-			sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
-		} else // < 5 KB
-		{
-			sizeUnit = "Byte";
-			sizeValue = (double) bytes;
-		}
+        return label;
+    }
 
-		sizeText = String.valueOf(sizeValue).replace('.', ',');
-		if (sizeText.endsWith(",0"))
-			sizeText = sizeText.substring(0, sizeText.length() - 2);
+    public String getPath() {
+        ensureNotDeleted();
 
-		return sizeText + " " + sizeUnit;
-	}
+        if (hasParent()) {
+            return getParent().getPath() + "/" + name;
+        } else {
+            return name;
+        }
+    }
 
-	/**
-	 * Returns the time of last modification of this node
-	 */
-	public GregorianCalendar getLastModified() {
-		ensureNotDeleted();
-		return lastModified;
-	}
+    public String getAbsolutePath() {
+        ensureNotDeleted();
 
-	protected static DateFormat formatter = new SimpleDateFormat(
-			"yyyy-MM-dd_HH-mm-ss_SSS");
+        if (hasParent()) {
+            String path = getParent().getAbsolutePath();
 
-	public String toString() {
-		String date = formatter.format(lastModified.getTime());
+            if (!path.endsWith("/")) {
+                path += "/";
+            }
 
-		StringBuffer sb = new StringBuffer();
-		sb.append("ID          = ").append(this.ID).append("\n");
-		sb.append("Name        = ").append(this.name).append("\n");
-		sb.append("Label       = ").append(this.label).append("\n");
-		sb.append("Type        = ").append(this.getClass().getName()).append(
-				"\n");
-		sb.append("ParentID    = ").append(this.parentID).append("\n");
-		sb.append("OwnerID     = ").append(this.ownerID).append("\n");
-		sb.append("Size        = ").append(this.size).append("\n");
-		sb.append("Modified    = ").append(date).append("\n");
-		return sb.toString();
-	}
+            return path + name;
+        } else {
+            return "/";
+        }
+    }
+
+    /**
+     * Returns the node size as number of bytes
+     */
+    public long getSize() {
+        ensureNotDeleted();
+
+        return size;
+    }
+
+    /**
+     * Returns the node size, formatted as a string
+     */
+    public String getSizeFormatted() {
+        ensureNotDeleted();
+
+        return getSizeFormatted(size);
+    }
+
+    /**
+     * Takes a file size in bytes and formats it as a string for output. For
+     * values &lt; 5 KB the output format is for example "320 Byte". For values
+     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
+     * the output format is for example "3,45 MB".
+     */
+    public static String getSizeFormatted(long bytes) {
+        String sizeUnit;
+        String sizeText;
+        double sizeValue;
+
+        if (bytes >= (1024 * 1024)) // >= 1 MB
+        {
+            sizeUnit = "MB";
+            sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
+        } else if (bytes >= (5 * 1024)) // >= 5 KB
+        {
+            sizeUnit = "KB";
+            sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
+        } else // < 5 KB
+        {
+            sizeUnit = "Byte";
+            sizeValue = (double) bytes;
+        }
+
+        sizeText = String.valueOf(sizeValue).replace('.', ',');
+
+        if (sizeText.endsWith(",0")) {
+            sizeText = sizeText.substring(0, sizeText.length() - 2);
+        }
+
+        return sizeText + " " + sizeUnit;
+    }
+
+    /**
+     * Returns the time of last modification of this node
+     */
+    public GregorianCalendar getLastModified() {
+        ensureNotDeleted();
+
+        return lastModified;
+    }
+
+    protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+
+    public String toString() {
+        String date = formatter.format(lastModified.getTime());
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("ID          = ").append(this.ID).append("\n");
+        sb.append("Name        = ").append(this.name).append("\n");
+        sb.append("Label       = ").append(this.label).append("\n");
+        sb.append("Type        = ").append(this.getClass().getName()).append("\n");
+        sb.append("ParentID    = ").append(this.parentID).append("\n");
+        sb.append("OwnerID     = ").append(this.ownerID).append("\n");
+        sb.append("Size        = ").append(this.size).append("\n");
+        sb.append("Modified    = ").append(date).append("\n");
+
+        return sb.toString();
+    }
 }

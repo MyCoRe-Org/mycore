@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,19 +16,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.acl;
 
-///============================================================================§
-
+// /============================================================================§
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 
-///============================================================================|
+// /============================================================================|
 
 /**
  * This interface characterizes objects which have an owner and an owning group.
@@ -33,50 +35,44 @@ import org.mycore.user.MCRUser;
  * @author Benno Süselbeck
  * @version 1.0.0, 01.11.2003
  */
-
 public interface MCROwnedObject {
-	///============================================================================/
+    // /============================================================================/
 
-	/**
-	 * Returns the owner of this guarded object.
-	 * 
-	 * @return the owner of this object.
-	 */
+    /**
+     * Returns the owner of this guarded object.
+     * 
+     * @return the owner of this object.
+     */
+    public MCRUser getOwner();
 
-	public MCRUser getOwner();
+    // ------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
+    /**
+     * Sets a new owner for this guarded object.
+     * 
+     * @throws MCRAccessException
+     *             if the currentUser is not allowed to set a new owner.
+     */
+    public void changeOwner(MCRUser newOwner) throws MCRAccessException;
 
-	/**
-	 * Sets a new owner for this guarded object.
-	 * 
-	 * @throws MCRAccessException
-	 *             if the currentUser is not allowed to set a new owner.
-	 */
+    // ------------------------------------------------------------------------------
 
-	public void changeOwner(MCRUser newOwner) throws MCRAccessException;
+    /**
+     * Returns the owner of this guarded object.
+     * 
+     * @return the owner of this object.
+     */
+    public MCRGroup getOwnerGroup();
 
-	//------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
 
-	/**
-	 * Returns the owner of this guarded object.
-	 * 
-	 * @return the owner of this object.
-	 */
+    /**
+     * Sets a new owner group for this guarded object.
+     * 
+     * @throws MCRAccessException
+     *             if the currentUser is not allowed to set a new owner.
+     */
+    public void changeOwnerGroup(MCRGroup newOwnerGroup) throws MCRAccessException;
 
-	public MCRGroup getOwnerGroup();
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 * Sets a new owner group for this guarded object.
-	 * 
-	 * @throws MCRAccessException
-	 *             if the currentUser is not allowed to set a new owner.
-	 */
-
-	public void changeOwnerGroup(MCRGroup newOwnerGroup)
-			throws MCRAccessException;
-
-	//-============================================================================\
+    // -============================================================================\
 }

@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.jdom;
 
@@ -53,273 +52,280 @@ import org.mycore.services.fieldquery.MCRSearcherBase;
 import org.mycore.services.fieldquery.MCRSimpleCondition;
 
 /**
- * Implements a searcher and indexer for MCRObject metadata using only
- * data in memory without any persistent structures. When data is indexed,
- * the values are stored as XML document in memory. When data is searched,
- * the query is transformed to a XSL condition and run against the XML in
- * memory. This class may also be useful for learning how to implement 
- * MCRSearchers and indexers.
+ * Implements a searcher and indexer for MCRObject metadata using only data in
+ * memory without any persistent structures. When data is indexed, the values
+ * are stored as XML document in memory. When data is searched, the query is
+ * transformed to a XSL condition and run against the XML in memory. This class
+ * may also be useful for learning how to implement MCRSearchers and indexers.
  * 
  * TODO: read metadata of all stored MCRObjects at startup
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRJDOMSearcher extends MCRSearcherBase 
-{
-  /** The logger */
-  private final static Logger LOGGER = Logger.getLogger( MCRJDOMSearcher.class );
-  
-  /** Map where key is entryID and value is XML document containing indexed data */
-  private HashMap map = new HashMap();
-  
-  /** XSL transformer factory */
-  private TransformerFactory factory = TransformerFactory.newInstance();
+public class MCRJDOMSearcher extends MCRSearcherBase {
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger(MCRJDOMSearcher.class);
 
-  protected void addToIndex( String entryID, List fields )
-  {
-    LOGGER.info( "MCRMemorySearcher indexing data of " + entryID );
+    /**
+     * Map where key is entryID and value is XML document containing indexed
+     * data
+     */
+    private HashMap map = new HashMap();
 
-    if( ( fields == null ) || ( fields.size() == 0 ) ) return;
-    
-    Element root = new Element( "data" );
-    for( int i = 0; i < fields.size(); i++ )
-    {
-      MCRSearchField field = (MCRSearchField)( fields.get( i ) );
-      Element e = new Element( field.getName() );
-      e.addContent( field.getValue() );
-      root.addContent( e );
-    }
-    
-    if( LOGGER.isDebugEnabled() )
-    {
-      String s = new XMLOutputter( Format.getPrettyFormat() ).outputString( root );
-      LOGGER.debug( "----------" + entryID + "----------" );
-      LOGGER.debug( s );
-      LOGGER.debug( "-----------------------------------" );
-    }
-    
-    map.put( entryID, new Document( root ) );
-  }
+    /** XSL transformer factory */
+    private TransformerFactory factory = TransformerFactory.newInstance();
 
-  protected void removeFromIndex( String entryID )
-  { 
-    LOGGER.info( "MCRMemorySearcher removing indexed data of " + entryID );
-    map.remove( entryID ); 
-  }
-  
-  public MCRResults search( MCRCondition cond, int maxResults )
-  {
-    String xslCondition = buildXSLCondition( cond );
-    LOGGER.debug( "MCRMemorySearcher searching for " + xslCondition );
-    
-    if( xslTemplate == null ) xslTemplate = prepareStylesheet();
-    Document xsl = buildStylesheet( xslCondition );
+    protected void addToIndex(String entryID, List fields) {
+        LOGGER.info("MCRMemorySearcher indexing data of " + entryID);
 
-    MCRResults results = new MCRResults();
-    java.util.Iterator keys = map.keySet().iterator();
-    
-    while( keys.hasNext() )
-    {
-      String entryID = (String)( keys.next() );
-      Document xml = (Document)( map.get( entryID ) );
-      if( matches( xml, xsl ) )
-        results.addHit( new MCRHit( entryID ) );
-      if( ( maxResults > 0 ) && ( results.getNumHits() >= maxResults ) )
-        break;
-    }
-    
-    results.setComplete();
-    LOGGER.debug( "MCRMemorySearcher results completed" );
-    return results;
-  }
-  
-  /**
-   * Returns true if the xml input document matches the 
-   * xsl when condition in the xsl stylesheet. 
-   **/
-  private boolean matches( Document xml, Document xsl )
-  {
-    Source xmlsrc = new JDOMSource( xml );
-    Source xslsrc = new JDOMSource( xsl );
-    try
-    {
-      Transformer transformer = factory.newTransformer( xslsrc );
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      transformer.transform( xmlsrc, new StreamResult( out ) );
-      out.close();
-      return "t".equals( out.toString( "UTF-8" ) );
-    }
-    catch( Exception ex )
-    {
-      LOGGER.warn( "Exception while testing indexed data with XSL condition", ex );
-      return false;
-    }
-  }
-  
-  /** XSL stylesheet template where only the when test attribute has to be added */
-  private Document xslTemplate = null;
-  
-  /** Prepares an XSL stylesheet in memory used as template */
-  private Document prepareStylesheet()
-  {
-    Namespace xslns = Namespace.getNamespace("xsl","http://www.w3.org/1999/XSL/Transform");
-    Namespace xalanns = Namespace.getNamespace("xalan","http://xml.apache.org/xalan");
-    Namespace extns = Namespace.getNamespace("ext","xalan://org.mycore.services.fieldquery.MCRMemorySearcher" );
-    
-    Element stylesheet = new Element( "stylesheet" );
-    stylesheet.setAttribute( "version", "1.0" );
-    stylesheet.setNamespace( xslns );
-    stylesheet.addNamespaceDeclaration( xalanns );
-    stylesheet.addNamespaceDeclaration( extns );
-    stylesheet.setAttribute( "extension-element-prefixes", "ext" );
-
-    Element output = new Element("output", xslns);
-    output.setAttribute("method", "text");
-    stylesheet.addContent(output);
-
-    Element template = new Element( "template", xslns );
-    template.setAttribute( "match", "/data" );
-    stylesheet.addContent( template );
-
-    Element choose = new Element("choose", xslns);
-    template.addContent(choose);
-
-    Element when = new Element("when", xslns);
-    when.addContent("t");
-    Element otherwise = new Element("otherwise", xslns);
-    otherwise.addContent("f");
-    choose.addContent(when).addContent(otherwise);
-    
-    return new Document( stylesheet );
-  }
-  
-  /** Adds the condition as xsl when test attribute to the stylesheet template */
-  private Document buildStylesheet( String condition )
-  {
-    Namespace xslns = Namespace.getNamespace("xsl","http://www.w3.org/1999/XSL/Transform");
-    Document xsl = (Document)( xslTemplate.clone() );
-    xsl.getRootElement()
-      .getChild( "template", xslns )
-      .getChild( "choose", xslns )
-      .getChild( "when", xslns )
-      .setAttribute( "test", condition );
-    
-    return xsl;
-  }
-  
-  /** Converter from MCRCondition to XSL test condition */
-  private String buildXSLCondition( MCRCondition cond )
-  {
-    if( cond instanceof MCRSimpleCondition )
-    {
-      MCRSimpleCondition sc = (MCRSimpleCondition)cond;
-      StringBuffer sb =  new StringBuffer( sc.getField() );
-      sb.append( "[" );
-      if( "= < > <= >=".indexOf( sc.getOperator() ) >= 0 )
-      {
-        String type = MCRSearchField.getDataType( sc.getField() );
-        if( "integer".equals( type ) || "decimal".equals( type ) )
-        {
-          sb.append( "number(text()) " );
-          sb.append( sc.getOperator() );
-          sb.append( " " );
-          sb.append( sc.getValue() );
+        if ((fields == null) || (fields.size() == 0)) {
+            return;
         }
-        else
-        {
-          sb.append( "text() " );
-          sb.append( sc.getOperator() ); 
-          sb.append( " '" );
-          sb.append( sc.getValue() );
-          sb.append( "'" );
+
+        Element root = new Element("data");
+
+        for (int i = 0; i < fields.size(); i++) {
+            MCRSearchField field = (MCRSearchField) (fields.get(i));
+            Element e = new Element(field.getName());
+            e.addContent(field.getValue());
+            root.addContent(e);
         }
-      }
-      else if( "phrase".equals( sc.getOperator() ) )
-      {
-        sb.append( "contains(text(),'" );
-        sb.append( sc.getValue() ).append( "')" );
-      }
-      else if( "contains".equals( sc.getOperator() ) )
-      {
-        sb.append( "ext:contains(text(),'" );
-        sb.append( sc.getValue() ).append( "')" );
-      }
-      else if( "like".equals( sc.getOperator() ) )
-      {
-        sb.append( "ext:like(text(),'" );
-        sb.append( sc.getValue() ).append( "')" );
-      }
-      sb.append( "]" );
-      return sb.toString();
+
+        if (LOGGER.isDebugEnabled()) {
+            String s = new XMLOutputter(Format.getPrettyFormat()).outputString(root);
+            LOGGER.debug("----------" + entryID + "----------");
+            LOGGER.debug(s);
+            LOGGER.debug("-----------------------------------");
+        }
+
+        map.put(entryID, new Document(root));
     }
-    else if( cond instanceof MCRNotCondition )
-    {
-      MCRNotCondition nc = (MCRNotCondition)cond;
-      return "not " + buildXSLCondition( nc.getChild() );
+
+    protected void removeFromIndex(String entryID) {
+        LOGGER.info("MCRMemorySearcher removing indexed data of " + entryID);
+        map.remove(entryID);
     }
-    else if( cond instanceof MCRAndCondition )
-    {
-      MCRAndCondition ac = (MCRAndCondition)cond;
-      List children = ac.getChildren();
-      StringBuffer sb = new StringBuffer();
-      sb.append( "(" );
-      for( int i = 0; i < children.size(); i++ )
-      {
-        MCRCondition sc = (MCRCondition)( children.get( i ) );
-        sb.append( buildXSLCondition( sc ) );
-        if( i < children.size() - 1 )
-          sb.append( " and " );
-      }
-      sb.append( ")" );
-      return sb.toString();
+
+    public MCRResults search(MCRCondition cond, int maxResults) {
+        String xslCondition = buildXSLCondition(cond);
+        LOGGER.debug("MCRMemorySearcher searching for " + xslCondition);
+
+        if (xslTemplate == null) {
+            xslTemplate = prepareStylesheet();
+        }
+
+        Document xsl = buildStylesheet(xslCondition);
+
+        MCRResults results = new MCRResults();
+        java.util.Iterator keys = map.keySet().iterator();
+
+        while (keys.hasNext()) {
+            String entryID = (String) (keys.next());
+            Document xml = (Document) (map.get(entryID));
+
+            if (matches(xml, xsl)) {
+                results.addHit(new MCRHit(entryID));
+            }
+
+            if ((maxResults > 0) && (results.getNumHits() >= maxResults)) {
+                break;
+            }
+        }
+
+        results.setComplete();
+        LOGGER.debug("MCRMemorySearcher results completed");
+
+        return results;
     }
-    else if( cond instanceof MCROrCondition )
-    {
-      MCROrCondition oc = (MCROrCondition)cond;
-      List children = oc.getChildren();
-      StringBuffer sb = new StringBuffer();
-      sb.append( "( " );
-      for( int i = 0; i < children.size(); i++ )
-      {
-        MCRCondition sc = (MCRCondition)( children.get( i ) );
-        sb.append( buildXSLCondition( sc ) );
-        if( i < children.size() - 1 )
-          sb.append( " or " );
-      }
-      sb.append( " )" );
-      return sb.toString();
+
+    /**
+     * Returns true if the xml input document matches the xsl when condition in
+     * the xsl stylesheet.
+     */
+    private boolean matches(Document xml, Document xsl) {
+        Source xmlsrc = new JDOMSource(xml);
+        Source xslsrc = new JDOMSource(xsl);
+
+        try {
+            Transformer transformer = factory.newTransformer(xslsrc);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            transformer.transform(xmlsrc, new StreamResult(out));
+            out.close();
+
+            return "t".equals(out.toString("UTF-8"));
+        } catch (Exception ex) {
+            LOGGER.warn("Exception while testing indexed data with XSL condition", ex);
+
+            return false;
+        }
     }
-    else return "";
-  }
-  
-  /** Implements the contains operator as Xalan function extension */
-  public static boolean contains( String value, String words )
-  {
-    if( ( value == null ) || ( value.trim().length() == 0 ) )
-      return false;
-    if( ( words == null ) || ( words.trim().length() == 0 ) )
-      return true;
-    
-    StringTokenizer st = new StringTokenizer( words );
-    while( st.hasMoreTokens() )
-      if( value.indexOf( st.nextToken() ) == -1 )
-        return false;
-      
-    return true;
-  }
-  
-  /** Implements the like operator as Xalan function extension */
-  public static boolean like( String value, String pattern )
-  {
-    if( ( value == null ) || ( value.trim().length() == 0 ) )
-      return false;
-    if( ( pattern == null ) || ( pattern.trim().length() == 0 ) )
-      return true;
-   
-    pattern = pattern.replaceAll( "\\?", "." );
-    pattern = pattern.replaceAll( "\\*", "(.*)" );
-    
-    Pattern p = Pattern.compile( pattern );
-    return p.matcher( value ).matches();
-  }
+
+    /**
+     * XSL stylesheet template where only the when test attribute has to be
+     * added
+     */
+    private Document xslTemplate = null;
+
+    /** Prepares an XSL stylesheet in memory used as template */
+    private Document prepareStylesheet() {
+        Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+        Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
+        Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRMemorySearcher");
+
+        Element stylesheet = new Element("stylesheet");
+        stylesheet.setAttribute("version", "1.0");
+        stylesheet.setNamespace(xslns);
+        stylesheet.addNamespaceDeclaration(xalanns);
+        stylesheet.addNamespaceDeclaration(extns);
+        stylesheet.setAttribute("extension-element-prefixes", "ext");
+
+        Element output = new Element("output", xslns);
+        output.setAttribute("method", "text");
+        stylesheet.addContent(output);
+
+        Element template = new Element("template", xslns);
+        template.setAttribute("match", "/data");
+        stylesheet.addContent(template);
+
+        Element choose = new Element("choose", xslns);
+        template.addContent(choose);
+
+        Element when = new Element("when", xslns);
+        when.addContent("t");
+
+        Element otherwise = new Element("otherwise", xslns);
+        otherwise.addContent("f");
+        choose.addContent(when).addContent(otherwise);
+
+        return new Document(stylesheet);
+    }
+
+    /** Adds the condition as xsl when test attribute to the stylesheet template */
+    private Document buildStylesheet(String condition) {
+        Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+        Document xsl = (Document) (xslTemplate.clone());
+        xsl.getRootElement().getChild("template", xslns).getChild("choose", xslns).getChild("when", xslns).setAttribute("test", condition);
+
+        return xsl;
+    }
+
+    /** Converter from MCRCondition to XSL test condition */
+    private String buildXSLCondition(MCRCondition cond) {
+        if (cond instanceof MCRSimpleCondition) {
+            MCRSimpleCondition sc = (MCRSimpleCondition) cond;
+            StringBuffer sb = new StringBuffer(sc.getField());
+            sb.append("[");
+
+            if ("= < > <= >=".indexOf(sc.getOperator()) >= 0) {
+                String type = MCRSearchField.getDataType(sc.getField());
+
+                if ("integer".equals(type) || "decimal".equals(type)) {
+                    sb.append("number(text()) ");
+                    sb.append(sc.getOperator());
+                    sb.append(" ");
+                    sb.append(sc.getValue());
+                } else {
+                    sb.append("text() ");
+                    sb.append(sc.getOperator());
+                    sb.append(" '");
+                    sb.append(sc.getValue());
+                    sb.append("'");
+                }
+            } else if ("phrase".equals(sc.getOperator())) {
+                sb.append("contains(text(),'");
+                sb.append(sc.getValue()).append("')");
+            } else if ("contains".equals(sc.getOperator())) {
+                sb.append("ext:contains(text(),'");
+                sb.append(sc.getValue()).append("')");
+            } else if ("like".equals(sc.getOperator())) {
+                sb.append("ext:like(text(),'");
+                sb.append(sc.getValue()).append("')");
+            }
+
+            sb.append("]");
+
+            return sb.toString();
+        } else if (cond instanceof MCRNotCondition) {
+            MCRNotCondition nc = (MCRNotCondition) cond;
+
+            return "not " + buildXSLCondition(nc.getChild());
+        } else if (cond instanceof MCRAndCondition) {
+            MCRAndCondition ac = (MCRAndCondition) cond;
+            List children = ac.getChildren();
+            StringBuffer sb = new StringBuffer();
+            sb.append("(");
+
+            for (int i = 0; i < children.size(); i++) {
+                MCRCondition sc = (MCRCondition) (children.get(i));
+                sb.append(buildXSLCondition(sc));
+
+                if (i < (children.size() - 1)) {
+                    sb.append(" and ");
+                }
+            }
+
+            sb.append(")");
+
+            return sb.toString();
+        } else if (cond instanceof MCROrCondition) {
+            MCROrCondition oc = (MCROrCondition) cond;
+            List children = oc.getChildren();
+            StringBuffer sb = new StringBuffer();
+            sb.append("( ");
+
+            for (int i = 0; i < children.size(); i++) {
+                MCRCondition sc = (MCRCondition) (children.get(i));
+                sb.append(buildXSLCondition(sc));
+
+                if (i < (children.size() - 1)) {
+                    sb.append(" or ");
+                }
+            }
+
+            sb.append(" )");
+
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
+
+    /** Implements the contains operator as Xalan function extension */
+    public static boolean contains(String value, String words) {
+        if ((value == null) || (value.trim().length() == 0)) {
+            return false;
+        }
+
+        if ((words == null) || (words.trim().length() == 0)) {
+            return true;
+        }
+
+        StringTokenizer st = new StringTokenizer(words);
+
+        while (st.hasMoreTokens())
+
+            if (value.indexOf(st.nextToken()) == -1) {
+                return false;
+            }
+
+        return true;
+    }
+
+    /** Implements the like operator as Xalan function extension */
+    public static boolean like(String value, String pattern) {
+        if ((value == null) || (value.trim().length() == 0)) {
+            return false;
+        }
+
+        if ((pattern == null) || (pattern.trim().length() == 0)) {
+            return true;
+        }
+
+        pattern = pattern.replaceAll("\\?", ".");
+        pattern = pattern.replaceAll("\\*", "(.*)");
+
+        Pattern p = Pattern.compile(pattern);
+
+        return p.matcher(value).matches();
+    }
 }

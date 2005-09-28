@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,14 +16,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.acl;
 
-///============================================================================§
+// /============================================================================§
 
 /**
  * This interface defines a permission context.
@@ -41,49 +44,44 @@ package org.mycore.acl;
  * @author Benno Süselbeck
  * @version 1.0.0, 01.11.2003
  */
-
 public interface MCRPermissionContext {
-	///============================================================================/
+    // /============================================================================/
 
-	/**
-	 * Checks if permission is valid for this context. This method is useful
-	 * when editing ACLs to prevent inconsistent entries.
-	 * 
-	 * @return true if the permission is valid for this context.
-	 */
+    /**
+     * Checks if permission is valid for this context. This method is useful
+     * when editing ACLs to prevent inconsistent entries.
+     * 
+     * @return true if the permission is valid for this context.
+     */
+    public boolean isValidPermission(MCRPermission permission);
 
-	public boolean isValidPermission(MCRPermission permission);
+    // ------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
+    /**
+     * Returns the valid permissions within this context.
+     * 
+     * This method can be used to provide choices for legal permissions when
+     * building an ACL editor.
+     * 
+     * @return an array of permissions which are valid with this context
+     */
+    public MCRPermission[] getValidPermissions();
 
-	/**
-	 * Returns the valid permissions within this context.
-	 * 
-	 * This method can be used to provide choices for legal permissions when
-	 * building an ACL editor.
-	 * 
-	 * @return an array of permissions which are valid with this context
-	 */
+    // ------------------------------------------------------------------------------
 
-	public MCRPermission[] getValidPermissions();
+    /**
+     * Returns the single instance of the permission within this context which
+     * has the corresponding name.
+     * 
+     * This method is used when creating permissions from external
+     * representations.
+     * 
+     * @return a permission valid within this context
+     * 
+     * @throws MCRInvalidPermissionException
+     *             when no such permission exists
+     */
+    public MCRPermission getPermission(String name) throws MCRInvalidPermissionException;
 
-	//------------------------------------------------------------------------------
-
-	/**
-	 * Returns the single instance of the permission within this context which
-	 * has the corresponding name.
-	 * 
-	 * This method is used when creating permissions from external
-	 * representations.
-	 * 
-	 * @return a permission valid within this context
-	 * 
-	 * @throws MCRInvalidPermissionException
-	 *             when no such permission exists
-	 */
-
-	public MCRPermission getPermission(String name)
-			throws MCRInvalidPermissionException;
-
-	//-============================================================================\
+    // -============================================================================\
 }

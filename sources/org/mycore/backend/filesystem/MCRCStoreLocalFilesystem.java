@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.filesystem;
 
@@ -54,109 +53,110 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRCStoreLocalFilesystem extends MCRContentStore {
-	/** Base directory on local filesystem where content is stored */
-	protected File baseDir;
+    /** Base directory on local filesystem where content is stored */
+    protected File baseDir;
 
-	public void init(String storeID) {
-		super.init(storeID);
+    public void init(String storeID) {
+        super.init(storeID);
 
-		MCRConfiguration config = MCRConfiguration.instance();
-		baseDir = new File(config.getString(prefix + "BaseDirectory"));
+        MCRConfiguration config = MCRConfiguration.instance();
+        baseDir = new File(config.getString(prefix + "BaseDirectory"));
 
-		if (!baseDir.exists()) {
-			baseDir.mkdirs();
-			if (!baseDir.exists()) {
-				String msg = "Could not create content store base directory: "
-						+ baseDir.getPath();
-				throw new MCRConfigurationException(msg);
-			}
-		} else if (!baseDir.isDirectory()) {
-			String msg = "Content store base must be a directory, but is not: "
-					+ baseDir.getPath();
-			throw new MCRConfigurationException(msg);
-		} else if (!baseDir.canRead()) {
-			String msg = "Content store base directory must be readable: "
-					+ baseDir.getPath();
-			throw new MCRConfigurationException(msg);
-		}
-	}
+        if (!baseDir.exists()) {
+            baseDir.mkdirs();
 
-	private void ensureCanWrite() {
-		if (!baseDir.canWrite()) {
-			String msg = "Content store base directory must be writeable: "
-					+ baseDir.getPath();
-			throw new MCRConfigurationException(msg);
-		}
-	}
+            if (!baseDir.exists()) {
+                String msg = "Could not create content store base directory: " + baseDir.getPath();
+                throw new MCRConfigurationException(msg);
+            }
+        } else if (!baseDir.isDirectory()) {
+            String msg = "Content store base must be a directory, but is not: " + baseDir.getPath();
+            throw new MCRConfigurationException(msg);
+        } else if (!baseDir.canRead()) {
+            String msg = "Content store base directory must be readable: " + baseDir.getPath();
+            throw new MCRConfigurationException(msg);
+        }
+    }
 
-	protected String doStoreContent(MCRFileReader file,
-			MCRContentInputStream source) throws Exception {
-		ensureCanWrite();
+    private void ensureCanWrite() {
+        if (!baseDir.canWrite()) {
+            String msg = "Content store base directory must be writeable: " + baseDir.getPath();
+            throw new MCRConfigurationException(msg);
+        }
+    }
 
-		StringBuffer storageID = new StringBuffer();
-		String[] slots = buildSlotPath();
+    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+        ensureCanWrite();
 
-		for (int i = 0; i < slots.length; i++)
-			storageID.append(slots[i]).append(File.separator);
+        StringBuffer storageID = new StringBuffer();
+        String[] slots = buildSlotPath();
 
-		File dir = new File(baseDir, storageID.toString());
-		synchronized (this) {
-			if (!dir.exists()) {
-				dir.mkdirs();
-				if (!dir.exists()) {
-					String msg = "Could not create content store slot directory: "
-							+ dir.getPath();
-					throw new MCRPersistenceException(msg);
-				}
-			}
-		}
+        for (int i = 0; i < slots.length; i++)
+            storageID.append(slots[i]).append(File.separator);
 
-		String fileID = buildNextID(file);
-		storageID.append(fileID);
+        File dir = new File(baseDir, storageID.toString());
 
-		File local = new File(dir, fileID);
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(local));
-		MCRUtils.copyStream(source, out);
-		out.close();
+        synchronized (this) {
+            if (!dir.exists()) {
+                dir.mkdirs();
 
-		return storageID.toString();
-	}
+                if (!dir.exists()) {
+                    String msg = "Could not create content store slot directory: " + dir.getPath();
+                    throw new MCRPersistenceException(msg);
+                }
+            }
+        }
 
-	protected void doDeleteContent(String storageID) throws Exception {
-		ensureCanWrite();
+        String fileID = buildNextID(file);
+        storageID.append(fileID);
 
-		File local = new File(baseDir, storageID);
-		local.delete();
+        File local = new File(dir, fileID);
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(local));
+        MCRUtils.copyStream(source, out);
+        out.close();
 
-		// Recursively remove all directories that have been created, if empty:
-		StringTokenizer st = new StringTokenizer(storageID, File.separator);
-		int numDirs = st.countTokens() - 1;
-		String[] dirs = new String[numDirs];
+        return storageID.toString();
+    }
 
-		for (int i = 0; i < numDirs; i++) {
-			dirs[i] = st.nextToken();
-			if (i > 0)
-				dirs[i] = dirs[i - 1] + File.separator + dirs[i];
-		}
+    protected void doDeleteContent(String storageID) throws Exception {
+        ensureCanWrite();
 
-		for (int i = numDirs; i > 0; i--) {
-			File dir = new File(baseDir, dirs[i - 1]);
-			if (dir.listFiles().length > 0)
-				break;
-			dir.delete();
-		}
-	}
+        File local = new File(baseDir, storageID);
+        local.delete();
 
-	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
-			throws Exception {
-		File local = new File(baseDir, file.getStorageID());
-		InputStream in = new BufferedInputStream(new FileInputStream(local));
-		MCRUtils.copyStream(in, target);
-	}
+        // Recursively remove all directories that have been created, if empty:
+        StringTokenizer st = new StringTokenizer(storageID, File.separator);
+        int numDirs = st.countTokens() - 1;
+        String[] dirs = new String[numDirs];
 
-	protected InputStream doRetrieveContent(MCRFileReader file)
-			throws Exception {
-		File local = new File(baseDir, file.getStorageID());
-		return new BufferedInputStream(new FileInputStream(local));
-	}
+        for (int i = 0; i < numDirs; i++) {
+            dirs[i] = st.nextToken();
+
+            if (i > 0) {
+                dirs[i] = dirs[i - 1] + File.separator + dirs[i];
+            }
+        }
+
+        for (int i = numDirs; i > 0; i--) {
+            File dir = new File(baseDir, dirs[i - 1]);
+
+            if (dir.listFiles().length > 0) {
+                break;
+            }
+
+            dir.delete();
+        }
+    }
+
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+        File local = new File(baseDir, file.getStorageID());
+        InputStream in = new BufferedInputStream(new FileInputStream(local));
+        MCRUtils.copyStream(in, target);
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+        File local = new File(baseDir, file.getStorageID());
+
+        return new BufferedInputStream(new FileInputStream(local));
+    }
 }

@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,10 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.access;
 
@@ -25,10 +28,9 @@ import java.net.UnknownHostException;
 
 /**
  * A class for representing an IP Address, or a range of IP addresses
- *
+ * 
  * @author Matthias Kramm
  */
-
 public class MCRIPAddress {
     byte[] address;
 
@@ -36,6 +38,7 @@ public class MCRIPAddress {
 
     public MCRIPAddress(String ip) throws UnknownHostException {
         int i = ip.indexOf('/');
+
         if (i >= 0) {
             String ipstr = ip.substring(0, i);
             String maskstr = ip.substring(i + 1);
@@ -65,20 +68,24 @@ public class MCRIPAddress {
         int t;
         this.address = address.getAddress();
         this.mask = new byte[this.address.length];
+
         for (t = 0; t < this.address.length; t++)
             this.mask[t] = (byte) 255;
     }
 
     boolean contains(MCRIPAddress other) {
         int t;
-        if (this.address.length != other.address.length)
-            throw new IllegalStateException(
-                    "can't map IPv6 to IPv4 and vice versa");
+
+        if (this.address.length != other.address.length) {
+            throw new IllegalStateException("can't map IPv6 to IPv4 and vice versa");
+        }
+
         for (t = 0; t < address.length; t++) {
             if ((this.address[t] & this.mask[t]) != (other.address[t] & this.mask[t])) {
                 return false;
             }
         }
+
         return true;
     }
 };

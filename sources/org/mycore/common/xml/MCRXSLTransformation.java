@@ -1,9 +1,9 @@
-/**
- * $RCSfile: MCRXSLTransformation.java,v $
- * $Revision: 1.0 $ $Date: 2003/02/03 14:57:25 $
+/*
+ * $RCSfile: MCRConfiguration.java,v $
+ * $Revision: 1.25 $ $Date: 2005/09/02 14:26:23 $
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.common.xml;
 
@@ -45,7 +44,6 @@ import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
-
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -78,210 +76,212 @@ import org.mycore.common.MCRConfiguration;
  * @version $Revision: 1.0 $ $Date: 2003/02/03 14:57:25 $
  */
 public class MCRXSLTransformation {
+    private static Logger logger = null;
 
-	private static Logger logger = null;
+    private static SAXTransformerFactory factory = null;
 
-	private static SAXTransformerFactory factory = null;
+    private static MCRXSLTransformation singleton = null;
 
-	private static MCRXSLTransformation singleton = null;
+    /**
+     * Method MCRXSLTransformation.
+     */
+    static {
+        logger = Logger.getLogger(MCRXSLTransformation.class);
+        MCRConfiguration.instance();
 
-	/**
-	 * Method MCRXSLTransformation.
-	 */
-	static {
-		logger = Logger.getLogger(MCRXSLTransformation.class);
-		MCRConfiguration.instance();
+        try {
+            TransformerFactory tf = TransformerFactory.newInstance();
 
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			if (tf.getFeature(SAXTransformerFactory.FEATURE)) {
-				factory = (SAXTransformerFactory) tf;
-			} else {
-				logger.fatal("TransformerFactory could not be initialized.");
-			}
-		} catch (TransformerFactoryConfigurationError tfce) {
-			if (tfce.getMessage() != null) {
-				logger.fatal(tfce.getMessage());
-			} else {
-				logger.fatal("Error in TranformerFactory configuration.");
-			}
-		}
-	}
+            if (tf.getFeature(SAXTransformerFactory.FEATURE)) {
+                factory = (SAXTransformerFactory) tf;
+            } else {
+                logger.fatal("TransformerFactory could not be initialized.");
+            }
+        } catch (TransformerFactoryConfigurationError tfce) {
+            if (tfce.getMessage() != null) {
+                logger.fatal(tfce.getMessage());
+            } else {
+                logger.fatal("Error in TranformerFactory configuration.");
+            }
+        }
+    }
 
-	/**
-	 * Method getInstance. Creates an instance of MCRXSLTransformation, when
-	 * called the first time.
-	 * 
-	 * @return MCRXSLTransformation
-	 */
-	public static synchronized MCRXSLTransformation getInstance() {
-		if (singleton == null) {
-			singleton = new MCRXSLTransformation();
-		}
+    /**
+     * Method getInstance. Creates an instance of MCRXSLTransformation, when
+     * called the first time.
+     * 
+     * @return MCRXSLTransformation
+     */
+    public static synchronized MCRXSLTransformation getInstance() {
+        if (singleton == null) {
+            singleton = new MCRXSLTransformation();
+        }
 
-		return singleton;
-	}
+        return singleton;
+    }
 
-	/**
-	 * Method getStylesheet. Returns a precompiled stylesheet.
-	 * 
-	 * @param stylesheet
-	 *            Full path to the stylesheet
-	 * @return Templates The precompiled Stylesheet
-	 */
-	public Templates getStylesheet(String stylesheet) {
-		File styleFile = new File(stylesheet);
+    /**
+     * Method getStylesheet. Returns a precompiled stylesheet.
+     * 
+     * @param stylesheet
+     *            Full path to the stylesheet
+     * @return Templates The precompiled Stylesheet
+     */
+    public Templates getStylesheet(String stylesheet) {
+        File styleFile = new File(stylesheet);
 
-		if (!styleFile.exists()) {
-			logger.fatal("The Stylesheet doesn't exist: " + stylesheet);
-			return null;
-		}
-		return getStylesheet(styleFile);
-	}
+        if (!styleFile.exists()) {
+            logger.fatal("The Stylesheet doesn't exist: " + stylesheet);
 
-	/**
-	 * Method getStylesheet. Returns a precompiled stylesheet.
-	 * 
-	 * @param stylesheet
-	 *            A File with the stylesheet code
-	 * @return Templates The precompiled Stylesheet
-	 */
-	public Templates getStylesheet(File stylesheet) {
-		return getStylesheet(new StreamSource(stylesheet));
-	}
+            return null;
+        }
 
-	/**
-	 * Method getStylesheet. Returns a precompiled stylesheet.
-	 * 
-	 * @param stylesheet
-	 *            A StreamSource
-	 * @return Templates The precompiled Stylesheet
-	 */
-	public Templates getStylesheet(StreamSource stylesheet) {
-		try {
-			Templates out = factory.newTemplates(stylesheet);
-			return out;
-		} catch (TransformerConfigurationException tcx) {
-			logger.fatal(tcx.getMessageAndLocation());
-			return null;
-		}
-	}
+        return getStylesheet(styleFile);
+    }
 
-	/**
-	 * Method getTransformerHandler. Returns a TransformerHandler for the given
-	 * Template.
-	 * 
-	 * @param stylesheet
-	 * @return TransformerHandler
-	 */
-	public TransformerHandler getTransformerHandler(Templates stylesheet) {
-		try {
-			TransformerHandler handler = factory
-					.newTransformerHandler(stylesheet);
-			return handler;
-		} catch (TransformerConfigurationException tcx) {
-			logger.fatal(tcx.getMessageAndLocation());
-			return null;
-		}
-	}
+    /**
+     * Method getStylesheet. Returns a precompiled stylesheet.
+     * 
+     * @param stylesheet
+     *            A File with the stylesheet code
+     * @return Templates The precompiled Stylesheet
+     */
+    public Templates getStylesheet(File stylesheet) {
+        return getStylesheet(new StreamSource(stylesheet));
+    }
 
-	/**
-	 * Method setParameters. Set some parameters which can be used by the
-	 * Stylesheet for the transformation.
-	 * 
-	 * @param handler
-	 * @param parameters
-	 */
-	public void setParameters(TransformerHandler handler, Properties parameters) {
-		Transformer transformer = handler.getTransformer();
-		Enumeration names = parameters.propertyNames();
+    /**
+     * Method getStylesheet. Returns a precompiled stylesheet.
+     * 
+     * @param stylesheet
+     *            A StreamSource
+     * @return Templates The precompiled Stylesheet
+     */
+    public Templates getStylesheet(StreamSource stylesheet) {
+        try {
+            Templates out = factory.newTemplates(stylesheet);
 
-		while (names.hasMoreElements()) {
-			String name = (String) (names.nextElement());
-			String value = parameters.getProperty(name);
+            return out;
+        } catch (TransformerConfigurationException tcx) {
+            logger.fatal(tcx.getMessageAndLocation());
 
-			transformer.setParameter(name, value);
-		}
-	}
+            return null;
+        }
+    }
 
-	/**
-	 * Method transform. Transforms a JDOM-Document to the given OutputStream
-	 * 
-	 * @param in
-	 * @param handler
-	 * @param out
-	 */
-	public void transform(org.jdom.Document in, TransformerHandler handler,
-			OutputStream out) {
-		handler.setResult(new StreamResult(out));
+    /**
+     * Method getTransformerHandler. Returns a TransformerHandler for the given
+     * Template.
+     * 
+     * @param stylesheet
+     * @return TransformerHandler
+     */
+    public TransformerHandler getTransformerHandler(Templates stylesheet) {
+        try {
+            TransformerHandler handler = factory.newTransformerHandler(stylesheet);
 
-		try {
-			new SAXOutputter(handler).output(in);
-		} catch (JDOMException ex) {
-			logger
-					.error("Error while transforming an XML document with an XSL stylesheet.");
-		}
-	}
+            return handler;
+        } catch (TransformerConfigurationException tcx) {
+            logger.fatal(tcx.getMessageAndLocation());
 
-	/**
-	 * Method transform. Transforms a JDOM-Document <i>in </i> with a given
-	 * <i>stylesheet </i> to a new document.
-	 * 
-	 * @param in
-	 *            A JDOM-Document.
-	 * @param stylesheet
-	 *            The Filename with complete path (this is not a servlet!) of
-	 *            the stylesheet.
-	 * @return Document The new document or null, if an exception was thrown.
-	 */
-	public static org.jdom.Document transform(org.jdom.Document in,
-			String stylesheet) {
-		try {
-			JDOMResult out = new JDOMResult();
-			Transformer transformer = TransformerFactory.newInstance()
-					.newTransformer(new StreamSource(new File(stylesheet)));
-			transformer.transform(new JDOMSource(in), out);
+            return null;
+        }
+    }
 
-			return out.getDocument();
-		} catch (TransformerException e) {
-			logger.fatal(e.getMessage());
-			return null;
-		}
-	}
+    /**
+     * Method setParameters. Set some parameters which can be used by the
+     * Stylesheet for the transformation.
+     * 
+     * @param handler
+     * @param parameters
+     */
+    public void setParameters(TransformerHandler handler, Properties parameters) {
+        Transformer transformer = handler.getTransformer();
+        Enumeration names = parameters.propertyNames();
 
-	/**
-	 * Method transform. Transforms a JDOM-Document <i>in </i> with a given
-	 * <i>stylesheet </i> to a new document.
-	 * 
-	 * @param in
-	 *            A JDOM-Document.
-	 * @param stylesheet
-	 *            The Filename with complete path (this is not a servlet!) of
-	 *            the stylesheet.
-	 * @param parameters
-	 *            parameters used by the stylesheet for transformation
-	 * @return Document The new document or null, if an exception was thrown.
-	 */
-	public static org.jdom.Document transform(org.jdom.Document in,
-			String stylesheet, Properties parameters) {
-		try {
-			JDOMResult out = new JDOMResult();
-			Transformer transformer = TransformerFactory.newInstance()
-					.newTransformer(new StreamSource(new File(stylesheet)));
-			Enumeration names = parameters.propertyNames();
-			while (names.hasMoreElements()) {
-				String name = (String) (names.nextElement());
-				String value = parameters.getProperty(name);
+        while (names.hasMoreElements()) {
+            String name = (String) (names.nextElement());
+            String value = parameters.getProperty(name);
 
-				transformer.setParameter(name, value);
-			}
-			transformer.transform(new JDOMSource(in), out);
+            transformer.setParameter(name, value);
+        }
+    }
 
-			return out.getDocument();
-		} catch (TransformerException e) {
-			logger.fatal(e.getMessage());
-			return null;
-		}
-	}
+    /**
+     * Method transform. Transforms a JDOM-Document to the given OutputStream
+     * 
+     * @param in
+     * @param handler
+     * @param out
+     */
+    public void transform(org.jdom.Document in, TransformerHandler handler, OutputStream out) {
+        handler.setResult(new StreamResult(out));
 
+        try {
+            new SAXOutputter(handler).output(in);
+        } catch (JDOMException ex) {
+            logger.error("Error while transforming an XML document with an XSL stylesheet.");
+        }
+    }
+
+    /**
+     * Method transform. Transforms a JDOM-Document <i>in </i> with a given
+     * <i>stylesheet </i> to a new document.
+     * 
+     * @param in
+     *            A JDOM-Document.
+     * @param stylesheet
+     *            The Filename with complete path (this is not a servlet!) of
+     *            the stylesheet.
+     * @return Document The new document or null, if an exception was thrown.
+     */
+    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet) {
+        try {
+            JDOMResult out = new JDOMResult();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File(stylesheet)));
+            transformer.transform(new JDOMSource(in), out);
+
+            return out.getDocument();
+        } catch (TransformerException e) {
+            logger.fatal(e.getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * Method transform. Transforms a JDOM-Document <i>in </i> with a given
+     * <i>stylesheet </i> to a new document.
+     * 
+     * @param in
+     *            A JDOM-Document.
+     * @param stylesheet
+     *            The Filename with complete path (this is not a servlet!) of
+     *            the stylesheet.
+     * @param parameters
+     *            parameters used by the stylesheet for transformation
+     * @return Document The new document or null, if an exception was thrown.
+     */
+    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Properties parameters) {
+        try {
+            JDOMResult out = new JDOMResult();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File(stylesheet)));
+            Enumeration names = parameters.propertyNames();
+
+            while (names.hasMoreElements()) {
+                String name = (String) (names.nextElement());
+                String value = parameters.getProperty(name);
+
+                transformer.setParameter(name, value);
+            }
+
+            transformer.transform(new JDOMSource(in), out);
+
+            return out.getDocument();
+        } catch (TransformerException e) {
+            logger.fatal(e.getMessage());
+
+            return null;
+        }
+    }
 }

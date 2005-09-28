@@ -2,8 +2,8 @@
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,81 +16,91 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
  */
+
 package org.mycore.access;
 
 import java.util.Date;
 
-public class MCRRuleMapping
-{
+public class MCRRuleMapping {
     private String ruleid;
+
     private String objid;
+
     private String pool;
+
     private String creator;
+
     private Date creationdate;
-    
-    public MCRRuleMapping(){
-        
+
+    public MCRRuleMapping() {
     }
 
     /**
      * objid = MCRObjectID as string
+     * 
      * @return
      */
     public String getObjId() {
         return objid;
     }
+
     public void setObjId(String objid) {
         this.objid = objid;
     }
 
     /**
      * pool
+     * 
      * @return
      */
     public String getPool() {
         return pool;
     }
+
     public void setPool(String pool) {
         this.pool = pool;
     }
 
     /**
      * ruleid
+     * 
      * @return
      */
     public String getRuleId() {
         return ruleid;
     }
+
     public void setRuleId(String ruleid) {
         this.ruleid = ruleid;
     }
-    
+
     /**
      * creationdate
+     * 
      * @return
      */
     public Date getCreationdate() {
         return creationdate;
     }
+
     public void setCreationdate(Date creationdate) {
         this.creationdate = creationdate;
     }
-    
+
     /**
      * creator
+     * 
      * @return
      */
     public String getCreator() {
         return creator;
     }
+
     public void setCreator(String creator) {
         this.creator = creator;
     }
-    
-    
 }

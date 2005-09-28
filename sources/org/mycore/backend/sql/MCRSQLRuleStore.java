@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,10 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.backend.sql;
 
@@ -32,19 +35,21 @@ import org.mycore.common.MCRException;
 
 /**
  * SQL implementation for RuleStore, storing access rules
+ * 
  * @author Arne Seifert
- *
+ * 
  */
-public class MCRSQLRuleStore extends MCRRuleStore{
-        
+public class MCRSQLRuleStore extends MCRRuleStore {
     /**
      * Method creates new rule in database by given rule-object
-     * @param rule as MCRAccessRule
+     * 
+     * @param rule
+     *            as MCRAccessRule
      */
     public void createRule(MCRAccessRule rule) {
-        if (! existsRule(rule.getId())){
+        if (!existsRule(rule.getId())) {
             MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-            MCRSQLStatement query = new MCRSQLStatement(ruletablename);  
+            MCRSQLStatement query = new MCRSQLStatement(ruletablename);
             query.setValue(new MCRSQLColumn("RID", rule.getId(), "string"));
             query.setValue(new MCRSQLColumn("CREATOR", rule.getCreator(), "string"));
 
@@ -52,106 +57,114 @@ public class MCRSQLRuleStore extends MCRRuleStore{
             query.setValue(new MCRSQLColumn("CREATIONDATE", df.format(rule.getCreationTime()), "date"));
             query.setValue(new MCRSQLColumn("RULE", rule.getRuleString(), "string"));
             query.setValue(new MCRSQLColumn("DESCRIPTION", rule.getDescription(), "string"));
-            
+
             try {
                 c.doUpdate(query.toTypedInsertStatement());
-            }catch(Exception e){
+            } catch (Exception e) {
                 logger.error(e);
             } finally {
                 c.release();
             }
-        }else{
+        } else {
             logger.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
         }
     }
-    
-    
+
     /**
      * Method checks existance of rule in db
-     * @param ruleid id as string
+     * 
+     * @param ruleid
+     *            id as string
      * @return boolean value
      * @throws MCRException
      */
     private boolean existsRule(String ruleid) throws MCRException {
         try {
-            return MCRSQLConnection.justCheckExists(new MCRSQLStatement(
-                    ruletablename).setCondition("RID", ruleid).toRowSelector());
+            return MCRSQLConnection.justCheckExists(new MCRSQLStatement(ruletablename).setCondition("RID", ruleid).toRowSelector());
         } catch (Exception ex) {
             throw new MCRException("Error in access-rule-store.", ex);
         }
     }
 
-    
     /**
-     * method updates rule by given value. If rule still exists it will be deleted and inserted
-     * @param rule rule object filled with values to be saved 
+     * method updates rule by given value. If rule still exists it will be
+     * deleted and inserted
+     * 
+     * @param rule
+     *            rule object filled with values to be saved
      */
     public void updateRule(MCRAccessRule rule) {
         deleteRule(rule.getId());
         createRule(rule);
     }
 
-    
     /**
-     * method deletes rule with given id 
+     * method deletes rule with given id
      */
     public void deleteRule(String ruleid) {
-        try{
+        try {
             MCRSQLConnection.justDoUpdate("DELETE FROM " + ruletablename + " WHERE RID = '" + ruleid + "'");
-        
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
     }
 
     /**
      * method returns rule by given id
-     * @param ruleid String with ruleid
+     * 
+     * @param ruleid
+     *            String with ruleid
      * @return MCRAccessRule object
      */
     public MCRAccessRule retrieveRule(String ruleid) {
         MCRAccessRule rule = null;
         MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+
         try {
             String select = "SELECT * FROM " + ruletablename + " WHERE RID = '" + ruleid + "'";
             Statement statement = connection.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
-            
+
             if (!rs.next()) {
                 String msg = "There is no rule with ID = " + ruleid;
                 throw new MCRException(msg);
             }
+
             DateFormat df = new SimpleDateFormat(sqlDateformat);
-           // df.parse(rs.getString(3));
-            rule = new MCRAccessRule(rs.getString(1),rs.getString(2),df.parse(rs.getString(3)),rs.getString(4),rs.getString(5));           
+
+            // df.parse(rs.getString(3));
+            rule = new MCRAccessRule(rs.getString(1), rs.getString(2), df.parse(rs.getString(3)), rs.getString(4), rs.getString(5));
             rs.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
-        }finally{
+        } finally {
             connection.release();
         }
+
         return rule;
     }
-    
-    
+
     /**
      * Method returns MCRAccessRule by given id
-     * @param ruleid as string
+     * 
+     * @param ruleid
+     *            as string
      * @return MCRAccessRule
      */
     public MCRAccessRule getRule(String ruleid) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRAccessRule rule = null;
+
         try {
-            String select = "SELECT CREATOR, CREATIONDATE, RULE, DESCRIPTION FROM " + ruletablename
-                    + " WHERE RID = '" + ruleid + "'";
+            String select = "SELECT CREATOR, CREATIONDATE, RULE, DESCRIPTION FROM " + ruletablename + " WHERE RID = '" + ruleid + "'";
             Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
+
             if (rs.next()) {
                 try {
-                    return new MCRAccessRule(ruleid, rs.getString(1), rs.getTimestamp(2),rs.getString(3), rs.getString(4));
-                } catch(Exception e) {
-                    throw new MCRException("Rule "+ruleid+" can't be parsed", e);
+                    return new MCRAccessRule(ruleid, rs.getString(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
+                } catch (Exception e) {
+                    throw new MCRException("Rule " + ruleid + " can't be parsed", e);
                 }
             } else {
                 return rule;
@@ -161,18 +174,20 @@ public class MCRSQLRuleStore extends MCRRuleStore{
         } finally {
             c.release();
         }
+
         return rule;
     }
-
 
     public ArrayList retrieveAllIDs() {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         ArrayList ret = new ArrayList();
+
         try {
             String select = "SELECT RID FROM " + ruletablename;
             Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
-            while (rs.next()){
+
+            while (rs.next()) {
                 ret.add(rs.getString(1));
             }
         } catch (Exception e) {
@@ -180,27 +195,30 @@ public class MCRSQLRuleStore extends MCRRuleStore{
         } finally {
             c.release();
         }
+
         return ret;
     }
-
 
     public boolean existRule(String ruleid) {
         MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
         boolean ret = false;
+
         try {
             String select = "SELECT * FROM " + ruletablename + " WHERE RID = '" + ruleid + "'";
             Statement statement = connection.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
+
             if (rs.next()) {
-                ret= true;
-            }           
+                ret = true;
+            }
+
             rs.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
-        }finally{
+        } finally {
             connection.release();
         }
+
         return ret;
     }
-
 }

@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,25 +16,24 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.filesystem;
 
 import java.io.OutputStream;
 import java.util.StringTokenizer;
 
-import com.enterprisedt.net.ftp.FTPClient;
-import com.enterprisedt.net.ftp.FTPTransferType;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
+
+import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPTransferType;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
@@ -54,140 +53,141 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRCStoreRemoteFTP extends MCRContentStore {
-	/** Hostname of FTP server */
-	protected String host;
+    /** Hostname of FTP server */
+    protected String host;
 
-	/** FTP Port of remote host */
-	protected int port;
+    /** FTP Port of remote host */
+    protected int port;
 
-	/** User ID for FTP login */
-	protected String user;
+    /** User ID for FTP login */
+    protected String user;
 
-	/** Password for FTP login */
-	protected String password;
+    /** Password for FTP login */
+    protected String password;
 
-	/** Base directory on FTP server where content is stored */
-	protected String baseDir;
+    /** Base directory on FTP server where content is stored */
+    protected String baseDir;
 
-	/** If true, FTP debug messages are written to stdout */
-	protected boolean debugFTP;
+    /** If true, FTP debug messages are written to stdout */
+    protected boolean debugFTP;
 
-	/** FTP Return codes if mkdir is successful in our interpretation */
-	protected final static String[] mkdirOK = { "257", "521", "550" };
+    /** FTP Return codes if mkdir is successful in our interpretation */
+    protected final static String[] mkdirOK = { "257", "521", "550" };
 
-	/** FTP Return codes if rmdir is successful in our interpretation */
-	protected final static String[] rmdirOK = { "250", "550" };
+    /** FTP Return codes if rmdir is successful in our interpretation */
+    protected final static String[] rmdirOK = { "250", "550" };
 
-	public void init(String storeID) {
-		super.init(storeID);
+    public void init(String storeID) {
+        super.init(storeID);
 
-		MCRConfiguration config = MCRConfiguration.instance();
+        MCRConfiguration config = MCRConfiguration.instance();
 
-		host = config.getString(prefix + "Hostname");
-		port = config.getInt(prefix + "FTPPort", 21);
-		user = config.getString(prefix + "UserID");
-		password = config.getString(prefix + "Password");
-		baseDir = config.getString(prefix + "BaseDirectory");
-		debugFTP = config.getBoolean(prefix + "DebugFTP", false);
-	}
+        host = config.getString(prefix + "Hostname");
+        port = config.getInt(prefix + "FTPPort", 21);
+        user = config.getString(prefix + "UserID");
+        password = config.getString(prefix + "Password");
+        baseDir = config.getString(prefix + "BaseDirectory");
+        debugFTP = config.getBoolean(prefix + "DebugFTP", false);
+    }
 
-	protected String doStoreContent(MCRFileReader file,
-			MCRContentInputStream source) throws Exception {
-		FTPClient connection = connect();
-		try {
-			StringBuffer storageID = new StringBuffer();
-			String[] slots = buildSlotPath();
+    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+        FTPClient connection = connect();
 
-			// Recursively create slot directories
-			for (int i = 0; i < slots.length; i++) {
-				connection.quote("MKD " + slots[i], mkdirOK);
-				connection.chdir(slots[i]);
-				storageID.append(slots[i]).append("/");
-			}
+        try {
+            StringBuffer storageID = new StringBuffer();
+            String[] slots = buildSlotPath();
 
-			String fileID = buildNextID(file);
-			connection.put(source, fileID);
-			storageID.append(fileID);
+            // Recursively create slot directories
+            for (int i = 0; i < slots.length; i++) {
+                connection.quote("MKD " + slots[i], mkdirOK);
+                connection.chdir(slots[i]);
+                storageID.append(slots[i]).append("/");
+            }
 
-			return storageID.toString();
-		} finally {
-			disconnect(connection);
-		}
-	}
+            String fileID = buildNextID(file);
+            connection.put(source, fileID);
+            storageID.append(fileID);
 
-	protected void doDeleteContent(String storageID) throws Exception {
-		FTPClient connection = connect();
-		try {
-			connection.delete(storageID);
+            return storageID.toString();
+        } finally {
+            disconnect(connection);
+        }
+    }
 
-			// Recursively remove all directories that have been created, if
-			// empty:
-			StringTokenizer st = new StringTokenizer(storageID, "/");
-			int numDirs = st.countTokens() - 1;
-			String[] dirs = new String[numDirs];
+    protected void doDeleteContent(String storageID) throws Exception {
+        FTPClient connection = connect();
 
-			for (int i = 0; i < numDirs; i++) {
-				dirs[i] = st.nextToken();
-				if (i > 0)
-					dirs[i] = dirs[i - 1] + "/" + dirs[i];
-			}
+        try {
+            connection.delete(storageID);
 
-			for (int i = numDirs; i > 0; i--) {
-				connection.quote("RMD " + dirs[i - 1], rmdirOK);
-			}
-		} finally {
-			disconnect(connection);
-		}
-	}
+            // Recursively remove all directories that have been created, if
+            // empty:
+            StringTokenizer st = new StringTokenizer(storageID, "/");
+            int numDirs = st.countTokens() - 1;
+            String[] dirs = new String[numDirs];
 
-	protected void doRetrieveContent(MCRFileReader file, OutputStream target)
-			throws Exception {
-		FTPClient connection = connect();
-		try {
-			connection.get(target, file.getStorageID());
-		} finally {
-			disconnect(connection);
-		}
-	}
+            for (int i = 0; i < numDirs; i++) {
+                dirs[i] = st.nextToken();
 
-	/**
-	 * Connects to remote host via FTP
-	 */
-	protected FTPClient connect() throws MCRPersistenceException {
-		FTPClient connection = null;
+                if (i > 0) {
+                    dirs[i] = dirs[i - 1] + "/" + dirs[i];
+                }
+            }
 
-		try {
-			connection = new FTPClient(host, port);
-			connection.debugResponses(debugFTP);
-			connection.login(user, password);
-			connection.setType(FTPTransferType.BINARY);
-		} catch (Exception exc) {
-			String msg = "Could not connect to " + host + ":" + port
-					+ " via FTP";
-			throw new MCRPersistenceException(msg, exc);
-		}
+            for (int i = numDirs; i > 0; i--) {
+                connection.quote("RMD " + dirs[i - 1], rmdirOK);
+            }
+        } finally {
+            disconnect(connection);
+        }
+    }
 
-		try {
-			connection.chdir(baseDir);
-		} catch (Exception exc) {
-			String msg = "Could not chdir to " + baseDir + " on FTP host "
-					+ host;
-			throw new MCRPersistenceException(msg, exc);
-		}
+    protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+        FTPClient connection = connect();
 
-		return connection;
-	}
+        try {
+            connection.get(target, file.getStorageID());
+        } finally {
+            disconnect(connection);
+        }
+    }
 
-	/**
-	 * Closes the FTP connection to remote host
-	 * 
-	 * @param connection
-	 *            the FTP connection to close
-	 */
-	protected void disconnect(FTPClient connection) {
-		try {
-			connection.quit();
-		} catch (Exception ignored) {
-		}
-	}
+    /**
+     * Connects to remote host via FTP
+     */
+    protected FTPClient connect() throws MCRPersistenceException {
+        FTPClient connection = null;
+
+        try {
+            connection = new FTPClient(host, port);
+            connection.debugResponses(debugFTP);
+            connection.login(user, password);
+            connection.setType(FTPTransferType.BINARY);
+        } catch (Exception exc) {
+            String msg = "Could not connect to " + host + ":" + port + " via FTP";
+            throw new MCRPersistenceException(msg, exc);
+        }
+
+        try {
+            connection.chdir(baseDir);
+        } catch (Exception exc) {
+            String msg = "Could not chdir to " + baseDir + " on FTP host " + host;
+            throw new MCRPersistenceException(msg, exc);
+        }
+
+        return connection;
+    }
+
+    /**
+     * Closes the FTP connection to remote host
+     * 
+     * @param connection
+     *            the FTP connection to close
+     */
+    protected void disconnect(FTPClient connection) {
+        try {
+            connection.quit();
+        } catch (Exception ignored) {
+        }
+    }
 }

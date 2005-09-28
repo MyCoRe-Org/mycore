@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,10 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.backend.hibernate;
 
@@ -39,122 +42,132 @@ import org.mycore.common.MCRException;
 
 /**
  * Hibernate implementation for RuleStore, storing access rules
+ * 
  * @author Arne Seifert
- *
+ * 
  */
-public class MCRHIBRuleStore extends MCRRuleStore{
-
+public class MCRHIBRuleStore extends MCRRuleStore {
     /**
      * Method creates new rule in database by given rule-object
-     * @param rule as MCRAccessRule
+     * 
+     * @param rule
+     *            as MCRAccessRule
      */
     public void createRule(MCRAccessRule rule) {
         init();
-        if (! existsRule(rule.getId())){
+
+        if (!existsRule(rule.getId())) {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             MCRACCESSRULE hibrule = new MCRACCESSRULE();
-            try{
+
+            try {
                 DateFormat df = new SimpleDateFormat(sqlDateformat);
                 hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
                 hibrule.setCreator(rule.getCreator());
                 hibrule.setRid(rule.getId());
                 hibrule.setRule(rule.getRuleString());
                 hibrule.setDescription(rule.getDescription());
-                session.saveOrUpdate(hibrule);          
-                tx.commit();         
-            }catch(Exception e){
+                session.saveOrUpdate(hibrule);
+                tx.commit();
+            } catch (Exception e) {
                 tx.rollback();
                 logger.error(e);
-            }finally{
+            } finally {
                 session.close();
             }
-        }else{
+        } else {
             logger.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
         }
-        
     }
-    
-    
+
     /**
      * Method checks existance of rule in db
-     * @param ruleid id as string
+     * 
+     * @param ruleid
+     *            id as string
      * @return boolean value
      * @throws MCRException
      */
-    private boolean existsRule(String ruleid) throws MCRException{
+    private boolean existsRule(String ruleid) throws MCRException {
         init();
-        try{
+
+        try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             List l = session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list();
             tx.commit();
             session.close();
-            if (l.size() == 1)
+
+            if (l.size() == 1) {
                 return true;
-            else
+            } else {
                 return false;
+            }
         } catch (Exception ex) {
             throw new MCRException("Error in access-rule-store.", ex);
         }
     }
 
-    
     /**
-     * Method updates accessrule by given rule.
-     * internal: rule will be deleted first and recreated
+     * Method updates accessrule by given rule. internal: rule will be deleted
+     * first and recreated
      */
     public void updateRule(MCRAccessRule rule) {
         deleteRule(rule.getId());
         createRule(rule);
     }
 
-    
     /**
      * Method deletes accessrule for given ruleid
      */
     public void deleteRule(String ruleid) {
         init();
+
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
-        try{
-            session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'") 
-                 .executeUpdate(); 
-            tx.commit(); 
-        }catch(Exception e){
+
+        try {
+            session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
+            tx.commit();
+        } catch (Exception e) {
             tx.rollback();
             logger.error(e);
             e.printStackTrace();
-        }finally{
+        } finally {
             session.close();
         }
     }
 
-    
     /**
      * Method returns accessrule for given ruleid
-     * @param ruleid as string
+     * 
+     * @param ruleid
+     *            as string
      * @return MCRAccessRule object with database values or null
      */
     public MCRAccessRule retrieveRule(String ruleid) {
         init();
+
         MCRAccessRule rule = null;
-        try{
+
+        try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
             tx.commit();
             session.close();
-            if (hibrule != null){
+
+            if (hibrule != null) {
                 rule = new MCRAccessRule(hibrule.getRid(), hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
+
         return rule;
     }
 
-    
     /**
      * update hibernate configuration and add mappings for acccesstable
      */
@@ -162,7 +175,8 @@ public class MCRHIBRuleStore extends MCRRuleStore{
         try {
             // update schema -> first time create table
             Configuration cfg = MCRHIBConnection.instance().getConfiguration();
-            if (! MCRHIBConnection.instance().containsMapping(ruletablename)){
+
+            if (!MCRHIBConnection.instance().containsMapping(ruletablename)) {
                 MCRTableGenerator map = new MCRTableGenerator(ruletablename, "org.mycore.backend.hibernate.tables.MCRACCESSRULE", "", 1);
                 map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
                 map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
@@ -173,32 +187,38 @@ public class MCRHIBRuleStore extends MCRRuleStore{
                 cfg.createMappings();
 
                 MCRHIBConnection.instance().buildSessionFactory(cfg);
-                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);    
+                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
     }
 
     /**
      * Method returns MCRAccessRule by given id
-     * @param ruleid as string
+     * 
+     * @param ruleid
+     *            as string
      * @return MCRAccessRule
      */
     public MCRAccessRule getRule(String ruleid) {
         init();
+
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRAccessRule rule = null;
+
         try {
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '"+ruleid+"'").list().get(0));
-            if (hibrule != null){
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
+
+            if (hibrule != null) {
                 try {
                     rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
-                } catch(Exception e) {
-                    throw new MCRException("Rule "+ruleid+" can't be parsed", e);
+                } catch (Exception e) {
+                    throw new MCRException("Rule " + ruleid + " can't be parsed", e);
                 }
             }
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
@@ -206,19 +226,22 @@ public class MCRHIBRuleStore extends MCRRuleStore{
         } finally {
             session.close();
         }
+
         return rule;
     }
 
-
     public ArrayList retrieveAllIDs() {
         init();
+
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         ArrayList ret = new ArrayList();
+
         try {
             List l = session.createQuery("from MCRACCESSRULE").list();
             tx.commit();
-            for (int i=0; i<l.size(); i++){
+
+            for (int i = 0; i < l.size(); i++) {
                 ret.add(((MCRACCESSRULE) l.get(i)).getRid());
             }
         } catch (Exception e) {
@@ -227,26 +250,29 @@ public class MCRHIBRuleStore extends MCRRuleStore{
         } finally {
             session.close();
         }
+
         return ret;
     }
 
-
     public boolean existRule(String ruleid) {
         init();
+
         boolean ret = false;
-        try{
+
+        try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
             tx.commit();
             session.close();
-            if (hibrule != null){
+
+            if (hibrule != null) {
                 ret = true;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
+
         return ret;
     }
-
 }

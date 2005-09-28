@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,16 +16,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -39,65 +37,62 @@ import org.mycore.datamodel.metadata.MCRObjectSearchStoreInterface;
  * @author Jens Kupferschmidt
  */
 public final class MCRDummySearchStore implements MCRObjectSearchStoreInterface {
-	private static final Logger logger = Logger
-			.getLogger(MCRDummySearchStore.class.getName());
+    private static final Logger logger = Logger.getLogger(MCRDummySearchStore.class.getName());
 
-	/**
-	 * Creates a new JDOM search store
-	 */
-	public MCRDummySearchStore() {
-	}
+    /**
+     * Creates a new JDOM search store
+     */
+    public MCRDummySearchStore() {
+    }
 
-	/**
-	 * Creates an object in the search store.
-	 * 
-	 * @param obj
-	 *            the MCRObject to put in the search store
-	 * @exception MCRConfigurationException
-	 *                if the configuration is not correct
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public void create(MCRBase obj) throws MCRConfigurationException,
-			MCRPersistenceException {
-		logger.debug("MCRDummySearchStore create: nothing done!");
-	}
+    /**
+     * Creates an object in the search store.
+     * 
+     * @param obj
+     *            the MCRObject to put in the search store
+     * @exception MCRConfigurationException
+     *                if the configuration is not correct
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public void create(MCRBase obj) throws MCRConfigurationException, MCRPersistenceException {
+        logger.debug("MCRDummySearchStore create: nothing done!");
+    }
 
-	/**
-	 * This operation is not necessary for this store, so the method does
-	 * nothing.
-	 */
-	public void createDataBase(String mcr_type, org.jdom.Document mcr_conf) {
-		logger.info("Create database operation is not needed for this store.");
-	}
+    /**
+     * This operation is not necessary for this store, so the method does
+     * nothing.
+     */
+    public void createDataBase(String mcr_type, org.jdom.Document mcr_conf) {
+        logger.info("Create database operation is not needed for this store.");
+    }
 
-	/**
-	 * Updates an object in the search store.
-	 * 
-	 * @param obj
-	 *            the MCRObject to update in the search store
-	 * @exception MCRConfigurationException
-	 *                if the configuration is not correct
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem occured
-	 */
-	public void update(MCRBase obj) throws MCRConfigurationException,
-			MCRPersistenceException {
-		MCRObjectID mcr_id = obj.getId();
-		logger.debug("MCRDummySearchStore update: nothing done!");
-	}
+    /**
+     * Updates an object in the search store.
+     * 
+     * @param obj
+     *            the MCRObject to update in the search store
+     * @exception MCRConfigurationException
+     *                if the configuration is not correct
+     * @exception MCRPersistenceException
+     *                if a persistence problem occured
+     */
+    public void update(MCRBase obj) throws MCRConfigurationException, MCRPersistenceException {
+        MCRObjectID mcr_id = obj.getId();
+        logger.debug("MCRDummySearchStore update: nothing done!");
+    }
 
-	/**
-	 * Deletes an object from the search store.
-	 * 
-	 * @param mcr_id
-	 *            the id of the object that should be deleted
-	 * @exception MCRConfigurationException
-	 *                if the configuration is not correct
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem occured
-	 */
-	public void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
-		logger.debug("MCRDummySearchStore delete: nothing done!");
-	}
+    /**
+     * Deletes an object from the search store.
+     * 
+     * @param mcr_id
+     *            the id of the object that should be deleted
+     * @exception MCRConfigurationException
+     *                if the configuration is not correct
+     * @exception MCRPersistenceException
+     *                if a persistence problem occured
+     */
+    public void delete(MCRObjectID mcr_id) throws MCRPersistenceException {
+        logger.debug("MCRDummySearchStore delete: nothing done!");
+    }
 }

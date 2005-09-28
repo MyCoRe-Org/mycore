@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.datamodel.ifs;
 
@@ -43,360 +42,368 @@ import org.mycore.common.MCRPersistenceException;
  * @version $Revision$ $Date$
  */
 public class MCROldFile implements MCRFileReader {
-	/** The ID of the store that holds this file's content */
-	protected String storeID;
+    /** The ID of the store that holds this file's content */
+    protected String storeID;
 
-	/** The ID that identifies the place where the store holds the content */
-	protected String storageID;
+    /** The ID that identifies the place where the store holds the content */
+    protected String storageID;
 
-	/** The ID of the file owner, e .g. a MILESS derivate ID */
-	protected String ownerID;
+    /** The ID of the file owner, e .g. a MILESS derivate ID */
+    protected String ownerID;
 
-	/** The ID of the content type of this file */
-	protected String contentTypeID;
+    /** The ID of the content type of this file */
+    protected String contentTypeID;
 
-	/** The file path */
-	protected String path;
+    /** The file path */
+    protected String path;
 
-	/** The md5 checksum that was built when content was read for this file */
-	protected String md5;
+    /** The md5 checksum that was built when content was read for this file */
+    protected String md5;
 
-	/** The file size in number of bytes */
-	protected long size;
+    /** The file size in number of bytes */
+    protected long size;
 
-	/** The date of last modification of this file */
-	protected GregorianCalendar lastModified;
+    /** The date of last modification of this file */
+    protected GregorianCalendar lastModified;
 
-	/** The optional extender for streaming audio/video files */
-	protected MCRAudioVideoExtender avExtender;
+    /** The optional extender for streaming audio/video files */
+    protected MCRAudioVideoExtender avExtender;
 
-	/**
-	 * Creates a new empty, unstored MCROldFile instance.
-	 */
-	public MCROldFile() {
-		storeID = "";
-		storageID = "";
-		ownerID = "";
-		path = "";
-		size = 0;
-		contentTypeID = "unknown";
-		md5 = "d41d8cd98f00b204e9800998ecf8427e";
-		lastModified = new GregorianCalendar();
-	}
+    /**
+     * Creates a new empty, unstored MCROldFile instance.
+     */
+    public MCROldFile() {
+        storeID = "";
+        storageID = "";
+        ownerID = "";
+        path = "";
+        size = 0;
+        contentTypeID = "unknown";
+        md5 = "d41d8cd98f00b204e9800998ecf8427e";
+        lastModified = new GregorianCalendar();
+    }
 
-	/**
-	 * Sets the ID of the owner of this file
-	 * 
-	 * @param ID
-	 *            the non-empty owner ID
-	 */
-	public void setOwnerID(String ID) {
-		MCRArgumentChecker.ensureNotEmpty(ID, "ID");
-		this.ownerID = ID;
-	}
+    /**
+     * Sets the ID of the owner of this file
+     * 
+     * @param ID
+     *            the non-empty owner ID
+     */
+    public void setOwnerID(String ID) {
+        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        this.ownerID = ID;
+    }
 
-	/**
-	 * Returns the ID of the owner of this file
-	 * 
-	 * @return the ID of the owner of this file
-	 */
-	public String getOwnerID() {
-		return ownerID;
-	}
+    /**
+     * Returns the ID of the owner of this file
+     * 
+     * @return the ID of the owner of this file
+     */
+    public String getOwnerID() {
+        return ownerID;
+    }
 
-	public String getID() {
-		return ownerID;
-	}
+    public String getID() {
+        return ownerID;
+    }
 
-	/**
-	 * Sets the relative path of this file
-	 */
-	public void setPath(String path) {
-		MCRArgumentChecker.ensureNotEmpty(path, "path");
-		this.path = path;
-	}
+    /**
+     * Sets the relative path of this file
+     */
+    public void setPath(String path) {
+        MCRArgumentChecker.ensureNotEmpty(path, "path");
+        this.path = path;
+    }
 
-	/**
-	 * Returns the relative path of this file
-	 */
-	public String getPath() {
-		return path;
-	}
+    /**
+     * Returns the relative path of this file
+     */
+    public String getPath() {
+        return path;
+    }
 
-	/**
-	 * Returns the filename of this file
-	 */
-	public String getFileName() {
-		int pos = path.lastIndexOf(File.separator);
-		return (pos == -1 ? path : path.substring(pos + 1));
-	}
+    /**
+     * Returns the filename of this file
+     */
+    public String getFileName() {
+        int pos = path.lastIndexOf(File.separator);
 
-	/**
-	 * Returns the directory of this file
-	 */
-	public String getDirectory() {
-		int pos = path.lastIndexOf(File.separator);
-		return (pos == -1 ? "" : path.substring(0, pos));
-	}
+        return ((pos == -1) ? path : path.substring(pos + 1));
+    }
 
-	/**
-	 * Returns the file extension of this file, or an empty string if the file
-	 * has no extension
-	 */
-	public String getExtension() {
-		if (path.endsWith("."))
-			return "";
+    /**
+     * Returns the directory of this file
+     */
+    public String getDirectory() {
+        int pos = path.lastIndexOf(File.separator);
 
-		int pos = path.lastIndexOf(".");
-		return (pos == -1 ? "" : path.substring(pos + 1));
-	}
+        return ((pos == -1) ? "" : path.substring(0, pos));
+    }
 
-	/**
-	 * Sets the file size
-	 */
-	public void setSize(long size) {
-		MCRArgumentChecker.ensureNotNegative(size, "size");
-		this.size = size;
-	}
+    /**
+     * Returns the file extension of this file, or an empty string if the file
+     * has no extension
+     */
+    public String getExtension() {
+        if (path.endsWith(".")) {
+            return "";
+        }
 
-	/**
-	 * Returns the file size as number of bytes
-	 */
-	public long getSize() {
-		return size;
-	}
+        int pos = path.lastIndexOf(".");
 
-	/**
-	 * Returns the file size, formatted as a string
-	 */
-	public String getSizeFormatted() {
-		return getSizeFormatted(size);
-	}
+        return ((pos == -1) ? "" : path.substring(pos + 1));
+    }
 
-	/**
-	 * Takes a file size in bytes and formats it as a string for output
-	 */
-	public static String getSizeFormatted(long bytes) {
-		String sizeUnit;
-		String sizeText;
-		double sizeValue;
+    /**
+     * Sets the file size
+     */
+    public void setSize(long size) {
+        MCRArgumentChecker.ensureNotNegative(size, "size");
+        this.size = size;
+    }
 
-		if (bytes >= 1024 * 1024) // >= 1 MB
-		{
-			sizeUnit = "MB";
-			sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
-		} else if (bytes >= 5 * 1024) // >= 5 KB
-		{
-			sizeUnit = "KB";
-			sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
-		} else // < 5 KB
-		{
-			sizeUnit = "Byte";
-			sizeValue = (double) bytes;
-		}
+    /**
+     * Returns the file size as number of bytes
+     */
+    public long getSize() {
+        return size;
+    }
 
-		sizeText = String.valueOf(sizeValue).replace('.', ',');
-		if (sizeText.endsWith(",0"))
-			sizeText = sizeText.substring(0, sizeText.length() - 2);
+    /**
+     * Returns the file size, formatted as a string
+     */
+    public String getSizeFormatted() {
+        return getSizeFormatted(size);
+    }
 
-		return sizeText + " " + sizeUnit;
-	}
+    /**
+     * Takes a file size in bytes and formats it as a string for output
+     */
+    public static String getSizeFormatted(long bytes) {
+        String sizeUnit;
+        String sizeText;
+        double sizeValue;
 
-	/**
-	 * Sets the MD5 checksum for this file
-	 */
-	public void setChecksum(String md5) {
-		MCRArgumentChecker.ensureNotEmpty(md5, "md5 checksum");
-		this.md5 = md5;
-	}
+        if (bytes >= (1024 * 1024)) // >= 1 MB
+        {
+            sizeUnit = "MB";
+            sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
+        } else if (bytes >= (5 * 1024)) // >= 5 KB
+        {
+            sizeUnit = "KB";
+            sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
+        } else // < 5 KB
+        {
+            sizeUnit = "Byte";
+            sizeValue = (double) bytes;
+        }
 
-	/**
-	 * Returns the MD5 checksum for this file
-	 */
-	public String getChecksum() {
-		return md5;
-	}
+        sizeText = String.valueOf(sizeValue).replace('.', ',');
 
-	/**
-	 * Sets the time of last modification of this file
-	 */
-	public void setLastModified(GregorianCalendar date) {
-		MCRArgumentChecker.ensureNotNull(date, "date");
-		this.lastModified = date;
-	}
+        if (sizeText.endsWith(",0")) {
+            sizeText = sizeText.substring(0, sizeText.length() - 2);
+        }
 
-	/**
-	 * Returns the time of last modification of this file
-	 */
-	public GregorianCalendar getLastModified() {
-		return lastModified;
-	}
+        return sizeText + " " + sizeUnit;
+    }
 
-	/**
-	 * Sets the ID of the MCRContentStore implementation that holds the content
-	 * of this file
-	 */
-	public void setStoreID(String ID) {
-		MCRArgumentChecker.ensureNotNull(ID, "ID");
-		this.storeID = ID.trim();
-	}
+    /**
+     * Sets the MD5 checksum for this file
+     */
+    public void setChecksum(String md5) {
+        MCRArgumentChecker.ensureNotEmpty(md5, "md5 checksum");
+        this.md5 = md5;
+    }
 
-	/**
-	 * Returns the ID of the MCRContentStore implementation that holds the
-	 * content of this file
-	 */
-	public String getStoreID() {
-		return storeID;
-	}
+    /**
+     * Returns the MD5 checksum for this file
+     */
+    public String getChecksum() {
+        return md5;
+    }
 
-	/**
-	 * Sets the storage ID that identifies the place where the MCRContentStore
-	 * has stored the content of this file
-	 */
-	public void setStorageID(String ID) {
-		MCRArgumentChecker.ensureNotNull(ID, "ID");
-		this.storageID = ID.trim();
-	}
+    /**
+     * Sets the time of last modification of this file
+     */
+    public void setLastModified(GregorianCalendar date) {
+        MCRArgumentChecker.ensureNotNull(date, "date");
+        this.lastModified = date;
+    }
 
-	/**
-	 * Returns the storage ID that identifies the place where the
-	 * MCRContentStore has stored the content of this file
-	 */
-	public String getStorageID() {
-		return storageID;
-	}
+    /**
+     * Returns the time of last modification of this file
+     */
+    public GregorianCalendar getLastModified() {
+        return lastModified;
+    }
 
-	/**
-	 * Returns the MCRContentStore instance that holds the content of this file
-	 */
-	protected MCRContentStore getContentStore() {
-		if (storeID.length() == 0)
-			return null;
-		else
-			return MCRContentStoreFactory.getStore(storeID);
-	}
+    /**
+     * Sets the ID of the MCRContentStore implementation that holds the content
+     * of this file
+     */
+    public void setStoreID(String ID) {
+        MCRArgumentChecker.ensureNotNull(ID, "ID");
+        this.storeID = ID.trim();
+    }
 
-	/**
-	 * Reads the content of this file from the source ContentInputStream and
-	 * stores it in the ContentStore given
-	 */
-	public void setContentFrom(MCRContentInputStream source,
-			MCRContentStore store) throws MCRPersistenceException {
-		if (source.getHeader().length == 0) {
-			storageID = "";
-			storeID = "";
-		} else {
-			storageID = store.storeContent(this, source);
-			storeID = store.getID();
-		}
+    /**
+     * Returns the ID of the MCRContentStore implementation that holds the
+     * content of this file
+     */
+    public String getStoreID() {
+        return storeID;
+    }
 
-		size = source.getLength();
-		md5 = source.getMD5String();
-	}
+    /**
+     * Sets the storage ID that identifies the place where the MCRContentStore
+     * has stored the content of this file
+     */
+    public void setStorageID(String ID) {
+        MCRArgumentChecker.ensureNotNull(ID, "ID");
+        this.storageID = ID.trim();
+    }
 
-	/**
-	 * Deletes the content of this file from the ContentStore used
-	 */
-	public void deleteContent() throws MCRPersistenceException {
-		if (storageID.length() != 0)
-			getContentStore().deleteContent(storageID);
+    /**
+     * Returns the storage ID that identifies the place where the
+     * MCRContentStore has stored the content of this file
+     */
+    public String getStorageID() {
+        return storageID;
+    }
 
-		storageID = "";
-		storeID = "";
-		contentTypeID = "unknown";
-		md5 = "d41d8cd98f00b204e9800998ecf8427e";
-		size = 0;
-		lastModified = new GregorianCalendar();
-	}
+    /**
+     * Returns the MCRContentStore instance that holds the content of this file
+     */
+    protected MCRContentStore getContentStore() {
+        if (storeID.length() == 0) {
+            return null;
+        } else {
+            return MCRContentStoreFactory.getStore(storeID);
+        }
+    }
 
-	/**
-	 * Writes the content of this file to a target output stream
-	 */
-	public void getContentTo(OutputStream target)
-			throws MCRPersistenceException {
-		if (storageID.length() != 0)
-			getContentStore().retrieveContent(this, target);
-	}
+    /**
+     * Reads the content of this file from the source ContentInputStream and
+     * stores it in the ContentStore given
+     */
+    public void setContentFrom(MCRContentInputStream source, MCRContentStore store) throws MCRPersistenceException {
+        if (source.getHeader().length == 0) {
+            storageID = "";
+            storeID = "";
+        } else {
+            storageID = store.storeContent(this, source);
+            storeID = store.getID();
+        }
 
-	/**
-	 * Writes the content of this file to a file on the local filesystem
-	 */
-	public void getContentTo(File target) throws MCRPersistenceException,
-			IOException {
-		getContentTo(new FileOutputStream(target));
-	}
+        size = source.getLength();
+        md5 = source.getMD5String();
+    }
 
-	/**
-	 * Gets the content of this file as a byte array
-	 */
-	public byte[] getContentAsByteArray() throws MCRPersistenceException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-			getContentTo(baos);
-			baos.close();
-		} catch (IOException willNotBeThrown) {
-		}
-		return baos.toByteArray();
-	}
+    /**
+     * Deletes the content of this file from the ContentStore used
+     */
+    public void deleteContent() throws MCRPersistenceException {
+        if (storageID.length() != 0) {
+            getContentStore().deleteContent(storageID);
+        }
 
-	/**
-	 * Gets the content of this file as a string, using the default encoding
-	 */
-	public String getContentAsString() throws MCRPersistenceException {
-		return new String(getContentAsByteArray());
-	}
+        storageID = "";
+        storeID = "";
+        contentTypeID = "unknown";
+        md5 = "d41d8cd98f00b204e9800998ecf8427e";
+        size = 0;
+        lastModified = new GregorianCalendar();
+    }
 
-	/**
-	 * Gets the content of this file as a string, using the given encoding
-	 */
-	public String getContentAsString(String encoding)
-			throws MCRPersistenceException, UnsupportedEncodingException {
-		return new String(getContentAsByteArray(), encoding);
-	}
+    /**
+     * Writes the content of this file to a target output stream
+     */
+    public void getContentTo(OutputStream target) throws MCRPersistenceException {
+        if (storageID.length() != 0) {
+            getContentStore().retrieveContent(this, target);
+        }
+    }
 
-	/**
-	 * Returns true, if this file is stored in a content store that provides an
-	 * MCRAudioVideoExtender for audio/video streaming and additional metadata
-	 */
-	public boolean hasAudioVideoExtender() {
-		if (storeID.length() == 0)
-			return false;
-		else
-			return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
-	}
+    /**
+     * Writes the content of this file to a file on the local filesystem
+     */
+    public void getContentTo(File target) throws MCRPersistenceException, IOException {
+        getContentTo(new FileOutputStream(target));
+    }
 
-	/**
-	 * Returns the AudioVideoExtender in case this file is streaming audio/video
-	 * and stored in a ContentStore that supports this
-	 */
-	public MCRAudioVideoExtender getAudioVideoExtender() {
-		if (hasAudioVideoExtender() && (avExtender == null))
-			avExtender = MCRContentStoreFactory.buildExtender(this);
+    /**
+     * Gets the content of this file as a byte array
+     */
+    public byte[] getContentAsByteArray() throws MCRPersistenceException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		return avExtender;
-	}
+        try {
+            getContentTo(baos);
+            baos.close();
+        } catch (IOException willNotBeThrown) {
+        }
 
-	/**
-	 * Sets the ID of the content type of this file
-	 */
-	public void setContentTypeID(String ID) {
-		MCRArgumentChecker.ensureNotEmpty(ID, "content type ID");
-		this.contentTypeID = ID;
-	}
+        return baos.toByteArray();
+    }
 
-	/**
-	 * Gets the ID of the content type of this file
-	 */
-	public String getContentTypeID() {
-		return contentTypeID;
-	}
+    /**
+     * Gets the content of this file as a string, using the default encoding
+     */
+    public String getContentAsString() throws MCRPersistenceException {
+        return new String(getContentAsByteArray());
+    }
 
-	/**
-	 * This method will throw an UnsupportedOperationException, it is not
-	 * implemented for MCROldFile class.
-	 */
-	public MCRFileContentType getContentType() {
-		throw new UnsupportedOperationException(
-				"Not implemented for MCROldFile");
-	}
+    /**
+     * Gets the content of this file as a string, using the given encoding
+     */
+    public String getContentAsString(String encoding) throws MCRPersistenceException, UnsupportedEncodingException {
+        return new String(getContentAsByteArray(), encoding);
+    }
+
+    /**
+     * Returns true, if this file is stored in a content store that provides an
+     * MCRAudioVideoExtender for audio/video streaming and additional metadata
+     */
+    public boolean hasAudioVideoExtender() {
+        if (storeID.length() == 0) {
+            return false;
+        } else {
+            return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
+        }
+    }
+
+    /**
+     * Returns the AudioVideoExtender in case this file is streaming audio/video
+     * and stored in a ContentStore that supports this
+     */
+    public MCRAudioVideoExtender getAudioVideoExtender() {
+        if (hasAudioVideoExtender() && (avExtender == null)) {
+            avExtender = MCRContentStoreFactory.buildExtender(this);
+        }
+
+        return avExtender;
+    }
+
+    /**
+     * Sets the ID of the content type of this file
+     */
+    public void setContentTypeID(String ID) {
+        MCRArgumentChecker.ensureNotEmpty(ID, "content type ID");
+        this.contentTypeID = ID;
+    }
+
+    /**
+     * Gets the ID of the content type of this file
+     */
+    public String getContentTypeID() {
+        return contentTypeID;
+    }
+
+    /**
+     * This method will throw an UnsupportedOperationException, it is not
+     * implemented for MCROldFile class.
+     */
+    public MCRFileContentType getContentType() {
+        throw new UnsupportedOperationException("Not implemented for MCROldFile");
+    }
 }

@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,18 +16,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.acl;
 
-///============================================================================§
-
+// /============================================================================§
 import java.util.Iterator;
 
-///============================================================================|
+// /============================================================================|
 
 /**
  * This interface defines a set of permissions.
@@ -41,130 +43,118 @@ import java.util.Iterator;
  * @author Benno Süselbeck
  * @version 1.0.0, 01.11.2003
  */
-
 public interface MCRPermissionRing {
-	///============================================================================/
+    // /============================================================================/
 
-	/**
-	 * Constant representing the status "granted" of a permission.
-	 */
+    /**
+     * Constant representing the status "granted" of a permission.
+     */
+    public static final Boolean GRANTED = new Boolean(true);
 
-	public static final Boolean GRANTED = new Boolean(true);
+    /**
+     * Constant representing the status "denied" of a permission.
+     */
+    public static final Boolean DENIED = new Boolean(false);
 
-	/**
-	 * Constant representing the status "denied" of a permission.
-	 */
+    // ------------------------------------------------------------------------------
 
-	public static final Boolean DENIED = new Boolean(false);
+    /**
+     * Adds a permission to this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be added
+     * @param grant
+     *            if <code>true</code> permission is granted, denied
+     *            otherwise.
+     */
+    public void putPermission(MCRPermission permission, boolean grant);
 
-	//------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
 
-	/**
-	 * Adds a permission to this set of permissions.
-	 * 
-	 * @param permission
-	 *            the permission to be added
-	 * @param grant
-	 *            if <code>true</code> permission is granted, denied
-	 *            otherwise.
-	 */
+    /**
+     * Deletes a permission from this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be deleted.
+     */
+    public void deletePermission(MCRPermission permission);
 
-	public void putPermission(MCRPermission permission, boolean grant);
+    // ------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
+    /**
+     * Checks if the given permission is contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be checked
+     * 
+     * @return true if the permission is contained in this set.
+     */
+    public boolean containsPermission(MCRPermission permission);
 
-	/**
-	 * Deletes a permission from this set of permissions.
-	 * 
-	 * @param permission
-	 *            the permission to be deleted.
-	 */
+    // ------------------------------------------------------------------------------
 
-	public void deletePermission(MCRPermission permission);
+    /**
+     * Checks if the given permission contained in this set of permissions is
+     * granted.
+     * 
+     * @param permission
+     *            the permission to be checked.
+     * 
+     * @return true if the permission is contained in this set and is granted,
+     *         false if it is not contained or denied explicitly.
+     */
+    public boolean isPermissionGranted(MCRPermission permission);
 
-	//------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
 
-	/**
-	 * Checks if the given permission is contained in this set of permissions.
-	 * 
-	 * @param permission
-	 *            the permission to be checked
-	 * 
-	 * @return true if the permission is contained in this set.
-	 */
+    /**
+     * Grants the given permission contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be granted.
+     */
+    public void grantPermission(MCRPermission permission);
 
-	public boolean containsPermission(MCRPermission permission);
+    // ------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
+    /**
+     * Denies the given permission contained in this set of permissions.
+     * 
+     * @param permission
+     *            the permission to be denied.
+     */
+    public void denyPermission(MCRPermission permission);
 
-	/**
-	 * Checks if the given permission contained in this set of permissions is
-	 * granted.
-	 * 
-	 * @param permission
-	 *            the permission to be checked.
-	 * 
-	 * @return true if the permission is contained in this set and is granted,
-	 *         false if it is not contained or denied explicitly.
-	 */
+    // ------------------------------------------------------------------------------
 
-	public boolean isPermissionGranted(MCRPermission permission);
+    /**
+     * Creates a copy of this set of permissions. Sometimes principals have the
+     * same set of permissions. While single permissions may be shared this is
+     * not true for sets of permissions, because they are mutable.
+     * 
+     * @return a new set of permissions with identical content.
+     */
+    public MCRPermissionRing copyPermissions();
 
-	//------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
 
-	/**
-	 * Grants the given permission contained in this set of permissions.
-	 * 
-	 * @param permission
-	 *            the permission to be granted.
-	 */
+    /**
+     * Returns an iterator over the containd permissions.
+     * 
+     * @return an iterator over the containd permissions.
+     */
+    public Iterator iterator();
 
-	public void grantPermission(MCRPermission permission);
+    // ------------------------------------------------------------------------------
 
-	//------------------------------------------------------------------------------
+    /**
+     * Adds all permissions of <code>permissionRing</code> to this ring,
+     * excluding duplicates.
+     * 
+     * @param permissionRing
+     *            the ring to be added.
+     */
+    public void addRing(MCRPermissionRing permissionRing);
 
-	/**
-	 * Denies the given permission contained in this set of permissions.
-	 * 
-	 * @param permission
-	 *            the permission to be denied.
-	 */
-
-	public void denyPermission(MCRPermission permission);
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 * Creates a copy of this set of permissions. Sometimes principals have the
-	 * same set of permissions. While single permissions may be shared this is
-	 * not true for sets of permissions, because they are mutable.
-	 * 
-	 * @return a new set of permissions with identical content.
-	 */
-
-	public MCRPermissionRing copyPermissions();
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 * Returns an iterator over the containd permissions.
-	 * 
-	 * @return an iterator over the containd permissions.
-	 */
-
-	public Iterator iterator();
-
-	//------------------------------------------------------------------------------
-
-	/**
-	 * Adds all permissions of <code>permissionRing</code> to this ring,
-	 * excluding duplicates.
-	 * 
-	 * @param permissionRing
-	 *            the ring to be added.
-	 */
-
-	public void addRing(MCRPermissionRing permissionRing);
-
-	//-============================================================================\
+    // -============================================================================\
 }

@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,17 +16,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.backend.hibernate;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -36,43 +38,34 @@ import org.mycore.frontend.cli.MCRCommand;
  * 
  * @author Arne Seifert
  */
-
 public class MCRHIBCtrlCommands extends MCRAbstractCommands {
+    /** The logger */
+    public static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
 
-	/** The logger */
-	public static Logger LOGGER = Logger
-			.getLogger(MCRClassificationCommands.class.getName());
+    /**
+     * constructor with commands.
+     */
+    public MCRHIBCtrlCommands() {
+        super();
 
-	/**
-	 * constructor with commands.
-	 */
+        MCRCommand com = null;
 
-	public MCRHIBCtrlCommands() {
-		super();
-		MCRCommand com = null;
+        com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables", "The command creates all tables for MyCoRe by hibernate.");
+        command.add(com);
+    }
 
-		com = new MCRCommand("init hibernate",
-				"org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
-				"The command creates all tables for MyCoRe by hibernate.");
-		command.add(com);
+    /**
+     * method creates tables using hibernate
+     */
+    public static void createTables() {
+        try {
+            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
 
-	}
-
-	/**
-	 * method creates tables using hibernate
-	 */
-	public static void createTables() {
-		try {
-			new SchemaUpdate(MCRHIBConnection.instance().getConfiguration())
-					.execute(true, true);
-
-			LOGGER.info("tables created.");
-		} catch (MCRPersistenceException e) {
-			throw new MCRException("error while creating tables.", e);
-		} catch (HibernateException e) {
-			throw new MCRException(
-					"Hibernate error while creating database tables.", e);
-		}
-	}
-
+            LOGGER.info("tables created.");
+        } catch (MCRPersistenceException e) {
+            throw new MCRException("error while creating tables.", e);
+        } catch (HibernateException e) {
+            throw new MCRException("Hibernate error while creating database tables.", e);
+        }
+    }
 }

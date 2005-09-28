@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.backend.sql;
 
@@ -32,48 +34,59 @@ import org.mycore.services.fieldquery.MCRResults;
 
 /**
  * SQL implementation of the searcher
+ * 
  * @author Arne Seifert
- *
+ * 
  */
-public class MCRSQLSearcher extends MCRQuerySearcher{
-
+public class MCRSQLSearcher extends MCRQuerySearcher {
     /**
-     * method runs given query-string
-     * access-control included: id of object will testet for rules of the "READ"-pool
-     * @param query  query string
+     * method runs given query-string access-control included: id of object will
+     * testet for rules of the "READ"-pool
+     * 
+     * @param query
+     *            query string
      * @return MCRResults with MCRHit-objects
      */
     public MCRResults runQuery(String query) {
         this.query = query;
+
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRResults result = new MCRResults();
-        try{
+
+        try {
             MCRSQLRowReader reader;
             MCRSQLQuery sqlquery = new MCRSQLQuery(query);
             reader = c.doQuery(sqlquery.getSQLQuery());
+
             List order = sqlquery.getOrderFields();
-            while (reader.next()){
+
+            while (reader.next()) {
                 String id = reader.getString("MCRID");
-                /*check access rule for object against the READ pool*/
-                if (MCRAccessManager.checkReadAccess(id, MCRSessionMgr.getCurrentSession())){
+
+                /* check access rule for object against the READ pool */
+                if (MCRAccessManager.checkReadAccess(id, MCRSessionMgr.getCurrentSession())) {
                     MCRHit hit = new MCRHit(id);
-                    /*fill hit meta*/
-                    for (int j=0; j<order.size(); j++){
+
+                    /* fill hit meta */
+                    for (int j = 0; j < order.size(); j++) {
                         String key = ((Element) order.get(j)).getAttributeValue("field");
                         String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
-                        hit.addSortData(key,value);
+                        hit.addSortData(key, value);
                     }
+
                     result.addHit(hit);
                 }
             }
-            if (order.size()>0)
+
+            if (order.size() > 0) {
                 result.setSorted(true);
-        }catch(Exception e){
+            }
+        } catch (Exception e) {
             logger.error(e);
-        }finally{
+        } finally {
             c.release();
         }
+
         return result;
     }
-
 }
