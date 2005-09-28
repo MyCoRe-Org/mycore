@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.servlets;
 
@@ -36,7 +35,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -47,63 +45,62 @@ import org.mycore.common.MCRSessionMgr;
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
-	protected final static Logger LOGGER = Logger
-			.getLogger(MCRStaticXMLFileServlet.class);
+    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-	private Random random = new Random();
+    private Random random = new Random();
 
-	public void doGetPost(MCRServletJob job) throws ServletException,
-			java.io.IOException {
-		String requestedPath = job.getRequest().getServletPath();
-		LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
-		URL url = null;
+    public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
+        String requestedPath = job.getRequest().getServletPath();
+        LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
 
-		try {
-			url = getServletContext().getResource(requestedPath);
-		} catch (MalformedURLException willNeverBeThrown) {
-		}
+        URL url = null;
 
-		if (url == null) {
-			String msg = "Could not find file " + requestedPath;
-			job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
-			return;
-		}
+        try {
+            url = getServletContext().getResource(requestedPath);
+        } catch (MalformedURLException willNeverBeThrown) {
+        }
 
-		String path = getServletContext().getRealPath(requestedPath);
-		File file = new File(path);
-		String documentBaseURL = file.getParent() + File.separator;
+        if (url == null) {
+            String msg = "Could not find file " + requestedPath;
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 
-		// Store http request parameters into session, for later use
-		Map map = new HashMap();
-		map.putAll(job.getRequest().getParameterMap());
-		String key = buildRequestParamKey();
-		MCRServlet.requestParamCache.put(key, map);
+            return;
+        }
 
-		job.getRequest().setAttribute("XSL.RequestParamKey", key);
-		job.getRequest().setAttribute("XSL.StaticFilePath",
-				requestedPath.substring(1));
-		job.getRequest().setAttribute("XSL.DocumentBaseURL", documentBaseURL);
-		job.getRequest().setAttribute("XSL.FileName", file.getName());
-		job.getRequest().setAttribute("XSL.FilePath", file.getPath());
-		job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
+        String path = getServletContext().getRealPath(requestedPath);
+        File file = new File(path);
+        String documentBaseURL = file.getParent() + File.separator;
 
-		// Set XSL Style to current language if no XSL.Style present in request:
-		if ((job.getRequest().getParameter("XSL.Style") == null)
-				|| (job.getRequest().getParameter("XSL.Style").length() == 0))
-			job.getRequest().setAttribute("XSL.Style",
-					MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        // Store http request parameters into session, for later use
+        Map map = new HashMap();
+        map.putAll(job.getRequest().getParameterMap());
 
-		RequestDispatcher rd = getServletContext().getNamedDispatcher(
-				"MCRLayoutServlet");
-		rd.forward(job.getRequest(), job.getResponse());
-	}
+        String key = buildRequestParamKey();
+        MCRServlet.requestParamCache.put(key, map);
 
-	/** Helper method to build a unique key for caching http request params * */
-	private synchronized String buildRequestParamKey() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(Long.toString(System.currentTimeMillis(), 36));
-		sb.append(Long.toString(random.nextLong(), 36));
-		sb.reverse();
-		return sb.toString();
-	}
+        job.getRequest().setAttribute("XSL.RequestParamKey", key);
+        job.getRequest().setAttribute("XSL.StaticFilePath", requestedPath.substring(1));
+        job.getRequest().setAttribute("XSL.DocumentBaseURL", documentBaseURL);
+        job.getRequest().setAttribute("XSL.FileName", file.getName());
+        job.getRequest().setAttribute("XSL.FilePath", file.getPath());
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
+
+        // Set XSL Style to current language if no XSL.Style present in request:
+        if ((job.getRequest().getParameter("XSL.Style") == null) || (job.getRequest().getParameter("XSL.Style").length() == 0)) {
+            job.getRequest().setAttribute("XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        }
+
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(job.getRequest(), job.getResponse());
+    }
+
+    /** Helper method to build a unique key for caching http request params * */
+    private synchronized String buildRequestParamKey() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(Long.toString(System.currentTimeMillis(), 36));
+        sb.append(Long.toString(random.nextLong(), 36));
+        sb.reverse();
+
+        return sb.toString();
+    }
 }

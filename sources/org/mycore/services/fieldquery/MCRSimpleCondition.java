@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.services.fieldquery;
 
@@ -30,43 +29,54 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * @author Frank Lützenkirchen
- **/
-public class MCRSimpleCondition implements MCRCondition
-{
+ */
+public class MCRSimpleCondition implements MCRCondition {
     private String field;
+
     private String operator;
+
     private String value;
-    
-    public MCRSimpleCondition(String field, String operator, String value) 
-    {
+
+    public MCRSimpleCondition(String field, String operator, String value) {
         this.field = field;
         this.operator = operator;
         this.value = value;
     }
-    
-    public String getField()    { return field; }
-    public String getOperator() { return operator; }
-    public String getValue()    { return value; }
-    
-    public String toString()
-    { return field + " " + operator + " \"" + value + "\""; }
-    
-    public Element toXML()
-    {
-        Element condition = new Element( "condition" );
-        condition.setAttribute( "field", field );
-        condition.setAttribute( "operator", operator );
-        condition.setAttribute( "value", value );
+
+    public String getField() {
+        return field;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return field + " " + operator + " \"" + value + "\"";
+    }
+
+    public Element toXML() {
+        Element condition = new Element("condition");
+        condition.setAttribute("field", field);
+        condition.setAttribute("operator", operator);
+        condition.setAttribute("value", value);
+
         return condition;
     }
-    
+
     public Element info() {
         return toXML();
     }
-    
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitQuery(this); 
-    }
-    public boolean evaluate(Object o) {return false;}
 
+    public void accept(MCRConditionVisitor visitor) {
+        visitor.visitQuery(this);
+    }
+
+    public boolean evaluate(Object o) {
+        return false;
+    }
 }

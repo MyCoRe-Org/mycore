@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.services.nbn;
 
@@ -32,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -46,61 +44,61 @@ import org.mycore.common.MCRConfiguration;
  * @version $Revision$ $Date$
  */
 public class MCRNBNResolver extends HttpServlet {
-	/** Logger */
-	static Logger logger = Logger.getLogger(MCRNBNResolver.class);
+    /** Logger */
+    static Logger logger = Logger.getLogger(MCRNBNResolver.class);
 
-	/** The URL of the non-local URN resolver script */
-	protected String resolver;
+    /** The URL of the non-local URN resolver script */
+    protected String resolver;
 
-	/** Initializes the URN Resolver */
-	public void init() {
-		resolver = MCRConfiguration.instance().getString(
-				"MCR.NBN.TopLevelResolver");
-	}
+    /** Initializes the URN Resolver */
+    public void init() {
+        resolver = MCRConfiguration.instance().getString("MCR.NBN.TopLevelResolver");
+    }
 
-	/** Handles HTTP GET requests to resolve a given URN */
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
-		String path = req.getPathInfo();
-		String param = req.getQueryString();
+    /** Handles HTTP GET requests to resolve a given URN */
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String path = req.getPathInfo();
+        String param = req.getQueryString();
 
-		logger.info("The servlet path: " + path);
-		logger.info("The servlet's parameters: " + param);
+        logger.info("The servlet path: " + path);
+        logger.info("The servlet's parameters: " + param);
 
-		MCRNBN urn = null;
+        MCRNBN urn = null;
 
-		if (path != null) {
-			urn = new MCRNBN(path.substring(1));
-		} else {
-			if (param != null) {
-				urn = new MCRNBN(param);
-			} else {
-				logger.info("No information given to extract URN information.");
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-				return;
-			}
-		}
+        if (path != null) {
+            urn = new MCRNBN(path.substring(1));
+        } else {
+            if (param != null) {
+                urn = new MCRNBN(param);
+            } else {
+                logger.info("No information given to extract URN information.");
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 
-		if (!urn.isValid()) {
-			logger.info("The URN " + urn.toString() + "is not valid.");
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
+                return;
+            }
+        }
 
-		if (!urn.isLocal()) {
-			logger.info("The URN " + urn.toString() + "is not local.");
-			res.sendRedirect(resolver + urn.getNBN());
-			return;
-		}
+        if (!urn.isValid()) {
+            logger.info("The URN " + urn.toString() + "is not valid.");
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 
-		String url = urn.getURL();
-		if (url == null) {
-			logger.info("No URL found in store for the URN " + urn.toString()
-					+ ".");
-			res.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} else {
-			res.sendRedirect(url);
-		}
-	}
+            return;
+        }
 
+        if (!urn.isLocal()) {
+            logger.info("The URN " + urn.toString() + "is not local.");
+            res.sendRedirect(resolver + urn.getNBN());
+
+            return;
+        }
+
+        String url = urn.getURL();
+
+        if (url == null) {
+            logger.info("No URL found in store for the URN " + urn.toString() + ".");
+            res.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            res.sendRedirect(url);
+        }
+    }
 }

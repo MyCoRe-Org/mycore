@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
+
 package org.mycore.services.plugins;
 
 import java.io.InputStream;
@@ -38,52 +38,50 @@ import org.mycore.datamodel.ifs.MCRFileContentType;
  * @author Thomas Scheffler (yagee)
  */
 public interface TextFilterPlugin {
+    /**
+     * should return a Name of the plugin
+     * 
+     * @return Plugin name
+     */
+    public String getName();
 
-	/**
-	 * should return a Name of the plugin
-	 * 
-	 * @return Plugin name
-	 */
-	public String getName();
+    /**
+     * should return the major version number
+     * 
+     * @return major version number
+     */
+    public int getMajorNumber();
 
-	/**
-	 * should return the major version number
-	 * 
-	 * @return major version number
-	 */
-	public int getMajorNumber();
+    /**
+     * should return the minor version number
+     * 
+     * @return minor version number
+     */
+    public int getMinorNumber();
 
-	/**
-	 * should return the minor version number
-	 * 
-	 * @return minor version number
-	 */
-	public int getMinorNumber();
+    /**
+     * may contain some additional Information on the plugin
+     * 
+     * @return further Informations on the plugin
+     */
+    public String getInfo();
 
-	/**
-	 * may contain some additional Information on the plugin
-	 * 
-	 * @return further Informations on the plugin
-	 */
-	public String getInfo();
+    /**
+     * returns a list of all supported MCRFileContentTypes.
+     * 
+     * These file extensions must be delivered without the leading dot.
+     * 
+     * @return HashSet List of file extensions
+     */
+    public HashSet getSupportedContentTypes();
 
-	/**
-	 * returns a list of all supported MCRFileContentTypes.
-	 * 
-	 * These file extensions must be delivered without the leading dot.
-	 * 
-	 * @return HashSet List of file extensions
-	 */
-	public HashSet getSupportedContentTypes();
-
-	/**
-	 * onverts a given Inputstream to Textstream which should contain a textual
-	 * representation of the source.
-	 * 
-	 * @param input
-	 *            File in foreign format
-	 * @return Inputstream textual representation of input
-	 */
-	public Reader transform(MCRFileContentType ct, InputStream input)
-			throws FilterPluginTransformException;
+    /**
+     * onverts a given Inputstream to Textstream which should contain a textual
+     * representation of the source.
+     * 
+     * @param input
+     *            File in foreign format
+     * @return Inputstream textual representation of input
+     */
+    public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException;
 }

@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
+
 package org.mycore.services.query;
 
 import java.util.LinkedList;
@@ -36,134 +36,131 @@ import org.mycore.common.xml.MCRXMLContainer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryAgent {
-	private int nThreads;
+    private int nThreads;
 
-	private PoolWorker[] threads;
+    private PoolWorker[] threads;
 
-	private LinkedList queue;
+    private LinkedList queue;
 
-	private MCRConfiguration conf;
+    private MCRConfiguration conf;
 
-	private static int vec_max_length;
+    private static int vec_max_length;
 
-	public MCRQueryAgent(int nThreads, MCRConfiguration conf) {
-		this.nThreads = nThreads;
-		queue = new LinkedList();
-		threads = new PoolWorker[nThreads];
-		this.conf = conf;
-		vec_max_length = conf.getInt("MCR.query_max_results", 10);
-		for (int i = 0; i < nThreads; i++) {
-			threads[i] = new PoolWorker();
-			threads[i].setName("MCRQueryAgent #" + (i + 1));
-			threads[i].start();
-		}
-	}
+    public MCRQueryAgent(int nThreads, MCRConfiguration conf) {
+        this.nThreads = nThreads;
+        queue = new LinkedList();
+        threads = new PoolWorker[nThreads];
+        this.conf = conf;
+        vec_max_length = conf.getInt("MCR.query_max_results", 10);
 
-	/**
-	 * add a query to the agent mission queue.
-	 * 
-	 * @param host
-	 *            host to be queried
-	 * @param type
-	 *            type of the query
-	 * @param query
-	 *            the query
-	 * @param result
-	 *            the MCRXMLContainer collecting results
-	 * @param tc
-	 *            inner Class of MCRQueryCollector
-	 */
-	public void add(String host, String type, String query,
-			MCRXMLContainer result, MCRQueryCollector.ThreadCounter tc) {
-		Mission m = new Mission(host, type, query, result, tc);
-		synchronized (queue) {
-			queue.addLast(m);
-			queue.notify();
-		}
-	}
+        for (int i = 0; i < nThreads; i++) {
+            threads[i] = new PoolWorker();
+            threads[i].setName("MCRQueryAgent #" + (i + 1));
+            threads[i].start();
+        }
+    }
 
-	private class Mission {
-		private String host;
+    /**
+     * add a query to the agent mission queue.
+     * 
+     * @param host
+     *            host to be queried
+     * @param type
+     *            type of the query
+     * @param query
+     *            the query
+     * @param result
+     *            the MCRXMLContainer collecting results
+     * @param tc
+     *            inner Class of MCRQueryCollector
+     */
+    public void add(String host, String type, String query, MCRXMLContainer result, MCRQueryCollector.ThreadCounter tc) {
+        Mission m = new Mission(host, type, query, result, tc);
 
-		private String type;
+        synchronized (queue) {
+            queue.addLast(m);
+            queue.notify();
+        }
+    }
 
-		private String query;
+    private class Mission {
+        private String host;
 
-		private MCRXMLContainer result;
+        private String type;
 
-		private MCRQueryCollector.ThreadCounter tc;
+        private String query;
 
-		public Mission(String host, String type, String query,
-				MCRXMLContainer result, MCRQueryCollector.ThreadCounter tc) {
-			this.host = host;
-			this.type = type;
-			this.query = query;
-			this.result = result;
-			this.tc = tc;
-		}
+        private MCRXMLContainer result;
 
-		public String getHost() {
-			return this.host;
-		}
+        private MCRQueryCollector.ThreadCounter tc;
 
-		public String getType() {
-			return this.type;
-		}
+        public Mission(String host, String type, String query, MCRXMLContainer result, MCRQueryCollector.ThreadCounter tc) {
+            this.host = host;
+            this.type = type;
+            this.query = query;
+            this.result = result;
+            this.tc = tc;
+        }
 
-		public String getQuery() {
-			return this.query;
-		}
+        public String getHost() {
+            return this.host;
+        }
 
-		public MCRXMLContainer getResultContainer() {
-			return this.result;
-		}
+        public String getType() {
+            return this.type;
+        }
 
-		public void accomplished() {
-			this.tc.decrease();
-		}
-	}
+        public String getQuery() {
+            return this.query;
+        }
 
-	private class PoolWorker extends Thread {
-		private MCRQueryInterface mcr_queryint;
+        public MCRXMLContainer getResultContainer() {
+            return this.result;
+        }
 
-		private MCRXMLContainer mcr_result;
+        public void accomplished() {
+            this.tc.decrease();
+        }
+    }
 
-		private String mcr_type;
+    private class PoolWorker extends Thread {
+        private MCRQueryInterface mcr_queryint;
 
-		private String mcr_query;
+        private MCRXMLContainer mcr_result;
 
-		private String hostAlias;
+        private String mcr_type;
 
-		public void run() {
-			Mission m;
+        private String mcr_query;
 
-			while (true) {
-				synchronized (queue) {
-					while (queue.isEmpty()) {
-						try {
-							queue.wait();
-						} catch (InterruptedException ignored) {
-						}
-					}
+        private String hostAlias;
 
-					m = (Mission) queue.removeFirst();
-				}
+        public void run() {
+            Mission m;
 
-				// If we don't catch RuntimeException,
-				// the pool could leak threads
-				try {
-					MCRXMLContainer result = m.getResultContainer();
-					result.importElements(MCRQueryCache.getResultList(m
-							.getHost(), m.getQuery(), m.getType(),
-							vec_max_length));
-					m.accomplished();
-				} catch (RuntimeException e) {
-					//to hang not forever mark mission accomplished
-					m.accomplished();
-					throw new MCRException("Error while grabbing resultset: "
-							+ e.getMessage(), e);
-				}
-			}
-		}
-	}
+            while (true) {
+                synchronized (queue) {
+                    while (queue.isEmpty()) {
+                        try {
+                            queue.wait();
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+
+                    m = (Mission) queue.removeFirst();
+                }
+
+                // If we don't catch RuntimeException,
+                // the pool could leak threads
+                try {
+                    MCRXMLContainer result = m.getResultContainer();
+                    result.importElements(MCRQueryCache.getResultList(m.getHost(), m.getQuery(), m.getType(), vec_max_length));
+                    m.accomplished();
+                } catch (RuntimeException e) {
+                    // to hang not forever mark mission accomplished
+                    m.accomplished();
+                    throw new MCRException("Error while grabbing resultset: " + e.getMessage(), e);
+                }
+            }
+        }
+    }
 }

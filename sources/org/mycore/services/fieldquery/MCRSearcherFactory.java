@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,10 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
  */
 
 package org.mycore.services.fieldquery;
@@ -27,7 +26,6 @@ package org.mycore.services.fieldquery;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -41,51 +39,46 @@ import org.mycore.common.MCRConfigurationException;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRSearcherFactory
-{
-  /** Hashtable SearcherID to MCRSearcher instance */
-  protected static Hashtable table = new Hashtable();
+public class MCRSearcherFactory {
+    /** Hashtable SearcherID to MCRSearcher instance */
+    protected static Hashtable table = new Hashtable();
 
-  /** The logger */
-  private static final Logger LOGGER = Logger
-      .getLogger( MCRSearcherFactory.class );
+    /** The logger */
+    private static final Logger LOGGER = Logger.getLogger(MCRSearcherFactory.class);
 
-  /**
-   * Returns the MCRSearcher instance that is configured for this SearcherID.
-   * The instance that is returned is configured by the property
-   * <tt>MCR.Searcher.<ID>.Class</tt> in mycore.properties.
-   * 
-   * @param searcherID
-   *          the non-null ID of the MCRSearcher implementation
-   * @return the MCRSearcher instance that uses this searcherID
-   * @throws MCRConfigurationException
-   *           if no MCRSearcher implementation is configured for this ID
-   */
-  public static MCRSearcher getSearcher( String searcherID )
-  {
-    MCRArgumentChecker.ensureNotEmpty( searcherID, "Searcher ID" );
-    if( !table.containsKey( searcherID ) )
-    {
-      try
-      {
-        String searcherClass = "MCR.Searcher." + searcherID
-            + ".Class";
-        LOGGER.debug( "Reading searcher implementation for ID " + searcherID
-            + ": " + searcherClass );
-        Object obj = MCRConfiguration.instance().getSingleInstanceOf(
-            searcherClass );
-        MCRSearcher s = (MCRSearcher)( obj );
-        
-        if( s instanceof MCRSearcherBase ) ((MCRSearcherBase)s).init( searcherID );
-        table.put( searcherID, s );
-      }
-      catch( Exception ex )
-      {
-        String msg = "Could not load MCRSearcher with searcher ID = "
-            + searcherID;
-        throw new MCRConfigurationException( msg,ex );
-      }
+    /**
+     * Returns the MCRSearcher instance that is configured for this SearcherID.
+     * The instance that is returned is configured by the property
+     * <tt>MCR.Searcher.<ID>.Class</tt> in mycore.properties.
+     * 
+     * @param searcherID
+     *            the non-null ID of the MCRSearcher implementation
+     * @return the MCRSearcher instance that uses this searcherID
+     * @throws MCRConfigurationException
+     *             if no MCRSearcher implementation is configured for this ID
+     */
+    public static MCRSearcher getSearcher(String searcherID) {
+        MCRArgumentChecker.ensureNotEmpty(searcherID, "Searcher ID");
+
+        if (!table.containsKey(searcherID)) {
+            try {
+                String searcherClass = "MCR.Searcher." + searcherID + ".Class";
+                LOGGER.debug("Reading searcher implementation for ID " + searcherID + ": " + searcherClass);
+
+                Object obj = MCRConfiguration.instance().getSingleInstanceOf(searcherClass);
+                MCRSearcher s = (MCRSearcher) (obj);
+
+                if (s instanceof MCRSearcherBase) {
+                    ((MCRSearcherBase) s).init(searcherID);
+                }
+
+                table.put(searcherID, s);
+            } catch (Exception ex) {
+                String msg = "Could not load MCRSearcher with searcher ID = " + searcherID;
+                throw new MCRConfigurationException(msg, ex);
+            }
+        }
+
+        return (MCRSearcher) (table.get(searcherID));
     }
-    return (MCRSearcher)( table.get( searcherID ) );
-  }
 }

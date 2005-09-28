@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.user;
 
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -43,73 +41,73 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-
 public class MCRUserPrivServlet extends MCRServlet {
-	private static Logger LOGGER = Logger.getLogger(MCRUserPrivServlet.class);
+    private static Logger LOGGER = Logger.getLogger(MCRUserPrivServlet.class);
 
-	/**
-	 * This method overrides doGetPost of MCRServlet. <br />
-	 * The method looks for one parameters - privilege (optional). If we get a
-	 * priviliege the method search for the privilege of the user of the
-	 * currenst session context. If it is true this privilege was set in the
-	 * answer XML-stream. If this parameter is not you get all privileges of the
-	 * user as XML-stream. <br />
-	 * The syntax of the stream is <br />
-	 * <br />
-	 * &lt;mycoreuserpriv <br />
-	 * ...&gt; <br />
-	 * &lt;user ID="..."&gt; <br />
-	 * &lt;privilege&gt; <br />
-	 * ... <br />
-	 * &lt;/privilege&gt; <br />
-	 * &lt;/user&gt; <br />
-	 * &lt;/mycoreuserpriv&gt; <br />
-	 */
-	public void doGetPost(MCRServletJob job) throws Exception {
-		// read the privilege parameter
-		String searchpriv = getProperty(job.getRequest(), "privilege");
-		if (searchpriv == null) {
-			searchpriv = "";
-		}
-		searchpriv.trim();
-		LOGGER.info("Search privilege = " + searchpriv);
+    /**
+     * This method overrides doGetPost of MCRServlet. <br />
+     * The method looks for one parameters - privilege (optional). If we get a
+     * priviliege the method search for the privilege of the user of the
+     * currenst session context. If it is true this privilege was set in the
+     * answer XML-stream. If this parameter is not you get all privileges of the
+     * user as XML-stream. <br />
+     * The syntax of the stream is <br />
+     * <br />
+     * &lt;mycoreuserpriv <br />
+     * ...&gt; <br />
+     * &lt;user ID="..."&gt; <br />
+     * &lt;privilege&gt; <br />
+     * ... <br />
+     * &lt;/privilege&gt; <br />
+     * &lt;/user&gt; <br />
+     * &lt;/mycoreuserpriv&gt; <br />
+     */
+    public void doGetPost(MCRServletJob job) throws Exception {
+        // read the privilege parameter
+        String searchpriv = getProperty(job.getRequest(), "privilege");
 
-		// get the MCRSession object for the current thread from the session
-		// manager.
-		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-		String userid = mcrSession.getCurrentUserID();
-		LOGGER.info("Curren user      = " + userid);
+        if (searchpriv == null) {
+            searchpriv = "";
+        }
 
-		// prepare the document
-		org.jdom.Element root = new org.jdom.Element("mycoreuserpriv");
-		org.jdom.Document jdom = new org.jdom.Document(root);
-		if (userid.length() != 0) {
-			org.jdom.Element uelm = new org.jdom.Element("user").setAttribute(
-					"ID", userid);
-			// if we have no given privileg
-			if (searchpriv.length() == 0) {
-				ArrayList privs = MCRUserMgr.instance()
-						.retrieveAllPrivsOfTheUser(userid);
-				for (int i = 0; i < privs.size(); i++) {
-					uelm.addContent(new org.jdom.Element("privilege")
-							.setText((String) privs.get(i)));
-				}
-			}
-			// else has the user this privilege
-			else {
-				if (MCRUserMgr.instance().hasPrivilege(userid, searchpriv)) {
-					uelm.addContent(new org.jdom.Element("privilege")
-							.setText(searchpriv));
-				}
-			}
-			root.addContent(uelm);
-		}
+        searchpriv.trim();
+        LOGGER.info("Search privilege = " + searchpriv);
 
-		job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-		job.getRequest().setAttribute("XSL.Style", "xml");
+        // get the MCRSession object for the current thread from the session
+        // manager.
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String userid = mcrSession.getCurrentUserID();
+        LOGGER.info("Curren user      = " + userid);
 
-		RequestDispatcher rd = getServletContext().getNamedDispatcher(
-				"MCRLayoutServlet");
-		rd.forward(job.getRequest(), job.getResponse());
-	}
+        // prepare the document
+        org.jdom.Element root = new org.jdom.Element("mycoreuserpriv");
+        org.jdom.Document jdom = new org.jdom.Document(root);
+
+        if (userid.length() != 0) {
+            org.jdom.Element uelm = new org.jdom.Element("user").setAttribute("ID", userid);
+
+            // if we have no given privileg
+            if (searchpriv.length() == 0) {
+                ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
+
+                for (int i = 0; i < privs.size(); i++) {
+                    uelm.addContent(new org.jdom.Element("privilege").setText((String) privs.get(i)));
+                }
+            }
+            // else has the user this privilege
+            else {
+                if (MCRUserMgr.instance().hasPrivilege(userid, searchpriv)) {
+                    uelm.addContent(new org.jdom.Element("privilege").setText(searchpriv));
+                }
+            }
+
+            root.addContent(uelm);
+        }
+
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+        job.getRequest().setAttribute("XSL.Style", "xml");
+
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(job.getRequest(), job.getResponse());
+    }
 }

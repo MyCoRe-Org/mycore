@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.fileupload;
 
@@ -55,140 +54,141 @@ import javax.swing.UIManager;
  * @version $Revision$ $Date$
  */
 public class MCRUploadApplet extends JApplet {
-	protected String uploadId;
+    protected String uploadId;
 
-	protected String peerURL;
+    protected String peerURL;
 
-	protected String targetURL;
+    protected String targetURL;
 
-	protected JButton chooserButton;
+    protected JButton chooserButton;
 
-	protected JTextField locationField;
+    protected JTextField locationField;
 
-	protected JButton locationButton;
+    protected JButton locationButton;
 
-	protected JFileChooser locationChooser;
+    protected JFileChooser locationChooser;
 
-	public void init() {
-		uploadId = getParameter("uploadId");
-		targetURL = getParameter("url");
-		peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
+    public void init() {
+        uploadId = getParameter("uploadId");
+        targetURL = getParameter("url");
+        peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
 
-		//TODO: Refactor parameters from web page
-		//TODO: I18N of strings and messages
-		//TODO: Refactor thread handling
+        // TODO: Refactor parameters from web page
+        // TODO: I18N of strings and messages
+        // TODO: Refactor thread handling
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (Exception ignored) {
+        }
 
-		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch (Exception ignored) {
-		}
+        chooserButton = new JButton("ausw\u00e4hlen...");
+        chooserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                handleChooserButton();
+            }
+        });
 
-		chooserButton = new JButton("ausw\u00e4hlen...");
-		chooserButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleChooserButton();
-			}
-		});
+        locationField = new JTextField(30);
+        locationField.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                locationButton.setEnabled(locationField.getText().length() > 0);
+            }
+        });
 
-		locationField = new JTextField(30);
-		locationField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				locationButton.setEnabled(locationField.getText().length() > 0);
-			}
-		});
+        locationButton = new JButton("\u00fcbertragen...");
+        locationButton.setEnabled(false);
+        locationButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                handleLocationButton();
+            }
+        });
 
-		locationButton = new JButton("\u00fcbertragen...");
-		locationButton.setEnabled(false);
-		locationButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleLocationButton();
-			}
-		});
+        locationChooser = new JFileChooser();
+        locationChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        locationChooser.setMultiSelectionEnabled(true);
 
-		locationChooser = new JFileChooser();
-		locationChooser
-				.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		locationChooser.setMultiSelectionEnabled(true);
-		File c = new File("C:\\");
-		if (c.exists())
-			locationChooser.setCurrentDirectory(c);
+        File c = new File("C:\\");
 
-		JPanel content = new JPanel();
-		setContentPane(content);
-		GridBagLayout gbl = new GridBagLayout();
-		GridBagConstraints gbc = new GridBagConstraints();
-		content.setLayout(gbl);
-		content.setBackground(Color.white);
-		content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        if (c.exists()) {
+            locationChooser.setCurrentDirectory(c);
+        }
 
-		JLabel jlChoose = new JLabel(
-				"Wählen Sie Dateien oder Verzeichnisse aus:");
-		gbc.insets = new Insets(2, 2, 2, 2);
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.NONE;
-		gbl.setConstraints(jlChoose, gbc);
-		content.add(jlChoose);
+        JPanel content = new JPanel();
+        setContentPane(content);
 
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbl.setConstraints(chooserButton, gbc);
-		content.add(chooserButton);
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints gbc = new GridBagConstraints();
+        content.setLayout(gbl);
+        content.setBackground(Color.white);
+        content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-		JLabel jlInput = new JLabel("oder geben Sie einen absoluten Pfad ein:");
-		gbc.gridx = 1;
-		gbc.gridy = 2;
-		gbl.setConstraints(jlInput, gbc);
-		content.add(jlInput);
+        JLabel jlChoose = new JLabel("Wählen Sie Dateien oder Verzeichnisse aus:");
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbl.setConstraints(jlChoose, gbc);
+        content.add(jlChoose);
 
-		gbc.gridx = 1;
-		gbc.gridy = 3;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbl.setConstraints(locationField, gbc);
-		content.add(locationField);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbl.setConstraints(chooserButton, gbc);
+        content.add(chooserButton);
 
-		gbc.gridx = 2;
-		gbc.gridy = 3;
-		gbc.fill = GridBagConstraints.NONE;
-		gbl.setConstraints(locationButton, gbc);
-		content.add(locationButton);
-	}
+        JLabel jlInput = new JLabel("oder geben Sie einen absoluten Pfad ein:");
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbl.setConstraints(jlInput, gbc);
+        content.add(jlInput);
 
-	protected void handleLocationButton() {
-		File[] selectedFiles = new File[1];
-		selectedFiles[0] = new File(locationField.getText());
-		doUpload(selectedFiles);
-	}
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbl.setConstraints(locationField, gbc);
+        content.add(locationField);
 
-	protected void handleChooserButton() {
-		int result = locationChooser.showDialog(this,
-				"Datei(en) oder Verzeichnis(se) w\u00e4hlen");
-		if (result == JFileChooser.APPROVE_OPTION)
-			doUpload(locationChooser.getSelectedFiles());
-	}
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
+        gbl.setConstraints(locationButton, gbc);
+        content.add(locationButton);
+    }
 
-	protected void doUpload(final File[] selectedFiles) {
-		chooserButton.setEnabled(false);
-		locationButton.setEnabled(false);
-		locationField.setEnabled(false);
+    protected void handleLocationButton() {
+        File[] selectedFiles = new File[1];
+        selectedFiles[0] = new File(locationField.getText());
+        doUpload(selectedFiles);
+    }
 
-		Thread th = new Thread() {
-			public void run() {
-				MCRUploadCommunicator comm = new MCRUploadCommunicator(peerURL,
-						uploadId, MCRUploadApplet.this);
-				comm.uploadFiles(selectedFiles);
-			}
-		};
-		th.start();
-	}
+    protected void handleChooserButton() {
+        int result = locationChooser.showDialog(this, "Datei(en) oder Verzeichnis(se) w\u00e4hlen");
 
-	void returnToURL() {
-		try {
-			getAppletContext().showDocument(new URL(targetURL));
-		} catch (MalformedURLException exc) {
-			System.out.println("MALFORMED URL: " + targetURL);
-		}
-	}
+        if (result == JFileChooser.APPROVE_OPTION) {
+            doUpload(locationChooser.getSelectedFiles());
+        }
+    }
+
+    protected void doUpload(final File[] selectedFiles) {
+        chooserButton.setEnabled(false);
+        locationButton.setEnabled(false);
+        locationField.setEnabled(false);
+
+        Thread th = new Thread() {
+            public void run() {
+                MCRUploadCommunicator comm = new MCRUploadCommunicator(peerURL, uploadId, MCRUploadApplet.this);
+                comm.uploadFiles(selectedFiles);
+            }
+        };
+
+        th.start();
+    }
+
+    void returnToURL() {
+        try {
+            getAppletContext().showDocument(new URL(targetURL));
+        } catch (MalformedURLException exc) {
+            System.out.println("MALFORMED URL: " + targetURL);
+        }
+    }
 }

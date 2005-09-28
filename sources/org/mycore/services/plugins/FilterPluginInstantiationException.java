@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
+
 package org.mycore.services.plugins;
 
 import org.mycore.common.MCRException;
@@ -33,29 +33,28 @@ import org.mycore.common.MCRException;
  * @author Thomas Scheffler (yagee)
  */
 public class FilterPluginInstantiationException extends MCRException {
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @see MCRException
+     */
+    public FilterPluginInstantiationException(String message) {
+        super(message);
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @see MCRException
-	 */
-	public FilterPluginInstantiationException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
+        // TODO Auto-generated constructor stub
+    }
 
-	/**
-	 * just uses super Constructor yet...
-	 * 
-	 * @param message
-	 * @param exception
-	 * @see MCRException
-	 */
-	public FilterPluginInstantiationException(String message,
-			Exception exception) {
-		super(message, exception);
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * just uses super Constructor yet...
+     * 
+     * @param message
+     * @param exception
+     * @see MCRException
+     */
+    public FilterPluginInstantiationException(String message, Exception exception) {
+        super(message, exception);
 
+        // TODO Auto-generated constructor stub
+    }
 }

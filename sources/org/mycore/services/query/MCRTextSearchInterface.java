@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
+
 package org.mycore.services.query;
 
 /**
@@ -33,26 +33,24 @@ package org.mycore.services.query;
  * @author Thomas Scheffler (yagee)
  */
 public interface MCRTextSearchInterface {
-
-	/**
-	 * searches on the index and delivers derivate ids matching the search
-	 * 
-	 * Syntax:
-	 * 
-	 * <pre>
-	 * 
-	 *  
-	 *   foo bar   : search for foo AND bar anywhere across the files of the derivate
-	 *   foo -bar  : search for foo and no file of the derivate may contain bar
-	 *   &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
-	 *   
-	 *  
-	 * </pre>
-	 * 
-	 * @param doctext
-	 *            query
-	 * @return Array of DerivateIDs
-	 */
-	public String[] getDerivateIDs(String doctext);
-
+    /**
+     * searches on the index and delivers derivate ids matching the search
+     * 
+     * Syntax:
+     * 
+     * <pre>
+     * 
+     * 
+     *    foo bar   : search for foo AND bar anywhere across the files of the derivate
+     *    foo -bar  : search for foo and no file of the derivate may contain bar
+     *    &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
+     * 
+     * 
+     * </pre>
+     * 
+     * @param doctext
+     *            query
+     * @return Array of DerivateIDs
+     */
+    public String[] getDerivateIDs(String doctext);
 }

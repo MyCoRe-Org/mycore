@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.editor;
 
@@ -30,8 +29,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -46,9 +45,7 @@ import org.jdom.output.XMLOutputter;
  * @version $Revision$ $Date$
  */
 public class MCREditorSubmission {
-
-    private final static Logger LOGGER = Logger
-            .getLogger(MCREditorSubmission.class);
+    private final static Logger LOGGER = Logger.getLogger(MCREditorSubmission.class);
 
     private List variables = new ArrayList();
 
@@ -77,27 +74,27 @@ public class MCREditorSubmission {
         setRepeatsFromVariables();
     }
 
-    MCREditorSubmission(MCRRequestParameters parms, Element editor,
-            boolean validate) {
+    MCREditorSubmission(MCRRequestParameters parms, Element editor, boolean validate) {
         this.parms = parms;
         setVariablesFromSubmission(parms, editor, validate);
         Collections.sort(variables);
         setRepeatsFromSubmission();
     }
 
-    MCREditorSubmission(Element saved, List submitted, String root,
-            String varpath) {
+    MCREditorSubmission(Element saved, List submitted, String root, String varpath) {
         Element input = saved.getChild("input");
         List children = input.getChildren();
+
         for (int i = 0; i < children.size(); i++) {
             Element var = (Element) (children.get(i));
             String path = var.getAttributeValue("name");
             String value = var.getAttributeValue("value");
 
-            if (path.equals(varpath) || path.startsWith(varpath + "/"))
+            if (path.equals(varpath) || path.startsWith(varpath + "/")) {
                 continue;
-            else
+            } else {
                 addVariable(path, value);
+            }
         }
 
         for (int i = 0; i < submitted.size(); i++) {
@@ -112,14 +109,14 @@ public class MCREditorSubmission {
         setRepeatsFromVariables();
     }
 
-    private void setVariablesFromElement(Element element, String prefix,
-            String suffix) {
+    private void setVariablesFromElement(Element element, String prefix, String suffix) {
         String path = prefix + element.getName() + suffix;
         String text = element.getText();
 
         addVariable(path, text);
 
         List attributes = element.getAttributes();
+
         for (int i = 0; i < attributes.size(); i++) {
             Attribute attribute = (Attribute) (attributes.get(i));
             addVariable(path + "/@" + attribute.getName(), attribute.getValue());
@@ -133,21 +130,25 @@ public class MCREditorSubmission {
 
             if (i > 0) {
                 Element before = (Element) (children.get(i - 1));
-                if (child.getName().equals(before.getName()))
+
+                if (child.getName().equals(before.getName())) {
                     suffix = "[" + String.valueOf(++nr) + "]";
-                else
+                } else {
                     nr = 1;
+                }
             }
+
             setVariablesFromElement(child, path + "/", suffix);
         }
     }
 
-    private void setVariablesFromSubmission(MCRRequestParameters parms,
-            Element editor, boolean validate) {
+    private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor, boolean validate) {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
-            if (name.startsWith("_"))
+
+            if (name.startsWith("_")) {
                 continue; // Skip internal request params
+            }
 
             String[] values = parms.getParameterValues(name);
             String sortNr = parms.getParameter("_sortnr-" + name);
@@ -155,50 +156,57 @@ public class MCREditorSubmission {
 
             // Skip files that should be deleted
             String delete = parms.getParameter("_delete-" + name);
-            if ("true".equals(delete) && (parms.getFileItem(name) == null))
+
+            if ("true".equals(delete) && (parms.getFileItem(name) == null)) {
                 continue;
+            }
 
             // Skip request params that are not input but target params
-            if (sortNr == null)
+            if (sortNr == null) {
                 continue;
+            }
 
             // For each value
             for (int k = 0; (values != null) && (k < values.length); k++) {
                 String value = values[k];
-                if ((value == null) || (value.trim().length() == 0))
+
+                if ((value == null) || (value.trim().length() == 0)) {
                     continue;
+                }
 
                 // Handle multiple variables with same name: checkboxes & select
                 // multiple
-                String nname = (k == 0 ? name : name + "[" + (k + 1) + "]");
+                String nname = ((k == 0) ? name : (name + "[" + (k + 1) + "]"));
 
                 MCREditorVariable var = new MCREditorVariable(nname, value);
                 var.setSortNr(sortNr);
 
                 // Add associated component from editor definition
                 if ((ID != null) && (ID.trim().length() > 0)) {
-                    Element component = MCREditorDefReader.findElementByID(ID,
-                            editor);
+                    Element component = MCREditorDefReader.findElementByID(ID, editor);
+
                     if (component != null) {
                         // Skip variables with values equal to autofill text
                         String attrib = component.getAttributeValue("autofill");
                         String elem = component.getChildTextTrim("autofill");
                         String autofill = null;
 
-                        if ((attrib != null) && (attrib.trim().length() > 0))
+                        if ((attrib != null) && (attrib.trim().length() > 0)) {
                             autofill = attrib.trim();
-                        else if ((attrib != null)
-                                && (attrib.trim().length() > 0))
+                        } else if ((attrib != null) && (attrib.trim().length() > 0)) {
                             autofill = elem.trim();
+                        }
 
-                        if (value.trim().equals(autofill))
+                        if (value.trim().equals(autofill)) {
                             continue;
+                        }
                     }
                 }
 
                 variables.add(var);
 
                 FileItem file = parms.getFileItem(name);
+
                 if (file != null) // Add associated uploaded file if it exists
                 {
                     var.setFile(file);
@@ -207,60 +215,77 @@ public class MCREditorSubmission {
             }
         }
 
-        if (validate)
+        if (validate) {
             validate(parms, editor);
+        }
     }
 
     private void validate(MCRRequestParameters parms, Element editor) {
         LOGGER.info("Validating editor input... ");
+
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
-            if (!name.startsWith("_sortnr-"))
+
+            if (!name.startsWith("_sortnr-")) {
                 continue;
+            }
 
             name = name.substring(8);
 
             String ID = parms.getParameter("_id@" + name);
-            if ((ID == null) || (ID.trim().length() == 0))
+
+            if ((ID == null) || (ID.trim().length() == 0)) {
                 continue;
+            }
 
             String[] values = { "" };
-            if (parms.getParameterValues(name) != null)
+
+            if (parms.getParameterValues(name) != null) {
                 values = parms.getParameterValues(name);
+            }
 
             Element component = MCREditorDefReader.findElementByID(ID, editor);
-            if (component == null)
+
+            if (component == null) {
                 continue;
+            }
 
             List conditions = component.getChildren("condition");
-            if (conditions == null)
+
+            if (conditions == null) {
                 continue;
+            }
 
             // Skip variables with values equal to autofill text
             String attrib = component.getAttributeValue("autofill");
             String elem = component.getChildTextTrim("autofill");
             String autofill = null;
 
-            if ((attrib != null) && (attrib.trim().length() > 0))
+            if ((attrib != null) && (attrib.trim().length() > 0)) {
                 autofill = attrib.trim();
-            else if ((attrib != null) && (attrib.trim().length() > 0))
+            } else if ((attrib != null) && (attrib.trim().length() > 0)) {
                 autofill = elem.trim();
+            }
 
-            if (values[0].trim().equals(autofill)) values[0]="";
+            if (values[0].trim().equals(autofill)) {
+                values[0] = "";
+            }
 
             for (int i = 0; i < conditions.size(); i++) {
                 Element condition = (Element) (conditions.get(i));
+
                 for (int j = 0; j < values.length; j++) {
-                    String nname = (j == 0 ? name : name + "[" + (j + 1) + "]");
+                    String nname = ((j == 0) ? name : (name + "[" + (j + 1) + "]"));
                     boolean ok = checkCondition(condition, nname, values[j]);
+
                     if (!ok) {
                         String sortNr = parms.getParameter("_sortnr-" + name);
                         failed.put(sortNr, condition);
 
                         LOGGER.info("Validation condition failed:");
                         LOGGER.info(nname + " = \"" + values[j] + "\"");
-                        String cond = new XMLOutputter(Format
-                                .getCompactFormat()).outputString(condition);
+
+                        String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
                         LOGGER.info(cond);
                     }
                 }
@@ -269,31 +294,33 @@ public class MCREditorSubmission {
 
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
-            if (!name.startsWith("_cond-"))
+
+            if (!name.startsWith("_cond-")) {
                 continue;
+            }
 
             String path = name.substring(6);
             String[] ids = parms.getParameterValues(name);
-            if (ids != null)
+
+            if (ids != null) {
                 for (int i = 0; i < ids.length; i++) {
                     String id = ids[i];
-                    Element condition = MCREditorDefReader.findElementByID(id,
-                            editor);
-                    if (condition == null)
-                        continue;
+                    Element condition = MCREditorDefReader.findElementByID(id, editor);
 
-                    String pathA = path + "/"
-                            + condition.getAttributeValue("field1");
-                    String pathB = path + "/"
-                            + condition.getAttributeValue("field2");
+                    if (condition == null) {
+                        continue;
+                    }
+
+                    String pathA = path + "/" + condition.getAttributeValue("field1");
+                    String pathB = path + "/" + condition.getAttributeValue("field2");
                     String type = condition.getAttributeValue("type");
                     String oper = condition.getAttributeValue("operator");
                     String format = condition.getAttributeValue("format");
 
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
-                    boolean ok = MCRInputValidator.instance().compare(valueA,
-                            valueB, oper, type, format);
+                    boolean ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
+
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
                         failed.put(sortNrA, condition);
@@ -303,64 +330,67 @@ public class MCREditorSubmission {
 
                         LOGGER.info("Validation condition failed:");
                         LOGGER.info(pathA + " " + oper + " " + pathB);
-                        String cond = new XMLOutputter(Format
-                                .getCompactFormat()).outputString(condition);
+
+                        String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
                         LOGGER.info(cond);
                     }
                 }
+            }
         }
     }
 
     private boolean checkCondition(Element condition, String name, String value) {
-        boolean required = "true".equals(condition
-                .getAttributeValue("required"));
+        boolean required = "true".equals(condition.getAttributeValue("required"));
 
         if (required) {
-            if (name.endsWith("]")
-                    && (value == null || value.trim().length() == 0))
-                return true; // repeated field is required but missing, this is
+            if (name.endsWith("]") && ((value == null) || (value.trim().length() == 0))) {
+                return true; // repeated field is required but missing, this
+                                // is
+            }
             // ok
-            else if (!MCRInputValidator.instance().validateRequired(value))
+            else if (!MCRInputValidator.instance().validateRequired(value)) {
                 return false; // field is required but empty, this is an error
-        } else if ((!required) && (value.trim().length() == 0))
+            }
+        } else if ((!required) && (value.trim().length() == 0)) {
             return true; // field is not required and empty, this is OK
+        }
 
         String type = condition.getAttributeValue("type");
         String min = condition.getAttributeValue("min");
         String max = condition.getAttributeValue("max");
         String format = condition.getAttributeValue("format");
 
-        if ((type != null)
-                && !MCRInputValidator.instance().validateMinMaxType(value,
-                        type, min, max, format))
+        if ((type != null) && !MCRInputValidator.instance().validateMinMaxType(value, type, min, max, format)) {
             return false; // field type, data format and/or min max value is
-        // illegal
+        }
 
+        // illegal
         String minLength = condition.getAttributeValue("minLength");
         String maxLength = condition.getAttributeValue("maxLength");
-        if (((maxLength != null) || (minLength != null))
-                && !MCRInputValidator.instance().validateLength(value,
-                        minLength, maxLength))
+
+        if (((maxLength != null) || (minLength != null)) && !MCRInputValidator.instance().validateLength(value, minLength, maxLength)) {
             return false; // field min/max length is illegal
+        }
 
         String regexp = condition.getAttributeValue("regexp");
-        if ((regexp != null)
-                && !MCRInputValidator.instance().validateRegularExpression(
-                        value, regexp))
+
+        if ((regexp != null) && !MCRInputValidator.instance().validateRegularExpression(value, regexp)) {
             return false; // field does not match given regular expression
+        }
 
         String xsl = condition.getAttributeValue("xsl");
-        if ((xsl != null)
-                && !MCRInputValidator.instance().validateXSLCondition(value,
-                        xsl))
+
+        if ((xsl != null) && !MCRInputValidator.instance().validateXSLCondition(value, xsl)) {
             return false; // field does not match given xsl condition
+        }
 
         return true;
     }
 
     private void addVariable(String path, String text) {
-        if ((text == null) || (text.trim().length() == 0))
+        if ((text == null) || (text.trim().length() == 0)) {
             return;
+        }
 
         MCREditorServlet.logger.debug("Editor variable " + path + "=" + text);
         variables.add(new MCREditorVariable(path, text));
@@ -375,46 +405,58 @@ public class MCREditorSubmission {
     }
 
     public FileItem getFile(Object xmlNode) {
-        if (xml == null)
+        if (xml == null) {
             buildTargetXML();
+        }
+
         return (FileItem) (node2file.get(xmlNode));
     }
 
     public Object getXMLNode(FileItem file) {
-        if (xml == null)
+        if (xml == null) {
             buildTargetXML();
+        }
+
         return file2node.get(file);
     }
 
     public Document getXML() {
-        if (xml == null)
+        if (xml == null) {
             buildTargetXML();
+        }
+
         return xml;
     }
 
     Element buildInputElements() {
         Element input = new Element("input");
+
         for (int i = 0; i < variables.size(); i++) {
             MCREditorVariable var = (MCREditorVariable) (variables.get(i));
             input.addContent(var.asInputElement());
         }
+
         return input;
     }
 
     Element buildRepeatElements() {
         Element eRepeats = new Element("repeats");
+
         for (int i = 0; i < repeats.size(); i++) {
             MCREditorVariable var = (MCREditorVariable) (repeats.get(i));
             eRepeats.addContent(var.asRepeatElement());
         }
+
         return eRepeats;
     }
 
     Element buildFailedConditions() {
-        if (failed.isEmpty())
+        if (failed.isEmpty()) {
             return null;
+        }
 
         Element failedConds = new Element("failed");
+
         for (Enumeration e = failed.keys(); e.hasMoreElements();) {
             String sortNr = (String) (e.nextElement());
             Element condition = (Element) (failed.get(sortNr));
@@ -423,6 +465,7 @@ public class MCREditorSubmission {
             field.setAttribute("condition", condition.getAttributeValue("id"));
             failedConds.addContent(field);
         }
+
         failed = new Hashtable();
 
         return failedConds;
@@ -448,17 +491,19 @@ public class MCREditorSubmission {
 
             for (int j = 1; j < elements.length; j++) {
                 String name = elements[j];
+
                 if (name.endsWith("]")) {
                     int pos = name.lastIndexOf("[");
-                    name = name.substring(0, pos) + "_XXX_"
-                            + name.substring(pos + 1, name.length() - 1);
+                    name = name.substring(0, pos) + "_XXX_" + name.substring(pos + 1, name.length() - 1);
                 }
 
                 Element child = parent.getChild(name);
+
                 if (child == null) {
                     child = new Element(name);
                     parent.addContent(child);
                 }
+
                 parent = child;
             }
 
@@ -473,6 +518,7 @@ public class MCREditorSubmission {
             }
 
             FileItem file = parms.getFileItem(var.getPath());
+
             if (file != null) {
                 file2node.put(file, node);
                 node2file.put(node, file);
@@ -487,10 +533,12 @@ public class MCREditorSubmission {
         String name = element.getName();
         int pos = name.lastIndexOf("_XXX_");
 
-        if (pos >= 0)
+        if (pos >= 0) {
             element.setName(name.substring(0, pos));
+        }
 
         List children = element.getChildren();
+
         for (int i = 0; i < children.size(); i++)
             renameRepeatedElements((Element) (children.get(i)));
     }
@@ -516,14 +564,14 @@ public class MCREditorSubmission {
                     int numNew = Integer.parseInt(num);
 
                     if (maxtable.containsKey(key)) {
-                        int numOld = Integer.parseInt((String) (maxtable
-                                .get(key)));
+                        int numOld = Integer.parseInt((String) (maxtable.get(key)));
                         maxtable.remove(key);
                         numNew = Math.max(numOld, numNew);
                     }
 
                     maxtable.put(key, String.valueOf(numNew));
                 }
+
                 prefix = prefix + "/" + name;
             }
         }
@@ -533,21 +581,18 @@ public class MCREditorSubmission {
             String value = (String) (maxtable.get(path));
 
             repeats.add(new MCREditorVariable(path, value));
-            MCREditorServlet.logger.debug("Editor repeats " + path + " = "
-                    + value);
+            MCREditorServlet.logger.debug("Editor repeats " + path + " = " + value);
         }
     }
 
     private void setRepeatsFromSubmission() {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String parameter = (String) (e.nextElement());
+
             if (parameter.startsWith("_n-")) {
                 String value = parms.getParameter(parameter);
-                repeats
-                        .add(new MCREditorVariable(parameter.substring(3),
-                                value));
-                MCREditorServlet.logger.debug("Editor repeats "
-                        + parameter.substring(3) + " = " + value);
+                repeats.add(new MCREditorVariable(parameter.substring(3), value));
+                MCREditorServlet.logger.debug("Editor repeats " + parameter.substring(3) + " = " + value);
             }
         }
     }
@@ -561,31 +606,34 @@ public class MCREditorSubmission {
         changeRepeatNumber(prefix, -1);
 
         String prefix2;
-        if (nr > 1)
+
+        if (nr > 1) {
             prefix2 = prefix + "[" + nr + "]";
-        else
+        } else {
             prefix2 = prefix;
+        }
 
         for (int i = 0; i < variables.size(); i++) {
             String path = ((MCREditorVariable) (variables.get(i))).getPath();
 
-            if (path.startsWith(prefix2 + "/") || path.equals(prefix2))
+            if (path.startsWith(prefix2 + "/") || path.equals(prefix2)) {
                 variables.remove(i--);
+            }
         }
 
         for (int i = 0; i < repeats.size(); i++) {
             String path = ((MCREditorVariable) (repeats.get(i))).getPath();
 
-            if (path.startsWith(prefix2 + "/"))
+            if (path.startsWith(prefix2 + "/")) {
                 repeats.remove(i--);
+            }
         }
 
         changeVariablesAndRepeats(prefix, nr, -1);
     }
 
     void doUp(String prefix, int nr) {
-        String prefix1 = prefix
-                + (nr > 2 ? "[" + String.valueOf(nr - 1) + "]" : "");
+        String prefix1 = prefix + ((nr > 2) ? ("[" + String.valueOf(nr - 1) + "]") : "");
         String prefix2 = prefix + "[" + String.valueOf(nr) + "]";
 
         for (int i = 0; i < variables.size(); i++) {
@@ -618,11 +666,16 @@ public class MCREditorSubmission {
     void changeRepeatNumber(String prefix, int change) {
         for (int i = 0; i < repeats.size(); i++) {
             MCREditorVariable var = (MCREditorVariable) (repeats.get(i));
+
             if (var.getPath().equals(prefix)) {
                 int value = Integer.parseInt(var.getValue()) + change;
-                if (value == 0)
+
+                if (value == 0) {
                     value = 1;
+                }
+
                 var.setValue(String.valueOf(value));
+
                 return;
             }
         }
@@ -637,8 +690,9 @@ public class MCREditorSubmission {
             MCREditorVariable var = (MCREditorVariable) (list.get(i));
             String path = var.getPath();
 
-            if (!path.startsWith(prefix + "["))
+            if (!path.startsWith(prefix + "[")) {
                 continue;
+            }
 
             String rest = path.substring(prefix.length() + 1);
 
@@ -649,8 +703,11 @@ public class MCREditorSubmission {
                 num += change;
 
                 StringBuffer newpath = new StringBuffer(prefix);
-                if (num > 1)
+
+                if (num > 1) {
                     newpath.append("[").append(num).append("]");
+                }
+
                 newpath.append(rest.substring(pos + 1));
 
                 var.setPath(newpath.toString());

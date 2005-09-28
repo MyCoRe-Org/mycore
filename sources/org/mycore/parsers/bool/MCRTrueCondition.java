@@ -1,6 +1,9 @@
-/**
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,22 +16,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- **/
+ */
 
 package org.mycore.parsers.bool;
 
-import org.jdom.Element;
 import org.jdom.Attribute;
+import org.jdom.Element;
 
 /**
  * Implementation of the boolean "true" primitive
  * 
  * @author Matthias Kramm
  */
-
 public class MCRTrueCondition implements MCRCondition {
     public MCRTrueCondition() {
     }
@@ -40,7 +42,7 @@ public class MCRTrueCondition implements MCRCondition {
     public String toString() {
         return "true\n";
     }
-  
+
     public Element toXML() {
         return new Element("true");
     }
@@ -48,9 +50,10 @@ public class MCRTrueCondition implements MCRCondition {
     public Element info() {
         Element el = new Element("info");
         el.setAttribute(new Attribute("type", "TRUE"));
+
         return el;
     }
-    
+
     public void accept(MCRConditionVisitor visitor) {
         visitor.visitType(info());
     }

@@ -1,6 +1,9 @@
-/**
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
  *
- * Copyright (C) 2000 University of Essen, Germany
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -13,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file sources/gpl.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.servlets;
 
@@ -25,7 +27,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -36,80 +37,88 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * This servlet response the MCRObject certain by the call path
- * <em>.../receive/MCRObjectID</em> or 
+ * <em>.../receive/MCRObjectID</em> or
  * <em>.../servlets/MCRObjectServlet/id=MCRObjectID[&XSL.Style=...]</em>.
- *
+ * 
  * @author Jens Kupferschmidt
  * @author Anja Schaar
- *
+ * 
  * @see org.mycore.frontend.servlets.MCRServlet
  */
 public class MCRObjectServlet extends MCRServlet {
+    private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
 
-  private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
+    private static MCRConfiguration CONFIG = null;
 
-  private static MCRConfiguration CONFIG = null;
+    private static MCRXMLTableManager TM = null;
 
-  private static MCRXMLTableManager TM = null;
- 
-  /**
-   * The initalization of the servlet.
-   * @see javax.servlet.GenericServlet#init()
-   */
-  public void init() throws ServletException {
-    super.init();
-    CONFIG = MCRConfiguration.instance();
-    TM = MCRXMLTableManager.instance();
+    /**
+     * The initalization of the servlet.
+     * 
+     * @see javax.servlet.GenericServlet#init()
+     */
+    public void init() throws ServletException {
+        super.init();
+        CONFIG = MCRConfiguration.instance();
+        TM = MCRXMLTableManager.instance();
     }
 
-  /**
-   * The method replace the default form MCRServlet and redirect the
-   * MCRLayoutServlet.
-   *
-   * @param job the MCRServletJob instance
-   **/
-  public void doGetPost(MCRServletJob job) throws ServletException, Exception {
+    /**
+     * The method replace the default form MCRServlet and redirect the
+     * MCRLayoutServlet.
+     * 
+     * @param job
+     *            the MCRServletJob instance
+     */
+    public void doGetPost(MCRServletJob job) throws ServletException, Exception {
+        // the urn with information about the MCRObjectID
+        String uri = job.getRequest().getPathInfo();
+        String id = "";
 
-  // the urn with information about the MCRObjectID
-  String uri = job.getRequest().getPathInfo();
-  String id = "";
-  if (uri != null) {
-    LOGGER.debug(this.getClass() + " Path = " + uri);
-    int j = uri.length();
-    LOGGER.debug(this.getClass() + " " + uri.substring(1,j));
-    id = uri.substring(1,j);
-    }
-  else {
-    id = getProperty( job.getRequest(), "id" );
-    }
+        if (uri != null) {
+            LOGGER.debug(this.getClass() + " Path = " + uri);
 
-  // check the ID and retrive the data
-  MCRXMLContainer result = new MCRXMLContainer();
-  MCRObjectID mcrid = null;
-  try {
-    mcrid = new MCRObjectID(id);
-    byte [] xml = TM.retrieve(mcrid);
-    result.add("local",id,0,xml);
-    }
-  catch (MCRException e) {
-    LOGGER.warn(this.getClass() + " The ID "+id+" is not a MCRObjectID!");
-    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+"editor_error_mcrid.xml"));
-    return;
-    }
+            int j = uri.length();
+            LOGGER.debug(this.getClass() + " " + uri.substring(1, j));
+            id = uri.substring(1, j);
+        } else {
+            id = getProperty(job.getRequest(), "id");
+        }
 
-  // call the LayoutServlet
-  MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-  String lang = mcrSession.getCurrentLanguage();
-  if (getProperty(job.getRequest(), "XSL.Style") == null)
-    job.getRequest().setAttribute("XSL.Style", "html");
-  job.getRequest().setAttribute("mode","ObjectMetadata");
-  String type = mcrid.getTypeId();
-  job.getRequest().setAttribute("type",type);
-  String layout = CONFIG.getString("MCR.type_"+type+"_in",type);
-  job.getRequest().setAttribute("layout",layout);
-  job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", result.exportAllToDocument() );
-  RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-  rd.forward(job.getRequest(), job.getResponse());
-  }
+        // check the ID and retrive the data
+        MCRXMLContainer result = new MCRXMLContainer();
+        MCRObjectID mcrid = null;
 
+        try {
+            mcrid = new MCRObjectID(id);
+
+            byte[] xml = TM.retrieve(mcrid);
+            result.add("local", id, 0, xml);
+        } catch (MCRException e) {
+            LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "editor_error_mcrid.xml"));
+
+            return;
+        }
+
+        // call the LayoutServlet
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String lang = mcrSession.getCurrentLanguage();
+
+        if (getProperty(job.getRequest(), "XSL.Style") == null) {
+            job.getRequest().setAttribute("XSL.Style", "html");
+        }
+
+        job.getRequest().setAttribute("mode", "ObjectMetadata");
+
+        String type = mcrid.getTypeId();
+        job.getRequest().setAttribute("type", type);
+
+        String layout = CONFIG.getString("MCR.type_" + type + "_in", type);
+        job.getRequest().setAttribute("layout", layout);
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", result.exportAllToDocument());
+
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(job.getRequest(), job.getResponse());
+    }
 }

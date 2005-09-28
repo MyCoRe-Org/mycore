@@ -1,4 +1,4 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.servlets;
 
@@ -40,48 +39,47 @@ import org.mycore.common.MCRConfigurationException;
  * @version $Revision$ $Date$
  */
 public class MCRServletJob {
-	/** The HttpServletRequest object */
-	private HttpServletRequest theRequest = null;
+    /** The HttpServletRequest object */
+    private HttpServletRequest theRequest = null;
 
-	/** The HttpServletResponse object */
-	private HttpServletResponse theResponse = null;
+    /** The HttpServletResponse object */
+    private HttpServletResponse theResponse = null;
 
-	/**
-	 * The constructor takes the given objects and stores them in private
-	 * objects.
-	 * 
-	 * @param theRequest
-	 *            the HttpServletRequest object for this servlet job
-	 * @param theResponse
-	 *            the HttpServletResponse object for this servlet job
-	 */
-	public MCRServletJob(HttpServletRequest theRequest,
-			HttpServletResponse theResponse) {
-		this.theRequest = theRequest;
-		this.theResponse = theResponse;
-	}
+    /**
+     * The constructor takes the given objects and stores them in private
+     * objects.
+     * 
+     * @param theRequest
+     *            the HttpServletRequest object for this servlet job
+     * @param theResponse
+     *            the HttpServletResponse object for this servlet job
+     */
+    public MCRServletJob(HttpServletRequest theRequest, HttpServletResponse theResponse) {
+        this.theRequest = theRequest;
+        this.theResponse = theResponse;
+    }
 
-	/** returns the HttpServletRequest object */
-	public HttpServletRequest getRequest() {
-		return theRequest;
-	}
+    /** returns the HttpServletRequest object */
+    public HttpServletRequest getRequest() {
+        return theRequest;
+    }
 
-	/** returns the HttpServletResponse object */
-	public HttpServletResponse getResponse() {
-		return theResponse;
-	}
+    /** returns the HttpServletResponse object */
+    public HttpServletResponse getResponse() {
+        return theResponse;
+    }
 
-	/** returns true if the current http request was issued from the local host * */
-	public boolean isLocal() {
-		try {
-			String serverName = theRequest.getServerName();
-			String serverIP = InetAddress.getByName(serverName)
-					.getHostAddress();
-			String remoteIP = MCRServlet.getRemoteAddr(theRequest);
-			return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
-		} catch (Exception ex) {
-			String msg = "Exception while testing if http request was from local host";
-			throw new MCRConfigurationException(msg, ex);
-		}
-	}
+    /** returns true if the current http request was issued from the local host * */
+    public boolean isLocal() {
+        try {
+            String serverName = theRequest.getServerName();
+            String serverIP = InetAddress.getByName(serverName).getHostAddress();
+            String remoteIP = MCRServlet.getRemoteAddr(theRequest);
+
+            return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
+        } catch (Exception ex) {
+            String msg = "Exception while testing if http request was from local host";
+            throw new MCRConfigurationException(msg, ex);
+        }
+    }
 }

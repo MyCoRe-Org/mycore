@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.frontend.editor;
 
@@ -46,7 +45,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 
@@ -71,8 +69,10 @@ public class MCRInputValidator {
     private static MCRInputValidator singleton;
 
     public static synchronized MCRInputValidator instance() {
-        if (singleton == null)
+        if (singleton == null) {
             singleton = new MCRInputValidator();
+        }
+
         return singleton;
     }
 
@@ -96,23 +96,25 @@ public class MCRInputValidator {
      *             if XSL condition has syntax errors
      */
     public boolean validateXSLCondition(String input, String condition) {
-        if (input == null)
+        if (input == null) {
             input = "";
+        }
+
         Document xml = new Document(new Element("input").addContent(input));
         Source xmlsrc = new JDOMSource(xml);
 
         Document xsl = (Document) (xslcondCache.get(condition));
+
         if (xsl == null) {
             xsl = (Document) (stylesheet.clone());
-            Element when = xsl.getRootElement().getChild("template", xslns)
-                    .getChild("choose", xslns).getChild("when", xslns);
+
+            Element when = xsl.getRootElement().getChild("template", xslns).getChild("choose", xslns).getChild("when", xslns);
             when.setAttribute("test", condition);
             xslcondCache.put(condition, xsl);
         }
 
         try {
-            Transformer transformer = factory
-                    .newTransformer(new JDOMSource(xsl));
+            Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             transformer.transform(xmlsrc, new StreamResult(out));
             out.close();
@@ -125,8 +127,7 @@ public class MCRInputValidator {
             String msg = "UTF-8 encoding seems not to be supported?";
             throw new org.mycore.common.MCRConfigurationException(msg, e);
         } catch (TransformerException e) {
-            String msg = "Probably syntax error in this XSL condition: "
-                    + condition;
+            String msg = "Probably syntax error in this XSL condition: " + condition;
             throw new org.mycore.common.MCRConfigurationException(msg, e);
         } catch (IOException e) {
             String msg = "IOException in memory, this should never happen";
@@ -134,21 +135,18 @@ public class MCRInputValidator {
         }
     }
 
-    private Namespace xslns = Namespace.getNamespace("xsl",
-            "http://www.w3.org/1999/XSL/Transform");
+    private Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
     /** Prepares a template stylesheet that is used for checking XSL conditions * */
     private synchronized Document prepareStylesheet() {
-        Element stylesheet = new Element("stylesheet").setAttribute("version",
-                "1.0");
+        Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
         stylesheet.setNamespace(xslns);
 
         Element output = new Element("output", xslns);
         output.setAttribute("method", "text");
         stylesheet.addContent(output);
 
-        Element template = new Element("template", xslns).setAttribute("match",
-                "/input");
+        Element template = new Element("template", xslns).setAttribute("match", "/input");
         stylesheet.addContent(template);
 
         Element choose = new Element("choose", xslns);
@@ -156,6 +154,7 @@ public class MCRInputValidator {
 
         Element when = new Element("when", xslns);
         when.addContent("t");
+
         Element otherwise = new Element("otherwise", xslns);
         otherwise.addContent("f");
         choose.addContent(when).addContent(otherwise);
@@ -180,10 +179,12 @@ public class MCRInputValidator {
      *         returned
      */
     public boolean validateRegularExpression(String input, String regexp) {
-        if (input == null)
+        if (input == null) {
             input = "";
+        }
 
         Pattern p = (Pattern) (regexpCache.get(regexp));
+
         if (p == null) {
             p = Pattern.compile(regexp);
             regexpCache.put(regexp, p);
@@ -209,10 +210,13 @@ public class MCRInputValidator {
      * @return true, if the string matches the given min and max lengths
      */
     public boolean validateLength(String input, String smin, String smax) {
-        if (input == null)
+        if (input == null) {
             input = "";
-        int min = (smin == null ? Integer.MIN_VALUE : Integer.parseInt(smin));
-        int max = (smax == null ? Integer.MAX_VALUE : Integer.parseInt(smax));
+        }
+
+        int min = ((smin == null) ? Integer.MIN_VALUE : Integer.parseInt(smin));
+        int max = ((smax == null) ? Integer.MAX_VALUE : Integer.parseInt(smax));
+
         return (input.length() >= min) && (input.length() <= max);
     }
 
@@ -225,11 +229,13 @@ public class MCRInputValidator {
      */
     private DateFormat getDateTimeFormat(String format) {
         DateFormat df = (DateFormat) (formatCache.get(format));
+
         if (df == null) {
             df = new SimpleDateFormat(format);
             df.setLenient(false);
             formatCache.put(format, df);
         }
+
         return df;
     }
 
@@ -285,17 +291,22 @@ public class MCRInputValidator {
      * @return true if input matches the given data type, min, max value and
      *         date time format
      */
-    public boolean validateMinMaxType(String input, String type, String min,
-            String max, String format) {
-        if (input == null)
+    public boolean validateMinMaxType(String input, String type, String min, String max, String format) {
+        if (input == null) {
             input = "";
+        }
 
         if (type.equals("string")) {
             boolean ok = true;
-            if (min != null)
+
+            if (min != null) {
                 ok = (min.compareTo(input) <= 0);
-            if (max != null)
+            }
+
+            if (max != null) {
                 ok = ok && (max.compareTo(input) >= 0);
+            }
+
             return ok;
         } else if (type.equals("integer")) {
             long lmin = Long.MIN_VALUE;
@@ -303,10 +314,13 @@ public class MCRInputValidator {
             long lval = 0;
 
             try {
-                if (min != null)
+                if (min != null) {
                     lmin = Long.parseLong(min);
-                if (max != null)
+                }
+
+                if (max != null) {
                     lmax = Long.parseLong(max);
+                }
             } catch (NumberFormatException ex) {
                 String msg = "Could not parse min/max value for input validation";
                 throw new MCRConfigurationException(msg, ex);
@@ -320,18 +334,21 @@ public class MCRInputValidator {
 
             return (lmin <= lval) && (lmax >= lval);
         } else if (type.equals("decimal")) {
-            Locale locale = (format == null ? Locale.getDefault() : new Locale(
-                    format));
+            Locale locale = ((format == null) ? Locale.getDefault() : new Locale(format));
             NumberFormat nf = NumberFormat.getNumberInstance(locale);
 
             double dmin = Double.MIN_VALUE;
             double dval = Double.MAX_VALUE;
             double dmax = 0.0;
+
             try {
-                if (min != null)
+                if (min != null) {
                     dmin = nf.parse(min).doubleValue();
-                if (max != null)
+                }
+
+                if (max != null) {
                     dmax = nf.parse(max).doubleValue();
+                }
             } catch (ParseException ex) {
                 String msg = "Could not parse min/max value for input validation";
                 throw new MCRConfigurationException(msg, ex);
@@ -358,24 +375,30 @@ public class MCRInputValidator {
             }
 
             try {
-                if (min != null)
+                if (min != null) {
                     dmin = df.parse(min);
-                if (max != null)
+                }
+
+                if (max != null) {
                     dmax = df.parse(max);
+                }
             } catch (ParseException ex) {
                 String msg = "Could not parse min/max value for input validation";
                 throw new MCRConfigurationException(msg, ex);
             }
 
-            if ((dmin != null) && (dmin.after(dval)))
+            if ((dmin != null) && (dmin.after(dval))) {
                 return false;
-            if ((dmax != null) && (dmax.before(dval)))
+            }
+
+            if ((dmax != null) && (dmax.before(dval))) {
                 return false;
+            }
 
             return true;
-        } else
-            throw new MCRConfigurationException("Unknown input data type: "
-                    + type);
+        } else {
+            throw new MCRConfigurationException("Unknown input data type: " + type);
+        }
     }
 
     /**
@@ -396,94 +419,97 @@ public class MCRInputValidator {
      * @return true if the compare result is true OR one of the input fields is
      *         empty OR one of the input fields is in wrong format.
      */
-    public boolean compare(String valueA, String valueB, String operator,
-            String type, String format) {
+    public boolean compare(String valueA, String valueB, String operator, String type, String format) {
         try {
-            if (valueA == null || valueA.trim().length() == 0)
+            if ((valueA == null) || (valueA.trim().length() == 0)) {
                 return true;
-            if (valueB == null || valueB.trim().length() == 0)
+            }
+
+            if ((valueB == null) || (valueB.trim().length() == 0)) {
                 return true;
+            }
+
             if (type.equals("string")) {
                 int res = valueA.compareTo(valueB);
-                if ("=".equals(operator))
+
+                if ("=".equals(operator)) {
                     return (res == 0);
-                else if ("<".equals(operator))
+                } else if ("<".equals(operator)) {
                     return (res < 0);
-                else if (">".equals(operator))
+                } else if (">".equals(operator)) {
                     return (res > 0);
-                else if ("<=".equals(operator))
+                } else if ("<=".equals(operator)) {
                     return (res <= 0);
-                else if (">=".equals(operator))
+                } else if (">=".equals(operator)) {
                     return (res >= 0);
-                else if ("!=".equals(operator))
+                } else if ("!=".equals(operator)) {
                     return !(res == 0);
-                else
-                    throw new MCRConfigurationException(
-                            "Unknown compare operator: " + operator);
+                } else {
+                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
+                }
             } else if (type.equals("integer")) {
                 long vA = Long.parseLong(valueA);
                 long vB = Long.parseLong(valueB);
 
-                if ("=".equals(operator))
+                if ("=".equals(operator)) {
                     return (vA == vB);
-                else if ("<".equals(operator))
+                } else if ("<".equals(operator)) {
                     return (vA < vB);
-                else if (">".equals(operator))
+                } else if (">".equals(operator)) {
                     return (vA > vB);
-                else if ("<=".equals(operator))
+                } else if ("<=".equals(operator)) {
                     return (vA <= vB);
-                else if (">=".equals(operator))
+                } else if (">=".equals(operator)) {
                     return (vA >= vB);
-                else if ("!=".equals(operator))
+                } else if ("!=".equals(operator)) {
                     return !(vA == vB);
-                else
-                    throw new MCRConfigurationException(
-                            "Unknown compare operator: " + operator);
+                } else {
+                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
+                }
             } else if (type.equals("decimal")) {
-                Locale locale = (format == null ? Locale.getDefault()
-                        : new Locale(format));
+                Locale locale = ((format == null) ? Locale.getDefault() : new Locale(format));
                 NumberFormat nf = NumberFormat.getNumberInstance(locale);
                 double vA = nf.parse(valueA).doubleValue();
                 double vB = nf.parse(valueB).doubleValue();
 
-                if ("=".equals(operator))
+                if ("=".equals(operator)) {
                     return (vA == vB);
-                else if ("<".equals(operator))
+                } else if ("<".equals(operator)) {
                     return (vA < vB);
-                else if (">".equals(operator))
+                } else if (">".equals(operator)) {
                     return (vA > vB);
-                else if ("<=".equals(operator))
+                } else if ("<=".equals(operator)) {
                     return (vA <= vB);
-                else if (">=".equals(operator))
+                } else if (">=".equals(operator)) {
                     return (vA >= vB);
-                else if ("!=".equals(operator))
+                } else if ("!=".equals(operator)) {
                     return !(vA == vB);
-                else
-                    throw new MCRConfigurationException(
-                            "Unknown compare operator: " + operator);
+                } else {
+                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
+                }
             } else if (type.equals("datetime")) {
                 DateFormat df = getDateTimeFormat(format);
                 Date vA = df.parse(valueA);
                 Date vB = df.parse(valueB);
 
-                if ("=".equals(operator))
+                if ("=".equals(operator)) {
                     return (vA.equals(vB));
-                else if ("<".equals(operator))
+                } else if ("<".equals(operator)) {
                     return (vA.before(vB));
-                else if (">".equals(operator))
+                } else if (">".equals(operator)) {
                     return (vA.after(vB));
-                else if ("<=".equals(operator))
+                } else if ("<=".equals(operator)) {
                     return (vA.before(vB) || vA.equals(vB));
-                else if (">=".equals(operator))
+                } else if (">=".equals(operator)) {
                     return (vA.after(vB) || vA.equals(vB));
-                else if ("!=".equals(operator))
+                } else if ("!=".equals(operator)) {
                     return !(vA.equals(vB));
-                else
-                    throw new MCRConfigurationException(
-                            "Unknown compare operator: " + operator);
-            } else
-                throw new MCRConfigurationException("Unknown input data type: "
-                        + type);
+                } else {
+                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
+                }
+            } else {
+                throw new MCRConfigurationException("Unknown input data type: " + type);
+            }
         } catch (ParseException ex) {
             return true;
         }
@@ -491,27 +517,17 @@ public class MCRInputValidator {
 
     public static void main(String[] args) {
         MCRInputValidator iv = MCRInputValidator.instance();
-        System.out.println(true == iv.validateXSLCondition("bingo@bongo.com",
-                "contains(.,'@')"));
+        System.out.println(true == iv.validateXSLCondition("bingo@bongo.com", "contains(.,'@')"));
         System.out.println(false == iv.validateLength("john doe", "20", null));
         System.out.println(false == iv.validateRequired(" \t"));
-        System.out.println(false == iv
-                .validateRegularExpression("aacab", "a*b"));
-        System.out.println(true == iv.validateMinMaxType("4711", "integer",
-                "100", null, null));
-        System.out.println(true == iv.validateMinMaxType("Frank", "string",
-                "AAAAA", "zzzzz", null));
-        System.out.println(true == iv.validateMinMaxType("13:58", "datetime",
-                null, "14:00", "HH:mm"));
-        System.out.println(false == iv.validateMinMaxType("27:58", "datetime",
-                null, null, "HH:mm"));
-        System.out.println(false == iv.validateMinMaxType("30.02.2005",
-                "datetime", null, null, "dd.MM.yyyy"));
-        System.out.println(true == iv.validateMinMaxType("26.02.2005",
-                "datetime", null, null, "dd.MM.yyyy"));
-        System.out.println(true == iv.validateMinMaxType("3,5", "decimal", "1",
-                "4", "de"));
-        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1",
-                "4", "en"));
+        System.out.println(false == iv.validateRegularExpression("aacab", "a*b"));
+        System.out.println(true == iv.validateMinMaxType("4711", "integer", "100", null, null));
+        System.out.println(true == iv.validateMinMaxType("Frank", "string", "AAAAA", "zzzzz", null));
+        System.out.println(true == iv.validateMinMaxType("13:58", "datetime", null, "14:00", "HH:mm"));
+        System.out.println(false == iv.validateMinMaxType("27:58", "datetime", null, null, "HH:mm"));
+        System.out.println(false == iv.validateMinMaxType("30.02.2005", "datetime", null, null, "dd.MM.yyyy"));
+        System.out.println(true == iv.validateMinMaxType("26.02.2005", "datetime", null, null, "dd.MM.yyyy"));
+        System.out.println(true == iv.validateMinMaxType("3,5", "decimal", "1", "4", "de"));
+        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1", "4", "en"));
     }
 }

@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.services.query;
 
@@ -41,201 +40,209 @@ import org.mycore.common.xml.MCRXMLContainer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryCollector {
-	private int nThreads;
+    private int nThreads;
 
-	private PoolWorker[] threads;
+    private PoolWorker[] threads;
 
-	private LinkedList queue;
+    private LinkedList queue;
 
-	private MCRQueryAgent agent;
+    private MCRQueryAgent agent;
 
-	//	The list of hosts from the configuration
-	private HashSet remoteAliasList = null;
+    // The list of hosts from the configuration
+    private HashSet remoteAliasList = null;
 
-	//	The instcnce of configuraion
-	private org.mycore.common.MCRConfiguration conf = null;
+    // The instcnce of configuraion
+    private org.mycore.common.MCRConfiguration conf = null;
 
-	public MCRQueryCollector(int cThreads, int aThreads) {
-		nThreads = cThreads;
-		queue = new LinkedList();
-		threads = new PoolWorker[nThreads];
+    public MCRQueryCollector(int cThreads, int aThreads) {
+        nThreads = cThreads;
+        queue = new LinkedList();
+        threads = new PoolWorker[nThreads];
 
-		for (int i = 0; i < nThreads; i++) {
-			threads[i] = new PoolWorker();
-			threads[i].setName("MCRQueryCollector #" + (i + 1));
-			threads[i].start();
-		}
-		// get an instance of configuration
-		conf = org.mycore.common.MCRConfiguration.instance();
-		agent = new MCRQueryAgent(aThreads, conf);
-		// read host list from configuration
-		String hostconf = conf.getString("MCR.remoteaccess_hostaliases",
-				"local");
-		remoteAliasList = new HashSet();
-		StringTokenizer tk = new StringTokenizer(hostconf, ",");
-		while (tk.hasMoreTokens())
-			remoteAliasList.add(tk.nextToken());
-		System.out.println("MCRCollector initialized");
-	}
+        for (int i = 0; i < nThreads; i++) {
+            threads[i] = new PoolWorker();
+            threads[i].setName("MCRQueryCollector #" + (i + 1));
+            threads[i].start();
+        }
 
-	/**
-	 * Start asynchronous ResultCollection for a query. The results of the query
-	 * will be put in the "result" MCRXMLContainer. As this is an asynchronous
-	 * process you can work further to a point where you work with "result"
-	 * again. Sample:
-	 * 
-	 * <pre>
-	 * try {
-	 * 	synchronized (result) {
-	 * 		collector.collectQueryResults(host, type, query, result);
-	 * 		//any code here between
-	 * 		result.wait();
-	 * 	}
-	 * } catch (InterruptedException ignored) {
-	 * }
-	 * </pre>
-	 * 
-	 * @param hostlist
-	 *            hostlist seperated by a comma
-	 * @param type
-	 *            type of resultobject
-	 * @param query
-	 *            obvious the "query"
-	 * @param result
-	 *            final result container
-	 */
-	public void collectQueryResults(String hostlist, String type, String query,
-			MCRXMLContainer result) {
-		if (result == null)
-			result = new MCRXMLContainer();
-		Mission m = new Mission(hostlist, type, query, result);
-		synchronized (queue) {
-			queue.addLast(m);
-			queue.notify();
-		}
-	}
+        // get an instance of configuration
+        conf = org.mycore.common.MCRConfiguration.instance();
+        agent = new MCRQueryAgent(aThreads, conf);
 
-	private class Mission {
-		private String hostlist;
+        // read host list from configuration
+        String hostconf = conf.getString("MCR.remoteaccess_hostaliases", "local");
+        remoteAliasList = new HashSet();
 
-		private String type;
+        StringTokenizer tk = new StringTokenizer(hostconf, ",");
 
-		private String query;
+        while (tk.hasMoreTokens())
+            remoteAliasList.add(tk.nextToken());
 
-		private MCRXMLContainer result;
+        System.out.println("MCRCollector initialized");
+    }
 
-		private LinkedList hosts;
+    /**
+     * Start asynchronous ResultCollection for a query. The results of the query
+     * will be put in the "result" MCRXMLContainer. As this is an asynchronous
+     * process you can work further to a point where you work with "result"
+     * again. Sample:
+     * 
+     * <pre>
+     * try {
+     *     synchronized (result) {
+     *         collector.collectQueryResults(host, type, query, result);
+     *         //any code here between
+     *         result.wait();
+     *     }
+     * } catch (InterruptedException ignored) {
+     * }
+     * </pre>
+     * 
+     * @param hostlist
+     *            hostlist seperated by a comma
+     * @param type
+     *            type of resultobject
+     * @param query
+     *            obvious the "query"
+     * @param result
+     *            final result container
+     */
+    public void collectQueryResults(String hostlist, String type, String query, MCRXMLContainer result) {
+        if (result == null) {
+            result = new MCRXMLContainer();
+        }
 
-		public Mission(String hostlist, String type, String query,
-				MCRXMLContainer result) {
-			this.hostlist = hostlist;
-			this.type = type;
-			this.query = query;
-			this.result = result;
-			this.hosts = sepHosts(hostlist);
-		}
+        Mission m = new Mission(hostlist, type, query, result);
 
-		private LinkedList sepHosts(String hostlist) {
-			StringTokenizer tk = new StringTokenizer(hostlist, ",");
-			LinkedList returns = new LinkedList();
-			String host = null;
-			while (tk.hasMoreTokens()) {
-				host = tk.nextToken();
-				if (remoteAliasList.contains(host))
-					returns.addLast(host);
-				else if (host.equals("local"))
-					returns.addFirst(host);
-				else if (host.equals("remote")) {
-					Object[] ob = remoteAliasList.toArray();
-					for (int j = 0; j < ob.length; j++) {
-						returns.addLast((String) ob[j]);
-					}
-				} else
-					throw new MCRException("Host '" + host
-							+ "' is not in the list");
-			}
-			return returns;
-		}
+        synchronized (queue) {
+            queue.addLast(m);
+            queue.notify();
+        }
+    }
 
-		public LinkedList getHosts() {
-			return this.hosts;
-		}
+    private class Mission {
+        private String hostlist;
 
-		public String getType() {
-			return this.type;
-		}
+        private String type;
 
-		public String getQuery() {
-			return this.query;
-		}
+        private String query;
 
-		public MCRXMLContainer getResultContainer() {
-			return this.result;
-		}
+        private MCRXMLContainer result;
 
-		public void accomplished() {
-			synchronized (result) {
-				result.notify();
-			}
-		}
-	}
+        private LinkedList hosts;
 
-	protected class ThreadCounter {
-		private int threadNum;
+        public Mission(String hostlist, String type, String query, MCRXMLContainer result) {
+            this.hostlist = hostlist;
+            this.type = type;
+            this.query = query;
+            this.result = result;
+            this.hosts = sepHosts(hostlist);
+        }
 
-		public ThreadCounter(int threadNum) {
-			this.threadNum = threadNum;
-		}
+        private LinkedList sepHosts(String hostlist) {
+            StringTokenizer tk = new StringTokenizer(hostlist, ",");
+            LinkedList returns = new LinkedList();
+            String host = null;
 
-		public synchronized void decrease() {
-			this.threadNum--;
-			this.notify();
-		}
+            while (tk.hasMoreTokens()) {
+                host = tk.nextToken();
 
-	}
+                if (remoteAliasList.contains(host)) {
+                    returns.addLast(host);
+                } else if (host.equals("local")) {
+                    returns.addFirst(host);
+                } else if (host.equals("remote")) {
+                    Object[] ob = remoteAliasList.toArray();
 
-	private class PoolWorker extends Thread {
+                    for (int j = 0; j < ob.length; j++) {
+                        returns.addLast((String) ob[j]);
+                    }
+                } else {
+                    throw new MCRException("Host '" + host + "' is not in the list");
+                }
+            }
 
-		public void run() {
-			Mission m;
+            return returns;
+        }
 
-			while (true) {
-				synchronized (queue) {
-					while (queue.isEmpty()) {
-						try {
-							queue.wait();
-						} catch (InterruptedException ignored) {
-						}
-					}
+        public LinkedList getHosts() {
+            return this.hosts;
+        }
 
-					m = (Mission) queue.removeFirst();
-				}
+        public String getType() {
+            return this.type;
+        }
 
-				// If we don't catch RuntimeException,
-				// the pool could leak threads
-				try {
-					LinkedList hosts = m.getHosts();
-					int threadsWait = hosts.size();
-					ThreadCounter tc = new ThreadCounter(threadsWait);
-					try {
-						synchronized (tc) {
-							while (!hosts.isEmpty()) {
-								agent.add((String) hosts.removeFirst(), m
-										.getType(), m.getQuery(), m
-										.getResultContainer(), tc);
-							}
-							while (tc.threadNum > 0) {
-								tc.wait();
-							}
-						}
-					} catch (InterruptedException ignored) {
-						ignored.printStackTrace(System.err);
-					}
-					m.accomplished();
-				} catch (RuntimeException e) {
-					// You might want to log something here
-				}
-			}
-		}
-	}
+        public String getQuery() {
+            return this.query;
+        }
+
+        public MCRXMLContainer getResultContainer() {
+            return this.result;
+        }
+
+        public void accomplished() {
+            synchronized (result) {
+                result.notify();
+            }
+        }
+    }
+
+    protected class ThreadCounter {
+        private int threadNum;
+
+        public ThreadCounter(int threadNum) {
+            this.threadNum = threadNum;
+        }
+
+        public synchronized void decrease() {
+            this.threadNum--;
+            this.notify();
+        }
+    }
+
+    private class PoolWorker extends Thread {
+        public void run() {
+            Mission m;
+
+            while (true) {
+                synchronized (queue) {
+                    while (queue.isEmpty()) {
+                        try {
+                            queue.wait();
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+
+                    m = (Mission) queue.removeFirst();
+                }
+
+                // If we don't catch RuntimeException,
+                // the pool could leak threads
+                try {
+                    LinkedList hosts = m.getHosts();
+                    int threadsWait = hosts.size();
+                    ThreadCounter tc = new ThreadCounter(threadsWait);
+
+                    try {
+                        synchronized (tc) {
+                            while (!hosts.isEmpty()) {
+                                agent.add((String) hosts.removeFirst(), m.getType(), m.getQuery(), m.getResultContainer(), tc);
+                            }
+
+                            while (tc.threadNum > 0) {
+                                tc.wait();
+                            }
+                        }
+                    } catch (InterruptedException ignored) {
+                        ignored.printStackTrace(System.err);
+                    }
+
+                    m.accomplished();
+                } catch (RuntimeException e) {
+                    // You might want to log something here
+                }
+            }
+        }
+    }
 }

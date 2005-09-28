@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.user;
 
@@ -39,122 +38,129 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRPrivilegeSet {
-	/** This vector holds all privileges of the org.mycore.user management system */
-	private ArrayList privileges = null;
+    /** This vector holds all privileges of the org.mycore.user management system */
+    private ArrayList privileges = null;
 
-	/** the class responsible for persistent datastore (configurable ) */
-	private MCRUserStore mcrUserStore;
+    /** the class responsible for persistent datastore (configurable ) */
+    private MCRUserStore mcrUserStore;
 
-	/** The one and only instance of this class */
-	private static MCRPrivilegeSet theInstance = null;
+    /** The one and only instance of this class */
+    private static MCRPrivilegeSet theInstance = null;
 
-	/** The instance of MCRConfiguration */
-	private MCRConfiguration conf = null;
+    /** The instance of MCRConfiguration */
+    private MCRConfiguration conf = null;
 
-	/** private constructor to create the singleton instance. */
-	private MCRPrivilegeSet() throws MCRException {
-		ArrayList privs = new ArrayList();
-		// Load the configuration
-		conf = MCRConfiguration.instance();
-		// Get the user store name
-		try {
-			String userStoreName = MCRConfiguration.instance().getString(
-					"MCR.userstore_class_name");
-			mcrUserStore = (MCRUserStore) Class.forName(userStoreName)
-					.newInstance();
-			privs = mcrUserStore.retrievePrivilegeSet();
-		} catch (Exception e) {
-			throw new MCRException("Can't instancied MCRPrivilegeSet.");
-		}
-		if (!(privs == null)) // There already exists a privilege set
-			this.privileges = privs;
-	}
+    /** private constructor to create the singleton instance. */
+    private MCRPrivilegeSet() throws MCRException {
+        ArrayList privs = new ArrayList();
 
-	/**
-	 * This method is the only way to get an instance of this class. It calls
-	 * the private constructor to create the singleton.
-	 * 
-	 * @return returns the one and only instance of <CODE>MCRPrivilegeSet
-	 *         </CODE>
-	 */
-	public final static synchronized MCRPrivilegeSet instance()
-			throws MCRException {
-		if (theInstance == null)
-			theInstance = new MCRPrivilegeSet();
-		return theInstance;
-	}
+        // Load the configuration
+        conf = MCRConfiguration.instance();
 
-	/**
-	 * This method takes a ArrayList of privileges as parameter and creates
-	 * resp. updates them in the persistent datastore.
-	 * 
-	 * @param privList
-	 *            ArrayList containing privilege objects
-	 */
-	public final void loadPrivileges(ArrayList privList) throws MCRException {
-		privList
-				.add(new MCRPrivilege("user administrator",
-						"Users with this privilege has administrator rights in the system."));
-		this.privileges = removeDouble(privList);
-		if (mcrUserStore.existsPrivilegeSet())
-			mcrUserStore.updatePrivilegeSet(this);
-		else
-			mcrUserStore.createPrivilegeSet(this);
-	}
+        // Get the user store name
+        try {
+            String userStoreName = MCRConfiguration.instance().getString("MCR.userstore_class_name");
+            mcrUserStore = (MCRUserStore) Class.forName(userStoreName).newInstance();
+            privs = mcrUserStore.retrievePrivilegeSet();
+        } catch (Exception e) {
+            throw new MCRException("Can't instancied MCRPrivilegeSet.");
+        }
 
-	/**
-	 * The method return the privileg set without doubles.
-	 */
-	private final ArrayList removeDouble(ArrayList privList) {
-		ArrayList n = new ArrayList();
-		for (int i = 0; i < privList.size(); i++) {
-			boolean test = false;
-			String name = ((MCRPrivilege) privList.get(i)).getName();
-			for (int j = 0; j < n.size(); j++) {
-				if (name.equals(((MCRPrivilege) n.get(j)).getName())) {
-					test = true;
-				}
-			}
-			if (!test) {
-				n.add(privList.get(i));
-			}
-		}
-		return n;
-	}
+        if (!(privs == null)) { // There already exists a privilege set
+            this.privileges = privs;
+        }
+    }
 
-	/**
-	 * @returns This method returns a ArrayList of strings containing all names
-	 *          of the privileges of the system.
-	 */
-	public final ArrayList getPrivileges() {
-		return privileges;
-	}
+    /**
+     * This method is the only way to get an instance of this class. It calls
+     * the private constructor to create the singleton.
+     * 
+     * @return returns the one and only instance of <CODE>MCRPrivilegeSet
+     *         </CODE>
+     */
+    public final static synchronized MCRPrivilegeSet instance() throws MCRException {
+        if (theInstance == null) {
+            theInstance = new MCRPrivilegeSet();
+        }
 
-	/**
-	 * @return This method returns the privilege set object as a DOM document.
-	 */
-	public synchronized org.jdom.Document toJDOMDocument() throws MCRException {
-		// Build the DOM
-		org.jdom.Element root = new org.jdom.Element("mycoreprivilege");
-		root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi",
-				MCRDefaults.XSI_URL));
-		root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",
-				MCRDefaults.XLINK_URL));
-		root.setAttribute("noNamespaceSchemaLocation", "MCRPrivilege.xsd",
-				org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-		for (int i = 0; i < privileges.size(); i++) {
-			MCRPrivilege currentPriv = (MCRPrivilege) privileges.get(i);
-			root.addContent(currentPriv.toJDOMElement());
-		}
-		org.jdom.Document jdomDoc = new org.jdom.Document(root);
-		return jdomDoc;
-	}
+        return theInstance;
+    }
 
-	/**
-	 * This helper method replaces null with an empty string and trims
-	 * whitespace from non-null strings.
-	 */
-	private static String trim(String s) {
-		return (s != null) ? s.trim() : "";
-	}
+    /**
+     * This method takes a ArrayList of privileges as parameter and creates
+     * resp. updates them in the persistent datastore.
+     * 
+     * @param privList
+     *            ArrayList containing privilege objects
+     */
+    public final void loadPrivileges(ArrayList privList) throws MCRException {
+        privList.add(new MCRPrivilege("user administrator", "Users with this privilege has administrator rights in the system."));
+        this.privileges = removeDouble(privList);
+
+        if (mcrUserStore.existsPrivilegeSet()) {
+            mcrUserStore.updatePrivilegeSet(this);
+        } else {
+            mcrUserStore.createPrivilegeSet(this);
+        }
+    }
+
+    /**
+     * The method return the privileg set without doubles.
+     */
+    private final ArrayList removeDouble(ArrayList privList) {
+        ArrayList n = new ArrayList();
+
+        for (int i = 0; i < privList.size(); i++) {
+            boolean test = false;
+            String name = ((MCRPrivilege) privList.get(i)).getName();
+
+            for (int j = 0; j < n.size(); j++) {
+                if (name.equals(((MCRPrivilege) n.get(j)).getName())) {
+                    test = true;
+                }
+            }
+
+            if (!test) {
+                n.add(privList.get(i));
+            }
+        }
+
+        return n;
+    }
+
+    /**
+     * @returns This method returns a ArrayList of strings containing all names
+     *          of the privileges of the system.
+     */
+    public final ArrayList getPrivileges() {
+        return privileges;
+    }
+
+    /**
+     * @return This method returns the privilege set object as a DOM document.
+     */
+    public synchronized org.jdom.Document toJDOMDocument() throws MCRException {
+        // Build the DOM
+        org.jdom.Element root = new org.jdom.Element("mycoreprivilege");
+        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        root.setAttribute("noNamespaceSchemaLocation", "MCRPrivilege.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+
+        for (int i = 0; i < privileges.size(); i++) {
+            MCRPrivilege currentPriv = (MCRPrivilege) privileges.get(i);
+            root.addContent(currentPriv.toJDOMElement());
+        }
+
+        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+
+        return jdomDoc;
+    }
+
+    /**
+     * This helper method replaces null with an empty string and trims
+     * whitespace from non-null strings.
+     */
+    private static String trim(String s) {
+        return (s != null) ? s.trim() : "";
+    }
 }

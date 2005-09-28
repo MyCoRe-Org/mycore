@@ -1,9 +1,9 @@
-/**
+/*
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
+ * along with this program, in a file called gpl.txt or license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ */
 
 package org.mycore.user;
 
@@ -32,7 +31,6 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -45,162 +43,155 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
-
 public class MCRLoginServlet extends MCRServlet {
-	// The configuration
-	private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
+    // The configuration
+    private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
 
-	// user ID and password of the guest user
-	private static String GUEST_ID;
+    // user ID and password of the guest user
+    private static String GUEST_ID;
 
-	private static String GUEST_PWD;
+    private static String GUEST_PWD;
 
-	public void init() throws ServletException {
-		super.init();
-		if (GUEST_ID == null || GUEST_PWD == null) {
-			GUEST_ID = CONFIG.getString("MCR.users_guestuser_username");
-			GUEST_PWD = CONFIG.getString("MCR.users_guestuser_userpasswd");
-		}
-	}
+    public void init() throws ServletException {
+        super.init();
 
-	/** This method overrides doGetPost of MCRServlet. */
-	public void doGetPost(MCRServletJob job) throws Exception {
-		boolean loginOk = false;
+        if ((GUEST_ID == null) || (GUEST_PWD == null)) {
+            GUEST_ID = CONFIG.getString("MCR.users_guestuser_username");
+            GUEST_PWD = CONFIG.getString("MCR.users_guestuser_userpasswd");
+        }
+    }
 
-		// Get the MCRSession object for the current thread from the session
-		// manager.
-		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    /** This method overrides doGetPost of MCRServlet. */
+    public void doGetPost(MCRServletJob job) throws Exception {
+        boolean loginOk = false;
 
-		String uid = getProperty(job.getRequest(), "uid");
-		String pwd = getProperty(job.getRequest(), "pwd");
-		String backto_url = getProperty(job.getRequest(), "url");
+        // Get the MCRSession object for the current thread from the session
+        // manager.
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-		if (uid != null)
-			uid = (uid.trim().length() == 0) ? null : uid.trim();
-		if (pwd != null)
-			pwd = (pwd.trim().length() == 0) ? null : pwd.trim();
-		if (backto_url != null)
-			backto_url = (backto_url.trim().length() == 0) ? null : backto_url
-					.trim();
+        String uid = getProperty(job.getRequest(), "uid");
+        String pwd = getProperty(job.getRequest(), "pwd");
+        String backto_url = getProperty(job.getRequest(), "url");
 
-		// Do not change login, just redirect to given url:
-		if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null)
-				&& (backto_url != null)) {
-			job.getResponse().sendRedirect(
-					job.getResponse().encodeRedirectURL(backto_url));
-			return;
-		}
+        if (uid != null) {
+            uid = (uid.trim().length() == 0) ? null : uid.trim();
+        }
 
-		if (backto_url == null)
-			backto_url = MCRServlet.getBaseURL();
+        if (pwd != null) {
+            pwd = (pwd.trim().length() == 0) ? null : pwd.trim();
+        }
 
-		org.jdom.Element root = new org.jdom.Element("mcr_user");
-		org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        if (backto_url != null) {
+            backto_url = (backto_url.trim().length() == 0) ? null : backto_url.trim();
+        }
 
-		root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
-		root
-				.addContent(new org.jdom.Element("guest_pwd")
-						.addContent(GUEST_PWD));
+        // Do not change login, just redirect to given url:
+        if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (backto_url != null)) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
 
-		try {
-			loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance()
-					.login(uid, pwd));
+            return;
+        }
 
-			// If the login attempt was successfull, change the user ID and
-			// forward to the
-			// UserServlet with mode=Select. However, if the user to login is
-			// the guest user,
-			// then the request will just be redirected to the originating URL,
-			// i.e. not
-			// forwarded to the UserServlet.
+        if (backto_url == null) {
+            backto_url = MCRServlet.getBaseURL();
+        }
 
-			if (loginOk) {
-				mcrSession.setCurrentUserID(uid);
-				LOGGER.info("MCRLoginServlet: user " + uid
-						+ " logged in successfully.");
+        org.jdom.Element root = new org.jdom.Element("mcr_user");
+        org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-				// We here put the list of groups separated by blanks as a
-				// string into the HTTP
-				// session. The LayoutServlet then forwards them to the XSL
-				// Stylesheets.
+        root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
+        root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
 
-				StringBuffer groups = new StringBuffer();
-				ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid)
-						.getGroupIDs();
+        try {
+            loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
 
-				for (int i = 0; i < groupList.size(); i++) {
-					groups.append((String) groupList.get(i)).append(" ");
-				}
-				job.getRequest().getSession().setAttribute("XSL.CurrentGroups",
-						groups.toString());
+            // If the login attempt was successfull, change the user ID and
+            // forward to the
+            // UserServlet with mode=Select. However, if the user to login is
+            // the guest user,
+            // then the request will just be redirected to the originating URL,
+            // i.e. not
+            // forwarded to the UserServlet.
+            if (loginOk) {
+                mcrSession.setCurrentUserID(uid);
+                LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
 
-				if (uid.equals(GUEST_ID)) {
-					job.getResponse().sendRedirect(backto_url);
-					return;
-				}
+                // We here put the list of groups separated by blanks as a
+                // string into the HTTP
+                // session. The LayoutServlet then forwards them to the XSL
+                // Stylesheets.
+                StringBuffer groups = new StringBuffer();
+                ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
 
-				RequestDispatcher rd = getServletContext().getNamedDispatcher(
-						"MCRUserServlet");
-				job.getRequest().removeAttribute("lang");
-				job.getRequest().setAttribute("lang",
-						mcrSession.getCurrentLanguage());
-				job.getRequest().removeAttribute("mode");
-				job.getRequest().setAttribute("mode", "Select");
-				rd.forward(job.getRequest(), job.getResponse());
-				return;
-			}
-			if (uid != null)
-				root.setAttribute("invalid_password", "true");
-		} catch (MCRException e) {
-			if (e.getMessage().equals("Error in UserStore.")) {
-				root.setAttribute("unknown_user", "true");
-				LOGGER.info("MCRLoginServlet: unknown user: " + uid);
-			} else if (e.getMessage().equals("Login denied. User is disabled.")) {
-				root.setAttribute("user_disabled", "true");
-				LOGGER.info("MCRLoginServlet: disabled user " + uid
-						+ " tried to login.");
-			} else {
-				LOGGER.debug("MCRLoginServlet: unknown error: "
-						+ e.getMessage());
-				throw e;
-			}
-		}
+                for (int i = 0; i < groupList.size(); i++) {
+                    groups.append((String) groupList.get(i)).append(" ");
+                }
 
-		root.addContent(new org.jdom.Element("backto_url")
-				.addContent(backto_url));
-		doLayout(job, "login", jdomDoc); // use the stylesheet
-		// mcr_user-login-*.xsl
-	}
+                job.getRequest().getSession().setAttribute("XSL.CurrentGroups", groups.toString());
 
-	/**
-	 * Gather information about the XML document to be shown and the
-	 * corresponding XSLT stylesheet and redirect the request to the
-	 * LayoutServlet
-	 * 
-	 * @param job
-	 *            The MCRServletJob instance
-	 * @param styleBase
-	 *            String value to select the correct XSL stylesheet
-	 * @param jdomDoc
-	 *            The XML representation to be presented by the LayoutServlet
-	 * @throws ServletException
-	 *             for errors from the servlet engine.
-	 * @throws IOException
-	 *             for java I/O errors.
-	 */
-	protected void doLayout(MCRServletJob job, String styleBase,
-			Document jdomDoc) throws ServletException, IOException {
-		String language = MCRSessionMgr.getCurrentSession()
-				.getCurrentLanguage();
-		String styleSheet = styleBase + "-" + language;
+                if (uid.equals(GUEST_ID)) {
+                    job.getResponse().sendRedirect(backto_url);
 
-		job.getRequest().getSession().setAttribute("mycore.language", language);
-		job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-		job.getRequest().setAttribute("XSL.Style", styleSheet);
+                    return;
+                }
 
-		RequestDispatcher rd = getServletContext().getNamedDispatcher(
-				"MCRLayoutServlet");
-		rd.forward(job.getRequest(), job.getResponse());
-	}
+                RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRUserServlet");
+                job.getRequest().removeAttribute("lang");
+                job.getRequest().setAttribute("lang", mcrSession.getCurrentLanguage());
+                job.getRequest().removeAttribute("mode");
+                job.getRequest().setAttribute("mode", "Select");
+                rd.forward(job.getRequest(), job.getResponse());
 
+                return;
+            }
+
+            if (uid != null) {
+                root.setAttribute("invalid_password", "true");
+            }
+        } catch (MCRException e) {
+            if (e.getMessage().equals("Error in UserStore.")) {
+                root.setAttribute("unknown_user", "true");
+                LOGGER.info("MCRLoginServlet: unknown user: " + uid);
+            } else if (e.getMessage().equals("Login denied. User is disabled.")) {
+                root.setAttribute("user_disabled", "true");
+                LOGGER.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
+            } else {
+                LOGGER.debug("MCRLoginServlet: unknown error: " + e.getMessage());
+                throw e;
+            }
+        }
+
+        root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
+        doLayout(job, "login", jdomDoc); // use the stylesheet
+
+        // mcr_user-login-*.xsl
+    }
+
+    /**
+     * Gather information about the XML document to be shown and the
+     * corresponding XSLT stylesheet and redirect the request to the
+     * LayoutServlet
+     * 
+     * @param job
+     *            The MCRServletJob instance
+     * @param styleBase
+     *            String value to select the correct XSL stylesheet
+     * @param jdomDoc
+     *            The XML representation to be presented by the LayoutServlet
+     * @throws ServletException
+     *             for errors from the servlet engine.
+     * @throws IOException
+     *             for java I/O errors.
+     */
+    protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws ServletException, IOException {
+        String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        String styleSheet = styleBase + "-" + language;
+
+        job.getRequest().getSession().setAttribute("mycore.language", language);
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
+        job.getRequest().setAttribute("XSL.Style", styleSheet);
+
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(job.getRequest(), job.getResponse());
+    }
 }
