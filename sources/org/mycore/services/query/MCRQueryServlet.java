@@ -45,6 +45,7 @@ import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRLayoutServlet;
@@ -146,6 +147,10 @@ public class MCRQueryServlet extends MCRServlet {
      *                for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+        // set the current IP
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        mcrSession.setCurrentIP(getRemoteAddr(job.getRequest()));
+
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         cachedFlag = false;

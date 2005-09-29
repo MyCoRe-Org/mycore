@@ -138,7 +138,7 @@ public class MCRAccessManager {
         MCRIPAddress ip;
 
         try {
-            ip = new MCRIPAddress(session.getIp());
+            ip = new MCRIPAddress(session.getCurrentIP());
         } catch (UnknownHostException e) {
             /* this should never happen */
             throw new MCRException("unknown host", e);

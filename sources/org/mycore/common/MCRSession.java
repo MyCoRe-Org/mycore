@@ -181,6 +181,7 @@ public class MCRSession implements Cloneable {
     public final void debug() {
         logger.debug("SessionID = " + sessionID);
         logger.debug("UserID    = " + userID);
+        logger.debug("IP        = " + ip);
         logger.debug("language  = " + language);
     }
 
@@ -194,11 +195,11 @@ public class MCRSession implements Cloneable {
         return map.get(key);
     }
 
-    public final void setIP(String ip) {
+    public final void setCurrentIP(String ip) {
         this.ip = ip;
     }
 
-    public String getIp() {
+    public String getCurrentIP() {
         return ip;
     }
 }
