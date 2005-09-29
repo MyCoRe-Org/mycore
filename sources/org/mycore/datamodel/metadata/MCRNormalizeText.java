@@ -79,13 +79,21 @@ public class MCRNormalizeText {
                 for (int j = 0; j < le; j++) {
                     org.jdom.Element metaelm = (org.jdom.Element) metaelms.get(j);
                     org.jdom.Element sub = metaelm.getChild("firstname");
-                    sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    if (sub != null) {
+                        sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    }
                     sub = metaelm.getChild("callname");
-                    sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    if (sub != null) {
+                        sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    }
                     sub = metaelm.getChild("fullname");
-                    sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    if (sub != null) {
+                        sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    }
                     sub = metaelm.getChild("surname");
-                    sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    if (sub != null) {
+                        sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    }
                 }
             }
 
@@ -96,7 +104,9 @@ public class MCRNormalizeText {
                 for (int j = 0; j < le; j++) {
                     org.jdom.Element metaelm = (org.jdom.Element) metaelms.get(j);
                     org.jdom.Element sub = metaelm.getChild("fullname");
-                    sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    if (sub != null) {
+                        sub.setText(MCRNormalizer.normalizeString(sub.getText()));
+                    }
                 }
             }
         }
