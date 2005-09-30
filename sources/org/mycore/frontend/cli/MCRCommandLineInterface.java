@@ -119,7 +119,7 @@ public class MCRCommandLineInterface {
                 obj = Class.forName(classname).newInstance();
             } catch (Exception e) {
                 String msg = "Could not instantiate class " + classname;
-                throw new org.mycore.common.MCRConfigurationException(msg);
+                throw new org.mycore.common.MCRConfigurationException(msg,e);
             }
             ArrayList commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
             knownCommands.addAll(commands);
