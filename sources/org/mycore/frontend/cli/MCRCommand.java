@@ -116,7 +116,7 @@ public class MCRCommand {
         if (helpText != null) {
             help = helpText;
         } else {
-            help = "";
+            help = "No help text available for this command";
         }
     }
 
