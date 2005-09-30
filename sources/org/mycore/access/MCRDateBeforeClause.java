@@ -48,7 +48,7 @@ class MCRDateBeforeClause implements MCRCondition {
     }
 
     public String toString() {
-        return "date < " + date + "\n";
+        return "date < " + date + " ";
     }
 
     public Element toXML() {

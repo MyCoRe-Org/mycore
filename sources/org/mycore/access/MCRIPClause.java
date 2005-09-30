@@ -51,7 +51,7 @@ class MCRIPClause implements MCRCondition {
     }
 
     public String toString() {
-        return "ip " + ip + "\n";
+        return "ip " + ip.toString() + " ";
     }
 
     public Element toXML() {

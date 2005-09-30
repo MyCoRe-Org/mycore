@@ -88,4 +88,11 @@ public class MCRIPAddress {
 
         return true;
     }
-};
+    
+    public String toString(){
+        String s = "";
+        for (int i=0; i<address.length; i++)
+            s+=(address[i]&255) + ".";
+        return s.substring(0,s.length()-1);
+    }
+}

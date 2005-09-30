@@ -46,7 +46,7 @@ class MCRUserClause implements MCRCondition {
     }
 
     public String toString() {
-        return "user " + user + "\n";
+        return "user " + user + " ";
     }
 
     public Element toXML() {
