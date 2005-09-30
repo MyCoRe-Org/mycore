@@ -225,7 +225,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
                 }
             }
         }
-
+        
         return ret;
     }
 
@@ -273,7 +273,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
                 if (operator.equals("=") || operator.equals("contains")) {
                     operator = "like";
                 }
-
+                value = value.replaceAll("\\*","%");
                 value = "\'%" + value + "%\'";
             }
 
