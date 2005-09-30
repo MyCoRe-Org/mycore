@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.102 $ $Date: 2005-09-27 12:58:22 $                      -->
+  <!-- $Revision: 1.102.2.1 $ $Date: 2005-09-30 08:03:03 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -15,8 +15,8 @@
   <property name="debug"          value="on" />
   <property name="optimize"       value="on" />
   <property name="deprecation"    value="on" />
-	  <property name="javatarget"     value="1.4" />
-	  <property name="sourcerelease"     value="1.4" />
+  <property name="javatarget"     value="1.4" />
+  <property name="sourcerelease"     value="1.4" />
   <!--property name="build.compiler"     value="jikes"/-->
   <property name="sourceencoding" value="ISO-8859-15" />
 
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.102 $ $Date: 2005-09-27 12:58:22 $</echo>
+    <echo>Ant build file   : $Revision: 1.102.2.1 $ $Date: 2005-09-30 08:03:03 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -578,9 +578,15 @@
   <target name="distribution">
     <antcall target="distribution.module">
       <param name="Distrib.Module" value="mycore" />
+      <param name="Distrib.ZipFile" value="mycore" />
     </antcall>
     <antcall target="distribution.module">
       <param name="Distrib.Module" value="docportal" />
+      <param name="Distrib.ZipFile" value="docportal" />
+    </antcall>
+    <antcall target="distribution.module">
+      <param name="Distrib.Module" value="content/defaultsample" />
+      <param name="Distrib.ZipFile" value="defaultsample" />
     </antcall>
   </target>
 
@@ -602,23 +608,23 @@
       dest="${Distrib.TmpDir}"
     />
 
-    <zip destfile="${Distrib.TargetDir}/${Distrib.Module}-${Distrib.ReleaseNr}.zip"
+    <zip destfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.zip"
       basedir="${Distrib.TmpDir}"
       includes="${Distrib.Module}/**"
       encoding="ISO_8859_1"
     />
 
-    <tar tarfile="${Distrib.TmpDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar"
+    <tar tarfile="${Distrib.TmpDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar"
       basedir="${Distrib.TmpDir}"
       includes="${Distrib.Module}/**"
       longfile="gnu"
     />
 
-    <gzip src="${Distrib.TmpDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar" zipfile="${Distrib.TargetDir}/${Distrib.Module}-${Distrib.ReleaseNr}.tar.gz" />
+    <gzip src="${Distrib.TmpDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar" zipfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar.gz" />
 
     <delete dir="${Distrib.TmpDir}" />
 
-    <chmod dir="${Distrib.TargetDir}" includes="${Distrib.Module}-${Distrib.ReleaseNr}.*" perm="a+r" />
+    <chmod dir="${Distrib.TargetDir}" includes="${Distrib.ZipFile}-${Distrib.ReleaseNr}.*" perm="a+r" />
 
   </target>
 
