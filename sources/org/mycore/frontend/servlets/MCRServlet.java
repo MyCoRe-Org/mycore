@@ -235,6 +235,11 @@ public class MCRServlet extends HttpServlet {
                 session.setCurrentLanguage(lang.trim());
             }
 
+            // Set the IP of the current session
+            if (session.getCurrentIP().length() == 0) {
+                session.setCurrentIP(getRemoteAddr(req));
+                }
+
             if (GETorPOST == GET) {
                 doGet(job);
             } else {

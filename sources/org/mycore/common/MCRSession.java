@@ -76,11 +76,7 @@ public class MCRSession implements Cloneable {
         userID = config.getString("MCR.users_guestuser_username", "gast");
         language = config.getString("MCR.metadata_default_lang", "de");
 
-        try {
-            ip = java.net.InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException ignored) {
-        }
-
+        ip = "";
         sessionID = buildSessionID();
         sessions.put(sessionID, this);
 
@@ -105,14 +101,9 @@ public class MCRSession implements Cloneable {
      * and IP address of host where the code runs.
      */
     private static synchronized String buildSessionID() {
-        String ip = "127.0.0.1";
+        String localip = getLocalIP();
 
-        try {
-            ip = java.net.InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException ignored) {
-        }
-
-        java.util.StringTokenizer st = new java.util.StringTokenizer(ip, ".");
+        java.util.StringTokenizer st = new java.util.StringTokenizer(localip, ".");
 
         long sum = Integer.parseInt(st.nextToken());
 
@@ -181,6 +172,7 @@ public class MCRSession implements Cloneable {
     public final void debug() {
         logger.debug("SessionID = " + sessionID);
         logger.debug("UserID    = " + userID);
+        logger.debug("IP        = " + ip);
         logger.debug("language  = " + language);
     }
 
@@ -194,11 +186,32 @@ public class MCRSession implements Cloneable {
         return map.get(key);
     }
 
-    public final void setIP(String ip) {
-        this.ip = ip;
+    /** Get the ip value to the local IP */
+    public static final String getLocalIP() {
+        try {
+            return java.net.InetAddress.getLocalHost().getHostAddress();
+        } catch (java.net.UnknownHostException ignored) {
+            return "127.0.0.1";
+        }
     }
 
-    public String getIp() {
+    /** Get the current ip value */
+    public String getCurrentIP() {
         return ip;
     }
+
+    /** Set the ip to the given IP */
+    public final void setCurrentIP(String newip) {
+        java.util.StringTokenizer st = new java.util.StringTokenizer(newip, ".");
+        if (st.countTokens() != 4) return;
+        while (st.hasMoreTokens()) {
+            try {
+                int i = Integer.parseInt(st.nextToken());
+            } catch ( Exception e) {
+                return;
+            }
+        }
+        this.ip = newip;
+    }
+
 }

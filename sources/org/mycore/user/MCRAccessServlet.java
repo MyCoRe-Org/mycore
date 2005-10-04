@@ -128,22 +128,25 @@ public class MCRAccessServlet extends MCRServlet {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userid = mcrSession.getCurrentUserID();
         LOGGER.debug("Access check for user " + userid);
+        String currip = mcrSession.getCurrentIP();
+        LOGGER.debug("Access check for ip " + currip);
 
         // check for mode reader
         if (mode.equals("reader")) {
-            if (LOGGER.isDebugEnabled()) {
-                StringBuffer sb = new StringBuffer();
-                sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("](").append(!retip).append(") and privilege [").append(privilege).append("](").append(!retpriv).append(')');
-                LOGGER.debug(sb.toString());
-            }
 
             // check the data
             if (!retip) {
-                retip = checkIP(ip, job);
+                retip = checkIP(currip, ip);
             }
 
             if (!retpriv) {
                 retpriv = checkPrivileg(privilege, userid);
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("](").append(retip).append(") and privilege [").append(privilege).append("](").append(retpriv).append(')');
+                LOGGER.debug(sb.toString());
             }
 
             result = retip && retpriv;
@@ -151,15 +154,10 @@ public class MCRAccessServlet extends MCRServlet {
 
         // check for mode editor
         if (mode.equals("editor")) {
-            if (LOGGER.isDebugEnabled()) {
-                StringBuffer sb = new StringBuffer();
-                sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("](").append(!retip).append(')').append(" and users [").append(userlist).append("](").append(!retuser).append(") and privilege [").append(privilege).append("](").append(!retpriv).append(')');
-                LOGGER.debug(sb.toString());
-            }
 
             // check the data
             if (!retip) {
-                retip = checkIP(ip, job);
+                retip = checkIP(currip, ip);
             }
 
             if (!retpriv) {
@@ -168,6 +166,12 @@ public class MCRAccessServlet extends MCRServlet {
 
             if (!retuser) {
                 retuser = checkGroupMember(userid, userset);
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("Access check in mode ").append(mode).append(" for ip [").append(ip).append("](").append(!retip).append(')').append(" and users [").append(userlist).append("](").append(!retuser).append(") and privilege [").append(privilege).append("](").append(!retpriv).append(')');
+                LOGGER.debug(sb.toString());
             }
 
             result = retip && retpriv && retuser;
@@ -190,13 +194,13 @@ public class MCRAccessServlet extends MCRServlet {
      * The method check the given host or domain name against the current ip of
      * this session.
      * 
+     * @param currip
+     *            the IP of the current session
      * @param ip
      *            the host or domain name
-     * @param job
-     *            the current job
      * @return true if the current session is in the host or domain name.
      */
-    boolean checkIP(String ip, MCRServletJob job) {
+    boolean checkIP(String currip, String ip) {
         String ipAddr;
         String subNet;
         int i = ip.indexOf("/");
@@ -210,10 +214,8 @@ public class MCRAccessServlet extends MCRServlet {
             subNet = "255.255.255.255";
         }
 
-        String remAddr = getRemoteAddr(job.getRequest());
-
         try {
-            return MCRAccessChecker.isInetAddressInSubnet(remAddr, ipAddr, subNet);
+            return MCRAccessChecker.isInetAddressInSubnet(currip, ipAddr, subNet);
         } catch (UnknownHostException e) {
             LOGGER.info("Unknown Host while checking ip : " + ip, e);
 
