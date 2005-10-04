@@ -951,7 +951,10 @@ public class WCMSActionServlet extends WCMSServlet {
 
                             Element actElem = findActElem(root, "lang", defaultLang, ns);
                             actElem.setAttribute("title", label);
-                            actElem.setContent(html.cloneContent());
+							if (html.getName().equals("dummyRoot")){
+								actElem.setContent(html.cloneContent());
+							}
+							else actElem.setContent((Element)html.clone());
                         } catch (Exception ex) {
                             logger.error("Error while updating document, update rejected.", ex);
                         }
