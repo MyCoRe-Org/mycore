@@ -147,10 +147,6 @@ public class MCRQueryServlet extends MCRServlet {
      *                for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
-        // set the current IP
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setCurrentIP(getRemoteAddr(job.getRequest()));
-
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         cachedFlag = false;

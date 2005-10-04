@@ -71,10 +71,6 @@ public class MCRObjectServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws ServletException, Exception {
-        // set the current IP
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setCurrentIP(getRemoteAddr(job.getRequest()));
-
         // the urn with information about the MCRObjectID
         String uri = job.getRequest().getPathInfo();
         String id = "";
@@ -106,6 +102,7 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         // call the LayoutServlet
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String lang = mcrSession.getCurrentLanguage();
 
         if (getProperty(job.getRequest(), "XSL.Style") == null) {

@@ -137,6 +137,7 @@ public class MCRCommandLineInterface {
         config = MCRConfiguration.instance();
         logger = Logger.getLogger(MCRCommandLineInterface.class);
         session = MCRSessionMgr.getCurrentSession();
+        session.setCurrentIP(MCRSession.getLocalIP());
         system = config.getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
         System.out.println();
