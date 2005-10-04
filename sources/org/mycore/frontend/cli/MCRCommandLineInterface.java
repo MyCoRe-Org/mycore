@@ -78,6 +78,9 @@ public class MCRCommandLineInterface {
 
     /** The current session */
     private static MCRSession session = null;
+    
+    /** If true, main() method will terminate after catched exception */
+    private static boolean terminateAfterException = false;
 
     /**
      * Reads command definitions from a configuration file and builds the
@@ -144,7 +147,7 @@ public class MCRCommandLineInterface {
         try {
             initCommands();
         } catch (Exception ex) {
-            showException(ex);
+            showException(ex, false);
             System.exit(1);
         }
 
@@ -202,6 +205,7 @@ public class MCRCommandLineInterface {
             }
         } while ((line = line.trim()).length() == 0);
 
+        terminateAfterException = false;
         return line;
     }
 
@@ -224,7 +228,7 @@ public class MCRCommandLineInterface {
 
             System.out.println(system + " Command not understood. Enter 'help' to get a list of commands.");
         } catch (Exception ex) {
-            showException(ex);
+            showException(ex, false);
         }
     }
 
@@ -234,10 +238,15 @@ public class MCRCommandLineInterface {
      * @param ex
      *            The exception that was catched while processing a command
      */
-    protected static void showException(Throwable ex) {
+    protected static void showException(Throwable ex, boolean child) {
         if (ex instanceof InvocationTargetException) {
             ex = ((InvocationTargetException) ex).getTargetException();
-            showException(ex);
+            showException(ex, false);
+            return;
+        }
+        else if (ex instanceof ExceptionInInitializerError) {
+            ex = ((ExceptionInInitializerError) ex).getCause();
+            showException(ex, false);
             return;
         }
 
@@ -257,9 +266,12 @@ public class MCRCommandLineInterface {
             if (ex != null) {
                 System.out.println(system);
                 System.out.println(system + " This exception was caused by:");
-                showException(ex);
+                showException(ex, true);
             }
         }
+        
+        if( (! child) && terminateAfterException )
+          System.exit( 1 );
     }
 
     /**
@@ -292,6 +304,8 @@ public class MCRCommandLineInterface {
         }
 
         reader.close();
+        
+        terminateAfterException = true; // we are in batch mode now
     }
 
     /**
