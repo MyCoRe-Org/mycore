@@ -867,6 +867,10 @@ final public class MCRObject extends MCRBase {
         mcr_persist.update(this);
         deleteLinksFromTable();
         addLinksToTable();
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
+        evt.put("object", this);
+        MCREventManager.instance().handleEvent(evt);
     }
 
     /**
