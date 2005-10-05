@@ -454,11 +454,15 @@ public abstract class MCRClassificationObject {
     public MCRCategoryItem[] getChildren() {
         ensureNotDeleted();
 
-        MCRCategoryItem[] children;
+        MCRCategoryItem[] children = null;
 
         if (childrenIDs == null) {
             String parentID = ((this instanceof MCRCategoryItem) ? ID : null);
-            children = manager().retrieveChildren(getClassificationID(), parentID);
+            try {
+                children = manager().retrieveChildren(getClassificationID(), parentID);
+            } catch (Exception e) {
+                return children;
+            }
             childrenIDs = new String[children.length];
 
             for (int i = 0; i < children.length; i++)
@@ -481,8 +485,13 @@ public abstract class MCRClassificationObject {
 
         MCRCategoryItem[] children = getChildren();
 
-        for (int i = 0; i < children.length; i++)
-            children[i].delete();
+        if (children != null) {
+            for (int i = 0; i < children.length; i++)
+                try {
+                    children[i].delete();
+                } catch (Exception e) {
+                }
+        }
 
         deleted = true;
     }
