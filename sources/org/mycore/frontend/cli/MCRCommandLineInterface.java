@@ -220,7 +220,7 @@ public class MCRCommandLineInterface {
     protected static void processCommand(String command) {
         try {
             for (int i = 0; i < knownCommands.size(); i++) {
-                if (((MCRCommand) knownCommands.get(i)).invoke(command)) {
+                if (((MCRCommand) knownCommands.get(i)).invoke(command.trim())) {
                     System.out.println(system + " Command done.");
 
                     return;
