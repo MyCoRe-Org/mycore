@@ -157,13 +157,19 @@ class MCRClassificationManager {
     }
 
     void deleteClassificationItem(String classifID) {
-        classificationCache.remove(classifID);
-        store.deleteClassificationItem(classifID);
+        try {
+            classificationCache.remove(classifID);
+            store.deleteClassificationItem(classifID);
+        } catch (Exception e) {
+        }
     }
 
     void deleteCategoryItem(String classifID, String categID) {
-        categoryCache.remove(classifID + "@@" + categID);
-        store.deleteCategoryItem(classifID, categID);
+        try {
+            categoryCache.remove(classifID + "@@" + categID);
+            store.deleteCategoryItem(classifID, categID);
+        } catch (Exception e) {
+        }
     }
 
     protected String getCachingID(MCRCategoryItem category) {
