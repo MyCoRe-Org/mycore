@@ -166,7 +166,7 @@ public class MCRSQLStatement {
             String column = (String) (keys.nextElement());
             String value = getSQLValue(column);
 
-            columnList.append(" ").append("`" + column + "`");
+            columnList.append(" ").append( column );
             valueList.append(" ").append(value);
 
             if (keys.hasMoreElements()) {
