@@ -180,19 +180,20 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      */
     public final int countTo(String to) {
         String sql = new MCRSQLStatement(tableName).setCondition("MCRTO", to).toCountStatement("MCRFROM");
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(sql);
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         int num = 0;
 
         try {
+            MCRSQLRowReader reader = conn.doQuery(sql);
             if (reader.next()) {
                 num = reader.getInt("NUMBER");
             }
-
+            reader.close();
             return num;
         } catch (Exception e) {
             throw new MCRException("SQL counter error", e);
         } finally {
-            reader.close();
+            conn.release();
         }
     }
 
@@ -234,19 +235,20 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 
         logger.info("STATEMENT:    " + select);
 
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(select.toString());
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         int num = 0;
 
         try {
+            MCRSQLRowReader reader = conn.doQuery(select.toString());
             if (reader.next()) {
                 num = reader.getInt("NUMBER");
             }
-
+            reader.close();
             return num;
         } catch (Exception e) {
             throw new MCRException("SQL counter error", e);
         } finally {
-            reader.close();
+            conn.release();
         }
     }
 }

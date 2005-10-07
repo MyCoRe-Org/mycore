@@ -260,25 +260,6 @@ public class MCRSQLConnection {
     }
 
     /**
-     * Executes an SQL select statement, using any currently free connection
-     * from the pool. The results of the query are returned as MCRSQLRowReader
-     * instance.
-     * 
-     * @param query
-     *            the SQL select statement to be executed
-     * @return the MCRSQLRowReader that can be used for reading the result rows
-     */
-    public static MCRSQLRowReader justDoQuery(String query) throws MCRPersistenceException {
-        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-
-        try {
-            return c.doQuery(query);
-        } finally {
-            c.release();
-        }
-    }
-
-    /**
      * Executes an SQL update statement, using any currently free connection
      * from the pool.
      * 

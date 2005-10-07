@@ -56,7 +56,7 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
     private void createTable() {
         MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table).addColumn("ID CHAR(16) NOT NULL PRIMARY KEY").addColumn("PID CHAR(16)").addColumn("TYPE CHAR(1) NOT NULL").addColumn("OWNER VARCHAR(" + Integer.toString(MCRObjectID.MAX_LENGTH) + ") NOT NULL").addColumn("NAME VARCHAR(250) NOT NULL").addColumn("LABEL VARCHAR(250)").addColumn("SIZE BIGINT NOT NULL")
                 .addColumn("DATE TIMESTAMP NOT NULL").addColumn("STOREID VARCHAR(32)").addColumn("STORAGEID VARCHAR(250)").addColumn("FCTID VARCHAR(32)").addColumn("MD5 CHAR(32)").addColumn("NUMCHDD INTEGER") // direct
-                                                                                                                                                                                                                    // directories
+                // directories
                 .addColumn("NUMCHDF INTEGER") // direct files
                 .addColumn("NUMCHTD INTEGER") // total directories
                 .addColumn("NUMCHTF INTEGER") // total files
@@ -139,12 +139,17 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
     }
 
     public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table).setCondition("ID", ID).toSelectStatement());
-
-        if (reader.next()) {
-            return buildNodeFromReader(reader);
-        } else {
-            return null;
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(table).setCondition("ID", ID).toSelectStatement());
+            MCRFilesystemNode node = null;
+            if (reader.next()) {
+                node = buildNodeFromReader(reader);
+            }
+            reader.close();
+            return node;
+        } finally {
+            conn.release();
         }
     }
 
@@ -170,28 +175,46 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
     }
 
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table).setCondition("PID", null).setCondition("OWNER", ownerID).toSelectStatement());
-
-        return (reader.next() ? reader.getString("ID") : null);
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        String res = null;
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(table).setCondition("PID", null).setCondition("OWNER", ownerID).toSelectStatement());
+            if (reader.next())
+                res = reader.getString("ID");
+            reader.close();
+        } finally {
+            conn.release();
+        }
+        return res;
     }
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table).setCondition("PID", parentID).setCondition("NAME", name).toSelectStatement());
-
-        if (reader.next()) {
-            return buildNodeFromReader(reader);
-        } else {
-            return null;
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(table).setCondition("PID", parentID).setCondition("NAME", name).toSelectStatement());
+            MCRFilesystemNode node = null;
+            if (reader.next()) {
+                node = buildNodeFromReader(reader);
+            }
+            reader.close();
+            return node;
+        } finally {
+            conn.release();
         }
     }
 
     public Vector retrieveChildrenIDs(String parentID) throws MCRPersistenceException {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(table).setCondition("PID", parentID).toSelectStatement());
-
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         Vector childrenIDs = new Vector();
 
-        while (reader.next())
-            childrenIDs.addElement(reader.getString("ID"));
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(table).setCondition("PID", parentID).toSelectStatement());
+            while (reader.next())
+                childrenIDs.addElement(reader.getString("ID"));
+            reader.close();
+        } finally {
+            conn.release();
+        }
 
         return childrenIDs;
     }

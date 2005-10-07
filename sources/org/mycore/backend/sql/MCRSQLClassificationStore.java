@@ -218,20 +218,23 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      *            the ID of the MCRClassificationItem
      */
     public final MCRClassificationItem retrieveClassificationItem(String ID) {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableClass).setCondition("ID", ID).toSelectStatement());
+        String query = new MCRSQLStatement(tableClassLabel).setCondition("ID", ID).toSelectStatement();
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
 
-        if (!reader.next()) {
-            return null;
-        }
-
-        MCRClassificationItem c = new MCRClassificationItem(ID);
-        reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableClassLabel).setCondition("ID", ID).toSelectStatement());
-
-        while (reader.next()) {
-            String lang = reader.getString("LANG");
-            String text = reader.getString("TEXT");
-            String desc = reader.getString("MCRDESC");
-            c.addData(lang, text, desc);
+        MCRClassificationItem c = null;
+        try {
+            MCRSQLRowReader reader = conn.doQuery(query);
+            while (reader.next()) {
+                if (c == null)
+                    c = new MCRClassificationItem(ID);
+                String lang = reader.getString("LANG");
+                String text = reader.getString("TEXT");
+                String desc = reader.getString("MCRDESC");
+                c.addData(lang, text, desc);
+            }
+            reader.close();
+        } finally {
+            conn.release();
         }
 
         return c;
@@ -288,41 +291,44 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      *            the ID of the MCRCategoryItem
      */
     public final MCRCategoryItem retrieveCategoryItem(String CLID, String ID) {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
-
-        if (!reader.next()) {
-            return null;
-        }
-
-        String PID = reader.getString("PID");
-        String URL = "";
-
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         try {
-            URL = reader.getString("URL");
-        } catch (Exception e) {
-            URL = "";
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
+
+            if (!reader.next()) {
+                return null;
+            }
+
+            String PID = reader.getString("PID");
+            String URL = "";
+
+            try {
+                URL = reader.getString("URL");
+            } catch (Exception e) {
+                URL = "";
+            }
+
+            if (URL == null) {
+                URL = "";
+            }
+            reader.close();
+
+            MCRCategoryItem c = new MCRCategoryItem(ID, CLID, PID);
+            c.setURL(URL);
+            reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
+
+            while (reader.next()) {
+                String lang = reader.getString("LANG");
+                String text = reader.getString("TEXT");
+                String desc = reader.getString("MCRDESC");
+                c.addData(lang, text, desc);
+            }
+            reader.close();
+
+            return c;
+        } finally {
+            conn.release();
         }
-
-        if (URL == null) {
-            URL = "";
-        }
-
-        MCRCategoryItem c = new MCRCategoryItem(ID, CLID, PID);
-        c.setURL(URL);
-        reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
-
-        if (!reader.next()) {
-            return null;
-        }
-
-        do {
-            String lang = reader.getString("LANG");
-            String text = reader.getString("TEXT");
-            String desc = reader.getString("MCRDESC");
-            c.addData(lang, text, desc);
-        } while (reader.next());
-
-        return c;
     }
 
     /**
@@ -334,39 +340,51 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      *            the label text of the MCRCategoryItem
      */
     public MCRCategoryItem retrieveCategoryItemForLabelText(String CLID, String labeltext) {
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCategLabel).setCondition("TEXT", labeltext).setCondition("CLID", CLID).toSelectStatement());
-
-        if (!reader.next()) {
-            return null;
-        }
-
-        String ID = reader.getString("ID");
-        String lang = reader.getString("LANG");
-        String text = reader.getString("TEXT");
-        String desc = reader.getString("MCRDESC");
-        MCRCategoryItem c = new MCRCategoryItem(ID, CLID, "");
-        c.addData(lang, text, desc);
-        reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
-
-        if (!reader.next()) {
-            return null;
-        }
-
-        String URL = "";
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
 
         try {
-            URL = reader.getString("URL");
-        } catch (Exception e) {
-            URL = "";
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("TEXT", labeltext).setCondition("CLID", CLID).toSelectStatement());
+            boolean found = reader.next();
+            reader.close();
+
+            if (!found) {
+                return null;
+            }
+
+            String ID = reader.getString("ID");
+            String lang = reader.getString("LANG");
+            String text = reader.getString("TEXT");
+            String desc = reader.getString("MCRDESC");
+            MCRCategoryItem c = new MCRCategoryItem(ID, CLID, "");
+            c.addData(lang, text, desc);
+            reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
+            found = reader.next();
+
+            if (!found) {
+                reader.close();
+                return null;
+            }
+
+            String URL = "";
+
+            try {
+                URL = reader.getString("URL");
+            } catch (Exception e) {
+                URL = "";
+            }
+
+            if (URL == null) {
+                URL = "";
+            }
+
+            reader.close();
+
+            c.setURL(URL);
+
+            return c;
+        } finally {
+            conn.release();
         }
-
-        if (URL == null) {
-            URL = "";
-        }
-
-        c.setURL(URL);
-
-        return c;
     }
 
     /**
@@ -393,37 +411,43 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      */
     public final ArrayList retrieveChildren(String CLID, String PID) {
         ArrayList children = new ArrayList();
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCateg).setCondition("PID", PID).setCondition("CLID", CLID).toSelectStatement());
-        logger.debug("Generiertes Statement: " + new MCRSQLStatement(tableCateg).setCondition("PID", PID).setCondition("CLID", CLID).toSelectStatement());
-
-        while (reader.next()) {
-            String ID = reader.getString("ID");
-            String URL = "";
-
-            try {
-                URL = reader.getString("URL");
-            } catch (Exception e) {
-                URL = "";
-            }
-
-            if (URL == null) {
-                URL = "";
-            }
-
-            MCRCategoryItem child = new MCRCategoryItem(ID, CLID, PID);
-            child.setURL(URL);
-            children.add(child);
-        }
-
-        for (int i = 0; i < children.size(); i++) {
-            reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ((MCRCategoryItem) children.get(i)).getID()).setCondition("CLID", CLID).toSelectStatement());
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("PID", PID).setCondition("CLID", CLID).toSelectStatement());
 
             while (reader.next()) {
-                String lang = reader.getString("LANG");
-                String text = reader.getString("TEXT");
-                String desc = reader.getString("MCRDESC");
-                ((MCRCategoryItem) children.get(i)).addData(lang, text, desc);
+                String ID = reader.getString("ID");
+                String URL = "";
+
+                try {
+                    URL = reader.getString("URL");
+                } catch (Exception e) {
+                    URL = "";
+                }
+
+                if (URL == null) {
+                    URL = "";
+                }
+
+                MCRCategoryItem child = new MCRCategoryItem(ID, CLID, PID);
+                child.setURL(URL);
+                children.add(child);
             }
+            reader.close();
+
+            for (int i = 0; i < children.size(); i++) {
+                reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ((MCRCategoryItem) children.get(i)).getID()).setCondition("CLID", CLID).toSelectStatement());
+
+                while (reader.next()) {
+                    String lang = reader.getString("LANG");
+                    String text = reader.getString("TEXT");
+                    String desc = reader.getString("MCRDESC");
+                    ((MCRCategoryItem) children.get(i)).addData(lang, text, desc);
+                }
+                reader.close();
+            }
+        } finally {
+            conn.release();
         }
 
         return children;
@@ -451,14 +475,20 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
         int len = MCRSQLConnection.justCountRows(new MCRSQLStatement(tableClass).addColumn("ID").toRowSelector());
         logger.debug("Number of classifications = " + Integer.toString(len));
 
-        MCRSQLRowReader reader = MCRSQLConnection.justDoQuery(new MCRSQLStatement(tableClass).addColumn("ID").toSelectStatement());
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         String[] ID = new String[len];
-        int i = 0;
+        try {
+            MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(tableClass).addColumn("ID").toSelectStatement());
+            int i = 0;
 
-        while (reader.next()) {
-            ID[i] = reader.getString("ID");
-            logger.debug("ID of classifications[" + Integer.toString(i) + "] = " + ID[i]);
-            i++;
+            while (reader.next()) {
+                ID[i] = reader.getString("ID");
+                logger.debug("ID of classifications[" + Integer.toString(i) + "] = " + ID[i]);
+                i++;
+            }
+            reader.close();
+        } finally {
+            conn.release();
         }
 
         return ID;
