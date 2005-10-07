@@ -155,8 +155,6 @@ public class MCRSQLConnectionPool {
             return;
         }
 
-        connection.use();
-
         if (usedConnections.contains(connection)) {
             usedConnections.removeElement(connection);
         }
