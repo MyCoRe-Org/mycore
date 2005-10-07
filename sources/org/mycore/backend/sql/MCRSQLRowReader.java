@@ -29,7 +29,6 @@ import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 
 /**
@@ -77,18 +76,7 @@ public class MCRSQLRowReader {
                 numRowsRead++;
             return hasNext;
         } catch (SQLException ex) {
-            String sql = "" + ex.getMessage();
-            String clazz = ex.getClass().getName();
-            if ((sql.indexOf("result set closed") >= 0) && (clazz.toLowerCase().indexOf("db2") >= 0)) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("DB2 result set already closed, but next() was called");
-                    LOGGER.debug(clazz + ": " + sql);
-                    LOGGER.debug("Number of rows read from result set was " + numRowsRead);
-                    LOGGER.debug(MCRException.getStackTraceAsString(ex));
-                }
-                return false;
-            } else
-                throw new MCRPersistenceException("Could not call next() on JDBC result set", ex);
+            throw new MCRPersistenceException("Could not call next() on JDBC result set", ex);
         }
     }
 
