@@ -68,16 +68,19 @@ public class MCRSQLConnection {
     /** The number of usages of this connection so far * */
     private int numUsages = 0;
 
+    private long lastUse;
+
     /** The maximum number of usages of this connection * */
     private static int maxUsages = Integer.MAX_VALUE;
+
+    /** The maximum age a connection can be before it is reconnected */
+    private static long maxAge = 3600 * 1000; // 1 hour
 
     private static String url;
 
     private static String userID;
 
     private static String password;
-
-    long lastUse;
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -99,11 +102,13 @@ public class MCRSQLConnection {
     }
 
     void use() {
+        long age = System.currentTimeMillis() - lastUse;
+        if ((numUsages > maxUsages) || (age > maxAge)) {
+            closeJDBCConnection();
+            buildJDBCConnection();
+        }
+        numUsages = 0;
         lastUse = System.currentTimeMillis();
-    }
-
-    long lastUse() {
-        return lastUse;
     }
 
     private void buildJDBCConnection() throws MCRPersistenceException {
@@ -130,13 +135,6 @@ public class MCRSQLConnection {
      */
     public void release() {
         numUsages++;
-
-        if (numUsages >= maxUsages) {
-            closeJDBCConnection();
-            numUsages = 0;
-            buildJDBCConnection();
-        }
-
         MCRSQLConnectionPool.instance().releaseConnection(this);
     }
 
@@ -152,9 +150,10 @@ public class MCRSQLConnection {
 
     void closeJDBCConnection() throws MCRPersistenceException {
         try {
+            logger.debug("MCRSQLConnection: Closing connection to JDBC datastore");
             connection.close();
         } catch (Exception exc) {
-            MCRSQLConnectionPool.getLogger().warn("Exception while closing JDBC connection");
+            MCRSQLConnectionPool.getLogger().warn("Exception while closing JDBC connection", exc);
         }
     }
 
