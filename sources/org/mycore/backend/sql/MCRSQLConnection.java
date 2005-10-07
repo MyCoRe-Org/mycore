@@ -106,8 +106,9 @@ public class MCRSQLConnection {
         if ((numUsages > maxUsages) || (age > maxAge)) {
             closeJDBCConnection();
             buildJDBCConnection();
+            numUsages = 0;
         }
-        numUsages = 0;
+        numUsages++;
         lastUse = System.currentTimeMillis();
     }
 
@@ -134,7 +135,6 @@ public class MCRSQLConnection {
      * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
      */
     public void release() {
-        numUsages++;
         MCRSQLConnectionPool.instance().releaseConnection(this);
     }
 
