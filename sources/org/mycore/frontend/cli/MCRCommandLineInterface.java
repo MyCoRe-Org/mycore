@@ -160,7 +160,7 @@ public class MCRCommandLineInterface {
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < args.length; i++)
                 sb.append(args[i]).append(" ");
-            String line = sb.toString();
+            String line = sb.toString().trim();
 
             int pos = line.indexOf(";;");
             if (pos == -1)
