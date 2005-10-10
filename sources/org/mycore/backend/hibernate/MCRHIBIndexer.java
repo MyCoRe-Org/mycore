@@ -154,7 +154,6 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
 
                 Iterator it = queryManager.getQueryFields().keySet().iterator();
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
-                map.addColumn("mcrtype", "MCRTYPE", new StringType(), 64, true, false, false);
 
                 while (it.hasNext()) {
                     Element el = (Element) queryManager.getQueryFields().get((String) it.next());
