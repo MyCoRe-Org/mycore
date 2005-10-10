@@ -66,7 +66,6 @@ public class GenClasses {
             Iterator it = searchfields.keySet().iterator();
 
             jc.addField("String", "mcrid");
-            jc.addField("String", "mcrtype");
 
             while (it.hasNext()) {
                 Element el = (Element) searchfields.get((String) it.next());

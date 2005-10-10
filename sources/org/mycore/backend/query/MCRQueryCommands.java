@@ -49,12 +49,13 @@ public class MCRQueryCommands extends MCRAbstractCommands {
     }
 
     public static void init() {
-        MCRQueryManager querymanager = MCRQueryManager.getInstance();
-        querymanager.createDataBase("", querymanager.getSearchDefinition());
+        MCRQueryManager.getInstance().createDataBase();
     }
 
     public static void runQuery() {
-        MCRResults res = MCRQueryManager.getInstance().runQuery(MCRQueryManager.getInstance().getQuery());
+        MCRResults res = MCRQueryManager.getInstance().search(MCRQueryManager.getInstance().getQuery());
         System.out.println(res.toString());
     }
+    
+    
 }

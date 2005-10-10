@@ -24,19 +24,19 @@
 package org.mycore.backend.query;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.services.fieldquery.MCRResults;
+//import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearcherBase;
 
-public abstract class MCRQuerySearcher {
-    public abstract MCRResults runQuery(String query);
+public abstract class MCRQuerySearcher extends MCRSearcherBase{
+    //public abstract MCRResults runQuery(String query);
 
     public static Logger logger = Logger.getLogger(MCRQuerySearcher.class.getName());
 
     protected static String SQLQueryTable = MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery");
 
     protected static String querytypes = MCRConfiguration.instance().getString("MCR.QueryTypes", "document,author");
-
-    protected String query = ""; // has to be filled while processing query
 
     static private MCRQuerySearcher implementation;
 
@@ -52,12 +52,4 @@ public abstract class MCRQuerySearcher {
         return implementation;
     }
 
-    /**
-     * returns querystring
-     * 
-     * @return
-     */
-    public String getQuery() {
-        return query;
-    }
 }

@@ -27,18 +27,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
 import org.mycore.backend.query.helper.GenClasses;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -50,6 +46,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRMetadata2Fields;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcherBase;
 
@@ -94,7 +91,7 @@ public class MCRQueryManager extends MCRSearcherBase {
         }
     }
 
-    public void createDataBase(String mcr_type, Document mcr_conf) {
+    public void createDataBase() {
         MCRQueryIndexer.getInstance().initialLoad();
     }
 
@@ -104,83 +101,45 @@ public class MCRQueryManager extends MCRSearcherBase {
      * @param objBase
      */
     public void create(MCRBase obj) {
-        MCRXMLTableManager manager = MCRXMLTableManager.instance();
-        Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
-        Iterator it = searchfields.keySet().iterator();
-        List values = new LinkedList();
+        try{
+            MCRXMLTableManager manager = MCRXMLTableManager.instance();
+            Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
 
-        String strValue = "";
+            List values = MCRMetadata2Fields.buildFields(metadata, obj.getId().getTypeId(), MCRMetadata2Fields.METADATA);
+           
+            HashMap tempMap = new HashMap();
 
-        // field loop: childs of searchfields = field
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            Element el = (Element) searchfields.get(key);
-
-            // path loop: children of fields = path
-            String path = "";
-
-            if (el.getAttributeValue("value") != null) {
-                StringTokenizer tokenizer = new StringTokenizer(el.getAttributeValue("xpath"), "|");
-                strValue = "";
-
-                while (tokenizer.hasMoreTokens()) {
-                    path = "." + tokenizer.nextToken();
-
-                    if (el.getAttributeValue("value").indexOf("normalize-space(text())") != -1) {
-                        path += "/text()";
-                    } else if (el.getAttributeValue("value").indexOf(":") != -1) {
-                        path += ("/@" + el.getAttributeValue("value").substring(el.getAttributeValue("value").indexOf(":") + 1));
-                    } else {
-                        path += ("/" + el.getAttributeValue("value"));
-                    }
-
-                    try {
-                        XPath xpath = XPath.newInstance(path);
-                        List list = xpath.selectNodes(metadata);
-
-                        // element loop: children of given xpath in metadata
-                        if (list.size() > 0) {
-                            for (int k = 0; k < list.size(); k++) {
-                                Object tmpobj = list.get(k);
-
-                                if (tmpobj.getClass().getName().equals("org.jdom.Text")) {
-                                    Text t = (Text) list.get(k);
-                                    strValue += t.getText();
-                                } else {
-                                    Attribute a = (Attribute) list.get(k);
-                                    strValue += a.getValue();
-                                }
-
-                                if (k < (list.size() - 1)) {
-                                    strValue += "|";
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        // strValue="";
-                    }
+            for (int i=0; i<values.size(); i++){
+                Element tmpel= (Element) values.get(i);
+                Attribute objtype = tmpel.getAttribute("objects");
+                
+                /** check correct object type **/
+                if (objtype == null || objtype.getValue().indexOf(obj.getId().getTypeId())!=-1){
+                    if (tempMap.containsKey(tmpel.getAttributeValue("name"))){
+                        /** add value to field **/
+                        Element field = (Element) tempMap.get(tmpel.getAttributeValue("name")); 
+                        Attribute att = field.getAttribute("value");
+                        att.setValue(att.getValue() + "|" + tmpel.getAttributeValue("value"));
+                        field.removeAttribute("value");
+                        field.setAttribute(att);
+                    }else{
+                        /** insert new field **/
+                        tempMap.put(tmpel.getAttributeValue("name"),tmpel);
+                    }   
                 }
             }
-
-            values.add(strValue);
+            
+            values.clear();
+            Iterator it = tempMap.keySet().iterator();
+            while (it.hasNext()){
+                values.add((Element) tempMap.get(it.next()));
+            }
+            MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
+        }catch(Exception e){
+            e.printStackTrace();
         }
-
-        // save values in db
-        MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
     }
-
-    public MCRResults runQuery(Document doc) {
-        XMLOutputter out = new XMLOutputter();
-
-        return runQuery(out.outputString(doc));
-    }
-
-    public MCRResults runQuery(String xml) {
-        MCRResults res = MCRQuerySearcher.getInstance().runQuery(xml);
-
-        return res;
-    }
-
+    
     private void loadFields() {
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -212,10 +171,6 @@ public class MCRQueryManager extends MCRSearcherBase {
         return searchfields;
     }
 
-    public Document getSearchDefinition() {
-        return doc;
-    }
-
     public void loadType(String type) {
         try {
             ArrayList objectID = new ArrayList();
@@ -234,39 +189,19 @@ public class MCRQueryManager extends MCRSearcherBase {
     }
 
     /**
-     * temporary Method
+     * temporary Method only for test purposes
      * 
      */
     public String getQuery() {
         String ret = "";
-        SAXBuilder builder = new SAXBuilder();
         InputStream in = this.getClass().getResourceAsStream("/query1.xml");
 
         try {
-            XMLOutputter out = new XMLOutputter();
-            Document doc = builder.build(in);
+            ret = new XMLOutputter().outputString(new SAXBuilder().build(in));
             in.close();
-            ret = out.outputString(doc);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
-
-        return ret;
-    }
-
-    public Element getQueryClause() {
-        Element ret = null;
-        SAXBuilder builder = new SAXBuilder();
-        InputStream in = this.getClass().getResourceAsStream("/query1.xml");
-
-        try {
-            Document doc1 = builder.build(in);
-            in.close();
-            ret = ((Element) doc1.getRootElement().getChild("conditions").getChildren().get(0));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-
         return ret;
     }
 
@@ -315,7 +250,8 @@ public class MCRQueryManager extends MCRSearcherBase {
         }
     }
 
-    public MCRResults search(MCRCondition condition, int maxResults) {
-        return null;
+    public MCRResults search(MCRCondition condition, List order, int maxResults) {
+        return MCRQuerySearcher.getInstance().search(condition, order, maxResults);
     }
+
 }

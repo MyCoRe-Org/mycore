@@ -38,7 +38,7 @@ public abstract class MCRQueryIndexer {
     public abstract void deleteObject(MCRObjectID objectid);
 
     public abstract void insertInQuery(String mcrid, List values);
-
+    
     public abstract void updateConfiguration();
 
     public static Logger logger = Logger.getLogger(MCRQueryIndexer.class.getName());
