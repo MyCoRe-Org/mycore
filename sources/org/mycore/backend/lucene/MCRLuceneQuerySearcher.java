@@ -23,7 +23,10 @@
 
 package org.mycore.backend.lucene;
 
+import java.util.List;
+
 import org.mycore.backend.query.MCRQuerySearcher;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 
 /**
@@ -33,7 +36,6 @@ import org.mycore.services.fieldquery.MCRResults;
  */
 public class MCRLuceneQuerySearcher extends MCRQuerySearcher {
     public MCRResults runQuery(String query) {
-        this.query = query;
 
         MCRResults result = null;
 
@@ -46,5 +48,10 @@ public class MCRLuceneQuerySearcher extends MCRQuerySearcher {
         }
 
         return result;
+    }
+
+    public MCRResults search(MCRCondition condition, List order, int maxResults) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

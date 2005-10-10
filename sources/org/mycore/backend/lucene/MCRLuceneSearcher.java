@@ -274,7 +274,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         }
     }
 
-    public MCRResults search(MCRCondition cond, int maxResults) {
+    public MCRResults search(MCRCondition cond, List order, int maxResults) {
         MCRResults results = new MCRResults();
 
         try {
@@ -289,4 +289,5 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
 
         return results;
     }
+
 }

@@ -106,7 +106,7 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
         map.remove(entryID);
     }
 
-    public MCRResults search(MCRCondition cond, int maxResults) {
+    public MCRResults search(MCRCondition cond, List order, int maxResults) {
         String xslCondition = buildXSLCondition(cond);
         LOGGER.debug("MCRMemorySearcher searching for " + xslCondition);
 
