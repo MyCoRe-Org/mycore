@@ -23,8 +23,13 @@
 
 package org.mycore.services.fieldquery;
 
+import java.io.StringReader;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
@@ -32,6 +37,7 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
+import org.xml.sax.InputSource;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
@@ -43,6 +49,10 @@ import org.mycore.parsers.bool.MCRCondition;
  * @author Frank Lützenkirchen
  */
 public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCREventHandler, MCRSearcher {
+    /** The logger */
+    public static Logger LOGGER = Logger.getLogger(MCRSearcherBase.class.getName());
+
+    
     /** The unique searcher ID for this MCRSearcher implementation */
     protected String ID;
 
@@ -81,8 +91,6 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
     public String getIndex() {
         return index;
     }
-
-    public abstract MCRResults search(MCRCondition condition, int maxResults);
 
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
@@ -145,5 +153,43 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
      *            the unique ID of this entry in the index
      */
     protected void removeFromIndex(String entryID) {
+    }
+    
+    /**
+     * Searcher implementation for different kinds of query-types. Uses 
+     * implemenation of MCRSeacher in non abstract classes.
+     * @param query
+     *          as xml-query string
+     * @return MCRResults
+     *          with matching records
+     */
+    
+    
+    public MCRResults search(String query){
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            org.jdom.Document doc = builder.build(new InputSource(new StringReader(query)));
+
+            List order = new LinkedList();
+            org.jdom.Element el_sort = doc.getRootElement().getChild("sortby");
+            
+            for (int i=0; i<el_sort.getChildren().size(); i++){
+                MCRSearchField sortby = new MCRSearchField();
+                sortby.setName(((org.jdom.Element)el_sort.getChildren().get(i)).getAttributeValue("field"));
+                if (((org.jdom.Element) el_sort.getChildren().get(i)).getAttributeValue("order").equals("ascending")){
+                    sortby.setSortOrder(true);
+                }else{
+                    sortby.setSortOrder(false);
+                }
+                order.add(sortby);
+            }
+            
+            return search(new MCRQueryParser().parse(((Element)doc.getRootElement().getChild("conditions").getChildren().get(0))), 
+                    order, 
+                    Integer.parseInt(doc.getRootElement().getAttributeValue("maxResults")));
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        }
     }
 }

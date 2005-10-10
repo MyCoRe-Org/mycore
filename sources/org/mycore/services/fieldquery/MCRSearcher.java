@@ -23,6 +23,8 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.List;
+
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -36,7 +38,11 @@ public interface MCRSearcher {
      * 
      * @param condition
      *            the query condition
+     *        order
+     *            list of MCRSearchField objects for orderby condition
+     *        maxResults
+     *            int with max number of results
      * @return the result list
      */
-    public MCRResults search(MCRCondition condition, int maxResults);
+    public MCRResults search(MCRCondition condition, List order, int maxResults);
 }
