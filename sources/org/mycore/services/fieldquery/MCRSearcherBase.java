@@ -36,7 +36,6 @@ import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.parsers.bool.MCRCondition;
 import org.xml.sax.InputSource;
 
 /**
@@ -163,8 +162,6 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
      * @return MCRResults
      *          with matching records
      */
-    
-    
     public MCRResults search(String query){
         try {
             SAXBuilder builder = new SAXBuilder();
