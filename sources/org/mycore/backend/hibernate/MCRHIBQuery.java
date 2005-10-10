@@ -23,21 +23,17 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.xml.sax.InputSource;
+import org.mycore.services.fieldquery.MCRSearchField;
 
 /**
  * Helper class for easy use of refelction given by hibernate. Getter and Setter
@@ -63,75 +59,35 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
     private int count = 0; // number of children to proceed
 
-    private Document querydoc; // xmlQuery-Document
-
-    private MCRCondition cond; // query-condition
-
     private List elList = new LinkedList(); // stack for type-elements
 
     private int bracket = 0; // counts correct number of ')'
 
-    private MCRQueryParser parser;
+    private List order;
 
     /**
      * constructor creates a reference on the Hibernate Getter/Setter class by
      * an internal object
      */
-    public MCRHIBQuery() {
-        this.parser = new MCRQueryParser();
-
+    public MCRHIBQuery(){
+        try{
+            queryclass = Class.forName("org.mycore.backend.query.MCRQuery");
+            queryobject = queryclass.newInstance();
+            querymethods = queryclass.getMethods();
+        }catch(Exception e){
+            LOGGER.error(e);
+        }
+        
+    }
+    
+    public MCRHIBQuery(MCRCondition condition, List order) {
         try {
             queryclass = Class.forName("org.mycore.backend.query.MCRQuery");
             queryobject = queryclass.newInstance();
             querymethods = queryclass.getMethods();
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    /**
-     * initialise query with xml-document containing complete query
-     * 
-     * @param document
-     *            xml query docuement
-     */
-    public MCRHIBQuery(Document document) {
-        this.parser = new MCRQueryParser();
-
-        try {
-            init(document);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    /**
-     * initialise query with xml-string containing complete query
-     * 
-     * @param xmlString
-     */
-    public MCRHIBQuery(String xmlString) {
-        this.parser = new MCRQueryParser();
-
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            init(builder.build(new InputSource(new StringReader(xmlString))));
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    /**
-     * fill internal fields with values
-     * 
-     * @param doc
-     *            document with xml query
-     */
-    private void init(Document doc) {
-        try {
-            querydoc = doc;
-            cond = parser.parse((Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0));
-            cond.accept(this);
+            condition.accept(this);
+            this.order = order;
+            
         } catch (Exception e) {
             LOGGER.error(e);
         }
@@ -175,7 +131,6 @@ public class MCRHIBQuery implements MCRConditionVisitor {
         for (int i = 0; i < querymethods.length; i++) {
             if (querymethods[i].getName().toLowerCase().equals(methodname.toLowerCase()) && (value != "")) {
                 try {
-                    // System.out.println(querymethods[i].getParameterTypes()[0].getName());
                     if (querymethods[i].getParameterTypes()[0].getName().equals("java.sql.Date")) {
                         // date format
                         values[0] = java.sql.Date.valueOf(value.split("[|]")[0]);
@@ -309,35 +264,6 @@ public class MCRHIBQuery implements MCRConditionVisitor {
     }
 
     /**
-     * method uses the type definition and creates a string for the where clause
-     * 
-     * @return empty string for type * or no type restriction; ohterwise returns
-     *         a sql where clause part to be included in the where clause
-     */
-    private String getTypeList() {
-        StringBuffer sbtype = new StringBuffer();
-        List l = querydoc.getRootElement().getChild("types").getChildren();
-
-        if (l.size() < 1) {
-            return "";
-        }
-
-        for (int i = 0; i < l.size(); i++) {
-            if (((Element) l.get(i)).getAttributeValue("field").equals("*")) {
-                return "";
-            }
-
-            sbtype.append("MCRTYPE = \'" + ((Element) l.get(i)).getAttributeValue("field") + "\'");
-
-            if (i < (l.size() - 1)) {
-                sbtype.append(" or ");
-            }
-        }
-
-        return sbtype.toString();
-    }
-
-    /**
      * method creates where clause for given xml query
      * 
      * @return sql where clause as string
@@ -348,12 +274,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
         }
 
         bracket = 0;
-
-        if (getTypeList().equals("")) {
-            return sbquery.toString();
-        } else {
-            return "(" + sbquery.toString() + ") and (" + getTypeList() + ")";
-        }
+        return sbquery.toString();
     }
 
     /**
@@ -365,18 +286,17 @@ public class MCRHIBQuery implements MCRConditionVisitor {
         StringBuffer sb = new StringBuffer();
 
         try {
-            List l = querydoc.getRootElement().getChild("sortby").getChildren();
 
-            for (int i = 0; i < l.size(); i++) {
-                sb.append(((Element) l.get(i)).getAttributeValue("field"));
+            for (int i = 0; i < order.size(); i++) {
+                sb.append(((MCRSearchField) order.get(i)).getName());
 
-                if (((Element) l.get(i)).getAttributeValue("order").equals("descending")) {
-                    sb.append(" desc ");
-                } else {
+                if (((MCRSearchField) order.get(i)).getSortOrder() == MCRSearchField.ASCENDING ){
                     sb.append(" asc ");
+                } else {
+                    sb.append(" desc ");
                 }
 
-                if (i < (l.size() - 1)) {
+                if (i < (order.size() - 1)) {
                     sb.append(", ");
                 }
             }
@@ -387,10 +307,6 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
             return "";
         }
-    }
-
-    public List getOrderFields() {
-        return querydoc.getRootElement().getChild("sortby").getChildren();
     }
 
     /**
@@ -437,4 +353,5 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
         return sb.toString();
     }
+    
 }

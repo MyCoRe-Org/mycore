@@ -116,14 +116,10 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
         query.setValue("setmcrid", mcrid);
         query.setValue("setmcrtype", new MCRObjectID(mcrid).getTypeId());
 
-        Iterator it = queryManager.getQueryFields().keySet().iterator();
-
         for (int i = 0; i < values.size(); i++) {
-            Element el = queryManager.getField((String) it.next());
-
             try {
                 if (values.get(i) != null) {
-                    query.setValue("set" + el.getAttributeValue("name"), (String) values.get(i));
+                    query.setValue("set" + ((Element) values.get(i)).getAttributeValue("name"), ((Element) values.get(i)).getAttributeValue("value"));
                 }
             } catch (Exception e) {
                 logger.error(e);

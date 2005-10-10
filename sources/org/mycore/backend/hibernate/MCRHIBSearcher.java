@@ -27,12 +27,13 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchField;
 
 /**
  * Hibernate implementation of the searcher
@@ -41,17 +42,15 @@ import org.mycore.services.fieldquery.MCRResults;
  * 
  */
 public class MCRHIBSearcher extends MCRQuerySearcher {
-    public MCRResults runQuery(String query) {
-        this.query = query;
 
+    public MCRResults search(MCRCondition condition, List order, int maxResults) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRResults result = new MCRResults();
 
         try {
-            MCRHIBQuery hibquery = new MCRHIBQuery(query);
+            MCRHIBQuery hibquery = new MCRHIBQuery(condition, order);
             List l = session.createQuery(hibquery.getHIBQuery()).list();
-            List order = hibquery.getOrderFields();
 
             for (int i = 0; i < l.size(); i++) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
@@ -62,15 +61,18 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
 
                     // fill hit meta
                     for (int j = 0; j < order.size(); j++) {
-                        String key = ((Element) order.get(j)).getAttributeValue("field");
-                        String value = (String) tmpquery.getValue("get" + ((Element) order.get(j)).getAttributeValue("field"));
+                        String key = ((MCRSearchField) order.get(j)).getName();
+                        String value = (String) tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
                         hit.addSortData(key, value);
                     }
 
-                    result.addHit(hit);
+                    if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
+                        result.addHit(hit);
+                    }else{
+                        break;
+                    }
                 }
             }
-
             tx.commit();
 
             if (order.size() > 0) {
