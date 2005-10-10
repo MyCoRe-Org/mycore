@@ -127,13 +127,13 @@ public class MCRMetadata2Fields {
             List resultList = xmlres.getResult();
             Element root = (Element) (resultList.get(0));
 
-         /*   if (LOGGER.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("---------- search fields ---------");
 
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(root.getChildren()));
                 LOGGER.debug("----------------------------------");
-            }*/
+            }
             return root.getChildren();
         } catch (Exception ex) {
             String msg = "Exception while transforming metadata to search fields";
@@ -203,14 +203,14 @@ public class MCRMetadata2Fields {
             }
 
             stylesheets.put(type, xsl);
-/*
+
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("---------- stylesheet to build search fields ---------");
 
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(xsl));
                 LOGGER.debug("------------------------------------------------------");
-            }*/
+            }
         }
 
         return xsl;
