@@ -62,6 +62,9 @@ public class MCRMetadata2Fields {
     /** The logger * */
     private static final Logger LOGGER = Logger.getLogger(MCRMetadata2Fields.class);
 
+    public static final String METADATA="metadata";
+    public static final String CONTENT="content";
+
     /**
      * Transforms XML stored in a MCRFile to search field values.
      * 
@@ -74,8 +77,8 @@ public class MCRMetadata2Fields {
      * @throws JDOMException
      *             if MCRFile xml content could not be parsed
      */
-    public static List buildFields(MCRFile file) throws IOException, JDOMException {
-        return buildFields(file.getContentAsJDOM(), file.getContentTypeID());
+    public static List buildFields(MCRFile file, String definition) throws IOException, JDOMException {
+        return buildFields(file.getContentAsJDOM(), file.getContentTypeID(), definition);
     }
 
     /**
@@ -86,8 +89,8 @@ public class MCRMetadata2Fields {
      * @return a List of JDOM field elements with values, see searchfields.xsd
      *         for schema
      */
-    public static List buildFields(MCRObject obj) {
-        return buildFields(obj.createXML(), obj.getId().getTypeId());
+    public static List buildFields(MCRObject obj, String definition) {
+        return buildFields(obj.createXML(), obj.getId().getTypeId(), definition);
     }
 
     /**
@@ -100,9 +103,17 @@ public class MCRMetadata2Fields {
      * @return a List of JDOM field elements with values, see searchfields.xsd
      *         for schema
      */
-    public static List buildFields(Document input, String type) {
+    public static List buildFields(Document input, String type, String definition) {
         String uri = "resource:searchfields.xml";
         Element def = MCRURIResolver.instance().resolve(uri);
+
+        List l =def.getChildren();
+        for (int i=0; i<l.size(); i++){
+            if(((Element)l.get(i)).getAttributeValue("id").equals(definition)){
+                def = (Element) l.get(i);
+                break;
+            }
+        }
         Document xsl = buildStylesheet(type, def);
 
         try {
@@ -112,18 +123,17 @@ public class MCRMetadata2Fields {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer(xslsrc);
             transformer.transform(xmlsrc, xmlres);
-
+            
             List resultList = xmlres.getResult();
             Element root = (Element) (resultList.get(0));
 
-            if (LOGGER.isDebugEnabled()) {
+         /*   if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("---------- search fields ---------");
 
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(root.getChildren()));
                 LOGGER.debug("----------------------------------");
-            }
-
+            }*/
             return root.getChildren();
         } catch (Exception ex) {
             String msg = "Exception while transforming metadata to search fields";
@@ -193,14 +203,14 @@ public class MCRMetadata2Fields {
             }
 
             stylesheets.put(type, xsl);
-
+/*
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("---------- stylesheet to build search fields ---------");
 
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(xsl));
                 LOGGER.debug("------------------------------------------------------");
-            }
+            }*/
         }
 
         return xsl;
@@ -247,6 +257,6 @@ public class MCRMetadata2Fields {
      */
     public static void main(String[] args) throws Exception {
         Document xml = new SAXBuilder().build(new File("c:\\demo-document.xml"));
-        buildFields(xml, "document");
+        buildFields(xml, "document", METADATA);
     }
 }
