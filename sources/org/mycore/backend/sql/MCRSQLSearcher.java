@@ -25,12 +25,13 @@ package org.mycore.backend.sql;
 
 import java.util.List;
 
-import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchField;
 
 /**
  * SQL implementation of the searcher
@@ -44,21 +45,17 @@ public class MCRSQLSearcher extends MCRQuerySearcher {
      * testet for rules of the "READ"-pool
      * 
      * @param query
-     *            query string
+     *            xml-query string as jdom document
      * @return MCRResults with MCRHit-objects
      */
-    public MCRResults runQuery(String query) {
-        this.query = query;
+    public MCRResults search(MCRCondition condition, List order, int maxResults) {
 
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRResults result = new MCRResults();
 
         try {
             MCRSQLRowReader reader;
-            MCRSQLQuery sqlquery = new MCRSQLQuery(query);
-            reader = c.doQuery(sqlquery.getSQLQuery());
-
-            List order = sqlquery.getOrderFields();
+            reader = c.doQuery(new MCRSQLQuery(condition, order, maxResults).getSQLQuery());
 
             while (reader.next()) {
                 String id = reader.getString("MCRID");
@@ -69,12 +66,17 @@ public class MCRSQLSearcher extends MCRQuerySearcher {
 
                     /* fill hit meta */
                     for (int j = 0; j < order.size(); j++) {
-                        String key = ((Element) order.get(j)).getAttributeValue("field");
-                        String value = (String) reader.getString(((Element) order.get(j)).getAttributeValue("field"));
+                        String key = ((MCRSearchField) order.get(j)).getName();
+                        String value = (String) reader.getString(((MCRSearchField) order.get(j)).getName());
                         hit.addSortData(key, value);
                     }
-
-                    result.addHit(hit);
+                    
+                    if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
+                        result.addHit(hit);
+                    }else{
+                        break;
+                    }
+                    
                 }
             }
 
@@ -86,7 +88,6 @@ public class MCRSQLSearcher extends MCRQuerySearcher {
         } finally {
             c.release();
         }
-
         return result;
     }
 }

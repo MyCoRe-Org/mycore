@@ -97,6 +97,42 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
 
+        for (int i = 0; i < values.size(); i++) {
+            Element fieldel = (Element) values.get(i);
+            String field = (String) fieldel.getAttributeValue("name");
+            String value = (String) fieldel.getAttributeValue("value");
+
+            if (value != "") {
+                Element el = (Element) queryManager.getQueryFields().get(field);
+                String type = el.getAttributeValue("type");
+
+                if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
+                    query.setValue(new MCRSQLColumn(field, value.replaceAll("\'", "''"), "string"));
+                } else if (type.equals("date")) {
+                    query.setValue(new MCRSQLColumn(field, value.split("[|]")[0].replaceAll("\'", "''"), "string"));
+                } else if (type.equals("integer")) {
+                    query.setValue(new MCRSQLColumn(field, "" + Integer.parseInt(value.split("[|]")[0]), "integer"));
+                } else if (type.equals("decimal")) {
+                    query.setValue(new MCRSQLColumn(field, "" + value.split("[|]")[0], "decimal"));
+                } else if (type.equals("boolean")) {
+                    query.setValue(new MCRSQLColumn(field, "" + value.split("[|]")[0], "boolean"));
+                }
+            }
+        }
+
+        try {
+            c.doUpdate(query.toTypedInsertStatement());
+        } catch (Exception e) {
+            logger.error("e: " + e);
+            e.printStackTrace();
+        } finally {
+            c.release();
+        }
+        
+        /*
+          MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
+
         query.setValue(new MCRSQLColumn("MCRID", mcrid, "string"));
         query.setValue(new MCRSQLColumn("MCRTYPE", new MCRObjectID(mcrid).getTypeId(), "string"));
 
@@ -131,7 +167,8 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
             e.printStackTrace();
         } finally {
             c.release();
-        }
+        } 
+         */
     }
 
     /**
@@ -143,7 +180,6 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         try {
             MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
             query.addColumn("MCRID VARCHAR(64) NOT NULL");
-            query.addColumn("MCRTYPE VARCHAR(64) NOT NULL");
 
             Iterator it = queryManager.getQueryFields().keySet().iterator();
 
@@ -210,10 +246,9 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         }
     }
 
-    /**
-     * method for initialisation - in SQL not needed - DO NOT DELETE -
-     */
     public void updateConfiguration() {
-        // not needed -do not delete
+        // TODO Auto-generated method stub
+        
     }
+    
 }

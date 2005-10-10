@@ -23,20 +23,16 @@
 
 package org.mycore.backend.sql;
 
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.xml.sax.InputSource;
+import org.mycore.services.fieldquery.MCRSearchField;
 
 /**
  * 
@@ -52,64 +48,28 @@ public class MCRSQLQuery implements MCRConditionVisitor {
 
     private int count = 0; // number of children to proceed
 
-    private Document querydoc; // xmlQuery-Document
-
-    private MCRCondition cond; // query-condition
-
     private List elList = new LinkedList(); // stack for type-elements
 
     private int bracket = 0; // counts correct number of ')'
-
-    private MCRQueryParser parser;
-
+ 
+    private List order;
+    
     /**
-     * initialise query with xml-document containing complete query
+     * initialise query 
      * 
      * @param document
      *            xml query docuement
      */
-    public MCRSQLQuery(Document document) {
-        this.parser = new MCRQueryParser();
-
-        try {
-            init(document);
+    public MCRSQLQuery(MCRCondition condition, List order, int maxResults) {
+        try{
+            condition.accept(this);
+            this.order = order;
         } catch (Exception e) {
             LOGGER.error(e);
         }
     }
 
-    /**
-     * initialise query with xml-string containing complete query
-     * 
-     * @param xmlString
-     */
-    public MCRSQLQuery(String xmlString) {
-        this.parser = new MCRQueryParser();
-
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            init(builder.build(new InputSource(new StringReader(xmlString))));
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    /**
-     * fill internal fields with values
-     * 
-     * @param doc
-     *            document with xml query
-     */
-    private void init(Document doc) {
-        try {
-            querydoc = doc;
-            cond = this.parser.parse((Element) querydoc.getRootElement().getChild("conditions").getChildren().get(0));
-            cond.accept(this);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
+    
     /**
      * interface implementation (visitor pattern) for condition types: on each
      * new type a xml-element will be added to an internal stack which holds the
@@ -189,34 +149,6 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         }
     }
 
-    /**
-     * method uses the type definition and creates a string for the where clause
-     * 
-     * @return empty string for type * or no type restriction; ohterwise returns
-     *         a sql where clause part to be included in the where clause
-     */
-    private String getTypeList() {
-        StringBuffer sbtype = new StringBuffer();
-        List l = querydoc.getRootElement().getChild("types").getChildren();
-
-        if (l.size() < 1) {
-            return "";
-        }
-
-        for (int i = 0; i < l.size(); i++) {
-            if (((Element) l.get(i)).getAttributeValue("field").equals("*")) {
-                return "";
-            }
-
-            sbtype.append("`MCRTYPE` = \'" + ((Element) l.get(i)).getAttributeValue("field") + "\'");
-
-            if (i < (l.size() - 1)) {
-                sbtype.append(" or ");
-            }
-        }
-
-        return sbtype.toString();
-    }
 
     /**
      * method creates where clause for given xml query
@@ -229,16 +161,11 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         }
 
         bracket = 0;
-
-        if (getTypeList().equals("")) {
-            return sbquery.toString();
-        } else {
-            return "(" + sbquery.toString() + ") and (" + getTypeList() + ")";
-        }
+        return sbquery.toString();
     }
 
     /**
-     * method creates order by clause for given xml query
+     * method creates order by clause for given order list
      * 
      * @return sql order by clause as string
      */
@@ -246,18 +173,19 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         StringBuffer sb = new StringBuffer();
 
         try {
-            List l = querydoc.getRootElement().getChild("sortby").getChildren();
 
-            for (int i = 0; i < l.size(); i++) {
-                sb.append("`" + ((Element) l.get(i)).getAttributeValue("field") + "`");
-
-                if (((Element) l.get(i)).getAttributeValue("order").equals("descending")) {
-                    sb.append(" desc ");
-                } else {
+            for (int i = 0; i < order.size(); i++) {
+                MCRSearchField field = (MCRSearchField) order.get(i);
+                
+                sb.append(field.getName());
+                
+                if (field.getSortOrder() == MCRSearchField.ASCENDING ){
                     sb.append(" asc ");
+                }else{
+                    sb.append(" desc ");
                 }
 
-                if (i < (l.size() - 1)) {
+                if (i < (order.size() - 1)) {
                     sb.append(", ");
                 }
             }
@@ -270,10 +198,6 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         }
     }
 
-    public List getOrderFields() {
-        return querydoc.getRootElement().getChild("sortby").getChildren();
-    }
-
     /**
      * method creates complete sql string for given query
      * 
@@ -281,12 +205,11 @@ public class MCRSQLQuery implements MCRConditionVisitor {
      */
     public String getSQLQuery() {
         StringBuffer sb = new StringBuffer();
-
         try {
             sb.append("SELECT MCRID");
 
-            for (int i = 0; i < querydoc.getRootElement().getChild("sortby").getChildren().size(); i++) {
-                sb.append(", " + ((Element) querydoc.getRootElement().getChild("sortby").getChildren().get(i)).getAttributeValue("field"));
+            for (int i = 0; i < order.size(); i++) {
+                sb.append(", " + ((MCRSearchField) order.get(i)).getName());
             }
 
             sb.append(" FROM ");
@@ -314,8 +237,8 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT MCRID");
 
-        for (int i = 0; i < querydoc.getRootElement().getChild("sortby").getChildren().size(); i++) {
-            sb.append(", " + ((Element) querydoc.getRootElement().getChild("sortby").getChildren().get(i)).getAttributeValue("field"));
+        for (int i = 0; i < order.size(); i++) {
+            sb.append(", " + ((MCRSearchField) order.get(i)).getName());
         }
 
         sb.append("\nFROM ");
