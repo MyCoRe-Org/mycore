@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
@@ -166,9 +167,28 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
         try {
             SAXBuilder builder = new SAXBuilder();
             org.jdom.Document doc = builder.build(new InputSource(new StringReader(query)));
+            
+            return search(doc);
+
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        }
+    }
+    
+    /**
+     * Searcher implementation for different kinds of query-types. Uses 
+     * implemenation of MCRSeacher in non abstract classes.
+     * @param query
+     *          as jdom-document
+     * @return MCRResults
+     *          with matching records
+     */
+    public MCRResults search(org.jdom.Document query){
+        try {
 
             List order = new LinkedList();
-            org.jdom.Element el_sort = doc.getRootElement().getChild("sortby");
+            org.jdom.Element el_sort = query.getRootElement().getChild("sortby");
             
             for (int i=0; i<el_sort.getChildren().size(); i++){
                 MCRSearchField sortby = new MCRSearchField();
@@ -181,12 +201,12 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
                 order.add(sortby);
             }
             
-            return search(new MCRQueryParser().parse(((Element)doc.getRootElement().getChild("conditions").getChildren().get(0))), 
+            return search(new MCRQueryParser().parse(((Element)query.getRootElement().getChild("conditions").getChildren().get(0))), 
                     order, 
-                    Integer.parseInt(doc.getRootElement().getAttributeValue("maxResults")));
+                    Integer.parseInt(query.getRootElement().getAttributeValue("maxResults")));
         } catch (Exception e) {
             LOGGER.error(e);
             return null;
         }
-    }
+    }    
 }
