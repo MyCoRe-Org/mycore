@@ -48,9 +48,6 @@ public class MCRSQLRowReader {
     /** The wrapped JDBC result set */
     protected ResultSet rs;
 
-    /** The number of rows read so far */
-    protected int numRowsRead = 0;
-
     /**
      * Creates a new MCRSQLRowReader. This constructor is called by
      * MCRSQLConnection methods that execute an SQL query.
@@ -71,10 +68,7 @@ public class MCRSQLRowReader {
      */
     public boolean next() throws MCRPersistenceException {
         try {
-            boolean hasNext = rs.next();
-            if (hasNext)
-                numRowsRead++;
-            return hasNext;
+            return rs.next();
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not call next() on JDBC result set", ex);
         }
