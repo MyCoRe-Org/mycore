@@ -176,36 +176,6 @@ public class MCRHIBConnection {
         return false;
     }
 
-    public long getID() {
-        synchronized (singleton) {
-            Session session = getSession();
-            Transaction tx = session.beginTransaction();
-
-            /* generate new id */
-            MCRID id = new MCRID();
-            session.save(id);
-
-            /* free up previous ids in the ID table */
-            List result = session.createCriteria(MCRID.class).list();
-            int t;
-
-            for (t = 0; t < result.size(); t++) {
-                MCRID lid = (MCRID) result.get(t);
-
-                if (lid.getId() > id.getId()) { // sanity check
-                    throw new IllegalStateException("bad \"native\" database ID generator");
-                } else if (lid.getId() < id.getId()) {
-                    session.delete(lid);
-                }
-            }
-
-            tx.commit();
-            session.close();
-
-            return id.getId();
-        }
-    }
-
     /**
      * helper mehtod: translates fieldtypes into hibernate types
      * 
