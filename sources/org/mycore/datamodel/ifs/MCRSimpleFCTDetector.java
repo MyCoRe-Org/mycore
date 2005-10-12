@@ -40,7 +40,6 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -315,14 +314,14 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         final String forcedInterrupt = "mcr.forced.interrupt";
 
         DefaultHandler handler = new DefaultHandler() {
-            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            public void startElement(String uri, String localName, String qName, Attributes attributes) {
                 logger.debug("MCRSimpleFCTDetector detected root element = " + qName);
                 detected.setProperty("docType", qName);
                 throw new MCRException(forcedInterrupt);
             }
 
             // We would need SAX 2.0 to be able to do this, for later use:
-            public void startDTD(String name, String publicId, String systemId) throws SAXException {
+            public void startDTD(String name, String publicId, String systemId) {
                 logger.debug("MCRSimpleFCTDetector detected DOCTYPE declaration = " + name);
                 detected.setProperty("docType", name);
                 throw new MCRException(forcedInterrupt);

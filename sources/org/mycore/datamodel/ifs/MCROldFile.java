@@ -187,15 +187,15 @@ public class MCROldFile implements MCRFileReader {
         if (bytes >= (1024 * 1024)) // >= 1 MB
         {
             sizeUnit = "MB";
-            sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
+            sizeValue = (double) (Math.round(bytes / 10485.76)) / 100;
         } else if (bytes >= (5 * 1024)) // >= 5 KB
         {
             sizeUnit = "KB";
-            sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
+            sizeValue = (double) (Math.round(bytes / 102.4)) / 10;
         } else // < 5 KB
         {
             sizeUnit = "Byte";
-            sizeValue = (double) bytes;
+            sizeValue = bytes;
         }
 
         sizeText = String.valueOf(sizeValue).replace('.', ',');

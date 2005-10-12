@@ -37,6 +37,8 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.GregorianCalendar;
 
+import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
@@ -282,6 +284,24 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         MCRArgumentChecker.ensureNotNull(source, "source byte array");
 
         setContentFrom(new ByteArrayInputStream(source));
+    }
+
+    /**
+     * Sets the content of this file from a JDOM xml document.
+     * 
+     * @param xml
+     *            the JDOM xml document that should be stored as file content
+     */
+    public void setContentFrom(Document xml) {
+        MCRArgumentChecker.ensureNotNull(xml, "jdom xml document");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            new XMLOutputter().output(xml, baos);
+            baos.close();
+        } catch (IOException ignored) {
+        }
+        setContentFrom(baos.toByteArray());
     }
 
     /**

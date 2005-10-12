@@ -294,7 +294,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * parameters that contain the timecodes where to start and/or stop
      * streaming.
      */
-    private void sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException, ServletException {
+    private void sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
         LOGGER.info("MCRFileNodeServlet: Sending file " + file.getName());
 
         if (file.hasAudioVideoExtender()) // Start streaming player

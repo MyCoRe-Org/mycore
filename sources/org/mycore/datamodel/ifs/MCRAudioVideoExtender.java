@@ -128,12 +128,10 @@ public abstract class MCRAudioVideoExtender {
      */
     public String getBitRateFormatted() {
         if (bitRate > (1024 * 1024)) {
-            double b = (double) (Math.round((double) bitRate / 10485.76)) / 100.0;
-
+            double b = Math.round(bitRate / 10485.76) / 100.0;
             return new DecimalFormat("##0.##").format(b) + " MBit";
         } else {
-            double b = (double) (Math.round((double) bitRate / 102.4)) / 10.0;
-
+            double b = Math.round(bitRate / 102.4) / 10.0;
             return new DecimalFormat("##0.#").format(b) + " kBit";
         }
     }
