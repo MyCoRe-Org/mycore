@@ -26,23 +26,23 @@ package org.mycore.backend.hibernate.tables;
 import java.sql.Blob;
 
 public class MCRCSTORE {
-    private String storageid;
+    private int storageid;
 
     private Blob content;
 
     public MCRCSTORE() {
     }
 
-    public MCRCSTORE(String storageid, byte[] content) {
+    public MCRCSTORE(int storageid, byte[] content) {
         setStorageid(storageid);
         setContentBytes(content);
     }
 
-    public String getStorageid() {
+    public int getStorageid() {
         return storageid;
     }
 
-    public void setStorageid(String storageid) {
+    public void setStorageid(int storageid) {
         this.storageid = storageid;
     }
 
