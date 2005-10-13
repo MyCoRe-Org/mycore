@@ -38,11 +38,11 @@ import org.jdom.Element;
 public class MCRBooleanClauseParser {
     private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
 
-    private static Pattern and = Pattern.compile("\\band\\b");
+    private static Pattern and = Pattern.compile("\\b[aA][nN][dD]\\b");
 
-    private static Pattern or = Pattern.compile("\\bor\\b");
+    private static Pattern or = Pattern.compile("\\b[oO][rR]\\b");
 
-    private static Pattern not = Pattern.compile("\\s*\\bnot\\b\\s*");
+    private static Pattern not = Pattern.compile("\\s*\\b[nN][oO][tT]\\b\\s*");
 
     private static Pattern marker = Pattern.compile("@<([0-9]*)>@");
 
@@ -67,7 +67,7 @@ public class MCRBooleanClauseParser {
             return defaultRule();
         }
 
-        String name = condition.getName();
+        String name = condition.getName().toLowerCase();
 
         if (name.equals("not")) {
             Element child = (Element) (condition.getChildren().get(0));
@@ -188,6 +188,7 @@ public class MCRBooleanClauseParser {
 
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         /* handle specific rules */
+        s = s.toLowerCase();
         if (s.equalsIgnoreCase("true")) {
             return new MCRTrueCondition();
         }
@@ -201,7 +202,7 @@ public class MCRBooleanClauseParser {
     }
 
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
-        String name = e.getName();
+        String name = e.getName().toLowerCase();
 
         if (name.equals("true")) {
             return new MCRTrueCondition();
