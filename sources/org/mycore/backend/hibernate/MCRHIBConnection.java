@@ -24,11 +24,9 @@
 package org.mycore.backend.hibernate;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Table;
 import org.hibernate.type.BooleanType;
