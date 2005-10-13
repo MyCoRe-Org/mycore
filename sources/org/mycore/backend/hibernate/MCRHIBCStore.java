@@ -65,7 +65,7 @@ public class MCRHIBCStore extends MCRContentStore {
         }
     }
 
-    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+    protected synchronized String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         String tableName = file.getContentTypeID();
         int ID = getNextFreeID(tableName);
         String storageID = String.valueOf(ID);
@@ -90,7 +90,7 @@ public class MCRHIBCStore extends MCRContentStore {
         return storageID;
     }
 
-    protected void doDeleteContent(String ID) throws Exception {
+    protected synchronized void doDeleteContent(String ID) throws Exception {
     	int storageID = Integer.valueOf(ID).intValue();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();

@@ -227,7 +227,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * 
      * @return the next free ID number as a String
      */
-    public final int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
+    public final synchronized int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
     	
           Session session = getSession(); 
           Transaction tx = session.beginTransaction();
