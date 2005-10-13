@@ -62,6 +62,8 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
                 .addColumn("NUMCHTF INTEGER") // total files
                 .toCreateTableStatement());
         MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table).addColumn("ID").toIndexStatement());
+        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table).addColumn("PID").toIndexStatement());
+        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table).addColumn("OWNER").toIndexStatement());
     }
 
     public void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
