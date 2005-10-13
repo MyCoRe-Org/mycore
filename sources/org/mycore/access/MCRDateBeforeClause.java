@@ -23,6 +23,8 @@
 
 package org.mycore.access;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jdom.Element;
@@ -36,6 +38,7 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
  */
 class MCRDateBeforeClause implements MCRCondition {
     private Date date;
+    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
 
     MCRDateBeforeClause(Date date) {
         this.date = date;
@@ -48,7 +51,7 @@ class MCRDateBeforeClause implements MCRCondition {
     }
 
     public String toString() {
-        return "date < " + date + " ";
+        return "date < " + dateformat.format(date) + " ";
     }
 
     public Element toXML() {
