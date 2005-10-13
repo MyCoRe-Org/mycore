@@ -101,7 +101,7 @@ public class MCRResults {
      * @return the hit at this position, or null if position is out of bounds
      */
     public MCRHit getHit(int i) {
-        if ((i > 0) && (i < hits.size())) {
+        if ((i >= 0) && (i < hits.size())) {
             return (MCRHit) hits.get(i);
         } else {
             return null;
