@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 
 /**
@@ -36,14 +37,14 @@ import org.mycore.common.MCRPersistenceException;
  * java.sql.ResultSet that provides some convenience methods.
  * 
  * @author Frank Lützenkirchen
- * 
  * @version $Revision$ $Date$
- * 
  * @see java.sql.ResultSet
  * @see MCRSQLConnection#doQuery( String )
  * @see MCRSQLConnection#justDoQuery( String )
  */
 public class MCRSQLRowReader {
+    protected final static Logger LOGGER = Logger.getLogger(MCRSQLRowReader.class);
+
     /** The wrapped JDBC result set */
     protected ResultSet rs;
 
@@ -63,14 +64,13 @@ public class MCRSQLRowReader {
      * a next row.
      * 
      * @see java.sql.ResultSet#next()
-     * 
      * @return true, if there was a next row; false, if the end is reached
      */
     public boolean next() throws MCRPersistenceException {
         try {
             return rs.next();
         } catch (SQLException ex) {
-            throw new MCRPersistenceException("Could not get next() on JDBC result set", ex);
+            throw new MCRPersistenceException("Could not call next() on JDBC result set", ex);
         }
     }
 
@@ -207,10 +207,10 @@ public class MCRSQLRowReader {
 
         try {
             rs.close();
-            rs = null;
         } catch (SQLException ex) {
-            // Logger logger = MCRSQLConnectionPool.getLogger();
-            // logger.warn( "Could not close result set: " + ex.getMessage() );
+            LOGGER.debug("Could not close result set: " + ex.getMessage());
+        } finally {
+            rs = null;
         }
     }
 

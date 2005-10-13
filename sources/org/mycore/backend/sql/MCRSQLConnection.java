@@ -68,16 +68,19 @@ public class MCRSQLConnection {
     /** The number of usages of this connection so far * */
     private int numUsages = 0;
 
+    private long lastUse;
+
     /** The maximum number of usages of this connection * */
     private static int maxUsages = Integer.MAX_VALUE;
+
+    /** The maximum age a connection can be before it is reconnected */
+    private static long maxAge = 3600 * 1000; // 1 hour
 
     private static String url;
 
     private static String userID;
 
     private static String password;
-
-    long lastUse;
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -99,11 +102,14 @@ public class MCRSQLConnection {
     }
 
     void use() {
+        long age = System.currentTimeMillis() - lastUse;
+        if ((numUsages > maxUsages) || (age > maxAge)) {
+            closeJDBCConnection();
+            buildJDBCConnection();
+            numUsages = 0;
+        }
+        numUsages++;
         lastUse = System.currentTimeMillis();
-    }
-
-    long lastUse() {
-        return lastUse;
     }
 
     private void buildJDBCConnection() throws MCRPersistenceException {
@@ -129,14 +135,6 @@ public class MCRSQLConnection {
      * @see MCRSQLConnectionPool#releaseConnection( MCRSQLConnection )
      */
     public void release() {
-        numUsages++;
-
-        if (numUsages >= maxUsages) {
-            closeJDBCConnection();
-            numUsages = 0;
-            buildJDBCConnection();
-        }
-
         MCRSQLConnectionPool.instance().releaseConnection(this);
     }
 
@@ -152,9 +150,10 @@ public class MCRSQLConnection {
 
     void closeJDBCConnection() throws MCRPersistenceException {
         try {
+            logger.debug("MCRSQLConnection: Closing connection to JDBC datastore");
             connection.close();
         } catch (Exception exc) {
-            MCRSQLConnectionPool.getLogger().warn("Exception while closing JDBC connection");
+            MCRSQLConnectionPool.getLogger().warn("Exception while closing JDBC connection", exc);
         }
     }
 
@@ -258,25 +257,6 @@ public class MCRSQLConnection {
      */
     public boolean exists(String condition) throws MCRPersistenceException {
         return (countRows(condition) > 0);
-    }
-
-    /**
-     * Executes an SQL select statement, using any currently free connection
-     * from the pool. The results of the query are returned as MCRSQLRowReader
-     * instance.
-     * 
-     * @param query
-     *            the SQL select statement to be executed
-     * @return the MCRSQLRowReader that can be used for reading the result rows
-     */
-    public static MCRSQLRowReader justDoQuery(String query) throws MCRPersistenceException {
-        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-
-        try {
-            return c.doQuery(query);
-        } finally {
-            c.release();
-        }
     }
 
     /**
