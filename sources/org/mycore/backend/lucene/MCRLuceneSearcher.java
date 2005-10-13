@@ -71,11 +71,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
 
     static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
-    private static final TextFilterPluginManager PLUGIN_MANAGER = TextFilterPluginManager.getInstance();
-
-    static {
-        PLUGIN_MANAGER.loadPlugins();
-    }
+    private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
     public void init(String ID) {
         super.init(ID);
@@ -134,6 +130,9 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
             LOGGER.debug("####### Name: " + name + " Type: " + type + " Content: " + content);
 
             if (null != mcrfile) {
+                if (PLUGIN_MANAGER == null) {
+                    PLUGIN_MANAGER = TextFilterPluginManager.getInstance();
+                }
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
