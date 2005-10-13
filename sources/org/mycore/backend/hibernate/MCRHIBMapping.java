@@ -199,10 +199,6 @@ public class MCRHIBMapping {
             map.addColumn("primgroup", "PRIMGROUP", dbString, 20, true, false, false);
             cfg.addXML(map.getTableXML());
 
-            // ID Table
-            map = new MCRTableGenerator("MCRID", "org.mycore.backend.hibernate.tables.MCRID", "", 1);
-            map.addIDColumn("id", "ID", dbLong, 64, "native", false);
-            cfg.addXML(map.getTableXML());
 
             // XML Table
             map = new MCRTableGenerator(config.getString("MCR.xml_store_sql_table", "MCRXMLTABLE"), "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
