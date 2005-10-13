@@ -23,10 +23,13 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import org.jdom.Document;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRArgumentChecker;
 
 /**
@@ -324,15 +327,15 @@ public abstract class MCRFilesystemNode {
         if (bytes >= (1024 * 1024)) // >= 1 MB
         {
             sizeUnit = "MB";
-            sizeValue = (double) (Math.round((double) bytes / 10485.76)) / 100;
+            sizeValue = (double) (Math.round(bytes / 10485.76)) / 100;
         } else if (bytes >= (5 * 1024)) // >= 5 KB
         {
             sizeUnit = "KB";
-            sizeValue = (double) (Math.round((double) bytes / 102.4)) / 10;
+            sizeValue = (double) (Math.round(bytes / 102.4)) / 10;
         } else // < 5 KB
         {
             sizeUnit = "Byte";
-            sizeValue = (double) bytes;
+            sizeValue = bytes;
         }
 
         sizeText = String.valueOf(sizeValue).replace('.', ',');
@@ -351,6 +354,36 @@ public abstract class MCRFilesystemNode {
         ensureNotDeleted();
 
         return lastModified;
+    }
+
+    /**
+     * Stores additional XML data for this node.
+     * 
+     * @param data
+     *            the additional XML data to be saved
+     */
+    public void setAdditionalData(Document data) {
+        String name = data.getRootElement().getName() + ".mcrdata";
+        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        if (dataFile == null)
+            dataFile = new MCRFile(name, this.ID);
+        dataFile.setContentFrom(data);
+    }
+
+    /**
+     * Gets additional XML data stored for this node, if any.
+     * 
+     * @return the additional XML data that was stored, or null
+     * @throws IOException
+     *             if the XML data can not be retrieved
+     * @throws JDOMException
+     *             if the XML data can not be parsed
+     */
+    public Document getAdditionalData() throws IOException, JDOMException {
+        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        if ((dataFile == null) || (dataFile.getSize() == 0))
+            return null;
+        return dataFile.getContentAsJDOM();
     }
 
     protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");

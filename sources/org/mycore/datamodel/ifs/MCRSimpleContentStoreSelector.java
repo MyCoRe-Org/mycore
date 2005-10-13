@@ -84,12 +84,17 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
     }
 
     public String selectStore(MCRFile file) throws MCRException {
-        String typeID = file.getContentTypeID();
+        return getStore(file.getContentTypeID());
+    }
 
+    public String selectStore(MCRFileContentType type) {
+        return getStore(type.getID());
+    }
+
+    private String getStore(String typeID) {
         if (table.containsKey(typeID)) {
             return (String) (table.get(typeID));
         }
-
         return defaultID;
     }
 
