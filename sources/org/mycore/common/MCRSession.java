@@ -185,6 +185,10 @@ public class MCRSession implements Cloneable {
     public Object get(Object key) {
         return map.get(key);
     }
+    
+    public void deleteObject(Object key){
+        map.remove(key);
+    }
 
     /** Get the ip value to the local IP */
     public static final String getLocalIP() {
