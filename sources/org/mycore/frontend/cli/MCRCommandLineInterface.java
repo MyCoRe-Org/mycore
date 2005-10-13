@@ -160,7 +160,7 @@ public class MCRCommandLineInterface {
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < args.length; i++)
                 sb.append(args[i]).append(" ");
-            String line = sb.toString();
+            String line = sb.toString().trim();
 
             int pos = line.indexOf(";;");
             if (pos == -1)
@@ -220,9 +220,10 @@ public class MCRCommandLineInterface {
     protected static void processCommand(String command) {
         try {
             for (int i = 0; i < knownCommands.size(); i++) {
+                long time = System.currentTimeMillis();
                 if (((MCRCommand) knownCommands.get(i)).invoke(command.trim())) {
-                    System.out.println(system + " Command done.");
-
+                    time = System.currentTimeMillis() - time;
+                    System.out.println(system + " Command processed (" + time + " ms)");
                     return;
                 }
             }
