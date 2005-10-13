@@ -38,7 +38,6 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimeType;
 import org.hibernate.type.TimestampType;
-import org.mycore.backend.hibernate.tables.MCRID;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
