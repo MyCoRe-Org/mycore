@@ -145,24 +145,6 @@ public final class MCRLUCENESearchStore implements MCRObjectSearchStoreInterface
     }
 
     /**
-     * The methode create a new datastore based of given configuration. It
-     * create a new data table for storing MCRObjects with the same MCRObjectID
-     * type.
-     * 
-     * @param mcr_type
-     *            the MCRObjectID type as string
-     * @param mcr_conf
-     *            the configuration LUCENE stream as JDOM tree
-     * @exception MCRConfigurationException
-     *                if the configuration is not correct
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public void createDataBase(String mcr_type, org.jdom.Document mcr_conf) throws MCRConfigurationException, MCRPersistenceException {
-        logger.info("This feature exist not for this store.");
-    }
-
-    /**
      * Updates the searchable content in the database. Currently this is the
      * same like delete and then a new create. Should be made with XUpdate in
      * the future.

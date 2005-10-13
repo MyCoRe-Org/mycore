@@ -273,12 +273,6 @@ public abstract class MCRBase {
     public abstract String createTextSearch() throws MCRException;
 
     /**
-     * The methode create a new datastore based of given data. It create a new
-     * data table for storing MCRObjects with the same MCRObjectID type.
-     */
-    public abstract void createDataBase(String mcr_type, org.jdom.Document confdoc);
-
-    /**
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException
@@ -295,21 +289,6 @@ public abstract class MCRBase {
      *                if a persistence problem is occured
      */
     public abstract void deleteFromDatastore(String id) throws MCRPersistenceException;
-
-    /**
-     * The methode return true if the object is in the data store, else return
-     * false.
-     * 
-     * @param id
-     *            the object ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-
-    /*
-     * public abstract boolean existInDatastore(String id) throws
-     * MCRPersistenceException;
-     */
 
     /**
      * The methode receive the object for the given MCRObjectID and stored it in

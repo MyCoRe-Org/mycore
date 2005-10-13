@@ -278,15 +278,6 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * The methode create a new datastore based of given data. It create a new
-     * data table for storing MCRObjects with the same MCRObjectID type.
-     */
-    public final void createDataBase(String mcr_type, org.jdom.Document confdoc) {
-        setId(new MCRObjectID("Template_" + mcr_type + "_1"));
-        mcr_persist.createDataBase(mcr_type, confdoc);
-    }
-
-    /**
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException

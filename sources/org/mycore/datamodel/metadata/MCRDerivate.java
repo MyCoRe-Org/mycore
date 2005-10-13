@@ -221,18 +221,6 @@ final public class MCRDerivate extends MCRBase {
     }
 
     /**
-     * The methode create a new datastore based of given data. It create a new
-     * data table for storing MCRObjects with the same MCRObjectID type.
-     * 
-     * @param confdoc
-     *            the configuration XML document
-     */
-    public final void createDataBase(String mcr_type, org.jdom.Document confdoc) {
-        setId(new MCRObjectID("Template_derivate_1"));
-        mcr_persist.createDataBase(mcr_type, confdoc);
-    }
-
-    /**
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException
