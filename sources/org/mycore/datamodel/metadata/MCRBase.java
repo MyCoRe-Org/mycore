@@ -107,6 +107,7 @@ public abstract class MCRBase {
             persist_name = mcr_conf.getString(proppers);
             mcr_persist = (MCRObjectSearchStoreInterface) Class.forName(persist_name).newInstance();
         } catch (Exception e) {
+        	logger.error("error occured: ",e);
             throw new MCRException(e.getMessage(), e);
         }
     }
