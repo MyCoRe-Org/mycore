@@ -250,6 +250,7 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
 
             do {
                 numRead = source.read(buffer, offset, bufferLength - offset);
+                if( numRead > 0 ) offset += numRead;
             } while ((numRead != -1) && (offset < bufferLength));
 
             if (numRead == -1) // all content was read into memory
