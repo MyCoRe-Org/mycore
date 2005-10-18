@@ -97,11 +97,6 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
 
     protected final static int MAX_ATTRIBUTE_TIME_LENGTH = 128;
 
-    /** The temporary store of the files * */
-    protected String[] STORE_TYPE_LIST = { "none", "memory" };
-
-    protected String storeTempType = "";
-
     protected int storeTempSize = 4;
 
     protected String storeTempDir = "";
@@ -146,17 +141,8 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
         attributeTime = CONFIG.getString(prefix + "Attribute.File");
         attributeOwner = CONFIG.getString(prefix + "Attribute.Owner");
         attributeFile = CONFIG.getString(prefix + "Attribute.Time");
-        storeTempType = CONFIG.getString(prefix + "StoreTemp.Type", "none");
         storeTempSize = CONFIG.getInt(prefix + "StoreTemp.MemSize", 4);
         storeTempDir = CONFIG.getString(prefix + "StoreTemp.Dir", "/tmp");
-
-        for (int i = 0; i < STORE_TYPE_LIST.length; i++) {
-            if (storeTempType.equals(STORE_TYPE_LIST[i])) {
-                return;
-            }
-        }
-
-        storeTempType = "none";
 
         if (TIEREF_TABLE == null) {
             // TIEREF_TABLE=MCRSQLConnection.justGetSingleValue(new
@@ -260,63 +246,55 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
 
             int filesize = 0;
 
-            if (storeTempType.equals("none")) {
-                filesize = source.available();
-                logger.debug("Set the MCRContentInputStream with available() length " + filesize + ".");
-                ddo.add((InputStream) source, filesize);
+            byte[] buffer = new byte[(storeTempSize * 1024 * 1024) + 16];
+
+            try {
+                filesize = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
+            } catch (IOException e) {
+                throw new MCRException("Cant read File with ID " + file.getID(), e);
             }
 
-            if (storeTempType.equals("memory")) {
-                byte[] buffer = new byte[(storeTempSize * 1024 * 1024) + 16];
+            if (filesize <= (storeTempSize * 1024 * 1024)) {
+                logger.debug("Set the MCRContentInputStream with memory length " + filesize + ".");
+                ddo.add(new ByteArrayInputStream(buffer), filesize);
+            } else {
+                int si = filesize;
+                File tmp = new File(storeTempDir, file.getID());
+                FileOutputStream ftmp = new FileOutputStream(tmp);
 
                 try {
-                    filesize = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
+                    ftmp.write(buffer, 0, filesize);
                 } catch (IOException e) {
-                    throw new MCRException("Cant read File with ID " + file.getID(), e);
+                    throw new MCRException("Cant write File with ID " + file.getID() + " to " + storeTempDir, e);
                 }
 
-                if (filesize <= (storeTempSize * 1024 * 1024)) {
-                    logger.debug("Set the MCRContentInputStream with memory length " + filesize + ".");
-                    ddo.add((InputStream) (new ByteArrayInputStream(buffer)), filesize);
-                } else {
-                    int si = filesize;
-                    File tmp = new File(storeTempDir, file.getID());
-                    FileOutputStream ftmp = new FileOutputStream(tmp);
+                while (true) {
+                    try {
+                        si = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
+                    } catch (IOException e) {
+                        throw new MCRException("Cant read File with ID " + file.getID(), e);
+                    }
+
+                    if (si == -1) {
+                        break;
+                    }
+
+                    filesize += si;
 
                     try {
-                        ftmp.write(buffer, 0, filesize);
+                        ftmp.write(buffer, 0, si);
                     } catch (IOException e) {
                         throw new MCRException("Cant write File with ID " + file.getID() + " to " + storeTempDir, e);
                     }
+                }
 
-                    while (true) {
-                        try {
-                            si = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
-                        } catch (IOException e) {
-                            throw new MCRException("Cant read File with ID " + file.getID(), e);
-                        }
+                ftmp.close();
+                logger.debug("Set the MCRContentInputStream with stream length " + filesize + ".");
+                ddo.add(new FileInputStream(tmp), filesize);
 
-                        if (si == -1) {
-                            break;
-                        }
-
-                        filesize += si;
-
-                        try {
-                            ftmp.write(buffer, 0, si);
-                        } catch (IOException e) {
-                            throw new MCRException("Cant write File with ID " + file.getID() + " to " + storeTempDir, e);
-                        }
-                    }
-
-                    ftmp.close();
-                    logger.debug("Set the MCRContentInputStream with stream length " + filesize + ".");
-                    ddo.add((InputStream) (new FileInputStream(tmp)), filesize);
-
-                    try {
-                        tmp.delete();
-                    } catch (SecurityException e) {
-                    }
+                try {
+                    tmp.delete();
+                } catch (SecurityException e) {
                 }
             }
 
