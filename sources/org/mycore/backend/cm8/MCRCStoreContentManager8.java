@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -244,61 +243,40 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
             ddo.setMimeType(file.getContentType().getMimeType());
             ddo.setTextSearchableFlag(true);
 
-            int filesize = 0;
+            int bufferLength = storeTempSize * 1024 * 1024;
+            byte[] buffer = new byte[bufferLength];
+            int offset = 0;
+            int numRead = 0;
 
-            byte[] buffer = new byte[(storeTempSize * 1024 * 1024) + 16];
+            do {
+                numRead = source.read(buffer, offset, bufferLength - offset);
+            } while ((numRead != -1) && (offset < bufferLength));
 
-            try {
-                filesize = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
-            } catch (IOException e) {
-                throw new MCRException("Cant read File with ID " + file.getID(), e);
-            }
-
-            if (filesize <= (storeTempSize * 1024 * 1024)) {
-                logger.debug("Set the MCRContentInputStream with memory length " + filesize + ".");
-                ddo.add(new ByteArrayInputStream(buffer), filesize);
-            } else {
-                int si = filesize;
+            if (numRead == -1) // all content was read into memory
+            {
+                logger.debug("Adding content of ddo from memory buffer, size is " + offset);
+                ddo.add(new ByteArrayInputStream(buffer), offset);
+            } else // bufferLength bytes of content is in memory
+            {
                 File tmp = new File(storeTempDir, file.getID());
                 FileOutputStream ftmp = new FileOutputStream(tmp);
+                ftmp.write(buffer); // write buffer back to temp file
 
-                try {
-                    ftmp.write(buffer, 0, filesize);
-                } catch (IOException e) {
-                    throw new MCRException("Cant write File with ID " + file.getID() + " to " + storeTempDir, e);
-                }
-
-                while (true) {
-                    try {
-                        si = source.read(buffer, 0, (storeTempSize * 1024 * 1024) + 16);
-                    } catch (IOException e) {
-                        throw new MCRException("Cant read File with ID " + file.getID(), e);
-                    }
-
-                    if (si == -1) {
-                        break;
-                    }
-
-                    filesize += si;
-
-                    try {
-                        ftmp.write(buffer, 0, si);
-                    } catch (IOException e) {
-                        throw new MCRException("Cant write File with ID " + file.getID() + " to " + storeTempDir, e);
-                    }
-                }
+                while ((numRead = source.read(buffer, 0, bufferLength)) != -1)
+                    ftmp.write(buffer, 0, numRead);
 
                 ftmp.close();
-                logger.debug("Set the MCRContentInputStream with stream length " + filesize + ".");
-                ddo.add(new FileInputStream(tmp), filesize);
+
+                logger.debug("Adding content of ddo from temp file, size is " + source.getLength());
+                ddo.add(new FileInputStream(tmp), source.getLength());
 
                 try {
                     tmp.delete();
-                } catch (SecurityException e) {
+                } catch (Exception ignored) {
                 }
             }
 
-            logger.debug("Add the DKTextICM.");
+            logger.debug("Added the DKTextICM.");
 
             String storageID = ddo.getPidObject().pidString();
             logger.debug("StorageID = " + storageID);
