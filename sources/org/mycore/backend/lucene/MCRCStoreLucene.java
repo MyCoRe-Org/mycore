@@ -51,7 +51,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.mycore.backend.filesystem.MCRCStoreLocalFilesystem;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRInputStreamCloner;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -84,8 +83,6 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
     private static int DOC_COUNT;
 
     private static File INDEX_DIR = null;
-
-    private static long LAST_MODIFIED;
 
     private static IndexReader INDEX_READER;
 
@@ -223,7 +220,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
         }
 
         try {
-            LAST_MODIFIED = IndexReader.getCurrentVersion(INDEX_DIR);
+            IndexReader.getCurrentVersion(INDEX_DIR);
         } catch (IOException e) {
             LOGGER.error("Error while getting last modified info from IndexDir", e);
         }
@@ -289,17 +286,12 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
                     "\nIf you don't have the right Plugin ready, reasign \"").append(file.getContentTypeID()).append("\" to another ContentStore.\n").append("Read the manual on how to do this!").toString());
         }
 
-        Document doc = null;
-        MCRInputStreamCloner isc = new MCRInputStreamCloner(source);
-        source = new MCRContentInputStream(isc.getNewInputStream());
-
         String returns = super.doStoreContent(file, source);
-
         if ((returns == null) || (returns.length() == 0)) {
             throw new MCRPersistenceException("Failed to store file " + file.getID() + " to local file system!");
         }
 
-        doc = getDocument(file, isc.getNewInputStream());
+        Document doc = getDocument(file);
 
         Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
         doc.add(storageID);
@@ -336,22 +328,20 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
         LOGGER.debug("shutting down... completed");
     }
 
-    protected Document getDocument(MCRFileReader reader, InputStream stream) throws IOException {
+    protected Document getDocument(MCRFileReader reader) throws IOException {
         Document returns = new Document();
 
-        // filter here
         // reader is instance of MCRFile
         // ownerID is derivate ID for all mycore files
-        if (reader instanceof MCRFile) {
             MCRFile file = (MCRFile) reader;
             Field derivateID = new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
             Field fileID = new Field("FileID", file.getID(), true, true, false);
             LOGGER.debug("adding fields to document");
             returns.add(derivateID);
             returns.add(fileID);
-        }
 
         try {
+            InputStream stream = file.getContentAsInputStream();
             BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(reader.getContentType(), stream));
 
             /*
@@ -549,7 +539,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
         }
 
         try {
-            LAST_MODIFIED = IndexReader.getCurrentVersion(INDEX_DIR);
+            IndexReader.getCurrentVersion(INDEX_DIR);
         } catch (IOException e) {
             LOGGER.warn("Cannot get current Version of IndexDir", e);
         }
@@ -575,16 +565,5 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
 
         INDEX_WRITER.mergeFactor = OPTIMIZE_INTERVALL;
         INDEX_WRITER.minMergeDocs = 1; // always write to local dir
-    }
-
-    private void refreshIndexSearcher() {
-        try {
-            if (LAST_MODIFIED != IndexReader.getCurrentVersion(INDEX_DIR)) {
-                INDEX_SEARCHER.close();
-                loadIndexSearcher();
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Cannot refresh IndexReader", e);
-        }
     }
 }
