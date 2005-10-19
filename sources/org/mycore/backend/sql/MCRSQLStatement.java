@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -64,7 +63,6 @@ public class MCRSQLStatement {
     }
 
     public MCRSQLStatement(String tableName) {
-        MCRArgumentChecker.ensureNotNull(tableName, "tableName");
         this.tableName = tableName;
         this.values = new Properties();
         this.conditions = new Properties();
@@ -73,8 +71,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement setValue(String columnName, String columnValue) {
-        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
-
         if (columnValue == null) {
             values.put(columnName, NULL);
         } else {
@@ -96,8 +92,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement setCondition(String columnName, String columnValue) {
-        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
-
         if (columnValue == null) {
             conditions.put(columnName, NULL);
         } else {
@@ -108,7 +102,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement addColumn(String columnDefinition) {
-        MCRArgumentChecker.ensureNotEmpty(columnDefinition, "columnDefinition");
         columns.addElement(columnDefinition);
 
         return this;
@@ -307,8 +300,6 @@ public class MCRSQLStatement {
     }
 
     public final String toSelectStatement(String columns) {
-        MCRArgumentChecker.ensureNotEmpty(columns, "Columns");
-
         return new StringBuffer("SELECT ").append(columns).append(" FROM ").append(toRowSelector()).toString();
     }
 

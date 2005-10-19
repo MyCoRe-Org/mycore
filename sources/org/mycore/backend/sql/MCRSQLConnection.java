@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 
@@ -179,8 +178,6 @@ public class MCRSQLConnection {
      * @return the MCRSQLRowReader that can be used for reading the result rows
      */
     public MCRSQLRowReader doQuery(String query) throws MCRPersistenceException {
-        MCRArgumentChecker.ensureNotEmpty(query, "query");
-
         logger.debug(query);
 
         try {
@@ -199,7 +196,6 @@ public class MCRSQLConnection {
      *            the SQL create, insert or delete statement to be executed
      */
     public void doUpdate(String statement) throws MCRPersistenceException {
-        MCRArgumentChecker.ensureNotEmpty(statement, "statement");
         logger.debug(statement);
 
         try {
