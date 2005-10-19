@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.103 $ $Date: 2005-09-30 08:01:18 $                      -->
+  <!-- $Revision: 1.104 $ $Date: 2005-10-19 08:53:29 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.103 $ $Date: 2005-09-30 08:01:18 $</echo>
+    <echo>Ant build file   : $Revision: 1.104 $ $Date: 2005-10-19 08:53:29 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${env.ANT_HOME}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -189,7 +189,7 @@
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-	  depends="compile_common, compile_servlets, compile_user, compile_acl, compile_metadata, compile_classifications, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
+	  depends="compile_common, compile_servlets, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
     <subant target="compile" inheritall="true" inheritrefs="true">
       <fileset dir="." includes="modules/module-*/build.xml" />
     </subant>
@@ -291,13 +291,6 @@
     <echo>Compiling online html-based file upload...</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/frontend/fileupload*/**"/>
-    </antcall>
-  </target>
-
-  <target name="compile_acl">
-    <echo>Compiling access control system...</echo>
-    <antcall target="javac">
-      <param name="packages" value="org/mycore/acl/**"/>
     </antcall>
   </target>
 
@@ -443,7 +436,6 @@
       <group title="MyCoRe Common Functionality"                packages="org.mycore.common*"    />
       <group title="MyCoRe Services"                            packages="org.mycore.services*"  />
       <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
-      <group title="MyCoRe Access Control Lists"                packages="org.mycore.acl"        />
 
       <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
       <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
