@@ -23,11 +23,15 @@
 
 package org.mycore.access;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.jdom.Element;
+import org.mycore.user.MCRUser;
 
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
-import org.mycore.user.MCRUser;
 
 public class MCRAccessRule {
     String id = "";
@@ -79,8 +83,13 @@ public class MCRAccessRule {
         this.rule = rule;
     }
 
-    public String getRuleString() {
-        return rule;
+    
+    public String getRuleString()
+    {
+        if (rule==null)
+            return "";
+        else
+            return rule;
     }
 
     /**
@@ -133,5 +142,20 @@ public class MCRAccessRule {
 
     public void setId(String id) {
         this.id = id;
+    }
+    
+    /**
+     * method returns element representation of mcraccessrule
+     * @return
+     */
+    public Element getRuleElement(){
+        Element el = new Element("mcraccessrule");
+        el.addContent(new Element("id").setText(this.id));
+        el.addContent(new Element("creator").setText(this.id));
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        el.addContent(new Element("creationdate").setText(df.format(this.creationTime)));
+        el.addContent(new Element("rule").setText(this.rule));
+        el.addContent(new Element("description").setText(""+this.description));
+        return el;
     }
 }

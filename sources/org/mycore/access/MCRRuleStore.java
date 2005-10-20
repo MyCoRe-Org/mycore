@@ -23,6 +23,8 @@
 
 package org.mycore.access;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 
@@ -43,6 +45,9 @@ public abstract class MCRRuleStore {
     public abstract void deleteRule(String ruleid);
 
     public abstract MCRAccessRule getRule(String ruleid);
+
+    public abstract boolean existRule(String ruleid);
+    public abstract ArrayList retrieveAllIDs();
 
     public abstract MCRAccessRule retrieveRule(String ruleid);
 
