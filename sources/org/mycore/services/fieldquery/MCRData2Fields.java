@@ -112,6 +112,20 @@ public class MCRData2Fields {
     public static List buildFields(MCRFile file, String index) {
         return buildFields(file, file.getContentTypeID(), index);
     }
+    
+    /**
+     * Extracts field values for indexing from the given JDOM xml document.
+     * 
+     * @param doc
+     *            the JDOM xml document thats data should be indexed
+     * @param index
+     *            the ID of the index as defined in searchfields.xml
+     * @return a List of MCRSearchField objects that contain name, type and
+     *         value
+     */
+    public static List buildFields(Document doc, String index) {
+        return buildFields(doc, doc.getRootElement().getName(), index);
+    }
 
     private static List buildFields(Object obj, String type, String index) {
         if (indexTable.isEmpty()) {
@@ -139,10 +153,15 @@ public class MCRData2Fields {
                 continue;
             }
 
-            String defau = ((obj instanceof MCRFile) ? "file.metadata" : "object.metadata");
+            String defau = "xml";
+            if (obj instanceof MCRFile)
+                defau = "file.metadata";
+            if (obj instanceof MCRObject)
+                defau = "object.metadata";
+            
             String source = fieldDef.getAttributeValue("source", defau);
 
-            if ("object.metadata".equals(source) || "file.xml".equals(source)) {
+            if ("object.metadata".equals(source) || "file.xml".equals(source) || "xml".equals(source)) {
                 xmlFields.add(fieldDef);
             } else if ("file.metadata".equals(source)) {
                 fileFields.add(fieldDef);
@@ -224,7 +243,10 @@ public class MCRData2Fields {
      * the file's content as XML, or null.
      */
     private static Document getXML(Object obj) {
-        if (obj instanceof MCRFile) {
+        if (obj instanceof Document) {
+            return (Document)obj;
+        }
+        else if (obj instanceof MCRFile) {
             MCRFile file = (MCRFile) obj;
 
             try {
