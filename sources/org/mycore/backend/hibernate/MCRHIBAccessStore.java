@@ -26,6 +26,7 @@ package org.mycore.backend.hibernate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -58,7 +59,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         try {
             List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
-
+           
             if (l.size() == 1) {
                 strRuleID = ((MCRACCESS) l.get(0)).getKey().getRid();
             }
@@ -184,7 +185,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Transaction tx = session.beginTransaction();
 
         try {
-            session.createQuery("delete MCRACCESS " + "where RID = '" + rulemapping.getRuleId() + "'" + " AND ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'").executeUpdate();
+            session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'").executeUpdate();
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
@@ -240,5 +241,80 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         }
 
         return rulemapping;
+    }
+
+    public ArrayList getMappedObjectId(String pool) {
+        createTables();
+
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        ArrayList ret = new ArrayList();
+
+        try {
+            List l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
+            tx.commit();
+            for (int i=0; i<l.size(); i++){
+                ret.add(((MCRACCESS) l.get(i)).getKey().getObjid());                
+            }
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+
+        return ret;
+    }
+
+    public ArrayList getPoolsForObject(String objid) {
+        createTables();
+
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        ArrayList ret = new ArrayList();
+
+        try {
+            List l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
+            
+            tx.commit();
+            for (int i=0; i<l.size(); i++){
+                MCRACCESS access = (MCRACCESS) l.get(i);
+                
+                ret.add(access.getKey().getAcpool());                
+            }
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+        
+        return ret;
+    }
+
+    public ArrayList getDatabasePools() {
+        createTables();
+        ArrayList ret = new ArrayList();
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        
+        try {
+            List l = session.createCriteria(MCRACCESS.class).list();
+            
+            tx.commit(); 
+            for (int i=0; i<l.size(); i++){
+                if (! ret.contains(((MCRACCESS)l.get(i)).getKey().getAcpool())){
+                    ret.add(((MCRACCESS)l.get(i)).getKey().getAcpool());
+                }
+            }
+            
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+        
+        return ret;
     }
 }

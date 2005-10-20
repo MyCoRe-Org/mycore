@@ -32,6 +32,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
@@ -95,7 +96,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
-            List l = session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list();
+            List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
             tx.commit();
             session.close();
 
@@ -129,6 +130,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
         try {
             session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
+          
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
@@ -154,7 +156,8 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));          
+            
             tx.commit();
             session.close();
 
@@ -209,7 +212,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         MCRAccessRule rule = null;
 
         try {
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));
 
             if (hibrule != null) {
                 try {
@@ -238,7 +241,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         ArrayList ret = new ArrayList();
 
         try {
-            List l = session.createQuery("from MCRACCESSRULE").list();
+            List l = session.createCriteria(MCRACCESSRULE.class).list();
             tx.commit();
 
             for (int i = 0; i < l.size(); i++) {
@@ -262,7 +265,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createQuery("from MCRACCESSRULE where RID = '" + ruleid + "'").list().get(0));
+            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));            
             tx.commit();
             session.close();
 

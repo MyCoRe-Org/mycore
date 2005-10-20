@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import org.mycore.access.MCRAccessStore;
 import org.mycore.access.MCRRuleMapping;
@@ -171,7 +172,7 @@ public class MCRSQLAccessStore extends MCRAccessStore {
 
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
         try {
-            MCRSQLConnection.justDoUpdate("DELETE FROM " + SQLAccessCtrlMapping + " WHERE RID = '" + rulemapping.getRuleId() + "' AND ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'");
+            MCRSQLConnection.justDoUpdate("DELETE FROM " + SQLAccessCtrlMapping + " WHERE ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'");
         } catch (Exception e) {
             logger.error(e);
         }
@@ -205,5 +206,69 @@ public class MCRSQLAccessStore extends MCRAccessStore {
         }
 
         return rulemapping;
+    }
+
+    public ArrayList getMappedObjectId(String pool) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
+        
+        try {
+            String select = "SELECT OBJID FROM " + SQLAccessCtrlMapping + " WHERE ACPOOL = '" + pool + "'";
+            logger.debug(" SQL: " + select);
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            while (rs.next()) {
+                ret.add(rs.getString(1));
+            }
+            rs.close();
+        } catch(Exception e) {
+            logger.error(e);
+        } finally {
+            c.release();            
+        }
+        
+        return ret;
+    }
+
+    public ArrayList getPoolsForObject(String objid) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
+        
+        try {
+            String select = "SELECT ACPOOL FROM " + SQLAccessCtrlMapping + " WHERE OBJID = '" + objid + "'";
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+
+            if (rs.next()) {
+                ret.add(rs.getString(1));
+            }
+        } catch(Exception e) {
+            logger.error(e);
+        } finally {
+            c.release();            
+        }
+        
+        return ret;
+    }
+
+    public ArrayList getDatabasePools() {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
+        
+        try {
+            String select = "SELECT distinct(ACPOOL) FROM " + SQLAccessCtrlMapping ;
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+
+            if (rs.next()) {
+                ret.add(rs.getString(1));
+            }
+        } catch(Exception e) {
+            logger.error(e);
+        } finally {
+            c.release();            
+        }
+        
+        return ret;
     }
 }
