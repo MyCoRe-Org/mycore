@@ -50,7 +50,7 @@ class MCRGroupClause implements MCRCondition {
     }
 
     public String toString() {
-        return "group " + group + "\n";
+        return "group " + group + " ";
     }
 
     public Element toXML() {
