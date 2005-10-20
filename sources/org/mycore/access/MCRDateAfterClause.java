@@ -25,7 +25,6 @@ package org.mycore.access;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.FieldPosition;
 import java.util.Date;
 
 import org.jdom.Element;
