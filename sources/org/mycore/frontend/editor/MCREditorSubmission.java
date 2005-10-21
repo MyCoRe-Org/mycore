@@ -361,10 +361,9 @@ public class MCREditorSubmission {
         String format = condition.getAttributeValue("format");
 
         if ((type != null) && !MCRInputValidator.instance().validateMinMaxType(value, type, min, max, format)) {
-            return false; // field type, data format and/or min max value is
+            return false; // field type, data format and/or min max value is illegal
         }
 
-        // illegal
         String minLength = condition.getAttributeValue("minLength");
         String maxLength = condition.getAttributeValue("maxLength");
 
@@ -382,6 +381,13 @@ public class MCREditorSubmission {
 
         if ((xsl != null) && !MCRInputValidator.instance().validateXSLCondition(value, xsl)) {
             return false; // field does not match given xsl condition
+        }
+        
+        String clazz = condition.getAttributeValue("class");
+        String method = condition.getAttributeValue("method");
+        
+        if ((clazz != null) && (method != null) && !MCRInputValidator.instance().validateExternally(clazz,method,value)) {
+            return false; // field does not validate using external method
         }
 
         return true;

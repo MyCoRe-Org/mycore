@@ -26,6 +26,7 @@ package org.mycore.frontend.editor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -47,6 +48,7 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * This class provides input validation methods for editor data.
@@ -513,6 +515,36 @@ public class MCRInputValidator {
         } catch (ParseException ex) {
             return true;
         }
+    }
+
+    /**
+     * Calls a "public static boolean" method in the given class and validates
+     * the value externally using the given method in that class.
+     * 
+     * @param clazz
+     *            the name of the class that contains the validation method
+     * @param method
+     *            the name of the public static boolean method that should be
+     *            called
+     * @param value
+     *            the value to validate
+     * 
+     * @return true, if the value validates
+     */
+    public boolean validateExternally(String clazz, String method, String value) {
+        Class[] argTypes = new Class[1];
+        argTypes[0] = String.class;
+        Object[] args = new Object[1];
+        args[0] = value;
+        Object result = new Boolean(false);
+        try {
+            Method m = Class.forName(clazz).getMethod(method, argTypes);
+            result = m.invoke(null, args);
+        } catch (Exception ex) {
+            String msg = "Exception while validating input using external method";
+            throw new MCRException(msg, ex);
+        }
+        return ((Boolean) result).booleanValue();
     }
 
     public static void main(String[] args) {
