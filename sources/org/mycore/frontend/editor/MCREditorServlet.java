@@ -113,7 +113,7 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Loads existing editor session data into webpage
      */
-    private void processLoadSession(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
+    private void processLoadSession(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
         String sessionID = req.getParameter("_session");
         logger.info("Editor session " + sessionID + " reload form data");
 
@@ -137,7 +137,7 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Starts a new editor session in webpage
      */
-    private void processStartSession(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
+    private void processStartSession(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
         String uri = req.getParameter("_uri");
         String ref = req.getParameter("_ref");
         String key = req.getParameter("_requestParamKey");
@@ -311,7 +311,7 @@ public class MCREditorServlet extends MCRServlet {
         return sb.toString();
     }
 
-    private void processEndSubSelect(HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms) throws ServletException, java.io.IOException {
+    private void processEndSubSelect(HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms) throws java.io.IOException {
         String root = "root";
         List variables = new ArrayList();
         Enumeration e = req.getParameterNames();
