@@ -274,9 +274,10 @@ public class MCREditorSubmission {
             for (int i = 0; i < conditions.size(); i++) {
                 Element condition = (Element) (conditions.get(i));
 
-                for (int j = 0; j < values.length; j++) {
+                boolean ok = true;
+                for (int j = 0; (j < values.length) && ok; j++) {
                     String nname = ((j == 0) ? name : (name + "[" + (j + 1) + "]"));
-                    boolean ok = checkCondition(condition, nname, values[j]);
+                    ok = checkCondition(condition, nname, values[j]);
 
                     if (!ok) {
                         String sortNr = parms.getParameter("_sortnr-" + name);
