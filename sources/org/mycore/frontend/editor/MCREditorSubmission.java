@@ -282,11 +282,13 @@ public class MCREditorSubmission {
                         String sortNr = parms.getParameter("_sortnr-" + name);
                         failed.put(sortNr, condition);
 
-                        LOGGER.info("Validation condition failed:");
-                        LOGGER.info(nname + " = \"" + values[j] + "\"");
-
-                        String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
-                        LOGGER.info(cond);
+                        if( LOGGER.isDebugEnabled() )
+                        {
+                          String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
+                          LOGGER.debug("Validation condition failed:");
+                          LOGGER.debug(nname + " = \"" + values[j] + "\"");
+                          LOGGER.debug(cond);
+                        }
                     }
                 }
             }
@@ -313,13 +315,22 @@ public class MCREditorSubmission {
 
                     String pathA = path + "/" + condition.getAttributeValue("field1");
                     String pathB = path + "/" + condition.getAttributeValue("field2");
+                    String valueA = parms.getParameter(pathA);
+                    String valueB = parms.getParameter(pathB);
+
                     String type = condition.getAttributeValue("type");
                     String oper = condition.getAttributeValue("operator");
                     String format = condition.getAttributeValue("format");
+                    
+                    String clazz = condition.getAttributeValue("class");
+                    String method = condition.getAttributeValue("method");
+                    
+                    boolean ok = true;
 
-                    String valueA = parms.getParameter(pathA);
-                    String valueB = parms.getParameter(pathB);
-                    boolean ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
+                    if( ( oper != null ) && ( oper.length() > 0 ) )
+                      ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
+                    if( ( clazz != null ) && ( clazz.length() > 0 ) )
+                      ok = ok && MCRInputValidator.instance().validateExternally( clazz, method, valueA, valueB );
 
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
@@ -328,11 +339,13 @@ public class MCREditorSubmission {
                         String sortNrB = parms.getParameter("_sortnr-" + pathB);
                         failed.put(sortNrB, condition);
 
-                        LOGGER.info("Validation condition failed:");
-                        LOGGER.info(pathA + " " + oper + " " + pathB);
-
-                        String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
-                        LOGGER.info(cond);
+                        if( LOGGER.isDebugEnabled() )
+                        {
+                          String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
+                          LOGGER.debug("Validation condition failed:");
+                          LOGGER.debug(pathA + " " + oper + " " + pathB);
+                          LOGGER.debug(cond);
+                        }
                     }
                 }
             }
