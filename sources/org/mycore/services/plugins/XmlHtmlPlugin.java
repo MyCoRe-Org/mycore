@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Comment;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -49,6 +50,9 @@ import org.w3c.tidy.Tidy;
  * @author Harald Richter
  */
 public class XmlHtmlPlugin implements TextFilterPlugin {
+    /** The logger */
+    private static final Logger LOGGER = Logger.getLogger(XmlHtmlPlugin.class);
+    
     private static final int MAJOR = 1;
 
     private static final int MINOR = 0;
@@ -174,6 +178,8 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         tidy.setForceOutput(true);
         tidy.setXmlOut(true);
         tidy.setShowWarnings(false);
+        if (!LOGGER.isDebugEnabled())
+          tidy.setQuiet(true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         tidy.parseDOM(input, out);
