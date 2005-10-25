@@ -117,7 +117,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
      * @return The lucene document
      * 
      */
-    private Document buildLuceneDocument(List fields) throws Exception {
+    public static Document buildLuceneDocument(List fields) throws Exception {
         Document doc = new Document();
 
         for (int i = 0; i < fields.size(); i++) {
@@ -173,7 +173,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         return doc;
     }
 
-    private String handleDate(String content, String informat, String outformat) throws Exception {
+    private static String handleDate(String content, String informat, String outformat) throws Exception {
         DateFormat f1 = new SimpleDateFormat(informat);
         DateFormat f2 = new SimpleDateFormat(outformat);
         Date d;
@@ -191,40 +191,54 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
      */
     private void addDocumentToLucene(Document doc) throws Exception {
         IndexWriter writer = null;
+
+        writer = getLuceneWriter(IndexDir, FIRST);
+        FIRST = false;
+
+        writer.addDocument(doc);
+        writer.close();
+    }
+
+    /**
+     * Get Lucene Writer
+     * 
+     * @param indexDir
+     *            directory where lucene index is store
+     *            first  check existance of index directory, if it does nor exist create it
+     * 
+     * @return the lucene writer, calling programm must close writer
+     */
+    public static IndexWriter getLuceneWriter(String indexDir, boolean first) throws Exception {
+        IndexWriter writer;
         Analyzer analyzer = new GermanAnalyzer();
 
         // does directory for text index exist, if not build it
-        if (FIRST) {
-            FIRST = false;
-
-            File file = new File(IndexDir);
+        if (first) {
+            File file = new File(indexDir);
 
             if (!file.exists()) {
-                LOGGER.info("The Directory doesn't exist: " + IndexDir + " try to build it");
+                LOGGER.info("The Directory doesn't exist: " + indexDir + " try to build it");
 
-                IndexWriter writer2 = new IndexWriter(IndexDir, analyzer, true);
+                IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
                 writer2.close();
             } else if (file.isDirectory()) {
                 if (0 == file.list().length) {
-                    LOGGER.info("No Entries in Directory, initialize: " + IndexDir);
+                    LOGGER.info("No Entries in Directory, initialize: " + indexDir);
 
-                    IndexWriter writer2 = new IndexWriter(IndexDir, analyzer, true);
+                    IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
                     writer2.close();
                 }
             }
         } // if ( first
 
-        if (null == writer) {
-            writer = new IndexWriter(IndexDir, analyzer, false);
-            writer.mergeFactor = 200;
-            writer.maxMergeDocs = 2000;
-        }
-
-        writer.addDocument(doc);
-        writer.close();
-        writer = null;
+        writer = new IndexWriter(indexDir, analyzer, false);
+        writer.mergeFactor = 200;
+        writer.maxMergeDocs = 2000;
+        
+        return writer;
     }
-
+    
+    
     protected void removeFromIndex(String entryID) {
         LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
 
