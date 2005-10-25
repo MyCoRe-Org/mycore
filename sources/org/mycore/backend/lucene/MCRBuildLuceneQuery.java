@@ -134,7 +134,7 @@ public class MCRBuildLuceneQuery {
     }
 
     private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf) throws Exception {
-        if ("text".equals(fieldtype) && ("contains".equals(operator) || "=".equals(operator))) {
+        if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
             Term te;
@@ -176,7 +176,7 @@ public class MCRBuildLuceneQuery {
             }
 
             return new PrefixQuery(te);
-        } else if ("text".equals(fieldtype) && "phrase".equals(operator)) {
+        } else if ("text".equals(fieldtype) && ("phrase".equals(operator) || "=".equals(operator))) {
             Term te;
             PhraseQuery pq = new PhraseQuery();
             TokenStream ts = analyzer.tokenStream(null, new StringReader(value));
@@ -223,6 +223,10 @@ public class MCRBuildLuceneQuery {
             return DateQuery(field, TIMESTAMP_FORMAT, "yyyyMMddHHmmss", operator, value);
         } else if ("identifier".equals(fieldtype) && "=".equals(operator)) {
             Term te = new Term(field, value);
+
+            return new TermQuery(te);
+        } else if ("boolean".equals(fieldtype) ) {
+            Term te = new Term(field, "true".equals(value) ? "1" : "0");
 
             return new TermQuery(te);
         } else if ("text".equals(fieldtype) && "lucene".equals(operator)) // value
