@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.GregorianCalendar;
@@ -404,6 +405,25 @@ public class MCROldFile implements MCRFileReader {
      * implemented for MCROldFile class.
      */
     public MCRFileContentType getContentType() {
-        throw new UnsupportedOperationException("Not implemented for MCROldFile");
+//        throw new UnsupportedOperationException("Not implemented for MCROldFile");
+      return MCRFileContentTypeFactory.getType(contentTypeID);
+  }
+    
+    /**
+     * Gets an InputStream to read the content of this file from the underlying
+     * store. It is important that you close() the stream when you are finished
+     * reading content from it.
+     * 
+     * @return an InputStream to read the file's content from
+     * @throws IOException
+     */
+    public InputStream getContentAsInputStream() throws IOException {
+        return getContentStore().retrieveContent(this);
     }
+    
+    public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
+      return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
+  }
+
+
 }
