@@ -62,7 +62,13 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
                     // fill hit meta
                     for (int j = 0; j < order.size(); j++) {
                         String key = ((MCRSearchField) order.get(j)).getName();
-                        String value = (String) tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
+                        Object valueObj = tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
+                        String value = "";
+                        if (valueObj instanceof java.sql.Date) {
+                        	value = ((java.sql.Date) valueObj).toString() ;
+                        }else{
+                        	value = (String) valueObj ;
+                        }
                         hit.addSortData(key, value);
                     }
 
@@ -80,7 +86,7 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
             }
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("error in MCRHibSearcher", e);
         } finally {
             session.close();
         }
