@@ -26,11 +26,14 @@ package org.mycore.backend.lucene;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Enumeration;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.document.Field;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
@@ -159,42 +162,32 @@ public class MCRLuceneQuery implements MCRConditionVisitor {
         for (int i = 0; i < found; i++) {
             // org.apache.lucene.document.Document doc = hits.doc(i);
             org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
-            String mcrtype = doc.get("mcrtype");
             String id;
 
-            if ("f".equals(mcrtype)) // MCRFile found
-            {
-                id = doc.get("FileID");
-                LOGGER.debug("ID of MCRFile found: " + id);
-
+            id = doc.get("mcrid");
+            LOGGER.debug("ID of MCRObject found: " + id);
+            /*
+             * TODO if (MCRAccessManager.checkReadAccess( id,
+             * MCRSessionMgr.getCurrentSession()))
+             */{
                 MCRHit hit = new MCRHit(id);
-                hit.addSortData("type", "MCRFile");
 
-                String key = "OwnnerID";
-                String value = doc.get("OwnnerID");
-                hit.addSortData(key, value);
+                Enumeration fields = doc.fields();
+                Field field;
+                Properties props = new Properties();
+                
+                while (fields.hasMoreElements()) 
+                {
+                  field = (Field) fields.nextElement();
+                  if ( field.isStored() && !"mcrid".equals(field.name()) )
+                    props.setProperty(field.name(), field.stringValue());
+                }
+                
+                if (props.size() > 0)
+                  hit.addMetaData(props);
+
                 result.addHit(hit);
-            } else // MCRObject found
-            {
-                id = doc.get("mcrid");
-                LOGGER.debug("ID of MCRObject found: " + id);
-                /*
-                 * TODO if (MCRAccessManager.checkReadAccess( id,
-                 * MCRSessionMgr.getCurrentSession()))
-                 */{
-                    MCRHit hit = new MCRHit(id);
-                    hit.addSortData("type", "MCRObject");
-
-                    // fill hit meta
-                    // for (int j=0; j<order.size(); j++){
-                    String key = "author";
-                    String value = doc.get("author");
-                    hit.addSortData(key, value);
-
-                    // }
-                    result.addHit(hit);
-                } // MCRAccessManager
-            }
+             } // MCRAccessManager
         }
 
         searcher.close();
