@@ -23,6 +23,10 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Properties;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.type.BlobType;
 import org.hibernate.type.IntegerType;
@@ -30,6 +34,7 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Creater class for mapping files This class generates the xml mapping for the
@@ -208,6 +213,14 @@ public class MCRHIBMapping {
             map.addColumn("xml", "MCRXML", dbBlob, 7000000, false, false, false);
             cfg.addXML(map.getTableXML());
 
+            // create additional tables, that are defined in hibernate standard hbm.xml-mapping files
+            // and configurable via properties like MCR.hibernate.hbm.xml.TABLENAME=TABLENAME.hbm.xml
+            // the -.hbm.xml files must be copied in the classpath before starting ant create.hibernate or ant create.metastore
+            Properties hbmxmlProps = config.getProperties("MCR.hibernate.hbm.xml");
+            for (Enumeration en = hbmxmlProps.propertyNames(); en.hasMoreElements();) {
+            	cfg.addResource(config.getString((String) en.nextElement()));
+			}
+            
             cfg.createMappings();
         } catch (Exception e) {
             e.printStackTrace();
