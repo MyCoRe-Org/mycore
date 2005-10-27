@@ -298,7 +298,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
             e.printStackTrace();
         }
 
-        LOGGER.debug("MCRMemorySearcher results completed");
+        LOGGER.debug("MCRLuceneSearcher results completed");
 
         return results;
     }
