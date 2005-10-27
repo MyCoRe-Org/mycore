@@ -121,8 +121,14 @@ public class MCRHIBConnection {
             throw new MCRException("Couldn't determine database type from connection string: \"" + url + "\"");
         }
 
-        cfg = new Configuration().setProperty("hibernate.dialect", dialect).setProperty("hibernate.connection.driver_class", driver).setProperty("hibernate.connection.url", url).setProperty("hibernate.connection.username", userID).setProperty("hibernate.connection.password", password).setProperty("hibernate.connection.pool_size", "" + maxUsages).setProperty("hibernate.show_sql",
-                "" + config.getBoolean("MCR.hibernate.show_sql", false));
+        cfg = new Configuration().setProperty("hibernate.dialect", dialect)
+        	.setProperty("hibernate.jdbc.batch_size","25")
+        	.setProperty("hibernate.connection.driver_class", driver)
+        	.setProperty("hibernate.connection.url", url)
+        	.setProperty("hibernate.connection.username", userID)
+        	.setProperty("hibernate.connection.password", password)
+        	.setProperty("hibernate.connection.pool_size", "" + maxUsages)
+        	.setProperty("hibernate.show_sql","" + config.getBoolean("MCR.hibernate.show_sql", false));
     }
 
     /**
