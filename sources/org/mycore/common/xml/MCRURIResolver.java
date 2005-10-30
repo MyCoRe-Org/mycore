@@ -162,7 +162,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         String scheme = getScheme(href);
 
-        if ("resource webapp file session query mcrobject".indexOf(scheme) != -1) {
+        if ("resource request webapp file session query mcrobject".indexOf(scheme) != -1) {
             return new JDOMSource(resolve(href));
         } else {
             return null;
