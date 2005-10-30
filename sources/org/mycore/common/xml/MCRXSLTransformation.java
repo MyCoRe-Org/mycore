@@ -266,6 +266,7 @@ public class MCRXSLTransformation {
         try {
             JDOMResult out = new JDOMResult();
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File(stylesheet)));
+            transformer.setURIResolver(MCRURIResolver.instance());
             Enumeration names = parameters.propertyNames();
 
             while (names.hasMoreElements()) {
@@ -279,7 +280,7 @@ public class MCRXSLTransformation {
 
             return out.getDocument();
         } catch (TransformerException e) {
-            logger.fatal(e.getMessage());
+            logger.fatal(e.getMessage(),e);
 
             return null;
         }
