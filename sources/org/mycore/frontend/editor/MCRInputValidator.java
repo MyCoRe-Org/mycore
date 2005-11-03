@@ -340,8 +340,8 @@ public class MCRInputValidator {
             NumberFormat nf = NumberFormat.getNumberInstance(locale);
 
             double dmin = Double.MIN_VALUE;
-            double dval = Double.MAX_VALUE;
-            double dmax = 0.0;
+            double dval = 0.0;
+            double dmax = Double.MAX_VALUE;
 
             try {
                 if (min != null) {
@@ -594,6 +594,6 @@ public class MCRInputValidator {
         System.out.println(false == iv.validateMinMaxType("30.02.2005", "datetime", null, null, "dd.MM.yyyy"));
         System.out.println(true == iv.validateMinMaxType("26.02.2005", "datetime", null, null, "dd.MM.yyyy"));
         System.out.println(true == iv.validateMinMaxType("3,5", "decimal", "1", "4", "de"));
-        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1", "4", "en"));
+        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1", null, "en"));
     }
 }
