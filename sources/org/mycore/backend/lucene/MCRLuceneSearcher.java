@@ -25,10 +25,12 @@ package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.lang.Math;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -70,6 +72,11 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
     static String TIME_FORMAT = "hh:mm:ss";
 
     static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    
+    static int INT_BEFORE = 10;
+    
+    static int DEC_BEFORE = 10;
+    static int DEC_AFTER  = 4;
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
@@ -153,9 +160,16 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
                     type = "indentifier";
+                } else if ("decimal".equals(type))
+                {
+                  content    = handleNumber(content, "decimal", 0);
+                  type       = "identifier";
+                } else if ("integer".equals(type))
+                {
+                  content    = handleNumber(content, "integer", 0);
+                  type       = "identifier";
                 }
 
-                // TODO handle decimal and integer
                 if (type.equals("identifier")) {
                     doc.add(Field.Keyword(name, content));
                 }
@@ -182,6 +196,34 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         return f2.format(d);
     }
 
+    public static String handleNumber(String content, String type, long add)
+    {
+      int before, after;  
+      int dez;
+      long l;
+      if ( "decimal".equals(type))
+      {
+        before   = DEC_BEFORE;
+        after    = DEC_AFTER;
+        dez      = before + after;
+        double d = Double.parseDouble(content);
+        d        = d*Math.pow(10, after) + Math.pow(10, dez);
+        l        = (long)d;
+      }
+      else
+      {
+        before   = INT_BEFORE;
+        dez      = before;
+        l        = Long.parseLong(content);
+        l        = l +(long)(Math.pow(10, dez) + 0.1);
+      }
+      
+      long m     = l + add;
+      String n   = "0000000000000000000";
+      String h   = Long.toString(m);
+      return n.substring(0,dez+1-h.length()) + h;
+    }
+    
     /**
      * Adds document to Lucene
      * 
@@ -243,23 +285,25 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
 
         try {
-            deleteLuceneDocument("mcrid", entryID);
+            deleteLuceneDocument("mcrid", entryID, IndexDir);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
         }
     }
 
     /**
-     * Delete document in Lucene
+     * Delete all documents in Lucene with id
      * 
      * @param fieldname
-     *            string name of lucene field to store id
+     *            string name of lucene field with stored id
      * @param id
      *            string document id
+     * @param indexDir
+     *      *     the directory where index is stored
      * 
      */
-    private void deleteLuceneDocument(String fieldname, String id) throws Exception {
-        IndexSearcher searcher = new IndexSearcher(IndexDir);
+    public static void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
+        IndexSearcher searcher = new IndexSearcher(indexDir);
 
         if (null == searcher) {
             return;
@@ -275,15 +319,14 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
 
         LOGGER.info("Number of documents found : " + hits.length());
 
-        if (1 == hits.length()) {
-            LOGGER.info(fieldname + ": " + hits.id(0) + " score: " + hits.score(0) + " key: " + hits.doc(0).get(fieldname));
-
-            if (id.equals(hits.doc(0).get(fieldname))) {
-                IndexReader reader = IndexReader.open(IndexDir);
-                reader.delete(hits.id(0));
-                reader.close();
-                LOGGER.info("DELETE: " + id);
-            }
+        if ( hits.length() > 0) {
+          IndexReader reader = IndexReader.open(indexDir);
+          for (int i = 0; i < hits.length(); i++)
+          {
+            reader.delete(hits.id(i));
+          }
+          LOGGER.info("DELETE: " + id);
+          reader.close();
         }
     }
 

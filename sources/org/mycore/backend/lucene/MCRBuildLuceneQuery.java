@@ -229,6 +229,10 @@ public class MCRBuildLuceneQuery {
             Term te = new Term(field, "true".equals(value) ? "1" : "0");
 
             return new TermQuery(te);
+        } else if ("decimal".equals(fieldtype)) {  
+          return NumberQuery(field, "decimal", operator, value);
+        } else if ("integer".equals(fieldtype)) {  
+          return NumberQuery(field, "integer", operator, value);
         } else if ("text".equals(fieldtype) && "lucene".equals(operator)) // value
                                                                             // contains
                                                                             // query
@@ -365,5 +369,33 @@ public class MCRBuildLuceneQuery {
 
             return null;
         }
+    }
+    
+    /***************************************************************************
+     * NumberQuery ()
+     **************************************************************************/
+    private static Query NumberQuery(String fieldname, String type, String Op, String value) throws Exception {
+        if (value.length() == 0) {
+            return null;
+        }
+        
+        String lower = "0000000000000000000";
+        String upper = "9999999999999999999";
+        
+        if (Op.equals(">") || Op.equals(">=") ) {
+          lower = MCRLuceneSearcher.handleNumber(value, type, Op.equals(">") ? 1 : 0);
+          upper = upper.substring(0, lower.length() );
+      } else if (Op.equals("<") || Op.equals("<=") ) {
+          upper = MCRLuceneSearcher.handleNumber(value, type, Op.equals("<") ? -1 : 0);
+          lower = lower.substring(0, upper.length() );
+      } else if (Op.equals("=")) {
+          return new TermQuery(new Term(fieldname, MCRLuceneSearcher.handleNumber(value, type, 0)));
+      } else {
+          LOGGER.info("Invalid operator for Number: " + Op);
+
+          return null;
+      }
+
+      return new RangeQuery(new Term(fieldname, lower), new Term(fieldname, upper), true);
     }
 }
