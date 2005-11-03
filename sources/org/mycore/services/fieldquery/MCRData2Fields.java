@@ -199,6 +199,7 @@ public class MCRData2Fields {
     private static Document buildXML(MCRFile file) {
         Element root = new Element("file");
         root.setAttribute("id", file.getID());
+        root.setAttribute("owner", file.getOwnerID());
         root.setAttribute("name", file.getName());
         root.setAttribute("path", file.getAbsolutePath());
         root.setAttribute("size", Long.toString(file.getSize()));
