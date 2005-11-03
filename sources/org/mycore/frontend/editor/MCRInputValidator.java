@@ -26,6 +26,7 @@ package org.mycore.frontend.editor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -47,6 +48,7 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * This class provides input validation methods for editor data.
@@ -338,8 +340,8 @@ public class MCRInputValidator {
             NumberFormat nf = NumberFormat.getNumberInstance(locale);
 
             double dmin = Double.MIN_VALUE;
-            double dval = Double.MAX_VALUE;
-            double dmax = 0.0;
+            double dval = 0.0;
+            double dmax = Double.MAX_VALUE;
 
             try {
                 if (min != null) {
@@ -515,6 +517,70 @@ public class MCRInputValidator {
         }
     }
 
+    /**
+     * Calls a "public static boolean" method in the given class and validates
+     * the value externally using the given method in that class.
+     * 
+     * @param clazz
+     *            the name of the class that contains the validation method
+     * @param method
+     *            the name of the public static boolean method that should be
+     *            called
+     * @param value
+     *            the value to validate
+     * 
+     * @return true, if the value validates
+     */
+    public boolean validateExternally(String clazz, String method, String value) {
+        Class[] argTypes = new Class[1];
+        argTypes[0] = String.class;
+        Object[] args = new Object[1];
+        args[0] = value;
+        Object result = new Boolean(false);
+        try {
+            Method m = Class.forName(clazz).getMethod(method, argTypes);
+            result = m.invoke(null, args);
+        } catch (Exception ex) {
+            String msg = "Exception while validating input using external method";
+            throw new MCRException(msg, ex);
+        }
+        return ((Boolean) result).booleanValue();
+    }
+
+    /**
+     * Calls a "public static boolean" method in the given class and validates
+     * the two values externally using the given method in that class.
+     * 
+     * @param clazz
+     *            the name of the class that contains the validation method
+     * @param method
+     *            the name of the public static boolean method that should be
+     *            called
+     * @param value1
+     *            the first value to validate
+     * @param value2
+     *            the second value to validate
+     * 
+     * @return true, if the two values validate
+     */
+    public boolean validateExternally(String clazz, String method, String value1, String value2) {
+        Class[] argTypes = new Class[2];
+        argTypes[0] = String.class;
+        argTypes[1] = String.class;
+        Object[] args = new Object[2];
+        args[0] = value1;
+        args[1] = value2;
+        Object result = new Boolean(false);
+        try {
+            Method m = Class.forName(clazz).getMethod(method, argTypes);
+            result = m.invoke(null, args);
+        } catch (Exception ex) {
+            String msg = "Exception while validating input using external method";
+            throw new MCRException(msg, ex);
+        }
+        return ((Boolean) result).booleanValue();
+    }
+
     public static void main(String[] args) {
         MCRInputValidator iv = MCRInputValidator.instance();
         System.out.println(true == iv.validateXSLCondition("bingo@bongo.com", "contains(.,'@')"));
@@ -528,6 +594,6 @@ public class MCRInputValidator {
         System.out.println(false == iv.validateMinMaxType("30.02.2005", "datetime", null, null, "dd.MM.yyyy"));
         System.out.println(true == iv.validateMinMaxType("26.02.2005", "datetime", null, null, "dd.MM.yyyy"));
         System.out.println(true == iv.validateMinMaxType("3,5", "decimal", "1", "4", "de"));
-        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1", "4", "en"));
+        System.out.println(true == iv.validateMinMaxType("3.5", "decimal", "1", null, "en"));
     }
 }
