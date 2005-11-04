@@ -1265,7 +1265,13 @@ public class MCRUserMgr {
         }
 
         if (reqUser == null) { // We do not have this user in the cache
-            reqUser = mcrUserStore.retrieveUser(userID);
+
+            try {
+                reqUser = mcrUserStore.retrieveUser(userID);
+            } catch (MCRException e) {
+                logger.warn(e.getMessage());
+                reqUser = new MCRUser();
+            }
 
             if (reqUser != null) {
                 userCache.put(userID, reqUser);
@@ -1753,7 +1759,7 @@ public class MCRUserMgr {
 
             MCRGroup linkedGroup = retrieveGroup(gid);
             linkedGroup.modificationIsAllowed(); // If the modification is
-                                                    // not
+            // not
 
             // allowed an exception will be
             // thrown.
