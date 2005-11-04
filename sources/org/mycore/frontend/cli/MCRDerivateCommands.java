@@ -273,6 +273,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                     }
                 }
 
+                mycore_obj.getDerivate().getInternals().setSourcePath(path);
+                LOGGER.info("Source path --> " + path);
             }
 
             LOGGER.info("Label --> " + mycore_obj.getLabel());
