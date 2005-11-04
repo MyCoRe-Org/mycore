@@ -26,7 +26,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -39,14 +38,13 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
  * interface.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDerivateCommands extends MCRAbstractCommands {
@@ -88,8 +86,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         com = new MCRCommand("get next derivate ID for base {0}", "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String", "The command return the next free MCRObjectID for the ID base.");
         command.add(com);
 
-        com = new MCRCommand("repair derivate search", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch", "The command read the SQL store table of derivate XML files and restore them to the search store.");
-        command.add(com);
     }
 
     /**
@@ -264,7 +260,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 File sPath = new File(path);
 
                 if (!sPath.isAbsolute()) {
-                    //only change path to absolute path when relative
+                    // only change path to absolute path when relative
 
                     String prefix = new File(file).getParent();
 
@@ -526,24 +522,4 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info(k + " Object's stored under " + dirname + ".");
     }
 
-    /**
-     * The method start the repair aof the derivate search
-     */
-    public static void repairDerivateSearch() {
-        LOGGER.info("Start the repair for type derivate");
-
-        // XML table manager
-        MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
-        ArrayList ar = mcr_xml.retrieveAllIDs("derivate");
-        MCRDerivate der = new MCRDerivate();
-        String stid = null;
-
-        for (int i = 0; i < ar.size(); i++) {
-            stid = (String) ar.get(i);
-            der.repairPersitenceDatastore(stid);
-            LOGGER.info("Repaired " + (String) ar.get(i));
-        }
-
-        LOGGER.info(" ");
-    }
 }
