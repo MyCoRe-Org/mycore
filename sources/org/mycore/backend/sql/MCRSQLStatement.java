@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUtils;
 
 /**
  * @author Frank Lützenkirchen
@@ -51,20 +51,21 @@ public class MCRSQLStatement {
 
     protected String tableName;
 
-    private static char MASK_CHAR;
+    private static String MASK_WHAT = "'";
+
+    private static String MASK_WITH;
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
 
         if (config.getString("MCR.persistence_sql_database_url").indexOf(":db2:") > 0) {
-            MASK_CHAR = '\'';
+            MASK_WITH = "''";
         } else {
-            MASK_CHAR = '\\';
+            MASK_WITH = "\\'";
         }
     }
 
     public MCRSQLStatement(String tableName) {
-        MCRArgumentChecker.ensureNotNull(tableName, "tableName");
         this.tableName = tableName;
         this.values = new Properties();
         this.conditions = new Properties();
@@ -73,8 +74,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement setValue(String columnName, String columnValue) {
-        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
-
         if (columnValue == null) {
             values.put(columnName, NULL);
         } else {
@@ -96,8 +95,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement setCondition(String columnName, String columnValue) {
-        MCRArgumentChecker.ensureNotEmpty(columnName, "columnName");
-
         if (columnValue == null) {
             conditions.put(columnName, NULL);
         } else {
@@ -108,7 +105,6 @@ public class MCRSQLStatement {
     }
 
     public final MCRSQLStatement addColumn(String columnDefinition) {
-        MCRArgumentChecker.ensureNotEmpty(columnDefinition, "columnDefinition");
         columns.addElement(columnDefinition);
 
         return this;
@@ -166,7 +162,7 @@ public class MCRSQLStatement {
             String column = (String) (keys.nextElement());
             String value = getSQLValue(column);
 
-            columnList.append(" ").append( column );
+            columnList.append(" ").append(column);
             valueList.append(" ").append(value);
 
             if (keys.hasMoreElements()) {
@@ -307,8 +303,6 @@ public class MCRSQLStatement {
     }
 
     public final String toSelectStatement(String columns) {
-        MCRArgumentChecker.ensureNotEmpty(columns, "Columns");
-
         return new StringBuffer("SELECT ").append(columns).append(" FROM ").append(toRowSelector()).toString();
     }
 
@@ -328,8 +322,9 @@ public class MCRSQLStatement {
      * @return value with masked '
      */
     private final String mask(String value) {
-        final char mask = '\'';
-
-        return value.replaceAll("" + mask, "" + MASK_CHAR + mask);
+        if (value.indexOf(MASK_WHAT) >= 0)
+            return MCRUtils.replaceString(value, MASK_WHAT, MASK_WITH);
+        else
+            return value;
     }
 }
