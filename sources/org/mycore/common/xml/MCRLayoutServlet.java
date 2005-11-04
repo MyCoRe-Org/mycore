@@ -66,7 +66,6 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -117,14 +116,14 @@ public class MCRLayoutServlet extends MCRServlet {
         final String forcedInterrupt = "mcr.forced.interrupt";
 
         DefaultHandler handler = new DefaultHandler() {
-            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            public void startElement(String uri, String localName, String qName, Attributes attributes) {
                 LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
                 detected.setProperty("docType", qName);
                 throw new MCRException(forcedInterrupt);
             }
 
             // We would need SAX 2.0 to be able to do this, for later use:
-            public void startDTD(String name, String publicId, String systemId) throws SAXException {
+            public void startDTD(String name, String publicId, String systemId) {
                 LOGGER.debug("MCRLayoutServlet detected DOCTYPE declaration = " + name);
                 detected.setProperty("docType", name);
                 throw new MCRException(forcedInterrupt);
@@ -143,7 +142,7 @@ public class MCRLayoutServlet extends MCRServlet {
         return detected.getProperty("docType");
     }
 
-    protected void forwardXML(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void forwardXML(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
 
         OutputStream out = response.getOutputStream();
@@ -288,8 +287,9 @@ public class MCRLayoutServlet extends MCRServlet {
                 LOGGER.error("IO Error while XSL transforming XML Document", ex);
             } catch (MCRException ex) {
                 if (errorPage) {
-                    response.getWriter().write("Error while generating error page!");
-
+                    String msg = "Error while generating error page!";
+                    LOGGER.warn( msg, ex );
+                    response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg );
                     return;
                 }
 
@@ -389,7 +389,7 @@ public class MCRLayoutServlet extends MCRServlet {
         parameters.put("Referer", referer);
         parameters.put("TypeMapping", typeParam.toString());
 
-        return parameters;
+        return parameters; 
     }
 
     protected static final String getCompleteURL(HttpServletRequest request) {
