@@ -191,24 +191,25 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Transaction tx = session.beginTransaction();
         List l = new LinkedList();
 
+        byte[] blob = null;
+
         try {
             MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version, this.type);
             l = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key", pk)).list();
+            if (l.size() > 0) {
+            	blob = ((MCRXMLTABLE) l.get(0)).getXmlByteArray();
+            }            
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("error in retrieving the blob ",e);
 
             return null;
         } finally {
             session.close();
         }
 
-        if (l.size() > 0) {
-            return ((MCRXMLTABLE) l.get(0)).getXmlByteArray();
-        }
-
-        return null;
+        return blob;
     }
 
     /**
