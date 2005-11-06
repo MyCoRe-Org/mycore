@@ -255,7 +255,20 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @return true if the MCRObjectID exist, else return false
      */
     public final boolean exist(MCRObjectID mcrid, int version) {
-        return retrieve(mcrid, version) != null;
+    	boolean exists = false;
+    	
+        Session session = getSession(); 
+        Transaction tx = session.beginTransaction();
+        StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '")
+        	.append(mcrid.getId()).append("' and MCRVERSION = ").append(version);
+        List l = session.createQuery(query.toString()).list();
+        if (l.size() > 0) {
+        	exists = true;
+        }
+        tx.commit(); 
+        session.close();
+        
+        return exists;
     }
 
     /**
