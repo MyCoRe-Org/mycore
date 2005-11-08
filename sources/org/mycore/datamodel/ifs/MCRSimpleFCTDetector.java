@@ -109,6 +109,28 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
                 rules.addElement(new MCRPatternRule(pattern, format, offset, score));
             }
+            
+            List doctypes = xRules.getChildren("doctype");
+
+            for (int i = 0; i < doctypes.size(); i++) {
+                Element elem = (Element) (doctypes.get(i));
+
+                double score   = elem.getAttribute("score").getDoubleValue();
+                String doctype = elem.getTextTrim();
+
+                rules.addElement(new MCRDoctypeRule(doctype, score));
+            }
+            
+            List strings = xRules.getChildren("string");
+
+            for (int i = 0; i < strings.size(); i++) {
+                Element elem = (Element) (strings.get(i));
+
+                double score  = elem.getAttribute("score").getDoubleValue();
+                String string = elem.getTextTrim();
+
+                rules.addElement(new MCRStringRule(string, score));
+            }
         } catch (Exception exc) {
             String msg = "Error parsing detection rules for file content type " + type.getLabel();
             throw new MCRConfigurationException(msg, exc);
@@ -251,37 +273,6 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         }
 
         double getScore(String filename, byte[] header) {
-            String pat = new String(pattern);
-            String head = new String(header);
-
-            if (-1 == offset) // pattern in header?
-            {
-                if (-1 != head.indexOf(pat)) {
-                    return score;
-                } else {
-                    return 0;
-                }
-            }
-
-            if (-2 == offset) // xml mit doctype?
-            {
-                if (!head.startsWith("<?xml")) {
-                    return 0;
-                }
-
-                try {
-                    String doctype = parseDocumentType(new ByteArrayInputStream(header));
-
-                    if (doctype.equals(pat)) {
-                        return score;
-                    } else {
-                        return 0;
-                    }
-                } catch (Exception exc) {
-                    return 0;
-                }
-            }
-
             boolean matches = (header.length >= (pattern.length + offset));
 
             for (int i = 0; matches && (i < pattern.length); i++)
@@ -291,6 +282,76 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         }
     }
 
+    /** A rule that decides based on the doctype of a xml file */
+    class MCRDoctypeRule extends MCRDetectionRule {
+        /** The doctype of the file */
+        protected String doctype;
+
+        /**
+         * Creates a new rule based on a match of the doctype of a xml file
+         * 
+         * @param doctype
+         *            the doctype the file must match
+         * @param score
+         *            the score for matching this rule, a value between 0.0 and
+         *            1.0
+         */
+        MCRDoctypeRule(String doctype, double score) {
+            super(score);
+            this.doctype = doctype;
+        }
+
+        double getScore(String filename, byte[] header) {
+          String head = new String(header);
+          
+          if (!head.startsWith("<?xml")) {
+            return 0;
+        }
+
+        try {
+            String type = parseDocumentType(new ByteArrayInputStream(header));
+
+            if (type.equals(doctype)) {
+                return score;
+            } else {
+                return 0;
+            }
+        } catch (Exception exc) {
+            return 0;
+        }
+        }
+    }
+    
+    /** A rule that decides based on a String at any position in the head of the file */
+    class MCRStringRule extends MCRDetectionRule {
+        protected String string;
+
+        /**
+         * Creates a new rule based on a match of a String at any position in the head of the file
+         * 
+         * @param string
+         *            the string in the head of the file must match
+         * @param score
+         *            the score for matching this rule, a value between 0.0 and
+         *            1.0
+         */
+        MCRStringRule(String string, double score) {
+            super(score);
+            this.string = string;
+        }
+
+        double getScore(String filename, byte[] header) {
+          String head = new String(header);
+          if (-1 != head.indexOf(string)) {
+            return score;
+        } else {
+            return 0;
+        }
+          
+        }
+    }
+    
+    
     /**
      * Copy from MCRLayoutServlet, messages changed from MCRLayoutServlet to
      * MCRSimpleFCTDetector Try to detect doctype of xml data
