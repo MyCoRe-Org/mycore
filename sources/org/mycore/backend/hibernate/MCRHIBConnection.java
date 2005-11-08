@@ -23,8 +23,11 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -129,6 +132,15 @@ public class MCRHIBConnection {
         	.setProperty("hibernate.connection.password", password)
         	.setProperty("hibernate.connection.pool_size", "" + maxUsages)
         	.setProperty("hibernate.show_sql","" + config.getBoolean("MCR.hibernate.show_sql", false));
+        
+        Properties hibProperties = config.getProperties("MCR.hibernate.");
+        for (Enumeration e = hibProperties.keys(); e.hasMoreElements();) {
+        	String key = (String) e.nextElement();
+        	// hbm.xml.tablename are mapping-files -> MCRHIBMapping
+        	if (key.indexOf("hbm.xml") < 0) {
+        		cfg.setProperty(key.substring(4),hibProperties.getProperty(key));
+        	}
+        }
     }
 
     /**
