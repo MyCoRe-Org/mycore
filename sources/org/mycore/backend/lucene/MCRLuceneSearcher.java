@@ -25,7 +25,6 @@ package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,9 +42,13 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearchField;
 import org.mycore.services.fieldquery.MCRSearcherBase;
@@ -344,6 +347,33 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         LOGGER.debug("MCRLuceneSearcher results completed");
 
         return results;
+    }
+    
+    /**
+     * Test application, query  lucene index.
+     */
+    public static void main(String[] args) throws Exception {
+      if ( 4 == args.length && "-query".equals(args[0]) &&             // build Query from xml-File 
+           "-indexer".equals(args[2]) )                                // use this indexer 
+      {
+        org.jdom.Element query = MCRURIResolver.instance().resolve("file://" + args[1]);
+        MCRLuceneSearcher ls = new MCRLuceneSearcher();
+        ls.init( args[3] );
+
+        MCRCondition  cond = new MCRQueryParser().parse((Element) query.getChild("conditions").getChildren().get(0));
+        int maxResults = 100;
+        MCRResults res = ls.search(cond, null, maxResults);
+
+        org.jdom.Document doc = res.buildXML();
+        XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+        System.out.println(out.outputString(doc));
+
+      } else
+      {
+        System.out.println("usage: query data\n");
+        System.out.println("-query     file with query   -indexer  name of indexer");
+      }
+      
     }
 
 }
