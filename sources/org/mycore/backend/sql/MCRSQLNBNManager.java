@@ -97,8 +97,6 @@ public class MCRSQLNBNManager implements MCRNBNManager {
         Connection connection = mcrConnection.getJDBCConnection();
 
         try {
-            connection.setAutoCommit(false);
-
             PreparedStatement statement;
             statement = connection.prepareStatement("insert into " + table + " values (?, ?, ?, ?, ?, ?)");
 
@@ -117,7 +115,6 @@ public class MCRSQLNBNManager implements MCRNBNManager {
 
             statement.execute();
             statement.close();
-            connection.commit();
         } catch (Exception exc) {
             String msg = "Error in database while reserving a new NBN.";
             logger.info(msg);
