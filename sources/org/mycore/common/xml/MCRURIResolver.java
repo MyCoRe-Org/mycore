@@ -50,6 +50,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -162,11 +163,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         String scheme = getScheme(href);
 
-        if ("resource request webapp file session query mcrobject".indexOf(scheme) != -1) {
+        if ("resource request webapp file ifs session query mcrobject".indexOf(scheme) != -1) {
             return new JDOMSource(resolve(href));
-        } else {
-            return null;
-        }
+        } 
+        return null;
     }
 
     /**
@@ -225,6 +225,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             return readFromFile(uri);
         } else if ("query".equals(scheme)) {
             return readFromQuery(uri);
+        } else if ("ifs".equals(scheme)) {
+            return readFromIFS(uri);
         } else if ("mcrobject".equals(scheme)) {
             return readFromObject(uri);
         } else if ("http".equals(scheme) || "https".equals(scheme)) {
@@ -346,6 +348,27 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     }
 
     /**
+     * Reads XML from a http or https URL.
+     * 
+     * @param uri
+     *            the URL of the xml document
+     * @return the root element of the xml document
+     */
+    private Element readFromIFS(String uri) {
+        LOGGER.debug("Reading xml from url " + uri);
+        
+        String path = uri.substring(uri.indexOf(":") + 1);
+        
+        String hosts=null;
+        int i=path.indexOf("?host");
+        if (i>0){
+            hosts=path.substring(i+1+6);//"?host=".length()
+            path=path.substring(0,i);
+        }
+        return MCRDirectoryXML.getInstance().getDirectory(path,hosts).getRootElement();
+    }
+
+    /**
      * Reads XML from a HTTP request to this web application.
      * 
      * @param uri
@@ -392,12 +415,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     }
 
     /**
-     * Reads local MCRObject with a given ID from the store and returns its XML
-     * representation within MCRXMLContainer.
+     * Reads local MCRObject with a given ID from the store.
      * 
      * @param uri
      *            for example, "mcrobject:DocPortal_document_07910401"
-     * @return
+     * @returns XML representation from MCRXMLContainer
      */
     private Element readFromObject(String uri) {
         String id = uri.substring(uri.indexOf(":") + 1);
@@ -428,7 +450,6 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         String host;
         String type;
         String query;
-        int pos;
         StringTokenizer tok = new StringTokenizer(key, "&");
         Hashtable params = new Hashtable();
 
