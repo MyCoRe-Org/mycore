@@ -69,6 +69,7 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
                         }else{
                         	value = (String) valueObj ;
                         }
+                        if (value == null) value = "";
                         hit.addSortData(key, value);
                     }
 
