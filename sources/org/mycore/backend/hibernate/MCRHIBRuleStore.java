@@ -48,6 +48,11 @@ import org.mycore.common.MCRException;
  * 
  */
 public class MCRHIBRuleStore extends MCRRuleStore {
+	
+	public MCRHIBRuleStore() {
+		init();
+	}
+	
     /**
      * Method creates new rule in database by given rule-object
      * 
@@ -55,7 +60,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      *            as MCRAccessRule
      */
     public void createRule(MCRAccessRule rule) {
-        init();
 
         if (!existsRule(rule.getId())) {
             Session session = MCRHIBConnection.instance().getSession();
@@ -91,7 +95,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @throws MCRException
      */
     private boolean existsRule(String ruleid) throws MCRException {
-        init();
 
         try {
             Session session = MCRHIBConnection.instance().getSession();
@@ -123,7 +126,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * Method deletes accessrule for given ruleid
      */
     public void deleteRule(String ruleid) {
-        init();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -149,7 +151,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @return MCRAccessRule object with database values or null
      */
     public MCRAccessRule retrieveRule(String ruleid) {
-        init();
 
         MCRAccessRule rule = null;
 
@@ -258,7 +259,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     }
 
     public boolean existRule(String ruleid) {
-        init();
 
         boolean ret = false;
 
