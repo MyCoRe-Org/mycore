@@ -49,9 +49,12 @@ import org.mycore.backend.hibernate.tables.MCRACCESSPK;
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
     final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
+    
+    public MCRHIBAccessStore() {
+    	createTables();
+    }
 
     public String getRuleID(String objID, String ACPool) {
-        createTables();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -80,7 +83,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             // update schema -> first time create table
             Configuration cfg = hibconnection.getConfiguration();
             MCRTableGenerator map = null;
-
+            boolean mappingMustBeCreated = false;
             if (!hibconnection.containsMapping(SQLAccessCtrlMapping)) {
                 map = new MCRTableGenerator(SQLAccessCtrlMapping, "org.mycore.backend.hibernate.tables.MCRACCESS", "", 3);
                 map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
@@ -89,6 +92,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
                 map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
                 cfg.addXML(map.getTableXML());
+                mappingMustBeCreated = true;
             }
 
             if (!hibconnection.containsMapping(SQLAccessCtrlRule)) {
@@ -99,14 +103,15 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 map.addColumn("rule", "RULE", new StringType(), 2147483647, false, false, false);
                 map.addColumn("description", "DESCRIPTION", new StringType(), 255, false, false, false);
                 cfg.addXML(map.getTableXML());
-                cfg.createMappings();
+                mappingMustBeCreated = true;
             }
+            if (mappingMustBeCreated)
+            	cfg.createMappings();
 
             hibconnection.buildSessionFactory(cfg);
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e);
+            logger.error("error at createTables()" ,e);
         }
     }
 
@@ -117,7 +122,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      *            with values
      */
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
-        createTables();
 
         if (!existAccessDefinition(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId())) {
             Session session = MCRHIBConnection.instance().getSession();
@@ -129,7 +133,10 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 accdef.setKey(new MCRACCESSPK(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId()));
                 accdef.setCreator(rulemapping.getCreator());
                 accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
-                session.saveOrUpdate(accdef);
+                
+             
+                session.save(accdef);
+                session.flush();
                 tx.commit();
             } catch (Exception e) {
                 tx.rollback();
@@ -179,7 +186,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      *            MCRAccessData containing key;
      */
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
-        createTables();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -216,7 +222,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * @return MCRAccessData
      */
     public MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid) {
-        createTables();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -244,7 +249,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     }
 
     public ArrayList getMappedObjectId(String pool) {
-        createTables();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -267,7 +271,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     }
 
     public ArrayList getPoolsForObject(String objid) {
-        createTables();
 
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -293,7 +296,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     }
 
     public ArrayList getDatabasePools() {
-        createTables();
+        
         ArrayList ret = new ArrayList();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
