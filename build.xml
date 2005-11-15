@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.104 $ $Date: 2005-10-19 08:53:29 $                      -->
+  <!-- $Revision: 1.105 $ $Date: 2005-11-15 19:31:10 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,9 +66,9 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.104 $ $Date: 2005-10-19 08:53:29 $</echo>
+    <echo>Ant build file   : $Revision: 1.105 $ $Date: 2005-11-15 19:31:10 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
-    <echo>Ant home         : ${env.ANT_HOME}</echo>
+    <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
     <echo>JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo>System CLASSPATH : ${build.sysclasspath}</echo>
@@ -90,7 +90,9 @@
     <fail message="Environment variable JAVA_HOME is not set!" unless="env.JAVA_HOME" />
 
     <path id="mycore.classpath">
+      <pathelement location="${basedir}/classes" />
       <fileset dir="${basedir}/lib" includes="*.jar"/>
+      <fileset dir="${ant.home}/lib" includes="*junit*.jar"/>
       <path refid="jdbc.classpath" />
       <path refid="xml.classpath"  />
     </path>
@@ -120,6 +122,30 @@
 
   <!-- System CLASSPATH is completely ignored! -->
   <property name="build.sysclasspath" value="ignore"/>
+
+  <!-- =================================================================== -->
+  <!-- Runs JUnit test cases                                               -->
+  <!-- =================================================================== -->
+
+	<target name="test" depends="compile_testcases">
+	    <junit printsummary="withOutAndErr" showoutput="true" reloading="off">
+	    	<classpath refid="mycore.classpath"/>
+	    	<formatter type="plain" usefile="false"/>
+	    	<batchtest>
+	    		<fileset dir="${basedir}/classes/">
+	    			<include name="**/*Test*.class"/>
+	    			<exclude name="**/FulltextTester.class"/>
+	    	    </fileset>
+	    	</batchtest>
+		</junit>    
+	</target>
+	<target name="compile_testcases" depends="compile">
+		<echo>Compiling JUnit test cases...</echo>
+	    <antcall target="javac">
+	      <param name="altdir" value="${basedir}/tests"/>
+	      <param name="packages" value="**/*Test*"/>
+	    </antcall>
+	</target>
 
   <!-- =================================================================== -->
   <!-- Creates a mycore-for-*.jar file containing all compiled MyCoRe classes  -->
@@ -174,7 +200,10 @@
 
   <target name="javac" depends="init">
     <echo>Compiling ${packages}</echo>
-    <javac srcdir="${basedir}/sources"
+  	<condition property="altdir" value="">
+  		<not><isset property="altdir"/></not>
+  	</condition>
+    <javac srcdir="${basedir}/sources:${altdir}"
            destdir="${basedir}/classes"
            includes="${packages}"
            classpathref="mycore.classpath"
