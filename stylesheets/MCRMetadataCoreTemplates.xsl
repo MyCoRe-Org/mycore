@@ -278,5 +278,15 @@
   fixed="MCRMetaBoolean" />
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaDateFragment -->
+
+<xsl:template match="mcrmetadatefragment">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}" type="mcrdatefragment"/>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaDateFragment" />
+</xsl:template>
+
 </xsl:stylesheet>
 
