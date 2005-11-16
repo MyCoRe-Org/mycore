@@ -62,7 +62,7 @@ public abstract class MCRRuleStore {
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.rulestore_class_name", "org.mycore.backend.sql.MCRSQLRuleStore");
+                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.rulestore_class_name", "org.mycore.backend.hibernate.MCRHIBRuleStore");
             }
         } catch (Exception e) {
             logger.error(e);
