@@ -84,9 +84,11 @@ public class MCRQueryManager extends MCRSearcherBase {
             config = MCRConfiguration.instance();
             searchfield = config.getString("MCR.QuerySearchFields", "searchfields.xml");
             loadFields();
-            MCRQueryIndexer.getInstance().updateConfiguration();
+            if (MCRQueryIndexer.queryManager != null) {
+            	MCRQueryIndexer.getInstance().updateConfiguration();
+            }
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("catched error: ", e);
             throw new MCRException("MCRQueryManager error", e);
         }
     }
@@ -136,7 +138,7 @@ public class MCRQueryManager extends MCRSearcherBase {
             }
             MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
         }catch(Exception e){
-            e.printStackTrace();
+            LOGGER.error("catched error: ", e);
         }
     }
     
