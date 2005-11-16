@@ -433,6 +433,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
     public final String getID() {
         return ID;
     }
+    
+    public final void setID(String value){
+        ID = value;
+    }
 
     /**
      * This method checks if members of this group have a given privilege. Not

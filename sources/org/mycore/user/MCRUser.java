@@ -311,7 +311,6 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal {
     public final ArrayList getAllGroupIDs() {
         ArrayList allGroupIDs = new ArrayList();
         allGroupIDs.addAll(groupIDs);
-
         try {
             for (int i = 0; i < groupIDs.size(); i++) {
                 ArrayList implicitGroupIDs = MCRUserMgr.instance().getAllImplicitGroupIDsOfGroup((String) groupIDs.get(i));
@@ -323,8 +322,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal {
                 }
             }
         } catch (MCRException ex) {
+            return null;
         }
-
         return allGroupIDs;
     }
 
@@ -633,5 +632,13 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal {
         }
 
         throw new MCRException("The current user " + currentUserID + " has no right to modify the user " + this.ID + ".");
+    }
+    
+    public final int getGroupCount(){
+           try{
+               return groupIDs.size();
+           }catch(Exception e){
+               return 0;
+           }
     }
 }

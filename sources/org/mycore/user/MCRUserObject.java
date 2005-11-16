@@ -177,6 +177,10 @@ abstract class MCRUserObject {
     public final String getDescription() {
         return description;
     }
+    
+    public final void setDescription(String value) {
+        description = value;
+    }
 
     /**
      * @return This method returns the list of groups as a ArrayList of strings.
