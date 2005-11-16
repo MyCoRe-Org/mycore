@@ -77,7 +77,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
                 tx.commit();
             } catch (Exception e) {
                 tx.rollback();
-                logger.error(e);
+                logger.error("catched error", e);
             } finally {
                 session.close();
             }
@@ -136,8 +136,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
-            e.printStackTrace();
+            logger.error("catched error",e);
         } finally {
             session.close();
         }
@@ -166,7 +165,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
                 rule = new MCRAccessRule(hibrule.getRid(), hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("catched error: ", e);
         }
 
         return rule;
@@ -194,7 +193,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
                 new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("catched error", e);
         }
     }
 
@@ -213,7 +212,11 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         MCRAccessRule rule = null;
 
         try {
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));
+        	MCRACCESSRULE hibrule = null;
+        	List li = session.createCriteria(MCRAccessRule.class).add(Restrictions.eq("rid", ruleid)).list();
+        	if ( li != null && li.size() > 0){
+        		hibrule = ((MCRACCESSRULE) li.get(0));
+        	}
 
             if (hibrule != null) {
                 try {
@@ -226,7 +229,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("catched error: ",e);
         } finally {
             session.close();
         }
@@ -250,7 +253,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
             }
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("catched error: ",e);
         } finally {
             session.close();
         }
@@ -273,7 +276,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
                 ret = true;
             }
         } catch (Exception e) {
-            logger.error(e);
+        	logger.error("catched error: ",e);
         }
 
         return ret;
