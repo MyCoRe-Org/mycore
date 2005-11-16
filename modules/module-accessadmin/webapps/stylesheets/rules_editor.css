@@ -1,0 +1,46 @@
+/* =================================================================== */
+/* general colors                                                      */
+/* =================================================================== */
+
+
+body
+{
+   background-color: ButtonFace;
+   color: #000000;
+   margin: 0px;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-weight : normal;
+   text-decoration: none;
+   text-align: left;
+   vertical-align: top;
+   font-size: 11px;
+}
+
+h1{
+	font-size: 14px;
+	margin:5px;
+}
+
+td{
+	font-size: 11px;
+}
+
+p{
+	background: #FFFFFF;
+	padding: 7px;		
+	border-color: silver; 
+	border-style: solid;
+	border-width: 1px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+div.field{
+	background: #FFFFFF;
+	border :solid silver 1px;
+	margin: 1px;
+	width: 600px;
+	height: 20px;
+	float: left;
+	font-size: 12px;
+}
