@@ -88,6 +88,9 @@ public class MCRSearchField {
      * stream *
      */
     private MCRFile file;
+    
+    /** The field is sortable, used by lucene to store original data * */
+    private boolean sortable = false;
 
     /** Returns the name of the field * */
     public String getName() {
@@ -149,5 +152,15 @@ public class MCRSearchField {
      */
     public MCRFile getFile() {
         return file;
+    }
+    
+    /** Returns if this field is sortable * */
+    public boolean getSortabale() {
+        return sortable;
+    }
+
+    /** Sets the sortable flag for this field * */
+    public void setSortable(boolean sortable) {
+        this.sortable = sortable;
     }
 }
