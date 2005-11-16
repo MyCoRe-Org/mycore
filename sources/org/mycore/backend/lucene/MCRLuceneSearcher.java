@@ -71,6 +71,12 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
 
     // TODO: read from property file
     static String DATE_FORMAT = "yyyy-MM-dd";
+    
+    static
+    {
+      DATE_FORMAT = CONFIG.getString("MCR.Lucene.DateFormat", "yyyy-MM-dd");
+      LOGGER.info("MCR.Lucene.DateFormat: " + DATE_FORMAT);
+    }
 
     static String TIME_FORMAT = "hh:mm:ss";
 
@@ -177,11 +183,9 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
                     doc.add(Field.Keyword(name, content));
                 }
 
-                if (type.equals("Text") || type.equals("name")) {
+                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getSortabale() )) {
                     doc.add(Field.Text(name, content));
-                }
-
-                if (type.equals("text")) {
+                } else if (type.equals("text")) {
                     doc.add(Field.UnStored(name, content));
                 }
             }
