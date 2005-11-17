@@ -335,6 +335,8 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
           LOGGER.info("DELETE: " + id);
           reader.close();
         }
+        
+        searcher.close();
     }
 
     public MCRResults search(MCRCondition cond, List order, int maxResults) {
