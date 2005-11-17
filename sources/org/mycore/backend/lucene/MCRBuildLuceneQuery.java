@@ -257,7 +257,7 @@ public class MCRBuildLuceneQuery {
     // queries are case sensitive. That is because those types of queries are
     // not passed through the Analyzer, which is the component that performs
     // operations such as stemming and lowercasing.
-    private static String fixQuery(String aQuery) {
+    public static String fixQuery(String aQuery) {
         aQuery = MCRUtils.replaceString(aQuery, "'", "\""); // handle phrase
 
         StringTokenizer _tokenizer = new StringTokenizer(aQuery, " \t\n\r", true);
@@ -307,7 +307,7 @@ public class MCRBuildLuceneQuery {
     /***************************************************************************
      * DateQuery ()
      **************************************************************************/
-    private static Query DateQuery(String fieldname, String informat, String outformat, String dateOp, String date) throws Exception {
+    public static Query DateQuery(String fieldname, String informat, String outformat, String dateOp, String date) throws Exception {
         if (date.length() == 0) {
             return null;
         }
