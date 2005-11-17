@@ -27,6 +27,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 
+import net.sf.antcontrib.logic.For;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -72,7 +74,7 @@ public class MCRHIBConnection {
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-        url = config.getString("MCR.persistence_sql_database_url");
+        url = config.getString("MCR.persistence_sql_database_url", "hsqldb");
         userID = config.getString("MCR.persistence_sql_database_userid", "");
         password = config.getString("MCR.persistence_sql_database_passwd", "");
         driver = config.getString("MCR.persistence_sql_driver", "");
@@ -140,6 +142,11 @@ public class MCRHIBConnection {
         	if (key.indexOf("hbm.xml") < 0) {
         		cfg.setProperty(key.substring(4),hibProperties.getProperty(key));
         	}
+        }
+        Properties hibs = cfg.getProperties();
+        for(Enumeration e = hibs.keys(); e.hasMoreElements();) {
+        	String key = (String) e.nextElement();
+        	Logger.getLogger("MCRHIBConnection.java").debug(key + ":" + hibs.getProperty(key));
         }
     }
 
