@@ -23,8 +23,11 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -206,4 +209,24 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
         return l.size();
     }
+
+	public Map getCountedMapOfMCRTO(String mcrtoPrefix) {
+		Map map = new HashMap();
+		Session session = getSession();
+		String query = "select count(key.mcrfrom), key.mcrto from " + classname + " where MCRTO like '" + mcrtoPrefix + "%' group by key.mcrto";
+		logger.debug("HQL-Statement: " + query);
+        try {
+            java.util.Iterator results = session.createQuery(query).list().iterator();
+            while (results.hasNext()) {
+				Object[] row = (Object[]) results.next();
+				map.put(row[1],row[0]);
+			}
+        } catch (Exception e) {
+            logger.error("catched error@getCountedMapOfMCRTO:",e);
+            throw new MCRException("Error during getCountedMapOfMCRTO", e);
+        } finally {
+            session.close();
+        }		
+		return map;
+	}
 }

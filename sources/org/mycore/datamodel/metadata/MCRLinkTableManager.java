@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -363,6 +364,20 @@ public class MCRLinkTableManager {
 
     /**
      * The method count the number of references to a category of a
+     * classification without sub ID's and returns it as a Map
+     * 
+     * @param classid
+     *            the classification ID as MCRObjectID
+     * 
+     * @return a Map with key=categID and value=counted number of references
+     */    
+    public Map countCategoryReferencesSharp(String classid) {
+    	int i = checkType("class");
+    	return ((MCRLinkTableInterface) tablelist.get(i)).getCountedMapOfMCRTO(classid);
+    }    
+    
+    /**
+     * The method count the number of references to a category of a
      * classification without sub ID's.
      * 
      * @param classid
@@ -432,4 +447,5 @@ public class MCRLinkTableManager {
     public int countCategoryReferencesFuzzy(String classid, String categid, String[] doctypes, String restriction) {
         return countReferenceLinkTo("class", classid + "##" + categid + "%", doctypes, restriction);
     }
+    
 }

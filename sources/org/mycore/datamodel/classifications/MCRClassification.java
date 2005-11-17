@@ -27,13 +27,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
@@ -325,6 +328,7 @@ public class MCRClassification {
      * @return the classification as JDOM
      */
     public final Document receiveClassificationAsJDOM(String classID) {
+    	final String cAttr = "counter";
         Document classification = null;
 
         try {
@@ -337,14 +341,23 @@ public class MCRClassification {
             LOGGER.error("Oops", e);
         }
 
-        List tagList = classification.getRootElement().getChild("categories").getChildren("category");
-
-        for (int i = 0; i < tagList.size(); i++) {
-            countDocuments(classID, (Element) tagList.get(i));
-        }
-
+        Map map = MCRLinkTableManager.instance().countCategoryReferencesSharp(classID);
+        for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
+			Element category = (Element) it.next();
+			String mapKey = classID + "##" + category.getAttributeValue("ID");
+			int count = (map.get(mapKey) != null) ? ((Integer)map.get(mapKey)).intValue() : 0;
+			for (Iterator it2 = category.getDescendants(new ElementFilter("category")); it2.hasNext();) {
+				Element category2 = (Element) it2.next();
+				String mapKey2 = classID + "##" + category2.getAttributeValue("ID");
+				if (map.get(mapKey2) != null) {
+					count = count + ((Integer)map.get(mapKey2)).intValue();
+				}
+			}
+			category.setAttribute(cAttr, Integer.toString(count));
+		}
         return classification;
     }
+    
 
     /**
      * The method return the classification as XML byte array.
