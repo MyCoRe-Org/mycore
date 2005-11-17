@@ -222,20 +222,24 @@ public class MCRHIBQuery implements MCRConditionVisitor {
             String fieldname = el.getAttributeValue("field");
             String operator = el.getAttributeValue("operator");
             String value = el.getAttributeValue("value");
-
+            
+            String not = " ";
+            if (type.equals("not")) {
+            	not = " not ";
+            }
             /** transform values and operators * */
             if (fieldtype.equals("text") || fieldtype.equals("name") || fieldtype.equals("identifier")) {
-                if (operator.equals("=") || operator.equals("contains")) {
-                    operator = "like";
+            	value = value.replaceAll("\\*","%");
+                if (operator.equals("=") || operator.equals("like") ) {
+                	operator = "like";
+                    value = "\'%" + value + "%\'";
+                    sbquery.append(fieldname).append(not).append(operator).append(" ").append(value);
+                } else if (operator.equals("contains")) {
+                	sbquery.append(not).append(" match_against(").append(fieldname)
+                		.append(",'").append(value).append("') > 0");
                 }
-                value = value.replaceAll("\\*","%");
-                value = "\'%" + value + "%\'";
-            }
-
-            if (type.equals("not")) {
-                sbquery.append(fieldname + " not " + operator + " " + value);
-            } else {
-                sbquery.append(fieldname + " " + operator + " " + value);
+            }else {
+            	sbquery.append(fieldname).append(not).append(operator).append(" ").append(value);
             }
 
             count -= 1;
