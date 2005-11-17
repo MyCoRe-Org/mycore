@@ -23,7 +23,11 @@
 
 package org.mycore.backend.sql;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -251,4 +255,35 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
             conn.release();
         }
     }
+    
+	public Map getCountedMapOfMCRTO(String mcrtoPrefix) {
+		Map map = new HashMap();
+        StringBuffer select = new StringBuffer();
+
+        select.append("SELECT COUNT( A.MCRFROM ) AS NUMBER, A.MCRTO AS KEY FROM ")
+        	.append(tableName).append(" A where MCRTO like '")
+        	.append(mcrtoPrefix).append("%' group by MCRTO");
+
+        logger.info("STATEMENT:    " + select);
+
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        int num = 0;
+        String key = "";
+
+        try {
+            MCRSQLRowReader reader = conn.doQuery(select.toString());
+            while (reader.next()) {
+                num = reader.getInt("NUMBER");
+                key = reader.getString("KEY");
+                map.put(key,new Integer(num));
+            }
+            reader.close();
+        } catch (Exception e) {
+            throw new MCRException("SQL counter error", e);
+        } finally {
+            conn.release();
+        }
+        return map;
+	}	
+	
 }
