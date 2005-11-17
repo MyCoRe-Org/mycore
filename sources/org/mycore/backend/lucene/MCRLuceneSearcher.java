@@ -72,12 +72,6 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
     // TODO: read from property file
     static String DATE_FORMAT = "yyyy-MM-dd";
     
-    static
-    {
-      DATE_FORMAT = CONFIG.getString("MCR.Lucene.DateFormat", "yyyy-MM-dd");
-      LOGGER.info("MCR.Lucene.DateFormat: " + DATE_FORMAT);
-    }
-
     static String TIME_FORMAT = "hh:mm:ss";
 
     static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
@@ -142,8 +136,6 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
             String type = field.getDataType();
             String content = field.getValue();
             MCRFile mcrfile = field.getFile();
-
-            LOGGER.debug("####### Name: " + name + " Type: " + type + " Content: " + content);
 
             if (null != mcrfile) {
                 if (PLUGIN_MANAGER == null) {
