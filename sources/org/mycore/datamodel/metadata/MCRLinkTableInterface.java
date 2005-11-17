@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Map;
+
 /**
  * This interface is designed to choose the Persistence for the link tables.
  * 
@@ -77,4 +79,11 @@ public interface MCRLinkTableInterface {
      * @return the number of references
      */
     public int countTo(String to, String doctype, String to2);
+    
+    /**
+     * The method returns a Map of all counted distinct references 
+     * @param mcrtoPrefix
+     * @return
+     */
+    public Map getCountedMapOfMCRTO(String mcrtoPrefix);
 }
