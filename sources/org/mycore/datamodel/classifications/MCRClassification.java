@@ -296,30 +296,6 @@ public class MCRClassification {
         return tm.readDocument(classID);
     }
 
-    private void countDocuments(String classID, Element cat) {
-        final String cAttr = "counter";
-        List tagList = cat.getChildren("category");
-        int docs = 0;
-
-        if (tagList.size() == 0) {
-            // we reached the leaves and count the documents
-            docs = MCRLinkTableManager.instance().countCategoryReferencesSharp(classID, cat.getAttributeValue("ID"));
-        } else {
-            for (int i = 0; i < tagList.size(); i++) {
-                Element child = (Element) tagList.get(i);
-                countDocuments(classID, child);
-
-                // all children are calculated
-                docs += Integer.parseInt(child.getAttributeValue(cAttr));
-            }
-
-            // childrens are counted make a "sharp" search on this category
-            docs += MCRLinkTableManager.instance().countCategoryReferencesSharp(classID, cat.getAttributeValue("ID"));
-        }
-
-        cat.setAttribute(cAttr, Integer.toString(docs));
-    }
-
     /**
      * The method return the classification as JDOM tree.
      * 
@@ -342,12 +318,16 @@ public class MCRClassification {
         }
 
         Map map = MCRLinkTableManager.instance().countCategoryReferencesSharp(classID);
+        // in map we've got the sharp number for every categoryID (without children)
+        // now we add to every categoryID the numbers of the children
         for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
 			Element category = (Element) it.next();
 			String mapKey = classID + "##" + category.getAttributeValue("ID");
 			int count = (map.get(mapKey) != null) ? ((Integer)map.get(mapKey)).intValue() : 0;
 			for (Iterator it2 = category.getDescendants(new ElementFilter("category")); it2.hasNext();) {
 				Element category2 = (Element) it2.next();
+				// in the database-field mcrto from mcrlinkclass we've got for example
+				// DocPortal_class_00000008##Unis.Freiburg
 				String mapKey2 = classID + "##" + category2.getAttributeValue("ID");
 				if (map.get(mapKey2) != null) {
 					count = count + ((Integer)map.get(mapKey2)).intValue();
