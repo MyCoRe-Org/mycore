@@ -24,11 +24,16 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
 
 /**
  * This class manage all accesses to the link table database. This database
@@ -226,7 +231,7 @@ public class MCRLinkTableManager {
      *            the target category id ad String
      */
     public void addClassificationLink(MCRObjectID from, MCRObjectID classid, String categid) {
-        addReferenceLink("class", from.getId(), classid.getId() + "##" + categid);
+        addClassificationLink(from.getId(), classid.getId(), categid);
     }
 
     /**
@@ -242,6 +247,11 @@ public class MCRLinkTableManager {
      */
     public void addClassificationLink(String from, String classid, String categid) {
         addReferenceLink("class", from, classid + "##" + categid);
+        MCRClassificationItem classitem=MCRClassificationItem.getClassificationItem(classid);
+        MCRCategoryItem categitem=classitem.getCategoryItem(categid);
+        if (categitem.getParent()!=null){
+        	addClassificationLink(from,classid,categitem.getParentID());
+        }
     }
 
     /**
@@ -252,7 +262,7 @@ public class MCRLinkTableManager {
      *            the source of the reference as MCRObjectID
      */
     public void deleteClassificationLink(MCRObjectID from) {
-        deleteReferenceLink("class", from.getId());
+        deleteClassificationLink(from.getId());
     }
 
     /**
@@ -446,6 +456,55 @@ public class MCRLinkTableManager {
      */
     public int countCategoryReferencesFuzzy(String classid, String categid, String[] doctypes, String restriction) {
         return countReferenceLinkTo("class", classid + "##" + categid + "%", doctypes, restriction);
+    }
+    
+    public List getSourceOf(String type, String destination){
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((destination == null) || (destination.length() == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getSourcesOf(destination);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references to " + destination + ".");
+            return new LinkedList();
+        }
+    }
+    public List getDestinationOf(String type, String source){
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((source == null) || (source.length() == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references from " + source + ".");
+            return new LinkedList();
+        }
+    }
+    
+    public List getLinksToCategory(String classid, String categid){
+    	return getSourceOf("class",classid+"##"+categid);
     }
     
 }

@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,65 +33,113 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public interface MCRLinkTableInterface {
-    /**
-     * The initializer for the class MCRSQLLinkTableStore. It reads the
-     * classification configuration and checks the table names.
-     * 
-     * @exception throws
-     *                if the type is not correct
-     */
-    public void init(String type);
+	/**
+	 * The initializer for the class MCRSQLLinkTableStore. It reads the
+	 * classification configuration and checks the table names.
+	 * 
+	 * @exception throws
+	 *                if the type is not correct
+	 */
+	public void init(String type);
 
-    /**
-     * The method create a new item in the datastore.
-     * 
-     * @param from
-     *            a string with the link ID MCRFROM
-     * @param to
-     *            a string with the link ID MCRTO
-     */
-    public void create(String from, String to);
+	/**
+	 * The method create a new item in the datastore.
+	 * 
+	 * @param from
+	 *            a string with the link ID MCRFROM
+	 * @param to
+	 *            a string with the link ID MCRTO
+	 */
+	public void create(String from, String to);
 
-    /**
-     * The method remove a item for the from ID from the datastore.
-     * 
-     * @param from
-     *            a string with the link ID MCRFROM
-     */
-    public void delete(String from);
+	/**
+	 * The method create a new item in the datastore.
+	 * 
+	 * @param from
+	 *            a string with the link ID MCRFROM
+	 * @param to
+	 *            a string with the link ID MCRTO
+	 */
+	public void create(String from, String[] to);
 
-    /**
-     * The method count the number of references to the 'to' value of the table.
-     * 
-     * @param to
-     *            the object ID as String, they was referenced
-     * @return the number of references
-     */
-    public int countTo(String to);
+	/**
+	 * The method remove a item for the from ID from the datastore.
+	 * 
+	 * @param from
+	 *            a string with the link ID MCRFROM
+	 */
+	public void delete(String from);
 
-    /**
-     * The method count the number of references to the 'to' value of the table
-     * with condition of a spezial doctype.
-     * 
-     * @param to
-     *            the object ID as String, they was referenced
-     * @param doctype
-     *            the type of the from document f.e. document, disshab, ...
-     * @return the number of references
-     */
-    public int countTo(String to, String doctype, String to2);
-    
-    /**
-     * The method returns a Map of all counted distinct references 
-     * @param mcrtoPrefix
-     * @return 
-     * 
-     * the result-map of (key,value)-pairs can be visualized as <br />
-     * select count(mcrfrom) as value, mcrto as key from
-     * mcrlinkclass|mcrlinkhref 
-     * where mcrto like mcrtoPrefix + '%'
-     * group by mcrto;
-     *  
-     */
-    public Map getCountedMapOfMCRTO(String mcrtoPrefix);
+	/**
+	 * The method remove a item for the from ID from the datastore.
+	 * 
+	 * @param from
+	 *            a string with the link ID MCRFROM
+	 * @param to
+	 *            an array of strings with the link ID MCRTO
+	 */
+	public void delete(String from, String[] to);
+
+	/**
+	 * The method remove a item for the from ID from the datastore.
+	 * 
+	 * @param from
+	 *            a string with the link ID MCRFROM
+	 * @param to
+	 *            an array of strings with the link ID MCRTO
+	 */
+	public void delete(String from, String to);
+
+	/**
+	 * The method count the number of references to the 'to' value of the table.
+	 * 
+	 * @param to
+	 *            the object ID as String, they was referenced
+	 * @return the number of references
+	 */
+	public int countTo(String to);
+
+	/**
+	 * The method count the number of references to the 'to' value of the table
+	 * with condition of a special doctype.
+	 * 
+	 * @param to
+	 *            the object ID as String, they was referenced
+	 * @param doctype
+	 *            the type of the from document f.e. document, disshab, ...
+	 * @return the number of references
+	 */
+	public int countTo(String to, String doctype, String to2);
+
+	/**
+	 * The method returns a Map of all counted distinct references
+	 * 
+	 * @param mcrtoPrefix
+	 * @return
+	 * 
+	 * the result-map of (key,value)-pairs can be visualized as <br />
+	 * select count(mcrfrom) as value, mcrto as key from
+	 * mcrlinkclass|mcrlinkhref where mcrto like mcrtoPrefix + '%' group by
+	 * mcrto;
+	 * 
+	 */
+	public Map getCountedMapOfMCRTO(String mcrtoPrefix);
+
+	/**
+	 * Returns a List of all link sources of <code>destination</code>
+	 * 
+	 * @param destination
+	 *            Destination-ID
+	 * @return List of Strings (Source-IDs)
+	 */
+	public List getSourcesOf(String destination);
+
+	/**
+	 * Returns a List of all link destination of <code>source</code>
+	 * 
+	 * @param source
+	 *            Source-ID
+	 * @return List of Strings (Destination-IDs)
+	 */
+	public List getDestinationsOf(String source);
 }
