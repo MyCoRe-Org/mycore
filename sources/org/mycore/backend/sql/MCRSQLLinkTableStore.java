@@ -409,6 +409,27 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 		return returns;
 	}
 
+	public List getSourcesOf(String[] destinations) {
+		StringBuffer select = new StringBuffer();
+		select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO IN").append(getSQLArray(destinations));
+		logger.debug("STATEMENT: " + select);
+		MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+		List returns = new LinkedList();
+
+		try {
+			MCRSQLRowReader reader = conn.doQuery(select.toString());
+			while (reader.next()) {
+				returns.add(reader.getString(1));
+			}
+			reader.close();
+		} catch (Exception e) {
+			throw new MCRException("SQL counter error", e);
+		} finally {
+			conn.release();
+		}
+		return returns;
+	}
+
 	public List getDestinationsOf(String source) {
 		StringBuffer select = new StringBuffer();
 		select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM='").append(source).append("'");
@@ -428,6 +449,40 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 			conn.release();
 		}
 		return returns;
+	}
+
+	public List getDestinationsOf(String[] sources) {
+		StringBuffer select = new StringBuffer();
+		select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM IN").append(getSQLArray(sources));
+		logger.debug("STATEMENT: " + select);
+		MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+		List returns = new LinkedList();
+
+		try {
+			MCRSQLRowReader reader = conn.doQuery(select.toString());
+			while (reader.next()) {
+				returns.add(reader.getString(1));
+			}
+			reader.close();
+		} catch (Exception e) {
+			throw new MCRException("SQL counter error", e);
+		} finally {
+			conn.release();
+		}
+		return returns;
+	}
+
+	private static final String getSQLArray(String[] values){
+		StringBuffer returns=new StringBuffer();
+		returns.append("( ");
+		for (int i=0;i<values.length;i++){
+			returns.append('\'').append(values[i]).append('\'');
+			if (i<(values.length-1)){
+				returns.append(", ");
+			}
+		}
+		returns.append(" )");
+		return returns.toString();
 	}
 
 }

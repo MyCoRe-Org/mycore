@@ -271,7 +271,7 @@ public class MCRClassification {
 			id = (String) it.next();
 			if (!newIDs.containsKey(id)) {
 				returns.add(id); // ID is removed in new Classification, mark
-									// it
+				// it
 			}
 		}
 		return returns;
@@ -314,7 +314,7 @@ public class MCRClassification {
 		moveChildren(categories, raked.getRootElement());
 		raked.getRootElement().removeChildren("label");
 		return raked; // after the root element all children now contains
-						// "ID"-Attributes
+		// "ID"-Attributes
 	}
 
 	private static final boolean rakeElement(Element root, Set keepIDs) {
@@ -341,16 +341,16 @@ public class MCRClassification {
 		return false;
 	}
 
-	private final static void checkActiveLinks(String ClassID, Element root, Map oldClass) throws MCRActiveLinkException {
+	private final static void checkActiveLinks(String classID, Element root, Map oldClass) throws MCRActiveLinkException {
 		Iterator children = root.getChildren().iterator();
 		while (children.hasNext()) {
-			checkActiveLinks(ClassID, (Element) children.next(), oldClass);
+			checkActiveLinks(classID, (Element) children.next(), oldClass);
 		}
 		if (root.getParentElement() == null) {
 			return; // do not check <mycoreclass>
 		}
 		String curID = root.getAttributeValue("ID");
-		LOGGER.debug("Checking " + ClassID + "##" + curID);
+		LOGGER.debug("Checking " + classID + "##" + curID);
 		if (curID != null) {
 			Element oldCateg = (Element) oldClass.get(curID); // fetched
 			// category-Element
@@ -368,6 +368,12 @@ public class MCRClassification {
 				subTotals += Integer.parseInt(attr);
 			}
 			attr = oldCateg.getAttributeValue(cAttr);
+			/* We calculated the total number of links to all children
+			 * at this point. If this number is equal to the counter of the
+			 * current category element, than there no need for further checking.
+			 * This category only contains links that its children contains and no other.
+			 * We'll check this issue in the following if-block.
+			 */
 			if (!cAvailable || attr == null || Integer.parseInt(attr) != subTotals) {
 				LOGGER.debug("cAvailable: " + cAvailable);
 				LOGGER.debug("totals: " + attr);
@@ -377,30 +383,20 @@ public class MCRClassification {
 				 * be removed category contains links from other objects. We
 				 * check this issue now further.
 				 */
-				// We get every link from any subcategory
-				HashSet subLinks = new HashSet();
-				for (int j = 0; j < subCategs.size(); j++) {
-					attr = ((Element) subCategs.get(j)).getAttributeValue("ID");
-					if (attr != null) {
-						subLinks.addAll(MCRLinkTableManager.instance().getLinksToCategory(ClassID, attr));
-					}
-				}
-				// We get every link for the current category
-				HashSet linkSet = new HashSet();
-				linkSet.addAll(MCRLinkTableManager.instance().getLinksToCategory(ClassID, curID));
-				// Now we remove all links from linkSet that are not in sublinks
-				Iterator it = linkSet.iterator();
-				String curSource;
+
+				//This call only returns IDs, that are in the current category but not in its children
+				List activeLinks = MCRLinkTableManager.instance().getFirstLinksToCategory(classID, attr);
+
+				Iterator it = activeLinks.iterator();
 				MCRActiveLinkException e = new MCRActiveLinkException(new StringBuffer("Error while deleting category ").append(curID).append(
-						" from Classification ").append(ClassID).append('.').toString());
+						" from Classification ").append(classID).append('.').toString());
+				String curSource;
 				while (it.hasNext()) {
 					curSource = (String) it.next();
-					if (!subLinks.contains(curSource)) {
-						// we add this element as this is not a element from the
-						// descendant list
-						LOGGER.debug("adding failed link " + curSource + "-->" + ClassID + "##" + curID);
-						e.addLink(curSource, ClassID + "##" + curID);
-					}
+					// we add this element as this is not a element from the
+					// descendant list
+					LOGGER.debug("adding failed link " + curSource + "-->" + classID + "##" + curID);
+					e.addLink(curSource, classID + "##" + curID);
 				}
 				// after all links are added to the exception
 				throw e;

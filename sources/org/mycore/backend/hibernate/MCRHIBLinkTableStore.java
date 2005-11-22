@@ -378,6 +378,22 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 		return returns;
 	}
 
+	public List getSourcesOf(String[] destinations) {
+		Session session = getSession();
+		String query = "select key.mcrfrom from " + classname + " where MCRTO IN " + getSQLArray(destinations) ;
+		logger.debug("HQL-Statement: " + query);
+		List returns;
+		try {
+			returns = session.createQuery(query).list();
+		} catch (Exception e) {
+			logger.error("catched error@getSourceOf:", e);
+			throw new MCRException("Error during getSourceOf", e);
+		} finally {
+			session.close();
+		}
+		return returns;
+	}
+
 	public List getDestinationsOf(String source) {
 		Session session = getSession();
 		String query = "select key.mcrto from " + classname + " where MCRFROM='" + source + "'";
@@ -392,5 +408,35 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 			session.close();
 		}
 		return returns;
+	}
+
+	public List getDestinationsOf(String[] sources) {
+		Session session = getSession();
+		String query = "select key.mcrto from " + classname + " where MCRFROM IN " + getSQLArray(sources) ;
+		logger.debug("HQL-Statement: " + query);
+		List returns;
+		try {
+			returns = session.createQuery(query).list();
+		} catch (Exception e) {
+			logger.error("catched error@getSourceOf:", e);
+			throw new MCRException("Error during getSourceOf", e);
+		} finally {
+			session.close();
+		}
+		return returns;
+	}
+
+	
+	private static final String getSQLArray(String[] values){
+		StringBuffer returns=new StringBuffer();
+		returns.append("( ");
+		for (int i=0;i<values.length;i++){
+			returns.append('\'').append(values[i]).append('\'');
+			if (i<(values.length-1)){
+				returns.append(", ");
+			}
+		}
+		returns.append(" )");
+		return returns.toString();
 	}
 }

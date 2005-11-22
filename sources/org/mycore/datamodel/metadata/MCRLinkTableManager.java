@@ -480,6 +480,30 @@ public class MCRLinkTableManager {
             return new LinkedList();
         }
     }
+
+    public List getSourceOf(String type, String[] destinations){
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((destinations == null) || (destinations.length == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getSourcesOf(destinations);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references to " + destinations + ".");
+            return new LinkedList();
+        }
+    }
+
     public List getDestinationOf(String type, String source){
         int i = checkType(type);
 
@@ -503,8 +527,45 @@ public class MCRLinkTableManager {
         }
     }
     
+    public List getDestinationOf(String type, String[] sources){
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((sources == null) || (sources.length == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(sources);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references from " + sources + ".");
+            return new LinkedList();
+        }
+    }
+    
     public List getLinksToCategory(String classid, String categid){
     	return getSourceOf("class",classid+"##"+categid);
+    }
+    
+    public List getFirstLinksToCategory(String classid, String categid){
+    	MCRClassificationItem classification=MCRClassificationItem.getClassificationItem(classid);
+    	MCRCategoryItem categ=classification.getCategoryItem(categid);
+    	List categList=getLinksToCategory(classid,categid);
+    	MCRCategoryItem[] childs=categ.getChildren();
+    	String[] childIDs=new String[childs.length];
+    	for (int i=0;i<childIDs.length;i++){
+    		childIDs[i]=new StringBuffer(classid).append("##").append(childs[i].getClassificationID()).toString();
+    	}
+    	List childrenList=getSourceOf("class",childIDs);
+    	categList.removeAll(childrenList);
+    	return categList;
     }
     
 }

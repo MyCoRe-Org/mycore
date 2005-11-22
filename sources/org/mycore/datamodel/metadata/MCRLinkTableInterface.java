@@ -142,4 +142,22 @@ public interface MCRLinkTableInterface {
 	 * @return List of Strings (Destination-IDs)
 	 */
 	public List getDestinationsOf(String source);
+
+	/**
+	 * Returns a List of all link sources of <code>destination</code>
+	 * 
+	 * @param destination
+	 *            Destination-ID
+	 * @return List of Strings (Source-IDs)
+	 */
+	public List getSourcesOf(String[] destinations);
+
+	/**
+	 * Returns a List of all link destination of <code>source</code>
+	 * 
+	 * @param source
+	 *            Source-ID
+	 * @return List of Strings (Destination-IDs)
+	 */
+	public List getDestinationsOf(String[] sources);
 }
