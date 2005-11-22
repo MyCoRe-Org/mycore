@@ -65,7 +65,7 @@ public abstract class MCRAccessStore {
     
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
     
-    public static Hashtable types = getTypes();
+    public static List types = getTypes();
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
@@ -80,7 +80,7 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.sql.MCRSQLAccessStore");
+                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.hibernate.MCRHIBAccessStore");
             }
         } catch (Exception e) {
             logger.error(e);
@@ -103,27 +103,23 @@ public abstract class MCRAccessStore {
             return null;
         }
     }
-    
-    public static Hashtable getTypes(){
-        try{
-            Hashtable map = new Hashtable();
-            final String prefix = "MCR.type_";
-            Properties prop = MCRConfiguration.instance().getProperties(prefix);
-            Enumeration names = prop.propertyNames();
-            
-            while (names.hasMoreElements()) {
-                String name = (String) (names.nextElement());
-                String name_in = name + "_in";
-                
-                if (MCRConfiguration.instance().getBoolean(name) && MCRConfiguration.instance().getProperties().containsKey(name_in)) {
-                    map.put(name.substring(prefix.length()),MCRConfiguration.instance().getString(prefix+MCRConfiguration.instance().getString(name_in)));
-                }
-            }
-            return map;
-        }catch(Exception e){
-            logger.error("Typeloading failed: "+e);
-            return null;
+ 
+    /**
+     * reads the mycore.properties-configuration for datamodel-types
+     * @return a list of datamodel-type for which MCR.type_{datamodel}=true
+     */
+    public static List getTypes() {
+    	List listTypes = new ArrayList();
+    	final String prefix = "MCR.type_";
+        Properties prop = MCRConfiguration.instance().getProperties(prefix);
+        Enumeration names = prop.propertyNames();
+        while (names.hasMoreElements()) {
+        	String name = (String) (names.nextElement());
+        	if (MCRConfiguration.instance().getBoolean(name)) {
+        		listTypes.add(name.substring(prefix.length()));
+        	}
         }
+    	return listTypes;
     }
     
     /**
@@ -147,10 +143,8 @@ public abstract class MCRAccessStore {
             List elements = new LinkedList();
             MCRAccessDefinition def = null;
             
-            if (types.get(type).equals("true")){
+            if (MCRConfiguration.instance().getBoolean("MCR.type_" + type)){
                 elements = MCRXMLTableManager.instance().retrieveAllIDs(type);
-            }else{
-                elements = MCRXMLTableManager.instance().retrieveAllIDs((String)types.get(type));
             }
             
             for (int i=0; i<elements.size(); i++){
@@ -168,7 +162,7 @@ public abstract class MCRAccessStore {
             }
             return ret;
         }catch(Exception e){
-            logger.error("definition loading failed: ");
+            logger.error("definition loading failed: ", e);
             return null;
         }
     }
