@@ -1,16 +1,18 @@
 <%@ page import="org.mycore.user.MCRUserMgr,
 	java.util.ArrayList,
 	java.util.Collections"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 
 <%
 	ArrayList userids = MCRUserMgr.instance().getAllUserIDs();
 	Collections.sort(userids);
+String WebApplicationBaseURL = MCRServlet.getBaseURL();
 
 %>
 
 <h4>Vorhandene Benutzer</h4>
 
-<form method=post action="./admin/user_validate.jsp" id="overview">
+<form method=post action="<%= WebApplicationBaseURL %>admin/user_validate.jsp" id="overview">
 
 <p>
 <%
@@ -28,7 +30,7 @@
 			&nbsp;
 		</td>
 		<td>
-			<input type="image" title="Neuen Benutzer anlegen" name="new" src="./admin/images/install.png">
+			<input type="image" title="Neuen Benutzer anlegen" name="new" src="<%= WebApplicationBaseURL %>admin/images/install.png">
 		</td>
 	</tr>
 	<%
@@ -42,7 +44,7 @@
 			
 			out.println("<tr>");
 			out.println("<td class=\"rule\">" + (String)userids.get(i) + "</td>");
-			out.println("<td class=\"rule\"><input type=\"image\" title=\"Benutzer bearbeiten\" name=\"e"+ (String)userids.get(i) +"\" src=\"./admin/images/edit.png\"> <input type=\"image\" title=\"Benutzer löschen\" name=\"d"+ (String)userids.get(i) +"\" src=\"./admin/images/delete.png\" onClick=\"return questionDel()\"></td>");
+			out.println("<td class=\"rule\"><input type=\"image\" title=\"Benutzer bearbeiten\" name=\"e"+ (String)userids.get(i) +"\" src=\"" + WebApplicationBaseURL + "admin/images/edit.png\"> <input type=\"image\" title=\"Benutzer löschen\" name=\"d"+ (String)userids.get(i) +"\" src=\"" + WebApplicationBaseURL + "admin/images/delete.png\" onClick=\"return questionDel()\"></td>");
 			out.println("</tr>");
 		}
 	%>

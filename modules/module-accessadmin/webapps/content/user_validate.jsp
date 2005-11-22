@@ -6,8 +6,9 @@
 		java.text.SimpleDateFormat,
 		java.text.DateFormat,
 		java.util.Date" %>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>        
 <%
-
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String operation = request.getParameter("operation");
 	String paramName = "";
 
@@ -26,13 +27,13 @@
 
 		if (op.equals("e")){
 			// edit userdata
-			response.sendRedirect("../admin?path=user_edit&id=" + val.substring(1));
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=user_edit&id=" + val.substring(1));
 		}else if (op.equals("d")){
 			MCRUserMgr.instance().deleteUser(val.substring(1));
-			response.sendRedirect("../admin?path=user");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=user");
 		}else if (op.equals("n")){
 			// new user
-			response.sendRedirect("../admin?path=user_edit");
+			response.sendRedirect(WebApplicationBaseURL +"admin?path=user_edit");
 		}
 
 
@@ -105,6 +106,6 @@
 			// update user
 			manager.updateUser(user);
 		}
-		response.sendRedirect("../admin?path=user");
+		response.sendRedirect(WebApplicationBaseURL + "admin?path=user");
 	}
 %>

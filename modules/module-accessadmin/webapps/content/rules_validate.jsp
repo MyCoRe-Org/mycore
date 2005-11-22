@@ -6,9 +6,11 @@
 	org.mycore.common.MCRSession,
 	org.mycore.frontend.servlets.MCRServlet,
 	java.util.Enumeration"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>    
 <%
 	MCRSession mcrSession = MCRServlet.getSession(request);
-
+    
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String operation = request.getParameter("operation");
 	String paramName = "";
 
@@ -25,13 +27,13 @@
 
 		if (op.equals("e")){
 			// edit
-			response.sendRedirect("../admin?path=rules_edit&id=" + val.substring(1));
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=rules_edit&id=" + val.substring(1));
 		}else if (op.equals("d")){
 			// delete
 			MCRRuleStore.getInstance().deleteRule(val.substring(1));
-			response.sendRedirect("../admin?path=rules");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=rules");
 		}else{
-			response.sendRedirect("../admin?path=rules_edit");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=rules_edit");
 		}
 	}else{
 		String id = request.getParameter("rid");
@@ -45,7 +47,7 @@
 		Date creationtime = new Date();
 		creationtime = df.parse(dateString);
 
-		String resultpage = "../admin?path=rules";
+		String resultpage = WebApplicationBaseURL + "admin?path=rules";
 
 	
 		//validation
@@ -58,7 +60,7 @@
 				rule.setId(id_orig);
 				mcrSession.put("rule", rule);
 				mcrSession.put("err_msg", "Duplicate key");
-				resultpage = "../admin?path=rules_edit&id=" + id;
+				resultpage = WebApplicationBaseURL + "admin?path=rules_edit&id=" + id;
 			}else{
 				if (! id_orig.equals(id)){
 					MCRRuleStore.getInstance().deleteRule(id_orig);

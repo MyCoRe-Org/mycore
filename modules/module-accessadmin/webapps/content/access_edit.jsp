@@ -5,14 +5,16 @@
 	org.mycore.access.MCRAccessDefinition,
 	java.util.ArrayList,
 	java.util.List"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%!
 	List pool = null;
 	String ids = "";
 	String[] id = null;
 %>
 <%
- pool = MCRAccessStore.getPools();
+pool = MCRAccessStore.getPools();
 MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+String WebApplicationBaseURL = MCRServlet.getBaseURL();
 ids = (String) mcrSession.get("access_ids");
 mcrSession.deleteObject("access_ids");
 
@@ -24,9 +26,9 @@ if(id.length==1){
 		
 %>
 	<h4>Einzelzuweisung</h4>
-	<p><a href="./admin?path=access">zur Übersicht</a></p>
+	<p><a href="<%= WebApplicationBaseURL %>admin?path=access">zur Übersicht</a></p>
 
-	<form method=post action="./admin/access_validate.jsp">
+	<form method=post action="<%= WebApplicationBaseURL %>admin/access_validate.jsp">
 	<table  class="access" cellspacing="1" cellpadding="0">
 		<tr>
 			<td rowspan="2">&nbsp;</td>
@@ -68,9 +70,9 @@ if(id.length==1){
 %>
 
 	<h4>Mehrfachzuweisung</h4>
-	<p><a href="./admin?path=access">zur Übersicht</a></p>
+	<p><a href="<%= WebApplicationBaseURL %>/admin?path=access">zur Übersicht</a></p>
 
-	<form method=post action="./admin/access_validate.jsp">
+	<form method=post action="<%= WebApplicationBaseURL %>/admin/access_validate.jsp">
 	<table  class="access" cellspacing="1" cellpadding="0">
 		<tr>
 			<td rowspan="2">&nbsp;</td>

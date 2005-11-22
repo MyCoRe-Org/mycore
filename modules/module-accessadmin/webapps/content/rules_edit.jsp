@@ -6,10 +6,13 @@
 	java.text.DateFormat,
 	java.util.Date,
 	java.util.Collections"%>
-
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>    
+<%
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
+%>    
 <h4>Regel bearbeiten</h4>
 
-<p><a href="./admin?path=rules">zur Übersicht</a></p>
+<p><a href="<%= WebApplicationBaseURL %>/admin?path=rules">zur Übersicht</a></p>
 
 <%
 	MCRSession mcrSession = MCRServlet.getSession(request);
@@ -43,7 +46,7 @@
 
 %>
 
-<form method="post" action="./admin/rules_validate.jsp">
+<form method="post" action="<%= WebApplicationBaseURL %>/admin/rules_validate.jsp">
 	<table class="access">
 		<tr>
 			<td>Regel-ID:</td>

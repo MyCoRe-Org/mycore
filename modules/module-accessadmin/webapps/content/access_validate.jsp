@@ -4,6 +4,7 @@
 	org.mycore.access.MCRRuleMapping,
 	java.util.List,
 	java.util.Date"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%!
 	List pool = null;
 	MCRRuleMapping mapping = null;
@@ -12,7 +13,7 @@
 <%
 	pool = MCRAccessStore.getPools();
 	mcrSession = MCRSessionMgr.getCurrentSession();
-
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String operation = request.getParameter("operation");
 
 	if(operation.equals("save")){
@@ -39,13 +40,13 @@
 				mapping=null;
 			}
 		}
-		response.sendRedirect("../admin?path=access");
+		response.sendRedirect(WebApplicationBaseURL +"admin?path=access");
 	}else if(operation.equals("detail")){
 		String ids = request.getParameter("ids");
 		mcrSession.deleteObject("access_ids");
 		mcrSession.put("access_ids", ids);
     
-		response.sendRedirect("../admin?path=access_edit");
+		response.sendRedirect(WebApplicationBaseURL +"admin?path=access_edit");
 	}
 
 	

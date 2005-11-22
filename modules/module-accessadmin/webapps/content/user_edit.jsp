@@ -10,10 +10,11 @@
 	java.util.Date,
 	java.util.Collections,
 	java.lang.Exception"%>
-
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%
 	
 
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	MCRUser user = null;
 	MCRUserContact contact = null;
@@ -52,9 +53,9 @@
 
 <h4>Benutzer bearbeiten</h4>
 
-<p><a href="./admin?path=user">zur Übersicht</a></p>
+<p><a href="<%= WebApplicationBaseURL %>admin?path=user">zur Übersicht</a></p>
 
-<form name="details" method="post" onSubmit="return validateOnSubmit()" action="./admin/user_validate.jsp">
+<form name="details" method="post" onSubmit="return validateOnSubmit()" action="<%= WebApplicationBaseURL %>admin/user_validate.jsp">
 	
 	<table class="access">
 		<tr>

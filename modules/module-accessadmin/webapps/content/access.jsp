@@ -7,11 +7,13 @@
 		java.util.Set,
 		java.util.Iterator,
 		org.mycore.datamodel.metadata.MCRXMLTableManager"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%!
 	List pool=null;
 %>
 <%
 	pool = MCRAccessStore.getPools();
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 %>
 
 <script>
@@ -69,7 +71,7 @@
 
 
 <h4>Regelzuweisung</h4>
-<form method=post action="./admin/access_validate.jsp" id="overview">
+<form method=post action="<%= WebApplicationBaseURL %>/admin/access_validate.jsp" id="overview">
 <table border="0">
 <tr>
 <td>
@@ -97,8 +99,8 @@
 	</tr>
 <%
 
-	Hashtable table = MCRAccessStore.getInstance().getTypes();
-	Iterator it = table.keySet().iterator();
+	List table = MCRAccessStore.getInstance().getTypes();
+	Iterator it = table.iterator();
         
         while (it.hasNext()){
 			String key= (String) it.next();

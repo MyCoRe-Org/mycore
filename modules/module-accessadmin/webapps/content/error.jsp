@@ -1,3 +1,4 @@
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <h1>Zugriffsverletzung</h1>
 
 
@@ -8,4 +9,4 @@
 Bitte wenden Sie sich an Ihren Administrator, falls Sie weitere Fragen haben</p>
 
 <p>&nbsp;</p><p>&nbsp;</p>
-<p align="center"><a href="servlets/MCRLoginServlet">Hier gelangen Sie zum Login</a>
+<p align="center"><a href="<%= MCRServlet.getBaseURL() %>">Sie müssen Sich erst auf Ihrer MyCoRe-Anwendung anmelden</a>

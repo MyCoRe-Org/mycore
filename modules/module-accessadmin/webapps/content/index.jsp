@@ -10,7 +10,7 @@
 <%
 	MCRSession mcrSession = MCRServlet.getSession(request);
 	MCRUser user = MCRUserMgr.instance().retrieveUser(mcrSession.getCurrentUserID());
-
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String pageurl = (String) request.getAttribute("page");
 
 	if(! MCRUserMgr.instance().hasPrivilege(mcrSession.getCurrentUserID(), "user administrator")){
@@ -24,15 +24,15 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<title>MyCoRe Administration Interface</title>
-		<script src="./admin/admin.js" type=text/javascript></script>
-		<link rel="stylesheet" href="./admin/css/admin.css" />
+		<script src="<%=WebApplicationBaseURL%>/admin/admin.js" type=text/javascript></script>
+		<link rel="stylesheet" href="<%=WebApplicationBaseURL%>/admin/css/admin.css" />
 	</head>
 	<body>
 
 <%
 	if (((String) request.getAttribute("page")).equals("rules_editor.jsp")){	
 %>
-		<jsp:include page='<%=pageurl%>'/>
+		<jsp:include page="<%=pageurl%>"/>
 
 <%	// normal page
 	}else{
@@ -41,7 +41,7 @@
 		<table cellpadding="0" cellspacing="0" id="mytable">
 			<tr>
 				<td id="mainLeftColumn" rowspan="2">
-					<img src="../docportal/templates/master/template_mycoresample-1/IMAGES/logo.gif" alt="MyCoRe-Logo" />
+					<!--  <img src="../docportal/templates/master/template_mycoresample-1/IMAGES/logo.gif" alt="MyCoRe-Logo" /> -->
 					<br />
 		    		<jsp:include page='navigation.jsp'/>
 				</td>
@@ -58,8 +58,7 @@
 									</tr>
 									<tr>
 										<td valign="top" style="padding:5px">
-											<!-- including <%=(String) request.getAttribute("page")%> -->
-					    					<jsp:include page='<%=pageurl%>'/>
+					    					<jsp:include page="<%=pageurl%>"/>
 										</td>
 									</tr>
 								</table>

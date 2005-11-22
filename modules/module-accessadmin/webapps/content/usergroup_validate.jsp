@@ -4,7 +4,9 @@
 			org.mycore.user.MCRPrivilege,
 			java.util.ArrayList,
 			java.lang.Exception"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String operation = request.getParameter("operation");
 	String paramName = "";
 
@@ -44,14 +46,14 @@ try{
 
 		if (op.equals("e")){
 			// edit
-			response.sendRedirect("../admin?path=usergroup_edit&id=" + val.substring(1));
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=usergroup_edit&id=" + val.substring(1));
 		}else if (op.equals("d")){
 			// delete
 			MCRUserMgr.instance().deleteGroup(val.substring(1));
-			response.sendRedirect("../admin?path=usergroup");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=usergroup");
 		}else if(op.equals("n")){
 			// new
-			response.sendRedirect("../admin?path=usergroup_edit&operation=new");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=usergroup_edit&operation=new");
 		}else{
 
 			group = MCRUserMgr.instance().retrieveGroup(groupid);
@@ -128,7 +130,7 @@ try{
 
 
 			MCRUserMgr.instance().updateGroup(group);
-			response.sendRedirect("../admin?path=usergroup");
+			response.sendRedirect(WebApplicationBaseURL + "admin?path=usergroup");
 		}
 	}
 }catch(Exception e){

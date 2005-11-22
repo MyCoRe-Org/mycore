@@ -1,6 +1,8 @@
 <%@ page import="java.util.StringTokenizer"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%
-	val = (String)request.getParameter("path");
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
+	val = (String)request.getParameter("path");    
 	if (val == null){
 		val = "";
 	}else{
@@ -15,13 +17,13 @@
 
 <span>
 	<ul class="nav">
-		<li class="<%=get("")%>"><a href="admin">Home</a></li>
-		<li class="<%=get("rules")%>"><a href="?path=rules">Regeleditor</a></li> 
-		<li class="<%=get("access")%>"><a href="?path=access">Regelzuweisung</a></li>
+		<li class="<%=get("")%>"><a href="<%= WebApplicationBaseURL %>admin">Home</a></li>
+		<li class="<%=get("rules")%>"><a href="<%= WebApplicationBaseURL %>admin?path=rules">Regeleditor</a></li> 
+		<li class="<%=get("access")%>"><a href="<%= WebApplicationBaseURL %>admin?path=access">Regelzuweisung</a></li>
 	</ul>
 	<ul class="nav">
-		<li class="<%=get("usergroup")%>"><a href="?path=usergroup">Benutzergruppen</a></li> 
-		<li class="<%=get("user")%>"><a href="?path=user">Benutzerverwaltung</a></li>
+		<li class="<%=get("usergroup")%>"><a href="<%= WebApplicationBaseURL %>admin?path=usergroup">Benutzergruppen</a></li> 
+		<li class="<%=get("user")%>"><a href="<%= WebApplicationBaseURL %>admin?path=user">Benutzerverwaltung</a></li>
 	</ul>
 </span>
 

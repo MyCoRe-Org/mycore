@@ -2,8 +2,9 @@
 	java.util.Date,
 	java.util.ArrayList,
 	org.jdom.Element"%>
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>    
 <%
-	
+	String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	ArrayList userIds = MCRUserMgr.instance().getAllUserIDs();
 	ArrayList groupIds = MCRUserMgr.instance().getAllGroupIDs();
 
@@ -34,7 +35,7 @@
   <META http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>MyCoRe Administration Interface - Regeleditor</title>
   
-	<link rel="stylesheet" href="./admin/css/rules_editor.css">
+	<link rel="stylesheet" href="<%= WebApplicationBaseURL %>admin/css/rules_editor.css">
 	<script>
 		var i = 0;
 		var value = "";

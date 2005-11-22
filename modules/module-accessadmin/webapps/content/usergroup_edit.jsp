@@ -8,11 +8,12 @@
 	java.util.Date,
 	java.util.ArrayList,
 	java.util.Collections"%>
-
+<%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 <%
 	
 	MCRSession mcrSession = MCRServlet.getSession(request);
-	String operation = request.getParameter("operation");
+    String WebApplicationBaseURL = MCRServlet.getBaseURL();
+    String operation = request.getParameter("operation");
 	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	ArrayList userlist = MCRUserMgr.instance().getAllUserIDs();
@@ -62,7 +63,7 @@
 <p><a href="./admin?path=usergroup">zur Übersicht</a></p>
 
 
-<form name="details" method="post" action="./admin/usergroup_validate.jsp" onSubmit="return validateOnSubmit()">
+<form name="details" method="post" action="<%= WebApplicationBaseURL %>admin/usergroup_validate.jsp" onSubmit="return validateOnSubmit()">
 	<table class="access">
 		<tr>
 			<td>Gruppen-ID <sup class="required">*</sup>:</td>
