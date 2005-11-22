@@ -8,7 +8,7 @@ import org.hibernate.engine.Mapping;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
-public class MatchAgainstFunction implements SQLFunction{
+public class MCRMatchAgainstFunction implements SQLFunction{
 
 	public String render(List args, SessionFactoryImplementor sfi) throws QueryException {
         StringBuffer buf = new StringBuffer();

@@ -3,11 +3,11 @@ package org.mycore.backend.hibernate.dialects;
 import org.hibernate.dialect.MySQLMyISAMDialect;
 import org.hibernate.dialect.function.SQLFunction;
 
-public class MyMySQLMyISAMDialect extends MySQLMyISAMDialect {
+public class MCRMySQLMyISAMDialect extends MySQLMyISAMDialect {
 
-	public MyMySQLMyISAMDialect() {
+	public MCRMySQLMyISAMDialect() {
 		super();
-		registerFunction("match_against", new MatchAgainstFunction() );
+		registerFunction("match_against", new MCRMatchAgainstFunction() );
 	}
 
 }
