@@ -150,25 +150,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @return MCRAccessRule object with database values or null
      */
     public MCRAccessRule retrieveRule(String ruleid) {
-
-        MCRAccessRule rule = null;
-
-        try {
-            Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));          
-            
-            tx.commit();
-            session.close();
-
-            if (hibrule != null) {
-                rule = new MCRAccessRule(hibrule.getRid(), hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
-            }
-        } catch (Exception e) {
-            logger.error("catched error: ", e);
-        }
-
-        return rule;
+    	return getRule(ruleid);
     }
 
     /**
@@ -210,10 +192,9 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRAccessRule rule = null;
-
         try {
         	MCRACCESSRULE hibrule = null;
-        	List li = session.createCriteria(MCRAccessRule.class).add(Restrictions.eq("rid", ruleid)).list();
+        	List li = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
         	if ( li != null && li.size() > 0){
         		hibrule = ((MCRACCESSRULE) li.get(0));
         	}
