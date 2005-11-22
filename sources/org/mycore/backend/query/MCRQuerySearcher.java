@@ -43,7 +43,7 @@ public abstract class MCRQuerySearcher extends MCRSearcherBase{
     public static MCRQuerySearcher getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRQuerySearcher) MCRConfiguration.instance().getSingleInstanceOf("MCR.QuerySearcher_class_name", "org.mycore.backend.sql.MCRSQLSearcher");
+                implementation = (MCRQuerySearcher) MCRConfiguration.instance().getSingleInstanceOf("MCR.QuerySearcher_class_name", "org.mycore.backend.hibernate.MCRHIBSearcher");
             }
         } catch (Exception e) {
             logger.error(e);

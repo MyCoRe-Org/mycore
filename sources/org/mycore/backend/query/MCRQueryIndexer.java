@@ -54,7 +54,7 @@ public abstract class MCRQueryIndexer {
     public static MCRQueryIndexer getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRQueryIndexer) MCRConfiguration.instance().getSingleInstanceOf("MCR.QueryIndexer_class_name", "org.mycore.backend.sql.MCRSQLIndexer");
+                implementation = (MCRQueryIndexer) MCRConfiguration.instance().getSingleInstanceOf("MCR.QueryIndexer_class_name", "org.mycore.backend.hibernate.MCRHIBIndexer");
             }
         } catch (Exception e) {
             logger.error(e);
