@@ -74,9 +74,6 @@ public class MCRSearchField {
     /** Name of the field as defined in searchfields.xml * */
     private String name;
 
-    /** Data type of the field as defined in fieldtypes.xml * */
-    private String type;
-
     /** Sort order of this field if it is part of the sort criteria * */
     private boolean order = ASCENDING;
 
@@ -91,6 +88,10 @@ public class MCRSearchField {
     
     /** The field is sortable, used by lucene to store original data * */
     private boolean sortable = false;
+
+    /** Creates a new search field with the given name **/
+    public MCRSearchField( String name )
+    { this.name = name; }
 
     /** Returns the name of the field * */
     public String getName() {

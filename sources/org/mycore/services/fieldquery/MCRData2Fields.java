@@ -167,8 +167,8 @@ public class MCRData2Fields {
                 fileFields.add(fieldDef);
             } else if ("file.textfilter".equals(source)) {
                 if (obj instanceof MCRFile) {
-                    MCRSearchField field = new MCRSearchField();
-                    field.setName(fieldDef.getAttributeValue("name"));
+                    String fieldName = fieldDef.getAttributeValue("name"); 
+                    MCRSearchField field = new MCRSearchField(fieldName);
                     field.setFile((MCRFile) obj);
                     values.add(field);
                 }
@@ -232,8 +232,7 @@ public class MCRData2Fields {
                 continue;
             }
 
-            MCRSearchField field = new MCRSearchField();
-            field.setName(fv.getAttributeValue("name"));
+            MCRSearchField field = new MCRSearchField(fv.getAttributeValue("name"));
             field.setValue(value);
             field.setSortable("true".equals(fv.getAttributeValue("sortable")) ? true : false);
             values.add(field);

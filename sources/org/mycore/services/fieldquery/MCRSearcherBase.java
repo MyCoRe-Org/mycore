@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
@@ -191,12 +190,12 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
             org.jdom.Element el_sort = query.getRootElement().getChild("sortby");
             
             for (int i=0; i<el_sort.getChildren().size(); i++){
-                MCRSearchField sortby = new MCRSearchField();
-                sortby.setName(((org.jdom.Element)el_sort.getChildren().get(i)).getAttributeValue("field"));
+                String name = ((org.jdom.Element)el_sort.getChildren().get(i)).getAttributeValue("field");
+                MCRSearchField sortby = new MCRSearchField( name );
                 if (((org.jdom.Element) el_sort.getChildren().get(i)).getAttributeValue("order").equals("ascending")){
-                    sortby.setSortOrder(true);
+                    sortby.setSortOrder(MCRSearchField.ASCENDING);
                 }else{
-                    sortby.setSortOrder(false);
+                    sortby.setSortOrder(MCRSearchField.DESCENDING);
                 }
                 order.add(sortby);
             }
