@@ -146,7 +146,7 @@ public class MCRHIBConnection {
         Properties hibs = cfg.getProperties();
         for(Enumeration e = hibs.keys(); e.hasMoreElements();) {
         	String key = (String) e.nextElement();
-        	Logger.getLogger("MCRHIBConnection.java").debug(key + ":" + hibs.getProperty(key));
+        	Logger.getLogger(MCRHIBConnection.class).debug(key + ":" + hibs.getProperty(key));
         }
     }
 
