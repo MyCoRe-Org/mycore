@@ -228,16 +228,20 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @return the next free ID number as a String
      */
     public final int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
-        /*
-         * Session session = getSession(); Transaction tx =
-         * session.beginTransaction(); List l = session.createQuery("from
-         * MCRXMLTABLE where MCRID like '"+project+"_"+type+"%'").list(); String
-         * max = ""; int t; for(t=0;t<l.size();t++) { MCRXMLTABLE tab =
-         * ((MCRXMLTABLE)l.get(t)); if(tab.getId().compareTo(max) > 0) max =
-         * tab.getId(); } tx.commit(); session.close(); return new
-         * MCRObjectID(max).getNumberAsInteger() + 1;
-         */
-        return (int) MCRHIBConnection.instance().getID();
+    	
+        Session session = getSession(); 
+        Transaction tx = session.beginTransaction();
+        List l = session.createQuery("select max(key.id) from MCRXMLTABLE where MCRID like '"+project+"_"+type+"%'").list();
+        tx.commit(); 
+        session.close();
+        
+        if (l.size() > 0) {
+        	String max = (String) l.get(0);
+        	return new
+	          MCRObjectID(max).getNumberAsInteger() + 1;
+        } else {
+        	return 1;
+        }
     }
 
     /**
