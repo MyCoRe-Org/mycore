@@ -51,7 +51,7 @@
 # Hibernate for Linux or Windows
 # Use package: org.mycore.backend.hibernate
 # Hint: the Hibernate access to SQL DB's is included!
-MCR.JDBCStore.Type=hibernate
+  MCR.JDBCStore.Type=hibernate
 
 ####################################################################### 
 #
