@@ -57,7 +57,7 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
     }
 
     /**
-     * This class create an index of meta data objects in the temporary XMLDB
+     * This method create an index of meta data objects in the temporary XMLDB
      * tree.
      * 
      * @param evt
@@ -106,7 +106,7 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
     }
 
     /**
-     * This class update an index of meta data objects in the temporary XMLDB
+     * This method update an index of meta data objects in the temporary XMLDB
      * tree.
      * 
      * @param evt
@@ -157,7 +157,7 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
     }
 
     /**
-     * This class delete an index of meta data objects from the temporary XMLDB
+     * This method delete an index of meta data objects from the temporary XMLDB
      * tree.
      * 
      * @param evt
