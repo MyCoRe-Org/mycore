@@ -30,7 +30,7 @@ package org.mycore.common.events;
  * Events are automatically created by some MyCoRe components and are forwarded
  * to the handlers by MCREventManager.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public class MCREvent extends java.util.Hashtable {
     /** Pre-defined event types * */
@@ -39,6 +39,8 @@ public class MCREvent extends java.util.Hashtable {
     final static public String UPDATE_EVENT = "update";
 
     final static public String DELETE_EVENT = "delete";
+    
+    final static public String REPAIR_EVENT = "repair";
 
     final static public String OBJECT_TYPE = "MCRObject";
 

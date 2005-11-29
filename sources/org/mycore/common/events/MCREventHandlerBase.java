@@ -31,7 +31,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * Abstract helper class that can be subclassed to implement event handlers more
  * easily.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {
     private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
@@ -47,6 +47,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 handleObjectUpdated(evt, obj);
             } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                 handleObjectDeleted(evt, obj);
+            } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                handleObjectRepaired(evt, obj);
             }
         } else if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
             MCRFile file = (MCRFile) (evt.get("file"));
@@ -73,6 +75,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 undoObjectUpdated(evt, obj);
             } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                 undoObjectDeleted(evt, obj);
+            } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                undoObjectRepaired(evt, obj);
             }
         } else if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
             MCRFile file = (MCRFile) (evt.get("file"));
@@ -124,6 +128,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles object repair events. This implementation does nothing and should
+     * be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         logger.debug("This default handler implementation does nothing");
     }
 
@@ -202,6 +219,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
+        logger.debug("This default handler implementation does nothing");
+    }
+
+    /**
+     * Handles undo of object repaired events. This implementation does nothing
+     * and should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void undoObjectRepaired(MCREvent evt, MCRObject obj) {
         logger.debug("This default handler implementation does nothing");
     }
 
