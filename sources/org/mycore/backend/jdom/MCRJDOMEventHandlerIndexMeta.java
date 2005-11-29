@@ -117,4 +117,32 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
         double diff = (double) (t2 - t1) / 1000.0;
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta delete: done in " + diff + " sec.");
     }
+
+    /**
+     * This class update an index of meta data objects in the temporary JDOM
+     * tree.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        // save the start time
+        long t1 = System.currentTimeMillis();
+
+        // update
+        MCRObjectID mcr_id = obj.getId();
+        LOGGER.debug("MCRJDOMEventHandlerIndexMeta repair: MCRObjectID : " + mcr_id.getId());
+
+        org.jdom.Element root = obj.createXML().detachRootElement();
+        store.removeElement(mcr_id);
+        store.addElement(mcr_id, root);
+
+        // save the stop time
+        long t2 = System.currentTimeMillis();
+        double diff = (double) (t2 - t1) / 1000.0;
+        LOGGER.debug("MCRJDOMEventHandlerIndexMeta repair: done in " + diff + " sec.");
+    }
+
 }

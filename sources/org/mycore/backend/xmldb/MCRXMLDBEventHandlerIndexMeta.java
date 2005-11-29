@@ -26,7 +26,6 @@ package org.mycore.backend.xmldb;
 import org.apache.log4j.Logger;
 import org.jdom.input.SAXHandler;
 import org.jdom.output.SAXOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -45,9 +44,6 @@ import org.xmldb.api.modules.XMLResource;
 public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
     // the LOGGER
     private static Logger LOGGER = Logger.getLogger(MCRXMLDBEventHandlerIndexMeta.class);
-
-    // the configuration
-    private static final MCRConfiguration config = MCRConfiguration.instance();
 
     /**
      * Creates a new MCRXMLDBEventHandlerIndexMeta.
@@ -192,6 +188,57 @@ public class MCRXMLDBEventHandlerIndexMeta extends MCREventHandlerBase {
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
         LOGGER.debug("MCRXMLDBEventHandlerIndexMeta delete: done in " + diff + " sec.");
+    }
+
+    /**
+     * This method update an index of meta data objects in the temporary XMLDB
+     * tree.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        // save the start time
+        long t1 = System.currentTimeMillis();
+
+        // store in the collection
+        Collection collection = null;
+
+        try {
+            MCRObjectID mcr_id = obj.getId();
+            LOGGER.debug("MCRXMLDBEventHandlerIndexMeta repair: MCRObjectID : " + mcr_id.getId() + " - " + obj.getLabel());
+
+            // normalize text fields
+            MCRNormalizeText.normalizeMCRObject(obj);
+
+            // open the collection
+            collection = MCRXMLDBConnectionPool.instance().getConnection(obj.getId().getTypeId());
+
+            // check that the item not exist
+            XMLResource res = (XMLResource) collection.getResource(obj.getId().getId());
+
+            if (res == null) {
+                LOGGER.warn("An object with ID " + obj.getId().getId() + " does not exist.");
+            } else {
+                handleObjectDeleted(evt, obj);
+            }
+
+            // create the new item
+            res = (XMLResource) collection.createResource(mcr_id.getId(), XMLResource.RESOURCE_TYPE);
+
+            SAXOutputter outputter = new SAXOutputter(res.setContentAsSAX());
+            outputter.output(obj.createXML());
+            collection.storeResource(res);
+        } catch (Exception e) {
+            throw new MCRPersistenceException(e.getMessage(), e);
+        }
+
+        // save the stop time
+        long t2 = System.currentTimeMillis();
+        double diff = (double) (t2 - t1) / 1000.0;
+        LOGGER.debug("MCRXMLDBEventHandlerIndexMeta repair: done in " + diff + " sec.");
     }
 
     /**
