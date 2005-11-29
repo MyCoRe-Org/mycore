@@ -52,12 +52,7 @@ public abstract class MCRBase {
 
     protected static String persist_type;
 
-    protected static MCRLinkTableManager mcr_linktable = null;
-
     protected static MCRXMLTableManager mcr_xmltable = null;
-
-    // interface classes
-    protected static MCRObjectSearchStoreInterface mcr_persist;
 
     // the DOM document
     protected org.jdom.Document jdom_document = null;
@@ -90,24 +85,14 @@ public abstract class MCRBase {
             // Load the configuration
             mcr_conf = MCRConfiguration.instance();
 
-            // Link table manager
-            mcr_linktable = MCRLinkTableManager.instance();
-
             // XML table manager
             mcr_xmltable = MCRXMLTableManager.instance();
 
             // Default Encoding
             mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding", MCRDefaults.ENCODING);
             logger.debug("Encoding = " + mcr_encoding);
-
-            // Set persistence layer
-            persist_type = mcr_conf.getString("MCR.XMLStore.Type");
-
-            String proppers = "MCR.persistence_" + persist_type.toLowerCase() + "_class_name";
-            persist_name = mcr_conf.getString(proppers);
-            mcr_persist = (MCRObjectSearchStoreInterface) Class.forName(persist_name).newInstance();
         } catch (Exception e) {
-        	logger.error("error occured: ",e);
+            logger.error("error occured: ", e);
             throw new MCRException(e.getMessage(), e);
         }
     }
@@ -253,25 +238,6 @@ public abstract class MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     public abstract org.jdom.Document createXML() throws MCRException;
-
-    /**
-     * This methode create a typed content list for all MCRObject data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public abstract MCRTypedContent createTypedContent() throws MCRException;
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text values from the metadata object
-     */
-    public abstract String createTextSearch() throws MCRException;
 
     /**
      * The methode create the object in the data store.

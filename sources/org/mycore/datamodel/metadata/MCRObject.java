@@ -314,10 +314,6 @@ final public class MCRObject extends MCRBase {
 
         // build this object
         mcr_xmltable.create(mcr_id, createXML());
-        mcr_persist.create(this);
-
-        deleteLinksFromTable();
-        addLinksToTable();
 
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.CREATE_EVENT);
@@ -356,7 +352,6 @@ final public class MCRObject extends MCRBase {
         setFromJDOM(mcr_xmltable.readDocument(mcr_id));
         mcr_service.setDate("modifydate");
         getStructure().addDerivate(link);
-        mcr_persist.update(this);
         mcr_xmltable.update(mcr_id, createXML());
     }
 
@@ -382,7 +377,6 @@ final public class MCRObject extends MCRBase {
 
         if (j != -1) {
             getStructure().removeDerivate(j);
-            mcr_persist.update(this);
             mcr_xmltable.update(mcr_id, createXML());
         } else {
             throw new MCRPersistenceException("The derivate link " + link.getXLinkHref() + " was not found.");
@@ -474,8 +468,6 @@ final public class MCRObject extends MCRBase {
         }
 
         // remove him self
-        mcr_persist.delete(mcr_id);
-        deleteLinksFromTable();
         mcr_xmltable.delete(mcr_id);
 
         // handle events
@@ -716,9 +708,6 @@ final public class MCRObject extends MCRBase {
     private final void updateThisInDatastore() throws MCRPersistenceException {
         mcr_service.setDate("modifydate");
         mcr_xmltable.update(mcr_id, createXML());
-        deleteLinksFromTable();
-        addLinksToTable();
-        mcr_persist.update(this);
 
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
@@ -778,55 +767,6 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * The method add all class and reference links of this instance to the link
-     * table.
-     */
-    private void addLinksToTable() {
-        MCRTypedContent mcr_tc = createTypedContent();
-        int i = 0;
-
-        while ((i < mcr_tc.getSize()) && (!mcr_tc.getNameElement(i).equals("metadata"))) {
-            i++;
-        }
-
-        // add metadata links
-        i++;
-
-        while ((i < mcr_tc.getSize()) && (!mcr_tc.getNameElement(i).equals("service"))) {
-            if ((mcr_tc.getNameElement(i).equals("type")) && (mcr_tc.getFormatElement(i) == MCRTypedContent.FORMAT_LINK) && (mcr_tc.getValueElement(i).equals("locator"))) {
-                try {
-                    MCRObjectID mcr_link = new MCRObjectID((String) mcr_tc.getValueElement(i + 1));
-                    mcr_linktable.addReferenceLink("href", mcr_id, mcr_link);
-                } catch (MCRException e) {
-                }
-
-                i++;
-            }
-
-            if ((mcr_tc.getNameElement(i).equals("classid")) && (mcr_tc.getFormatElement(i) == MCRTypedContent.FORMAT_CLASSID)) {
-                try {
-                    MCRObjectID mcr_class = new MCRObjectID((String) mcr_tc.getValueElement(i));
-                    mcr_linktable.addClassificationLink(mcr_id, mcr_class, (String) mcr_tc.getValueElement(i + 1));
-                } catch (MCRException e) {
-                }
-
-                i++;
-            }
-
-            i++;
-        }
-    }
-
-    /**
-     * The method delete all class and reference links of this instance from the
-     * link table.
-     */
-    private void deleteLinksFromTable() {
-        mcr_linktable.deleteReferenceLink("href", mcr_id);
-        mcr_linktable.deleteClassificationLink(mcr_id);
-    }
-
-    /**
      * The method updates the persistence layer with the data from the XLM
      * store.
      * 
@@ -855,11 +795,8 @@ final public class MCRObject extends MCRBase {
             throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
         }
 
-        mcr_persist.update(this);
-        deleteLinksFromTable();
-        addLinksToTable();
         // handle events
-        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
         evt.put("object", this);
         MCREventManager.instance().handleEvent(evt);
     }

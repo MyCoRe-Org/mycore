@@ -188,39 +188,6 @@ final public class MCRDerivate extends MCRBase {
     }
 
     /**
-     * This methode create a typed content list for all MCRObject data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-        tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "mycoreobject");
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "ID", mcr_id.getId());
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "label", mcr_label);
-        tc.addMCRTypedContent(mcr_derivate.createTypedContent());
-        tc.addMCRTypedContent(mcr_service.createTypedContent());
-
-        return tc;
-    }
-
-    /**
-     * This methode create an empty String. They exist only for the interface.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text values from the metadata object
-     */
-    public final String createTextSearch() throws MCRException {
-        return "";
-    }
-
-    /**
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException
@@ -255,21 +222,6 @@ final public class MCRDerivate extends MCRBase {
             }
         }
 
-        // create the derivate in the search store
-        try {
-            mcr_persist.create(this);
-        } catch (Exception e) {
-            // delete from IFS
-            MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
-            difs.delete();
-
-            // delete from the XML table
-            mcr_xmltable.delete(mcr_id);
-
-            // throw final exception
-            throw new MCRPersistenceException("Error while creating derivate in" + " datastore.", e);
-        }
-
         // add the link to metadata
         MCRObject obj;
 
@@ -286,9 +238,6 @@ final public class MCRDerivate extends MCRBase {
                 // delete from IFS
                 MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.getId());
                 difs.delete();
-
-                // delete search data
-                mcr_persist.delete(mcr_id);
 
                 // delete from the XML table
                 mcr_xmltable.delete(mcr_id);
@@ -351,13 +300,6 @@ final public class MCRDerivate extends MCRBase {
             } else {
                 logger.warn("Error while clean IFS for ID " + id);
             }
-        }
-
-        // delete derivate from search store
-        try {
-            mcr_persist.delete(mcr_id);
-        } catch (MCRException e) {
-            logger.warn(e.getMessage());
         }
 
         // delete derivate from XML table
@@ -479,7 +421,6 @@ final public class MCRDerivate extends MCRBase {
             old.receiveFromDatastore(mcr_id.getId());
         } catch (MCRException e) {
             createInDatastore();
-
             return;
         }
 
@@ -521,7 +462,6 @@ final public class MCRDerivate extends MCRBase {
         mcr_service.setDate("createdate", old.getService().getDate("createdate"));
         mcr_service.setDate("modifydate");
         mcr_xmltable.update(mcr_id, createXML());
-        mcr_persist.update(this);
 
         // add the link to metadata
         for (int i = 0; i < getDerivate().getLinkMetaSize(); i++) {
@@ -548,39 +488,6 @@ final public class MCRDerivate extends MCRBase {
     public final void updateXMLInDatastore() throws MCRPersistenceException {
         mcr_service.setDate("modifydate");
         mcr_xmltable.update(mcr_id, createXML());
-        mcr_persist.update(this);
     }
 
-    /**
-     * The method updates the persistence layer with the data from the XLM
-     * store.
-     * 
-     * @param id
-     *            the MCRObjectID as string
-     */
-    public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
-        repairPersitenceDatastore(new MCRObjectID(id));
-    }
-
-    /**
-     * The method updates the persistence layer with the data from the XLM
-     * store.
-     * 
-     * @param id
-     *            the MCRObjectID
-     */
-    public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
-        mcr_id = id;
-
-        Document doc = mcr_xmltable.readDocument(mcr_id);
-
-        if (doc != null) {
-            jdom_document = doc;
-            set();
-        } else {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
-        }
-
-        mcr_persist.update(this);
-    }
 }
