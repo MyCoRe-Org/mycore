@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.105 $ $Date: 2005-11-15 19:31:10 $                      -->
+  <!-- $Revision: 1.106 $ $Date: 2005-11-30 13:08:03 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.105 $ $Date: 2005-11-15 19:31:10 $</echo>
+    <echo>Ant build file   : $Revision: 1.106 $ $Date: 2005-11-30 13:08:03 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -218,7 +218,7 @@
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-	  depends="compile_common, compile_servlets, compile_user, compile_metadata, compile_classifications, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
+	  depends="compile_common, compile_servlets, compile_user, compile_metadata, compile_classifications, compile_fieldquery, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
     <subant target="compile" inheritall="true" inheritrefs="true">
       <fileset dir="." includes="modules/module-*/build.xml" />
     </subant>
@@ -341,6 +341,13 @@
     <echo>Compiling servlets for HTML frontend...</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/frontend/servlets/**"/>
+    </antcall>
+  </target>
+
+  <target name="compile_fieldquery">
+    <echo>Compiling fieldquery support classes...</echo>
+    <antcall target="javac">
+      <param name="packages" value="org/mycore/services/fieldquery/**"/>
     </antcall>
   </target>
 
