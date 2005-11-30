@@ -82,13 +82,14 @@ public class MCRResults {
         if (!map.containsKey(hit.getID())) {
             // This is a new entry with new ID
             hits.add(hit);
-            map.put(hit.getID(), null);
+            map.put(hit.getID(), hit);
         } else {
             // Merge data of existing hit with new one with the same ID
             MCRHit existing = getHit(hit.getID());
             MCRHit merged = MCRHit.buildMergedHitData(hit, existing);
             hits.remove(existing);
             hits.add(merged);
+            map.put(merged.getID(), merged);
         }
     }
 
