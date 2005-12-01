@@ -186,7 +186,7 @@ public class MCRLuceneQuery implements MCRConditionVisitor {
                     String value = field.stringValue();
                     props.setProperty( name, value );
                     MCRSearchField sf = new MCRSearchField( name );
-                    if (sf.getSortabale())
+                    if (sf.isSortable())
                       hit.addSortData(name, value);
                   }
                 }

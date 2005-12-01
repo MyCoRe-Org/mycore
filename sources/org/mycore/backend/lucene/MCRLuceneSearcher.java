@@ -175,7 +175,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
                     doc.add(Field.Keyword(name, content));
                 }
 
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getSortabale() )) {
+                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.isSortable() )) {
                     doc.add(Field.Text(name, content));
                 } else if (type.equals("text")) {
                     doc.add(Field.UnStored(name, content));
