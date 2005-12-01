@@ -42,6 +42,7 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchField;
 import org.xml.sax.InputSource;
 
 /**
@@ -180,7 +181,14 @@ public class MCRLuceneQuery implements MCRConditionVisitor {
                 {
                   field = (Field) fields.nextElement();
                   if ( field.isStored() && !"mcrid".equals(field.name()) )
-                    props.setProperty(field.name(), field.stringValue());
+                  {
+                    String name  = field.name();
+                    String value = field.stringValue();
+                    props.setProperty( name, value );
+                    MCRSearchField sf = new MCRSearchField( name );
+                    if (sf.getSortabale())
+                      hit.addSortData(name, value);
+                  }
                 }
                 
                 if (props.size() > 0)
