@@ -234,7 +234,9 @@ public class MCRHIBQuery implements MCRConditionVisitor {
                 	operator = "like";
                 	if(!fieldtype.equals("identifier")) {
                 		value = "\'%" + value + "%\'";
-                	}
+                	}else {
+                		value = "\'" + value + "\'";
+                    }
                     sbquery.append(fieldname).append(not).append(operator).append(" ").append(value);
                 } else if (operator.equals("contains")) {
                 	sbquery.append(not).append(" match_against(").append(fieldname)
