@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -302,14 +303,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         }
 
         double getScore(String filename, byte[] header) {
-          String head = new String(header);
-          
-          if (!head.startsWith("<?xml")) {
-            return 0;
-        }
-
         try {
-            String type = parseDocumentType(new ByteArrayInputStream(header));
+            String type = MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
 
             if (type.equals(doctype)) {
                 return score;
