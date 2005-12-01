@@ -234,7 +234,6 @@ public class MCRData2Fields {
 
             MCRSearchField field = new MCRSearchField(fv.getAttributeValue("name"));
             field.setValue(value);
-            field.setSortable("true".equals(fv.getAttributeValue("sortable")) ? true : false);
             values.add(field);
         }
     }
