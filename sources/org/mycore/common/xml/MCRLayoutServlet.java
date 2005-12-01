@@ -102,46 +102,6 @@ public class MCRLayoutServlet extends MCRServlet {
         CACHE = new MCRCache(100);
     }
 
-    protected String parseDocumentType(InputStream in) {
-        SAXParser parser = null;
-
-        try {
-            parser = SAXParserFactory.newInstance().newSAXParser();
-        } catch (Exception ex) {
-            String msg = "Could not build a SAX Parser for processing XML input";
-            throw new MCRConfigurationException(msg, ex);
-        }
-
-        final Properties detected = new Properties();
-        final String forcedInterrupt = "mcr.forced.interrupt";
-
-        DefaultHandler handler = new DefaultHandler() {
-            public void startElement(String uri, String localName, String qName, Attributes attributes) {
-                LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
-                detected.setProperty("docType", qName);
-                throw new MCRException(forcedInterrupt);
-            }
-
-            // We would need SAX 2.0 to be able to do this, for later use:
-            public void startDTD(String name, String publicId, String systemId) {
-                LOGGER.debug("MCRLayoutServlet detected DOCTYPE declaration = " + name);
-                detected.setProperty("docType", name);
-                throw new MCRException(forcedInterrupt);
-            }
-        };
-
-        try {
-            parser.parse(new InputSource(in), handler);
-        } catch (Exception ex) {
-            if (!forcedInterrupt.equals(ex.getMessage())) {
-                String msg = "Error while detecting XML document type from input source";
-                throw new MCRException(msg, ex);
-            }
-        }
-
-        return detected.getProperty("docType");
-    }
-
     protected void forwardXML(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
 
@@ -207,17 +167,17 @@ public class MCRLayoutServlet extends MCRServlet {
             InputStream is = (InputStream) (request.getAttribute(STREAM_ATTR));
             PushbackInputStream pis = new PushbackInputStream(is, bufferSize);
             pis.mark(bufferSize);
-            docType = parseDocumentType(pis);
+            docType = MCRUtils.parseDocumentType(pis);
             pis.reset();
             sourceXML = new StreamSource(pis);
         } else if (request.getAttribute(BYTE_ATTR) != null) {
             byte[] bytes = (byte[]) (request.getAttribute(BYTE_ATTR));
-            docType = parseDocumentType(new ByteArrayInputStream(bytes));
+            docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(bytes));
             sourceXML = new StreamSource(new ByteArrayInputStream(bytes));
         } else if (request.getAttribute(FILE_ATTR) != null) {
             File file = (File) (request.getAttribute(FILE_ATTR));
             FileInputStream fis = new FileInputStream(file);
-            docType = parseDocumentType(fis);
+            docType = MCRUtils.parseDocumentType(fis);
             fis.close();
             sourceXML = new StreamSource(file);
         }
