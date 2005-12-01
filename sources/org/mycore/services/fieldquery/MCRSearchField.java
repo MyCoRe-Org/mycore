@@ -24,7 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Hashtable;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -42,8 +42,8 @@ import org.mycore.datamodel.ifs.MCRFile;
  * @see MCRResults#sort(List)
  */
 public class MCRSearchField {
-    private static Properties fieldTypes = new Properties();
-
+    private static Hashtable fieldTable = new Hashtable();
+    
     static {
         Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
 
@@ -60,7 +60,11 @@ public class MCRSearchField {
                 Element field = (Element) (fields.get(j));
                 String name = field.getAttributeValue("name");
                 String type = field.getAttributeValue("type");
-                fieldTypes.put(name, type);
+
+                MCRSearchField f = new MCRSearchField(name);
+                f.sortable = "true".equals(field.getAttributeValue("sortable")) ? true : false;
+                f.type     = type;
+                fieldTable.put(name, f);
             }
         }
     }
@@ -77,6 +81,8 @@ public class MCRSearchField {
     /** Sort order of this field if it is part of the sort criteria * */
     private boolean order = ASCENDING;
 
+    private String type;
+    
     /** The value of this field * */
     private String value;
 
@@ -91,23 +97,26 @@ public class MCRSearchField {
 
     /** Creates a new search field with the given name **/
     public MCRSearchField( String name )
-    { this.name = name; }
+    { 
+      this.name = name;
+      MCRSearchField fromTable = MCRSearchField.getField( name );
+      if( fromTable != null )
+      {
+        this.type = fromTable.type;
+        this.sortable = fromTable.sortable;
+      }
+    }
 
     /** Returns the name of the field * */
     public String getName() {
         return name;
     }
 
-    /** Sets the name of the field * */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     /** Returns the sort order if this field is part of the sort criteria * */
     public boolean getSortOrder() {
         return order;
     }
-
+    
     /** Sets the sort order if this field is part of the sort criteria * */
     public void setSortOrder(boolean order) {
         this.order = order;
@@ -115,14 +124,15 @@ public class MCRSearchField {
 
     /** Returns the data type of this field as defined in fieldtypes.xml * */
     public String getDataType() {
-        return fieldTypes.getProperty(name);
+        return type;
     }
-
-    /** Returns the data type of this field as defined in fieldtypes.xml * */
-    public static String getDataType(String fieldName) {
-        return fieldTypes.getProperty(fieldName);
-    }
-
+    
+    public static String getDataType( String name )
+    { return ((MCRSearchField)( fieldTable.get( name ) )).type; }
+    
+    public static MCRSearchField getField( String name )
+    { return (MCRSearchField)( fieldTable.get( name ) ); }
+    
     /**
      * Returns the value of this field, filled by MCRData2Fields.buildFields
      * method
@@ -156,12 +166,7 @@ public class MCRSearchField {
     }
     
     /** Returns if this field is sortable * */
-    public boolean getSortabale() {
+    public boolean isSortable() {
         return sortable;
-    }
-
-    /** Sets the sortable flag for this field * */
-    public void setSortable(boolean sortable) {
-        this.sortable = sortable;
     }
 }
