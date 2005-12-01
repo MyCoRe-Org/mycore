@@ -46,11 +46,18 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Properties;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class represent a general set of external methods to support the
@@ -1038,4 +1045,46 @@ public class MCRUtils {
 
         return buf.toString();
     }
+    
+    public static String parseDocumentType(InputStream in) {
+      SAXParser parser = null;
+
+      try {
+          parser = SAXParserFactory.newInstance().newSAXParser();
+      } catch (Exception ex) {
+          String msg = "Could not build a SAX Parser for processing XML input";
+          throw new MCRConfigurationException(msg, ex);
+      }
+
+      final Properties detected = new Properties();
+      final String forcedInterrupt = "mcr.forced.interrupt";
+
+      DefaultHandler handler = new DefaultHandler() {
+          public void startElement(String uri, String localName, String qName, Attributes attributes) {
+              LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
+              detected.setProperty("docType", qName);
+              throw new MCRException(forcedInterrupt);
+          }
+
+          // We would need SAX 2.0 to be able to do this, for later use:
+          public void startDTD(String name, String publicId, String systemId) {
+              LOGGER.debug("MCRLayoutServlet detected DOCTYPE declaration = " + name);
+              detected.setProperty("docType", name);
+              throw new MCRException(forcedInterrupt);
+          }
+      };
+
+      try {
+          parser.parse(new InputSource(in), handler);
+      } catch (Exception ex) {
+          if (!forcedInterrupt.equals(ex.getMessage())) {
+              String msg = "Error while detecting XML document type from input source";
+              throw new MCRException(msg, ex);
+          }
+      }
+
+      return detected.getProperty("docType");
+  }
+
+    
 }
