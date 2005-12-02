@@ -559,18 +559,6 @@ public class MCRClassification {
 			Element category = (Element) it.next();
 			String mapKey = classID + "##" + category.getAttributeValue("ID");
 			int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
-			// for (Iterator it2 = category.getDescendants(new
-			// ElementFilter("category")); it2.hasNext();) {
-			// Element category2 = (Element) it2.next();
-			// // in the database-field mcrto from mcrlinkclass we've got for
-			// example
-			// // DocPortal_class_00000008##Unis.Freiburg
-			// String mapKey2 = classID + "##" +
-			// category2.getAttributeValue("ID");
-			// if (map.get(mapKey2) != null) {
-			// count = count + ((Integer)map.get(mapKey2)).intValue();
-			// }
-			// }
 			category.setAttribute(cAttr, Integer.toString(count));
 		}
 		return classification;
