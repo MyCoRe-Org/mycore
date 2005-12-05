@@ -220,6 +220,36 @@ public class MCRLinkTableManager {
     }
 
     /**
+     * The method delete a reference link pair for the given type to the store.
+     * 
+     * @param type
+     *            the table type
+     * @param from
+     *            the source of the reference as String
+     */
+    public void deleteReferenceLink(String type, String from, String to) {
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was " + "not deleted from the link table");
+
+            return;
+        }
+
+        if ((from == null) || ((from = from.trim()).length() == 0)) {
+            logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
+
+            return;
+        }
+
+        try {
+            ((MCRLinkTableInterface) tablelist.get(i)).delete(from,to);
+        } catch (Exception e) {
+            logger.warn("An error was occured while delete a dataset from the" + " reference link table, deleting is not succesful.");
+        }
+    }
+
+    /**
      * The method add a classification link pair for the given type to the
      * store.
      * 
@@ -274,6 +304,23 @@ public class MCRLinkTableManager {
      */
     public void deleteClassificationLink(String from) {
         deleteReferenceLink("class", from);
+    }
+
+    /**
+     * removes a link from an object to a category and it's ancestors.
+     * 
+     * WARNING: This could result in an inconsistent system if you don't keep track of links in the childlist.
+     * @param from the source of the reference as MCRObjectID
+     * @param classid target Classification ID
+     * @param categid target Category ID in Classification classid
+     */
+    public void deleteClassificationLink(String from, String classid, String categid) {
+        deleteReferenceLink("class", from, classid + "##" + categid);
+        MCRClassificationItem classitem=MCRClassificationItem.getClassificationItem(classid);
+        MCRCategoryItem categitem=classitem.getCategoryItem(categid);
+        if (categitem.getParent()!=null){
+        	deleteClassificationLink(from,classid,categitem.getParentID());
+        }
     }
 
     /**

@@ -71,7 +71,9 @@ public class MCRClassification {
 
 	private ArrayList cat;
 
-	private static final String cAttr = "counter";
+	private static final String OBJ_COUNT_ATTR = "counter";
+
+	private static final String ID_ATTR = "ID";
 
 	/**
 	 * The constructor
@@ -86,7 +88,7 @@ public class MCRClassification {
 	 *            the classification as jdom tree
 	 */
 	private final void setFromJDOM(org.jdom.Document jdom) {
-		cl = new MCRClassificationItem(new MCRObjectID(jdom.getRootElement().getAttributeValue("ID")).getId());
+		cl = new MCRClassificationItem(new MCRObjectID(jdom.getRootElement().getAttributeValue(ID_ATTR)).getId());
 
 		List tagList = jdom.getRootElement().getChildren("label");
 		Element tag;
@@ -107,7 +109,7 @@ public class MCRClassification {
 
 	private void breakDownCategories(Element category, MCRClassificationObject parent) {
 		// process labels
-		MCRCategoryItem ci = new MCRCategoryItem(category.getAttributeValue("ID"), parent);
+		MCRCategoryItem ci = new MCRCategoryItem(category.getAttributeValue(ID_ATTR), parent);
 		List tagList = category.getChildren("label");
 		Element element;
 
@@ -151,7 +153,7 @@ public class MCRClassification {
 			throw new MCRException("Ooops", e);
 		}
 
-		String ID = jdom.getRootElement().getAttributeValue("ID");
+		String ID = jdom.getRootElement().getAttributeValue(ID_ATTR);
 		MCRObjectID mcr_id = new MCRObjectID(ID);
 		MCRXMLTableManager.instance().create(mcr_id, bout.toByteArray());
 		cl.create();
@@ -245,6 +247,13 @@ public class MCRClassification {
 		MCRXMLTableManager.instance().delete(new MCRObjectID(ID));
 	}
 
+	/**
+	 * Finds all elements with attribute ID and gives access to them via this attribute.
+	 * It a workaround to access Element objects like the getElementById() of DOM.
+	 * 
+	 * @param root the root element (starting point)
+	 * @param sink a Hashtable with key(ID as String) and value(Element with that ID)
+	 */
 	private static final void getHashedIDs(Element root, Hashtable sink) {
 		Iterator children = root.getChildren().iterator();
 		String id;
@@ -253,14 +262,22 @@ public class MCRClassification {
 			// collect all IDs of children and save them together with the
 			// element in the Hashtable
 			cur = (Element) children.next();
-			id = cur.getAttributeValue("ID");
+			id = cur.getAttributeValue(ID_ATTR);
 			if (id != null) {
 				sink.put(id, cur);
+				LOGGER.debug("added hash for "+id+": "+cur.getAttributeValue(OBJ_COUNT_ATTR));
 			}
 			getHashedIDs(cur, sink); // recursive call for all children
 		}
 	}
 
+	/**
+	 * returns only these IDs in a new set that are part of oldIDs but not in newIDs.
+	 * @param oldIDs Hashtable as described in getHashedIDs()
+	 * @param newIDs Hashtable as described in getHashedIDs()
+	 * @see #getHashedIDs(Element, Hashtable)
+	 * @return a Set with all IDs from oldIds that are not in newIds
+	 */
 	private static final Set getRemovedIDs(Hashtable oldIDs, Hashtable newIDs) {
 		int size = oldIDs.size() - newIDs.size();
 		size = (size < 0) ? 10 : size;
@@ -277,8 +294,14 @@ public class MCRClassification {
 		return returns;
 	}
 
+	/**
+	 * Relinks a all children of oldParent to newParent.
+	 * This will also unlink oldParent from its parent, which removes it actually from the document tree.
+	 * @param oldParent Element to remove
+	 * @param newParent Element to link all children of oldParent
+	 */
 	private static final void moveChildren(Element oldParent, Element newParent) {
-		LOGGER.debug("gently removing " + oldParent.getName() + " with ID " + oldParent.getAttributeValue("ID") + " parent is " + newParent.getName());
+		LOGGER.debug("gently removing " + oldParent.getName() + " with ID " + oldParent.getAttributeValue(ID_ATTR) + " parent is " + newParent.getName());
 		oldParent.detach();
 		Iterator children = oldParent.getChildren("category").iterator();
 		Element child;
@@ -289,6 +312,15 @@ public class MCRClassification {
 		}
 	}
 
+	/**
+	 * Removes all categories from the document that IDs are not in keepIDs.
+	 * This method preserves any affinity of the categories that a kept.
+	 * For example if category ID X is an ancestor of category Y and both are in keepIDs,
+	 * than after the rake X is still ancestor of Y. But both maybe close on an ancestor axis after the rake operation.
+	 * @param oldDoc document in MyCoRe XML view of a classification 
+	 * @param keepIDs IDs that should be kept
+	 * @return
+	 */
 	private static final Document rakeDocument(Document oldDoc, Set keepIDs) {
 		Document raked = (Document) oldDoc.clone();
 		Element categories = raked.getRootElement().getChild("categories");
@@ -317,6 +349,13 @@ public class MCRClassification {
 		// "ID"-Attributes
 	}
 
+	/**
+	 * helps rakeDocument to function.
+	 * It's just a recursive helper function
+	 * @param root the current Element
+	 * @param keepIDs IDs that should be kept
+	 * @return true if the element should be removed
+	 */
 	private static final boolean rakeElement(Element root, Set keepIDs) {
 		Iterator children = root.getChildren().iterator();
 		Element curEl;
@@ -333,7 +372,7 @@ public class MCRClassification {
 		while (children.hasNext()) {
 			moveChildren((Element) children.next(), root);
 		}
-		String id = root.getAttributeValue("ID");
+		String id = root.getAttributeValue(ID_ATTR);
 		if (id == null || !keepIDs.contains(id)) {
 			// LOGGER.debug("gently removing "+root.getName()+" with ID "+id);
 			return true;
@@ -341,6 +380,14 @@ public class MCRClassification {
 		return false;
 	}
 
+	/**
+	 * checks if there are links to any category under root.
+	 * @param classID the classification ID of the categories
+	 * @param root the current Element/root element
+	 * @param oldClass HashTable as in getHashedIDs()
+	 * @see #getHashedIDs(Element, Hashtable)
+	 * @throws MCRActiveLinkException if links to any category under root where detected
+	 */
 	private final static void checkActiveLinks(String classID, Element root, Map oldClass) throws MCRActiveLinkException {
 		Iterator children = root.getChildren().iterator();
 		while (children.hasNext()) {
@@ -349,7 +396,7 @@ public class MCRClassification {
 		if (root.getParentElement() == null) {
 			return; // do not check <mycoreclass>
 		}
-		String curID = root.getAttributeValue("ID");
+		String curID = root.getAttributeValue(ID_ATTR);
 		LOGGER.debug("Checking " + classID + "##" + curID);
 		if (curID != null) {
 			Element oldCateg = (Element) oldClass.get(curID); // fetched
@@ -360,19 +407,20 @@ public class MCRClassification {
 			boolean cAvailable = true;
 			String attr;
 			for (int j = 0; j < subCategs.size(); j++) {
-				attr = ((Element) subCategs.get(j)).getAttributeValue(cAttr);
+				attr = ((Element) subCategs.get(j)).getAttributeValue(OBJ_COUNT_ATTR);
 				if (attr == null) {
 					cAvailable = false;
 					break;
 				}
 				subTotals += Integer.parseInt(attr);
 			}
-			attr = oldCateg.getAttributeValue(cAttr);
-			/* We calculated the total number of links to all children
-			 * at this point. If this number is equal to the counter of the
-			 * current category element, than there no need for further checking.
-			 * This category only contains links that its children contains and no other.
-			 * We'll check this issue in the following if-block.
+			attr = oldCateg.getAttributeValue(OBJ_COUNT_ATTR);
+			/*
+			 * We calculated the total number of links to all children at this
+			 * point. If this number is equal to the counter of the current
+			 * category element, than there no need for further checking. This
+			 * category only contains links that its children contains and no
+			 * other. We'll check this issue in the following if-block.
 			 */
 			if (!cAvailable || attr == null || Integer.parseInt(attr) != subTotals) {
 				LOGGER.debug("cAvailable: " + cAvailable);
@@ -384,7 +432,8 @@ public class MCRClassification {
 				 * check this issue now further.
 				 */
 
-				//This call only returns IDs, that are in the current category but not in its children
+				// This call only returns IDs, that are in the current category
+				// but not in its children
 				List activeLinks = MCRLinkTableManager.instance().getFirstLinksToCategory(classID, attr);
 
 				Iterator it = activeLinks.iterator();
@@ -405,6 +454,126 @@ public class MCRClassification {
 	}
 
 	/**
+	 * Returns a set of IDs that a root of a subtree so, that the root of the subtree has in oldClass a different parent than in newClass.
+	 * @param oldClass old Classification
+	 * @param newClass new Classification
+	 * @param removedIDs Set to gather if IDs are available in newClass
+	 * @return
+	 */
+	private final Set diff(Document oldClass, Document newClass, Set removedIDs) {
+		Set markedIDs = new HashSet();
+		diff(oldClass.getRootElement().getChild("categories"), newClass.getRootElement().getChild("categories"), markedIDs, removedIDs);
+		return markedIDs;
+	}
+
+	/**
+	 * helps diff for recursive calls;
+	 * @param oldCateg old Category element with the same ID as
+	 * @param newCateg new Category element
+	 * @param markedIDs Set to save the IDs as noted in main diff()
+	 * @param removedIDs Set to gather if IDs are available in newClass
+	 * @see #diff(Document, Document, Set)
+	 */
+	private final void diff(Element oldCateg, Element newCateg, Set markedIDs, Set removedIDs) {
+
+		String attr = oldCateg.getAttributeValue(OBJ_COUNT_ATTR);
+		int counter = 1;
+		if (attr != null) {
+			counter = Integer.parseInt(attr);
+		}
+		attr = oldCateg.getAttributeValue(ID_ATTR);
+		if (counter == 0) {
+			// no work in this subtree, as there are no links to this category
+			return;
+		}
+		// objects are linked to this category
+		/*
+		 * now we synchronize the walk down the tree: For every ID we look in
+		 * the childlist of new categs for that id. If we found a match we walk
+		 * down that path
+		 */
+		List oldChildren = oldCateg.getChildren("category");
+		List newChildren = newCateg.getChildren("category");
+		Map newIDs = hashIDs(newChildren);
+		Map oldIDs = hashIDs(oldChildren);
+		Set diff = new HashSet();
+		Iterator it = newIDs.keySet().iterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+			if (!oldIDs.containsKey(o)) {
+				diff.add(o); // is not available in oldChildren
+				it.remove();
+			}
+		}
+		it = oldIDs.keySet().iterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+			if (removedIDs.contains(o)) {
+				// we don't bother since this category has been removed and is
+				// checked allready
+				it.remove();
+			} else if (!newIDs.containsKey(o)) {
+				diff.add(o); // is not available in newChildren
+				it.remove();
+			}
+		}
+		// we can mark all in diff
+		markedIDs.addAll(diff);
+		// newIDs and oldIDs contain now only the same set of IDs
+		it = oldIDs.keySet().iterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+			diff((Element) oldIDs.get(o), (Element) newIDs.get(o), markedIDs, removedIDs);
+		}
+	}
+
+	/**
+	 * Will hash all Elements in a list to a Hashtable.
+	 * 
+	 * This is strictly non recursive. For a recursive call see getHashedIDs()
+	 * @param children a list with elements to hash
+	 * @return a Hashtable with hashed elements of children
+	 * @see #getHashedIDs(Element, Hashtable);
+	 */
+	private final Map hashIDs(List children) {
+		Hashtable returns = new Hashtable(children.size());
+		Iterator it = children.iterator();
+		while (it.hasNext()) {
+			Element el = (Element) it.next();
+			String attr = el.getAttributeValue(ID_ATTR);
+			if (attr != null) {
+				returns.put(attr, el);
+			}
+		}
+		return returns;
+	}
+
+	/**
+	 * Saves all document links under category for later use in sink.
+	 * @param classId the classification ID of the categories
+	 * @param categid the root of the category sub tree
+	 * @param sink this is where the information is saved to
+	 * @param idMap a Hashtable of the old Classification as described in getHashedIds()
+	 * @see #getHashedIDs(Element, Hashtable)
+	 */
+	private final void saveOldLinks(String classId, String categid, Map sink, Map idMap) {
+		LOGGER.debug("saving old links for "+classId+"##"+categid);
+		Element el=(Element) idMap.get(categid);
+		String attr = el.getAttributeValue(OBJ_COUNT_ATTR);
+		if (attr != null && attr.equals("0")) {
+			return;
+		}
+		List list = MCRLinkTableManager.instance().getFirstLinksToCategory(classId, categid);
+		if (list.size() > 0) {
+			sink.put(categid, list);
+		}
+		MCRCategoryItem[] children = MCRCategoryItem.getCategoryItem(classId, categid).getChildren();
+		for (int i = 0; i < children.length; i++) {
+			saveOldLinks(classId, children[i].getClassificationID(), sink, idMap);
+		}
+	}
+
+	/**
 	 * The method update a MCRClassification from the given JDOM tree.
 	 * 
 	 * @param jdom
@@ -413,16 +582,20 @@ public class MCRClassification {
 	public final String updateFromJDOM(org.jdom.Document jdom) throws MCRActiveLinkException {
 		// old part 1 starts
 		org.jdom.Element root = jdom.getRootElement();
-		String ID = (String) root.getAttribute("ID").getValue();
+		String ID = root.getAttributeValue(ID_ATTR);
 		MCRObjectID mcr_id = new MCRObjectID(ID);
 		// old part 1 ends
 
+		boolean realUpdate = false;
+		Hashtable oldLinks = new Hashtable();
+
 		if (MCRXMLTableManager.instance().exist(mcr_id)) {
 			// save old classification for later reference
-			Document oldClass = MCRClassification.receiveClassificationAsJDOM(jdom.getRootElement().getAttributeValue("ID"));
+			Document oldClass = MCRClassification.receiveClassificationAsJDOM(jdom.getRootElement().getAttributeValue(ID_ATTR));
 
 			Hashtable oldIDs = new Hashtable();
 			getHashedIDs(oldClass.getRootElement(), oldIDs); // all categ-IDs
+			LOGGER.debug("hashing of old ids done");
 			// can easily be
 			// searched now
 			Hashtable newIDs = new Hashtable();
@@ -445,14 +618,36 @@ public class MCRClassification {
 			 * of oldClass but only contains removed categIDs, so that we can
 			 * easily verify later for associated objects.
 			 */
-			checkActiveLinks(jdom.getRootElement().getAttributeValue("ID"), raked.getRootElement(), oldIDs);
+			checkActiveLinks(jdom.getRootElement().getAttributeValue(ID_ATTR), raked.getRootElement(), oldIDs);
 			// If the code tuns through the previous method without error we're
 			// fine
+			/*
+			 * now updates may follow if the structure of the categories has
+			 * changed with the update a transaction should start here to be
+			 * save: now the write access begins. We compare from the root of
+			 * the new and old categories where a root of a subtree differs, so
+			 * that subtreeRoot of oldClass has a different parent than its
+			 * related node of newClass. We'll have to keep track of all those
+			 * root ids that contain links from other objects.
+			 */
+			Set markedIDs = diff(oldClass, jdom, removedIDs);
+			Iterator it = markedIDs.iterator();
+			while (it.hasNext()) {
+				Object o = it.next();
+				// recursive call down the subtree
+				saveOldLinks(mcr_id.toString(), o.toString(), oldLinks, oldIDs);
+			}
+			it = oldLinks.keySet().iterator();
+			while (it.hasNext()) {
+				String categId = (String) it.next();
+				Iterator objIdIt = ((List) oldLinks.get(categId)).iterator();
+				while (objIdIt.hasNext()) {
+					// delete all links that are changed
+					MCRLinkTableManager.instance().deleteClassificationLink(objIdIt.next().toString(), mcr_id.toString(), categId);
+				}
+			}
+			realUpdate = true;
 		}
-		// now updates may follow if the structure of the categories has changed
-		// with the update
-		// a transaction should start here to be save: now the write access
-		// begins
 
 		// old part 2
 		cl = new MCRClassificationItem(mcr_id.getId());
@@ -480,6 +675,23 @@ public class MCRClassification {
 
 		for (int i = 0; i < cat.size(); i++) {
 			((MCRCategoryItem) cat.get(i)).create();
+		}
+
+		// new part 2
+		if (realUpdate) {
+			// keySet of oldLinks is our markedIds;
+			Iterator it = oldLinks.keySet().iterator();
+			while (it.hasNext()) {
+				String categId = (String) it.next();
+				Iterator objIdIt = ((List) oldLinks.get(categId)).iterator();
+				while (objIdIt.hasNext()) {
+					// add all links that are changed
+					MCRLinkTableManager.instance().addClassificationLink(objIdIt.next().toString(), mcr_id.toString(), categId);
+					// hopefully no Exception got thrown between the delete
+					// before and the add here
+				}
+			}
+
 		}
 
 		return cl.getClassificationID();
@@ -557,9 +769,9 @@ public class MCRClassification {
 		// now we add to every categoryID the numbers of the children
 		for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
 			Element category = (Element) it.next();
-			String mapKey = classID + "##" + category.getAttributeValue("ID");
+			String mapKey = classID + "##" + category.getAttributeValue(ID_ATTR);
 			int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
-			category.setAttribute(cAttr, Integer.toString(count));
+			category.setAttribute(OBJ_COUNT_ATTR, Integer.toString(count));
 		}
 		return classification;
 	}
@@ -593,7 +805,7 @@ public class MCRClassification {
 		org.jdom.Document doc = new org.jdom.Document(elm);
 		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
 		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-		elm.setAttribute("ID", classID);
+		elm.setAttribute(ID_ATTR, classID);
 
 		org.jdom.Element cats = new org.jdom.Element("categories");
 
@@ -614,7 +826,7 @@ public class MCRClassification {
 
 			if (ci != null) {
 				org.jdom.Element cat = new org.jdom.Element("category");
-				cat.setAttribute("ID", ci.getID());
+				cat.setAttribute(ID_ATTR, ci.getID());
 
 				int cou = mcr_linktable.countCategoryReferencesFuzzy(classID, categID);
 				cat.setAttribute("counter", Integer.toString(cou));
