@@ -44,7 +44,7 @@ import org.mycore.common.MCRException;
  * submisstion and multipart/form-data submissions with uploaded files in the
  * same way.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRRequestParameters {
