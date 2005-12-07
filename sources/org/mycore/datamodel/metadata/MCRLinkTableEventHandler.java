@@ -25,6 +25,10 @@ package org.mycore.datamodel.metadata;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassificationObject;
 
 /**
  * This class manages all operations of the LinkTables for operations of an
@@ -44,6 +48,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the event that occured
      * @param obj
      *            the MCRObject that caused the event
+     * @throws MCRActiveLinkException
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         handleObjectDeleted(evt, obj);
@@ -51,16 +56,50 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
+        String classID, categID, destination;
         for (int i = 0; i < meta.size(); i++) {
             elm = meta.getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {
                 inf = elm.getElement(j);
                 if (inf instanceof MCRMetaClassification) {
-                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf).getCategId());
+                    classID = ((MCRMetaClassification) inf).getClassId();
+                    categID = ((MCRMetaClassification) inf).getCategId();
+                    MCRClassificationItem classification = MCRClassificationItem.getClassificationItem(classID);
+                    if (classification != null) {
+                        MCRCategoryItem categ = classification.getCategoryItem(categID);
+                        if (categ != null) {
+                            continue;
+                        }
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    destination = classID + "##" + categID;
+                    activeLink.addLink(mcr_id.toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+                if (inf instanceof MCRMetaLink) {
+                    destination = ((MCRMetaLink) inf).getXLinkHref();
+                    if (!MCRXMLTableManager.instance().exist(new MCRObjectID(destination))) {
+                        continue;
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    activeLink.addLink(mcr_id.toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+            }
+        }
+        for (int i = 0; i < meta.size(); i++) {
+            elm = meta.getMetadataElement(i);
+            for (int j = 0; j < elm.size(); j++) {
+                inf = elm.getElement(j);
+                if (inf instanceof MCRMetaClassification) {
+                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf)
+                            .getCategId());
                     continue;
                 }
                 if (inf instanceof MCRMetaLink) {
-                    mcr_linktable.addReferenceLink("href", mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref());
+                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref());
                     continue;
                 }
             }
