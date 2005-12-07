@@ -35,10 +35,9 @@ import org.mycore.common.MCRArgumentChecker;
  */
 public class MCRCategoryItem extends MCRClassificationObject {
     protected String parentID;
-
     protected String classifID;
-
     protected String URL;
+    protected int counter;
 
     /**
      * The constructor to fill this item.
@@ -80,6 +79,7 @@ public class MCRCategoryItem extends MCRClassificationObject {
         this.classifID = classifID;
         this.parentID = parentID;
         URL = "";
+        counter =0;
     }
 
     /**
