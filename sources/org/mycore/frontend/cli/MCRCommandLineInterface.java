@@ -267,20 +267,32 @@ public class MCRCommandLineInterface {
 		System.out.println(system + " Exception message: " + ex.getLocalizedMessage());
 		System.out.println(system);
 
+		if (ex instanceof MCRActiveLinkException) {
+			MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
+			StringBuffer msgBuf = new StringBuffer(system);
+			msgBuf.append(" There are links active preventing the commit of work, see error message for details. The following links where affected:");
+			Map links = activeLinks.getActiveLinks();
+			Iterator destIt = links.keySet().iterator();
+			String curDest;
+			int count = 0;
+			while (destIt.hasNext()) {
+				count++;
+				curDest = destIt.next().toString();
+				List sources = (List) links.get(curDest);
+				Iterator sourceIt = sources.iterator();
+				while (sourceIt.hasNext()) {
+					msgBuf.append("\n\t").append(count).append(".) ").append(sourceIt.next().toString()).append("==>").append(curDest);
+				}
+			}
+			msgBuf.append('\n');
+			System.out.println(msgBuf.toString());
+		}
+
 		String trace = MCRException.getStackTraceAsString(ex);
 		if (logger.isDebugEnabled())
 			logger.debug(trace);
 		else
 			System.out.println(trace);
-
-		if (ex instanceof MCRException) {
-			ex = ((MCRException) ex).getException();
-			if (ex != null) {
-				System.out.println(system);
-				System.out.println(system + " This exception was caused by:");
-				showException(ex, true);
-			}
-		}
 
 		if (ex instanceof MCRActiveLinkException) {
 			MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
@@ -290,12 +302,21 @@ public class MCRCommandLineInterface {
 			Iterator destIt = links.keySet().iterator();
 			String curDest;
 			while (destIt.hasNext()) {
-				curDest = destIt.toString();
+				curDest = destIt.next().toString();
+				logger.debug("Current Destination: " + curDest);
 				List sources = (List) links.get(curDest);
 				Iterator sourceIt = sources.iterator();
 				while (sourceIt.hasNext()) {
 					msgBuf.append('\n').append(sourceIt.next().toString()).append("==>").append(curDest);
 				}
+			}
+		}
+		if (ex instanceof MCRException) {
+			ex = ((MCRException) ex).getException();
+			if (ex != null) {
+				System.out.println(system);
+				System.out.println(system + " This exception was caused by:");
+				showException(ex, true);
 			}
 		}
 
