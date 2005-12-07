@@ -223,7 +223,7 @@ public class MCRCM8EventHandlerIndexMeta extends MCREventHandlerBase {
      */
     private final void fillItem(MCRCM8Item item, MCRObject obj, String itemtypename, String itemtypeprefix) throws Exception {
         StringBuffer mcr_ts = new StringBuffer();
-
+        mcr_ts.append(obj.createTextSearch());
         item.setAttribute("/", itemtypeprefix + "ts", mcr_ts.toString());
 
     }
