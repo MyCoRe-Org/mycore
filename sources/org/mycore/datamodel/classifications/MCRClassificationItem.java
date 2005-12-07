@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications;
 
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.jdom.Element;
 
 /**
  * This class represents a classification item of the MyCoRe classification
@@ -132,5 +133,22 @@ public class MCRClassificationItem extends MCRClassificationObject {
         MCRArgumentChecker.ensureNotEmpty(ID, "ID");
 
         return manager().retrieveClassificationItem(ID);
+    }
+    
+    /**
+     * The method return a MCRClassificationItem for the given classification
+     * ID.
+     * 
+     * @param categID
+     *            the classification ID
+     * @return the MCRClassificationItem
+     */
+     public Element getClassificationItemAsJDom() {
+    	Element xClassI = new Element( "classification" );
+	    xClassI.setAttribute ( "ID", getClassificationID());
+	    for (int i=0; i< getSize(); i++ ){
+		    xClassI.addContent(getJDOMElement(i));	    	
+	    }
+	    return xClassI;
     }
 }

@@ -23,444 +23,596 @@
 
 package org.mycore.datamodel.classifications;
 
-import java.util.List;
-import java.util.Vector;
-
-import org.apache.log4j.Logger;
-import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.user.MCRUserMgr;
+import java.util.*;
+import org.apache.log4j.Logger;
+import org.jdom.*;
+
 
 /**
- * Instances of MCRClassificationBrowser contain the data of the currently
- * displayed navigation tree. MCRClassificationBrowser uses one
- * MCRClassificationBrowserData instance per browser session to store and update
- * the category lines to be displayed.
- * 
+ * Instances of MCRClassificationBrowser contain the data of the currently displayed
+ * navigation tree. MCRClassificationBrowser uses one MCRClassificationBrowserData instance per
+ * browser session to store and update the category lines to be displayed.
+ *
  * @author Anja Schaar
- * 
+ *
  */
-public class MCRClassificationBrowserData {
-    protected boolean showComments;
+public class MCRClassificationBrowserData
+{
+  protected boolean        				showComments;
+  protected String						pageName;
+  protected String						xslStyle;
+  protected String 						uri;
 
-    protected String pageName;
+  private 	static 	MCRConfiguration 	config;
+  private 	static 	Logger 				LOGGER=Logger.getLogger(MCRClassificationBrowserData.class);
+  private   MCRCategoryItem[] 			categItem ;
+  private 	Vector         				lines;
+  private 	MCRClassificationItem 		classif;
+  private   String						startPath	="";
+  private   String						actItemID	="";
+  private 	String 						lastItemID	="";
+  private   String[]					categFields;
+  private   String						emptyLeafs	=null;
+  private   String						view		=null;
+  private   String						comments	=null;
+  private   String						searchField	="";
+  private   String						sort		=null;
+  private   String						doctype		=null;
+  private   String[]					doctypeArray=null;
+  private   String						restriction	=null;
+  int 		maxlevel = 0;
+  int 		totalNumOfDocs = 0;
+ 
 
-    protected String xslStyle;
+  public MCRClassificationBrowserData( String u , String mode, String actclid, String actEditorCategid)   throws Exception  {
+  	uri = u;
+	config = MCRConfiguration.instance();
 
-    protected String uri;
+	LOGGER.info( this.getClass() + " incomming Path " + uri);
+	String[] uriParts = uri.split("/");		//	mySplit();
+	LOGGER.info( this.getClass() + " Start" );
+	String classifID = "";
+	
+	if (uriParts.length <= 1) {
+		LOGGER.debug( this.getClass() + " PathParts - classification is default");
+		pageName     = config.getString( "MCR.ClassificationBrowser.default.EmbeddingPage" );
+		xslStyle     = config.getString( "MCR.ClassificationBrowser.default.Style" );
+		emptyLeafs   = config.getString( "MCR.ClassificationBrowser.default.EmptyLeafs" );
+		view  	     = config.getString( "MCR.ClassificationBrowser.default.View" );
+		doctype      = config.getString( "MCR.ClassificationBrowser.default.Doctype" );
+		comments     = config.getString( "MCR.ClassificationBrowser.default.Comments" );
+		searchField  = config.getString( "MCR.ClassificationBrowser.default.searchField" );
+		classifID    = actclid;
+		startPath = "default";		
+	}
+	else {
+		LOGGER.debug( this.getClass() + " PathParts - classification " + uriParts[1]);
+		LOGGER.debug( this.getClass() + " Number of PathParts =" + uriParts.length);
+		try {
+			classifID    = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Classification" );
+		} catch (org.mycore.common.MCRConfigurationException noClass){
+			classifID    = actclid;	
+		}
+		try {
+			pageName     = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".EmbeddingPage" );
+		} catch (org.mycore.common.MCRConfigurationException noPagename){
+			pageName     = config.getString( "MCR.ClassificationBrowser.default.EmbeddingPage" );
+		}
+		try {
+			xslStyle     = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Style" );
+		} catch (org.mycore.common.MCRConfigurationException noStyle){
+			xslStyle     = config.getString( "MCR.ClassificationBrowser.default.Style" );			
+		}
+		try {
+			searchField  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".searchField" );
+		} catch (org.mycore.common.MCRConfigurationException noSearchfield){
+			searchField  = config.getString( "MCR.ClassificationBrowser.default.searchField" );
+		}
 
-    private static MCRConfiguration config;
+		try {
+			emptyLeafs= config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".EmptyLeafs" );
+		} catch (org.mycore.common.MCRConfigurationException noEmptyLeafs){
+			emptyLeafs= config.getString( "MCR.ClassificationBrowser.default.EmptyLeafs" );
+		}
+		try {
+			view  	  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".View" );
+		} catch (org.mycore.common.MCRConfigurationException noView){
+			view  	  = config.getString( "MCR.ClassificationBrowser.default.View" );
+		}
+		try {
+			doctype   = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Doctype" );
+		} catch (org.mycore.common.MCRConfigurationException noDoctype){
+			doctype   = config.getString( "MCR.ClassificationBrowser.default.Doctype" );
+		}
+		try {
+			sort      = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Sort" );
+			comments  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Comments" );
+			restriction  = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Restriction" );
+		} catch (org.mycore.common.MCRConfigurationException ig){
+			// ignore for this parameters, the are optionally
+			;
+		}
+		startPath = uriParts[1];		
+	} 
+	
+	if ("edit".equals(mode) ){
+		pageName  = config.getString( "MCR.classeditor.EmbeddingPage" );
+		xslStyle  = config.getString( "MCR.classeditor.Style" );
+		sort      = "false";
+		if ( classifID.length() == 0) {
+			return;
+		}
+	}
+	
+	if ( emptyLeafs == null ) 						emptyLeafs = "yes";
+	if ( view == null || !view.endsWith("tree") ) 	view = "flat";
+	if ( comments == null ) 		 				comments = "false";
 
-    private static Logger logger = Logger.getLogger(MCRClassificationBrowserData.class);
+	setClassification(classifID);
+	clearPath(uriParts );
+	setActualPath(actEditorCategid);
 
-    private MCRCategoryItem[] categItem;
+	if ( doctype  != null ) {
+		try {
+			String typelist = config.getString( "MCR.type_"+ doctype);
+			doctypeArray=typelist.split(",");
+		} catch  (Exception allignore){
+			LOGGER.info( this.getClass() + "No search type was set - it seams to be ok"  );
+		}
+	}
+	showComments  = comments.endsWith("true")?true:false;
 
-    private Vector lines;
+	LOGGER.info( this.getClass() + " SetClassification " + classifID);
+	LOGGER.info( this.getClass() + " Leere Knoten auslassen: " + emptyLeafs );
+	LOGGER.info( this.getClass() + " Darstellung: " + view );
+	LOGGER.info( this.getClass() + " Kommentare: " + comments );
+	LOGGER.info( this.getClass() + " Doctypes: " + doctype );
+	LOGGER.info( this.getClass() + " Restriction: " + restriction );
+	LOGGER.info( this.getClass() + " Sortiert: " + sort );
+  }
+	
 
-    private MCRClassificationItem classif;
-
-    private String startPath;
-
-    private String actItemID;
-
-    private String lastItemID;
-
-    private String[] categFields;
-
-    private String emptyLeafs;
-
-    private String view;
-
-    private String comments;
-
-    private String doctype = null;
-
-    private String[] doctypeArray = null;
-
-    private String restriction = null;
-
-    public MCRClassificationBrowserData(String u) throws Exception {
-        uri = u;
-        config = MCRConfiguration.instance();
-
-        String classifID = "";
-
-        logger.info(this.getClass() + " incomming Path " + uri);
-
-        String[] uriParts = mySplit();
-        logger.info(this.getClass() + " Start");
-
-        if (uriParts.length > 1) {
-            logger.debug(this.getClass() + " PathParts - classification " + uriParts[1]);
-            logger.debug(this.getClass() + " Number of PathParts =" + uriParts.length);
-            classifID = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Classification");
-            pageName = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".EmbeddingPage");
-            xslStyle = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Style");
-
-            try {
-                emptyLeafs = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".EmptyLeafs");
-                view = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".View");
-                comments = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Comments");
-                doctype = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Doctype");
-                restriction = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Restriction");
-            } catch (org.mycore.common.MCRConfigurationException ig) {
-                // ignore for this parameters
-                ;
-            }
-
-            startPath = uriParts[1];
-        }
-
-        setClassification(classifID);
-        clearPath(uriParts);
-        setActualPath();
-
-        if (emptyLeafs == null) {
-            emptyLeafs = "yes";
-        }
-
-        if ((view == null) || !view.endsWith("tree")) {
-            view = "flat";
-        }
-
-        if (comments == null) {
-            comments = "false";
-        }
-
-        if (doctype != null) {
-            try {
-                String typelist = config.getString("MCR.type_" + doctype);
-                doctypeArray = typelist.split(",");
-            } catch (Exception allignore) {
-                logger.info(this.getClass() + "No search type was set - it seams to be ok");
-            }
-        }
-
-        showComments = comments.endsWith("true") ? true : false;
-
-        logger.info(this.getClass() + " SetClassification " + classifID);
-        logger.info(this.getClass() + " Leere Knoten auslassen: " + emptyLeafs);
-        logger.info(this.getClass() + " Darstellung: " + view);
-        logger.info(this.getClass() + " Kommentare: " + comments);
-        logger.info(this.getClass() + " Doctypes: " + doctype);
-        logger.info(this.getClass() + " Restriction: " + restriction);
+  private void setClassification( String classifID )   throws Exception
+  {
+    lines       	= new Vector();    
+    classif 		= MCRClassificationItem.getClassificationItem(classifID);
+    categItem 		= classif.getChildrenFromJDom();    //classif.getChildren();
+    
+    
+    for( int i = 0,j = classif.getNumChildren(); i<j; i++) {
+      lines.addElement( new MCRNavigTreeLine( categItem[i] , 1 )) ;
     }
+        
+  }
 
-    private String[] mySplit() throws Exception {
-        // entspricht: String[] uriParts = uri.split("/");
-        if (uri.endsWith("/")) {
-            uri = uri.substring(0, uri.length() - 1);
-        }
+  private void clearPath(String[] uriParts )  throws Exception {
+  	String[] cati = new String[uriParts.length];
+  	String   path = "";
+	int len =0;
+    // pfad bereinigen
+	for ( int k=2; k< uriParts.length; k++ ) {
+		  LOGGER.debug( this.getClass() + " uriParts[k]=" + uriParts[k] + " k=" + k);
+		  if ( uriParts[k].length()>0 ){
+		  	  if (uriParts[k].equalsIgnoreCase("..") && len > 0) {
+		  	  	len--;
+		  	  }else {
+				cati[len]= uriParts[k];
+				len ++;
+		  	  }
+		  }
+		  LOGGER.debug( this.getClass() + " cati[len]=" + cati[len] + " len=" + len);
+	}
 
-        String[] tmpP = new String[uri.length()];
-        int pCount = 0;
-        int first = uri.indexOf("/");
-        logger.debug(this.getClass() + " Index " + first);
+	//reinitialisieren
+	categFields = new String[len];
+	for ( int i=0; i < len ; i++ ){
+		categFields[i]= cati[i];
+		path += categFields[i]+ (i+1<categFields.length?"/":"");
+	}
+	uri = new String( uriParts[1] + "/" + path);
+  }
+  
 
-        while ((first >= 0) && ((first + 1) < uri.length())) {
-            logger.info(this.getClass() + " Länge " + uri.length());
+  private void setActualPath( String actEditorCategid )   throws Exception {
+	actItemID = lastItemID ="";
+	for ( int k=0; k< categFields.length; k++) {
+		update(categFields[k]);
+		lastItemID=actItemID;
+		actItemID= categFields[k];
+	}
+	if (actEditorCategid != null){
+		actItemID = lastItemID =actEditorCategid;
+	}
+	LOGGER.debug( this.getClass() + " lastItemID " + lastItemID);
+	LOGGER.debug( this.getClass() + " actItemID " + actItemID);
+	LOGGER.debug( this.getClass() + " setActualPath OK" );
+  }
 
-            // logger.info( this.getClass() + " tmpP " + tmpP[pCount] );
-            tmpP[pCount] = uri.substring(0, first);
-            uri = uri.substring(first + 1);
-            first = uri.indexOf("/");
-            pCount++;
-            logger.info(this.getClass() + " uri " + uri);
-            logger.info(this.getClass() + " Index " + first);
-        }
 
-        tmpP[pCount] = uri;
-        logger.debug(this.getClass() + " pCount " + pCount);
+  /**
+   * Returns true if category comments for the classification
+   * currently displayed should be shown.
+   */
+  public boolean showComments()
+  { return showComments; }
 
-        String[] Parts = new String[pCount + 1];
 
-        for (int i = 0; i <= pCount; i++)
-            Parts[i] = tmpP[i];
+  /**
+   * Returns the pageName for the classification
+   */
+  public String getPageName()
+  { return pageName; }
 
-        return Parts;
+  /**
+	 * Returns the xslStyle for the classification
+	 */
+  public String getXslStyle()
+  { return xslStyle; }
+
+  public MCRClassificationItem getClassification() {
+     return  classif;
+  }
+
+  public MCRNavigTreeLine getLine( int i )  {
+    if( i >= lines.size() )
+      return null;
+    else
+      return (MCRNavigTreeLine)( lines.elementAt( i ) );
+  }
+
+  public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover,
+  		org.jdom.Document  browser ){
+
+		Element placeholder = cover.getRootElement().getChild( "classificationBrowser" );
+  		LOGGER.info( this.getClass() + " Found Entry at " + placeholder);
+	    if ( placeholder != null ) {
+			List children = browser.getRootElement().getChildren();
+			for( int j = 0; j < children.size(); j++ )	{
+			    Element child = (Element)( (Element)( children.get( j ) ) ).clone();
+				placeholder.addContent( child );
+			}
+	    }
+		LOGGER.debug(cover);
+    	return cover;
+  }
+  
+  public org.jdom.Document  createXmlTreeforAllClassifications(  )	 throws Exception {
+	 MCRClassificationManager clm = new MCRClassificationManager();
+ 	 MCRClassificationItem[] clI = clm.getAllClassification();
+ 	 
+	 Element xDocument = new Element( "classificationbrowse" );
+	 MCRSession mcrSession 	= MCRSessionMgr.getCurrentSession();
+	 String	userid = mcrSession.getCurrentUserID();         
+	 ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
+	 Element EditClassbutton = new Element( "userCanEdit" );
+	 EditClassbutton.addContent( String.valueOf(privs.contains("create-classification" ) || privs.contains("delete-classification")) );	 
+	 xDocument.addContent( EditClassbutton );
+		 
+	 Element xNavtree = new Element( "classificationlist" );
+	 xDocument.addContent( xNavtree );
+	 String browserClass = "";
+	 String Counter = "";
+	 
+	 for(int i=0; i<clI.length; i++ ) {
+		  Element cli = clI[i].getClassificationItemAsJDom();
+		  try {
+			  browserClass  = config.getString( "MCR.classeditor." + clI[i].getClassificationID() );
+		  } catch(Exception ignore){
+			  browserClass = "default";
+		  }
+		  cli.setAttribute("browserClass", browserClass);				  
+		  try {
+			  String typelist = config.getString( "MCR.type_alldocs");
+			  doctypeArray=typelist.split(",");			  
+			  Counter = Integer.toString(clI[i].countDocLinks(doctypeArray,""));
+		  } catch(Exception ignore){
+			  Counter = "NaN";
+		  }
+		  cli.setAttribute("counter", Counter);			  
+		  xNavtree.addContent(cli);
+	 }
+	 
+	 return new Document( xDocument );
+  }	
+  
+  /**
+	* Creates an XML representation of MCRClassificationBrowserData
+	* @author Anja Schaar
+	*
+	*/
+  
+   public org.jdom.Document  createXmlTree( String lang )
+	 throws Exception
+   {
+
+	 MCRClassificationItem cl = getClassification();
+ 	 Element xDocument = new Element( "classificationBrowse" );
+	 LOGGER.info(cl.getClassificationID());
+
+	 Element xID = new Element( "classifID" );
+	 xID.addContent(cl.getClassificationID());
+	 xDocument.addContent( xID );
+
+	 Element xLabel = new Element( "label" );
+	 xLabel.addContent(cl.getText(lang));
+	 xDocument.addContent( xLabel );
+
+	 Element xDesc = new Element( "description" );
+	 xDesc.addContent(cl.getDescription(lang));
+	 xDocument.addContent( xDesc );
+
+	 Element xDocuments = new Element( "cntDocuments" );
+	 xDocuments.addContent(String.valueOf( cl.countDocLinks(doctypeArray, restriction)) );
+	 xDocument.addContent( xDocuments );
+
+	 Element xShowComments = new Element( "showComments" );
+	 xShowComments.addContent( String.valueOf( showComments() ) );
+	 xDocument.addContent( xShowComments );
+
+	 Element xUri = new Element( "uri" );
+	 xUri.addContent(uri);
+	 xDocument.addContent( xUri );
+
+	 Element xStartPath = new Element( "startPath" );
+	 xStartPath.addContent(startPath);
+	 xDocument.addContent( xStartPath );
+
+	 // Editierbutton Einfügen - wenn das privieg es erlaubt
+	 MCRSession mcrSession 	= MCRSessionMgr.getCurrentSession();
+	 String	userid = mcrSession.getCurrentUserID();         
+	 ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
+	 Element Editbutton = new Element( "userCanEdit" );
+	 Editbutton.addContent( String.valueOf( privs.contains("modify-classification")) );	 
+	 xDocument.addContent( Editbutton );
+
+	 // data as XML from outputNavigationTree
+	 Element xNavtree = new Element( "navigationtree" );
+	 xNavtree.setAttribute ( "classifID", cl.getClassificationID());
+	 xNavtree.setAttribute ( "categID", actItemID );
+	 xNavtree.setAttribute ( "predecessor",  lastItemID);
+	 xNavtree.setAttribute ( "emptyLeafs",  emptyLeafs);
+	 xNavtree.setAttribute ( "view",  view);
+	 xNavtree.setAttribute ( "doctype", doctype!=null?doctype:"alldocs");
+	 xNavtree.setAttribute ( "restriction", restriction!=null?restriction:"");
+	 xNavtree.setAttribute ( "searchField", searchField);
+
+
+	 int i = 0;
+	 MCRNavigTreeLine line;	 
+
+	 while( ( line = getLine( i++ ) ) != null )	 {
+		 
+	   int numDocs =line.cat.counter;		//line.cat.countDocLinks(doctypeArray,restriction);
+	   //für Sortierung schon mal die leveltiefe bestimmen
+	   LOGGER.info( this.getClass() + " NumDocs - " + numDocs );
+
+	   if ( emptyLeafs.endsWith("no") && numDocs == 0    ) {
+		    LOGGER.debug( this.getClass() + " empty Leaf continue - " + emptyLeafs );
+	   		continue;
+	   }
+	   Element xRow = new Element( "row" );
+	   Element xCol1 = new Element( "col" );
+	   Element xCol2 = new Element( "col" );   
+	   int numLength = String.valueOf( numDocs ).length();
+	   
+	   xRow.addContent(xCol1 );
+	   xRow.addContent( xCol2 );
+	   xNavtree.addContent( xRow );
+	   
+	   xCol1.setAttribute( "lineLevel",  String.valueOf( line.level - 1 ) );	   
+	   xCol1.setAttribute( "childpos",  "middle" );
+	   
+	   if ( line.level > maxlevel)	 {
+		   xCol1.setAttribute( "childpos",  "first" );
+		   maxlevel = line.level;
+		   if ( getLine(i) == null) {
+			   // Spezialfall nur genau ein Element
+			   xCol1.setAttribute( "childpos",  "firstlast" );
+		   }
+	   } else if ( getLine(i) == null) {
+		   xCol1.setAttribute( "childpos",  "last" );
+	   }
+	   
+	   xCol1.setAttribute( "folder1", "folder_plain" );
+	   xCol1.setAttribute( "folder2", numDocs > 0 ? "folder_closed_in_use" : "folder_closed_empty" );
+	   
+	   if( line.status.equals( "T" ) )   {
+		 xCol1.setAttribute( "plusminusbase",  line.cat.getID() );
+		 xCol1.setAttribute( "folder1",  "folder_plus" );
+	   } else if( line.status.equals( "F" ) )   {
+		 xCol1.setAttribute( "plusminusbase",  line.cat.getID() );
+		 xCol1.setAttribute( "folder1",  "folder_minus" );
+		 xCol1.setAttribute( "folder2", numDocs > 0 ? "folder_open_in_use" : "folder_open_empty" );
+	   }
+	      
+	   xCol2.setAttribute( "numDocs",  String.valueOf( numDocs ) );
+
+	   if( numLength > 0 )	   {
+		 String search ="/"+uri;
+		 if ( line.cat.getID().equalsIgnoreCase(actItemID)	 )			 
+			 	search+= "/..";
+		 else	search+= "/" +line.cat.getID();
+
+		 if ( search.indexOf("//") > 0 )
+			search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//")+1);
+		 
+		 xCol2.setAttribute( "searchbase",  search );
+		 xCol2.setAttribute( "lineID",  line.cat.getID() );
+	   }
+
+	   xCol2.addContent( line.cat.getText(lang));
+
+	   if( showComments() && ( line.cat.getDescription(lang) != null)  )  {
+		 Element comment = new Element( "comment" );
+		 xCol2.addContent( comment );
+		 comment.setText(line.cat.getDescription(lang) );
+	   }
+	   
+	 }
+	 xNavtree.setAttribute ( "rowcount", ""+i );
+	 xDocument.addContent( xNavtree );
+	 
+     if ( "true".equals(sort) )
+     	xDocument = sortMyTree(xDocument);
+	 return new org.jdom.Document( xDocument );
+  }
+
+
+  public void update( String categID )    throws Exception  {
+    int     lastLevel = 0;
+    boolean hideLevel = false;
+
+	LOGGER.debug( this.getClass() + " update CategoryTree for: " + categID);
+    for( int i = 0; i < lines.size(); i++ )    {
+      MCRNavigTreeLine 	line = getLine( i );
+	  hideLevel = hideLevel && ( line.level > lastLevel );
+	  LOGGER.debug( this.getClass() + " compare CategoryTree on " +i + "_" +line.cat.getID() + " to " + categID);
+
+
+      if ( view.endsWith("tree")) {
+      	if ( hideLevel) {
+			lines.removeElementAt( i-- );
+      	} else if( categID.equals( line.cat.getID() ) )
+      	{
+			if( line.status.equals( "F" ) ) // hide expanded category children
+			{
+			   line.status = "T";
+			   hideLevel  = true;
+			   lastLevel  = line.level;
+			} else if( line.status.equals( "T" ) ) // expand category children
+			{
+			  line.status = "F";
+			  MCRCategoryItem[] children = line.cat.getChildrenFromJDom();				  //line.cat.getChildren();
+			  for( int j = 0, k= children.length;  j < k ; j++ )    {
+					MCRCategoryItem cat = children[j] ;
+					lines.insertElementAt( new MCRNavigTreeLine( cat, line.level + 1 ), ++i );
+			  }
+      		}
+      	}
+      } else {
+      	if( categID.equalsIgnoreCase(line.cat.getID() ) )  {
+      		line.level=0;
+		    LOGGER.info( this.getClass() + " expand " +line.cat.getID());
+			line.status = "F";
+		    MCRCategoryItem[] children = line.cat.getChildrenFromJDom();  // 	line.cat.getChildren();
+          	for( int j = 0, k= children.length;  j < k ; j++ )    {
+			  MCRCategoryItem cat = children[j] ;
+          	  lines.insertElementAt( new MCRNavigTreeLine( cat, line.level + 1 ), ++i );
+          	}
+          }
+         else {
+			LOGGER.debug( this.getClass() + " remove lines " + i + "_" +line.cat.getID() );
+			lines.removeElementAt( i-- );
+	  	  }
+	   }
+
     }
+  }
+  private Element sortMyTree(Element xDocument) {
+	  	Element xDoc = (Element) xDocument.clone();
+	  	for ( int i=0; i<maxlevel; i++) {
+	  		xDoc = sortMyTreeperLevel(xDoc, i, 0 );
+	  	}
+	  	return xDoc;
+	  }
 
-    private void setClassification(String classifID) throws Exception {
-        lines = new Vector();
-        classif = MCRClassificationItem.getClassificationItem(classifID);
-        categItem = classif.getChildren();
+  private Element sortMyTreeperLevel( Element xDocument, int activelevel, int position){
+	  	Element xDoc = (Element) xDocument;
+	  	Element aktRow = ( (Element) xDoc.getChild("navigationtree").getChildren().get(position));
+	  	String  aktText = ( (Element) aktRow.getChildren().get(1)).getText();
 
-        for (int i = 0, j = classif.getNumChildren(); i < j; i++) {
-            lines.addElement(new MCRNavigTreeLine(categItem[i], 1));
-        }
-    }
+		List children = xDoc.getChild("navigationtree").getChildren();
+		int level = activelevel;
+		int Cnt = 0;
+		for( int j = position+1; j < children.size(); j++ )	{
+			Element child = (Element)((Element) children.get( j ));
+			Element col1 = (Element)( (Element) child ).getChildren().get(0);
+			Element col2 = (Element)( (Element) child ).getChildren().get(1);
 
-    private void clearPath(String[] uriParts) throws Exception {
-        String[] cati = new String[uriParts.length];
-        String path = "";
-        int len = 0;
+	  		try {
+	  			level = col1.getAttribute("lineLevel").getIntValue();
+	  		} catch (Exception ignored){;}
 
-        // pfad bereinigen
-        for (int k = 2; k < uriParts.length; k++) {
-            logger.debug(this.getClass() + " uriParts[k]=" + uriParts[k] + " k=" + k);
+	  		String sText = col2.getText();
 
-            if (uriParts[k].length() > 0) {
-                if (uriParts[k].equalsIgnoreCase("..") && (len > 0)) {
-                    len--;
-                } else {
-                    cati[len] = uriParts[k];
-                    len++;
-                }
-            }
+	  		if ( activelevel == level ) {
+				if (aktText.compareTo(sText) > 0 ) {
+					changeRows(xDoc, aktRow, child);
+					boolean bjumpOverChilds=true;
+					while ( bjumpOverChilds && j < children.size()-1 )
+					{
+						Element next = (Element)((Element) children.get( j+1));
+						if ( next != null  ){
+							Element colx = (Element)( (Element) child ).getChildren().get(0);
+							int nextlevel = level;
+					  		try {
+					  			nextlevel = colx.getAttribute("lineLevel").getIntValue();
+					  		} catch (Exception ignored){;}
 
-            logger.debug(this.getClass() + " cati[len]=" + cati[len] + " len=" + len);
-        }
+					  		if ( nextlevel > level )
+					  			j++;
+					  		else bjumpOverChilds=false;
+						}else
+							bjumpOverChilds=false;
+					}
+					Cnt++;
+	  				xDoc = sortMyTreeperLevel(xDoc, activelevel, position );
+	  			}
+	  		if ( position < children.size()-1 && j==children.size()-1 && Cnt==0)
+	  			xDoc = sortMyTreeperLevel(xDoc, activelevel, position+1 );
+	  		}
+		}
+	  	return  xDoc;
+	  }
 
-        // reinitialisieren
-        categFields = new String[len];
+  private void changeRows(Element xDoc, Element aktRow, Element child ){
 
-        for (int i = 0; i < len; i++) {
-            categFields[i] = cati[i];
-            path += (categFields[i] + (((i + 1) < categFields.length) ? "/" : ""));
-        }
+		Element col1 = (Element)( (Element) child ).getChildren().get(0);
+		Element col2 = (Element)( (Element) child ).getChildren().get(1);
+		Element placer  = (Element)( (Element) aktRow ).clone();
+	  	Element place1  = (Element)( (Element) placer ).getChildren().get(0);
+	  	Element place2  = (Element)( (Element) placer ).getChildren().get(1);
 
-        uri = new String(uriParts[1] + "/" + path);
-    }
+		Element xc1 = new Element("col");
+		Element xc2 = new Element("col");
 
-    private void setActualPath() throws Exception {
-        actItemID = lastItemID = "";
+		aktRow.setContent(0, xc1);
+		xc1.setAttribute( "lineLevel",  col1.getAttributeValue("lineLevel") );
 
-        for (int k = 0; k < categFields.length; k++) {
-            update(categFields[k]);
-            lastItemID = actItemID;
-            actItemID = categFields[k];
-        }
+		xc1.setAttribute( "childpos", col1.getAttributeValue( "childpos"));
+		xc1.setAttribute( "folder1", col1.getAttributeValue( "folder1"));
+		xc1.setAttribute( "folder2", col1.getAttributeValue("folder2"));
+		if (col1.getAttributeValue("plusminusbase") != null )
+			xc1.setAttribute( "plusminusbase",  col1.getAttributeValue("plusminusbase"));
 
-        logger.debug(this.getClass() + " lastItemID " + lastItemID);
-        logger.debug(this.getClass() + " actItemID " + actItemID);
-        logger.debug(this.getClass() + " setActualPath OK");
-    }
+		aktRow.setContent(1, xc2);
+		xc2.setAttribute( "numDocs",  col2.getAttributeValue("numDocs") );
+		xc2.setAttribute( "searchbase",  col2.getAttributeValue("searchbase") );
+		if (col2.getAttributeValue("lineID") != null )
+			xc2.setAttribute( "lineID",  col2.getAttributeValue("lineID") );
+		xc2.addContent( col2.getText());
 
-    /**
-     * Returns true if category comments for the classification currently
-     * displayed should be shown.
-     */
-    public boolean showComments() {
-        return showComments;
-    }
+		Element xc3 = new Element("col");
+		Element xc4 = new Element("col");
 
-    /**
-     * Returns the pageName for the classification
-     */
-    public String getPageName() {
-        return pageName;
-    }
+		child.setContent(0,xc3);
+		xc3.setAttribute( "lineLevel", place1.getAttributeValue("lineLevel") );
+		xc3.setAttribute( "childpos", place1.getAttributeValue( "childpos"));
+		xc3.setAttribute( "folder1", place1.getAttributeValue( "folder1"));
+		xc3.setAttribute( "folder2", place1.getAttributeValue("folder2"));
+		if (place1.getAttributeValue("plusminusbase") != null )
+			xc3.setAttribute( "plusminusbase", place1.getAttributeValue("plusminusbase"));
 
-    /**
-     * Returns the xslStyle for the classification
-     */
-    public String getXslStyle() {
-        return xslStyle;
-    }
+		child.setContent(1,xc4);
+		xc4.setAttribute( "numDocs",  place2.getAttributeValue("numDocs") );
+		xc4.setAttribute( "searchbase",  place2.getAttributeValue("searchbase") );
+		if (place2.getAttributeValue("lineID") != null )
+			xc4.setAttribute( "lineID",  place2.getAttributeValue("lineID") );
+		xc4.addContent( place2.getText());
+	  }
 
-    public MCRClassificationItem getClassification() {
-        return classif;
-    }
-
-    public MCRNavigTreeLine getLine(int i) {
-        if (i >= lines.size()) {
-            return null;
-        } else {
-            return (MCRNavigTreeLine) (lines.elementAt(i));
-        }
-    }
-
-    public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover, org.jdom.Document browser) {
-        Element placeholder = cover.getRootElement().getChild("classificationBrowser");
-        logger.info(this.getClass() + " Found Entry at " + placeholder);
-
-        if (placeholder != null) {
-            List children = browser.getRootElement().getChildren();
-
-            for (int j = 0; j < children.size(); j++) {
-                Element child = (Element) ((Element) (children.get(j))).clone();
-                placeholder.addContent(child);
-            }
-        }
-
-        logger.debug(cover);
-
-        return cover;
-    }
-
-    /**
-     * Creates an XML representation of MCRClassificationBrowserData
-     * 
-     * @author Anja Schaar
-     * 
-     */
-    public org.jdom.Document createXmlTree(String lang) throws Exception {
-        MCRClassificationItem cl = getClassification();
-
-        // MCRLinkTableManager clm = new MCRLinkTableManager();
-        // clm.countCategoryReferencesFuzzy(cl.getClassificationID(), "");
-        Element xDocument = new Element("classificationBrowse");
-        logger.info(cl.toString());
-
-        Element xID = new Element("classifID");
-        xID.addContent(cl.getClassificationID());
-        xDocument.addContent(xID);
-
-        Element xLabel = new Element("label");
-        xLabel.addContent(cl.getText(lang));
-        xDocument.addContent(xLabel);
-
-        Element xDesc = new Element("description");
-        xDesc.addContent(cl.getDescription(lang));
-        xDocument.addContent(xDesc);
-
-        Element xDocuments = new Element("cntDocuments");
-        xDocuments.addContent(String.valueOf(cl.countDocLinks(doctypeArray, restriction)));
-        xDocument.addContent(xDocuments);
-
-        Element xShowComments = new Element("showComments");
-        xShowComments.addContent(String.valueOf(showComments()));
-        xDocument.addContent(xShowComments);
-
-        Element xUri = new Element("uri");
-        xUri.addContent(uri);
-        xDocument.addContent(xUri);
-
-        Element xStartPath = new Element("startPath");
-        xStartPath.addContent(startPath);
-        xDocument.addContent(xStartPath);
-
-        // data as XML from outputNavigationTree
-        Element xNavtree = new Element("navigationtree");
-        xNavtree.setAttribute("classifID", cl.getClassificationID());
-        xNavtree.setAttribute("categID", actItemID);
-        xNavtree.setAttribute("predecessor", lastItemID);
-        xNavtree.setAttribute("emptyLeafs", emptyLeafs);
-        xNavtree.setAttribute("view", view);
-        xNavtree.setAttribute("doctype", (doctype != null) ? doctype : "alldocs");
-        xNavtree.setAttribute("restriction", (restriction != null) ? restriction : "");
-
-        xDocument.addContent(xNavtree);
-
-        int i = 0;
-        MCRNavigTreeLine line;
-
-        while ((line = getLine(i++)) != null) {
-            int numDocs = line.cat.countDocLinks(doctypeArray, restriction);
-            logger.info(this.getClass() + " NumDocs - " + numDocs);
-
-            if (emptyLeafs.endsWith("no") && (numDocs == 0)) {
-                logger.debug(this.getClass() + " empty Leaf continue - " + emptyLeafs);
-
-                continue;
-            }
-
-            Element xRow = new Element("row");
-            xNavtree.addContent(xRow);
-
-            Element xCol = new Element("col");
-            xRow.addContent(xCol);
-            xCol.setAttribute("lineLevel", String.valueOf(line.level - 1));
-
-            if (line.status.equals("T")) {
-                xCol.setAttribute("plusminusbase", line.cat.getID());
-                xCol.setAttribute("folder1", "folder_plus");
-                xCol.setAttribute("folder2", (numDocs > 0) ? "folder_closed_in_use" : "folder_closed_empty");
-            } else if (line.status.equals("F")) {
-                xCol.setAttribute("plusminusbase", line.cat.getID());
-                xCol.setAttribute("folder1", "folder_minus");
-                xCol.setAttribute("folder2", (numDocs > 0) ? "folder_open_in_use" : "folder_open_empty");
-            } else {
-                xCol.setAttribute("folder1", "folder_plain");
-                xCol.setAttribute("folder2", (numDocs > 0) ? "folder_closed_in_use" : "folder_closed_empty");
-            }
-
-            int numLength = String.valueOf(numDocs).length();
-
-            xCol = new Element("col");
-            xRow.addContent(xCol);
-            xCol.setAttribute("numDocs", String.valueOf(numDocs));
-
-            if (numLength > 0) {
-                String search = "/" + uri;
-
-                if (line.cat.getID().equalsIgnoreCase(actItemID)) {
-                    search += "/..";
-                } else {
-                    search += ("/" + line.cat.getID());
-                }
-
-                if (search.indexOf("//") > 0) {
-                    search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//") + 1);
-                }
-
-                // search = search.replaceAll("//","/");
-                xCol.setAttribute("searchbase", search);
-                xCol.setAttribute("lineID", line.cat.getID());
-            }
-
-            xCol.addContent(line.cat.getText(lang));
-
-            if (showComments() && (line.cat.getDescription(lang) != null)) {
-                Element comment = new Element("comment");
-                xCol.addContent(comment);
-                comment.setText(line.cat.getDescription(lang));
-            }
-        }
-
-        return new org.jdom.Document(xDocument);
-    }
-
-    public void update(String categID) throws Exception {
-        int lastLevel = 0;
-        boolean hideLevel = false;
-
-        logger.debug(this.getClass() + " update CategoryTree for: " + categID);
-
-        for (int i = 0; i < lines.size(); i++) {
-            MCRNavigTreeLine line = getLine(i);
-            hideLevel = hideLevel && (line.level > lastLevel);
-            logger.debug(this.getClass() + " compare CategoryTree on " + i + "_" + line.cat.getID() + " to " + categID);
-
-            if (view.endsWith("tree")) {
-                if (hideLevel) {
-                    lines.removeElementAt(i--);
-                } else if (categID.equals(line.cat.getID())) {
-                    if (line.status.equals("F")) // hide expanded category
-                    // children
-                    {
-                        line.status = "T";
-                        hideLevel = true;
-                        lastLevel = line.level;
-                    } else if (line.status.equals("T")) // expand category
-                    // children
-                    {
-                        line.status = "F";
-
-                        MCRCategoryItem[] children = line.cat.getChildren();
-
-                        for (int j = 0, k = children.length; j < k; j++) {
-                            MCRCategoryItem cat = children[j];
-                            lines.insertElementAt(new MCRNavigTreeLine(cat, line.level + 1), ++i);
-                        }
-                    }
-                }
-            } else {
-                if (categID.equalsIgnoreCase(line.cat.getID())) {
-                    line.level = 0;
-                    logger.info(this.getClass() + " expand " + line.cat.getID());
-                    line.status = "F";
-
-                    MCRCategoryItem[] children = line.cat.getChildren();
-
-                    for (int j = 0, k = children.length; j < k; j++) {
-                        MCRCategoryItem cat = children[j];
-                        lines.insertElementAt(new MCRNavigTreeLine(cat, line.level + 1), ++i);
-                    }
-                } else {
-                    logger.debug(this.getClass() + " remove lines " + i + "_" + line.cat.getID());
-                    lines.removeElementAt(i--);
-                }
-            }
-        }
-    }
 }

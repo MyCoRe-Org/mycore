@@ -48,9 +48,9 @@ class MCRClassificationManager {
     }
 
     protected MCRCache categoryCache;
-
     protected MCRCache classificationCache;
-
+    protected MCRCache jDomCache;
+    
     protected MCRClassificationInterface store;
 
     /**
@@ -65,6 +65,8 @@ class MCRClassificationManager {
         int categSize = config.getInt("MCR.classifications_category_cache_size", 500);
         classificationCache = new MCRCache(classifSize);
         categoryCache = new MCRCache(categSize);
+        jDomCache = new MCRCache(categSize);
+
     }
 
     void createClassificationItem(MCRClassificationItem classification) {
@@ -156,22 +158,7 @@ class MCRClassificationManager {
         return store.retrieveNumberOfChildren(classifID, parentID);
     }
 
-    void deleteClassificationItem(String classifID) {
-        try {
-            classificationCache.remove(classifID);
-            store.deleteClassificationItem(classifID);
-        } catch (Exception e) {
-        }
-    }
-
-    void deleteCategoryItem(String classifID, String categID) {
-        try {
-            categoryCache.remove(classifID + "@@" + categID);
-            store.deleteCategoryItem(classifID, categID);
-        } catch (Exception e) {
-        }
-    }
-
+    
     protected String getCachingID(MCRCategoryItem category) {
         return category.getClassificationID() + "@@" + category.getID();
     }
@@ -179,4 +166,21 @@ class MCRClassificationManager {
     protected String[] getAllClassificationID() {
         return store.getAllClassificationID();
     }
+    
+    protected MCRClassificationItem[] getAllClassification() {
+        return store.getAllClassification();
+    }
+    
+    void deleteClassificationItem(String classifID) {
+        classificationCache.remove(classifID);
+        jDomCache.remove(classifID);
+        store.deleteClassificationItem(classifID);
+    }
+
+    void deleteCategoryItem(String classifID, String categID) {
+        categoryCache.remove(classifID + "@@" + categID);
+        jDomCache.remove(classifID + "@@" + categID);
+        store.deleteCategoryItem(classifID, categID);
+    }
+    
 }

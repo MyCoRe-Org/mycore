@@ -838,6 +838,30 @@ public class MCRClassification {
 		return xml;
 	}
 
+
+	private void countDocuments(String classID, Element cat) {
+	        final String cAttr = "counter";
+	        List tagList = cat.getChildren("category");
+	        int docs = 0;
+	        if (tagList.size() == 0) {
+	            //we reached the leaves and count the documents
+	            docs = MCRLinkTableManager.instance().countCategoryReferencesSharp(
+	                    classID, cat.getAttributeValue("ID"));
+	        } else {
+	            for (int i = 0; i < tagList.size(); i++) {
+	                Element child = (Element) tagList.get(i);
+	                countDocuments(classID, child);
+	                //all children are calculated
+	                docs += Integer.parseInt(child.getAttributeValue(cAttr));
+	            }
+	            //childrens are counted make a "sharp" search on this category
+	            docs += MCRLinkTableManager.instance()
+	                    .countCategoryReferencesSharp(classID,
+	                            cat.getAttributeValue("ID"));
+	        }
+	        cat.setAttribute(cAttr, Integer.toString(docs));
+	    }
+
 	/**
 	 * The method return the category as XML byte array.
 	 * 
@@ -1018,4 +1042,5 @@ public class MCRClassification {
 	public static final String[] getAllClassificationID() {
 		return (MCRClassificationItem.manager()).getAllClassificationID();
 	}
-}
+	
+ }

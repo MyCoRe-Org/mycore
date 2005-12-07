@@ -24,13 +24,18 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jdom.Namespace;
+import org.jdom.Element;
+import org.jdom.Document;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRDefaults;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 
 /**
  * This class is an abstract class for the implementation of the classes
@@ -83,6 +88,7 @@ public abstract class MCRClassificationObject {
         return MCRClassificationManager.instance();
     }
 
+    
     /**
      * The abstract constructor of a classififcation or a category.
      * 
@@ -111,6 +117,15 @@ public abstract class MCRClassificationObject {
         }
     }
 
+    /**
+     * The method check that this instance realy exist in the store
+     *
+     * @return true if it is, else false
+     **/
+    public boolean existInStore(){
+  	  return (manager().retrieveCategoryItem( getClassificationID(), ID )!= null);	  
+    }
+    
     /**
      * This method get the ID.
      * 
@@ -473,6 +488,34 @@ public abstract class MCRClassificationObject {
         return children;
     }
 
+    public MCRCategoryItem[] getChildrenFromJDom(){
+ 	   ensureNotDeleted();
+        MCRCategoryItem[] children;
+        String categID = ( this instanceof MCRCategoryItem ? ID : null );
+        Document cljdom = receiveClassificationAsJDOM(getClassificationID());
+ 	   Element EFound;	   
+ 	   if (categID != null){
+ 	      String cachingID = getClassificationID() + "@@" + categID;	      
+ 		  EFound =  (Element) (	manager().jDomCache.get(cachingID));
+           if (EFound == null) {
+ 			 EFound = findCategInJDom(categID, cljdom.getRootElement().getChild("categories"));
+            	 manager().jDomCache.put(cachingID, EFound);
+           }		
+ 	   } else {
+ 		  EFound = cljdom.getRootElement().getChild("categories");
+ 	   }
+ 	   List childfromJDom = EFound.getChildren("category");
+ 	   children = new MCRCategoryItem[ childfromJDom.size() ];
+ 	   for( int k = 0; k < childfromJDom.size(); k++ )	{
+ 		   children[k] = setNewCategFromJDomElement( ((Element)childfromJDom.get(k)) );
+ 	   }   
+ 	   childrenIDs = new String[ children.length ];	   
+ 	   for( int k = 0; k < children.length   ; k++ )	{
+ 		   childrenIDs[ k] = children[ k ].getID();
+ 	   }
+ 	   return children;
+    }
+    
     /**
      * The method remove this.
      */
@@ -501,5 +544,69 @@ public abstract class MCRClassificationObject {
         sb.append("\n");
 
         return sb.toString();
+    }
+    
+    public void updateFromJDOM(Document cljdom) {
+ 	   MCRClassification cl = new MCRClassification();
+ 	   try {
+ 		  cl.updateFromJDOM(cljdom);
+ 		  manager().jDomCache.remove(getClassificationID());
+ 	   } catch ( org.mycore.datamodel.metadata.MCRActiveLinkException ignored) {
+ 		   //new kind of error - seems that no category can be updated if in use
+ 		   //we do nothing instead of it
+ 		   ;
+ 	   }
+ 	   
+    }
+    
+    private Element findCategInJDom( String categID, Element categories){
+        List jchildren = categories.getChildren("category");
+   	 Element EFound = new Element("category");
+   	 for( int j = 0; j < jchildren.size(); j++ )	{
+   		 if( ((Element)jchildren.get(j)).getAttributeValue("ID").equalsIgnoreCase(categID)){
+   			 //System.out.println("Treffer:" + categID);
+   			 return (Element)jchildren.get(j);
+   		 }
+   		 if (!((Element)jchildren.get(j)).getChildren("category").isEmpty())  {
+   			 EFound = findCategInJDom(categID, (Element)jchildren.get(j));
+   			 if (EFound.getAttribute("ID") != null ){
+   				 return EFound;
+   			 }
+   		 }
+      	 }
+   	 return EFound;
+      }
+      
+      private MCRCategoryItem 	setNewCategFromJDomElement( Element newCateg) {	   
+    	   MCRCategoryItem cat = new MCRCategoryItem(newCateg.getAttributeValue("ID"),this);
+    	   if ( newCateg.getAttributeValue("counter")!= null )
+    		   cat.counter = Integer.parseInt( newCateg.getAttributeValue("counter"));
+    	   List tagList = newCateg.getChildren("label");
+    	   Element element;
+   	   for (int i = 0; i < tagList.size(); i++) {
+   		   element = (Element) tagList.get(i);
+   		   cat.addData(element.getAttributeValue("lang",Namespace.XML_NAMESPACE),
+   		   			   element.getAttributeValue("text"),
+   		   			   element.getAttributeValue("description"));		   
+   	   }
+   	   //process url, if given
+   	   element = newCateg.getChild("url");
+   	   if (element != null) {    	   
+   		   cat.URL= element.getAttributeValue("href",Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+   	   }
+   	   return cat;
+      }
+      
+   
+    public Document receiveClassificationAsJDOM(String clid) {
+ 	   //	 Klassification laden!
+ 	   MCRClassification cl = new MCRClassification();
+ 	   String cachingID = getClassificationID();
+        Document cljdom =  (Document)(	manager().jDomCache.get(cachingID));
+        if (cljdom == null) {
+     	   cljdom = cl.receiveClassificationAsJDOM(getClassificationID());
+    	  	   manager().jDomCache.put(cachingID,cljdom); 
+        }
+        return cljdom;
     }
 }

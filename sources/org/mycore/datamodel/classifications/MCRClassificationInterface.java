@@ -144,4 +144,12 @@ public interface MCRClassificationInterface {
      * @return a list of classification ID's as String array
      */
     public String[] getAllClassificationID();
+
+    /**
+     * The method returns all availiable classification's they are loaded.
+     * 
+     * @return a list of classification ID's as String array
+     */
+    public MCRClassificationItem[] getAllClassification();
+
 }
