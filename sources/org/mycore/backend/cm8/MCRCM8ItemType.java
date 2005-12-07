@@ -153,329 +153,329 @@ final class MCRCM8ItemType implements DKConstantICM {
                 org.jdom.Element mcr_root = mcr_conf.getRootElement();
 
                 // set config element offset to structure
-                org.jdom.Element mcr_structure = mcr_root.getChild("structure");
+//                org.jdom.Element mcr_structure = mcr_root.getChild("structure");
 
-                if (mcr_structure != null) {
+//                if (mcr_structure != null) {
                     // Set the structure child component
-                    DKComponentTypeDefICM item_structure = new DKComponentTypeDefICM(connection);
-                    item_structure.setName(mcr_item_type_prefix + "structure");
-                    item_structure.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                    DKComponentTypeDefICM item_structure = new DKComponentTypeDefICM(connection);
+//                    item_structure.setName(mcr_item_type_prefix + "structure");
+//                    item_structure.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                     // over all elements
-                    List mcr_taglist = mcr_structure.getChildren();
+//                    List mcr_taglist = mcr_structure.getChildren();
 
-                    for (int i = 0; i < mcr_taglist.size(); i++) {
+//                    for (int i = 0; i < mcr_taglist.size(); i++) {
                         // the tag
-                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
-                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
+//                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
+//                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
 
                         // should it create for search?
-                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
+//                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
 
-                        if (parasearch == null) {
-                            parasearch = "true";
-                        }
+//                        if (parasearch == null) {
+//                            parasearch = "true";
+//                        }
 
-                        if (!parasearch.toLowerCase().equals("true")) {
-                            continue;
-                        }
+//                        if (!parasearch.toLowerCase().equals("true")) {
+//                            continue;
+//                        }
 
                         // create the tag child component
-                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
-                        item_tag.setName(mcr_item_type_prefix + tagname);
-                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
+//                        item_tag.setName(mcr_item_type_prefix + tagname);
+//                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                         // over all mcrmeta...
-                        List mcr_subtaglist = mcr_tag.getChildren();
+//                        List mcr_subtaglist = mcr_tag.getChildren();
 
-                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
-                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
-                            String subtagname = mcr_subtag.getName();
+//                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
+//                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
+//                            String subtagname = mcr_subtag.getName();
+//
+//                            if (subtagname.length() <= 7) {
+//                                continue;
+//                            }
 
-                            if (subtagname.length() <= 7) {
-                                continue;
-                            }
+//                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
+//                                continue;
+//                            }
+//
+//                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
+//                            StringBuffer stb = new StringBuffer(128);
+//                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
+//                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
 
-                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
-                                continue;
-                            }
+//                            Object obj = new Object();
 
-                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
-                            StringBuffer stb = new StringBuffer(128);
-                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
-                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
+//                            try {
+//                                obj = Class.forName(stb.toString()).newInstance();
 
-                            Object obj = new Object();
+//                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, "false");
+//                                item_tag.addSubEntity(item_subtag);
+//                            } catch (ClassNotFoundException e) {
+//                                throw new MCRException(classname + " ClassNotFoundException");
+//                            } catch (IllegalAccessException e) {
+//                                throw new MCRException(classname + " IllegalAccessException");
+//                            } catch (InstantiationException e) {
+//                                throw new MCRException(classname + " InstantiationException");
+//                            }
+//                        }
 
-                            try {
-                                obj = Class.forName(stb.toString()).newInstance();
+//                        item_structure.addSubEntity(item_tag);
+//                    }
 
-                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, "false");
-                                item_tag.addSubEntity(item_subtag);
-                            } catch (ClassNotFoundException e) {
-                                throw new MCRException(classname + " ClassNotFoundException");
-                            } catch (IllegalAccessException e) {
-                                throw new MCRException(classname + " IllegalAccessException");
-                            } catch (InstantiationException e) {
-                                throw new MCRException(classname + " InstantiationException");
-                            }
-                        }
-
-                        item_structure.addSubEntity(item_tag);
-                    }
-
-                    item_type.addSubEntity(item_structure);
-                }
+//                    item_type.addSubEntity(item_structure);
+//                }
 
                 // set config element offset to metadata
                 org.jdom.Element mcr_metadata = mcr_root.getChild("metadata");
 
-                if (mcr_metadata != null) {
-                    DKComponentTypeDefICM item_metadata = new DKComponentTypeDefICM(connection);
-                    item_metadata.setName(mcr_item_type_prefix + "metadata");
-                    item_metadata.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
-                    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
-                    attr.setNullable(true);
-                    attr.setUnique(false);
-                    item_metadata.addAttr(attr);
+//                if (mcr_metadata != null) {
+//                    DKComponentTypeDefICM item_metadata = new DKComponentTypeDefICM(connection);
+//                    item_metadata.setName(mcr_item_type_prefix + "metadata");
+//                    item_metadata.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
+//                    attr.setNullable(true);
+//                    attr.setUnique(false);
+//                    item_metadata.addAttr(attr);
 
                     // over all elements
-                    List mcr_taglist = mcr_metadata.getChildren();
+//                    List mcr_taglist = mcr_metadata.getChildren();
 
-                    for (int i = 0; i < mcr_taglist.size(); i++) {
+//                    for (int i = 0; i < mcr_taglist.size(); i++) {
                         // the tag
-                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
-                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
-                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
+//                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
+//                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
+//                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
 
-                        if (parasearch == null) {
-                            parasearch = "true";
-                        }
+//                        if (parasearch == null) {
+//                            parasearch = "true";
+//                        }
 
-                        if (!parasearch.toLowerCase().equals("true")) {
-                            continue;
-                        }
+//                        if (!parasearch.toLowerCase().equals("true")) {
+//                            continue;
+//                        }
 
-                        String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
+//                        String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
 
-                        if (textsearch == null) {
-                            textsearch = "false";
-                        }
+//                        if (textsearch == null) {
+//                            textsearch = "false";
+//                        }
 
-                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
-                        item_tag.setName(mcr_item_type_prefix + tagname);
-                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
+//                        item_tag.setName(mcr_item_type_prefix + tagname);
+//                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                         // add lang attribute to tag
-                        attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
-                        attr.setNullable(true);
-                        attr.setUnique(false);
-                        item_tag.addAttr(attr);
+//                        attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
+//                        attr.setNullable(true);
+//                        attr.setUnique(false);
+//                        item_tag.addAttr(attr);
 
                         // over all mcrmeta...
-                        List mcr_subtaglist = mcr_tag.getChildren();
+//                        List mcr_subtaglist = mcr_tag.getChildren();
 
-                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
-                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
-                            String subtagname = mcr_subtag.getName();
+//                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
+//                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
+//                            String subtagname = mcr_subtag.getName();
 
-                            if (subtagname.length() <= 7) {
-                                continue;
-                            }
+//                            if (subtagname.length() <= 7) {
+//                                continue;
+//                            }
 
-                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
-                                continue;
-                            }
+//                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
+//                                continue;
+//                            }
 
-                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
-                            StringBuffer stb = new StringBuffer(128);
-                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
-                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
+//                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
+//                            StringBuffer stb = new StringBuffer(128);
+//                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
+//                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
 
-                            Object obj = new Object();
+//                            Object obj = new Object();
 
-                            try {
-                                obj = Class.forName(stb.toString()).newInstance();
+//                            try {
+//                                obj = Class.forName(stb.toString()).newInstance();
 
-                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
-                                item_tag.addSubEntity(item_subtag);
-                            } catch (ClassNotFoundException e) {
-                                throw new MCRException(classname + " ClassNotFoundException");
-                            } catch (IllegalAccessException e) {
-                                throw new MCRException(classname + " IllegalAccessException");
-                            } catch (InstantiationException e) {
-                                throw new MCRException(classname + " InstantiationException");
-                            }
-                        }
+//                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
+//                                item_tag.addSubEntity(item_subtag);
+//                            } catch (ClassNotFoundException e) {
+//                                throw new MCRException(classname + " ClassNotFoundException");
+//                            } catch (IllegalAccessException e) {
+//                                throw new MCRException(classname + " IllegalAccessException");
+//                            } catch (InstantiationException e) {
+//                                throw new MCRException(classname + " InstantiationException");
+//                            }
+//                        }
 
-                        item_metadata.addSubEntity(item_tag);
-                    }
+//                        item_metadata.addSubEntity(item_tag);
+//                    }
 
-                    item_type.addSubEntity(item_metadata);
-                }
+//                    item_type.addSubEntity(item_metadata);
+//                }
 
                 // set config element offset to derivate
-                org.jdom.Element mcr_derivate = mcr_root.getChild("derivate");
+//                org.jdom.Element mcr_derivate = mcr_root.getChild("derivate");
 
-                if (mcr_derivate != null) {
-                    DKComponentTypeDefICM item_derivate = new DKComponentTypeDefICM(connection);
-                    item_derivate.setName(mcr_item_type_prefix + "derivate");
-                    item_derivate.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                if (mcr_derivate != null) {
+//                    DKComponentTypeDefICM item_derivate = new DKComponentTypeDefICM(connection);
+//                    item_derivate.setName(mcr_item_type_prefix + "derivate");
+//                    item_derivate.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                     // over all elements
-                    List mcr_taglist = mcr_derivate.getChildren();
+//                    List mcr_taglist = mcr_derivate.getChildren();
 
-                    for (int i = 0; i < mcr_taglist.size(); i++) {
+//                    for (int i = 0; i < mcr_taglist.size(); i++) {
                         // the tag
-                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
-                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
-                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
+//                        org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
+//                        String tagname = (String) mcr_tag.getAttribute("name").getValue();
+//                        String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
 
-                        if (parasearch == null) {
-                            parasearch = "true";
-                        }
+//                        if (parasearch == null) {
+//                            parasearch = "true";
+//                        }
 
-                        if (!parasearch.toLowerCase().equals("true")) {
-                            continue;
-                        }
+//                        if (!parasearch.toLowerCase().equals("true")) {
+//                            continue;
+//                        }
 
-                        String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
+//                        String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
 
-                        if (textsearch == null) {
-                            textsearch = "false";
-                        }
+//                        if (textsearch == null) {
+//                            textsearch = "false";
+//                        }
 
-                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
-                        item_tag.setName(mcr_item_type_prefix + tagname);
-                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                        DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
+//                        item_tag.setName(mcr_item_type_prefix + tagname);
+//                        item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
-                        // add lang attribute to the tag
-                        attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
-                        attr.setNullable(true);
-                        attr.setUnique(false);
-                        item_tag.addAttr(attr);
+//                        // add lang attribute to the tag
+//                        attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
+//                        attr.setNullable(true);
+//                        attr.setUnique(false);
+//                        item_tag.addAttr(attr);
 
-                        // over all mcrmeta...
-                        List mcr_subtaglist = mcr_tag.getChildren();
+//                        // over all mcrmeta...
+//                        List mcr_subtaglist = mcr_tag.getChildren();
 
-                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
-                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
-                            String subtagname = mcr_subtag.getName();
+//                        for (int j = 0; j < mcr_subtaglist.size(); j++) {
+//                            org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
+//                            String subtagname = mcr_subtag.getName();
 
-                            if (subtagname.length() <= 7) {
-                                continue;
-                            }
+//                            if (subtagname.length() <= 7) {
+//                                continue;
+//                            }
 
-                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
-                                continue;
-                            }
+//                            if (!subtagname.substring(0, 7).equals("mcrmeta")) {
+//                                continue;
+//                            }
 
-                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
-                            StringBuffer stb = new StringBuffer(128);
-                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
-                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
+//                            String classname = (String) mcr_subtag.getAttribute("class").getValue();
+//                            StringBuffer stb = new StringBuffer(128);
+//                            stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
+//                            logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
 
-                            Object obj = new Object();
+//                            Object obj = new Object();
 
-                            try {
-                                obj = Class.forName(stb.toString()).newInstance();
+//                            try {
+//                                obj = Class.forName(stb.toString()).newInstance();
 
-                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
-                                item_tag.addSubEntity(item_subtag);
-                            } catch (ClassNotFoundException e) {
-                                throw new MCRException(classname + " ClassNotFoundException");
-                            } catch (IllegalAccessException e) {
-                                throw new MCRException(classname + " IllegalAccessException");
-                            } catch (InstantiationException e) {
-                                throw new MCRException(classname + " InstantiationException");
-                            }
-                        }
+//                                DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
+//                                item_tag.addSubEntity(item_subtag);
+//                            } catch (ClassNotFoundException e) {
+//                                throw new MCRException(classname + " ClassNotFoundException");
+//                            } catch (IllegalAccessException e) {
+//                                throw new MCRException(classname + " IllegalAccessException");
+//                            } catch (InstantiationException e) {
+//                                throw new MCRException(classname + " InstantiationException");
+//                            }
+//                        }
 
-                        item_derivate.addSubEntity(item_tag);
-                    }
+//                        item_derivate.addSubEntity(item_tag);
+//                    }
 
-                    item_type.addSubEntity(item_derivate);
-                }
+//                    item_type.addSubEntity(item_derivate);
+//                }
 
                 // the service part
-                org.jdom.Element mcr_service = mcr_root.getChild("service");
-                DKComponentTypeDefICM item_service = new DKComponentTypeDefICM(connection);
-                item_service.setName(mcr_item_type_prefix + "service");
-                item_service.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                org.jdom.Element mcr_service = mcr_root.getChild("service");
+//                DKComponentTypeDefICM item_service = new DKComponentTypeDefICM(connection);
+//                item_service.setName(mcr_item_type_prefix + "service");
+//                item_service.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                 // over all elements
-                List mcr_taglist = mcr_service.getChildren();
+//                List mcr_taglist = mcr_service.getChildren();
 
-                for (int i = 0; i < mcr_taglist.size(); i++) {
+//                for (int i = 0; i < mcr_taglist.size(); i++) {
                     // the tag
-                    org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
-                    String tagname = (String) mcr_tag.getAttribute("name").getValue();
-                    String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
+//                    org.jdom.Element mcr_tag = (org.jdom.Element) mcr_taglist.get(i);
+//                    String tagname = (String) mcr_tag.getAttribute("name").getValue();
+//                    String parasearch = (String) mcr_tag.getAttribute("parasearch").getValue();
 
-                    if (parasearch == null) {
-                        parasearch = "true";
-                    }
+//                    if (parasearch == null) {
+//                        parasearch = "true";
+//                    }
 
-                    if (!parasearch.toLowerCase().equals("true")) {
-                        continue;
-                    }
+//                    if (!parasearch.toLowerCase().equals("true")) {
+//                        continue;
+//                    }
 
-                    String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
+//                    String textsearch = (String) mcr_tag.getAttribute("textsearch").getValue();
 
-                    if (textsearch == null) {
-                        textsearch = "false";
-                    }
+//                    if (textsearch == null) {
+//                        textsearch = "false";
+//                    }
 
-                    DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
-                    item_tag.setName(mcr_item_type_prefix + tagname);
-                    item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
+//                    DKComponentTypeDefICM item_tag = new DKComponentTypeDefICM(connection);
+//                    item_tag.setName(mcr_item_type_prefix + tagname);
+//                    item_tag.setDeleteRule(DK_ICM_DELETE_RULE_CASCADE);
 
                     // add lang attribute to the tag
-                    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
-                    attr.setNullable(true);
-                    attr.setUnique(false);
-                    item_tag.addAttr(attr);
+//                    attr = (DKAttrDefICM) dsDefICM.retrieveAttr(mcr_item_type_prefix + "lang");
+//                    attr.setNullable(true);
+//                    attr.setUnique(false);
+//                    item_tag.addAttr(attr);
 
-                    // over all mcrmeta...
-                    List mcr_subtaglist = mcr_tag.getChildren();
+//                    // over all mcrmeta...
+//                    List mcr_subtaglist = mcr_tag.getChildren();
 
-                    for (int j = 0; j < mcr_subtaglist.size(); j++) {
-                        org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
-                        String subtagname = mcr_subtag.getName();
+//                    for (int j = 0; j < mcr_subtaglist.size(); j++) {
+//                        org.jdom.Element mcr_subtag = (org.jdom.Element) mcr_subtaglist.get(j);
+//                        String subtagname = mcr_subtag.getName();
 
-                        if (subtagname.length() <= 7) {
-                            continue;
-                        }
+//                        if (subtagname.length() <= 7) {
+//                            continue;
+//                        }
 
-                        if (!subtagname.substring(0, 7).equals("mcrmeta")) {
-                            continue;
-                        }
+//                        if (!subtagname.substring(0, 7).equals("mcrmeta")) {
+//                            continue;
+//                        }
 
-                        String classname = (String) mcr_subtag.getAttribute("class").getValue();
-                        StringBuffer stb = new StringBuffer(128);
-                        stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
-                        logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
+//                        String classname = (String) mcr_subtag.getAttribute("class").getValue();
+//                        StringBuffer stb = new StringBuffer(128);
+//                        stb.append(META_PACKAGE_NAME).append("MCRCM8").append(classname.substring(3, classname.length()));
+//                        logger.debug("CM8 Datastore Creation: " + tagname + " with class " + stb.toString());
 
-                        Object obj = new Object();
+//                        Object obj = new Object();
 
-                        try {
-                            obj = Class.forName(stb.toString()).newInstance();
+//                        try {
+//                            obj = Class.forName(stb.toString()).newInstance();
 
-                            DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
-                            item_tag.addSubEntity(item_subtag);
-                        } catch (ClassNotFoundException e) {
-                            throw new MCRException(classname + " ClassNotFoundException");
-                        } catch (IllegalAccessException e) {
-                            throw new MCRException(classname + " IllegalAccessException");
-                        } catch (InstantiationException e) {
-                            throw new MCRException(classname + " InstantiationException");
-                        }
-                    }
+//                            DKComponentTypeDefICM item_subtag = ((MCRCM8MetaInterface) obj).createItemType(mcr_subtag, connection, dsDefICM, mcr_item_type_prefix, mcr_item_text_index, textsearch);
+//                            item_tag.addSubEntity(item_subtag);
+//                        } catch (ClassNotFoundException e) {
+//                            throw new MCRException(classname + " ClassNotFoundException");
+//                        } catch (IllegalAccessException e) {
+//                            throw new MCRException(classname + " IllegalAccessException");
+//                        } catch (InstantiationException e) {
+//                            throw new MCRException(classname + " InstantiationException");
+//                        }
+//                    }
 
-                    item_service.addSubEntity(item_tag);
-                }
+//                    item_service.addSubEntity(item_tag);
+//                }
 
-                item_type.addSubEntity(item_service);
+//                item_type.addSubEntity(item_service);
 
                 item_type.add();
                 logger.info("CM8 Datastore Creation: " + mcr_item_type_name + " is created.");

@@ -40,13 +40,13 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRCM8CreateItemTypeCommands extends MCRAbstractCommands {
-    private static Logger logger = Logger.getLogger(MCRCM8CreateItemTypeCommands.class.getName());
+public class MCRCM8ItemTypeCommands extends MCRAbstractCommands {
+    private static Logger logger = Logger.getLogger(MCRCM8ItemTypeCommands.class.getName());
 
     /**
      * The constructor.
      */
-    public MCRCM8CreateItemTypeCommands() {
+    public MCRCM8ItemTypeCommands() {
         super();
 
         MCRCommand com = null;
@@ -72,7 +72,7 @@ public class MCRCM8CreateItemTypeCommands extends MCRAbstractCommands {
 
         logger.info("Reading file " + conf_filename + " ...");
 
-        InputStream conf_file = MCRCM8CreateItemTypeCommands.class.getResourceAsStream("/" + conf_filename);
+        InputStream conf_file = MCRCM8ItemTypeCommands.class.getResourceAsStream("/" + conf_filename);
 
         if (conf_file == null) {
             throw new MCRException("Can't read configuration file " + conf_filename);
