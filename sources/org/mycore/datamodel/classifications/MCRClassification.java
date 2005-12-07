@@ -457,7 +457,7 @@ public class MCRClassification {
 
 				// This call only returns IDs, that are in the current category
 				// but not in its children
-				List activeLinks = MCRLinkTableManager.instance().getFirstLinksToCategory(classID, attr);
+				List activeLinks = MCRLinkTableManager.instance().getFirstLinksToCategory(classID, curID);
 
 				Iterator it = activeLinks.iterator();
 				MCRActiveLinkException e = new MCRActiveLinkException(new StringBuffer("Error while deleting category ").append(curID).append(
