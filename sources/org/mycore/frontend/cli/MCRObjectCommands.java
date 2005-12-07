@@ -120,7 +120,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 * @param ID
 	 *            the ID of the MCRObject that should be deleted
 	 */
-	public static void delete(String ID) throws Exception {
+	public static void delete(String ID) throws MCRActiveLinkException {
 		MCRObject mycore_obj = new MCRObject();
 
 		try {
@@ -142,7 +142,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 * @param IDto
 	 *            the stop ID for deleting the MCRObjects
 	 */
-	public static void deleteFromTo(String IDfrom, String IDto) throws Exception {
+	public static void deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
 		int from_i = 0;
 		int to_i = 0;
 
