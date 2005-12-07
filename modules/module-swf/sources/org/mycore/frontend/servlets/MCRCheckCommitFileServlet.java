@@ -36,58 +36,59 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCRCheckCommitFileServlet extends MCRCheckFileBase {
-    /**
-     * The method check the privileg of this action.
-     * 
-     * @param privs
-     *            the ArrayList of privilegs
-     * @return true if the privileg exist, else return false
-     */
-    public final boolean hasPrivileg(ArrayList privs, String type) {
-        if (!privs.contains("modify-" + type)) {
-            return false;
-        }
+	/**
+	 * The method check the privileg of this action.
+	 * 
+	 * @param privs
+	 *            the ArrayList of privilegs
+	 * @return true if the privileg exist, else return false
+	 */
+	public final boolean hasPrivileg(ArrayList privs, String type) {
+		if (!privs.contains("modify-" + type)) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * The method is a dummy and return an URL with the next working step.
-     * 
-     * @param ID
-     *            the MCRObjectID of the MCRObject
-     * @return the next URL as String
-     */
-    public final String getNextURL(MCRObjectID ID) throws Exception {
-        // return all is ready
-        return "";
-    }
+	/**
+	 * The method is a dummy and return an URL with the next working step.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 * @return the next URL as String
+	 */
+	public final String getNextURL(MCRObjectID ID) {
+		// return all is ready
+		return "";
+	}
 
-    /**
-     * The method is a dummy and return an URL with the next working step.
-     * 
-     * @param ID
-     *            the MCRObjectID of the MCRObject
-     * @param DD
-     *            the MCRObjectID of the MCRDerivate
-     * @param step
-     *            the step text String
-     * @return the next URL as String
-     */
-    public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception {
-        // return all is ready
-        StringBuffer sb = new StringBuffer();
-        sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=").append(ID.getTypeId()).append("&step=").append(step).append("&se_mcrid=").append(DD.getId()).append("&re_mcrid=").append(ID.getId()).append("&tf_mcrid=").append(DD.getId());
+	/**
+	 * The method is a dummy and return an URL with the next working step.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 * @param DD
+	 *            the MCRObjectID of the MCRDerivate
+	 * @param step
+	 *            the step text String
+	 * @return the next URL as String
+	 */
+	public final String getNextURL(MCRObjectID ID, MCRObjectID DD, String step) throws Exception {
+		// return all is ready
+		StringBuffer sb = new StringBuffer();
+		sb.append("servlets/MCRStartEditorServlet?todo=scommitder&type=").append(ID.getTypeId()).append("&step=").append(step).append("&se_mcrid=").append(
+				DD.getId()).append("&re_mcrid=").append(ID.getId()).append("&tf_mcrid=").append(DD.getId());
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    /**
-     * The method send a message to the mail address for the MCRObjectType.
-     * 
-     * @param ID
-     *            the MCRObjectID of the MCRObject
-     */
-    public final void sendMail(MCRObjectID ID) {
-    }
+	/**
+	 * The method send a message to the mail address for the MCRObjectType.
+	 * 
+	 * @param ID
+	 *            the MCRObjectID of the MCRObject
+	 */
+	public final void sendMail(MCRObjectID ID) {
+	}
 }
