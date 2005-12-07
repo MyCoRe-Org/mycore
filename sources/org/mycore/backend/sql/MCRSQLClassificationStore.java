@@ -493,4 +493,48 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
 
         return ID;
     }
+    
+    /**
+     * The method returns all availiable classification's they are loaded.
+     * 
+     * @return a list of classification ID's as String array
+     */
+    public final MCRClassificationItem[] getAllClassification() {
+    	logger.debug("List of classifications");
+    	// 	Select count(*) FROM MCRCLASS 
+    	MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+    	
+        int len = MCRSQLConnection
+        		.justCountRows(new MCRSQLStatement(tableClass).addColumn("ID")
+                .toRowSelector());
+        
+        MCRClassificationItem[] classList = new MCRClassificationItem[len];
+        
+    	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang
+    	StringBuffer querySB = new StringBuffer("SELECT ID, LANG, TEXT, MCRDESC FROM MCRCLASSLABEL ORDER BY 1,2");  	        
+    	MCRSQLRowReader reader = conn.doQuery(querySB.toString());
+        
+        int k = -1;
+        while (reader.next()) {
+        	String ID = reader.getString("ID");
+        	if ( k==-1 || !classList[k].getClassificationID().equalsIgnoreCase(ID) ){
+        		k++;
+                //logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + ID);
+        		classList[k] = new MCRClassificationItem(ID);
+           		//logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + ID);
+           	 	classList[k].addData(reader.getString("LANG"),
+        				reader.getString("TEXT"),
+        				reader.getString("MCRDESC")
+        				);
+        	} else {
+        		//logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + ID);
+        		classList[k].addData(reader.getString("LANG"),
+        				reader.getString("TEXT"),
+        				reader.getString("MCRDESC")
+        				);
+        	}
+        }
+        return classList;
+    }
+
 }

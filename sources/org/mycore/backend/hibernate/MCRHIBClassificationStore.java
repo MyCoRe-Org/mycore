@@ -446,4 +446,44 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
         return ID;
     }
+    
+    /**
+     * The method returns all availiable classification's they are loaded.
+     * 
+     * @return a list of classification ID's as String array
+     */
+    public final MCRClassificationItem[] getAllClassification() {
+        Session session = getSession();
+    	logger.debug("List of classifications");
+    	MCRClassificationItem[] classList =null;
+    	
+        try {
+        	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang
+            List l = session.createQuery("MCRCLASSLABEL ORDER BY 1,2").list();
+            classList = new MCRClassificationItem[l.size()];
+            
+            int k = -1;
+
+            for(int i=0; i < classList.length; i++) {
+            	MCRCLASSLABEL actual = (MCRCLASSLABEL)l.get(i);
+            	if ( k==-1 || !classList[i].getClassificationID().equalsIgnoreCase(actual.getId()) ){
+            		k++;
+                    //logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + ID);
+            		classList[k] = new MCRClassificationItem(actual.getId());
+               		//logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + ID);
+               	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
+            	} else {
+            		//logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + ID);
+               	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
+            	}
+            }
+        } catch (Exception e) {
+            logger.error(e);
+            throw new MCRException("error while retrieving classifications ", e);
+        } finally {
+            session.close();
+        }
+        return classList;
+    }
+
 }
