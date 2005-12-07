@@ -348,7 +348,7 @@ public class MCRServlet extends HttpServlet {
 		Iterator destIt = links.keySet().iterator();
 		String curDest;
 		while (destIt.hasNext()) {
-			curDest = destIt.toString();
+			curDest = destIt.next().toString();
 			List sources = (List) links.get(curDest);
 			Iterator sourceIt = sources.iterator();
 			while (sourceIt.hasNext()) {
