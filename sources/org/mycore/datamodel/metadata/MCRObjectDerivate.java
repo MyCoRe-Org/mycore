@@ -248,29 +248,6 @@ public class MCRObjectDerivate {
     }
 
     /**
-     * This methode create a typed content list for all derivate data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the metadata part
-     */
-    public final MCRTypedContent createTypedContent() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-        tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "derivate");
-        tc.addTagElement(MCRTypedContent.TYPE_TAG, "linkmetas");
-
-        for (int i = 0; i < linkmetas.size(); i++) {
-            tc.addMCRTypedContent(((MCRMetaLinkID) linkmetas.get(i)).createTypedContent(true));
-        }
-
-        return tc;
-    }
-
-    /**
      * This method check the validation of the content of this class. The method
      * returns <em>true</em> if <br>
      * <ul>

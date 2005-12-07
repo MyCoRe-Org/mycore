@@ -197,51 +197,6 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault implements MCRM
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent(boolean parasearch) throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaInstitutionName is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "lang", lang);
-
-        if ((type = type.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "type", type);
-        }
-
-        if ((fullname = fullname.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "fullname");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, fullname);
-        }
-
-        if ((nickname = nickname.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "nickname");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, nickname);
-        }
-
-        if ((property = property.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "property");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, property);
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create a String for all text searchable data in this
      * instance.
      * 

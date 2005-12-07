@@ -43,8 +43,6 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRObjectMetadata {
     // common data
-    private static String NL = new String((System.getProperties()).getProperty("line.separator"));;
-
     private String default_lang = null;
 
     private boolean herited_xml = false;
@@ -338,31 +336,6 @@ public class MCRObjectMetadata {
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("MCRObjectMetadata : The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-        tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "metadata");
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "lang", default_lang);
-
-        int len = meta_list.size();
-
-        for (int i = 0; i < len; i++) {
-            tc.addMCRTypedContent(((MCRMetaElement) meta_list.get(i)).createTypedContent(herited_search));
-        }
-
-        return tc;
     }
 
     /**

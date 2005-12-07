@@ -175,36 +175,6 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public MCRTypedContent createTypedContent(boolean parasearch) throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaXML is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-
-        if ((type = type.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "type", type);
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create an empty String for all cases
      * 
      * @param textsearch

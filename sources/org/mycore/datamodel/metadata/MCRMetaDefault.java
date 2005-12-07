@@ -349,15 +349,6 @@ public abstract class MCRMetaDefault {
     public abstract org.jdom.Element createXML() throws MCRException;
 
     /**
-     * This abstract method create a typed content list for the data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the data part
-     */
-    public abstract MCRTypedContent createTypedContent(boolean parametric) throws MCRException;
-
-    /**
      * This abstract method create a String for the text searchable data.
      * 
      * @exception MCRException

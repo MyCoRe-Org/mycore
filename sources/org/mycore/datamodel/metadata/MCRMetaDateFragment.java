@@ -147,31 +147,6 @@ public class MCRMetaDateFragment extends MCRMetaDefault implements MCRMetaInterf
 
     /**
      * 
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#createTypedContent(boolean)
-     */
-    public MCRTypedContent createTypedContent(boolean parametric) throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaXML is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parametric) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-
-        if ((type = type.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "type", type);
-        }
-
-        return tc;
-    }
-
-    /**
-     * 
      * @see org.mycore.datamodel.metadata.MCRMetaDefault#createTextSearch(boolean)
      */
     public String createTextSearch(boolean textsearch) throws MCRException {

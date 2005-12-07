@@ -246,29 +246,6 @@ final public class MCRObject extends MCRBase {
 	}
 
 	/**
-	 * This methode create a typed content list for all MCRObject data.
-	 * 
-	 * @exception MCRException
-	 *                if the content of this class is not valid
-	 * @return a MCRTypedContent with the data of the MCRObject data
-	 */
-	public final MCRTypedContent createTypedContent() throws MCRException {
-		if (!isValid()) {
-			throw new MCRException("The content is not valid.");
-		}
-
-		MCRTypedContent tc = new MCRTypedContent();
-		tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "mycoreobject");
-		tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "ID", mcr_id.getId());
-		tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "label", mcr_label);
-		tc.addMCRTypedContent(mcr_struct.createTypedContent());
-		tc.addMCRTypedContent(mcr_metadata.createTypedContent());
-		tc.addMCRTypedContent(mcr_service.createTypedContent());
-
-		return tc;
-	}
-
-	/**
 	 * This methode create a String for all text searchable data in this
 	 * instance.
 	 * 

@@ -134,17 +134,6 @@ public interface MCRMetaInterface {
     public org.jdom.Element createXML() throws MCRException;
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public MCRTypedContent createTypedContent(boolean parasearch) throws MCRException;
-
-    /**
      * This abstract method create a String for the text searchable data.
      * 
      * @exception MCRException

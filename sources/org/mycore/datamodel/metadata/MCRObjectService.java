@@ -431,40 +431,6 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode create a typed content list for all structure data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the metadata part
-     */
-    public final MCRTypedContent createTypedContent() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-        tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "service");
-
-        if (dates.size() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_TAG, "servdates");
-
-            for (int i = 0; i < dates.size(); i++) {
-                tc.addMCRTypedContent(((MCRMetaDate) dates.get(i)).createTypedContent(true));
-            }
-        }
-
-        if (flags.size() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_TAG, "servflags");
-
-            for (int i = 0; i < flags.size(); i++) {
-                tc.addMCRTypedContent(((MCRMetaLangText) flags.get(i)).createTypedContent(true));
-            }
-        }
-
-        return tc;
-    }
-
-    /**
      * This method check the validation of the content of this class. The method
      * returns <em>true</em> if
      * <ul>

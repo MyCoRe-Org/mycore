@@ -351,43 +351,6 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public MCRTypedContent createTypedContent(boolean parasearch) throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaLink is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-        tc.addLinkElement("type", linktype);
-
-        if (linktype.equals("locator")) {
-            tc.addLinkElement("href", href);
-            tc.addLinkElement("label", label);
-            tc.addLinkElement("title", title);
-        } else {
-            tc.addLinkElement("from", from);
-            tc.addLinkElement("to", to);
-            tc.addLinkElement("title", title);
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create a String for all text searchable data in this
      * instance. Only the title string was returned.
      * 

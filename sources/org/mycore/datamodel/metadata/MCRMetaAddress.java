@@ -301,66 +301,6 @@ final public class MCRMetaAddress extends MCRMetaDefault implements MCRMetaInter
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent(boolean parasearch) throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaAddress is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "lang", lang);
-
-        if ((type = type.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "type", type);
-        }
-
-        if ((country = country.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "country");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, country);
-        }
-
-        if ((state = state.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "state");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, state);
-        }
-
-        if ((zipcode = zipcode.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "zipcode");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, zipcode);
-        }
-
-        if ((city = city.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "city");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, city);
-        }
-
-        if ((street = street.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "street");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, street);
-        }
-
-        if ((number = number.trim()).length() != 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_SUB2TAG, "number");
-            tc.addStringElement(MCRTypedContent.TYPE_VALUE, null, number);
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create a String for all text searchable data in this
      * instance.
      * 

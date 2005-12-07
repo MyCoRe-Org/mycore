@@ -56,13 +56,10 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectStructure {
-    private String NL = null;
 
     private MCRMetaLinkID parent = null;
 
     private ArrayList children = null;
-
-    private ArrayList inherited_metadata = null;
 
     private ArrayList derivates = null;
 
@@ -74,7 +71,6 @@ public class MCRObjectStructure {
      * are MCRMetaLink's.
      */
     public MCRObjectStructure(Logger log) {
-        NL = System.getProperties().getProperty("line.separator");
         children = new ArrayList();
         derivates = new ArrayList();
         logger = log;
@@ -443,47 +439,6 @@ public class MCRObjectStructure {
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-        tc.addTagElement(MCRTypedContent.TYPE_MASTERTAG, "structure");
-
-        /*
-         * if (children.size() > 0) { tc.addTagElement(tc.TYPE_TAG,"children");
-         * for (int i=0;i <children.size();i++)
-         * tc.addMCRTypedContent(((MCRMetaLink) children.get(i))
-         * .createTypedContent(true)); } if (parent != null) {
-         * tc.addTagElement(tc.TYPE_TAG,"parents"); tc.addMCRTypedContent(parent
-         * .createTypedContent(true)); if (inherited_metadata == null)
-         * collectInheritedMetadata(); tc.addTagElement(tc.TYPE_TAG,
-         * "parents_metadata"); for (int i = 0; i < inherited_metadata.size();
-         * ++i) { MCRObjectMetadata meta = (MCRObjectMetadata)
-         * inherited_metadata.get(i); for (int j = 0; j < meta.size(); ++j)
-         * tc.addMCRTypedContent(meta.getMetadataElement(meta.tagName(j))
-         * .createTypedContent()); } }
-         */
-
-        // add the derivates for the parametric searchable
-        if (derivates.size() > 0) {
-            tc.addTagElement(MCRTypedContent.TYPE_TAG, "derobjects");
-
-            for (int i = 0; i < derivates.size(); i++)
-                tc.addMCRTypedContent(((MCRMetaLink) derivates.get(i)).createTypedContent(true));
-        }
-
-        return tc;
     }
 
     /**

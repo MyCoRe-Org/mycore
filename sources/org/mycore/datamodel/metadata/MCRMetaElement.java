@@ -542,56 +542,6 @@ public class MCRMetaElement {
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param flag
-     *            true if all inherited data should be include, els false
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent(boolean flag) throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("MCRMetaElement : The content is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        int j = 0;
-
-        for (int i = 0; i < list.size(); i++) {
-            if (((MCRMetaInterface) list.get(i)).getInherited() > 0) {
-                ;
-            }
-
-            j++;
-        }
-
-        if ((j == 0) && (!flag)) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_TAG, tag);
-
-        for (int i = 0; i < list.size(); i++) {
-            if (!flag) {
-                if (((MCRMetaInterface) list.get(i)).getInherited() > 0) {
-                    continue;
-                }
-            }
-
-            tc.addMCRTypedContent(((MCRMetaInterface) list.get(i)).createTypedContent(parasearch));
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create a String for all text searchable data in this
      * instance.
      * 

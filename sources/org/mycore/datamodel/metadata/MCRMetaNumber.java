@@ -370,45 +370,6 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
     }
 
     /**
-     * This methode create a typed content list for all data in this instance.
-     * 
-     * @param parasearch
-     *            true if the data should parametric searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a MCRTypedContent with the data of the MCRObject data
-     */
-    public final MCRTypedContent createTypedContent(boolean parasearch) throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaNumber is not valid.");
-        }
-
-        MCRTypedContent tc = new MCRTypedContent();
-
-        if (!parasearch) {
-            return tc;
-        }
-
-        tc.addTagElement(MCRTypedContent.TYPE_SUBTAG, subtag);
-        tc.addDoubleElement(number);
-        tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "lang", lang);
-
-        if ((type = type.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "type", type);
-        }
-
-        if ((dimension = dimension.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "dimension", dimension);
-        }
-
-        if ((measurement = measurement.trim()).length() != 0) {
-            tc.addStringElement(MCRTypedContent.TYPE_ATTRIBUTE, "measurement", measurement);
-        }
-
-        return tc;
-    }
-
-    /**
      * This methode create a String for all text searchable data in this
      * instance.
      * 
