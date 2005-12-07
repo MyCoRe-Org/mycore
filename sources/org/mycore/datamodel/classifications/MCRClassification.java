@@ -248,11 +248,15 @@ public class MCRClassification {
 	}
 
 	/**
-	 * Finds all elements with attribute ID and gives access to them via this attribute.
-	 * It a workaround to access Element objects like the getElementById() of DOM.
+	 * Finds all elements with attribute ID and gives access to them via this
+	 * attribute. It a workaround to access Element objects like the
+	 * getElementById() of DOM.
 	 * 
-	 * @param root the root element (starting point)
-	 * @param sink a Hashtable with key(ID as String) and value(Element with that ID)
+	 * @param root
+	 *            the root element (starting point)
+	 * @param sink
+	 *            a Hashtable with key(ID as String) and value(Element with that
+	 *            ID)
 	 */
 	private static final void getHashedIDs(Element root, Hashtable sink) {
 		Iterator children = root.getChildren().iterator();
@@ -265,16 +269,20 @@ public class MCRClassification {
 			id = cur.getAttributeValue(ID_ATTR);
 			if (id != null) {
 				sink.put(id, cur);
-				LOGGER.debug("added hash for "+id+": "+cur.getAttributeValue(OBJ_COUNT_ATTR));
+				LOGGER.debug("added hash for " + id + ": " + cur.getAttributeValue(OBJ_COUNT_ATTR));
 			}
 			getHashedIDs(cur, sink); // recursive call for all children
 		}
 	}
 
 	/**
-	 * returns only these IDs in a new set that are part of oldIDs but not in newIDs.
-	 * @param oldIDs Hashtable as described in getHashedIDs()
-	 * @param newIDs Hashtable as described in getHashedIDs()
+	 * returns only these IDs in a new set that are part of oldIDs but not in
+	 * newIDs.
+	 * 
+	 * @param oldIDs
+	 *            Hashtable as described in getHashedIDs()
+	 * @param newIDs
+	 *            Hashtable as described in getHashedIDs()
 	 * @see #getHashedIDs(Element, Hashtable)
 	 * @return a Set with all IDs from oldIds that are not in newIds
 	 */
@@ -295,10 +303,14 @@ public class MCRClassification {
 	}
 
 	/**
-	 * Relinks a all children of oldParent to newParent.
-	 * This will also unlink oldParent from its parent, which removes it actually from the document tree.
-	 * @param oldParent Element to remove
-	 * @param newParent Element to link all children of oldParent
+	 * Relinks a all children of oldParent to newParent. This will also unlink
+	 * oldParent from its parent, which removes it actually from the document
+	 * tree.
+	 * 
+	 * @param oldParent
+	 *            Element to remove
+	 * @param newParent
+	 *            Element to link all children of oldParent
 	 */
 	private static final void moveChildren(Element oldParent, Element newParent) {
 		LOGGER.debug("gently removing " + oldParent.getName() + " with ID " + oldParent.getAttributeValue(ID_ATTR) + " parent is " + newParent.getName());
@@ -314,11 +326,15 @@ public class MCRClassification {
 
 	/**
 	 * Removes all categories from the document that IDs are not in keepIDs.
-	 * This method preserves any affinity of the categories that a kept.
-	 * For example if category ID X is an ancestor of category Y and both are in keepIDs,
-	 * than after the rake X is still ancestor of Y. But both maybe close on an ancestor axis after the rake operation.
-	 * @param oldDoc document in MyCoRe XML view of a classification 
-	 * @param keepIDs IDs that should be kept
+	 * This method preserves any affinity of the categories that a kept. For
+	 * example if category ID X is an ancestor of category Y and both are in
+	 * keepIDs, than after the rake X is still ancestor of Y. But both maybe
+	 * close on an ancestor axis after the rake operation.
+	 * 
+	 * @param oldDoc
+	 *            document in MyCoRe XML view of a classification
+	 * @param keepIDs
+	 *            IDs that should be kept
 	 * @return
 	 */
 	private static final Document rakeDocument(Document oldDoc, Set keepIDs) {
@@ -350,10 +366,12 @@ public class MCRClassification {
 	}
 
 	/**
-	 * helps rakeDocument to function.
-	 * It's just a recursive helper function
-	 * @param root the current Element
-	 * @param keepIDs IDs that should be kept
+	 * helps rakeDocument to function. It's just a recursive helper function
+	 * 
+	 * @param root
+	 *            the current Element
+	 * @param keepIDs
+	 *            IDs that should be kept
 	 * @return true if the element should be removed
 	 */
 	private static final boolean rakeElement(Element root, Set keepIDs) {
@@ -382,11 +400,16 @@ public class MCRClassification {
 
 	/**
 	 * checks if there are links to any category under root.
-	 * @param classID the classification ID of the categories
-	 * @param root the current Element/root element
-	 * @param oldClass HashTable as in getHashedIDs()
+	 * 
+	 * @param classID
+	 *            the classification ID of the categories
+	 * @param root
+	 *            the current Element/root element
+	 * @param oldClass
+	 *            HashTable as in getHashedIDs()
 	 * @see #getHashedIDs(Element, Hashtable)
-	 * @throws MCRActiveLinkException if links to any category under root where detected
+	 * @throws MCRActiveLinkException
+	 *             if links to any category under root where detected
 	 */
 	private final static void checkActiveLinks(String classID, Element root, Map oldClass) throws MCRActiveLinkException {
 		Iterator children = root.getChildren().iterator();
@@ -454,10 +477,15 @@ public class MCRClassification {
 	}
 
 	/**
-	 * Returns a set of IDs that a root of a subtree so, that the root of the subtree has in oldClass a different parent than in newClass.
-	 * @param oldClass old Classification
-	 * @param newClass new Classification
-	 * @param removedIDs Set to gather if IDs are available in newClass
+	 * Returns a set of IDs that a root of a subtree so, that the root of the
+	 * subtree has in oldClass a different parent than in newClass.
+	 * 
+	 * @param oldClass
+	 *            old Classification
+	 * @param newClass
+	 *            new Classification
+	 * @param removedIDs
+	 *            Set to gather if IDs are available in newClass
 	 * @return
 	 */
 	private final Set diff(Document oldClass, Document newClass, Set removedIDs) {
@@ -468,10 +496,15 @@ public class MCRClassification {
 
 	/**
 	 * helps diff for recursive calls;
-	 * @param oldCateg old Category element with the same ID as
-	 * @param newCateg new Category element
-	 * @param markedIDs Set to save the IDs as noted in main diff()
-	 * @param removedIDs Set to gather if IDs are available in newClass
+	 * 
+	 * @param oldCateg
+	 *            old Category element with the same ID as
+	 * @param newCateg
+	 *            new Category element
+	 * @param markedIDs
+	 *            Set to save the IDs as noted in main diff()
+	 * @param removedIDs
+	 *            Set to gather if IDs are available in newClass
 	 * @see #diff(Document, Document, Set)
 	 */
 	private final void diff(Element oldCateg, Element newCateg, Set markedIDs, Set removedIDs) {
@@ -531,7 +564,9 @@ public class MCRClassification {
 	 * Will hash all Elements in a list to a Hashtable.
 	 * 
 	 * This is strictly non recursive. For a recursive call see getHashedIDs()
-	 * @param children a list with elements to hash
+	 * 
+	 * @param children
+	 *            a list with elements to hash
 	 * @return a Hashtable with hashed elements of children
 	 * @see #getHashedIDs(Element, Hashtable);
 	 */
@@ -550,15 +585,21 @@ public class MCRClassification {
 
 	/**
 	 * Saves all document links under category for later use in sink.
-	 * @param classId the classification ID of the categories
-	 * @param categid the root of the category sub tree
-	 * @param sink this is where the information is saved to
-	 * @param idMap a Hashtable of the old Classification as described in getHashedIds()
+	 * 
+	 * @param classId
+	 *            the classification ID of the categories
+	 * @param categid
+	 *            the root of the category sub tree
+	 * @param sink
+	 *            this is where the information is saved to
+	 * @param idMap
+	 *            a Hashtable of the old Classification as described in
+	 *            getHashedIds()
 	 * @see #getHashedIDs(Element, Hashtable)
 	 */
 	private final void saveOldLinks(String classId, String categid, Map sink, Map idMap) {
-		LOGGER.debug("saving old links for "+classId+"##"+categid);
-		Element el=(Element) idMap.get(categid);
+		LOGGER.debug("saving old links for " + classId + "##" + categid);
+		Element el = (Element) idMap.get(categid);
 		String attr = el.getAttributeValue(OBJ_COUNT_ATTR);
 		if (attr != null && attr.equals("0")) {
 			return;
@@ -705,13 +746,16 @@ public class MCRClassification {
 	 * @exception MCRException
 	 *                if the parser can't build a JDOM tree
 	 */
-	public final String updateFromXML(byte[] xml) throws MCRException {
+	public final String updateFromXML(byte[] xml) throws MCRActiveLinkException, MCRException {
 		try {
 			org.jdom.input.SAXBuilder bulli = new org.jdom.input.SAXBuilder(false);
 			org.jdom.Document jdom = bulli.build(new ByteArrayInputStream(xml));
 
 			return updateFromJDOM(jdom);
 		} catch (Exception e) {
+			if (e instanceof MCRActiveLinkException) {
+				throw (MCRActiveLinkException) e;
+			}
 			throw new MCRException(e.getMessage());
 		}
 	}
@@ -723,13 +767,17 @@ public class MCRClassification {
 	 *            the classification URI
 	 * @exception MCRException
 	 *                if the parser can't build a JDOM tree
+	 * @throws MCRActiveLinkException
 	 */
-	public final String updateFromURI(String uri) throws MCRException {
+	public final String updateFromURI(String uri) throws MCRException, MCRActiveLinkException {
 		try {
 			org.jdom.Document jdom = MCRXMLHelper.parseURI(uri);
 
 			return updateFromJDOM(jdom);
 		} catch (Exception e) {
+			if (e instanceof MCRActiveLinkException) {
+				throw (MCRActiveLinkException) e;
+			}
 			throw new MCRException(e.getMessage(), e);
 		}
 	}

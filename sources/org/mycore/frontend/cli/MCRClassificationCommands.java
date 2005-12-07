@@ -30,6 +30,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -77,12 +78,11 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRClassification that should be deleted
      */
-    public static void delete(String ID) throws Exception {
+    public static void delete(String ID) throws MCRActiveLinkException {
         MCRObjectID mcr_id = new MCRObjectID(ID);
-        MCRClassification cl = new MCRClassification();
 
         try {
-            cl.delete(mcr_id.getId());
+            MCRClassification.delete(mcr_id.getId());
             LOGGER.info(mcr_id.getId() + " deleted.");
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -97,8 +97,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
+     * @throws MCRActiveLinkException 
      */
-    public static void loadFromDirectory(String directory) {
+    public static void loadFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, false);
     }
 
@@ -107,8 +108,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
+     * @throws MCRActiveLinkException 
      */
-    public static void updateFromDirectory(String directory) {
+    public static void updateFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, true);
     }
 
@@ -120,8 +122,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else Classification
      *            is created
+     * @throws MCRActiveLinkException 
      */
-    private static void processFromDirectory(String directory, boolean update) {
+    private static void processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -158,8 +161,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the location of the xml file
+     * @throws MCRActiveLinkException 
      */
-    public static boolean loadFromFile(String file) {
+    public static boolean loadFromFile(String file) throws MCRActiveLinkException {
         return processFromFile(file, false);
     }
 
@@ -168,8 +172,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the location of the xml file
+     * @throws MCRActiveLinkException 
      */
-    public static boolean updateFromFile(String file) {
+    public static boolean updateFromFile(String file) throws MCRActiveLinkException {
         return processFromFile(file, true);
     }
 
@@ -181,8 +186,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else classification
      *            is created
+     * @throws MCRActiveLinkException 
      */
-    private static boolean processFromFile(String file, boolean update) {
+    private static boolean processFromFile(String file, boolean update) throws MCRActiveLinkException {
         if (!file.endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
