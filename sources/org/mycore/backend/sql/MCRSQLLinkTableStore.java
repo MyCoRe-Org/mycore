@@ -363,7 +363,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 		Map map = new HashMap();
 		StringBuffer select = new StringBuffer();
 
-		select.append("SELECT COUNT( A.MCRFROM ) AS NUMBER, A.MCRTO AS KEY FROM ").append(tableName).append(" A where MCRTO like '").append(mcrtoPrefix)
+		select.append("SELECT COUNT( A.MCRFROM ) AS NUMBER, A.MCRTO AS MYKEY FROM ").append(tableName).append(" A where MCRTO like '").append(mcrtoPrefix)
 				.append("%' group by MCRTO");
 
 		logger.info("STATEMENT:    " + select);
@@ -376,7 +376,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 			MCRSQLRowReader reader = conn.doQuery(select.toString());
 			while (reader.next()) {
 				num = reader.getInt("NUMBER");
-				key = reader.getString("KEY");
+				key = reader.getString("MYKEY");
 				map.put(key, new Integer(num));
 			}
 			reader.close();
