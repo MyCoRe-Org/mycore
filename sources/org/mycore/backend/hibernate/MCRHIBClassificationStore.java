@@ -458,22 +458,25 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
     	MCRClassificationItem[] classList =null;
     	
         try {
-        	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang
-            List l = session.createQuery("MCRCLASSLABEL ORDER BY 1,2").list();
-            classList = new MCRClassificationItem[l.size()];
+        	//SELECT count * from MCRCLASS !!! ist redundanzfrei!
+            List lcount = session.createQuery("from MCRCLASS").list();
+            classList = new MCRClassificationItem[lcount.size()];
+            
+        	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang, !! ist mehr als count * from MCRCLASS
+            List l = session.createQuery("from MCRCLASSLABEL ORDER BY 1,2").list();
             
             int k = -1;
 
             for(int i=0; i < classList.length; i++) {
             	MCRCLASSLABEL actual = (MCRCLASSLABEL)l.get(i);
-            	if ( k==-1 || !classList[i].getClassificationID().equalsIgnoreCase(actual.getId()) ){
+            	if ( k==-1 || !classList[k].getClassificationID().equalsIgnoreCase(actual.getId()) ){
             		k++;
-                    //logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + ID);
+                    logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + actual.getId());
             		classList[k] = new MCRClassificationItem(actual.getId());
-               		//logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + ID);
+               		logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + actual.getId());
                	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
             	} else {
-            		//logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + ID);
+            		logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + actual.getId());
                	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
             	}
             }
