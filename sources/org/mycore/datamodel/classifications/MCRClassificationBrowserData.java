@@ -143,13 +143,15 @@ public class MCRClassificationBrowserData
 		pageName  = config.getString( "MCR.classeditor.EmbeddingPage" );
 		xslStyle  = config.getString( "MCR.classeditor.Style" );
 		sort      = "false";
+		view	  = "tree";
+		
 		if ( classifID.length() == 0) {
 			return;
 		}
 	}
 	
 	if ( emptyLeafs == null ) 						emptyLeafs = "yes";
-	if ( view == null || !view.endsWith("tree") ) 	view = "flat";
+	if ( view == null || !view.endsWith("flat") ) 	view = "tree";
 	if ( comments == null ) 		 				comments = "false";
 
 	setClassification(classifID);
@@ -297,7 +299,7 @@ public class MCRClassificationBrowserData
 	 String browserClass = "";
 	 String Counter = "";
 	 
-	 for(int i=0; i<clI.length; i++ ) {
+	 for(int i=0; i<clI.length && clI[i] != null; i++ ) {
 		  Element cli = clI[i].getClassificationItemAsJDom();
 		  try {
 			  browserClass  = config.getString( "MCR.classeditor." + clI[i].getClassificationID() );

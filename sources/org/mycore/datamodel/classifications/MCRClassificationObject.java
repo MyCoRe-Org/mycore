@@ -600,11 +600,11 @@ public abstract class MCRClassificationObject {
    
     public Document receiveClassificationAsJDOM(String clid) {
  	   //	 Klassification laden!
- 	   MCRClassification cl = new MCRClassification();
+ 	   //MCRClassification cl = new MCRClassification();
  	   String cachingID = getClassificationID();
         Document cljdom =  (Document)(	manager().jDomCache.get(cachingID));
         if (cljdom == null) {
-     	   cljdom = cl.receiveClassificationAsJDOM(getClassificationID());
+     	   cljdom = MCRClassification.receiveClassificationAsJDOM(getClassificationID());
     	  	   manager().jDomCache.put(cachingID,cljdom); 
         }
         return cljdom;
