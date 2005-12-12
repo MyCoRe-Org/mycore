@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.mycore.common.MCRException;
+
 /**
  * This exception holds information about a link condition that did not allow a
  * certain action to be performed.
@@ -37,7 +39,7 @@ import java.util.Map;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRActiveLinkException extends Exception {
+public class MCRActiveLinkException extends MCRException {
 
 	/**
 	 * 
