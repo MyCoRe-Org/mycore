@@ -184,11 +184,13 @@ public class MCRClassificationBrowserData
     classif 		= MCRClassificationItem.getClassificationItem(classifID);
     categItem 		= classif.getChildrenFromJDom();    //classif.getChildren();
     
+    totalNumOfDocs=0;
     
     for( int i = 0,j = classif.getNumChildren(); i<j; i++) {
       lines.addElement( new MCRNavigTreeLine( categItem[i] , 1 )) ;
+      totalNumOfDocs += categItem[i].counter;
     }
-        
+    
   }
 
   private void clearPath(String[] uriParts )  throws Exception {
@@ -299,7 +301,7 @@ public class MCRClassificationBrowserData
 	 String browserClass = "";
 	 String Counter = "";
 	 
-	 for(int i=0; i<clI.length && clI[i] != null; i++ ) {
+	for(int i=0; i<clI.length && clI[i] != null; i++ ) {
 		  Element cli = clI[i].getClassificationItemAsJDom();
 		  try {
 			  browserClass  = config.getString( "MCR.classeditor." + clI[i].getClassificationID() );
@@ -348,7 +350,7 @@ public class MCRClassificationBrowserData
 	 xDocument.addContent( xDesc );
 
 	 Element xDocuments = new Element( "cntDocuments" );
-	 xDocuments.addContent(String.valueOf( cl.countDocLinks(doctypeArray, restriction)) );
+	 xDocuments.addContent(String.valueOf(totalNumOfDocs) );   // cl.countDocLinks(doctypeArray, restriction)) );
 	 xDocument.addContent( xDocuments );
 
 	 Element xShowComments = new Element( "showComments" );
