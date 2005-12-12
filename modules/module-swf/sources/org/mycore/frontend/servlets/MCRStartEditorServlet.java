@@ -537,7 +537,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 				String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
 				String subject = "Automaticaly message from " + appl;
 				StringBuffer text = new StringBuffer();
-				text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow gelöscht.");
+				text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow gelï¿½scht.");
 				LOGGER.info(text.toString());
 
 				try {
@@ -579,7 +579,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 				String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
 				String subject = "Automaticaly message from " + appl;
 				StringBuffer text = new StringBuffer();
-				text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" aus dem Workflow gelöscht.");
+				text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" aus dem Workflow gelï¿½scht.");
 				LOGGER.info(text.toString());
 
 				try {
@@ -639,11 +639,11 @@ public class MCRStartEditorServlet extends MCRServlet {
 				} else {
 					myfile = storeerrorpage;
 				}
-			} catch (MCRException e) {
-				myfile = storeerrorpage;
 			} catch (MCRActiveLinkException e) {
 				generateActiveLinkErrorpage(job.getRequest(), job.getResponse(), "Error while commiting work to the server.", e);
 				return;
+            } catch (MCRException e) {
+                myfile = storeerrorpage;
 			}
 			job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + myfile));
 
@@ -856,7 +856,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 				String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
 				String subject = "Automaticaly message from " + appl;
 				StringBuffer text = new StringBuffer();
-				text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mytfmcrid).append(" aus dem Server gelöscht.");
+				text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mytfmcrid).append(" aus dem Server gelï¿½scht.");
 				LOGGER.info(text.toString());
 
 				try {
@@ -910,7 +910,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 				String subject = "Automaticaly message from " + appl;
 				StringBuffer text = new StringBuffer();
 				text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(
-						" aus dem Server gelöscht.");
+						" aus dem Server gelï¿½scht.");
 				LOGGER.info(text.toString());
 
 				try {
