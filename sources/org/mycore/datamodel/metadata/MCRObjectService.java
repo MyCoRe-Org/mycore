@@ -63,7 +63,7 @@ public class MCRObjectService {
     private String lang = null;
 
     private ArrayList dates = null;
-    
+
     private ArrayList users = null;
 
     private ArrayList groups = null;
@@ -77,7 +77,7 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang","en");
+        lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
         dates = new ArrayList();
 
         MCRMetaDate d = new MCRMetaDate("service", "servdate", lang, "createdate", 0, new GregorianCalendar());
@@ -219,9 +219,10 @@ public class MCRObjectService {
      * 
      * @return the size of the date list
      */
-    public final int getDateSize()
-    { return dates.size(); }
-    
+    public final int getDateSize() {
+        return dates.size();
+    }
+
     /**
      * This method get a date for a given type. If the type was not found, an
      * null was returned.
@@ -379,9 +380,10 @@ public class MCRObjectService {
      * 
      * @return the size of the flag list
      */
-    public final int getFlagSize()
-    { return flags.size(); }
-    
+    public final int getFlagSize() {
+        return flags.size();
+    }
+
     /**
      * This methode get a single flag from the flag list as a string.
      * 
@@ -470,9 +472,16 @@ public class MCRObjectService {
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             return;
         }
-
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servuser", null, type, 0, null, value);
-        users.add(flag);
+        boolean test = true;
+        for (int i = 0; i < users.size(); i++) {
+            if (((MCRMetaLangText) users.get(i)).getText().equals(value) && ((MCRMetaLangText) users.get(i)).getType().equals(type)) {
+                test = false;
+            }
+        }
+        if (test) {
+            MCRMetaLangText user = new MCRMetaLangText("service", "servuser", null, type, 0, null, value);
+            users.add(user);
+        }
     }
 
     /**
@@ -480,9 +489,10 @@ public class MCRObjectService {
      * 
      * @return the size of the user list
      */
-    public final int getUserSize()
-    { return users.size(); }
-    
+    public final int getUserSize() {
+        return users.size();
+    }
+
     /**
      * This methode get a single user from the user list as a string.
      * 
@@ -529,7 +539,7 @@ public class MCRObjectService {
         users.remove(index);
     }
 
-   /**
+    /**
      * This methode add a group to the groups list.
      * 
      * @param value -
@@ -542,9 +552,16 @@ public class MCRObjectService {
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             return;
         }
-
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servgroup", null, type, 0, null, value);
-        groups.add(flag);
+        boolean test = true;
+        for (int i = 0; i < groups.size(); i++) {
+            if (((MCRMetaLangText) groups.get(i)).getText().equals(value) && ((MCRMetaLangText) groups.get(i)).getType().equals(type)) {
+                test = false;
+            }
+        }
+        if (test) {
+            MCRMetaLangText flag = new MCRMetaLangText("service", "servgroup", null, type, 0, null, value);
+            groups.add(flag);
+        }
     }
 
     /**
@@ -552,9 +569,10 @@ public class MCRObjectService {
      * 
      * @return the size of the group list
      */
-    public final int getGroupSize()
-    { return groups.size(); }
-    
+    public final int getGroupSize() {
+        return groups.size();
+    }
+
     /**
      * This methode get a single group from the group list as a string.
      * 
@@ -606,7 +624,8 @@ public class MCRObjectService {
      * 
      * @param value -
      *            the new ip as string
-     *            @param type - the new type of ip ip/netmask or domain name
+     * @param type -
+     *            the new type of ip ip/netmask or domain name
      */
     public final void addIP(String value, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
@@ -615,9 +634,16 @@ public class MCRObjectService {
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             return;
         }
-
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servip", null, type, 0, null, value);
-        ips.add(flag);
+        boolean test = true;
+        for (int i = 0; i < ips.size(); i++) {
+            if (((MCRMetaLangText) ips.get(i)).getText().equals(value) && ((MCRMetaLangText) ips.get(i)).getType().equals(type)) {
+                test = false;
+            }
+        }
+        if (test) {
+            MCRMetaLangText flag = new MCRMetaLangText("service", "servip", null, type, 0, null, value);
+            ips.add(flag);
+        }
     }
 
     /**
@@ -625,9 +651,10 @@ public class MCRObjectService {
      * 
      * @return the size of the ip list
      */
-    public final int getIPSize()
-    { return ips.size(); }
-    
+    public final int getIPSize() {
+        return ips.size();
+    }
+
     /**
      * This methode get a single ip from the ip list as a string.
      * 
@@ -642,7 +669,7 @@ public class MCRObjectService {
 
         return ((MCRMetaLangText) ips.get(index)).getText();
     }
-    
+
     /**
      * This methode get a single type of ip from the ip list as a string.
      * 
@@ -726,13 +753,13 @@ public class MCRObjectService {
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
-            for (int i = 0; i < users.size(); i++) {
-                elmm.addContent(((MCRMetaLangText) users.get(i)).createXML());
+            for (int i = 0; i < groups.size(); i++) {
+                elmm.addContent(((MCRMetaLangText) groups.get(i)).createXML());
             }
 
             elm.addContent(elmm);
         }
-        
+
         if (ips.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servips");
             elmm.setAttribute("class", "MCRMetaLangText");
@@ -761,8 +788,6 @@ public class MCRObjectService {
 
             elm.addContent(elmm);
         }
-
-
 
         return elm;
     }
@@ -797,55 +822,59 @@ public class MCRObjectService {
      *            the value of a user as string
      * 
      */
-    public final int getUserIndex(String value) {
+    public final int getUserIndex(String value, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
 
         for (int i = 0; i < users.size(); i++) {
-            if (((MCRMetaLangText) users.get(i)).getText().equals(value)) {
+            if (((MCRMetaLangText) users.get(i)).getText().equals(value) && ((MCRMetaLangText) users.get(i)).getType().equals(type)) {
                 return i;
             }
         }
 
         return -1;
     }
-    
+
     /**
      * This methode returns the index for the given group value.
      * 
      * @param value
      *            the value of a group as string
+     * @param type
+     *            the pool if an ip as string
      * 
      */
-    public final int getGroupIndex(String value) {
+    public final int getGroupIndex(String value, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
 
         for (int i = 0; i < groups.size(); i++) {
-            if (((MCRMetaLangText) groups.get(i)).getText().equals(value)) {
+            if (((MCRMetaLangText) groups.get(i)).getText().equals(value) && ((MCRMetaLangText) groups.get(i)).getType().equals(type)) {
                 return i;
             }
         }
 
         return -1;
     }
-    
+
     /**
      * This methode returns the index for the given ip value.
      * 
      * @param value
-     *            the value of a ip as string
+     *            the value of an ip as string
+     * @param type
+     *            the pool if an ip as string
      * 
      */
-    public final int getIPIndex(String value) {
+    public final int getIPIndex(String value, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
 
         for (int i = 0; i < ips.size(); i++) {
-            if (((MCRMetaLangText) ips.get(i)).getText().equals(value)) {
+            if (((MCRMetaLangText) ips.get(i)).getText().equals(value) && ((MCRMetaLangText) ips.get(i)).getType().equals(type)) {
                 return i;
             }
         }
@@ -858,6 +887,8 @@ public class MCRObjectService {
      * 
      * @param value
      *            the value of a flag as string
+     * @param type
+     *            the pool if an ip as string
      * 
      */
     public final int getFlagIndex(String value) {
@@ -873,6 +904,5 @@ public class MCRObjectService {
 
         return -1;
     }
-    
-}
 
+}
