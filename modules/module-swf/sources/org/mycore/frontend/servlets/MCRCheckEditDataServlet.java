@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCRWorkflowManager;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -77,7 +77,7 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 	 *            the MCRObjectID of the MCRObject
 	 */
 	public final void sendMail(MCRObjectID ID) {
-		MCRWorkflowManager wfm = MCRWorkflowManager.instance();
+		MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
 		List addr = wfm.getMailAddress(ID.getTypeId(), "weditobj");
 
 		if (addr.size() == 0) {

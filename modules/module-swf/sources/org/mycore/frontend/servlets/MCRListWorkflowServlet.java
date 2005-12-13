@@ -38,7 +38,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.workflow.MCRWorkflowManager;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.user.MCRUserMgr;
 
 /**
@@ -48,7 +48,7 @@ import org.mycore.user.MCRUserMgr;
  * <p />
  * &gt;mcr_workflow type="..." step="..."&lt; <br />
  * &gt;item ID="..."&lt; <br />
- * &gt;label&lt;Die 99 582 am Lokschuppen in Schönheide&gt;/label&lt; <br />
+ * &gt;label&lt;Die 99 582 am Lokschuppen in Schï¿½nheide&gt;/label&lt; <br />
  * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt; <br />
  * &gt;data&lt;2004-06-08&gt;/data&lt; <br />
  * &gt;derivate ID="..." label="..."&lt; <br />
@@ -67,7 +67,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRListWorkflowServlet.class.getName());
 
     // The workflow manager
-    private static MCRWorkflowManager WFM = null;
+    private static MCRSimpleWorkflowManager WFM = null;
 
     // The file slash
     private static String SLASH = System.getProperty("file.separator");
@@ -77,7 +77,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
     /** Initialisation of the servlet */
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
         super.init();
-        WFM = MCRWorkflowManager.instance();
+        WFM = MCRSimpleWorkflowManager.instance();
         DefaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
     }
 

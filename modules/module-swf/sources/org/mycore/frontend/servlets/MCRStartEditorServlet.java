@@ -53,7 +53,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
-import org.mycore.frontend.workflow.MCRWorkflowManager;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
@@ -88,7 +88,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 	private static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
 	// The workflow manager
-	private static MCRWorkflowManager WFM = null;
+	private static MCRSimpleWorkflowManager WFM = null;
 
 	// the SQL data table
 	private static MCRXMLTableManager MCR_XMLTABLE = null;
@@ -101,7 +101,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 		super.init();
 
 		// Workflow Manager
-		WFM = MCRWorkflowManager.instance();
+		WFM = MCRSimpleWorkflowManager.instance();
 
 		// XML table manager
 		MCR_XMLTABLE = MCRXMLTableManager.instance();

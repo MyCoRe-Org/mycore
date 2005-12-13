@@ -29,7 +29,7 @@ import java.util.List;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCRWorkflowManager;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -65,7 +65,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 	 */
 	public final String getNextURL(MCRObjectID ID) throws MCRActiveLinkException {
 		// commit to the server
-		MCRWorkflowManager wfm = MCRWorkflowManager.instance();
+		MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
 		boolean b = wfm.commitMetadataObject(ID.getTypeId(), ID.getId());
 
 		if (b) {
@@ -94,7 +94,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 	 *            the MCRObjectID of the MCRObject
 	 */
 	public final void sendMail(MCRObjectID ID) {
-		MCRWorkflowManager wfm = MCRWorkflowManager.instance();
+		MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
 		List addr = wfm.getMailAddress(ID.getTypeId(), "wcommit");
 
 		if (addr.size() == 0) {
