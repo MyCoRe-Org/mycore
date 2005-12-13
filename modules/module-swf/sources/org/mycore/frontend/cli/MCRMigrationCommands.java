@@ -52,7 +52,7 @@ final class MCRMigrationCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("migrate xml data {0} to access system", "org.mycore.frontend.cli.MCRMigrateCommands.mirgateXMLToAccessSystem", "The command imigrate all servflag access data to the access system of MyCoRe 1.3.");
+        com = new MCRCommand("migrate xml access data of type {0}", "org.mycore.frontend.cli.MCRMigrationCommands.mirgateXMLToAccessSystem String", "The command imigrate all servflag access data to the access system of MyCoRe 1.3.");
         command.add(com);
     }
 
