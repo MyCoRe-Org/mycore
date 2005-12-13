@@ -24,7 +24,6 @@
 package org.mycore.user;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 
 /**
  * Instances of this class store contact information of MyCoRe users.
@@ -42,8 +41,6 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRUserContact {
     private static Logger logger = Logger.getLogger(MCRUserContact.class.getName());
-
-    private static MCRConfiguration config = null;
 
     /** The maximum length of the salutation string */
     public final static int salutation_len = 24;
@@ -204,7 +201,6 @@ public class MCRUserContact {
      * This method initializes this object with empty attributes.
      */
     private final void init() {
-        config = MCRConfiguration.instance();
         salutation = "";
         firstname = "";
         lastname = "";

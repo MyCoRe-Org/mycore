@@ -892,11 +892,30 @@ public class MCRUserMgr {
      * @param priv
      *            the privilege as String
      */
-    public final boolean hasPrivilege(String user, String priv) {
+    public final boolean hasUserPrivilege(String user, String priv) {
         try {
             MCRUser u = retrieveUser(user, false);
 
             return u.hasPrivilege(priv);
+        } catch (MCRException e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * The method checks if a group has a certain privilege.
+     * 
+     * @param group
+     *            the group name as String
+     * @param priv
+     *            the privilege as String
+     */
+    public final boolean hasGroupPrivilege(String group, String priv) {
+        try {
+            MCRGroup g = retrieveGroup(group, false);
+
+            return g.hasPrivilege(priv);
         } catch (MCRException e) {
         }
 

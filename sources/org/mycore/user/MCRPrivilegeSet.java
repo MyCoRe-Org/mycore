@@ -47,15 +47,9 @@ public class MCRPrivilegeSet {
     /** The one and only instance of this class */
     private static MCRPrivilegeSet theInstance = null;
 
-    /** The instance of MCRConfiguration */
-    private MCRConfiguration conf = null;
-
     /** private constructor to create the singleton instance. */
     private MCRPrivilegeSet() throws MCRException {
         ArrayList privs = new ArrayList();
-
-        // Load the configuration
-        conf = MCRConfiguration.instance();
 
         // Get the user store name
         try {
@@ -156,11 +150,4 @@ public class MCRPrivilegeSet {
         return jdomDoc;
     }
 
-    /**
-     * This helper method replaces null with an empty string and trims
-     * whitespace from non-null strings.
-     */
-    private static String trim(String s) {
-        return (s != null) ? s.trim() : "";
-    }
 }
