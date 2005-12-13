@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * This class implements all methode for handling one document service data. The
@@ -58,15 +59,16 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-    // common data
-    private String NL;
-
-    private static String DEFAULT_LANGUAGE = "de";
-
     // service data
     private String lang = null;
 
     private ArrayList dates = null;
+    
+    private ArrayList users = null;
+
+    private ArrayList groups = null;
+
+    private ArrayList ips = null;
 
     private ArrayList flags = null;
 
@@ -75,14 +77,16 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        NL = new String((System.getProperties()).getProperty("line.separator"));
-        lang = DEFAULT_LANGUAGE;
+        lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang","en");
         dates = new ArrayList();
 
         MCRMetaDate d = new MCRMetaDate("service", "servdate", lang, "createdate", 0, new GregorianCalendar());
         dates.add(d);
         d = new MCRMetaDate("service", "servdate", lang, "modifydate", 0, new GregorianCalendar());
         dates.add(d);
+        users = new ArrayList();
+        groups = new ArrayList();
+        ips = new ArrayList();
         flags = new ArrayList();
     }
 
@@ -132,13 +136,68 @@ public class MCRObjectService {
             }
         }
 
+        // User part
+        org.jdom.Element users_element = service_element.getChild("servusers");
+        if (users_element != null) {
+            List user_element_list = users_element.getChildren();
+            int user_len = user_element_list.size();
+            for (int i = 0; i < user_len; i++) {
+                org.jdom.Element user_element = (org.jdom.Element) user_element_list.get(i);
+                String user_element_name = user_element.getName();
+                if (!user_element_name.equals("servuser")) {
+                    continue;
+                }
+                MCRMetaLangText user = new MCRMetaLangText();
+                user.setLang(lang);
+                user.setDataPart("service");
+                user.setFromDOM(user_element);
+                users.add(user);
+            }
+        }
+
+        // Group part
+        org.jdom.Element groups_element = service_element.getChild("servgroups");
+        if (groups_element != null) {
+            List group_element_list = groups_element.getChildren();
+            int group_len = group_element_list.size();
+            for (int i = 0; i < group_len; i++) {
+                org.jdom.Element group_element = (org.jdom.Element) group_element_list.get(i);
+                String group_element_name = group_element.getName();
+                if (!group_element_name.equals("servgroup")) {
+                    continue;
+                }
+                MCRMetaLangText group = new MCRMetaLangText();
+                group.setLang(lang);
+                group.setDataPart("service");
+                group.setFromDOM(group_element);
+                groups.add(group);
+            }
+        }
+
+        // IP part
+        org.jdom.Element ips_element = service_element.getChild("servips");
+        if (ips_element != null) {
+            List ip_element_list = ips_element.getChildren();
+            int ip_len = ip_element_list.size();
+            for (int i = 0; i < ip_len; i++) {
+                org.jdom.Element ip_element = (org.jdom.Element) ip_element_list.get(i);
+                String ip_element_name = ip_element.getName();
+                if (!ip_element_name.equals("servip")) {
+                    continue;
+                }
+                MCRMetaLangText ip = new MCRMetaLangText();
+                ip.setLang(lang);
+                ip.setDataPart("service");
+                ip.setFromDOM(ip_element);
+                ips.add(ip);
+            }
+        }
+
         // Flag part
         org.jdom.Element flags_element = service_element.getChild("servflags");
-
         if (flags_element != null) {
             List flag_element_list = flags_element.getChildren();
             int flag_len = flag_element_list.size();
-
             for (int i = 0; i < flag_len; i++) {
                 org.jdom.Element flag_element = (org.jdom.Element) flag_element_list.get(i);
                 String flag_element_name = flag_element.getName();
@@ -146,7 +205,6 @@ public class MCRObjectService {
                 if (!flag_element_name.equals("servflag")) {
                     continue;
                 }
-
                 MCRMetaLangText flag = new MCRMetaLangText();
                 flag.setLang(lang);
                 flag.setDataPart("service");
@@ -156,6 +214,14 @@ public class MCRObjectService {
         }
     }
 
+    /**
+     * This method return the size of the date list.
+     * 
+     * @return the size of the date list
+     */
+    public final int getDateSize()
+    { return dates.size(); }
+    
     /**
      * This method get a date for a given type. If the type was not found, an
      * null was returned.
@@ -309,6 +375,14 @@ public class MCRObjectService {
     }
 
     /**
+     * This method return the size of the flag list.
+     * 
+     * @return the size of the flag list
+     */
+    public final int getFlagSize()
+    { return flags.size(); }
+    
+    /**
      * This methode get a single flag from the flag list as a string.
      * 
      * @exception IndexOutOfBoundsException
@@ -317,7 +391,7 @@ public class MCRObjectService {
      */
     public final String getFlag(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > flags.size())) {
-            throw new IndexOutOfBoundsException("Index error in removeFlag.");
+            throw new IndexOutOfBoundsException("Index error in getFlag.");
         }
 
         return ((MCRMetaLangText) flags.get(index)).getText();
@@ -384,6 +458,223 @@ public class MCRObjectService {
     }
 
     /**
+     * This methode add a user to the users list.
+     * 
+     * @param value -
+     *            the new user as string
+     */
+    public final void addUser(String value, String type) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return;
+        }
+        if ((type == null) || ((type = type.trim()).length() == 0)) {
+            return;
+        }
+
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servuser", null, type, 0, null, value);
+        users.add(flag);
+    }
+
+    /**
+     * This method return the size of the user list.
+     * 
+     * @return the size of the user list
+     */
+    public final int getUserSize()
+    { return users.size(); }
+    
+    /**
+     * This methode get a single user from the user list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a user string
+     */
+    public final String getUser(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > users.size())) {
+            throw new IndexOutOfBoundsException("Index error in getUser.");
+        }
+
+        return ((MCRMetaLangText) users.get(index)).getText();
+    }
+
+    /**
+     * This methode get a single type of user from the user list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a user type string
+     */
+    public final String getUserType(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > users.size())) {
+            throw new IndexOutOfBoundsException("Index error in getUserType.");
+        }
+
+        return ((MCRMetaLangText) users.get(index)).getType();
+    }
+
+    /**
+     * This methode remove a user from the user list.
+     * 
+     * @param index
+     *            a index in the list
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     */
+    public final void removeUser(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > users.size())) {
+            throw new IndexOutOfBoundsException("Index error in removeUser.");
+        }
+
+        users.remove(index);
+    }
+
+   /**
+     * This methode add a group to the groups list.
+     * 
+     * @param value -
+     *            the new group as string
+     */
+    public final void addGroup(String value, String type) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return;
+        }
+        if ((type == null) || ((type = type.trim()).length() == 0)) {
+            return;
+        }
+
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servgroup", null, type, 0, null, value);
+        groups.add(flag);
+    }
+
+    /**
+     * This method return the size of the group list.
+     * 
+     * @return the size of the group list
+     */
+    public final int getGroupSize()
+    { return groups.size(); }
+    
+    /**
+     * This methode get a single group from the group list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a group string
+     */
+    public final String getGroup(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > groups.size())) {
+            throw new IndexOutOfBoundsException("Index error in getGroup.");
+        }
+
+        return ((MCRMetaLangText) groups.get(index)).getText();
+    }
+
+    /**
+     * This methode get a single type of group from the group list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a group type string
+     */
+    public final String getGroupType(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > groups.size())) {
+            throw new IndexOutOfBoundsException("Index error in getGroupType.");
+        }
+
+        return ((MCRMetaLangText) groups.get(index)).getType();
+    }
+
+    /**
+     * This methode remove a group from the group list.
+     * 
+     * @param index
+     *            a index in the list
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     */
+    public final void removeGroup(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > groups.size())) {
+            throw new IndexOutOfBoundsException("Index error in removeGroup.");
+        }
+
+        groups.remove(index);
+    }
+
+    /**
+     * This methode add a ip to the ips list.
+     * 
+     * @param value -
+     *            the new ip as string
+     *            @param type - the new type of ip ip/netmask or domain name
+     */
+    public final void addIP(String value, String type) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return;
+        }
+        if ((type == null) || ((type = type.trim()).length() == 0)) {
+            return;
+        }
+
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servip", null, type, 0, null, value);
+        ips.add(flag);
+    }
+
+    /**
+     * This method return the size of the ip list.
+     * 
+     * @return the size of the ip list
+     */
+    public final int getIPSize()
+    { return ips.size(); }
+    
+    /**
+     * This methode get a single ip from the ip list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a ip string
+     */
+    public final String getIP(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > ips.size())) {
+            throw new IndexOutOfBoundsException("Index error in getIP.");
+        }
+
+        return ((MCRMetaLangText) ips.get(index)).getText();
+    }
+    
+    /**
+     * This methode get a single type of ip from the ip list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a ip type string
+     */
+    public final String getIPType(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > ips.size())) {
+            throw new IndexOutOfBoundsException("Index error in getIPType.");
+        }
+
+        return ((MCRMetaLangText) ips.get(index)).getType();
+    }
+
+    /**
+     * This methode remove an ip from the ip list.
+     * 
+     * @param index
+     *            a index in the list
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     */
+    public final void removeIP(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > ips.size())) {
+            throw new IndexOutOfBoundsException("Index error in removeIP.");
+        }
+
+        ips.remove(index);
+    }
+
+    /**
      * This methode create a XML stream for all structure data.
      * 
      * @exception MCRException
@@ -412,6 +703,50 @@ public class MCRObjectService {
             elm.addContent(elmm);
         }
 
+        if (users.size() != 0) {
+            org.jdom.Element elmm = new org.jdom.Element("servusers");
+            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("heritable", "false");
+            elmm.setAttribute("notinherit", "false");
+            elmm.setAttribute("parasearch", "true");
+            elmm.setAttribute("textsearch", "false");
+
+            for (int i = 0; i < users.size(); i++) {
+                elmm.addContent(((MCRMetaLangText) users.get(i)).createXML());
+            }
+
+            elm.addContent(elmm);
+        }
+
+        if (groups.size() != 0) {
+            org.jdom.Element elmm = new org.jdom.Element("servgroups");
+            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("heritable", "false");
+            elmm.setAttribute("notinherit", "false");
+            elmm.setAttribute("parasearch", "true");
+            elmm.setAttribute("textsearch", "false");
+
+            for (int i = 0; i < users.size(); i++) {
+                elmm.addContent(((MCRMetaLangText) users.get(i)).createXML());
+            }
+
+            elm.addContent(elmm);
+        }
+        
+        if (ips.size() != 0) {
+            org.jdom.Element elmm = new org.jdom.Element("servips");
+            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("heritable", "false");
+            elmm.setAttribute("notinherit", "false");
+            elmm.setAttribute("parasearch", "true");
+            elmm.setAttribute("textsearch", "false");
+
+            for (int i = 0; i < ips.size(); i++) {
+                elmm.addContent(((MCRMetaLangText) ips.get(i)).createXML());
+            }
+
+            elm.addContent(elmm);
+        }
         if (flags.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
@@ -426,6 +761,8 @@ public class MCRObjectService {
 
             elm.addContent(elmm);
         }
+
+
 
         return elm;
     }
@@ -454,6 +791,69 @@ public class MCRObjectService {
     }
 
     /**
+     * This methode returns the index for the given user value.
+     * 
+     * @param value
+     *            the value of a user as string
+     * 
+     */
+    public final int getUserIndex(String value) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return -1;
+        }
+
+        for (int i = 0; i < users.size(); i++) {
+            if (((MCRMetaLangText) users.get(i)).getText().equals(value)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    
+    /**
+     * This methode returns the index for the given group value.
+     * 
+     * @param value
+     *            the value of a group as string
+     * 
+     */
+    public final int getGroupIndex(String value) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return -1;
+        }
+
+        for (int i = 0; i < groups.size(); i++) {
+            if (((MCRMetaLangText) groups.get(i)).getText().equals(value)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    
+    /**
+     * This methode returns the index for the given ip value.
+     * 
+     * @param value
+     *            the value of a ip as string
+     * 
+     */
+    public final int getIPIndex(String value) {
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return -1;
+        }
+
+        for (int i = 0; i < ips.size(); i++) {
+            if (((MCRMetaLangText) ips.get(i)).getText().equals(value)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * This methode returns the index for the given flag value.
      * 
      * @param value
@@ -473,4 +873,6 @@ public class MCRObjectService {
 
         return -1;
     }
+    
 }
+
