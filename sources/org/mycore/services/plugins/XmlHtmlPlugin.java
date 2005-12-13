@@ -162,6 +162,20 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         }
     }
 
+    /** Converts HTML string to XML to be able to extract text nodes * */
+    public static String getFullText( String html ) {
+      try {
+         org.jdom.Document xml = tidy(new ByteArrayInputStream(html.getBytes()));
+         return getText(xml);
+      } catch (Exception ex) {
+          ex.printStackTrace();
+
+          return null;
+      }
+  }
+
+    
+    
     /** Converts HTML files to XML to be able to extract text nodes * */
     private static org.jdom.Document tidy(InputStream input) throws java.io.IOException {
         /*
