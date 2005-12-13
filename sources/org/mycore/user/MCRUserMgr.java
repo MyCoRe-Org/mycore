@@ -826,6 +826,26 @@ public class MCRUserMgr {
     }
 
     /**
+     * This method determines in which groups is the user member.
+     * 
+     * @return an ArrayList of groups where the given user is a member of
+     */
+    public final ArrayList getGroupsContainingUser(String user) {
+        MCRUser u = retrieveUser(user);
+        ArrayList a = getAllGroupIDs();
+        ArrayList o = new ArrayList();
+        for (int i=0;i < a.size(); i++) {
+            String aa = (String)a.get(i);
+            if (retrieveGroup(aa).hasUserMember(u)){
+                if (!o.contains(aa)) {
+                    o.add(aa);
+                }
+            }
+        }
+    return a;
+    }
+
+    /**
      * This method returns the maximum value of the numerical user IDs
      * 
      * @return maximum value of the numerical user IDs
