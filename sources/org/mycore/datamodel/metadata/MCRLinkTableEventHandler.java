@@ -26,9 +26,7 @@ package org.mycore.datamodel.metadata;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationObject;
 
 /**
  * This class manages all operations of the LinkTables for operations of an
@@ -77,8 +75,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     // throw activeLink;
                     // TODO: should trigger undo-Event
                 }
-                if (inf instanceof MCRMetaLink) {
-                    destination = ((MCRMetaLink) inf).getXLinkHref();
+                if (inf instanceof MCRMetaLinkID) {
+                    destination = ((MCRMetaLinkID) inf).getXLinkHref();
                     if (!MCRXMLTableManager.instance().exist(new MCRObjectID(destination))) {
                         continue;
                     }
@@ -98,7 +96,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                             .getCategId());
                     continue;
                 }
-                if (inf instanceof MCRMetaLink) {
+                if (inf instanceof MCRMetaLinkID) {
                     mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref());
                     continue;
                 }
