@@ -96,9 +96,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
         com = new MCRCommand("import group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile String", "The command import one or more groups to the user system with data from the file {0}. This create make a NOT constency check. The command is designd only for repair processes.");
         command.add(com);
 
-        com = new MCRCommand("update group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.updateGroupFromFile String", "The command update one or more groups of the user system with data from the file {0}.");
-        command.add(com);
-
         com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String", "");
         command.add(com);
 
@@ -751,9 +748,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
             for (int i = 0; i < listelm.size(); i++) {
                 MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), false); // do
-                                                                                    // not
-                                                                                    // encrypt
-                                                                                    // passwords
+                // not
+                // encrypt
+                // passwords
                 MCRUserMgr.instance().importUserObject(u);
             }
         } catch (Exception e) {
@@ -869,38 +866,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
             }
         } catch (Exception e) {
             throw new MCRException("Error while updating a user from file.", e);
-        }
-    }
-
-    /**
-     * This method invokes MCRUserMgr.updateGroup() with data from a file.
-     * 
-     * @param filename
-     *            the filename of the user data input
-     */
-    public static final void updateGroupFromFile(String filename) throws MCRException {
-        if (!checkFilename(filename)) {
-            return;
-        }
-
-        LOGGER.info("Reading file " + filename + " ...");
-
-        try {
-            org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
-            org.jdom.Element rootelm = doc.getRootElement();
-
-            if (!rootelm.getName().equals("mycoregroup")) {
-                throw new MCRException("The data are not for a group.");
-            }
-
-            List listelm = rootelm.getChildren();
-
-            for (int i = 0; i < listelm.size(); i++) {
-                MCRGroup g = new MCRGroup((org.jdom.Element) listelm.get(i));
-                MCRUserMgr.instance().updateGroup(g);
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while update group from file.", e);
         }
     }
 
@@ -1088,7 +1053,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param jdomDoc
      *            the JDOM XML document to be printed
      */
-    private static final void showAsXML(org.jdom.Document jdomDoc) throws MCRException {
+    public static final void showAsXML(org.jdom.Document jdomDoc) throws MCRException {
         XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat());
 
         try {
