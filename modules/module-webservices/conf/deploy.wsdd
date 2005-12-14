@@ -1,0 +1,18 @@
+<deployment name="miless" xmlns="http://xml.apache.org/axis/wsdd/" 
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"
+            xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance">
+  <service name="MCRWebService" provider="java:RPC">
+    <parameter name="className" value="org.mycore.services.webservices.MCRWebService" />
+
+    <parameter name="allowedMethods" value="*" /> <!-- allow all public methods -->
+    
+    <operation name="MCRDoRetrieveObject">
+      <documentation>This operation retrieves mycore objects
+                     Result is org.w3c.dom.Document</documentation>
+      <parameter name="id" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>id of mycore object</documentation>
+      </parameter>
+    </operation>
+
+  </service>
+</deployment>
