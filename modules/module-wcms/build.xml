@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.8 $ $Date: 2005-08-15 13:05:20 $ -->
+<!-- $Revision: 1.9 $ $Date: 2005-12-14 09:27:31 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -72,6 +72,8 @@
      <param name="packages" value="wcms/**"/>
    </antcall>
   </target>
+
+  <target name="webapps" />
 
   <!-- =================================================================== -->
 

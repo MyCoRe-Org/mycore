@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-AccessAdministration build file for use with ANT             -->
-<!-- $Revision: 1.1 $ $Date: 2005-11-16 12:58:29 $                       -->
+<!-- $Revision: 1.2 $ $Date: 2005-12-14 09:27:31 $                       -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - AccessAdministration" default="usage" basedir=".">
@@ -76,6 +76,8 @@
       <param name="packages" value="org/mycore/frontend/servlets/**"/>
     </antcall>
   </target>
+
+  <target name="webapps" />
 
 <!-- =================================================================== -->
 <!-- Remove the user created directories and files                       -->
