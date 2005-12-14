@@ -37,17 +37,17 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  */
 public class MCRSimpleWorkflowAccess {
 
-    public static final String READ_POOL = "READ";
+    public static final String READWEB_POOL = "READWEB";
 
-    public static final String WRITE_POOL = "WRITE";
+    public static final String WRITEDB_POOL = "WRITEDB";
 
     public static final String WRITEWF_POOL = "WRITEWF";
 
-    public static final String DELETE_POOL = "DELETE";
+    public static final String DELETEDB_POOL = "DELETEDB";
 
     public static final String DELETEWF_POOL = "DELETEWF";
 
-    public static final String COMMIT_POOL = "COMMIT";
+    public static final String COMMITDB_POOL = "COMMITDB";
 
     // logger
     static Logger LOGGER = Logger.getLogger(MCRSimpleWorkflowAccess.class.getName());
@@ -60,38 +60,44 @@ public class MCRSimpleWorkflowAccess {
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             return;
         }
-        if (!pool.equals(READ_POOL) & !pool.equals(WRITE_POOL) & !pool.equals(WRITEWF_POOL) & !pool.equals(DELETE_POOL) & !pool.equals(DELETEWF_POOL) & !pool.equals(COMMIT_POOL)) {
+        if (!pool.equals(READWEB_POOL) & !pool.equals(WRITEDB_POOL) & !pool.equals(WRITEWF_POOL) & !pool.equals(DELETEDB_POOL) & !pool.equals(DELETEWF_POOL) & !pool.equals(COMMITDB_POOL)) {
             return;
         }
         StringBuffer sb1 = new StringBuffer(1024);
         int j = 0;
         for (int i = 0; i < serv.getGroupSize(); i++) {
-            if (serv.getGroupType(i).equals(pool)) {
+            if (serv.getGroupPool(i).equals(pool)) {
                 if (j > 0) {
                     sb1.append(" or ");
                 }
-                sb1.append(serv.getGroup(i));
+                sb1.append("group ").append(serv.getGroup(i));
                 j++;
             }
         }
         for (int i = 0; i < serv.getUserSize(); i++) {
-            if (serv.getUserType(i).equals(pool)) {
+            if (serv.getUserPool(i).equals(pool)) {
                 if (j > 0) {
                     sb1.append(" or ");
                 }
-                sb1.append(serv.getUser(i));
+                sb1.append("user ").append(serv.getUser(i));
                 j++;
             }
         }
         StringBuffer sb2 = new StringBuffer(1024);
         int k = 0;
         for (int i = 0; i < serv.getIPSize(); i++) {
-            if (serv.getIPType(i).equals(pool)) {
+            if (serv.getIPPool(i).equals(pool)) {
                 if (k > 0) {
                     sb2.append(" or ");
                 }
-                sb2.append(serv.getIP(i));
-                k++;
+                if (serv.getIPType(i).equals("ip")) {
+                    sb2.append("ip ").append(serv.getIP(i));
+                    k++;
+                }
+                if (serv.getIPType(i).equals("domain")) {
+                    sb2.append("network ").append(serv.getIP(i));
+                    k++;
+                }
             }
         }
         StringBuffer sb = new StringBuffer(1024);
@@ -106,6 +112,6 @@ public class MCRSimpleWorkflowAccess {
         }
 
         String rule = sb.toString();
-        LOGGER.debug("ACCESS RULE : " + rule);
+        LOGGER.debug("ACCESS RULE for "+pool+" : " + rule);
     }
 }

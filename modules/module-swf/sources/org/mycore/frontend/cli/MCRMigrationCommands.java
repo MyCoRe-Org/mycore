@@ -102,7 +102,7 @@ final class MCRMigrationCommands extends MCRAbstractCommands {
                     ArrayList gar = umgr.getAllGroupIDs();
                     for (int k = 0; k < gar.size(); k++) {
                         if (umgr.hasGroupPrivilege((String) gar.get(k), priv)) {
-                            serv.addGroup((String) gar.get(k), MCRSimpleWorkflowAccess.READ_POOL);
+                            serv.addGroup((String) gar.get(k), MCRSimpleWorkflowAccess.READWEB_POOL);
                         }
                     }
                     // serv.removeFlag(j);
@@ -114,40 +114,40 @@ final class MCRMigrationCommands extends MCRAbstractCommands {
                     // Write, delete, commit acces for the master group wit editor privilege
                     ArrayList gg = umgr.getGroupsContainingUser(user);
                     for (int k = 0; k < gg.size(); k++) {
-                        serv.addGroup((String) gg.get(k), MCRSimpleWorkflowAccess.READ_POOL);
+                        serv.addGroup((String) gg.get(k), MCRSimpleWorkflowAccess.READWEB_POOL);
                         ArrayList mg = umgr.retrieveGroup((String)gg.get(k)).getMemberGroupIDs();
                         for (int l = 0; l < mg.size(); l++) {
                             if (umgr.hasGroupPrivilege((String)mg.get(l), "editor")) {
-                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.WRITE_POOL);
+                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.WRITEDB_POOL);
                                 serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.WRITEWF_POOL);
-                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.DELETE_POOL);
+                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.DELETEDB_POOL);
                                 serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.DELETEWF_POOL);
-                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.COMMIT_POOL);
+                                serv.addGroup((String)mg.get(l), MCRSimpleWorkflowAccess.COMMITDB_POOL);
                             }
                         }
                     }
                     // write access for the user if he has the modify privilege
                     if (umgr.hasUserPrivilege(user, "modify-" + type)) {
-                        serv.addUser(user, MCRSimpleWorkflowAccess.WRITE_POOL);
+                        serv.addUser(user, MCRSimpleWorkflowAccess.WRITEDB_POOL);
                         serv.addUser(user, MCRSimpleWorkflowAccess.WRITEWF_POOL);
                     }
                     // delete access for the user if he has the delete privilege
                     if (umgr.hasUserPrivilege(user, "delete-" + type)) {
-                        serv.addUser(user, MCRSimpleWorkflowAccess.DELETE_POOL);
+                        serv.addUser(user, MCRSimpleWorkflowAccess.DELETEDB_POOL);
                         serv.addUser(user, MCRSimpleWorkflowAccess.DELETEWF_POOL);
                     }
                     // commit access for the user if he has the commit privilege
                     if (umgr.hasUserPrivilege(user, "commit-" + type)) {
-                        serv.addUser(user, MCRSimpleWorkflowAccess.COMMIT_POOL);
+                        serv.addUser(user, MCRSimpleWorkflowAccess.COMMITDB_POOL);
                     }
                     // serv.removeFlag(j);
                 }
                 if (serv.getFlag(j).startsWith("IP:")) {
-                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.READ_POOL);
-                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.WRITE_POOL);
-                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.WRITEWF_POOL);
-                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.DELETE_POOL);
-                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.DELETEWF_POOL);
+                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.READWEB_POOL,"ip");
+                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.WRITEDB_POOL,"ip");
+                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.WRITEWF_POOL,"ip");
+                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.DELETEDB_POOL,"ip");
+                    serv.addIP(serv.getFlag(j), MCRSimpleWorkflowAccess.DELETEWF_POOL,"ip");
                     serv.removeFlag(j);
                 }
             }

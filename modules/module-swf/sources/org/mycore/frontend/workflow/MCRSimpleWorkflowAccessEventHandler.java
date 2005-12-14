@@ -59,12 +59,12 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRSimpleWorkflowAccessEventHandler create: MCRObjectID : " + mcr_id.getId());
         MCRObjectService serv = obj.getService();
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READ_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READWEB_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMIT_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMITDB_POOL,serv);
         
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -88,12 +88,12 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRSimpleWorkflowAccessEventHandler update: MCRObjectID : " + mcr_id.getId());
         MCRObjectService serv = obj.getService();
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READ_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READWEB_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMIT_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMITDB_POOL,serv);
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -117,12 +117,12 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRSimpleWorkflowAccessEventHandler delete: MCRObjectID : " + mcr_id.getId());
         MCRObjectService serv = obj.getService();
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READ_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READWEB_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMIT_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMITDB_POOL,serv);
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -146,12 +146,12 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRSimpleWorkflowAccessEventHandler repair: MCRObjectID : " + mcr_id.getId());
         MCRObjectService serv = obj.getService();
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READ_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.READWEB_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.WRITEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETE_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEDB_POOL,serv);
         MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.DELETEWF_POOL,serv);
-        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMIT_POOL,serv);
+        MCRSimpleWorkflowAccess.getAccessRule(MCRSimpleWorkflowAccess.COMMITDB_POOL,serv);
 
         // save the stop time
         long t2 = System.currentTimeMillis();
