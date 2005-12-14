@@ -288,5 +288,27 @@
   fixed="MCRMetaDateFragment" />
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaAccessRule -->
+
+<xsl:template match="mcrmetaaccessrule">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:simpleContent>
+       <xsd:extension base="xsd:string">
+         <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+         <xsd:attribute name="pool" use="optional" type="mcrdefaulttype" />
+         <xsd:attribute name="form" use="optional" type="mcrdefaultform" />
+         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+         <xsd:attribute ref="xml:lang" />
+       </xsd:extension>
+     </xsd:simpleContent>
+   </xsd:complexType>
+ </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaAccessRule" />
+</xsl:template>
+
 </xsl:stylesheet>
 
