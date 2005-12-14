@@ -147,7 +147,7 @@ public class MCRObjectService {
                 if (!user_element_name.equals("servuser")) {
                     continue;
                 }
-                MCRMetaLangText user = new MCRMetaLangText();
+                MCRMetaAccessRule user = new MCRMetaAccessRule();
                 user.setLang(lang);
                 user.setDataPart("service");
                 user.setFromDOM(user_element);
@@ -166,7 +166,7 @@ public class MCRObjectService {
                 if (!group_element_name.equals("servgroup")) {
                     continue;
                 }
-                MCRMetaLangText group = new MCRMetaLangText();
+                MCRMetaAccessRule group = new MCRMetaAccessRule();
                 group.setLang(lang);
                 group.setDataPart("service");
                 group.setFromDOM(group_element);
@@ -185,7 +185,7 @@ public class MCRObjectService {
                 if (!ip_element_name.equals("servip")) {
                     continue;
                 }
-                MCRMetaLangText ip = new MCRMetaLangText();
+                MCRMetaAccessRule ip = new MCRMetaAccessRule();
                 ip.setLang(lang);
                 ip.setDataPart("service");
                 ip.setFromDOM(ip_element);
@@ -450,11 +450,9 @@ public class MCRObjectService {
         if ((index < 0) || (index > flags.size())) {
             throw new IndexOutOfBoundsException("Index error in replaceFlag.");
         }
-
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return;
         }
-
         MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, null, 0, null, value);
         flags.set(index, flag);
     }
@@ -464,22 +462,18 @@ public class MCRObjectService {
      * 
      * @param value -
      *            the new user as string
+     * @param pool -
+     *            the new pool as string
      */
-    public final void addUser(String value, String type) {
+    public final void addUser(String value, String pool) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return;
         }
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             return;
         }
-        boolean test = true;
-        for (int i = 0; i < users.size(); i++) {
-            if (((MCRMetaLangText) users.get(i)).getText().equals(value) && ((MCRMetaLangText) users.get(i)).getType().equals(type)) {
-                test = false;
-            }
-        }
-        if (test) {
-            MCRMetaLangText user = new MCRMetaLangText("service", "servuser", null, type, 0, null, value);
+        if (getUserIndex(value, pool) == -1) {
+            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, pool, value);
             users.add(user);
         }
     }
@@ -504,8 +498,7 @@ public class MCRObjectService {
         if ((index < 0) || (index > users.size())) {
             throw new IndexOutOfBoundsException("Index error in getUser.");
         }
-
-        return ((MCRMetaLangText) users.get(index)).getText();
+        return ((MCRMetaAccessRule) users.get(index)).getText();
     }
 
     /**
@@ -513,14 +506,13 @@ public class MCRObjectService {
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return a user type string
+     * @return a user pool string
      */
-    public final String getUserType(int index) throws IndexOutOfBoundsException {
+    public final String getUserPool(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > users.size())) {
-            throw new IndexOutOfBoundsException("Index error in getUserType.");
+            throw new IndexOutOfBoundsException("Index error in getUserPool.");
         }
-
-        return ((MCRMetaLangText) users.get(index)).getType();
+        return ((MCRMetaAccessRule) users.get(index)).getPool();
     }
 
     /**
@@ -535,7 +527,6 @@ public class MCRObjectService {
         if ((index < 0) || (index > users.size())) {
             throw new IndexOutOfBoundsException("Index error in removeUser.");
         }
-
         users.remove(index);
     }
 
@@ -544,23 +535,19 @@ public class MCRObjectService {
      * 
      * @param value -
      *            the new group as string
+     * @param pool -
+     *            the new pool as string
      */
-    public final void addGroup(String value, String type) {
+    public final void addGroup(String value, String pool) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return;
         }
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             return;
         }
-        boolean test = true;
-        for (int i = 0; i < groups.size(); i++) {
-            if (((MCRMetaLangText) groups.get(i)).getText().equals(value) && ((MCRMetaLangText) groups.get(i)).getType().equals(type)) {
-                test = false;
-            }
-        }
-        if (test) {
-            MCRMetaLangText flag = new MCRMetaLangText("service", "servgroup", null, type, 0, null, value);
-            groups.add(flag);
+        if (getGroupIndex(value, pool) == -1) {
+            MCRMetaAccessRule group = new MCRMetaAccessRule("service", "servgroup", null, null, 0, pool, value);
+            groups.add(group);
         }
     }
 
@@ -584,8 +571,7 @@ public class MCRObjectService {
         if ((index < 0) || (index > groups.size())) {
             throw new IndexOutOfBoundsException("Index error in getGroup.");
         }
-
-        return ((MCRMetaLangText) groups.get(index)).getText();
+        return ((MCRMetaAccessRule) groups.get(index)).getText();
     }
 
     /**
@@ -593,14 +579,13 @@ public class MCRObjectService {
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return a group type string
+     * @return a group pool string
      */
-    public final String getGroupType(int index) throws IndexOutOfBoundsException {
+    public final String getGroupPool(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > groups.size())) {
-            throw new IndexOutOfBoundsException("Index error in getGroupType.");
+            throw new IndexOutOfBoundsException("Index error in getGroupPool.");
         }
-
-        return ((MCRMetaLangText) groups.get(index)).getType();
+        return ((MCRMetaAccessRule) groups.get(index)).getPool();
     }
 
     /**
@@ -615,7 +600,6 @@ public class MCRObjectService {
         if ((index < 0) || (index > groups.size())) {
             throw new IndexOutOfBoundsException("Index error in removeGroup.");
         }
-
         groups.remove(index);
     }
 
@@ -624,25 +608,27 @@ public class MCRObjectService {
      * 
      * @param value -
      *            the new ip as string
+     * @param pool -
+     *            the new pool of ip ip/netmask or domain name
      * @param type -
-     *            the new type of ip ip/netmask or domain name
+     *            the new type of ip, it can be 'ip' or 'domain'
      */
-    public final void addIP(String value, String type) {
+    public final void addIP(String value, String pool, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return;
+        }
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             return;
         }
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             return;
         }
-        boolean test = true;
-        for (int i = 0; i < ips.size(); i++) {
-            if (((MCRMetaLangText) ips.get(i)).getText().equals(value) && ((MCRMetaLangText) ips.get(i)).getType().equals(type)) {
-                test = false;
-            }
+        if ((!pool.equals("ip")) && (!pool.equals("domain"))) {
+            return;
         }
-        if (test) {
-            MCRMetaLangText flag = new MCRMetaLangText("service", "servip", null, type, 0, null, value);
-            ips.add(flag);
+        if (getIPIndex(value, pool, type) == -1) {
+            MCRMetaAccessRule ip = new MCRMetaAccessRule("service", "servip", null, type, 0, pool, value);
+            ips.add(ip);
         }
     }
 
@@ -666,8 +652,7 @@ public class MCRObjectService {
         if ((index < 0) || (index > ips.size())) {
             throw new IndexOutOfBoundsException("Index error in getIP.");
         }
-
-        return ((MCRMetaLangText) ips.get(index)).getText();
+        return ((MCRMetaAccessRule) ips.get(index)).getText();
     }
 
     /**
@@ -681,8 +666,21 @@ public class MCRObjectService {
         if ((index < 0) || (index > ips.size())) {
             throw new IndexOutOfBoundsException("Index error in getIPType.");
         }
+        return ((MCRMetaAccessRule) ips.get(index)).getType();
+    }
 
-        return ((MCRMetaLangText) ips.get(index)).getType();
+    /**
+     * This methode get a single pool of ip from the ip list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a ip pool string
+     */
+    public final String getIPPool(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > ips.size())) {
+            throw new IndexOutOfBoundsException("Index error in getIPPool.");
+        }
+        return ((MCRMetaAccessRule) ips.get(index)).getPool();
     }
 
     /**
@@ -697,7 +695,6 @@ public class MCRObjectService {
         if ((index < 0) || (index > ips.size())) {
             throw new IndexOutOfBoundsException("Index error in removeIP.");
         }
-
         ips.remove(index);
     }
 
@@ -732,14 +729,14 @@ public class MCRObjectService {
 
         if (users.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servusers");
-            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < users.size(); i++) {
-                elmm.addContent(((MCRMetaLangText) users.get(i)).createXML());
+                elmm.addContent(((MCRMetaAccessRule) users.get(i)).createXML());
             }
 
             elm.addContent(elmm);
@@ -747,14 +744,14 @@ public class MCRObjectService {
 
         if (groups.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servgroups");
-            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < groups.size(); i++) {
-                elmm.addContent(((MCRMetaLangText) groups.get(i)).createXML());
+                elmm.addContent(((MCRMetaAccessRule) groups.get(i)).createXML());
             }
 
             elm.addContent(elmm);
@@ -762,14 +759,14 @@ public class MCRObjectService {
 
         if (ips.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servips");
-            elmm.setAttribute("class", "MCRMetaLangText");
+            elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < ips.size(); i++) {
-                elmm.addContent(((MCRMetaLangText) ips.get(i)).createXML());
+                elmm.addContent(((MCRMetaAccessRule) ips.get(i)).createXML());
             }
 
             elm.addContent(elmm);
@@ -820,19 +817,22 @@ public class MCRObjectService {
      * 
      * @param value
      *            the value of a user as string
+     * @param pool
+     *            the pool of an ip as string
      * 
      */
-    public final int getUserIndex(String value, String type) {
+    public final int getUserIndex(String value, String pool) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
-
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
+            return -1;
+        }
         for (int i = 0; i < users.size(); i++) {
-            if (((MCRMetaLangText) users.get(i)).getText().equals(value) && ((MCRMetaLangText) users.get(i)).getType().equals(type)) {
+            if (((MCRMetaAccessRule) users.get(i)).getText().equals(value) && ((MCRMetaAccessRule) users.get(i)).getPool().equals(pool)) {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -841,21 +841,22 @@ public class MCRObjectService {
      * 
      * @param value
      *            the value of a group as string
-     * @param type
-     *            the pool if an ip as string
+     * @param pool
+     *            the pool of an ip as string
      * 
      */
-    public final int getGroupIndex(String value, String type) {
+    public final int getGroupIndex(String value, String pool) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
-
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
+            return -1;
+        }
         for (int i = 0; i < groups.size(); i++) {
-            if (((MCRMetaLangText) groups.get(i)).getText().equals(value) && ((MCRMetaLangText) groups.get(i)).getType().equals(type)) {
+            if (((MCRMetaAccessRule) groups.get(i)).getText().equals(value) && ((MCRMetaAccessRule) groups.get(i)).getPool().equals(pool)) {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -865,20 +866,26 @@ public class MCRObjectService {
      * @param value
      *            the value of an ip as string
      * @param type
-     *            the pool if an ip as string
+     *            the type of an ip as string
+     * @param pool
+     *            the pool of an ip as string
      * 
      */
-    public final int getIPIndex(String value, String type) {
+    public final int getIPIndex(String value, String pool, String type) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
-
+        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
+            return -1;
+        }
+        if ((type == null) || ((type = type.trim()).length() == 0)) {
+            return -1;
+        }
         for (int i = 0; i < ips.size(); i++) {
-            if (((MCRMetaLangText) ips.get(i)).getText().equals(value) && ((MCRMetaLangText) ips.get(i)).getType().equals(type)) {
+            if (((MCRMetaAccessRule) ips.get(i)).getText().equals(value) && ((MCRMetaAccessRule) ips.get(i)).getPool().equals(pool) && ((MCRMetaAccessRule) ips.get(i)).getType().equals(type)) {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -895,13 +902,11 @@ public class MCRObjectService {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return -1;
         }
-
         for (int i = 0; i < flags.size(); i++) {
             if (((MCRMetaLangText) flags.get(i)).getText().equals(value)) {
                 return i;
             }
         }
-
         return -1;
     }
 
