@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.mycore.common.MCRException;
+import org.mycore.common.MCRCatchException;
 
 /**
  * This exception holds information about a link condition that did not allow a
@@ -39,44 +39,51 @@ import org.mycore.common.MCRException;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRActiveLinkException extends MCRException {
+public class MCRActiveLinkException extends MCRCatchException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	Hashtable linkTable = new Hashtable();
+    Hashtable linkTable = new Hashtable();
 
-	/**
-	 * 
-	 * @return a Hashtable with destinations (key) and List of sources (value)
-	 */
-	public Map getActiveLinks() {
-		return linkTable;
-	}
+    /**
+     * 
+     * @return a Hashtable with destinations (key) and List of sources (value)
+     */
+    public Map getActiveLinks() {
+        return linkTable;
+    }
 
-	/**
-	 * collects information on active links that do not permit a certain action
-	 * on the repository.
-	 * 
-	 * @param source
-	 *            the source of a link
-	 * @param dest
-	 *            the destination of a link
-	 */
-	public void addLink(String source, String dest) {
-		if (!linkTable.containsKey(dest)) {
-			linkTable.put(dest, new LinkedList());
-		}
-		((List) linkTable.get(dest)).add(source);
-	}
+    /**
+     * collects information on active links that do not permit a certain action
+     * on the repository.
+     * 
+     * @param source
+     *            the source of a link
+     * @param dest
+     *            the destination of a link
+     */
+    public void addLink(String source, String dest) {
+        if (!linkTable.containsKey(dest)) {
+            linkTable.put(dest, new LinkedList());
+        }
+        ((List) linkTable.get(dest)).add(source);
+    }
 
-	/**
-	 * @param message
-	 */
-	public MCRActiveLinkException(String message) {
-		super(message);
-	}
+    /**
+     * @see MCRCatchException#MCRCatchException(String)
+     */
+    public MCRActiveLinkException(String message) {
+        super(message);
+    }
+
+    /**
+     * @see MCRCatchException#MCRCatchException(String, Throwable)
+     */
+    public MCRActiveLinkException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }
