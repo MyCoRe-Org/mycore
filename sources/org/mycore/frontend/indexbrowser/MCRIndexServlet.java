@@ -33,6 +33,7 @@ import org.jdom.Element;
 import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.backend.sql.MCRSQLConnectionPool;
 import org.mycore.common.MCRCache;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -100,7 +101,7 @@ public class MCRIndexServlet extends MCRServlet {
                             String value = rs.getString(ic.extraFields[j]);
                             Element col = new Element("col");
                             col.setAttribute("name", ic.extraFields[j]);
-                            col.addContent(value);
+                            col.addContent(MCRXMLHelper.removeIllegalChars(value));
                             v.addContent(col);
                         }
 
@@ -182,14 +183,14 @@ public class MCRIndexServlet extends MCRServlet {
 
             Element eFrom = new Element("from");
             eFrom.setAttribute("pos", String.valueOf(start.pos));
-            eFrom.setAttribute("short", start.diff);
-            eFrom.addContent(start.value);
+            eFrom.setAttribute("short", MCRXMLHelper.removeIllegalChars(start.diff));
+            eFrom.addContent(MCRXMLHelper.removeIllegalChars(start.value.trim()));
             range.addContent(eFrom);
 
             Element eTo = new Element("to");
             eTo.setAttribute("pos", String.valueOf(end.pos));
-            eTo.setAttribute("short", end.diff);
-            eTo.addContent(end.value);
+            eTo.setAttribute("short", MCRXMLHelper.removeIllegalChars(end.diff));
+            eTo.addContent(MCRXMLHelper.removeIllegalChars(end.value));
             range.addContent(eTo);
         }
     }
@@ -285,7 +286,7 @@ public class MCRIndexServlet extends MCRServlet {
     // **************************************************************************
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
-            double dNum = (double) numSelectedRows;
+            double dNum = numSelectedRows;
             double dI = 1.0 / ((double) i);
             double root = Math.pow(dNum, dI);
 
