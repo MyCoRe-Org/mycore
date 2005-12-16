@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import org.jdom.Document;
+import org.jdom.Verifier;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -138,5 +139,26 @@ public class MCRXMLHelper {
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException {
         return getParser().parseXML(xml, valid);
+    }
+
+    /**
+     * Removes characters that are illegal in XML text nodes or attribute values.
+     * 
+     * @param text the String that should be used in XML elements or attributes
+     * @return the String with all illegal characters removed
+     */
+    public static String removeIllegalChars(String text) {
+        if ((text == null) || (text.trim().length() == 0))
+            return null;
+        if (org.jdom.Verifier.checkCharacterData(text) == null)
+            return text;
+
+        // It seems we have to filter out invalid XML characters...
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < text.length(); i++) {
+            if (Verifier.isXMLCharacter(text.charAt(i)))
+                sb.append(text.charAt(i));
+        }
+        return sb.toString();
     }
 }
