@@ -149,7 +149,7 @@ public class MCRXMLHelper {
      */
     public static String removeIllegalChars(String text) {
         if ((text == null) || (text.trim().length() == 0))
-            return null;
+            return text;
         if (org.jdom.Verifier.checkCharacterData(text) == null)
             return text;
 
