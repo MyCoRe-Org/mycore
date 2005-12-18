@@ -584,7 +584,6 @@ final public class MCRObject extends MCRBase {
 			throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
 		}
 
-		setFromJDOM(doc);
 		return doc;
 	}
 
