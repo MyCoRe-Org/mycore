@@ -406,7 +406,7 @@ public class MCRLayoutServlet extends MCRServlet {
     }
 
     /** The XSL transformer factory to use */
-    protected SAXTransformerFactory factory;
+    private static SAXTransformerFactory factory;
 
     /**
      * Builds a SAX transformer factory for later use
@@ -414,15 +414,18 @@ public class MCRLayoutServlet extends MCRServlet {
      * @throws MCRConfigurationException
      *             if no SAXTransformerFactory was found
      */
-    protected void buildTransformerFactory() {
-        TransformerFactory tf = TransformerFactory.newInstance();
-
-        if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
-            throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
+    protected static synchronized void buildTransformerFactory() {
+        if(factory == null)
+        {
+            TransformerFactory tf = TransformerFactory.newInstance();
+    
+            if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
+                throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
+            }
+    
+            factory = (SAXTransformerFactory) (tf);
+            factory.setURIResolver(MCRURIResolver.instance());
         }
-
-        factory = (SAXTransformerFactory) (tf);
-        factory.setURIResolver(MCRURIResolver.instance());
     }
 
     /**
