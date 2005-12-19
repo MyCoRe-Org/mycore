@@ -33,6 +33,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
@@ -82,6 +85,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("save derivate from {0} to {1} to directory {2}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}");
         command.add(com);
+        
+        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
+        command.add(com);        
 
         com = new MCRCommand("get next derivate ID for base {0}", "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String", "The command return the next free MCRObjectID for the ID base.");
         command.add(com);
@@ -311,6 +317,22 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
      * directory with <em>dirname</em> and store the derivate objects in a
+     * directory under them named <em>MCRObjectID</em>. The IFS-Attribute
+     * of the derivate files aren't saved, for reloading purpose after deleting
+     * a derivate in the datastore
+     * 
+     * @param ID
+     *            the ID of the MCRDerivate to be save.
+     * @param dirname
+     *            the dirname to store the derivate
+     */
+    public static void show(String ID, String dirname) {
+    	save(ID, dirname, false);
+    }
+
+    /**
+     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
+     * directory with <em>dirname</em> and store the derivate objects in a
      * directory under them named <em>MCRObjectID</em>.
      * 
      * @param ID
@@ -318,7 +340,21 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param dirname
      *            the dirname to store the derivate
      */
-    public static void save(String ID, String dirname) {
+    public static void save(String ID, String dirname){
+    	save(ID, dirname, true);
+    }
+    
+    /**
+     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
+     * directory with <em>dirname</em> and store the derivate objects in a
+     * directory under them named <em>MCRObjectID</em>.
+     * 
+     * @param ID
+     *            the ID of the MCRDerivate to be save.
+     * @param dirname
+     *            the dirname to store the derivate
+     */
+    public static void save(String ID, String dirname, boolean withIfsID) {
         // check ID
         MCRDerivate obj = new MCRDerivate();
         MCRObjectID id = null;
@@ -342,11 +378,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
 
+        
         // get XML
-        byte[] xml = null;
+        Document xml = null;
 
         try {
-            xml = obj.receiveXMLFromDatastore(ID);
+        	obj.receiveFromDatastore(ID);
+        	obj.getDerivate().getInternals().setSourcePath(ID);
+        	if (!withIfsID)
+        		obj.getDerivate().getInternals().setIFSID("");
+        	xml = obj.createXML();
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.error("");
@@ -367,9 +408,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 TransformerFactory transfakt = TransformerFactory.newInstance();
                 Transformer trans = transfakt.newTransformer(source);
                 StreamResult sr = new StreamResult(out);
-                trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+                trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
             } else {
-                out.write(xml);
+            	(new XMLOutputter(Format.getPrettyFormat())).output(xml, out);
                 out.flush();
             }
         } catch (Exception ex) {
@@ -470,10 +511,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 nid.setNumber(i);
 
                 // store the XML file
-                byte[] xml = null;
+                Document xml = null;
 
                 try {
-                    xml = obj.receiveXMLFromDatastore(nid.toString());
+                	obj.receiveFromDatastore(nid.toString());
+                	obj.getDerivate().getInternals().setSourcePath(dirname);
+                	xml = obj.createXML();                	
                 } catch (MCRException ex) {
                     continue;
                 }
@@ -483,11 +526,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
                 if (trans != null) {
                     StreamResult sr = new StreamResult(out);
-                    trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+                    trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
                 } else {
-                    out.write(xml);
-                    out.flush();
-                }
+                	(new XMLOutputter(Format.getPrettyFormat())).output(xml, out);
+                	out.close();
+                } 
 
                 LOGGER.info("Object " + nid.toString() + " stored under " + filename + ".");
 
