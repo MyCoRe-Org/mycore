@@ -33,6 +33,7 @@ import org.jdom.Element;
 import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.backend.sql.MCRSQLConnectionPool;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -261,10 +262,11 @@ public class MCRIndexServlet extends MCRServlet {
         Vector conditions = new Vector();
 
         if (br.search != null) {
+            String toSearch = ( ic.normalizeSearch ? MCRNormalizer.normalizeString( br.search ) : br.search );
             if (br.mode.equals("contains")) {
-                conditions.addElement(ic.browseField + " like '%" + br.search + "%'");
+                conditions.addElement(ic.browseField + " like '%" + toSearch + "%'");
             } else if (br.mode.equals("prefix")) {
-                conditions.addElement(ic.browseField + " like '" + br.search + "%'");
+                conditions.addElement(ic.browseField + " like '" + toSearch + "%'");
             }
         }
 

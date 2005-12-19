@@ -48,6 +48,8 @@ class MCRIndexConfiguration {
     String style;
 
     int maxPerPage;
+    
+    boolean normalizeSearch;
 
     MCRIndexConfiguration(String ID) {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -61,6 +63,7 @@ class MCRIndexConfiguration {
         style = config.getString(prefix + "Style");
         fields = config.getString(prefix + "ExtraOutputFields", null);
         order = config.getString(prefix + "Order", "asc");
+        normalizeSearch = config.getBoolean(prefix + "NormalizeSearch", false);
         buildFieldList(fields);
     }
 
