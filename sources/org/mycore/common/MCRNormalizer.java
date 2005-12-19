@@ -24,6 +24,7 @@
 package org.mycore.common;
 
 import java.util.Locale;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 /**
@@ -35,36 +36,43 @@ import java.util.regex.Pattern;
  * @version $Revision$ $Date$
  */
 public class MCRNormalizer {
-    static final Pattern AE_PATTERN = Pattern.compile("ä");
+    /** List of characters that will be replaced */
+    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u";
 
-    static final Pattern OE_PATTERN = Pattern.compile("ö");
+    private static Pattern[] patterns;
 
-    static final Pattern UE_PATTERN = Pattern.compile("ü");
+    private static String[] replace;
 
-    static final Pattern SZ_PATTERN = Pattern.compile("ß");
+    static {
+        StringTokenizer st = new StringTokenizer(rules, "> ");
+        int numPatterns = st.countTokens() / 2;
+
+        patterns = new Pattern[numPatterns];
+        replace = new String[numPatterns];
+
+        for (int i = 0; i < numPatterns; i++) {
+            patterns[i] = Pattern.compile(st.nextToken());
+            replace[i] = st.nextToken();
+        }
+    }
 
     /**
-     * This methode replace any characters of languages like german to
-     * normalized values.
+     * This method replaces umlauts and other special characters of languages
+     * like german to normalized lowercase a-z characters.
      * 
      * @param in
-     *            a string
-     * @return the converted string in lower case.
+     *            the String to be normalized
+     * @return the normalized String in lower case.
      */
     public static final String normalizeString(String in) {
-        if (in == null) {
+        if ((in == null) || (in.trim().length() == 0))
             return "";
-        }
 
-        in = in.toLowerCase(Locale.GERMANY);
+        in = in.toLowerCase(Locale.GERMANY).trim();
 
-        return AE_PATTERN.matcher( // replace "ä" by "ae"
-                OE_PATTERN.matcher( // replace "ö" by "oe"
-                        UE_PATTERN.matcher( // replace "ü" by "ue"
-                                SZ_PATTERN.matcher(in).replaceAll("ss")) // replace
-                                                                            // "ß"
-                                                                            // by
-                                                                            // "ss"
-                                .replaceAll("ue")).replaceAll("oe")).replaceAll("ae");
+        for (int i = 0; i < patterns.length; i++)
+            in = patterns[i].matcher(in).replaceAll(replace[i]);
+
+        return in;
     }
 }
