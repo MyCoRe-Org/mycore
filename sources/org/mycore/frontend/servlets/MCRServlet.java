@@ -73,8 +73,6 @@ public class MCRServlet extends HttpServlet {
 
 	private final static boolean POST = false;
 
-	protected String ReqCharEncoding;
-
 	protected static MCRCache requestParamCache = new MCRCache(40);
 
 	static {
@@ -193,7 +191,7 @@ public class MCRServlet extends HttpServlet {
 		}
 
 		// Try to set encoding of form values
-		ReqCharEncoding = req.getCharacterEncoding();
+		String ReqCharEncoding = req.getCharacterEncoding();
 
 		if (ReqCharEncoding == null) {
 			// Set default to UTF-8
