@@ -376,9 +376,13 @@ public class MCRServlet extends HttpServlet {
 	public static String getRemoteAddr(HttpServletRequest req) {
 		String addr = req.getHeader("X_FORWARDED_FOR");
 
-		if ((addr == null) || (addr.trim().length() == 0)) {
-			addr = req.getRemoteAddr();
-		}
+        if ((addr == null) || (addr.trim().length() == 0)) {
+            addr = req.getHeader("x-forwarded-for");
+        }
+
+        if ((addr == null) || (addr.trim().length() == 0)) {
+            addr = req.getRemoteAddr();
+        }
 
 		return addr;
 	}
