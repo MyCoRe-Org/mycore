@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.1 $ $Date: 2005-12-14 14:18:24 $ -->
+<!-- $Revision: 1.2 $ $Date: 2005-12-20 13:15:04 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -10,6 +10,7 @@
     <property name="hostname"      value="localhost" />
     <property name="port"          value="8080" />
     <property name="servletpath"   value="/docportal/services/AdminService" />
+    <property name="webservice"    value="/docportal/services/MCRWebService" />
 
 	<!-- ============================================== -->
 
@@ -37,6 +38,10 @@
         webapps                         copy files to webapps
         deploy                          deploy webservices
         undeploy                        undeploy webservices
+        wsdl2java                       generate stub from wsdl
+        compile.client                  compile webservice client
+        wsclient.cmd                    build wsclient command
+        clean                           delete directory build
 		</echo>
 	</target>
 	
@@ -48,6 +53,7 @@
     <mkdir dir="${basedir}/classes" />
     <path id="mycore.classpath">
       <fileset dir="${basedir}/lib" includes="*.jar"/>
+      <fileset dir="${basedir}/modules/module-webservices/lib" includes="*.jar"/>
     </path>
   </target>
 
@@ -56,6 +62,7 @@
     <javac srcdir="${basedir}/modules/module-webservices/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
+           excludes="org/mycore/services/wsclient/**"
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
@@ -82,8 +89,6 @@
       <fileset dir="${env.MYCORE_HOME}/modules/module-webservices/lib" includes="*.jar" />
     </copy>
   </target>
-
-  <!-- ============================================== -->
 
   <!-- ============================================== -->
 
@@ -119,6 +124,81 @@
     />
   </target>
 
+  <!-- ============================================== -->
+
+  <target name="wsdl2java">
+    <path id="wsdl2java.classpath">
+      <fileset dir="../../lib" includes="*.jar" />
+      <fileset dir="lib" includes="*.jar"/>
+    </path>
+    <taskdef name="axis-wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask" classpathref="wsdl2java.classpath" />
+    <delete dir="build/src" />
+    <mkdir dir="build/src" />
+    <axis-wsdl2java 
+      all="true"
+      output="build/src"
+      testcase="false"
+      verbose="true"
+      serverside="true"
+      url="http://${hostname}:${port}${webservice}?wsdl" 
+    >
+      <mapping namespace="http://${hostname}:${port}${webservice}" package="org.mycore.services.wsclient" /> 
+    </axis-wsdl2java>
+  </target>
+
+  <!-- ============================================== -->
+
+  <target name="compile.client" depends="wsdl2java">
+    <echo>
+      Compiling WebServices client
+    </echo>
+    <mkdir dir="build/classes" />
+    <path id="axis.classpath">
+      <fileset dir="../../lib" includes="*.jar" />
+      <fileset dir="lib" includes="*.jar"/>
+    </path>
+    <javac srcdir="sources" includes="org/mycore/services/wsclient/**" destdir="build/classes" classpathref="axis.classpath" encoding="ISO-8859-1">
+      <src path="sources" />
+      <src path="build/src" />
+    </javac>
+  </target>
+  
+  <!-- ============================================== -->
+
+    <target name="wsclient.cmd" depends="compile.client">
+    <echo>
+
+      Generating wsclient.cmd for starting wsclient from Command Line
+    </echo>
+    
+    <mkdir dir="build/bin" />
+
+    <echo file="build/bin/mycore.properties"/>
+    
+    <path id="wsclient.classpath">
+      <fileset dir="../../lib" includes="*.jar" />
+      <fileset dir="lib" includes="*.jar"/>
+      <pathelement location="build/classes" />
+    </path>
+    
+   <property name="path"           refid="wsclient.classpath"/>
+
+    <echo file="build/bin/wsclient.cmd">@echo off 
+SET AXISCLASSPATH=${path};%CLASSPATH% 
+java -Xms128m -Xmx512m -classpath "%AXISCLASSPATH%" org.mycore.services.wsclient.MCRWebServiceClient %1 %2 %3 %4 %5 %6 %7 %8 %9
+    </echo>
+  </target>
+  
+  <!-- ============================================== -->
+
+    <target name="clean">
+    <echo>
+      Delete directory "build"
+    </echo>
+    
+    <delete dir="build" />
+  </target>
+  
 </project>
 
 
