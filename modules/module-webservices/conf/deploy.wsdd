@@ -14,5 +14,13 @@
       </parameter>
     </operation>
 
+    <operation name="MCRDoQuery">
+      <documentation>This operation does a search in mycore
+                     Result is org.w3c.dom.Document</documentation>
+      <parameter name="query" type="apachesoap:Document" xmlns:apachesoap="http://xml.apache.org/xml-soap">
+        <documentation>query as xml in mycore query language</documentation>
+      </parameter>
+    </operation>
+
   </service>
 </deployment>
