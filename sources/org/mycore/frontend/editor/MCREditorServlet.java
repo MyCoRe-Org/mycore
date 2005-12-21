@@ -408,7 +408,7 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(sub.buildRepeatElements());
 
             logger.info("Editor goto subselect at " + url);
-            res.sendRedirect(url);
+            res.sendRedirect(res.encodeRedirectURL(url));
         } else {
             int pos = button.lastIndexOf("-");
 
@@ -444,7 +444,7 @@ public class MCREditorServlet extends MCRServlet {
             sb.append(sessionID);
 
             logger.debug("Editor redirect to " + sb.toString());
-            res.sendRedirect(sb.toString());
+            res.sendRedirect(res.encodeRedirectURL(sb.toString()));
         }
     }
 
@@ -473,7 +473,7 @@ public class MCREditorServlet extends MCRServlet {
             sb.append(sessionID);
 
             logger.debug("Editor redirect to " + sb.toString());
-            res.sendRedirect(sb.toString());
+            res.sendRedirect(res.encodeRedirectURL(sb.toString()));
 
             return;
         }
@@ -486,7 +486,7 @@ public class MCREditorServlet extends MCRServlet {
             String cancelURL = ((cancel != null) ? cancel.getAttributeValue("url", (String) null) : null);
 
             if (cancelURL != null) {
-                res.sendRedirect(cancelURL);
+                res.sendRedirect(res.encodeRedirectURL(cancelURL));
             }
 
             return;
@@ -539,7 +539,7 @@ public class MCREditorServlet extends MCRServlet {
     private void sendToURL(HttpServletRequest req, HttpServletResponse res) throws IOException {
         StringBuffer url = new StringBuffer(req.getParameter("_target-url"));
         url.append('?').append(req.getQueryString());
-        res.sendRedirect(url.toString());
+        res.sendRedirect(res.encodeRedirectURL(url.toString()));
     }
 
     private void sendToDisplay(HttpServletRequest req, HttpServletResponse res, Document xml) throws IOException, ServletException {
@@ -569,7 +569,7 @@ public class MCREditorServlet extends MCRServlet {
         sb.append(sessionID);
 
         logger.debug("Editor redirect to " + sb.toString());
-        res.sendRedirect(sb.toString());
+        res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
     private void sendToDebug(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
