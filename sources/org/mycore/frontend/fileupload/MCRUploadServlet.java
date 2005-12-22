@@ -182,9 +182,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        MCREditorSubmission sub = (MCREditorSubmission)( req.getAttribute( "MCREditorSubmission" ) );
-        MCRRequestParameters parms = ( sub == null ? new MCRRequestParameters( req ) : sub.getParameters() );
-        
+        MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
+        MCRRequestParameters parms = (sub == null ? new MCRRequestParameters(req) : sub.getParameters());
+
         String method = parms.getParameter("method");
 
         if (method.equals("redirecturl")) {
@@ -230,32 +230,44 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             MCRUploadHandler handler = MCRUploadHandlerManager.getHandler(uploadId);
 
             LOGGER.info("UploadHandler form based file upload for ID " + uploadId);
-            
-            Element uploads = sub.getXML().getRootElement();
-            List paths = uploads.getChildren( "path" );
-            List files = sub.getFiles();
-            
-            if( ( files != null ) && ( files.size() >= 0 ) )
-            {
-              int numFiles = files.size();
-              LOGGER.info("UploadHandler uploading " + numFiles + " file(s)" );
-              handler.startUpload( numFiles );
 
-              for( int i = 0; i < numFiles; i++ )
-              {
-                FileItem item = (FileItem)( files.get( i ) );
-                InputStream in = item.getInputStream();
-                String path = ((Element)( paths.get( i ))).getTextTrim();
-                int pos = Math.max( path.lastIndexOf( '\\' ), path.lastIndexOf( "/" ) );
-                path = path.substring( pos + 1 );
-            
-                LOGGER.info("UploadServlet uploading " + path);
-                handler.receiveFile(path, in);
-              }
-            
-              handler.finishUpload();
+            Element uploads = sub.getXML().getRootElement();
+            List paths = uploads.getChildren("path");
+            List files = sub.getFiles();
+
+            if ((files != null) && (files.size() >= 0)) {
+                int numFiles = files.size();
+                LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
+                handler.startUpload(numFiles);
+
+                for (int i = 0; i < numFiles; i++) {
+                    FileItem item = (FileItem) (files.get(i));
+                    InputStream in = item.getInputStream();
+                    String path = ((Element) (paths.get(i))).getTextTrim();
+                    path = getFileName(path);
+
+                    LOGGER.info("UploadServlet uploading " + path);
+                    if (path.toLowerCase().endsWith(".zip")) {
+                        LOGGER.debug("UploadServlet unpacking ZIP file " + path);
+                        ZipInputStream zis = new ZipInputStream(in);
+                        ZipEntry entry = null;
+                        while ((entry = zis.getNextEntry()) != null) {
+                            path = entry.getName();
+                            if (entry.isDirectory()) {
+                                LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
+                                continue;
+                            }
+
+                            LOGGER.info("UploadServlet unpacking ZIP entry " + path);
+                            handler.receiveFile(path, zis);
+                        }
+                    } else
+                        handler.receiveFile(path, in);
+                }
+
+                handler.finishUpload();
             }
-            
+
             String url = handler.getRedirectURL();
             LOGGER.info("UploadServlet redirect to " + url);
             res.sendRedirect(res.encodeRedirectURL(url));
@@ -263,6 +275,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             return;
         }
+    }
+
+    protected String getFileName(String path) {
+        int pos = Math.max(path.lastIndexOf('\\'), path.lastIndexOf("/"));
+        return path.substring(pos + 1);
     }
 
     protected void sendException(HttpServletResponse res, Exception ex) throws Exception {
