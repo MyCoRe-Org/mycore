@@ -119,7 +119,7 @@ public class MCRUploadApplet extends JApplet {
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
         content.setLayout(gbl);
-        content.setBackground(Color.white);
+        content.setBackground( new Color( 0xCA, 0xD9, 0xE0 ) );
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JLabel jlChoose = new JLabel("Wählen Sie Dateien oder Verzeichnisse aus:");
