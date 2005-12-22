@@ -134,7 +134,7 @@ public class MCRAccessManager {
     }
 
     public static boolean checkAccess(String pool, String objID, MCRSession session) {
-        MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
+        MCRUser user = MCRUserMgr.instance().retrieveUserForAccessManager(session.getCurrentUserID());
         MCRIPAddress ip;
 
         try {
