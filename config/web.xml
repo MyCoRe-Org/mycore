@@ -72,14 +72,6 @@
             <servlet-name>MCRIndexServlet</servlet-name>
             <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexServlet</servlet-class>
       </servlet>    
-      <servlet id="MCRUserAdmin">
-            <servlet-name>MCRUserAdminServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.servlets.MCRUserAdminServlet</servlet-class>
-      </servlet>
-      <servlet id="MCRUserEditor">
-            <servlet-name>MCRUserEditorServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.servlets.MCRUserEditorServlet</servlet-class>
-      </servlet>
       <servlet id="MCRObject">
             <servlet-name>MCRObjectServlet</servlet-name>
             <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
