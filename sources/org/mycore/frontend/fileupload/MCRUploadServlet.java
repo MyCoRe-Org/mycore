@@ -25,6 +25,7 @@ package org.mycore.frontend.fileupload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -248,19 +249,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
                     LOGGER.info("UploadServlet uploading " + path);
                     if (path.toLowerCase().endsWith(".zip")) {
-                        LOGGER.debug("UploadServlet unpacking ZIP file " + path);
-                        ZipInputStream zis = new ZipInputStream(in);
-                        ZipEntry entry = null;
-                        while ((entry = zis.getNextEntry()) != null) {
-                            path = entry.getName();
-                            if (entry.isDirectory()) {
-                                LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
-                                continue;
-                            }
-
-                            LOGGER.info("UploadServlet unpacking ZIP entry " + path);
-                            handler.receiveFile(path, zis);
-                        }
+                        uploadZipFile(handler, in);
                     } else
                         handler.receiveFile(path, in);
                 }
@@ -274,6 +263,29 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             handler.unregister();
 
             return;
+        }
+    }
+
+    private void uploadZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
+        ZipInputStream zis = new ZipInputStream(in);
+        ZipEntry entry = null;
+        while ((entry = zis.getNextEntry()) != null) {
+            String path = entry.getName();
+
+            // Convert absolute paths to relative paths:
+            int pos = path.indexOf(":");
+            if (pos >= 0)
+                path = path.substring(pos + 1);
+            while (path.startsWith("\\") || path.startsWith("/"))
+                path = path.substring(1);
+
+            if (entry.isDirectory()) {
+                LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
+                continue;
+            }
+
+            LOGGER.info("UploadServlet unpacking ZIP entry " + path);
+            handler.receiveFile(path, zis);
         }
     }
 
