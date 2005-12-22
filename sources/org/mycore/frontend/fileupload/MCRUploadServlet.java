@@ -25,6 +25,7 @@ package org.mycore.frontend.fileupload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -32,6 +33,7 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -41,9 +43,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.frontend.editor.MCREditorSubmission;
+import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -176,7 +182,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        String method = req.getParameter("method");
+        MCREditorSubmission sub = (MCREditorSubmission)( req.getAttribute( "MCREditorSubmission" ) );
+        MCRRequestParameters parms = ( sub == null ? new MCRRequestParameters( req ) : sub.getParameters() );
+        
+        String method = parms.getParameter("method");
 
         if (method.equals("redirecturl")) {
             String uploadId = req.getParameter("uploadId");
@@ -216,6 +225,43 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
             uploadHandler.finishUpload();
             sendResponse(res, "OK");
+        } else if (method.equals("formBasedUpload")) {
+            String uploadId = parms.getParameter("uploadId");
+            MCRUploadHandler handler = MCRUploadHandlerManager.getHandler(uploadId);
+
+            LOGGER.info("UploadHandler form based file upload for ID " + uploadId);
+            
+            Element uploads = sub.getXML().getRootElement();
+            List paths = uploads.getChildren( "path" );
+            List files = sub.getFiles();
+            
+            if( ( files != null ) && ( files.size() >= 0 ) )
+            {
+              int numFiles = files.size();
+              LOGGER.info("UploadHandler uploading " + numFiles + " file(s)" );
+              handler.startUpload( numFiles );
+
+              for( int i = 0; i < numFiles; i++ )
+              {
+                FileItem item = (FileItem)( files.get( i ) );
+                InputStream in = item.getInputStream();
+                String path = ((Element)( paths.get( i ))).getTextTrim();
+                int pos = Math.max( path.lastIndexOf( '\\' ), path.lastIndexOf( "/" ) );
+                path = path.substring( pos + 1 );
+            
+                LOGGER.info("UploadServlet uploading " + path);
+                handler.receiveFile(path, in);
+              }
+            
+              handler.finishUpload();
+            }
+            
+            String url = handler.getRedirectURL();
+            LOGGER.info("UploadServlet redirect to " + url);
+            res.sendRedirect(res.encodeRedirectURL(url));
+            handler.unregister();
+
+            return;
         }
     }
 
