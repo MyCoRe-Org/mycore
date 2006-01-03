@@ -45,7 +45,6 @@ import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRLayoutServlet;
@@ -58,7 +57,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * This servlet provides a web interface to query the datastore using XQueries
  * and deliver the result list
  * 
- * @author Frank L?tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
@@ -82,42 +81,25 @@ public class MCRQueryServlet extends MCRServlet {
 
     private static final String PARAM_IN_ORDER = "inOrder";
 
-    private boolean customSort = false;
-
-    private String sortKey;
-
-    private boolean inOrder = true;
-
-    private boolean saveResults;
-
     private static Logger LOGGER = Logger.getLogger(MCRQueryServlet.class);
 
+    private boolean customSort = false;
+    private String sortKey;
+    private boolean inOrder = true;
+    private boolean saveResults;
     private String mode;
-
     private String query;
-
     private String type;
-
     private String layout;
-
     private String lang;
-
     private String[] hosts;
-
     private String att_host;
-
     private String view;
-
     private String referer;
-
     private String host;
-
     private int maxresults = 0;
-
     private int offset;
-
     private int size;
-
     private boolean cachedFlag;
 
     /**
@@ -269,15 +251,11 @@ public class MCRQueryServlet extends MCRServlet {
             if (resarray.size() == 1) {
                 resarray.setStatus(0, status);
             }
-            // cut results if more than "maxresults"
-            else if (maxresults > 0) {
-                resarray.cutDownTo(maxresults);
-            }
 
             HashSet sortTypes = new HashSet();
 
             // initialSort is set to true by the SearchMaskServlet
-            if (mode.equals("ResultList") && saveResults) {
+            if (mode.equals("ResultList") && saveResults && !customSort) {
                 // Only in mode ResultList sorting makes sense
                 StringTokenizer st = new StringTokenizer(CONFIG.getString(MCR_SORTER_CONFIG_PREFIX + ".types"), ",");
 
@@ -288,18 +266,15 @@ public class MCRQueryServlet extends MCRServlet {
 
             if (customSort) {
                 // when I'm in here a ResultList exists and I have to resort it.
-                try {
-                    jdom = resarray.exportAllToDocument();
-                    jdom = reSort(jdom);
-                } catch (JDOMException e) {
-                    generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while RE-sorting JDOM", new MCRException("Import of elements failed due to some reason!", e), false);
-                }
+                    sort(resarray, lang.toLowerCase());
             } else if (sortTypes.contains(type)) {
                 sort(resarray, lang.toLowerCase());
-                jdom = resarray.exportAllToDocument();
-            } else {
-                jdom = resarray.exportAllToDocument();
             }
+            // cut results if more than "maxresults"
+            if (maxresults > 0) {
+                resarray.cutDownTo(maxresults);
+            }
+            jdom = resarray.exportAllToDocument();
         }
 
         if (mode.equals("ResultList") && saveResults) {
@@ -321,7 +296,7 @@ public class MCRQueryServlet extends MCRServlet {
             LOGGER.info("MCRQueryServlet: forward to MCRLayoutServlet!");
             rd.forward(request, response);
         } catch (Exception ex) {
-            generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while forwarding XML document to LayoutServlet!", ex, false);
+            LOGGER.warn("Error while forwading result to MCRLayoutServlet.",ex);
 
             return;
         }
