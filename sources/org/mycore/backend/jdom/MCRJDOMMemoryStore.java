@@ -36,7 +36,10 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.fieldquery.MCRSearcherFactory;
+import org.mycore.common.events.*;
 
 /**
  * This class implements the memory store based on JDOM documents.
@@ -174,6 +177,20 @@ public class MCRJDOMMemoryStore {
             MCRNormalizeText.normalizeJDOM(jdom_document);
             objects.put(mid, jdom_document.detachRootElement());
             logger.debug("Load to JDOM tree " + stid);
+            
+            try
+            {
+              MCREventHandlerBase bs = (MCREventHandlerBase)MCRSearcherFactory.getSearcher( "jdomm");
+              if ( null != bs )
+              {
+                MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
+                MCRObject mcrobj = new MCRObject();
+                mcrobj.receiveFromDatastore(mid);
+                evt.put("object", mcrobj);
+                bs.doHandleEvent(evt);
+              }
+            } catch (MCRConfigurationException e){}
+              catch (MCRException e) {}
         }
 
         long stopdate = System.currentTimeMillis();
