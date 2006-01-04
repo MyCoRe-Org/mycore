@@ -170,7 +170,7 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
     private Document prepareStylesheet() {
         Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
         Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
-        Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRMemorySearcher");
+        Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.backend.jdom.MCRJDOMSearcher");
 
         Element stylesheet = new Element("stylesheet");
         stylesheet.setAttribute("version", "1.0");
