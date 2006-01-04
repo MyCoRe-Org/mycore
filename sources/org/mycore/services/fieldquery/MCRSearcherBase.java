@@ -128,6 +128,21 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
     }
 
     /**
+     * Handles object repair events. 
+     * Calls handleObjectUpdated
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+      handleObjectUpdated( evt, obj);
+    }
+    
+    
+    
+    /**
      * Adds field values to the search index. Searchers that need an indexer
      * must overwrite this method to store the values in their backend index. If
      * this class is configured as event handler, this method is automatically
