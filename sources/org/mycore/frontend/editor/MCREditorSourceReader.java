@@ -37,6 +37,9 @@ import org.mycore.frontend.servlets.MCRServlet;
  * @author Frank Lützenkirchen
  */
 public class MCREditorSourceReader {
+    
+    private final static int MAX_URI_PROTOCOL_LENGTH=10;
+    
     /**
      * Reads XML input from an url and builds a list of source variable elements
      * that can be processed by editor.xsl
@@ -75,11 +78,12 @@ public class MCREditorSourceReader {
 
             return null;
         } else {
-            if (!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
+            //:NOTE: adjust MAX_URI_PROTOCOL_LENGTH according to the longest protocol name MCRURIResolver understands
+            if (url.substring(0,(url.length()<MAX_URI_PROTOCOL_LENGTH)? url.length():MAX_URI_PROTOCOL_LENGTH).indexOf(":")==-1) {
                 url = MCRServlet.getBaseURL() + url;
             }
 
-            if (!url.startsWith("file:")) {
+            if (url.startsWith("http:") || url.startsWith("https:")) {
                 StringBuffer sb = new StringBuffer(url);
                 sb.append((url.indexOf("?") == -1) ? "?" : "&");
                 sb.append("MCRSessionID=");
