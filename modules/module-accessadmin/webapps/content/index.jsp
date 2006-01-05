@@ -6,6 +6,7 @@
 	org.mycore.common.MCRSession,
 	org.mycore.frontend.servlets.MCRServlet"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ page import="org.mycore.user.MCRGroup" %>
 
 <%
 	MCRSession mcrSession = MCRServlet.getSession(request);
@@ -13,7 +14,7 @@
     String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String pageurl = (String) request.getAttribute("page");
 
-	if(! MCRUserMgr.instance().hasPrivilege(mcrSession.getCurrentUserID(), "user administrator")){
+	if(! user.isMemberOf(new MCRGroup("admingroup"))){
 		pageurl="error.jsp";
 	}
 
