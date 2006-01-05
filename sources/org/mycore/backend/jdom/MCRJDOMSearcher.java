@@ -76,7 +76,7 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
     private TransformerFactory factory = TransformerFactory.newInstance();
 
     protected void addToIndex(String entryID, List fields) {
-        LOGGER.info("MCRMemorySearcher indexing data of " + entryID);
+        LOGGER.info("MCRJDOMSearcher indexing data of " + entryID);
 
         if ((fields == null) || (fields.size() == 0)) {
             return;
@@ -102,13 +102,13 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
     }
 
     protected void removeFromIndex(String entryID) {
-        LOGGER.info("MCRMemorySearcher removing indexed data of " + entryID);
+        LOGGER.info("MCRJDOMSearcher removing indexed data of " + entryID);
         map.remove(entryID);
     }
 
     public MCRResults search(MCRCondition cond, List order, int maxResults) {
         String xslCondition = buildXSLCondition(cond);
-        LOGGER.debug("MCRMemorySearcher searching for " + xslCondition);
+        LOGGER.debug("MCRJDOMSearcher searching for " + xslCondition);
 
         if (xslTemplate == null) {
             xslTemplate = prepareStylesheet();
@@ -133,7 +133,7 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
         }
 
         results.setComplete();
-        LOGGER.debug("MCRMemorySearcher results completed");
+        LOGGER.debug("MCRJDOMSearcher results completed");
 
         return results;
     }
@@ -302,9 +302,10 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
 
         StringTokenizer st = new StringTokenizer(words);
 
+        String valuelow = value.toLowerCase();
         while (st.hasMoreTokens())
 
-            if (value.indexOf(st.nextToken()) == -1) {
+            if (valuelow.indexOf(st.nextToken().toLowerCase()) == -1) {
                 return false;
             }
 
