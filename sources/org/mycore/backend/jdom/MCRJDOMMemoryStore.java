@@ -169,6 +169,14 @@ public class MCRJDOMMemoryStore {
         String stid;
         MCRObjectID mid;
         org.jdom.Document jdom_document;
+        
+        MCREventHandlerBase bs = null;
+        try
+        {
+          bs = (MCREventHandlerBase)MCRSearcherFactory.getSearcher( "jdomm");
+        } 
+        catch (MCRConfigurationException e){}
+        catch (MCRException e) {}
 
         for (int i = 0; i < size; i++) {
             stid = (String) ar.get(i);
@@ -178,19 +186,14 @@ public class MCRJDOMMemoryStore {
             objects.put(mid, jdom_document.detachRootElement());
             logger.debug("Load to JDOM tree " + stid);
             
-            try
+            if ( null != bs )
             {
-              MCREventHandlerBase bs = (MCREventHandlerBase)MCRSearcherFactory.getSearcher( "jdomm");
-              if ( null != bs )
-              {
-                MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
-                MCRObject mcrobj = new MCRObject();
-                mcrobj.receiveFromDatastore(mid);
-                evt.put("object", mcrobj);
-                bs.doHandleEvent(evt);
-              }
-            } catch (MCRConfigurationException e){}
-              catch (MCRException e) {}
+              MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
+              MCRObject mcrobj = new MCRObject();
+              mcrobj.receiveFromDatastore(mid);
+              evt.put("object", mcrobj);
+              bs.doHandleEvent(evt);
+            }
         }
 
         long stopdate = System.currentTimeMillis();
