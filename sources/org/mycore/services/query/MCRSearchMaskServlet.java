@@ -51,11 +51,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @version $Revision$ $Date$
  */
 public class MCRSearchMaskServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
     // logger
     protected static Logger LOGGER = Logger.getLogger(MCRSearchMaskServlet.class.getName());
-
-    // The default mode for this class
-    String mode = "CreateSearchMask";
 
     /**
      * This method handles HTTP requests and resolves them to output. The method
@@ -72,14 +70,14 @@ public class MCRSearchMaskServlet extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
-        mode = request.getParameter("mode");
+        String mode = request.getParameter("mode");
 
         if (mode == null) {
             mode = "CreateSearchMask";
         }
 
         if (mode.equals("CreateSearchMask")) {
-            createSearchMask(request, response);
+            createSearchMask(request, response, mode);
         }
 
         if (mode.equals("CreateQuery")) {
@@ -130,7 +128,7 @@ public class MCRSearchMaskServlet extends MCRServlet {
      * @exception ServletException
      *                for errors from the servlet engine.
      */
-    protected void createSearchMask(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void createSearchMask(HttpServletRequest request, HttpServletResponse response, String mode) throws IOException, ServletException {
         String type = request.getParameter("type");
         String layout = request.getParameter("layout");
 

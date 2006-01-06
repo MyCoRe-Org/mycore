@@ -43,13 +43,12 @@ import org.mycore.user.MCRUserMgr;
  * @version $Revision$ $Date$
  */
 public class MCRUserServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     // user ID and password of the guest user
     private static String GUEST_ID;
 
     private static String GUEST_PWD;
-
-    // The default mode for this class
-    String mode = "Select";
 
     /*
      * (non-Javadoc)
@@ -75,7 +74,7 @@ public class MCRUserServlet extends MCRServlet {
      *             for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
-        mode = getProperty(job.getRequest(), "mode");
+        String mode = getProperty(job.getRequest(), "mode");
 
         if (mode.length() == 0) {
             mode = "Select";
