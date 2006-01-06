@@ -39,6 +39,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
@@ -52,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.frontend.editor.MCREditorServletHelper;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.user.MCRGroup;
@@ -426,7 +429,17 @@ public class MCRStartEditorServlet extends MCRServlet {
 
 			String base = getBaseURL() + myfile;
 			Properties params = new Properties();
-			params.put("XSL.editor.source.new", "true");
+            //start changes for submitting xml templates
+            Element root=new Element("mycoreobject");
+            LOGGER.debug("calling buildXMLTemplate...");
+            if (MCREditorServletHelper.buildXMLTemplate(job.getRequest(),root)){
+                MCRSessionMgr.getCurrentSession().put("wnewobj",root);
+                params.put("XSL.editor.source.url", "session:wnewobj");
+            } else {
+                LOGGER.debug("XMLTemplate is empty");
+                params.put("XSL.editor.source.new", "true");//old code
+            }
+            //end changes
 			params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
 			params.put("mcrid", mytfmcrid);
 			params.put("type", mytype);
