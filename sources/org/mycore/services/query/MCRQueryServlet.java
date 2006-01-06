@@ -67,9 +67,10 @@ public class MCRQueryServlet extends MCRServlet {
     // TODO: we should invent something here!!
     private static final long serialVersionUID = 1L;
 
-    private static MCRConfiguration conf = MCRConfiguration.instance();
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private MCRQueryCollector collector;
+    private static final MCRQueryCollector QUERY_COLLECTOR = new MCRQueryCollector(CONFIG.getInt("MCR.Collector_Thread_num", 2), CONFIG.getInt(
+            "MCR.Agent_Thread_num", 6));;
 
     private static final String MCR_SORTER_CONFIG_PREFIX = "MCR.XMLSorter";
 
@@ -83,39 +84,12 @@ public class MCRQueryServlet extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRQueryServlet.class);
 
-    private boolean customSort = false;
-    private String sortKey;
-    private boolean inOrder = true;
-    private boolean saveResults;
-    private String mode;
-    private String query;
-    private String type;
-    private String layout;
-    private String lang;
-    private String[] hosts;
-    private String att_host;
-    private String view;
-    private String referer;
-    private String host;
-    private int maxresults = 0;
-    private int offset;
-    private int size;
-    private boolean cachedFlag;
-
     /**
      * The initialization method for this servlet. This read the default
      * language from the configuration.
      */
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
-
-        collector = (MCRQueryCollector) this.getServletContext().getAttribute("QueryCollector");
-
-        if (collector == null) {
-            collector = new MCRQueryCollector(CONFIG.getInt("MCR.Collector_Thread_num", 2), CONFIG.getInt("MCR.Agent_Thread_num", 6));
-        }
-
-        this.getServletContext().setAttribute("QueryCollector", collector);
     }
 
     /**
@@ -131,16 +105,17 @@ public class MCRQueryServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        cachedFlag = false;
 
         HttpSession session = request.getSession(false); // if
 
         // session
         // exists;
         org.jdom.Document jdom = null;
+        Query qParam = new Query();
+        qParam.cachedFlag = false;
 
         // check Parameter to meet requirements
-        if (!checkInputParameter(request)) {
+        if (!checkInputParameter(request, qParam)) {
             StringBuffer buf = new StringBuffer();
             Set entries = request.getParameterMap().entrySet();
             Iterator it = entries.iterator();
@@ -151,13 +126,14 @@ public class MCRQueryServlet extends MCRServlet {
                 buf.append(entry.getKey()).append(" : ").append(MCRUtils.arrayToString((Object[]) entry.getValue(), ", ")).append("\n");
             }
 
-            generateErrorPage(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "Some input parameters don't meet the requirements!:\n" + buf.toString(), new MCRException("Input parameter mismatch!"), false);
+            generateErrorPage(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "Some input parameters don't meet the requirements!:\n"
+                    + buf.toString(), new MCRException("Input parameter mismatch!"), false);
 
             return;
         }
 
         // Check if session is valid to performing caching functions
-        if (!validateCacheSession(request)) {
+        if (!validateCacheSession(request, qParam)) {
             MCRException ex = new MCRException("Session invalid!");
             String sId = session.getId();
             StringBuffer msg = new StringBuffer("Requested session is invalid, maybe it was timed out!\n");
@@ -167,22 +143,23 @@ public class MCRQueryServlet extends MCRServlet {
             return;
         }
 
-        lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        LOGGER.info("MCRQueryServlet : lang = " + lang);
+        qParam.lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        LOGGER.info("MCRQueryServlet : lang = " + qParam.lang);
 
         // prepare the stylesheet name
         Properties parameters = MCRLayoutServlet.buildXSLParameters(request);
-        String style = parameters.getProperty("Style", mode + "-" + layout + "-" + lang);
+        String style = parameters.getProperty("Style", qParam.mode + "-" + qParam.layout + "-" + qParam.lang);
         LOGGER.info("Style = " + style);
 
         // set staus for neigbours
         int status = getStatus(request);
 
-        if (type.equals("class")) {
-            jdom = queryClassification(host, type, query);
+        if (qParam.type.equals("class")) {
+            jdom = queryClassification(qParam.host, qParam.type, qParam.query);
 
             if (jdom == null) {
-                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error!", new MCRException("No classification or category exists"), false);
+                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error!", new MCRException(
+                        "No classification or category exists"), false);
 
                 return;
             }
@@ -194,7 +171,8 @@ public class MCRQueryServlet extends MCRServlet {
                 RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
                 rd.forward(request, response);
             } catch (Exception ex) {
-                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while forwarding XML document to LayoutServlet!", ex, false);
+                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while forwarding XML document to LayoutServlet!", ex,
+                        false);
 
                 return;
             }
@@ -202,50 +180,52 @@ public class MCRQueryServlet extends MCRServlet {
             return;
         }
 
-        if (cachedFlag) {
+        if (qParam.cachedFlag) {
             // retrieve result list from session cache
             try {
                 // session at this point is valid, load objects
                 jdom = (org.jdom.Document) session.getAttribute("CachedList");
-                type = (String) session.getAttribute("CachedType");
+                qParam.type = (String) session.getAttribute("CachedType");
 
-                if ((jdom == null) || (type == null)) {
+                if ((jdom == null) || (qParam.type == null)) {
                     throw new MCRException("Either jdom or type (or both) were null!");
                 }
             } catch (Exception ex) {
-                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to get jdom and type out of session cache!", ex, false);
+                generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to get jdom and type out of session cache!", ex,
+                        false);
 
                 return;
             }
 
-            if (customSort) {
+            if (qParam.customSort) {
                 try {
                     // when I'm in here a ResultList exists and I have to resort
                     // it.
-                    jdom = reSort(jdom);
+                    jdom = reSort(jdom, qParam);
                 } catch (JDOMException e) {
-                    generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while RE-sorting JDOM", new MCRException("Import of elements failed due to some reason!", e), false);
+                    generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while RE-sorting JDOM", new MCRException(
+                            "Import of elements failed due to some reason!", e), false);
                 }
-            } else if ((view.equals("prev") || view.equals("next")) && (referer != null)) {
+            } else if ((qParam.view.equals("prev") || qParam.view.equals("next")) && (qParam.referer != null)) {
                 // user want's to browse the documents here..
-                browse(request, response, jdom);
+                browse(request, response, jdom, qParam);
 
                 return;
-            } else if ((offset == 0) && (size == 0)) {
+            } else if ((qParam.offset == 0) && (qParam.size == 0)) {
                 try {
-                    offset = Integer.parseInt(jdom.getRootElement().getAttributeValue("offset"));
-                    size = Integer.parseInt(jdom.getRootElement().getAttributeValue("size"));
+                    qParam.offset = Integer.parseInt(jdom.getRootElement().getAttributeValue("offset"));
+                    qParam.size = Integer.parseInt(jdom.getRootElement().getAttributeValue("size"));
                     LOGGER.debug("Found info about last position in resultlist!");
                 } catch (Exception e) {
                     LOGGER.warn("Failing to determine preset values of resultlist size and offset!");
-                    offset = 0;
-                    size = 0;
+                    qParam.offset = 0;
+                    qParam.size = 0;
                 }
             }
         } else {
             // cachedFlag==false
             MCRXMLContainer resarray = new MCRXMLContainer();
-            putResult(collector, host, type, query, resarray);
+            putResult(QUERY_COLLECTOR, qParam.host, qParam.type, qParam.query, resarray);
 
             // set neighbour status for documents
             if (resarray.size() == 1) {
@@ -255,7 +235,7 @@ public class MCRQueryServlet extends MCRServlet {
             HashSet sortTypes = new HashSet();
 
             // initialSort is set to true by the SearchMaskServlet
-            if (mode.equals("ResultList") && saveResults && !customSort) {
+            if (qParam.mode.equals("ResultList") && qParam.saveResults && !qParam.customSort) {
                 // Only in mode ResultList sorting makes sense
                 StringTokenizer st = new StringTokenizer(CONFIG.getString(MCR_SORTER_CONFIG_PREFIX + ".types"), ",");
 
@@ -264,28 +244,28 @@ public class MCRQueryServlet extends MCRServlet {
                 }
             }
 
-            if (customSort) {
+            if (qParam.customSort) {
                 // when I'm in here a ResultList exists and I have to resort it.
-                    sort(resarray, lang.toLowerCase());
-            } else if (sortTypes.contains(type)) {
-                sort(resarray, lang.toLowerCase());
+                sort(resarray, qParam);
+            } else if (sortTypes.contains(qParam.type)) {
+                sort(resarray, qParam);
             }
             // cut results if more than "maxresults"
-            if (maxresults > 0) {
-                resarray.cutDownTo(maxresults);
+            if (qParam.maxresults > 0) {
+                resarray.cutDownTo(qParam.maxresults);
             }
             jdom = resarray.exportAllToDocument();
         }
 
-        if (mode.equals("ResultList") && saveResults) {
-            jdom.getRootElement().setAttribute("offset", "" + offset).setAttribute("size", "" + size);
+        if (qParam.mode.equals("ResultList") && qParam.saveResults) {
+            jdom.getRootElement().setAttribute("offset", "" + qParam.offset).setAttribute("size", "" + qParam.size);
             session.setAttribute("CachedList", jdom);
-            session.setAttribute("CachedType", type);
+            session.setAttribute("CachedType", qParam.type);
         }
 
         try {
-            if (mode.equals("ResultList") && !style.equals("xml")) {
-                request.setAttribute(MCRLayoutServlet.JDOM_ATTR, cutJDOM(jdom, offset, size));
+            if (qParam.mode.equals("ResultList") && !style.equals("xml")) {
+                request.setAttribute(MCRLayoutServlet.JDOM_ATTR, cutJDOM(jdom, qParam.offset, qParam.size));
             } else {
                 request.setAttribute(MCRLayoutServlet.JDOM_ATTR, jdom);
             }
@@ -296,7 +276,7 @@ public class MCRQueryServlet extends MCRServlet {
             LOGGER.info("MCRQueryServlet: forward to MCRLayoutServlet!");
             rd.forward(request, response);
         } catch (Exception ex) {
-            LOGGER.warn("Error while forwading result to MCRLayoutServlet.",ex);
+            LOGGER.warn("Error while forwading result to MCRLayoutServlet.", ex);
 
             return;
         }
@@ -354,7 +334,8 @@ public class MCRQueryServlet extends MCRServlet {
             throw new MCRException("MCRQueryServlet: Sorry doesn't found searched document");
         }
 
-        int status = ((search.getAttributeValue(MCRXMLContainer.ATTR_SUCC).equals("true")) ? 1 : 0) + ((search.getAttributeValue(MCRXMLContainer.ATTR_PRED).equals("true")) ? 2 : 0);
+        int status = ((search.getAttributeValue(MCRXMLContainer.ATTR_SUCC).equals("true")) ? 1 : 0)
+                + ((search.getAttributeValue(MCRXMLContainer.ATTR_PRED).equals("true")) ? 2 : 0);
         id = search.getAttributeValue("id");
         host = search.getAttributeValue("host");
 
@@ -364,11 +345,12 @@ public class MCRQueryServlet extends MCRServlet {
         return result;
     }
 
-    private final MCRXMLContainer sort(MCRXMLContainer xmlcont, String lang) {
+    private final MCRXMLContainer sort(MCRXMLContainer xmlcont, Query qParam) {
         MCRXMLSortInterface sorter = null;
 
         try {
-            sorter = (MCRXMLSortInterface) (Class.forName(CONFIG.getString("MCR.XMLSorter." + type + ".InterfaceImpl", MCR_STANDARD_SORTER))).newInstance();
+            sorter = (MCRXMLSortInterface) (Class.forName(CONFIG.getString("MCR.XMLSorter." + qParam.type + ".InterfaceImpl", MCR_STANDARD_SORTER)))
+                    .newInstance();
         } catch (InstantiationException e) {
             throw new MCRException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
@@ -381,18 +363,18 @@ public class MCRQueryServlet extends MCRServlet {
             sorter.setServletContext(getServletContext());
         }
 
-        if (customSort) {
-            LOGGER.info("MCRQueryServlet: CustomSort enalbed. Sorting inorder: " + inOrder);
-            sorter.addSortKey(replString(sortKey, MCR_SORTER_CONFIG_DELIMITER, lang), inOrder);
+        if (qParam.customSort) {
+            LOGGER.info("MCRQueryServlet: CustomSort enalbed. Sorting inorder: " + qParam.inOrder);
+            sorter.addSortKey(replString(qParam.sortKey, MCR_SORTER_CONFIG_DELIMITER, qParam.lang), qParam.inOrder);
         } else {
             LOGGER.info("MCRQueryServlet: default sorting enabled by properties...");
 
             StringBuffer prop = new StringBuffer();
-            prop.append(MCR_SORTER_CONFIG_PREFIX).append('.').append(type).append(".keys.count");
+            prop.append(MCR_SORTER_CONFIG_PREFIX).append('.').append(qParam.type).append(".keys.count");
 
             int keynum = Integer.parseInt(CONFIG.getString(prop.toString(), "0"));
             boolean inorder = true;
-            int prefix = MCR_SORTER_CONFIG_PREFIX.length() + 1 + type.length() + ".keys.".length();
+            int prefix = MCR_SORTER_CONFIG_PREFIX.length() + 1 + qParam.type.length() + ".keys.".length();
 
             for (int key = 1; key <= keynum; key++) {
                 // get XPATH Expression and hope it's good, if not exist sort
@@ -400,7 +382,8 @@ public class MCRQueryServlet extends MCRServlet {
                 prop.delete(prefix, prop.length()).append(key).append(".inorder");
                 inorder = CONFIG.getBoolean(prop.toString(), true);
                 prop.delete(prefix, prop.length()).append(key);
-                sorter.addSortKey(replString(CONFIG.getString(prop.toString(), "./*/*/*/title[lang('" + lang + "')]"), MCR_SORTER_CONFIG_DELIMITER, lang), inorder);
+                sorter.addSortKey(replString(CONFIG.getString(prop.toString(), "./*/*/*/title[lang('" + qParam.lang + "')]"), MCR_SORTER_CONFIG_DELIMITER, qParam.lang),
+                        inorder);
             }
         }
 
@@ -460,30 +443,30 @@ public class MCRQueryServlet extends MCRServlet {
         return ((RemoteHost.equals(servletHost)) && (remotePath.equals(queryServletPath)) && (servletPort == remotePort)) ? true : false;
     }
 
-    private final boolean checkInputParameter(HttpServletRequest request) {
-        mode = getProperty(request, "mode");
-        query = getProperty(request, "query");
-        type = getProperty(request, "type");
-        layout = getProperty(request, "layout");
+    private final boolean checkInputParameter(HttpServletRequest request, Query qParam) {
+        qParam.mode = getProperty(request, "mode");
+        qParam.query = getProperty(request, "query");
+        qParam.type = getProperty(request, "type");
+        qParam.layout = getProperty(request, "layout");
 
         String saveResults_str = getProperty(request, "saveResults");
 
         if ((saveResults_str != null) && saveResults_str.equals("true")) {
-            saveResults = true;
+            qParam.saveResults = true;
         } else {
-            saveResults = false;
+            qParam.saveResults = false;
         }
 
         // multiple host are allowed
-        hosts = request.getParameterValues("hosts");
-        att_host = (String) request.getAttribute("hosts");
+        qParam.hosts = request.getParameterValues("hosts");
+        qParam.att_host = (String) request.getAttribute("hosts");
 
         // dont't overwrite host if getParameter("hosts") was successful
-        host = "";
+        qParam.host = "";
 
-        if ((att_host != null) && ((hosts == null) || (hosts.length == 0))) {
-            host = att_host;
-        } else if ((hosts != null) && (hosts.length > 0)) {
+        if ((qParam.att_host != null) && ((qParam.hosts == null) || (qParam.hosts.length == 0))) {
+            qParam.host = qParam.att_host;
+        } else if ((qParam.hosts != null) && (qParam.hosts.length > 0)) {
             // find a Instance of the local one
             String ServerName = request.getServerName();
             LOGGER.info("MCRQueryServlet: Try to map remote request to local one!");
@@ -491,132 +474,133 @@ public class MCRQueryServlet extends MCRServlet {
 
             StringBuffer hostBf = new StringBuffer();
 
-            for (int i = 0; i < hosts.length; i++) {
-                if (!hosts[i].equals("local")) {
+            for (int i = 0; i < qParam.hosts.length; i++) {
+                if (!qParam.hosts[i].equals("local")) {
                     // the following replaces a remote request with "local" if
                     // needed
-                    hosts[i] = (isInstanceOfLocal(hosts[i], request.getServerName(), request.getServletPath(), request.getServerPort())) ? "local" : hosts[i];
+                    qParam.hosts[i] = (isInstanceOfLocal(qParam.hosts[i], request.getServerName(), request.getServletPath(), request.getServerPort())) ? "local"
+                            : qParam.hosts[i];
                 }
 
                 // make a comma seperated list of all hosts
-                hostBf.append(",").append(hosts[i]);
+                hostBf.append(",").append(qParam.hosts[i]);
             }
 
-            host = hostBf.deleteCharAt(0).toString();
+            qParam.host = hostBf.deleteCharAt(0).toString();
 
-            if (host.indexOf("local") != host.lastIndexOf("local")) {
+            if (qParam.host.indexOf("local") != qParam.host.lastIndexOf("local")) {
                 LOGGER.info("MCRQueryServlet: multiple \"local\" will be removed by MCRQueryResult!");
             }
         }
 
-        view = request.getParameter("view");
-        referer = request.getParameter("ref");
+        qParam.view = request.getParameter("view");
+        qParam.referer = request.getParameter("ref");
 
         String offsetStr = request.getParameter("offset");
         String sizeStr = request.getParameter("size");
         String max_results = request.getParameter("max_results");
-        sortKey = request.getParameter(PARAM_SORT);
+        qParam.sortKey = request.getParameter(PARAM_SORT);
 
-        if (sortKey != null) {
+        if (qParam.sortKey != null) {
             if ((request.getParameter(PARAM_IN_ORDER) != null) && request.getParameter(PARAM_IN_ORDER).toLowerCase().equals("false")) {
-                inOrder = false;
+                qParam.inOrder = false;
             } else {
-                inOrder = true;
+                qParam.inOrder = true;
             }
 
-            customSort = true;
+            qParam.customSort = true;
 
             // if customSort enabled we must saveResults too
-            saveResults = true;
+            qParam.saveResults = true;
         } else {
-            customSort = false;
+            qParam.customSort = false;
         }
 
         if (max_results != null) {
-            maxresults = Integer.parseInt(max_results);
+            qParam.maxresults = Integer.parseInt(max_results);
         }
 
-        offset = 0;
+        qParam.offset = 0;
 
         if (offsetStr != null) {
-            offset = Integer.parseInt(offsetStr);
+            qParam.offset = Integer.parseInt(offsetStr);
         }
 
-        size = 0;
+        qParam.size = 0;
 
         if (sizeStr != null) {
-            size = Integer.parseInt(sizeStr);
+            qParam.size = Integer.parseInt(sizeStr);
         }
 
-        if (mode == null) {
-            mode = "ResultList";
+        if (qParam.mode == null) {
+            qParam.mode = "ResultList";
         }
 
-        if (mode.equals("")) {
-            mode = "ResultList";
+        if (qParam.mode.equals("")) {
+            qParam.mode = "ResultList";
         }
 
-        if (host == null) {
-            host = "local";
+        if (qParam.host == null) {
+            qParam.host = "local";
         }
 
-        if (host.equals("")) {
-            host = "local";
+        if (qParam.host.equals("")) {
+            qParam.host = "local";
         }
 
-        if (query == null) {
-            query = "";
+        if (qParam.query == null) {
+            qParam.query = "";
         }
 
-        if (type == null) {
+        if (qParam.type == null) {
             LOGGER.debug("Parameter type is NULL!");
 
             return false;
         }
 
-        if (type.equals("")) {
+        if (qParam.type.equals("")) {
             LOGGER.debug("Parameter type is EMPTY!");
 
             return false;
         }
 
-        if (layout == null) {
-            layout = type;
+        if (qParam.layout == null) {
+            qParam.layout = qParam.type;
         }
 
-        if (layout.equals("")) {
-            layout = type;
+        if (qParam.layout.equals("")) {
+            qParam.layout = qParam.type;
         }
 
-        type = type.toLowerCase();
+        qParam.type = qParam.type.toLowerCase();
 
-        if (view == null) {
-            view = "";
+        if (qParam.view == null) {
+            qParam.view = "";
         } else {
-            view = view.toLowerCase();
+            qParam.view = qParam.view.toLowerCase();
         }
 
         LOGGER.info("MCRQueryServlet: RequestEncoding = " + request.getCharacterEncoding());
         LOGGER.info("MCRQueryServlet: ContentType = " + request.getContentType());
-        LOGGER.info("MCRQueryServlet : mode = " + mode);
-        LOGGER.info("MCRQueryServlet : type = " + type);
-        LOGGER.info("MCRQueryServlet : layout = " + layout);
-        LOGGER.info("MCRQueryServlet : hosts = " + host);
-        LOGGER.info("MCRQueryServlet : query = \"" + query + "\"");
+        LOGGER.info("MCRQueryServlet : mode = " + qParam.mode);
+        LOGGER.info("MCRQueryServlet : type = " + qParam.type);
+        LOGGER.info("MCRQueryServlet : layout = " + qParam.layout);
+        LOGGER.info("MCRQueryServlet : hosts = " + qParam.host);
+        LOGGER.info("MCRQueryServlet : query = \"" + qParam.query + "\"");
 
         return true;
     }
 
-    private final boolean validateCacheSession(HttpServletRequest request) {
+    private final boolean validateCacheSession(HttpServletRequest request, Query qParam) {
         // check for valid session
-        if (mode.equals("CachedResultList")) {
+        if (qParam.mode.equals("CachedResultList")) {
             if (!request.isRequestedSessionIdValid()) {
                 // page session timed out
                 return false;
             }
 
-            cachedFlag = true;
-            mode = "ResultList";
+            qParam.cachedFlag = true;
+            qParam.mode = "ResultList";
         }
 
         return true;
@@ -629,8 +613,9 @@ public class MCRQueryServlet extends MCRServlet {
              * everything through the two thread pools, but just return the
              * result
              */
-            LOGGER.debug("Retrieving query " + query + " from MCRQueryCache (hostlist: " + host + ") type=" + type + " maxresults=" + conf.getInt("MCR.query_max_results", 10));
-            result.importElements(MCRQueryCache.getResultList(host, query, type, conf.getInt("MCR.query_max_results", 10)));
+            LOGGER.debug("Retrieving query " + query + " from MCRQueryCache (hostlist: " + host + ") type=" + type + " maxresults="
+                    + CONFIG.getInt("MCR.query_max_results", 10));
+            result.importElements(MCRQueryCache.getResultList(host, query, type, CONFIG.getInt("MCR.query_max_results", 10)));
         } else {
             try {
                 synchronized (result) {
@@ -661,16 +646,16 @@ public class MCRQueryServlet extends MCRServlet {
         MCRXMLContainer resarray = new MCRXMLContainer();
 
         if (squence.equalsIgnoreCase("local-remote")) {
-            putResult(collector, "local", type, query, resarray);
+            putResult(QUERY_COLLECTOR, "local", type, query, resarray);
 
             if (resarray.size() == 0) {
-                putResult(collector, host, type, query, resarray);
+                putResult(QUERY_COLLECTOR, host, type, query, resarray);
             }
         } else {
-            putResult(collector, host, type, query, resarray);
+            putResult(QUERY_COLLECTOR, host, type, query, resarray);
 
             if (resarray.size() == 0) {
-                putResult(collector, "local", type, query, resarray);
+                putResult(QUERY_COLLECTOR, "local", type, query, resarray);
             }
         }
 
@@ -681,13 +666,13 @@ public class MCRQueryServlet extends MCRServlet {
         return resarray.exportAllToDocument();
     }
 
-    private final Document reSort(Document jdom) throws ServletException, IOException, MCRException, JDOMException {
+    private final Document reSort(Document jdom, Query qParam) throws ServletException, IOException, MCRException, JDOMException {
         MCRXMLContainer resarray = new MCRXMLContainer();
         resarray.importElements(jdom);
 
         if (resarray.size() > 0) {
             // let's do resorting.
-            return sort(resarray, lang.toLowerCase()).exportAllToDocument();
+            return sort(resarray, qParam).exportAllToDocument();
         }
 
         LOGGER.fatal("MCRQueryServlet: Error while RE-sorting JDOM:" + "After import Containersize was ZERO!");
@@ -695,12 +680,12 @@ public class MCRQueryServlet extends MCRServlet {
         return jdom;
     }
 
-    private final void browse(HttpServletRequest request, HttpServletResponse response, Document jdom) throws ServletException, IOException {
+    private final void browse(HttpServletRequest request, HttpServletResponse response, Document jdom, Query qParam) throws ServletException, IOException {
         /* change generate new query */
         StringTokenizer refGet = null;
 
         try {
-            refGet = new StringTokenizer(this.getBrowseElementID(jdom, referer, view.equals("next")), "@");
+            refGet = new StringTokenizer(this.getBrowseElementID(jdom, qParam.referer, qParam.view.equals("next")), "@");
         } catch (Exception ex) {
             generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not resolve browse origin!", ex, false);
 
@@ -708,27 +693,68 @@ public class MCRQueryServlet extends MCRServlet {
         }
 
         if (refGet.countTokens() < 3) {
-            generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not resolve browse origin!", new MCRException("MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: " + refGet), false);
+            generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not resolve browse origin!", new MCRException(
+                    "MCRQueryServlet: Sorry \"refGet\" has not 3 Tokens: " + refGet), false);
 
             return;
         }
 
         String StrStatus = refGet.nextToken();
-        query = new StringBuffer("/mycoreobject[@ID='").append(refGet.nextToken()).append("']").toString();
-        host = refGet.nextToken();
-        mode = "ObjectMetadata";
-        request.setAttribute("mode", mode);
+        qParam.query = new StringBuffer("/mycoreobject[@ID='").append(refGet.nextToken()).append("']").toString();
+        qParam.host = refGet.nextToken();
+        qParam.mode = "ObjectMetadata";
+        request.setAttribute("mode", qParam.mode);
         request.removeAttribute("status");
         request.setAttribute("status", StrStatus);
-        request.setAttribute("type", type);
-        request.setAttribute("layout", layout);
-        request.setAttribute("hosts", host);
-        request.setAttribute("lang", lang);
-        request.setAttribute("query", query);
+        request.setAttribute("type", qParam.type);
+        request.setAttribute("layout", qParam.layout);
+        request.setAttribute("hosts", qParam.host);
+        request.setAttribute("lang", qParam.lang);
+        request.setAttribute("query", qParam.query);
         request.setAttribute("view", "done");
-        LOGGER.info("MCRQueryServlet: sending to myself:" + "?mode=" + mode + "&status=" + StrStatus + "&type=" + type + "&hosts=" + host + "&lang=" + lang + "&query=" + query);
+        LOGGER.info(new StringBuffer("MCRQueryServlet: sending to myself:").append("?mode=").append(qParam.mode).append("&status=").append(StrStatus).append(
+                "&type=").append(qParam.type).append("&hosts=").append(qParam.host).append("&lang=").append(qParam.lang).append("&query=").append(qParam.query)
+                .toString());
         doGet(request, response);
 
         return;
+    }
+
+    private static final class Query {
+        private boolean customSort = false;
+
+        private String sortKey;
+
+        private boolean inOrder = true;
+
+        private boolean saveResults;
+
+        private String mode;
+
+        private String query;
+
+        private String type;
+
+        private String layout;
+
+        private String lang;
+
+        private String[] hosts;
+
+        private String att_host;
+
+        private String view;
+
+        private String referer;
+
+        private String host;
+
+        private int maxresults = 0;
+
+        private int offset;
+
+        private int size;
+
+        private boolean cachedFlag;
     }
 }
