@@ -150,4 +150,10 @@ public class MCRAccessManager {
     public static boolean checkReadAccess(String objID, MCRSession session) {
         return checkAccess("READ", objID, session);
     }
+    
+    public boolean removeFromCache(String pool, String objID) {
+    	String cacheKey = pool + "#" + objID;
+    	cache.remove(cacheKey);
+    	return true;
+    }
 };
