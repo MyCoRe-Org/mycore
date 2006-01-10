@@ -74,7 +74,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 		// read the XML data
 		MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
 		org.jdom.Document indoc = sub.getXML();
-		List files = sub.getFiles();
 
 		// read the parameter
 		MCRRequestParameters parms;
@@ -927,7 +926,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
 				// the edit button
 				org.jdom.Element form = section.getChild("form");
-				form.setAttribute("action", (new URL(getBaseURL())) + "servlets/MCRStartEditorServlet");
+				form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
 
 				org.jdom.Element input1 = new org.jdom.Element("input");
 				input1.setAttribute("name", "lang");
