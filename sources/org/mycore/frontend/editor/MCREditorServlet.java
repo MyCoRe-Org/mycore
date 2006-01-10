@@ -388,7 +388,10 @@ public class MCREditorServlet extends MCRServlet {
                 sb.append("?XSL.editor.session.id=").append(sessionID);
             } else if ("webpage".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
-                sb.append("?XSL.subselect.session=").append(sessionID);
+                if ( subselect.getAttributeValue("href").indexOf("?") > 0)
+                    sb.append("&XSL.subselect.session=").append(sessionID);
+                else
+                    sb.append("?XSL.subselect.session=").append(sessionID);                                
                 sb.append("&XSL.subselect.varpath=").append(var);
                 sb.append("&XSL.subselect.webpage=").append(parms.getParameter("_webpage"));
             } else if ("servlet".equals(subselect.getAttributeValue("type"))) {
