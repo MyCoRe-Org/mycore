@@ -72,7 +72,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
