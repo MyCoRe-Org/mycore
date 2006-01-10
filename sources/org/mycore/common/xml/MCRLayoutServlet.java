@@ -72,7 +72,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -259,39 +259,56 @@ public class MCRLayoutServlet extends MCRServlet {
     }
 
     public static Properties buildXSLParameters(HttpServletRequest request) {
-        Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
 
-        // Read all properties from mycore.properties
-        // Read all *.xsl attributes that are stored in the browser session
-        HttpSession session = request.getSession(false);
-
-        if (session != null) {
-            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
-                String name = (String) (e.nextElement());
-
-                if (name.startsWith("XSL.")) {
-                    parameters.put(name.substring(4), session.getAttribute(name));
-                }
-            }
-        }
-
-        // Read all *.xsl attributes from the client HTTP request parameters
-        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-            String name = (String) (e.nextElement());
-
-            if (name.startsWith("XSL.")) {
-                parameters.put(name.substring(4), request.getParameter(name));
-            }
-        }
-
-        // Read all *.xsl attributes provided by the invoking servlet
-        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-            String name = (String) (e.nextElement());
-
-            if (name.startsWith("XSL.")) {
-                parameters.put(name.substring(4), request.getAttribute(name));
-            }
-        }
+		// PROPERTIES: Read all properties from system configuration
+		Properties parameters = (Properties) (MCRConfiguration.instance()
+		        .getProperties().clone());
+		
+		// SESSION: Read all *.xsl attributes that are stored in the browser session
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+		    for (Enumeration e = session.getAttributeNames(); e
+		            .hasMoreElements();) {
+		        String name = (String) (e.nextElement());
+		        if (name.startsWith("XSL."))
+		            parameters.put(name.substring(4), session
+		                    .getAttribute(name));
+		    }
+		}
+		
+		// HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client HTTP request parameters
+		for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
+		    String name = (String) (e.nextElement());
+		    
+		    if (name.startsWith("XSL.")) {
+		    	if (!name.endsWith(".SESSION")) {
+		    		parameters.put(name.substring(4), request.getParameter(name));	
+		    	}     // store parameter in session if ends with *.SESSION 
+		    	else {
+		    		parameters.put(name.substring(4, name.length()-8), request.getParameter(name));
+		    		session.setAttribute( name.substring(0, name.length()-8), request.getParameter(name));
+		        	LOGGER.debug("MCRLayoutServlet: found HTTP-Req.-Parameter "+name+"="+request.getParameter(name)
+		        			+" that should be saved in session, safed "+name.substring(0, name.length()-8)+"="+request.getParameter(name));
+		    	}
+		    }
+		}
+		
+		// SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by the invoking servlet
+		for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+		    String name = (String) (e.nextElement());
+		    if (name.startsWith("XSL.")) {
+		    	if (!name.endsWith(".SESSION")) {
+		            parameters.put(name.substring(4), request.getAttribute(name));
+		       	} // store parameter in session if ends with *.SESSION
+		    	else {
+		    	parameters.put(name.substring(4, name.length()-8), request.getAttribute(name));
+		    	session.setAttribute( name.substring(0, name.length()-8), request.getAttribute(name));
+		    	LOGGER.debug("MCRLayoutServlet: found Req.-Attribut "+name+"="+request.getAttribute(name)
+		    			+" that should be saved in session, safed "+name.substring(0, name.length()-8)+"="+request.getAttribute(name));
+		    	}
+		    }
+		    	
+		}        
 
         // Set some predefined XSL parameters:
         String defaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
