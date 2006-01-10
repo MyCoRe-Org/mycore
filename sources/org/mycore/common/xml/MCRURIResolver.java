@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
@@ -45,6 +46,10 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
+
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRAccessRule;
+import org.mycore.access.MCRAccessStore;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -81,6 +86,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     private static final String QUERY_PARAM = "query";
 
     private static final String HOST_DEFAULT = "local";
+
+    private static final String ACTION_PARAM = "action";
+    
+    private static final String OBJECT_ID_PARAM = "object";
 
     private static final String URL_ENCODING = MCRConfiguration.instance().getString("MCR.request_charencoding", "UTF-8");;
 
@@ -163,7 +172,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         String scheme = getScheme(href);
 
-        if ("resource request webapp file ifs session query mcrobject".indexOf(scheme) != -1) {
+        if ("resource request webapp file ifs session query mcrobject access".indexOf(scheme) != -1) {
             return new JDOMSource(resolve(href));
         } 
         return null;
@@ -235,6 +244,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             return readFromRequest(uri);
         } else if ("session".equals(scheme)) {
             return readFromSession(uri);
+        } else if ("access".equals(scheme)) {
+            return readFromAccessControll(uri);
         } else {
             String msg = "Unsupported URI type: " + uri;
             throw new MCRUsageException(msg);
@@ -437,6 +448,68 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
             return null;
         }
+    }
+
+    /**
+     * Returns access controll rules as XML
+     */
+    private Element readFromAccessControll(String uri) {
+        String key = uri.substring(uri.indexOf(":") + 1);
+        LOGGER.debug("Reading xml from query result using key :" + key);
+
+        String[] param;
+        StringTokenizer tok = new StringTokenizer(key, "&");
+        Hashtable params = new Hashtable();
+
+        while (tok.hasMoreTokens()) {
+            param = tok.nextToken().split("=");
+            params.put(param[0], param[1]);
+        }
+
+        String action = (String) params.get(ACTION_PARAM);
+        String objId = (String) params.get(OBJECT_ID_PARAM);
+
+        if (action == null || objId == null) {
+            return null;
+        }
+
+        // :NOTE: until real export format is defined: start some selfdefined
+        // one access Element per (Object-)ID
+        Element container = new Element("access").setAttribute("id", objId);
+
+        if (action.equals("all")) {
+            Iterator it = MCRAccessStore.getPools().iterator();
+            while (it.hasNext()) {
+                action = it.next().toString();
+                // one pool Element under access per defined AccessRule in Pool
+                // for (Object-)ID
+                addRule(container, action, MCRAccessManager.instance().getAccess(action, objId));
+            }
+        } else {
+            addRule(container, action, MCRAccessManager.instance().getAccess(action, objId));
+        }
+
+        return container;
+    }
+
+    private void addRule(Element root, String pool, MCRAccessRule rule) {
+        if (rule != null && pool != null && !isDummyRule(rule)) {
+            Element poolElement = new Element("pool").setAttribute("id", pool);
+            poolElement.addContent(rule.getRuleElement());
+            root.addContent(poolElement);
+        }
+    }
+
+    /**
+     * determines if the submited rule is just the MyCoRe dummy rule
+     * 
+     * @param rule
+     *            rule to check against a magic algorithm
+     * @return true, if rule is "dummy rule"
+     */
+    private boolean isDummyRule(MCRAccessRule rule) {
+        // a "real" rule should have an id != null
+        return (rule.getId() == null);
     }
 
     /**
