@@ -37,7 +37,7 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -80,7 +80,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String", "The command update all derivates form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("save derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}");
+        com = new MCRCommand("save derivate {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}");
         command.add(com);
 
         com = new MCRCommand("save derivate from {0} to {1} to directory {2}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}");
@@ -355,91 +355,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the dirname to store the derivate
      */
     public static void save(String ID, String dirname, boolean withIfsID) {
-        // check ID
-        MCRDerivate obj = new MCRDerivate();
-        MCRObjectID id = null;
-
-        try {
-            id = new MCRObjectID(ID);
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-
-            return;
-        }
-
-        // check dirname
-        File dir = new File(dirname);
-
-        if (dir.isFile()) {
-            LOGGER.error(dirname + " is not a dirctory.");
-            LOGGER.error("");
-
-            return;
-        }
-
-        
-        // get XML
-        Document xml = null;
-
-        try {
-        	obj.receiveFromDatastore(ID);
-        	obj.getDerivate().getInternals().setSourcePath(ID);
-        	if (!withIfsID)
-        		obj.getDerivate().getInternals().setIFSID("");
-        	xml = obj.createXML();
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-
-            return;
-        }
-
-        // store the XML file
-        String xslfile = "mcr_save-derivate.xsl";
-        String filename = dirname + SLASH + id.toString() + ".xml";
-
-        try {
-            FileOutputStream out = new FileOutputStream(filename);
-            InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
-
-            if (in != null) {
-                StreamSource source = new StreamSource(in);
-                TransformerFactory transfakt = TransformerFactory.newInstance();
-                Transformer trans = transfakt.newTransformer(source);
-                StreamResult sr = new StreamResult(out);
-                trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
-            } else {
-            	(new XMLOutputter(Format.getPrettyFormat())).output(xml, out);
-                out.flush();
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to file " + filename);
-            LOGGER.error("");
-
-            return;
-        }
-
-        // store the derivate file under dirname
-        try {
-            dir = new File(dirname + SLASH + id.toString());
-
-            if (!dir.isDirectory()) {
-                dir.mkdir();
-            }
-
-            MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(id.toString()), dir);
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to object in " + dirname + SLASH + id.toString());
-            LOGGER.error("");
-
-            return;
-        }
-
-        LOGGER.info("Derivate " + id.toString() + " stored under " + dirname + SLASH + id.toString() + " and " + filename + ".");
-        LOGGER.info("");
+        save(ID,ID,dirname,withIfsID);
     }
 
     /**
@@ -456,6 +372,23 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the filename to store the object
      */
     public static void save(String fromID, String toID, String dirname) {
+        save(fromID,toID,dirname,false); // :NOTE: false was the default, but is not equal to "single" save
+    }
+
+    /**
+     * Save any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
+     * directory and the objects under them named <em>MCRObjectID</em>. The
+     * saving starts with fromID and runs to toID. ID's they was not found will
+     * skiped.
+     * 
+     * @param fromID
+     *            the ID of the MCRObject from be save.
+     * @param toID
+     *            the ID of the MCRObject to be save.
+     * @param dirname
+     *            the filename to store the object
+     */
+    public static void save(String fromID, String toID, String dirname, boolean withIfsID) {
         // check fromID and toID
         MCRDerivate obj = new MCRDerivate();
         MCRObjectID fid = null;
@@ -493,11 +426,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         Transformer trans = null;
 
         try {
-            InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
+            InputStream in = MCRDerivateCommands.class.getResourceAsStream("/" + xslfile);
 
             if (in != null) {
                 StreamSource source = new StreamSource(in);
                 TransformerFactory transfakt = TransformerFactory.newInstance();
+                transfakt.setURIResolver(MCRURIResolver.instance());
                 trans = transfakt.newTransformer(source);
             }
         } catch (Exception e) {
@@ -514,29 +448,31 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 Document xml = null;
 
                 try {
-                	obj.receiveFromDatastore(nid.toString());
-                	obj.getDerivate().getInternals().setSourcePath(dirname);
-                	xml = obj.createXML();                	
+                    obj.receiveFromDatastore(nid.toString());
+                    obj.getDerivate().getInternals().setSourcePath(dirname);
+                    if (!withIfsID)
+                        obj.getDerivate().getInternals().setIFSID("");
+                    xml = obj.createXML();                  
                 } catch (MCRException ex) {
                     continue;
                 }
 
-                String filename = dirname + SLASH + nid.toString() + ".xml";
-                FileOutputStream out = new FileOutputStream(filename);
+                File xmlOutput = new File(dirname,nid.toString()+".xml");
+                FileOutputStream out = new FileOutputStream(xmlOutput);
 
                 if (trans != null) {
                     StreamResult sr = new StreamResult(out);
                     trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
                 } else {
-                	(new XMLOutputter(Format.getPrettyFormat())).output(xml, out);
-                	out.close();
+                    (new XMLOutputter(Format.getPrettyFormat())).output(xml, out);
+                    out.close();
                 } 
 
-                LOGGER.info("Object " + nid.toString() + " stored under " + filename + ".");
+                LOGGER.info("Object " + nid.toString() + " stored under " + xmlOutput + ".");
 
                 // store the derivate file under dirname
                 try {
-                    dir = new File(dirname + SLASH + nid.toString());
+                    dir = new File(dirname,nid.toString());
 
                     if (!dir.isDirectory()) {
                         dir.mkdir();
@@ -545,24 +481,24 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                     MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(nid.toString()), dir);
                 } catch (MCRException ex) {
                     LOGGER.error(ex.getMessage());
-                    LOGGER.error("Exception while store to object in " + dirname + SLASH + nid.toString());
+                    LOGGER.error("Exception while store to object in " + dir.getAbsolutePath());
                     LOGGER.error("");
 
                     return;
                 }
 
-                LOGGER.info("Derivate " + nid.toString() + " stored under " + dirname + SLASH + nid.toString() + " and " + filename + ".");
+                LOGGER.info("Derivate " + nid.toString() + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
                 k++;
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file or objects to " + dirname);
+            LOGGER.error("Exception while store file or objects to " + dir.getAbsolutePath());
             LOGGER.error("");
 
             return;
         }
 
-        LOGGER.info(k + " Object's stored under " + dirname + ".");
+        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
 
 }
