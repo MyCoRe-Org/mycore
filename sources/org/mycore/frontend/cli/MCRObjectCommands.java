@@ -425,8 +425,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 					continue;
 				}
 
-				String filename = dirname + SLASH + nid.toString() + ".xml";
-				FileOutputStream out = new FileOutputStream(filename);
+				File xmlOutput = new File(dir,nid.toString()+".xml");
+				FileOutputStream out = new FileOutputStream(xmlOutput);
 
 				if (trans != null) {
 					StreamResult sr = new StreamResult((OutputStream) out);
@@ -437,17 +437,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 				}
 
 				k++;
-				LOGGER.info("Object " + nid.toString() + " stored under " + filename + ".");
+				LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
 			}
 		} catch (Exception ex) {
 			LOGGER.error(ex.getMessage());
-			LOGGER.error("Exception while store file to " + dirname);
+			LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
 			LOGGER.error("");
 
 			return;
 		}
 
-		LOGGER.info(k + " Object's stored under " + dirname + ".");
+		LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
 	}
 
 	/**
