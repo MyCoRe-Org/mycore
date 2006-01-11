@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -89,7 +90,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 				"The command store all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2}");
 		command.add(com);
 
-		com = new MCRCommand("save object of {0} to directory {1}", "org.mycore.frontend.cli.MCRObjectCommands.save String String",
+		com = new MCRCommand("save object {0} to directory {1}", "org.mycore.frontend.cli.MCRObjectCommands.save String String",
 				"The command store the MCRObject with the MCRObjectID {0} to the directory {1}");
 		command.add(com);
 
@@ -345,69 +346,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 *            the dirname to store the object
 	 */
 	public static void save(String ID, String dirname) {
-		// check ID
-		MCRObject obj = new MCRObject();
-		MCRObjectID id = null;
-
-		try {
-			id = new MCRObjectID(ID);
-		} catch (Exception ex) {
-			LOGGER.error(ex.getMessage());
-			LOGGER.error("");
-
-			return;
-		}
-
-		// check dirname
-		File dir = new File(dirname);
-
-		if (dir.isFile()) {
-			LOGGER.error(dirname + " is not a dirctory.");
-			LOGGER.error("");
-
-			return;
-		}
-
-		// get XML
-		byte[] xml = null;
-
-		try {
-			xml = obj.receiveXMLFromDatastore(ID);
-		} catch (MCRException ex) {
-			LOGGER.error(ex.getMessage());
-			LOGGER.error("");
-
-			return;
-		}
-
-		// store the XML file
-		String xslfile = "mcr_save-object.xsl";
-		String filename = dirname + SLASH + id.toString() + ".xml";
-
-		try {
-			FileOutputStream out = new FileOutputStream(filename);
-			InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
-
-			if (in != null) {
-				StreamSource source = new StreamSource(in);
-				TransformerFactory transfakt = TransformerFactory.newInstance();
-				Transformer trans = transfakt.newTransformer(source);
-				StreamResult sr = new StreamResult((OutputStream) out);
-				trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
-			} else {
-				out.write(xml);
-				out.flush();
-			}
-		} catch (Exception ex) {
-			LOGGER.error(ex.getMessage());
-			LOGGER.error("Exception while store to file " + filename);
-			LOGGER.error("");
-
-			return;
-		}
-
-		LOGGER.info("Object " + id.toString() + " stored under " + filename + ".");
-		LOGGER.info("");
+        save(ID,ID,dirname);
 	}
 
 	/**
@@ -460,11 +399,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 		Transformer trans = null;
 
 		try {
-			InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
+			InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
 
 			if (in != null) {
 				StreamSource source = new StreamSource(in);
 				TransformerFactory transfakt = TransformerFactory.newInstance();
+                transfakt.setURIResolver(MCRURIResolver.instance());
 				trans = transfakt.newTransformer(source);
 			}
 		} catch (Exception e) {
