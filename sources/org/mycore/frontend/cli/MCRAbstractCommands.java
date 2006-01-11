@@ -39,9 +39,6 @@ public class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The configuration instance */
     protected static MCRConfiguration CONFIG = null;
 
-    /** the file separator */
-    protected static String SLASH = System.getProperty("file.separator");
-
     /** The array holding all known commands */
     protected ArrayList command = null;
 

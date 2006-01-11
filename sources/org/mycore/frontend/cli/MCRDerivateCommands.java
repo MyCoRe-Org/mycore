@@ -204,7 +204,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(directory + SLASH + list[i], update)) {
+            if (processFromFile(new File(dir, list[i]), update)) {
                 numProcessed++;
             }
         }
@@ -219,7 +219,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean loadFromFile(String file) {
-        return processFromFile(file, false);
+        return processFromFile(new File(file), false);
     }
 
     /**
@@ -229,7 +229,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean updateFromFile(String file) {
-        return processFromFile(file, true);
+        return processFromFile(new File(file), true);
     }
 
     /**
@@ -240,14 +240,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param update
      *            if true, object will be updated, else object is created
      */
-    private static boolean processFromFile(String file, boolean update) {
-        if (!file.endsWith(".xml")) {
+    private static boolean processFromFile(File file, boolean update) {
+        if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
             return false;
         }
 
-        if (!new File(file).isFile()) {
+        if (file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
 
             return false;
@@ -257,7 +257,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         try {
             MCRDerivate mycore_obj = new MCRDerivate();
-            mycore_obj.setFromURI(file);
+            mycore_obj.setFromURI(file.getAbsolutePath());
 
             // Replace relative path with absolute path of files
             if (mycore_obj.getDerivate().getInternals() != null) {
@@ -268,7 +268,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 if (!sPath.isAbsolute()) {
                     // only change path to absolute path when relative
 
-                    String prefix = new File(file).getParent();
+                    String prefix = file.getParent();
 
                     if (prefix != null) {
                         path = prefix + File.separator + path;

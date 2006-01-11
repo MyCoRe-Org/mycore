@@ -148,7 +148,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(directory + SLASH + list[i], update)) {
+            if (processFromFile(new File(dir, list[i]), update)) {
                 numProcessed++;
             }
         }
@@ -164,7 +164,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException 
      */
     public static boolean loadFromFile(String file) throws MCRActiveLinkException {
-        return processFromFile(file, false);
+        return processFromFile(new File(file), false);
     }
 
     /**
@@ -175,7 +175,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException 
      */
     public static boolean updateFromFile(String file) throws MCRActiveLinkException {
-        return processFromFile(file, true);
+        return processFromFile(new File(file), true);
     }
 
     /**
@@ -188,14 +188,14 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            is created
      * @throws MCRActiveLinkException 
      */
-    private static boolean processFromFile(String file, boolean update) throws MCRActiveLinkException {
-        if (!file.endsWith(".xml")) {
+    private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
+        if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
             return false;
         }
 
-        if (!new File(file).isFile()) {
+        if (file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
 
             return false;
@@ -207,10 +207,10 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
             MCRClassification cl = new MCRClassification();
 
             if (update) {
-                String id = cl.updateFromURI(file);
+                String id = cl.updateFromURI(file.getAbsolutePath());
                 LOGGER.info(id + " updated.\n");
             } else {
-                String id = cl.createFromURI(file);
+                String id = cl.createFromURI(file.getAbsolutePath());
                 LOGGER.info(id + " loaded.\n");
             }
 

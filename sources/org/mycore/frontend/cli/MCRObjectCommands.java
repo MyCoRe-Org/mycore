@@ -228,7 +228,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 				continue;
 			}
 
-			if (processFromFile(directory + SLASH + list[i], update)) {
+			if (processFromFile(new File(dir, list[i]), update)) {
 				numProcessed++;
 			}
 		}
@@ -244,7 +244,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 * @throws MCRActiveLinkException
 	 */
 	public static boolean loadFromFile(String file) throws MCRActiveLinkException {
-		return processFromFile(file, false);
+		return processFromFile(new File(file), false);
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 * @throws MCRActiveLinkException
 	 */
 	public static boolean updateFromFile(String file) throws MCRActiveLinkException {
-		return processFromFile(file, true);
+		return processFromFile(new File(file), true);
 	}
 
 	/**
@@ -267,14 +267,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 	 *            if true, object will be updated, else object is created
 	 * @throws MCRActiveLinkException
 	 */
-	private static boolean processFromFile(String file, boolean update) throws MCRActiveLinkException {
-		if (!file.endsWith(".xml")) {
+	private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
+		if (!file.getName().endsWith(".xml")) {
 			LOGGER.warn(file + " ignored, does not end with *.xml");
 
 			return false;
 		}
 
-		if (!new File(file).isFile()) {
+		if (file.isFile()) {
 			LOGGER.warn(file + " ignored, is not a file.");
 
 			return false;
@@ -284,7 +284,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
 		try {
 			MCRObject mycore_obj = new MCRObject();
-			mycore_obj.setFromURI(file);
+			mycore_obj.setFromURI(file.getAbsolutePath());
 			LOGGER.info("Label --> " + mycore_obj.getLabel());
 
 			if (update) {
