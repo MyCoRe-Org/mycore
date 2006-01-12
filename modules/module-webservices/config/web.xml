@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
+
   <listener>
     <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
   </listener>
@@ -37,9 +39,11 @@
     <url-pattern>/servlets/AxisAdminServlet</url-pattern>
   </servlet-mapping>
 
-  <!-- currently the W3C havent settled on a media type for WSDL;
-    http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
-    for now we go with the basic 'it's XML' response -->
+  <!-- currently the W3C havent settled on a media type for WSDL; -->
+  <!-- http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft -->
+  <!-- for now we go with the basic 'it's XML' response -->
+
+<!--
   <mime-mapping>
     <extension>wsdl</extension>
     <mime-type>text/xml</mime-type>
@@ -49,4 +53,6 @@
     <extension>xsd</extension>
     <mime-type>text/xml</mime-type>
   </mime-mapping>
+-->
+
 </web-app>
