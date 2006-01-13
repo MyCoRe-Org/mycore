@@ -29,40 +29,38 @@ import org.mycore.common.MCRException;
 /**
  * This class implements all method for handling with the MCRMetaAccessRule part
  * of a metadata object. The MCRMetaAccessRule class present a single item,
- * which has triples of a text and his corresponding language and optional a
- * type.
+ * which hold an ACL condition for a defined pool.
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterface {
     // MCRMetaAccessRule data
-    protected String text;
+    protected org.jdom.Element condition;
 
     protected String pool;
 
     /**
      * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts was set to
-     * an empty string. The <em>pool</em> Attribute is set to 'READ'. The
-     * <b>text</b> is set to 'true'
+     * The constructor of the MCRMetaDefault runs. The <em>pool</em> Attribute
+     * is set to 'READ'. The <b>condition</b> is set to 'null'.
      */
     public MCRMetaAccessRule() {
         super();
-        text = "true";
+        condition = null;
         pool = "READ";
     }
 
     /**
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * null, empty or false <b>en</b> was set. This is not use in other methods
+     * of this class. The subtag element was set to the value of
+     * <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * is null or empty an exception will be throwed. The type element was set to
      * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The text element was set to the value of
-     * <em>set_text<em>, if it is null, an empty string was set
-     * to the text element.
+     * to the type element. The condition element was set to the value of
+     * <em>set_condition<em>, if it is null, an exception will be throwed.
      *
      * @param set_datapart     the global part of the elements like 'metadata'
      *                         or 'service'
@@ -71,71 +69,64 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param_set_pool         the format string, if it is empty 'READ' will be set.
-     * @param set_text         the text string, if it is empty 'true' will be set.
-     * @exception MCRException if the set_subtag value is null or empty
+     * @param set_condition    the JDOM Element included the condition tree
+     * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_pool, String set_text) throws MCRException {
+    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_pool, org.jdom.Element set_condition) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
-        text = set_text;
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
-            text = "true";
-        } else {
-            text = text.trim();
-        }
         pool = set_pool;
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             pool = "READ";
         } else {
             pool = pool.trim();
         }
+        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
+        }
+        condition = set_condition;
     }
 
     /**
-     * This method set the languge, type and text.
+     * This method set the pool and the condition.
      * 
-     * @param set_lang
-     *            the new language string, if this is null or empty, nothing is
-     *            to do
-     * @param set_type
-     *            the optional type syting
      * @param_set_pool the format string, if it is empty 'READ' will be set.
-     * @param set_text
-     *            the new text string, if it is empty 'true' will be set.
+     * @param set_condition
+     *            the JDOM Element included the condition tree
+     * @exception MCRException
+     *                if the set_condition is null or empty
      */
-    public final void set(String set_lang, String set_type, String set_pool, String set_text) {
-        setLang(set_lang);
-        setType(set_type);
-        text = set_text;
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
-            text = "true";
-        } else {
-            text = text.trim();
-        }
+    public final void set(String set_pool, org.jdom.Element set_condition) throws MCRException {
+        setLang("en");
+        setType("");
         pool = set_pool;
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             pool = "READ";
         } else {
             pool = pool.trim();
         }
-    }
-
-    /**
-     * This method set the text.
-     * 
-     * @param set_text
-     *            the new text string, if it is empty 'READ' will be set.
-     */
-    public final void setText(String set_text) {
-        text = set_text;
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
-            text = "true";
-        } else {
-            text = text.trim();
+        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
+        condition = set_condition;
     }
 
     /**
-     * This method set the form attribute.
+     * This method set the condition.
+     * 
+     * @param set_condition
+     *            the JDOM Element included the condition tree
+     * @exception MCRException
+     *                if the set_condition is null or empty
+     */
+    public final void setCondition(org.jdom.Element set_condition) throws MCRException {
+        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
+        }
+        condition = set_condition;
+    }
+
+    /**
+     * This method set the pool attribute.
      * 
      * @param set_pool
      *            the new pool string, if it is empty 'READ' will be set.
@@ -150,12 +141,12 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     }
 
     /**
-     * This method get the text element.
+     * This method get the condition.
      * 
-     * @return the text
+     * @return the condition as JDOM Element
      */
-    public final String getText() {
-        return text;
+    public final org.jdom.Element getCondition() {
+        return condition;
     }
 
     /**
@@ -177,15 +168,15 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
-        String temp_text = element.getText();
-        if (temp_text == null) {
-            temp_text = "READ";
+        org.jdom.Element temp_condition = element.getChild("condition");
+        if (temp_condition == null) {
+            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        text = temp_text.trim();
+        condition = temp_condition;
 
         String temp_pool = (String) element.getAttributeValue("pool");
         if (temp_pool == null) {
-            temp_pool = "true";
+            temp_pool = "READ";
         }
         pool = temp_pool.trim();
     }
@@ -212,7 +203,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
         }
-        elm.addContent(text);
+        elm.addContent(condition);
         return elm;
     }
 
@@ -245,7 +236,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         if (!super.isValid()) {
             return false;
         }
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
+        if (condition == null) {
             return false;
         }
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
@@ -258,7 +249,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaAccessRule out = new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, pool, text);
+        MCRMetaAccessRule out = new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, pool, condition);
         return (Object) out;
     }
 
@@ -269,6 +260,6 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         LOGGER.debug("Start Class : MCRMetaAccessRule");
         super.debugDefault();
         LOGGER.debug("Pool               = " + pool);
-        LOGGER.debug("Rule               = " + text);
+        LOGGER.debug("Rule               = " + "condition");
     }
 }
