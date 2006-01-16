@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.3 $ $Date: 2006-01-03 10:50:23 $ -->
+<!-- $Revision: 1.4 $ $Date: 2006-01-16 10:04:28 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -85,7 +85,8 @@
     <echo>
       Copying web application files of module "WebServices"
     </echo>
-    <copy todir="webapps/WEB-INF/lib">
+    <property name="webapps-libdir" value="webapps/WEB-INF/lib"/>  	
+    <copy todir="${webapps-libdir}">
       <fileset dir="${env.MYCORE_HOME}/modules/module-webservices/lib" includes="*.jar" />
     </copy>
   </target>
