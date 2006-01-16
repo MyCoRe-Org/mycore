@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -60,6 +61,10 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
      */
     public MCRMetaISO8601Date() {
         super();
+    }
+
+    public MCRMetaISO8601Date(String set_datapart, String set_subtag, String set_type, int set_inherted){
+        super(set_datapart, set_subtag, null, set_type, set_inherted);
     }
 
     /*
@@ -106,6 +111,7 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
     }
 
     /**
+     *  sets the date for this meta data object
      * @param String
      *            Date in form YYYY-MM-DDThh:mm:ssTZD
      */
@@ -128,14 +134,16 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
     }
 
     /**
+     * sets the date for this meta data object
      * @param dt
      *            Date object representing date String in Element
      */
-    private void setDate(Date dt) {
-        this.dt=dt;
+    public void setDate(Date dt) {
         if (dt==null){
+            this.dt=null;
             valid=false;
         } else {
+            this.dt=new Date(dt.getTime());
             valid=true;
         }
         changed = true;
