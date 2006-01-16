@@ -83,7 +83,8 @@ public class MCROrCondition implements MCRCondition {
     }
 
     public Element toXML() {
-        Element cond = new Element("OR");
+        Element cond = new Element("boolean");
+    	cond.setAttribute("operator", "OR");        
 
         for (int i = 0; i < children.size(); i++) {
             MCRCondition child = (MCRCondition) (children.get(i));

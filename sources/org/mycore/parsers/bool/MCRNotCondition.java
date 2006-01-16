@@ -49,9 +49,9 @@ public class MCRNotCondition implements MCRCondition {
     }
 
     public Element toXML() {
-        Element not = new Element("not");
+    	Element not = new Element("boolean");
+    	not.setAttribute("operator", "NOT");    	
         not.addContent(child.toXML());
-
         return not;
     }
 

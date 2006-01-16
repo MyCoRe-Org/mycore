@@ -69,40 +69,44 @@ public class MCRBooleanClauseParser {
             return defaultRule();
         }
 
-        String name = condition.getName().toLowerCase();
+        if (condition.getName().toLowerCase().equals("boolean")) {
+            String name = condition.getAttributeValue("operator").toLowerCase();
 
-        if (name.equals("not")) {
-            Element child = (Element) (condition.getChildren().get(0));
+            if (name.equals("not")) {
+                Element child = (Element) (condition.getChildren().get(0));
+                return new MCRNotCondition(parse(child));
+            } else if (name.equals("and") || name.equals("or")) {
+                List children = condition.getChildren();
+                MCRCondition cond;
 
-            return new MCRNotCondition(parse(child));
-        } else if (name.equals("and") || name.equals("or")) {
-            List children = condition.getChildren();
-            MCRCondition cond;
+                if (name.equals("and")) {
+                    MCRAndCondition acond = new MCRAndCondition();
 
-            if (name.equals("and")) {
-                MCRAndCondition acond = new MCRAndCondition();
+                    for (int i = 0; i < children.size(); i++) {
+                        Element child = (Element) (children.get(i));
+                        acond.addChild(parse(child));
+                    }
 
-                for (int i = 0; i < children.size(); i++) {
-                    Element child = (Element) (children.get(i));
-                    acond.addChild(parse(child));
+                    cond = acond;
+                } else {
+                    MCROrCondition ocond = new MCROrCondition();
+
+                    for (int i = 0; i < children.size(); i++) {
+                        Element child = (Element) (children.get(i));
+                        ocond.addChild(parse(child));
+                    }
+
+                    cond = ocond;
                 }
 
-                cond = acond;
+                return cond;
             } else {
-                MCROrCondition ocond = new MCROrCondition();
-
-                for (int i = 0; i < children.size(); i++) {
-                    Element child = (Element) (children.get(i));
-                    ocond.addChild(parse(child));
-                }
-
-                cond = ocond;
-            }
-
-            return cond;
+                return parseSimpleCondition(condition);
+            }        	
         } else {
-            return parseSimpleCondition(condition);
+        	return parseSimpleCondition(condition);
         }
+
     }
 
     public MCRCondition parse(String s) throws MCRParseException {

@@ -44,7 +44,9 @@ public class MCRTrueCondition implements MCRCondition {
     }
 
     public Element toXML() {
-        return new Element("true");
+    	Element cond = new Element("boolean");
+    	cond.setAttribute("operator", "true");
+        return cond;
     }
 
     public Element info() {
