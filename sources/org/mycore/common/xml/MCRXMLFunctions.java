@@ -23,6 +23,14 @@
 
 package org.mycore.common.xml;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import org.apache.log4j.Logger;
+
+import org.mycore.common.ISO8601DateFormat;
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -46,6 +54,10 @@ public class MCRXMLFunctions {
 	private static final String PROTOCOLL_SUFFIX = "_protocol";
 
 	private static final String DEFAULT_PORT = "80";
+    
+    private static final ISO8601DateFormat isoDf=new ISO8601DateFormat();
+    
+    private static final Logger LOGGER=Logger.getLogger(MCRXMLFunctions.class);
 
 	/**
 	 * returns the given String trimmed
@@ -91,5 +103,23 @@ public class MCRXMLFunctions {
 		}
 		return returns;
 	}
+    
+    public static String formatISODate(String isoDate,String simpleFormat, String iso639Language) throws ParseException{
+        if (LOGGER.isDebugEnabled()){
+            StringBuffer sb=new StringBuffer("isoDate=");
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", iso649Language=").append(iso639Language);
+            LOGGER.debug(sb.toString());
+        }
+        Locale locale=new Locale(iso639Language);
+        SimpleDateFormat df=new SimpleDateFormat(simpleFormat,locale);
+        Date date=isoDf.parse(isoDate);
+        return df.format(date);
+    }
+
+    public static String getISODate(String simpleDate,String simpleFormat) throws ParseException{
+        SimpleDateFormat df=new SimpleDateFormat(simpleFormat);
+        Date date=df.parse(simpleDate);
+        return isoDf.format(date);
+    }
 
 }
