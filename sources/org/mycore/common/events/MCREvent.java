@@ -39,10 +39,16 @@ public class MCREvent extends java.util.Hashtable {
     final static public String UPDATE_EVENT = "update";
 
     final static public String DELETE_EVENT = "delete";
-    
+
     final static public String REPAIR_EVENT = "repair";
 
+    final static public String RECEIVE_EVENT = "receive";
+    
+    final static public String EXIST_EVENT = "exist";
+
     final static public String OBJECT_TYPE = "MCRObject";
+
+    final static public String DERIVATE_TYPE = "MCRDerivate";
 
     final static public String FILE_TYPE = "MCRFile";
 
