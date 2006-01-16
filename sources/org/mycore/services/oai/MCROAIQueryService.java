@@ -26,8 +26,8 @@ package org.mycore.services.oai;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -269,13 +269,12 @@ public class MCROAIQueryService implements MCROAIQuery {
      *         categories the element is classified in
      */
     private String[] getHeader(MCRObject object, String objectId, String repositoryId, String instance) {
-        Calendar calendar = object.getService().getDate("modifydate");
+        Date date = object.getService().getDate("modifydate");
 
         // Format the date.
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        formatter.setCalendar(calendar);
 
-        String datestamp = formatter.format(calendar.getTime());
+        String datestamp = formatter.format(date);
 
         StringBuffer setSpec = new StringBuffer("");
         String[] identifier = new String[3];
@@ -286,9 +285,6 @@ public class MCROAIQueryService implements MCROAIQuery {
         List classifications = Arrays.asList(getClassifications(instance));
 
         for (int j = 0; j < object.getMetadata().size(); j++) {
-            MCRMetaElement meta = object.getMetadata().getMetadataElement(j);
-
-            // logger.debug("Metaelement: " + meta.getTag());
             if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
                 MCRMetaElement element = object.getMetadata().getMetadataElement(j);
 

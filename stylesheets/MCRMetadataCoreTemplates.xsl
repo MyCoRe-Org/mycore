@@ -135,6 +135,25 @@
   fixed="MCRMetaDate" />
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaISO8601Date -->
+
+<xsl:template match="mcrmetaiso8601date">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:simpleContent>
+       <xsd:extension base="xsd:string">
+         <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+         <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+       </xsd:extension>
+     </xsd:simpleContent>
+   </xsd:complexType>
+  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaISO8601Date" />
+</xsl:template>
+
 <!-- Template for the metadata MCRMetaIFS -->
 
 <xsl:template match="mcrmetaifs">

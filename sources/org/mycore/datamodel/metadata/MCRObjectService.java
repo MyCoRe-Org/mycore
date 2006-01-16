@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 
 import org.mycore.common.MCRException;
@@ -75,11 +75,16 @@ public class MCRObjectService {
     public MCRObjectService() {
         lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
         dates = new ArrayList();
+        
+        Date curTime=new Date();
+        
+        MCRMetaISO8601Date d = new MCRMetaISO8601Date("service", "servdate","createdate",0);
+        d.setDate(curTime);
+        dates.add(d);
+        d = new MCRMetaISO8601Date("service", "servdate","modifydate",0);
+        d.setDate(curTime);
+        dates.add(d);
 
-        MCRMetaDate d = new MCRMetaDate("service", "servdate", lang, "createdate", 0, new GregorianCalendar());
-        dates.add(d);
-        d = new MCRMetaDate("service", "servdate", lang, "modifydate", 0, new GregorianCalendar());
-        dates.add(d);
         rules = new ArrayList();
         flags = new ArrayList();
     }
@@ -187,52 +192,29 @@ public class MCRObjectService {
      *            the type of the date
      * @return the date as GregorianCalendar
      */
-    public final GregorianCalendar getDate(String type) {
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return null;
-        }
-
-        int i = -1;
-
-        for (int j = 0; j < dates.size(); j++) {
-            if (((MCRMetaDate) dates.get(j)).getType().equals(type)) {
-                i = j;
-            }
-        }
-
-        if (i == -1) {
-            return null;
-        }
-
-        MCRMetaDate d = (MCRMetaDate) dates.get(i);
-
-        return d.getDate();
+    public final Date getDate(String type) {
+        return getISO8601Date(type).getDate();
     }
-
-    /**
-     * This method remove a date for a given type.
-     * 
-     * @param type
-     *            the type of the date
-     */
-    public final void removeDate(String type) {
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return;
+    
+    private final MCRMetaISO8601Date getISO8601Date(String type){
+        if ((type == null) || (type.length() == 0)) {
+            return null;
         }
 
         int i = -1;
 
         for (int j = 0; j < dates.size(); j++) {
-            if (((MCRMetaDate) dates.get(j)).getType().equals(type)) {
+            if (((MCRMetaISO8601Date) dates.get(j)).getType().equals(type)) {
                 i = j;
+                break;
             }
         }
 
         if (i == -1) {
-            return;
+            return null;
         }
 
-        dates.remove(i);
+        return (MCRMetaISO8601Date) dates.get(i);
     }
 
     /**
@@ -243,26 +225,7 @@ public class MCRObjectService {
      *            the type of the date
      */
     public final void setDate(String type) {
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return;
-        }
-
-        int i = -1;
-
-        for (int j = 0; j < dates.size(); j++) {
-            if (((MCRMetaDate) dates.get(j)).getType().equals(type)) {
-                i = j;
-            }
-        }
-
-        if (i == -1) {
-            MCRMetaDate d = new MCRMetaDate("service", "servdate", null, type, 0, new GregorianCalendar());
-            dates.add(d);
-        } else {
-            MCRMetaDate d = (MCRMetaDate) dates.get(i);
-            d.setDate(new GregorianCalendar());
-            dates.set(i, d);
-        }
+        setDate(type,new Date());
     }
 
     /**
@@ -272,32 +235,17 @@ public class MCRObjectService {
      * @param type
      *            the type of the date
      * @param date
-     *            the given date
+     *            set time to this Calendar
      */
-    public final void setDate(String type, GregorianCalendar date) {
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return;
-        }
+    public final void setDate(String type, Date date) {
+        MCRMetaISO8601Date d=getISO8601Date(type); //search date in ArrayList
 
-        if (date == null) {
-            return;
-        }
-
-        int i = -1;
-
-        for (int j = 0; j < dates.size(); j++) {
-            if (((MCRMetaDate) dates.get(j)).getType().equals(type)) {
-                i = j;
-            }
-        }
-
-        if (i == -1) {
-            MCRMetaDate d = new MCRMetaDate("service", "servdate", null, type, 0, date);
+        if (d == null) {
+            d = new MCRMetaISO8601Date("service", "servdate", type, 0);
+            d.setDate(date);
             dates.add(d);
         } else {
-            MCRMetaDate d = (MCRMetaDate) dates.get(i);
-            d.setDate(date);
-            dates.set(i, d);
+            d.setDate(date); // alter date found in ArrayList
         }
     }
 
