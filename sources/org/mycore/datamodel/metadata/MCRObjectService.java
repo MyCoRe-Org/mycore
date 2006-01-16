@@ -64,11 +64,7 @@ public class MCRObjectService {
 
     private ArrayList dates = null;
 
-    private ArrayList users = null;
-
-    private ArrayList groups = null;
-
-    private ArrayList ips = null;
+    private ArrayList rules = null;
 
     private ArrayList flags = null;
 
@@ -84,9 +80,7 @@ public class MCRObjectService {
         dates.add(d);
         d = new MCRMetaDate("service", "servdate", lang, "modifydate", 0, new GregorianCalendar());
         dates.add(d);
-        users = new ArrayList();
-        groups = new ArrayList();
-        ips = new ArrayList();
+        rules = new ArrayList();
         flags = new ArrayList();
     }
 
@@ -136,60 +130,22 @@ public class MCRObjectService {
             }
         }
 
-        // User part
-        org.jdom.Element users_element = service_element.getChild("servusers");
-        if (users_element != null) {
-            List user_element_list = users_element.getChildren();
-            int user_len = user_element_list.size();
-            for (int i = 0; i < user_len; i++) {
-                org.jdom.Element user_element = (org.jdom.Element) user_element_list.get(i);
-                String user_element_name = user_element.getName();
-                if (!user_element_name.equals("servuser")) {
+        // Rule part
+        org.jdom.Element rules_element = service_element.getChild("servacls");
+        if (rules_element != null) {
+            List rule_element_list = rules_element.getChildren();
+            int rule_len = rule_element_list.size();
+            for (int i = 0; i < rule_len; i++) {
+                org.jdom.Element rule_element = (org.jdom.Element) rule_element_list.get(i);
+                String rule_element_name = rule_element.getName();
+                if (!rule_element_name.equals("servacl")) {
                     continue;
                 }
                 MCRMetaAccessRule user = new MCRMetaAccessRule();
                 user.setLang(lang);
                 user.setDataPart("service");
-                user.setFromDOM(user_element);
-                users.add(user);
-            }
-        }
-
-        // Group part
-        org.jdom.Element groups_element = service_element.getChild("servgroups");
-        if (groups_element != null) {
-            List group_element_list = groups_element.getChildren();
-            int group_len = group_element_list.size();
-            for (int i = 0; i < group_len; i++) {
-                org.jdom.Element group_element = (org.jdom.Element) group_element_list.get(i);
-                String group_element_name = group_element.getName();
-                if (!group_element_name.equals("servgroup")) {
-                    continue;
-                }
-                MCRMetaAccessRule group = new MCRMetaAccessRule();
-                group.setLang(lang);
-                group.setDataPart("service");
-                group.setFromDOM(group_element);
-                groups.add(group);
-            }
-        }
-
-        // IP part
-        org.jdom.Element ips_element = service_element.getChild("servips");
-        if (ips_element != null) {
-            List ip_element_list = ips_element.getChildren();
-            int ip_len = ip_element_list.size();
-            for (int i = 0; i < ip_len; i++) {
-                org.jdom.Element ip_element = (org.jdom.Element) ip_element_list.get(i);
-                String ip_element_name = ip_element.getName();
-                if (!ip_element_name.equals("servip")) {
-                    continue;
-                }
-                MCRMetaAccessRule ip = new MCRMetaAccessRule();
-                ip.setLang(lang);
-                ip.setDataPart("service");
-                ip.setFromDOM(ip_element);
-                ips.add(ip);
+                user.setFromDOM(rule_element);
+                rules.add(user);
             }
         }
 
@@ -458,244 +414,95 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode add a user to the users list.
+     * This methode add a rule to the rules list.
      * 
-     * @param value -
-     *            the new user as string
      * @param pool -
      *            the new pool as string
+     * @param condition -
+     *            the new rule as JDOM tree Element
      */
-    public final void addUser(String value, String pool) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+    public final void addRool(String pool, org.jdom.Element condition) {
+        if (condition == null) {
             return;
         }
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
             return;
         }
-        if (getUserIndex(value, pool) == -1) {
-            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, pool, value);
-            users.add(user);
+        if (getRuleIndex(pool) == -1) {
+            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, pool, condition);
+            rules.add(user);
         }
     }
 
     /**
-     * This method return the size of the user list.
+     * This method return the size of the rules list.
      * 
-     * @return the size of the user list
+     * @return the size of the rules list
      */
-    public final int getUserSize() {
-        return users.size();
+    public final int getRulesSize() {
+        return rules.size();
     }
 
     /**
-     * This methode get a single user from the user list as a string.
+     * This method return the index of a pool in the rules list.
+     * 
+     * @return the index of a pool in the rules list
+     */
+    public final int getRuleIndex(String pool) {
+        int ret = -1;
+        if ((pool == null) || (pool.trim().length() == 0))
+            return ret;
+        for (int i = 0; i < rules.size(); i++) {
+            if (((MCRMetaAccessRule) rules.get(i)).getPool().equals(pool)) {
+                ret = i;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * This methode get a single rule from the rules list as a JDOM Element.
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a user string
      */
-    public final String getUser(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > users.size())) {
-            throw new IndexOutOfBoundsException("Index error in getUser.");
+    public final org.jdom.Element getRule(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > rules.size())) {
+            throw new IndexOutOfBoundsException("Index error in getRule.");
         }
-        return ((MCRMetaAccessRule) users.get(index)).getText();
+        return ((MCRMetaAccessRule) rules.get(index)).getCondition();
     }
 
     /**
-     * This methode get a single type of user from the user list as a string.
+     * This methode get a single pool name of rule from the rules list as a
+     * string.
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return a user pool string
+     * @return a rule pool string
      */
-    public final String getUserPool(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > users.size())) {
-            throw new IndexOutOfBoundsException("Index error in getUserPool.");
+    public final String getRulePool(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > rules.size())) {
+            throw new IndexOutOfBoundsException("Index error in getRulePool.");
         }
-        return ((MCRMetaAccessRule) users.get(index)).getPool();
+        return ((MCRMetaAccessRule) rules.get(index)).getPool();
     }
 
     /**
-     * This methode remove a user from the user list.
+     * This methode remove a rule from the rules list.
      * 
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      */
-    public final void removeUser(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > users.size())) {
-            throw new IndexOutOfBoundsException("Index error in removeUser.");
+    public final void removeRule(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > rules.size())) {
+            throw new IndexOutOfBoundsException("Index error in removeRule.");
         }
-        users.remove(index);
-    }
-
-    /**
-     * This methode add a group to the groups list.
-     * 
-     * @param value -
-     *            the new group as string
-     * @param pool -
-     *            the new pool as string
-     */
-    public final void addGroup(String value, String pool) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
-            return;
-        }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            return;
-        }
-        if (getGroupIndex(value, pool) == -1) {
-            MCRMetaAccessRule group = new MCRMetaAccessRule("service", "servgroup", null, null, 0, pool, value);
-            groups.add(group);
-        }
-    }
-
-    /**
-     * This method return the size of the group list.
-     * 
-     * @return the size of the group list
-     */
-    public final int getGroupSize() {
-        return groups.size();
-    }
-
-    /**
-     * This methode get a single group from the group list as a string.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @return a group string
-     */
-    public final String getGroup(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > groups.size())) {
-            throw new IndexOutOfBoundsException("Index error in getGroup.");
-        }
-        return ((MCRMetaAccessRule) groups.get(index)).getText();
-    }
-
-    /**
-     * This methode get a single type of group from the group list as a string.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @return a group pool string
-     */
-    public final String getGroupPool(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > groups.size())) {
-            throw new IndexOutOfBoundsException("Index error in getGroupPool.");
-        }
-        return ((MCRMetaAccessRule) groups.get(index)).getPool();
-    }
-
-    /**
-     * This methode remove a group from the group list.
-     * 
-     * @param index
-     *            a index in the list
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     */
-    public final void removeGroup(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > groups.size())) {
-            throw new IndexOutOfBoundsException("Index error in removeGroup.");
-        }
-        groups.remove(index);
-    }
-
-    /**
-     * This methode add a ip to the ips list.
-     * 
-     * @param value -
-     *            the new ip as string
-     * @param pool -
-     *            the new pool of ip ip/netmask or domain name
-     * @param type -
-     *            the new type of ip, it can be 'ip' or 'domain'
-     */
-    public final void addIP(String value, String pool, String type) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
-            return;
-        }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            return;
-        }
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return;
-        }
-        if ((!pool.equals("ip")) && (!pool.equals("domain"))) {
-            return;
-        }
-        if (getIPIndex(value, pool, type) == -1) {
-            MCRMetaAccessRule ip = new MCRMetaAccessRule("service", "servip", null, type, 0, pool, value);
-            ips.add(ip);
-        }
-    }
-
-    /**
-     * This method return the size of the ip list.
-     * 
-     * @return the size of the ip list
-     */
-    public final int getIPSize() {
-        return ips.size();
-    }
-
-    /**
-     * This methode get a single ip from the ip list as a string.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @return a ip string
-     */
-    public final String getIP(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > ips.size())) {
-            throw new IndexOutOfBoundsException("Index error in getIP.");
-        }
-        return ((MCRMetaAccessRule) ips.get(index)).getText();
-    }
-
-    /**
-     * This methode get a single type of ip from the ip list as a string.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @return a ip type string
-     */
-    public final String getIPType(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > ips.size())) {
-            throw new IndexOutOfBoundsException("Index error in getIPType.");
-        }
-        return ((MCRMetaAccessRule) ips.get(index)).getType();
-    }
-
-    /**
-     * This methode get a single pool of ip from the ip list as a string.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @return a ip pool string
-     */
-    public final String getIPPool(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > ips.size())) {
-            throw new IndexOutOfBoundsException("Index error in getIPPool.");
-        }
-        return ((MCRMetaAccessRule) ips.get(index)).getPool();
-    }
-
-    /**
-     * This methode remove an ip from the ip list.
-     * 
-     * @param index
-     *            a index in the list
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     */
-    public final void removeIP(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > ips.size())) {
-            throw new IndexOutOfBoundsException("Index error in removeIP.");
-        }
-        ips.remove(index);
+        rules.remove(index);
     }
 
     /**
@@ -727,7 +534,7 @@ public class MCRObjectService {
             elm.addContent(elmm);
         }
 
-        if (users.size() != 0) {
+        if (rules.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servusers");
             elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
@@ -735,42 +542,13 @@ public class MCRObjectService {
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
-            for (int i = 0; i < users.size(); i++) {
-                elmm.addContent(((MCRMetaAccessRule) users.get(i)).createXML());
+            for (int i = 0; i < rules.size(); i++) {
+                elmm.addContent(((MCRMetaAccessRule) rules.get(i)).createXML());
             }
 
             elm.addContent(elmm);
         }
 
-        if (groups.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servgroups");
-            elmm.setAttribute("class", "MCRMetaAccessRule");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
-
-            for (int i = 0; i < groups.size(); i++) {
-                elmm.addContent(((MCRMetaAccessRule) groups.get(i)).createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
-        if (ips.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servips");
-            elmm.setAttribute("class", "MCRMetaAccessRule");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
-
-            for (int i = 0; i < ips.size(); i++) {
-                elmm.addContent(((MCRMetaAccessRule) ips.get(i)).createXML());
-            }
-
-            elm.addContent(elmm);
-        }
         if (flags.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
@@ -810,83 +588,6 @@ public class MCRObjectService {
         }
 
         return true;
-    }
-
-    /**
-     * This methode returns the index for the given user value.
-     * 
-     * @param value
-     *            the value of a user as string
-     * @param pool
-     *            the pool of an ip as string
-     * 
-     */
-    public final int getUserIndex(String value, String pool) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
-            return -1;
-        }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            return -1;
-        }
-        for (int i = 0; i < users.size(); i++) {
-            if (((MCRMetaAccessRule) users.get(i)).getText().equals(value) && ((MCRMetaAccessRule) users.get(i)).getPool().equals(pool)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * This methode returns the index for the given group value.
-     * 
-     * @param value
-     *            the value of a group as string
-     * @param pool
-     *            the pool of an ip as string
-     * 
-     */
-    public final int getGroupIndex(String value, String pool) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
-            return -1;
-        }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            return -1;
-        }
-        for (int i = 0; i < groups.size(); i++) {
-            if (((MCRMetaAccessRule) groups.get(i)).getText().equals(value) && ((MCRMetaAccessRule) groups.get(i)).getPool().equals(pool)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * This methode returns the index for the given ip value.
-     * 
-     * @param value
-     *            the value of an ip as string
-     * @param type
-     *            the type of an ip as string
-     * @param pool
-     *            the pool of an ip as string
-     * 
-     */
-    public final int getIPIndex(String value, String pool, String type) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
-            return -1;
-        }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            return -1;
-        }
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return -1;
-        }
-        for (int i = 0; i < ips.size(); i++) {
-            if (((MCRMetaAccessRule) ips.get(i)).getText().equals(value) && ((MCRMetaAccessRule) ips.get(i)).getPool().equals(pool) && ((MCRMetaAccessRule) ips.get(i)).getType().equals(type)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     /**
