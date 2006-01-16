@@ -253,7 +253,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return false;
         }
 
-        if (file.isFile()) {
+        if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
 
             return false;
