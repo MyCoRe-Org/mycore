@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRObjectCommands extends MCRAbstractCommands {
-    private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
 
     /**
      * The empty constructor.
@@ -267,7 +267,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return false;
         }
 
-        if (file.isFile()) {
+        if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
 
             return false;
