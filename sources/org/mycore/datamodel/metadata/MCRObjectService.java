@@ -99,6 +99,7 @@ public class MCRObjectService {
     public final void setFromDOM(org.jdom.Element service_element) {
         // Date part
         org.jdom.Element dates_element = service_element.getChild("servdates");
+        dates.clear();
 
         if (dates_element != null) {
             List date_element_list = dates_element.getChildren();
@@ -112,26 +113,11 @@ public class MCRObjectService {
                     continue;
                 }
 
-                MCRMetaDate date = new MCRMetaDate();
-                date.setDataPart("service");
-                date.setLang(lang);
+                MCRMetaISO8601Date date = new MCRMetaISO8601Date();
+                date.setDataPart(service_element.getName());
                 date.setFromDOM(date_element);
-
-                int k = -1;
-
-                for (int j = 0; j < dates.size(); j++) {
-                    if (((MCRMetaDate) dates.get(j)).getType().equals(date.getType())) {
-                        k = j;
-
-                        break;
-                    }
-                }
-
-                if (k == -1) {
-                    dates.add(date);
-                } else {
-                    dates.set(k, date);
-                }
+                
+                setDate(date);
             }
         }
 
@@ -239,13 +225,35 @@ public class MCRObjectService {
      */
     public final void setDate(String type, Date date) {
         MCRMetaISO8601Date d=getISO8601Date(type); //search date in ArrayList
+        System.out.println("Set date of type "+type+" to "+date.getTime());
 
         if (d == null) {
             d = new MCRMetaISO8601Date("service", "servdate", type, 0);
             d.setDate(date);
             dates.add(d);
+            System.out.println("added date");
         } else {
             d.setDate(date); // alter date found in ArrayList
+            System.out.println("set date");
+        }
+    }
+
+    /**
+     * This methode set a date element in the dates list to a given date value.
+     * If the given type exists, the date was update.
+     * 
+     * @param type
+     *            the type of the date
+     * @param date
+     *            set time to this Calendar
+     */
+    private final void setDate(MCRMetaISO8601Date date) {
+        MCRMetaISO8601Date d=getISO8601Date(date.getType()); //search date in ArrayList
+
+        if (d == null) {
+            dates.add(date);
+        } else {
+            d.setDate(date.getDate()); // alter date found in ArrayList
         }
     }
 
@@ -469,14 +477,14 @@ public class MCRObjectService {
 
         if (dates.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servdates");
-            elmm.setAttribute("class", "MCRMetaDate");
+            elmm.setAttribute("class", "MCRMetaISO8601Date");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
             elmm.setAttribute("parasearch", "true");
             elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < dates.size(); i++) {
-                elmm.addContent(((MCRMetaDate) dates.get(i)).createXML());
+                elmm.addContent(((MCRMetaISO8601Date) dates.get(i)).createXML());
             }
 
             elm.addContent(elmm);
@@ -527,11 +535,11 @@ public class MCRObjectService {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (getDate("createdate") == null) {
+        if (getISO8601Date("createdate") == null) {
             return false;
         }
 
-        if (getDate("modifydate") == null) {
+        if (getISO8601Date("modifydate") == null) {
             return false;
         }
 

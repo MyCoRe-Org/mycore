@@ -119,7 +119,17 @@ final public class MCRObject extends MCRBase {
 			throw new MCRException("The JDOM document is null or empty.");
 		}
 
-		// get object ID from DOM
+		setRoot();
+
+        setStructure();
+
+		setMetadata();
+
+		setService();
+	}
+
+    private void setRoot() {
+        // get object ID from DOM
 		org.jdom.Element jdom_element_root = jdom_document.getRootElement();
 		mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID").getValue());
 		mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
@@ -130,22 +140,32 @@ final public class MCRObject extends MCRBase {
 
 		mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
 		logger.debug("MCRObject set schemafile: " + mcr_schema);
+    }
 
-		// get the structure data of the object
+    private void setStructure() {
+        // get the structure data of the object
+        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
 		org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
 		mcr_struct = new MCRObjectStructure(logger);
 		mcr_struct.setFromDOM(jdom_element);
+    }
 
-		// get the metadata of the object
-		jdom_element = jdom_element_root.getChild("metadata");
-		mcr_metadata = new MCRObjectMetadata();
-		mcr_metadata.setFromDOM(jdom_element);
+    private void setMetadata() {
+        // get the metadata of the object
+        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
+        org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
+        mcr_metadata = new MCRObjectMetadata();
+        mcr_metadata.setFromDOM(jdom_element);
+    }
 
-		// get the service data of the object
-		jdom_element = jdom_element_root.getChild("service");
-		mcr_service = new MCRObjectService();
-		mcr_service.setFromDOM(jdom_element);
-	}
+    private void setService() {
+        org.jdom.Element jdom_element;
+        // get the service data of the object
+        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
+        jdom_element = jdom_element_root.getChild("service");
+        mcr_service = new MCRObjectService();
+        mcr_service.setFromDOM(jdom_element);
+    }
 
 	/**
 	 * This method read the XML input stream from an URI to build up the
