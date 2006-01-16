@@ -142,7 +142,7 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:simpleContent>
-       <xsd:extension base="xsd:string">
+       <xsd:extension base="xsd:dateTime">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
        </xsd:extension>
