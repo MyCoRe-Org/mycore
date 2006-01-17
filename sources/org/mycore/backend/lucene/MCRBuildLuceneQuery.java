@@ -89,8 +89,9 @@ public class MCRBuildLuceneQuery {
         for (int i = 0; i < f.size(); i++) {
             org.jdom.Element xEle = (org.jdom.Element) (f.get(i));
             String name = xEle.getName();
+            if ("boolean".equals(name))
+              name = xEle.getAttributeValue("operator").toLowerCase();
             Query x = null;
-            ;
 
             boolean reqfn = reqf;
             boolean prof = false;
