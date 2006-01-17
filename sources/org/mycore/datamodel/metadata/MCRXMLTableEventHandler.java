@@ -105,4 +105,73 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
         evt.put("exist", Boolean.toString(res));
     }
 
+    /**
+     * This method add the data to SQL table of XML data via MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     * @throws MCRActiveLinkException
+     */
+    protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
+        org.jdom.Document doc = der.createXML();
+        mcr_xmltable.create(der.getId(), doc);
+    }
+
+    /**
+     * This method update the data to SQL table of XML data via
+     * MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
+        mcr_xmltable.delete(der.getId());
+        handleDerivateCreated(evt, der);
+    }
+
+    /**
+     * This method delete the XML data from SQL table data via
+     * MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
+        mcr_xmltable.delete(der.getId());
+    }
+
+    /**
+     * This method receive the XML data from SQL table data via
+     * MCRXMLTableManager and put it in the MCREvent instance.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objid
+     *            the MCRObjectID that caused the event
+     */
+    protected final void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
+        byte[] xml = mcr_xmltable.retrieve(objid);
+        evt.put("xml", xml);
+    }
+
+    /**
+     * This method check exist of the XML data from SQL table data via
+     * MCRXMLTableManager and put the boolean result in the MCREvent instance.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objid
+     *            the MCRObjectID that caused the event
+     */
+    protected final void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
+        boolean res = mcr_xmltable.exist(objid);
+        evt.put("exist", Boolean.toString(res));
+    }
+
 }
