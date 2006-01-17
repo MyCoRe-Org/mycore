@@ -405,7 +405,7 @@ final public class MCRDerivate extends MCRBase {
         try {
             xml = (byte[]) evt.get("xml");
         } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
+            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.",e);
         }
         return xml;
     }

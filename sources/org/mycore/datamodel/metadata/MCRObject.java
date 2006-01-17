@@ -562,7 +562,7 @@ final public class MCRObject extends MCRBase {
             xml = (byte [])evt.get("xml");
             setFromXML(xml,false);
         } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
+            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.",e);
         }
 	}
 

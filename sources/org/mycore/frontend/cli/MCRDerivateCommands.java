@@ -508,7 +508,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.debug("Cannot build Transformer.", e);
         }
 
-        MCRObjectID nid = fid;
+       MCRObjectID nid = fid;
         int k = 0;
 
         try {
@@ -524,7 +524,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                     LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
                     continue;
                 }
-
                 File xmlOutput = new File(dirname, nid.toString() + ".xml");
                 FileOutputStream out = new FileOutputStream(xmlOutput);
                 dir = new File(dirname, nid.toString());
