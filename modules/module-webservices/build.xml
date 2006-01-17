@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.4 $ $Date: 2006-01-16 10:04:28 $ -->
+<!-- $Revision: 1.5 $ $Date: 2006-01-17 10:58:07 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -158,8 +158,8 @@
       <fileset dir="../../lib" includes="*.jar" />
       <fileset dir="lib" includes="*.jar"/>
     </path>
-    <javac srcdir="sources" includes="org/mycore/services/wsclient/**" destdir="build/classes" classpathref="axis.classpath" encoding="ISO-8859-1">
-      <src path="sources" />
+    <javac destdir="build/classes" classpathref="axis.classpath" encoding="ISO-8859-1">
+      <src path="sources/org/mycore/services/wsclient" />
       <src path="build/src" />
     </javac>
   </target>
