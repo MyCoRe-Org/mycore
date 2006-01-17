@@ -195,7 +195,7 @@ public class TextFilterPluginManager {
         File pluginDir = new File(CONF.getString("MCR.PluginDirectory"));
 
         if ((pluginDir == null) || !pluginDir.isDirectory()) {
-            LOGGER.info("PluginDirectory does not exist! " + pluginDir.getAbsolutePath());
+            LOGGER.warn("PluginDirectory does not exist! " + pluginDir.getAbsolutePath());
 
             return new URL[0];
         }
@@ -203,7 +203,7 @@ public class TextFilterPluginManager {
         File[] plugins = pluginDir.listFiles();
 
         for (int i = 0; i < plugins.length; i++) {
-            System.err.println(plugins[i].getName());
+            LOGGER.debug(plugins[i].getName());
 
             if (plugins[i].isFile() && plugins[i].getName().toUpperCase().endsWith(".JAR")) {
                 // This Jar file possibly contains a text filter plugin
