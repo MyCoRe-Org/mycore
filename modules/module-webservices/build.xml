@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.5 $ $Date: 2006-01-17 10:58:07 $ -->
+<!-- $Revision: 1.6 $ $Date: 2006-01-17 12:25:06 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -179,6 +179,7 @@
     <path id="wsclient.classpath">
       <fileset dir="../../lib" includes="*.jar" />
       <fileset dir="lib" includes="*.jar"/>
+      <fileset dir="build/bin" includes="mycore.properties"/>
       <pathelement location="build/classes" />
     </path>
     
