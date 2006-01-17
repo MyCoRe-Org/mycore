@@ -26,7 +26,6 @@ package org.mycore.datamodel.metadata;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -41,29 +40,29 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterface {
-    
-    protected final static int defaultValue = 0;
 
     private Element export;
 
     private boolean changed = true;
 
-    private static final Namespace ns = Namespace.NO_NAMESPACE;
-    
+    private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
+
     private Date dt;
-    private final static DateFormat df=new ISO8601DateFormat();
-    private boolean valid=false;
-    
-    private static final Logger LOGGER=Logger.getLogger(MCRMetaISO8601Date.class);
+
+    private final static DateFormat DATE_FORMAT = new ISO8601DateFormat();
+
+    private boolean valid = false;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaISO8601Date.class);
 
     /**
-     *  
+     * 
      */
     public MCRMetaISO8601Date() {
         super();
     }
 
-    public MCRMetaISO8601Date(String set_datapart, String set_subtag, String set_type, int set_inherted){
+    public MCRMetaISO8601Date(String set_datapart, String set_subtag, String set_type, int set_inherted) {
         super(set_datapart, set_subtag, null, set_type, set_inherted);
     }
 
@@ -74,21 +73,21 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
      */
     public Element createXML() throws MCRException {
         if (!changed) {
-            return (Element)export.clone();
+            return (Element) export.clone();
         }
         if (!isValid()) {
             debug();
             throw new MCRException("The content of MCRMetaXML is not valid.");
         }
-        export = new org.jdom.Element(subtag, ns);
+        export = new org.jdom.Element(subtag, DEFAULT_NAMESPACE);
         export.setAttribute("inherited", (new Integer(inherited)).toString());
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             export.setAttribute("type", type);
         }
-        export.setText(df.format(dt));
+        export.setText(DATE_FORMAT.format(dt));
         changed = false;
-        return (Element)export.clone();
+        return (Element) export.clone();
     }
 
     /**
@@ -107,44 +106,47 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
      * @return Returns the ns.
      */
     protected static Namespace getNs() {
-        return ns;
+        return DEFAULT_NAMESPACE;
     }
 
     /**
-     *  sets the date for this meta data object
+     * sets the date for this meta data object
+     * 
      * @param String
      *            Date in form YYYY-MM-DDThh:mm:ssTZD
      */
     final void setDate(String isoString) {
-        Date dt=null;
+        Date dt = null;
         try {
-            dt=df.parse(isoString);
+            dt = DATE_FORMAT.parse(isoString);
         } catch (ParseException e) {
-            //no handling of exceptions at this point valid should be set to false;
-            LOGGER.warn("Error while parsing String to Date: "+isoString, e);
-            System.err.println("Error while parsing String to Date: "+isoString);
+            // no handling of exceptions at this point valid should be set to
+            // false;
+            LOGGER.warn("Error while parsing String to Date: " + isoString, e);
+            System.err.println("Error while parsing String to Date: " + isoString);
             System.err.println(MCRException.getStackTraceAsString(e));
-            valid=false;
+            valid = false;
         }
         setDate(dt);
     }
-    
-    final Date getDate(){
+
+    final Date getDate() {
         return new Date(dt.getTime());
     }
 
     /**
      * sets the date for this meta data object
+     * 
      * @param dt
      *            Date object representing date String in Element
      */
     public void setDate(Date dt) {
-        if (dt==null){
-            this.dt=null;
-            valid=false;
+        if (dt == null) {
+            this.dt = null;
+            valid = false;
         } else {
-            this.dt=new Date(dt.getTime());
-            valid=true;
+            this.dt = new Date(dt.getTime());
+            valid = true;
         }
         changed = true;
     }
@@ -163,7 +165,7 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
     public void debug() {
         LOGGER.debug("Start Class : MCRMetaTimestamp");
         super.debugDefault();
-        LOGGER.debug("Date=" + df.format(dt));
+        LOGGER.debug("Date=" + DATE_FORMAT.format(dt));
     }
 
     /**
@@ -186,7 +188,7 @@ public class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterfa
     }
 
     public boolean isValid() {
-        if (!valid || !super.isValid()){
+        if (!valid || !super.isValid()) {
             return false;
         }
         return true;
