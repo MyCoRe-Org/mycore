@@ -144,6 +144,7 @@
      <xsd:simpleContent>
        <xsd:extension base="xsd:dateTime">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+         <xsd:attribute name="format" use="optional" type="mcrdateformat" default="YYYY-MM-DDThh:mm:ss.sTZD" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
        </xsd:extension>
      </xsd:simpleContent>

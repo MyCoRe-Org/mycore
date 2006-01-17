@@ -23,6 +23,12 @@
  </xsd:restriction>
 </xsd:simpleType>
 
+<xsd:simpleType name="mcrdateformat">
+ <xsd:restriction base="xsd:string">
+  <xsd:maxLength value="256"/>
+ </xsd:restriction>
+</xsd:simpleType>
+
 <xsd:simpleType name="mcrobjectid">
  <xsd:restriction base="xsd:string">
   <xsd:maxLength value="64"/>
