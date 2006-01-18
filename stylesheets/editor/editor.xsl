@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.42 $ $Date: 2005-09-22 13:39:32 $ -->
+<!-- $Revision: 1.43 $ $Date: 2006-01-18 15:12:19 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -305,7 +305,7 @@
     <xsl:if test="@lines='on'">
       <tr>
         <td width="100%" colspan="2" class="editorHLine">
-          <img src="" height="1" width="1" alt=" "/>
+          <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
         </td>
       </tr>
     </xsl:if>
@@ -464,7 +464,7 @@
   <xsl:if test="(count($cells[@row=$row.nr]) &gt; 0) and ($cells[@row &gt; $row.nr]) and (@lines='on')">
     <tr>
       <td width="100%" colspan="10" class="editorHLine">
-        <img src="" height="1" width="1" alt=" "/>
+        <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
       </td>
     </tr>
   </xsl:if>
