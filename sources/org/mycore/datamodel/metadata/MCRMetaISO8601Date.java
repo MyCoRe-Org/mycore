@@ -110,28 +110,11 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
         AVAILABLE_FORMATS.add(COMPLETE_HH_MM_SS_SSS);
     }
 
-    private final static DateTimeFormatter YEAR_FORMAT = ISODateTimeFormat.year();
-
-    private final static DateTimeFormatter YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth();
-
-    private final static DateTimeFormatter COMPLETE_FORMAT = ISODateTimeFormat.date();
-
-    // TODO: check complete_hh_mm
-    private final static DateTimeFormatter COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute();
-
-    private final static DateTimeFormatter COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
-
-    private final static DateTimeFormatter COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime();
-
-    private static final boolean USE_UTC = true;
-
-    private DateTimeFormatter dateTimeFormatter = USE_UTC ? COMPLETE_HH_MM_SS_SSS_FORMAT.withZone(DateTimeZone.UTC) : COMPLETE_HH_MM_SS_SSS_FORMAT;
+    private DateTimeFormatter dateTimeFormatter = FormatChooser.getFormatter(null, null);
 
     private boolean valid = false;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetaISO8601Date.class);
-
-    private static final Pattern MILLI_CHECK_PATTERN = Pattern.compile("\\.\\d{4,}\\+");
 
     /**
      * constructs a empty instance.
@@ -201,26 +184,17 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      * sets the date for this meta data object
      * 
      * @param String
-     *            Date in any form that is a valid xsd:dateTime
+     *            Date in any form that is a valid xsd:duration
      */
     public final void setDate(String isoString) {
         DateTime dt = null;
         try {
-            dt = getDateTime(fixDate(isoString));
+            dt = getDateTime(FormatChooser.cropSecondFractions(isoString));
         } catch (RuntimeException e) {
-            LOGGER.debug("Error while parsing date, set date to NULL.",e);
-            dt=null;
+            LOGGER.debug("Error while parsing date, set date to NULL.", e);
+            dt = null;
         }
         setDateTime(dt);
-    }
-
-    private final static String fixDate(String isoString) {
-        Matcher matcher = MILLI_CHECK_PATTERN.matcher(isoString);
-        boolean result = matcher.find();
-        if (result) {
-            return matcher.replaceFirst(isoString.substring(matcher.start(), matcher.start() + 4) + "+");
-        } else
-            return isoString;
     }
 
     /**
@@ -229,7 +203,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      * @return a new Date instance of the time set in this element
      */
     public final Date getDate() {
-        return (dt==null)? null:new Date(dt.getMillis());
+        return (dt == null) ? null : new Date(dt.getMillis());
     }
 
     /**
@@ -261,39 +235,17 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
     }
 
     private DateTime getDateTime(String timeString) {
+        dateTimeFormatter = FormatChooser.getFormatter(timeString, this.format);
         return dateTimeFormatter.parseDateTime(timeString);
     }
 
     /**
      * returns a ISO 8601 conform String using the current set format.
+     * 
      * @return date in ISO 8601 format, or null if date is unset.
      */
     public final String getISOString() {
-        return (dt==null)? null:dateTimeFormatter.print(this.dt);
-    }
-
-    private void setFormatter(String formatter) {
-        if (!AVAILABLE_FORMATS.contains(formatter)) {
-            dateTimeFormatter = COMPLETE_HH_MM_SS_SSS_FORMAT;
-        } else if (formatter.equals(YEAR)) {
-            dateTimeFormatter = YEAR_FORMAT;
-        } else if (formatter.equals(YEAR_MONTH)) {
-            dateTimeFormatter = YEAR_MONTH_FORMAT;
-        } else if (formatter.equals(COMPLETE)) {
-            dateTimeFormatter = COMPLETE_FORMAT;
-        } else if (formatter.equals(COMPLETE_HH_MM)) {
-            dateTimeFormatter = COMPLETE_HH_MM_FORMAT;
-        } else if (formatter.equals(COMPLETE_HH_MM_SS)) {
-            dateTimeFormatter = COMPLETE_HH_MM_SS_FORMAT;
-        } else if (formatter.equals(COMPLETE_HH_MM_SS_SSS)) {
-            dateTimeFormatter = COMPLETE_HH_MM_SS_SSS_FORMAT;
-        } else {
-            LOGGER.warn("Somebody forgot to add " + formatter + " to AVAILABLE_FORMATS");
-            dateTimeFormatter = COMPLETE_HH_MM_SS_SSS_FORMAT;
-        }
-        if (USE_UTC) {
-            dateTimeFormatter = dateTimeFormatter.withZone(DateTimeZone.UTC);
-        }
+        return (dt == null) ? null : dateTimeFormatter.print(this.dt);
     }
 
     /**
@@ -304,33 +256,34 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      * exported as static fields by this class.
      * 
      * @param format
-     *            a format string that is valid conforming to xsd:dateTime
+     *            a format string that is valid conforming to xsd:duration
      *            schema type.
      * 
      */
     public void setFormat(String format) {
         if (format == null) {
-            LOGGER.debug("Format was not given (null), fallback to:" + COMPLETE_HH_MM_SS_SSS);
-            this.format = COMPLETE_HH_MM_SS_SSS;
+            this.format = null;
         } else if (AVAILABLE_FORMATS.contains(format)) {
             this.format = format;
         } else {
-            LOGGER.debug(format + " is a unknown format, fallback to:" + COMPLETE_HH_MM_SS_SSS);
-            this.format = COMPLETE_HH_MM_SS_SSS;
+            LOGGER.debug(format + " is a unknown format, fallback to: null");
+            this.format = null;
         }
-        setFormatter(this.format);
+        dateTimeFormatter = FormatChooser.getFormatter(null, this.format);
     }
 
     /**
      * gets the input and output format.
      * 
-     * this is allways a String that is also exported as static fields by this class.
+     * this is a String that is also exported as static fields by this class, or
+     * null if not defined.
      * 
-     * @return a format string that is valid conforming to xsd:dateTime schema type.
+     * @return a format string that is valid conforming to xsd:duration schema
+     *         type, or null if not defined.
      * 
      */
     public String getFormat() {
-        return (this.format==null)? COMPLETE_HH_MM_SS_SSS:this.format;
+        return this.format;
     }
 
     /*
@@ -391,5 +344,164 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
             return false;
         }
         return true;
+    }
+
+    /**
+     * is a helper class for MCRMetaISO8601Date.
+     * 
+     * Please be aware that this class is not supported. It may disappear some day or methods get removed.
+     * 
+     * @author Thomas Scheffler (yagee)
+     *
+     * @version $Revision$ $Date$
+     * @since 1.3
+     */
+    protected static final class FormatChooser {
+        private final static Set AVAILABLE_FORMATS;
+        static {
+            AVAILABLE_FORMATS = new HashSet(7, 1l);
+            AVAILABLE_FORMATS.add(YEAR);
+            AVAILABLE_FORMATS.add(YEAR_MONTH);
+            AVAILABLE_FORMATS.add(COMPLETE);
+            AVAILABLE_FORMATS.add(COMPLETE_HH_MM);
+            AVAILABLE_FORMATS.add(COMPLETE_HH_MM_SS);
+            AVAILABLE_FORMATS.add(COMPLETE_HH_MM_SS_SSS);
+        }
+
+        protected final static DateTimeFormatter YEAR_FORMAT = ISODateTimeFormat.year();
+
+        protected final static DateTimeFormatter YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth();
+
+        protected final static DateTimeFormatter COMPLETE_FORMAT = ISODateTimeFormat.date();
+
+        protected final static DateTimeFormatter COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute();
+
+        protected final static DateTimeFormatter COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
+
+        protected final static DateTimeFormatter COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime();
+
+        protected final static DateTimeFormatter UTC_YEAR_FORMAT = ISODateTimeFormat.year().withZone(DateTimeZone.UTC);
+
+        protected final static DateTimeFormatter UTC_YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth().withZone(DateTimeZone.UTC);
+
+        protected final static DateTimeFormatter UTC_COMPLETE_FORMAT = ISODateTimeFormat.date().withZone(DateTimeZone.UTC);
+
+        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute().withZone(DateTimeZone.UTC);
+
+        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC);
+
+        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+
+        private static final Pattern MILLI_CHECK_PATTERN = Pattern.compile("\\.\\d{4,}\\+");
+
+        private static final boolean USE_UTC = true;
+
+        /**
+         * returns a DateTimeFormatter for the given isoString or format.
+         * 
+         * This method prefers the format parameter. So if it's not null or not
+         * zero length this method will interpret the format string. You can
+         * also get a formatter for e specific iso String. In either case if the
+         * underlying algorithm can not determine an exact matching formatter it
+         * will allway fall back to a default. So this method will never return
+         * null.
+         * 
+         * @param isoString
+         *            an ISO 8601 formatted time String, or null
+         * @param format
+         *            a valid format String, or null
+         * @return returns a specific DateTimeFormatter
+         */
+        public static DateTimeFormatter getFormatter(String isoString, String format) {
+            DateTimeFormatter df;
+            if ((format != null) && (format.length() != 0)) {
+                df = getFormatterForFormat(format);
+            } else if ((isoString != null) && (isoString.length() != 0)) {
+                df = getFormatterForDuration(isoString);
+            } else {
+                df = COMPLETE_HH_MM_SS_SSS_FORMAT;
+            }
+            if (USE_UTC) {
+                df = df.withZone(DateTimeZone.UTC);
+            }
+            return df;
+        }
+
+        private static DateTimeFormatter getFormatterForFormat(String format) {
+            if (!AVAILABLE_FORMATS.contains(format)) {
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            } else if (format.equals(YEAR)) {
+                return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+            } else if (format.equals(YEAR_MONTH)) {
+                return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
+            } else if (format.equals(COMPLETE)) {
+                return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
+            } else if (format.equals(COMPLETE_HH_MM)) {
+                return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
+            } else if (format.equals(COMPLETE_HH_MM_SS)) {
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
+            } else if (format.equals(COMPLETE_HH_MM_SS_SSS)) {
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            } else {
+                LOGGER.warn("Somebody forgot to add " + format + " to AVAILABLE_FORMATS");
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            }
+        }
+
+        private static DateTimeFormatter getFormatterForDuration(String isoString) {
+            boolean test = false;
+            switch (isoString.length()) {
+            case 4:
+                System.err.println("YEAR");
+                return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+            case 7:
+                return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
+            case 10:
+                return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
+            case 17: // YYYY-MM-DDThh:mm'Z'
+                test = true;
+            case 22:
+                if (test || !isoString.endsWith("Z")) {
+                    // YYYY-MM-DDThh:mm[+-]hh:mm
+                    return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
+                } else {
+                    // YYYY-MM-DDThh:mm:ss.s'Z'
+                    return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+                }
+            case 20: // YYYY-MM-DDThh:mm:ss'Z'
+            case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
+            case 23: // YYYY-MM-DDThh:mm:ss.ss'Z'
+            case 24: // YYYY-MM-DDThh:mm:ss.sss'Z'
+            case 27: // YYYY-MM-DDThh:mm:ss.s[+-]hh:mm
+            case 28: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+            case 29: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            default:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            }
+        }
+
+        /**
+         * returns a String that has not more than 3 digits representing
+         * "fractions of a second".
+         * 
+         * If isoString has no or not more than 3 digits this method simply
+         * returns isoString.
+         * 
+         * @param isoString
+         *            an ISO 8601 formatted time String
+         * @return an ISO 8601 formatted time String with at max 3 digits for
+         *         fractions of a second
+         */
+        public final static String cropSecondFractions(String isoString) {
+            Matcher matcher = MILLI_CHECK_PATTERN.matcher(isoString);
+            boolean result = matcher.find();
+            if (result) {
+                return matcher.replaceFirst(isoString.substring(matcher.start(), matcher.start() + 4) + "+");
+            } else
+                return isoString;
+        }
+
     }
 }
