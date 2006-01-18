@@ -492,7 +492,7 @@ final public class MCRObject extends MCRBase {
 		// handle events
 		MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.DELETE_EVENT);
 		evt.put("object", this);
-		MCREventManager.instance().handleEvent(evt);
+		MCREventManager.instance().handleEvent(evt,MCREventManager.BACKWARD);
 	}
 
 	/**

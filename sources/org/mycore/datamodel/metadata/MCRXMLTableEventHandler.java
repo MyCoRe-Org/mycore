@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 
@@ -87,11 +86,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param objid
      *            the MCRObjectID that caused the event
      */
-    protected final void handleObjectReceived(MCREvent evt, MCRObjectID objid) throws MCRPersistenceException {
+    protected final void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
         byte[] xml = mcr_xmltable.retrieve(objid);
-        if (xml == null) {
-            throw new MCRPersistenceException("The returned XML is null.");
-        }
         evt.put("xml", xml);
     }
 
@@ -159,11 +155,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param objid
      *            the MCRObjectID that caused the event
      */
-    protected final void handleDerivateReceived(MCREvent evt, MCRObjectID objid) throws MCRPersistenceException {
+    protected final void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
         byte[] xml = mcr_xmltable.retrieve(objid);
-        if (xml == null) {
-            throw new MCRPersistenceException("The returned XML is null.");
-        }
         evt.put("xml", xml);
     }
 

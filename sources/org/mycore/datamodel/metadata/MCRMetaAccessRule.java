@@ -203,7 +203,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
         }
-        elm.addContent(condition);
+        elm.addContent(condition.detach());
         return elm;
     }
 
