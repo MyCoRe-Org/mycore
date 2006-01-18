@@ -91,6 +91,10 @@ public class MCRMetaISO8601DateTest extends TestCase {
         ts.setFormat(null); // check auto format determination
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
+        ts.setFormat(MCRMetaISO8601Date.YEAR); // check auto format determination
+        timeString = "1997-07";
+        ts.setDate(timeString);
+        assertNull("Date is not null", ts.getDate());
         System.out.println(ts.getISOString());
     }
 
