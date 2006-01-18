@@ -121,25 +121,39 @@ public class MCREventManager {
         }
     }
 
+    /** Call event handlers in forward direction (create, update) */
+    public final static boolean FORWARD = true;
+
+    /** Call event handlers in backward direction (delete) */
+    public final static boolean BACKWARD = false;
+
     /**
      * This method is called by the component that created the event and acts as
      * a multiplexer that invokes all registered event handlers doHandleEvent
      * methods. If something goes wrong and an exception is caught, the
      * undoHandleEvent methods of all event handlers that are at a position
-     * BEFORE the failed one, will be called in reversed order.
+     * BEFORE the failed one, will be called in reversed order. The parameter
+     * direction controls the order in which the event handlers are called.
      * 
      * @see MCREventHandler#doHandleEvent
      * @see MCREventHandlerBase
      * 
      * @param evt
      *            the event that happened
+     * @param direction
+     *            the order in which the event handlers are called
      */
-    public void handleEvent(MCREvent evt) throws MCRException {
+    public void handleEvent(MCREvent evt, boolean direction) {
         List list = (List) (handlers.get(evt.getObjectType()));
+        if (list == null)
+            return;
 
-        int undoPos = 0;
+        int first = (direction ? 0 : list.size() - 1);
+        int last = (direction ? list.size() - 1 : 0);
+        int step = (direction ? 1 : -1);
+        int undoPos = first;
 
-        for (int i = 0; (list != null) && (i < list.size()); i++) {
+        for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = (MCREventHandler) (list.get(i));
             logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling handler " + eh.getClass().getName());
 
@@ -156,7 +170,7 @@ public class MCREventManager {
         }
 
         // Rollback by calling undo of successfull handlers
-        for (int i = undoPos - 1; i >= 0; i--) {
+        for (int i = undoPos - step; i != first - step; i -= step) {
             MCREventHandler eh = (MCREventHandler) (list.get(i));
             logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler " + eh.getClass().getName());
 
@@ -166,5 +180,10 @@ public class MCREventManager {
                 logger.info("Exception caught while calling undo of event handler", ex);
             }
         }
+    }
+
+    /** Same as handleEvent( evt, MCREventManager.FORWARD ) */
+    public void handleEvent(MCREvent evt) throws MCRException {
+        handleEvent(evt, MCREventManager.FORWARD);
     }
 }
