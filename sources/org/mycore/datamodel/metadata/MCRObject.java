@@ -654,9 +654,6 @@ final public class MCRObject extends MCRBase {
 			return;
 		}
 
-		// check the data
-		createXML();
-
 		// clean the structure
 		mcr_struct.clearChildren();
 		mcr_struct.clearDerivate();

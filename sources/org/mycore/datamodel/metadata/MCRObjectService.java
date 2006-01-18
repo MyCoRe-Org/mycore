@@ -225,16 +225,12 @@ public class MCRObjectService {
      */
     public final void setDate(String type, Date date) {
         MCRMetaISO8601Date d=getISO8601Date(type); //search date in ArrayList
-        System.out.println("Set date of type "+type+" to "+date.getTime());
-
         if (d == null) {
             d = new MCRMetaISO8601Date("service", "servdate", type, 0);
             d.setDate(date);
             dates.add(d);
-            System.out.println("added date");
         } else {
             d.setDate(date); // alter date found in ArrayList
-            System.out.println("set date");
         }
     }
 

@@ -172,7 +172,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         if (temp_condition == null) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = temp_condition;
+        condition = (org.jdom.Element)temp_condition.detach();
 
         String temp_pool = (String) element.getAttributeValue("pool");
         if (temp_pool == null) {
