@@ -1,4 +1,4 @@
-/*
+/**
  * $RCSfile$
  * $Revision$ $Date$
  *
@@ -22,7 +22,7 @@
  */
 
 // package
-package org.mycore.frontend.workflow;
+package org.mycore.access;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
@@ -38,10 +38,10 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
+public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
-    private static Logger LOGGER = Logger.getLogger(MCRSimpleWorkflowAccessEventHandler.class);
+    private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
 
     /**
      * This method will be used to create the access rules for SWF for a MCRObject. 
@@ -60,7 +60,7 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRSimpleWorkflowAccessEventHandler create: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");
     }
 
     /**
@@ -80,7 +80,7 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRSimpleWorkflowAccessEventHandler update: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler update: done in " + diff + " sec.");
     }
 
     /**
@@ -100,7 +100,7 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRSimpleWorkflowAccessEventHandler delete: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler delete: done in " + diff + " sec.");
     }
 
     /**
@@ -120,7 +120,7 @@ public class MCRSimpleWorkflowAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRSimpleWorkflowAccessEventHandler repair: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler repair: done in " + diff + " sec.");
     }
 
 }
