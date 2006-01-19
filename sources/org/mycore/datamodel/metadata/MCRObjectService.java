@@ -373,7 +373,7 @@ public class MCRObjectService {
      * @param condition -
      *            the new rule as JDOM tree Element
      */
-    public final void addRool(String pool, org.jdom.Element condition) {
+    public final void addRule(String pool, org.jdom.Element condition) {
         if (condition == null) {
             return;
         }
