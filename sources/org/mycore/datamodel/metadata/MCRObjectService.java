@@ -418,13 +418,13 @@ public class MCRObjectService {
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return a user string
+     * @return a the MCRMetaAccessRule instance
      */
-    public final org.jdom.Element getRule(int index) throws IndexOutOfBoundsException {
+    public final MCRMetaAccessRule getRule(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > rules.size())) {
             throw new IndexOutOfBoundsException("Index error in getRule.");
         }
-        return ((MCRMetaAccessRule) rules.get(index)).getCondition();
+        return (MCRMetaAccessRule) rules.get(index);
     }
 
     /**
