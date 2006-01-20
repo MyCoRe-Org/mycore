@@ -44,10 +44,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
 
     // the access interface
-    private MCRAccessInterface AI = null;
+    private MCRAccessInterface AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
 
-    // The class name of the access implementation
-    private static String classname =  MCRConfiguration.instance().getString("MCR.Access_class_name", "MCRAccessManagerDummy");
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRObject.
@@ -63,19 +61,11 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // create
         int rulesize = obj.getService().getRulesSize();
-        Object aiobj = new Object();
-        try {
-            aiobj = Class.forName(classname);
-            AI = ((MCRAccessInterface) aiobj).instance();
-            for (int i = 0; i < rulesize; i++) {
-                org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
-                String pool = obj.getService().getRule(i).getPool();
-                ((MCRAccessInterface) AI).addRule(obj.getId(), pool, conditions);
-                //obj.getService().removeRule(i);
-            }
-
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(classname + " ClassNotFoundException");
+        for (int i = 0; i < rulesize; i++) {
+            org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
+            String pool = obj.getService().getRule(i).getPool();
+            AI.addRule(obj.getId(), pool, conditions);
+            // obj.getService().removeRule(i);
         }
 
         // save the stop time
@@ -99,19 +89,11 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // update
         int rulesize = obj.getService().getRulesSize();
-        Object aiobj = new Object();
-        try {
-            aiobj = Class.forName(classname);
-            AI = ((MCRAccessInterface) aiobj).instance();
-            for (int i = 0; i < rulesize; i++) {
-                org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
-                String pool = obj.getService().getRule(i).getPool();
-                ((MCRAccessInterface) AI).updateRule(obj.getId(), pool, conditions);
-                //obj.getService().removeRule(i);
-            }
-
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(classname + " ClassNotFoundException");
+        for (int i = 0; i < rulesize; i++) {
+            org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
+            String pool = obj.getService().getRule(i).getPool();
+            AI.updateRule(obj.getId(), pool, conditions);
+            // obj.getService().removeRule(i);
         }
 
         // save the stop time
@@ -134,14 +116,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // delete
-        Object aiobj = new Object();
-        try {
-            aiobj = Class.forName(classname);
-            AI = ((MCRAccessInterface) aiobj).instance();
-            ((MCRAccessInterface) AI).removeAllRules(obj.getId());
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(classname + " ClassNotFoundException");
-        }
+        AI.removeAllRules(obj.getId());
 
         // save the stop time
         long t2 = System.currentTimeMillis();

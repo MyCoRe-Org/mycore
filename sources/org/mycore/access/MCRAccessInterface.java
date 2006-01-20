@@ -35,12 +35,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * 
  */
 public interface MCRAccessInterface {
-    /**
-     * The method return a singleton instance of MCRAccessManagerDummy.
-     * 
-     * @return a singleton instance of MCRAccessManagerDummy
-     */
-    public MCRAccessManagerDummy instance();
 
     /**
      * The method add an access rule for an MCRObjectID to an access system.
