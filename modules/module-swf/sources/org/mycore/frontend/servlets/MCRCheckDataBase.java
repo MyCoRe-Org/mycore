@@ -26,11 +26,16 @@ package org.mycore.frontend.servlets;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 
@@ -53,6 +58,7 @@ import org.mycore.datamodel.metadata.MCRMetaDate;
 import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
+import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -77,7 +83,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     /**
      * This method overrides doGetPost of MCRServlet. <br />
      */
-    private static Logger LOGGER=Logger.getLogger(MCRCheckDataBase.class);
+    private static Logger LOGGER = Logger.getLogger(MCRCheckDataBase.class);
+
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -324,8 +331,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
         }
 
-        System.out.println(jdom);
-
         // restart editor
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
         job.getRequest().setAttribute("XSL.Style", lang);
@@ -334,6 +339,22 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         rd.forward(job.getRequest(), job.getResponse());
     }
 
+    /**
+     * provides a wrappe for editor validation and MCRObject creation.
+     * 
+     * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
+     * <pre>boolean checkMCRMetaFooBar(Element)</pre>
+     * use the following methods in that method to do common tasks on element validation
+     * <ul>
+     * <li>checkMetaObject(Element,Class)</li>
+     * <li>checkMetaObjectWithLang(Element,Class)</li>
+     * <li>checkMetaObjectWithLangNotEmpty(Element,Class)</li>
+     * <li>checkMetaObjectWithLinks(Element,Class)</li>
+     * </ul>
+     * @author Thomas Scheffler (yagee)
+     *
+     * @version $Revision$ $Date$
+     */
     private static final class EditorValidator {
         private List errorlog;
 
@@ -341,6 +362,30 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         private MCRObjectID id;
 
+        private static final Map checkMethods;
+        static {
+            //save all check methods in a Map for later usage
+            HashMap methods = new HashMap();
+            Method[] m = EditorValidator.class.getDeclaredMethods();
+            for (int i = 0; i < m.length; i++) {
+                if (!m[i].getName().startsWith("checkMCR")
+                        || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
+                    continue;
+                }
+                LOGGER.debug("adding Method " + m[i].getName());
+                methods.put(m[i].getName().substring(5), m[i]);
+            }
+            checkMethods = Collections.unmodifiableMap(methods);
+        }
+
+        /**
+         * instantiate the validator with the editor input <code>jdom_in</code>.
+         * 
+         * <code>id</code> will be set as the MCRObjectID for the resulting object
+         * that can be fetched with <code>generateValidMyCoReObject()</code>
+         * @param jdom_in editor input
+         * @param MCRObject id
+         */
         public EditorValidator(Document jdom_in, MCRObjectID id) {
             this.errorlog = new ArrayList();
             this.input = jdom_in;
@@ -349,9 +394,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         /**
-         * @param input
-         * @param errorlog
-         * @return
+         * tries to generate a valid MCRObject as JDOM Document.
+         * @return MCRObject
          */
         public Document generateValidMyCoReObject() {
             MCRObject obj = new MCRObject();
@@ -377,406 +421,234 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             return input;
         }
 
+        /**
+         * returns a List of Error log entries
+         * @return log entries for the whole validation process
+         */
         public List getErrorLog() {
             return errorlog;
         }
 
         /**
+         * @param datatag
+         */
+        private boolean checkMetaTags(Element datatag) {
+            String mcrclass = datatag.getAttributeValue("class");
+            List datataglist = datatag.getChildren();
+            Iterator datatagIt = datataglist.iterator();
+
+            while (datatagIt.hasNext()) {
+                Element datasubtag = (Element) datatagIt.next();
+                if (checkMethods.containsKey(mcrclass)) {
+                    Method m = (Method) checkMethods.get(mcrclass);
+                    try {
+                        Object returns = m.invoke(this, new Object[] { datasubtag });
+                        if (!((Boolean) returns).booleanValue()) {
+                            datatagIt.remove();
+                        }
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.warn("Error while invoking " + m.getName(), e);
+                    } catch (IllegalAccessException e) {
+                        LOGGER.warn("Error while invoking " + m.getName(), e);
+                    } catch (InvocationTargetException e) {
+                        LOGGER.warn("Error while invoking " + m.getName(), e);
+                    }
+                } else {
+                    LOGGER.warn("To do for type " + mcrclass + " not found, fallback to default behaviour");
+                    //try to create MCRMetaInterface instance
+                    try {
+                        Class metaClass=Class.forName(mcrclass);
+                        //just checks if class would validate this element
+                        if (!checkMetaObject(datasubtag,metaClass)){
+                            datatagIt.remove();
+                        }
+                    } catch (ClassNotFoundException e) {
+                        LOGGER.error("Failure while trying fallback. Class not found: "+mcrclass);
+                    }
+                }
+            }
+            if (datatag.getChildren().size() == 0) {
+                return false;
+            }
+            return true;
+        }
+
+        private boolean checkMetaObject(Element datasubtag, Class metaClass) {
+            try {
+                MCRMetaInterface test = (MCRMetaInterface) metaClass.newInstance();
+                test.setFromDOM(datasubtag);
+
+                if (!test.isValid()) {
+                    throw new MCRException("");
+                }
+            } catch (Exception e) {
+                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
+                return false;
+            }
+            return true;
+        }
+
+        private boolean checkMetaObjectWithLang(Element datasubtag, Class metaClass) {
+            if (datasubtag.getAttribute("lang") != null) {
+                datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
+            }
+            return checkMetaObject(datasubtag, metaClass);
+        }
+
+        private boolean checkMetaObjectWithLangNotEmpty(Element datasubtag, Class metaClass) {
+            String text = datasubtag.getTextNormalize();
+            if ((text == null) || ((text = text.trim()).length() == 0)) {
+                return false;
+            }
+            return checkMetaObjectWithLang(datasubtag, metaClass);
+        }
+
+        private boolean checkMetaObjectWithLinks(Element datasubtag, Class metaClass) {
+            String href = datasubtag.getAttributeValue("href");
+            if (href == null) {
+                return false;
+            }
+            if (datasubtag.getAttribute("type") != null) {
+                datasubtag.getAttribute("type").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            }
+
+            if (datasubtag.getAttribute("href") != null) {
+                datasubtag.getAttribute("href").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            }
+
+            if (datasubtag.getAttribute("title") != null) {
+                datasubtag.getAttribute("title").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            }
+
+            if (datasubtag.getAttribute("label") != null) {
+                datasubtag.getAttribute("label").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            }
+            return checkMetaObject(datasubtag, metaClass);
+        }
+
+
+        /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaBoolean(Element datasubtag) {
-            try {
-                MCRMetaBoolean test = new MCRMetaBoolean();
-                test.setFromDOM(datasubtag);
-
-                if (!test.isValid()) {
-                    throw new MCRException("");
-                }
-            } catch (Exception e) {
-                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                return false;
-            }
-            return true;
+            return checkMetaObject(datasubtag, MCRMetaBoolean.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaPersonName(Element datasubtag) {
-            if (datasubtag.getAttribute("lang") != null) {
-                datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-            }
-
-            try {
-                MCRMetaPersonName test = new MCRMetaPersonName();
-                test.setFromDOM(datasubtag);
-
-                if (!test.isValid()) {
-                    throw new MCRException("");
-                }
-            } catch (Exception e) {
-                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                return false;
-            }
-            return true;
+            return checkMetaObjectWithLang(datasubtag, MCRMetaPersonName.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaInstitutionName(Element datasubtag) {
-            if (datasubtag.getAttribute("lang") != null) {
-                datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-            }
-
-            try {
-                MCRMetaInstitutionName test = new MCRMetaInstitutionName();
-                test.setFromDOM(datasubtag);
-
-                if (!test.isValid()) {
-                    throw new MCRException("");
-                }
-            } catch (Exception e) {
-                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                return false;
-            }
-            return true;
+            return checkMetaObjectWithLang(datasubtag, MCRMetaInstitutionName.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaAddress(Element datasubtag) {
-            if (datasubtag.getAttribute("lang") != null) {
-                datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-            }
-
-            try {
-                MCRMetaAddress test = new MCRMetaAddress();
-                test.setFromDOM(datasubtag);
-
-                if (!test.isValid()) {
-                    throw new MCRException("");
-                }
-            } catch (Exception e) {
-                // errorlog.add("Element "+datasubtag.getName()+" is not
-                // valid.");
-                return false;
-            }
-            return true;
+            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaNumber(Element datasubtag) {
-            String text = datasubtag.getTextNormalize();
-
-            if ((text == null) || ((text = text.trim()).length() == 0)) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("lang") != null) {
-                    datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-                }
-
-                try {
-                    MCRMetaNumber test = new MCRMetaNumber();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
+            return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaNumber.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaHistoryDate(Element datasubtag) {
-            if (datasubtag.getAttribute("lang") != null) {
-                datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-            }
-
-            try {
-                MCRMetaHistoryDate test = new MCRMetaHistoryDate();
-                test.setFromDOM(datasubtag);
-
-                if (!test.isValid()) {
-                    throw new MCRException("");
-                }
-            } catch (Exception e) {
-                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                return false;
-            }
-            return true;
+            return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
         }
 
         /**
-         * @param datasubtag
-         * @param errorlog
-         */
-        private boolean checkMCRDate(Element datasubtag) {
-            String text = datasubtag.getTextNormalize();
-
-            if ((text == null) || ((text = text.trim()).length() == 0)) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("lang") != null) {
-                    datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-                }
-
-                try {
-                    MCRMetaDate test = new MCRMetaDate();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         * @param errorlog
          * @param datasubtag
          */
-        private boolean checkMCRMetaLinkID(List errorlog, Element datasubtag) {
-            String href = datasubtag.getAttributeValue("href");
-
-            if (href == null) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("type") != null) {
-                    datasubtag.getAttribute("type").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("href") != null) {
-                    datasubtag.getAttribute("href").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("title") != null) {
-                    datasubtag.getAttribute("title").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("label") != null) {
-                    datasubtag.getAttribute("label").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                try {
-                    MCRMetaLinkID test = new MCRMetaLinkID();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
+        private boolean checkMCRMetaDate(Element datasubtag) {
+            return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaDate.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
+         */
+        private boolean checkMCRMetaLinkID(Element datasubtag) {
+            return checkMetaObjectWithLinks(datasubtag, MCRMetaLinkID.class);
+        }
+
+        /**
+         * @param datasubtag
          */
         private boolean checkMCRMetaLink(Element datasubtag) {
-            String href = datasubtag.getAttributeValue("href");
-
-            if (href == null) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("type") != null) {
-                    datasubtag.getAttribute("type").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("href") != null) {
-                    datasubtag.getAttribute("href").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("title") != null) {
-                    datasubtag.getAttribute("title").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                if (datasubtag.getAttribute("label") != null) {
-                    datasubtag.getAttribute("label").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                }
-
-                try {
-                    MCRMetaLink test = new MCRMetaLink();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
+            return checkMetaObjectWithLinks(datasubtag, MCRMetaLink.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
-         * @param datatagIt
          */
         private boolean checkMCRMetaClassification(Element datasubtag) {
             String categid = datasubtag.getAttributeValue("categid");
-
             if (categid == null) {
                 return false;
-            } else {
-
-                try {
-                    MCRMetaClassification test = new MCRMetaClassification();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
             }
-            return true;
+            return checkMetaObject(datasubtag, MCRMetaClassification.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
          */
         private boolean checkMCRMetaISO8601Date(Element datasubtag) {
-            String text = datasubtag.getTextNormalize();
-
-            if ((text == null) || ((text = text.trim()).length() == 0)) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("lang") != null) {
-                    datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-                }
-
-                try {
-                    MCRMetaISO8601Date test = new MCRMetaISO8601Date();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
+            return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaISO8601Date.class);
         }
 
         /**
          * @param datasubtag
-         * @param errorlog
-         * @param datatagIt
          */
         private boolean checkMCRMetaLangText(Element datasubtag) {
-            String text = datasubtag.getTextNormalize();
-
-            if ((text == null) || ((text = text.trim()).length() == 0)) {
-                return false;
-            } else {
-
-                if (datasubtag.getAttribute("lang") != null) {
-                    datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
-                }
-
-                try {
-                    MCRMetaLangText test = new MCRMetaLangText();
-                    test.setFromDOM(datasubtag);
-
-                    if (!test.isValid()) {
-                        throw new MCRException("");
-                    }
-                } catch (Exception e) {
-                    errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                    return false;
-                }
-            }
-            return true;
+            return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaLangText.class);
         }
 
-        /**
-         * @param input
-         * @param ID
-         * @param errorlog
-         */
         private void checkObject() {
             // add the namespaces (this is a workaround)
             org.jdom.Element root = input.getRootElement();
             root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
             root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-
             // set the schema
             String mcr_schema = "datamodel-" + id.getTypeId() + ".xsd";
             root.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-
             // check the label
             String label = root.getAttributeValue("label");
-
             if ((label == null) || ((label = label.trim()).length() == 0)) {
                 root.setAttribute("label", id.getId());
             }
-
             // remove the path elements from the incoming
             org.jdom.Element pathes = root.getChild("pathes");
-
             if (pathes != null) {
                 root.removeChildren("pathes");
             }
-
-            // structure
             org.jdom.Element structure = root.getChild("structure");
-
             if (structure == null) {
                 root.addContent(new Element("structure"));
             } else {
                 checkObjectStructure(structure);
             }
-
-            // metadata
             Element metadata = root.getChild("metadata");
             checkObjectMetadata(metadata);
-
-            // service
             org.jdom.Element service = root.getChild("service");
             checkObjectService(service);
         }
 
         /**
          * @param service
-         * @param errorlog
          */
-        private void checkObjectService(org.jdom.Element service) {
+        private void checkObjectService(Element service) {
             List servicelist = service.getChildren();
             Iterator serviceIt = servicelist.iterator();
 
@@ -817,7 +689,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         /**
          * @param metadata
-         * @param errorlog
          */
         private void checkObjectMetadata(Element metadata) {
             metadata.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
@@ -835,142 +706,19 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         /**
-         * @param datatag
-         * @param errorlog
-         */
-        private boolean checkMetaTags(Element datatag) {
-            String mcrclass = datatag.getAttributeValue("class");
-            List datataglist = datatag.getChildren();
-            Iterator datatagIt = datataglist.iterator();
-
-            while (datatagIt.hasNext()) {
-                Element datasubtag = (Element) datatagIt.next();
-
-                if (mcrclass.equals("MCRMetaLangText")) {
-                    if (!checkMCRMetaLangText(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaISO8601Date")) {
-                    if (!checkMCRMetaISO8601Date(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaClassification")) {
-                    if (!checkMCRMetaClassification(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaLink")) {
-                    if (!checkMCRMetaLink(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaLinkID")) {
-                    if (!checkMCRMetaLinkID(errorlog, datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaDate")) {
-                    if (!checkMCRDate(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaHistoryDate")) {
-                    if (!checkMCRMetaHistoryDate(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaNumber")) {
-                    if (!checkMCRMetaNumber(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaAddress")) {
-                    if (!checkMCRMetaAddress(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaInstitutionName")) {
-                    if (!checkMCRMetaInstitutionName(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaPersonName")) {
-                    if (!checkMCRMetaPersonName(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else if (mcrclass.equals("MCRMetaBoolean")) {
-                    if (!checkMCRMetaBoolean(datasubtag)) {
-                        datatagIt.remove();
-                    }
-                } else {
-                    LOGGER.error("To do for type " + mcrclass + " not found.");
-                }
-            }
-            if (datatag.getChildren().size() == 0) {
-                return false;
-            }
-            return true;
-        }
-
-        /**
          * @param structure
-         * @param errorlog
          */
-        private void checkObjectStructure(org.jdom.Element structure) {
+        private void checkObjectStructure(Element structure) {
             List structurelist = structure.getChildren();
             Iterator structIt = structurelist.iterator();
 
             while (structIt.hasNext()) {
                 Element datatag = (Element) structIt.next();
-                String mcrclass = datatag.getAttributeValue("class");
-                List datataglist = datatag.getChildren();
-                Iterator datatagIt = datataglist.iterator();
-
-                while (datatagIt.hasNext()) {
-                    Element datasubtag = (Element) datatagIt.next();
-
-                    // MCRMetaLinkID
-                    if (mcrclass.equals("MCRMetaLinkID")) {
-                        String href = datasubtag.getAttributeValue("href");
-
-                        if (href == null) {
-                            datatagIt.remove();
-                        } else {
-
-                            if (datasubtag.getAttribute("type") != null) {
-                                datasubtag.getAttribute("type").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                            }
-
-                            if (datasubtag.getAttribute("href") != null) {
-                                datasubtag.getAttribute("href").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                            }
-
-                            if (datasubtag.getAttribute("title") != null) {
-                                datasubtag.getAttribute("title").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                            }
-
-                            if (datasubtag.getAttribute("label") != null) {
-                                datasubtag.getAttribute("label").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                            }
-
-                            try {
-                                MCRMetaLinkID test = new MCRMetaLinkID();
-                                test.setFromDOM(datasubtag);
-
-                                if (!test.isValid()) {
-                                    throw new MCRException("");
-                                }
-                            } catch (Exception e) {
-                                errorlog.add("Element " + datasubtag.getName() + " is not valid.");
-                                datatagIt.remove();
-                            }
-                        }
-                    }
-                }
-
-                datataglist = datatag.getChildren();
-
-                if (datataglist.size() == 0) {
+                if (!checkMetaTags(datatag)) {
+                    // e.g. datatag is empty
                     structIt.remove();
-                } else {
-                    if (datatag.getName().equals("parents")) {
-                        LOGGER.debug("A parrent was found.");
-                    }
                 }
             }
         }
-
     }
 }
