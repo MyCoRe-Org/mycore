@@ -25,11 +25,11 @@
 package org.mycore.access;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
  * This class holds all EventHandler methods to manage the access part of the
@@ -43,8 +43,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     // the logger
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
 
+    // the access interface
+    private MCRAccessInterface AI = null;
+
+    // The class name of the access implementation
+    private static String classname =  MCRConfiguration.instance().getString("MCR.Access_class_name", "MCRAccessManagerDummy");
     /**
-     * This method will be used to create the access rules for SWF for a MCRObject. 
+     * This method will be used to create the access rules for SWF for a
+     * MCRObject.
      * 
      * @param evt
      *            the event that occured
@@ -56,7 +62,22 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // create
-        
+        int rulesize = obj.getService().getRulesSize();
+        Object aiobj = new Object();
+        try {
+            aiobj = Class.forName(classname);
+            AI = ((MCRAccessInterface) aiobj).instance();
+            for (int i = 0; i < rulesize; i++) {
+                org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
+                String pool = obj.getService().getRule(i).getPool();
+                ((MCRAccessInterface) AI).addRule(obj.getId(), pool, conditions);
+                //obj.getService().removeRule(i);
+            }
+
+        } catch (ClassNotFoundException e) {
+            throw new MCRException(classname + " ClassNotFoundException");
+        }
+
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (double) (t2 - t1) / 1000.0;
@@ -64,7 +85,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method will be used to update the access rules for SWF for a MCRObject. 
+     * This method will be used to update the access rules for SWF for a
+     * MCRObject.
      * 
      * @param evt
      *            the event that occured
@@ -76,6 +98,21 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // update
+        int rulesize = obj.getService().getRulesSize();
+        Object aiobj = new Object();
+        try {
+            aiobj = Class.forName(classname);
+            AI = ((MCRAccessInterface) aiobj).instance();
+            for (int i = 0; i < rulesize; i++) {
+                org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
+                String pool = obj.getService().getRule(i).getPool();
+                ((MCRAccessInterface) AI).updateRule(obj.getId(), pool, conditions);
+                //obj.getService().removeRule(i);
+            }
+
+        } catch (ClassNotFoundException e) {
+            throw new MCRException(classname + " ClassNotFoundException");
+        }
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -84,7 +121,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method will be used to delete the access rules for SWF for a MCRObject. 
+     * This method will be used to delete the access rules for SWF for a
+     * MCRObject.
      * 
      * @param evt
      *            the event that occured
@@ -96,6 +134,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // delete
+        Object aiobj = new Object();
+        try {
+            aiobj = Class.forName(classname);
+            AI = ((MCRAccessInterface) aiobj).instance();
+            ((MCRAccessInterface) AI).removeAllRules(obj.getId());
+        } catch (ClassNotFoundException e) {
+            throw new MCRException(classname + " ClassNotFoundException");
+        }
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -104,7 +150,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method will be used to repair the access rules for SWF for a MCRObject. 
+     * This method will be used to repair the access rules for SWF for a
+     * MCRObject.
      * 
      * @param evt
      *            the event that occured
@@ -112,15 +159,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        // save the start time
-        long t1 = System.currentTimeMillis();
-
-        // repair
-
-        // save the stop time
-        long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRAccessEventHandler repair: done in " + diff + " sec.");
+        // Do nothing
     }
 
 }
