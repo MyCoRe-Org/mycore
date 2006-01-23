@@ -36,7 +36,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -50,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRObjectCommands extends MCRAbstractCommands {
-    private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
 
     /**
      * The empty constructor.
@@ -81,7 +83,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         com = new MCRCommand("save object from {0} to {1} to directory {2}", "org.mycore.frontend.cli.MCRObjectCommands.save String String String", "The command store all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2}");
         command.add(com);
 
-        com = new MCRCommand("save object of {0} to directory {1}", "org.mycore.frontend.cli.MCRObjectCommands.save String String", "The command store the MCRObject with the MCRObjectID {0} to the directory {1}");
+        com = new MCRCommand("save object {0} to directory {1}", "org.mycore.frontend.cli.MCRObjectCommands.save String String", "The command store the MCRObject with the MCRObjectID {0} to the directory {1}");
+        command.add(com);
+
+        com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String String", "The command store all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
+        command.add(com);
+
+        com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String", "The command store the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
         com = new MCRCommand("get last object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String", "The command return the last used MCRObjectID for the ID base.");
@@ -106,7 +114,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRObject that should be deleted
      */
-    public static void delete(String ID) throws Exception {
+    public static void delete(String ID) throws MCRActiveLinkException {
         MCRObject mycore_obj = new MCRObject();
 
         try {
@@ -128,7 +136,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param IDto
      *            the stop ID for deleting the MCRObjects
      */
-    public static void deleteFromTo(String IDfrom, String IDto) throws Exception {
+    public static void deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
         int from_i = 0;
         int to_i = 0;
 
@@ -159,8 +167,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
+     * @throws MCRActiveLinkException
      */
-    public static void loadFromDirectory(String directory) {
+    public static void loadFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, false);
     }
 
@@ -169,8 +178,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
+     * @throws MCRActiveLinkException
      */
-    public static void updateFromDirectory(String directory) {
+    public static void updateFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, true);
     }
 
@@ -181,8 +191,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @param update
      *            if true, object will be updated, else object is created
+     * @throws MCRActiveLinkException
      */
-    private static void processFromDirectory(String directory, boolean update) {
+    private static void processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -210,7 +221,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(directory + SLASH + list[i], update)) {
+            if (processFromFile(new File(dir, list[i]), update)) {
                 numProcessed++;
             }
         }
@@ -223,9 +234,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the location of the xml file
+     * @throws MCRActiveLinkException
      */
-    public static boolean loadFromFile(String file) {
-        return processFromFile(file, false);
+    public static boolean loadFromFile(String file) throws MCRActiveLinkException {
+        return processFromFile(new File(file), false);
     }
 
     /**
@@ -233,9 +245,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the location of the xml file
+     * @throws MCRActiveLinkException
      */
-    public static boolean updateFromFile(String file) {
-        return processFromFile(file, true);
+    public static boolean updateFromFile(String file) throws MCRActiveLinkException {
+        return processFromFile(new File(file), true);
     }
 
     /**
@@ -245,15 +258,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param update
      *            if true, object will be updated, else object is created
+     * @throws MCRActiveLinkException
      */
-    private static boolean processFromFile(String file, boolean update) {
-        if (!file.endsWith(".xml")) {
+    private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
+        if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
             return false;
         }
 
-        if (!new File(file).isFile()) {
+        if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
 
             return false;
@@ -263,7 +277,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         try {
             MCRObject mycore_obj = new MCRObject();
-            mycore_obj.setFromURI(file);
+            mycore_obj.setFromURI(file.getAbsolutePath());
             LOGGER.info("Label --> " + mycore_obj.getLabel());
 
             if (update) {
@@ -323,71 +337,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the ID of the MCRObject to be save.
      * @param dirname
      *            the dirname to store the object
+     * @deprecated
      */
     public static void save(String ID, String dirname) {
-        // check ID
-        MCRObject obj = new MCRObject();
-        MCRObjectID id = null;
-
-        try {
-            id = new MCRObjectID(ID);
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-
-            return;
-        }
-
-        // check dirname
-        File dir = new File(dirname);
-
-        if (dir.isFile()) {
-            LOGGER.error(dirname + " is not a dirctory.");
-            LOGGER.error("");
-
-            return;
-        }
-
-        // get XML
-        byte[] xml = null;
-
-        try {
-            xml = obj.receiveXMLFromDatastore(ID);
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-
-            return;
-        }
-
-        // store the XML file
-        String xslfile = "mcr_save-object.xsl";
-        String filename = dirname + SLASH + id.toString() + ".xml";
-
-        try {
-            FileOutputStream out = new FileOutputStream(filename);
-            InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
-
-            if (in != null) {
-                StreamSource source = new StreamSource(in);
-                TransformerFactory transfakt = TransformerFactory.newInstance();
-                Transformer trans = transfakt.newTransformer(source);
-                StreamResult sr = new StreamResult((OutputStream) out);
-                trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
-            } else {
-                out.write(xml);
-                out.flush();
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to file " + filename);
-            LOGGER.error("");
-
-            return;
-        }
-
-        LOGGER.info("Object " + id.toString() + " stored under " + filename + ".");
-        LOGGER.info("");
+        export(ID, ID, dirname, "save");
     }
 
     /**
@@ -401,8 +354,42 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the ID of the MCRObject to be save.
      * @param dirname
      *            the filename to store the object
+     * @deprecated
      */
     public static void save(String fromID, String toID, String dirname) {
+        export(fromID, toID, dirname, "save");
+    }
+
+    /**
+     * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a
+     * directory. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * 
+     * @param ID
+     *            the ID of the MCRObject to be save.
+     * @param dirname
+     *            the dirname to store the object
+     * @param style
+     *            the type of the stylesheet
+     */
+    public static void export(String ID, String dirname, String style) {
+        export(ID, ID, dirname, style);
+    }
+
+    /**
+     * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a
+     * directory. The saving starts with fromID and runs to toID. ID's they was
+     * not found will skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * 
+     * @param fromID
+     *            the ID of the MCRObject from be save.
+     * @param toID
+     *            the ID of the MCRObject to be save.
+     * @param dirname
+     *            the filename to store the object
+     * @param style
+     *            the type of the stylesheet
+     */
+    public static void export(String fromID, String toID, String dirname, String style) {
         // check fromID and toID
         MCRObject obj = new MCRObject();
         MCRObjectID fid = null;
@@ -437,14 +424,19 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         String xslfile = "mcr_save-object.xsl";
+        if ((style != null) && (style.trim().length() != 0))
+            xslfile = "mcr_" + style + "-object.xsl";
         Transformer trans = null;
 
         try {
-            InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
-
+            InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
+            if (in == null) {
+                in = MCRObjectCommands.class.getResourceAsStream("/mcr_save-object.xsl");
+            }
             if (in != null) {
                 StreamSource source = new StreamSource(in);
                 TransformerFactory transfakt = TransformerFactory.newInstance();
+                transfakt.setURIResolver(MCRURIResolver.instance());
                 trans = transfakt.newTransformer(source);
             }
         } catch (Exception e) {
@@ -465,8 +457,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                     continue;
                 }
 
-                String filename = dirname + SLASH + nid.toString() + ".xml";
-                FileOutputStream out = new FileOutputStream(filename);
+                File xmlOutput = new File(dir, nid.toString() + ".xml");
+                FileOutputStream out = new FileOutputStream(xmlOutput);
 
                 if (trans != null) {
                     StreamResult sr = new StreamResult((OutputStream) out);
@@ -477,17 +469,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 }
 
                 k++;
-                LOGGER.info("Object " + nid.toString() + " stored under " + filename + ".");
+                LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file to " + dirname);
+            LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
             LOGGER.error("");
 
             return;
         }
 
-        LOGGER.info(k + " Object's stored under " + dirname + ".");
+        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
 
     /**
