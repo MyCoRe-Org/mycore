@@ -31,7 +31,9 @@ import javax.servlet.ServletException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRConfiguration;
+// import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -46,10 +48,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *            MyCoRe objectid as string to check
  * 
  * @return xml: <?xml version="1.0" encoding="UTF-8" ?> <mycoreaccesscheck>
- *         <accesscheck return="false" disabled="false" /> </mycoreaccesscheck>
- *  - attribute disabled contains the AccessManagerState (disabled
- * true/false) - attribute return contains the access check result
- * (false=locked)
+ *         <accesscheck return="false" disabled="false" /> </mycoreaccesscheck> -
+ *         attribute disabled contains the AccessManagerState (disabled
+ *         true/false) - attribute return contains the access check result
+ *         (false=locked)
  * 
  * @author Arne Seifert
  * 
@@ -57,15 +59,35 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRAccessCheckServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
+    private MCRAccessInterface AI = null;
+
     /**
-     * access check for given pool and objectid
+     * Initalize this servlet
+     */
+    public void init() throws ServletException {
+        super.init();
+        // the access interface
+        AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+
+    }
+
+    /**
+     * The method make access check for given pool and objectid. It return a
+     * JDOM Object with the following structure:<br /><br />
+     * &gt;mycoreaccesscheck&lt; <br />
+     * &gt;accesscheck return="true|false" disable="true|false" /&lt;<br />
+     * &gt;/mycoreaccesscheck&lt;
+     * 
+     * 
      */
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         // get parameter
         String objid = getProperty(job.getRequest(), "objid");
         String pool = getProperty(job.getRequest(), "pool");
 
-        boolean result = MCRAccessManager.checkAccess(pool, objid, MCRSessionMgr.getCurrentSession());
+        // boolean result = MCRAccessManager.checkAccess(pool, objid,
+        // MCRSessionMgr.getCurrentSession());
+        boolean result = AI.checkAccess(new MCRObjectID(objid), pool);
 
         Document jdom = new Document(new Element("mycoreaccesscheck"));
         jdom.getRootElement().addContent(new Element("accesscheck"));
