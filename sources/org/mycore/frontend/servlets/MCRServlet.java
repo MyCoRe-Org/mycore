@@ -53,16 +53,18 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
  * taken from MilessServlet.java written by Frank L?tzenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank L?tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
-	// Some configuration details
+    private static final long serialVersionUID = 1L;
+
+    // Some configuration details
 	protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-	private static Logger LOGGER;
+	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);;
 
 	private static String BASE_URL;
 
@@ -74,10 +76,6 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean POST = false;
 
 	protected static MCRCache requestParamCache = new MCRCache(40);
-
-	static {
-		LOGGER = Logger.getLogger(MCRServlet.class);
-	}
 
 	/** returns the base URL of the mycore system */
 	public static String getBaseURL() {
@@ -334,8 +332,12 @@ public class MCRServlet extends HttpServlet {
 		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
 		request.setAttribute("XSL.Style", style);
 
-		RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-		rd.forward(request, response);
+        if (!response.isCommitted()){
+            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+            rd.forward(request, response);
+        } else {
+            LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"+msg,ex);
+        }
 	}
 
 	protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
