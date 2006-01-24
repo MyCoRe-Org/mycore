@@ -23,6 +23,9 @@
 
 package org.mycore.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -216,9 +219,19 @@ public class MCRConfiguration {
      */
     public void loadFromFile(String filename) {
         MCRArgumentChecker.ensureNotEmpty(filename, "filename");
-
-        InputStream in = this.getClass().getResourceAsStream("/" + filename);
-
+        File mycoreProperties=new File(filename);
+        InputStream in;
+        if (mycoreProperties.canRead()){
+            try {
+                in = new FileInputStream(mycoreProperties);
+            } catch (FileNotFoundException e) {
+                //should never happend, because we verified it allready with canRead() above
+                String msg = "Could not find configuration file " + filename;
+                throw new MCRConfigurationException(msg,e);
+            }
+        } else {
+            in = this.getClass().getResourceAsStream("/" + filename);
+        }
         if (in == null) {
             String msg = "Could not find configuration file " + filename + " in CLASSPATH";
             throw new MCRConfigurationException(msg);
