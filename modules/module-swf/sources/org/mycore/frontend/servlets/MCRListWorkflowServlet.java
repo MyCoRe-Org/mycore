@@ -27,10 +27,15 @@ package org.mycore.frontend.servlets;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -38,6 +43,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.user.MCRUserMgr;
 
@@ -201,17 +207,6 @@ public class MCRListWorkflowServlet extends MCRServlet {
         if (in == null) {
             throw new MCRConfigurationException("Can't read stylesheet " + xslfile);
         }
-
-        javax.xml.transform.Transformer transformer = null;
-
-        try {
-            transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer(new javax.xml.transform.stream.StreamSource(in));
-            transformer.setParameter("DefaultLang", DefaultLang);
-            transformer.setParameter("CurrentLang", lang);
-        } catch (Exception ex) {
-            throw new MCRConfigurationException("Can't initialize transformer.", ex);
-        }
-
         LOGGER.debug(xslfile + " readed.");
 
         // build the frame of mcr_workflow
@@ -222,6 +217,13 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         org.jdom.Document workflow_in = null;
 
+        //initialize transformer 
+        MCRXSLTransformation transform=MCRXSLTransformation.getInstance();
+        TransformerHandler handler=transform.getTransformerHandler(transform.getStylesheet(new StreamSource(in)));
+        Map parameters=new HashMap();
+        parameters.put("DefaultLang", DefaultLang);
+        parameters.put("CurrentLang", lang);
+        MCRXSLTransformation.setParameters(handler,parameters);
         // run the loop over all objects in the workflow
         for (int i = 0; i < workfiles.size(); i++) {
             String wfile = (String) workfiles.get(i);
@@ -239,9 +241,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             }
 
             try {
-                org.jdom.transform.JDOMResult workflow_out = new org.jdom.transform.JDOMResult();
-                transformer.transform(new org.jdom.transform.JDOMSource(workflow_in), workflow_out);
-                elm = workflow_out.getDocument().getRootElement();
+                elm = MCRXSLTransformation.transform(workflow_in,handler.getTransformer()).getRootElement();
                 elm.detach();
             } catch (Exception ex) {
                 LOGGER.error("Error while tranforming XML workflow file " + wfile);
