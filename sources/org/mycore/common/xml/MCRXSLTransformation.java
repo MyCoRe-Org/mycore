@@ -26,12 +26,11 @@ package org.mycore.common.xml;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -44,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
 import org.jdom.transform.JDOMResult;
@@ -162,7 +162,7 @@ public class MCRXSLTransformation {
      *            A StreamSource
      * @return Templates The precompiled Stylesheet
      */
-    public Templates getStylesheet(StreamSource stylesheet) {
+    public Templates getStylesheet(Source stylesheet) {
         try {
             Templates out = saxFactory.newTemplates(stylesheet);
 
@@ -200,14 +200,22 @@ public class MCRXSLTransformation {
      * @param handler
      * @param parameters
      */
-    public void setParameters(TransformerHandler handler, Properties parameters) {
-        Transformer transformer = handler.getTransformer();
-        Enumeration names = parameters.propertyNames();
+    public static void setParameters(TransformerHandler handler, Map parameters) {
+        setParameters(handler.getTransformer(),parameters);
+    }
 
-        while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
-            String value = parameters.getProperty(name);
-
+    /**
+     * Method setParameters. Set some parameters which can be used by the
+     * Stylesheet for the transformation.
+     * 
+     * @param handler
+     * @param parameters
+     */
+    public static void setParameters(Transformer transformer, Map parameters) {
+        Iterator names = parameters.keySet().iterator();
+        while (names.hasNext()) {
+            String name = names.next().toString();
+            String value = parameters.get(name).toString();
             transformer.setParameter(name, value);
         }
     }
@@ -258,26 +266,44 @@ public class MCRXSLTransformation {
      * @return Document The new document or null, if an exception was thrown.
      */
     public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Map parameters) {
+        return transform(in,new StreamSource(new File(stylesheet)),parameters);
+    }
+    /**
+     * Method transform. Transforms a JDOM-Document <i>in </i> with a given
+     * <i>stylesheet </i> to a new document.
+     * 
+     * @param in
+     *            A JDOM-Document.
+     * @param stylesheet
+     *            The Filename with complete path (this is not a servlet!) of
+     *            the stylesheet.
+     * @param parameters
+     *            parameters used by the stylesheet for transformation
+     * @return Document The new document or null, if an exception was thrown.
+     */
+    public static org.jdom.Document transform(org.jdom.Document in, Source stylesheet, Map parameters) {
         try {
-            JDOMResult out = new JDOMResult();
-            Transformer transformer = factory.newTransformer(new StreamSource(new File(stylesheet)));
-            transformer.setURIResolver(MCRURIResolver.instance());
-            Iterator nameIt = parameters.keySet().iterator();
-
-            while (nameIt.hasNext()) {
-                String name = nameIt.next().toString();
-                String value = parameters.get(name).toString();
-
-                transformer.setParameter(name, value);
-            }
-
-            transformer.transform(new JDOMSource(in), out);
-
-            return out.getDocument();
+            Transformer transformer = factory.newTransformer(stylesheet);
+            setParameters(transformer,parameters);
+            return transform(in, transformer);
         } catch (TransformerException e) {
             LOGGER.fatal(e.getMessage(),e);
-
             return null;
         }
+    }
+
+    /**
+     * transforms a jdom Document via XSLT.
+     * 
+     * @param in Document input
+     * @param transformer Transformer handling the transformation process
+     * @return the transformation result as jdom Document
+     * @throws TransformerException if transformation fails
+     */
+    public static Document transform(Document in, Transformer transformer) throws TransformerException {
+        JDOMResult out = new JDOMResult();
+        transformer.setURIResolver(MCRURIResolver.instance());
+        transformer.transform(new JDOMSource(in), out);
+        return out.getDocument();
     }
 }
