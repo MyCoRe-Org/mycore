@@ -76,9 +76,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         pool = set_pool;
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "READ";
+            pool = "read";
         } else {
-            pool = pool.trim();
+            pool = pool.trim().toLowerCase();
         }
         if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
@@ -100,9 +100,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         setType("");
         pool = set_pool;
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "READ";
+            pool = "read";
         } else {
-            pool = pool.trim();
+            pool = pool.trim().toLowerCase();
         }
         if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
@@ -134,9 +134,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     public final void setPool(String set_pool) {
         pool = set_pool;
         if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "READ";
+            pool = "read";
         } else {
-            pool = pool.trim();
+            pool = pool.trim().toLowerCase();
         }
     }
 
@@ -176,9 +176,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
 
         String temp_pool = (String) element.getAttributeValue("pool");
         if (temp_pool == null) {
-            temp_pool = "READ";
+            temp_pool = "read";
         }
-        pool = temp_pool.trim();
+        pool = temp_pool.trim().toLowerCase();
     }
 
     /**
