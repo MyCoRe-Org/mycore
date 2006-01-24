@@ -44,7 +44,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
 
     // the access interface
-    private MCRAccessInterface AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+    private MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
 
     /**
      * This method will be used to create the access rules for SWF for a

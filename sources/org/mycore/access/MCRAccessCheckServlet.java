@@ -59,7 +59,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRAccessCheckServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private MCRAccessInterface AI = null;
+    private MCRAccessManagerBase AI = null;
 
     /**
      * Initalize this servlet
@@ -67,13 +67,13 @@ public class MCRAccessCheckServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
         // the access interface
-        AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
-
+        AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
     }
 
     /**
      * The method make access check for given pool and objectid. It return a
-     * JDOM Object with the following structure:<br /><br />
+     * JDOM Object with the following structure:<br />
+     * <br />
      * &gt;mycoreaccesscheck&lt; <br />
      * &gt;accesscheck return="true|false" disable="true|false" /&lt;<br />
      * &gt;/mycoreaccesscheck&lt;
@@ -85,8 +85,6 @@ public class MCRAccessCheckServlet extends MCRServlet {
         String objid = getProperty(job.getRequest(), "objid");
         String pool = getProperty(job.getRequest(), "pool");
 
-        // boolean result = MCRAccessManager.checkAccess(pool, objid,
-        // MCRSessionMgr.getCurrentSession());
         boolean result = AI.checkAccess(new MCRObjectID(objid), pool);
 
         Document jdom = new Document(new Element("mycoreaccesscheck"));
