@@ -25,7 +25,11 @@ package org.mycore.common.xml;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.transform.Templates;
@@ -44,7 +48,6 @@ import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
-import org.mycore.common.MCRConfiguration;
 
 /**
  * This class implements XSLTransformation functions to be used in all other
@@ -76,9 +79,13 @@ import org.mycore.common.MCRConfiguration;
  * @version $Revision: 1.0 $ $Date: 2003/02/03 14:57:25 $
  */
 public class MCRXSLTransformation {
-    private static Logger logger = null;
+    private static Logger LOGGER = Logger.getLogger(MCRXSLTransformation.class);
 
-    private static SAXTransformerFactory factory = null;
+    private static SAXTransformerFactory saxFactory = null;
+    
+    private static TransformerFactory factory = TransformerFactory.newInstance();
+    
+    private static final Map emptyParameters=Collections.unmodifiableMap(new HashMap(0,1));
 
     private static MCRXSLTransformation singleton = null;
 
@@ -86,22 +93,20 @@ public class MCRXSLTransformation {
      * Method MCRXSLTransformation.
      */
     static {
-        logger = Logger.getLogger(MCRXSLTransformation.class);
-        MCRConfiguration.instance();
-
+        factory.setURIResolver(MCRURIResolver.instance());
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
 
             if (tf.getFeature(SAXTransformerFactory.FEATURE)) {
-                factory = (SAXTransformerFactory) tf;
+                saxFactory = (SAXTransformerFactory) tf;
             } else {
-                logger.fatal("TransformerFactory could not be initialized.");
+                LOGGER.fatal("TransformerFactory could not be initialized.");
             }
         } catch (TransformerFactoryConfigurationError tfce) {
             if (tfce.getMessage() != null) {
-                logger.fatal(tfce.getMessage());
+                LOGGER.fatal(tfce.getMessage());
             } else {
-                logger.fatal("Error in TranformerFactory configuration.");
+                LOGGER.fatal("Error in TranformerFactory configuration.");
             }
         }
     }
@@ -131,7 +136,7 @@ public class MCRXSLTransformation {
         File styleFile = new File(stylesheet);
 
         if (!styleFile.exists()) {
-            logger.fatal("The Stylesheet doesn't exist: " + stylesheet);
+            LOGGER.fatal("The Stylesheet doesn't exist: " + stylesheet);
 
             return null;
         }
@@ -159,11 +164,11 @@ public class MCRXSLTransformation {
      */
     public Templates getStylesheet(StreamSource stylesheet) {
         try {
-            Templates out = factory.newTemplates(stylesheet);
+            Templates out = saxFactory.newTemplates(stylesheet);
 
             return out;
         } catch (TransformerConfigurationException tcx) {
-            logger.fatal(tcx.getMessageAndLocation());
+            LOGGER.fatal(tcx.getMessageAndLocation());
 
             return null;
         }
@@ -178,11 +183,11 @@ public class MCRXSLTransformation {
      */
     public TransformerHandler getTransformerHandler(Templates stylesheet) {
         try {
-            TransformerHandler handler = factory.newTransformerHandler(stylesheet);
+            TransformerHandler handler = saxFactory.newTransformerHandler(stylesheet);
 
             return handler;
         } catch (TransformerConfigurationException tcx) {
-            logger.fatal(tcx.getMessageAndLocation());
+            LOGGER.fatal(tcx.getMessageAndLocation());
 
             return null;
         }
@@ -220,7 +225,7 @@ public class MCRXSLTransformation {
         try {
             new SAXOutputter(handler).output(in);
         } catch (JDOMException ex) {
-            logger.error("Error while transforming an XML document with an XSL stylesheet.");
+            LOGGER.error("Error while transforming an XML document with an XSL stylesheet.");
         }
     }
 
@@ -236,17 +241,7 @@ public class MCRXSLTransformation {
      * @return Document The new document or null, if an exception was thrown.
      */
     public static org.jdom.Document transform(org.jdom.Document in, String stylesheet) {
-        try {
-            JDOMResult out = new JDOMResult();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File(stylesheet)));
-            transformer.transform(new JDOMSource(in), out);
-
-            return out.getDocument();
-        } catch (TransformerException e) {
-            logger.fatal(e.getMessage());
-
-            return null;
-        }
+        return transform(in,stylesheet,emptyParameters);
     }
 
     /**
@@ -262,16 +257,16 @@ public class MCRXSLTransformation {
      *            parameters used by the stylesheet for transformation
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Properties parameters) {
+    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Map parameters) {
         try {
             JDOMResult out = new JDOMResult();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File(stylesheet)));
+            Transformer transformer = factory.newTransformer(new StreamSource(new File(stylesheet)));
             transformer.setURIResolver(MCRURIResolver.instance());
-            Enumeration names = parameters.propertyNames();
+            Iterator nameIt = parameters.keySet().iterator();
 
-            while (names.hasMoreElements()) {
-                String name = (String) (names.nextElement());
-                String value = parameters.getProperty(name);
+            while (nameIt.hasNext()) {
+                String name = nameIt.next().toString();
+                String value = parameters.get(name).toString();
 
                 transformer.setParameter(name, value);
             }
@@ -280,7 +275,7 @@ public class MCRXSLTransformation {
 
             return out.getDocument();
         } catch (TransformerException e) {
-            logger.fatal(e.getMessage(),e);
+            LOGGER.fatal(e.getMessage(),e);
 
             return null;
         }
