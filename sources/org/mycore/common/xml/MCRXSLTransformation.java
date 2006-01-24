@@ -99,6 +99,7 @@ public class MCRXSLTransformation {
 
             if (tf.getFeature(SAXTransformerFactory.FEATURE)) {
                 saxFactory = (SAXTransformerFactory) tf;
+                saxFactory.setURIResolver(MCRURIResolver.instance());
             } else {
                 LOGGER.fatal("TransformerFactory could not be initialized.");
             }
@@ -302,7 +303,6 @@ public class MCRXSLTransformation {
      */
     public static Document transform(Document in, Transformer transformer) throws TransformerException {
         JDOMResult out = new JDOMResult();
-        transformer.setURIResolver(MCRURIResolver.instance());
         transformer.transform(new JDOMSource(in), out);
         return out.getDocument();
     }
