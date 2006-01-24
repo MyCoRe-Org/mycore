@@ -1,19 +1,30 @@
 package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
 
-import junit.framework.TestCase;
-
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.format.DateTimeFormatter;
 
-public class MCRMetaISO8601DateTest extends TestCase {
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRTestCase;
+
+public class MCRMetaISO8601DateTest extends MCRTestCase {
+    private static Logger LOGGER;
 
     protected void setUp() throws Exception {
-        super.setUp();
+        super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
+        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO, stdout", false)){
+            //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
+            MCRConfiguration.instance().configureLogging();
+        }
+        if (LOGGER == null) {
+            LOGGER = Logger.getLogger(MCRMetaISO8601DateTest.class);
+        }
     }
 
     protected void tearDown() throws Exception {
@@ -75,28 +86,28 @@ public class MCRMetaISO8601DateTest extends TestCase {
     public void testsetDate() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         String timeString = "1997-07-16T19:20:30.452300+01:00";
-        System.out.println(timeString);
+        LOGGER.debug(timeString);
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
         // this can be a different String, but point in time should be the same
-        System.out.println(ts.getISOString());
+        LOGGER.debug(ts.getISOString());
         ts.setFormat(MCRMetaISO8601Date.COMPLETE_HH_MM);
-        System.out.println(ts.getISOString());
+        LOGGER.debug(ts.getISOString());
         // wrong date format for the following string should null the internal
         // date.
         timeString = "1997-07-16T19:20:30+01:00";
-        System.out.println(timeString);
+        LOGGER.debug(timeString);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
         ts.setFormat(null); // check auto format determination
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
-        //check if shorter format declarations fail if String is longer 
+        // check if shorter format declarations fail if String is longer
         ts.setFormat(MCRMetaISO8601Date.YEAR);
         timeString = "1997-07";
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        System.out.println(ts.getISOString());
+        LOGGER.debug(ts.getISOString());
     }
 
     /*
@@ -109,11 +120,15 @@ public class MCRMetaISO8601DateTest extends TestCase {
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
         Element export = ts.createXML();
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        try {
-            xout.output(export, System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (LOGGER.isDebugEnabled()) {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            StringWriter sw = new StringWriter();
+            try {
+                xout.output(export, sw);
+                LOGGER.debug(sw.toString());
+            } catch (IOException e) {
+                LOGGER.warn("Failure printing xml result", e);
+            }
         }
     }
 
@@ -140,18 +155,17 @@ public class MCRMetaISO8601DateTest extends TestCase {
         ts.setDate(dt);
         assertNotNull("Date is Null", ts.getISOString());
     }
-    
-    public void testsetFromDOM(){
+
+    public void testsetFromDOM() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
-        Element datum=new Element ("datum");
-        datum.setAttribute("inherited","0")
-            .setText("2006-01-23");
+        Element datum = new Element("datum");
+        datum.setAttribute("inherited", "0").setText("2006-01-23");
         ts.setFromDOM(datum);
-        assertEquals("Dates not equal","2006-01-23",ts.getISOString());
-        datum.setAttribute("format",MCRMetaISO8601Date.COMPLETE_HH_MM);
+        assertEquals("Dates not equal", "2006-01-23", ts.getISOString());
+        datum.setAttribute("format", MCRMetaISO8601Date.COMPLETE_HH_MM);
         ts.setFromDOM(datum);
-        assertNull("Date should be null",ts.getDate());
-        assertEquals("Format should be set by jdom",MCRMetaISO8601Date.COMPLETE_HH_MM,ts.getFormat());
+        assertNull("Date should be null", ts.getDate());
+        assertEquals("Format should be set by jdom", MCRMetaISO8601Date.COMPLETE_HH_MM, ts.getFormat());
     }
 
     private String getFormat(DateTimeFormatter df) {
