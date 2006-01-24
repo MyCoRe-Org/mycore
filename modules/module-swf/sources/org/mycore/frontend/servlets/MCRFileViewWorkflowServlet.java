@@ -28,19 +28,15 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet read a digital object from the workflow and put it to the web.
@@ -52,6 +48,8 @@ import org.mycore.user.MCRUserMgr;
  * @version $Revision$ $Date$
  */
 public class MCRFileViewWorkflowServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     // The configuration
     private static Logger LOGGER = Logger.getLogger(MCRFileViewWorkflowServlet.class.getName());
 
@@ -89,18 +87,7 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
         LOGGER.debug("MCRFileViewWorkflowServlet : type = " + type);
 
         // check the privileg
-        boolean haspriv = false;
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
-
-        // userid = "administrator";
-        LOGGER.debug("Curren user for list workflow = " + userid);
-
-        ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-
-        if (privs.contains("modify-" + type)) {
-            haspriv = true;
-        }
+        boolean haspriv = true;
 
         // read the file and write to output
         String dirname = CONFIG.getString("MCR.editor_" + type + "_directory", null);
