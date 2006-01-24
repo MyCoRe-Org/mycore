@@ -466,7 +466,6 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
             boolean test = false;
             switch (isoString.length()) {
             case 4:
-                System.err.println("YEAR");
                 return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
             case 7:
                 return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
