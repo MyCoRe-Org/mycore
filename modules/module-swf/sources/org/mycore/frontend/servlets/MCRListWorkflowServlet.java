@@ -54,7 +54,7 @@ import org.mycore.user.MCRUserMgr;
  * <p />
  * &gt;mcr_workflow type="..." step="..."&lt; <br />
  * &gt;item ID="..."&lt; <br />
- * &gt;label&lt;Die 99 582 am Lokschuppen in Schï¿½nheide&gt;/label&lt; <br />
+ * &gt;label&lt;Die 99 582 am Lokschuppen in Schönheide&gt;/label&lt; <br />
  * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt; <br />
  * &gt;data&lt;2004-06-08&gt;/data&lt; <br />
  * &gt;derivate ID="..." label="..."&lt; <br />
@@ -202,12 +202,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // create a XML JDOM tree with master tag mcr_workflow
         // prepare the transformer stylesheet
         String xslfile = "mycoreobject-" + type + "-to-workflow.xsl";
-        InputStream in = MCRListWorkflowServlet.class.getResourceAsStream("/" + xslfile);
-
-        if (in == null) {
-            throw new MCRConfigurationException("Can't read stylesheet " + xslfile);
-        }
-        LOGGER.debug(xslfile + " readed.");
+        File styleFile=getStylesheetFile("/WEB-INF/stylesheets/",xslfile);
 
         // build the frame of mcr_workflow
         org.jdom.Element root = new org.jdom.Element("mcr_workflow");
@@ -219,7 +214,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         //initialize transformer 
         MCRXSLTransformation transform=MCRXSLTransformation.getInstance();
-        TransformerHandler handler=transform.getTransformerHandler(transform.getStylesheet(new StreamSource(in)));
+        TransformerHandler handler=transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
         Map parameters=new HashMap();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
@@ -313,5 +308,27 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
+    }
+
+    /**
+     * Gets a File object for the given filename and directory, or returns null
+     * if no such file exists.
+     */
+    protected File getStylesheetFile(String dir, String name) {
+        String path = getServletContext().getRealPath(dir + name);
+        File file = new File(path);
+    
+        if (!file.exists()) {
+            LOGGER.debug("MCRListWorkflowServlet did not find stylesheet " + name);
+    
+            return null;
+        }
+    
+        if (!file.canRead()) {
+            String msg = "XSL stylesheet " + path + " not readable";
+            throw new MCRConfigurationException(msg);
+        }
+    
+        return file;
     }
 }
