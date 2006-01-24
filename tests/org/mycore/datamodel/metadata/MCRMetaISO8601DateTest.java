@@ -140,6 +140,19 @@ public class MCRMetaISO8601DateTest extends TestCase {
         ts.setDate(dt);
         assertNotNull("Date is Null", ts.getISOString());
     }
+    
+    public void testsetFromDOM(){
+        MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
+        Element datum=new Element ("datum");
+        datum.setAttribute("inherited","0")
+            .setText("2006-01-23");
+        ts.setFromDOM(datum);
+        assertEquals("Dates not equal","2006-01-23",ts.getISOString());
+        datum.setAttribute("format",MCRMetaISO8601Date.COMPLETE_HH_MM);
+        ts.setFromDOM(datum);
+        assertNull("Date should be null",ts.getDate());
+        assertEquals("Format should be set by jdom",MCRMetaISO8601Date.COMPLETE_HH_MM,ts.getFormat());
+    }
 
     private String getFormat(DateTimeFormatter df) {
         if ((df == null) || (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT)
