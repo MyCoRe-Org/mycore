@@ -145,7 +145,7 @@
 	   <!-- sorry, there is not yet a primitive datatype for all formats of http://www.w3.org/TR/NOTE-datetime -->
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
-         <xsd:attribute name="format" use="optional" type="mcrdateformat" default="YYYY-MM-DDThh:mm:ss.sTZD" />
+         <xsd:attribute name="format" use="optional" type="mcrdateformat" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
        </xsd:extension>
      </xsd:simpleContent>
