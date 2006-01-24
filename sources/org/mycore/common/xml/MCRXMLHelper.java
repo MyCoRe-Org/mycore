@@ -187,7 +187,7 @@ public class MCRXMLHelper {
 
     private static class JDOMEquivalent {
     
-        public JDOMEquivalent() { }
+        private JDOMEquivalent() { }
     
         public static boolean equivalent(Document d1, Document d2) {
             return equivalentContent((Document) d1, (Document) d2);
