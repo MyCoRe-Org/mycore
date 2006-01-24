@@ -23,6 +23,8 @@
  **/
 package org.mycore.datamodel.metadata;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +34,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -145,7 +149,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
         }
         if (!isValid()) {
             debug();
-            throw new MCRException("The content of MCRMetaXML is not valid.");
+            throw new MCRException("The content of MCRMetaISO8601Date is not valid.");
         }
         export = new org.jdom.Element(subtag, DEFAULT_NAMESPACE);
         export.setAttribute("inherited", (new Integer(inherited)).toString());
@@ -169,6 +173,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
+        this.export=(Element)element.clone();
     }
 
     /**
@@ -298,9 +303,18 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      * This method put debug data to the logger (for the debug mode).
      */
     public void debug() {
-        LOGGER.debug("Start Class : MCRMetaTimestamp");
+        LOGGER.debug("Start Class : MCRMetaISO8601Date");
         super.debugDefault();
-        LOGGER.debug("Date=" + dateTimeFormatter.print(dt));
+        LOGGER.debug("Date=" + ((dt==null)?null:dateTimeFormatter.print(dt)));
+        LOGGER.debug("Format=" + this.format);
+        XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
+        StringWriter sw=new StringWriter();
+        try {
+            xout.output(this.export,sw);
+            LOGGER.debug("JDOM=" + sw.toString());
+        } catch (IOException e) {
+            //ignore
+        }
     }
 
     /**
