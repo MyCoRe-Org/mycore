@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.107 $ $Date: 2006-01-07 02:41:35 $                      -->
+  <!-- $Revision: 1.108 $ $Date: 2006-01-24 13:44:06 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.107 $ $Date: 2006-01-07 02:41:35 $</echo>
+    <echo>Ant build file   : $Revision: 1.108 $ $Date: 2006-01-24 13:44:06 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -135,6 +135,7 @@
 	    		<fileset dir="${basedir}/classes/">
 	    			<include name="**/*Test*.class"/>
 	    			<exclude name="**/FulltextTester.class"/>
+	    			<exclude name="**/MCRTestCase.class"/>
 	    	    </fileset>
 	    	</batchtest>
 		</junit>    
