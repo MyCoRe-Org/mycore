@@ -47,7 +47,7 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 
-import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRAccessManagerBase;
 import org.mycore.access.MCRAccessRule;
 import org.mycore.access.MCRAccessStore;
 import org.mycore.common.MCRCache;
@@ -483,33 +483,21 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 action = it.next().toString();
                 // one pool Element under access per defined AccessRule in Pool
                 // for (Object-)ID
-                addRule(container, action, MCRAccessManager.instance().getAccess(action, objId));
+                addRule(container, action, MCRAccessManagerBase.instance().getAccessRule(action, objId));
             }
         } else {
-            addRule(container, action, MCRAccessManager.instance().getAccess(action, objId));
+            addRule(container, action, MCRAccessManagerBase.instance().getAccessRule(action, objId));
         }
 
         return container;
     }
 
-    private void addRule(Element root, String pool, MCRAccessRule rule) {
-        if (rule != null && pool != null && !isDummyRule(rule)) {
+    private void addRule(Element root, String pool, Element rule) {
+        if (rule != null && pool != null ) {
             Element poolElement = new Element("pool").setAttribute("id", pool);
-            poolElement.addContent(rule.getRuleElement());
+            poolElement.addContent(rule);
             root.addContent(poolElement);
         }
-    }
-
-    /**
-     * determines if the submited rule is just the MyCoRe dummy rule
-     * 
-     * @param rule
-     *            rule to check against a magic algorithm
-     * @return true, if rule is "dummy rule"
-     */
-    private boolean isDummyRule(MCRAccessRule rule) {
-        // a "real" rule should have an id != null
-        return (rule.getId() == null);
     }
 
     /**
