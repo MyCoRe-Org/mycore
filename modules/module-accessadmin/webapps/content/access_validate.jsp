@@ -1,7 +1,7 @@
 <%@ page import="org.mycore.common.MCRSession,
 	org.mycore.common.MCRSessionMgr,
-	org.mycore.access.MCRAccessStore,
-	org.mycore.access.MCRRuleMapping,
+	org.mycore.access.mcrimpl.MCRAccessStore,
+	org.mycore.access.mcrimpl.MCRRuleMapping,
 	java.util.List,
 	java.util.Date"%>
 <%@ page import="org.mycore.frontend.servlets.MCRServlet" %>

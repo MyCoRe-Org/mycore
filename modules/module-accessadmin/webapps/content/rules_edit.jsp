@@ -1,5 +1,5 @@
-<%@ page import="org.mycore.access.MCRRuleStore,
-	org.mycore.access.MCRAccessRule,
+<%@ page import="org.mycore.access.mcrimpl.MCRRuleStore,
+	org.mycore.access.mcrimpl.MCRAccessRule,
 	org.mycore.common.MCRSession,
 	org.mycore.frontend.servlets.MCRServlet,
 	java.text.SimpleDateFormat,

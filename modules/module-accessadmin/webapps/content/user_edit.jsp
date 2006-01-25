@@ -1,4 +1,4 @@
-<%@ page import="org.mycore.access.MCRRuleStore,
+<%@ page import="org.mycore.access.mcrimpl.MCRRuleStore,
 	org.mycore.user.MCRUser,
 	org.mycore.user.MCRUserContact,
 	org.mycore.user.MCRUserMgr,

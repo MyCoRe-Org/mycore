@@ -1,8 +1,8 @@
-<%@ page import="org.mycore.access.MCRRuleStore,
+<%@ page import="org.mycore.access.mcrimpl.MCRRuleStore,
 	org.mycore.user.MCRUserMgr,
 	org.mycore.user.MCRUser,
 	org.mycore.user.MCRGroup,
-	org.mycore.access.MCRAccessRule,
+	org.mycore.access.mcrimpl.MCRAccessRule,
 	org.mycore.common.MCRSession,
 	org.mycore.frontend.servlets.MCRServlet"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>

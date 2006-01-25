@@ -1,8 +1,8 @@
 <%@ page import="org.mycore.common.MCRSession,
-	org.mycore.access.MCRAccessStore,
+	org.mycore.access.mcrimpl.MCRAccessStore,
 	org.mycore.common.MCRSessionMgr,
-	org.mycore.access.MCRRuleStore,
-	org.mycore.access.MCRAccessDefinition,
+	org.mycore.access.mcrimpl.MCRRuleStore,
+	org.mycore.access.mcrimpl.MCRAccessDefinition,
 	java.util.ArrayList,
 	java.util.List"%>
 <%@ page import="org.mycore.frontend.servlets.MCRServlet" %>

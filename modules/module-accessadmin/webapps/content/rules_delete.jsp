@@ -1,4 +1,4 @@
-<%@ page import="org.mycore.access.MCRRuleStore"%>
+<%@ page import="org.mycore.access.mcrimpl.MCRRuleStore"%>
 <%@ page import="org.mycore.frontend.servlets.MCRServlet" %>
 
 <%

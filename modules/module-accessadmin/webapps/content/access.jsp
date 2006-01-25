@@ -1,5 +1,5 @@
-<%@ page import="org.mycore.access.MCRAccessStore,
-		org.mycore.access.MCRAccessDefinition,
+<%@ page import="org.mycore.access.mcrimpl.MCRAccessStore,
+		org.mycore.access.mcrimpl.MCRAccessDefinition,
 		org.mycore.common.MCRConfiguration,
 		java.util.ArrayList,
 		java.util.Hashtable,

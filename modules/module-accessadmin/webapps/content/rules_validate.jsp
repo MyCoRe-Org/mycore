@@ -1,5 +1,5 @@
-<%@ page import="org.mycore.access.MCRRuleStore,
-	org.mycore.access.MCRAccessRule,
+<%@ page import="org.mycore.access.mcrimpl.MCRRuleStore,
+	org.mycore.access.mcrimpl.MCRAccessRule,
 	java.util.Date,
 	java.text.SimpleDateFormat,
 	java.text.DateFormat,
@@ -55,7 +55,7 @@
 
 		if (request.getParameter("operation").equals("edit")){
 			// update rule
-			if (! id_orig.equals(id) && MCRRuleStore.getInstance().existRule(id)){
+			if (! id_orig.equals(id) && MCRRuleStore.getInstance().existsRule(id)){
 				// error 
 				rule.setId(id_orig);
 				mcrSession.put("rule", rule);
