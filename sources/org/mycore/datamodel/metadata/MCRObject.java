@@ -305,8 +305,12 @@ final public class MCRObject extends MCRBase {
 		}
 
 		// create this object in datastore
-		mcr_service.setDate("createdate");
-		mcr_service.setDate("modifydate");
+		if (mcr_service.getDate("createdate") == null) {
+			mcr_service.setDate("createdate");
+		}
+		if (mcr_service.getDate("modifydate") == null) {
+			mcr_service.setDate("modifydate");
+		}
 
 		// prepare this object with parent metadata
 		MCRObjectID parent_id = mcr_struct.getParentID();

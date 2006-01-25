@@ -179,7 +179,11 @@ public class MCRObjectService {
      * @return the date as GregorianCalendar
      */
     public final Date getDate(String type) {
-        return getISO8601Date(type).getDate();
+    	MCRMetaISO8601Date isoDate = getISO8601Date(type);
+    	if(isoDate != null)
+    		return isoDate.getDate();
+    	else
+    		return null;
     }
     
     private final MCRMetaISO8601Date getISO8601Date(String type){
