@@ -21,54 +21,54 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.user.MCRGroup;
 
 /**
- * Implementation of a (group xy) clause
+ * Implementation of a (date &lt; x) clause
  * 
  * @author Matthias Kramm
  */
-class MCRGroupClause implements MCRCondition {
-    private MCRGroup group;
+class MCRDateBeforeClause implements MCRCondition {
+    private Date date;
+    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
 
-    private String groupname;
-
-    MCRGroupClause(String group) {
-        this.groupname = group;
-        this.group = new MCRGroup(group);
+    MCRDateBeforeClause(Date date) {
+        this.date = date;
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return data.getUser().isMemberOf(group);
+        return data.getDate().before(this.date);
     }
 
     public String toString() {
-        return "group " + groupname + " ";
+        return "date < " + dateformat.format(date) + " ";
     }
 
     public Element toXML() {
     	Element cond = new Element("condition");
-    	cond.setAttribute("field", "group");
-    	cond.setAttribute("operator", "=");
-    	cond.setAttribute("value", groupname);
+    	cond.setAttribute("field", "date");
+    	cond.setAttribute("operator", "<");
+    	cond.setAttribute("value", dateformat.format(date));
         return cond;
     }
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "GROUP"));
+        el.setAttribute(new Attribute("type", "DATE"));
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { 
-    	visitor.visitType(info());
+    public void accept(MCRConditionVisitor visitor) { /* TODO */
     }
 };

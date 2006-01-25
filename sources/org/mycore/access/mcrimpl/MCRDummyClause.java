@@ -21,55 +21,42 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.parsers.bool.MCRParseException;
 
 /**
- * Implementation of a (ip xy) clause
+ * Implementation of a dummy clause (useful for debugging)
  * 
  * @author Matthias Kramm
  */
-class MCRIPClause implements MCRCondition {
-    private MCRIPAddress ip;
+class MCRDummyClause implements MCRCondition {
+    private String s;
 
-    MCRIPClause(String ip) throws MCRParseException {
-        try {
-            this.ip = new MCRIPAddress(ip);
-        } catch (java.net.UnknownHostException e) {
-            throw new MCRParseException("Couldn't parse/resolve host " + ip);
-        }
+    MCRDummyClause(String s) {
+        this.s = s;
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return this.ip.contains(data.getIp());
+        return false;
     }
 
     public String toString() {
-        return "ip " + ip.toString() + " ";
+        return "\"" + s + "\"";
     }
 
     public Element toXML() {
-    	Element cond = new Element("condition");
-    	cond.setAttribute("field", "ip");
-    	cond.setAttribute("operator", "=");
-    	cond.setAttribute("value", ip.toString());
-        return cond;
+        return null; /* TODO */
     }
 
     public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "IP"));
-        return el;
+        return null; /* TODO */
     }
 
-    public void accept(MCRConditionVisitor visitor) { 
-    	visitor.visitType(info());
+    public void accept(MCRConditionVisitor visitor) { /* TODO */
     }
 };

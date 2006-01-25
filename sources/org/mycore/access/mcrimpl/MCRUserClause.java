@@ -21,11 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package org.mycore.access.mcrimpl;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -33,42 +29,42 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
- * Implementation of a (date &lt; x) clause
+ * Implementation of a (user xy) clause
  * 
  * @author Matthias Kramm
  */
-class MCRDateBeforeClause implements MCRCondition {
-    private Date date;
-    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
+class MCRUserClause implements MCRCondition {
+    private String user;
 
-    MCRDateBeforeClause(Date date) {
-        this.date = date;
+    MCRUserClause(String user) {
+        this.user = user;
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return data.getDate().before(this.date);
+        return this.user.equals(data.getUser().getID());
     }
 
     public String toString() {
-        return "date < " + dateformat.format(date) + " ";
+        return "user " + user + " ";
     }
 
     public Element toXML() {
     	Element cond = new Element("condition");
-    	cond.setAttribute("field", "date");
-    	cond.setAttribute("operator", "<");
-    	cond.setAttribute("value", dateformat.format(date));
+    	cond.setAttribute("field", "user");
+    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("value", user);
         return cond;
     }
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "DATE"));
+        el.setAttribute(new Attribute("type", "USER"));
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    public void accept(MCRConditionVisitor visitor) { 
+    	visitor.visitType(info());
     }
 };

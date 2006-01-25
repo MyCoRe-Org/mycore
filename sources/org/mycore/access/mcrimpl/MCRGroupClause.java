@@ -21,42 +21,54 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.user.MCRGroup;
 
 /**
- * Implementation of a dummy clause (useful for debugging)
+ * Implementation of a (group xy) clause
  * 
  * @author Matthias Kramm
  */
-class MCRDummyClause implements MCRCondition {
-    private String s;
+class MCRGroupClause implements MCRCondition {
+    private MCRGroup group;
 
-    MCRDummyClause(String s) {
-        this.s = s;
+    private String groupname;
+
+    MCRGroupClause(String group) {
+        this.groupname = group;
+        this.group = new MCRGroup(group);
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return false;
+        return data.getUser().isMemberOf(group);
     }
 
     public String toString() {
-        return "\"" + s + "\"";
+        return "group " + groupname + " ";
     }
 
     public Element toXML() {
-        return null; /* TODO */
+    	Element cond = new Element("condition");
+    	cond.setAttribute("field", "group");
+    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("value", groupname);
+        return cond;
     }
 
     public Element info() {
-        return null; /* TODO */
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", "GROUP"));
+        return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    public void accept(MCRConditionVisitor visitor) { 
+    	visitor.visitType(info());
     }
 };

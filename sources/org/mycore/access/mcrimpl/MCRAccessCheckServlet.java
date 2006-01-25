@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
 import java.io.IOException;
 
@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessManagerBase;
 import org.mycore.common.MCRConfiguration;
 // import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;

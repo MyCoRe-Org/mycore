@@ -47,7 +47,7 @@ public class MCRAccessManagerBase {
     final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "");
 
     /** the logger */
-    static Logger logger = Logger.getLogger(MCRAccessManagerBase.class.getName());
+    protected static Logger logger = Logger.getLogger(MCRAccessManagerBase.class.getName());
 
     public MCRAccessManagerBase() {
     }

@@ -21,11 +21,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,18 +34,13 @@ import java.util.List;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.mycore.access.MCRAccessManagerBase;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
-
-import sun.misc.Compare;
 
 /**
  * MyCoRe-Standard Implementation of the

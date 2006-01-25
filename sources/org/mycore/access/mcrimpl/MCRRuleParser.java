@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,7 +33,6 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRTrueCondition;
-import org.mycore.services.fieldquery.MCRSimpleCondition;
 
 class MCRRuleParser extends MCRBooleanClauseParser {
     MCRRuleParser() {

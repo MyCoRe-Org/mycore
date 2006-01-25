@@ -26,7 +26,6 @@ package org.mycore.access;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;

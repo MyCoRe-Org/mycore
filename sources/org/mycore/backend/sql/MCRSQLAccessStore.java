@@ -29,8 +29,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import org.mycore.access.MCRAccessStore;
-import org.mycore.access.MCRRuleMapping;
+import org.mycore.access.mcrimpl.MCRAccessStore;
+import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.common.MCRException;
 
 /**

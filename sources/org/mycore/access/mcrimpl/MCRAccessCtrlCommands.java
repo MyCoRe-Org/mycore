@@ -21,9 +21,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
+package org.mycore.access.mcrimpl;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessManagerBase;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRAbstractCommands;

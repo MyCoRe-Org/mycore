@@ -21,55 +21,55 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package org.mycore.access.mcrimpl;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRParseException;
 
 /**
- * Implementation of a (date &gt; xy) clause
+ * Implementation of a (ip xy) clause
  * 
  * @author Matthias Kramm
  */
-class MCRDateAfterClause implements MCRCondition {
-    private Date date;
-    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
+class MCRIPClause implements MCRCondition {
+    private MCRIPAddress ip;
 
-    MCRDateAfterClause(Date date) {
-        this.date = date;
+    MCRIPClause(String ip) throws MCRParseException {
+        try {
+            this.ip = new MCRIPAddress(ip);
+        } catch (java.net.UnknownHostException e) {
+            throw new MCRParseException("Couldn't parse/resolve host " + ip);
+        }
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return data.getDate().after(this.date);
+        return this.ip.contains(data.getIp());
     }
 
     public String toString() {
-        return "date > " + dateformat.format(date) + " ";
+        return "ip " + ip.toString() + " ";
     }
 
     public Element toXML() {
     	Element cond = new Element("condition");
-    	cond.setAttribute("field", "date");
-    	cond.setAttribute("operator", ">");
-    	cond.setAttribute("value", dateformat.format(date));
+    	cond.setAttribute("field", "ip");
+    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("value", ip.toString());
         return cond;
     }
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "DATE"));
+        el.setAttribute(new Attribute("type", "IP"));
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) {
+    public void accept(MCRConditionVisitor visitor) { 
     	visitor.visitType(info());
     }
 };

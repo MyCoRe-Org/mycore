@@ -36,8 +36,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
-import org.mycore.access.MCRAccessRule;
-import org.mycore.access.MCRRuleStore;
+import org.mycore.access.mcrimpl.MCRAccessRule;
+import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRException;
 
