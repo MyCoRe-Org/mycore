@@ -48,6 +48,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -475,7 +476,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         // one access Element per (Object-)ID
         Element container = new Element("access").setAttribute("id", objId);
 
-        MCRAccessInterface AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         
         if (action.equals("all")) {
             Iterator it = AI.getPermissionsForID(objId).iterator();
