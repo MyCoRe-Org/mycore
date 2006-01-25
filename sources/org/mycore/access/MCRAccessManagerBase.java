@@ -292,5 +292,20 @@ public class MCRAccessManagerBase {
     public boolean checkAccessCondition(MCRObjectID id, String pool, org.jdom.Element rule) {
         return checkAccessCondition(id.getId(), pool, rule);
     }
+
+    /**
+     * The method check the access rule against the MCRSession and return true
+     * if the access is allowed otherwise it return false.
+     * 
+     * @param id
+     *            the ID-String of the object
+     * @param pool
+     *            the access pool for the rule
+
+     * @return the rule tree as jdom element
+     */    
+    public Element getAccess(String pool, String objID) {
+    	return null;
+    }
     
 }
