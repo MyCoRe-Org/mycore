@@ -324,7 +324,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    private Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+    public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
 
         String classname = properties.getProperty(name);
