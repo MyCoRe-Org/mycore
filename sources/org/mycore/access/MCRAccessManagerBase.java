@@ -304,7 +304,7 @@ public class MCRAccessManagerBase {
 
      * @return the rule tree as jdom element
      */    
-    public Element getAccess(String pool, String objID) {
+    public Element getAccessRule(String pool, String objID) {
     	return null;
     }
     
