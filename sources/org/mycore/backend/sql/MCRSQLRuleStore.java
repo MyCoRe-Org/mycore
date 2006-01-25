@@ -28,17 +28,9 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.mycore.access.MCRAccessRule;
 import org.mycore.access.MCRRuleStore;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRObjectID;
-
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 /**
  * SQL implementation for RuleStore, storing access rules
