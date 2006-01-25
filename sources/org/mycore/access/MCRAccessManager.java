@@ -180,6 +180,11 @@ public class MCRAccessManager extends MCRAccessManagerBase{
 		condition.setAttribute("format","xml");
 		condition.addContent(rule);
     	return condition;
+    }  
+    
+    public ArrayList getPoolsForObject(String objid) {
+    	ArrayList ret = accessStore.getPoolsForObject(objid);
+    	return ret;
     }    
     
     // not extended methods

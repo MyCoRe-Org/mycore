@@ -48,8 +48,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 
 import org.mycore.access.MCRAccessManagerBase;
-import org.mycore.access.MCRAccessRule;
-import org.mycore.access.MCRAccessStore;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -480,7 +478,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
         
         if (action.equals("all")) {
-            Iterator it = MCRAccessStore.getPools().iterator();
+            Iterator it = AI.getPoolsForObject(objId).iterator();
             while (it.hasNext()) {
                 action = it.next().toString();
                 // one pool Element under access per defined AccessRule in Pool

@@ -23,8 +23,11 @@
 
 package org.mycore.access;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -41,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRAccessManagerBase {
 
     private static MCRAccessManagerBase singleton;
+    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "");
 
     /** the logger */
     static Logger logger = Logger.getLogger(MCRAccessManagerBase.class.getName());
@@ -299,6 +303,16 @@ public class MCRAccessManagerBase {
      */    
     public Element getAccessRule(String objID, String pool) {
     	return null;
+    }
+    
+    /**
+     * delivers an ArrayList with the pools defined for the current objid
+     * @param objid
+     * @return
+     */
+    public ArrayList getPoolsForObject(String objid) {
+    	ArrayList ret = new ArrayList();
+    	return ret;
     }
     
 }
