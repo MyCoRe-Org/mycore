@@ -55,29 +55,26 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
             for (int i = 0; i < l.size(); i++) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
 
-                /* check access rule for object against the READ pool */
-                if (MCRAccessManager.checkReadAccess((String) tmpquery.getValue("getmcrid"), MCRSessionMgr.getCurrentSession())) {
-                    MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
+                MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
 
-                    // fill hit meta
-                    for (int j = 0; j < order.size(); j++) {
-                        String key = ((MCRSearchField) order.get(j)).getName();
-                        Object valueObj = tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
-                        String value = "";
-                        if (valueObj instanceof java.sql.Date) {
-                        	value = ((java.sql.Date) valueObj).toString() ;
-                        }else{
-                        	value = (String) valueObj ;
-                        }
-                        if (value == null) value = "";
-                        hit.addSortData(key, value);
-                    }
-
-                    if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
-                        result.addHit(hit);
+                // fill hit meta
+                for (int j = 0; j < order.size(); j++) {
+                    String key = ((MCRSearchField) order.get(j)).getName();
+                    Object valueObj = tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
+                    String value = "";
+                    if (valueObj instanceof java.sql.Date) {
+                    	value = ((java.sql.Date) valueObj).toString() ;
                     }else{
-                        break;
+                    	value = (String) valueObj ;
                     }
+                    if (value == null) value = "";
+                    hit.addSortData(key, value);
+                }
+
+                if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
+                    result.addHit(hit);
+                }else{
+                    break;
                 }
             }
             tx.commit();

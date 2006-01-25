@@ -60,23 +60,19 @@ public class MCRSQLSearcher extends MCRQuerySearcher {
             while (reader.next()) {
                 String id = reader.getString("MCRID");
 
-                /* check access rule for object against the READ pool */
-                if (MCRAccessManager.checkReadAccess(id, MCRSessionMgr.getCurrentSession())) {
-                    MCRHit hit = new MCRHit(id);
+                MCRHit hit = new MCRHit(id);
 
-                    /* fill hit meta */
-                    for (int j = 0; j < order.size(); j++) {
-                        String key = ((MCRSearchField) order.get(j)).getName();
-                        String value = (String) reader.getString(((MCRSearchField) order.get(j)).getName());
-                        hit.addSortData(key, value);
-                    }
-                    
-                    if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
-                        result.addHit(hit);
-                    }else{
-                        break;
-                    }
-                    
+                /* fill hit meta */
+                for (int j = 0; j < order.size(); j++) {
+                    String key = ((MCRSearchField) order.get(j)).getName();
+                    String value = (String) reader.getString(((MCRSearchField) order.get(j)).getName());
+                    hit.addSortData(key, value);
+                }
+                
+                if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
+                    result.addHit(hit);
+                }else{
+                    break;
                 }
             }
 
