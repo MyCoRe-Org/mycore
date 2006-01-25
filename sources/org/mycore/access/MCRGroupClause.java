@@ -23,6 +23,7 @@
 
 package org.mycore.access;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
@@ -50,17 +51,24 @@ class MCRGroupClause implements MCRCondition {
     }
 
     public String toString() {
-        return "group " + group + " ";
+        return "group " + groupname + " ";
     }
 
     public Element toXML() {
-        return null; /* TODO */
+    	Element cond = new Element("condition");
+    	cond.setAttribute("field", "group");
+    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("value", groupname);
+        return cond;
     }
 
     public Element info() {
-        return null; /* TODO */
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", "GROUP"));
+        return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    public void accept(MCRConditionVisitor visitor) { 
+    	visitor.visitType(info());
     }
 };

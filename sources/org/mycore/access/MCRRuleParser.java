@@ -33,6 +33,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRTrueCondition;
+import org.mycore.services.fieldquery.MCRSimpleCondition;
 
 class MCRRuleParser extends MCRBooleanClauseParser {
     MCRRuleParser() {
@@ -55,8 +56,37 @@ class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
-        /* XML parsing not implemented yet for access rules */
-        return null;
+        String name = e.getName();
+        if (name.equals("condition")) {
+            String field = e.getAttributeValue("field").toLowerCase().trim();
+            String operator = e.getAttributeValue("operator").trim();
+            String value = e.getAttributeValue("value").trim();
+
+            if (field.equals("group")) {
+            	return new MCRGroupClause(value);
+            } else if (field.equals("user")) {
+            	return new MCRUserClause(value);
+            }else if (field.equals("ip")) {
+            	return new MCRIPClause(value);
+            }else if (field.equals("date")) {
+            	if(operator.equals("<")) {
+            		return new MCRDateBeforeClause(parseDate(value, true));
+            	}else if(operator.equals("<=")) {
+            		return new MCRDateBeforeClause(parseDate(value, true));
+            	}else if(operator.equals(">")) {
+            		return new MCRDateAfterClause(parseDate(value, true));
+            	}else if(operator.equals(">=")) {
+            		return new MCRDateAfterClause(parseDate(value, true));
+            	}
+            	else {
+            		throw new MCRParseException("Not a valid operator <" + operator + ">");
+            	}
+            }else {
+            	throw new MCRParseException("Not a valid condition field <" + field + ">");
+            }
+        } else {
+            throw new MCRParseException("Not a valid name <" + name + ">");
+        }  	
     }
 
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {

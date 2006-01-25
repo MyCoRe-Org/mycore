@@ -23,6 +23,7 @@
 
 package org.mycore.access;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
@@ -50,13 +51,20 @@ class MCRUserClause implements MCRCondition {
     }
 
     public Element toXML() {
-        return null; /* TODO */
+    	Element cond = new Element("condition");
+    	cond.setAttribute("field", "user");
+    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("value", user);
+        return cond;
     }
 
     public Element info() {
-        return null; /* TODO */
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", "USER"));
+        return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    public void accept(MCRConditionVisitor visitor) { 
+    	visitor.visitType(info());
     }
 };

@@ -140,7 +140,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 session.flush();
                 tx.commit();
                 
-                MCRAccessManager.instance().removeFromCache(rulemapping.getPool(), rulemapping.getObjId());
+                ((MCRAccessManager)MCRAccessManager.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
             } catch (Exception e) {
                 tx.rollback();
                 logger.error("catched error", e);

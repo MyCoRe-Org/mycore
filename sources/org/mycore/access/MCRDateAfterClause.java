@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
@@ -55,13 +56,20 @@ class MCRDateAfterClause implements MCRCondition {
     }
 
     public Element toXML() {
-        return null; /* TODO */
+    	Element cond = new Element("condition");
+    	cond.setAttribute("field", "date");
+    	cond.setAttribute("operator", ">");
+    	cond.setAttribute("value", dateformat.format(date));
+        return cond;
     }
 
     public Element info() {
-        return null; /* TODO */
+        Element el = new Element("info");
+        el.setAttribute(new Attribute("type", "DATE"));
+        return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
+    public void accept(MCRConditionVisitor visitor) {
+    	visitor.visitType(info());
     }
 };

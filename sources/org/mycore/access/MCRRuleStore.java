@@ -46,8 +46,13 @@ public abstract class MCRRuleStore {
 
     public abstract MCRAccessRule getRule(String ruleid);
 
-    public abstract boolean existRule(String ruleid);
+    public abstract boolean existsRule(String ruleid);
+    
     public abstract ArrayList retrieveAllIDs();
+    
+    public abstract ArrayList retrieveRuleIDs(String ruleExpression);
+    
+    public abstract int getNextFreeRuleID(String prefix);
 
     public abstract MCRAccessRule retrieveRule(String ruleid);
 
