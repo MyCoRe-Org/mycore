@@ -23,8 +23,18 @@
 
 package org.mycore.access;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -50,7 +60,7 @@ public class MCRAccessManagerBase {
      * 
      * @return a singleton instance of MCRAccessManagerBase
      */
-    public synchronized MCRAccessManagerBase instance() {
+    public static synchronized MCRAccessManagerBase instance() {
         if (singleton == null) {
             singleton = new MCRAccessManagerBase();
         }
@@ -71,7 +81,7 @@ public class MCRAccessManagerBase {
      *             if an errow was occured
      */
     public void addRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        logger.debug("Execude MCRAccessManagerBase addRule");
+        logger.debug("Execute MCRAccessManagerBase addRule");
     }
 
     /**
@@ -101,7 +111,7 @@ public class MCRAccessManagerBase {
      *             if an errow was occured
      */
     public void removeRule(String id, String pool) throws MCRException {
-        logger.debug("Execude MCRAccessManagerBase removeRule");
+        logger.debug("Execute MCRAccessManagerBase removeRule");
     }
 
     /**
@@ -127,7 +137,7 @@ public class MCRAccessManagerBase {
      *             if an errow was occured
      */
     public void removeAllRules(String id) throws MCRException {
-        logger.debug("Execude MCRAccessManagerBase removeAllRules");
+        logger.debug("Execute MCRAccessManagerBase removeAllRules");
     }
 
     /**
@@ -155,7 +165,7 @@ public class MCRAccessManagerBase {
      *             if an errow was occured
      */
     public void updateRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        logger.debug("Execude MCRAccessManagerBase updateRule");
+        logger.debug("Execute MCRAccessManagerBase updateRule");
     }
 
     /**
@@ -183,7 +193,7 @@ public class MCRAccessManagerBase {
      * @return true if the access is allowed otherwise it return
      */
     public boolean checkAccess(String pool) {
-        logger.debug("Execude MCRAccessManagerBase checkAccess");
+        logger.debug("Execute MCRAccessManagerBase checkAccess");
         return true;
     }
 
@@ -198,9 +208,25 @@ public class MCRAccessManagerBase {
      * @return true if the access is allowed otherwise it return
      */
     public boolean checkAccess(String id, String pool) {
-        logger.debug("Execude MCRAccessManagerBase checkAccess");
-        return true;
+        return checkAccess(id, pool, MCRSessionMgr.getCurrentSession());
     }
+    
+    /**
+     * The method check the access rule against the MCRSession and return true
+     * if the access is allowed otherwise it return false.
+     * 
+     * @param id
+     *            the ID-String of the object
+     * @param pool
+     *            the access pool for the rule
+     * @param session
+     * 			  the current MCRSession            
+     * @return true if the access is allowed otherwise it return
+     */
+    public boolean checkAccess(String id, String pool, MCRSession session) {
+        logger.debug("Execute MCRAccessManagerBase checkAccess");
+        return true;
+    }    
 
     /**
      * The method check the access rule against the MCRSession and return true
@@ -226,11 +252,29 @@ public class MCRAccessManagerBase {
      *            the access pool for the rule
      * @param condition
      *            the rule tree as a JDOM Element
+     * @param session
+     * 			  the current MCRSession            
+     * @return true if the access is allowed otherwise it return
+     */
+    public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule, MCRSession session) {
+        logger.debug("Execute MCRAccessManagerBase checkAccess");
+        return true;
+    }
+    
+    /**
+     * The method check the access rule against the MCRSession and return true
+     * if the access is allowed otherwise it return false.
+     * 
+     * @param id
+     *            the ID-String of the object
+     * @param pool
+     *            the access pool for the rule
+     * @param condition
+     *            the rule tree as a JDOM Element
      * @return true if the access is allowed otherwise it return
      */
     public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule) {
-        logger.debug("Execude MCRAccessManagerBase checkAccess");
-        return true;
+        return checkAccessCondition(id, pool, rule, MCRSessionMgr.getCurrentSession());
     }
 
     /**
@@ -248,4 +292,5 @@ public class MCRAccessManagerBase {
     public boolean checkAccessCondition(MCRObjectID id, String pool, org.jdom.Element rule) {
         return checkAccessCondition(id.getId(), pool, rule);
     }
+    
 }
