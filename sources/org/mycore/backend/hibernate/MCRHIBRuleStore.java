@@ -87,32 +87,28 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     }
 
     /**
-     * Method checks existance of rule in db
+     * Method retrieves the ruleIDs of rules, whose string-representation starts with given data
      * 
-     * @param ruleid
-     *            id as string
-     * @return boolean value
-     * @throws MCRException
      */
-    private boolean existsRule(String ruleid) throws MCRException {
-
-        try {
-            Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
-            List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
+    public ArrayList retrieveRuleIDs(String ruleExpression) {
+    	ArrayList ret = new ArrayList();
+    	Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try{
+        	List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).list();
             tx.commit();
+            for (int i = 0; i < l.size(); i++) {
+                ret.add(((MCRACCESSRULE) l.get(i)).getRid());
+            }        	
+        }catch (Exception e) {
+            tx.rollback();
+            logger.error("catched error", e);
+        } finally {
             session.close();
-
-            if (l.size() == 1) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            throw new MCRException("Error in access-rule-store.", ex);
         }
+    	return ret;
     }
-
+    
     /**
      * Method updates accessrule by given rule. internal: rule will be deleted
      * first and recreated
@@ -242,24 +238,56 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         return ret;
     }
 
-    public boolean existRule(String ruleid) {
-
-        boolean ret = false;
+    /**
+     * Method checks existance of rule in db
+     * 
+     * @param ruleid
+     *            id as string
+     * @return boolean value
+     * @throws MCRException
+     */
+    public boolean existsRule(String ruleid) throws MCRException {
 
         try {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
-            MCRACCESSRULE hibrule = ((MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list().get(0));            
+            List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
             tx.commit();
             session.close();
 
-            if (hibrule != null) {
-                ret = true;
+            if (l.size() == 1) {
+                return true;
+            } else {
+                return false;
             }
-        } catch (Exception e) {
-        	logger.error("catched error: ",e);
+        } catch (Exception ex) {
+            throw new MCRException("Error in access-rule-store.", ex);
         }
-
-        return ret;
     }
+
+	public int getNextFreeRuleID(String prefix) {
+    	int ret = 1;
+    	Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try{
+        	List l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '"+prefix+"%'").list();
+        	tx.commit();
+            if (l.size() > 0) {
+              	String max = (String) l.get(0);
+              	if (max == null){
+              		ret = 1;
+              	}else {
+                  	int lastNumber = Integer.parseInt(max.substring(prefix.length()));
+                  	ret = lastNumber + 1;              		
+              	}
+            } else
+            	return 1;
+        }catch (Exception e) {
+            tx.rollback();
+            logger.error("catched error", e);
+        } finally {
+            session.close();
+        }
+        return ret;
+	}    
 }

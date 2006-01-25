@@ -28,10 +28,17 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.mycore.access.MCRAccessRule;
 import org.mycore.access.MCRRuleStore;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 /**
  * SQL implementation for RuleStore, storing access rules
@@ -78,7 +85,7 @@ public class MCRSQLRuleStore extends MCRRuleStore {
      * @return boolean value
      * @throws MCRException
      */
-    private boolean existsRule(String ruleid) throws MCRException {
+    public boolean existsRule(String ruleid) throws MCRException {
         try {
             return MCRSQLConnection.justCheckExists(new MCRSQLStatement(ruletablename).setCondition("RID", ruleid).toRowSelector());
         } catch (Exception ex) {
@@ -199,26 +206,36 @@ public class MCRSQLRuleStore extends MCRRuleStore {
         return ret;
     }
 
-    public boolean existRule(String ruleid) {
-        MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
-        boolean ret = false;
+	public ArrayList retrieveRuleIDs(String ruleExpression) {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
 
         try {
-            String select = "SELECT * FROM " + ruletablename + " WHERE RID = '" + ruleid + "'";
-            Statement statement = connection.getJDBCConnection().createStatement();
+            String select = "SELECT RID FROM " + ruletablename + " WHERE RULE LIKE '" + ruleExpression + "'";
+            Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
 
-            if (rs.next()) {
-                ret = true;
+            while (rs.next()) {
+                ret.add(rs.getString(1));
             }
-
-            rs.close();
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            connection.release();
+            c.release();
         }
 
         return ret;
-    }
+	}
+
+	public int getNextFreeRuleID(String prefix) {
+    	String query = new StringBuffer().append("SELECT MAX(RID) FROM MCRACCESSRULE WHERE (RID LIKE \'").append(prefix).append("%\' )").toString();
+    	try {
+            return Integer.parseInt(MCRSQLConnection.justGetSingleValue(query).substring(prefix.length())) + 1;
+        } catch (Exception e) {
+        	logger.debug("catched error", e);
+        }
+        return 1;    	
+	}
+
+
 }
