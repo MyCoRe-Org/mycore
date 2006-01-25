@@ -36,7 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
-import org.mycore.access.mcrimpl.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControllSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
@@ -140,7 +140,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 session.flush();
                 tx.commit();
                 
-                ((MCRAccessManager)MCRAccessManager.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
+                ((MCRAccessControllSystem)MCRAccessControllSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
             } catch (Exception e) {
                 tx.rollback();
                 logger.error("catched error", e);

@@ -25,7 +25,7 @@ package org.mycore.backend.sql;
 
 import java.util.List;
 
-import org.mycore.access.mcrimpl.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControllSystem;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;

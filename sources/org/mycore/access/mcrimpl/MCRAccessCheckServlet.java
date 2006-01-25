@@ -31,10 +31,9 @@ import javax.servlet.ServletException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.access.MCRAccessManagerBase;
-import org.mycore.common.MCRConfiguration;
-// import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRObjectID;
+
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -60,7 +59,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRAccessCheckServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private MCRAccessManagerBase AI = null;
+    private MCRAccessInterface AI = null;
 
     /**
      * Initalize this servlet
@@ -68,7 +67,7 @@ public class MCRAccessCheckServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
         // the access interface
-        AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+        AI = MCRAccessManager.getAccessImpl();
     }
 
     /**
@@ -86,12 +85,12 @@ public class MCRAccessCheckServlet extends MCRServlet {
         String objid = getProperty(job.getRequest(), "objid");
         String pool = getProperty(job.getRequest(), "pool");
 
-        boolean result = AI.checkAccess(new MCRObjectID(objid), pool);
+        boolean result = AI.checkPermission(objid, pool);
 
         Document jdom = new Document(new Element("mycoreaccesscheck"));
         jdom.getRootElement().addContent(new Element("accesscheck"));
         jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("return", String.valueOf(result)));
-        jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("disabled", String.valueOf(new MCRAccessManager().isDisabled())));
+        jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("disabled", String.valueOf(new MCRAccessControllSystem().isDisabled())));
 
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
 

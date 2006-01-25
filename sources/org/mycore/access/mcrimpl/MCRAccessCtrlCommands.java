@@ -24,9 +24,9 @@
 package org.mycore.access.mcrimpl;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessManagerBase;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRSessionMgr;
+
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
@@ -68,7 +68,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      *            internal database ruleid
      */
     public static void validate(String objid, String pool) {
-    	MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
-        System.out.println("current user has access: " + AI.checkAccess(objid, pool, MCRSessionMgr.getCurrentSession()));
+    	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        System.out.println("current user has access: " + AI.checkPermission(objid, pool));
     }
 }

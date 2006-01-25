@@ -47,7 +47,7 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 
-import org.mycore.access.MCRAccessManagerBase;
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -475,18 +475,18 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         // one access Element per (Object-)ID
         Element container = new Element("access").setAttribute("id", objId);
 
-        MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+        MCRAccessInterface AI = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
         
         if (action.equals("all")) {
-            Iterator it = AI.getPoolsForObject(objId).iterator();
+            Iterator it = AI.getPermissionsForID(objId).iterator();
             while (it.hasNext()) {
                 action = it.next().toString();
                 // one pool Element under access per defined AccessRule in Pool
                 // for (Object-)ID
-                addRule(container, action, AI.getAccessRule(objId, action));
+                addRule(container, action, AI.getRule(objId, action));
             }
         } else {
-            addRule(container, action, AI.getAccessRule(objId, action));
+            addRule(container, action, AI.getRule(objId, action));
         }
 
         return container;

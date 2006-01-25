@@ -25,7 +25,7 @@
 package org.mycore.access;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -41,9 +41,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
-
-    // the access interface
-    private MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
 
     /**
      * This method will be used to create the access rules for SWF for a
@@ -63,7 +60,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPool();
-            AI.addRule(obj.getId(), pool, conditions);
+            MCRAccessManager.addRule(obj.getId(), pool, conditions);
             // obj.getService().removeRule(i);
         }
 
@@ -91,7 +88,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPool();
-            AI.updateRule(obj.getId(), pool, conditions);
+            MCRAccessManager.updateRule(obj.getId(), pool, conditions);
             // obj.getService().removeRule(i);
         }
 
@@ -115,7 +112,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // delete
-        AI.removeAllRules(obj.getId());
+        MCRAccessManager.removeAllRules(obj.getId());
 
         // save the stop time
         long t2 = System.currentTimeMillis();

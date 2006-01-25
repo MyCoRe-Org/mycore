@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.mycore.access.mcrimpl.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControllSystem;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
