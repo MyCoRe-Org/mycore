@@ -485,10 +485,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 action = it.next().toString();
                 // one pool Element under access per defined AccessRule in Pool
                 // for (Object-)ID
-                addRule(container, action, AI.getAccessRule(action, objId));
+                addRule(container, action, AI.getAccessRule(objId, action));
             }
         } else {
-            addRule(container, action, AI.getAccessRule(action, objId));
+            addRule(container, action, AI.getAccessRule(objId, action));
         }
 
         return container;

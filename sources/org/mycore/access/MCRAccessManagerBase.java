@@ -23,14 +23,7 @@
 
 package org.mycore.access;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -304,7 +297,7 @@ public class MCRAccessManagerBase {
 
      * @return the rule tree as jdom element
      */    
-    public Element getAccessRule(String pool, String objID) {
+    public Element getAccessRule(String objID, String pool) {
     	return null;
     }
     
