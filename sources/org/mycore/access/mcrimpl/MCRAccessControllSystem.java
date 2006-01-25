@@ -41,6 +41,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 
@@ -136,8 +137,13 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
 		}
 		return;    	
 	}	
-	
-    public boolean checkAccess(String id, String pool, MCRSession session) {
+
+    public boolean checkPermission(String id, String pool) {
+    	MCRSession session = MCRSessionMgr.getCurrentSession();
+    	return checkPermission(id, pool, session);
+    }	
+    
+    public boolean checkPermission(String id, String pool, MCRSession session) {
         MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
         MCRIPAddress ip;
 
