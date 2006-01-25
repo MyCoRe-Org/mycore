@@ -477,16 +477,18 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         // one access Element per (Object-)ID
         Element container = new Element("access").setAttribute("id", objId);
 
+        MCRAccessManagerBase AI = (MCRAccessManagerBase) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name");
+        
         if (action.equals("all")) {
             Iterator it = MCRAccessStore.getPools().iterator();
             while (it.hasNext()) {
                 action = it.next().toString();
                 // one pool Element under access per defined AccessRule in Pool
                 // for (Object-)ID
-                addRule(container, action, MCRAccessManagerBase.instance().getAccessRule(action, objId));
+                addRule(container, action, AI.getAccessRule(action, objId));
             }
         } else {
-            addRule(container, action, MCRAccessManagerBase.instance().getAccessRule(action, objId));
+            addRule(container, action, AI.getAccessRule(action, objId));
         }
 
         return container;
