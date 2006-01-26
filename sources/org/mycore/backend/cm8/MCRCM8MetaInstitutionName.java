@@ -64,10 +64,10 @@ public class MCRCM8MetaInstitutionName implements DKConstantICM, MCRCM8MetaInter
      */
     public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException {
         Logger logger = MCRCM8ConnectionPool.getLogger();
-        String subtagname = prefix + (String) element.getAttribute("name").getValue();
+        String subtagname = prefix + element.getAttribute("name").getValue();
 
         // String length
-        String subtaglen = (String) element.getAttribute("length").getValue();
+        String subtaglen = element.getAttribute("length").getValue();
         int len = MCRMetaDefault.DEFAULT_STRING_LENGTH;
 
         try {

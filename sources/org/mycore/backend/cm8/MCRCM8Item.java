@@ -25,7 +25,6 @@ package org.mycore.backend.cm8;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 
 import com.ibm.mm.sdk.common.DKChildCollection;
@@ -52,8 +51,6 @@ final class MCRCM8Item implements DKConstantICM {
 
     private String itemtypename = "";
 
-    private Logger logger = null;
-
     /**
      * Constructor for a new Item with given CM connection.
      * 
@@ -65,7 +62,6 @@ final class MCRCM8Item implements DKConstantICM {
      *                Exceptions of CM
      */
     MCRCM8Item(DKDatastoreICM connection, String itemtypename) throws DKException, Exception {
-        logger = MCRCM8ConnectionPool.getLogger();
         ddolist = new ArrayList();
         ddopath = new ArrayList();
         ddocoll = new ArrayList();
@@ -94,7 +90,6 @@ final class MCRCM8Item implements DKConstantICM {
      *                Exceptions of JDK
      */
     MCRCM8Item(String id, DKDatastoreICM connection, String itemtypename, String itemtypeprefix) throws DKException, MCRPersistenceException, Exception {
-        logger = MCRCM8ConnectionPool.getLogger();
 
         if (id == null) {
             throw new MCRPersistenceException("MCRCM8Item constructor error.");

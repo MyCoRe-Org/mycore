@@ -23,7 +23,6 @@
 
 package org.mycore.backend.cm8;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 
 import com.ibm.mm.sdk.common.DKAttrDefICM;
@@ -64,8 +63,7 @@ public class MCRCM8MetaLink implements DKConstantICM, MCRCM8MetaInterface {
      *                general Exception of MyCoRe CM8
      */
     public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException {
-        Logger logger = MCRCM8ConnectionPool.getLogger();
-        String subtagname = prefix + (String) element.getAttribute("name").getValue();
+        String subtagname = prefix + element.getAttribute("name").getValue();
         String typename = prefix + "xlinktype";
         String hrefname = prefix + "xlinkhref";
         String labelname = prefix + "xlinklabel";

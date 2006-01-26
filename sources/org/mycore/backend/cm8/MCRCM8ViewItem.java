@@ -204,7 +204,7 @@ public class MCRCM8ViewItem implements DKConstantICM {
                 dkIterator iter = col.createIterator();
 
                 while (iter.more()) {
-                    processDDO((DKDDO) iter.next(), "|  " + pre);
+                    processDDO(iter.next(), "|  " + pre);
                 }
             }
 
@@ -215,7 +215,7 @@ public class MCRCM8ViewItem implements DKConstantICM {
                 dkIterator iter = col.createIterator();
 
                 while (iter.more()) {
-                    processDDO((DKDDO) iter.next(), "|  " + pre);
+                    processDDO(iter.next(), "|  " + pre);
                 }
             }
         }

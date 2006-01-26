@@ -23,19 +23,15 @@
 
 package org.mycore.backend.cm8;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import com.ibm.mm.sdk.common.DKAttrDefICM;
-import com.ibm.mm.sdk.common.DKComponentTypeDefICM;
 import com.ibm.mm.sdk.common.DKConstantICM;
 import com.ibm.mm.sdk.common.DKDatastoreDefICM;
 import com.ibm.mm.sdk.common.DKException;
@@ -53,8 +49,6 @@ import com.ibm.mm.sdk.server.DKDatastoreICM;
  * @version $Revision$ $Date$
  */
 final class MCRCM8ItemType implements DKConstantICM {
-    // internal data
-    private static final String META_PACKAGE_NAME = "org.mycore.backend.cm8.";
 
     /**
      * The constructor of this class.
@@ -150,7 +144,7 @@ final class MCRCM8ItemType implements DKConstantICM {
                 item_type.addAttr(attr);
 
                 // get the configuration JDOM root element
-                org.jdom.Element mcr_root = mcr_conf.getRootElement();
+                //org.jdom.Element mcr_root = mcr_conf.getRootElement();
 
                 // set config element offset to structure
 //                org.jdom.Element mcr_structure = mcr_root.getChild("structure");
@@ -228,7 +222,7 @@ final class MCRCM8ItemType implements DKConstantICM {
 //                }
 
                 // set config element offset to metadata
-                org.jdom.Element mcr_metadata = mcr_root.getChild("metadata");
+                // org.jdom.Element mcr_metadata = mcr_root.getChild("metadata");
 
 //                if (mcr_metadata != null) {
 //                    DKComponentTypeDefICM item_metadata = new DKComponentTypeDefICM(connection);

@@ -23,7 +23,6 @@
 
 package org.mycore.backend.cm8;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRMetaNumber;
 
@@ -64,8 +63,7 @@ public class MCRCM8MetaNumber implements DKConstantICM, MCRCM8MetaInterface {
      *                general Exception of MyCoRe
      */
     public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException {
-        Logger logger = MCRCM8ConnectionPool.getLogger();
-        String subtagname = prefix + (String) element.getAttribute("name").getValue();
+        String subtagname = prefix + element.getAttribute("name").getValue();
         String dimname = prefix + "dimension";
         String measname = prefix + "measurement";
 

@@ -177,8 +177,7 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
 
             MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
             String id = "";
-            int rank = 0;
-            byte[] xml = null;
+
             short dataId = 0;
 
             while (iter.more()) {
