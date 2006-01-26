@@ -156,22 +156,21 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
         return checkAccess(id, pool, user, ip);
     }	
     
-    public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule, MCRSession session) {
-    	// pool not needed?
-    	Date date = new Date();
-        MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
-        MCRIPAddress ip;
-
+    public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule) {
+    	MCRSession session = MCRSessionMgr.getCurrentSession();
+        String ruleStr = getNormalizedRuleString(rule);
+        MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
         try {
-            ip = new MCRIPAddress(session.getCurrentIP());
+            return accessRule.checkAccess(MCRUserMgr.instance().retrieveUser(session.getCurrentUserID()), new Date(), new MCRIPAddress(session.getCurrentIP()));
+        } catch (MCRException e) {
+            // only return true if access is allowed, we dont know this
+            LOGGER.debug("Error while checking rule.", e);
+            return false;
         } catch (UnknownHostException e) {
-            /* this should never happen */
-            throw new MCRException("unknown host", e);
+            // only return true if access is allowed, we dont know this
+            LOGGER.debug("Error while checking rule.", e);
+            return false;
         }
-        
-        MCRAccessRule accessRule = new MCRAccessRule(null, null, null, getNormalizedRuleString(rule), null );
-        
-        return accessRule.checkAccess(user, date, ip);
     }
 
     public Element getRule(String objID, String pool) {
