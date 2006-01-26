@@ -78,6 +78,16 @@ public interface MCRAccessInterface {
      *             if an error occured
      */
     public void removeRule(String id, String permission) throws MCRException;
+    
+    /**
+     * removes a rule for an "a priori permission" like "create-document"
+     * 
+     * @param permission
+     *            the access pool for the rule
+     * @throws MCRException
+     *             if an error occured
+     */
+    public void removeRule(String permission) throws MCRException;    
 
     /**
      * removes all rules of the <code>id</code>. The parameter

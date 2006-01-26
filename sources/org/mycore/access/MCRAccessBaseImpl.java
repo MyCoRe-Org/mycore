@@ -96,6 +96,15 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public void removeRule(String id, String pool) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl removeRule");
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String)
+     */
+    public void removeRule(String pool) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule");
+    }    
 
     /*
      * (non-Javadoc)
