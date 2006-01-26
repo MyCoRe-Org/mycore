@@ -91,7 +91,7 @@ public class MCRServlet extends HttpServlet {
 	 * Initialisation of the static values for the base URL and servlet URL of
 	 * the mycore system.
 	 */
-	private static synchronized void prepareURLs(HttpServletRequest req) throws ServletException, IOException {
+	private static synchronized void prepareURLs(HttpServletRequest req) {
 		String contextPath = req.getContextPath();
 
 		if (contextPath == null) {

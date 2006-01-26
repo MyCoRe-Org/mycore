@@ -44,8 +44,6 @@ public class MCRBooleanClauseParser {
 
     private static Pattern or = Pattern.compile("\\b[oO][rR]\\b");
 
-    private static Pattern not = Pattern.compile("\\s*\\b[nN][oO][tT]\\b\\s*");
-
     private static Pattern marker = Pattern.compile("@<([0-9]*)>@");
 
     private static String extendClauses(String s, List l) {

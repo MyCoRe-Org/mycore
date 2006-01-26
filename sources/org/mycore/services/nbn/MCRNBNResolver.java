@@ -25,7 +25,6 @@ package org.mycore.services.nbn;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +55,7 @@ public class MCRNBNResolver extends HttpServlet {
     }
 
     /** Handles HTTP GET requests to resolve a given URN */
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String path = req.getPathInfo();
         String param = req.getQueryString();
 

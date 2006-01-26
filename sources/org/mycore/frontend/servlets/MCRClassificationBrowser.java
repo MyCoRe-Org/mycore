@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.servlets;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.jdom.*;
@@ -31,7 +30,6 @@ import org.jdom.input.SAXBuilder;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import java.net.*;
 import java.io.File;
 
 /**
