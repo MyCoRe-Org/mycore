@@ -23,6 +23,7 @@
 
 package org.mycore.user;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -43,9 +44,10 @@ import org.mycore.common.MCRSessionMgr;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public class MCRUser extends MCRUserObject implements MCRPrincipal {
+public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
     protected int numID = -1;
 
@@ -640,5 +642,48 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal {
            }catch(Exception e){
                return 0;
            }
+    }
+
+    /**
+     * @see #getID()
+     */
+    public String getName() {
+        return getID();
+    }
+    
+    /**
+     * @see #getID()
+     */
+    public String toString() {
+        return getID();
+    }
+    
+    public boolean equals(Object obj){
+        if (!(obj instanceof MCRUser)){
+            return false;
+        }
+        MCRUser u=(MCRUser)obj;
+        if (this==u){
+            return true;
+        }
+        if (this.hashCode()!=this.hashCode()){
+            //acording to the hashCode() contract
+            return false;
+        }
+        return fastEquals(u);
+    }
+    
+    private boolean fastEquals(MCRUser u){
+        return (
+                ((this.getID()==u.getID()) || (this.getID().equals(u.getID()))) &&
+                ((this.getUserContact()==u.getUserContact()) || (this.getUserContact().equals(u.getUserContact())))
+               );
+    }
+    
+    public int hashCode() {
+        int result=17;
+        result=37*result+getID().hashCode();
+        result=37*result+getUserContact().hashCode();
+        return result;
     }
 }
