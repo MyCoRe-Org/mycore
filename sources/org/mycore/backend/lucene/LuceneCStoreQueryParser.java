@@ -180,7 +180,7 @@ public class LuceneCStoreQueryParser extends QueryParser {
         return queries;
     }
 
-    private final BooleanQuery bClauseToBQuery(BooleanClause clause) throws ParseException {
+    private final BooleanQuery bClauseToBQuery(BooleanClause clause) {
         BooleanQuery query = new BooleanQuery();
         query.add(clause);
 
