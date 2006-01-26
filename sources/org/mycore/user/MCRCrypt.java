@@ -148,7 +148,7 @@ public class MCRCrypt {
                     0x00208020 } };
 
     private static final int byteToUnsigned(byte b) {
-        int value = (int) b;
+        int value = b;
 
         return (value >= 0) ? value : (value + 256);
     }
@@ -352,7 +352,7 @@ public class MCRCrypt {
             key[i] = (byte) 0;
 
         for (int i = 0; (i < key.length) && (i < original.length()); i++)
-            key[i] = (byte) (((int) original.charAt(i)) << 1);
+            key[i] = (byte) (original.charAt(i) << 1);
 
         int[] schedule = des_set_key(key);
         int[] out = body(schedule, Eswap0, Eswap1);
@@ -367,7 +367,7 @@ public class MCRCrypt {
             for (int j = 0, c = 0; j < 6; j++) {
                 c <<= 1;
 
-                if (((int) b[y] & u) != 0) {
+                if ((b[y] & u) != 0) {
                     c |= 1;
                 }
 

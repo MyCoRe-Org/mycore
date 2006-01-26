@@ -230,7 +230,7 @@ public class MCRZipServlet extends MCRServlet {
         MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
         Templates templates = transformation.getStylesheet(stylesheetFullPath);
         TransformerHandler th = transformation.getTransformerHandler(templates);
-        transformation.setParameters(th, parameters);
+        MCRXSLTransformation.setParameters(th, parameters);
         transformation.transform(jdom, th, out);
         out.closeEntry();
 
@@ -247,11 +247,10 @@ public class MCRZipServlet extends MCRServlet {
      *            relative path zu a special folder, if given, only this folder
      *            is zipped
      */
-    protected void sendDerivate(String ownerID, String dirpath, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws IOException, ServletException {
+    protected void sendDerivate(String ownerID, String dirpath, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws IOException {
         MCRFilesystemNode root;
         MCRDirectory rootdirectory;
         MCRFilesystemNode zipdirectory;
-        MCRFilesystemNode[] nodeArray;
         root = MCRFilesystemNode.getRootNode(ownerID);
 
         if (root == null) {
@@ -306,7 +305,7 @@ public class MCRZipServlet extends MCRServlet {
      *            the JDOM of the given MycoreObject
      * 
      */
-    protected void sendObject(Document jdom, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws ServletException, IOException {
+    protected void sendObject(Document jdom, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws IOException {
         // zip the object's Metadata
         Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
