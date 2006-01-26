@@ -28,11 +28,13 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 import java.util.Properties;
+import java.rmi.Remote;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
+import javax.xml.rpc.*;
 
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.*;
@@ -42,6 +44,14 @@ import org.apache.log4j.Logger;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.AxisFault;
+import org.apache.axis.client.Stub;
+
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.message.token.UsernameToken;
+
+import org.apache.axis.EngineConfiguration;
+import org.apache.axis.configuration.FileProvider;
 
 /**
  * Test client for MyCoRe MCRWebService
@@ -83,33 +93,6 @@ public class MCRWebServiceClient
   
   public static void main(String args[])
   {
-/* This code can be used to build a client without MCRWebServiceServiceLocator     
-    String endpoint = "http://localhost:8080/docportal/services/MCRWebService";
-    try 
-    {
-      Service service = new Service();
-      Call    call    = (Call)service.createCall();
-      call.setTargetEndpointAddress(new URL(endpoint) );
-      call.setOperationName("MCRDoRetrieveObject");
-      String mcrid = "DocPortal_document_00410901";
-      org.w3c.dom.Document result = (org.w3c.dom.Document)call.invoke( new Object[] { mcrid } );
-
-      org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-      org.jdom.Document doc = d.build(result);
-      org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-      logger.info( outputter.outputString( doc ) );
-    }
-    catch (AxisFault ax)
-    {
-      System.out.println(ax.toString());
-      ax.dump();
-    }
-    catch (Exception ex)
-    {
-      ex.printStackTrace();
-    }
-  }
-*/  
     Properties params = new Properties();
     params.setProperty("endpoint", "http://localhost:8080/docportal/services/MCRWebService");
     params.setProperty("mcrid", "DocPortal_document_00410901");
@@ -121,13 +104,25 @@ public class MCRWebServiceClient
     System.out.println("Endpoint: " + endpoint);
     String operation = (String)params.getProperty("operation");
     System.out.println("Operation: " + operation);
+
     
+    EngineConfiguration config = new FileProvider("client_deploy.wsdd");
+    MCRWebServiceServiceLocator l = new MCRWebServiceServiceLocator(config);
     
-    MCRWebServiceServiceLocator l = new MCRWebServiceServiceLocator();
     try 
     {
       l.setMCRWebServiceEndpointAddress(endpoint);
-      MCRWebService stub          = l.getMCRWebService();
+      
+      Remote remote = l.getPort(MCRWebService.class);
+      Stub axisPort = (Stub)remote;
+      axisPort._setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+      axisPort._setProperty(UsernameToken.PASSWORD_TYPE, WSConstants.PASSWORD_DIGEST);
+      axisPort._setProperty(WSHandlerConstants.USER, "wss4j");
+      axisPort._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mycore.services.wsclient.MCRPWCallback");
+
+      //Need to cast 
+      MCRWebService stub          = (MCRWebServiceSoapBindingStub)axisPort;
+      
       if ("retrieve".equals(operation))
       {
         org.w3c.dom.Document result = stub.MCRDoRetrieveObject((String)params.getProperty("mcrid"));
