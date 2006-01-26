@@ -61,9 +61,9 @@ public class WCMSFileUploadServlet extends WCMSServlet {
 
     private String action = null;
 
-    private String documentPath = super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
+    private String documentPath = CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
 
-    private String imagePath = super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
+    private String imagePath = CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
 
     private String savePath = null;
 
@@ -105,7 +105,7 @@ public class WCMSFileUploadServlet extends WCMSServlet {
         action = request.getParameter("action");
 
         if (action.equals("upload")) {
-            fileMaxSize = super.CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
+            fileMaxSize = CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
             fileSize = request.getContentLength();
             fileContentType = request.getContentType();
 

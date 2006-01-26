@@ -58,7 +58,7 @@ public abstract class WCMSServlet extends MCRServlet {
         if (isValidUser()) {
             processRequest(job.getRequest(), job.getResponse());
         } else {
-            job.getResponse().sendRedirect(super.CONFIG.getString("MCR.WCMS.sessionError"));
+            job.getResponse().sendRedirect(CONFIG.getString("MCR.WCMS.sessionError"));
         }
     }
 
@@ -82,7 +82,7 @@ public abstract class WCMSServlet extends MCRServlet {
          */
 
         // master
-        File[] masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        File[] masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         Element master = new Element("master");
 
         for (int i = 0; i < masterTemplates.length; i++) {

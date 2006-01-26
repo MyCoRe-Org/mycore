@@ -58,7 +58,7 @@ public class WCMSAdminServlet extends WCMSServlet {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String action = request.getParameter("action");
         List rootNodes = (List) mcrSession.get("rootNodes");
-        File[] contentTemplates = new File((super.CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+        File[] contentTemplates = new File((CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
         Element rootOut = new Element("cms");
         Document jdom = new Document(rootOut);
         rootOut.addContent(new Element("session").setText(action));
@@ -111,11 +111,10 @@ public class WCMSAdminServlet extends WCMSServlet {
     public void generateXML_logs(HttpServletRequest request, Element rootOut) {
         String sort = request.getParameter("sort");
         String sortOrder = request.getParameter("sortOrder");
-        char fs = File.separatorChar;
         String error;
 
         try {
-            File logFile = new File(super.CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
+            File logFile = new File(CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
 
             if (!logFile.exists()) {
                 error = "Logfile nicht gefunden!";
@@ -140,7 +139,7 @@ public class WCMSAdminServlet extends WCMSServlet {
 
     public void generateXML_saveGlobal(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String pathToNavi = new String(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+            String pathToNavi = new String(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
             Document naviBase = new Document();
             naviBase = XMLFile2JDOM(pathToNavi);
 
@@ -161,7 +160,7 @@ public class WCMSAdminServlet extends WCMSServlet {
                 // save changed naviBase
                 NaviBaseRoot.setAttribute("template", defaultTemplateAIF);
 
-                File navigationBase = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+                File navigationBase = new File(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
                 XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
                 xmlOut.output(naviBase, new FileOutputStream(navigationBase));
             }

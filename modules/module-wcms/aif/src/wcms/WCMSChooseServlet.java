@@ -95,10 +95,7 @@ public class WCMSChooseServlet extends WCMSServlet {
     // _self}
     private String template = null; // choosen Template
 
-    private String style = null; // style of the selected element: {bold,
-
-    // normal}
-    private String dir = null; // main navigation elements like "Men? links"
+    private String style = null; // style of the selected element: {bold, normal}
 
     // have a valid dir attribute instead of a href
     // attribute
@@ -148,11 +145,11 @@ public class WCMSChooseServlet extends WCMSServlet {
             action = "false";
         }
 
-        File[] contentTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
-        File[] masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        File[] contentTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
+        File[] masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
 
-        File conTemp = new File(super.CONFIG.getString("MCR.WCMS.templatePath") + "content/".replace('/', File.separatorChar));
+        File conTemp = new File(CONFIG.getString("MCR.WCMS.templatePath") + "content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -232,7 +229,7 @@ public class WCMSChooseServlet extends WCMSServlet {
          */
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+            Document doc = builder.build(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
             Element root = doc.getRootElement();
             validate(root);
         } catch (JDOMException jdome) {
@@ -264,7 +261,7 @@ public class WCMSChooseServlet extends WCMSServlet {
                     ed = sax.build(getServletContext().getRealPath("") + fs + href);
                 } else {
                     // if (mode.equals("intern")) {
-                    ed = sax.build((super.CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar) + template);
+                    ed = sax.build((CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar) + template);
 
                     // }
                     // else return;
@@ -354,7 +351,6 @@ public class WCMSChooseServlet extends WCMSServlet {
 
                         File hrefFile = new File(getServletContext().getRealPath("") + href);
                         BufferedReader br = new BufferedReader(new FileReader(hrefFile));
-                        String test = hrefFile.toString();
 
                         validXHTML = false;
 
@@ -526,7 +522,7 @@ public class WCMSChooseServlet extends WCMSServlet {
         Element images = new Element("images");
         rootOut.addContent(images);
 
-        File imagePath = new File((super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
+        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
 
         if (!imagePath.exists()) {
             imagePath.mkdirs();
@@ -540,12 +536,12 @@ public class WCMSChooseServlet extends WCMSServlet {
             }
         }
 
-        rootOut.addContent(new Element("imagePath").setText(super.CONFIG.getString("MCR.WCMS.imagePath").substring(super.CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
+        rootOut.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
 
         Element documents = new Element("documents");
         rootOut.addContent(documents);
 
-        File documentPath = new File((super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
+        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
 
         if (!documentPath.exists()) {
             documentPath.mkdirs();
@@ -559,7 +555,7 @@ public class WCMSChooseServlet extends WCMSServlet {
             }
         }
 
-        rootOut.addContent(new Element("documentPath").setText(super.CONFIG.getString("MCR.WCMS.documentPath").substring(super.CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+        rootOut.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
 
         Element master = new Element("master");
 

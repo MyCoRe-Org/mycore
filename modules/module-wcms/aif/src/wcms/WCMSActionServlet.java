@@ -51,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -179,7 +178,7 @@ public class WCMSActionServlet extends WCMSServlet {
 
     private String addAtPosition = null;
 
-    private File naviFile = new File(super.CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+    private File naviFile = new File(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 
     private HttpServletRequest request;
 
@@ -210,7 +209,7 @@ public class WCMSActionServlet extends WCMSServlet {
      * @param response
      *            servlet response
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         mcrSession = MCRSessionMgr.getCurrentSession();
         setReq(request);
         setResp(response);
@@ -227,7 +226,6 @@ public class WCMSActionServlet extends WCMSServlet {
     public void generateOutput(String error, String label, String fileName) {
         try {
             // MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-            SAXBuilder builder = new SAXBuilder();
             Document doc = getXMLAsJDOM(naviFile);
 
             // Document doc = builder.build(naviFile);
@@ -258,7 +256,7 @@ public class WCMSActionServlet extends WCMSServlet {
             }
 
             if (action.equals("delete")) {
-                File[] contentTemplates = new File((super.CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+                File[] contentTemplates = new File((CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
 
@@ -276,18 +274,18 @@ public class WCMSActionServlet extends WCMSServlet {
 
                 Element images = new Element("images");
                 rootOut.addContent(images);
-                imageList = (new File(super.CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
+                imageList = (new File(CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
 
                 for (int i = 0; i < imageList.length; i++) {
-                    images.addContent(new Element("image").setText(super.CONFIG.getString("MCR.WCMS.imagePath") + imageList[i]));
+                    images.addContent(new Element("image").setText(CONFIG.getString("MCR.WCMS.imagePath") + imageList[i]));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
-                documentList = (new File(super.CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
+                documentList = (new File(CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
 
                 for (int i = 0; i < documentList.length; i++) {
-                    documents.addContent(new Element("document").setText(super.CONFIG.getString("MCR.WCMS.imagePath") + documentList[i]));
+                    documents.addContent(new Element("document").setText(CONFIG.getString("MCR.WCMS.imagePath") + documentList[i]));
                 }
 
                 Element templates = new Element("templates");
@@ -393,21 +391,11 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void updateFooterFile() {
         try {
-            File footer = new File(super.CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
-            SAXBuilder builder = new SAXBuilder();
+            File footer = new File(CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             Document doc = new Document();
 
-            if (!footer.exists()) {
-                footer.getParentFile().mkdirs();
-                doc = getXMLAsJDOM(footer);
-
-                Element root = doc.getRootElement();
-
-                // System.out.println("Footer gibts noch nicht.");
-            } else {
-                doc = getXMLAsJDOM(footer);
-            }
-
+            if (!footer.exists()) footer.getParentFile().mkdirs();
+            doc = getXMLAsJDOM(footer);
             Element root = doc.getRootElement();
             root.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName);
             writeJDOMDocumentToFile(doc, footer);
@@ -426,7 +414,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void addLastModifiedToContent(File hrefFile) {
         try {
-            SAXBuilder builder = new SAXBuilder();
             Document doc = getXMLAsJDOM(hrefFile);
             Element root = doc.getRootElement();
 
@@ -458,8 +445,7 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void writeToLogFile(String action, String contentFileBackup) {
         try {
-            File logFile = new File(super.CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
-            SAXBuilder builder = new SAXBuilder();
+            File logFile = new File(CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
             Document doc;
 
             if (!logFile.exists()) {
@@ -601,9 +587,9 @@ public class WCMSActionServlet extends WCMSServlet {
         File backupFile = null;
 
         if (inputFile.toString().endsWith(fs + "navigation.xml")) {
-            backupFile = new File(super.CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs + "navi" + fs + "navigation.xml");
+            backupFile = new File(CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs + "navi" + fs + "navigation.xml");
         } else {
-            backupFile = new File(super.CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + href.replace('/', File.separatorChar));
+            backupFile = new File(CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + href.replace('/', File.separatorChar));
         }
 
         if (inputFile.exists()) {
@@ -643,7 +629,6 @@ public class WCMSActionServlet extends WCMSServlet {
     public void modifyNavi(File inputFile) {
         if (action.equals("add")) {
             try {
-                SAXBuilder builder = new SAXBuilder();
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
@@ -704,7 +689,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
         if (action.equals("edit")) {
             try {
-                SAXBuilder builder = new SAXBuilder();
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
@@ -798,7 +782,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
         if (action.equals("delete")) {
             try {
-                SAXBuilder builder = new SAXBuilder();
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
@@ -819,7 +802,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
         if (action.equals("translate")) {
             try {
-                SAXBuilder builder = new SAXBuilder();
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
                 validate(root);
@@ -854,7 +836,7 @@ public class WCMSActionServlet extends WCMSServlet {
         }
     }
 
-    public boolean validXHTML(File htmlFile) throws IOException {
+    public boolean validXHTML(File htmlFile) {
         boolean validXHTML = true;
 
         /* just to be implemented */
@@ -870,7 +852,6 @@ public class WCMSActionServlet extends WCMSServlet {
         String reval = "";
 
         try {
-            SAXBuilder builder = new SAXBuilder();
             Document doc = getXMLAsJDOM(inputFile);
             Element root = doc.getRootElement();
             validate(root);
@@ -899,7 +880,7 @@ public class WCMSActionServlet extends WCMSServlet {
      * @param action
      * @throws IOException
      */
-    public void makeAction(String action) throws IOException {
+    public void makeAction(String action) {
         try {
             // /////////////////////////////////////////////////////////////////////////////////////////////
             // prepare content as sdom document
@@ -1103,7 +1084,7 @@ public class WCMSActionServlet extends WCMSServlet {
         return true;
     }
 
-    public void doItAll(File hrefFile, String action, String mode, String addAtPosition) throws IOException {
+    public void doItAll(File hrefFile, String action, String mode, String addAtPosition) {
         // verify if html form was filled in correctly
         if ((checkInput()) == false) {
             sessionParam = "action";
@@ -1541,7 +1522,7 @@ public class WCMSActionServlet extends WCMSServlet {
         hrefFile = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(super.CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         userID = (String) mcrSession.get("userID");
         userClass = (String) mcrSession.get("userClass");
         userRealName = (String) mcrSession.get("userRealName");
