@@ -253,7 +253,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // write to the log file
         for (int i = 0; i < logtext.size(); i++) {
-            LOGGER.error((String) logtext.get(i));
+            LOGGER.error(logtext.get(i));
         }
 
         // prepare editor with error messages

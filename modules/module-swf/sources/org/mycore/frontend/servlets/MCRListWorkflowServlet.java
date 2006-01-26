@@ -25,7 +25,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -249,7 +248,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             // LOGGER.debug("The data ID is "+ID);
             try {
                 for (int j = 0; j < derifiles.size(); j++) {
-                    if (ID.equals((String) derobjid.get(j))) {
+                    if (ID.equals(derobjid.get(j))) {
                         dername = (String) derifiles.get(j);
                         LOGGER.debug("Check the derivate file " + dername);
 
@@ -273,7 +272,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                                 File thisfile = new File(dir, (String) dirlist.get(k));
                                 file.setAttribute("size", String.valueOf(thisfile.length()));
 
-                                if (mainfile.equals((String) dirlist.get(k))) {
+                                if (mainfile.equals(dirlist.get(k))) {
                                     file.setAttribute("main", "true");
                                 } else {
                                     file.setAttribute("main", "false");

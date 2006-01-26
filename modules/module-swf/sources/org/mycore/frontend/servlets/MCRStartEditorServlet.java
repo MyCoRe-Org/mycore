@@ -30,13 +30,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -314,7 +311,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 		String mytfmcrid = getProperty(job.getRequest(), "tf_mcrid");
 
 		try {
-			MCRObjectID testid = new MCRObjectID(mytfmcrid);
+			new MCRObjectID(mytfmcrid);
 		} catch (Exception e) {
 			mytfmcrid = "";
 		}
@@ -367,7 +364,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			mysemcrid = "";
 		} else {
 			try {
-				MCRObjectID testid = new MCRObjectID(mysemcrid);
+				new MCRObjectID(mysemcrid);
 			} catch (Exception e) {
 				mysemcrid = "";
 			}
@@ -382,7 +379,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			myremcrid = "";
 		} else {
 			try {
-				MCRObjectID testid = new MCRObjectID(myremcrid);
+				new MCRObjectID(myremcrid);
 			} catch (Exception e) {
 				myremcrid = "";
 			}
@@ -409,13 +406,11 @@ public class MCRStartEditorServlet extends MCRServlet {
 
 		String myfile = sb.toString();
 		String cancelpage = pagedir + CONFIG.getString("MCR.editor_page_cancel", "editor_cancel.xml");
-		String commitpage = pagedir + CONFIG.getString("MCR.editor_page_commit", "editor_loaded.xml");
 		String deletepage = pagedir + CONFIG.getString("MCR.editor_page_delete", "editor_delete.xml");
 		String usererrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
 		String mcriderrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_mcrid", "editor_error_mcrid.xml");
 		String storeerrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml");
 		String deleteerrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_delete", "editor_error_delete.xml");
-		String mymcrid = "";
 
 		// action WNEWOBJ - create a new object
 		if (mytodo.equals("wnewobj")) {
@@ -472,12 +467,10 @@ public class MCRStartEditorServlet extends MCRServlet {
 				return;
 			}
 
-			mymcrid = mysemcrid;
 			sb = new StringBuffer(pagedir);
 			sb.append("editor_").append(mytype).append("_editor.xml");
 
 			String fuhid = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", getBaseURL() + sb.toString()).getID();
-			mymcrid = mysemcrid;
 			myfile = pagedir + "fileupload_new.xml";
 
 			String base = getBaseURL() + myfile;
@@ -540,7 +533,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			sb = new StringBuffer(pagedir);
 			sb.append("editor_").append(mytype).append("_editor.xml");
 
-			MCRObjectID mid = new MCRObjectID(mysemcrid);
+			new MCRObjectID(mysemcrid);
 			WFM.deleteMetadataObject(mytype, mysemcrid);
 
 			List addr = WFM.getMailAddress(mytype, "wdelobj");
@@ -582,7 +575,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			sb = new StringBuffer(pagedir);
 			sb.append("editor_").append(mytype).append("_editor.xml");
 
-			MCRObjectID mid = new MCRObjectID(mysemcrid);
+			new MCRObjectID(mysemcrid);
 			WFM.deleteDerivateObject(mytype, mysemcrid);
 
 			List addr = WFM.getMailAddress(mytype, "wdelder");
@@ -769,7 +762,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			}
 
 			int all = 0;
-			int the = 0;
+
 			int i = extparm.indexOf("####nrall####");
 			int j = 0;
 
@@ -782,7 +775,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
 			if (i != -1) {
 				j = extparm.indexOf("####", i + 13);
-				the = Integer.parseInt(extparm.substring(i + 13, j));
+				Integer.parseInt(extparm.substring(i + 13, j));
 			}
 
 			if (all > 1) {
@@ -974,14 +967,12 @@ public class MCRStartEditorServlet extends MCRServlet {
 				return;
 			}
 
-			mymcrid = mysemcrid;
 			sb = new StringBuffer(getBaseURL());
 			sb.append("servlets/MCRStartEditorServlet?").append("se_mcrid=").append(mysemcrid).append("&re_mcrid=").append(myremcrid).append("&type=").append(
 					mytype).append("&step=").append(mystep).append("&todo=scommitder");
 
 			MCRUploadHandlerMyCoRe fuh = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", sb.toString());
 			String fuhid = fuh.getID();
-			mymcrid = mysemcrid;
 			myfile = pagedir + "fileupload_commit.xml";
 
 			String base = getBaseURL() + myfile;
@@ -1164,7 +1155,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 			}
 
 			int all = 0;
-			int the = 0;
+
 			int i = extparm.indexOf("####nrall####");
 			int j = 0;
 
@@ -1177,7 +1168,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
 			if (i != -1) {
 				j = extparm.indexOf("####", i + 13);
-				the = Integer.parseInt(extparm.substring(i + 13, j));
+				Integer.parseInt(extparm.substring(i + 13, j));
 			}
 
 			if (all > 1) {
@@ -1345,7 +1336,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 						return true;
 					}
 
-					if (memberGroupIDsOfPrimaryGroup.contains((String) allCurrentUserGroupIDs.get(j))) {
+					if (memberGroupIDsOfPrimaryGroup.contains(allCurrentUserGroupIDs.get(j))) {
 						return true;
 					}
 				}

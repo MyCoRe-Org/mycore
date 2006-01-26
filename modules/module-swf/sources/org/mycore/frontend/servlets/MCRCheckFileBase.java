@@ -68,7 +68,6 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom.Document indoc = sub.getXML();
         List files = sub.getFiles();
 
         // read the parameter
@@ -116,7 +115,6 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         String dirname = workdir + NL + se_mcrid;
 
         // save the files
-        File dir = new File(dirname);
         ArrayList ffname = new ArrayList();
         String mainfile = "";
 
