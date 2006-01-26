@@ -53,6 +53,18 @@ public interface MCRAccessInterface {
      *             if an error occured
      */
     public void addRule(String id, String permission, org.jdom.Element rule) throws MCRException;
+    
+    /**
+     * adds an access rule for an "a priori-permission" like "create-document"
+     * 
+     * @param permission
+     *            the access pool for the rule (e.g. "create-document")
+     * @param rule
+     *            the access rule
+     * @throws MCRException
+     *             if an error occured
+     */
+    public void addRule(String permission, org.jdom.Element rule) throws MCRException;    
 
     /**
      * removes a rule. The parameter <code>id</code> serves as an identifier
@@ -94,6 +106,19 @@ public interface MCRAccessInterface {
      *             if an errow was occured
      */
     public void updateRule(String id, String permission, Element rule) throws MCRException;
+    
+    /**
+     * updates an access rule for an "a priori permission" 
+     * of an access system like "create-document".
+     * 
+     * @param permission
+     *            the access pool for the rule
+     * @param rule
+     *            the access rule
+     * @throws MCRException
+     *             if an errow was occured
+     */
+    public void updateRule(String permission, Element rule) throws MCRException;    
 
     /**
      * determines whether the current user has the permission to perform a
@@ -118,6 +143,28 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSession
      */
     public boolean checkPermission(String id, String permission);
+    
+    /**
+     * determines whether the current user has the permission to perform a
+     * certain action.
+     * 
+     * All information regarding the current user is capsulated by a
+     * <code>MCRSession</code> instance which can be retrieved by
+     * 
+     * <pre>
+     * MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+     * </pre>
+     * 
+     * This method is used for checking "a priori permissions" like "create-document"
+     *     where a String ID does not exist yet
+     * 
+     * @param permission
+     *            the permission/action to be granted, e.g. "create-document"
+     * @return true if the permission is granted, else false
+     * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
+     * @see org.mycore.common.MCRSession
+     */
+    public boolean checkPermission(String permission);    
 
     /**
      * exports a access rule as JDOM element.

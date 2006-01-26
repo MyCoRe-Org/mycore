@@ -55,9 +55,9 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     }
 
     /**
-     * The method return a singleton instance of MCRAccessManagerBase.
+     * The method return a singleton instance of MCRAccessInterface.
      * 
-     * @return a singleton instance of MCRAccessManagerBase
+     * @return a singleton instance of MCRAccessInterface
      */
     public static synchronized MCRAccessInterface instance() {
         if (SINGLETON == null) {
@@ -74,8 +74,18 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, org.jdom.Element)
      */
     public void addRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        LOGGER.debug("Execute MCRAccessManagerBase addRule");
+        LOGGER.debug("Execute MCRAccessBaseImpl addRule");
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
+     *      org.jdom.Element)
+     */    
+	public void addRule(String permission, Element rule) throws MCRException {
+		LOGGER.debug("Execute MCRAccessBaseImpl addRule");
+	}    
 
     /*
      * (non-Javadoc)
@@ -84,7 +94,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String)
      */
     public void removeRule(String id, String pool) throws MCRException {
-        LOGGER.debug("Execute MCRAccessManagerBase removeRule");
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule");
     }
 
     /*
@@ -93,7 +103,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#removeAllRules(java.lang.String)
      */
     public void removeAllRules(String id) throws MCRException {
-        LOGGER.debug("Execute MCRAccessManagerBase removeAllRules");
+        LOGGER.debug("Execute MCRAccessBaseImpl removeAllRules");
     }
 
     /*
@@ -103,8 +113,18 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, org.jdom.Element)
      */
     public void updateRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        LOGGER.debug("Execute MCRAccessManagerBase updateRule");
+        LOGGER.debug("Execute MCRAccessBaseImpl updateRule");
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
+     *      org.jdom.Element)
+     */    
+	public void updateRule(String permission, Element rule) throws MCRException {
+		LOGGER.debug("Execute MCRAccessBaseImpl updateRule");
+	}    
 
     /*
      * (non-Javadoc)
@@ -115,6 +135,15 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public boolean checkPermission(String id, String pool) {
         return true;
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String)
+     */    
+	public boolean checkPermission(String permission) {
+		return true;
+	}    
 
     /*
      * (non-Javadoc)
