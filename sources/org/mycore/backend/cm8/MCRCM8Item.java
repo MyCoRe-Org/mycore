@@ -118,7 +118,7 @@ final class MCRCM8Item implements DKConstantICM {
             throw new MCRPersistenceException("There is no item in Item Type " + itemtypename + " that matches the MCRObjectID (" + id + ")");
         }
 
-        ddolist.set(0, (DKDDO) iter.next());
+        ddolist.set(0, iter.next());
 
         for (int i = 1; i < ddolist.size(); i++) {
             ddolist.remove(i);

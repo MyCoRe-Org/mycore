@@ -195,7 +195,7 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
         }
 
         for (Iterator it = idmeta.iterator(); it.hasNext();) {
-            logger.debug("IDMETA = " + ((String) ((MCRObjectID) it.next()).getId()));
+            logger.debug("IDMETA = " + ((MCRObjectID) it.next()).getId());
         }
 
         return idmeta;

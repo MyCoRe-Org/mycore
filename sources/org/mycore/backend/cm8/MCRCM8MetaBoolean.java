@@ -64,7 +64,7 @@ public class MCRCM8MetaBoolean implements DKConstantICM, MCRCM8MetaInterface {
      */
     public DKComponentTypeDefICM createItemType(org.jdom.Element element, DKDatastoreICM connection, DKDatastoreDefICM dsDefICM, String prefix, DKTextIndexDefICM textindex, String textsearch) throws MCRPersistenceException {
         Logger logger = MCRCM8ConnectionPool.getLogger();
-        String subtagname = prefix + (String) element.getAttribute("name").getValue();
+        String subtagname = prefix + element.getAttribute("name").getValue();
 
         DKComponentTypeDefICM lt = new DKComponentTypeDefICM(connection);
 
