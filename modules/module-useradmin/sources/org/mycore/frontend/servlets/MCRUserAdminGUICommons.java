@@ -104,7 +104,7 @@ public class MCRUserAdminGUICommons extends MCRServlet {
      * @param job
      *            The MCRServletJob instance
      */
-    protected void showNoPrivsPage(MCRServletJob job) throws IOException, ServletException {
+    protected void showNoPrivsPage(MCRServletJob job) throws IOException {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + noPrivsPage));
 
         return;
@@ -117,7 +117,7 @@ public class MCRUserAdminGUICommons extends MCRServlet {
      * @param job
      *            The MCRServletJob instance
      */
-    protected void showOkPage(MCRServletJob job) throws IOException, ServletException {
+    protected void showOkPage(MCRServletJob job) throws IOException {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + okPage));
 
         return;

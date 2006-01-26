@@ -140,7 +140,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough privileges for this use case!";
-                job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+                job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
 
                 return;
             }

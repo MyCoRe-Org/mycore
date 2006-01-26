@@ -23,7 +23,6 @@
 
 package wcms.util;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -32,7 +31,7 @@ public class HashCipher {
     public HashCipher() {
     }
 
-    public static final void main(String[] args) throws IOException, NoSuchAlgorithmException, ArrayIndexOutOfBoundsException {
+    public static final void main(String[] args) throws ArrayIndexOutOfBoundsException {
         try {
             // System.out.println(crypt(args[0]));
         } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -43,7 +42,7 @@ public class HashCipher {
         }
     }
 
-    public static String crypt(String string) throws IOException, NoSuchAlgorithmException {
+    public static String crypt(String string) throws NoSuchAlgorithmException {
         byte[] buffer = new byte[12];
 
         // DigestInputStream dis = new DigestInputStream(new

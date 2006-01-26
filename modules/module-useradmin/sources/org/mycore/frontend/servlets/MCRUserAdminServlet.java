@@ -30,7 +30,6 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.user.MCRUserMgr;
@@ -47,10 +46,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRUserAdminServlet.class);
-
-    private static String SLASH = System.getProperty("file.separator");
 
     /** Initialisation of the servlet */
     public void init() throws ServletException {
@@ -71,7 +66,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String currentUserID = mcrSession.getCurrentUserID();
         ArrayList currentPrivs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(currentUserID);
@@ -107,7 +102,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void createUser(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void createUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
         // We first check the privileges for this use case
         if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("create user")) {
             showNoPrivsPage(job);
@@ -138,7 +133,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void listallUser(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void listallUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
         // We first check the privileges for this use case
         if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("list all users")) {
             showNoPrivsPage(job);
@@ -156,7 +151,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
     /**
      * This method is still experimental !
      */
-    private void modifyUser(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void modifyUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
         // We first check the privileges for this use case
         if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("modify user")) {
             showNoPrivsPage(job);

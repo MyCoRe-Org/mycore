@@ -24,13 +24,11 @@
 package wcms;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,8 +42,6 @@ import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 
 public class WCMSGetStaticHTMLServlet extends WCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE; // xml Namespace for the
@@ -65,10 +61,6 @@ public class WCMSGetStaticHTMLServlet extends WCMSServlet {
 
     List contentOutput;
 
-    private String currentLang = null; //
-
-    private String defaultLang = null; //
-
     boolean validXHTML = true;
 
     /**
@@ -80,8 +72,7 @@ public class WCMSGetStaticHTMLServlet extends WCMSServlet {
      * @param response
      *            servlet response
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         href = request.getParameter("href");
         lang = request.getParameter("lang");
         contentOutput = new Vector();

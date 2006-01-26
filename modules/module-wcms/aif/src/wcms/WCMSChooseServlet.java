@@ -64,8 +64,6 @@ public class WCMSChooseServlet extends WCMSServlet {
 
     private String defaultLang = null; //
 
-    private String error = null;
-
     private String contentError = null;
 
     private String href = null; // representing the href(dir) attribute of the
@@ -153,7 +151,6 @@ public class WCMSChooseServlet extends WCMSServlet {
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
-        error = null;
         contentError = null;
 
         /* get languages */
@@ -347,7 +344,7 @@ public class WCMSChooseServlet extends WCMSServlet {
             } catch (JDOMException je) {
                 try {
                     if (!mode.equals("extern")) {
-                        error = "Error: " + getServletContext().getRealPath("") + href.replace('/', File.separatorChar) + " is no valid XHTML file.";
+                        // "Error: " + getServletContext().getRealPath("") + href.replace('/', File.separatorChar) + " is no valid XHTML file.";
 
                         File hrefFile = new File(getServletContext().getRealPath("") + href);
                         BufferedReader br = new BufferedReader(new FileReader(hrefFile));

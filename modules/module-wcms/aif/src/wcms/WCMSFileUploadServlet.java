@@ -29,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Dictionary;
-import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -45,15 +44,11 @@ import org.mycore.common.MCRSessionMgr;
 public class WCMSFileUploadServlet extends WCMSServlet {
     char fs = File.separatorChar;
 
-    private static Set props = null;
-
     private String fileName;
 
     private String filePath;
 
     private String contentType;
-
-    private String fileContentType;
 
     private String error;
 
@@ -107,7 +102,6 @@ public class WCMSFileUploadServlet extends WCMSServlet {
         if (action.equals("upload")) {
             fileMaxSize = CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
             fileSize = request.getContentLength();
-            fileContentType = request.getContentType();
 
             if (fileSize == 0) {
                 status = "failed";
