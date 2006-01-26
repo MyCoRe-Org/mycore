@@ -85,90 +85,36 @@ public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
 
     // repository independent settings which are used for all repositories
-    private static final String STR_OAI_ADMIN_EMAIL = "MCR.oai.adminemail"; // EMail
+    
+    private static final String STR_OAI_ADMIN_EMAIL = "MCR.oai.adminemail"; 
+    // EMail address of oai admin repository specific settings. Should be followed by 
+    // Servletname so the OAI client may decide which settings belong to itself.
+    
+    private static final String STR_OAI_REPOSITORY_NAME = "MCR.oai.repositoryname"; 
+    // Name of the repository
+    
+    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; 
+    // Identifier of the repository
+    
+    private static final String STR_OAI_FRIENDS = "MCR.oai.friends"; 
+    // a colon (:) separated list of other OAI repsoitories (friends)
+    
+    private static final String STR_OAI_QUERYSERVICE = "MCR.oai.queryservice"; 
+    // implementing class of MCROAIQuery
 
-    // address
-    // of
-    // oai
-    // admin
-    // repository specific settings. Should be followed by .Servletname so the
-    // OAI client
-    // may decide which settings belong to itself.
-    private static final String STR_OAI_REPOSITORY_NAME = "MCR.oai.repositoryname"; // Name
+    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.oai.resumptiontoken.dir"; 
+    // temporary Directory
+    
+    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.oai.resumptiontoken.timeout"; 
+    // timeout, after which a resumption token will be deleted
+    
+    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; 
+    // maximum number of returned list sets
 
-    // of
-    // the
-    // repository
-    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier
-
-    // of
-    // the
-    // repository
-    private static final String STR_OAI_FRIENDS = "MCR.oai.friends"; // a
-                                                                        // colon
-
-    // (:)
-    // separated
-    // list of
-    // other
-    // OAI
-    // repsoitories
-    // (friends)
-    private static final String STR_OAI_QUERYSERVICE = "MCR.oai.queryservice"; // implementing
-
-    // class
-    // of
-    // MCROAIQuery
-    private static final String STR_OAI_SETSCHEME = "MCR.oai.setscheme"; // the
-
-    // classification
-    // id
-    // which
-    // serves
-    // as
-    // scheme
-    // for
-    // the
-    // OAI
-    // set
-    // structure
-    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.oai.resumptiontoken.dir"; // temporary
-
-    // Directory
-    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.oai.resumptiontoken.timeout"; // timeout,
-
-    // after
-    // which
-    // a
-    // resumption
-    // token
-    // will
-    // be
-    // deleted
-    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; // maximum
-
-    // number
-    // of
-    // returned
-    // list
-    // sets
-    private static final String STR_OAI_RESTRICTION_CLASSIFICATION = "MCR.oai.restriction.classification"; // Classification
-
-    // and...
-    private static final String STR_OAI_RESTRICTION_CATEGORY = "MCR.oai.restriction.category"; // ...Category
-
-    // to
-    // restrict
-    // the
-    // access
-    // to
     private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.oai.metadata.transformer";
 
-    private static final String STR_STANDARD_TRANSFORMER = "oai_dc";
-
     // If there are other metadata formats available, all need a namespace and
-    // schema entry
-    // of it's own, e.g.
+    // schema entry of it's own, e.g.
     // MCR.oai.metadata.namespace.olac=http://www.language-archives.org/OLAC/0.2/
     // MCR.oai.metadata.schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
     private static final String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace";
@@ -256,7 +202,7 @@ public class MCROAIDataProvider extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         processRequest(request, response);
     }
 
@@ -270,7 +216,7 @@ public class MCROAIDataProvider extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         processRequest(request, response);
     }
 
@@ -285,7 +231,7 @@ public class MCROAIDataProvider extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml; charset=UTF-8");
 
         // Exceptions must be caught...
@@ -1863,7 +1809,7 @@ public class MCROAIDataProvider extends HttpServlet {
                     String propertyKey = (String) enumeration.nextElement();
                     String value = mappingProperties.getProperty(propertyKey);
                     StringTokenizer tokenizer = new StringTokenizer(value, " ");
-                    String shortKey = ((String) propertyKey).substring(STR_OAI_CATEGORY_MAPPING.length() + 1).replace('.', ':');
+                    String shortKey = propertyKey.substring(STR_OAI_CATEGORY_MAPPING.length() + 1).replace('.', ':');
 
                     while (tokenizer.hasMoreTokens()) {
                         String token = tokenizer.nextToken();

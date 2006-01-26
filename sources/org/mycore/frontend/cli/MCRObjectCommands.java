@@ -26,7 +26,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import javax.xml.transform.Transformer;
@@ -461,7 +460,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 FileOutputStream out = new FileOutputStream(xmlOutput);
 
                 if (trans != null) {
-                    StreamResult sr = new StreamResult((OutputStream) out);
+                    StreamResult sr = new StreamResult(out);
                     trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
                 } else {
                     out.write(xml);

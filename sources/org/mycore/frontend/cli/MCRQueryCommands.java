@@ -24,7 +24,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -190,7 +189,7 @@ final class MCRQueryCommands extends MCRAbstractCommands {
             StreamSource source = new StreamSource(in);
             TransformerFactory transfakt = TransformerFactory.newInstance();
             Transformer trans = transfakt.newTransformer(source);
-            StreamResult sr = new StreamResult((OutputStream) System.out);
+            StreamResult sr = new StreamResult(System.out);
             trans.transform(new JDOMSource(resarray.exportAllToDocument()), sr);
         } catch (Exception ex) {
             LOGGER.error("Error while tranforming query result XML using XSLT");

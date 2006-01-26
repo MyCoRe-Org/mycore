@@ -36,21 +36,15 @@ import org.mycore.common.xml.MCRXMLContainer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRQueryAgent {
-    private int nThreads;
-
     private PoolWorker[] threads;
 
     private LinkedList queue;
 
-    private MCRConfiguration conf;
-
     private static int vec_max_length;
 
     public MCRQueryAgent(int nThreads, MCRConfiguration conf) {
-        this.nThreads = nThreads;
         queue = new LinkedList();
         threads = new PoolWorker[nThreads];
-        this.conf = conf;
         vec_max_length = conf.getInt("MCR.query_max_results", 10);
 
         for (int i = 0; i < nThreads; i++) {
@@ -124,16 +118,6 @@ public class MCRQueryAgent {
     }
 
     private class PoolWorker extends Thread {
-        private MCRQueryInterface mcr_queryint;
-
-        private MCRXMLContainer mcr_result;
-
-        private String mcr_type;
-
-        private String mcr_query;
-
-        private String hostAlias;
-
         public void run() {
             Mission m;
 

@@ -229,7 +229,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#close()
          */
-        public void close() throws IOException {
+        public void close() {
         }
 
         /*
@@ -237,7 +237,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#read(char[], int, int)
          */
-        public int read(char[] cbuf, int off, int len) throws IOException {
+        public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
             } else {

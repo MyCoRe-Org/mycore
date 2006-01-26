@@ -39,7 +39,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;

@@ -121,8 +121,6 @@ public class MCRQueryCollector {
     }
 
     private class Mission {
-        private String hostlist;
-
         private String type;
 
         private String query;
@@ -132,7 +130,6 @@ public class MCRQueryCollector {
         private LinkedList hosts;
 
         public Mission(String hostlist, String type, String query, MCRXMLContainer result) {
-            this.hostlist = hostlist;
             this.type = type;
             this.query = query;
             this.result = result;
@@ -155,7 +152,7 @@ public class MCRQueryCollector {
                     Object[] ob = remoteAliasList.toArray();
 
                     for (int j = 0; j < ob.length; j++) {
-                        returns.addLast((String) ob[j]);
+                        returns.addLast(ob[j]);
                     }
                 } else {
                     throw new MCRException("Host '" + host + "' is not in the list");

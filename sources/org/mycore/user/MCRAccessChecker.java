@@ -102,7 +102,7 @@ public class MCRAccessChecker {
 
                 if (LOGGER.isDebugEnabled()) {
                     StringBuffer buf = new StringBuffer();
-                    buf.append(MCRAccessChecker.class.getName()).append("\ni: ").append(i).append("\nsubnet1[i]: ").append(((int) subnet1[i]) & 0xff).append("\nsubnet2[i]: ").append(((int) subnet2[i]) & 0xff);
+                    buf.append(MCRAccessChecker.class.getName()).append("\ni: ").append(i).append("\nsubnet1[i]: ").append(subnet1[i] & 0xff).append("\nsubnet2[i]: ").append(subnet2[i] & 0xff);
                     LOGGER.debug(buf.toString());
                 }
             }
@@ -192,7 +192,7 @@ public class MCRAccessChecker {
                         return true;
                     }
 
-                    if (memberGroupIDsOfPrimaryGroup.contains((String) allCurrentUserGroupIDs.get(j))) {
+                    if (memberGroupIDsOfPrimaryGroup.contains(allCurrentUserGroupIDs.get(j))) {
                         return true;
                     }
                 }

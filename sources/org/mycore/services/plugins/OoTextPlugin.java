@@ -66,8 +66,6 @@ public class OoTextPlugin implements TextFilterPlugin {
 
     private static int DEF_BYTE_SZ = 1024 * 63;
 
-    private ByteArrayInputStream bis;
-
     /**
      * 
      */
@@ -222,7 +220,7 @@ public class OoTextPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#close()
          */
-        public void close() throws IOException {
+        public void close() {
         }
 
         /*
@@ -230,7 +228,7 @@ public class OoTextPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#read(char[], int, int)
          */
-        public int read(char[] cbuf, int off, int len) throws IOException {
+        public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
             } else {
@@ -261,7 +259,7 @@ public class OoTextPlugin implements TextFilterPlugin {
          * 
          * @see org.xml.sax.ContentHandler#characters(char[], int, int)
          */
-        public void characters(char[] ch, int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length) {
             if (textElement) {
                 // write text to the stream
                 buf.append(ch, start, length).append(' ');
@@ -274,7 +272,7 @@ public class OoTextPlugin implements TextFilterPlugin {
          * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
          *      java.lang.String, java.lang.String, org.xml.sax.Attributes)
          */
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) {
             // using internal optimized Strings of Xerces-J
             if (uri == textNS) {
                 textElement = true;

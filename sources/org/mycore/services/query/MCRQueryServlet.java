@@ -297,7 +297,7 @@ public class MCRQueryServlet extends MCRServlet {
      * @return String String in the given form, representing the searched
      *         Document.
      */
-    private final String getBrowseElementID(org.jdom.Document jdom, String ref, boolean next) throws MCRException, IOException {
+    private final String getBrowseElementID(org.jdom.Document jdom, String ref, boolean next) throws MCRException {
         org.jdom.Document tempDoc = (org.jdom.Document) jdom.clone();
         LOGGER.info("MCRQueryServlet: getBrowseElementID() got: " + ref);
 
@@ -666,7 +666,7 @@ public class MCRQueryServlet extends MCRServlet {
         return resarray.exportAllToDocument();
     }
 
-    private final Document reSort(Document jdom, Query qParam) throws ServletException, IOException, MCRException, JDOMException {
+    private final Document reSort(Document jdom, Query qParam) throws MCRException, JDOMException {
         MCRXMLContainer resarray = new MCRXMLContainer();
         resarray.importElements(jdom);
 
