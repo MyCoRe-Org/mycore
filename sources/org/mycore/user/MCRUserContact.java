@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRUserContact {
@@ -402,5 +403,60 @@ public class MCRUserContact {
         logger.debug("Fax             : " + fax);
         logger.debug("Email           : " + email);
         logger.debug("Cellphone       : " + cellphone);
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MCRUserContact)){
+            return false;
+        }
+        MCRUserContact uc=(MCRUserContact)obj;
+        if (this==uc){
+            return true;
+        }
+        if (this.hashCode()!=this.hashCode()){
+            //acording to the hashCode() contract
+            return false;
+        }
+        return fastEquals(uc);
+    }
+    
+    private boolean fastEquals(MCRUserContact uc){
+        return ((this.cellphone==uc.cellphone) &&
+                ((this.city==uc.city) || (this.city.equals(uc.city))) && 
+                ((this.country==uc.country) || (this.country.equals(uc.country))) && 
+                ((this.department==uc.department) || (this.department.equals(uc.department))) && 
+                ((this.email==uc.email) || (this.email.equals(uc.email))) && 
+                ((this.faculty==uc.faculty) || (this.faculty.equals(uc.faculty))) && 
+                ((this.fax==uc.fax) || (this.fax.equals(uc.fax))) && 
+                ((this.firstname==uc.firstname) || (this.firstname.equals(uc.firstname))) && 
+                ((this.institute==uc.institute) || (this.institute.equals(uc.institute))) && 
+                ((this.institution==uc.institution) || (this.institution.equals(uc.institution))) && 
+                ((this.lastname==uc.lastname) || (this.lastname.equals(uc.lastname))) && 
+                ((this.postalcode==uc.postalcode) || (this.postalcode.equals(uc.postalcode))) && 
+                ((this.salutation==uc.salutation) || (this.salutation.equals(uc.salutation))) && 
+                ((this.state==uc.state) || (this.state.equals(uc.state))) && 
+                ((this.street==uc.street) || (this.street.equals(uc.street))) && 
+                ((this.telephone==uc.telephone) || (this.telephone.equals(uc.telephone)))
+               );
+    }
+
+    public int hashCode() {
+        int result=17;
+        result = 37*result+this.cellphone.hashCode();
+        result = 37*result+this.city.hashCode();
+        result = 37*result+this.department.hashCode();
+        result = 37*result+this.email.hashCode();
+        result = 37*result+this.faculty.hashCode();
+        result = 37*result+this.fax.hashCode();
+        result = 37*result+this.firstname.hashCode();
+        result = 37*result+this.institute.hashCode();
+        result = 37*result+this.institution.hashCode();
+        result = 37*result+this.lastname.hashCode();
+        result = 37*result+this.postalcode.hashCode();
+        result = 37*result+this.salutation.hashCode();
+        result = 37*result+this.state.hashCode();
+        result = 37*result+this.street.hashCode();
+        result = 37*result+this.telephone.hashCode();
+        return result;
     }
 }
