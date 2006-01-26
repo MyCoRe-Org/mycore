@@ -84,6 +84,11 @@
             <servlet-name>MCRAccessCheckServlet</servlet-name>
             <servlet-class>org.mycore.access.MCRAccessCheckServlet</servlet-class>
       </servlet>
+
+      <servlet id="MCRSearch">
+            <servlet-name>MCRSearchServlet</servlet-name>
+            <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
+      </servlet>
       
       <!-- uncomment for administration interface -->
       <!-- <servlet id="MCRAdminServlet"> -->
@@ -164,6 +169,10 @@
          <servlet-name>MCRIndexServlet</servlet-name>
          <url-pattern>/index/*</url-pattern>
        </servlet-mapping>
+      <servlet-mapping>
+            <servlet-name>MCRSearchServlet</servlet-name>
+            <url-pattern>/servlets/MCRSearchServlet</url-pattern>
+      </servlet-mapping>
 
       <!-- uncomment for administration interface -->
       <!-- <servlet-mapping> -->
