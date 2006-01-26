@@ -145,50 +145,11 @@ public class MCRAccessManager {
      *            the access pool for the rule
      * @param condition
      *            the rule tree as a JDOM Element
-     * @param session
-     *            the current MCRSession
      * @return true if the access is allowed, false otherwise
-     */
-    public static boolean checkAccessCondition(String id, String pool, Element rule, MCRSession session) {
-        LOGGER.debug("Execute MCRAccessManagerBase checkAccess");
-        // As the rule may not saved we can check against mcrimpl classes.
-        MCRAccessControllSystem mcrManager = (MCRAccessControllSystem) MCRAccessControllSystem.instance();
-        String ruleStr = mcrManager.getNormalizedRuleString(rule);
-        MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
-        try {
-            return accessRule.checkAccess(MCRUserMgr.instance().retrieveUser(session.getCurrentUserID()), new Date(), new MCRIPAddress(session.getCurrentIP()));
-        } catch (MCRException e) {
-            // only return true if access is allowed, we dont know this
-            LOGGER.debug("Error while checking rule.", e);
-            return false;
-        } catch (UnknownHostException e) {
-            // only return true if access is allowed, we dont know this
-            LOGGER.debug("Error while checking rule.", e);
-            return false;
-        }
-    }
-
-    /**
-     * checks the access rule against the current MCRSession and return true if
-     * the access is allowed otherwise it return false.
-     * 
-     * It's the same as calling
-     * 
-     * <pre>
-     * checkAccessCondition(id, pool, rule, MCRSessionMgr.getCurrentSession());
-     * </pre>
-     * 
-     * @param id
-     *            the ID-String of the object
-     * @param pool
-     *            the access pool for the rule
-     * @param condition
-     *            the rule tree as a JDOM Element
-     * @return true if the access is allowed, false otherwise
-     * @see #checkAccessCondition(String, String, Element, MCRSession)
      */
     public static boolean checkAccessCondition(String id, String pool, Element rule) {
-        return checkAccessCondition(id, pool, rule, MCRSessionMgr.getCurrentSession());
+    	MCRAccessControllSystem mcrManager = (MCRAccessControllSystem) MCRAccessControllSystem.instance();
+    	return mcrManager.checkAccessCondition(id, pool, rule);
     }
 
     /**
