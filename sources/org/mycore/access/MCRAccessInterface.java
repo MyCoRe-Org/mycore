@@ -187,6 +187,17 @@ public interface MCRAccessInterface {
      *         defined
      */
     public Element getRule(String id, String permission);
+    
+    /**
+     * exports a access rule for a "a priori permission"
+     * as JDOM element.
+     * 
+     * @param permission
+     *            the access pool for the rule
+     * @return the rule as jdom element, or <code>null</code> if no rule is
+     *         defined
+     */
+    public Element getRule(String permission);    
 
     /**
      * lists all permissions defined for the <code>id</code>.

@@ -90,7 +90,7 @@ public class MCRAccessCheckServlet extends MCRServlet {
         Document jdom = new Document(new Element("mycoreaccesscheck"));
         jdom.getRootElement().addContent(new Element("accesscheck"));
         jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("return", String.valueOf(result)));
-        jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("disabled", String.valueOf(new MCRAccessControllSystem().isDisabled())));
+        jdom.getRootElement().getChild("accesscheck").setAttribute(new Attribute("disabled", String.valueOf(new MCRAccessControlSystem().isDisabled())));
 
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
 

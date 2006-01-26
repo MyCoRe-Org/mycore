@@ -54,9 +54,10 @@ import org.mycore.user.MCRUserMgr;
  * @author Matthias Kramm
  * @author Heiko Helmbrecht
  */
-public class MCRAccessControllSystem extends MCRAccessBaseImpl{
+public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 	
 	public static final String systemRulePrefix = "SYSTEMRULE" ;
+	public static final String poolPrivilegeID = "POOLPRIVILEGE" ;
 	
     MCRCache cache;
 
@@ -68,7 +69,7 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
     
     boolean disabled = false;
 
-    public MCRAccessControllSystem() {
+    public MCRAccessControlSystem() {
         MCRConfiguration config = MCRConfiguration.instance();
         int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
         String pools = config.getString("MCR.AccessPools", "");
@@ -87,7 +88,7 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-    private static MCRAccessControllSystem singleton;
+    private static MCRAccessControlSystem singleton;
     private static Comparator accessComp ;
     
     private static HashMap nextFreeRuleID;
@@ -95,7 +96,7 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
     // extended methods
     public static synchronized MCRAccessInterface instance() {
         if (singleton == null) {
-            singleton = new MCRAccessControllSystem();
+            singleton = new MCRAccessControlSystem();
         }
         return singleton;
     }
@@ -111,12 +112,20 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
 		return;
 	}
 	
+	public void addRule(String permission, org.jdom.Element rule) {
+		addRule(poolPrivilegeID, permission, rule);
+	}
+	
 	public void removeRule(String id, String pool) throws MCRException {
 		String ruleID = accessStore.getRuleID(id, pool);
 		if(ruleID != null && !ruleID.equals("")) {
 			MCRRuleMapping ruleMapping = accessStore.getAccessDefinition(ruleID, pool, id);
 			accessStore.deleteAccessDefinition(ruleMapping);
 		}
+	}
+	
+	public void removeRule(String permission) throws MCRException {
+		removeRule(poolPrivilegeID, permission);
 	}
 
 	public void removeAllRules(String id) throws MCRException {
@@ -137,24 +146,30 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
 		}
 		return;    	
 	}	
+    
+    public void updateRule(String permission, Element rule) throws MCRException {
+    	updateRule(poolPrivilegeID, permission, rule);
+    }
 
     public boolean checkPermission(String id, String pool) {
     	MCRSession session = MCRSessionMgr.getCurrentSession();
-    	return checkPermission(id, pool, session);
+        MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
+        try {
+            return checkAccess(id, pool, user, new MCRIPAddress(session.getCurrentIP()));
+        } catch (MCRException e) {
+            // only return true if access is allowed, we dont know this
+            LOGGER.debug("Error while checking rule.", e);
+            return false;        	
+        } catch (UnknownHostException e) {
+            // only return true if access is allowed, we dont know this
+            LOGGER.debug("Error while checking rule.", e);
+            return false;
+        } 
     }	
     
-    public boolean checkPermission(String id, String pool, MCRSession session) {
-        MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
-        MCRIPAddress ip;
-
-        try {
-            ip = new MCRIPAddress(session.getCurrentIP());
-        } catch (UnknownHostException e) {
-            /* this should never happen */
-            throw new MCRException("unknown host", e);
-        }
-        return checkAccess(id, pool, user, ip);
-    }	
+    public boolean checkPermission(String permission) {
+    	return checkPermission(poolPrivilegeID, permission);
+    }
     
     public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule) {
     	MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -179,13 +194,27 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
 		Element rule = parser.parse(accessRule.rule).toXML();
 		Element condition = new Element("condition");
 		condition.setAttribute("format","xml");
-		condition.addContent(rule);
+		if (rule != null) {
+			condition.addContent(rule);
+		}
     	return condition;
     }  
+    
+    public Element getRule(String permission) {
+    	return getRule(poolPrivilegeID, permission);
+    }
     
     public List getPermissionsForID(String objid) {
     	ArrayList ret = accessStore.getPoolsForObject(objid);
     	return ret;
+    }   
+    
+    public boolean hasRule(String id, String permission) {
+    	return accessStore.existsRule(id, permission);
+    }
+
+    public boolean hasRule(String id) {
+    	return hasRule(id, null);
     }    
     
     // not extended methods
@@ -198,25 +227,19 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
         if (disabled) {
             return dummyRule;
         }
-
         MCRAccessRule a = (MCRAccessRule) cache.get(pool + "#" + objID);
-
         if (a == null) {
             String ruleID = accessStore.getRuleID(objID, pool);
-
             if (ruleID != null) {
                 a = ruleStore.getRule(ruleID);
             } else {
                 a = null;
             }
-
             if (a == null) {
                 a = dummyRule;
             }
-
             cache.put(pool + "#" + objID, a);
         }
-
         return a;
     }
 
@@ -238,11 +261,9 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
     public boolean checkAccess(String objID, String pool, MCRUser user, MCRIPAddress ip) {
         Date date = new Date();
         MCRAccessRule rule = getAccess(objID, pool);
-
         if (rule == null) {
             return true; // no rule: everybody can access this
         }
-
         return rule.checkAccess(user, date, ip);
     }
 
@@ -324,7 +345,7 @@ public class MCRAccessControllSystem extends MCRAccessBaseImpl{
 		ruleMapping.setObjId(id);  
 		return ruleMapping;
     }
-	
+
 	/**
 	 * method, that normalizes the jdom-representation of
 	 * a mycore access condition

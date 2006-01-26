@@ -163,6 +163,15 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public Element getRule(String objID, String pool) {
         return null;
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#getAccessRule(java.lang.String)
+     */
+    public Element getRule(String pool) {
+        return null;
+    }    
 
     /*
      * (non-Javadoc)

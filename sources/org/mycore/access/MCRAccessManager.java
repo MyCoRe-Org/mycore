@@ -22,21 +22,14 @@
  */
 package org.mycore.access;
 
-import java.net.UnknownHostException;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import org.mycore.access.mcrimpl.MCRAccessControllSystem;
-import org.mycore.access.mcrimpl.MCRAccessRule;
-import org.mycore.access.mcrimpl.MCRIPAddress;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.user.MCRUserMgr;
+
 
 /**
  * 
@@ -148,7 +141,7 @@ public class MCRAccessManager {
      * @return true if the access is allowed, false otherwise
      */
     public static boolean checkAccessCondition(String id, String pool, Element rule) {
-    	MCRAccessControllSystem mcrManager = (MCRAccessControllSystem) MCRAccessControllSystem.instance();
+    	MCRAccessControlSystem mcrManager = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
     	return mcrManager.checkAccessCondition(id, pool, rule);
     }
 

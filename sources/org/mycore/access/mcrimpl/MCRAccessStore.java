@@ -63,6 +63,8 @@ public abstract class MCRAccessStore {
    
     public abstract ArrayList getDatabasePools();
     
+    public abstract boolean existsRule(String objid, String pool) ;
+    
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
     
     public static List types = getTypes();

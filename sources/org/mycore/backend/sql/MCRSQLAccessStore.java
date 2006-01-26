@@ -29,9 +29,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
@@ -271,4 +275,24 @@ public class MCRSQLAccessStore extends MCRAccessStore {
         
         return ret;
     }
+    
+    public boolean existsRule(String objid, String pool) {
+        StringBuffer query = new StringBuffer("SELECT COUNT(*) from MCRACCESS ")
+    		.append("WHERE OBJID LIKE '").append(objid).append("'");
+        if (pool != null && !pool.equals("")) {
+        	query.append(" AND ACPOOL LIKE '").append(pool).append("'");
+        }    	
+
+        try {
+            int count = Integer.parseInt(MCRSQLConnection.justGetSingleValue(query.toString()));
+            if (count > 0)
+            	return true;
+            else
+            	return false;
+        } catch (Exception e) {
+            logger.error("catched error", e);
+            return false;        	
+        }    	
+    }
+    
 }

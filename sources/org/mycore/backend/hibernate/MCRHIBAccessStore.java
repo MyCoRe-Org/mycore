@@ -36,7 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
-import org.mycore.access.mcrimpl.MCRAccessControllSystem;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
@@ -140,7 +140,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
                 session.flush();
                 tx.commit();
                 
-                ((MCRAccessControllSystem)MCRAccessControllSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
+                ((MCRAccessControlSystem)MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
             } catch (Exception e) {
                 tx.rollback();
                 logger.error("catched error", e);
@@ -176,6 +176,36 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             tx.rollback();
             logger.error(e);
 
+            return true;
+        } finally {
+            session.close();
+        }
+    }
+    
+    public boolean existsRule(String objid, String pool) {
+    	Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        
+        if(objid == null || objid.equals("")) {
+        	logger.warn("empty parameter objid in existsRule");
+        	return false;
+        }
+        
+        StringBuffer query = new StringBuffer("select count(*) from MCRACCESS ")
+        	.append("where key.objid like '").append(objid).append("'");
+        if (pool != null && !pool.equals("")) {
+        	query.append(" and key.acpool like '").append(pool).append("'");
+        }
+        
+        try {
+        	int count = ( (Integer) session.createQuery(query.toString()).iterate().next() ).intValue();
+        	if (count > 0)
+        		return true;
+        	else
+        		return false;
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error("catched error", e);
             return true;
         } finally {
             session.close();
