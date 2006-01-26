@@ -40,7 +40,7 @@ class MCRDummyClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
+        //MCRAccessData data = (MCRAccessData) o;
 
         return false;
     }

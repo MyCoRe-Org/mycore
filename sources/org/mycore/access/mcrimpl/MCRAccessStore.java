@@ -138,7 +138,7 @@ public abstract class MCRAccessStore {
             pools.addAll(getPools());
 
             for(int i=0; i<pools.size(); i++){
-                sqlDefinition.put((String)pools.get(i),MCRAccessStore.getInstance().getMappedObjectId((String)pools.get(i)));
+                sqlDefinition.put(pools.get(i),MCRAccessStore.getInstance().getMappedObjectId((String)pools.get(i)));
             }
                
             List ret = new LinkedList();
@@ -153,8 +153,8 @@ public abstract class MCRAccessStore {
                 def =  new MCRAccessDefinition();
                 def.setObjID((String)elements.get(i));
                 for(int j=0; j<pools.size(); j++){
-                    List l = (List) sqlDefinition.get((String)pools.get(j));
-                    if (l.contains((String)elements.get(i))){
+                    List l = (List) sqlDefinition.get(pools.get(j));
+                    if (l.contains(elements.get(i))){
                         def.addPool((String)pools.get(j),"X");
                     }else{
                         def.addPool((String)pools.get(j)," ");

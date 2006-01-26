@@ -22,7 +22,6 @@
  */
 package org.mycore.access;
 
-import org.apache.log4j.Logger;
 import org.jdom.Element;
 
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
@@ -41,8 +40,6 @@ public class MCRAccessManager {
 
     private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name",
             MCRAccessBaseImpl.class.getName());
-
-    private static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 
     public static MCRAccessInterface getAccessImpl() {
         return ACCESS_IMPL;
