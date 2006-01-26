@@ -530,17 +530,17 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
         }
 
         if ((text = text.trim()).length() != 0) {
-            elm.addContent((org.jdom.Content) new org.jdom.Element("text").addContent(text));
+            elm.addContent(new org.jdom.Element("text").addContent(text));
         }
 
         if (von != null) {
-            elm.addContent((org.jdom.Content) new org.jdom.Element("von").addContent(getVonToString()));
-            elm.addContent((org.jdom.Content) new org.jdom.Element("ivon").addContent((new Integer(ivon)).toString()));
+            elm.addContent(new org.jdom.Element("von").addContent(getVonToString()));
+            elm.addContent(new org.jdom.Element("ivon").addContent((new Integer(ivon)).toString()));
         }
 
         if (bis != null) {
-            elm.addContent((org.jdom.Content) new org.jdom.Element("bis").addContent(getBisToString()));
-            elm.addContent((org.jdom.Content) new org.jdom.Element("ibis").addContent((new Integer(ibis)).toString()));
+            elm.addContent(new org.jdom.Element("bis").addContent(getBisToString()));
+            elm.addContent(new org.jdom.Element("ibis").addContent((new Integer(ibis)).toString()));
         }
 
         return elm;
@@ -608,7 +608,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
         out.setVonDate(von);
         out.setBisDate(bis);
 
-        return (Object) out;
+        return out;
     }
 
     /**

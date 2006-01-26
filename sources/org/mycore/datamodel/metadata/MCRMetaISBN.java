@@ -266,9 +266,7 @@ public class MCRMetaISBN extends MCRMetaDefault implements MCRMetaInterface {
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaISBN out = new MCRMetaISBN(datapart, subtag, inherited, isbn);
-
-        return (Object) out;
+        return new MCRMetaISBN(datapart, subtag, inherited, isbn);
     }
 
     /**

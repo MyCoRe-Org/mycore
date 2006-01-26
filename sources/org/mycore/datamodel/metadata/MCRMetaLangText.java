@@ -173,7 +173,7 @@ public class MCRMetaLangText extends MCRMetaDefault implements MCRMetaInterface 
 
         text = temp_text.trim();
 
-        String temp_form = (String) element.getAttributeValue("form");
+        String temp_form = element.getAttributeValue("form");
 
         if (temp_form == null) {
             temp_form = "plain";
@@ -262,9 +262,7 @@ public class MCRMetaLangText extends MCRMetaDefault implements MCRMetaInterface 
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaLangText out = new MCRMetaLangText(datapart, subtag, lang, type, inherited, form, text);
-
-        return (Object) out;
+        return new MCRMetaLangText(datapart, subtag, lang, type, inherited, form, text);
     }
 
     /**

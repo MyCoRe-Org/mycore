@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -182,15 +181,15 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault implements MCRM
         }
 
         if ((fullname = fullname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("fullname").addContent(fullname));
+            elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
         }
 
         if ((nickname = nickname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("nickname").addContent(nickname));
+            elm.addContent(new org.jdom.Element("nickname").addContent(nickname));
         }
 
         if ((property = property.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("property").addContent(property));
+            elm.addContent(new org.jdom.Element("property").addContent(property));
         }
 
         return elm;
@@ -232,8 +231,6 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault implements MCRM
      * This method make a clone of this class.
      */
     public final Object clone() {
-        MCRMetaInstitutionName out = new MCRMetaInstitutionName(datapart, subtag, lang, type, inherited, fullname, nickname, property);
-
-        return (Object) out;
+        return new MCRMetaInstitutionName(datapart, subtag, lang, type, inherited, fullname, nickname, property);
     }
 }

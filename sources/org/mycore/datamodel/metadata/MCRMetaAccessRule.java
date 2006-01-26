@@ -174,7 +174,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         }
         condition = (org.jdom.Element)temp_condition.detach();
 
-        String temp_pool = (String) element.getAttributeValue("pool");
+        String temp_pool = element.getAttributeValue("pool");
         if (temp_pool == null) {
             temp_pool = "read";
         }
@@ -249,8 +249,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaAccessRule out = new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, pool, condition);
-        return (Object) out;
+        return new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, pool, condition);
     }
 
     /**

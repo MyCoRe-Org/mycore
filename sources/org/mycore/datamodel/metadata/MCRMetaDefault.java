@@ -321,13 +321,13 @@ public abstract class MCRMetaDefault {
             lang = temp_lang;
         }
 
-        String temp_type = (String) element.getAttributeValue("type");
+        String temp_type = element.getAttributeValue("type");
 
         if ((temp_type != null) && ((temp_type = temp_type.trim()).length() != 0)) {
             type = temp_type;
         }
 
-        String temp_herit = (String) element.getAttributeValue("inherited");
+        String temp_herit = element.getAttributeValue("inherited");
 
         if ((temp_herit != null) && ((temp_herit = temp_herit.trim()).length() != 0)) {
             try {

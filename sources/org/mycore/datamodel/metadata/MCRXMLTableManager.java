@@ -54,9 +54,6 @@ public class MCRXMLTableManager {
 
     static MCRCache jdomCache;
 
-    // the list of link table
-    private String persistclassname = null;
-
     private Hashtable tablelist;
 
     private static int number_distance = 1;

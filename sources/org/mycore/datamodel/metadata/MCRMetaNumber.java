@@ -298,7 +298,7 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
         attr = element.getAttribute("measurement");
 
         if (attr != null) {
-            String temp_meas = (String) attr.getValue();
+            String temp_meas = attr.getValue();
 
             if ((temp_meas != null) && ((temp_meas = temp_meas.trim()).length() != 0)) {
                 measurement = temp_meas;
@@ -313,7 +313,7 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
         attr = element.getAttribute("dimension");
 
         if (attr != null) {
-            String temp_dim = (String) attr.getValue();
+            String temp_dim = attr.getValue();
 
             if ((temp_dim != null) && ((temp_dim = temp_dim.trim()).length() != 0)) {
                 dimension = temp_dim;
@@ -405,9 +405,7 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
      * This method make a clone of this class.
      */
     public final Object clone() {
-        MCRMetaNumber out = new MCRMetaNumber(datapart, subtag, lang, inherited, dimension, measurement, number);
-
-        return (Object) out;
+        return new MCRMetaNumber(datapart, subtag, lang, inherited, dimension, measurement, number);
     }
 
     /**

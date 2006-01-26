@@ -298,14 +298,14 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         }
 
         if (linktype.equals("locator")) {
-            String temp1 = (String) element.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp2 = (String) element.getAttributeValue("label", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp3 = (String) element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp1 = element.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp2 = element.getAttributeValue("label", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp3 = element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
             setReference(temp1, temp2, temp3);
         } else {
-            String temp1 = (String) element.getAttributeValue("from", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp2 = (String) element.getAttributeValue("to", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp3 = (String) element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp1 = element.getAttributeValue("from", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp2 = element.getAttributeValue("to", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp3 = element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
             setBiLink(temp1, temp2, temp3);
         }
     }
@@ -420,7 +420,7 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         out.to = to;
         out.from = from;
 
-        return (Object) out;
+        return out;
     }
 
     /**

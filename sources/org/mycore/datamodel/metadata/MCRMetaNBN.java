@@ -200,9 +200,7 @@ public class MCRMetaNBN extends MCRMetaDefault implements MCRMetaInterface {
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaNBN out = new MCRMetaNBN(datapart, subtag, inherited, nbn);
-
-        return (Object) out;
+        return new MCRMetaNBN(datapart, subtag, inherited, nbn);
     }
 
     /**

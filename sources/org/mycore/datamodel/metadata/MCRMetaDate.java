@@ -307,8 +307,6 @@ final public class MCRMetaDate extends MCRMetaDefault implements MCRMetaInterfac
      * This method make a clone of this class.
      */
     public final Object clone() {
-        MCRMetaDate out = new MCRMetaDate(datapart, subtag, lang, type, inherited, date);
-
-        return (Object) out;
+        return new MCRMetaDate(datapart, subtag, lang, type, inherited, date);
     }
 }

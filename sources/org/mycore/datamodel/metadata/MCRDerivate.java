@@ -25,7 +25,6 @@ package org.mycore.datamodel.metadata;
 
 import java.io.File;
 
-import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -94,14 +93,14 @@ final public class MCRDerivate extends MCRBase {
 
         // get object ID from DOM
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = new MCRObjectID((String) jdom_element_root.getAttribute("ID").getValue());
-        mcr_label = (String) jdom_element_root.getAttribute("label").getValue().trim();
+        mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID").getValue());
+        mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
 
         if (mcr_label.length() > MAX_LABEL_LENGTH) {
             mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
         }
 
-        mcr_schema = (String) jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
+        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
 
         org.jdom.Element jdom_element;
 

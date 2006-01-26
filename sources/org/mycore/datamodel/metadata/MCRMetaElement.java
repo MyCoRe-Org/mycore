@@ -634,7 +634,7 @@ public class MCRMetaElement {
             out.addMetaObject(mif);
         }
 
-        return (Object) out;
+        return out;
     }
 
     /**

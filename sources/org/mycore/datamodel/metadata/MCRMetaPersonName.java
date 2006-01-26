@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -275,31 +274,31 @@ final public class MCRMetaPersonName extends MCRMetaDefault implements MCRMetaIn
         }
 
         if ((firstname = firstname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("firstname").addContent(firstname));
+            elm.addContent(new org.jdom.Element("firstname").addContent(firstname));
         }
 
         if ((callname = callname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("callname").addContent(callname));
+            elm.addContent(new org.jdom.Element("callname").addContent(callname));
         }
 
         if ((fullname = fullname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("fullname").addContent(fullname));
+            elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
         }
 
         if ((surname = surname.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("surname").addContent(surname));
+            elm.addContent(new org.jdom.Element("surname").addContent(surname));
         }
 
         if ((academic = academic.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("academic").addContent(academic));
+            elm.addContent(new org.jdom.Element("academic").addContent(academic));
         }
 
         if ((peerage = peerage.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("peerage").addContent(peerage));
+            elm.addContent(new org.jdom.Element("peerage").addContent(peerage));
         }
 
         if ((prefix = prefix.trim()).length() != 0) {
-            elm.addContent((Content) new org.jdom.Element("prefix").addContent(prefix));
+            elm.addContent(new org.jdom.Element("prefix").addContent(prefix));
         }
 
         return elm;
@@ -363,9 +362,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault implements MCRMetaIn
      * This method make a clone of this class.
      */
     public final Object clone() {
-        MCRMetaPersonName out = new MCRMetaPersonName(datapart, subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
-
-        return (Object) out;
+        return new MCRMetaPersonName(datapart, subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
     }
 
     /**

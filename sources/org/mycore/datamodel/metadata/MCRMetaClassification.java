@@ -237,9 +237,7 @@ public class MCRMetaClassification extends MCRMetaDefault implements MCRMetaInte
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaClassification out = new MCRMetaClassification(datapart, subtag, inherited, type, classid, categid);
-
-        return (Object) out;
+        return new MCRMetaClassification(datapart, subtag, inherited, type, classid, categid);
     }
 
     /**

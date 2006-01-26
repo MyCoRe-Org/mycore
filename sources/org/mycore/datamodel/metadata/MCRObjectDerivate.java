@@ -35,8 +35,6 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectDerivate {
-    // common data
-    private String NL;
 
     // derivate data
     private ArrayList linkmetas = null;
@@ -50,7 +48,6 @@ public class MCRObjectDerivate {
      * to null.
      */
     public MCRObjectDerivate() {
-        NL = new String((System.getProperties()).getProperty("line.separator"));
         linkmetas = new ArrayList();
         externals = new ArrayList();
         internals = null;

@@ -278,8 +278,6 @@ final public class MCRMetaBoolean extends MCRMetaDefault implements MCRMetaInter
      * This method make a clone of this class.
      */
     public final Object clone() {
-        MCRMetaBoolean out = new MCRMetaBoolean(datapart, subtag, lang, type, inherited, value);
-
-        return (Object) out;
+        return new MCRMetaBoolean(datapart, subtag, lang, type, inherited, value);
     }
 }
