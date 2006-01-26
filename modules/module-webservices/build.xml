@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.7 $ $Date: 2006-01-17 12:45:52 $ -->
+<!-- $Revision: 1.8 $ $Date: 2006-01-26 13:27:55 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -182,6 +182,10 @@
       <pathelement location="build/bin" />
       <pathelement location="build/classes" />
     </path>
+    
+    <copy todir="build/bin" preservelastmodified="yes">
+      <fileset dir="config"        includes="client_deploy.wsdd" />
+    </copy>
     
    <property name="path"           refid="wsclient.classpath"/>
 
