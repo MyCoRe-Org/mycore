@@ -525,7 +525,7 @@ public class MCRClassificationBrowserData
 	  }
 
   private Element sortMyTreeperLevel( Element xDocument, int activelevel, int position){
-	  	Element xDoc = (Element) xDocument;
+	  	Element xDoc = xDocument;
 	  	Element aktRow = ( (Element) xDoc.getChild("navigationtree").getChildren().get(position));
 	  	String  aktText = ( (Element) aktRow.getChildren().get(1)).getText();
 
@@ -533,9 +533,9 @@ public class MCRClassificationBrowserData
 		int level = activelevel;
 		int Cnt = 0;
 		for( int j = position+1; j < children.size(); j++ )	{
-			Element child = (Element)((Element) children.get( j ));
-			Element col1 = (Element)( (Element) child ).getChildren().get(0);
-			Element col2 = (Element)( (Element) child ).getChildren().get(1);
+			Element child = (Element)( children.get( j ));
+			Element col1 = (Element)( child.getChildren().get(0) );
+			Element col2 = (Element)( child.getChildren().get(1) );
 
 	  		try {
 	  			level = col1.getAttribute("lineLevel").getIntValue();
@@ -549,9 +549,9 @@ public class MCRClassificationBrowserData
 					boolean bjumpOverChilds=true;
 					while ( bjumpOverChilds && j < children.size()-1 )
 					{
-						Element next = (Element)((Element) children.get( j+1));
+						Element next = (Element)(children.get(j+1));
 						if ( next != null  ){
-							Element colx = (Element)( (Element) child ).getChildren().get(0);
+							Element colx = (Element)( child.getChildren().get(0) );
 							int nextlevel = level;
 					  		try {
 					  			nextlevel = colx.getAttribute("lineLevel").getIntValue();
@@ -575,11 +575,11 @@ public class MCRClassificationBrowserData
 
   private void changeRows(Element xDoc, Element aktRow, Element child ){
 
-		Element col1 = (Element)( (Element) child ).getChildren().get(0);
-		Element col2 = (Element)( (Element) child ).getChildren().get(1);
-		Element placer  = (Element)( (Element) aktRow ).clone();
-	  	Element place1  = (Element)( (Element) placer ).getChildren().get(0);
-	  	Element place2  = (Element)( (Element) placer ).getChildren().get(1);
+		Element col1 = (Element)( child.getChildren().get(0) );
+		Element col2 = (Element)( child.getChildren().get(1) );
+		Element placer  = (Element)( aktRow.clone() );
+	  	Element place1  = (Element)( placer.getChildren().get(0) );
+	  	Element place2  = (Element)( placer.getChildren().get(1) );
 
 		Element xc1 = new Element("col");
 		Element xc2 = new Element("col");

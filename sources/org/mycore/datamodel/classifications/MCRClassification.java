@@ -39,7 +39,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
@@ -782,7 +781,7 @@ public class MCRClassification {
 		}
 	}
 
-	private static Document getClassification(String ID) throws MCRException, JDOMException, IOException {
+	private static Document getClassification(String ID) throws MCRException {
 		MCRObjectID classID = new MCRObjectID(ID);
 		LOGGER.debug("Loading Classification " + ID + " of MCRType: " + classID.getTypeId());
 
@@ -804,10 +803,6 @@ public class MCRClassification {
 		try {
 			classification = getClassification(classID);
 		} catch (MCRException e) {
-			LOGGER.error("Oops", e);
-		} catch (JDOMException e) {
-			LOGGER.error("Oops", e);
-		} catch (IOException e) {
 			LOGGER.error("Oops", e);
 		}
 
@@ -837,30 +832,6 @@ public class MCRClassification {
 
 		return xml;
 	}
-
-
-	private void countDocuments(String classID, Element cat) {
-	        final String cAttr = "counter";
-	        List tagList = cat.getChildren("category");
-	        int docs = 0;
-	        if (tagList.size() == 0) {
-	            //we reached the leaves and count the documents
-	            docs = MCRLinkTableManager.instance().countCategoryReferencesSharp(
-	                    classID, cat.getAttributeValue("ID"));
-	        } else {
-	            for (int i = 0; i < tagList.size(); i++) {
-	                Element child = (Element) tagList.get(i);
-	                countDocuments(classID, child);
-	                //all children are calculated
-	                docs += Integer.parseInt(child.getAttributeValue(cAttr));
-	            }
-	            //childrens are counted make a "sharp" search on this category
-	            docs += MCRLinkTableManager.instance()
-	                    .countCategoryReferencesSharp(classID,
-	                            cat.getAttributeValue("ID"));
-	        }
-	        cat.setAttribute(cAttr, Integer.toString(docs));
-	    }
 
 	/**
 	 * The method return the category as XML byte array.

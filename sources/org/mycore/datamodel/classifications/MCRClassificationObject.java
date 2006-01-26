@@ -35,7 +35,6 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.MCRDefaults;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
 
 /**
  * This class is an abstract class for the implementation of the classes

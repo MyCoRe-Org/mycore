@@ -64,7 +64,7 @@ public class MCRClassificationEditor {
     public boolean  createCategoryInClassification(  org.jdom.Document indoc, String clid, String categid ) {	   
 	 try  { 	   
 	 LOGGER.info("CALL: createCategoryInClassification for Classification:" + clid + " after categid "  + categid);
-	   	   Element clroot = (Element) indoc.getRootElement();
+	   	   Element clroot = indoc.getRootElement();
 	 	   Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
 	
 	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid); 	   
@@ -93,7 +93,7 @@ public class MCRClassificationEditor {
     public boolean    modifyCategoryInClassification(org.jdom.Document indoc, String clid, String categid )  { 	   
  	   try {
  	   LOGGER.info("CALL: modifyCategoryInClassification for Classification:" + clid + " with categid "  + categid);
-	 	   Element clroot = (Element) indoc.getRootElement();
+	 	   Element clroot = indoc.getRootElement();
 	 	   Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
 		 	   	   
 	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
@@ -146,7 +146,7 @@ public class MCRClassificationEditor {
     public boolean createNewClassification(org.jdom.Document indoc ) {
  	   try {
  	   LOGGER.info("CALL: createNewClassificationDescription." );
-	 	   Element clroot = (Element) indoc.getRootElement();
+	 	   Element clroot = indoc.getRootElement();
 	
 	 	   cljdom = new Document();   
 	 	   Element mycoreclass = new Element("mycoreclass");
@@ -196,7 +196,7 @@ public class MCRClassificationEditor {
     public boolean    modifyClassificationDescription(org.jdom.Document indoc , String clid ) {
  	   try {
  	   LOGGER.info("CALL: modifyClassificationDescription for Classification: " + clid);
-	 	   Element clroot = (Element) indoc.getRootElement();
+	 	   Element clroot = indoc.getRootElement();
 	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
  		   Element element; 	   
  		   List tagList = clroot.getChildren("label");
