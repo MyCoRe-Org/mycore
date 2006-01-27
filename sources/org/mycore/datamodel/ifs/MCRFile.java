@@ -35,9 +35,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
@@ -539,4 +541,33 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         return sb.toString();
     }
+
+    /**
+     * Build a XML representation of all technical metadata of this MCRFile and
+     * its MCRAudioVideoExtender, if present. That xml can be used for indexing
+     * this data.
+     */
+    public Document createXML() {
+        Element root = new Element("file");
+        root.setAttribute("id", this.getID());
+        root.setAttribute("owner", this.getOwnerID());
+        root.setAttribute("name", this.getName());
+        root.setAttribute("path", this.getAbsolutePath());
+        root.setAttribute("size", Long.toString(this.getSize()));
+        root.setAttribute("extension", this.getExtension());
+        root.setAttribute("contentTypeID", this.getContentTypeID());
+        root.setAttribute("contentType", this.getContentType().getLabel());
+        root.setAttribute("modified", new SimpleDateFormat("yyyy-MM-dd").format(this.getLastModified().getTime()));
+
+        if (this.hasAudioVideoExtender()) {
+            MCRAudioVideoExtender ext = this.getAudioVideoExtender();
+            root.setAttribute("bitRate", String.valueOf(ext.getBitRate()));
+            root.setAttribute("frameRate", String.valueOf(ext.getFrameRate()));
+            root.setAttribute("duration", ext.getDurationTimecode());
+            root.setAttribute("mediaType", ((ext.getMediaType() == MCRAudioVideoExtender.AUDIO) ? "audio" : "video"));
+        }
+
+        return new Document(root);
+    }
+
 }
