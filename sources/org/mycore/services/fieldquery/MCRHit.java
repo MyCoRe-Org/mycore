@@ -23,39 +23,44 @@
 
 package org.mycore.services.fieldquery;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Represents a single result hit of a query. The hit has an ID which is the
- * MCRObjectID of the document that matched the query. The hit may have sort
- * data which is a set of name-value pairs of fields that must be used for
- * sorting the hits in the current query. The hit may have 0-n sets of metadata
- * name-value pairs that represent technical hit metadata like score, rank,
- * position where something was found etc. provided by the backend searcher.
+ * MCRObjectID of the document that matched the query. The hit may have MCRFieldValue
+ * objects set for sorting data or representing hit metadata like score or rank.
+ * 
+ * If the same hit (hit with same ID) is in different result sets A and B, 
+ * the data of the hit objects is merged. The hit sort data is copied from one of the 
+ * hits that contains sort data. There is only on sort data set for each hit.
+ * The hit metadata of both hits is preserved and copied from both hits, so there can be
+ * multiple metadata sets from different searches for the same hit.
  * 
  * @see MCRResults
- * 
  * @author Arne Seifert
  * @author Frank Lützenkirchen
  */
 public class MCRHit {
-    /** The ID of this object that matched the query * */
+    /** The ID of this object that matched the query */
     private String id;
 
-    /** Data for sorting this hit or hit metadata like rank, score * */
-    private Properties sortData = new Properties();
+    /** List of MCRFieldValue objects that are hit metadata */
+    private List metaData = new ArrayList();
 
-    /**
-     * List of Properties objects that contain technical hit metadata from the
-     * backend searcher *
-     */
-    private List metaData = new LinkedList();
+    /** List of MCRFieldValue objects that are sort data */
+    private List sortData = new ArrayList();
+
+    /** Map from field to field value, used for sorting */
+    private Map sortValues = new HashMap();
 
     /**
      * Creates a new result hit with the given object ID
@@ -77,54 +82,52 @@ public class MCRHit {
     }
 
     /**
-     * Returns hit metadata for sorting or ranking
-     * 
-     * @return hit metadata as name-value pairs of Strings
+     * Adds hit metadata like score or rank
+     *  
+     * @param value the value of the metadata field
      */
-    public Properties getSortData() {
-        return sortData;
+    public void addMetaData(MCRFieldValue value) {
+        metaData.add(value);
+        sortValues.put(value.getField(), value.getValue());
     }
 
     /**
-     * Set data value of the hit
+     * Adds data for sorting this hit
      * 
-     * @param key
-     *            the name of the data value
-     * @param value
-     *            the value as string
+     * @param value the value of a sortable search field
      */
-    public void addSortData(String key, String value) {
-        if (!sortData.containsKey(key)) {
-            sortData.put(key, value);
+    public void addSortData(MCRFieldValue value) {
+        sortData.add(value);
+        sortValues.put(value.getField(), value.getValue());
+    }
+
+    /**
+     * Compares this hit with another hit by comparing the 
+     * value of the given search field. Used for sorting results.
+     * 
+     * @param field the field to compare
+     * @param other the other hit to compare with 
+     * @return 0 if the two hits are equal, 
+     *         a positive value if this hit is "greater" than the other, 
+     *         a negative value if this hit is "smaller" than the other
+     *         
+     * @see MCRResults#sortBy(List)
+     */
+    int compareTo(MCRFieldDef field, MCRHit other) {
+        String va = (String) (this.sortValues.get(field));
+        String vb = (String) (other.sortValues.get(field));
+
+        if ((va == null) || (va.trim().length() == 0)) {
+            return (((vb == null) || (vb.trim().length() == 0)) ? 0 : (-1));
+        } else if ((vb == null) || (vb.trim().length() == 0)) {
+            return (((va == null) || (va.trim().length() == 0)) ? 0 : 1);
+        } else if ("decimal".equals(field.getDataType())) {
+            return (int) ((Double.parseDouble(va) - Double.parseDouble(vb)) * 10.0);
+        } else if ("integer".equals(field.getDataType())) {
+            return (int) (Long.parseLong(va) - Long.parseLong(vb));
+        } else {
+            return va.compareTo(vb);
         }
-    }
-
-    /**
-     * Adds metadata about the hit. This metadata comes from the searcher and
-     * may contain additional information like score, rank, derivate ID, file
-     * path, position where something was found in the content etc. There may be
-     * more than just one set of such metadata because the same criteria may
-     * have been found in more than just one MCRFile of the same MCRObject etc.
-     * 
-     * @param metadata
-     *            a Properties object containing hit metadata as name-value
-     *            pairs
-     */
-    public void addMetaData(Properties metadata) {
-        if (metadata != null) {
-            metaData.add(metadata);
-        }
-    }
-
-    /**
-     * Returns technical metadata about the hit that was provided by the
-     * searcher.
-     * 
-     * @return a List of Properties objects containing hit metadata as
-     *         name-value pairs
-     */
-    public List getMetaData() {
-        return metaData;
     }
 
     /**
@@ -138,12 +141,11 @@ public class MCRHit {
      *            the other hit from the other searcher
      * @return
      */
-    static MCRHit buildMergedHitData(MCRHit a, MCRHit b) {
+    static MCRHit merge(MCRHit a, MCRHit b) {
         // If there is nothing to merge, return existing hit
         if (b == null) {
             return a;
         }
-
         if (a == null) {
             return b;
         }
@@ -151,56 +153,64 @@ public class MCRHit {
         // Copy ID
         MCRHit c = new MCRHit(a.getID());
 
-        // Copy sort data
-        c.sortData = (a.sortData.isEmpty() ? b.sortData : a.sortData);
+        // Copy sortData
+        c.sortData.addAll(a.sortData.isEmpty() ? b.sortData : a.sortData);
+        c.sortValues.putAll(a.sortValues);
+        c.sortValues.putAll(b.sortValues);
 
-        // Copy metadata sets
+        // Copy metaData
         c.metaData.addAll(a.metaData);
+        c.metaData.add(null); // used as a delimiter
         c.metaData.addAll(b.metaData);
 
         return c;
     }
 
+    public String toString() {
+        return new XMLOutputter(Format.getPrettyFormat()).outputString(buildXML());
+    }
+
     /**
-     * Creates an XML representation of this hit and its data
+     * Creates a XML representation of this hit and its sort data and meta data
      * 
-     * @return the hit data as XML
+     * @return a 'hit' element with attribute 'id', optionally one 'sortData' child element and multiple 'metaData' child elements
      */
     public Element buildXML() {
-        Element el = new Element("mcrhit");
-        el.setAttribute(new Attribute("mcrid", this.id));
+        Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
+
+        Element eHit = new Element("hit", mcrns);
+        eHit.setAttribute(new Attribute("id", this.id));
 
         if (!sortData.isEmpty()) {
-            addDataProperties(el, "sortData", sortData);
-        }
+            Element eSort = new Element("sortData", mcrns);
+            eHit.addContent(eSort);
 
-        if (!metaData.isEmpty()) {
-            for (int i = 0; i < metaData.size(); i++) {
-                Properties prop = (Properties) (metaData.get(i));
-
-                if (!prop.isEmpty()) {
-                    addDataProperties(el, "metaData", prop);
-                }
+            for (int i = 0; i < sortData.size(); i++) {
+                MCRFieldValue fv = (MCRFieldValue) (sortData.get(i));
+                eSort.addContent(fv.buildXML());
             }
         }
 
-        return el;
-    }
+        Element eMeta = null;
+        int count = 0;
 
-    /** Helper method to add data values to the xml representation of the hit * */
-    private void addDataProperties(Element parent, String name, Properties data) {
-        Element coll = new Element(name);
-        parent.addContent(coll);
+        for (int i = 0; i < metaData.size(); i++) {
+            MCRFieldValue fv = (MCRFieldValue) (metaData.get(i));
+            if ((i == 0) || (fv == null)) {
+                if ((eMeta != null) && (count == 0))
+                    continue;
 
-        Iterator it = data.keySet().iterator();
+                eMeta = new Element("metadata", mcrns);
+                eHit.addContent(eMeta);
+                count = 0;
+                if (i > 0)
+                    continue;
+            }
 
-        while (it.hasNext()) {
-            String key = (String) it.next();
-
-            Element d = new Element("data");
-            coll.addContent(d);
-            d.setAttribute("name", key);
-            d.addContent(data.getProperty(key));
+            eMeta.addContent(fv.buildXML());
+            count++;
         }
+
+        return eHit;
     }
 }
