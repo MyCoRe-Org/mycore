@@ -29,7 +29,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.lang.Math;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -48,9 +47,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchField;
 import org.mycore.services.fieldquery.MCRSearcherBase;
 import org.mycore.services.plugins.TextFilterPluginManager;
 
@@ -131,9 +130,9 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         Document doc = new Document();
 
         for (int i = 0; i < fields.size(); i++) {
-            MCRSearchField field = (MCRSearchField) (fields.get(i));
-            String name = field.getName();
-            String type = field.getDataType();
+            MCRFieldValue field = (MCRFieldValue) (fields.get(i));
+            String name = field.getField().getName();
+            String type = field.getField().getDataType();
             String content = field.getValue();
             MCRFile mcrfile = field.getFile();
 
@@ -175,7 +174,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
                     doc.add(Field.Keyword(name, content));
                 }
 
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.isSortable() )) {
+                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable() )) {
                     doc.add(Field.Text(name, content));
                 } else if (type.equals("text")) {
                     doc.add(Field.UnStored(name, content));
@@ -337,7 +336,6 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         try {
             MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults, IndexDir);
             results = lucenequery.getLuceneHits();
-            results.setComplete();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -362,7 +360,7 @@ public class MCRLuceneSearcher extends MCRSearcherBase {
         int maxResults = 100;
         MCRResults res = ls.search(cond, null, maxResults);
 
-        org.jdom.Document doc = res.buildXML();
+        org.jdom.Element doc = res.buildXML();
         XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
         System.out.println(out.outputString(doc));
 
