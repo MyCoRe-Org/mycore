@@ -32,7 +32,7 @@ import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * 
@@ -175,11 +175,11 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         try {
 
             for (int i = 0; i < order.size(); i++) {
-                MCRSearchField field = (MCRSearchField) order.get(i);
+                MCRSortBy field = (MCRSortBy) order.get(i);
                 
-                sb.append(field.getName());
+                sb.append(field.getField().getName());
                 
-                if (field.getSortOrder() == MCRSearchField.ASCENDING ){
+                if (field.getSortOrder() == MCRSortBy.ASCENDING ){
                     sb.append(" asc ");
                 }else{
                     sb.append(" desc ");
@@ -209,7 +209,7 @@ public class MCRSQLQuery implements MCRConditionVisitor {
             sb.append("SELECT MCRID");
 
             for (int i = 0; i < order.size(); i++) {
-                sb.append(", " + ((MCRSearchField) order.get(i)).getName());
+                sb.append(", " + ((MCRSortBy) order.get(i)).getField().getName());
             }
 
             sb.append(" FROM ");
@@ -238,7 +238,7 @@ public class MCRSQLQuery implements MCRConditionVisitor {
         sb.append("SELECT MCRID");
 
         for (int i = 0; i < order.size(); i++) {
-            sb.append(", " + ((MCRSearchField) order.get(i)).getName());
+            sb.append(", " + ((MCRSortBy) order.get(i)).getField().getName());
         }
 
         sb.append("\nFROM ");

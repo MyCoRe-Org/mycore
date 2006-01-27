@@ -25,13 +25,13 @@ package org.mycore.backend.sql;
 
 import java.util.List;
 
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.backend.query.MCRQuerySearcher;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * SQL implementation of the searcher
@@ -64,9 +64,9 @@ public class MCRSQLSearcher extends MCRQuerySearcher {
 
                 /* fill hit meta */
                 for (int j = 0; j < order.size(); j++) {
-                    String key = ((MCRSearchField) order.get(j)).getName();
-                    String value = (String) reader.getString(((MCRSearchField) order.get(j)).getName());
-                    hit.addSortData(key, value);
+                    MCRFieldDef fd = ((MCRSortBy) order.get(j)).getField();
+                    String value = reader.getString(fd.getName());
+                    hit.addSortData(new MCRFieldValue(fd, value));
                 }
                 
                 if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
