@@ -23,31 +23,51 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * A search field definition. For each field in the configuration file
- * searchfields.xml there is one MCRFieldDef instance with attributes
- * name, data type and sortable flag.
- *  
+ * searchfields.xml there is one MCRFieldDef instance with attributes name, data
+ * type and sortable flag.
+ * 
  * @author Frank Lützenkirchen
  */
 public class MCRFieldDef {
+    /** The logger */
+    private static final Logger LOGGER = Logger.getLogger(MCRFieldDef.class);
+
     /**
-     * A map, name -> MCRFieldDef
+     * name -> MCRFieldDef
      */
     private static Hashtable fieldTable = new Hashtable();
+
+    private static Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+
+    static Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
+
+    private static Namespace xmlns = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+
+    private static Namespace xlinkns = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
+
+    private static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
+
+    private static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
 
     /**
      * Read searchfields.xml and build the MCRFiedDef objects
      */
     static {
-        Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
+        buildXSLTemplate();
 
         String uri = "resource:searchfields.xml";
         Element def = MCRURIResolver.instance().resolve(uri);
@@ -56,18 +76,29 @@ public class MCRFieldDef {
 
         for (int i = 0; i < children.size(); i++) {
             Element index = (Element) (children.get(i));
+            String id = index.getAttributeValue("id");
+
             List fields = index.getChildren("field", mcrns);
 
             for (int j = 0; j < fields.size(); j++) {
                 Element field = (Element) (fields.get(j));
                 String name = field.getAttributeValue("name");
                 String type = field.getAttributeValue("type");
+                String objects = field.getAttributeValue("objects", (String) null);
+                String source = field.getAttributeValue("source");
                 boolean sortable = "true".equals(field.getAttributeValue("sortable")) ? true : false;
 
-                fieldTable.put(name, new MCRFieldDef(name, type, sortable));
+                MCRFieldDef fd = new MCRFieldDef(id, name, type, sortable, objects, source);
+                fieldTable.put(name, fd );
+                fd.buildStylesheet( field );
             }
         }
     }
+
+    /**
+     * The index this field belongs to
+     */
+    private String index;
 
     /**
      * The unique name of the field
@@ -84,17 +115,30 @@ public class MCRFieldDef {
      */
     private boolean sortable = false;
 
-    private MCRFieldDef(String name, String dataType, boolean sortable) {
+    /**
+     * A list of object names this field is used for, separated by blanks
+     */
+    private String objects;
+
+    /**
+     * A keyword identifying where the values of this field come from
+     */
+    private String source;
+
+    private MCRFieldDef(String index, String name, String dataType, boolean sortable, String objects, String source) {
         this.name = name;
         this.dataType = dataType;
         this.sortable = sortable;
+        this.objects = objects;
+        this.source = source;
     }
 
     /**
-     * Returns the MCRFieldDef with the given name, or null if no
-     * such field is defined in searchfields.xml
+     * Returns the MCRFieldDef with the given name, or null if no such field is
+     * defined in searchfields.xml
      * 
-     * @param name the name of the field
+     * @param name
+     *            the name of the field
      * @return the MCRFieldDef instance representing this field
      */
     public static MCRFieldDef getDef(String name) {
@@ -102,26 +146,193 @@ public class MCRFieldDef {
     }
 
     /**
+     * Returns all fields that belong to the given index
+     * 
+     * @param index
+     *            the ID of the index
+     * @return a List of MCRFieldDef objects for that index
+     */
+    static List getFieldDefs(String index) {
+        List fields = new ArrayList();
+        Iterator fieldIterator = fieldTable.values().iterator();
+        while (fieldIterator.hasNext()) {
+            MCRFieldDef field = (MCRFieldDef) (fieldIterator.next());
+            if (field.index.equals(index))
+                fields.add(field);
+        }
+        return fields;
+    }
+
+    /**
+     * Returns the ID of the index this field belongs to
+     * 
+     * @return the index ID
+     */
+    public String getIndex() {
+        return index;
+    }
+
+    /**
      * Returns the name of the field
+     * 
      * @return the field's name
      */
     public String getName() {
         return name;
     }
 
-    /** 
+    /**
      * Returns the data type of this field as defined in fieldtypes.xml
-     * @return the data type 
+     * 
+     * @return the data type
      */
     public String getDataType() {
         return dataType;
     }
 
-    /** 
+    /**
      * Returns true if this field can be used as sort criteria
-     * @return true, if field can be used to sort query results 
+     * 
+     * @return true, if field can be used to sort query results
      */
     public boolean isSortable() {
         return sortable;
+    }
+
+    /**
+     * Returns true if this field is used for this type of object
+     * 
+     * @param objectType
+     *            the type of object
+     * @return
+     */
+    boolean isUsedForObjectType(String objectType) {
+        if (objects == null)
+            return true;
+
+        String a = " " + objects + " ";
+        String b = " " + objectType + " ";
+        return (a.indexOf(b) >= 0);
+    }
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * createXML() method of MCRObject
+     */
+    final static String OBJECT_METADATA = "objectMetadata";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * createXML() method of MCRFile
+     */
+    final static String FILE_METADATA = "fileMetadata";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * XML content of the MCRFile
+     */
+    final static String FILE_XML_CONTENT = "fileXMLContent";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * XML content of a pure JDOM xml document
+     */
+    final static String XML = "xml";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * text content of the MCRFile, using text filter plug-ins.
+     */
+    final static String FILE_TEXT_CONTENT = "fileTextContent";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
+     * MCRSearcher that does the search, this means it is technical hit metadata
+     * added by the searcher when the query results are built.
+     */
+    final static String SEARCHER_HIT_METADATA = "searcherHitMetadata";
+
+    /**
+     * Returns a keyword identifying where the values of this field come from.
+     * 
+     * @see #FILE_METADATA
+     * @see #FILE_TEXT_CONTENT
+     * @see #FILE_XML_CONTENT
+     * @see #OBJECT_METADATA
+     * @see #SEARCHER_HIT_METADATA
+     * @see #XML
+     */
+    String getSource() {
+        return source;
+    }
+
+    /** A template element to be used for building individual stylesheet */
+    private static Element xslTemplate;
+
+    /** Builds a template element to be used for building individual stylesheet */
+    private static void buildXSLTemplate() {
+        xslTemplate = new Element("stylesheet");
+        xslTemplate.setAttribute("version", "1.0");
+        xslTemplate.setNamespace(xslns);
+        xslTemplate.addNamespaceDeclaration(xmlns);
+        xslTemplate.addNamespaceDeclaration(xlinkns);
+        xslTemplate.addNamespaceDeclaration(xalanns);
+        xslTemplate.addNamespaceDeclaration(extns);
+        xslTemplate.setAttribute("extension-element-prefixes", "ext");
+
+        Element template = new Element("template", xslns);
+        template.setAttribute("match", "/");
+        xslTemplate.addContent(template);
+
+        Element fieldValues = new Element("fieldValues", mcrns);
+        template.addContent(fieldValues);
+
+        Element forEach = new Element("for-each", xslns);
+        fieldValues.addContent(forEach);
+    }
+
+    /** The stylesheet to build values for this field from XML source data */
+    private Document xsl = null;
+    
+    /** Returns a stylesheet to build values for this field from XML source data */
+    Document getStylesheet() {
+        return xsl;
+    }
+
+    private void buildStylesheet( Element field )
+    {
+        field.detach();
+        
+        String xpath = field.getAttributeValue("xpath");
+        if ((xpath == null) || (xpath.trim().length() == 0)) {
+            return;
+        }
+
+        Element stylesheet = (Element) (xslTemplate.clone());
+        xsl = new Document(stylesheet);
+        
+        Element forEach = stylesheet.getChild( "template", xslns ).getChild( "fieldValues", mcrns ).getChild( "for-each", xslns );
+        forEach.setAttribute("select", xpath);
+
+        field.removeAttribute("source");
+        field.removeAttribute("objects");
+        field.removeAttribute("xpath");
+        forEach.addContent(field);
+        
+        field.setAttribute("value", "{" + field.getAttributeValue("value") + "}");
+
+        List attributes = field.getChildren("attribute", mcrns);
+
+        for (int j = 0; j < attributes.size(); j++) {
+            Element attribute = (Element) (attributes.get(j));
+            attribute.setAttribute("value", "{" + attribute.getAttributeValue("value") + "}");
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("---------- stylesheet for field " + name + " ---------" );
+            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+            LOGGER.debug(out.outputString(xsl));
+            LOGGER.debug("------------------------------------------------------------" );
+        }
     }
 }
