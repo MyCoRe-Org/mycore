@@ -49,10 +49,6 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
         }
     }
 
-    private void dropTable() throws MCRPersistenceException {
-        MCRSQLConnection.justDoUpdate("DROP TABLE " + table);
-    }
-
     private void createTable() {
         MCRSQLConnection.justDoUpdate(new MCRSQLStatement(table).addColumn("ID CHAR(16) NOT NULL PRIMARY KEY").addColumn("PID CHAR(16)").addColumn("TYPE CHAR(1) NOT NULL").addColumn("OWNER VARCHAR(" + Integer.toString(MCRObjectID.MAX_LENGTH) + ") NOT NULL").addColumn("NAME VARCHAR(250) NOT NULL").addColumn("LABEL VARCHAR(250)").addColumn("SIZE BIGINT NOT NULL")
                 .addColumn("DATE TIMESTAMP NOT NULL").addColumn("STOREID VARCHAR(32)").addColumn("STORAGEID VARCHAR(250)").addColumn("FCTID VARCHAR(32)").addColumn("MD5 CHAR(32)").addColumn("NUMCHDD INTEGER") // direct
