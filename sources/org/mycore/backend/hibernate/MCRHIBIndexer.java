@@ -23,7 +23,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -32,10 +31,10 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
-import org.jdom.Element;
 import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 
 public class MCRHIBIndexer extends MCRQueryIndexer {
@@ -153,13 +152,13 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
 
             if (!hibconnection.containsMapping(SQLQueryTable)) {
                 MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
-
-                Iterator it = queryManager.getQueryFields().keySet().iterator();
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
-
-                while (it.hasNext()) {
-                    Element el = (Element) queryManager.getQueryFields().get(it.next());
-                    map.addColumn(el.getAttributeValue("name"), el.getAttributeValue("name"), hibconnection.getHibType(el.getAttributeValue("type")), 2147483647, false, false, false);
+                List fds = MCRFieldDef.getFieldDefs( "metadata" );
+                for( int i = 0; i < fds.size(); i++ )
+                {
+                  MCRFieldDef fd = (MCRFieldDef)( fds.get( i ) );
+                  if( ! MCRFieldDef.SEARCHER_HIT_METADATA.equals( fd.getSource() ) )
+                    map.addColumn(fd.getName(),fd.getName(),hibconnection.getHibType(fd.getDataType()),2147483647, false, false, false);
                 }
 
                 cfg.addXML(map.getTableXML());

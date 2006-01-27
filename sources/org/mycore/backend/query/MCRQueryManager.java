@@ -30,15 +30,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.mycore.backend.query.helper.GenClasses;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -58,16 +56,8 @@ import org.mycore.services.fieldquery.MCRSearcherBase;
  * 
  */
 public class MCRQueryManager extends MCRSearcherBase {
-    /** the logger */
+
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
-
-    private Document doc = new Document();
-
-    private static String searchfield = "";
-
-    protected HashMap searchfields = new HashMap();
-
-    private static MCRConfiguration config;
 
     private static MCRQueryManager singleton;
 
@@ -81,9 +71,10 @@ public class MCRQueryManager extends MCRSearcherBase {
 
     private MCRQueryManager() {
         try {
-            config = MCRConfiguration.instance();
-            searchfield = config.getString("MCR.QuerySearchFields", "searchfields.xml");
-            loadFields();
+            String uri = "resource:searchfields.xml";
+            Element def = MCRURIResolver.instance().resolve(uri);
+            GenClasses.loadFields(def);
+            
             if (MCRQueryIndexer.queryManager != null) {
             	MCRQueryIndexer.getInstance().updateConfiguration();
             }
@@ -131,37 +122,6 @@ public class MCRQueryManager extends MCRSearcherBase {
         }
     }
     
-    private void loadFields() {
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            InputStream in = this.getClass().getResourceAsStream("/" + searchfield);
-
-            if (in == null) {
-                String msg = "Could not find configuration file " + searchfield + " in CLASSPATH";
-                throw new MCRConfigurationException(msg);
-            }
-
-            builder.setValidation(false);
-            doc = builder.build(in);
-            in.close();
-            searchfields = GenClasses.loadFields(doc);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    public Element getField(String name) {
-        if (searchfields.containsKey(name)) {
-            return (Element) searchfields.get(name);
-        } else {
-            return null;
-        }
-    }
-
-    public HashMap getQueryFields() {
-        return searchfields;
-    }
-
     public void loadType(String type) {
         try {
             ArrayList objectID = new ArrayList();

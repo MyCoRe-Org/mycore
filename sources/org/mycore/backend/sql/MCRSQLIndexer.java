@@ -23,14 +23,13 @@
 
 package org.mycore.backend.sql;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.jdom.Element;
 import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 
 /**
@@ -138,11 +137,12 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         try {
             MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
             query.addColumn("MCRID VARCHAR(64) NOT NULL");
-
-            Iterator it = queryManager.getQueryFields().keySet().iterator();
-
-            while (it.hasNext()) {
-                query.addColumn(addcolumn((Element) queryManager.getQueryFields().get(it.next())));
+            List fds = MCRFieldDef.getFieldDefs( "metadata" );
+            for( int i = 0; i < fds.size(); i++ )
+            {
+              MCRFieldDef fd = (MCRFieldDef)( fds.get( i ) );
+              if( ! MCRFieldDef.SEARCHER_HIT_METADATA.equals( fd.getSource() ) )
+                  query.addColumn(buildColumn(fd));
             }
 
             if (MCRSQLConnection.doesTableExist(SQLQueryTable)) {
@@ -166,9 +166,9 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
      *            jdom-element with definition of searchfield
      * @return formated sql-string for table generation
      */
-    private String addcolumn(Element el) {
-        StringBuffer sbRet = new StringBuffer().append("`" + el.getAttributeValue("name").toUpperCase() + "` ");
-        String type = el.getAttributeValue("type").toLowerCase();
+    private String buildColumn(MCRFieldDef fd) {
+        StringBuffer sbRet = new StringBuffer().append("`" + fd.getName().toUpperCase() + "` ");
+        String type = fd.getDataType().toLowerCase();
 
         if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
             sbRet.append("TEXT");

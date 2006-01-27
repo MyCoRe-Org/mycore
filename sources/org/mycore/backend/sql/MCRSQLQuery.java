@@ -28,10 +28,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
@@ -103,11 +103,11 @@ public class MCRSQLQuery implements MCRConditionVisitor {
      */
     public void visitQuery(MCRCondition entry) {
         try {
-            Element el = entry.info();
-            String fieldtype = MCRQueryManager.getInstance().getField(el.getAttributeValue("field")).getAttributeValue("type");
-            String fieldname = el.getAttributeValue("field");
-            String operator = el.getAttributeValue("operator");
-            String value = el.getAttributeValue("value");
+            MCRQueryCondition qc = (MCRQueryCondition)( entry );
+            String fieldtype = qc.getField().getDataType();
+            String operator = qc.getOperator();
+            String value = qc.getValue();
+            String fieldname = qc.getField().getName();
 
             /** transform values and operators * */
             if (fieldtype.equals("text") || fieldtype.equals("name") || fieldtype.equals("identifier")) {
