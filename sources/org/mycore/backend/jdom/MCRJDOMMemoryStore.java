@@ -228,7 +228,7 @@ public class MCRJDOMMemoryStore {
         Hashtable h = getObjects(type);
 
         for (Enumeration e = h.keys(); e.hasMoreElements();) {
-            logger.info((String) (e.nextElement().toString()));
+            logger.info(e.nextElement().toString());
         }
     }
 }
