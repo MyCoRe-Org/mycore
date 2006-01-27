@@ -24,7 +24,6 @@
 package org.mycore.backend.query;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 //import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcherBase;
