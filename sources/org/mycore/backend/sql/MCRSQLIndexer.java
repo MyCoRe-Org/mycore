@@ -31,6 +31,7 @@ import org.jdom.Element;
 import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRFieldValue;
 
 /**
  * 
@@ -98,14 +99,12 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
 
         for (int i = 0; i < values.size(); i++) {
-            Element fieldel = (Element) values.get(i);
-            String field = fieldel.getAttributeValue("name");
-            String value = fieldel.getAttributeValue("value");
+            MCRFieldValue fv = (MCRFieldValue)( values.get(i));
+            String field = fv.getField().getName();
+            String value = fv.getValue();
+            String type  = fv.getField().getDataType();
 
             if (value != "") {
-                Element el = (Element) queryManager.getQueryFields().get(field);
-                String type = el.getAttributeValue("type");
-
                 if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
                     query.setValue(new MCRSQLColumn(field, value.replaceAll("\'", "''"), "string"));
                 } else if (type.equals("date")) {
@@ -128,47 +127,6 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
         } finally {
             c.release();
         }
-        
-        /*
-          MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-        MCRSQLStatement query = new MCRSQLStatement(SQLQueryTable);
-
-        query.setValue(new MCRSQLColumn("MCRID", mcrid, "string"));
-        query.setValue(new MCRSQLColumn("MCRTYPE", new MCRObjectID(mcrid).getTypeId(), "string"));
-
-        Iterator it = queryManager.getQueryFields().keySet().iterator();
-
-        for (int i = 0; i < values.size(); i++) {
-            String field = (String) it.next();
-            String value = (String) values.get(i);
-
-            if (value != "") {
-                Element el = (Element) queryManager.getQueryFields().get(field);
-                String type = el.getAttributeValue("type");
-
-                if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
-                    query.setValue(new MCRSQLColumn(field, value.replaceAll("\'", "''"), "string"));
-                } else if (type.equals("date")) {
-                    query.setValue(new MCRSQLColumn(field, value.replaceAll("\'", "''"), "string"));
-                } else if (type.equals("integer")) {
-                    query.setValue(new MCRSQLColumn(field, "" + Integer.parseInt(value.split("[|]")[0]), "integer"));
-                } else if (type.equals("decimal")) {
-                    query.setValue(new MCRSQLColumn(field, "" + value.split("[|]")[0], "decimal"));
-                } else if (type.equals("boolean")) {
-                    query.setValue(new MCRSQLColumn(field, "" + value.split("[|]")[0], "boolean"));
-                }
-            }
-        }
-
-        try {
-            c.doUpdate(query.toTypedInsertStatement());
-        } catch (Exception e) {
-            logger.error("e: " + e);
-            e.printStackTrace();
-        } finally {
-            c.release();
-        } 
-         */
     }
 
     /**

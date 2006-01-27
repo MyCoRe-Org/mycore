@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -40,13 +39,14 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRMetadata2Fields;
+import org.mycore.services.fieldquery.MCRData2Fields;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcherBase;
 
@@ -104,31 +104,20 @@ public class MCRQueryManager extends MCRSearcherBase {
      */
     public void create(MCRBase obj) {
         try{
-            MCRXMLTableManager manager = MCRXMLTableManager.instance();
-            Document metadata = MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
-
-            List values = MCRMetadata2Fields.buildFields(metadata, obj.getId().getTypeId(), MCRMetadata2Fields.METADATA);
+            List values = MCRData2Fields.buildFields( (MCRObject)obj, this.index );
            
             HashMap tempMap = new HashMap();
 
             for (int i=0; i<values.size(); i++){
-                Element tmpel= (Element) values.get(i);
-                Attribute objtype = tmpel.getAttribute("objects");
-                
-                /** check correct object type **/
-                if (objtype == null || objtype.getValue().indexOf(obj.getId().getTypeId())!=-1){
-                    if (tempMap.containsKey(tmpel.getAttributeValue("name"))){
+                MCRFieldValue fvNew= (MCRFieldValue)(values.get(i));
+                MCRFieldDef fd = fvNew.getField();
+
+                if (tempMap.containsKey(fd)){
                         /** add value to field **/
-                        Element field = (Element) tempMap.get(tmpel.getAttributeValue("name")); 
-                        Attribute att = field.getAttribute("value");
-                        att.setValue(att.getValue() + "|" + tmpel.getAttributeValue("value"));
-                        field.removeAttribute("value");
-                        field.setAttribute(att);
-                    }else{
-                        /** insert new field **/
-                        tempMap.put(tmpel.getAttributeValue("name"),tmpel);
-                    }   
-                }
+                        MCRFieldValue fvOld = (MCRFieldValue) tempMap.get(fd);
+                        fvNew = new MCRFieldValue( fd, fvNew.getValue() + "|" + fvOld.getValue() );
+                    }
+                    tempMap.put(fd,fvNew);
             }
             
             values.clear();

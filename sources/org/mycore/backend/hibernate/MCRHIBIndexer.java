@@ -36,6 +36,7 @@ import org.jdom.Element;
 import org.mycore.backend.query.MCRQueryIndexer;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRFieldValue;
 
 public class MCRHIBIndexer extends MCRQueryIndexer {
     protected static MCRHIBMapping genTable = new MCRHIBMapping();
@@ -119,7 +120,8 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
         for (int i = 0; i < values.size(); i++) {
             try {
                 if (values.get(i) != null) {
-                    query.setValue("set" + ((Element) values.get(i)).getAttributeValue("name"), ((Element) values.get(i)).getAttributeValue("value"));
+                    MCRFieldValue fv = (MCRFieldValue) (values.get(i));
+                    query.setValue("set" + fv.getField().getName(), fv.getValue());
                 }
             } catch (Exception e) {
                 logger.error(e);
@@ -156,7 +158,7 @@ public class MCRHIBIndexer extends MCRQueryIndexer {
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
 
                 while (it.hasNext()) {
-                    Element el = (Element) queryManager.getQueryFields().get((String) it.next());
+                    Element el = (Element) queryManager.getQueryFields().get(it.next());
                     map.addColumn(el.getAttributeValue("name"), el.getAttributeValue("name"), hibconnection.getHibType(el.getAttributeValue("type")), 2147483647, false, false, false);
                 }
 
