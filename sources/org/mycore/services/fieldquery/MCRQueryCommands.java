@@ -49,7 +49,8 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
     }
 
     public static void runQuery() {
-        MCRResults res = MCRQueryManager.getInstance().search(MCRQueryManager.getInstance().getQuery());
-        System.out.println(res.toString());
+        String query = MCRQueryManager.getInstance().getQuery();
+        MCRResults res = MCRQueryManager.getInstance().search(query);
+        System.out.println(res);
     }
 }
