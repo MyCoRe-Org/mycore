@@ -29,13 +29,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
