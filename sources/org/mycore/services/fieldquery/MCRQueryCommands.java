@@ -21,31 +21,27 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.query;
+package org.mycore.services.fieldquery;
 
-import org.apache.log4j.Logger;
-import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRClassificationCommands;
+import java.util.ArrayList;
+
+import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.frontend.cli.MCRCommand;
-import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.frontend.cli.MCRExternalCommandInterface;
 
-public class MCRQueryCommands extends MCRAbstractCommands {
-    /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+/**
+ * Provides commands to test the query classes using the command line interface
+ * 
+ * @author Arne Seifert
+ * @author Frank Lützenkirchen
+ */
+public class MCRQueryCommands implements MCRExternalCommandInterface {
 
-    /**
-     * constructor with commands.
-     */
-    public MCRQueryCommands() {
-        super();
-
-        MCRCommand com = null;
-
-        com = new MCRCommand("initial load querytable", "org.mycore.backend.query.MCRQueryCommands.init", "The command imports objects of given type into querytable.");
-        command.add(com);
-
-        com = new MCRCommand("run query", "org.mycore.backend.query.MCRQueryCommands.runQuery", "lists all MCRID for query");
-        command.add(com);
+    public ArrayList getPossibleCommands() {
+        ArrayList commands = new ArrayList();
+        commands.add(new MCRCommand("initial load querytable", "org.mycore.backend.query.MCRQueryCommands.init", "The command imports objects of given type into querytable."));
+        commands.add(new MCRCommand("run query", "org.mycore.backend.query.MCRQueryCommands.runQuery", "lists all MCRID for query"));
+        return commands;
     }
 
     public static void init() {
@@ -56,6 +52,4 @@ public class MCRQueryCommands extends MCRAbstractCommands {
         MCRResults res = MCRQueryManager.getInstance().search(MCRQueryManager.getInstance().getQuery());
         System.out.println(res.toString());
     }
-    
-    
 }
