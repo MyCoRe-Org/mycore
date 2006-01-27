@@ -49,7 +49,7 @@ public class MCRXMLFunctions {
 
 	private static final String HOST_SUFFIX = "_host";
 
-	private static final String PORT_SUFFIX = "_host";
+	private static final String PORT_SUFFIX = "_port";
 
 	private static final String PROTOCOLL_SUFFIX = "_protocol";
 
@@ -96,8 +96,8 @@ public class MCRXMLFunctions {
 		returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http")).append("://").append(
 				CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
 		String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
-		if (port.equals(DEFAULT_PORT)) {
-			returns.append(":").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), "80"));
+		if (!port.equals(DEFAULT_PORT)) {
+			returns.append(":").append(port);
 		}
 		return returns;
 	}
