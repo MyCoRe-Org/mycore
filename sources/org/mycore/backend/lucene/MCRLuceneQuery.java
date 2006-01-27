@@ -25,24 +25,24 @@ package org.mycore.backend.lucene;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Enumeration;
-import java.util.Properties;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.document.Field;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchField;
 import org.xml.sax.InputSource;
 
 /**
@@ -174,25 +174,17 @@ public class MCRLuceneQuery implements MCRConditionVisitor {
                 MCRHit hit = new MCRHit(id);
 
                 Enumeration fields = doc.fields();
-                Field field;
-                Properties props = new Properties();
-                
                 while (fields.hasMoreElements()) 
                 {
-                  field = (Field) fields.nextElement();
+                  Field field = (Field) fields.nextElement();
                   if ( field.isStored() && !"mcrid".equals(field.name()) )
                   {
-                    String name  = field.name();
-                    String value = field.stringValue();
-                    props.setProperty( name, value );
-                    MCRSearchField sf = new MCRSearchField( name );
-                    if (sf.isSortable())
-                      hit.addSortData(name, value);
+                    MCRFieldDef fd = MCRFieldDef.getDef( field.name() );
+                    MCRFieldValue fv = new MCRFieldValue( fd, field.stringValue() );
+                    hit.addMetaData( fv );
+                    if (fd.isSortable()) hit.addSortData( fv );
                   }
                 }
-                
-                if (props.size() > 0)
-                  hit.addMetaData(props);
 
                 result.addHit(hit);
              } // MCRAccessManager

@@ -45,9 +45,10 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchField;
 import org.mycore.services.fieldquery.MCRSearcherBase;
 import org.mycore.services.fieldquery.MCRSimpleCondition;
 
@@ -85,9 +86,9 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
         Element root = new Element("data");
 
         for (int i = 0; i < fields.size(); i++) {
-            MCRSearchField field = (MCRSearchField) (fields.get(i));
-            Element e = new Element(field.getName());
-            e.addContent(field.getValue());
+            MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
+            Element e = new Element(fv.getField().getName());
+            e.addContent(fv.getValue());
             root.addContent(e);
         }
 
@@ -132,7 +133,6 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
             }
         }
 
-        results.setComplete();
         LOGGER.debug("MCRJDOMSearcher results completed");
 
         return results;
@@ -217,7 +217,7 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
             sb.append("[");
 
             if ("= < > <= >=".indexOf(sc.getOperator()) >= 0) {
-                String type = MCRSearchField.getDataType(sc.getField());
+                String type = MCRFieldDef.getDef(sc.getField()).getDataType();
 
                 if ("integer".equals(type) || "decimal".equals(type)) {
                     sb.append("number(text()) ");
