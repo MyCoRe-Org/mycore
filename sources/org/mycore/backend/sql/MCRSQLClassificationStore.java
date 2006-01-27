@@ -54,8 +54,6 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
 
     private String tableCategLabel;
 
-    private String tableLinkClass;
-
     private int lengthClassID = MCRMetaClassification.MAX_CLASSID_LENGTH;
 
     private int lengthCategID = MCRMetaClassification.MAX_CATEGID_LENGTH;
@@ -80,7 +78,6 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
         tableClassLabel = config.getString("MCR.classifications_store_sql_table_classlabel", "MCRCLASSLABEL");
         tableCateg = config.getString("MCR.classifications_store_sql_table_categ", "MCRCATEG");
         tableCategLabel = config.getString("MCR.classifications_store_sql_table_categlabel", "MCRCATEGLABEL");
-        tableLinkClass = config.getString("MCR.linktable_store_sql_table_class", "MCRLINKCLASS");
 
         if (!MCRSQLConnection.doesTableExist(tableClass)) {
             logger.info("Create table " + tableClass);
