@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
@@ -79,24 +78,23 @@ public class GenClasses {
     }
 
     private void readDefinition(String path, String dest) {
-        SAXBuilder builder = new SAXBuilder();
-
         try {
+            SAXBuilder builder = new SAXBuilder();
             File d = new File(path);
             builder.setValidation(false);
-            searchfields = loadFields(builder.build(d));
+            searchfields = loadFields(builder.build(d).getRootElement());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static HashMap loadFields(Document doc) {
+    public static HashMap loadFields(Element def) {
         HashMap map = new HashMap();
         List fields = new LinkedList();
 
-        for (int i = 0; i < doc.getRootElement().getChildren().size(); i++) {
-            if (((Element) doc.getRootElement().getChildren().get(i)).getAttributeValue("id").equals("metadata")) {
-                fields = ((Element) doc.getRootElement().getChildren().get(i)).getChildren();
+        for (int i = 0; i < def.getChildren().size(); i++) {
+            if (((Element) def.getChildren().get(i)).getAttributeValue("id").equals("metadata")) {
+                fields = ((Element) def.getChildren().get(i)).getChildren();
 
                 break;
             }
