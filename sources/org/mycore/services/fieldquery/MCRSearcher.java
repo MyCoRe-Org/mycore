@@ -37,9 +37,14 @@ public interface MCRSearcher {
      * The heart of the searcher: Executes a query and returns the result list
      * 
      * @param condition
-     *            the query condition order list of MCRSortBy objects for
-     *            orderby condition maxResults int with max number of results
+     *            the query condition
+     * @param list
+     *            a List of MCRSortBy objects for sorting results, may be null
+     * @param maxResults
+     *            maximum number of results to return
      * @return the result list
+     * 
+     * @see MCRQueryParser
      */
     public MCRResults search(MCRCondition condition, List order, int maxResults);
 }
