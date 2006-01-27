@@ -51,7 +51,7 @@ import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.mycore.common.MCRUtils;
-import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRFieldDef;
 
 /**
  * This class builds a Lucene Query from XML query (specified by Frank
@@ -112,7 +112,7 @@ public class MCRBuildLuceneQuery {
 
                 LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
 
-                String fieldtype = MCRSearchField.getDataType(field);
+                String fieldtype = MCRFieldDef.getDef( field ).getDataType();
 
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
