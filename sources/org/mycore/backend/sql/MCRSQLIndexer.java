@@ -99,8 +99,8 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
 
         for (int i = 0; i < values.size(); i++) {
             Element fieldel = (Element) values.get(i);
-            String field = (String) fieldel.getAttributeValue("name");
-            String value = (String) fieldel.getAttributeValue("value");
+            String field = fieldel.getAttributeValue("name");
+            String value = fieldel.getAttributeValue("value");
 
             if (value != "") {
                 Element el = (Element) queryManager.getQueryFields().get(field);
@@ -184,7 +184,7 @@ public class MCRSQLIndexer extends MCRQueryIndexer {
             Iterator it = queryManager.getQueryFields().keySet().iterator();
 
             while (it.hasNext()) {
-                query.addColumn(addcolumn((Element) queryManager.getQueryFields().get((String) it.next())));
+                query.addColumn(addcolumn((Element) queryManager.getQueryFields().get(it.next())));
             }
 
             if (MCRSQLConnection.doesTableExist(SQLQueryTable)) {
