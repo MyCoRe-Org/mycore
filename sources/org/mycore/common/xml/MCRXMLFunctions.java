@@ -91,7 +91,7 @@ public class MCRXMLFunctions {
 		return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
 	}
 
-	private static StringBuffer getBaseLink(String hostAlias) {
+	public static StringBuffer getBaseLink(String hostAlias) {
 		StringBuffer returns = new StringBuffer();
 		returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http")).append("://").append(
 				CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
