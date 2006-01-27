@@ -68,7 +68,7 @@ public class GenClasses {
             jc.addField("String", "mcrid");
 
             while (it.hasNext()) {
-                Element el = (Element) searchfields.get((String) it.next());
+                Element el = (Element) searchfields.get(it.next());
                 jc.addField((String) typeMapping.get(el.getAttributeValue("type")), el.getAttributeValue("name"));
             }
 
