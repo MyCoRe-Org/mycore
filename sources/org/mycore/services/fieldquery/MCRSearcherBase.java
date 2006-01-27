@@ -51,7 +51,6 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
     /** The logger */
     public static Logger LOGGER = Logger.getLogger(MCRSearcherBase.class.getName());
 
-    
     /** The unique searcher ID for this MCRSearcher implementation */
     protected String ID;
 
@@ -128,8 +127,7 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
     }
 
     /**
-     * Handles object repair events. 
-     * Calls handleObjectUpdated
+     * Handles object repair events. Calls handleObjectUpdated
      * 
      * @param evt
      *            the event that occured
@@ -137,11 +135,9 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
      *            the MCRObject that caused the event
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-      handleObjectUpdated( evt, obj);
+        handleObjectUpdated(evt, obj);
     }
-    
-    
-    
+
     /**
      * Adds field values to the search index. Searchers that need an indexer
      * must overwrite this method to store the values in their backend index. If
@@ -152,7 +148,7 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
      * @param entryID
      *            the unique ID of this entry in the index
      * @param fields
-     *            a List of MCRSearchField objects
+     *            a List of MCRFieldValue objects
      */
     protected void addToIndex(String entryID, List fields) {
     }
@@ -168,20 +164,20 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
      */
     protected void removeFromIndex(String entryID) {
     }
-    
+
     /**
-     * Searcher implementation for different kinds of query-types. Uses 
+     * Searcher implementation for different kinds of query-types. Uses
      * implemenation of MCRSeacher in non abstract classes.
+     * 
      * @param query
-     *          as xml-query string
-     * @return MCRResults
-     *          with matching records
+     *            as xml-query string
+     * @return MCRResults with matching records
      */
-    public MCRResults search(String query){
+    public MCRResults search(String query) {
         try {
             SAXBuilder builder = new SAXBuilder();
             org.jdom.Document doc = builder.build(new InputSource(new StringReader(query)));
-            
+
             return search(doc);
 
         } catch (Exception e) {
@@ -189,38 +185,34 @@ public abstract class MCRSearcherBase extends MCREventHandlerBase implements MCR
             return null;
         }
     }
-    
-    /**
-     * Searcher implementation for different kinds of query-types. Uses 
-     * implemenation of MCRSeacher in non abstract classes.
-     * @param query
-     *          as jdom-document
-     * @return MCRResults
-     *          with matching records
-     */
-    public MCRResults search(org.jdom.Document query){
-        try {
 
+    /**
+     * Searcher implementation for different kinds of query-types. Uses
+     * implemenation of MCRSeacher in non abstract classes.
+     * 
+     * @param query
+     *            as jdom-document
+     * @return MCRResults with matching records
+     */
+    public MCRResults search(org.jdom.Document query) {
+        try {
             List order = new LinkedList();
             org.jdom.Element el_sort = query.getRootElement().getChild("sortby");
-            
-            for (int i=0; i<el_sort.getChildren().size(); i++){
-                String name = ((org.jdom.Element)el_sort.getChildren().get(i)).getAttributeValue("field");
-                MCRSearchField sortby = new MCRSearchField( name );
-                if (((org.jdom.Element) el_sort.getChildren().get(i)).getAttributeValue("order").equals("ascending")){
-                    sortby.setSortOrder(MCRSearchField.ASCENDING);
-                }else{
-                    sortby.setSortOrder(MCRSearchField.DESCENDING);
-                }
-                order.add(sortby);
+
+            for (int i = 0; i < el_sort.getChildren().size(); i++) {
+                Element sortByElem = (org.jdom.Element) (el_sort.getChildren().get(i));
+                String name = sortByElem.getAttributeValue("field");
+                String ad = sortByElem.getAttributeValue("order");
+
+                MCRFieldDef fd = MCRFieldDef.getDef(name);
+                boolean direction = ("ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING);
+                order.add(new MCRSortBy(fd, direction));
             }
-            
-            return search(new MCRQueryParser().parse(((Element)query.getRootElement().getChild("conditions").getChildren().get(0))), 
-                    order, 
-                    Integer.parseInt(query.getRootElement().getAttributeValue("maxResults")));
+
+            return search(new MCRQueryParser().parse(((Element) query.getRootElement().getChild("conditions").getChildren().get(0))), order, Integer.parseInt(query.getRootElement().getAttributeValue("maxResults")));
         } catch (Exception e) {
             LOGGER.error(e);
             return null;
         }
-    }    
+    }
 }
