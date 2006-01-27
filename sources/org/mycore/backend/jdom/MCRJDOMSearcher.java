@@ -45,12 +45,11 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcherBase;
-import org.mycore.services.fieldquery.MCRSimpleCondition;
+import org.mycore.services.fieldquery.MCRQueryCondition;
 
 /**
  * Implements a searcher and indexer for MCRObject metadata using only data in
@@ -211,13 +210,13 @@ public class MCRJDOMSearcher extends MCRSearcherBase {
 
     /** Converter from MCRCondition to XSL test condition */
     private String buildXSLCondition(MCRCondition cond) {
-        if (cond instanceof MCRSimpleCondition) {
-            MCRSimpleCondition sc = (MCRSimpleCondition) cond;
-            StringBuffer sb = new StringBuffer(sc.getField());
+        if (cond instanceof MCRQueryCondition) {
+            MCRQueryCondition sc = (MCRQueryCondition) cond;
+            StringBuffer sb = new StringBuffer(sc.getField().getName());
             sb.append("[");
 
             if ("= < > <= >=".indexOf(sc.getOperator()) >= 0) {
-                String type = MCRFieldDef.getDef(sc.getField()).getDataType();
+                String type = sc.getField().getDataType();
 
                 if ("integer".equals(type) || "decimal".equals(type)) {
                     sb.append("number(text()) ");

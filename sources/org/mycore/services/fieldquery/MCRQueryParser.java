@@ -41,6 +41,13 @@ import org.mycore.parsers.bool.MCRParseException;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
+    
+    /** 
+     * Parses XML element containing a simple query condition
+     * 
+     * @param e the 'condition' element
+     * @return a instance of MCRQueryCondition
+     */
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
 
@@ -49,14 +56,21 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             String opera = e.getAttributeValue("operator");
             String value = e.getAttributeValue("value");
 
-            return new MCRSimpleCondition(field, opera, value);
+            return new MCRQueryCondition(MCRFieldDef.getDef(field), opera, value);
         } else {
             throw new MCRParseException("Not a valid <" + name + ">");
         }
     }
 
+    /** Pattern for MCRQueryConditions expressed as String */
     private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
 
+    /** 
+     * Parses a String containing a simple query condition
+     * 
+     * @param s the condition as a String
+     * @return a instance of MCRQueryCondition
+     */
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         Matcher m = pattern.matcher(s);
 
@@ -69,7 +83,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 value = value.substring(1, value.length() - 1);
             }
 
-            return new MCRSimpleCondition(field, operator, value);
+            return new MCRQueryCondition(MCRFieldDef.getDef(field), operator, value);
         } else {
             throw new MCRParseException("Not a valid condition: " + s);
         }

@@ -28,42 +28,36 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
+ * Represents a simple query condition, which consists of a search field,
+ * a value and a comparison operator.
+ * 
  * @author Frank Lützenkirchen
  */
-public class MCRSimpleCondition implements MCRCondition {
-    private String field;
-
+public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
+    
+    /** The comparison operator used in this condition */
     private String operator;
 
-    private String value;
-
-    public MCRSimpleCondition(String field, String operator, String value) {
-        this.field = field;
+    /** Creates a new simple query condition */
+    public MCRQueryCondition(MCRFieldDef field, String operator, String value) {
+        super( field, value );
         this.operator = operator;
-        this.value = value;
     }
 
-    public String getField() {
-        return field;
-    }
-
+    /** Returns the comparison operator used in this condition */
     public String getOperator() {
         return operator;
     }
 
-    public String getValue() {
-        return value;
-    }
-
     public String toString() {
-        return field + " " + operator + " \"" + value + "\"";
+        return getField().getName() + " " + operator + " \"" + getValue() + "\"";
     }
 
     public Element toXML() {
         Element condition = new Element("condition");
-        condition.setAttribute("field", field);
+        condition.setAttribute("field", getField().getName());
         condition.setAttribute("operator", operator);
-        condition.setAttribute("value", value);
+        condition.setAttribute("value", getValue());
 
         return condition;
     }
