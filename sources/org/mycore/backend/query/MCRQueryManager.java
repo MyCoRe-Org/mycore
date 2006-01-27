@@ -105,7 +105,7 @@ public class MCRQueryManager extends MCRSearcherBase {
     public void create(MCRBase obj) {
         try{
             MCRXMLTableManager manager = MCRXMLTableManager.instance();
-            Document metadata = (Document) MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
+            Document metadata = MCRXMLHelper.parseXML(manager.retrieve(obj.getId()), false);
 
             List values = MCRMetadata2Fields.buildFields(metadata, obj.getId().getTypeId(), MCRMetadata2Fields.METADATA);
            
@@ -134,7 +134,7 @@ public class MCRQueryManager extends MCRSearcherBase {
             values.clear();
             Iterator it = tempMap.keySet().iterator();
             while (it.hasNext()){
-                values.add((Element) tempMap.get(it.next()));
+                values.add(tempMap.get(it.next()));
             }
             MCRQueryIndexer.getInstance().insertInQuery(obj.getId().getId(), values);
         }catch(Exception e){
