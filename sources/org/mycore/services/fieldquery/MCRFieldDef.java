@@ -152,7 +152,7 @@ public class MCRFieldDef {
      *            the ID of the index
      * @return a List of MCRFieldDef objects for that index
      */
-    static List getFieldDefs(String index) {
+    public static List getFieldDefs(String index) {
         List fields = new ArrayList();
         Iterator fieldIterator = fieldTable.values().iterator();
         while (fieldIterator.hasNext()) {
@@ -219,38 +219,38 @@ public class MCRFieldDef {
      * A keyword identifying that the source of the values of this field is the
      * createXML() method of MCRObject
      */
-    final static String OBJECT_METADATA = "objectMetadata";
+    public final static String OBJECT_METADATA = "objectMetadata";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * createXML() method of MCRFile
      */
-    final static String FILE_METADATA = "fileMetadata";
+    public final static String FILE_METADATA = "fileMetadata";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * XML content of the MCRFile
      */
-    final static String FILE_XML_CONTENT = "fileXMLContent";
+    public final static String FILE_XML_CONTENT = "fileXMLContent";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * XML content of a pure JDOM xml document
      */
-    final static String XML = "xml";
+    public final static String XML = "xml";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * text content of the MCRFile, using text filter plug-ins.
      */
-    final static String FILE_TEXT_CONTENT = "fileTextContent";
+    public final static String FILE_TEXT_CONTENT = "fileTextContent";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * MCRSearcher that does the search, this means it is technical hit metadata
      * added by the searcher when the query results are built.
      */
-    final static String SEARCHER_HIT_METADATA = "searcherHitMetadata";
+    public final static String SEARCHER_HIT_METADATA = "searcherHitMetadata";
 
     /**
      * Returns a keyword identifying where the values of this field come from.
@@ -262,7 +262,7 @@ public class MCRFieldDef {
      * @see #SEARCHER_HIT_METADATA
      * @see #XML
      */
-    String getSource() {
+    public String getSource() {
         return source;
     }
 
