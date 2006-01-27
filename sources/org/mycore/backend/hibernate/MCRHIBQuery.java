@@ -33,7 +33,7 @@ import org.mycore.backend.query.MCRQueryManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Helper class for easy use of refelction given by hibernate. Getter and Setter
@@ -296,13 +296,9 @@ public class MCRHIBQuery implements MCRConditionVisitor {
         try {
 
             for (int i = 0; i < order.size(); i++) {
-                sb.append(((MCRSearchField) order.get(i)).getName());
-
-                if (((MCRSearchField) order.get(i)).getSortOrder() == MCRSearchField.ASCENDING ){
-                    sb.append(" asc ");
-                } else {
-                    sb.append(" desc ");
-                }
+                MCRSortBy by = (MCRSortBy)(order.get(i));
+                sb.append(by.getField().getName());
+                sb.append( by.getSortOrder() == MCRSortBy.ASCENDING ? " asc " : " desc " );
 
                 if (i < (order.size() - 1)) {
                     sb.append(", ");

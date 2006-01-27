@@ -29,9 +29,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mycore.backend.query.MCRQuerySearcher;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchField;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Hibernate implementation of the searcher
@@ -57,16 +58,16 @@ public class MCRHIBSearcher extends MCRQuerySearcher {
 
                 // fill hit meta
                 for (int j = 0; j < order.size(); j++) {
-                    String key = ((MCRSearchField) order.get(j)).getName();
-                    Object valueObj = tmpquery.getValue("get" + ((MCRSearchField) order.get(j)).getName());
-                    String value = "";
+                    MCRSortBy by = (MCRSortBy)(order.get(j));
+                    Object valueObj = tmpquery.getValue("get" + by.getField().getName());
+                    String value;
                     if (valueObj instanceof java.sql.Date) {
                     	value = ((java.sql.Date) valueObj).toString() ;
                     }else{
                     	value = (String) valueObj ;
                     }
                     if (value == null) value = "";
-                    hit.addSortData(key, value);
+                    hit.addSortData( new MCRFieldValue( by.getField(), value ) );
                 }
 
                 if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
