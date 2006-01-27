@@ -28,7 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -52,10 +52,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * Provides methods to automatically extract field values for indexing from
  * MCRObject or MCRFile using the definition in searchfields.xml. The
- * buildFields method return a list of MCRFieldValue objects with values
+ * buildFields method returns a list of MCRFieldValue objects with values
  * extracted from the object for the given search index. This class supports
  * extracting values from MCRObject metadata, MCRFile metadata, MCRFile xml
- * content and MCRFile text content using text filter plug-in.
+ * content and MCRFile text content (using the text filter plug-ins).
  * 
  * @see MCRSearcherBase#addToIndex(String, List)
  * @author Frank Lützenkirchen
@@ -90,7 +90,7 @@ public class MCRData2Fields {
      *            the MCRObject thats metadata should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml
-     * @return a List of MCRFieldValue objects that contain name, type and value
+     * @return a List of MCRFieldValue objects that contain field and value
      */
     public static List buildFields(MCRObject obj, String index) {
         return buildFields(obj, obj.getId().getTypeId(), index);
@@ -104,7 +104,7 @@ public class MCRData2Fields {
      *            the MCRFile thats data should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml
-     * @return a List of MCRFieldValue objects that contain name, type and value
+     * @return a List of MCRFieldValue objects that contain field and value
      */
     public static List buildFields(MCRFile file, String index) {
         return buildFields(file, file.getContentTypeID(), index);
@@ -128,7 +128,7 @@ public class MCRData2Fields {
             buildIndexTable();
         }
 
-        List values = new LinkedList();
+        List values = new ArrayList();
 
         // Are there any search fields defined for this index?
         List fieldDefList = (List) (indexTable.get(index));
@@ -137,8 +137,8 @@ public class MCRData2Fields {
             return values;
         }
 
-        List xmlFields = new LinkedList();
-        List fileFields = new LinkedList();
+        List xmlFields = new ArrayList();
+        List fileFields = new ArrayList();
 
         for (int i = 0; i < fieldDefList.size(); i++) {
             Element fieldDef = (Element) (fieldDefList.get(i));
@@ -149,12 +149,16 @@ public class MCRData2Fields {
                 continue;
             }
 
+            // Default data source for building field values
             String defau = "xml";
             if (obj instanceof MCRFile)
-                defau = "file.metadata";
+                defau = "file.metadata"; // Build fields from MCRFile
+                                            // metadata
             if (obj instanceof MCRObject)
-                defau = "object.metadata";
+                defau = "object.metadata"; // Build fields from MCRObject xml
+                                            // metadata
 
+            // Where does the value of this field come from?
             String source = fieldDef.getAttributeValue("source", defau);
 
             if ("object.metadata".equals(source) || "file.xml".equals(source) || "xml".equals(source)) {
@@ -356,7 +360,6 @@ public class MCRData2Fields {
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("---------- stylesheet to build search fields ---------");
-
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(xsl));
                 LOGGER.debug("------------------------------------------------------");
