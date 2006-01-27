@@ -52,13 +52,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * Provides methods to automatically extract field values for indexing from
  * MCRObject or MCRFile using the definition in searchfields.xml. The
- * buildFields method return a list of MCRSearchField objects with values
+ * buildFields method return a list of MCRFieldValue objects with values
  * extracted from the object for the given search index. This class supports
  * extracting values from MCRObject metadata, MCRFile metadata, MCRFile xml
  * content and MCRFile text content using text filter plug-in.
  * 
  * @see MCRSearcherBase#addToIndex(String, List)
- * 
  * @author Frank Lützenkirchen
  */
 public class MCRData2Fields {
@@ -91,8 +90,7 @@ public class MCRData2Fields {
      *            the MCRObject thats metadata should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml
-     * @return a List of MCRSearchField objects that contain name, type and
-     *         value
+     * @return a List of MCRFieldValue objects that contain name, type and value
      */
     public static List buildFields(MCRObject obj, String index) {
         return buildFields(obj, obj.getId().getTypeId(), index);
@@ -106,13 +104,12 @@ public class MCRData2Fields {
      *            the MCRFile thats data should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml
-     * @return a List of MCRSearchField objects that contain name, type and
-     *         value
+     * @return a List of MCRFieldValue objects that contain name, type and value
      */
     public static List buildFields(MCRFile file, String index) {
         return buildFields(file, file.getContentTypeID(), index);
     }
-    
+
     /**
      * Extracts field values for indexing from the given JDOM xml document.
      * 
@@ -120,8 +117,7 @@ public class MCRData2Fields {
      *            the JDOM xml document thats data should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml
-     * @return a List of MCRSearchField objects that contain name, type and
-     *         value
+     * @return a List of MCRFieldValue objects that contain name, type and value
      */
     public static List buildFields(Document doc, String index) {
         return buildFields(doc, doc.getRootElement().getName(), index);
@@ -158,7 +154,7 @@ public class MCRData2Fields {
                 defau = "file.metadata";
             if (obj instanceof MCRObject)
                 defau = "object.metadata";
-            
+
             String source = fieldDef.getAttributeValue("source", defau);
 
             if ("object.metadata".equals(source) || "file.xml".equals(source) || "xml".equals(source)) {
@@ -167,9 +163,9 @@ public class MCRData2Fields {
                 fileFields.add(fieldDef);
             } else if ("file.textfilter".equals(source)) {
                 if (obj instanceof MCRFile) {
-                    String fieldName = fieldDef.getAttributeValue("name"); 
-                    MCRSearchField field = new MCRSearchField(fieldName);
-                    field.setFile((MCRFile) obj);
+                    String fieldName = fieldDef.getAttributeValue("name");
+                    MCRFieldDef def = MCRFieldDef.getDef(fieldName);
+                    MCRFieldValue field = new MCRFieldValue(def, (MCRFile) obj);
                     values.add(field);
                 }
             }
@@ -232,8 +228,9 @@ public class MCRData2Fields {
                 continue;
             }
 
-            MCRSearchField field = new MCRSearchField(fv.getAttributeValue("name"));
-            field.setValue(value);
+            MCRFieldDef def = MCRFieldDef.getDef(fv.getAttributeValue("name"));
+            MCRFieldValue field = new MCRFieldValue(def, value);
+
             values.add(field);
         }
     }
@@ -244,9 +241,8 @@ public class MCRData2Fields {
      */
     private static Document getXML(Object obj) {
         if (obj instanceof Document) {
-            return (Document)obj;
-        }
-        else if (obj instanceof MCRFile) {
+            return (Document) obj;
+        } else if (obj instanceof MCRFile) {
             MCRFile file = (MCRFile) obj;
 
             try {
@@ -386,7 +382,6 @@ public class MCRData2Fields {
     /**
      * Xalan XSL extension to convert MyCoRe date values to standard format. To
      * be used in a stylesheet or searchfields.xml configuration. Usage example:
-     * 
      * &lt;field name="date" type="date"
      * xpath="/mycoreobject/metadata/dates/date"
      * value="ext:normalizeDate(string(normalize-space(text())),string(@xml:lang))"
