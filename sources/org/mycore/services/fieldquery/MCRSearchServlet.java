@@ -127,9 +127,9 @@ public class MCRSearchServlet extends MCRServlet {
       int maxResults = Integer.parseInt(root.getAttributeValue("maxResults", "100"));
       MCRResults result = ls.search(cond, null, maxResults);
 
-      Document doc = result.buildXML();
+      Element resXML = result.buildXML();
       // start Layout servlet
-      request.setAttribute("MCRLayoutServlet.Input.JDOM", doc);
+      request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document( resXML ) );
 
       RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
       rd.forward(request, response);
