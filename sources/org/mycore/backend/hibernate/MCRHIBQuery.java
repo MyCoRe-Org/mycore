@@ -45,7 +45,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
  */
 public class MCRHIBQuery implements MCRConditionVisitor {
     /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRHIBIndexer.class.getName());
+    public static Logger LOGGER = Logger.getLogger(MCRHIBQuery.class);
 
     private Object queryobject;
 
