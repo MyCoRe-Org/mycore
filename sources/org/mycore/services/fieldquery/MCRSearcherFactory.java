@@ -82,16 +82,15 @@ public class MCRSearcherFactory {
     }
 
     /**
-     * Returns the MCRSearcher instance that manages the given field.
+     * Returns the MCRSearcher instance that manages the given index.
      * 
-     * @param field
-     *            a field declared in searchfields.xml
-     * @return the MCRSearcher instance that manages this field
+     * @param indexID
+     *            the ID of the search index as declared in searchfields.xml
+     * @return the MCRSearcher instance that manages this index
      * @throws MCRConfigurationException
-     *             if no MCRSearcher implementation is configured for this field
+     *             if no MCRSearcher implementation is configured for this index
      */
-    public static MCRSearcher getSearcher(MCRFieldDef field) {
-        String index = field.getIndex();
+    public static MCRSearcher getSearcherForIndex(String indexID) {
         String prefix = "MCR.Searcher.";
         String suffix = ".Index";
 
@@ -99,13 +98,13 @@ public class MCRSearcherFactory {
         Enumeration names = props.keys();
         while (names.hasMoreElements()) {
             String name = (String) (names.nextElement());
-            if (name.endsWith(suffix) && MCRConfiguration.instance().getString(name).equals(index)) {
+            if (name.endsWith(suffix) && MCRConfiguration.instance().getString(name).equals(indexID)) {
                 String searcherID = name.substring(prefix.length(), name.indexOf(suffix));
                 return getSearcher(searcherID);
             }
         }
 
-        String msg = "No searcher configured for search field " + field.getName();
+        String msg = "No searcher configured for search index " + indexID;
         throw new MCRConfigurationException(msg);
     }
 }

@@ -90,7 +90,12 @@ public class MCRQueryManager {
      * @return the query results
      */
     public static MCRResults search(MCRCondition cond, List sortBy, int maxResults) {
-        MCRSearcher searcher = findSearcher(cond);
+        String index = getIndex(cond);
+        if (index == null) {
+            throw new IllegalArgumentException("Querying multiple indexes not yet supported!");
+        }
+
+        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
         MCRResults results = searcher.search(cond, sortBy, maxResults);
 
         // Sort results if not already sorted
@@ -100,20 +105,24 @@ public class MCRQueryManager {
         return results;
     }
 
-    /**
-     * Find the MCRSearcher that can be used to query the fields referenced in
-     * the condition.
-     */
-    private static MCRSearcher findSearcher(MCRCondition cond) {
+    private static String getIndex(MCRCondition cond) {
         if (cond instanceof MCRQueryCondition)
-            return MCRSearcherFactory.getSearcher(((MCRQueryCondition) cond).getField());
+            return ((MCRQueryCondition) cond).getField().getIndex();
         else if (cond instanceof MCRNotCondition)
-            return findSearcher(((MCRNotCondition) cond).getChild());
-        else if (cond instanceof MCRAndCondition)
-            return findSearcher((MCRCondition) (((MCRAndCondition) cond).getChildren().get(0)));
-        else if (cond instanceof MCROrCondition)
-            return findSearcher((MCRCondition) (((MCROrCondition) cond).getChildren().get(0)));
+            return getIndex(((MCRNotCondition) cond).getChild());
+
+        List children = null;
+        if (cond instanceof MCRAndCondition)
+            children = ((MCRAndCondition) cond).getChildren();
         else
-            return null;
+            children = ((MCROrCondition) cond).getChildren();
+
+        String index = getIndex((MCRCondition) (children.get(0)));
+        for (int i = 1; i < children.size(); i++) {
+            String other = getIndex((MCRCondition) (children.get(i)));
+            if (!index.equals(other))
+                return null; // mixed indexes here!
+        }
+        return index;
     }
 }
