@@ -36,9 +36,6 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 
-// TODO: build table
-// TODO: load entries
-
 /**
  * @author Arne Seifert
  * @author Frank Lützenkirchen
@@ -52,6 +49,60 @@ public class MCRSQLSearcher extends MCRSearcher {
     public void init(String ID) {
         super.init(ID);
         this.table = MCRConfiguration.instance().getString(prefix + "TableName");
+        if (!MCRSQLConnection.doesTableExist(table)) {
+            createSQLQueryTable();
+        }
+    }
+
+    /**
+     * This method creates the SQL table that stores the field values to query.
+     */
+    private void createSQLQueryTable() {
+        MCRSQLStatement sQuery = new MCRSQLStatement(table);
+        sQuery.addColumn("MCRID VARCHAR(64) NOT NULL");
+
+        List fds = MCRFieldDef.getFieldDefs(getIndex());
+        for (int i = 0; i < fds.size(); i++) {
+            MCRFieldDef fd = (MCRFieldDef) (fds.get(i));
+            if (!MCRFieldDef.SEARCHER_HIT_METADATA.equals(fd.getSource()))
+                sQuery.addColumn(buildColumn(fd));
+        }
+
+        MCRSQLConnection.justDoUpdate(sQuery.toCreateTableStatement());
+
+        MCRSQLStatement sIndex = new MCRSQLStatement(table).addColumn("MCRID");
+        MCRSQLConnection.justDoUpdate(sIndex.toIndexStatement());
+    }
+
+    /**
+     * Builds SQL column definition from MCRFieldDef object when SQL table is
+     * created.
+     * 
+     * @param fd
+     *            the search field definition
+     * @return formatted SQL string for table generation
+     */
+    private String buildColumn(MCRFieldDef fd) {
+        StringBuffer sbRet = new StringBuffer().append(fd.getName().toUpperCase());
+        String type = fd.getDataType().toLowerCase();
+
+        if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
+            sbRet.append("TEXT");
+        } else if (type.equals("date")) {
+            sbRet.append("DATE");
+        } else if (type.equals("time")) {
+            sbRet.append("TIME");
+        } else if (type.equals("timestamp")) {
+            sbRet.append("TIMESTAMP");
+        } else if (type.equals("integer")) {
+            sbRet.append("INT");
+        } else if (type.equals("decimal")) {
+            sbRet.append("DOUBLE");
+        } else if (type.equals("boolean")) {
+            sbRet.append("SMALLINT");
+        }
+
+        return sbRet.toString();
     }
 
     // TODO: store all values, not just the first for each repeated field
