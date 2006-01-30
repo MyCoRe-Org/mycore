@@ -43,16 +43,15 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
 
     public ArrayList getPossibleCommands() {
         ArrayList commands = new ArrayList();
-        commands.add(new MCRCommand("run query from file {0} using searcher {1}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String String", "Runs a query that is specified as XML in the given file, using the MCRSearcher implementation with the given ID"));
+        commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String", "Runs a query that is specified as XML in the given file"));
         return commands;
     }
 
     /**
-     * Runs a query that is specified as XML in the given file, using the
-     * MCRSearcher implementation with the given ID. The results are written to
-     * stdout.
+     * Runs a query that is specified as XML in the given file. 
+     * The results are written to stdout.
      */
-    public static void runQueryFromFile(String filename, String searcherID) throws JDOMException, IOException {
+    public static void runQueryFromFile(String filename) throws JDOMException, IOException {
         File file = new File(filename);
         if (!(file.exists() && file.canRead())) {
             String msg = "File containing XML query does not exist: " + filename;
@@ -60,8 +59,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
         }
 
         Document query = new SAXBuilder().build(new File(filename));
-        MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
-        MCRResults results = searcher.search(query);
+        MCRResults results = MCRQueryManager.search(query);
         System.out.println(results);
     }
 }
