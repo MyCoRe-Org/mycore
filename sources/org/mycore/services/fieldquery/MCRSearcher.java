@@ -23,13 +23,11 @@
 
 package org.mycore.services.fieldquery;
 
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
@@ -37,7 +35,6 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
-import org.xml.sax.InputSource;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
@@ -164,27 +161,6 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      *            the unique ID of this entry in the index
      */
     protected void removeFromIndex(String entryID) {
-    }
-
-    /**
-     * Searcher implementation for different kinds of query-types. Uses
-     * implemenation of MCRSeacher in non abstract classes.
-     * 
-     * @param query
-     *            as xml-query string
-     * @return MCRResults with matching records
-     */
-    public MCRResults search(String query) {
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            org.jdom.Document doc = builder.build(new InputSource(new StringReader(query)));
-
-            return search(doc);
-
-        } catch (Exception e) {
-            LOGGER.error(e);
-            return null;
-        }
     }
 
     /**
