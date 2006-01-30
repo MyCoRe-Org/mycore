@@ -40,7 +40,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * 
  */
 public class MCRSQLQuery implements MCRConditionVisitor {
-    public static Logger LOGGER = Logger.getLogger(MCRSQLQuery.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRSQLQuery.class.getName());
 
     private StringBuffer sbquery = new StringBuffer();
 
@@ -54,13 +54,16 @@ public class MCRSQLQuery implements MCRConditionVisitor {
  
     private List order;
     
+    private String table;
+    
     /**
      * initialise query 
      * 
      * @param document
      *            xml query docuement
      */
-    public MCRSQLQuery(MCRCondition condition, List order, int maxResults) {
+    public MCRSQLQuery(String table, MCRCondition condition, List order, int maxResults) {
+        this.table = table;
         try{
             condition.accept(this);
             this.order = order;
@@ -213,7 +216,7 @@ public class MCRSQLQuery implements MCRConditionVisitor {
             }
 
             sb.append(" FROM ");
-            sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
+            sb.append(table);
             sb.append(" WHERE ");
             sb.append(getWhereClause());
 
