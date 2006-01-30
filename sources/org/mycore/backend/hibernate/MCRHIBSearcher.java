@@ -23,71 +23,117 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.mycore.backend.query.MCRQuerySearcher;
+import org.mycore.backend.sql.MCRSQLSearcher;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
- * Hibernate implementation of the searcher
+ * Hibernate implementation of MCRSearcher
  * 
  * @author Arne Seifert
- * 
+ * @author Frank Lützenkirchen
  */
-public class MCRHIBSearcher extends MCRQuerySearcher {
+public class MCRHIBSearcher extends MCRSearcher {
+    /** The logger */
+    private static Logger LOGGER = Logger.getLogger(MCRSQLSearcher.class.getName());
+
+    protected void addToIndex(String entryID, List fields) {
+        MCRHIBQuery query = new MCRHIBQuery();
+        Hashtable used = new Hashtable();
+
+        query.setValue("setmcrid", entryID);
+
+        for (int i = 0; i < fields.size(); i++) {
+            MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
+
+            // Store only first occurrence of field
+            if (used.containsKey(fv.getField()))
+                continue;
+            else
+                used.put(fv.getField(), fv.getField());
+
+            query.setValue("set" + fv.getField().getName(), fv.getValue());
+        }
+
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+
+        try {
+            session.saveOrUpdate(query.getQueryObject());
+            tx.commit();
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+            tx.rollback();
+        } finally {
+            session.close();
+        }
+    }
+
+    protected void removeFromIndex(String entryID) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+
+        try {
+            session.createQuery("delete MCRQuery where MCRID =\'" + entryID + "\'").executeUpdate();
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            LOGGER.error(e);
+        } finally {
+            session.close();
+        }
+
+    }
 
     public MCRResults search(MCRCondition condition, List order, int maxResults) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
-        MCRResults result = new MCRResults();
+        MCRResults results = new MCRResults();
 
         try {
             MCRHIBQuery hibquery = new MCRHIBQuery(condition, order);
             List l = session.createQuery(hibquery.getHIBQuery()).list();
 
-            for (int i = 0; i < l.size(); i++) {
-                MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i));
+            for (int i = 0; (i < l.size()) && (maxResults > 0) && (results.getNumHits() < maxResults); i++) {
+                MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i)); // ?
+                MCRHit hit = new MCRHit((String) (tmpquery.getValue("getmcrid")));
 
-                MCRHit hit = new MCRHit((String) tmpquery.getValue("getmcrid"));
-
-                // fill hit meta
-                for (int j = 0; j < order.size(); j++) {
-                    MCRSortBy by = (MCRSortBy)(order.get(j));
-                    Object valueObj = tmpquery.getValue("get" + by.getField().getName());
-                    String value;
-                    if (valueObj instanceof java.sql.Date) {
-                    	value = ((java.sql.Date) valueObj).toString() ;
-                    }else{
-                    	value = (String) valueObj ;
+                // Add hit sort data
+                if (order != null)
+                    for (int j = 0; j < order.size(); j++) {
+                        MCRSortBy by = (MCRSortBy) (order.get(j));
+                        Object valueObj = tmpquery.getValue("get" + by.getField().getName());
+                        String value;
+                        if (valueObj instanceof java.sql.Date) {
+                            value = ((java.sql.Date) valueObj).toString();
+                        } else {
+                            value = (String) valueObj;
+                        }
+                        hit.addSortData(new MCRFieldValue(by.getField(), value));
                     }
-                    if (value == null) value = "";
-                    hit.addSortData( new MCRFieldValue( by.getField(), value ) );
-                }
-
-                if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
-                    result.addHit(hit);
-                }else{
-                    break;
-                }
+                results.addHit(hit);
             }
             tx.commit();
 
-            if (order.size() > 0) {
-                result.setSorted(true);
-            }
-        } catch (Exception e) {
+            if ((order != null) && (order.size() > 0))
+                results.setSorted(true);
+        } catch (Exception ex) {
             tx.rollback();
-            logger.error("error in MCRHibSearcher", e);
+            LOGGER.error("Exception in MCRHibSearcher", ex);
         } finally {
             session.close();
         }
 
-        return result;
+        return results;
     }
 }
