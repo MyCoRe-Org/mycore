@@ -41,12 +41,9 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcher;
 
 /**
  * MCRQueryManager handles all Events needed für the sql/hibernate-indexer
@@ -55,7 +52,7 @@ import org.mycore.services.fieldquery.MCRSearcher;
  * @author Arne Seifert
  * 
  */
-public class MCRQueryManager extends MCRSearcher {
+public class MCRQueryManager {
 
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
 
@@ -95,7 +92,7 @@ public class MCRQueryManager extends MCRSearcher {
      */
     public void create(MCRBase obj) {
         try{
-            List values = MCRData2Fields.buildFields( (MCRObject)obj, this.index );
+            List values = MCRData2Fields.buildFields( (MCRObject)obj, "metadata" );
            
             HashMap tempMap = new HashMap();
 
@@ -200,9 +197,4 @@ public class MCRQueryManager extends MCRSearcher {
             LOGGER.error(e);
         }
     }
-
-    public MCRResults search(MCRCondition condition, List order, int maxResults) {
-        return MCRQuerySearcher.getInstance().search(condition, order, maxResults);
-    }
-
 }

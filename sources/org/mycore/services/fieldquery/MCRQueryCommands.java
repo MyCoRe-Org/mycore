@@ -50,7 +50,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
 
     public static void runQuery() {
         String query = MCRQueryManager.getInstance().getQuery();
-        MCRResults res = MCRQueryManager.getInstance().search(query);
+        MCRResults res = MCRSearcherFactory.getSearcher( "lucene" ).search(query);
         System.out.println(res);
     }
 }
