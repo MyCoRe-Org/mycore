@@ -23,11 +23,9 @@
 
 package org.mycore.services.fieldquery;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
@@ -47,7 +45,7 @@ import org.mycore.parsers.bool.MCRCondition;
  */
 public abstract class MCRSearcher extends MCREventHandlerBase implements MCREventHandler {
     /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRSearcher.class.getName());
+    public static Logger LOGGER = Logger.getLogger(MCRSearcher.class);
 
     /** The unique searcher ID for this MCRSearcher implementation */
     protected String ID;
@@ -164,34 +162,17 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     /**
-     * Searcher implementation for different kinds of query-types. Uses
-     * implementation of MCRSeacher in non abstract classes.
+     * Executes a query on this searcher. The query MUST only refer to fields that are
+     * managed by this searcher.
      * 
-     * @param query
-     *            as jdom-document
-     * @return MCRResults with matching records
+     * @param query the parsed query
+     * @param sortBy a List of MCRSortBy objects that defines the sort order of the results, may be null
+     * @param maxResults the maximum number of results to return, a value &lt; 1 means to return all results.
+     * @return the query results
+     * 
+     * @see MCRQueryParser
+     * @see MCRQueryManager
+     * @see MCRSortBy
      */
-    public MCRResults search(org.jdom.Document query) {
-        try {
-            List order = new LinkedList();
-            org.jdom.Element el_sort = query.getRootElement().getChild("sortby");
-
-            for (int i = 0; i < el_sort.getChildren().size(); i++) {
-                Element sortByElem = (org.jdom.Element) (el_sort.getChildren().get(i));
-                String name = sortByElem.getAttributeValue("field");
-                String ad = sortByElem.getAttributeValue("order");
-
-                MCRFieldDef fd = MCRFieldDef.getDef(name);
-                boolean direction = ("ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING);
-                order.add(new MCRSortBy(fd, direction));
-            }
-
-            return search(new MCRQueryParser().parse(((Element) query.getRootElement().getChild("conditions").getChildren().get(0))), order, Integer.parseInt(query.getRootElement().getAttributeValue("maxResults")));
-        } catch (Exception e) {
-            LOGGER.error(e);
-            return null;
-        }
-    }
-    
     public abstract MCRResults search( MCRCondition query, List sortBy, int maxResults );
 }
