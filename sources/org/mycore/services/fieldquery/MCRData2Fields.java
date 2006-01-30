@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * extracting values from MCRObject metadata, MCRFile metadata, MCRFile xml
  * content and MCRFile text content (using the text filter plug-ins).
  * 
- * @see MCRSearcherBase#addToIndex(String, List)
+ * @see MCRSearcher#addToIndex(String, List)
  * @author Frank Lützenkirchen
  */
 public class MCRData2Fields {

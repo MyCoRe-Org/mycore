@@ -50,7 +50,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.plugins.TextFilterPluginManager;
 
 /**
@@ -58,7 +58,7 @@ import org.mycore.services.plugins.TextFilterPluginManager;
  * 
  * @author Harald Richter
  */
-public class MCRLuceneSearcher extends MCRSearcherBase {
+public class MCRLuceneSearcher extends MCRSearcher {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
 

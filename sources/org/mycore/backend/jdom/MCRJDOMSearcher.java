@@ -48,7 +48,7 @@ import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 
 /**
@@ -62,7 +62,7 @@ import org.mycore.services.fieldquery.MCRQueryCondition;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRJDOMSearcher extends MCRSearcherBase {
+public class MCRJDOMSearcher extends MCRSearcher {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRJDOMSearcher.class);
 

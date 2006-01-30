@@ -67,10 +67,7 @@ public class MCRSearcherFactory {
 
                 Object obj = MCRConfiguration.instance().getSingleInstanceOf(searcherClass);
                 MCRSearcher s = (MCRSearcher) (obj);
-
-                if (s instanceof MCRSearcherBase) {
-                    ((MCRSearcherBase) s).init(searcherID);
-                }
+                s.init(searcherID);
 
                 table.put(searcherID, s);
             } catch (Exception ex) {
