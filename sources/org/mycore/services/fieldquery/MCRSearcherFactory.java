@@ -23,7 +23,9 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
@@ -77,5 +79,33 @@ public class MCRSearcherFactory {
         }
 
         return (MCRSearcher) (table.get(searcherID));
+    }
+
+    /**
+     * Returns the MCRSearcher instance that manages the given field.
+     * 
+     * @param field
+     *            a field declared in searchfields.xml
+     * @return the MCRSearcher instance that manages this field
+     * @throws MCRConfigurationException
+     *             if no MCRSearcher implementation is configured for this field
+     */
+    public static MCRSearcher getSearcher(MCRFieldDef field) {
+        String index = field.getIndex();
+        String prefix = "MCR.Searcher.";
+        String suffix = ".Index";
+
+        Properties props = MCRConfiguration.instance().getProperties(prefix);
+        Enumeration names = props.keys();
+        while (names.hasMoreElements()) {
+            String name = (String) (names.nextElement());
+            if (name.endsWith(suffix) && MCRConfiguration.instance().getString(name).equals(index)) {
+                String searcherID = name.substring(prefix.length(), name.indexOf(suffix));
+                return getSearcher(searcherID);
+            }
+        }
+
+        String msg = "No searcher configured for search field " + field.getName();
+        throw new MCRConfigurationException(msg);
     }
 }
