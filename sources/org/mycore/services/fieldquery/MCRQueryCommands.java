@@ -23,34 +23,45 @@
 
 package org.mycore.services.fieldquery;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import org.mycore.backend.query.MCRQueryManager;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 
 /**
  * Provides commands to test the query classes using the command line interface
  * 
- * @author Arne Seifert
  * @author Frank Lützenkirchen
+ * @author Arne Seifert
  */
 public class MCRQueryCommands implements MCRExternalCommandInterface {
 
     public ArrayList getPossibleCommands() {
         ArrayList commands = new ArrayList();
-        commands.add(new MCRCommand("initial load querytable", "org.mycore.backend.query.MCRQueryCommands.init", "The command imports objects of given type into querytable."));
-        commands.add(new MCRCommand("run query", "org.mycore.backend.query.MCRQueryCommands.runQuery", "lists all MCRID for query"));
+        commands.add(new MCRCommand("run query from file {0} using searcher {1}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String String", "Runs a query that is specified as XML in the given file, using the MCRSearcher implementation with the given ID"));
         return commands;
     }
 
-    public static void init() {
-        MCRQueryManager.getInstance().createDataBase();
-    }
+    /**
+     * Runs a query that is specified as XML in the given file, using the
+     * MCRSearcher implementation with the given ID. The results are written to
+     * stdout.
+     */
+    public static void runQueryFromFile(String filename, String searcherID) throws JDOMException, IOException {
+        File file = new File(filename);
+        if (!(file.exists() && file.canRead())) {
+            String msg = "File containing XML query does not exist: " + filename;
+            throw new org.mycore.common.MCRUsageException(msg);
+        }
 
-    public static void runQuery() {
-        String query = MCRQueryManager.getInstance().getQuery();
-        MCRResults res = MCRSearcherFactory.getSearcher( "lucene" ).search(query);
-        System.out.println(res);
+        Document query = new SAXBuilder().build(new File(filename));
+        MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
+        MCRResults results = searcher.search(query);
+        System.out.println(results);
     }
 }
