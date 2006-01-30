@@ -39,7 +39,6 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * This servlet executes queries and presents result pages.
@@ -75,12 +74,8 @@ public class MCRSearchServlet extends MCRServlet {
                 }
             }
 
-            String index = root.getAttributeValue("index");
-            MCRSearcher ls = MCRSearcherFactory.getSearcher(index);
-
-            MCRCondition cond = new MCRQueryParser().parse((Element) root.getChild("conditions").getChildren().get(0));
-            int maxResults = Integer.parseInt(root.getAttributeValue("maxResults", "100"));
-            MCRResults result = ls.search(cond, null, maxResults);
+            // Execute query
+            MCRResults result = MCRQueryManager.search( input );
 
             // start Layout servlet
             request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(result.buildXML()));
