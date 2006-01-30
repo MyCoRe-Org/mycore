@@ -26,9 +26,9 @@ package org.mycore.backend.query;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 //import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.fieldquery.MCRSearcher;
 
-public abstract class MCRQuerySearcher extends MCRSearcherBase{
+public abstract class MCRQuerySearcher extends MCRSearcher{
     //public abstract MCRResults runQuery(String query);
 
     public static Logger logger = Logger.getLogger(MCRQuerySearcher.class.getName());

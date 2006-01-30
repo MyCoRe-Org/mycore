@@ -46,7 +46,7 @@ import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcherBase;
+import org.mycore.services.fieldquery.MCRSearcher;
 
 /**
  * MCRQueryManager handles all Events needed für the sql/hibernate-indexer
@@ -55,7 +55,7 @@ import org.mycore.services.fieldquery.MCRSearcherBase;
  * @author Arne Seifert
  * 
  */
-public class MCRQueryManager extends MCRSearcherBase {
+public class MCRQueryManager extends MCRSearcher {
 
     static Logger LOGGER = Logger.getLogger(MCRQueryManager.class.getName());
 
