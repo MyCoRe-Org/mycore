@@ -23,64 +23,111 @@
 
 package org.mycore.backend.sql;
 
+import java.util.Hashtable;
 import java.util.List;
 
-import org.mycore.backend.query.MCRQuerySearcher;
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 
-/**
- * SQL implementation of the searcher
- * 
- * @author Arne Seifert
- * 
- */
-public class MCRSQLSearcher extends MCRQuerySearcher {
-    /**
-     * method runs given query-string access-control included: id of object will
-     * testet for rules of the "READ"-pool
-     * 
-     * @param query
-     *            xml-query string as jdom document
-     * @return MCRResults with MCRHit-objects
-     */
-    public MCRResults search(MCRCondition condition, List order, int maxResults) {
+// TODO: build table
+// TODO: load entries
 
+/**
+ * @author Arne Seifert
+ * @author Frank Lützenkirchen
+ */
+public class MCRSQLSearcher extends MCRSearcher {
+    /** The logger */
+    private static Logger LOGGER = Logger.getLogger(MCRSQLSearcher.class.getName());
+
+    private String table;
+
+    public void init(String ID) {
+        super.init(ID);
+        this.table = MCRConfiguration.instance().getString(prefix + "TableName");
+    }
+
+    // TODO: store all values, not just the first for each repeated field
+    protected void addToIndex(String entryID, List fields) {
+        MCRSQLStatement query = new MCRSQLStatement(table);
+        Hashtable used = new Hashtable();
+
+        for (int i = 0; i < fields.size(); i++) {
+            MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
+
+            String value = fv.getValue();
+            String name = fv.getField().getName();
+            String type = fv.getField().getDataType();
+
+            // Store only first occurrence of field
+            if (used.containsKey(name))
+                continue;
+            else
+                used.put(name, name);
+
+            MCRSQLColumn col = null;
+            if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
+                col = new MCRSQLColumn(name, value.replaceAll("\'", "''"), "string");
+            } else if (type.equals("date")) {
+                col = new MCRSQLColumn(name, value.replaceAll("\'", "''"), "string");
+            } else if (type.equals("integer")) {
+                col = new MCRSQLColumn(name, value, "integer");
+            } else if (type.equals("decimal")) {
+                col = new MCRSQLColumn(name, value, "decimal");
+            } else if (type.equals("boolean")) {
+                col = new MCRSQLColumn(name, value, "boolean");
+            }
+
+            if (col != null)
+                query.setValue(col);
+        }
+
+        String sql = query.toTypedInsertStatement();
+        LOGGER.debug(sql);
+        MCRSQLConnection.justDoUpdate(sql);
+    }
+
+    protected void removeFromIndex(String entryID) {
+        MCRSQLStatement query = new MCRSQLStatement(table).setCondition("MCRID", entryID);
+        String sql = query.toDeleteStatement();
+        LOGGER.debug(sql);
+        MCRSQLConnection.justDoUpdate(sql);
+    }
+
+    public MCRResults search(MCRCondition query, List sortBy, int maxResults) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRResults result = new MCRResults();
 
         try {
-            MCRSQLRowReader reader;
-            reader = c.doQuery(new MCRSQLQuery(condition, order, maxResults).getSQLQuery());
+            String sql = new MCRSQLQuery(table, query, sortBy, maxResults).getSQLQuery();
+            LOGGER.debug(sql);
+            MCRSQLRowReader reader = c.doQuery(sql);
 
-            while (reader.next()) {
+            while (reader.next() && (maxResults > 0) && (result.getNumHits() < maxResults)) {
                 String id = reader.getString("MCRID");
 
                 MCRHit hit = new MCRHit(id);
 
-                /* fill hit meta */
-                for (int j = 0; j < order.size(); j++) {
-                    MCRFieldDef fd = ((MCRSortBy) order.get(j)).getField();
-                    String value = reader.getString(fd.getName());
-                    hit.addSortData(new MCRFieldValue(fd, value));
-                }
-                
-                if ((maxResults > 0) && (result.getNumHits() <= maxResults)) {
-                    result.addHit(hit);
-                }else{
-                    break;
-                }
+                // Add hit sort data
+                if (sortBy != null)
+                    for (int j = 0; j < sortBy.size(); j++) {
+                        MCRFieldDef fd = ((MCRSortBy) sortBy.get(j)).getField();
+                        String value = reader.getString(fd.getName());
+                        hit.addSortData(new MCRFieldValue(fd, value));
+                    }
+                result.addHit(hit);
             }
 
-            if (order.size() > 0) {
+            if ((sortBy != null) && (sortBy.size() > 0)) {
                 result.setSorted(true);
             }
-        } catch (Exception e) {
-            logger.error(e);
         } finally {
             c.release();
         }
