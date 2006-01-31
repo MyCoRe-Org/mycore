@@ -86,17 +86,24 @@ public class MCRLuceneSearcher extends MCRSearcher {
         super.init(ID);
         IndexDir = CONFIG.getString(prefix + "IndexDir");
         LOGGER.info(prefix + "indexDir: " + IndexDir);
-
-        String lockDir = CONFIG.getString("MCR.Lucene.LockDir", "");
-        LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
-
-        File file = new File(lockDir);
-
-        if (!file.exists()) {
-            LOGGER.info("Lock Directory for Lucene doesn't exist: \"" + lockDir + "\" use " + System.getProperty("java.io.tmpdir"));
-        } else if (file.isDirectory()) {
-            System.setProperty("org.apache.lucene.lockdir", lockDir);
+        File f = new File( IndexDir );
+        if( ! f.exists() ) f.mkdirs();
+        if( ! f.isDirectory() || f.canWrite() )
+        {
+            String msg = IndexDir + " is not a directory or is not writeable!";
+            throw new org.mycore.common.MCRConfigurationException( msg );
         }
+
+        String lockDir = CONFIG.getString("MCR.Lucene.LockDir");
+        LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
+        f = new File( lockDir );
+        if( ! f.exists() ) f.mkdirs();
+        if( ! f.isDirectory() || f.canWrite() )
+        {
+            String msg = lockDir + " is not a directory or is not writeable!";
+            throw new org.mycore.common.MCRConfigurationException( msg );
+        }
+        System.setProperty("org.apache.lucene.lockdir", lockDir);
     }
 
     protected void addToIndex(String entryID, List fields) {

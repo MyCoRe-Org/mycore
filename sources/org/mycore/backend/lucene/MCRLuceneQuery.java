@@ -23,7 +23,6 @@
 
 package org.mycore.backend.lucene;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -34,16 +33,12 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
-import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
-import org.xml.sax.InputSource;
 
 /**
  * Helper class for generating lucene query from mycore query
@@ -53,47 +48,16 @@ import org.xml.sax.InputSource;
  */
 public class MCRLuceneQuery implements MCRConditionVisitor {
     /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRLuceneQuery.class.getName());
+    public static Logger LOGGER = Logger.getLogger(MCRLuceneQuery.class);
 
     private String IndexDir = "";
 
     private Query luceneQuery;
 
-    private MCRCondition cond; // query-condition
-
     private int maxResults = 200;
-
-    /**
-     * initialise query with xml-document containing complete query
-     * 
-     * @param document
-     *            xml query docuement
-     */
-    public MCRLuceneQuery(Element document) {
-        try {
-            init(document);
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
-
-    /**
-     * initialise query with xml-string containing complete query
-     * 
-     * @param xmlString
-     */
-    public MCRLuceneQuery(String xmlString) {
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            init(builder.build(new InputSource(new StringReader(xmlString))).getRootElement());
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-    }
 
     public MCRLuceneQuery(MCRCondition cond, int maxResults, String IndexDir) {
         try {
-            this.cond = cond;
             this.maxResults = maxResults;
             this.IndexDir = IndexDir;
 
@@ -106,40 +70,6 @@ public class MCRLuceneQuery implements MCRConditionVisitor {
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * fill internal fields with query and build lucene query
-     * 
-     * @param doc
-     *            document with xml query
-     */
-    private void init(Element root) {
-        try {
-            IndexDir = MCRConfiguration.instance().getString("MCR.Searcher.lucenem.IndexDir");
-            LOGGER.info("MCR.Searcher.lucenem.IndexDir: " + IndexDir);
-
-            // org.jdom.Element root = querydoc.getRootElement();
-            cond = new MCRQueryParser().parse((Element) root.getChild("conditions").getChildren().get(0));
-
-            // cond.accept(this);
-            maxResults = Integer.parseInt(root.getAttributeValue("maxResults", "200"));
-            LOGGER.debug("maxResults " + maxResults);
-
-            Element x = cond.toXML();
-            org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-            LOGGER.debug(outputter.outputString(x));
-            LOGGER.debug("input" + outputter.outputString(root));
-
-            List f = root.getChild("conditions").getChildren();
-            boolean reqf = true; // required flag Term with AND (true) or OR
-                                    // (false) combined
-            luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
-            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error(e);
         }
     }
 
