@@ -88,9 +88,14 @@ public class MCRLuceneSearcher extends MCRSearcher {
         LOGGER.info(prefix + "indexDir: " + IndexDir);
         File f = new File( IndexDir );
         if( ! f.exists() ) f.mkdirs();
-        if( ! f.isDirectory() || f.canWrite() )
+        if( ! f.isDirectory() )
         {
-            String msg = IndexDir + " is not a directory or is not writeable!";
+            String msg = IndexDir + " is not a directory!";
+            throw new org.mycore.common.MCRConfigurationException( msg );
+        }
+        if( ! f.canWrite() )
+        {
+            String msg = IndexDir + " is not writeable!";
             throw new org.mycore.common.MCRConfigurationException( msg );
         }
 
@@ -98,9 +103,14 @@ public class MCRLuceneSearcher extends MCRSearcher {
         LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
         f = new File( lockDir );
         if( ! f.exists() ) f.mkdirs();
-        if( ! f.isDirectory() || f.canWrite() )
+        if( ! f.isDirectory() )
         {
-            String msg = lockDir + " is not a directory or is not writeable!";
+            String msg = lockDir + " is not a directory!";
+            throw new org.mycore.common.MCRConfigurationException( msg );
+        }
+        if( ! f.canWrite() )
+        {
+            String msg = lockDir + " is not writeable!";
             throw new org.mycore.common.MCRConfigurationException( msg );
         }
         System.setProperty("org.apache.lucene.lockdir", lockDir);
