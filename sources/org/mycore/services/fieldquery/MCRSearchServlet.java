@@ -25,6 +25,7 @@ package org.mycore.services.fieldquery;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Vector;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -66,14 +67,22 @@ public class MCRSearchServlet extends MCRServlet {
 
             // Remove condition fields without values
             Iterator it = root.getDescendants(new ElementFilter("condition"));
+            Vector help      = new Vector();
             while (it.hasNext()) {
                 Element condition = (Element) it.next();
                 if (condition.getAttribute("value") == null) {
                     LOGGER.debug("Remove condition field without value : " + condition.getAttribute("field"));
-                    condition.detach();
+                    help.add(condition);
                 }
             }
 
+            //  delete conditions without values 
+            for( int i = help.size() - 1; i >= 0; i-- )
+            {
+              Element condition = (Element)( help.get( i ) );
+              if( condition.getAttribute( "value" ) == null ) condition.detach();
+            }
+            
             // Execute query
             MCRResults result = MCRQueryManager.search( input );
 
