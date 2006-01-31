@@ -215,7 +215,11 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 
     public boolean hasRule(String id) {
     	return hasRule(id, null);
-    }    
+    }   
+    
+	public List getAllControlledIDs() {
+		return accessStore.getDistinctStringIDs();
+	}    
     
     // not extended methods
 
