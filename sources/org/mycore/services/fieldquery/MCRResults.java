@@ -125,6 +125,21 @@ public class MCRResults {
     public int getNumHits() {
         return hits.size();
     }
+    
+    /**
+     * Cuts the result list to the given maximum size, if more
+     * hits are present.
+     *  
+     * @param maxResults the number of results to be left
+     */
+    public void cutResults( int maxResults )
+    {
+      while( ( hits.size() > maxResults  ) && (maxResults >= 0) )
+      {
+        MCRHit hit = (MCRHit)( hits.remove( hits.size() - 1 ) );
+        map.remove( hit.getID() );
+      }
+    }
 
     /**
      * The searcher must set this to true, if the hits already have been added
