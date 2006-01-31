@@ -65,9 +65,9 @@ public class MCRSearchServlet extends MCRServlet {
 
             org.jdom.Element root = input.getRootElement();
 
-            // Remove condition fields without values
+            // Find condition fields without values
             Iterator it = root.getDescendants(new ElementFilter("condition"));
-            Vector help      = new Vector();
+            Vector help = new Vector();
             while (it.hasNext()) {
                 Element condition = (Element) it.next();
                 if (condition.getAttribute("value") == null) {
@@ -76,15 +76,12 @@ public class MCRSearchServlet extends MCRServlet {
                 }
             }
 
-            //  delete conditions without values 
-            for( int i = help.size() - 1; i >= 0; i-- )
-            {
-              Element condition = (Element)( help.get( i ) );
-              if( condition.getAttribute( "value" ) == null ) condition.detach();
-            }
-            
+            // Remove found conditions without values
+            for (int i = help.size() - 1; i >= 0; i--)
+                ((Element) (help.get(i))).detach();
+
             // Execute query
-            MCRResults result = MCRQueryManager.search( input );
+            MCRResults result = MCRQueryManager.search(input);
 
             // start Layout servlet
             request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(result.buildXML()));
