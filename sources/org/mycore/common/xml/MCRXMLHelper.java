@@ -190,7 +190,7 @@ public class MCRXMLHelper {
         private JDOMEquivalent() { }
     
         public static boolean equivalent(Document d1, Document d2) {
-            return equivalentContent((Document) d1, (Document) d2);
+            return equivalentContent(d1, d2);
         }
     
         public static boolean equivalent(Element e1, Element e2) {

@@ -173,7 +173,7 @@ public class MCRJDOMMemoryStore {
         MCREventHandlerBase bs = null;
         try
         {
-          bs = (MCREventHandlerBase)MCRSearcherFactory.getSearcher( "jdomm");
+          bs = MCRSearcherFactory.getSearcher( "jdomm");
         } 
         catch (MCRConfigurationException e){}
         catch (MCRException e) {}
