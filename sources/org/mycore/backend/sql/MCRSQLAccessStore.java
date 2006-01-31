@@ -297,7 +297,7 @@ public class MCRSQLAccessStore extends MCRAccessStore {
         ArrayList ret = new ArrayList();
         
         try {
-        	String select = "SELECT DISTINCT(OBJID) from MCRACCESS ";
+        	String select = "SELECT DISTINCT(OBJID) from MCRACCESS ORDER BY OBJID";
             Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
 

@@ -359,7 +359,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         
-        String query = "select distinct(key.objid) from MCRACCESS ";
+        String query = "select distinct(key.objid) from MCRACCESS order by OBJID";
         try{
         	ret = session.createQuery(query).list();        	
         }catch (Exception e) {

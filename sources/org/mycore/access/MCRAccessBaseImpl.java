@@ -209,5 +209,14 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public boolean hasRule(String id) {
         return (getPermissionsForID(id).size() > 0);
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#getAllControlledIDs()
+     */
+	public List getAllControlledIDs() {
+		return null;
+	}
 
 }

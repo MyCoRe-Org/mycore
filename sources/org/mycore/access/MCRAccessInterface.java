@@ -210,6 +210,17 @@ public interface MCRAccessInterface {
      *         permission
      */
     public List getPermissionsForID(String id);
+    
+    /**
+     * lists all String IDs, a permission is assigned to.
+     * 
+     * The parameter <code>id</code> serves as an identifier for the concrete
+     * underlying rule, e.g. a MCRObjectID.
+     * 
+     * @param id
+     * @return a sorted and distinct <code>List</code> of all  <code>String</code> IDs
+     */
+    public List getAllControlledIDs();    
 
     /**
      * checks wether a rule with the <code>id</code> and
