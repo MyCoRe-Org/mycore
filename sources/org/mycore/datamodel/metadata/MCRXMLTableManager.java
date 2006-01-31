@@ -24,7 +24,11 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -100,7 +104,7 @@ public class MCRXMLTableManager {
 
         return inst;
     }
-
+    
     /**
      * The method create a new item in the datastore.
      * 
@@ -241,6 +245,42 @@ public class MCRXMLTableManager {
      */
     public ArrayList retrieveAllIDs(String type) {
         return getXMLTable(type).retrieveAllIDs(type);
+    }
+    
+    /**
+     * The method return a Array list with all stored MCRObjectID's of the XML
+     * table
+     * 
+     * @return a ArrayList of MCRObjectID's
+     */
+    public ArrayList retrieveAllIDs() {
+    		ArrayList a = new ArrayList();
+    		for (Iterator it = getAllAllowedMCRObjectIDTypes().iterator(); it.hasNext();) {
+				String type = (String) it.next();
+				a.addAll(retrieveAllIDs(type));
+			}
+    		Collections.sort(a);
+    		return a;
+    }   
+    
+    /**
+     * The method return a Array list with all MCRObjectID-Types, stored in the XML
+     * table.
+     * reads the mycore.properties-configuration for datamodel-types
+     * @return a ArrayList of MCRObjectID-Types for which MCR.type_{datamodel}=true
+     */
+    public ArrayList getAllAllowedMCRObjectIDTypes(){
+    	ArrayList listTypes = new ArrayList();
+    	final String prefix = "MCR.type_";
+        Properties prop = MCRConfiguration.instance().getProperties(prefix);
+        Enumeration names = prop.propertyNames();
+        while (names.hasMoreElements()) {
+        	String name = (String) (names.nextElement());
+        	if (MCRConfiguration.instance().getBoolean(name)) {
+        		listTypes.add(name.substring(prefix.length()));
+        	}
+        }
+    	return listTypes;    	
     }
 
     /**

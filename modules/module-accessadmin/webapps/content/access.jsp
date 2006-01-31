@@ -99,7 +99,7 @@
 	</tr>
 <%
 
-	List table = MCRAccessStore.getInstance().getTypes();
+	List table = MCRXMLTableManager.instance().getAllAllowedMCRObjectIDTypes();
 	Iterator it = table.iterator();
         
         while (it.hasNext()){

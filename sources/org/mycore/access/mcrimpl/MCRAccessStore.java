@@ -73,8 +73,6 @@ public abstract class MCRAccessStore {
     
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
     
-    public static List types = getTypes();
-
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
     final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.access_store_sql_table_rule", "MCRACCESSRULE");
@@ -111,26 +109,7 @@ public abstract class MCRAccessStore {
             return null;
         }
     }
-    
- 
-    /**
-     * reads the mycore.properties-configuration for datamodel-types
-     * @return a list of datamodel-type for which MCR.type_{datamodel}=true
-     */
-    public static List getTypes() {
-    	List listTypes = new ArrayList();
-    	final String prefix = "MCR.type_";
-        Properties prop = MCRConfiguration.instance().getProperties(prefix);
-        Enumeration names = prop.propertyNames();
-        while (names.hasMoreElements()) {
-        	String name = (String) (names.nextElement());
-        	if (MCRConfiguration.instance().getBoolean(name)) {
-        		listTypes.add(name.substring(prefix.length()));
-        	}
-        }
-    	return listTypes;
-    }
-    
+   
     /**
      * alle Elemente eines Datentypes aufbereiten
      * @param type

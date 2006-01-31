@@ -284,28 +284,17 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
         List l = new LinkedList();
-        ArrayList a = null;
+        ArrayList a = new ArrayList();
 
         try {
-            l = session.createQuery("from MCRXMLTABLE where MCRTYPE = '" + type + "'").list();
-            a = new ArrayList(l.size());
-
-            Set s = new HashSet();
-            int t;
-
-            for (t = 0; t < l.size(); t++) {
-                MCRXMLTABLE tab = ((MCRXMLTABLE) l.get(t));
-
-                if (!s.contains(tab.getId())) {
-                    a.add(t, tab.getId());
-                    s.add(tab.getId());
-                }
+            l = session.createQuery("select distinct(key.id) from MCRXMLTABLE where MCRTYPE = '" + type + "'").list();
+            for (int t = 0; t < l.size(); t++) {
+                a.add(l.get(t));
             }
-
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("error stacktrace" ,e);
             throw new MCRException("Error during retrieveAllIDs(" + type + ")", e);
         } finally {
             session.close();
@@ -313,6 +302,35 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
         return a;
     }
+    
+    /**
+     * The method return a Array list with all stored MCRObjectID's of the XML
+     * table. 
+     * 
+     * @return a ArrayList of MCRObjectID's
+     */
+    public ArrayList retrieveAllIDs() {
+        Session session = getSession();
+        Transaction tx = session.beginTransaction();
+        List l = new LinkedList();
+        ArrayList a = new ArrayList();
+
+        try {
+            l = session.createQuery("select distinct(key.id) from MCRXMLTABLE").list();
+            for (int t = 0; t < l.size(); t++) {
+                a.add(l.get(t));
+            }
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            logger.error("error stacktrace" ,e);
+            throw new MCRException("Error during retrieveAllIDs(" + type + ")", e);
+        } finally {
+            session.close();
+        }
+
+        return a;
+    }    
 
     public static void test() {
         MCRHIBXMLStore store = new MCRHIBXMLStore();
