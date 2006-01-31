@@ -65,6 +65,12 @@ public abstract class MCRAccessStore {
     
     public abstract boolean existsRule(String objid, String pool) ;
     
+    /**
+     * 
+     * @return a list of all String IDs an access rule is assigned to
+     */
+    public abstract List getDistinctStringIDs() ;    
+    
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
     
     public static List types = getTypes();
@@ -105,6 +111,7 @@ public abstract class MCRAccessStore {
             return null;
         }
     }
+    
  
     /**
      * reads the mycore.properties-configuration for datamodel-types

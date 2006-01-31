@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
@@ -290,5 +291,26 @@ public class MCRSQLAccessStore extends MCRAccessStore {
             return false;        	
         }    	
     }
+    
+	public List getDistinctStringIDs() {
+        MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
+        ArrayList ret = new ArrayList();
+        
+        try {
+        	String select = "SELECT DISTINCT(OBJID) from MCRACCESS ";
+            Statement statement = c.getJDBCConnection().createStatement();
+            ResultSet rs = statement.executeQuery(select);
+
+            if (rs.next()) {
+                ret.add(rs.getString(1));
+            }
+        } catch(Exception e) {
+            logger.error("error stacktrace", e);
+        } finally {
+            c.release();            
+        }
+        
+        return ret;
+	}    
     
 }

@@ -353,4 +353,21 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         
         return ret;
     }
+
+	public List getDistinctStringIDs() {
+        List ret = new ArrayList();
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        
+        String query = "select distinct(key.objid) from MCRACCESS ";
+        try{
+        	ret = session.createQuery(query).list();        	
+        }catch (Exception e) {
+            tx.rollback();
+            logger.error("error stacktrace", e);
+        } finally {
+            session.close();
+        }
+        return ret;
+	}
 }
