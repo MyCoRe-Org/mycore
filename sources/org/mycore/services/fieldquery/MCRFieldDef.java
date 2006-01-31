@@ -126,6 +126,7 @@ public class MCRFieldDef {
     private String source;
 
     private MCRFieldDef(String index, String name, String dataType, boolean sortable, String objects, String source) {
+        this.index = index;
         this.name = name;
         this.dataType = dataType;
         this.sortable = sortable;
