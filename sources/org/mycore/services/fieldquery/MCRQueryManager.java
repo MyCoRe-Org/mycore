@@ -132,7 +132,10 @@ public class MCRQueryManager {
         String index = getIndex((MCRCondition) (children.get(0)));
         for (int i = 1; i < children.size(); i++) {
             String other = getIndex((MCRCondition) (children.get(i)));
-            if (!index.equals(other))
+            if (index == null) {
+                if (other != null)
+                    return null; // mixed indexes here!
+            } else if (!index.equals(other))
                 return null; // mixed indexes here!
         }
         return index;
