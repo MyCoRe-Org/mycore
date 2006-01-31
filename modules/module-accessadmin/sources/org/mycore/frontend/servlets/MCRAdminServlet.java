@@ -14,7 +14,6 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.services.query.MCRQueryCache;
 
 public class MCRAdminServlet extends MCRServlet{
 	

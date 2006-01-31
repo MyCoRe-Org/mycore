@@ -27,8 +27,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 
-import net.sf.antcontrib.logic.For;
-
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

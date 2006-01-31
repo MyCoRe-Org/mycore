@@ -24,7 +24,6 @@
 package org.mycore.backend.hibernate;
 
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.hibernate.cfg.Configuration;
@@ -34,7 +33,6 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Creater class for mapping files This class generates the xml mapping for the

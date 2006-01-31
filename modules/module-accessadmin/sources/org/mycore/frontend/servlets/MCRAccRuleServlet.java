@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.access.*;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;

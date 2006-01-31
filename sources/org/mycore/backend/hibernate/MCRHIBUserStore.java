@@ -548,7 +548,7 @@ public class MCRHIBUserStore implements MCRUserStore {
 
             for (int i = 0; i < l.size(); i++) {
                 MCRGROUPS group = (MCRGROUPS) l.get(i);
-                retList.add((String) group.getGid());
+                retList.add(group.getGid());
             }
 
             return retList;
@@ -663,7 +663,7 @@ public class MCRHIBUserStore implements MCRUserStore {
                 MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
 
                 if ((grpmembers.getUserid() != null) && !grpmembers.getUserid().equals("")) {
-                    oldUserIDs.add((String) grpmembers.getUserid());
+                    oldUserIDs.add(grpmembers.getUserid());
                 }
             }
 
@@ -678,7 +678,7 @@ public class MCRHIBUserStore implements MCRUserStore {
                 MCRGROUPMEMBERS grpmembers = new MCRGROUPMEMBERS();
 
                 if ((grpmembers.getGroupid() != null) && !grpmembers.getGroupid().equals("")) {
-                    oldGroupIDs.add((String) grpmembers.getGroupid());
+                    oldGroupIDs.add(grpmembers.getGroupid());
                 }
             }
 
