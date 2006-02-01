@@ -81,7 +81,7 @@ public class MCRFieldDef {
             List fields = index.getChildren("field", mcrns);
 
             for (int j = 0; j < fields.size(); j++)
-                new MCRFieldDef(id, (Element) (fields.get(j)));
+            	new MCRFieldDef(id, (Element)((Element)fields.get(j)).clone());
         }
     }
 
