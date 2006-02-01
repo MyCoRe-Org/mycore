@@ -232,6 +232,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
     }
 
+    /** This method does nothing. It is very useful for debugging events. */
+    public void doNothing(MCREvent evt) {
+        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType());
+    }
+
     /**
      * Handles object created events. This implementation does nothing and
      * should be overwritted by subclasses.
@@ -242,7 +247,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -255,7 +260,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -268,7 +273,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -281,7 +286,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -294,12 +299,12 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
-     * Handles object exist events. This implementation does nothing and
-     * should be overwritted by subclasses.
+     * Handles object exist events. This implementation does nothing and should
+     * be overwritted by subclasses.
      * 
      * @param evt
      *            the event that occured
@@ -307,7 +312,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void handleObjectExist(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -320,7 +325,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -333,7 +338,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -346,12 +351,12 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
-     * Handles derivate repair events. This implementation does nothing and should
-     * be overwritted by subclasses.
+     * Handles derivate repair events. This implementation does nothing and
+     * should be overwritted by subclasses.
      * 
      * @param evt
      *            the event that occured
@@ -359,7 +364,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -372,7 +377,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -385,7 +390,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -398,7 +403,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -411,7 +416,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -424,7 +429,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -437,7 +442,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -450,7 +455,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectUpdated(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -463,7 +468,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -476,7 +481,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectRepaired(MCREvent evt, MCRObject obj) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -489,7 +494,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoObjectReceived(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -502,7 +507,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoObjectExist(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -515,7 +520,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateCreated(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -528,7 +533,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -541,7 +546,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -554,7 +559,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -567,7 +572,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -580,7 +585,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoDerivateExist(MCREvent evt, MCRObjectID objid) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -593,7 +598,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileCreated(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -606,7 +611,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileUpdated(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 
     /**
@@ -619,6 +624,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileDeleted(MCREvent evt, MCRFile file) {
-        logger.debug("This default handler implementation does nothing");
+        doNothing(evt);
     }
 }
