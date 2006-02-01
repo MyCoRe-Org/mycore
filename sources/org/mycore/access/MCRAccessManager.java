@@ -50,16 +50,16 @@ public class MCRAccessManager {
      * 
      * @param id
      *            the MCRObjectID of the object
-     * @param pool
-     *            the access pool for the rule
+     * @param permission
+     *            the access permission for the rule
      * @param rule
      *            the access rule
      * @throws MCRException
      *             if an errow was occured
      * @see MCRAccessInterface#addRule(String, String, org.jdom.Element)
      */
-    public static void addRule(MCRObjectID id, String pool, org.jdom.Element rule) throws MCRException {
-        getAccessImpl().addRule(id.getId(), pool, rule);
+    public static void addRule(MCRObjectID id, String permission, org.jdom.Element rule) throws MCRException {
+        getAccessImpl().addRule(id.getId(), permission, rule);
     }
 
     /**
@@ -68,7 +68,7 @@ public class MCRAccessManager {
      * @param id
      *            the MCRObjectID of an object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @throws MCRException
      *             if an errow was occured
      * @see MCRAccessInterface#removeRule(String, String)
@@ -95,16 +95,16 @@ public class MCRAccessManager {
      * 
      * @param id
      *            the MCRObjectID of the object
-     * @param pool
-     *            the access pool for the rule
+     * @param permission
+     *            the access permission for the rule
      * @param rule
      *            the access rule
      * @throws MCRException
      *             if an errow was occured
      * @see MCRAccessInterface#updateRule(String, String, Element)
      */
-    public static void updateRule(MCRObjectID id, String pool, org.jdom.Element rule) throws MCRException {
-        getAccessImpl().updateRule(id.getId(), pool, rule);
+    public static void updateRule(MCRObjectID id, String permission, org.jdom.Element rule) throws MCRException {
+        getAccessImpl().updateRule(id.getId(), permission, rule);
     }
 
     /**
@@ -113,13 +113,13 @@ public class MCRAccessManager {
      * 
      * @param id
      *            the MCRObjectID of the object
-     * @param pool
-     *            the access pool for the rule
+     * @param permission
+     *            the access permission for the rule
      * @return true if the access is allowed otherwise it return
      * @see MCRAccessInterface#checkPermission(String, String)
      */
-    public static boolean checkPermission(MCRObjectID id, String pool) {
-        return getAccessImpl().checkPermission(id.getId(), pool);
+    public static boolean checkPermission(MCRObjectID id, String permission) {
+        return getAccessImpl().checkPermission(id.getId(), permission);
     }
 
     /**
@@ -131,15 +131,15 @@ public class MCRAccessManager {
      * 
      * @param id
      *            the ID-String of the object
-     * @param pool
-     *            the access pool for the rule
+     * @param permission
+     *            the access permission for the rule
      * @param condition
      *            the rule tree as a JDOM Element
      * @return true if the access is allowed, false otherwise
      */
-    public static boolean checkAccessCondition(String id, String pool, Element rule) {
+    public static boolean checkAccessCondition(String id, String permission, Element rule) {
     	MCRAccessControlSystem mcrManager = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
-    	return mcrManager.checkAccessCondition(id, pool, rule);
+    	return mcrManager.checkAccessCondition(id, permission, rule);
     }
 
     /**
@@ -147,20 +147,20 @@ public class MCRAccessManager {
      * the access is allowed otherwise it return false. It's the same as calling
      * 
      * <pre>
-     * checkAccessCondition(id.getId(), pool, rule);
+     * checkAccessCondition(id.getId(), permission, rule);
      * </pre>
      * 
      * @param id
      *            the MCRObjectID of the object
-     * @param pool
-     *            the access pool for the rule
+     * @param permission
+     *            the access permission for the rule
      * @param condition
      *            the rule tree as a JDOM Element
      * @return true if the access is allowed otherwise it return
      * @see #checkAccessCondition(String, String, Element)
      */
-    public static boolean checkAccessCondition(MCRObjectID id, String pool, Element rule) {
-        return checkAccessCondition(id.getId(), pool, rule);
+    public static boolean checkAccessCondition(MCRObjectID id, String permission, Element rule) {
+        return checkAccessCondition(id.getId(), permission, rule);
     }
 
 }

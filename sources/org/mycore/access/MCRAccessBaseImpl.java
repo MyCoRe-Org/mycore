@@ -46,7 +46,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.AccessPermissions", "read");
 
     /** the logger */
     protected static Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class.getName());
@@ -73,8 +73,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      java.lang.String, org.jdom.Element)
      */
-    public void addRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl addRule");
+    public void addRule(String id, String permission, org.jdom.Element rule) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID " + id + " for permission " + permission);
     }
 
     /*
@@ -82,10 +82,10 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      org.jdom.Element)
-     */    
-	public void addRule(String permission, Element rule) throws MCRException {
-		LOGGER.debug("Execute MCRAccessBaseImpl addRule");
-	}    
+     */
+    public void addRule(String permission, Element rule) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl addRule for permission " + permission);
+    }
 
     /*
      * (non-Javadoc)
@@ -93,18 +93,18 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String,
      *      java.lang.String)
      */
-    public void removeRule(String id, String pool) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeRule");
+    public void removeRule(String id, String permission) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for ID " + id + " for permission " + permission);
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String)
      */
-    public void removeRule(String pool) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeRule");
-    }    
+    public void removeRule(String permission) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for permission " + permission);
+    }
 
     /*
      * (non-Javadoc)
@@ -112,7 +112,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#removeAllRules(java.lang.String)
      */
     public void removeAllRules(String id) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeAllRules");
+        LOGGER.debug("Execute MCRAccessBaseImpl removeAllRules for ID " + id);
     }
 
     /*
@@ -121,8 +121,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom.Element)
      */
-    public void updateRule(String id, String pool, org.jdom.Element rule) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl updateRule");
+    public void updateRule(String id, String permission, org.jdom.Element rule) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID " + id + " for permission " + permission);
     }
 
     /*
@@ -130,10 +130,10 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      org.jdom.Element)
-     */    
-	public void updateRule(String permission, Element rule) throws MCRException {
-		LOGGER.debug("Execute MCRAccessBaseImpl updateRule");
-	}    
+     */
+    public void updateRule(String permission, Element rule) throws MCRException {
+        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for permission " + permission);
+    }
 
     /*
      * (non-Javadoc)
@@ -141,18 +141,20 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String,
      *      java.lang.String)
      */
-    public boolean checkPermission(String id, String pool) {
+    public boolean checkPermission(String id, String permission) {
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission);
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String)
-     */    
-	public boolean checkPermission(String permission) {
-		return true;
-	}    
+     */
+    public boolean checkPermission(String permission) {
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission);
+        return true;
+    }
 
     /*
      * (non-Javadoc)
@@ -163,7 +165,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public Element getRule(String objID, String pool) {
         return null;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -171,7 +173,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      */
     public Element getRule(String pool) {
         return null;
-    }    
+    }
 
     /*
      * (non-Javadoc)
@@ -188,7 +190,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * as calling
      * 
      * <pre>
-     *  (getRule(id, permission)!=null);
+     *    (getRule(id, permission)!=null);
      * </pre>
      * 
      * @see #getRule(String, String)
@@ -201,7 +203,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * checks wether a rule with the id is defined. It's the same as calling
      * 
      * <pre>
-     *  (getPermissionsForID(id).size()&gt;0);
+     *    (getPermissionsForID(id).size()&gt;0);
      * </pre>
      * 
      * @see #getRule(String, String)
@@ -209,14 +211,14 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public boolean hasRule(String id) {
         return (getPermissionsForID(id).size() > 0);
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#getAllControlledIDs()
      */
-	public List getAllControlledIDs() {
-		return null;
-	}
+    public List getAllControlledIDs() {
+        return null;
+    }
 
 }

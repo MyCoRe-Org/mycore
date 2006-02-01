@@ -46,7 +46,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @param rule
      *            the access rule
      * @throws MCRException
@@ -58,7 +58,7 @@ public interface MCRAccessInterface {
      * adds an access rule for an "a priori-permission" like "create-document"
      * 
      * @param permission
-     *            the access pool for the rule (e.g. "create-document")
+     *            the access permission for the rule (e.g. "create-document")
      * @param rule
      *            the access rule
      * @throws MCRException
@@ -73,7 +73,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @throws MCRException
      *             if an error occured
      */
@@ -83,7 +83,7 @@ public interface MCRAccessInterface {
      * removes a rule for an "a priori permission" like "create-document"
      * 
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @throws MCRException
      *             if an error occured
      */
@@ -109,7 +109,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @param rule
      *            the access rule
      * @throws MCRException
@@ -122,7 +122,7 @@ public interface MCRAccessInterface {
      * of an access system like "create-document".
      * 
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @param rule
      *            the access rule
      * @throws MCRException
@@ -182,7 +182,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @return the rule as jdom element, or <code>null</code> if no rule is
      *         defined
      */
@@ -193,7 +193,7 @@ public interface MCRAccessInterface {
      * as JDOM element.
      * 
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @return the rule as jdom element, or <code>null</code> if no rule is
      *         defined
      */
@@ -229,7 +229,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @return false, if getRule(id, permission) would return null, else true
      */
     public boolean hasRule(String id, String permission);
@@ -240,7 +240,7 @@ public interface MCRAccessInterface {
      * @param id
      *            the ID-String of the object
      * @param permission
-     *            the access pool for the rule
+     *            the access permission for the rule
      * @return false, if getPermissionsForID(id) would return an empty list,
      *         else true
      */
