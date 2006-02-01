@@ -32,24 +32,12 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.*;
 
-import javax.xml.transform.Templates;
-import javax.xml.transform.sax.TransformerHandler;
-
-import org.mycore.backend.lucene.MCRLuceneSearcher;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.common.xml.MCRXSLTransformation;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.common.xml.MCRXMLContainer;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcher;
-import org.mycore.services.fieldquery.MCRSearcherFactory;
-
 
 /**
  * This class contains MyCoRe Webservices
@@ -140,17 +128,11 @@ public class MCRWebService
         org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
         logger.debug(outputter.outputString(doc));
       }
+      
+      // Execute query
+      MCRResults res = MCRQueryManager.search(doc);
 
-      org.jdom.Element root = doc.getRootElement();
-      String index = root.getAttributeValue("index");
-      MCRSearcher ls = MCRSearcherFactory.getSearcher(index);
-
-      MCRCondition cond = new MCRQueryParser().parse((Element) root.getChild("conditions")
-          .getChildren().get(0));
-      int maxResults = Integer.parseInt(root.getAttributeValue("maxResults", "100"));
-      MCRResults res = ls.search(cond, null, maxResults);
-
-      result = res.buildXML();
+      result = new org.jdom.Document(res.buildXML());
 
     } catch (Exception ex)
     {
