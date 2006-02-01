@@ -211,18 +211,32 @@ public class MCRFieldDef {
     /**
      * A keyword identifying that the source of the values of this field is the
      * createXML() method of MCRObject
+     * 
+     * @see org.mycore.datamodel.metadata.MCRObject#createXML()
      */
     public final static String OBJECT_METADATA = "objectMetadata";
 
     /**
      * A keyword identifying that the source of the values of this field is the
      * createXML() method of MCRFile
+     * 
+     * @see org.mycore.datamodel.ifs.MCRFile#createXML()
      */
     public final static String FILE_METADATA = "fileMetadata";
 
     /**
      * A keyword identifying that the source of the values of this field is the
+     * getAdditionalData() method of MCRFile
+     * 
+     * @see org.mycore.datamodel.ifs.MCRFilesystemNode#getAdditionalData()
+     */
+    public final static String FILE_ADDITIONAL_DATA = "fileAdditionalData";
+
+    /**
+     * A keyword identifying that the source of the values of this field is the
      * XML content of the MCRFile
+     * 
+     * @see org.mycore.datamodel.ifs.MCRFile#getContentAsJDOM()
      */
     public final static String FILE_XML_CONTENT = "fileXMLContent";
 
