@@ -122,14 +122,6 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         removeFromIndex(entryID);
     }
 
-    /**
-     * Handles object repair events. Calls handleObjectUpdated
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
-     */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         handleObjectUpdated(evt, obj);
     }
