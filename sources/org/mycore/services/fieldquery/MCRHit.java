@@ -36,14 +36,15 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * Represents a single result hit of a query. The hit has an ID which is the
- * MCRObjectID of the document that matched the query. The hit may have MCRFieldValue
- * objects set for sorting data or representing hit metadata like score or rank.
+ * MCRObjectID of the document that matched the query. The hit may have
+ * MCRFieldValue objects set for sorting data or representing hit metadata like
+ * score or rank.
  * 
- * If the same hit (hit with same ID) is in different result sets A and B, 
- * the data of the hit objects is merged. The hit sort data is copied from one of the 
- * hits that contains sort data. There is only on sort data set for each hit.
- * The hit metadata of both hits is preserved and copied from both hits, so there can be
- * multiple metadata sets from different searches for the same hit.
+ * If the same hit (hit with same ID) is in different result sets A and B, the
+ * data of the hit objects is merged. The hit sort data is copied from one of
+ * the hits that contains sort data. There is only on sort data set for each
+ * hit. The hit metadata of both hits is preserved and copied from both hits, so
+ * there can be multiple metadata sets from different searches for the same hit.
  * 
  * @see MCRResults
  * @author Arne Seifert
@@ -83,8 +84,9 @@ public class MCRHit {
 
     /**
      * Adds hit metadata like score or rank
-     *  
-     * @param value the value of the metadata field
+     * 
+     * @param value
+     *            the value of the metadata field
      */
     public void addMetaData(MCRFieldValue value) {
         metaData.add(value);
@@ -94,23 +96,42 @@ public class MCRHit {
     /**
      * Adds data for sorting this hit
      * 
-     * @param value the value of a sortable search field
+     * @param fieldValue
+     *            the value of a sortable search field
      */
-    public void addSortData(MCRFieldValue value) {
-        sortData.add(value);
-        sortValues.put(value.getField(), value.getValue());
+    public void addSortData(MCRFieldValue fieldValue) {
+        sortData.add(fieldValue);
+
+        String value = fieldValue.getValue();
+        MCRFieldDef field = fieldValue.getField();
+
+        // If field is repeated (multiple values for same field):
+        // for text fields, combine all values for sorting
+        // for dates and numbers, use only first value for sorting
+
+        if (sortValues.containsKey(field)) {
+            if ("text name identifier".indexOf(field.getDataType()) >= 0) {
+                String oldValue = (String) (sortValues.get(field));
+                String newValue = oldValue.concat(" ").concat(value);
+                sortValues.put(field, newValue);
+            }
+        } else {
+            sortValues.put(field, value);
+        }
     }
 
     /**
-     * Compares this hit with another hit by comparing the 
-     * value of the given search field. Used for sorting results.
+     * Compares this hit with another hit by comparing the value of the given
+     * search field. Used for sorting results.
      * 
-     * @param field the field to compare
-     * @param other the other hit to compare with 
-     * @return 0 if the two hits are equal, 
-     *         a positive value if this hit is "greater" than the other, 
-     *         a negative value if this hit is "smaller" than the other
-     *         
+     * @param field
+     *            the field to compare
+     * @param other
+     *            the other hit to compare with
+     * @return 0 if the two hits are equal, a positive value if this hit is
+     *         "greater" than the other, a negative value if this hit is
+     *         "smaller" than the other
+     * 
      * @see MCRResults#sortBy(List)
      */
     int compareTo(MCRFieldDef field, MCRHit other) {
@@ -173,7 +194,8 @@ public class MCRHit {
     /**
      * Creates a XML representation of this hit and its sort data and meta data
      * 
-     * @return a 'hit' element with attribute 'id', optionally one 'sortData' child element and multiple 'metaData' child elements
+     * @return a 'hit' element with attribute 'id', optionally one 'sortData'
+     *         child element and multiple 'metaData' child elements
      */
     public Element buildXML() {
         Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
