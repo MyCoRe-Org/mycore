@@ -159,10 +159,10 @@ public class MCRData2Fields {
         List fieldValues = transform(def, xml);
 
         if( fieldValues != null ) for (int i = 0; i < fieldValues.size(); i++) {
-            String value = ((Element)(fieldValues.get(i))).getAttributeValue("value",MCRFieldDef.mcrns);
-            LOGGER.debug( "--> value: " + value );
+            String value = ((Element)(fieldValues.get(i))).getAttributeValue("value");
 
             if ((value != null) && (value.trim().length() > 0)) {
+                LOGGER.debug( def.getName() + ":=" + value );
                 values.add(new MCRFieldValue(def, value));
             }
         }
