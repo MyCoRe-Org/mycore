@@ -29,8 +29,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.mycore.backend.sql.MCRSQLSearcher;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.type.StringType;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
@@ -45,9 +49,12 @@ import org.mycore.services.fieldquery.MCRSortBy;
  */
 public class MCRHIBSearcher extends MCRSearcher {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRSQLSearcher.class.getName());
-
+    private static Logger LOGGER = Logger.getLogger(MCRHIBSearcher.class.getName());
+    private static String SQLQueryTable = MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery");
+    private static boolean existsTable = false;
+    
     protected void addToIndex(String entryID, List fields) {
+    	if(!existsTable) updateConfiguration();
         MCRHIBQuery query = new MCRHIBQuery();
         Hashtable used = new Hashtable();
 
@@ -80,11 +87,14 @@ public class MCRHIBSearcher extends MCRSearcher {
     }
 
     protected void removeFromIndex(String entryID) {
+    	if(!existsTable) updateConfiguration();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
 
         try {
-            session.createQuery("delete MCRQuery where MCRID =\'" + entryID + "\'").executeUpdate();
+        	String query = new StringBuffer("delete MCRQuery")
+        		.append(" where MCRID = \'").append(entryID).append("\'").toString();
+            session.createQuery(query).executeUpdate();
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
@@ -96,6 +106,7 @@ public class MCRHIBSearcher extends MCRSearcher {
     }
 
     public MCRResults search(MCRCondition condition, List order, int maxResults) {
+    	if(!existsTable) updateConfiguration();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRResults results = new MCRResults();
@@ -136,4 +147,37 @@ public class MCRHIBSearcher extends MCRSearcher {
 
         return results;
     }
+    
+    /**
+     * method updates the hibernate configuration and introduces the new table
+     * for searching
+     */
+    public void updateConfiguration() {
+        try {
+        	MCRHIBConnection hibconnection = MCRHIBConnection.instance();
+            // update schema -> first time create table
+            Configuration cfg = hibconnection.getConfiguration();
+
+            if (!hibconnection.containsMapping(SQLQueryTable)) {
+                MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
+                map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
+                List fds = MCRFieldDef.getFieldDefs( getIndex() );
+                for( int i = 0; i < fds.size(); i++ )
+                {
+                  MCRFieldDef fd = (MCRFieldDef)( fds.get( i ) );
+                  if( ! MCRFieldDef.SEARCHER_HIT_METADATA.equals( fd.getSource() ) )
+                    map.addColumn(fd.getName(),fd.getName(),hibconnection.getHibType(fd.getDataType()),2147483647, false, false, false);
+                }
+
+                cfg.addXML(map.getTableXML());
+                cfg.createMappings();
+                hibconnection.buildSessionFactory(cfg);
+
+                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
+            }
+            existsTable = true;
+        } catch (Exception e) {
+            LOGGER.error("error stacktrace", e);
+        }
+    }    
 }
