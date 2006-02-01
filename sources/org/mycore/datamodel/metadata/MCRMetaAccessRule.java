@@ -29,7 +29,7 @@ import org.mycore.common.MCRException;
 /**
  * This class implements all method for handling with the MCRMetaAccessRule part
  * of a metadata object. The MCRMetaAccessRule class present a single item,
- * which hold an ACL condition for a defined pool.
+ * which hold an ACL condition for a defined permission.
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -38,17 +38,17 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     // MCRMetaAccessRule data
     protected org.jdom.Element condition;
 
-    protected String pool;
+    protected String permission;
 
     /**
      * This is the constructor. <br>
-     * The constructor of the MCRMetaDefault runs. The <em>pool</em> Attribute
+     * The constructor of the MCRMetaDefault runs. The <em>permission</em> Attribute
      * is set to 'READ'. The <b>condition</b> is set to 'null'.
      */
     public MCRMetaAccessRule() {
         super();
         condition = null;
-        pool = "READ";
+        permission = "READ";
     }
 
     /**
@@ -68,17 +68,17 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
-     * @param_set_pool         the format string, if it is empty 'READ' will be set.
+     * @param_set_permission         the format string, if it is empty 'READ' will be set.
      * @param set_condition    the JDOM Element included the condition tree
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_pool, org.jdom.Element set_condition) throws MCRException {
+    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission, org.jdom.Element set_condition) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
-        pool = set_pool;
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "read";
+        permission = set_permission;
+        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+            permission = "read";
         } else {
-            pool = pool.trim().toLowerCase();
+            permission = permission.trim().toLowerCase();
         }
         if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
@@ -87,22 +87,22 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     }
 
     /**
-     * This method set the pool and the condition.
+     * This method set the permission and the condition.
      * 
-     * @param_set_pool the format string, if it is empty 'READ' will be set.
+     * @param_set_permission the format string, if it is empty 'READ' will be set.
      * @param set_condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
      *                if the set_condition is null or empty
      */
-    public final void set(String set_pool, org.jdom.Element set_condition) throws MCRException {
+    public final void set(String set_permission, org.jdom.Element set_condition) throws MCRException {
         setLang("en");
         setType("");
-        pool = set_pool;
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "read";
+        permission = set_permission;
+        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+            permission = "read";
         } else {
-            pool = pool.trim().toLowerCase();
+            permission = permission.trim().toLowerCase();
         }
         if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
@@ -126,17 +126,17 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     }
 
     /**
-     * This method set the pool attribute.
+     * This method set the permission attribute.
      * 
-     * @param set_pool
-     *            the new pool string, if it is empty 'READ' will be set.
+     * @param set_permission
+     *            the new permission string, if it is empty 'READ' will be set.
      */
-    public final void setPool(String set_pool) {
-        pool = set_pool;
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
-            pool = "read";
+    public final void setpermission(String set_permission) {
+        permission = set_permission;
+        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+            permission = "read";
         } else {
-            pool = pool.trim().toLowerCase();
+            permission = permission.trim().toLowerCase();
         }
     }
 
@@ -150,12 +150,12 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     }
 
     /**
-     * This method get the pool attribute.
+     * This method get the permission attribute.
      * 
-     * @return the pool attribute
+     * @return the permission attribute
      */
-    public final String getPool() {
-        return pool;
+    public final String getpermission() {
+        return permission;
     }
 
     /**
@@ -174,11 +174,11 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         }
         condition = (org.jdom.Element)temp_condition.detach();
 
-        String temp_pool = element.getAttributeValue("pool");
-        if (temp_pool == null) {
-            temp_pool = "read";
+        String temp_permission = element.getAttributeValue("permission");
+        if (temp_permission == null) {
+            temp_permission = "read";
         }
-        pool = temp_pool.trim().toLowerCase();
+        permission = temp_permission.trim().toLowerCase();
     }
 
     /**
@@ -197,8 +197,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", (new Integer(inherited)).toString());
-        if ((pool != null) && ((pool = pool.trim()).length() != 0)) {
-            elm.setAttribute("pool", pool);
+        if ((permission != null) && ((permission = permission.trim()).length() != 0)) {
+            elm.setAttribute("permission", permission);
         }
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
@@ -239,7 +239,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         if (condition == null) {
             return false;
         }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
+        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
             return false;
         }
         return true;
@@ -249,7 +249,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * This method make a clone of this class.
      */
     public Object clone() {
-        return new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, pool, condition);
+        return new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, permission, condition);
     }
 
     /**
@@ -258,7 +258,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
     public final void debug() {
         LOGGER.debug("Start Class : MCRMetaAccessRule");
         super.debugDefault();
-        LOGGER.debug("Pool               = " + pool);
+        LOGGER.debug("Permission         = " + permission);
         LOGGER.debug("Rule               = " + "condition");
     }
 }
