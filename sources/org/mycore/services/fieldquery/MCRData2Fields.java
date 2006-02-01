@@ -36,7 +36,6 @@ import javax.xml.transform.TransformerFactory;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
@@ -162,7 +161,7 @@ public class MCRData2Fields {
             String value = ((Element)(fieldValues.get(i))).getAttributeValue("value");
 
             if ((value != null) && (value.trim().length() > 0)) {
-                LOGGER.debug( def.getName() + ":=" + value );
+                LOGGER.debug( "MCRData2Fields " + def.getName() + " := " + value );
                 values.add(new MCRFieldValue(def, value));
             }
         }
@@ -184,14 +183,6 @@ public class MCRData2Fields {
 
             List resultList = xmlres.getResult();
             Element root = (Element) (resultList.get(0));
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("---------- values for search field " + def.getName() + " ---------");
-                XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-                LOGGER.debug(out.outputString(root.getChildren()));
-                LOGGER.debug("------------------------------------------------------------------");
-            }
-
             return root.getChildren();
         } catch (Exception ex) {
             String msg = "Exception while transforming metadata to search field";
