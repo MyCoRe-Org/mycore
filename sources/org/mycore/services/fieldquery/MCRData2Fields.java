@@ -160,6 +160,7 @@ public class MCRData2Fields {
 
         if( fieldValues != null ) for (int i = 0; i < fieldValues.size(); i++) {
             String value = ((Element)(fieldValues.get(i))).getAttributeValue("value",MCRFieldDef.mcrns);
+            LOGGER.debug( "--> value: " + value );
 
             if ((value != null) && (value.trim().length() > 0)) {
                 values.add(new MCRFieldValue(def, value));
@@ -185,10 +186,10 @@ public class MCRData2Fields {
             Element root = (Element) (resultList.get(0));
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("---------- search fields ---------");
+                LOGGER.debug("---------- values for search field " + def.getName() + " ---------");
                 XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(root.getChildren()));
-                LOGGER.debug("----------------------------------");
+                LOGGER.debug("------------------------------------------------------------------");
             }
 
             return root.getChildren();
