@@ -88,6 +88,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
         byte[] xml = mcr_xmltable.retrieve(objid);
+        if (xml == null)
+            return;
         evt.put("xml", xml);
     }
 
@@ -157,6 +159,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
         byte[] xml = mcr_xmltable.retrieve(objid);
+        if (xml == null)
+            return;
         evt.put("xml", xml);
     }
 
