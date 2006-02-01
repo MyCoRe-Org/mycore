@@ -307,8 +307,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
             return sb.toString();
         } catch (Exception e) {
-            LOGGER.error(e);
-
+            LOGGER.debug("no order given", e);
             return "";
         }
     }
