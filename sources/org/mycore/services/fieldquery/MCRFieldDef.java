@@ -80,18 +80,8 @@ public class MCRFieldDef {
 
             List fields = index.getChildren("field", mcrns);
 
-            for (int j = 0; j < fields.size(); j++) {
-                Element field = (Element) (fields.get(j));
-                String name = field.getAttributeValue("name");
-                String type = field.getAttributeValue("type");
-                String objects = field.getAttributeValue("objects", (String) null);
-                String source = field.getAttributeValue("source");
-                boolean sortable = "true".equals(field.getAttributeValue("sortable")) ? true : false;
-
-                MCRFieldDef fd = new MCRFieldDef(id, name, type, sortable, objects, source);
-                fieldTable.put(name, fd );
-                fd.buildStylesheet( field );
-            }
+            for (int j = 0; j < fields.size(); j++)
+                new MCRFieldDef(id, (Element) (fields.get(j)));
         }
     }
 
@@ -125,13 +115,16 @@ public class MCRFieldDef {
      */
     private String source;
 
-    private MCRFieldDef(String index, String name, String dataType, boolean sortable, String objects, String source) {
+    public MCRFieldDef(String index, Element def) {
         this.index = index;
-        this.name = name;
-        this.dataType = dataType;
-        this.sortable = sortable;
-        this.objects = objects;
-        this.source = source;
+        this.name = def.getAttributeValue("name");
+        this.dataType = def.getAttributeValue("type");
+        this.sortable = "true".equals(def.getAttributeValue("sortable"));
+        this.objects = def.getAttributeValue("objects", (String) null);
+        this.source = def.getAttributeValue("source");
+
+        fieldTable.put(name, this);
+        buildStylesheet(def);
     }
 
     /**
@@ -155,9 +148,8 @@ public class MCRFieldDef {
      */
     public static List getFieldDefs(String index) {
         List fields = new ArrayList();
-        Iterator fieldIterator = fieldTable.values().iterator();
-        while (fieldIterator.hasNext()) {
-            MCRFieldDef field = (MCRFieldDef) (fieldIterator.next());
+        for (Iterator iter = fieldTable.values().iterator(); iter.hasNext();) {
+            MCRFieldDef field = (MCRFieldDef) (iter.next());
             if (field.index.equals(index))
                 fields.add(field);
         }
@@ -294,16 +286,15 @@ public class MCRFieldDef {
 
     /** The stylesheet to build values for this field from XML source data */
     private Document xsl = null;
-    
+
     /** Returns a stylesheet to build values for this field from XML source data */
     Document getStylesheet() {
         return xsl;
     }
 
-    private void buildStylesheet( Element field )
-    {
+    private void buildStylesheet(Element field) {
         field.detach();
-        
+
         String xpath = field.getAttributeValue("xpath");
         if ((xpath == null) || (xpath.trim().length() == 0)) {
             return;
@@ -311,15 +302,15 @@ public class MCRFieldDef {
 
         Element stylesheet = (Element) (xslTemplate.clone());
         xsl = new Document(stylesheet);
-        
-        Element forEach = stylesheet.getChild( "template", xslns ).getChild( "fieldValues", mcrns ).getChild( "for-each", xslns );
+
+        Element forEach = stylesheet.getChild("template", xslns).getChild("fieldValues", mcrns).getChild("for-each", xslns);
         forEach.setAttribute("select", xpath);
 
         field.removeAttribute("source");
         field.removeAttribute("objects");
         field.removeAttribute("xpath");
         forEach.addContent(field);
-        
+
         field.setAttribute("value", "{" + field.getAttributeValue("value") + "}");
 
         List attributes = field.getChildren("attribute", mcrns);
@@ -330,10 +321,10 @@ public class MCRFieldDef {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("---------- stylesheet for field " + name + " ---------" );
+            LOGGER.debug("---------- stylesheet for field " + name + " ---------");
             XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
             LOGGER.debug(out.outputString(xsl));
-            LOGGER.debug("------------------------------------------------------------" );
+            LOGGER.debug("------------------------------------------------------------");
         }
     }
 }
