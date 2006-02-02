@@ -96,7 +96,7 @@ public class MCRQueryManager {
         MCRResults results = buildResults(cond, sortBy, maxResults);
 
         // Sort results if not already sorted
-        if (!results.isSorted())
+        if (!results.isSorted() && null != sortBy)
             results.sortBy(sortBy);
 
         // After sorting, cut result list to maxResults if not already done
