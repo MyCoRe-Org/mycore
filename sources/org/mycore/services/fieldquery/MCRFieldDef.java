@@ -81,7 +81,7 @@ public class MCRFieldDef {
             List fields = index.getChildren("field", mcrns);
 
             for (int j = 0; j < fields.size(); j++)
-            	new MCRFieldDef(id, (Element)((Element)fields.get(j)).clone());
+            	new MCRFieldDef(id, (Element)fields.get(j));
         }
     }
 
@@ -306,10 +306,9 @@ public class MCRFieldDef {
         return xsl;
     }
 
-    private void buildStylesheet(Element field) {
-        field.detach();
-
-        String xpath = field.getAttributeValue("xpath");
+    /** Builds the stylesheet to build values for this field from XML source data */
+    private void buildStylesheet(Element fieldDef) {
+        String xpath = fieldDef.getAttributeValue("xpath");
         if ((xpath == null) || (xpath.trim().length() == 0)) {
             return;
         }
@@ -317,28 +316,44 @@ public class MCRFieldDef {
         Element stylesheet = (Element) (xslTemplate.clone());
         xsl = new Document(stylesheet);
 
+        // <xsl:for-each select="{@xpath}">
         Element forEach = stylesheet.getChild("template", xslns).getChild("fieldValues", mcrns).getChild("for-each", xslns);
         forEach.setAttribute("select", xpath);
 
-        field.removeAttribute("source");
-        field.removeAttribute("objects");
-        field.removeAttribute("xpath");
-        forEach.addContent(field);
+        // <mcr:fieldValue>
+        Element fieldValue = new Element("fieldValue", mcrns);
+        forEach.addContent(fieldValue);
 
-        field.setAttribute("value", "{" + field.getAttributeValue("value") + "}");
+        // <mcr:value>
+        Element valueElem = new Element("value", mcrns);
+        fieldValue.addContent(valueElem);
 
-        List attributes = field.getChildren("attribute", mcrns);
+        // <xsl:value-of select="{@value}" />
+        String valueExpr = fieldDef.getAttributeValue("value");
+        Element valueOf = new Element("value-of", xslns);
+        valueOf.setAttribute("select", valueExpr);
+        valueElem.addContent(valueOf);
+
+        List attributes = fieldDef.getChildren("attribute", mcrns);
 
         for (int j = 0; j < attributes.size(); j++) {
-            Element attribute = (Element) (attributes.get(j));
-            attribute.setAttribute("value", "{" + attribute.getAttributeValue("value") + "}");
+            Element attribDef = (Element) (attributes.get(j));
+
+            // <mcr:attribute name="{@name}">
+            Element attribute = new Element("attribute", mcrns);
+            fieldValue.addContent(attribute);
+            attribute.setAttribute("name", attribDef.getAttributeValue("name"));
+
+            // <xsl:value-of select="{@value}" />
+            valueOf = new Element("value-of", xslns);
+            valueOf.setAttribute("select", attribDef.getAttributeValue("value"));
+            attribute.addContent(valueOf);
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("---------- stylesheet for field " + name + " ---------");
+            LOGGER.debug("---------- Stylesheet for search field <" + name + "> ----------");
             XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
             LOGGER.debug(out.outputString(xsl));
-            LOGGER.debug("------------------------------------------------------------");
         }
     }
 }
