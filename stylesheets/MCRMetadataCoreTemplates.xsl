@@ -308,7 +308,7 @@
     <xsd:sequence>
      <xsd:any processContents="skip"/>
     </xsd:sequence>
-    <xsd:attribute name="pool" use="required" type="xsd:string" />
+    <xsd:attribute name="permission" use="required" type="xsd:string" />
     <xsd:attribute name="inherited" use="optional" type="xsd:string" />
     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    </xsd:complexType>

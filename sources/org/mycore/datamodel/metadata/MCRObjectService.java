@@ -372,20 +372,20 @@ public class MCRObjectService {
     /**
      * This methode add a rule to the rules list.
      * 
-     * @param pool -
-     *            the new pool as string
+     * @param permission -
+     *            the new permission as string
      * @param condition -
      *            the new rule as JDOM tree Element
      */
-    public final void addRule(String pool, org.jdom.Element condition) {
+    public final void addRule(String permission, org.jdom.Element condition) {
         if (condition == null) {
             return;
         }
-        if ((pool == null) || ((pool = pool.trim()).length() == 0)) {
+        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
             return;
         }
-        if (getRuleIndex(pool) == -1) {
-            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, pool, condition);
+        if (getRuleIndex(permission) == -1) {
+            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, permission, condition);
             rules.add(user);
         }
     }
@@ -400,16 +400,16 @@ public class MCRObjectService {
     }
 
     /**
-     * This method return the index of a pool in the rules list.
+     * This method return the index of a permission in the rules list.
      * 
-     * @return the index of a pool in the rules list
+     * @return the index of a permission in the rules list
      */
-    public final int getRuleIndex(String pool) {
+    public final int getRuleIndex(String permission) {
         int ret = -1;
-        if ((pool == null) || (pool.trim().length() == 0))
+        if ((permission == null) || (permission.trim().length() == 0))
             return ret;
         for (int i = 0; i < rules.size(); i++) {
-            if (((MCRMetaAccessRule) rules.get(i)).getPool().equals(pool)) {
+            if (((MCRMetaAccessRule) rules.get(i)).getPermission().equals(permission)) {
                 ret = i;
                 break;
             }
@@ -432,18 +432,18 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode get a single pool name of rule from the rules list as a
+     * This methode get a single permission name of rule from the rules list as a
      * string.
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return a rule pool string
+     * @return a rule permission string
      */
-    public final String getRulePool(int index) throws IndexOutOfBoundsException {
+    public final String getRulePermission(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > rules.size())) {
-            throw new IndexOutOfBoundsException("Index error in getRulePool.");
+            throw new IndexOutOfBoundsException("Index error in getRulePermission.");
         }
-        return ((MCRMetaAccessRule) rules.get(index)).getPool();
+        return ((MCRMetaAccessRule) rules.get(index)).getPermission();
     }
 
     /**
@@ -552,7 +552,7 @@ public class MCRObjectService {
      * @param value
      *            the value of a flag as string
      * @param type
-     *            the pool if an ip as string
+     *            the permission if an ip as string
      * 
      */
     public final int getFlagIndex(String value) {

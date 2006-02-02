@@ -131,7 +131,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * @param set_permission
      *            the new permission string, if it is empty 'READ' will be set.
      */
-    public final void setpermission(String set_permission) {
+    public final void setPermission(String set_permission) {
         permission = set_permission;
         if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
             permission = "read";
@@ -154,7 +154,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
      * 
      * @return the permission attribute
      */
-    public final String getpermission() {
+    public final String getPermission() {
         return permission;
     }
 
