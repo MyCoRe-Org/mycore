@@ -173,9 +173,10 @@ public class MCRData2Fields {
 
         if (fieldValues != null)
             for (int i = 0; i < fieldValues.size(); i++) {
-                String value = ((Element) (fieldValues.get(i))).getAttributeValue("value");
+                Element fieldValue = (Element) (fieldValues.get(i));
+                String value = fieldValue.getChildTextTrim("value", MCRFieldDef.mcrns);
 
-                if ((value != null) && (value.trim().length() > 0)) {
+                if ((value != null) && (value.length() > 0)) {
                     LOGGER.debug("MCRData2Fields " + def.getName() + " := " + value);
                     values.add(new MCRFieldValue(def, value));
                 }
