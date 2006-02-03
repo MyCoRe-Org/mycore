@@ -86,11 +86,11 @@ public class MCRJDOMSearcher extends MCRSearcher {
         super.init(ID);
 
         // Find all types of MCRObject data:
-        String prefix = "MCR.persistence_config_";
-        Properties props = MCRConfiguration.instance().getProperties(prefix);
+        String cfgPrefix = "MCR.persistence_config_";
+        Properties props = MCRConfiguration.instance().getProperties(cfgPrefix);
         for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
             String key = (String) (keys.nextElement());
-            String type = key.substring(prefix.length());
+            String type = key.substring(cfgPrefix.length());
 
             LOGGER.debug("Now indexing metadata of all stored MCRObjects from type " + type);
 
