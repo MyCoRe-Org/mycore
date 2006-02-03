@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.access.mcrimpl;
+package org.mycore.access;
 
 import java.io.IOException;
 
@@ -32,18 +32,17 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Servlet for access check URL:
- * /servlets/MCRAccessCheckservlet?pool=XXX&objid=YYY if no parameter where
+ * /servlets/MCRAccessCheckservlet?permission=XXX&objid=YYY if no parameter where
  * given, return value will always be true
  * 
- * @param pool:
- *            accesspool to check
+ * @param permission:
+ *            access permission to check
  * @param objid:
  *            MyCoRe objectid as string to check
  * 
@@ -83,9 +82,13 @@ public class MCRAccessCheckServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         // get parameter
         String objid = getProperty(job.getRequest(), "objid");
-        String pool = getProperty(job.getRequest(), "pool");
+        String permission = getProperty(job.getRequest(), "permission");
 
-        boolean result = AI.checkPermission(objid, pool);
+        boolean result = false;
+        if ((objid == null) || (objid.trim().length() == 0))
+        result = AI.checkPermission(objid, permission);
+        else
+            result = AI.checkPermission(permission);
 
         Document jdom = new Document(new Element("mycoreaccesscheck"));
         jdom.getRootElement().addContent(new Element("accesscheck"));
