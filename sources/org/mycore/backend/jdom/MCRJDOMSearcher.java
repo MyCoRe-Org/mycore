@@ -24,8 +24,10 @@
 package org.mycore.backend.jdom;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -41,10 +43,15 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
@@ -55,10 +62,10 @@ import org.mycore.services.fieldquery.MCRQueryCondition;
  * Implements a searcher and indexer for MCRObject metadata using only data in
  * memory without any persistent structures. When data is indexed, the values
  * are stored as XML document in memory. When data is searched, the query is
- * transformed to a XSL condition and run against the XML in memory. This class
- * may also be useful for learning how to implement MCRSearchers and indexers.
- * 
- * TODO: read metadata of all stored MCRObjects at startup
+ * transformed to a XSL condition and run against the XML in memory. Before
+ * first use of instances of this class, all MCRObject metadata is loaded from
+ * persistent store and indexed in memory. This class may also be useful for
+ * learning how to implement MCRSearchers and indexers.
  * 
  * @author Frank Lützenkirchen
  */
@@ -74,6 +81,33 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
     /** XSL transformer factory */
     private TransformerFactory factory = TransformerFactory.newInstance();
+
+    public void init(String ID) {
+        super.init(ID);
+
+        // Find all types of MCRObject data:
+        String prefix = "MCR.persistence_config_";
+        Properties props = MCRConfiguration.instance().getProperties(prefix);
+        for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
+            String key = (String) (keys.nextElement());
+            String type = key.substring(prefix.length());
+
+            LOGGER.debug("Now indexing metadata of all stored MCRObjects from type " + type);
+
+            MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+            List IDs = mcr_xml.retrieveAllIDs(type);
+            for (int i = 0; i < IDs.size(); i++) {
+                String sid = (String) (IDs.get(i));
+                MCRObject obj = new MCRObject();
+                MCRObjectID oid = new MCRObjectID(sid);
+                obj.setId(oid);
+                obj.setFromXML(mcr_xml.retrieve(oid), false);
+                List fields = MCRData2Fields.buildFields(obj, index);
+                if ((fields != null) && (fields.size() > 0))
+                    addToIndex(sid, fields);
+            }
+        }
+    }
 
     protected void addToIndex(String entryID, List fields) {
         LOGGER.info("MCRJDOMSearcher indexing data of " + entryID);
