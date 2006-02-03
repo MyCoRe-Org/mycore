@@ -25,7 +25,7 @@ package org.mycore.services.fieldquery;
 
 /**
  * Represents a single sort criteria for sorting query results.
- * Each MCRSortBy defines the field to sort by, and the order
+ * Each MCRSortBy defines one field to sort by, and the order
  * (ascending or descending).
  *  
  * @author Frank Lützenkirchen

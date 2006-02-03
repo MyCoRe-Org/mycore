@@ -36,10 +36,11 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
- * a specific backend should be implemented as a subclass. This class implements
+ * a specific backend must be implemented as a subclass. This class implements
  * MCREventHandler. Indexers can easily be implemented by overwriting the two
  * methods addToIndex and removeFromIndex. Searchers are implemented by
- * overwriting the method search.
+ * overwriting the method search. Searchers that do not need indexing or do this
+ * on their own can simply ignore the add/remove methods.
  * 
  * @author Frank Lützenkirchen
  */

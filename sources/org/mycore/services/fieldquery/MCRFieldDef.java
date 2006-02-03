@@ -37,8 +37,8 @@ import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * A search field definition. For each field in the configuration file
- * searchfields.xml there is one MCRFieldDef instance with attributes name, data
- * type and sortable flag.
+ * searchfields.xml there is one MCRFieldDef instance with attributes that
+ * represent the configuration in the xml file.
  * 
  * @author Frank Lützenkirchen
  */
@@ -193,7 +193,10 @@ public class MCRFieldDef {
     }
 
     /**
-     * Returns true if this field is used for this type of object
+     * Returns true if this field is used for this type of object.
+     * For MCRObject, the type is the same as in MCRObject.getId().getTypeId().
+     * For MCRFile, the type is the same as in MCRFile.getContentTypeID().
+     * For plain XML data, the type is the name of the root element. 
      * 
      * @param objectType
      *            the type of object
