@@ -41,14 +41,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldValue;
-import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.plugins.TextFilterPluginManager;
@@ -62,56 +58,54 @@ public class MCRLuceneSearcher extends MCRSearcher {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
 
-    static final private MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     String IndexDir = "";
 
     boolean FIRST = true;
 
-    // TODO: read from property file
     static String DATE_FORMAT = "yyyy-MM-dd";
-    
+
     static String TIME_FORMAT = "hh:mm:ss";
 
     static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
-    
+
     static int INT_BEFORE = 10;
-    
+
     static int DEC_BEFORE = 10;
-    static int DEC_AFTER  = 4;
+
+    static int DEC_AFTER = 4;
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
     public void init(String ID) {
         super.init(ID);
-        IndexDir = CONFIG.getString(prefix + "IndexDir");
+
+        MCRConfiguration config = MCRConfiguration.instance();
+        IndexDir = config.getString(prefix + "IndexDir");
         LOGGER.info(prefix + "indexDir: " + IndexDir);
-        File f = new File( IndexDir );
-        if( ! f.exists() ) f.mkdirs();
-        if( ! f.isDirectory() )
-        {
+        File f = new File(IndexDir);
+        if (!f.exists())
+            f.mkdirs();
+        if (!f.isDirectory()) {
             String msg = IndexDir + " is not a directory!";
-            throw new org.mycore.common.MCRConfigurationException( msg );
+            throw new org.mycore.common.MCRConfigurationException(msg);
         }
-        if( ! f.canWrite() )
-        {
+        if (!f.canWrite()) {
             String msg = IndexDir + " is not writeable!";
-            throw new org.mycore.common.MCRConfigurationException( msg );
+            throw new org.mycore.common.MCRConfigurationException(msg);
         }
 
-        String lockDir = CONFIG.getString("MCR.Lucene.LockDir");
+        String lockDir = config.getString("MCR.Lucene.LockDir");
         LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
-        f = new File( lockDir );
-        if( ! f.exists() ) f.mkdirs();
-        if( ! f.isDirectory() )
-        {
+        f = new File(lockDir);
+        if (!f.exists())
+            f.mkdirs();
+        if (!f.isDirectory()) {
             String msg = lockDir + " is not a directory!";
-            throw new org.mycore.common.MCRConfigurationException( msg );
+            throw new org.mycore.common.MCRConfigurationException(msg);
         }
-        if( ! f.canWrite() )
-        {
+        if (!f.canWrite()) {
             String msg = lockDir + " is not writeable!";
-            throw new org.mycore.common.MCRConfigurationException( msg );
+            throw new org.mycore.common.MCRConfigurationException(msg);
         }
         System.setProperty("org.apache.lucene.lockdir", lockDir);
     }
@@ -164,7 +158,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     Field f = Field.Text(name, in);
                     doc.add(f);
                 }
-            } else if ((null != name) && (null != type) && (null != content) && (content.length() > 0)) {
+            } else {
                 if ("date".equals(type)) {
                     content = handleDate(content, DATE_FORMAT, "yyyyMMdd");
                     type = "Text";
@@ -176,22 +170,20 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     type = "Text";
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
-                    type = "indentifier";
-                } else if ("decimal".equals(type))
-                {
-                  content    = handleNumber(content, "decimal", 0);
-                  type       = "identifier";
-                } else if ("integer".equals(type))
-                {
-                  content    = handleNumber(content, "integer", 0);
-                  type       = "identifier";
+                    type = "identifier";
+                } else if ("decimal".equals(type)) {
+                    content = handleNumber(content, "decimal", 0);
+                    type = "identifier";
+                } else if ("integer".equals(type)) {
+                    content = handleNumber(content, "integer", 0);
+                    type = "identifier";
                 }
 
                 if (type.equals("identifier")) {
                     doc.add(Field.Keyword(name, content));
                 }
 
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable() )) {
+                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
                     doc.add(Field.Text(name, content));
                 } else if (type.equals("text")) {
                     doc.add(Field.UnStored(name, content));
@@ -211,34 +203,30 @@ public class MCRLuceneSearcher extends MCRSearcher {
         return f2.format(d);
     }
 
-    public static String handleNumber(String content, String type, long add)
-    {
-      int before, after;  
-      int dez;
-      long l;
-      if ( "decimal".equals(type))
-      {
-        before   = DEC_BEFORE;
-        after    = DEC_AFTER;
-        dez      = before + after;
-        double d = Double.parseDouble(content);
-        d        = d*Math.pow(10, after) + Math.pow(10, dez);
-        l        = (long)d;
-      }
-      else
-      {
-        before   = INT_BEFORE;
-        dez      = before;
-        l        = Long.parseLong(content);
-        l        = l +(long)(Math.pow(10, dez) + 0.1);
-      }
-      
-      long m     = l + add;
-      String n   = "0000000000000000000";
-      String h   = Long.toString(m);
-      return n.substring(0,dez+1-h.length()) + h;
+    public static String handleNumber(String content, String type, long add) {
+        int before, after;
+        int dez;
+        long l;
+        if ("decimal".equals(type)) {
+            before = DEC_BEFORE;
+            after = DEC_AFTER;
+            dez = before + after;
+            double d = Double.parseDouble(content);
+            d = d * Math.pow(10, after) + Math.pow(10, dez);
+            l = (long) d;
+        } else {
+            before = INT_BEFORE;
+            dez = before;
+            l = Long.parseLong(content);
+            l = l + (long) (Math.pow(10, dez) + 0.1);
+        }
+
+        long m = l + add;
+        String n = "0000000000000000000";
+        String h = Long.toString(m);
+        return n.substring(0, dez + 1 - h.length()) + h;
     }
-    
+
     /**
      * Adds document to Lucene
      * 
@@ -247,9 +235,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * 
      */
     private void addDocumentToLucene(Document doc) throws Exception {
-        IndexWriter writer = null;
-
-        writer = getLuceneWriter(IndexDir, FIRST);
+        IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
         FIRST = false;
 
         writer.addDocument(doc);
@@ -260,8 +246,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * Get Lucene Writer
      * 
      * @param indexDir
-     *            directory where lucene index is store
-     *            first  check existance of index directory, if it does nor exist create it
+     *            directory where lucene index is store first check existance of
+     *            index directory, if it does nor exist create it
      * 
      * @return the lucene writer, calling programm must close writer
      */
@@ -291,11 +277,10 @@ public class MCRLuceneSearcher extends MCRSearcher {
         writer = new IndexWriter(indexDir, analyzer, false);
         writer.mergeFactor = 200;
         writer.maxMergeDocs = 2000;
-        
+
         return writer;
     }
-    
-    
+
     protected void removeFromIndex(String entryID) {
         LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
 
@@ -313,8 +298,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
      *            string name of lucene field with stored id
      * @param id
      *            string document id
-     * @param indexDir
-     *      *     the directory where index is stored
+     * @param indexDir *
+     *            the directory where index is stored
      * 
      */
     public static void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
@@ -334,16 +319,15 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         LOGGER.info("Number of documents found : " + hits.length());
 
-        if ( hits.length() > 0) {
-          IndexReader reader = IndexReader.open(indexDir);
-          for (int i = 0; i < hits.length(); i++)
-          {
-            reader.delete(hits.id(i));
-          }
-          LOGGER.info("DELETE: " + id);
-          reader.close();
+        if (hits.length() > 0) {
+            IndexReader reader = IndexReader.open(indexDir);
+            for (int i = 0; i < hits.length(); i++) {
+                reader.delete(hits.id(i));
+            }
+            LOGGER.info("DELETE: " + id);
+            reader.close();
         }
-        
+
         searcher.close();
     }
 
@@ -361,32 +345,4 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         return results;
     }
-    
-    /**
-     * Test application, query  lucene index.
-     */
-    public static void main(String[] args) throws Exception {
-      if ( 4 == args.length && "-query".equals(args[0]) &&             // build Query from xml-File 
-           "-indexer".equals(args[2]) )                                // use this indexer 
-      {
-        org.jdom.Element query = MCRURIResolver.instance().resolve("file://" + args[1]);
-        MCRLuceneSearcher ls = new MCRLuceneSearcher();
-        ls.init( args[3] );
-
-        MCRCondition  cond = new MCRQueryParser().parse((Element) query.getChild("conditions").getChildren().get(0));
-        int maxResults = 100;
-        MCRResults res = ls.search(cond, null, maxResults);
-
-        org.jdom.Element doc = res.buildXML();
-        XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        System.out.println(out.outputString(doc));
-
-      } else
-      {
-        System.out.println("usage: query data\n");
-        System.out.println("-query     file with query   -indexer  name of indexer");
-      }
-      
-    }
-
 }
