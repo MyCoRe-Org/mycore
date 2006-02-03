@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -181,7 +180,8 @@ public class MCRHit {
 
         // Copy metaData
         c.metaData.addAll(a.metaData);
-        c.metaData.add(null); // used as a delimiter
+        if ((a.metaData.size() > 0) && (b.metaData.size() > 0))
+            c.metaData.add(null); // used as a delimiter
         c.metaData.addAll(b.metaData);
 
         return c;
@@ -198,13 +198,11 @@ public class MCRHit {
      *         child element and multiple 'metaData' child elements
      */
     public Element buildXML() {
-        Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
-
-        Element eHit = new Element("hit", mcrns);
+        Element eHit = new Element("hit", MCRFieldDef.mcrns);
         eHit.setAttribute(new Attribute("id", this.id));
 
         if (!sortData.isEmpty()) {
-            Element eSort = new Element("sortData", mcrns);
+            Element eSort = new Element("sortData", MCRFieldDef.mcrns);
             eHit.addContent(eSort);
 
             for (int i = 0; i < sortData.size(); i++) {
@@ -222,7 +220,7 @@ public class MCRHit {
                 if ((eMeta != null) && (count == 0))
                     continue;
 
-                eMeta = new Element("metadata", mcrns);
+                eMeta = new Element("metaData", MCRFieldDef.mcrns);
                 eHit.addContent(eMeta);
                 count = 0;
                 if (i > 0)
