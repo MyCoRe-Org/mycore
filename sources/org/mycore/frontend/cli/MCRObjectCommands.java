@@ -35,12 +35,13 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -565,9 +566,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
-        // XML table manager
-        MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
-        ArrayList ar = mcr_xml.retrieveAllIDs(type);
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.LISTIDS_EVENT);
+        evt.put("objectType", type);
+        MCREventManager.instance().handleEvent(evt);
+        ArrayList ar = (ArrayList) evt.get("objectIDs");
+        if ((ar == null) || (ar.size() == 0)) {
+            LOGGER.warn("No ID's was found for type " + type + ".");
+            return;
+        }
         String stid = null;
 
         for (int i = 0; i < ar.size(); i++) {
