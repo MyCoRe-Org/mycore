@@ -56,7 +56,9 @@ class MCRRuleParser extends MCRBooleanClauseParser {
 
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
-        if (name.equals("condition")) {
+        if (name.equals("boolean")) {
+        	return super.parseSimpleCondition(e);
+        } else if (name.equals("condition")) {
             String field = e.getAttributeValue("field").toLowerCase().trim();
             String operator = e.getAttributeValue("operator").trim();
             String value = e.getAttributeValue("value").trim();
@@ -83,7 +85,7 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             }else {
             	throw new MCRParseException("Not a valid condition field <" + field + ">");
             }
-        } else {
+        }else{
             throw new MCRParseException("Not a valid name <" + name + ">");
         }  	
     }

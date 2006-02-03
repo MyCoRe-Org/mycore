@@ -222,7 +222,8 @@ public class MCRBooleanClauseParser {
     }
 
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
-        String name = e.getName().toLowerCase();
+    	// <boolean operator="true|false" />
+        String name = e.getAttributeValue("operator").toLowerCase();
 
         if (name.equals("true")) {
             return new MCRTrueCondition();
