@@ -51,17 +51,17 @@ public class MCRFieldDef {
      */
     private static Hashtable fieldTable = new Hashtable();
 
-    private static Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+    public final static Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
-    static Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
+    public final static Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
 
-    private static Namespace xmlns = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+    public final static Namespace xmlns = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
 
-    private static Namespace xlinkns = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
+    public final static Namespace xlinkns = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
-    private static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
+    public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
-    private static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
+    private final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
 
     /**
      * Read searchfields.xml and build the MCRFiedDef objects
