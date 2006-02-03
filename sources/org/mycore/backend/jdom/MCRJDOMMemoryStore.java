@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -36,10 +37,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
-import org.mycore.services.fieldquery.MCRSearcherFactory;
-import org.mycore.common.events.*;
 
 /**
  * This class implements the memory store based on JDOM documents.
@@ -166,34 +164,14 @@ public class MCRJDOMMemoryStore {
         ArrayList ar = mcr_xml.retrieveAllIDs(type);
         Hashtable objects = new Hashtable();
         int size = ar.size();
-        String stid;
-        MCRObjectID mid;
-        org.jdom.Document jdom_document;
         
-        MCREventHandlerBase bs = null;
-        try
-        {
-          bs = MCRSearcherFactory.getSearcher( "jdomm");
-        } 
-        catch (MCRConfigurationException e){}
-        catch (MCRException e) {}
-
         for (int i = 0; i < size; i++) {
-            stid = (String) ar.get(i);
-            mid = new MCRObjectID(stid);
-            jdom_document = (org.jdom.Document) mcr_xml.readDocument(mid).clone();
+            String stid = (String) ar.get(i);
+            MCRObjectID mid = new MCRObjectID(stid);
+            Document jdom_document = (Document)( mcr_xml.readDocument(mid).clone() );
             MCRNormalizeText.normalizeJDOM(jdom_document);
             objects.put(mid, jdom_document.detachRootElement());
             logger.debug("Load to JDOM tree " + stid);
-            
-            if ( null != bs )
-            {
-              MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
-              MCRObject mcrobj = new MCRObject();
-              mcrobj.receiveFromDatastore(mid);
-              evt.put("object", mcrobj);
-              bs.doHandleEvent(evt);
-            }
         }
 
         long stopdate = System.currentTimeMillis();
