@@ -26,6 +26,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -40,6 +41,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -111,6 +113,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 "The command return the next free MCRObjectID for the ID base.");
         command.add(com);
 
+        com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch", "The command read the Content store and reindex the derivate search stores.");
+        command.add(com);
+
+        com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String", "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
+        command.add(com);
     }
 
     /**
@@ -567,6 +574,53 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+    }
+    /**
+     * The method start the repair the content search index for all derivates.
+     */
+    public static void repairMetadataSearch() {
+        LOGGER.info("Start the repair for type derivate.");
+
+        // XML table manager
+        MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+        ArrayList ar = mcr_xml.retrieveAllIDs("derivate");
+        String stid = null;
+
+        for (int i = 0; i < ar.size(); i++) {
+            stid = (String) ar.get(i);
+
+            MCRDerivate der = new MCRDerivate();
+            der.repairPersitenceDatastore(stid);
+            LOGGER.info("Repaired " + (String) ar.get(i));
+        }
+
+        LOGGER.info(" ");
+    }
+
+    /**
+     * The method start the repair the content search index for one.
+     * 
+     * @param id
+     *            the MCRObjectID as String
+     */
+    public static void repairDerivateSearchForID(String id) {
+        LOGGER.info("Start the repair for the ID " + id);
+
+        MCRObjectID mid = null;
+
+        try {
+            mid = new MCRObjectID(id);
+        } catch (Exception e) {
+            LOGGER.error("The String " + id + " is not a MCRObjectID.");
+            LOGGER.info(" ");
+
+            return;
+        }
+
+        MCRDerivate der = new MCRDerivate();
+        der.repairPersitenceDatastore(mid);
+        LOGGER.info("Repaired " + mid.getId());
+        LOGGER.info(" ");
     }
 
 }

@@ -404,7 +404,7 @@ final public class MCRDerivate extends MCRBase {
         try {
             xml = (byte[]) evt.get("xml");
         } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.",e);
+            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.", e);
         }
         return xml;
     }
@@ -517,4 +517,37 @@ final public class MCRDerivate extends MCRBase {
         MCREventManager.instance().handleEvent(evt);
     }
 
+    /**
+     * The method updates the indexer of content.
+     * 
+     * @param id
+     *            the MCRObjectID as string
+     */
+    public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
+        repairPersitenceDatastore(new MCRObjectID(id));
+    }
+
+    /**
+     * The method updates the indexer of content.
+     * 
+     * @param id
+     *            the MCRObjectID
+     */
+    public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
+        receiveFromDatastore(id);
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.REPAIR_EVENT);
+        evt.put("derivate", this);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The method print all informations about this MCRObject.
+     */
+    public final void debug() {
+        logger.debug("MCRDerivate ID : " + mcr_id.getId());
+        logger.debug("MCRDerivate Label : " + mcr_label);
+        logger.debug("MCRDerivate Schema : " + mcr_schema);
+        logger.debug("");
+    }
 }

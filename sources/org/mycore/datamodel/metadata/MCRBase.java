@@ -287,6 +287,22 @@ public abstract class MCRBase {
     public abstract void updateInDatastore() throws MCRPersistenceException, MCRActiveLinkException;
 
     /**
+     * The method repair search index.
+     * 
+     * @param id
+     *            the MCRObjectID as String
+     */
+    public abstract void repairPersitenceDatastore(String id) throws MCRPersistenceException;
+
+    /**
+     * The method repair search index.
+     * 
+     * @param id
+     *            the MCRObjectID
+     */
+    public abstract void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException;
+
+    /**
      * This method check the validation of the content of this class. The method
      * returns <em>true</em> if
      * <ul>

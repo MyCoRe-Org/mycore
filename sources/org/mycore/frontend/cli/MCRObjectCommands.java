@@ -547,7 +547,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method start the repair aof the metadata search for a given
+     * The method start the repair of the metadata search for a given
      * MCRObjectID type.
      * 
      * @param type
@@ -582,7 +582,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method start the repair aof the metadata search for a given
+     * The method start the repair of the metadata search for a given
      * MCRObjectID as String.
      * 
      * @param id
