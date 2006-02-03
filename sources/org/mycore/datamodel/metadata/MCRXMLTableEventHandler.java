@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.ArrayList;
+
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 
@@ -95,7 +97,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
 
     /**
      * This method check exist of the XML data from SQL table data via
-     * MCRXMLTableManager and put the boolean result in the MCREvent instance.
+     * MCRXMLTableManager and put the boolean result in the MCREvent instance as
+     * entry 'exist'.
      * 
      * @param evt
      *            the event that occured
@@ -105,6 +108,21 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
     protected final void handleObjectExist(MCREvent evt, MCRObjectID objid) {
         boolean res = mcr_xmltable.exist(objid);
         evt.put("exist", Boolean.toString(res));
+    }
+
+    /**
+     * This method put all ID's of the XML data from SQL table data via
+     * MCRXMLTableManager in an ArryList and put it in the MCREvent instance as
+     * entry 'objectIDs'.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objtype
+     *            the MCR type that caused the event
+     */
+    protected final void handleObjectListIDs(MCREvent evt, String objtype) {
+        ArrayList ar = mcr_xmltable.retrieveAllIDs(objtype);
+        evt.put("objectIDs", ar);
     }
 
     /**
@@ -176,6 +194,21 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
     protected final void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
         boolean res = mcr_xmltable.exist(objid);
         evt.put("exist", Boolean.toString(res));
+    }
+
+    /**
+     * This method put all ID's of the XML data from SQL table data via
+     * MCRXMLTableManager in an ArryList and put it in the MCREvent instance as
+     * entry 'derivateIDs'.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param dertype
+     *            the MCR type that caused the event
+     */
+    protected final void handleDerivateListIDs(MCREvent evt, String dertype) {
+        ArrayList ar = mcr_xmltable.retrieveAllIDs(dertype);
+        evt.put("derivateIDs", ar);
     }
 
 }

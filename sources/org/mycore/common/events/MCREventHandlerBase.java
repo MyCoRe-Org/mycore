@@ -24,6 +24,7 @@
 package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -38,6 +39,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {
     private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
+
+    /** configuration */
+    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * This method handle all calls for EventHandler for the event types
@@ -77,6 +81,16 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
+            String objtype = (String) (evt.get("objectType"));
+            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
+                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
+                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
+                    handleObjectListIDs(evt, objtype);
+                } else {
+                    logger.warn("Can't find method for an object type data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
             logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
             return;
         }
@@ -94,7 +108,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleDerivateRepaired(evt, der);
                 } else {
-                    logger.warn("Can't find method for an derivate data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for a derivate data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -106,7 +120,17 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
                     handleDerivateExist(evt, objid);
                 } else {
-                    logger.warn("Can't find method for an derivate ID data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for a derivate ID data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
+            String objtype = (String) (evt.get("derivateType"));
+            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
+                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
+                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
+                    handleDerivateListIDs(evt, objtype);
+                } else {
+                    logger.warn("Can't find method for a derivate type data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -173,6 +197,16 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
+            String objtype = (String) (evt.get("objectType"));
+            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
+                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
+                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
+                    undoObjectListIDs(evt, objtype);
+                } else {
+                    logger.warn("Can't find method for an object type data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
             logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
             return;
         }
@@ -190,7 +224,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     undoDerivateRepaired(evt, der);
                 } else {
-                    logger.warn("Can't find method for an derivate data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for a derivate data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -202,7 +236,17 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
                     undoDerivateExist(evt, objid);
                 } else {
-                    logger.warn("Can't find method for an derivate ID data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for a derivate ID data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
+            String objtype = (String) (evt.get("derivateType"));
+            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
+                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
+                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
+                    undoDerivateListIDs(evt, objtype);
+                } else {
+                    logger.warn("Can't find method for a derivate type data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -316,6 +360,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
+     * Handles of object listids events. This implementation does nothing and
+     * should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objtype
+     *            the MCR type that caused the event
+     */
+    protected void handleObjectListIDs(MCREvent evt, String objtype) {
+        doNothing(evt);
+    }
+
+    /**
      * Handles derivate created events. This implementation does nothing and
      * should be overwritted by subclasses.
      * 
@@ -390,6 +447,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
+        doNothing(evt);
+    }
+
+    /**
+     * Handles undo of object listids events. This implementation does nothing
+     * and should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objtype
+     *            the MCR type that caused the event
+     */
+    protected void handleDerivateListIDs(MCREvent evt, String objtype) {
         doNothing(evt);
     }
 
@@ -511,6 +581,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
+     * Handles undo of object listids events. This implementation does nothing
+     * and should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objtyle
+     *            the MCR type that caused the event
+     */
+    protected void undoObjectListIDs(MCREvent evt, String objtype) {
+        doNothing(evt);
+    }
+
+    /**
      * Handles undo of derivate created events. This implementation does nothing
      * and should be overwritted by subclasses.
      * 
@@ -585,6 +668,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoDerivateExist(MCREvent evt, MCRObjectID objid) {
+        doNothing(evt);
+    }
+
+    /**
+     * Handles undo of derivate listids events. This implementation does nothing
+     * and should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objtype
+     *            the MCR type that caused the event
+     */
+    protected void undoDerivateListIDs(MCREvent evt, String objtype) {
         doNothing(evt);
     }
 
