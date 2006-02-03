@@ -27,8 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
@@ -41,80 +39,60 @@ import org.mycore.parsers.bool.MCRParseException;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
-    
-    /** 
+
+    /**
      * Parses XML element containing a simple query condition
      * 
-     * @param e the 'condition' element
-     * @return a instance of MCRQueryCondition
+     * @param e
+     *            the 'condition' element
+     * @return the parsed MCRQueryCondition object
      */
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
 
-        if (name.equals("condition")) {
-            String field = e.getAttributeValue("field");
-            String opera = e.getAttributeValue("operator");
-            String value = e.getAttributeValue("value");
-
-            return new MCRQueryCondition(MCRFieldDef.getDef(field), opera, value);
-        } else {
+        if (!name.equals("condition"))
             throw new MCRParseException("Not a valid <" + name + ">");
-        }
+
+        String field = e.getAttributeValue("field");
+        String opera = e.getAttributeValue("operator");
+        String value = e.getAttributeValue("value");
+
+        MCRFieldDef def = MCRFieldDef.getDef(field);
+        if (def == null)
+            throw new MCRParseException("Field not defined: <" + field + ">");
+
+        return new MCRQueryCondition(def, opera, value);
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
     private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
 
-    /** 
-     * Parses a String containing a simple query condition
+    /**
+     * Parses a String containing a simple query condition, for example: (title
+     * contains "Java") and (creatorID = "122132131")
      * 
-     * @param s the condition as a String
-     * @return a instance of MCRQueryCondition
+     * @param s
+     *            the condition as a String
+     * @return the parsed MCRQueryCondition object
      */
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         Matcher m = pattern.matcher(s);
 
-        if (m.find()) {
-            String field = m.group(1);
-            String operator = m.group(2);
-            String value = m.group(3);
-
-            if (value.startsWith("\"") || value.endsWith("\"")) {
-                value = value.substring(1, value.length() - 1);
-            }
-
-            return new MCRQueryCondition(MCRFieldDef.getDef(field), operator, value);
-        } else {
+        if (!m.find())
             throw new MCRParseException("Not a valid condition: " + s);
+
+        String field = m.group(1);
+        String operator = m.group(2);
+        String value = m.group(3);
+
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
         }
-    }
 
-    /** A test program with some usage samples * */
-    public static void main(String[] args) {
-        MCRCondition cond;
-        String query;
-        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-        MCRQueryParser parser = new MCRQueryParser();
+        MCRFieldDef def = MCRFieldDef.getDef(field);
+        if (def == null)
+            throw new MCRParseException("Field not defined: <" + field + ">");
 
-        query = "title contains Optik";
-        cond = parser.parse(query);
-        System.out.println("input: " + query);
-        System.out.println("parsed: " + cond);
-        System.out.println(out.outputString(cond.toXML()));
-        System.out.println();
-
-        query = " not (  title   contains  \"Magnetische Wellen\"\t\t)  ";
-        cond = parser.parse(query);
-        System.out.println("input: " + query);
-        System.out.println("parsed: " + cond);
-        System.out.println(out.outputString(cond.toXML()));
-        System.out.println();
-
-        query = "(title contains Optik ) and ( x = y) and (a  < b)";
-        cond = parser.parse(query);
-        System.out.println("input: " + query);
-        System.out.println("parsed: " + cond);
-        System.out.println(out.outputString(cond.toXML()));
-        System.out.println();
+        return new MCRQueryCondition(def, operator, value);
     }
 }
