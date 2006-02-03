@@ -26,6 +26,7 @@ package org.mycore.backend.jdom;
 import java.io.ByteArrayOutputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -52,6 +53,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRData2Fields;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
@@ -103,36 +105,34 @@ public class MCRJDOMSearcher extends MCRSearcher {
                 obj.setId(oid);
                 obj.setFromXML(mcr_xml.retrieve(oid), false);
                 List fields = MCRData2Fields.buildFields(obj, index);
-                if ((fields != null) && (fields.size() > 0))
-                    addToIndex(sid, fields);
+                addToIndex(sid, fields);
             }
         }
     }
 
     protected void addToIndex(String entryID, List fields) {
-        LOGGER.info("MCRJDOMSearcher indexing data of " + entryID);
-
         if ((fields == null) || (fields.size() == 0)) {
             return;
         }
 
-        Element root = new Element("data");
+        LOGGER.info("MCRJDOMSearcher indexing data of " + entryID);
+        Element data = new Element("data");
 
         for (int i = 0; i < fields.size(); i++) {
             MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
-            Element e = new Element(fv.getField().getName());
-            e.addContent(fv.getValue());
-            root.addContent(e);
+            Element field = new Element(fv.getField().getName());
+            field.addContent(fv.getValue());
+            data.addContent(field);
         }
 
         if (LOGGER.isDebugEnabled()) {
-            String s = new XMLOutputter(Format.getPrettyFormat()).outputString(root);
+            String s = new XMLOutputter(Format.getPrettyFormat()).outputString(data);
             LOGGER.debug("----------" + entryID + "----------");
             LOGGER.debug(s);
             LOGGER.debug("-----------------------------------");
         }
 
-        map.put(entryID, new Document(root));
+        map.put(entryID, new Document(data));
     }
 
     protected void removeFromIndex(String entryID) {
@@ -141,30 +141,39 @@ public class MCRJDOMSearcher extends MCRSearcher {
     }
 
     public MCRResults search(MCRCondition cond, List order, int maxResults) {
+        boolean doSort = (order != null) && (order.size() > 0);
         String xslCondition = buildXSLCondition(cond);
         LOGGER.debug("MCRJDOMSearcher searching for " + xslCondition);
 
-        if (xslTemplate == null) {
-            xslTemplate = prepareStylesheet();
-        }
-
         Document xsl = buildStylesheet(xslCondition);
-
         MCRResults results = new MCRResults();
-        java.util.Iterator keys = map.keySet().iterator();
 
-        while (keys.hasNext()) {
+        for (Iterator keys = map.keySet().iterator(); keys.hasNext();) {
             String entryID = (String) (keys.next());
             Document xml = (Document) (map.get(entryID));
 
             if (matches(xml, xsl)) {
-                results.addHit(new MCRHit(entryID));
+                MCRHit hit = new MCRHit(entryID);
+                results.addHit(hit);
+
+                // Add values of all fields that may be sort criteria
+                List values = xml.getRootElement().getChildren();
+                for (int i = 0; i < values.size(); i++) {
+                    Element value = (Element) (values.get(i));
+                    MCRFieldDef def = MCRFieldDef.getDef(value.getName());
+                    if (def.isSortable())
+                        hit.addSortData(new MCRFieldValue(def, value.getText()));
+                }
             }
 
-            if ((maxResults > 0) && (results.getNumHits() >= maxResults)) {
+            if ((!doSort) && (maxResults > 0) && (results.getNumHits() >= maxResults)) {
                 break;
             }
         }
+
+        // Sort results
+        if (doSort)
+            results.sortBy(order);
 
         LOGGER.debug("MCRJDOMSearcher results completed");
 
@@ -201,32 +210,30 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
     /** Prepares an XSL stylesheet in memory used as template */
     private Document prepareStylesheet() {
-        Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
-        Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
         Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.backend.jdom.MCRJDOMSearcher");
 
         Element stylesheet = new Element("stylesheet");
         stylesheet.setAttribute("version", "1.0");
-        stylesheet.setNamespace(xslns);
-        stylesheet.addNamespaceDeclaration(xalanns);
+        stylesheet.setNamespace(MCRFieldDef.xslns);
+        stylesheet.addNamespaceDeclaration(MCRFieldDef.xalanns);
         stylesheet.addNamespaceDeclaration(extns);
         stylesheet.setAttribute("extension-element-prefixes", "ext");
 
-        Element output = new Element("output", xslns);
+        Element output = new Element("output", MCRFieldDef.xslns);
         output.setAttribute("method", "text");
         stylesheet.addContent(output);
 
-        Element template = new Element("template", xslns);
-        template.setAttribute("match", "/data");
+        Element template = new Element("template", MCRFieldDef.xslns);
+        template.setAttribute("match", "/mcr:values");
         stylesheet.addContent(template);
 
-        Element choose = new Element("choose", xslns);
+        Element choose = new Element("choose", MCRFieldDef.xslns);
         template.addContent(choose);
 
-        Element when = new Element("when", xslns);
+        Element when = new Element("when", MCRFieldDef.xslns);
         when.addContent("t");
 
-        Element otherwise = new Element("otherwise", xslns);
+        Element otherwise = new Element("otherwise", MCRFieldDef.xslns);
         otherwise.addContent("f");
         choose.addContent(when).addContent(otherwise);
 
@@ -235,9 +242,12 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
     /** Adds the condition as xsl when test attribute to the stylesheet template */
     private Document buildStylesheet(String condition) {
-        Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+        if (xslTemplate == null) {
+            xslTemplate = prepareStylesheet();
+        }
+
         Document xsl = (Document) (xslTemplate.clone());
-        xsl.getRootElement().getChild("template", xslns).getChild("choose", xslns).getChild("when", xslns).setAttribute("test", condition);
+        xsl.getRootElement().getChild("template", MCRFieldDef.xslns).getChild("choose", MCRFieldDef.xslns).getChild("when", MCRFieldDef.xslns).setAttribute("test", condition);
 
         return xsl;
     }
@@ -284,43 +294,31 @@ public class MCRJDOMSearcher extends MCRSearcher {
             return "not " + buildXSLCondition(nc.getChild());
         } else if (cond instanceof MCRAndCondition) {
             MCRAndCondition ac = (MCRAndCondition) cond;
-            List children = ac.getChildren();
-            StringBuffer sb = new StringBuffer();
-            sb.append("(");
-
-            for (int i = 0; i < children.size(); i++) {
-                MCRCondition sc = (MCRCondition) (children.get(i));
-                sb.append(buildXSLCondition(sc));
-
-                if (i < (children.size() - 1)) {
-                    sb.append(" and ");
-                }
-            }
-
-            sb.append(")");
-
-            return sb.toString();
+            return buildXSLCondition(ac.getChildren(), "and");
         } else if (cond instanceof MCROrCondition) {
             MCROrCondition oc = (MCROrCondition) cond;
-            List children = oc.getChildren();
-            StringBuffer sb = new StringBuffer();
-            sb.append("( ");
-
-            for (int i = 0; i < children.size(); i++) {
-                MCRCondition sc = (MCRCondition) (children.get(i));
-                sb.append(buildXSLCondition(sc));
-
-                if (i < (children.size() - 1)) {
-                    sb.append(" or ");
-                }
-            }
-
-            sb.append(" )");
-
-            return sb.toString();
+            return buildXSLCondition(oc.getChildren(), "or");
         } else {
             return "";
         }
+    }
+
+    /** Builds a combined and/or XSL condition */
+    private String buildXSLCondition(List children, String operator) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(");
+
+        for (int i = 0; i < children.size(); i++) {
+            MCRCondition sc = (MCRCondition) (children.get(i));
+            sb.append(buildXSLCondition(sc));
+
+            if (i < (children.size() - 1)) {
+                sb.append(" ").append(operator).append(" ");
+            }
+        }
+
+        sb.append(")");
+        return sb.toString();
     }
 
     /** Implements the contains operator as Xalan function extension */
