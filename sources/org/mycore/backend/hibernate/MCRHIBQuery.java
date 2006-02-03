@@ -50,7 +50,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
     private Object queryobject;
 
     private Class queryclass;
-
+    
     private Method[] querymethods;
 
     private StringBuffer sbquery = new StringBuffer();
@@ -69,20 +69,20 @@ public class MCRHIBQuery implements MCRConditionVisitor {
      * constructor creates a reference on the Hibernate Getter/Setter class by
      * an internal object
      */
-    public MCRHIBQuery(){
-        try{
-            queryclass = Class.forName("org.mycore.backend.query.MCRQuery");
+    
+    public MCRHIBQuery(String queryclassName) {
+    	try{
+    		queryclass = Class.forName(queryclassName);
             queryobject = queryclass.newInstance();
             querymethods = queryclass.getMethods();
-        }catch(Exception e){
-            LOGGER.error(e);
-        }
-        
+    	}catch(Exception e) {
+    		LOGGER.error("error in calling MCRHIBQuery", e);
+    	}
     }
     
-    public MCRHIBQuery(MCRCondition condition, List order) {
+    public MCRHIBQuery(MCRCondition condition, List order, String queryclassName) {
         try {
-            queryclass = Class.forName("org.mycore.backend.query.MCRQuery");
+    		queryclass = Class.forName(queryclassName);
             queryobject = queryclass.newInstance();
             querymethods = queryclass.getMethods();
             condition.accept(this);
@@ -297,14 +297,16 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
             for (int i = 0; i < order.size(); i++) {
                 MCRSortBy by = (MCRSortBy)(order.get(i));
-                sb.append(by.getField().getName());
-                sb.append( by.getSortOrder() == MCRSortBy.ASCENDING ? " asc " : " desc " );
-
-                if (i < (order.size() - 1)) {
-                    sb.append(", ");
+                String curIndex = by.getField().getIndex();
+                boolean first = true;
+                if(MCRHIBSearcher.indexClassMapping.get(curIndex) != null
+                		&& MCRHIBSearcher.indexClassMapping.get(curIndex).equals(queryclass.getName())) {
+                	if(!first)
+                		sb.append(", ");
+                    sb.append(by.getField().getName());
+                    sb.append( by.getSortOrder() == MCRSortBy.ASCENDING ? " asc " : " desc " );
                 }
             }
-
             return sb.toString();
         } catch (Exception e) {
             LOGGER.debug("no order given", e);
@@ -322,7 +324,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
         try {
             sb.append("from ");
-            sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
+            sb.append(queryclass.getName());
             sb.append(" where ");
             sb.append(getWhereClause());
 
@@ -330,7 +332,6 @@ public class MCRHIBQuery implements MCRConditionVisitor {
                 sb.append(" order by ");
                 sb.append(getOrderClause());
             }
-
             return sb.toString();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -345,7 +346,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("from ");
-        sb.append(MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery"));
+        sb.append(queryclass.getName());
         sb.append("\nwhere ");
         sb.append(getWhereClause());
 

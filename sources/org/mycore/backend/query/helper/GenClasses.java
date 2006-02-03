@@ -24,44 +24,74 @@
 package org.mycore.backend.query.helper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConfiguration;
 
 public class GenClasses {
     private static String pack = "org.mycore.backend.query";
+    private static MCRConfiguration config = MCRConfiguration.instance();
 
     private HashMap searchfields = new HashMap();
 
     private HashMap typeMapping = new HashMap();
 
     public static void main(String[] args) {
-        GenClasses gen = new GenClasses();
-
+        
         try {
             if (args.length < 2) {
                 System.out.println("needs arg:\n" + "1: filename for queryconfiguration as String\n" + "2: pathname for output as String\n" + "3: (optional) package name as String");
             } else {
-                gen.buildFieldMapping();
-                gen.readDefinition(args[0], args[1]);
-                gen.execute(args[1]);
-
                 if (args.length == 3) {
                     pack = args[3];
-                }
+                }            	
+            	int i = 0;
+            	for (Iterator it = getHibernateIndices().iterator(); it.hasNext();) {
+            		GenClasses gen = new GenClasses();
+            		gen.buildFieldMapping();
+            		i++;
+            		String indexID = (String)it.next();
+            		String indexName = config.getString("MCR.Searcher." + indexID + ".Index");
+            		String queryClassName;
+            		String queryTable = config.getString("MCR.Searcher." + indexID + ".TableName");
+           			queryClassName = queryTable + "Bean";
+            		gen.readDefinition(args[0], args[1], indexName);
+            		gen.execute(args[1], queryClassName);
+				}
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void execute(String dest) {
+    public static List getHibernateIndices(){
+    	List ret = new ArrayList();
+    	Properties props = config.getProperties("MCR.Searcher.");
+    	for(Enumeration en = props.keys(); en.hasMoreElements();) {
+    		String prop = (String)en.nextElement();
+    		if(prop.endsWith("Class") && props.getProperty(prop).endsWith("MCRHIBSearcher")) {
+    			Matcher m = Pattern.compile("MCR\\.Searcher\\.(.*)\\.Class").matcher(prop);
+    			if (m.find()) {
+    				ret.add(m.group(1));
+    			}
+    		}
+    	}
+    	return ret;
+    }
+    
+    private void execute(String dest, String queryClassName) {
         try {
-            JavaClass jc = new JavaClass(pack, "MCRQuery");
+            JavaClass jc = new JavaClass(pack, queryClassName);
             Iterator it = searchfields.keySet().iterator();
 
             jc.addField("String", "mcrid");
@@ -77,23 +107,23 @@ public class GenClasses {
         }
     }
 
-    private void readDefinition(String path, String dest) {
+    private void readDefinition(String path, String dest, String indexName) {
         try {
             SAXBuilder builder = new SAXBuilder();
             File d = new File(path);
             builder.setValidation(false);
-            searchfields = loadFields(builder.build(d).getRootElement());
+            searchfields = loadFields(builder.build(d).getRootElement(), indexName);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static HashMap loadFields(Element def) {
+    public static HashMap loadFields(Element def, String indexName) {
         HashMap map = new HashMap();
         List fields = new LinkedList();
 
         for (int i = 0; i < def.getChildren().size(); i++) {
-            if (((Element) def.getChildren().get(i)).getAttributeValue("id").equals("metadata")) {
+            if (((Element) def.getChildren().get(i)).getAttributeValue("id").equals(indexName)) {
                 fields = ((Element) def.getChildren().get(i)).getChildren();
 
                 break;

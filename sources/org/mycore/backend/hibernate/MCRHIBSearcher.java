@@ -23,6 +23,8 @@
 
 package org.mycore.backend.hibernate;
 
+import java.awt.image.IndexColorModel;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
+import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -50,12 +53,21 @@ import org.mycore.services.fieldquery.MCRSortBy;
 public class MCRHIBSearcher extends MCRSearcher {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRHIBSearcher.class.getName());
-    private static String SQLQueryTable = MCRConfiguration.instance().getString("MCR.QueryTableName", "MCRQuery");
-    private static boolean existsTable = false;
+    public static HashMap indexClassMapping = new HashMap();
+
+    private String tableName;
+    private String mappedClass;
+    
+    public void init(String ID) {
+        super.init(ID);
+        this.tableName = MCRConfiguration.instance().getString(prefix + "TableName");
+        this.mappedClass = tableName + "Bean";
+        indexClassMapping.put(index, "org.mycore.backend.query." + this.mappedClass );
+        updateConfiguration();
+    }
     
     protected void addToIndex(String entryID, List fields) {
-    	if(!existsTable) updateConfiguration();
-        MCRHIBQuery query = new MCRHIBQuery();
+        MCRHIBQuery query = new MCRHIBQuery((String)indexClassMapping.get(index));
         Hashtable used = new Hashtable();
 
         query.setValue("setmcrid", entryID);
@@ -87,12 +99,11 @@ public class MCRHIBSearcher extends MCRSearcher {
     }
 
     protected void removeFromIndex(String entryID) {
-    	if(!existsTable) updateConfiguration();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
 
         try {
-        	String query = new StringBuffer("delete MCRQuery")
+        	String query = new StringBuffer("delete ").append(mappedClass)
         		.append(" where MCRID = \'").append(entryID).append("\'").toString();
             session.createQuery(query).executeUpdate();
             tx.commit();
@@ -106,13 +117,13 @@ public class MCRHIBSearcher extends MCRSearcher {
     }
 
     public MCRResults search(MCRCondition condition, List order, int maxResults) {
-    	if(!existsTable) updateConfiguration();
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRResults results = new MCRResults();
+        boolean isSorted = true;
 
         try {
-            MCRHIBQuery hibquery = new MCRHIBQuery(condition, order);
+            MCRHIBQuery hibquery = new MCRHIBQuery(condition, order, (String)indexClassMapping.get(index));
             List l = session.createQuery(hibquery.getHIBQuery()).list();
 
             for (int i = 0; (i < l.size()) && (maxResults > 0) && (results.getNumHits() < maxResults); i++) {
@@ -123,21 +134,28 @@ public class MCRHIBSearcher extends MCRSearcher {
                 if (order != null)
                     for (int j = 0; j < order.size(); j++) {
                         MCRSortBy by = (MCRSortBy) (order.get(j));
-                        Object valueObj = tmpquery.getValue("get" + by.getField().getName());
-                        String value;
-                        if (valueObj instanceof java.sql.Date) {
-                            value = ((java.sql.Date) valueObj).toString();
-                        } else {
-                            value = (String) valueObj;
+                        Object tmpObj = indexClassMapping.get(by.getField().getIndex()); 
+                        if(tmpObj != null) {
+                        	MCRHIBQuery sortQuery = new MCRHIBQuery((String)tmpObj);
+                            Object valueObj = sortQuery.getValue("get" + by.getField().getName());
+                            String value;
+                            if (valueObj instanceof java.sql.Date) {
+                                value = ((java.sql.Date) valueObj).toString();
+                            } else {
+                                value = (String) valueObj;
+                            }
+                            hit.addSortData(new MCRFieldValue(by.getField(), value));                        	
+                        }else{
+                        	isSorted = false;
                         }
-                        hit.addSortData(new MCRFieldValue(by.getField(), value));
+                        
                     }
                 results.addHit(hit);
             }
             tx.commit();
 
             if ((order != null) && (order.size() > 0))
-                results.setSorted(true);
+                results.setSorted(isSorted);
         } catch (Exception ex) {
             tx.rollback();
             LOGGER.error("Exception in MCRHibSearcher", ex);
@@ -157,9 +175,9 @@ public class MCRHIBSearcher extends MCRSearcher {
         	MCRHIBConnection hibconnection = MCRHIBConnection.instance();
             // update schema -> first time create table
             Configuration cfg = hibconnection.getConfiguration();
-
-            if (!hibconnection.containsMapping(SQLQueryTable)) {
-                MCRTableGenerator map = new MCRTableGenerator(SQLQueryTable, "org.mycore.backend.query.MCRQuery", "", 1);
+            
+            if (!hibconnection.containsMapping(tableName)) {
+                MCRTableGenerator map = new MCRTableGenerator(tableName, "org.mycore.backend.query." + mappedClass, "", 1);
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
                 List fds = MCRFieldDef.getFieldDefs( getIndex() );
                 for( int i = 0; i < fds.size(); i++ )
@@ -175,7 +193,6 @@ public class MCRHIBSearcher extends MCRSearcher {
 
                 new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
             }
-            existsTable = true;
         } catch (Exception e) {
             LOGGER.error("error stacktrace", e);
         }
