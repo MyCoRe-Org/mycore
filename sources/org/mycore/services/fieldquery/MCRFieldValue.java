@@ -24,7 +24,6 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
@@ -105,8 +104,7 @@ public class MCRFieldValue {
      * @return a 'field' element with attribute 'name' and the value as element content
      */
     public Element buildXML() {
-        Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
-        Element eField = new Element("field", mcrns);
+        Element eField = new Element("field", MCRFieldDef.mcrns );
         eField.setAttribute("name", field.getName());
         eField.addContent(value);
         return eField;

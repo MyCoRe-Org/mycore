@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -215,9 +214,7 @@ public class MCRResults {
      * @return a 'results' element with attributes 'sorted' and 'numHits' and hit child elements
      */
     public Element buildXML() {
-        Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
-
-        Element results = new Element("results", mcrns);
+        Element results = new Element("results", MCRFieldDef.mcrns);
         results.setAttribute("sorted", Boolean.toString(isSorted()));
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
