@@ -48,13 +48,17 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
     }
 
     /**
-     * Runs a query that is specified as XML in the given file. 
-     * The results are written to stdout.
+     * Runs a query that is specified as XML in the given file. The results are
+     * written to stdout.
      */
     public static void runQueryFromFile(String filename) throws JDOMException, IOException {
         File file = new File(filename);
-        if (!(file.exists() && file.canRead())) {
+        if (!file.exists()) {
             String msg = "File containing XML query does not exist: " + filename;
+            throw new org.mycore.common.MCRUsageException(msg);
+        }
+        if (!file.canRead()) {
+            String msg = "File containing XML query not readable: " + filename;
             throw new org.mycore.common.MCRUsageException(msg);
         }
 
