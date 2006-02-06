@@ -33,6 +33,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -69,7 +70,8 @@ public class MCRFieldDef {
     static {
         buildXSLTemplate();
 
-        String uri = "resource:searchfields.xml";
+        String configFile = MCRConfiguration.instance().getString( "MCR.QuerySearchFields" );
+        String uri = "resource:" + configFile ;
         Element def = MCRURIResolver.instance().resolve(uri);
 
         List children = def.getChildren("index", mcrns);
