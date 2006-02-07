@@ -83,10 +83,10 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         String re_mcrid = parms.getParameter("remcrid");
         String type = parms.getParameter("type");
         String step = parms.getParameter("step");
-        logger.debug("XSL.target.param.0 = " + se_mcrid);
-        logger.debug("XSL.target.param.1 = " + type);
-        logger.debug("XSL.target.param.2 = " + step);
-        logger.debug("XSL.target.param.3 = " + re_mcrid);
+        LOGGER.debug("XSL.target.param.0 = " + se_mcrid);
+        LOGGER.debug("XSL.target.param.1 = " + type);
+        LOGGER.debug("XSL.target.param.2 = " + step);
+        LOGGER.debug("XSL.target.param.3 = " + re_mcrid);
 
         // get the MCRSession object for the current thread from the session
         // manager.
@@ -94,7 +94,7 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         String userid = mcrSession.getCurrentUserID();
 
         // userid = "administrator";
-        logger.debug("Current user for edit check = " + userid);
+        LOGGER.debug("Current user for edit check = " + userid);
 
         ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
 
@@ -106,7 +106,7 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         }
 
         String mylang = mcrSession.getCurrentLanguage();
-        logger.info("LANG = " + mylang);
+        LOGGER.info("LANG = " + mylang);
 
         // prepare the derivate MCRObjectID
         MCRObjectID ID = new MCRObjectID(re_mcrid);
@@ -149,7 +149,7 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
             FileOutputStream fouts = new FileOutputStream(fout);
             MCRUtils.copyStream(item.getInputStream(), fouts);
             fouts.close();
-            logger.info("Data object stored under " + fout.getName());
+            LOGGER.info("Data object stored under " + fout.getName());
         }
 
         if ((mainfile.length() == 0) && (ffname.size() > 0)) {
@@ -172,12 +172,12 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
                     out.write(outxml);
                     out.flush();
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
-                    logger.error("Exception while store to file " + dirname + ".xml");
+                    LOGGER.error(ex.getMessage());
+                    LOGGER.error("Exception while store to file " + dirname + ".xml");
                 }
             }
         } catch (Exception e) {
-            logger.warn("Can't open file " + dirname + ".xml");
+            LOGGER.warn("Can't open file " + dirname + ".xml");
         }
 
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + getNextURL(ID, DD, step)));

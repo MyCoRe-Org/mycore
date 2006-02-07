@@ -24,11 +24,17 @@
 package org.mycore.frontend.servlets;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.editor.MCREditorOutValidator;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -38,49 +44,92 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 abstract public class MCRCheckBase extends MCRServlet {
-	protected static Logger logger = Logger.getLogger(MCRCheckBase.class);
+    protected static Logger LOGGER = Logger.getLogger(MCRCheckBase.class);
 
-	String NL = System.getProperty("file.separator");
+    String NL = System.getProperty("file.separator");
 
-	/**
-	 * The method check the privileg of this action.
-	 * 
-	 * @param privs
-	 *            the ArrayList of privilegs
-	 * @return true if the privileg exist, else return false
-	 */
-	abstract public boolean hasPrivileg(ArrayList privs, String type);
+    protected List errorlog;
 
-	/**
-	 * The method is a dummy or works with the data and return an URL with the
-	 * next working step.
-	 * 
-	 * @param ID
-	 *            the MCRObjectID of the MCRObject
-	 * @return the next URL as String
-	 * @throws MCRActiveLinkException
-	 *             if links preventing the next step in the workflow
-	 */
-	abstract public String getNextURL(MCRObjectID ID) throws MCRActiveLinkException;
+    /**
+     * The method check the privileg of this action.
+     * 
+     * @param privs
+     *            the ArrayList of privilegs
+     * @return true if the privileg exist, else return false
+     */
+    abstract public boolean hasPrivileg(ArrayList privs, String type);
 
-	/**
-	 * The method send a message to the mail address for the MCRObjectType.
-	 * 
-	 * @param ID
-	 *            the MCRObjectID of the MCRObject
-	 */
-	abstract public void sendMail(MCRObjectID ID);
+    /**
+     * The method is a dummy or works with the data and return an URL with the
+     * next working step.
+     * 
+     * @param ID
+     *            the MCRObjectID of the MCRObject
+     * @return the next URL as String
+     * @throws MCRActiveLinkException
+     *             if links preventing the next step in the workflow
+     */
+    abstract public String getNextURL(MCRObjectID ID) throws MCRActiveLinkException;
 
-	/**
-	 * A method to handle IO errors.
-	 * 
-	 * @param jab
-	 *            the MCRServletJob
-	 * @param lang
-	 *            the current language
-	 */
-	protected void errorHandlerIO(MCRServletJob job, String lang) throws Exception {
-		String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
-		job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + "editor_error_store.xml"));
-	}
+    /**
+     * The method send a message to the mail address for the MCRObjectType.
+     * 
+     * @param ID
+     *            the MCRObjectID of the MCRObject
+     */
+    abstract public void sendMail(MCRObjectID ID);
+
+    /**
+     * A method to handle IO errors.
+     * 
+     * @param jab
+     *            the MCRServletJob
+     * @param lang
+     *            the current language
+     */
+    protected void errorHandlerIO(MCRServletJob job, String lang) throws Exception {
+        String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + "editor_error_store.xml"));
+    }
+
+    /**
+     * provides a wrappe for editor validation and MCRObject creation.
+     * 
+     * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
+     * 
+     * <pre>
+     *  boolean checkMCRMetaFooBar(Element)
+     * </pre>
+     * 
+     * use the following methods in that method to do common tasks on element
+     * validation
+     * <ul>
+     * <li>checkMetaObject(Element,Class)</li>
+     * <li>checkMetaObjectWithLang(Element,Class)</li>
+     * <li>checkMetaObjectWithLangNotEmpty(Element,Class)</li>
+     * <li>checkMetaObjectWithLinks(Element,Class)</li>
+     * </ul>
+     * 
+     * @author Thomas Scheffler (yagee)
+     * 
+     * @version $Revision$ $Date$
+     */
+    protected class EditorValidator extends MCREditorOutValidator {
+        /**
+         * instantiate the validator with the editor input <code>jdom_in</code>.
+         * 
+         * <code>id</code> will be set as the MCRObjectID for the resulting
+         * object that can be fetched with
+         * <code>generateValidMyCoReObject()</code>
+         * 
+         * @param jdom_in
+         *            editor input
+         * @param MCRObject
+         *            id
+         */
+        public EditorValidator(Document jdom_in, MCRObjectID id) {
+            super(jdom_in, id);
+        }
+
+    }
 }

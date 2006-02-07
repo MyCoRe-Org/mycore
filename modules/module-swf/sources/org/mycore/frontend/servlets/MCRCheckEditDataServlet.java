@@ -89,12 +89,12 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 		String subject = "Automaticaly message from " + appl;
 		StringBuffer text = new StringBuffer();
 		text.append("Es wurde ein Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" im Workflow bearbeitet.");
-		logger.info(text.toString());
+		LOGGER.info(text.toString());
 
 		try {
 			MCRMailer.send(sender, addr, subject, text.toString(), false);
 		} catch (Exception ex) {
-			logger.error("Can't send a mail to " + addr);
+			LOGGER.error("Can't send a mail to " + addr);
 		}
 	}
 }

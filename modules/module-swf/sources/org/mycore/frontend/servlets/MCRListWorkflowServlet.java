@@ -68,7 +68,7 @@ import org.mycore.user.MCRUserMgr;
  * @version $Revision$ $Date$
  */
 public class MCRListWorkflowServlet extends MCRServlet {
-    // The logger
+    // The LOGGER
     private static Logger LOGGER = Logger.getLogger(MCRListWorkflowServlet.class.getName());
 
     // The workflow manager
