@@ -311,6 +311,7 @@
     <xsd:attribute name="permission" use="required" type="xsd:string" />
     <xsd:attribute name="inherited" use="optional" type="xsd:string" />
     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+    <xsd:attribute ref="xml:lang" />
    </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
