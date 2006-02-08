@@ -161,7 +161,7 @@ public class MCRSQLSearcher extends MCRSearcher {
             LOGGER.debug(sql);
             MCRSQLRowReader reader = c.doQuery(sql);
 
-            while (reader.next() && (maxResults > 0) && (result.getNumHits() < maxResults)) {
+            while (reader.next() && ( maxResults <= 0 ? true: result.getNumHits() < maxResults)) {
                 String id = reader.getString("MCRID");
 
                 MCRHit hit = new MCRHit(id);
