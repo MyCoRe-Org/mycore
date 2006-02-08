@@ -385,8 +385,8 @@ public class MCRObjectService {
             return;
         }
         if (getRuleIndex(permission) == -1) {
-            MCRMetaAccessRule user = new MCRMetaAccessRule("service", "servuser", null, null, 0, permission, condition);
-            rules.add(user);
+            MCRMetaAccessRule acl = new MCRMetaAccessRule("service", "servacl", null, null, 0, permission, condition);
+            rules.add(acl);
         }
     }
 
@@ -491,7 +491,7 @@ public class MCRObjectService {
         }
 
         if (rules.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servusers");
+            org.jdom.Element elmm = new org.jdom.Element("servacls");
             elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
