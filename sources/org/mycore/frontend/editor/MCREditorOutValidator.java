@@ -63,7 +63,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
  * 
  * <pre>
- *     boolean checkMCRMetaFooBar(Element)
+ *      boolean checkMCRMetaFooBar(Element)
  * </pre>
  * 
  * use the following methods in that method to do common tasks on element
@@ -354,7 +354,7 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     private boolean checkMCRMetaAccessRule(Element datasubtag) {
-        return true;
+        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaLangText.class);
     }
 
     /**
@@ -446,18 +446,20 @@ public class MCREditorOutValidator {
                 serviceIt.remove();
             }
         }
-        if (!hasacls) setDefaultACLs(service);
+        if (!hasacls)
+            setDefaultACLs(service);
     }
 
     /**
      * The method add a default ACL-block.
+     * 
      * @param service
      */
     private void setDefaultACLs(org.jdom.Element service) {
         // Read stylesheet
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls.xml");
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
         if (aclxml == null) {
-            LOGGER.warn("Can't find default ACL file editor_default_acls.xml.");
+            LOGGER.warn("Can't find default ACL file editor_default_acls_....xml.");
         } else {
             try {
                 org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
@@ -466,7 +468,7 @@ public class MCREditorOutValidator {
                     service.addContent(acls.detach());
                 }
             } catch (Exception e) {
-                LOGGER.warn("Error while parsing file editor_default_acls.xml.");
+                LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
             }
         }
     }

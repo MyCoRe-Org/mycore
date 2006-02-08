@@ -53,6 +53,14 @@ import org.mycore.frontend.cli.MCRObjectCommands;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+/**
+ * @author mcradmin
+ *
+ */
+/**
+ * @author mcradmin
+ * 
+ */
 public class MCRSimpleWorkflowManager {
     /** New line */
     static String NL = System.getProperty("file.separator");
@@ -607,5 +615,40 @@ public class MCRSimpleWorkflowManager {
         logger.info("Derivate " + DD.getId() + " stored under " + fullname + ".");
 
         return DD.getId();
+    }
+
+    /**
+     * The method return the conditione XML tree from a XML file in the workflow
+     * for a given permission.
+     * 
+     * @param id
+     *            the MCRObjectID as string
+     * @param permission
+     *            the permission for the ACL system
+     * @return the XML tree of the condition
+     */
+    public final org.jdom.Element getRuleFromFile(String id, String permission) {
+        // read data
+        MCRObjectID mcrid = new MCRObjectID(id);
+        String fn = getDirectoryPath(mcrid.getTypeId()) + SLASH + id + ".xml";
+        org.jdom.Element condition = new org.jdom.Element("condition");
+        condition.setAttribute("format","xml");
+        try {
+            File fi = new File(fn);
+            if (fi.isFile() && fi.canRead()) {
+                MCRObject obj = new MCRObject();
+                obj.setFromURI(fn);
+                System.out.println(obj.getId());
+                int index = obj.getService().getRuleIndex(permission);
+                System.out.println(permission+"  "+index);
+                if (index == -1) return condition;
+                condition = obj.getService().getRule(index).getCondition();
+            } else {
+                logger.error("Can't read file " + fn);
+            }
+        } catch (Exception ex) {
+            logger.error("Can't read file " + fn);
+        }
+        return condition;
     }
 }

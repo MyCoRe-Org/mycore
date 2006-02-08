@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -45,20 +44,15 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.editor.MCREditorServletHelper;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.mycore.user.MCRGroup;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * The servlet start the MyCoRe editor session or other workflow actions with
@@ -470,7 +464,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WEDITOBJ - change the object in the workflow
         if (mytodo.equals("weditobj")) {
-            if (!AI.checkPermission(mysemcrid, "writewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            if (!MCRAccessManager.checkAccessCondition(mysemcrid, "writewf", rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -496,7 +491,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WDELOBJ - delete an object from the workflow
         if (mytodo.equals("wdelobj")) {
-            if (!AI.checkPermission(mysemcrid, "deletewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
+            if (!MCRAccessManager.checkAccessCondition(mysemcrid, "deletewf", rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -574,7 +570,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WCOMMIT - commit a object from the workflow to the server
         if (mytodo.equals("wcommit")) {
-            if (!AI.checkPermission(mysemcrid, "commitdb")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "commitdb");
+            if (!MCRAccessManager.checkAccessCondition(mysemcrid, "commitdb", rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -763,7 +760,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SEDITOBJ in the database
         if (mytodo.equals("seditobj")) {
-            if (!AI.checkPermission(myremcrid, "writedb")) {
+            if (!AI.checkPermission(mytfmcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
