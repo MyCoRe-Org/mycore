@@ -33,7 +33,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -63,6 +62,8 @@ public class MCRFieldDef {
     public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
     private final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
+    
+    private final static String configFile = "searchfields.xml";
 
     /**
      * Read searchfields.xml and build the MCRFiedDef objects
@@ -70,9 +71,7 @@ public class MCRFieldDef {
     static {
         buildXSLTemplate();
 
-        String configFile = MCRConfiguration.instance().getString( "MCR.QuerySearchFields" );
-        String uri = "resource:" + configFile ;
-        Element def = MCRURIResolver.instance().resolve(uri);
+        Element def = getConfigFile();
 
         List children = def.getChildren("index", mcrns);
 
@@ -117,6 +116,15 @@ public class MCRFieldDef {
      */
     private String source;
 
+    /**
+     * @return the searchfields-configuration file as 
+     * 			jdom-element
+     */
+    public static Element getConfigFile() {
+    	String uri = "resource:" + configFile ;
+        return MCRURIResolver.instance().resolve(uri);
+    }
+    
     public MCRFieldDef(String index, Element def) {
         this.index = index;
         this.name = def.getAttributeValue("name");

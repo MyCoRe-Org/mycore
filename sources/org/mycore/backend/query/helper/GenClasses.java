@@ -23,7 +23,6 @@
 
 package org.mycore.backend.query.helper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,8 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.services.fieldquery.MCRFieldDef;
 
 public class GenClasses {
     private static String pack = "org.mycore.backend.query";
@@ -49,11 +48,11 @@ public class GenClasses {
     public static void main(String[] args) {
         
         try {
-            if (args.length < 2) {
-                System.out.println("needs arg:\n" + "1: filename for queryconfiguration as String\n" + "2: pathname for output as String\n" + "3: (optional) package name as String");
+            if (args.length < 1) {
+                System.out.println("needs arg:\n" + "1: pathname for output as String\n" + "2: (optional) package name as String");
             } else {
-                if (args.length == 3) {
-                    pack = args[3];
+                if (args.length == 2) {
+                    pack = args[1];
                 }            	
             	int i = 0;
             	for (Iterator it = getHibernateIndices().iterator(); it.hasNext();) {
@@ -65,8 +64,8 @@ public class GenClasses {
             		String queryClassName;
             		String queryTable = config.getString("MCR.Searcher." + indexID + ".TableName");
            			queryClassName = queryTable + "Bean";
-            		gen.readDefinition(args[0], args[1], indexName);
-            		gen.execute(args[1], queryClassName);
+            		gen.readDefinition(indexName);
+            		gen.execute(args[0], queryClassName);
 				}
             }
         } catch (Exception e) {
@@ -107,12 +106,9 @@ public class GenClasses {
         }
     }
 
-    private void readDefinition(String path, String dest, String indexName) {
+    private void readDefinition(String indexName) {
         try {
-            SAXBuilder builder = new SAXBuilder();
-            File d = new File(path);
-            builder.setValidation(false);
-            searchfields = loadFields(builder.build(d).getRootElement(), indexName);
+            searchfields = loadFields(MCRFieldDef.getConfigFile(), indexName);
         } catch (Exception e) {
             e.printStackTrace();
         }
