@@ -638,9 +638,7 @@ public class MCRSimpleWorkflowManager {
             if (fi.isFile() && fi.canRead()) {
                 MCRObject obj = new MCRObject();
                 obj.setFromURI(fn);
-                System.out.println(obj.getId());
                 int index = obj.getService().getRuleIndex(permission);
-                System.out.println(permission+"  "+index);
                 if (index == -1) return condition;
                 condition = obj.getService().getRule(index).getCondition();
             } else {
