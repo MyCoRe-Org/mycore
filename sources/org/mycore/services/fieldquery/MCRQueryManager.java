@@ -145,15 +145,15 @@ public class MCRQueryManager {
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
             return searcher.search(cond, sortBy, maxResults);
         } else if ((cond instanceof MCRAndCondition) || (cond instanceof MCROrCondition)) {
-            return buildCombinedResults(cond, sortBy, false, maxResults);
+            return buildCombinedResults(cond, sortBy, false);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
             MCRCondition child = ((MCRNotCondition) cond).getChild();
-            return buildCombinedResults(child, sortBy, true, maxResults);
+            return buildCombinedResults(child, sortBy, true);
         }
     }
 
     /** Split query into subqueries for each index, recombine results */
-    private static MCRResults buildCombinedResults(MCRCondition cond, List sortBy, boolean not, int maxResults) {
+    private static MCRResults buildCombinedResults(MCRCondition cond, List sortBy, boolean not) {
         boolean and = (cond instanceof MCRAndCondition);
         Hashtable table = groupConditionsByIndex(cond);
         MCRResults totalResults = null;
@@ -162,7 +162,7 @@ public class MCRQueryManager {
             List conditions = (List) (table.get(indexes.nextElement()));
             MCRCondition subCond = buildSubCondition(conditions, and, not);
 
-            MCRResults subResults = buildResults(subCond, sortBy, maxResults);
+            MCRResults subResults = buildResults(subCond, sortBy, 0);
             if (totalResults == null)
                 totalResults = subResults;
             else if (and)

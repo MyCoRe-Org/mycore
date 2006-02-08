@@ -115,7 +115,7 @@ public class MCRHIBSearcher extends MCRSearcher {
         }
 
     }
-
+    
     public MCRResults search(MCRCondition condition, List order, int maxResults) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -126,7 +126,7 @@ public class MCRHIBSearcher extends MCRSearcher {
             MCRHIBQuery hibquery = new MCRHIBQuery(condition, order, (String)indexClassMapping.get(index));
             List l = session.createQuery(hibquery.getHIBQuery()).list();
 
-            for (int i = 0; (i < l.size()) && (maxResults > 0) && (results.getNumHits() < maxResults); i++) {
+            for (int i = 0; (i < l.size()) && ( maxResults <= 0 ? true: results.getNumHits() < maxResults); i++) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i)); // ?
                 MCRHit hit = new MCRHit((String) (tmpquery.getValue("getmcrid")));
 
