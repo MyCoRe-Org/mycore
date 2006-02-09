@@ -24,7 +24,6 @@ package org.mycore.access;
 
 import org.jdom.Element;
 
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -122,33 +121,10 @@ public class MCRAccessManager {
         return getAccessImpl().checkPermission(id.getId(), permission);
     }
 
-    /**
-     * checks the access rule against the MCRSession and return true if the
-     * access is allowed otherwise it return false.
-     * 
-     * This method is independent of the underlying
-     * <code>MCRAccessInterface</code> implementation.
-     * 
-     * @param id
-     *            the ID-String of the object
-     * @param permission
-     *            the access permission for the rule
-     * @param condition
-     *            the rule tree as a JDOM Element
-     * @return true if the access is allowed, false otherwise
-     */
-    public static boolean checkAccessCondition(String id, String permission, Element rule) {
-    	MCRAccessControlSystem mcrManager = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
-    	return mcrManager.checkAccessCondition(id, permission, rule);
-    }
 
     /**
      * checks the access rule against the current MCRSession and return true if
-     * the access is allowed otherwise it return false. It's the same as calling
-     * 
-     * <pre>
-     * checkAccessCondition(id.getId(), permission, rule);
-     * </pre>
+     * the access is allowed otherwise it return false. 
      * 
      * @param id
      *            the MCRObjectID of the object
@@ -159,8 +135,8 @@ public class MCRAccessManager {
      * @return true if the access is allowed otherwise it return
      * @see #checkAccessCondition(String, String, Element)
      */
-    public static boolean checkAccessCondition(MCRObjectID id, String permission, Element rule) {
-        return checkAccessCondition(id.getId(), permission, rule);
+    public static boolean checkPermission(MCRObjectID id, String permission, Element rule) {
+        return getAccessImpl().checkPermission(id.getId(), permission, rule);
     }
 
 }

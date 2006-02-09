@@ -24,11 +24,9 @@
 package org.mycore.access.mcrimpl;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;

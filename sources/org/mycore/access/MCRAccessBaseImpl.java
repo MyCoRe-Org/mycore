@@ -155,6 +155,15 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission);
         return true;
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#checkPermission(java.lang.String, java.lang.String, org.jdom.Document)
+     */    
+	public boolean checkPermission(String id, String permission, Element rule) {
+		return true;
+	}    
 
     /*
      * (non-Javadoc)

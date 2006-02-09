@@ -170,8 +170,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     public boolean checkPermission(String permission) {
     	return checkPermission(poolPrivilegeID, permission);
     }
-    
-    public boolean checkAccessCondition(String id, String pool, org.jdom.Element rule) {
+
+	public boolean checkPermission(String id, String permission, Element rule) {
     	MCRSession session = MCRSessionMgr.getCurrentSession();
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
@@ -186,8 +186,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
             LOGGER.debug("Error while checking rule.", e);
             return false;
         }
-    }
-
+	}        
+    
     public Element getRule(String objID, String pool) {
     	MCRAccessRule accessRule = getAccess(objID, pool);
     	MCRRuleParser parser = new MCRRuleParser();
