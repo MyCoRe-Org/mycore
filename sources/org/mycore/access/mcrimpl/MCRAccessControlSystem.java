@@ -171,7 +171,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     	return checkPermission(poolPrivilegeID, permission);
     }
 
-	public boolean checkPermission(String id, String permission, Element rule) {
+	public boolean checkPermission(Element rule) {
     	MCRSession session = MCRSessionMgr.getCurrentSession();
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");

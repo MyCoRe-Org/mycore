@@ -161,7 +161,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#checkPermission(java.lang.String, java.lang.String, org.jdom.Document)
      */    
-	public boolean checkPermission(String id, String permission, Element rule) {
+	public boolean checkPermission(Element rule) {
 		return true;
 	}    
 

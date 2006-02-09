@@ -186,17 +186,13 @@ public interface MCRAccessInterface {
      * <pre>
      * MCRSession currentSession = MCRSessionMgr.getCurrentSession();
      * </pre>
-     * @param id
-     *            the ID-String of the object
-     * @param permission
-     *            the permission/action to be granted, e.g. "read"
      * @param rule
      *            the jdom-representation of a mycore access rule           
      * @return true if the permission is granted, else false
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */    
-    public boolean checkPermission(String id, String permission, org.jdom.Element rule) ;
+    public boolean checkPermission(org.jdom.Element rule) ;
     
     /**
      * exports a access rule as JDOM element.

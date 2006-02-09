@@ -121,22 +121,4 @@ public class MCRAccessManager {
         return getAccessImpl().checkPermission(id.getId(), permission);
     }
 
-
-    /**
-     * checks the access rule against the current MCRSession and return true if
-     * the access is allowed otherwise it return false. 
-     * 
-     * @param id
-     *            the MCRObjectID of the object
-     * @param permission
-     *            the access permission for the rule
-     * @param condition
-     *            the rule tree as a JDOM Element
-     * @return true if the access is allowed otherwise it return
-     * @see #checkAccessCondition(String, String, Element)
-     */
-    public static boolean checkPermission(MCRObjectID id, String permission, Element rule) {
-        return getAccessImpl().checkPermission(id.getId(), permission, rule);
-    }
-
 }
