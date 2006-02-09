@@ -62,7 +62,7 @@ public class MCRAccessRule {
 
     public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip) {
         if (this.parsedRule == null) {
-            return true;
+            return false;
         }
 
         MCRAccessData data = new MCRAccessData(user, date, ip);
