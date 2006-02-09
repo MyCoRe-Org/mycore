@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -104,6 +105,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
                         .getConnection(type);
                 XPathQueryService xps = (XPathQueryService) collection
                         .getService("XPathQueryService", "1.0");
+                xps.setNamespace("xlink",MCRDefaults.XLINK_URL);
 
                 ResourceSet resultset = xps.query(newquery);
                 logger.debug("Results: "
