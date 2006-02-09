@@ -465,7 +465,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // action WEDITOBJ - change the object in the workflow
         if (mytodo.equals("weditobj")) {
             org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
-            if (!AI.checkPermission(mysemcrid, "writewf", rule)) {
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -492,7 +492,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // action WDELOBJ - delete an object from the workflow
         if (mytodo.equals("wdelobj")) {
             org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
-            if (!AI.checkPermission(mysemcrid, "deletewf", rule)) {
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -571,7 +571,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // action WCOMMIT - commit a object from the workflow to the server
         if (mytodo.equals("wcommit")) {
             org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "commitdb");
-            if (!AI.checkPermission(mysemcrid, "commitdb", rule)) {
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
