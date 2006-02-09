@@ -33,14 +33,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -63,7 +67,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
  * 
  * <pre>
- *      boolean checkMCRMetaFooBar(Element)
+ *         boolean checkMCRMetaFooBar(Element)
  * </pre>
  * 
  * use the following methods in that method to do common tasks on element
@@ -90,6 +94,8 @@ public class MCREditorOutValidator {
 
     private static final Map checkMethods;
 
+    private static final ArrayList adduserlist;
+
     static {
         // save all check methods in a Map for later usage
         HashMap methods = new HashMap();
@@ -102,6 +108,13 @@ public class MCREditorOutValidator {
             methods.put(m[i].getName().substring(5), m[i]);
         }
         checkMethods = Collections.unmodifiableMap(methods);
+        // read the list of user add to ACL's
+        adduserlist = new ArrayList();
+        String inline = MCRConfiguration.instance().getString("MCR.AccessAddUser", "read");
+        StringTokenizer st = new StringTokenizer(inline,",");
+        while (st.hasMoreTokens()) {
+            adduserlist.add(st.nextToken());
+        }
     }
 
     /**
@@ -119,7 +132,13 @@ public class MCREditorOutValidator {
         this.errorlog = new ArrayList();
         this.input = jdom_in;
         this.id = id;
+        System.out.println("1111111111111111111111111111111");
+        byte[] xml = MCRUtils.getByteArray(input);
+        System.out.println(new String(xml));
         checkObject();
+        System.out.println("2222222222222222222222222222222");
+        xml = MCRUtils.getByteArray(input);
+        System.out.println(new String(xml));
     }
 
     /**
@@ -175,6 +194,7 @@ public class MCREditorOutValidator {
                 try {
                     Object returns = m.invoke(this, new Object[] { datasubtag });
                     if (!((Boolean) returns).booleanValue()) {
+                        System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBB");
                         datatagIt.remove();
                     }
                 } catch (IllegalArgumentException e) {
@@ -191,6 +211,7 @@ public class MCREditorOutValidator {
                     Class metaClass = Class.forName(mcrclass);
                     // just checks if class would validate this element
                     if (!checkMetaObject(datasubtag, metaClass)) {
+                        System.out.println("AAAAAAAAAAAAAAAAAAAAAAA");
                         datatagIt.remove();
                     }
                 } catch (ClassNotFoundException e) {
@@ -354,7 +375,7 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     private boolean checkMCRMetaAccessRule(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaLangText.class);
+        return checkMetaObjectWithLang(datasubtag, MCRMetaAccessRule.class);
     }
 
     /**
@@ -376,6 +397,7 @@ public class MCREditorOutValidator {
         // remove the path elements from the incoming
         org.jdom.Element pathes = root.getChild("pathes");
         if (pathes != null) {
+            System.out.println("CCCCCCCCCCCCCCCCC");
             root.removeChildren("pathes");
         }
         org.jdom.Element structure = root.getChild("structure");
@@ -441,10 +463,6 @@ public class MCREditorOutValidator {
                 }
 
             }
-            if (!checkMetaTags(datatag)) {
-                // e.g. datatag is empty
-                serviceIt.remove();
-            }
         }
         if (!hasacls)
             setDefaultACLs(service);
@@ -456,7 +474,7 @@ public class MCREditorOutValidator {
      * @param service
      */
     private void setDefaultACLs(org.jdom.Element service) {
-        // Read stylesheet
+        // Read stylesheet and add user
         InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
         if (aclxml == null) {
             LOGGER.warn("Can't find default ACL file editor_default_acls_....xml.");
@@ -465,9 +483,41 @@ public class MCREditorOutValidator {
                 org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
                 org.jdom.Element acls = xml.getRootElement().getChild("servacls");
                 if (acls != null) {
-                    service.addContent(acls.detach());
+                    acls.detach();
+                    List acllist = acls.getChildren();
+                    if (acllist != null) {
+                        for (int i = 0; i < acllist.size(); i++) {
+                            org.jdom.Element acl = (org.jdom.Element) acllist.get(i);
+                            if (acl != null) {
+                                String perm = acl.getAttributeValue("permission");
+                                org.jdom.Element condition = acl.getChild("condition");
+                                if (condition != null) {
+                                    if (adduserlist.contains(perm)) {
+                                        org.jdom.Element bool = condition.getChild("boolean");
+                                        if (bool != null) {
+                                            org.jdom.Element obool = (org.jdom.Element) bool.detach().clone();
+                                            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDD");
+                                            condition.removeContent();
+                                            org.jdom.Element nbool = new org.jdom.Element("boolean");
+                                            nbool.setAttribute("operator", "or");
+                                            org.jdom.Element user = new org.jdom.Element("condition");
+                                            user.setAttribute("field", "user");
+                                            user.setAttribute("operator", "=");
+                                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                                            user.setAttribute("value", thisuser);
+                                            nbool.addContent(user);
+                                            nbool.addContent(obool);
+                                            condition.addContent(nbool);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    service.addContent(acls);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
             }
         }
