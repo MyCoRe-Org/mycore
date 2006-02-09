@@ -52,6 +52,7 @@ public class MCRSearchServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
 
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+        long start = System.currentTimeMillis();
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
@@ -87,6 +88,9 @@ public class MCRSearchServlet extends MCRServlet {
             request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(result.buildXML()));
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             rd.forward(request, response);
+            
+            long qtime = System.currentTimeMillis() - start;
+            LOGGER.debug("total time in MCRSearchServlet:    " + qtime);
         }
     }
 }
