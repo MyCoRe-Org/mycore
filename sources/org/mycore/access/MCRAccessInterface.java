@@ -49,10 +49,12 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @param rule
      *            the access rule
+     * @param description
+     *            a String description of the rule in prosa            
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String id, String permission, org.jdom.Element rule) throws MCRException;
+    public void addRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException;
     
     /**
      * adds an access rule for an "a priori-permission" like "create-document"
@@ -61,10 +63,12 @@ public interface MCRAccessInterface {
      *            the access permission for the rule (e.g. "create-document")
      * @param rule
      *            the access rule
+     * @param description
+     *            a String description of the rule in prosa            
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String permission, org.jdom.Element rule) throws MCRException;    
+    public void addRule(String permission, org.jdom.Element rule, String description) throws MCRException;    
 
     /**
      * removes a rule. The parameter <code>id</code> serves as an identifier
@@ -112,10 +116,12 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @param rule
      *            the access rule
+     * @param description
+     *            a String description of the rule in prosa 
      * @throws MCRException
      *             if an errow was occured
      */
-    public void updateRule(String id, String permission, Element rule) throws MCRException;
+    public void updateRule(String id, String permission, Element rule, String description) throws MCRException;
     
     /**
      * updates an access rule for an "a priori permission" 
@@ -125,10 +131,12 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @param rule
      *            the access rule
+     * @param description
+     *            a String description of the rule in prosa 
      * @throws MCRException
      *             if an errow was occured
      */
-    public void updateRule(String permission, Element rule) throws MCRException;    
+    public void updateRule(String permission, Element rule, String description) throws MCRException;    
 
     /**
      * determines whether the current user has the permission to perform a
@@ -215,7 +223,27 @@ public interface MCRAccessInterface {
      * @return the rule as jdom element, or <code>null</code> if no rule is
      *         defined
      */
-    public Element getRule(String permission);    
+    public Element getRule(String permission); 
+    
+    /**
+     * returns the prosa description of a defined rule for a "a priori" permission like "create-document".
+     * 
+     * @param permission
+     *            the access permission for the rule
+     * @return the String of the description
+     */    
+    public String getRuleDescription(String permission);
+    
+    /**
+     * returns the prosa description of a defined rule.
+     * 
+     * @param id
+     *            the ID-String of the object
+     * @param permission
+     *            the access permission for the rule
+     * @return the String of the description
+     */        
+    public String getRuleDescription(String id, String permission);
 
     /**
      * lists all permissions defined for the <code>id</code>.
@@ -228,6 +256,13 @@ public interface MCRAccessInterface {
      *         permission
      */
     public List getPermissionsForID(String id);
+    
+    /**
+     * lists all a-priori permissions like "create-document".
+     * 
+     * @return a <code>List</code> of all defined permissions
+     */
+    public List getPermissions();    
     
     /**
      * lists all String IDs, a permission is assigned to.

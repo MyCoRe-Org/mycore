@@ -60,7 +60,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
-            MCRAccessManager.addRule(obj.getId(), pool, conditions);
+            MCRAccessManager.addRule(obj.getId(), pool, conditions, "");
             // obj.getService().removeRule(i);
         }
 
@@ -88,7 +88,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
-            MCRAccessManager.updateRule(obj.getId(), pool, conditions);
+            MCRAccessManager.updateRule(obj.getId(), pool, conditions, "");
             // obj.getService().removeRule(i);
         }
 

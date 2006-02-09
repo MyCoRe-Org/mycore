@@ -73,7 +73,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      java.lang.String, org.jdom.Element)
      */
-    public void addRule(String id, String permission, org.jdom.Element rule) throws MCRException {
+    public void addRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID " + id + " for permission " + permission);
     }
 
@@ -83,7 +83,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      org.jdom.Element)
      */
-    public void addRule(String permission, Element rule) throws MCRException {
+    public void addRule(String permission, Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl addRule for permission " + permission);
     }
 
@@ -121,7 +121,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom.Element)
      */
-    public void updateRule(String id, String permission, org.jdom.Element rule) throws MCRException {
+    public void updateRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID " + id + " for permission " + permission);
     }
 
@@ -131,7 +131,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      org.jdom.Element)
      */
-    public void updateRule(String permission, Element rule) throws MCRException {
+    public void updateRule(String permission, Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl updateRule for permission " + permission);
     }
 
@@ -187,12 +187,40 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mycore.access.MCRAccessInterface#getPoolsForObject(java.lang.String)
+     * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String)
+     */    
+	public String getRuleDescription(String permission) {
+		return "";
+	}
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String, java.lang.String)
+     */	
+	public String getRuleDescription(String id, String permission) {
+		return "";
+	}    
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#getPermissionsForID(java.lang.String)
      */
     public List getPermissionsForID(String objid) {
         ArrayList ret = new ArrayList();
         return ret;
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.access.MCRAccessInterface#getPermissions()
+     */
+    public List getPermissions() {
+        ArrayList ret = new ArrayList();
+        return ret;
+    }    
 
     /**
      * checks wether a rule with the id and permission is defined. It's the same

@@ -57,8 +57,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#addRule(String, String, org.jdom.Element)
      */
-    public static void addRule(MCRObjectID id, String permission, org.jdom.Element rule) throws MCRException {
-        getAccessImpl().addRule(id.getId(), permission, rule);
+    public static void addRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
+        getAccessImpl().addRule(id.getId(), permission, rule, description);
     }
 
     /**
@@ -102,8 +102,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#updateRule(String, String, Element)
      */
-    public static void updateRule(MCRObjectID id, String permission, org.jdom.Element rule) throws MCRException {
-        getAccessImpl().updateRule(id.getId(), permission, rule);
+    public static void updateRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
+        getAccessImpl().updateRule(id.getId(), permission, rule, description);
     }
 
     /**
