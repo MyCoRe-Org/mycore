@@ -27,7 +27,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,11 +42,15 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.plugins.TextFilterPluginManager;
@@ -332,17 +338,79 @@ public class MCRLuceneSearcher extends MCRSearcher {
     }
 
     public MCRResults search(MCRCondition cond, List order, int maxResults) {
+        long start = System.currentTimeMillis();
         MCRResults results = new MCRResults();
 
         try {
-            MCRLuceneQuery lucenequery = new MCRLuceneQuery(cond, maxResults, IndexDir);
-            results = lucenequery.getLuceneHits();
+             List f = new ArrayList();
+             f.add(cond.toXML());
+
+             boolean reqf = true; // required flag Term with AND (true) or OR
+                                  // (false) combined
+            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
+            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
+            results = getLuceneHits(luceneQuery, maxResults);
         } catch (Exception e) {
             e.printStackTrace();
+            LOGGER.error("Exception in MCRLuceneSearcher", e);
         }
 
-        LOGGER.debug("MCRLuceneSearcher results completed");
+        long qtime = System.currentTimeMillis() - start;
+        LOGGER.debug("total query time in MCRLuceneSearcher:    " + qtime);
 
         return results;
+    }
+  
+    /**
+     * method does lucene query
+     * 
+     * @return result set
+     */
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults) throws Exception {
+        IndexSearcher searcher = new IndexSearcher(IndexDir);
+
+        // Hits hits = searcher.search( luceneQuery );
+        // int found = hits.length();
+        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
+        int found = hits.scoreDocs.length;
+
+        LOGGER.info("Number of Objects found : " + found);
+
+        MCRResults result = new MCRResults();
+
+        for (int i = 0; i < found; i++) {
+            // org.apache.lucene.document.Document doc = hits.doc(i);
+            org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
+            String id;
+
+            id = doc.get("mcrid");
+            if ( null == id )         //TODO: temporary used, field name of aleph index is id and NOT mcrid
+              id = doc.get("id");
+            /*
+             * TODO if (MCRAccessManager.checkReadAccess( id,
+             * MCRSessionMgr.getCurrentSession()))
+             */{
+                MCRHit hit = new MCRHit(id);
+
+                Enumeration fields = doc.fields();
+                while (fields.hasMoreElements()) 
+                {
+                  Field field = (Field) fields.nextElement();
+                  if ( field.isStored() && !"mcrid".equals(field.name()) )
+                  {
+                    MCRFieldDef fd = MCRFieldDef.getDef( field.name() );
+                    MCRFieldValue fv = new MCRFieldValue( fd, field.stringValue() );
+                    hit.addMetaData( fv );
+                    if (fd.isSortable()) hit.addSortData( fv );
+                  }
+                }
+
+                result.addHit(hit);
+             } // MCRAccessManager
+        }
+
+        searcher.close();
+
+        return result;
     }
 }
