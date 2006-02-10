@@ -277,11 +277,15 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
      *            MCRSession           
      * @return
      */
-    public boolean checkAccess(String objID, String pool, MCRUser user, MCRIPAddress ip) {
+    public boolean checkAccess(String objID, String permission, MCRUser user, MCRIPAddress ip) {
         Date date = new Date();
-        MCRAccessRule rule = getAccess(objID, pool);
+        MCRAccessRule rule = getAccess(objID, permission);
         if (rule == null) {
-            return true; // no rule: everybody can access this
+        	// no rule: in read-pool everybody has access
+        	if(permission.equals("read") || user.getID().equals("administrator"))
+        		return true;
+        	else
+        		return false; 
         }
         return rule.checkAccess(user, date, ip);
     }
