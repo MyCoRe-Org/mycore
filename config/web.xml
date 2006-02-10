@@ -169,10 +169,14 @@
          <servlet-name>MCRIndexServlet</servlet-name>
          <url-pattern>/index/*</url-pattern>
        </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRSearchServlet</servlet-name>
-            <url-pattern>/servlets/MCRSearchServlet</url-pattern>
-      </servlet-mapping>
+	   <servlet-mapping>
+         <servlet-name>MCRObjectServlet</servlet-name>
+         <url-pattern>/receive/*</url-pattern>
+       </servlet-mapping>
+       <servlet-mapping>
+         <servlet-name>MCRSearchServlet</servlet-name>
+         <url-pattern>/servlets/MCRSearchServlet</url-pattern>
+       </servlet-mapping>
 
       <!-- uncomment for administration interface -->
       <!-- <servlet-mapping> -->
