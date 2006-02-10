@@ -48,111 +48,111 @@ import org.mycore.common.xml.MCRXMLHelper;
  * @version $Revision$ $Date$
  */
 final public class MCRObject extends MCRBase {
-	// the object content
-	private MCRObjectStructure mcr_struct = null;
+    // the object content
+    private MCRObjectStructure mcr_struct = null;
 
-	private MCRObjectMetadata mcr_metadata = null;
+    private MCRObjectMetadata mcr_metadata = null;
 
-	/**
-	 * This is the constructor of the MCRObject class. It make an instance of
-	 * the parser class and the metadata class. <br>
-	 * The constructor reads the following informations from the property file:
-	 * <ul>
-	 * <li>MCR.parser_class_name</li>
-	 * </ul>
-	 * 
-	 * @exception MCRException
-	 *                general Exception of MyCoRe
-	 * @exception MCRConfigurationException
-	 *                a special exception for configuartion data
-	 */
-	public MCRObject() throws MCRException, MCRConfigurationException {
-		super();
+    /**
+     * This is the constructor of the MCRObject class. It make an instance of
+     * the parser class and the metadata class. <br>
+     * The constructor reads the following informations from the property file:
+     * <ul>
+     * <li>MCR.parser_class_name</li>
+     * </ul>
+     * 
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     * @exception MCRConfigurationException
+     *                a special exception for configuartion data
+     */
+    public MCRObject() throws MCRException, MCRConfigurationException {
+        super();
 
-		// Metadata class
-		mcr_metadata = new MCRObjectMetadata();
+        // Metadata class
+        mcr_metadata = new MCRObjectMetadata();
 
-		// Structure class
-		mcr_struct = new MCRObjectStructure(logger);
-	}
+        // Structure class
+        mcr_struct = new MCRObjectStructure(logger);
+    }
 
-	/**
-	 * This methode return the object metadata element selected by tag. If this
-	 * was not found, null was returned.
-	 * 
-	 * @return the metadata tag part as a object that extend MCRMetaElement
-	 */
-	public final MCRMetaElement getMetadataElement(String tag) {
-		return mcr_metadata.getMetadataElement(tag);
-	}
+    /**
+     * This methode return the object metadata element selected by tag. If this
+     * was not found, null was returned.
+     * 
+     * @return the metadata tag part as a object that extend MCRMetaElement
+     */
+    public final MCRMetaElement getMetadataElement(String tag) {
+        return mcr_metadata.getMetadataElement(tag);
+    }
 
-	/**
-	 * This method returns the instance of the MCRObjectMetadata class. If there
-	 * was no MCRObjectMetadata found, null will be returned.
-	 * 
-	 * @return the instance of the MCRObjectMetadata class
-	 */
-	public final MCRObjectMetadata getMetadata() {
-		return mcr_metadata;
-	}
+    /**
+     * This method returns the instance of the MCRObjectMetadata class. If there
+     * was no MCRObjectMetadata found, null will be returned.
+     * 
+     * @return the instance of the MCRObjectMetadata class
+     */
+    public final MCRObjectMetadata getMetadata() {
+        return mcr_metadata;
+    }
 
-	/**
-	 * This methode return the instance of the MCRObjectStructure class. If this
-	 * was not found, null was returned.
-	 * 
-	 * @return the instance of the MCRObjectStructure class
-	 */
-	public final MCRObjectStructure getStructure() {
-		return mcr_struct;
-	}
+    /**
+     * This methode return the instance of the MCRObjectStructure class. If this
+     * was not found, null was returned.
+     * 
+     * @return the instance of the MCRObjectStructure class
+     */
+    public final MCRObjectStructure getStructure() {
+        return mcr_struct;
+    }
 
-	/**
-	 * The given DOM was convert into an internal view of metadata. This are the
-	 * object ID and the object label, also the blocks structure, flags and
-	 * metadata.
-	 * 
-	 * @exception MCRException
-	 *                general Exception of MyCoRe
-	 */
-	private final void set() throws MCRException {
-		if (jdom_document == null) {
-			throw new MCRException("The JDOM document is null or empty.");
-		}
+    /**
+     * The given DOM was convert into an internal view of metadata. This are the
+     * object ID and the object label, also the blocks structure, flags and
+     * metadata.
+     * 
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    private final void set() throws MCRException {
+        if (jdom_document == null) {
+            throw new MCRException("The JDOM document is null or empty.");
+        }
 
-		setRoot();
+        setRoot();
 
         setStructure();
 
-		setMetadata();
+        setMetadata();
 
-		setService();
-	}
+        setService();
+    }
 
     private void setRoot() {
         // get object ID from DOM
-		org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-		mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID").getValue());
-		mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
+        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
+        mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID").getValue());
+        mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
 
-		if (mcr_label.length() > MAX_LABEL_LENGTH) {
-			mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
-		}
+        if (mcr_label.length() > MAX_LABEL_LENGTH) {
+            mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
+        }
 
-		mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
-		logger.debug("MCRObject set schemafile: " + mcr_schema);
+        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
+        logger.debug("MCRObject set schemafile: " + mcr_schema);
     }
 
     private void setStructure() {
         // get the structure data of the object
-        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
-		org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
-		mcr_struct = new MCRObjectStructure(logger);
-		mcr_struct.setFromDOM(jdom_element);
+        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
+        org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
+        mcr_struct = new MCRObjectStructure(logger);
+        mcr_struct.setFromDOM(jdom_element);
     }
 
     private void setMetadata() {
         // get the metadata of the object
-        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
+        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
         mcr_metadata = new MCRObjectMetadata();
         mcr_metadata.setFromDOM(jdom_element);
@@ -161,356 +161,354 @@ final public class MCRObject extends MCRBase {
     private void setService() {
         org.jdom.Element jdom_element;
         // get the service data of the object
-        org.jdom.Element jdom_element_root=jdom_document.getRootElement();
+        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         jdom_element = jdom_element_root.getChild("service");
         mcr_service = new MCRObjectService();
         mcr_service.setFromDOM(jdom_element);
     }
 
-	/**
-	 * This method read the XML input stream from an URI to build up the
-	 * MyCoRe-Object.
-	 * 
-	 * @param uri
-	 *            an URI
-	 * @exception MCRException
-	 *                general Exception of MyCoRe
-	 */
-	public final void setFromURI(String uri) throws MCRException {
-		setFromJDOM(MCRXMLHelper.parseURI(uri));
-	}
+    /**
+     * This method read the XML input stream from an URI to build up the
+     * MyCoRe-Object.
+     * 
+     * @param uri
+     *            an URI
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    public final void setFromURI(String uri) throws MCRException {
+        setFromJDOM(MCRXMLHelper.parseURI(uri));
+    }
 
-	/**
-	 * This method read the XML input stream from a byte array to build up the
-	 * MyCoRe-Object.
-	 * 
-	 * @param xml
-	 *            a XML string
-	 * @exception MCRException
-	 *                general Exception of MyCoRe
-	 */
-	public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
-		setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
-	}
+    /**
+     * This method read the XML input stream from a byte array to build up the
+     * MyCoRe-Object.
+     * 
+     * @param xml
+     *            a XML string
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
+        setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
+    }
 
-	/**
-	 * This methode gets a JDOM-Document to build up the MyCoRe-Object.
-	 * 
-	 * @param doc
-	 *            an JDOM Object
-	 * @exception MCRException
-	 *                general Exception of MyCoRe
-	 */
-	public final void setFromJDOM(Document doc) throws MCRException {
-		jdom_document = doc;
-		set();
-	}
+    /**
+     * This methode gets a JDOM-Document to build up the MyCoRe-Object.
+     * 
+     * @param doc
+     *            an JDOM Object
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    public final void setFromJDOM(Document doc) throws MCRException {
+        jdom_document = doc;
+        set();
+    }
 
-	/**
-	 * This methode set the object metadata part named by a tag.
-	 * 
-	 * @param obj
-	 *            the class object of a metadata part
-	 * @param tag
-	 *            the tag of a metadata part
-	 * @return true if set was succesful, otherwise false
-	 */
-	public final boolean setMetadataElement(MCRMetaElement obj, String tag) {
-		if (obj == null) {
-			return false;
-		}
+    /**
+     * This methode set the object metadata part named by a tag.
+     * 
+     * @param obj
+     *            the class object of a metadata part
+     * @param tag
+     *            the tag of a metadata part
+     * @return true if set was succesful, otherwise false
+     */
+    public final boolean setMetadataElement(MCRMetaElement obj, String tag) {
+        if (obj == null) {
+            return false;
+        }
 
-		if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
-			return false;
-		}
+        if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
+            return false;
+        }
 
-		return mcr_metadata.setMetadataElement(obj, tag);
-	}
+        return mcr_metadata.setMetadataElement(obj, tag);
+    }
 
-	/**
-	 * This methode set the object MCRObjectStructure.
-	 * 
-	 * @param structure
-	 *            the object MCRObjectStructure part
-	 */
-	public final void setStructure(MCRObjectStructure structure) {
-		if (structure != null) {
-			mcr_struct = structure;
-		}
-	}
+    /**
+     * This methode set the object MCRObjectStructure.
+     * 
+     * @param structure
+     *            the object MCRObjectStructure part
+     */
+    public final void setStructure(MCRObjectStructure structure) {
+        if (structure != null) {
+            mcr_struct = structure;
+        }
+    }
 
-	/**
-	 * This methode create a XML stream for all object data.
-	 * 
-	 * @exception MCRException
-	 *                if the content of this class is not valid
-	 * @return a JDOM Document with the XML data of the object as byte array
-	 */
-	public final org.jdom.Document createXML() throws MCRException {
-		if (!isValid()) {
-			throw new MCRException("The content is not valid.");
-		}
+    /**
+     * This methode create a XML stream for all object data.
+     * 
+     * @exception MCRException
+     *                if the content of this class is not valid
+     * @return a JDOM Document with the XML data of the object as byte array
+     */
+    public final org.jdom.Document createXML() throws MCRException {
+        if (!isValid()) {
+            throw new MCRException("The content is not valid.");
+        }
 
-		org.jdom.Element elm = new org.jdom.Element("mycoreobject");
-		org.jdom.Document doc = new org.jdom.Document(elm);
-		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-		elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-		elm.setAttribute("ID", mcr_id.getId());
-		elm.setAttribute("label", mcr_label);
-		elm.addContent(mcr_struct.createXML());
-		elm.addContent(mcr_metadata.createXML());
-		elm.addContent(mcr_service.createXML());
+        org.jdom.Element elm = new org.jdom.Element("mycoreobject");
+        org.jdom.Document doc = new org.jdom.Document(elm);
+        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        elm.setAttribute("ID", mcr_id.getId());
+        elm.setAttribute("label", mcr_label);
+        elm.addContent(mcr_struct.createXML());
+        elm.addContent(mcr_metadata.createXML());
+        elm.addContent(mcr_service.createXML());
 
-		return doc;
-	}
+        return doc;
+    }
 
-	/**
-	 * This methode create a String for all text searchable data in this
-	 * instance.
-	 * 
-	 * @exception MCRException
-	 *                if the content of this class is not valid
-	 * @return a String with the text values from the metadata object
-	 */
-	public final String createTextSearch() throws MCRException {
-		return mcr_metadata.createTextSearch();
-	}
+    /**
+     * This methode create a String for all text searchable data in this
+     * instance.
+     * 
+     * @exception MCRException
+     *                if the content of this class is not valid
+     * @return a String with the text values from the metadata object
+     */
+    public final String createTextSearch() throws MCRException {
+        return mcr_metadata.createTextSearch();
+    }
 
-	/**
-	 * The methode create the object in the data store.
-	 * 
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 * @throws MCRActiveLinkException
-	 */
-	public final void createInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
-		// exist the object?
-		if (existInDatastore(mcr_id.getId())) {
-			throw new MCRPersistenceException("The object " + mcr_id.getId() + " allready exists, nothing done.");
-		}
+    /**
+     * The methode create the object in the data store.
+     * 
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     */
+    public final void createInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
+        // exist the object?
+        if (existInDatastore(mcr_id.getId())) {
+            throw new MCRPersistenceException("The object " + mcr_id.getId() + " allready exists, nothing done.");
+        }
 
-		// check if document allready refer to this id
-		List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
-		if (sources.size() > 0) {
-			MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while adding object ").append(mcr_id.toString()).append(
-					". The ID of this object is already referenced by other objects so this object can not be added until all links are corrected.").toString());
-			String curSource;
-			Iterator it = sources.iterator();
-			while (it.hasNext()) {
-				curSource = (String) it.next();
-				activeLinks.addLink(curSource, mcr_id.toString());
-			}
-			throw activeLinks;
-		}
+        // check if document allready refer to this id
+        List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
+        if (sources.size() > 0) {
+            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while adding object ").append(mcr_id.toString()).append(". The ID of this object is already referenced by other objects so this object can not be added until all links are corrected.").toString());
+            String curSource;
+            Iterator it = sources.iterator();
+            while (it.hasNext()) {
+                curSource = (String) it.next();
+                activeLinks.addLink(curSource, mcr_id.toString());
+            }
+            throw activeLinks;
+        }
 
-		// create this object in datastore
-		if (mcr_service.getDate("createdate") == null) {
-			mcr_service.setDate("createdate");
-		}
-		if (mcr_service.getDate("modifydate") == null) {
-			mcr_service.setDate("modifydate");
-		}
+        // create this object in datastore
+        if (mcr_service.getDate("createdate") == null) {
+            mcr_service.setDate("createdate");
+        }
+        if (mcr_service.getDate("modifydate") == null) {
+            mcr_service.setDate("modifydate");
+        }
 
-		// prepare this object with parent metadata
-		MCRObjectID parent_id = mcr_struct.getParentID();
-		MCRObject parent = null;
+        // prepare this object with parent metadata
+        MCRObjectID parent_id = mcr_struct.getParentID();
+        MCRObject parent = null;
 
-		if (parent_id != null) {
-			logger.debug("Parent ID = " + parent_id.getId());
+        if (parent_id != null) {
+            logger.debug("Parent ID = " + parent_id.getId());
 
-			try {
-				parent = new MCRObject();
-				parent.receiveFromDatastore(parent_id);
-				mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
-			} catch (Exception e) {
-				logger.error(MCRException.getStackTraceAsString(e));
-				logger.error("Error while merging metadata in this object.");
+            try {
+                parent = new MCRObject();
+                parent.receiveFromDatastore(parent_id);
+                mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
+            } catch (Exception e) {
+                logger.error(MCRException.getStackTraceAsString(e));
+                logger.error("Error while merging metadata in this object.");
 
-				return;
-			}
-		}
+                return;
+            }
+        }
 
-		// handle events
+        // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.CREATE_EVENT);
         evt.put("object", this);
         MCREventManager.instance().handleEvent(evt);
 
-		// add the MCRObjectID to the child list in the parent object
-		if (parent_id != null) {
-			try {
-				parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
-				parent.updateThisInDatastore();
-			} catch (Exception e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error("Error while store child ID in parent object.");
-				try {
-					deleteFromDatastore();
-					logger.error("Child object was removed.");
-				} catch (MCRActiveLinkException e1) {
-					// it shouldn't be possible to have allready links to this
-					// object
-					logger.error("Error while deleting child object.", e1);
-				}
+        // add the MCRObjectID to the child list in the parent object
+        if (parent_id != null) {
+            try {
+                parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
+                parent.updateThisInDatastore();
+            } catch (Exception e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error("Error while store child ID in parent object.");
+                try {
+                    deleteFromDatastore();
+                    logger.error("Child object was removed.");
+                } catch (MCRActiveLinkException e1) {
+                    // it shouldn't be possible to have allready links to this
+                    // object
+                    logger.error("Error while deleting child object.", e1);
+                }
 
-				return;
-			}
-		}
-	}
+                return;
+            }
+        }
+    }
 
-	/**
-	 * The methode add a derivate MCRMetaLinkID to the structure part and update
-	 * the object with the ID in the data store.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @param derivate
-	 *            a link to a derivate as MCRMetaLinkID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final void addDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
+    /**
+     * The methode add a derivate MCRMetaLinkID to the structure part and update
+     * the object with the ID in the data store.
+     * 
+     * @param id
+     *            the object ID
+     * @param derivate
+     *            a link to a derivate as MCRMetaLinkID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final void addDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
         receiveFromDatastore(id);
-		mcr_service.setDate("modifydate");
-		getStructure().addDerivate(link);
+        mcr_service.setDate("modifydate");
+        getStructure().addDerivate(link);
         updateThisInDatastore();
-	}
+    }
 
-	/**
-	 * The methode remove a derivate MCRMetaLinkID from the structure part and
-	 * update the object with the ID in the data store.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @param derivate
-	 *            a link to a derivate as MCRMetaLinkID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final void removeDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
+    /**
+     * The methode remove a derivate MCRMetaLinkID from the structure part and
+     * update the object with the ID in the data store.
+     * 
+     * @param id
+     *            the object ID
+     * @param derivate
+     *            a link to a derivate as MCRMetaLinkID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final void removeDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
         receiveFromDatastore(id);
-		mcr_service.setDate("modifydate");
+        mcr_service.setDate("modifydate");
 
-		int j = getStructure().searchForDerivate(link);
+        int j = getStructure().searchForDerivate(link);
 
-		if (j != -1) {
-			getStructure().removeDerivate(j);
+        if (j != -1) {
+            getStructure().removeDerivate(j);
             updateThisInDatastore();
-		} else {
-			throw new MCRPersistenceException("The derivate link " + link.getXLinkHref() + " was not found.");
-		}
-	}
+        } else {
+            throw new MCRPersistenceException("The derivate link " + link.getXLinkHref() + " was not found.");
+        }
+    }
 
-	/**
-	 * The methode delete the object for the given ID from the data store.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 * @throws MCRActiveLinkException
-	 */
-	public final void deleteFromDatastore(String id) throws MCRPersistenceException, MCRActiveLinkException {
-		mcr_id = new MCRObjectID(id);
-		deleteFromDatastore();
-	}
+    /**
+     * The methode delete the object for the given ID from the data store.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     */
+    public final void deleteFromDatastore(String id) throws MCRPersistenceException, MCRActiveLinkException {
+        mcr_id = new MCRObjectID(id);
+        deleteFromDatastore();
+    }
 
-	/**
-	 * The methode delete the object from the data store.
-	 * 
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 * @throws MCRActiveLinkException
-	 */
-	private final void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException {
-		if (mcr_id == null) {
-			throw new MCRPersistenceException("The MCRObjectID is null.");
-		}
+    /**
+     * The methode delete the object from the data store.
+     * 
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     */
+    private final void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException {
+        if (mcr_id == null) {
+            throw new MCRPersistenceException("The MCRObjectID is null.");
+        }
 
-		// check for active links
-		List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
-		logger.debug("Sources size:" + sources.size());
-		if (sources.size() > 0) {
-			MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(
-					". This object is still referenced by other objects and can not be removed until all links are released.").toString());
-			String curSource;
-			Iterator it = sources.iterator();
-			while (it.hasNext()) {
-				curSource = (String) it.next();
-				activeLinks.addLink(curSource, mcr_id.toString());
-			}
-			throw activeLinks;
-		}
+        // check for active links
+        List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
+        logger.debug("Sources size:" + sources.size());
+        if (sources.size() > 0) {
+            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(". This object is still referenced by other objects and can not be removed until all links are released.").toString());
+            String curSource;
+            Iterator it = sources.iterator();
+            while (it.hasNext()) {
+                curSource = (String) it.next();
+                activeLinks.addLink(curSource, mcr_id.toString());
+            }
+            throw activeLinks;
+        }
 
-		// get the Item
+        // get the Item
         receiveFromDatastore(mcr_id);
 
-		// set the derivate data in structure
-		MCRDerivate der = null;
+        // set the derivate data in structure
+        MCRDerivate der = null;
 
-		for (int i = 0; i < mcr_struct.getDerivateSize(); i++) {
-			der = new MCRDerivate();
+        for (int i = 0; i < mcr_struct.getDerivateSize(); i++) {
+            der = new MCRDerivate();
 
-			try {
-				der.deleteFromDatastore(getStructure().getDerivate(i).getXLinkHref());
-			} catch (MCRException e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error(e.getMessage());
-				logger.error("Error while deleting derivate.");
-			}
-		}
+            try {
+                der.deleteFromDatastore(getStructure().getDerivate(i).getXLinkHref());
+            } catch (MCRException e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error(e.getMessage());
+                logger.error("Error while deleting derivate.");
+            }
+        }
 
-		// remove all children
-		MCRObject child = null;
+        // remove all children
+        MCRObject child = null;
 
-		for (int i = 0; i < mcr_struct.getChildSize(); i++) {
-			child = new MCRObject();
+        for (int i = 0; i < mcr_struct.getChildSize(); i++) {
+            child = new MCRObject();
 
-			try {
-				child.deleteFromDatastore(getStructure().getChild(i).getXLinkHref());
-			} catch (MCRException e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error(e.getMessage());
-				logger.error("Error while deleting child.");
-			}
-		}
+            try {
+                child.deleteFromDatastore(getStructure().getChild(i).getXLinkHref());
+            } catch (MCRException e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error(e.getMessage());
+                logger.error("Error while deleting child.");
+            }
+        }
 
-		// remove child from parent
-		MCRObjectID parent_id = mcr_struct.getParentID();
+        // remove child from parent
+        MCRObjectID parent_id = mcr_struct.getParentID();
 
-		if (parent_id != null) {
-			logger.debug("Parent ID = " + parent_id.getId());
+        if (parent_id != null) {
+            logger.debug("Parent ID = " + parent_id.getId());
 
-			try {
-				MCRObject parent = new MCRObject();
-				parent.receiveFromDatastore(parent_id);
-				parent.mcr_struct.removeChild(mcr_id);
-				parent.updateThisInDatastore();
-			} catch (Exception e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error("Error while delete child ID in parent object.");
-				logger.warn("Attention, the parent " + parent_id + "is now inconsist.");
-			}
-		}
+            try {
+                MCRObject parent = new MCRObject();
+                parent.receiveFromDatastore(parent_id);
+                parent.mcr_struct.removeChild(mcr_id);
+                parent.updateThisInDatastore();
+            } catch (Exception e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error("Error while delete child ID in parent object.");
+                logger.warn("Attention, the parent " + parent_id + "is now inconsist.");
+            }
+        }
 
-		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.DELETE_EVENT);
-		evt.put("object", this);
-		MCREventManager.instance().handleEvent(evt,MCREventManager.BACKWARD);
-	}
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.DELETE_EVENT);
+        evt.put("object", this);
+        MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
+    }
 
-	/**
-	 * The methode return true if the object is in the data store, else return
-	 * false.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final static boolean existInDatastore(String id) throws MCRPersistenceException {
+    /**
+     * The methode return true if the object is in the data store, else return
+     * false.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final static boolean existInDatastore(String id) throws MCRPersistenceException {
         return existInDatastore(new MCRObjectID(id));
-	}
+    }
 
     /**
      * The methode return true if the object is in the data store, else return
@@ -527,48 +525,49 @@ final public class MCRObject extends MCRBase {
         evt.put("objectID", id);
         MCREventManager.instance().handleEvent(evt);
         boolean ret = false;
-         try {
-            ret = Boolean.getBoolean((String)evt.get("exist"));
+        try {
+            ret = Boolean.parseBoolean((String) evt.get("exist"));
+            System.out.println("Retrun = " + ret);
         } catch (RuntimeException e) {
         }
         return ret;
     }
 
-	/**
-	 * The methode receive the object for the given MCRObjectID and stored it in
-	 * this MCRObject.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final void receiveFromDatastore(String id) throws MCRPersistenceException {
-		receiveFromDatastore(new MCRObjectID(id));
-	}
+    /**
+     * The methode receive the object for the given MCRObjectID and stored it in
+     * this MCRObject.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final void receiveFromDatastore(String id) throws MCRPersistenceException {
+        receiveFromDatastore(new MCRObjectID(id));
+    }
 
-	/**
-	 * The methode receive the object for the given MCRObjectID and stored it in
-	 * this MCRObject.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
+    /**
+     * The methode receive the object for the given MCRObjectID and stored it in
+     * this MCRObject.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.RECEIVE_EVENT);
         evt.put("objectID", id);
         MCREventManager.instance().handleEvent(evt);
-        byte [] xml = null;
-         try {
-            xml = (byte [])evt.get("xml");
-            setFromXML(xml,false);
+        byte[] xml = null;
+        try {
+            xml = (byte[]) evt.get("xml");
+            setFromXML(xml, false);
         } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.",e);
+            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.", e);
         }
-	}
+    }
 
     /**
      * The methode receive the object for the given MCRObjectID and returned it
@@ -583,30 +582,30 @@ final public class MCRObject extends MCRBase {
     public final byte[] receiveXMLFromDatastore(String id) throws MCRPersistenceException {
         return receiveXMLFromDatastore(new MCRObjectID(id));
     }
-    
-	/**
-	 * The methode receive the object for the given MCRObjectID and returned it
-	 * as XML stream.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @return the XML stream of the object as string
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
+
+    /**
+     * The methode receive the object for the given MCRObjectID and returned it
+     * as XML stream.
+     * 
+     * @param id
+     *            the object ID
+     * @return the XML stream of the object as string
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.RECEIVE_EVENT);
         evt.put("objectID", id);
         MCREventManager.instance().handleEvent(evt);
-        byte [] xml = null;
-         try {
-            xml = (byte [])evt.get("xml");
+        byte[] xml = null;
+        try {
+            xml = (byte[]) evt.get("xml");
         } catch (RuntimeException e) {
             throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
         }
-		return xml;
-	}
+        return xml;
+    }
 
     /**
      * The methode receive the object for the given MCRObjectID and returned it
@@ -621,252 +620,252 @@ final public class MCRObject extends MCRBase {
     public final org.jdom.Document receiveJDOMFromDatastore(String id) throws MCRPersistenceException {
         return receiveJDOMFromDatastore(new MCRObjectID(id));
     }
-    
-	/**
-	 * The methode receive the object for the given MCRObjectID and returned it
-	 * as JDOM Document.
-	 * 
-	 * @param id
-	 *            the object ID
-	 * @return the JDOM Document of the object
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        byte [] xml = receiveXMLFromDatastore(id);
+
+    /**
+     * The methode receive the object for the given MCRObjectID and returned it
+     * as JDOM Document.
+     * 
+     * @param id
+     *            the object ID
+     * @return the JDOM Document of the object
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
+        byte[] xml = receiveXMLFromDatastore(id);
         return MCRXMLHelper.parseXML(xml, false);
-	}
+    }
 
-	/**
-	 * The methode update the object in the data store.
-	 * 
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 * @throws MCRActiveLinkException
-	 *             if object is created (no real update) and references to it's
-	 *             id already exist
-	 */
-	public final void updateInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
-		// get the old Item
-		MCRObject old = new MCRObject();
+    /**
+     * The methode update the object in the data store.
+     * 
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     *             if object is created (no real update) and references to it's
+     *             id already exist
+     */
+    public final void updateInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
+        // get the old Item
+        MCRObject old = new MCRObject();
 
-		try {
-			old.receiveFromDatastore(mcr_id);
-		} catch (MCRPersistenceException pe) {
-			createInDatastore();
+        try {
+            old.receiveFromDatastore(mcr_id);
+        } catch (MCRPersistenceException pe) {
+            createInDatastore();
 
-			return;
-		}
+            return;
+        }
 
-		// clean the structure
-		mcr_struct.clearChildren();
-		mcr_struct.clearDerivate();
+        // clean the structure
+        mcr_struct.clearChildren();
+        mcr_struct.clearDerivate();
 
-		// set the derivate data in structure
-		for (int i = 0; i < old.mcr_struct.getDerivateSize(); i++) {
-			mcr_struct.addDerivate(old.mcr_struct.getDerivate(i));
-		}
+        // set the derivate data in structure
+        for (int i = 0; i < old.mcr_struct.getDerivateSize(); i++) {
+            mcr_struct.addDerivate(old.mcr_struct.getDerivate(i));
+        }
 
-		// set the parent from the original and this update
-		boolean setparent = false;
+        // set the parent from the original and this update
+        boolean setparent = false;
 
-		if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() != null)) {
-			String oldparent = old.mcr_struct.getParent().getXLinkHref();
-			String newparent = mcr_struct.getParent().getXLinkHref();
+        if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() != null)) {
+            String oldparent = old.mcr_struct.getParent().getXLinkHref();
+            String newparent = mcr_struct.getParent().getXLinkHref();
 
-			if (!newparent.equals(oldparent)) {
-				// remove child from the old parent
-				logger.debug("Parent ID = " + oldparent);
+            if (!newparent.equals(oldparent)) {
+                // remove child from the old parent
+                logger.debug("Parent ID = " + oldparent);
 
-				try {
-					MCRObject parent = new MCRObject();
-					parent.receiveFromDatastore(oldparent);
-					parent.mcr_struct.removeChild(mcr_id);
-					parent.updateThisInDatastore();
-					setparent = true;
-				} catch (Exception e) {
-					logger.debug(MCRException.getStackTraceAsString(e));
-					logger.error("Error while delete child ID in parent object.");
-					logger.warn("Attention, the parent " + oldparent + "is now inconsist.");
-				}
-			}
-		}
+                try {
+                    MCRObject parent = new MCRObject();
+                    parent.receiveFromDatastore(oldparent);
+                    parent.mcr_struct.removeChild(mcr_id);
+                    parent.updateThisInDatastore();
+                    setparent = true;
+                } catch (Exception e) {
+                    logger.debug(MCRException.getStackTraceAsString(e));
+                    logger.error("Error while delete child ID in parent object.");
+                    logger.warn("Attention, the parent " + oldparent + "is now inconsist.");
+                }
+            }
+        }
 
-		if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() == null)) {
-			String oldparent = old.mcr_struct.getParent().getXLinkHref();
+        if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() == null)) {
+            String oldparent = old.mcr_struct.getParent().getXLinkHref();
 
-			// remove child from the old parent
-			logger.debug("Parent ID = " + oldparent);
+            // remove child from the old parent
+            logger.debug("Parent ID = " + oldparent);
 
-			try {
-				MCRObject parent = new MCRObject();
+            try {
+                MCRObject parent = new MCRObject();
                 parent.receiveFromDatastore(oldparent);
-				parent.mcr_struct.removeChild(mcr_id);
-				parent.updateThisInDatastore();
-				setparent = true;
-			} catch (Exception e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error("Error while delete child ID in parent object.");
-				logger.warn("Attention, the parent " + oldparent + "is now inconsist.");
-			}
-		}
+                parent.mcr_struct.removeChild(mcr_id);
+                parent.updateThisInDatastore();
+                setparent = true;
+            } catch (Exception e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error("Error while delete child ID in parent object.");
+                logger.warn("Attention, the parent " + oldparent + "is now inconsist.");
+            }
+        }
 
-		if ((old.mcr_struct.getParent() == null) && (mcr_struct.getParent() != null)) {
-			setparent = true;
-		}
+        if ((old.mcr_struct.getParent() == null) && (mcr_struct.getParent() != null)) {
+            setparent = true;
+        }
 
-		// set the children from the original
-		for (int i = 0; i < old.mcr_struct.getChildSize(); i++) {
-			mcr_struct.addChild(old.mcr_struct.getChild(i));
-		}
+        // set the children from the original
+        for (int i = 0; i < old.mcr_struct.getChildSize(); i++) {
+            mcr_struct.addChild(old.mcr_struct.getChild(i));
+        }
 
-		// import all herited matadata from the parent
-		MCRObjectID parent_id = mcr_struct.getParentID();
+        // import all herited matadata from the parent
+        MCRObjectID parent_id = mcr_struct.getParentID();
 
-		if (parent_id != null) {
-			logger.debug("Parent ID = " + parent_id.getId());
+        if (parent_id != null) {
+            logger.debug("Parent ID = " + parent_id.getId());
 
-			try {
-				MCRObject parent = new MCRObject();
-				parent.receiveFromDatastore(parent_id);
-				mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
-			} catch (Exception e) {
-				logger.error(MCRException.getStackTraceAsString(e));
-				logger.error("Error while merging metadata in this object.");
-			}
-		}
+            try {
+                MCRObject parent = new MCRObject();
+                parent.receiveFromDatastore(parent_id);
+                mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
+            } catch (Exception e) {
+                logger.error(MCRException.getStackTraceAsString(e));
+                logger.error("Error while merging metadata in this object.");
+            }
+        }
 
-		// set the date
-		mcr_service.setDate("createdate", old.getService().getDate("createdate"));
+        // set the date
+        mcr_service.setDate("createdate", old.getService().getDate("createdate"));
 
-		// update this dataset
-		updateThisInDatastore();
+        // update this dataset
+        updateThisInDatastore();
 
-		// check if the parent was new set and set them
-		if (setparent) {
-			try {
-				MCRObject parent = new MCRObject();
-				parent.receiveFromDatastore(parent_id);
-				parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
-				parent.updateThisInDatastore();
-			} catch (Exception e) {
-				logger.debug(MCRException.getStackTraceAsString(e));
-				logger.error("Error while store child ID in parent object.");
-				try {
-					deleteFromDatastore();
-					logger.error("Child object was removed.");
-				} catch (MCRActiveLinkException e1) {
-					// it shouldn't be possible to have allready links to this
-					// object
-					logger.error("Error while deleting child object.", e1);
-				}
+        // check if the parent was new set and set them
+        if (setparent) {
+            try {
+                MCRObject parent = new MCRObject();
+                parent.receiveFromDatastore(parent_id);
+                parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
+                parent.updateThisInDatastore();
+            } catch (Exception e) {
+                logger.debug(MCRException.getStackTraceAsString(e));
+                logger.error("Error while store child ID in parent object.");
+                try {
+                    deleteFromDatastore();
+                    logger.error("Child object was removed.");
+                } catch (MCRActiveLinkException e1) {
+                    // it shouldn't be possible to have allready links to this
+                    // object
+                    logger.error("Error while deleting child object.", e1);
+                }
 
-				return;
-			}
-		}
+                return;
+            }
+        }
 
-		// update all children
-		for (int i = 0; i < mcr_struct.getChildSize(); i++) {
-			MCRObject child = new MCRObject();
-			child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
-		}
-	}
+        // update all children
+        for (int i = 0; i < mcr_struct.getChildSize(); i++) {
+            MCRObject child = new MCRObject();
+            child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+        }
+    }
 
-	/**
-	 * The method updates this object in the persistence layer.
-	 */
-	private final void updateThisInDatastore() throws MCRPersistenceException {
-		mcr_service.setDate("modifydate");
-		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
-		evt.put("object", this);
-		MCREventManager.instance().handleEvent(evt);
-	}
+    /**
+     * The method updates this object in the persistence layer.
+     */
+    private final void updateThisInDatastore() throws MCRPersistenceException {
+        mcr_service.setDate("modifydate");
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
+        evt.put("object", this);
+        MCREventManager.instance().handleEvent(evt);
+    }
 
-	/**
-	 * The method update the metadata of the stored dataset and replace the
-	 * inherited data from the parent.
-	 * 
-	 * @param child_id
-	 *            the MCRObjectID of the parent as string
-	 * @exception MCRPersistenceException
-	 *                if a persistence problem is occured
-	 */
-	private final void updateMetadataInDatastore(MCRObjectID child_id) throws MCRPersistenceException {
-		logger.debug("Update metadata from Child " + child_id.getId());
+    /**
+     * The method update the metadata of the stored dataset and replace the
+     * inherited data from the parent.
+     * 
+     * @param child_id
+     *            the MCRObjectID of the parent as string
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    private final void updateMetadataInDatastore(MCRObjectID child_id) throws MCRPersistenceException {
+        logger.debug("Update metadata from Child " + child_id.getId());
 
-		// get the XML Stream for the child_id
-		receiveFromDatastore(child_id);
+        // get the XML Stream for the child_id
+        receiveFromDatastore(child_id);
 
-		// delete the old inherited data from all metadata elements
-		for (int i = 0; i < mcr_metadata.size(); i++) {
-			mcr_metadata.getMetadataElement(i).removeInheritedObject();
+        // delete the old inherited data from all metadata elements
+        for (int i = 0; i < mcr_metadata.size(); i++) {
+            mcr_metadata.getMetadataElement(i).removeInheritedObject();
 
-			if (mcr_metadata.getMetadataElement(i).size() == 0) {
-				mcr_metadata.removeMetadataElement(i);
-				i--;
-			}
-		}
+            if (mcr_metadata.getMetadataElement(i).size() == 0) {
+                mcr_metadata.removeMetadataElement(i);
+                i--;
+            }
+        }
 
-		// import all herited matadata from the parent
-		MCRObjectID parent_id = mcr_struct.getParentID();
+        // import all herited matadata from the parent
+        MCRObjectID parent_id = mcr_struct.getParentID();
 
-		if (parent_id != null) {
-			logger.debug("Parent ID = " + parent_id.getId());
+        if (parent_id != null) {
+            logger.debug("Parent ID = " + parent_id.getId());
 
-			try {
-				MCRObject parent = new MCRObject();
-				parent.receiveFromDatastore(parent_id);
-				mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
-			} catch (Exception e) {
-				logger.error(MCRException.getStackTraceAsString(e));
-				logger.error("Error while merging metadata in this object.");
-			}
-		}
+            try {
+                MCRObject parent = new MCRObject();
+                parent.receiveFromDatastore(parent_id);
+                mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
+            } catch (Exception e) {
+                logger.error(MCRException.getStackTraceAsString(e));
+                logger.error("Error while merging metadata in this object.");
+            }
+        }
 
-		// update this dataset
-		updateThisInDatastore();
+        // update this dataset
+        updateThisInDatastore();
 
-		// update all children
-		for (int i = 0; i < mcr_struct.getChildSize(); i++) {
-			MCRObject child = new MCRObject();
-			child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
-		}
-	}
+        // update all children
+        for (int i = 0; i < mcr_struct.getChildSize(); i++) {
+            MCRObject child = new MCRObject();
+            child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+        }
+    }
 
-	/**
-	 * The method updates the persistence layer with the data from the XLM
-	 * store.
-	 * 
-	 * @param id
-	 *            the MCRObjectID as string
-	 */
-	public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
-		repairPersitenceDatastore(new MCRObjectID(id));
-	}
+    /**
+     * The method updates the persistence layer with the data from the XLM
+     * store.
+     * 
+     * @param id
+     *            the MCRObjectID as string
+     */
+    public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
+        repairPersitenceDatastore(new MCRObjectID(id));
+    }
 
-	/**
-	 * The method updates the persistence layer with the data from the XLM
-	 * store.
-	 * 
-	 * @param id
-	 *            the MCRObjectID
-	 */
-	public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
+    /**
+     * The method updates the persistence layer with the data from the XLM
+     * store.
+     * 
+     * @param id
+     *            the MCRObjectID
+     */
+    public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
         receiveFromDatastore(id);
-		// handle events
-		MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
-		evt.put("object", this);
-		MCREventManager.instance().handleEvent(evt);
-	}
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
+        evt.put("object", this);
+        MCREventManager.instance().handleEvent(evt);
+    }
 
-	/**
-	 * The method print all informations about this MCRObject.
-	 */
-	public final void debug() {
-		logger.debug("MCRObject ID : " + mcr_id.getId());
-		logger.debug("MCRObject Label : " + mcr_label);
-		logger.debug("MCRObject Schema : " + mcr_schema);
-		logger.debug("");
-	}
+    /**
+     * The method print all informations about this MCRObject.
+     */
+    public final void debug() {
+        logger.debug("MCRObject ID : " + mcr_id.getId());
+        logger.debug("MCRObject Label : " + mcr_label);
+        logger.debug("MCRObject Schema : " + mcr_schema);
+        logger.debug("");
+    }
 }
