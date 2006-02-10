@@ -363,7 +363,7 @@ final public class MCRObject extends MCRBase {
      * 
      * @param id
      *            the object ID
-     * @param derivate
+     * @param link
      *            a link to a derivate as MCRMetaLinkID
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
@@ -381,7 +381,7 @@ final public class MCRObject extends MCRBase {
      * 
      * @param id
      *            the object ID
-     * @param derivate
+     * @param link
      *            a link to a derivate as MCRMetaLinkID
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
@@ -526,7 +526,7 @@ final public class MCRObject extends MCRBase {
         MCREventManager.instance().handleEvent(evt);
         boolean ret = false;
         try {
-            ret = Boolean.parseBoolean((String) evt.get("exist"));
+            ret = Boolean.getBoolean((String) evt.get("exist"));
         } catch (RuntimeException e) {
         }
         return ret;
